@@ -31,7 +31,6 @@
 #include <cstring>
 
 using std::int32_t;
-using std::int64_t;
 using std::uint32_t;
 using std::memset;
 
@@ -136,8 +135,13 @@ class TrinomialPRNG
                 /* This does:
                    state[i] = (16807 * state[i - 1]) % 2147483647;
                    but avoids overflowing 31 bits. */
-                int64_t hi = word / 127773;
-                int64_t lo = word % 127773;
+                // Ichthyo 12/2018 : the above comment is only true for seed <= INT_MAX
+                //                   for INT_MAX < seed <= UINT_MAX the calculation diverges from correct
+                //                   modulus result, however, its values show a similar distribution pattern.
+                //                   Moreover the original code used long int for 'hi' and 'lo'.
+                //                   It behaves identical when using uint32_t, but not with int32_t
+                uint32_t hi = word / 127773;
+                uint32_t lo = word % 127773;
                 word = 16807 * lo - 2836 * hi;
                 if (word < 0)
                     word += 2147483647;
