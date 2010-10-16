@@ -1,0 +1,457 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cpp}
+comment {Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009-2010, Alan Calvert
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is a derivative of the ZynAddSubFX original, modified January 2010
+} {in_source in_header
+} 
+
+decl {\#include <iostream>} {public
+} 
+
+decl {\#include <cmath>} {public
+} 
+
+decl {\#include <FL/Fl_File_Chooser.H>} {public
+} 
+
+decl {\#include "Misc/Config.h"} {public
+} 
+
+decl {\#include "Misc/MiscFuncs.h"} {public
+} 
+
+class ConfigUI {open : {private MiscFuncs}
+} {
+  Function {make_window()} {open
+  } {
+    Fl_Window configwindow {
+      label {Yoshimi Settings}
+      callback {writebankcfg();
+          o->hide();} open
+      xywh {1047 165 465 335} type Double hide
+    } {
+      Fl_Tabs {} {open
+        xywh {5 5 520 325}
+      } {
+        Fl_Group {} {
+          label {Main settings} open
+          xywh {5 25 460 260} labelsize 12
+        } {
+          Fl_Choice {} {
+            label OscilSize
+            callback {Runtime.Oscilsize = 128 << o->value();}
+            tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
+          } {
+            MenuItem {} {
+              label 128
+              xywh {25 25 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 256
+              xywh {35 35 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 512
+              xywh {45 45 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 1024
+              xywh {45 45 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 2048
+              xywh {55 55 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 4096
+              xywh {55 55 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 8192
+              xywh {65 65 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 16384
+              xywh {75 75 100 20} labelfont 1
+            }
+          }
+          Fl_Choice {} {
+            label {PADsynth Interpolation}
+            callback {Runtime.Interpolation=(int) o->value();}
+            xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            code0 {o->value(Runtime.Interpolation);}
+          } {
+            MenuItem {} {
+              label {Linear(fast)}
+              xywh {0 0 100 20} labelfont 1 labelsize 10
+            }
+            MenuItem {} {
+              label {Cubic(slow)}
+              xywh {10 10 100 20} labelfont 1 labelsize 10
+            }
+          }
+          Fl_Choice {} {
+            label {Virtual Keyboard Layout}
+            callback {Runtime.VirKeybLayout=(int) o->value();;}
+            xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            code0 {o->value(Runtime.VirKeybLayout);}
+          } {
+            MenuItem {} {
+              label { }
+              xywh {5 5 100 20} labelfont 1 labelsize 11 deactivate
+            }
+            MenuItem {} {
+              label QWERTY
+              xywh {15 15 100 20} labelfont 1 labelsize 11
+            }
+            MenuItem {} {
+              label Dvorak
+              xywh {25 25 100 20} labelfont 1 labelsize 11
+            }
+            MenuItem {} {
+              label QWERTZ
+              xywh {35 35 100 20} labelfont 1 labelsize 11
+            }
+          }
+          Fl_Input SessionStateFile {
+            label {Session state save file}
+            callback {
+              Runtime.StateFile = string(o->value());
+              SessionStateFile->changed();
+            }
+            xywh {159 216 235 25} labelsize 12 when 1 textsize 12
+            code0 {o->value(Runtime.StateFile.c_str());}
+          }
+          Fl_Button StateFileButton {
+            label Select
+            callback {const char *filename =
+                    fl_file_chooser("Nominate session save state file", NULL,
+                                    Runtime.StateFile.c_str(), 0);
+                if (NULL != filename)
+                {
+                    Runtime.StateFile = string(filename);
+                    SessionStateFile->value(Runtime.StateFile.c_str());
+                    SessionStateFile->changed();
+                }}
+            xywh {404 218 49 20} labelsize 12
+            code0 {/* code */}
+          }
+        }
+        Fl_Group {} {
+          label {Bank root dirs} open
+          xywh {5 25 460 287} labelsize 12 hide
+        } {
+          Fl_Browser rootsbrowse {
+            callback {activatebutton_rootdir(o->value()!=0);}
+            xywh {15 35 485 200} type Hold labelsize 12 textsize 13
+          }
+          Fl_Button {} {
+            label {Add root directory...}
+            callback {const char *dirname;
+                dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
+                if (dirname == NULL)
+                    return;
+                rootsbrowse->add(dirname);}
+            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+          }
+          Fl_Button removerootdirbutton {
+            label {Remove root dir...}
+            callback {if (rootsbrowse->value() != 0)
+                {
+                    rootsbrowse->remove(rootsbrowse->value());
+                }
+                activatebutton_rootdir(false);}
+            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+            code0 {o->deactivate();}
+          }
+          Fl_Button makedefaultrootdirbutton {
+            label {Make default}
+            callback {int n = rootsbrowse->value();
+                if (n != 0)
+                {
+                    rootsbrowse->move(1, n);
+                    rootsbrowse->value(1);
+                    rootsbrowse->redraw();
+                }
+                activatebutton_rootdir(true);}
+            xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+            code0 {o->deactivate();}
+          }
+        }
+        Fl_Group {} {
+          label {Presets dirs} open
+          xywh {5 25 460 260} labelsize 12 hide
+        } {
+          Fl_Browser presetbrowse {
+            callback {activatebutton_presetdir(o->value()!=0);}
+            xywh {15 35 485 200} type Hold labelsize 12 textsize 12
+          }
+          Fl_Button {} {
+            label {Add preset directory...}
+            callback {const char *dirname;
+                dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
+                if (dirname == NULL)
+                    return;
+                presetbrowse->add(dirname);}
+            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+          }
+          Fl_Button removepresetbutton {
+            label {Remove preset dir...}
+            callback {if (presetbrowse->value() != 0)
+                {
+                    presetbrowse->remove(presetbrowse->value());
+                }
+                activatebutton_presetdir(false);}
+            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+            code0 {o->deactivate();}
+          }
+          Fl_Button makedefaultpresetbutton {
+            label {Make default}
+            callback {int n = presetbrowse->value();
+                if (n != 0)
+                {
+                    presetbrowse->move(1, n);
+                    presetbrowse->value(1);
+                    presetbrowse->redraw();
+                }
+                activatebutton_presetdir(true);}
+            xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+            code0 {o->deactivate();}
+          }
+        }
+        Fl_Group {} {
+          label Jack open
+          xywh {5 25 460 260} labelsize 12 hide
+        } {
+          Fl_Input {} {
+            label {Jack Server}
+            callback {Runtime.jackServer = string(o->value());}
+            tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
+            code0 {o->insert(Runtime.jackServer.c_str());}
+          }
+        }
+        Fl_Group {} {
+          label Alsa open
+          xywh {5 25 460 260} labelsize 12 hide
+        } {
+          Fl_Input {} {
+            label {Alsa Midi Device}
+            callback {Runtime.alsaMidiDevice = string(o->value());}
+            tooltip {Alsa midi device - default, hw:0, ...} xywh {195 54 120 22} labelsize 12 textsize 12
+            code0 {o->insert(Runtime.alsaMidiDevice.c_str());}
+          }
+          Fl_Input {} {
+            label {Alsa Audio Device}
+            callback {Runtime.alsaAudioDevice = string(o->value());}
+            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 95 120 22} labelsize 12 textsize 12
+            code0 {o->insert(Runtime.alsaAudioDevice.c_str());}
+          }
+          Fl_Check_Browser {} {
+            label Samplerate
+            callback {int chk = o->value();
+                if (o->nchecked() < 1)
+                    o->set_checked(chk = 2);
+                else if (o->nchecked() > 1)
+                {
+                    if (!chk)
+                        chk = 2;
+                    o->check_none();
+                    o->set_checked(chk);
+                }
+                unsigned int sample_rate;
+                switch (chk)
+                {
+                    case 1:
+                        sample_rate = 96000;
+                        break;
+                    case 3:
+                        sample_rate = 44100;
+                        break;
+                    case 2:
+                    default:
+                        sample_rate = 48000;
+                        break;
+                }
+                Runtime.Samplerate = sample_rate;}
+            xywh {195 133 84 50} labelsize 12 align 4 when 1 textsize 12
+            code0 {/* extra */
+                o->add("96000");
+                o->add("48000");
+                o->add("44100");
+                switch (Runtime.Samplerate)
+                {
+                    case 96000: o->set_checked(1); break;
+                    case 44100: o->set_checked(3); break;
+                    case 48000:
+                    default: o->set_checked(2); break;
+                }}
+          }
+          Fl_Check_Browser {} {
+            label {Period Size}
+            callback {int chk = o->value();
+                if (o->nchecked() < 1)
+                    o->set_checked(3);
+                else if (o->nchecked() > 1)
+                {
+                    if (!chk)
+                        chk = 3;
+                    o->check_none();
+                    o->set_checked(chk);
+                }
+                int buff_size;
+                switch (chk)
+                {
+                    case 1: buff_size = 64; break;
+                    case 2: buff_size = 128; break;
+                    case 3: buff_size = 256; break;
+                    case 4: buff_size = 512; break;
+                    case 5: buff_size = 1024; break;
+                    case 6: buff_size = 2048; break;
+                    case 7: buff_size = 4096; break;
+                    default: buff_size = 256; break;
+                }
+                Runtime.Buffersize = buff_size;}
+            xywh {195 197 76 73} labelsize 12 align 4 when 1 textsize 12
+            code0 {//
+                o->add("64");
+                o->add("128");
+                o->add("256");
+                o->add("512");
+                o->add("1024");
+                o->add("2048");
+                o->add("4096");
+                switch (Runtime.Buffersize)
+                {
+                    case 64: o->set_checked(1); break;
+                    case 128: o->set_checked(2); break;
+                    case 256: o->set_checked(3); break;
+                    case 512: o->set_checked(4); break;
+                    case 1024: o->set_checked(5); break;
+                    case 2048: o->set_checked(6); break;
+                    case 4096: o->set_checked(7); break;
+                    default: o->set_checked(5); break;
+                }}
+          }
+        }
+        Fl_Group {} {
+          label Recorder open
+          xywh {15 35 460 260} labelsize 12 hide
+        } {
+          Fl_Input {} {
+            label {Default Record Directory}
+            callback {if (NULL == o || !isDirectory(string(o->value())))
+                    fl_alert("Invalid directory");
+                else
+                    Runtime.DefaultRecordDirectory = string(o->value());}
+            tooltip {Default directory for recordings} xywh {192 120 242 22} labelsize 12 textsize 12
+            code0 {o->insert(Runtime.DefaultRecordDirectory.c_str());}
+          }
+          Fl_Check_Button {} {
+            label {32 bit float wavs}
+            callback {Runtime.Float32bitWavs = (o->value()) ? true : false;}
+            tooltip {Record in 32 bit float format} xywh {192 165 18 22} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value((Runtime.Float32bitWavs) ? 1 : 0);}
+          }
+        }
+      }
+      Fl_Button {} {
+        label Close
+        callback {configwindow->hide();
+            writebankcfg();
+            writepresetcfg();}
+        xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
+      }
+      Fl_Button {} {
+        label {Save Settings}
+        callback {Runtime.saveConfig();
+            writebankcfg();
+            writepresetcfg();}
+        xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
+      }
+      Fl_Box {} {
+        label {Most settings changes require a restart}
+        xywh {104 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+      }
+    }
+  }
+  Function {ConfigUI()} {open
+  } {
+    code {make_window();
+        readbankcfg();
+        readpresetcfg();} {}
+  }
+  Function {activatebutton_rootdir(bool active)} {open
+  } {
+    code {if (active)
+        {
+            removerootdirbutton->activate();
+            makedefaultrootdirbutton->activate();
+        }
+        else
+        {
+            removerootdirbutton->deactivate();
+            makedefaultrootdirbutton->deactivate();
+        }} {}
+  }
+  Function {activatebutton_presetdir(bool active)} {} {
+    code {if (active)
+        {
+            removepresetbutton->activate();
+            makedefaultpresetbutton->activate();
+        }
+        else
+        {
+            removepresetbutton->deactivate();
+            makedefaultpresetbutton->deactivate();
+        }} {}
+  }
+  Function {readbankcfg()} {} {
+    code {rootsbrowse->clear();
+        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        {
+            if (Runtime.bankRootDirlist[i].size())
+                rootsbrowse->add(Runtime.bankRootDirlist[i].c_str());
+        }} {}
+  }
+  Function {writebankcfg()} {} {
+    code {Runtime.clearBankrootDirlist();
+        for (int n = 0; n < rootsbrowse->size(); ++n)
+            Runtime.bankRootDirlist[n] = string(rootsbrowse->text(n + 1));} {}
+  }
+  Function {readpresetcfg()} {} {
+    code {presetbrowse->clear();
+        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+            if (Runtime.presetsDirlist[i].size())
+                presetbrowse->add(Runtime.presetsDirlist[i].c_str());} {}
+  }
+  Function {writepresetcfg()} {} {
+    code {Runtime.clearPresetsDirlist();
+        for (int n = 0; n < presetbrowse->size(); ++n)
+            Runtime.presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
+  }
+  Function {Show()} {} {
+    code {configwindow->show();} {}
+  }
+  Function {Hide()} {} {
+    code {configwindow->hide();} {}
+  }
+} 
