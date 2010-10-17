@@ -636,85 +636,90 @@ void Part::SetController(unsigned int type, int par)
 {
     switch (type)
     {
-        case MSG_pitchwheel_control:
-            ctl->setpitchwheel(par);
-            break;
-        case C_expression:
-            ctl->setexpression(par);
-            setPvolume(Pvolume);
-            break;
-        case C_portamento:
-            ctl->setportamento(par);
-            break;
-        case C_pan:
-            ctl->setpanning(par);
-            setPpanning(Ppanning);
-            break;
-        case C_filtercutoff:
-            ctl->setfiltercutoff(par);
-            break;
-        case C_filterq:
-            ctl->setfilterq(par);
-            break;
-        case C_bandwidth:
-            ctl->setbandwidth(par);
-            break;
-        case C_modwheel:
+        case C_modwheel: // 1
             ctl->setmodwheel(par);
             break;
-        case C_fmamp:
-            ctl->setfmamp(par);
-            break;
-        case C_volume:
+
+        case C_volume: // 7
             ctl->setvolume(par);
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
             else
                 setPvolume(Pvolume);
             break;
-        case C_sustain:
+
+        case C_pan: // 10
+            ctl->setpanning(par);
+            setPpanning(Ppanning);
+            break;
+
+        case C_expression: // 11
+            ctl->setexpression(par);
+            setPvolume(Pvolume);
+            break;
+
+        case C_sustain: // 64
             ctl->setsustain(par);
             if (!ctl->sustain.sustain)
                 RelaseSustainedKeys();
             break;
-        case C_allsoundsoff:
-            AllNotesOff(); // Panic
+
+        case C_portamento: // 65
+            ctl->setportamento(par);
             break;
-        case C_resetallcontrollers:
+
+        case C_filterq: // 71
+            ctl->setfilterq(par);
+            break;
+
+        case C_filtercutoff: // 74
+            ctl->setfiltercutoff(par);
+            break;
+
+        case C_soundcontroller6 : // 75 bandwidth
+            ctl->setbandwidth(par);
+            break;
+
+        case C_soundcontroller7: // 76 fmamp:
+            ctl->setfmamp(par);
+            break;
+
+        case C_soundcontroller8: // 77 resonance center
+            ctl->setresonancecenter(par);
+            for (int item = 0; item < NUM_KIT_ITEMS; ++item)
+                if (kit[item].adpars)
+                    kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, ctl->resonancecenter.relcenter);
+            break;
+
+        case C_soundcontroller9: // 78 resonance bandwidth:
+            ctl->setresonancebw(par);
+            kit[0].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, ctl->resonancebandwidth.relbw);
+            break;
+
+        case C_allsoundsoff: // 120
+            AllNotesOff();
+            break;
+
+        case C_resetallcontrollers: // 121
             ctl->resetall();
             RelaseSustainedKeys();
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
             setPvolume(Pvolume);
             setPpanning(Ppanning);
-
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
-            {
-                if (!kit[item].adpars)
-                    continue;
-                kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_center, 1.0);
-                kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_bandwidth, 1.0);
-            }
-            // more update to add here if I add controllers
+                if (kit[item].adpars)
+                {
+                    kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, 1.0f);
+                    kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, 1.0f);
+                }
             break;
-        case C_allnotesoff:
+
+        case C_allnotesoff: // 123
             RelaseAllKeys();
             break;
-        case C_resonance_center:
-            ctl->setresonancecenter(par);
-            for (int item = 0; item < NUM_KIT_ITEMS; ++item)
-            {
-                if (!kit[item].adpars)
-                    continue;
-                kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_center,
-                                                                  ctl->resonancecenter.relcenter);
-            }
-            break;
-        case C_resonance_bandwidth:
-            ctl->setresonancebw(par);
-            kit[0].adpars->GlobalPar.Reson->sendcontroller(C_resonance_bandwidth,
-                                                           ctl->resonancebandwidth.relbw);
-            break;
+            
+        // more update to add here if I add controllers
     }
 }
 
@@ -899,7 +904,7 @@ void Part::ComputePartSmps(void)
                     partnote[k].kititem[item].adnote = NULL;
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
-                {   // add the ADnote to part(mix)
+                {   // add ADnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
                 }
@@ -916,7 +921,7 @@ void Part::ComputePartSmps(void)
                     memset(tmpoutr, 0, synth->bufferbytes);
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
-                {   // add the SUBnote to part(mix)
+                {   // add SUBnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
@@ -945,7 +950,7 @@ void Part::ComputePartSmps(void)
                     partnote[k].kititem[item].padnote = NULL;
                 }
                 for (int i = 0 ; i < synth->buffersize; ++i)
-                {   // add the PADnote to part(mix)
+                {   // add PADnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }

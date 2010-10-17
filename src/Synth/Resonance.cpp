@@ -212,7 +212,7 @@ float Resonance::getoctavesfreq(void)
 
 void Resonance::sendcontroller(unsigned char ctl, float par)
 {
-    if (ctl == C_resonance_center)
+    if (ctl == C_soundcontroller8)
         ctlcenter = par;
     else
         ctlbw = par;

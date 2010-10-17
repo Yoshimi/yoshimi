@@ -93,11 +93,12 @@ class OscilSpectrum {: {public Fl_Box, MiscFuncs}
             spc[i] = 0.0;
 
         synth->lockSharable();
-        if (oscbase == 0)
-            oscil->getspectrum(n, spc, 0);
-        else
-            oscil->getspectrum(n, spc, 1);
+        oscil->getspectrum(n, spc, (oscbase == 0) ? 0 : 1);
         synth->unlockSharable();
+        //if (oscbase == 0)
+        //    oscil->getspectrum(n, spc, 0);
+        //else
+        //    oscil->getspectrum(n, spc, 1);
 
         // normalize
         float max = 0;
@@ -298,50 +299,56 @@ class Oscilharmonic {: {public Fl_Group}
       class Fl_Group
     } {
       Fl_Slider mag {
-        callback {int x=64;
-if (Fl::event_button3()) o->value(x);
-   else x=127-(int)o->value();
-if (x==64) o->selection_color(0);
-    else o->selection_color(222);
+        callback {//
+            int x=64;
+            if (Fl::event_button3()) o->value(x);
+            else x=127-(int)o->value();
+            if (x==64) o->selection_color(0);
+            else o->selection_color(222);
+            oscil->Phmag[n]=x;
+            if (x==64)
+            {
+                oscil->Phphase[n]=64;
+                phase->value(64);
+            }
+            synth->lockSharable();
+            oscil->prepare();
+            synth->unlockSharable();
 
-synth->lockSharable();
- oscil->Phmag[n]=x;
- if (x==64) {
-    oscil->Phphase[n]=64;
-    phase->value(64);
- };
- oscil->prepare();
-synth->unlockSharable();
-
-display->redraw();
-oldosc->redraw();
-if (cbwidget!=NULL) {
-	cbwidget->do_callback();
-	applybutton->color(FL_RED);
-	applybutton->redraw();
-};}
+            display->redraw();
+            oldosc->redraw();
+            if (cbwidget!=NULL)
+            {
+                cbwidget->do_callback();
+                applybutton->color(FL_RED);
+                applybutton->redraw();
+            }
+        }
         xywh {0 15 15 115} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-oscil->Phmag[n]);}
         code1 {if (oscil->Phmag[n]==64) o->selection_color(0);}
         class PSlider
       }
       Fl_Slider phase {
-        callback {int x=64;
-if (Fl::event_button3()) o->value(x);
-   else x=(int)o->value();
+        callback {//
+            int x=64;
+            if (Fl::event_button3()) o->value(x);
+            else x=(int)o->value();
 
-synth->lockSharable();
- oscil->Phphase[n]=x;
- oscil->prepare();
-synth->lockSharable();
+            synth->lockSharable();
+            oscil->Phphase[n]=x;
+            oscil->prepare();
+            synth->unlockSharable();
 
-display->redraw();
-oldosc->redraw();
-if (cbwidget!=NULL) {
-	cbwidget->do_callback();
-	applybutton->color(FL_RED);
-	applybutton->redraw();
-};}
+            display->redraw();
+            oldosc->redraw();
+            if (cbwidget!=NULL)
+            {
+                cbwidget->do_callback();
+                applybutton->color(FL_RED);
+                applybutton->redraw();
+            }
+        }
         xywh {0 135 15 75} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(oscil->Phphase[n]);}
         class PSlider
@@ -365,22 +372,26 @@ if (cbwidget!=NULL) {
     }
   }
   Function {Oscilharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
-    code {n=0;
-oscil=NULL;
-display=NULL;
-applybutton=NULL;
-cbwidget=NULL;} {}
+    code {//
+        n=0;
+        oscil=NULL;
+        display=NULL;
+        applybutton=NULL;
+        cbwidget=NULL;
+    } {}
   }
   Function {init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_)} {} {
-    code {oscil=oscil_;
-n=n_;
-display=display_;
-oldosc=oldosc_;
-cbwidget=cbwidget_;
-applybutton=applybutton_;
-make_window();
-end();
-harmonic->show();} {}
+    code {//
+        oscil=oscil_;
+        n=n_;
+        display=display_;
+        oldosc=oldosc_;
+        cbwidget=cbwidget_;
+        applybutton=applybutton_;
+        make_window();
+        end();
+        harmonic->show();
+    } {}
   }
   Function {refresh()} {} {
     code {mag->value(127-oscil->Phmag[n]);
@@ -409,13 +420,15 @@ class OscilEditor {: {public PresetsUI_}
     } {
       Fl_Button applybutton {
         label Apply
-        callback {applybutton->color(FL_GRAY);
-applybutton->redraw();
-if (cbapplywidget!=NULL) {
-	cbapplywidget->do_callback();
-	cbapplywidget->color(FL_GRAY);
-	cbapplywidget->redraw();
-};}
+        callback {//
+            applybutton->color(FL_GRAY);
+            applybutton->redraw();
+            if (cbapplywidget!=NULL) {
+                cbapplywidget->do_callback();
+                cbapplywidget->color(FL_GRAY);
+                cbapplywidget->redraw();
+            }
+        }
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
@@ -721,7 +734,7 @@ for (int i=0;i<MAX_AD_HARMONICS;i++){
 
 synth->lockSharable();
  oscil->prepare();
-synth->lockSharable();
+synth->unlockSharable();
 
 redrawoscil();}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -1162,7 +1175,7 @@ for (int i=0;i<MAX_AD_HARMONICS;i++) h[i]->refresh();
 
 synth->lockSharable();
  oscil->prepare();
-synth->lockSharable();
+synth->unlockSharable();
 
 basefuncdisplaygroup->redraw();
 redrawoscil();} {}

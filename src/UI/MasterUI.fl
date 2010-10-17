@@ -223,9 +223,9 @@ class MasterUI {open :{private MiscFuncs}
             callback {if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
                 {
                     // int npart = (int)npartcounter->value() - 1;
-                synth->lockSharable();
+                synth->lockExclusive();
                     synth->part[npart]->defaultsinstrument();
-                synth->unlockSharable();
+                synth->unlockExclusive();
                     npartcounter->do_callback();
                 }
                 updatepanel();}
@@ -237,13 +237,13 @@ class MasterUI {open :{private MiscFuncs}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-            synth->lockSharable();
+            synth->lockExclusive();
                 synth->part[npart]->defaultsinstrument();
                 // load the instr. parameters
                 bool result =
                     synth->part[npart]->loadXMLinstrument(string(filename));
                 synth->part[npart]->applyparameters(true);
-                synth->unlockSharable();
+                synth->unlockExclusive();
                 npartcounter->do_callback();
                 updatepanel();
                 if (!result)
@@ -320,10 +320,10 @@ class MasterUI {open :{private MiscFuncs}
                 if (filename == NULL)
                     return;
                 string fname = string(filename);
-                synth->lockSharable();
+                synth->lockExclusive();
                 synth->microtonal.defaults(); // clear all parameters
                 bool result = synth->microtonal.loadXML(fname);
-                synth->unlockSharable();
+                synth->unlockExclusive();
                 if (NULL != microtonalui)
                     delete microtonalui;
                 microtonalui = new MicrotonalUI(&synth->microtonal);
@@ -391,9 +391,9 @@ class MasterUI {open :{private MiscFuncs}
         Fl_Button {} {
           label Reset
           callback {virkeyboard->relaseallkeys();
-              synth->lockSharable();
+              synth->lockExclusive();
               synth->shutup = 1;
-              synth->unlockSharable();}
+              synth->unlockExclusive();}
           tooltip {Cease all sound immediately!} xywh {11 52 40 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -555,9 +555,9 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Choice sysefftype {
             label Type
-            callback {synth->lockSharable();
+            callback {synth->lockExclusive();
               synth->sysefx[nsyseff]->changeeffect(o->value());
-              synth->unlockSharable();
+              synth->unlockExclusive();
               syseffectui->refresh(synth->sysefx[nsyseff]);
               showSysEfxUI();} open
             xywh {140 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
@@ -612,7 +612,8 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Button {} {
             label P
-            callback {synth->lockSharable();
+            callback {//
+              synth->lockSharable();
               presetsui->paste(synth->sysefx[nsyseff], syseffectui);
               synth->unlockSharable();}
             xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
@@ -646,9 +647,9 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Choice insefftype {
             label Type
-            callback {synth->lockSharable();
+            callback {synth->lockExclusive();
               synth->insefx[ninseff]->changeeffect(o->value());
-              synth->unlockSharable();
+              synth->unlockExclusive();
               inseffectui->refresh(synth->insefx[ninseff]);
               inseffectui->show();}
             xywh {126 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
@@ -896,9 +897,9 @@ ZynAddSubFX}
     code {if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
             delete microtonalui;
-            synth->lockSharable();
+            synth->lockExclusive();
             synth->defaults();
-            synth->unlockSharable();
+            synth->unlockExclusive();
             npartcounter->value(1);
             refresh_master_ui();
         }
@@ -914,13 +915,11 @@ ZynAddSubFX}
             if (fname == NULL)
                 return;
         }
-        synth->lockSharable();
+        synth->lockExclusive();
         synth->defaults(); // clear all parameters
-        synth->unlockSharable();
         int result = synth->loadXML(fname); // load the data
-        synth->lockSharable();
         synth->applyparameters();
-        synth->unlockSharable();
+        synth->unlockExclusive();
         npartcounter->value(1);
         refresh_master_ui();
         updatepanel();

@@ -220,7 +220,7 @@ class PartKitItem {open : {public Fl_Group}
                 answer = fl_choice("Delete the item?","No","Yes",NULL);
             if (answer != 0)
             {
-                synth->lockSharable();
+                synth->lockExclusive();
                 part->setkititemstatus(n, o->value());
                 synth->unlockSharable();
 
@@ -370,7 +370,7 @@ Offset}
       Fl_Check_Button {} {
         label Enabled
         callback {//
-            synth->partonoff(npart, o->value());
+            synth->partOnOff(npart, o->value());
             if (!part->Penabled)
                 partgroupui->deactivate();
             else
@@ -682,7 +682,7 @@ Offset}
       }
       Fl_Choice insefftype {
         label EffType
-        callback {synth->lockSharable();
+        callback {synth->lockExclusive();
             part->partefx[ninseff]->changeeffect(o->value());
             synth->unlockSharable();
             inseffectui->refresh(part->partefx[ninseff]);}

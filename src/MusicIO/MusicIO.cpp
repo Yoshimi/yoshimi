@@ -43,7 +43,9 @@ MusicIO::MusicIO() :
     periodendframe(0u),
     wavRecorder(NULL),
     midiRingbuf(NULL),
-    midiEventsUp(NULL)
+    midiEventsUp(NULL),
+    bankselectMsb(0),
+    bankselectLsb(0)
 {
     baseclientname = "yoshimi";
     if (!Runtime.nameTag.empty())
@@ -145,7 +147,6 @@ void MusicIO::Close(void)
 }
 
 
-
 void MusicIO::getAudio(void)
 {
     synth->MasterAudio(zynLeft, zynRight);
@@ -168,38 +169,18 @@ void MusicIO::interleaveShorts(void)
     }
 }
 
-
-void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl,
-                                    int param)
-{
-    synth->SetController(ch, ctrl, param);
-}
-
-
-void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
-                           unsigned char velocity)
-{
-    synth->NoteOn(channel, note, velocity, wavRecorder->Trigger());
-}
-
-
-void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
-{
-    synth->NoteOff(channel, note);
-}
-
-
+/**
 void MusicIO::applyMidi(unsigned char* bytes)
 {
     unsigned char channel = bytes[0] & 0x0f;
     switch (bytes[0] & 0xf0)
     {
         case MSG_noteoff: // 128
-            synth->NoteOff(channel, bytes[1]);
+            synth->noteOff(channel, bytes[1]);
             break;
 
         case MSG_noteon: // 144
-            synth->NoteOn(channel, bytes[1], bytes[2], wavRecorder->Trigger());
+            synth->noteOn(channel, bytes[1], bytes[2], wavRecorder->Trigger());
             break;
 
         case MSG_control_change: // 176
@@ -223,26 +204,28 @@ void MusicIO::applyMidi(unsigned char* bytes)
                     case C_allsoundsoff:         // 120
                     case C_resetallcontrollers:  // 121
                     case C_allnotesoff:          // 123
-                        synth->SetController(channel, bytes[1], bytes[2]);
+                        synth->setController(channel, bytes[1], bytes[2]);
                         break;
+
                     case C_bankselectmsb:
-                        // bank_select_msb = bytes[2];
+                        bankselectMsb = bytes[2];
                         break;
+
                     case C_bankselectlsb:
-                        // curr_program_bank = (bank_select_msb << 7) | bytes[2];
-                        // bank_select_msb = 0;
+                        bankselectLsb = bytes[2];
                         break;
+
                     default:
                         break;
             }
             break;
 
          case MSG_program_change: // 224
-             // not yet :-(
+             synth->programChange(bankselectMsb, bankselectLsb);
              break;
 
          case MSG_pitchwheel_control: // 224
-             synth->SetController(channel, MSG_pitchwheel_control,
+             synth->setController(channel, MSG_pitchwheel_control,
                                   ((bytes[2] << 7) | bytes[1]) - 8192);
              break;
 
@@ -250,7 +233,7 @@ void MusicIO::applyMidi(unsigned char* bytes)
             break;
     }
 }
-
+**/
 
 void *MusicIO::_midiThread(void *arg)
 {
@@ -301,22 +284,27 @@ void *MusicIO::midiThread(void)
         switch (msg.bytes[0] & 0xf0)
         {
             case MSG_noteoff: // 128
-                synth->NoteOff(channel, msg.bytes[1]);
+                synth->noteOff(channel, msg.bytes[1]);
                 break;
+
             case MSG_noteon: // 144
-               synth->NoteOn(channel, msg.bytes[1], msg.bytes[2],
+               synth->noteOn(channel, msg.bytes[1], msg.bytes[2],
                              (wavRecorder != NULL) ? wavRecorder->Trigger() : false);
                 break;
+
             case MSG_control_change: // 176
                 processControlChange(&msg);
                 break;
-             case MSG_program_change: // 192 ... inactive
+
+            case MSG_program_change: // 192
+                 synth->programChange(channel, bankselectMsb, bankselectLsb);
                  break;
+
              case MSG_pitchwheel_control: // 224
-                 synth->SetController(channel, MSG_pitchwheel_control,
-                                      ((msg.bytes[2] << 7) | msg.bytes[1]) - 8192);
+                 synth->setPitchwheel(channel, ((msg.bytes[2] << 7) | msg.bytes[1]) - 8192);
                  break;
-            default: // too difficult or just uninteresting
+
+             default: // too difficult or just uninteresting
                 break;
         }
     }
@@ -335,32 +323,34 @@ void MusicIO::processControlChange(midimessage *msg)
         default:
             switch (msg->bytes[1])
             {
+                case C_bankselectmsb: // inactive
+                    bankselectMsb = msg->bytes[2];
+                    break;
+
+                case C_bankselectlsb: // inactive
+                    bankselectLsb = msg->bytes[2];
+                    break;
+
                 case C_modwheel:             //   1
                 case C_volume:               //   7
                 case C_pan:                  //  10
                 case C_expression:           //  11
-                case C_effectcontrol2:       //  13
                 case C_sustain:              //  64
                 case C_portamento:           //  65
                 case C_filterq:              //  71
                 case C_filtercutoff:         //  74
-                case C_bandwidth:            //  75
-                case C_fmamp:                //  76
-                case C_resonance_center:     //  77
-                case C_resonance_bandwidth:  //  78
+                case C_soundcontroller6:     //  75 bandwidth
+                case C_soundcontroller7:     //  76 fmamp
+                case C_soundcontroller8:     //  77 resonance center     
+                case C_soundcontroller9:     //  78 resonance bandwidth
                 case C_allsoundsoff:         // 120
                 case C_resetallcontrollers:  // 121
                 case C_allnotesoff:          // 123
-                    synth->SetController(channel, msg->bytes[1], msg->bytes[2]);
+                    synth->setController(channel, msg->bytes[1], msg->bytes[2]);
                     break;
-                case C_bankselectmsb: // inactive
-                    // bank_select_msb = bytes[2];
-                    break;
-                case C_bankselectlsb: // inactive
-                    // curr_program_bank = (bank_select_msb << 7) | bytes[2];
-                    // bank_select_msb = 0;
-                    break;
+
                 default:
+                    cerr << "Midi control change " << (int)msg->bytes[1] << " ignored" << endl; 
                     break;
             }
             break;

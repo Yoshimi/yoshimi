@@ -58,9 +58,6 @@ class MusicIO : protected MiscFuncs
         void interleaveShorts(void);
         static void *_midiThread(void *arg);
         void *midiThread(void);
-        void setMidiController(unsigned char ch, unsigned int ctrl, int param);
-        void setMidiNote(unsigned char chan, unsigned char note);
-        void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 
         string baseclientname;
         string audioclientname;
@@ -78,10 +75,13 @@ class MusicIO : protected MiscFuncs
 
     private:
         void processControlChange(midimessage *msg);
-        void applyMidi(unsigned char *bytes);
+        //void applyMidi(unsigned char *bytes);
         jack_ringbuffer_t *midiRingbuf;
         boost::interprocess::interprocess_semaphore *midiEventsUp;
         pthread_t  midiPthread;
+        int bankselectMsb;
+        int bankselectLsb;
+        
 };
 
 #endif

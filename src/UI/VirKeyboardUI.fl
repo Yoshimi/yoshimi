@@ -356,10 +356,10 @@ virkeyboardwindow->hide();} open
                 case 6: midictl = C_portamento; break;
                 case 7: midictl = C_filterq; break;
                 case 8: midictl = C_filtercutoff; break;
-                case 9: midictl = C_bandwidth; break;
-                case 10: midictl = C_fmamp; break;
-                case 11: midictl = C_resonance_center; break;
-                case 12: midictl = C_resonance_bandwidth; break;
+                case 9: midictl = C_soundcontroller6; break;   // bandwidth
+                case 10: midictl = C_soundcontroller7; break;  // fmamp
+                case 11: midictl = C_soundcontroller8; break;  // resonance enter
+                case 12: midictl = C_soundcontroller9; break;  // resonance bandwidth
                 default: midictl = 0; break;
             }
             virkeys->take_focus();} open

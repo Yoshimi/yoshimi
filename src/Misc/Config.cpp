@@ -794,6 +794,7 @@ void Config::signalCheck(void)
         case 2: // JackSessionSaveAndQuit
             saveJackSession();
             __sync_bool_compare_and_swap(&jsessionSave, 2, 0);
+            usleep(3333);
             runSynth = false;
             break;
         case 3: // JackSessionSaveTemplate not implemented
@@ -808,13 +809,13 @@ void Config::signalCheck(void)
 void Config::setInterruptActive(int sig)
 {
     Log("Interrupt received");
-    __sync_bool_compare_and_swap(&sigIntActive, sigIntActive, 0);
+    __sync_bool_compare_and_swap(&sigIntActive, sigIntActive, 1);
 }
 
 
 void Config::setLadi1Active(int sig)
 {
-    __sync_bool_compare_and_swap (&ladi1IntActive, ladi1IntActive, 0);
+    __sync_bool_compare_and_swap (&ladi1IntActive, ladi1IntActive, 1);
 }
 
 

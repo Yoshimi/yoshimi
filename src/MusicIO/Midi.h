@@ -65,7 +65,7 @@ typedef enum {
     C_pan =                  10, // active
     C_expression =           11, // active
     C_effectcontrol1 =       12, 
-    C_effectcontrol2 =       13, // active
+    C_effectcontrol2 =       13,
     C_undefined14 =          14,
     C_undefined15 =          15,
     C_generalpurpose1 =      16,
@@ -112,10 +112,10 @@ typedef enum {
     C_soundcontroller3 =     72,
     C_soundcontroller4 =     73, 
     C_filtercutoff =         74, // active
-    C_bandwidth =            75, // active
-    C_fmamp =                76, // active
-    C_resonance_center =     77, // active
-    C_resonance_bandwidth =  78, // active
+    C_soundcontroller6 =     75, // active => bandwidth
+    C_soundcontroller7 =     76, // active => fmamp
+    C_soundcontroller8 =     77, // active => resonance center
+    C_soundcontroller9 =     78, // active => resonance bandwidth 
     C_soundcontroller10 =    79,
     C_gpcontroller5lsb =     80, 
     C_gpcontroller6lsb =     81, 
@@ -128,27 +128,27 @@ typedef enum {
     C_undefined88 =          88,
     C_undefined89 =          89,
     C_undefined90 =          90,
-    C_undefined102 =        102,
-    C_undefined103 =        103,
-    C_undefined104 =        104,
-    C_undefined105 =        105,
-    C_undefined106 =        106,
-    C_undefined107 =        107,
-    C_undefined108 =        108,
-    C_undefined109 =        109,
-    C_undefined110 =        110,
-    C_undefined111 =        111,
-    C_undefined112 =        112,
-    C_undefined113 =        113,
-    C_undefined114 =        114,
-    C_undefined115 =        115,
-    C_undefined116 =        116,
-    C_undefined117 =        117,
-    C_undefined118 =        118,
-    C_undefined119 =        119,
-    C_allsoundsoff =        120, // active
-    C_resetallcontrollers = 121, // active 
-    C_allnotesoff =         123, // active
+    C_undefined102 =         102,
+    C_undefined103 =         103,
+    C_undefined104 =         104,
+    C_undefined105 =         105,
+    C_undefined106 =         106,
+    C_undefined107 =         107,
+    C_undefined108 =         108,
+    C_undefined109 =         109,
+    C_undefined110 =         110,
+    C_undefined111 =         111,
+    C_undefined112 =         112,
+    C_undefined113 =         113,
+    C_undefined114 =         114,
+    C_undefined115 =         115,
+    C_undefined116 =         116,
+    C_undefined117 =         117,
+    C_undefined118 =         118,
+    C_undefined119 =         119,
+    C_allsoundsoff =         120, // active
+    C_resetallcontrollers =  121, // active 
+    C_allnotesoff =          123, // active
 } midicontroltype;
 
 #endif

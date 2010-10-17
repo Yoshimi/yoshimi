@@ -245,7 +245,7 @@ void SynthEngine::defaults(void)
         part[npart]->defaults();
         part[npart]->midichannel = npart % NUM_MIDI_CHANNELS;
     }
-    partonoff(0, 1); // enable the first part
+    partOnOff(0, 1); // enable the first part
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
@@ -265,12 +265,12 @@ void SynthEngine::defaults(void)
 }
 
 
-// Note On Messages (velocity == 0 => NoteOff)
-void SynthEngine::NoteOn(unsigned char chan, unsigned char note,
+// Note On Messages ()
+void SynthEngine::noteOn(unsigned char chan, unsigned char note,
                          unsigned char velocity, bool record_trigger)
-{
+{                        // velocity 0 => NoteOff
     if (!velocity)
-        NoteOff(chan, note);
+        noteOff(chan, note);
     else if (!muted)
     {
         if (recordPending && record_trigger)
@@ -290,8 +290,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note,
 }
 
 
-// Note Off Messages
-void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
+void SynthEngine::noteOff(unsigned char chan, unsigned char note)
 {
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -305,58 +304,49 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 }
 
 
-// Controllers
-void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
+void SynthEngine::setController(unsigned char chan, unsigned char type, short int par)
 {
-    /**
-    if (type == C_dataentryhi
-        || type == C_dataentrylo
-        || type == C_nrpnhi
-        || type == C_nrpnlo)
-    {
-        // Process RPN and NRPN by the Master (ignore the chan)
-        ctl->setparameternumber(type, par);
-
-        int parhi = -1, parlo = -1, valhi = -1, vallo = -1;
-        if (!ctl->getnrpn(&parhi, &parlo, &valhi, &vallo))
-        {   // this is NRPN
-            // fprintf(stderr,"rcv. NRPN: %d %d %d %d\n",parhi,parlo,valhi,vallo);
-            switch (parhi)
-            {
-                case 0x04: // System Effects
-                    if (parlo < NUM_SYS_EFX)
-                        sysefx[parlo]->seteffectpar_nolock(valhi, vallo);
-                    break;
-            case 0x08: // Insertion Effects
-                if (parlo < NUM_INS_EFX)
-                    insefx[parlo]->seteffectpar_nolock(valhi, vallo);
-                break;
-
-            }
-        }
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {   // Send the controller to all active parts assigned to the channel
+        if (part[npart]->Penabled && chan == part[npart]->midichannel)
+            part[npart]->SetController(type, par);
     }
-    else
-    {   // other controllers
-        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        {   // Send the controller to all part assigned to the channel
-            if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-                part[npart]->SetController(type, par);
-        }
 
-        if (type == C_allsoundsoff)
-        {   // cleanup insertion/system FX
-            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-                sysefx[nefx]->cleanup();
-            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-                insefx[nefx]->cleanup();
-        }
+    if (type == C_allsoundsoff)
+    {   // cleanup insertion/system FX
+        synth->lockSharable();
+        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+            sysefx[nefx]->cleanup();
+        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+            insefx[nefx]->cleanup();
+        synth->unlockSharable();
     }
-**/
+}
+
+
+void SynthEngine::setPitchwheel(unsigned char chan, short int par)
+{
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        if (part[npart]->Penabled && chan == part[npart]->midichannel)
+            part[npart]->ctl->setpitchwheel(par);
+}
+
+
+void SynthEngine::programChange(unsigned char chan, int bankmsb, int banklsb)
+{
+    cerr << "Through SynthEngine::programChange, bank msb " << bankmsb
+         << ", banklsb " << banklsb << endl;
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        if (part[npart]->Penabled && chan == part[npart]->midichannel)
+        {
+            cerr << "Part " << npart << ", chan " << (int)chan << " to change program" << endl;
+            //part[npart]->programChange(bankmsb, banklsb)
+        }
 }
 
 
 // Enable/Disable a part
-void SynthEngine::partonoff(int npart, int what)
+void SynthEngine::partOnOff(int npart, int what)
 {
     if (npart >= NUM_MIDI_PARTS)
         return;
@@ -381,7 +371,6 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 {
     memset(outl, 0, bufferbytes);
     memset(outr, 0, bufferbytes);
-
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -400,9 +389,9 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
             int efxpart = Pinsparts[nefx];
             if (part[efxpart]->Penabled)
             {
-                lockExclusive();
+                //lockExclusive();
                 insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
-                unlockExclusive();
+                //unlockExclusive();
             }
         }
     }
@@ -427,10 +416,8 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         {   // the volume or the panning has changed and needs interpolation
             for (int i = 0; i < buffersize; ++i)
             {
-                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i,
-                                                   buffersize);
-                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i,
-                                                   buffersize);
+                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i, buffersize);
+                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i, buffersize);
                 part[npart]->partoutl[i] *= vol_l;
                 part[npart]->partoutr[i] *= vol_r;
             }
@@ -480,10 +467,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 float v = sysefxsend[nefxfrom][nefx];
                 for (int i = 0; i < buffersize; ++i)
                 {
-                    lockExclusive();
+                    //lockExclusive();
                     tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
                     tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
-                    unlockExclusive();
+                    //unlockExclusive();
                 }
             }
         }
@@ -571,7 +558,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     // Part Peak computation (for Part vu meters/fake part vu meters)
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        vuoutpeakpart[npart] = 1.0e-12;
+        vuoutpeakpart[npart] = 1.0e-12f;
         if (part[npart]->Penabled)
         {
             float *outl = part[npart]->partoutl;
@@ -700,12 +687,13 @@ bool SynthEngine::timedlockExclusive(void)
     bool ok = false;
     //  wait_period = boost::posix_time::microsec(1000u);
     boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time()
-                                       + boost::posix_time::microsec(500);
+                                       + boost::posix_time::microsec(666u);
     using namespace boost::interprocess;
     try { ok = synthMutex.timed_lock(endtime); }
     catch (interprocess_exception &ex)
     {
         Runtime.Log("SynthEngine::timedlockExclusive throws exception!");
+        ok = false;
     }
     return ok;
 }
@@ -757,6 +745,7 @@ bool SynthEngine::timedlockSharable(void)
     catch (interprocess_exception &ex)
     {
         Runtime.Log("SynthEngine::timedlockSharable throws exception!");
+        ok = false;
     }
     return ok;
 }

@@ -71,18 +71,17 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int getalldata(char **data);
         void putalldata(char *data, int size);
 
-        // midi in
-        void NoteOn(unsigned char chan, unsigned char note,
-                    unsigned char velocity, bool record_trigger);
-        void NoteOff(unsigned char chan, unsigned char note);
-        void SetController(unsigned char chan, unsigned int type, short int par);
-        // void NRPN...
-
         void ShutUp(void);
-
         void MasterAudio(float *outl, float *outr);
+        void partOnOff(int npart, int what);
 
-        void partonoff(int npart, int what);
+        // midi
+        void noteOn(unsigned char chan, unsigned char note,
+                    unsigned char velocity, bool record_trigger);
+        void noteOff(unsigned char chan, unsigned char note);
+        void setController(unsigned char chan, unsigned char type, short int par);
+        void setPitchwheel(unsigned char chan, short int par);
+        void programChange(unsigned char chan, int bankmsb, int banklsb);
 
         Part *part[NUM_MIDI_PARTS];
 

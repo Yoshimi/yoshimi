@@ -398,7 +398,7 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         label 01
         callback {//
             synth->lockSharable();
-            synth->partonoff(npart, o->value());
+            synth->partOnOff(npart, o->value());
             synth->unlockSharable();
             if (o->value() == 0)
                 panellistitemgroup->deactivate();

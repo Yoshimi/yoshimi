@@ -21,6 +21,7 @@
     This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
+#include <iostream>
 #include <cmath>
 
 #include "Misc/XMLwrapper.h"
@@ -600,12 +601,12 @@ void PADnoteParameters::applyparameters(bool islocked)
         // that's all; here is the only ifft for the whole sample; no windows are used ;-)
 
         // normalize(rms)
-        float rms = 0.0;
+        float rms = 0.0f;
         for (int i = 0; i < samplesize; ++i)
             rms += newsample.smp[i] * newsample.smp[i];
         rms = sqrtf(rms);
-        if (rms < 0.000001)
-            rms = 1.0;
+        if (rms < 0.000001f)
+            rms = 1.0f;
         rms *= sqrtf(262144.0f / samplesize);
         for (int i = 0; i < samplesize; ++i)
             newsample.smp[i] *= 1.0f / rms * 50.0f;
@@ -616,13 +617,13 @@ void PADnoteParameters::applyparameters(bool islocked)
 
         // replace the current sample with the new computed sample
         if (!islocked)
-            synth->lockExclusive();
+            synth->lockSharable();
         deletesample(nsample);
         sample[nsample].smp = newsample.smp;
         sample[nsample].size = samplesize;
         sample[nsample].basefreq = basefreq * basefreqadjust;
         if (!islocked)
-            synth->unlockExclusive();
+            synth->unlockSharable();
         newsample.smp = NULL;
     }
     delete fft;

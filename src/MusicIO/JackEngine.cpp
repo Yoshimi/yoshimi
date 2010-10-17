@@ -340,7 +340,7 @@ int JackEngine::_xrunCallback(void *arg)
 
 void JackEngine::_errorCallback(const char *msg)
 {
-    Runtime.Log("Jack error:" + string(msg));
+    Runtime.Log(string(msg));
 }
 
 
