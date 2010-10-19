@@ -22,7 +22,7 @@
 
 bool AlsaJackClient::openAudio(WavRecord *recorder)
 {
-    if (alsaEngine.openAudio(recorder))
+    if (alsaEngine.openAudio(Recorder))
     {
         Runtime.Samplerate = getSamplerate();
         Runtime.Buffersize = getBuffersize();
@@ -38,14 +38,15 @@ bool AlsaJackClient::openMidi(WavRecord *recorder)
 {
     if (jackEngine.connectServer(Runtime.midiDevice))
     {
-        if (jackEngine.openMidi(recorder))
+        if (jackEngine.openMidi(Recorder))
+        {
             return true;
+        }
         else
             Runtime.Log("AlsaJackClient failed to open midi");
     }
     return false;
 }
-
 
 bool AlsaJackClient::Start(void)
 {
@@ -61,4 +62,11 @@ bool AlsaJackClient::Start(void)
     else
         Runtime.Log("alsaEngine.Start() failed");
     return false;
+}
+
+
+void AlsaJackClient::Close(void)
+{
+    alsaEngine.Close();
+    jackEngine.Close();
 }

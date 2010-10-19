@@ -267,9 +267,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {//
-        switch (event)
-        {
+    code {switch(event){
             case FL_SHOW:
                 tick(this);
                 break;
@@ -281,8 +279,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
                     synth->vuresetpeaks();
                 break;
         }
-        return 1;
-    } {}
+        return 1;} {}
   }
   decl {int npart;} {}
   decl {float olddbl;} {}
@@ -297,8 +294,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
     code {neff1=0; neff2=0;} {}
   }
   Function {init(int neff1_,int neff2_)} {} {
-    code {//
-        neff1 = neff1_;
+    code {neff1 = neff1_;
         neff2 = neff2_;
         minimum(0);
         maximum(127);
@@ -307,21 +303,18 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
         labelsize(10);
         align(FL_ALIGN_TOP);
         value(synth->Psysefxsend[neff1][neff2]);
-        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());
-    } {}
+        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());} {}
   }
   Function {~SysEffSend()} {} {
     code {hide();} {}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {//
-        if (event == FL_PUSH || event == FL_DRAG)
+    code {if (event == FL_PUSH || event == FL_DRAG)
         {
             synth->setPsysefxsend(neff1,neff2,value());
         }
-        return WidgetPDial::handle(event);
-    } {}
+        return WidgetPDial::handle(event);} {}
   }
   decl {int neff1;} {}
   decl {int neff2;} {}
@@ -372,17 +365,15 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         }
         Fl_Button {} {
           label edit
-          callback {//
-              if ((int)bankui->cbwig->value() != (npart + 1))
+          callback {if ((int)bankui->cbwig->value() != (npart + 1))
               {
                   bankui->cbwig->value(npart+1);
                   bankui->cbwig->do_callback();
-              }
-          }
+              }}
           xywh {15 235 40 20} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Choice partrcv {
-          callback {synth->part[npart]->midichannel=o->value();}
+          callback {synth->part[npart]->Prcvchn=o->value();}
           tooltip {receive from Midi channel} xywh {10 213 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -391,15 +382,14 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
                 else
                     o->add("Dr10");
             }}
-          code1 {o->value(synth->part[npart]->midichannel);}
+          code1 {o->value(synth->part[npart]->Prcvchn);}
         } {}
       }
       Fl_Check_Button partenabled {
         label 01
-        callback {//
-            synth->lockSharable();
-            synth->partOnOff(npart, o->value());
-            synth->unlockSharable();
+        callback {synth->actionLock(lockmute);
+            synth->partonoff(npart, o->value());
+            synth->actionLock(unlock);
             if (o->value() == 0)
                 panellistitemgroup->deactivate();
             else
@@ -434,15 +424,14 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
   }
   Function {refresh()} {open
   } {
-    code {//
-        partenabled->value(synth->part[npart]->Penabled);
+    code {partenabled->value(synth->part[npart]->Penabled);
         if (synth->part[npart]->Penabled != 0)
             panellistitemgroup->activate();
         else
             panellistitemgroup->deactivate();
         partvolume->value(synth->part[npart]->Pvolume);
         partpanning->value(synth->part[npart]->Ppanning);
-        partrcv->value(synth->part[npart]->midichannel);
+        partrcv->value(synth->part[npart]->Prcvchn);
         partname->label(synth->part[npart]->Pname.c_str());
         if ((int)bankui->cbwig->value() != (npart + 1))
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));

@@ -37,10 +37,11 @@ using namespace std;
 class JackEngine : public MusicIO
 {
     public:
-        JackEngine();    
+        JackEngine();
         ~JackEngine() { Close(); };
+
+        bool isConnected(void) { return (NULL != jackClient); };
         bool connectServer(string server);
-        bool isConnected(void) { return (NULL != jackClient); }
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
         bool Start(void);
@@ -48,8 +49,10 @@ class JackEngine : public MusicIO
         #if defined(JACK_SESSION)
             bool jacksessionReply(string cmdline);
         #endif
-        unsigned int getSamplerate(void) { return jackSamplerate; }
-        int getBuffersize(void) { return jackNframes; };
+        unsigned int getSamplerate(void) { return audio.jackSamplerate; };
+        int getBuffersize(void) { return audio.jackNframes; };
+        string clientName(void);
+        int clientId(void);
 
     private:
         bool openJackClient(string server);
@@ -59,6 +62,10 @@ class JackEngine : public MusicIO
         bool processMidi(jack_nframes_t nframes);
         int processCallback(jack_nframes_t nframes);
         static int _processCallback(jack_nframes_t nframes, void *arg);
+        static void *_midiThread(void *arg);
+        void *midiThread(void);
+        void midiCleanup(void);
+        static void _midiCleanup(void *arg);
         static void _errorCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
@@ -68,12 +75,27 @@ class JackEngine : public MusicIO
             jack_session_event_t *lastevent;
         #endif
 
-        jack_client_t  *jackClient;
-        jack_port_t*    midiPort;
-        unsigned int    jackSamplerate;
-        unsigned int    jackNframes;
-        jack_port_t    *audioPortL;
-        jack_port_t    *audioPortR;
+        jack_client_t      *jackClient;
+        struct {
+            unsigned int  jackSamplerate;
+            unsigned int  jackNframes;
+            jack_port_t  *ports[2];
+            float        *portBuffs[2];
+        } audio;
+
+        struct {
+            jack_port_t*       port;
+            jack_ringbuffer_t *ringBuf;
+            pthread_t          pThread;
+            string             semName;
+            sem_t             *eventsUp;
+        } midi;
+
+        struct midi_event {
+            jack_nframes_t time;
+            char data[4]; // all events of interest are <= 4bytes
+        };
+
 };
 
 #endif

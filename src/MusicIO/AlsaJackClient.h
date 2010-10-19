@@ -33,20 +33,21 @@ class AlsaJackClient : public MusicClient
     public:
         AlsaJackClient() : MusicClient() { };
         ~AlsaJackClient() { Close(); };
+
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
         bool Start(void);
-        void queueMidi(midimessage *msg) { jackEngine.queueMidi(msg); }
-        void Close(void) { alsaEngine.Close(); jackEngine.Close(); }
+        void Close(void);
         bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
-        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); }
-        int getBuffersize(void) { return alsaEngine.getBuffersize(); }
-        int audioLatency(void) { return alsaEngine.audioLatency(); }
-        int midiLatency(void) { return jackEngine.midiLatency(); }
+        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
+        int getBuffersize(void) { return alsaEngine.getBuffersize(); };
+        int grossLatency(void)
+            { return alsaEngine.grossLatency() + jackEngine.grossLatency(); };
+
         string audioClientName(void) { return alsaEngine.audioClientName(); };
-        string midiClientName(void) { return jackEngine.midiClientName(); };
+        string midiClientName(void) { return jackEngine.clientName(); };
         int audioClientId(void) { return alsaEngine.audioClientId(); };
-        int midiClientId(void) { return jackEngine.midiClientId(); };
+        int midiClientId(void) { return jackEngine.clientId(); };
 
     private:
         AlsaEngine alsaEngine;

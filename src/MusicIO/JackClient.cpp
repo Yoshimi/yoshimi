@@ -53,3 +53,9 @@ bool JackClient::openMidi(WavRecord *recorder)
         Runtime.Log("JackClient failed to open midi");
     return false;
 }
+
+
+void JackClient::Close(void)
+{
+    jackEngine.Close();
+}

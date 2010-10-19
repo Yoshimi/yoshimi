@@ -20,12 +20,14 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.062-pre1")
+set (YOSHIMI_VERSION "0.060-pre5")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
-set (CMAKE_USE_RELATIVE_PATHS OFF)   # relative paths break some scripts(?)
-set (CMAKE_SKIP_RULE_DEPENDENCY OFF) # rebuild objects if rules have changed, even if source hasn't.
+set (CMAKE_USE_RELATIVE_PATHS OFF)
+    # relative paths break some scripts(?)
+set (CMAKE_SKIP_RULE_DEPENDENCY OFF)
+    # Rebuild objects if rules have changed, even if source hasn't.
 
 message (STATUS "Building Yoshimi version ${YOSHIMI_VERSION} for ${CMAKE_SYSTEM_NAME}")
 
@@ -141,7 +143,7 @@ find_package (Boost)
 if (Boost_FOUND)
     message(STATUS "Found boost headers version " ${Boost_VERSION})
 else (Boost_FOUND)
-    message (FATAL_ERROR "Boost headers required but not found")
+    message (FATAL_ERROR "boost headers required, but not found")
 endif (Boost_FOUND)
 
 # libsndfile

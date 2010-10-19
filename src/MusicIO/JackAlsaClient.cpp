@@ -36,3 +36,22 @@ bool JackAlsaClient::openAudio(WavRecord *recorder)
         Runtime.Log("Error, failed to connect to jack server");
     return false;
 }
+
+
+bool JackAlsaClient::openMidi(WavRecord *recorder)
+{
+    return alsaEngine.openMidi(recorder);
+}
+
+
+bool JackAlsaClient::Start(void)
+{
+    return jackEngine.Start() && alsaEngine.Start();
+}
+
+
+void JackAlsaClient::Close(void)
+{
+    jackEngine.Close();
+    alsaEngine.Close();
+}

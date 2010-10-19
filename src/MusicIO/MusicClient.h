@@ -25,38 +25,48 @@
 
 using namespace std;
 
-#include "MusicIO/Midi.h"
+#include "MusicIO/MidiControl.h"
 #include "MusicIO/WavRecord.h"
 
 class MusicClient
 {
     public:
-        MusicClient() : wavrecord(new WavRecord()) { }
-        ~MusicClient() { }
-        bool Open(void) { return openAudio(wavrecord) && openMidi(wavrecord); }
-        virtual bool Start(void) { return wavrecord->Start(getSamplerate(), getBuffersize()); }
+        MusicClient();
+        ~MusicClient() { };
+
+        bool Open(void);
+        virtual bool Start(void) = 0;
         virtual void Close(void) = 0;
-        virtual void queueMidi(midimessage *msg) = 0;
         virtual bool jacksessionReply(string cmdline) { return false; }
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
+        virtual int grossLatency(void) = 0;
         virtual string audioClientName(void) = 0;
         virtual string midiClientName(void) = 0;
         virtual int audioClientId(void) = 0;
         virtual int midiClientId(void) = 0;
-        virtual int audioLatency(void) = 0;
-        virtual int midiLatency(void) = 0;
+
         static MusicClient *newMusicClient(void);
-        void startRecord(void)  { wavrecord->StartRecord(); }
-        void stopRecord(void) { wavrecord->StopRecord(); };
-        bool setRecordFile(const char* fpath, string& errmsg) { return wavrecord->SetFile(string(fpath), errmsg); }
-        bool setRecordOverwrite(string& errmsg) { return wavrecord->SetOverwrite(errmsg); }
-        string wavFilename(void) { return wavrecord->Filename(); }
+
+        void startRecord(void)  { Recorder->Start(); };
+        void stopRecord(void) { Recorder->Stop(); };
+
+        bool setRecordFile(const char* fpath, string& errmsg)
+            { return Recorder->SetFile(string(fpath), errmsg); };
+
+        bool setRecordOverwrite(string& errmsg)
+            { return Recorder->SetOverwrite(errmsg); };
+
+        string wavFilename(void) { return Recorder->Filename(); };
+
+        string      audiodevice;
+        string      mididevice;
 
     protected:
         virtual bool openAudio(WavRecord *recorder) = 0;
         virtual bool openMidi(WavRecord *recorder) = 0;
-        WavRecord *wavrecord;
+
+        WavRecord *Recorder;
 };
 
 extern MusicClient *musicClient;

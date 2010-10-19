@@ -39,3 +39,9 @@ bool AlsaClient::openMidi(WavRecord *recorder)
     Runtime.Log("AlsaClient midi open failed");
     return false;
 }
+
+
+void AlsaClient::Close(void)
+{
+    alsaEngine.Close();
+}

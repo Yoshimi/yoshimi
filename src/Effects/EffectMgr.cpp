@@ -133,9 +133,9 @@ void EffectMgr::changepreset_nolock(unsigned char npreset)
 // Change the preset of the current effect(with thread locking)
 void EffectMgr::changepreset(unsigned char npreset)
 {
-    synth->lockExclusive();
+    synth->actionLock(lock);
     changepreset_nolock(npreset);
-    synth->unlockExclusive();
+    synth->actionLock(unlock);
 }
 
 
@@ -150,9 +150,9 @@ void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
 // Change a parameter of the current effect (with thread locking)
 void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
-    synth->lockExclusive();
+    synth->actionLock(lock);
     seteffectpar_nolock(npar, value);
-    synth->unlockExclusive();
+    synth->actionLock(unlock);
 }
 
 // Get a parameter of the current effect

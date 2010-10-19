@@ -55,18 +55,19 @@ class Controller
         void setresonancebw(int value);
 
 
-        //void setparameternumber(unsigned int type, int value); // used for rpn and nrpn's
-        //int getnrpn(int *parhi, int *parlo, int *valhi, int *vallo);
+        void setparameternumber(unsigned int type, int value); // used for rpn and nrpn's
+        int getnrpn(int *parhi, int *parlo, int *valhi, int *vallo);
 
         int initportamento(float oldfreq, float newfreq, bool in_progress);
         // returns 1 if the portamento's conditions are true, else return 0
+
         void updateportamento(void); // update portamento values
 
         // Controllers values
-        struct { 
+        struct { // Pitch Wheel
             int data;
-            short int bendrange; // pitchwheel bendrange is in cents
-            float relfreq;       // relative frequency, default is 1.0
+            short int bendrange; // bendrange is in cents
+            float relfreq; // the relative frequency (default is 1.0)
         } pitchwheel;
 
         struct { // Expression
@@ -129,11 +130,14 @@ class Controller
             // parameters
             int data;
             unsigned char portamento;
+
             unsigned char receive;
             unsigned char time;
             unsigned char pitchthresh;
             unsigned char pitchthreshtype;
+
             unsigned char updowntimestretch;
+
             float freqrap;
             int noteusing;
             int used;

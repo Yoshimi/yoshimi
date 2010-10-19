@@ -53,7 +53,7 @@ class Config : public MiscFuncs
         void StartupReport(void);
         void Announce(void);
         void Usage(void);
-        void Log(string msg, bool tostderr = true);
+        void Log(string msg, bool tostderr = false);
         void flushLog(void);
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
@@ -61,7 +61,8 @@ class Config : public MiscFuncs
         void saveState(void);
         bool restoreState(SynthEngine *synth);
         bool restoreJsession(SynthEngine *synth);
-        void setJackSessionSave(int save_type, const char *session_dir, const char *client_uuid);
+        void setJackSessionSave(int event_type, const char *session_dir, const char *client_uuid);
+        void saveJackSession(void);
 
         static void sigHandler(int sig);
         void setInterruptActive(int sig);
@@ -74,53 +75,54 @@ class Config : public MiscFuncs
         string addParamHistory(string file);
         string historyFilename(int index);
 
-        string ConfigDir;
-        string ConfigFile;
-        string paramsLoad;
-        string instrumentLoad;
-        bool   doRestoreState;
-        string StateFile;
-        string CurrentXMZ;
-        bool   doRestoreJackSession;
-        string jackSessionUuid;
-        string jackSessionFile;
+        string        ConfigDir;
+        string        ConfigFile;
+        string        paramsLoad;
+        string        instrumentLoad;
+        bool          doRestoreState;
+        string        StateFile;
+        string        CurrentXMZ;
+        bool          doRestoreJackSession;
+        const string  baseCmdLine;
+        string        jackSessionFile;
 
         unsigned int  Samplerate;
         unsigned int  Buffersize;
         unsigned int  Oscilsize;
 
-        bool runSynth;
-        bool showGui;
-        bool showConsole;
-        int  VirKeybLayout;
+        bool          runSynth;
+        bool          showGui;
+        bool          showConsole;
+        int           VirKeybLayout;
 
-        string audioDevice;
-        string midiDevice;
         audio_drivers audioEngine;
         midi_drivers  midiEngine;
+        string        audioDevice;
+        string        midiDevice;
 
-        string jackServer;
-        bool   startJack;        // false
-        bool   connectJackaudio; // false
+        string        jackServer;
+        bool          startJack;        // false
+        bool          connectJackaudio; // false
+        string        jackSessionUuid;
 
         string        alsaAudioDevice;
         unsigned int  alsaSamplerate;
         int           alsaBuffersize;
 
-        string alsaMidiDevice;
-        string nameTag;
+        string        alsaMidiDevice;
+        string        nameTag;
 
-        bool   Float32bitWavs;
-        string DefaultRecordDirectory;
-        string CurrentRecordDirectory;
+        bool          Float32bitWavs;
+        string        DefaultRecordDirectory;
+        string        CurrentRecordDirectory;
 
-        int    BankUIAutoClose;
-        int    Interpolation;
-        string bankRootDirlist[MAX_BANK_ROOT_DIRS];
-        string currentBankDir;
-        string presetsDirlist[MAX_BANK_ROOT_DIRS];
-        int    CheckPADsynth;
-        int    rtprio;
+        int           BankUIAutoClose;
+        int           Interpolation;
+        string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
+        string        currentBankDir;
+        string        presetsDirlist[MAX_BANK_ROOT_DIRS];
+        int           CheckPADsynth;
+        int           rtprio;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
@@ -139,7 +141,6 @@ class Config : public MiscFuncs
         bool restoreSessionData(SynthEngine *synth, string sessionfile);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
-        void saveJackSession(void);
 
         static unsigned short nextHistoryIndex;
         static struct sigaction sigAction;

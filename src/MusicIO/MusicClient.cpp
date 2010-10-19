@@ -25,6 +25,13 @@
 
 MusicClient *musicClient = NULL;
 
+MusicClient::MusicClient() :
+    audiodevice(string()),
+    mididevice(string()),
+    Recorder(NULL)
+{ Recorder = new WavRecord(); }
+
+
 MusicClient *MusicClient::newMusicClient(void)
 {
     MusicClient *musicObj = NULL;
@@ -74,3 +81,12 @@ MusicClient *MusicClient::newMusicClient(void)
     }
     return musicObj;
 }
+
+
+bool MusicClient::Open(void)
+{
+    if (openAudio(Recorder) && openMidi(Recorder))
+        return Recorder->Prep(getSamplerate(), getBuffersize());
+    return false;
+}
+

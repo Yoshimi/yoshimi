@@ -38,21 +38,22 @@ class JackAlsaClient : public MusicClient
     public:
         JackAlsaClient() : MusicClient() { };
         ~JackAlsaClient() { Close(); };
-        bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder) { return alsaEngine.openMidi(recorder); }
-        bool Start(void) { return jackEngine.Start() && alsaEngine.Start(); }
-        void queueMidi(midimessage *msg) { alsaEngine.queueMidi(msg); }
-        void Close(void) { jackEngine.Close(); alsaEngine.Close(); }
-        bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
 
-        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); }
-        int getBuffersize(void) { return jackEngine.getBuffersize(); }
-        int audioLatency(void) { return jackEngine.audioLatency(); }
-        int midiLatency(void) { return alsaEngine.midiLatency(); }
-        string audioClientName(void) { return jackEngine.audioClientName(); }
-        string midiClientName(void) { return alsaEngine.midiClientName(); }
-        int audioClientId(void) { return jackEngine.audioClientId(); }
-        int midiClientId(void) { return alsaEngine.midiClientId(); }
+        bool openAudio(WavRecord *recorder);
+        bool openMidi(WavRecord *recorder);
+        bool Start(void);
+        void Close(void);
+        bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
+        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
+        int getBuffersize(void) { return jackEngine.getBuffersize(); };
+        int grossLatency(void)
+            { return jackEngine.grossLatency() + alsaEngine.grossLatency(); };
+
+        string audioClientName(void) { return jackEngine.clientName(); };
+        string midiClientName(void) { return alsaEngine.midiClientName(); };
+        int audioClientId(void) { return jackEngine.clientId(); };
+        int midiClientId(void) { return alsaEngine.midiClientId(); };
+
 
     private:
         JackEngine jackEngine;

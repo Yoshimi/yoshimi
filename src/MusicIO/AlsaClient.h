@@ -32,13 +32,12 @@ class AlsaClient : public MusicClient
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
         bool Start(void) { return alsaEngine.Start(); };
-        void queueMidi(midimessage *msg) { alsaEngine.queueMidi(msg); }
         void Stop(void);
-        void Close(void) { alsaEngine.Close(); }
+        void Close(void);
+
         unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
         int getBuffersize(void) { return alsaEngine.getBuffersize(); };
-        int audioLatency(void) { return alsaEngine.audioLatency(); };
-        int midiLatency(void) { return alsaEngine.midiLatency(); };
+        int grossLatency(void) { return alsaEngine.grossLatency(); };
 
         string audioClientName(void) { return alsaEngine.audioClientName(); };
         string midiClientName(void) { return alsaEngine.midiClientName(); };

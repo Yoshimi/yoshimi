@@ -57,61 +57,59 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
     code {this->pars=pars;} {}
   }
   Function {draw()} {} {
-    code {//
-        int ox=x(),oy=y(),lx=w(),ly=h();
-        if (!visible()) return;
-        float smps[lx];
-        
-        float realbw=pars->getprofile(smps,lx);
-        bool active=active_r();
-        
-        //draw the equivalent bandwidth
-        if (active) fl_color(220,220,220);
-        else fl_color(160,165,165);
-        fl_line_style(0);
-        int rbw=(int)(realbw*(lx-1.0)/2.0);
-        for (int i=lx/2-rbw;i<(lx/2+rbw);i++) fl_line(ox+i,oy,ox+i,oy+ly-1);
-        
-        fl_line_style(0);
-        if (active) fl_color(200,200,200);
-         else  fl_color(160,160,160);
-        for (int i=1;i<10;i++){
-            int kx=(int)(lx/10.0*i);
-            fl_line(ox+kx,oy,ox+kx,oy+ly-1);
-        };
-        for (int i=1;i<5;i++){
-            int ky=(int)(ly/5.0*i);
-            fl_line(ox,oy+ly-ky,ox+lx,oy+ly-ky-1);
-        };
-        
-        
-        fl_color(120,120,120);
-        fl_line_style(FL_DOT);
-        fl_line(ox+lx/2,oy,ox+lx/2,oy+ly);
-        
-        //draw the graph
-        fl_line_style(0);
-        int old=0;
-        for (int i=0;i<lx;i++){
-           int val=(int) ((ly-2)*smps[i]);
-           if (active) fl_color(180,210,240);
-              else fl_color(150,150,155);
-           fl_line(ox+i,oy+ly-1,ox+i,oy+ly-1-val);
-           if (active) fl_color(0,0,100);
-               else fl_color(150,150,150);
-           if (i>0) fl_line(ox+i-1,oy+ly-2-old,ox+i,oy+ly-2-val);
-           old=val;   
-        };
-        
-        
-        fl_line_style(FL_DASH);
-        if (active) fl_color(0,100,220);
-            else fl_color(150,160,170);
-        fl_line(ox+lx/2-rbw,oy,ox+lx/2-rbw,oy+ly-1);
-        fl_line(ox+lx/2+rbw,oy,ox+lx/2+rbw,oy+ly-1);
-    
-        fl_line_style(0);
-    } {}
+    code {int ox=x(),oy=y(),lx=w(),ly=h();
+if (!visible()) return;
+float smps[lx];
+
+float realbw=pars->getprofile(smps,lx);
+bool active=active_r();
+
+//draw the equivalent bandwidth
+if (active) fl_color(220,220,220);
+ else fl_color(160,165,165);
+fl_line_style(0);
+int rbw=(int)(realbw*(lx-1.0)/2.0);
+for (int i=lx/2-rbw;i<(lx/2+rbw);i++) fl_line(ox+i,oy,ox+i,oy+ly-1);
+
+fl_line_style(0);
+if (active) fl_color(200,200,200);
+ else  fl_color(160,160,160);
+for (int i=1;i<10;i++){
+	int kx=(int)(lx/10.0*i);
+	fl_line(ox+kx,oy,ox+kx,oy+ly-1);
+};
+for (int i=1;i<5;i++){
+	int ky=(int)(ly/5.0*i);
+	fl_line(ox,oy+ly-ky,ox+lx,oy+ly-ky-1);
+};
+
+
+fl_color(120,120,120);
+fl_line_style(FL_DOT);
+fl_line(ox+lx/2,oy,ox+lx/2,oy+ly);
+
+//draw the graph
+fl_line_style(0);
+int old=0;
+for (int i=0;i<lx;i++){
+   int val=(int) ((ly-2)*smps[i]);
+   if (active) fl_color(180,210,240);
+      else fl_color(150,150,155);
+   fl_line(ox+i,oy+ly-1,ox+i,oy+ly-1-val);
+   if (active) fl_color(0,0,100);
+       else fl_color(150,150,150);
+   if (i>0) fl_line(ox+i-1,oy+ly-2-old,ox+i,oy+ly-2-val);
+   old=val;   
+};
+
+
+fl_line_style(FL_DASH);
+if (active) fl_color(0,100,220);
+    else fl_color(150,160,170);
+fl_line(ox+lx/2-rbw,oy,ox+lx/2-rbw,oy+ly-1);
+fl_line(ox+lx/2+rbw,oy,ox+lx/2+rbw,oy+ly-1);
+
+fl_line_style(0);} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
@@ -126,83 +124,85 @@ class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
     code {this->pars=pars;} {}
   }
   Function {draw()} {} {
-    code {//
-        if (!visible()) return;
-        const int maxdb=60;
+    code {if (!visible()) return;
+const int maxdb=60;
 
-        int ox=x(),oy=y(),lx=w(),ly=h();
-        const int maxharmonic=64;
+int ox=x(),oy=y(),lx=w(),ly=h();
+const int maxharmonic=64;
 
-        for (int i=1;i<maxharmonic;i++){
-            fl_color(200,200,200);
-            fl_line_style(FL_DOT);
-            if (i%5==0) fl_line_style(0);
-            if (i%10==0) fl_color(160,160,160);
-            int kx=(int)(lx/(float)maxharmonic*i);
-            fl_line(ox+kx,oy,ox+kx,oy+ly);
-        }
 
-        int n = synth->halfoscilsize;
-        float spc[n];
-        for (int i=0;i<n;i++) spc[i]=0.0;
-            synth->lockSharable();
-            pars->oscilgen->getspectrum(n,spc,0);
-            synth->unlockSharable();
+for (int i=1;i<maxharmonic;i++){
+	fl_color(200,200,200);
+	fl_line_style(FL_DOT);
+	if (i%5==0) fl_line_style(0);
+	if (i%10==0) fl_color(160,160,160);
+	int kx=(int)(lx/(float)maxharmonic*i);
+	fl_line(ox+kx,oy,ox+kx,oy+ly);
+};
 
-            //normalize
-            float max=0;
-            for (int i=0;i<n;i++){
-                float x=fabsf(spc[i]);
-                if (max<x) max=x;
-            }
-            if (max<0.000001) max=1.0;
-            max=max*1.05;
 
-            float spectrum[lx];
-            for (int i=0;i<lx;i++) spectrum[i]=0;
 
-            for (int i=1;i<n;i++)
-            {
-                float nhr=pars->getNhr(i);
-                int kx=(int)(lx/(float)maxharmonic*nhr);
-                if ((kx<0) || (kx>lx))
-                    continue;
-                spectrum[kx]=spc[i-1]/max+1e-9;
-            }
+int n = synth->halfoscilsize;
+float spc[n];
+for (int i=0;i<n;i++) spc[i]=0.0;
 
-            fl_color(180,0,0);
-            fl_line_style(0);
+synth->actionLock(lock);
+pars->oscilgen->getspectrum(n,spc,0);
+synth->actionLock(unlock);
 
-            if (pars->Pmode==2)
-            {
-                int old=0;
-                for (int i=1;i<lx;i++)
-                {
-                    if ((spectrum[i]>1e-10)||(i==(lx-1))){
-                        int delta=i-old;
-                        float val1=spectrum[old];
-                        float val2=spectrum[i];
 
-                        float idelta=1.0/delta;
-                        for (int j=0;j<delta;j++)
-                        {
-                            float x=idelta*j;
-                            spectrum[old+j]=val1*(1.0-x)+val2*x;
-                        }
-                        old=i;
-                    }        
-                }
-            }
+//normalize
+float max=0;
+for (int i=0;i<n;i++){
+   float x=fabsf(spc[i]);
+   if (max<x) max=x;
+}
+if (max<0.000001) max=1.0;
+max=max*1.05;
 
-            for (int i=0;i<lx;i++)
-            {
-                float x=spectrum[i];
-                if (x>dB2rap(-maxdb)) x=rap2dB(x)/maxdb+1;
-                else continue;
-                int yy=(int)(x*ly);
-                fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
-            }
-      } {}
+float spectrum[lx];
+for (int i=0;i<lx;i++) spectrum[i]=0;
+
+
+for (int i=1;i<n;i++){
+	float nhr=pars->getNhr(i);
+	int kx=(int)(lx/(float)maxharmonic*nhr);
+	if ((kx<0)||(kx>lx)) continue;
+
+        spectrum[kx]=spc[i-1]/max+1e-9;
+
+};
+
+fl_color(180,0,0);
+fl_line_style(0);
+
+if (pars->Pmode==2){
+   int old=0;
+   for (int i=1;i<lx;i++){
+	if ((spectrum[i]>1e-10)||(i==(lx-1))){
+		int delta=i-old;
+		float val1=spectrum[old];
+		float val2=spectrum[i];
+
+		float idelta=1.0/delta;
+		for (int j=0;j<delta;j++){
+			float x=idelta*j;
+			spectrum[old+j]=val1*(1.0-x)+val2*x;
+		};
+		old=i;
+	};
+      
+   };
+};
+
+for (int i=0;i<lx;i++){
+	float x=spectrum[i];
+        if (x>dB2rap(-maxdb)) x=rap2dB(x)/maxdb+1;
+             else continue;
+       	int yy=(int)(x*ly);
+	fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
+      
+};} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
@@ -407,16 +407,13 @@ cbwidget->do_callback();}
           }
           Fl_Group {} {
             xywh {100 155 270 135} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179 align 6
-            code0 {osc = new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
+            code0 {osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
             code1 {osc->init(pars->oscilgen);}
           } {}
           Fl_Button {} {
             label Change
-            callback {//
-                if (oscui != NULL)
-                    delete oscui;   
-                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton);
-            }
+            callback {if (oscui!=NULL) delete (oscui);
+oscui=new OscilEditor(pars->oscilgen,osc,cbwidget,applybutton);}
             xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Box cbwidget {
@@ -793,12 +790,10 @@ pars->PCoarseDetune = k*1024+
             }
             Fl_Counter coarsedet {
               label {Coarse det.}
-              callback {//
-                  int k=(int) o->value();
-                  if (k < 0)
-                      k += 1024;
-                  pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;
-              }
+              callback {int k=(int) o->value();
+if (k<0) k+=1024;
+pars->PCoarseDetune = k+
+   (pars->PCoarseDetune/1024)*1024;}
               tooltip {Coarse Detune} xywh {455 365 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune%1024;}
               code1 {if (k>=512) k-=1024;}
@@ -812,7 +807,8 @@ pars->PCoarseDetune = k*1024+
               class LFOUI
             } {}
             Fl_Slider detune {
-              callback {pars->PDetune=(int)o->value()+8192; detunevalueoutput->do_callback();}
+              callback {pars->PDetune=(int)o->value()+8192;
+detunevalueoutput->do_callback();}
               tooltip {Fine Detune (cents)} xywh {60 295 295 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
             }
@@ -824,24 +820,18 @@ pars->PCoarseDetune = k*1024+
             }
             Fl_Choice detunetype {
               label {Detune Type}
-              callback {//
-                  pars->PDetuneType = (int) o->value() + 1;
-                  detunevalueoutput->do_callback();
-              }
+              callback {pars->PDetuneType=(int) o->value()+1;
+detunevalueoutput->do_callback();}
               xywh {450 335 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->PDetuneType-1);}
             } {}
             Fl_Check_Button hz440 {
               label 440Hz
-              callback {//
-                  int x=(int) o->value();
-                  pars->Pfixedfreq=x;
-                  if (x==0)
-                      fixedfreqetdial->deactivate();
-                  else
-                      fixedfreqetdial->activate();
-              }
+              callback {int x=(int) o->value();
+pars->Pfixedfreq=x;
+if (x==0) fixedfreqetdial->deactivate();
+   else fixedfreqetdial->activate();}
               tooltip {set the base frequency to 440Hz} xywh {365 295 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->Pfixedfreq);}
             }
@@ -1083,13 +1073,11 @@ pars->PCoarseDetune = k*1024+
     } {}
   }
   Function {~PADnoteUI()} {} {
-    code {//
-        delete oscui;
-        delete resui;
+    code {delete(oscui);
+delete(resui);
 
-        padnotewindow->hide();
-        delete padnotewindow;
-    } {}
+padnotewindow->hide();
+delete(padnotewindow);} {}
   }
   decl {PADnoteParameters *pars;} {public
   }

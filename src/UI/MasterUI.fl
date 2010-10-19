@@ -223,9 +223,9 @@ class MasterUI {open :{private MiscFuncs}
             callback {if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
                 {
                     // int npart = (int)npartcounter->value() - 1;
-                synth->lockExclusive();
+                    synth->actionLock(lockmute);
                     synth->part[npart]->defaultsinstrument();
-                synth->unlockExclusive();
+                    synth->actionLock(unlock);
                     npartcounter->do_callback();
                 }
                 updatepanel();}
@@ -237,13 +237,13 @@ class MasterUI {open :{private MiscFuncs}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-            synth->lockExclusive();
+                synth->actionLock(lockmute);
                 synth->part[npart]->defaultsinstrument();
                 // load the instr. parameters
                 bool result =
                     synth->part[npart]->loadXMLinstrument(string(filename));
                 synth->part[npart]->applyparameters(true);
-                synth->unlockExclusive();
+                synth->actionLock(unlock);
                 npartcounter->do_callback();
                 updatepanel();
                 if (!result)
@@ -259,9 +259,9 @@ class MasterUI {open :{private MiscFuncs}
                 if (isRegFile(string(filename)))
                     if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
                         return;
-                synth->lockSharable();
+                synth->actionLock(lockmute);
                 bool result = synth->part[npart]->saveXML(string(filename));
-                synth->unlockSharable();
+                synth->actionLock(unlock);
                 if (!result)
                     fl_alert("Failed to save instrument file");
                 updatepanel();}
@@ -320,10 +320,10 @@ class MasterUI {open :{private MiscFuncs}
                 if (filename == NULL)
                     return;
                 string fname = string(filename);
-                synth->lockExclusive();
+                synth->actionLock(lockmute);
                 synth->microtonal.defaults(); // clear all parameters
                 bool result = synth->microtonal.loadXML(fname);
-                synth->unlockExclusive();
+                synth->actionLock(unlock);
                 if (NULL != microtonalui)
                     delete microtonalui;
                 microtonalui = new MicrotonalUI(&synth->microtonal);
@@ -341,9 +341,9 @@ class MasterUI {open :{private MiscFuncs}
                 if (isRegFile(string(filename)))
                     if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
                         return;
-                synth->lockSharable();
+                synth->actionLock(lockmute);
                 bool result = synth->microtonal.saveXML(string(filename));
-                synth->unlockSharable();
+                synth->actionLock(unlock);
                 if (!result)
                     fl_alert("Failed to save scale settings");
                 updatepanel();}
@@ -391,9 +391,9 @@ class MasterUI {open :{private MiscFuncs}
         Fl_Button {} {
           label Reset
           callback {virkeyboard->relaseallkeys();
-              synth->lockExclusive();
+              synth->actionLock(lockmute);
               synth->shutup = 1;
-              synth->unlockExclusive();}
+              synth->actionLock(unlock);}
           tooltip {Cease all sound immediately!} xywh {11 52 40 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -555,9 +555,9 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Choice sysefftype {
             label Type
-            callback {synth->lockExclusive();
+            callback {synth->actionLock(lockmute);
               synth->sysefx[nsyseff]->changeeffect(o->value());
-              synth->unlockExclusive();
+              synth->actionLock(unlock);
               syseffectui->refresh(synth->sysefx[nsyseff]);
               showSysEfxUI();} open
             xywh {140 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
@@ -612,10 +612,9 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Button {} {
             label P
-            callback {//
-              synth->lockSharable();
+            callback {synth->actionLock(lockmute);
               presetsui->paste(synth->sysefx[nsyseff], syseffectui);
-              synth->unlockSharable();}
+              synth->actionLock(unlock);}
             xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
@@ -647,9 +646,9 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Choice insefftype {
             label Type
-            callback {synth->lockExclusive();
+            callback {synth->actionLock(lockmute);
               synth->insefx[ninseff]->changeeffect(o->value());
-              synth->unlockExclusive();
+              synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff]);
               inseffectui->show();}
             xywh {126 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
@@ -725,9 +724,9 @@ class MasterUI {open :{private MiscFuncs}
           }
           Fl_Button {} {
             label P
-            callback {synth->lockSharable();
+            callback {synth->actionLock(lockmute);
               presetsui->paste(synth->insefx[ninseff], inseffectui);
-              synth->unlockSharable();}
+              synth->actionLock(unlock);}
             xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
@@ -897,9 +896,11 @@ ZynAddSubFX}
     code {if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
             delete microtonalui;
-            synth->lockExclusive();
+
+            synth->actionLock(lockmute);
             synth->defaults();
-            synth->unlockExclusive();
+            synth->actionLock(unlock);
+
             npartcounter->value(1);
             refresh_master_ui();
         }
@@ -915,11 +916,11 @@ ZynAddSubFX}
             if (fname == NULL)
                 return;
         }
-        synth->lockExclusive();
+        synth->actionLock(lockmute);
         synth->defaults(); // clear all parameters
         int result = synth->loadXML(fname); // load the data
+        synth->actionLock(unlock);
         synth->applyparameters();
-        synth->unlockExclusive();
         npartcounter->value(1);
         refresh_master_ui();
         updatepanel();

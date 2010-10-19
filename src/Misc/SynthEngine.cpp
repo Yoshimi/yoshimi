@@ -22,9 +22,7 @@
     This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
-#include <iostream>
-
-//using namespace std;
+using namespace std;
 
 #include "MasterUI.h"
 #include "Misc/SynthEngine.h"
@@ -51,6 +49,8 @@ SynthEngine::SynthEngine() :
     recordPending(false),
     tmpmixl(NULL),
     tmpmixr(NULL),
+    processLock(NULL),
+    meterLock(NULL),
     stateXMLtree(NULL)
 {
     ctl = new Controller();
@@ -82,6 +82,8 @@ SynthEngine::~SynthEngine()
         delete [] tmpmixr;
     if (fft)
         delete fft;
+    pthread_mutex_destroy(&processMutex);
+    pthread_mutex_destroy(&meterMutex);
     if (ctl)
         delete ctl;
 }
@@ -95,6 +97,24 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
+
+    if (!pthread_mutex_init(&processMutex, NULL))
+        processLock = &processMutex;
+    else
+    {
+        Runtime.Log("SynthEngine actionLock init fails :-(");
+        processLock = NULL;
+        goto bail_out;
+    }
+
+    if (!pthread_mutex_init(&meterMutex, NULL))
+        meterLock = &meterMutex;
+    else
+    {
+        Runtime.Log("SynthEngine meterLock init fails :-(");
+        meterLock = NULL;
+        goto bail_out;
+    }
 
     if (initstate_r(samplerate + buffersize + oscilsize, random_state,
                     sizeof(random_state), &random_buf))
@@ -175,9 +195,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     {
         if (Runtime.paramsLoad.size())
         {
-            if (loadXML(Runtime.paramsLoad) >= 0)
+            if (synth->loadXML(Runtime.paramsLoad) >= 0)
             {
-                applyparameters();
+                synth->applyparameters();
                 Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
@@ -190,14 +210,14 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         if (!Runtime.instrumentLoad.empty())
         {
             int loadtopart = 0;
-            if (!part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
+            if (!synth->part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
             {
                 Runtime.Log("Failed to load instrument file " + Runtime.instrumentLoad);
                 goto bail_out;
             }
             else
             {
-                part[loadtopart]->applyparameters(true);
+                synth->part[loadtopart]->applyparameters(true);
                 Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
             }
         }
@@ -243,9 +263,9 @@ void SynthEngine::defaults(void)
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->defaults();
-        part[npart]->midichannel = npart % NUM_MIDI_CHANNELS;
+        part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
-    partOnOff(0, 1); // enable the first part
+    partonoff(0, 1); // enable the first part
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
@@ -265,93 +285,102 @@ void SynthEngine::defaults(void)
 }
 
 
-// Note On Messages ()
-void SynthEngine::noteOn(unsigned char chan, unsigned char note,
-                         unsigned char velocity, bool record_trigger)
-{                        // velocity 0 => NoteOff
+// Note On Messages (velocity == 0 => NoteOff)
+void SynthEngine::NoteOn(unsigned char chan, unsigned char note,
+                    unsigned char velocity, bool record_trigger)
+{
     if (!velocity)
-        noteOff(chan, note);
+        this->NoteOff(chan, note);
     else if (!muted)
     {
         if (recordPending && record_trigger)
             guiMaster->record_activated();
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
-            if (part[npart]->Penabled && chan == part[npart]->midichannel)
+            if (chan == part[npart]->Prcvchn)
             {
-                lockSharable();
-                part[npart]->NoteOn(note, velocity, keyshift);
-                unlockSharable();
+                fakepeakpart[npart] = velocity * 2;
+                if (part[npart]->Penabled)
+                {
+                    synth->actionLock(lock);
+                    part[npart]->NoteOn(note, velocity, keyshift);
+                    synth->actionLock(unlock);
+                }
+            }
+        }
+    }
+}
+
+
+// Note Off Messages
+void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
+{
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {
+        if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+        {
+            synth->actionLock(lock);
+            part[npart]->NoteOff(note);
+            synth->actionLock(unlock);
+        }
+    }
+}
+
+
+// Controllers
+void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
+{
+    if (type == C_dataentryhi
+        || type == C_dataentrylo
+        || type == C_nrpnhi
+        || type == C_nrpnlo)
+    {
+        // Process RPN and NRPN by the Master (ignore the chan)
+        ctl->setparameternumber(type, par);
+
+        int parhi = -1, parlo = -1, valhi = -1, vallo = -1;
+        if (!ctl->getnrpn(&parhi, &parlo, &valhi, &vallo))
+        {   // this is NRPN
+            // fprintf(stderr,"rcv. NRPN: %d %d %d %d\n",parhi,parlo,valhi,vallo);
+            switch (parhi)
+            {
+                case 0x04: // System Effects
+                    if (parlo < NUM_SYS_EFX)
+                        sysefx[parlo]->seteffectpar_nolock(valhi, vallo);
+                    break;
+            case 0x08: // Insertion Effects
+                if (parlo < NUM_INS_EFX)
+                    insefx[parlo]->seteffectpar_nolock(valhi, vallo);
+                break;
+
             }
         }
     }
     else
-        cerr << " Is muted" << endl;
-}
+    {   // other controllers
+        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        {   // Send the controller to all part assigned to the channel
+            if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                part[npart]->SetController(type, par);
+        }
 
-
-void SynthEngine::noteOff(unsigned char chan, unsigned char note)
-{
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if (part[npart]->Penabled && chan == part[npart]->midichannel)
-        {
-            lockSharable();
-            part[npart]->NoteOff(note);
-            unlockSharable();
+        if (type == C_allsoundsoff)
+        {   // cleanup insertion/system FX
+            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+                sysefx[nefx]->cleanup();
+            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+                insefx[nefx]->cleanup();
         }
     }
-}
-
-
-void SynthEngine::setController(unsigned char chan, unsigned char type, short int par)
-{
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {   // Send the controller to all active parts assigned to the channel
-        if (part[npart]->Penabled && chan == part[npart]->midichannel)
-            part[npart]->SetController(type, par);
-    }
-
-    if (type == C_allsoundsoff)
-    {   // cleanup insertion/system FX
-        synth->lockSharable();
-        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-            sysefx[nefx]->cleanup();
-        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-            insefx[nefx]->cleanup();
-        synth->unlockSharable();
-    }
-}
-
-
-void SynthEngine::setPitchwheel(unsigned char chan, short int par)
-{
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        if (part[npart]->Penabled && chan == part[npart]->midichannel)
-            part[npart]->ctl->setpitchwheel(par);
-}
-
-
-void SynthEngine::programChange(unsigned char chan, int bankmsb, int banklsb)
-{
-    cerr << "Through SynthEngine::programChange, bank msb " << bankmsb
-         << ", banklsb " << banklsb << endl;
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        if (part[npart]->Penabled && chan == part[npart]->midichannel)
-        {
-            cerr << "Part " << npart << ", chan " << (int)chan << " to change program" << endl;
-            //part[npart]->programChange(bankmsb, banklsb)
-        }
 }
 
 
 // Enable/Disable a part
-void SynthEngine::partOnOff(int npart, int what)
+void SynthEngine::partonoff(int npart, int what)
 {
     if (npart >= NUM_MIDI_PARTS)
         return;
     fakepeakpart[npart] = 0;
-    lockSharable();
     if (what)
         part[npart]->Penabled = 1;
     else
@@ -362,7 +391,6 @@ void SynthEngine::partOnOff(int npart, int what)
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
     }
-    unlockSharable();
 }
 
 
@@ -371,14 +399,15 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 {
     memset(outl, 0, bufferbytes);
     memset(outr, 0, bufferbytes);
+
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
         {
-            lockExclusive();
+            actionLock(lock);
             part[npart]->ComputePartSmps();
-            unlockExclusive();
+            actionLock(unlock);
         }
     // Insertion effects
     int nefx;
@@ -389,9 +418,9 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
             int efxpart = Pinsparts[nefx];
             if (part[efxpart]->Penabled)
             {
-                //lockExclusive();
+                actionLock(lock);
                 insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
-                //unlockExclusive();
+                actionLock(unlock);
             }
         }
     }
@@ -401,6 +430,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     {
         if (!part[npart]->Penabled)
             continue;
+
         float newvol_l = part[npart]->volume;
         float newvol_r = part[npart]->volume;
         float oldvol_l = part[npart]->oldvolumel;
@@ -411,13 +441,16 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         else
             newvol_r *= pan * 2.0;
 
+        actionLock(lock);
         if (aboveAmplitudeThreshold(oldvol_l, newvol_l)
             || aboveAmplitudeThreshold(oldvol_r, newvol_r))
         {   // the volume or the panning has changed and needs interpolation
             for (int i = 0; i < buffersize; ++i)
             {
-                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i, buffersize);
-                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i, buffersize);
+                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i,
+                                                   buffersize);
+                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i,
+                                                   buffersize);
                 part[npart]->partoutl[i] *= vol_l;
                 part[npart]->partoutr[i] *= vol_r;
             }
@@ -432,6 +465,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 part[npart]->partoutr[i] *= newvol_r;
             }
         }
+        actionLock(unlock);
     }
     // System effects
     for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
@@ -453,8 +487,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 float vol = sysefxvol[nefx][npart];
                 for (int i = 0; i < buffersize; ++i)
                 {
+                    actionLock(lock);
                     tmpmixl[i] += part[npart]->partoutl[i] * vol;
                     tmpmixr[i] += part[npart]->partoutr[i] * vol;
+                    actionLock(unlock);
                 }
             }
         }
@@ -467,10 +503,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 float v = sysefxsend[nefxfrom][nefx];
                 for (int i = 0; i < buffersize; ++i)
                 {
-                    //lockExclusive();
+                    actionLock(lock);
                     tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
                     tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
-                    //unlockExclusive();
+                    actionLock(unlock);
                 }
             }
         }
@@ -480,9 +516,11 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         float outvol = sysefx[nefx]->sysefxgetvolume();
         for (int i = 0; i < buffersize; ++i)
         {
+            actionLock(lock);
             outl[i] += tmpmixl[i] * outvol;
             outr[i] += tmpmixr[i] * outvol;
-       }
+            actionLock(unlock);
+        }
     }
 
     // Mix all parts
@@ -490,8 +528,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     {
         for (int i = 0; i < buffersize; ++i)
         {   // the volume did not change
+            actionLock(lock);
             outl[i] += part[npart]->partoutl[i];
             outr[i] += part[npart]->partoutr[i];
+            actionLock(unlock);
         }
     }
 
@@ -500,20 +540,20 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     {
         if (Pinsparts[nefx] == -2)
         {
-            lockExclusive();
+            actionLock(lock);
             insefx[nefx]->out(outl, outr);
-            unlockExclusive();
+            actionLock(unlock);
         }
     }
 
     LFOParams::time++; // update the LFO's time
 
-    meterMutex.lock();
-    vuoutpeakl = 1e-12f;
-    vuoutpeakr = 1e-12f;
-    vurmspeakl = 1e-12f;
-    vurmspeakr = 1e-12f;
-    meterMutex.unlock();
+    synth->vupeakLock(lock);
+    vuoutpeakl = 1e-12;
+    vuoutpeakr = 1e-12;
+    vurmspeakl = 1e-12;
+    vurmspeakr = 1e-12;
+    synth->vupeakLock(unlock);
 
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
@@ -530,13 +570,25 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 
         // Clip as necessary
         if (outl[idx] > 1.0f)
+        {
+            outl[idx] = 1.0f;
             clippedL = true;
-         else if (outl[idx] < -1.0f)
+        }
+        else if (outl[idx] < -1.0f)
+        {
+            outl[idx] = -1.0f;
             clippedL = true;
+        }
         if (outr[idx] > 1.0f)
+        {
+            outr[idx] = 1.0f;
             clippedR = true;
-         else if (outr[idx] < -1.0f)
+        }
+        else if (outr[idx] < -1.0f)
+        {
+            outr[idx] = -1.0f;
             clippedR = true;
+        }
 
         if (shutup) // fade-out
         {
@@ -548,7 +600,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     if (shutup)
         ShutUp();
 
-    meterMutex.lock();
+    synth->vupeakLock(lock);
     if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;
     if (vumaxoutpeakr < vuoutpeakr)  vumaxoutpeakr = vuoutpeakr;
 
@@ -558,7 +610,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     // Part Peak computation (for Part vu meters/fake part vu meters)
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        vuoutpeakpart[npart] = 1.0e-12f;
+        vuoutpeakpart[npart] = 1.0e-12;
         if (part[npart]->Penabled)
         {
             float *outl = part[npart]->partoutl;
@@ -582,7 +634,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     vuRmsPeakR =    vurmspeakr;
     vuClippedL =    clippedL;
     vuClippedR =    clippedR;
-    meterMutex.unlock();
+    synth->vupeakLock(unlock);
 }
 
 
@@ -590,7 +642,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 void SynthEngine::setPvolume(char control_value)
 {
     Pvolume = control_value;
-    volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f);
+    volume  = dB2rap((Pvolume - 96.0) / 96.0 * 40.0);
 }
 
 
@@ -632,122 +684,68 @@ void SynthEngine::ShutUp(void)
 }
 
 
+bool SynthEngine::actionLock(lockset request)
+{
+    int chk  = -1;
+    switch (request)
+    {
+        case trylock:
+            chk = pthread_mutex_trylock(processLock);
+            break;
+
+        case lock:
+            chk = pthread_mutex_lock(processLock);
+            break;
+
+        case unlock:
+            __sync_val_compare_and_swap(&muted, muted, 0);
+            chk = pthread_mutex_unlock(processLock);
+            break;
+
+        case lockmute:
+            chk = pthread_mutex_lock(processLock);
+            __sync_val_compare_and_swap(&muted, muted, 1);
+            break;
+
+        default:
+            break;
+    }
+    return (chk == 0) ? true : false;
+}
+
+
+bool SynthEngine::vupeakLock(lockset request)
+{
+    int chk  = -1;
+    switch (request)
+    {
+        case lock:
+            chk = pthread_mutex_lock(meterLock);
+            break;
+
+        case unlock:
+            chk = pthread_mutex_unlock(meterLock);
+            break;
+
+        default:
+            break;
+    }
+    return (chk == 0) ? true : false;
+}
+
+
 // Reset peaks and clear the "clipped" flag (for VU-meter)
 void SynthEngine::vuresetpeaks(void)
 {
-    meterMutex.lock();
-    vuOutPeakL = vuoutpeakl = 1e-12f;
-    vuOutPeakR = vuoutpeakr =  1e-12f;
-    vuMaxOutPeakL = vumaxoutpeakl = 1e-12f;
-    vuMaxOutPeakR = vumaxoutpeakr = 1e-12f;
-    vuRmsPeakL = vurmspeakl = 1e-12f;
-    vuRmsPeakR = vurmspeakr = 1e-12f;
+    synth->vupeakLock(lock);
+    vuOutPeakL = vuoutpeakl = 1e-12;
+    vuOutPeakR = vuoutpeakr =  1e-12;
+    vuMaxOutPeakL = vumaxoutpeakl = 1e-12;
+    vuMaxOutPeakR = vumaxoutpeakr = 1e-12;
+    vuRmsPeakL = vurmspeakl = 1e-12;
+    vuRmsPeakR = vurmspeakr = 1e-12;
     vuClippedL = vuClippedL = clippedL = clippedR = false;
-    meterMutex.unlock();
-}
-
-
-void SynthEngine::lockExclusive(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.lock(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::lockExclusive throws exception!");
-    }
-}
-
-
-void SynthEngine::unlockExclusive(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.unlock(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::unlockExclusive throws exception!");
-    }
-}
-
-
-bool SynthEngine::trylockExclusive(void)
-{
-    bool ok = false;
-    using namespace boost::interprocess;
-    try { ok = synthMutex.try_lock(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::trylockExclusive throws exception!");
-    }
-    return ok;
-}
-
-
-bool SynthEngine::timedlockExclusive(void)
-{
-    bool ok = false;
-    //  wait_period = boost::posix_time::microsec(1000u);
-    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time()
-                                       + boost::posix_time::microsec(666u);
-    using namespace boost::interprocess;
-    try { ok = synthMutex.timed_lock(endtime); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::timedlockExclusive throws exception!");
-        ok = false;
-    }
-    return ok;
-}
-
-
-void SynthEngine::lockSharable(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.lock_sharable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::lockSharable throws exception!");
-    }
-}
-
-
-void SynthEngine::unlockSharable(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.unlock_sharable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::unlockSharable throws exception!");
-    }
-}
-
-
-bool SynthEngine::trylockSharable(void)
-{
-    bool ok = false;
-    using namespace boost::interprocess;
-    try {ok = synthMutex.try_lock_sharable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::trylockSharable throws exception!");
-    }
-    return ok;
-}
-
-
-bool SynthEngine::timedlockSharable(void)
-{
-    bool ok = false;
-    boost::posix_time::time_duration wait_period = boost::posix_time::microsec(1000u);
-    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time() + lockwait;
-                                       //+ boost::posix_time::microsec(500);
-    using namespace boost::interprocess;
-    try { ok = synthMutex.timed_lock_sharable(endtime); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::timedlockSharable throws exception!");
-        ok = false;
-    }
-    return ok;
+    synth->vupeakLock(unlock);
 }
 
 
@@ -762,7 +760,7 @@ void SynthEngine::applyparameters(void)
 void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
-    lockSharable();
+    actionLock(lockmute);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
     xml->addparbool("nrpn_receive", ctl->NRPN.receive);
@@ -815,7 +813,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
         xml->endbranch();
     }
     xml->endbranch(); // INSERTION_EFFECTS
-    unlockSharable();
+    actionLock(unlock);
     xml->endbranch(); // MASTER
 }
 
@@ -841,9 +839,9 @@ void SynthEngine::putalldata(char *data, int size)
     }
     if (xml->enterbranch("MASTER"))
     {
-        lockSharable();
+        actionLock(lock);
         getfromXML(xml);
-        unlockSharable();
+        actionLock(unlock);
         xml->exitbranch();
     }
     else

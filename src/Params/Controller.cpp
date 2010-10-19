@@ -27,7 +27,7 @@ using namespace std;
 
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
-#include "MusicIO/Midi.h"
+#include "MusicIO/MidiControl.h"
 #include "Params/Controller.h"
 
 Controller::Controller()
@@ -294,7 +294,6 @@ void Controller::setresonancebw(int value)
 }
 
 
-/**
 // Returns 0 if there is NRPN or 1 if there is not
 int Controller::getnrpn(int *parhi, int *parlo, int *valhi, int *vallo)
 {
@@ -335,7 +334,6 @@ void Controller::setparameternumber(unsigned int type,int value)
             break;
     }
 }
-**/
 
 
 void Controller::add2XML(XMLwrapper *xml)

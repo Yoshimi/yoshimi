@@ -20,7 +20,6 @@
 #ifndef WAV_RECORD_H
 #define WAV_RECORD_H
 
-#include <boost/shared_array.hpp>
 #include <string>
 #include <sndfile.h>
 #include <pthread.h>
@@ -36,13 +35,16 @@ class WavRecord : private MiscFuncs
     public:
         WavRecord();
         ~WavRecord();
-        bool Start(unsigned int sample_rate, int buffer_size);
-        void StartRecord(void);
-        void StopRecord(void);
+
+        bool Prep(unsigned int sample_rate, int buffer_size);
+        void Start(void);
+        void Stop(void);
         void Close(void);
+
         bool SetFile(string fpath, string& errmsg);
         bool SetOverwrite(string& errmsg);
         string Filename(void) { return wavFile; };
+
         bool IsFloat(void) { return float32bit; };
         void Feed(float* samples_left, float *samples_right);
         inline bool Running(void) { return (recordState == recording); };
@@ -58,19 +60,22 @@ class WavRecord : private MiscFuncs
         record_state  recordState;
         unsigned int  samplerate;
         unsigned int  buffersize;
-        boost::shared_array<float> interleavedFloats;
+        float        *interleavedFloats;
+        bool          float32bit;
 
-        string      wavFile;
-        bool        float32bit;
-        SF_INFO     wavOutInfo;
-        SNDFILE    *wavOutsnd;
-        pthread_t   pThread;
-        bool        threadRun;
         string      recordFifo;
         FILE       *toFifo;
-        SF_INFO    fromFifoInfo;
-        SNDFILE   *fromFifoSndfle;
-        sf_count_t tferSamples;
+        SF_INFO     fromFifoInfo;
+        SNDFILE    *fromFifoSndfle;
+        sf_count_t  tferSamples;
+        float      *tferBuf;
+
+        string   wavFile;
+        SF_INFO  wavOutInfo;
+        SNDFILE *wavOutsnd;
+
+        bool         runRecordThread;
+        pthread_t    pThread;
 };
 
 #endif

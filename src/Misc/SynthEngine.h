@@ -26,8 +26,6 @@
 
 #include <limits.h>
 #include <cstdlib>
-#include <boost/interprocess/sync/interprocess_upgradable_mutex.hpp>
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
 
 using namespace std;
 
@@ -37,7 +35,7 @@ using namespace std;
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
 
-//typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
+typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
 class EffectMgr;
 class Part;
@@ -50,14 +48,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         SynthEngine();
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
-        void lockExclusive(void);
-        void unlockExclusive(void);
-        bool trylockExclusive(void);
-        bool timedlockExclusive(void);
-        void lockSharable(void);
-        void unlockSharable(void);
-        bool trylockSharable(void);
-        bool timedlockSharable(void);
+        bool actionLock(lockset request);
+        bool vupeakLock(lockset request);
 
         bool saveXML(string filename);
         void add2XML(XMLwrapper *xml);
@@ -71,17 +63,18 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int getalldata(char **data);
         void putalldata(char *data, int size);
 
-        void ShutUp(void);
-        void MasterAudio(float *outl, float *outr);
-        void partOnOff(int npart, int what);
-
-        // midi
-        void noteOn(unsigned char chan, unsigned char note,
+        // midi in
+        void NoteOn(unsigned char chan, unsigned char note,
                     unsigned char velocity, bool record_trigger);
-        void noteOff(unsigned char chan, unsigned char note);
-        void setController(unsigned char chan, unsigned char type, short int par);
-        void setPitchwheel(unsigned char chan, short int par);
-        void programChange(unsigned char chan, int bankmsb, int banklsb);
+        void NoteOff(unsigned char chan, unsigned char note);
+        void SetController(unsigned char chan, unsigned int type, short int par);
+        // void NRPN...
+
+        void ShutUp(void);
+
+        void MasterAudio(float *outl, float *outr);
+
+        void partonoff(int npart, int what);
 
         Part *part[NUM_MIDI_PARTS];
 
@@ -128,6 +121,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank bank;
         FFTwrapper *fft;
 
+//        unsigned int getSamplerate(void) { return samplerate; };
+//        int getBuffersize(void) { return buffersize; };
+//        int getOscilsize(void) { return oscilsize; };
+
         // peaks for VU-meters
         void vuresetpeaks(void);
         float vuOutPeakL;
@@ -161,9 +158,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool clippedL;
         bool clippedR;
 
-        boost::interprocess::interprocess_upgradable_mutex synthMutex;
-        const boost::posix_time::time_duration lockwait;
-        boost::interprocess::interprocess_mutex meterMutex;
+        pthread_mutex_t  processMutex;
+        pthread_mutex_t *processLock;
+        pthread_mutex_t  meterMutex;
+        pthread_mutex_t *meterLock;
 
         XMLwrapper *stateXMLtree;
 

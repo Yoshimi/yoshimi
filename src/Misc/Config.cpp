@@ -81,6 +81,7 @@ static struct argp_option cmd_options[] = {
 Config::Config() :
     doRestoreState(false),
     doRestoreJackSession(false),
+    baseCmdLine("yoshimi"),
     Samplerate(48000),
     Buffersize(128),
     Oscilsize(1024),
@@ -88,10 +89,10 @@ Config::Config() :
     showGui(true),
     showConsole(false),
     VirKeybLayout(1),
-    audioDevice("default"),
-    midiDevice("default"),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
+    audioDevice("default"),
+    midiDevice("default"),
     jackServer("default"),
     startJack(false),
     connectJackaudio(false),
@@ -105,14 +106,14 @@ Config::Config() :
     Interpolation(0),
     CheckPADsynth(1),
     rtprio(50),
-    deadObjects(new BodyDisposal()),
+    deadObjects(NULL),
     sse_level(0),
     programCmd("yoshimi")
 {
-    setlocale( LC_TIME, "" ); // use compiler's native locale
     std::ios::sync_with_stdio(false);
     cerr.precision(4);
     std::ios::sync_with_stdio(false);
+    deadObjects = new BodyDisposal();
 }
 
 
@@ -788,17 +789,18 @@ void Config::signalCheck(void)
     switch (jsessionSave)
     {
         case 1: // JackSessionSave
+            cerr << "Config::signalCheck, JackSessionSave is active" << endl;
             saveJackSession();
-            __sync_bool_compare_and_swap(&jsessionSave, 1, 0);
+            __sync_val_compare_and_swap(&jsessionSave, jsessionSave, 0);
             break;
         case 2: // JackSessionSaveAndQuit
+            cerr << "Config::signalCheck, JackSessionSaveAndQuit is active" << endl;
             saveJackSession();
-            __sync_bool_compare_and_swap(&jsessionSave, 2, 0);
-            usleep(3333);
+            __sync_bool_compare_and_swap(&jsessionSave, jsessionSave, 0);
             runSynth = false;
             break;
         case 3: // JackSessionSaveTemplate not implemented
-            __sync_bool_compare_and_swap(&jsessionSave, 3, 0);
+            __sync_val_compare_and_swap(&jsessionSave, jsessionSave, 0);
             break;
         default:
             break;
@@ -809,19 +811,20 @@ void Config::signalCheck(void)
 void Config::setInterruptActive(int sig)
 {
     Log("Interrupt received");
-    __sync_bool_compare_and_swap(&sigIntActive, sigIntActive, 1);
+    __sync_val_compare_and_swap(&sigIntActive, sigIntActive, 0);
 }
 
 
 void Config::setLadi1Active(int sig)
 {
-    __sync_bool_compare_and_swap (&ladi1IntActive, ladi1IntActive, 1);
+    __sync_val_compare_and_swap (&ladi1IntActive, ladi1IntActive, 0);
 }
 
 
 bool Config::restoreJsession(SynthEngine *synth)
 {
     #if defined(JACK_SESSION)
+        cerr << "Config::restoreJsession to restore from jackSessionFile: " << jackSessionFile << endl;
         return restoreSessionData(synth, jackSessionFile);
     #else
         return false;
@@ -836,14 +839,22 @@ void Config::setJackSessionSave(int event_type, const char *session_dir, const c
     jackSessionFile = "yoshimi-" + jackSessionUuid + ".xml";
     if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, event_type))
         Log("setJackSessionSave, error setting jack session save flag", true);
+
+    cerr << "Through Config::setJackSessionSave, event_type " << event_type
+         << ", session_dir " << session_dir << ", client_uuid " << client_uuid << endl;
 }
 
 
 void Config::saveJackSession(void)
 {
+    cerr << "Through Config::saveJackSession, saving to " << (jackSessionDir + jackSessionFile) << endl;
     if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, 0))
         Log("saveJackSession, error clearing jack session save flag", true);
     saveSessionData(jackSessionDir + jackSessionFile);
+    cerr << "Config::saveJackSession calls musicClient->jacksessionReply with: "
+         << (programCmd + string(" -U ") + jackSessionUuid
+             + string(" -u ${SESSION_DIR}") + jackSessionFile) << endl;
+         
     if (!musicClient->jacksessionReply(programCmd + string(" -U ") + jackSessionUuid
                                        + string(" -u ${SESSION_DIR}") + jackSessionFile))
         Log("Error on jack session reply");

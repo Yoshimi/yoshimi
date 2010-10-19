@@ -29,23 +29,26 @@ This file is a derivative of a ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
-decl {\#include <FL/fl_ask.H>
+decl {
+    \#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
-    \#include "Misc/SynthEngine.h"} {global
-} 
+    \#include "Misc/SynthEngine.h"
+} {global}
 
-decl {\#include "EffUI.h"
+decl {
+    \#include "EffUI.h"
     \#include "BankUI.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "Params/Controller.h"
-    \#include "Misc/MiscFuncs.h"} {public global
-} 
+    \#include "Misc/MiscFuncs.h"
+} {public global}
 
-decl {\#include "Misc/Part.h"
-    \#define MAX_INFO_TEXT_SIZE 256} {public
-} 
+decl {
+    \#include "Misc/Part.h"
+    \#define MAX_INFO_TEXT_SIZE 256
+} {public}
 
 class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
 } {
@@ -96,7 +99,7 @@ class PartKitItem {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window partkititem {open
-      private xywh {121 479 670 30} type Double hide
+      private xywh {120 453 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -220,9 +223,9 @@ class PartKitItem {open : {public Fl_Group}
                 answer = fl_choice("Delete the item?","No","Yes",NULL);
             if (answer != 0)
             {
-                synth->lockExclusive();
+                synth->actionLock(lockmute);
                 part->setkititemstatus(n, o->value());
-                synth->unlockSharable();
+                synth->actionLock(unlock);
 
                 if (o->value() == 0)
                     partkititemgroup->deactivate();
@@ -268,9 +271,9 @@ class PartKitItem {open : {public Fl_Group}
                 answer = fl_choice("Delete the item?", "No", "Yes", NULL);
             if (answer)
             {
-                synth->lockSharable();
+                synth->actionLock(lockmute);
                 part->setkititemstatus(n, o->value());
-                synth->unlockSharable();
+                synth->actionLock(unlock);
     
                 if (!o->value())
                     partkititemgroup->deactivate();
@@ -307,12 +310,12 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {1220 794 385 240} type Double
-      class Fl_Group visible
+      private xywh {835 602 385 240} type Double hide
+      class Fl_Group
     } {
       Fl_Group partgroupui {open
         xywh {0 0 387 242}
-        code0 {if (!part->Penabled) o->deactivate();}
+        code0 {if (part->Penabled==0) o->deactivate();}
       } {
         Fl_Button {} {
           label Instrument
@@ -362,28 +365,31 @@ Offset}
         Fl_Dial {} {
           label Volume
           callback {part->setPvolume(o->value());}
-          tooltip {Part volume} xywh {345 40 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Part Volume} xywh {345 40 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
         }
       }
       Fl_Check_Button {} {
         label Enabled
-        callback {//
-            synth->partOnOff(npart, o->value());
+        callback {synth->actionLock(lockmute);
+            synth->partonoff(npart, o->value());
+            synth->actionLock(unlock);
             if (!part->Penabled)
                 partgroupui->deactivate();
             else
                 partgroupui->activate();}
-        tooltip {Switch part on/off} xywh {11 30 11 20} down_box DOWN_BOX labelsize 11 align 8
+        xywh {11 30 11 20} down_box DOWN_BOX labelsize 11 align 8
         code0 {o->value(part->Penabled);}
       }
-      Fl_Spinner {} {
+      Fl_Choice {} {
         label {Midi Channel}
-        callback {part->midichannel = lrintf(o->value()) - 1;} selected
-        tooltip {Select midi channel - 10 is conventionally Drums} xywh {82 68 42 18} labelsize 10 maximum 16 textsize 11
-        code0 {o->value(part->midichannel + 1);}
-      }
+        callback {part->Prcvchn = o->value();} open
+        tooltip {receive from Midi channel} xywh {82 68 88 20} down_box BORDER_BOX selection_color 0 labelsize 11 textfont 1 textsize 11
+        code0 {for(int i = 0; i < NUM_MIDI_CHANNELS;++i)
+              o->add((i != 9) ? asString(i + 1).c_str() : "10 Drums");}
+        code1 {o->value(part->Prcvchn);}
+      } {}
       Fl_Choice {} {
         label Mode
         callback {switch (o->value())
@@ -422,16 +428,15 @@ Offset}
       }
       Fl_Choice keylimitlist {
         label {Key Limit}
-        callback {//
-            int val = 0;
+        callback {int val = 0;
             val = atoi(o->text());
             part->setkeylimit(val);}
-        tooltip {Key Limit} xywh {204 136 42 18} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+        tooltip {Key Limit} xywh {204 136 48 18} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
       } {}
       Fl_Spinner {} {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
-        xywh {204 113 42 18} labelsize 10 minimum -12 maximum 12 textsize 11
+        xywh {204 113 47 18} labelsize 10 minimum -12 maximum 12 textsize 11
         code0 {o->range(-12.0, 12.0);}
         code1 {o->value(part->Pkeyshift - 64);}
       }
@@ -454,7 +459,7 @@ Offset}
       Fl_Button {} {
         label Controllers
         callback {ctlwindow->show();}
-        tooltip {Controller settings} xywh {82 90 88 18} box PLASTIC_UP_BOX color 22 labelsize 10
+        tooltip {Controller settings} xywh {82 90 88 20} box PLASTIC_UP_BOX color 22 labelsize 10
       }
       Fl_Spinner minkcounter {
         label {Minimum Note}
@@ -463,7 +468,7 @@ Offset}
                 o->textcolor(FL_RED);
             else
                 o->textcolor(FL_BLACK);}
-        tooltip {Minimum note the part receives} xywh {82 136 42 18} labelsize 10 minimum 0 maximum 127 textsize 11
+        tooltip {Minimum note the part receives} xywh {82 136 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
         code0 {o->range(0.0, 127.0);o->step(1.0);}
         code1 {o->value(part->Pminkey);}
       }
@@ -474,7 +479,7 @@ Offset}
                 o->textcolor(FL_RED);
             else
                 o->textcolor(FL_BLACK);}
-        tooltip {Maximum note the part receives} xywh {82 162 42 18} labelsize 10 minimum 0 maximum 127 textsize 11
+        tooltip {Maximum note the part receives} xywh {82 162 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
         code0 {o->range(0.0, 127.0);o->step(1.0);}
         code1 {o->value(part->Pmaxkey);}
       }
@@ -682,9 +687,9 @@ Offset}
       }
       Fl_Choice insefftype {
         label EffType
-        callback {synth->lockExclusive();
+        callback {synth->actionLock(lockmute);
             part->partefx[ninseff]->changeeffect(o->value());
-            synth->unlockSharable();
+            synth->actionLock(unlock);
             inseffectui->refresh(part->partefx[ninseff]);}
         xywh {155 110 70 15} down_box BORDER_BOX labelsize 10 align 6
         code0 {o->value(part->partefx[ninseff]->geteffect());}
@@ -778,9 +783,9 @@ Offset}
       }
       Fl_Button {} {
         label P
-        callback {synth->lockSharable();
+        callback {synth->actionLock(lockmute);
             presetsui->paste(part->partefx[ninseff], inseffectui);
-            synth->unlockSharable();}
+            synth->actionLock(unlock);}
         xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }

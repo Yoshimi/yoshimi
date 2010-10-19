@@ -22,7 +22,6 @@
     This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
-#include <iostream>
 #include <cstring>
 
 using namespace std;
@@ -120,7 +119,7 @@ void Part::defaults(void)
     Plegatomode = 0;
     setPvolume(96);
     Pkeyshift = 64;
-    midichannel = 0;
+    Prcvchn = 0;
     setPpanning(64);
     Pvelsns = 64;
     Pveloffs = 64;
@@ -227,6 +226,7 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
 {
     if (!Pnoteon || note < Pminkey || note > Pmaxkey)
         return;
+
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
     bool legatomodevalid = false;   // true when legato mode is determined applicable.
@@ -608,17 +608,22 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
 // Note Off Messages
 void Part::NoteOff(unsigned char note) //relase the key
 {
+    int i;
+
     // This note is released, so we remove it from the list.
     if (not monomemnotes.empty())
         monomemnotes.remove(note);
 
-    for (int i = POLIPHONY - 1; i >= 0; i--)                               // first note in is first out if there
-        if (partnote[i].status == KEY_PLAYING && partnote[i].note == note) // are same note multiple times
+    for ( i = POLIPHONY - 1; i >= 0; i--)
+    {   //first note in, is first out if there are same note multiple times
+        if (partnote[i].status == KEY_PLAYING && partnote[i].note == note)
         {
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
                 if (!Ppolymode && (not monomemnotes.empty()))
+                {
                     MonoMemRenote(); // To play most recent still held note.
+                }
                 else
                 {
                     RelaseNotePos(i);
@@ -626,8 +631,11 @@ void Part::NoteOff(unsigned char note) //relase the key
                 }
             }
             else
-                partnote[i].status = KEY_RELASED_AND_SUSTAINED; // the sustain pedal is pushed
+            {   // the sustain pedal is pushed
+                partnote[i].status = KEY_RELASED_AND_SUSTAINED;
+            }
         }
+    }
 }
 
 
@@ -636,90 +644,85 @@ void Part::SetController(unsigned int type, int par)
 {
     switch (type)
     {
-        case C_modwheel: // 1
+        case C_pitchwheel:
+            ctl->setpitchwheel(par);
+            break;
+        case C_expression:
+            ctl->setexpression(par);
+            setPvolume(Pvolume);
+            break;
+        case C_portamento:
+            ctl->setportamento(par);
+            break;
+        case C_panning:
+            ctl->setpanning(par);
+            setPpanning(Ppanning);
+            break;
+        case C_filtercutoff:
+            ctl->setfiltercutoff(par);
+            break;
+        case C_filterq:
+            ctl->setfilterq(par);
+            break;
+        case C_bandwidth:
+            ctl->setbandwidth(par);
+            break;
+        case C_modwheel:
             ctl->setmodwheel(par);
             break;
-
-        case C_volume: // 7
+        case C_fmamp:
+            ctl->setfmamp(par);
+            break;
+        case C_volume:
             ctl->setvolume(par);
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
             else
                 setPvolume(Pvolume);
             break;
-
-        case C_pan: // 10
-            ctl->setpanning(par);
-            setPpanning(Ppanning);
-            break;
-
-        case C_expression: // 11
-            ctl->setexpression(par);
-            setPvolume(Pvolume);
-            break;
-
-        case C_sustain: // 64
+        case C_sustain:
             ctl->setsustain(par);
             if (!ctl->sustain.sustain)
                 RelaseSustainedKeys();
             break;
-
-        case C_portamento: // 65
-            ctl->setportamento(par);
+        case C_allsoundsoff:
+            AllNotesOff(); // Panic
             break;
-
-        case C_filterq: // 71
-            ctl->setfilterq(par);
-            break;
-
-        case C_filtercutoff: // 74
-            ctl->setfiltercutoff(par);
-            break;
-
-        case C_soundcontroller6 : // 75 bandwidth
-            ctl->setbandwidth(par);
-            break;
-
-        case C_soundcontroller7: // 76 fmamp:
-            ctl->setfmamp(par);
-            break;
-
-        case C_soundcontroller8: // 77 resonance center
-            ctl->setresonancecenter(par);
-            for (int item = 0; item < NUM_KIT_ITEMS; ++item)
-                if (kit[item].adpars)
-                    kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, ctl->resonancecenter.relcenter);
-            break;
-
-        case C_soundcontroller9: // 78 resonance bandwidth:
-            ctl->setresonancebw(par);
-            kit[0].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, ctl->resonancebandwidth.relbw);
-            break;
-
-        case C_allsoundsoff: // 120
-            AllNotesOff();
-            break;
-
-        case C_resetallcontrollers: // 121
+        case C_resetallcontrollers:
             ctl->resetall();
             RelaseSustainedKeys();
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
             setPvolume(Pvolume);
             setPpanning(Ppanning);
-            for (int item = 0; item < NUM_KIT_ITEMS; ++item)
-                if (kit[item].adpars)
-                {
-                    kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, 1.0f);
-                    kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, 1.0f);
-                }
-            break;
 
-        case C_allnotesoff: // 123
+            for (int item = 0; item < NUM_KIT_ITEMS; ++item)
+            {
+                if (!kit[item].adpars)
+                    continue;
+                kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_center, 1.0);
+                kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_bandwidth, 1.0);
+            }
+            // more update to add here if I add controllers
+            break;
+        case C_allnotesoff:
             RelaseAllKeys();
             break;
-            
-        // more update to add here if I add controllers
+        case C_resonance_center:
+            ctl->setresonancecenter(par);
+            for (int item = 0; item < NUM_KIT_ITEMS; ++item)
+            {
+                if (!kit[item].adpars)
+                    continue;
+                kit[item].adpars->GlobalPar.Reson->sendcontroller(C_resonance_center,
+                                                                  ctl->resonancecenter.relcenter);
+            }
+            break;
+        case C_resonance_bandwidth:
+            ctl->setresonancebw(par);
+            kit[0].adpars->GlobalPar.Reson->sendcontroller(C_resonance_bandwidth,
+                                                           ctl->resonancebandwidth.relbw);
+            break;
     }
 }
 
@@ -904,7 +907,7 @@ void Part::ComputePartSmps(void)
                     partnote[k].kititem[item].adnote = NULL;
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
-                {   // add ADnote to part(mix)
+                {   // add the ADnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
                 }
@@ -921,7 +924,7 @@ void Part::ComputePartSmps(void)
                     memset(tmpoutr, 0, synth->bufferbytes);
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
-                {   // add SUBnote to part(mix)
+                {   // add the SUBnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
@@ -950,7 +953,7 @@ void Part::ComputePartSmps(void)
                     partnote[k].kititem[item].padnote = NULL;
                 }
                 for (int i = 0 ; i < synth->buffersize; ++i)
-                {   // add PADnote to part(mix)
+                {   // add the PADnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
@@ -1141,7 +1144,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 void Part::add2XML(XMLwrapper *xml)
 {
     // parameters
-    xml->addparbool("enabled", Penabled);
+    xml->addparbool("enabled",Penabled);
     if (!Penabled && xml->minimal)
         return;
 
@@ -1151,7 +1154,7 @@ void Part::add2XML(XMLwrapper *xml)
     xml->addpar("min_key", Pminkey);
     xml->addpar("max_key", Pmaxkey);
     xml->addpar("key_shift", Pkeyshift);
-    xml->addpar("rcv_chn", midichannel);
+    xml->addpar("rcv_chn", Prcvchn);
 
     xml->addpar("velocity_sensing", Pvelsns);
     xml->addpar("velocity_offset", Pveloffs);
@@ -1308,7 +1311,7 @@ void Part::getfromXML(XMLwrapper *xml)
     Pminkey = xml->getpar127("min_key", Pminkey);
     Pmaxkey = xml->getpar127("max_key", Pmaxkey);
     Pkeyshift = xml->getpar127("key_shift", Pkeyshift);
-    midichannel = xml->getpar127("rcv_chn", midichannel);
+    Prcvchn = xml->getpar127("rcv_chn", Prcvchn);
 
     Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
     Pveloffs = xml->getpar127("velocity_offset", Pveloffs);

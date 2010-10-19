@@ -310,20 +310,20 @@ class BankUI {open : {public BankProcess_}
                 bank->setname(slot, string(tmp), -1);
             bs[slot]->refresh();
             // Re-read from slot
-            synth->lockExclusive();
+            synth->actionLock(lockmute);
             bank->loadfromslot(slot, synth->part[*npart]);
             synth->part[*npart]->applyparameters(true);
-            synth->unlockExclusive();
+            synth->actionLock(unlock);
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
         }
 
         if (what == 1 && mode == 1 && !bank->emptyslot(slot))
         {   // Reads from slot
-            synth->lockExclusive();
+            synth->actionLock(lockmute);
             bank->loadfromslot(slot, synth->part[*npart]);
             synth->part[*npart]->applyparameters(true);
-            synth->unlockExclusive();
+            synth->actionLock(unlock);
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
      
@@ -339,9 +339,9 @@ class BankUI {open : {public BankProcess_}
                     doit = false;
             if (doit)
             {
-                synth->lockSharable();
+                synth->actionLock(lockmute);
                 bank->savetoslot(slot,synth->part[*npart]);
-                synth->unlockSharable();
+                synth->actionLock(unlock);
                 bs[slot]->refresh();
                 mode = 1;
                 readbutton->value(1);

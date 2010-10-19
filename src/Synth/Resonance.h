@@ -18,18 +18,18 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified September 2010
+    This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
 #ifndef RESONANCE_H
 #define RESONANCE_H
 
 #include "DSP/FFTwrapper.h"
+#include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
+#include "MusicIO/MidiControl.h"
 
 #define N_RES_POINTS 256
-
-class XMLwrapper;
 
 class Resonance : public Presets
 {
@@ -37,7 +37,7 @@ class Resonance : public Presets
         Resonance();
         ~Resonance() { };
         void setpoint(int n, unsigned char p);
-        void applyres(int n, FFTFREQS& fftdata, float freq);
+        void applyres(int n, FFTFREQS fftdata, float freq);
         void smooth(void);
         void interpolatepeaks(int type);
         void randomize(int type);
@@ -51,7 +51,7 @@ class Resonance : public Presets
         float getfreqresponse(float freq);
         float getcenterfreq(void);
         float getoctavesfreq(void);
-        void sendcontroller(unsigned char ctl, float par);
+        void sendcontroller(MidiControllers ctl, float par);
 
         // parameters
         unsigned char Penabled;                 //if the ressonance is enabled

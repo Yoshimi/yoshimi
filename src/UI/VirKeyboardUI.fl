@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0110
 header_name {.h} 
 code_name {.cc}
 comment {VirKeyboard.h} {not_in_source in_header
-} 
+}
 
 comment {VirKeyboard.cc} {in_source not_in_header
-} 
+}
 
 comment {//
 // Original ZynAddSubFX author Nasca Octavian Paul
 // Copyright (C) 2002-2005 Nasca Octavian Paul
-// Copyright 2009-2010, Alan Calvert
+// Copyright 2009, Alan Calvert
 //
 // This file is part of yoshimi, which is free software: you can redistribute
 // it and/or modify it under the terms of version 2 of the GNU General Public
@@ -26,41 +26,55 @@ comment {//
 // yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 // Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
-// This file is a derivative of the ZynAddSubFX original, modified August 2010
+// This file is a derivative of the ZynAddSubFX original, modified October 2009
 //} {in_source in_header
+}
+
+decl {\#include <stdlib.h>} {public
 } 
 
-decl {\#include <FL/fl_draw.H>
-    \#include <FL/Fl_Box.H>
-    \#include "Misc/SynthEngine.h"
-    \#include "Misc/MiscFuncs.h"
-    \#include "WidgetPDialUI.h"} {public
+decl {\#include <FL/fl_draw.H>} {public
 } 
 
-decl {\#include <stdlib.h>
-    \#include "MusicIO/Midi.h"
-    \#include "Misc/Config.h"
-    \#include "MusicIO/MusicClient.h"} {} 
+decl {\#include <FL/Fl_Box.H>} {public
+} 
 
-decl {const int keyspos[12] = { 0, -1, 1, -2, 2, 3, -4, 4, -5, 5, -6, 6 };
-    const int keysoct1qwerty[] = { 'q', '2', 'w', '3', 'e', 'r', '5', 't', '6', 'y', '7', 'u', 'i', '9', 'o', '0', 'p', '[', '=', ']', '\\\\', FL_Enter, 0 };
-    const int keysoct2qwerty[] = { 'z', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', 'm', ',', 'l', '.', ';', '/', 0 };
-    const int keysoct1dw[] = { '\\'', '2', ',', '3', '.', 'p', '5', 'y', '6', 'f', '7', 'g', 'c', '9', 'r', '0', 'l', '/', ']', '=', '\\\\', FL_Enter, 0 };
-    const int keysoct2dw[] = { ';', 'o', 'q', 'e', 'j', 'k', 'i', 'x', 'd', 'b', 'h', 'm', 'w', 'n', 'v', 's', 'z', 0 };
-    const int keysoct1qwertz[] = { 'q', '2', 'w', '3', 'e', 'r', '5', 't', '6', 'z', '7', 'u', 'i', '9', 'o', '0', 'p', 252, '\\'', '+','\\\\', FL_Enter, 0 };
-    const int keysoct2qwertz[] = { 'y', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', 'm', ',', 'l', '.', 246, '-', 0 };} {} 
+decl {\#include "Misc/Config.h"} {public
+}
+
+decl {\#include "Misc/SynthEngine.h"} {public
+} 
+
+decl {\#include "MusicIO/MidiControl.h"} {public
+}
+
+decl {\#include "WidgetPDialUI.h"} {public
+} 
+
+decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {} 
+
+decl {const int keysoct1qwerty[]={'q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','=',']','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2qwerty[]={'z','s','x','d','c','v','g','b','h','n','j','m',',','l','.',';','/',0};} {} 
+
+decl {const int keysoct1dw[]={'\\'','2',',','3','.','p','5','y','6','f','7','g','c','9','r','0','l','/',']','=','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2dw[]={';','o','q','e','j','k','i','x','d','b','h','m','w','n','v','s','z',0};} {} 
+
+decl {const int keysoct1qwertz[]={'q','2','w','3','e','r','5','t','6','z','7','u','i','9','o','0','p',252,'\\'','+','\\\\',FL_Enter,0};} {} 
+
+decl {const int keysoct2qwertz[]={'y','s','x','d','c','v','g','b','h','n','j','m',',','l','.',246,'-',0};} {} 
 
 class VirKeys {: {public Fl_Box}
 } {
-  decl {static const int N_OCT = 6;
-    static const int SIZE_WHITE = 14;
-    static const int SIZE_BLACK = 8;} {}
+  decl {static const int N_OCT = 6;} {}
+  decl {static const int SIZE_WHITE = 14;} {}
+  decl {static const int SIZE_BLACK = 8;} {}
   Function {VirKeys(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {} {}
   }
   Function {init(void)} {} {
-    code {//
-        for (int i = 0; i < N_OCT * 12 + 1; ++i)
+    code {for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
         midich = 0;
         midivel = 75;
@@ -70,8 +84,7 @@ class VirKeys {: {public Fl_Box}
         rndvelocity = 0;} {}
   }
   Function {draw()} {} {
-    code {//
-        int ox = x(), oy = y(), lx = w(), ly = h() - 1, i;
+    code {int ox = x(), oy = y(), lx = w(), ly = h() - 1, i;
         if (damage() != 1)
         {
             fl_color(250, 240, 230);
@@ -119,8 +132,7 @@ class VirKeys {: {public Fl_Box}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {//
-        int i;
+    code {int i;
         int ly = h();
         int x_ = Fl::event_x() - x();
         int y_ = Fl::event_y() - y();
@@ -129,7 +141,7 @@ class VirKeys {: {public Fl_Box}
         if (event == FL_PUSH || event == FL_DRAG || event == FL_RELEASE)
         {
             int kpos = -1;
-
+  
             if (y_ > ly * 3 / 5)
             {   // white keys
                 int pos = x_ / SIZE_WHITE;
@@ -230,19 +242,14 @@ class VirKeys {: {public Fl_Box}
         pressed[nk] = type;
 
         damage(1);
-        float velocity = (!rndvelocity)
-                         ? midivel
-                         : midivel * (127.0f - rndvelocity) / 127.0f + synth->numRandom() * rndvelocity;
-        //synth->vkbdNoteOn(midich, nk + midioct * 12, lrintf(vel));
-        midimessage msg;
-        //msg.period_start_frame = 0;
-        msg.event_frame = 0;
-        msg.bytes[0] = 144 | (midich & 0x0f);
-        msg.bytes[1] = nk + midioct * 12;
-        msg.bytes[2] = (unsigned char)velocity;
-        musicClient->queueMidi(&msg);} {}
+        float vel = midivel;
+        if (rndvelocity != 0)
+        {
+            vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
+        }
+        synth->NoteOn(midich, nk + midioct * 12, (int)vel, false);} {}
   }
-  Function {relasekey(int nk, int type)} {} {
+  Function {relasekey(int nk,int type)} {} {
     code {if (nk < 0 || nk >= N_OCT * 12)
             return;
         if (pressed[nk] == 0)
@@ -251,28 +258,24 @@ class VirKeys {: {public Fl_Box}
             return;
         pressed[nk] = 0;
         damage(1);
-        //synth->vkbdNoteOff(midich, nk + 12 * midioct);
-        midimessage msg;
-        //msg.period_start_frame = 0;
-        msg.event_frame = 0;
-        msg.bytes[0] = 128 | (midich & 0x0f);
-        msg.bytes[1] = nk + 12 * midioct;
-        msg.bytes[2] = 0;
-        musicClient->queueMidi(&msg);} {}
+        synth->NoteOff(midich, nk + 12 * midioct);} {}
   }
   Function {relaseallkeys(int type)} {} {
     code {for (int i = 0; i < N_OCT * 12; ++i)
             relasekey(i, type);} {}
   }
   decl {int pressed[N_OCT * 12 + 1];} {}
-  decl {unsigned char midich;
-    unsigned char midivel;
-    char midioct, keyoct1, keyoct2;
-    unsigned char rndvelocity;} {public
+  decl {unsigned char midich;} {public
+  }
+  decl {unsigned char midivel;} {public
+  }
+  decl {char midioct, keyoct1, keyoct2;} {public
+  }
+  decl {unsigned char rndvelocity;} {public
   }
 } 
 
-class VirKeyboard {open : {private MiscFuncs}
+class VirKeyboard {open
 } {
   Function {make_window()} {open
   } {
@@ -280,7 +283,7 @@ class VirKeyboard {open : {private MiscFuncs}
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
 virkeyboardwindow->hide();} open
-      xywh {172 207 650 130} type Double visible
+      xywh {75 679 650 130} type Double visible
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -291,80 +294,68 @@ virkeyboardwindow->hide();} open
       Fl_Counter {} {
         label {"qwer.." Oct}
         callback {relaseallkeys();
-            virkeys->keyoct1 = lrint(o->value());
+            virkeys->keyoct1 = (int)o->value();
             virkeys->take_focus();}
         tooltip {keys "q2w3er5t6y..." octave} xywh {380 95 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->keyoct1);}
       }
       Fl_Counter {} {
         label {"zxcv.." Oct}
-        callback {//
-          relaseallkeys();
-          virkeys->keyoct2 = lrintf(o->value());
-          virkeys->take_focus();}
+        callback {relaseallkeys();
+virkeys->keyoct2=(int) o->value();
+virkeys->take_focus();}
         tooltip {keys "zsxdcvgbh..." octave} xywh {380 110 45 15} type Simple labelsize 10 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->keyoct2);}
       }
       Fl_Value_Slider {} {
         label Velocity
-        callback {//
-          virkeys->midivel = lrintf(o->value());
-          virkeys->take_focus();}
-        tooltip Velocity xywh {67 108 114 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
+        callback {virkeys->midivel=(int) o->value();
+virkeys->take_focus();}
+        tooltip Velocity xywh {83 108 109 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
       }
       Fl_Counter {} {
         label Octave
-        callback {//
-          relaseallkeys();
-          virkeys->midioct = lrint(o->value());
-          virkeys->take_focus();}
-        tooltip {Midi Octave} xywh {245 108 56 18} type Simple labelsize 10 align 1 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
+        callback {relaseallkeys();
+virkeys->midioct=(int) o->value();
+virkeys->take_focus();}
+        tooltip {Midi Octave} xywh {245 106 56 18} type Simple labelsize 10 align 1 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->midioct);}
       }
       Fl_Button {} {
         label Close
-        callback {//
-          relaseallkeys();
-          virkeyboardwindow->hide();}
-        xywh {545 104 55 18} box THIN_UP_BOX labelsize 12
+        callback {relaseallkeys();
+virkeyboardwindow->hide();}
+        xywh {545 105 55 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Value_Slider {} {
         label Cval
-        callback {//
-            //synth->vkbdSetController(virkeys->midich, ctl, (short)lrintf(o->value()));
-            midimessage msg;
-            //msg.period_start_frame = 0;
-            msg.event_frame = 0;
-            msg.bytes[0] = MSG_control_change | (virkeys->midich & 0x0f);
-            msg.bytes[1] = midictl;
-            msg.bytes[2] = o->value();
-            musicClient->queueMidi(&msg);
+        callback {int ctl = midictl;
+            synth->SetController(virkeys->midich, ctl, (int) o->value());
             virkeys->take_focus();}
         tooltip {Controller value} xywh {605 10 15 115} type {Vert Fill} box ENGRAVED_BOX selection_color 229 labelsize 8 align 5 minimum 127 maximum 0 step 1 value 64 textsize 7
       }
       Fl_Choice {} {
         label Controller
-        callback {//
-            switch(lrintf(o->value()) + 1)
+        callback {switch((int) o->value() + 1)
             {
                 case 1: midictl = C_modwheel; break;
                 case 2: midictl = C_volume; break;
-                case 3: midictl = C_pan; break;
+                case 3: midictl = C_panning; break;
                 case 4: midictl = C_expression; break;
                 case 5: midictl = C_sustain; break;
                 case 6: midictl = C_portamento; break;
                 case 7: midictl = C_filterq; break;
                 case 8: midictl = C_filtercutoff; break;
-                case 9: midictl = C_soundcontroller6; break;   // bandwidth
-                case 10: midictl = C_soundcontroller7; break;  // fmamp
-                case 11: midictl = C_soundcontroller8; break;  // resonance enter
-                case 12: midictl = C_soundcontroller9; break;  // resonance bandwidth
-                default: midictl = 0; break;
+                case 9: midictl = C_bandwidth; break;
+                case 10: midictl = C_fmamp; break;
+                case 11: midictl = C_resonance_center; break;
+                case 12: midictl = C_resonance_bandwidth; break;
+                default: midictl = C_NULL; break;
             }
-            virkeys->take_focus();} open
+            virkeys->take_focus();}
         xywh {435 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
-        code0 {midictl = C_filtercutoff; o->value(7);}
+        code0 {midictl=C_filtercutoff;o->value(7);}
       } {
         MenuItem {} {
           label {01: Mod.Wheel}
@@ -417,55 +408,51 @@ virkeyboardwindow->hide();} open
       }
       Fl_Roller pitchwheelroller {
         label Pwh
-        callback {//
-            //synth->vkbdSetPitchwheel(virkeys->midich, -(short)lrintf(o->value()));
-            midimessage msg;
-            //msg.period_start_frame = 0;
-            msg.event_frame = 0;
-            msg.bytes[0] = MSG_pitchwheel_control | (virkeys->midich & 0x0f);
-            short int par = o->value();
-            msg.bytes[1] = par % 8192;
-            msg.bytes[2] = par >> 7;
-            musicClient->queueMidi(&msg);
+        callback {
+            synth->SetController(virkeys->midich, C_pitchwheel, -(int) o->value());
             virkeys->take_focus();}
-        tooltip {Pitch Wheel} xywh {625 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -16384 maximum 0 step 112
+        tooltip {Pitch Wheel} xywh {625 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
       }
       Fl_Button {} {
         label R
-        callback {//
-            pitchwheelroller->value(-8192);
+        callback {pitchwheelroller->value(0);
             pitchwheelroller->do_callback();}
         tooltip {Reset Pitch Bend} xywh {625 110 20 15} box THIN_UP_BOX labelfont 1
       }
       Fl_Dial {} {
         label Vrnd
-        callback {virkeys->rndvelocity = lrintf(o->value());}
+        callback {virkeys->rndvelocity=(int) o->value();}
         tooltip {Velocity Randomness} xywh {205 106 20 21} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
         code0 {o->value(virkeys->rndvelocity);}
         class WidgetPDial
       }
-      Fl_Spinner {} {
+      Fl_Choice partrcv {
         label {Midi Channel}
-        callback {//
-            relaseallkeys();
-            virkeys->midich = lrintf(o->value() - 1);
+        callback {relaseallkeys();
+            virkeys->midich = (int) o->value();
             virkeys->take_focus();} selected
-        tooltip {Select midi channel - 10 is conventionally Drums} xywh {21 108 42 18} labelsize 10 align 1 maximum 16 textsize 11
-        code0 {o->value(virkeys->midich + 1);}
-      }
+        tooltip {Send to Midi Channel} xywh {11 108 66 16} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
+        code0 {char nrstr[10];
+            for(int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+            {
+                sprintf(nrstr, "Chn%d", i + 1);
+                if (i != 9)
+                    o->add(nrstr);
+                else
+                    o->add("Drum10");
+            }}
+        code1 {o->value(virkeys->midich);}
+      } {}
     }
   }
-  Function {VirKeyboard(void)} {open
-  } {
-    code {//
-        midictl = 75;
+  Function {VirKeyboard(void)} {} {
+    code {midictl = 75;
         make_window();} {}
   }
   Function {~VirKeyboard()} {} {
     code {delete virkeyboardwindow;} {}
   }
-  Function {Show()} {open
-  } {
+  Function {Show()} {} {
     code {virkeyboardwindow->show();} {}
   }
   Function {Hide()} {} {

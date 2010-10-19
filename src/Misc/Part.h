@@ -28,6 +28,17 @@
 
 using namespace std;
 
+//#include "Params/ADnoteParameters.h"
+//#include "Params/SUBnoteParameters.h"
+//#include "Params/PADnoteParameters.h"
+//#include "Synth/ADnote.h"
+//#include "Synth/SUBnote.h"
+//#include "Synth/PADnote.h"
+//#include "Params/Controller.h"
+//#include "Misc/Microtonal.h"
+//#include "DSP/FFTwrapper.h"
+//#include "Effects/EffectMgr.h"
+//#include "Misc/XMLwrapper.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
 
@@ -48,24 +59,37 @@ class Part : private MiscFuncs, SynthHelper
     public:
         Part(Microtonal *microtonal_, FFTwrapper *fft_);
         ~Part();
-        void ComputePartSmps(void);
-        void cleanup(void);
+
+        // Midi commands implemented
         void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
         void NoteOff(unsigned char note);
         void AllNotesOff(void) { killallnotes = true; };
+             // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
-        void RelaseSustainedKeys(void); 
+        void RelaseSustainedKeys(void);
+             // this is called when the sustain pedal is relased
         void RelaseAllKeys(void);
+             // this is called on AllNotesOff controller
 
+        void ComputePartSmps(void); // Part output
+
+        // instrumentonly: 0 - save all, 1 - save only instrumnet,
+        //                 2 - save only instrument without the name(used in bank)
         bool saveXML(string filename); // true for load ok, otherwise false
         bool loadXMLinstrument(string filename);
+
         void add2XML(XMLwrapper *xml);
         void add2XMLinstrument(XMLwrapper *xml);
+
         void defaults(void);
         void defaultsinstrument(void);
+
         void applyparameters(bool islocked);
+
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
+
+        void cleanup(void);
 
         // the part's kit
         struct {
@@ -89,7 +113,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pminkey;
         unsigned char Pmaxkey;     // the maximum key that the part receives noteon messages
         unsigned char Pkeyshift;   // Part keyshift
-        unsigned char midichannel; // from what midi channel it receive commnads
+        unsigned char Prcvchn;     // from what midi channel it receive commnads
         unsigned char Ppanning;    // part panning
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset

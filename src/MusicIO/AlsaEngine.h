@@ -24,9 +24,9 @@
 #include <string>
 #include <alsa/asoundlib.h>
 
-#include "MusicIO/MusicIO.h"
-
 using namespace std;
+
+#include "MusicIO/MusicIO.h"
 
 class AlsaEngine : public MusicIO
 {
@@ -41,24 +41,32 @@ class AlsaEngine : public MusicIO
         
         unsigned int getSamplerate(void) { return audio.samplerate; };
         int getBuffersize(void) { return audio.period_size; };
+        
+        string audioClientName(void);
+        string midiClientName(void);
+        int audioClientId(void) { return audio.alsaId; };
+        int midiClientId(void) { return midi.alsaId; };
 
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);
-        void writepcm(void);
-        bool pcmRecover(int err);
+        void Write(void);
+        bool Recover(int err);
         bool xrunRecover(void);
         bool alsaBad(int op_result, string err_msg);
         void closeAudio(void);
         void closeMidi(void);
         
-        void *audioThread(void);
-        static void *_audioThread(void *arg);
-        static void _midiTimerCallback(snd_async_handler_t *midicbh);
-        void midiTimerCallback(void);
+        void *AudioThread(void);
+        static void *_AudioThread(void *arg);
+        void *MidiThread(void);
+        static void *_MidiThread(void *arg);
+        static void _audioCleanup(void *arg) { };
+        static void _midiCleanup(void *arg) { };
 
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
                                       snd_pcm_uframes_t nframes);
+
         struct {
             string             device;
             snd_pcm_t         *handle;
@@ -66,18 +74,19 @@ class AlsaEngine : public MusicIO
             unsigned int       samplerate;
             snd_pcm_uframes_t  period_size;
             snd_pcm_uframes_t  buffer_size;
+            int                alsaId;
             snd_pcm_state_t    pcm_state;
             pthread_t          pThread;
         } audio;
 
         struct {
-            string               device;
-            snd_seq_t           *handle;
-            int                  portId;
-            snd_timer_t         *timerhandle;
-            snd_midi_event_t    *decoder;
-            snd_async_handler_t *callbackHandler;
+            string     device;
+            snd_seq_t *handle;
+            int        alsaId;
+            pthread_t  pThread;
         } midi;
+
+        bool threadStop;
 };
 
 #endif
