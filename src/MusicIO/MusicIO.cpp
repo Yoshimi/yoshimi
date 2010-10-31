@@ -40,10 +40,6 @@ MusicIO::MusicIO() :
 { }
 
 
-MusicIO::~MusicIO()
-{ }
-
-
 void MusicIO::Close(void)
 {
     if (NULL != zynLeft)

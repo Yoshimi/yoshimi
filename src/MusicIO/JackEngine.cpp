@@ -202,6 +202,7 @@ void JackEngine::Close(void)
             midi.ringBuf = NULL;
         }
         jackClient = NULL;
+        MusicIO::Close();
     }
 }
 

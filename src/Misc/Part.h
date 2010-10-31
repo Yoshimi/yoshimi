@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #ifndef PART_H
@@ -28,17 +28,6 @@
 
 using namespace std;
 
-//#include "Params/ADnoteParameters.h"
-//#include "Params/SUBnoteParameters.h"
-//#include "Params/PADnoteParameters.h"
-//#include "Synth/ADnote.h"
-//#include "Synth/SUBnote.h"
-//#include "Synth/PADnote.h"
-//#include "Params/Controller.h"
-//#include "Misc/Microtonal.h"
-//#include "DSP/FFTwrapper.h"
-//#include "Effects/EffectMgr.h"
-//#include "Misc/XMLwrapper.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
 
@@ -63,15 +52,12 @@ class Part : private MiscFuncs, SynthHelper
         // Midi commands implemented
         void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
         void NoteOff(unsigned char note);
-        void AllNotesOff(void) { killallnotes = true; };
-             // panic, prepare all notes to be turned off
+        void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
         void RelaseSustainedKeys(void);
-             // this is called when the sustain pedal is relased
         void RelaseAllKeys(void);
-             // this is called on AllNotesOff controller
 
-        void ComputePartSmps(void); // Part output
+        void ComputePartSmps(void);
 
         // instrumentonly: 0 - save all, 1 - save only instrumnet,
         //                 2 - save only instrument without the name(used in bank)
@@ -111,35 +97,32 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Penabled;
         unsigned char Pvolume;
         unsigned char Pminkey;
-        unsigned char Pmaxkey;     // the maximum key that the part receives noteon messages
-        unsigned char Pkeyshift;   // Part keyshift
-        unsigned char Prcvchn;     // from what midi channel it receive commnads
-        unsigned char Ppanning;    // part panning
+        unsigned char Pmaxkey;
+        unsigned char Pkeyshift;
+        unsigned char Prcvchn;
+        unsigned char Ppanning;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages
         unsigned char Pkitmode;    // if the kitmode is enabled
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
 
-        unsigned char Ppolymode;   // Part mode - 0=monophonic , 1=polyphonic
-        unsigned char Plegatomode; // 0=normal, 1=legato
-        unsigned char Pkeylimit;   // how many keys are alowed to be played same
-                                   // time (0=off), the older will be relased
-
-        string        Pname;       // name of the instrument
-        struct {                   // instrument additional information
+        unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic
+        unsigned char Plegatomode; // 0 = normal, 1 = legato
+        unsigned char Pkeylimit;   // how many keys can play simultaneously,
+                                   // time 0 = off, the older will be released
+        string        Pname;
+        struct {
             unsigned char Ptype;
             string        Pauthor;
             string        Pcomments;
         } info;
 
-        float *partoutl; // Left channel output of the part
-        float *partoutr; // Right channel output of the part
-
-        // Left and right signal that pass thru part effects
-        // [NUM_PART_EFX] is for "no effect" buffer
-        float *partfxinputl[NUM_PART_EFX + 1];
-        float *partfxinputr[NUM_PART_EFX + 1];
+        float *partoutl;
+        float *partoutr;
+        
+        float *partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass thru part effects
+        float *partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
 
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
 
@@ -150,12 +133,11 @@ class Part : private MiscFuncs, SynthHelper
 
         Controller *ctl; // Part controllers
 
-        // insertion part effects - part of the instrument
-        EffectMgr *partefx[NUM_PART_EFX];
-        // how the effect's output is routed (to next effect/to out)
-        unsigned char Pefxroute[NUM_PART_EFX];
-        // if the effects are bypassed, [NUM_PART_EFX] is for "no effect" buffer
-        bool Pefxbypass[NUM_PART_EFX + 1];
+        EffectMgr *partefx[NUM_PART_EFX];      // insertion part effects - part of the instrument
+        unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
+                                               // routed (to next effect/to out)
+        bool Pefxbypass[NUM_PART_EFX + 1];     // if the effects are bypassed,
+                                               // [NUM_PART_EFX] is for "no effect" buffer
 
         int lastnote;
 
@@ -164,11 +146,11 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
 
-        bool killallnotes; // true if I want to kill all notes (ie, panic)
-
+        bool killallnotes;
+        
         struct PartNotes {
             NoteStatus status;
-            int note; // if there is no note playing, the "note"=-1
+            int note;          // if there is no note playing, "note" = -1
             int itemsplaying;
             struct {
                 ADnote *adnote;
@@ -179,27 +161,23 @@ class Part : private MiscFuncs, SynthHelper
             int time;
         };
 
-        int lastpos, lastposb;    // To keep track of previously used pos and posb.
-        bool lastlegatomodevalid; // To keep track of previous legatomodevalid.
+        int lastpos, lastposb;    // to keep track of previously used pos and posb.
+        bool lastlegatomodevalid; // to keep track of previous legatomodevalid.
 
         // MonoMem stuff
-        list<unsigned char> monomemnotes; // A list to remember held notes.
+        list<unsigned char> monomemnotes; // a list to remember held notes.
         struct {
             unsigned char velocity;
-            int mkeyshift; // I'm not sure masterkeyshift should be remembered.
-        } monomem[256];
-        /* 256 is to cover all possible note values. monomem[] is used in
-           conjunction with the list to store the velocity and masterkeyshift
-           values of a given note (the list only store note values).
-           For example 'monomem[note].velocity' would be the velocity value of
-           the note 'note'.
-        */
-
+            int mkeyshift; // Not sure if masterkeyshift should be remembered.
+        } monomem[256];    // 256 is to cover all possible note values. monomem[]
+                           // is used in conjunction with the list to store the
+                           // velocity and masterkeyshift values of a given note
+                           // (the list only store note values). For example.
+                           // 'monomem[note].velocity' would be the velocity
+                           // value of the note 'note'.
         PartNotes partnote[POLIPHONY];
-
         float *tmpoutl;
         float *tmpoutr;
-
         float oldfreq; // for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;

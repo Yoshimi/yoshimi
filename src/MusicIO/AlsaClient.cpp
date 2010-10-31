@@ -44,4 +44,5 @@ bool AlsaClient::openMidi(WavRecord *recorder)
 void AlsaClient::Close(void)
 {
     alsaEngine.Close();
+    MusicClient::Close();
 }

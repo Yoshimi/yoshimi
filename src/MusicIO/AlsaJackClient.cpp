@@ -69,4 +69,5 @@ void AlsaJackClient::Close(void)
 {
     alsaEngine.Close();
     jackEngine.Close();
+    MusicClient::Close();
 }

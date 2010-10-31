@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
 #include <iostream>
@@ -30,6 +30,10 @@
 
 #if defined(__SSE__)
 #include <xmmintrin.h>
+#endif
+
+#if defined(JACK_SESSION)
+#include <jack/session.h>
 #endif
 
 using namespace std;
@@ -740,11 +744,13 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
 
         if (schedfifo)
         {
-            Log("Failed to start thread (sched_fifo): " + asString(chk));
+            Log("Failed to start thread (sched_fifo): " + asString(chk)
+                + "  " + string(strerror(errno)));
             schedfifo = false;
             continue;
         }
-        Log("Failed to start thread (sched_other): " + asString(chk));
+        Log("Failed to start thread (sched_other): " + asString(chk)
+            + "  " + string(strerror(errno)));
         outcome = false;
         break;
     }
@@ -786,25 +792,25 @@ void Config::signalCheck(void)
     if (sigIntActive)
         runSynth = false;
 
-    switch (jsessionSave)
-    {
-        case 1: // JackSessionSave
-            cerr << "Config::signalCheck, JackSessionSave is active" << endl;
-            saveJackSession();
-            __sync_val_compare_and_swap(&jsessionSave, jsessionSave, 0);
-            break;
-        case 2: // JackSessionSaveAndQuit
-            cerr << "Config::signalCheck, JackSessionSaveAndQuit is active" << endl;
-            saveJackSession();
-            __sync_bool_compare_and_swap(&jsessionSave, jsessionSave, 0);
-            runSynth = false;
-            break;
-        case 3: // JackSessionSaveTemplate not implemented
-            __sync_val_compare_and_swap(&jsessionSave, jsessionSave, 0);
-            break;
-        default:
-            break;
-    }
+    #if defined(JACK_SESSION)
+        switch (jsessionSave)
+        {
+            case JackSessionSave:
+                saveJackSession();
+                __sync_val_compare_and_swap(&jsessionSave, jsessionSave, 0);
+                break;
+            case JackSessionSaveAndQuit:
+                saveJackSession();
+                __sync_bool_compare_and_swap(&jsessionSave, jsessionSave, 0);
+                runSynth = false;
+                break;
+            case JackSessionSaveTemplate:
+                // not implemented
+                break;
+            default:
+                break;
+        }
+    #endif
 }
 
 
@@ -824,7 +830,6 @@ void Config::setLadi1Active(int sig)
 bool Config::restoreJsession(SynthEngine *synth)
 {
     #if defined(JACK_SESSION)
-        cerr << "Config::restoreJsession to restore from jackSessionFile: " << jackSessionFile << endl;
         return restoreSessionData(synth, jackSessionFile);
     #else
         return false;
@@ -839,25 +844,20 @@ void Config::setJackSessionSave(int event_type, const char *session_dir, const c
     jackSessionFile = "yoshimi-" + jackSessionUuid + ".xml";
     if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, event_type))
         Log("setJackSessionSave, error setting jack session save flag", true);
-
-    cerr << "Through Config::setJackSessionSave, event_type " << event_type
-         << ", session_dir " << session_dir << ", client_uuid " << client_uuid << endl;
 }
 
 
 void Config::saveJackSession(void)
 {
-    cerr << "Through Config::saveJackSession, saving to " << (jackSessionDir + jackSessionFile) << endl;
     if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, 0))
         Log("saveJackSession, error clearing jack session save flag", true);
+    Log("saveJackSession, saving session to " + jackSessionDir + jackSessionFile, true);
     saveSessionData(jackSessionDir + jackSessionFile);
-    cerr << "Config::saveJackSession calls musicClient->jacksessionReply with: "
-         << (programCmd + string(" -U ") + jackSessionUuid
-             + string(" -u ${SESSION_DIR}") + jackSessionFile) << endl;
-         
-    if (!musicClient->jacksessionReply(programCmd + string(" -U ") + jackSessionUuid
-                                       + string(" -u ${SESSION_DIR}") + jackSessionFile))
-        Log("Error on jack session reply");
+    string cmd = string("yoshimi --show-console -U ") + jackSessionUuid
+                 + string(" -u ${SESSION_DIR}") + jackSessionFile;
+   Log("Jack session restart command: " + cmd);
+   if (!musicClient->jacksessionReply(cmd))
+        Log("Error on jack session reply", true);
     jackSessionDir.clear();
     jackSessionUuid.clear();
     jackSessionFile.clear();

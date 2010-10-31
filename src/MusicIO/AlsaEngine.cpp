@@ -36,8 +36,6 @@ AlsaEngine::AlsaEngine() :
     midi.handle = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
-
-    threadStop = true;
 }
 
 
@@ -113,10 +111,6 @@ bail_out:
 
 void AlsaEngine::Close(void)
 {
-    synth->actionLock(lockmute);
-    wavRecorder->Close();
-    synth->actionLock(unlock);
-    threadStop = true;
     if (NULL != audio.handle && audio.pThread)
         if (pthread_cancel(audio.pThread))
             Runtime.Log("Error, failed to cancel Alsa audio thread");
@@ -130,6 +124,7 @@ void AlsaEngine::Close(void)
         if (snd_seq_close(midi.handle) < 0)
             Runtime.Log("Error closing Alsa midi connection");
     midi.handle = NULL;
+    MusicIO::Close();
 }
 
 
@@ -278,7 +273,7 @@ void *AlsaEngine::AudioThread(void)
     }
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
     pthread_cleanup_push(_audioCleanup, this);
-    while (!threadStop)
+    while (Runtime.runSynth)
     {
         pthread_testcancel();
         audio.pcm_state = snd_pcm_state(audio.handle);
@@ -407,7 +402,6 @@ bool AlsaEngine::Start(void)
 {
     int chk;
     pthread_attr_t attr;
-    threadStop = false;
     if (NULL != audio.handle)
     {
         chk = 999;
@@ -456,7 +450,6 @@ bool AlsaEngine::Start(void)
 bail_out:
     Runtime.Log("Error - bail out of AlsaEngine::Start()");
     Close();
-    threadStop = true;
     return false;
 }
 
@@ -477,7 +470,7 @@ void *AlsaEngine::MidiThread(void)
     int par;
     int chk;
     pthread_cleanup_push(_midiCleanup, this);
-    while (!threadStop)
+    while (Runtime.runSynth)
     {
         pthread_testcancel();
         while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)

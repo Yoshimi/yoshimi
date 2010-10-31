@@ -90,3 +90,9 @@ bool MusicClient::Open(void)
     return false;
 }
 
+
+void MusicClient::Close(void)
+{
+    if (Recorder != NULL)
+        Recorder->Close();
+}

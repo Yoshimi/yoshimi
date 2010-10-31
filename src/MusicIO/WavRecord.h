@@ -53,8 +53,6 @@ class WavRecord : private MiscFuncs
     private:
         void *recorderThread(void);
         static void *_recorderThread(void *arg);
-        static void _cleanup(void *arg);
-        void cleanup(void);
         void recordLog(string tag);
 
         record_state  recordState;
@@ -73,8 +71,6 @@ class WavRecord : private MiscFuncs
         string   wavFile;
         SF_INFO  wavOutInfo;
         SNDFILE *wavOutsnd;
-
-        bool         runRecordThread;
         pthread_t    pThread;
 };
 

@@ -85,8 +85,6 @@ class AlsaEngine : public MusicIO
             int        alsaId;
             pthread_t  pThread;
         } midi;
-
-        bool threadStop;
 };
 
 #endif

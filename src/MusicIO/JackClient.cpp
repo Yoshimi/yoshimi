@@ -58,4 +58,5 @@ bool JackClient::openMidi(WavRecord *recorder)
 void JackClient::Close(void)
 {
     jackEngine.Close();
+    MusicClient::Close();
 }

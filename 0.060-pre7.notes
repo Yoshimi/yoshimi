@@ -1,0 +1,18 @@
+----------------------------
+yoshimi-0.060-pre7
+
+Includes Paul, the original ZynaddSubFx author's Unison and Reverb updates,
+plus jack session support.
+
+Points of note -
+
+- as per desktop.org standards, it now uses $HOME/.config/yoshimi/ for config and
+state files. If it can't find a ~/.config/yoshimi/yoshimi.config, it looks
+for the old $HOME/.yoshimiXML.cfg file and copies it over.
+
+- CMakeLists.txt has changed significantly. Including a run of ccmake in your
+build process and checking your build options is probably a good idea.
+
+- new dependency on the boost development headers.
+
+- Will Godfrey's instrument collection has been reorganised (by Will!).

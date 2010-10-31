@@ -17,6 +17,8 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
+
 #include <errno.h>
 #include <stdio_ext.h>
 #include <sys/stat.h>
@@ -42,7 +44,6 @@ WavRecord::WavRecord() :
     tferBuf(NULL),
     wavFile(string()),
     wavOutsnd(NULL),
-    runRecordThread(false),
     pThread(0)
 {
     setlocale( LC_TIME, "" ); // use compiler's native locale
@@ -58,6 +59,10 @@ WavRecord::~WavRecord()
         sf_close(wavOutsnd);
     if (!recordFifo.empty() && isFifo(recordFifo))
         unlink(recordFifo.c_str());
+    if (NULL != interleavedFloats)
+        delete [] interleavedFloats;
+    interleavedFloats = NULL;
+
 }
 
 bool WavRecord::Prep(unsigned int sample_rate, int buffer_size)
@@ -109,7 +114,6 @@ bool WavRecord::Prep(unsigned int sample_rate, int buffer_size)
         goto bail_out;
     }
 
-    runRecordThread = true;
     chk = pthread_create(&pThread, &attr, _recorderThread, this);
     if (chk)
     {
@@ -183,15 +187,37 @@ void WavRecord::Stop(void)
 
 void WavRecord::Close(void)
 {
-    runRecordThread = false;
-    if (recordState != nada)
+    recordState = nada;
+    if (NULL != wavOutsnd)
     {
-        if (pThread && pthread_cancel(pThread))
-            Runtime.Log("Cancel record thread failed");
-        if (NULL != interleavedFloats)
-            delete [] interleavedFloats;
-        interleavedFloats = NULL;
+        if (sf_close(wavOutsnd))
+            Runtime.Log("Error closing wav file " + wavFile
+                        + string(sf_strerror(wavOutsnd)));
+        else
+            recordLog("Close");
+        wavOutsnd = NULL;
     }
+
+    if (NULL != toFifo)
+    {
+        if (fclose(toFifo))
+            Runtime.Log("Closing fifo feed: " + string(strerror(errno)));
+        toFifo = NULL;
+    }
+
+    if (NULL != fromFifoSndfle)
+    {
+        if (sf_close(fromFifoSndfle))
+            Runtime.Log("Error closing fifo read sndfle: "
+                        + string(sf_strerror(fromFifoSndfle)));
+        fromFifoSndfle = NULL;
+    }
+
+    if (!recordFifo.empty())
+        unlink(recordFifo.c_str());
+    else
+        Runtime.Log("Ooops, recordFifo is empty at unlink time");
+    recordFifo.clear();
 }
 
 
@@ -352,8 +378,8 @@ void *WavRecord::recorderThread(void)
     }
     sf_count_t samplesRead;
     sf_count_t wroteSamples;
-    pthread_cleanup_push(_cleanup, this);
-    while (runRecordThread)
+    pthread_cleanup_push(NULL, NULL);
+    while (Runtime.runSynth)
     {
         pthread_testcancel();
         samplesRead = sf_read_float(fromFifoSndfle, tferBuf, tferSamples);
@@ -376,53 +402,10 @@ void *WavRecord::recorderThread(void)
             }
         }
     }
-    pthread_cleanup_pop(1);
+    pthread_cleanup_pop(0);
     return NULL;
 }
 
-
-void WavRecord::_cleanup(void *arg)
-{
-    static_cast<WavRecord*>(arg)->cleanup();
-}
-
-
-void WavRecord::cleanup(void)
-{
-    runRecordThread = false;
-    recordState = nada;
-    if (NULL != wavOutsnd)
-    {
-        if (sf_close(wavOutsnd))
-            Runtime.Log("Error closing wav file " + wavFile
-                        + string(sf_strerror(wavOutsnd)));
-        else
-            recordLog("Close");
-        wavOutsnd = NULL;
-    }
-
-    if (NULL != toFifo)
-    {
-        if (fclose(toFifo))
-            Runtime.Log("Closing fifo feed: " + string(strerror(errno)));
-        toFifo = NULL;
-    }
-
-    if (NULL != fromFifoSndfle)
-    {
-        if (sf_close(fromFifoSndfle))
-            Runtime.Log("Error closing fifo read sndfle: "
-                        + string(sf_strerror(fromFifoSndfle)));
-        fromFifoSndfle = NULL;
-    }
-
-    if (!recordFifo.empty())
-        unlink(recordFifo.c_str());
-    else
-        Runtime.Log("Ooops, recordFifo is empty at unlink time");
-    recordFifo.clear();
-}    
-    
 
 void WavRecord::recordLog(string tag)
 {

@@ -29,26 +29,23 @@ This file is a derivative of a ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
-decl {
-    \#include <FL/fl_ask.H>
+decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
-    \#include "Misc/SynthEngine.h"
-} {global}
+    \#include "Misc/SynthEngine.h"} {global
+} 
 
-decl {
-    \#include "EffUI.h"
+decl {\#include "EffUI.h"
     \#include "BankUI.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "Params/Controller.h"
-    \#include "Misc/MiscFuncs.h"
-} {public global}
+    \#include "Misc/MiscFuncs.h"} {public global
+} 
 
-decl {
-    \#include "Misc/Part.h"
-    \#define MAX_INFO_TEXT_SIZE 256
-} {public}
+decl {\#include "Misc/Part.h"
+    \#define MAX_INFO_TEXT_SIZE 256} {public
+} 
 
 class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
 } {
@@ -94,12 +91,12 @@ class PartUI_ {open
   } {}
 } 
 
-class PartKitItem {open : {public Fl_Group}
+class PartKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {open private
   } {
     Fl_Window partkititem {open
-      private xywh {120 453 670 30} type Double hide
+      private xywh {121 479 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -310,16 +307,17 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {835 602 385 240} type Double hide
-      class Fl_Group
+      private xywh {1165 299 385 240} type Double
+      class Fl_Group visible
     } {
-      Fl_Group partgroupui {open
-        xywh {0 0 387 242}
+      Fl_Group partgroupui {open selected
+        xywh {0 0 387 240}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
         Fl_Button {} {
           label Instrument
           callback {int event = Fl::event_button();
+              const char *tmp = NULL;
               switch (event)
               {
                   case FL_LEFT_MOUSE:
@@ -327,6 +325,14 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       break;
                   case FL_MIDDLE_MOUSE:
                       instrumenteditwindow->show();
+                      break;
+                  case FL_RIGHT_MOUSE:
+                      tmp = fl_input("Instrument name:", part->Pname.c_str());
+                      if (tmp != NULL)
+                      {
+                          part->Pname = string(tmp);
+                          o->copy_label(part->Pname.c_str());
+                      }
                       break;
                   default:
                       break;
@@ -379,17 +385,15 @@ Offset}
                 partgroupui->deactivate();
             else
                 partgroupui->activate();}
-        xywh {11 30 11 20} down_box DOWN_BOX labelsize 11 align 8
+        xywh {10 35 11 20} down_box DOWN_BOX labelsize 11 align 8
         code0 {o->value(part->Penabled);}
       }
-      Fl_Choice {} {
-        label {Midi Channel}
-        callback {part->Prcvchn = o->value();} open
-        tooltip {receive from Midi channel} xywh {82 68 88 20} down_box BORDER_BOX selection_color 0 labelsize 11 textfont 1 textsize 11
-        code0 {for(int i = 0; i < NUM_MIDI_CHANNELS;++i)
-              o->add((i != 9) ? asString(i + 1).c_str() : "10 Drums");}
-        code1 {o->value(part->Prcvchn);}
-      } {}
+      Fl_Spinner {} {
+        label {Midi Chan}
+        callback {part->Prcvchn = lrintf(o->value()) - 1;}
+        tooltip {Midi channel for this part} xywh {70 85 36 18} labelsize 11 maximum 16 textsize 10
+        code0 {o->value(part->Prcvchn + 1);}
+      }
       Fl_Choice {} {
         label Mode
         callback {switch (o->value())
@@ -409,7 +413,7 @@ Offset}
                 default:
                     break;
             }}
-        tooltip {Poly, Mono or Legato mode} xywh {82 113 65 18} down_box BORDER_BOX labelsize 11 textfont 1 textsize 10
+        tooltip {Poly, Mono or Legato mode} xywh {107 60 67 18} down_box BORDER_BOX labelsize 11 textfont 1 textsize 10
         code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
         code1 {if (part->Ppolymode) o->value(0); else o->value(1);}
         code2 {if (!part->Ppolymode && part->Plegatomode) o->value(2);}
@@ -417,13 +421,13 @@ Offset}
       Fl_Check_Button {} {
         label NoteOn
         callback {part->Pnoteon = o->value();}
-        tooltip {set if the part receives NoteOn messages} xywh {82 30 65 20} down_box DOWN_BOX labelsize 11
+        tooltip {set if the part receives NoteOn messages} xywh {10 59 65 20} down_box DOWN_BOX labelsize 11
         code0 {o->value(part->Pnoteon);}
       }
       Fl_Check_Button {} {
         label Portamento
         callback {part->ctl->portamento.portamento = o->value();}
-        tooltip {Enable/Disable the portamento} xywh {82 48 88 20} down_box DOWN_BOX labelsize 11
+        tooltip {Enable/Disable the portamento} xywh {82 35 88 20} down_box DOWN_BOX labelsize 11
         code0 {o->value(part->ctl->portamento.portamento);}
       }
       Fl_Choice keylimitlist {
@@ -431,12 +435,12 @@ Offset}
         callback {int val = 0;
             val = atoi(o->text());
             part->setkeylimit(val);}
-        tooltip {Key Limit} xywh {204 136 48 18} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+        tooltip {Key Limit} xywh {204 140 48 18} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
       } {}
       Fl_Spinner {} {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
-        xywh {204 113 47 18} labelsize 10 minimum -12 maximum 12 textsize 11
+        xywh {204 116 47 18} labelsize 10 minimum -12 maximum 12 textsize 11
         code0 {o->range(-12.0, 12.0);}
         code1 {o->value(part->Pkeyshift - 64);}
       }
@@ -459,7 +463,7 @@ Offset}
       Fl_Button {} {
         label Controllers
         callback {ctlwindow->show();}
-        tooltip {Controller settings} xywh {82 90 88 20} box PLASTIC_UP_BOX color 22 labelsize 10
+        tooltip {Controller settings} xywh {108 85 67 18} box PLASTIC_UP_BOX color 22 labelsize 10
       }
       Fl_Spinner minkcounter {
         label {Minimum Note}
@@ -468,7 +472,7 @@ Offset}
                 o->textcolor(FL_RED);
             else
                 o->textcolor(FL_BLACK);}
-        tooltip {Minimum note the part receives} xywh {82 136 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+        tooltip {Minimum note the part receives} xywh {82 116 42 18} labelsize 10 minimum 0 maximum 127 textsize 11
         code0 {o->range(0.0, 127.0);o->step(1.0);}
         code1 {o->value(part->Pminkey);}
       }
@@ -479,7 +483,7 @@ Offset}
                 o->textcolor(FL_RED);
             else
                 o->textcolor(FL_BLACK);}
-        tooltip {Maximum note the part receives} xywh {82 162 42 20} labelsize 10 minimum 0 maximum 127 textsize 11
+        tooltip {Maximum note the part receives} xywh {82 140 42 18} labelsize 10 minimum 0 maximum 127 textsize 11
         code0 {o->range(0.0, 127.0);o->step(1.0);}
         code1 {o->value(part->Pmaxkey);}
       }
@@ -489,14 +493,14 @@ Offset}
                 minkcounter->value(part->lastnote);
             minkcounter->do_callback();
             maxkcounter->do_callback();}
-        tooltip {set minimum note to the last note played} xywh {127 136 20 14} box PLASTIC_UP_BOX color 22 labelsize 11
+        tooltip {set minimum note to the last note played} xywh {127 113 20 14} box PLASTIC_UP_BOX color 22 labelsize 11
       }
       Fl_Button {} {
         label M
         callback {if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
             maxkcounter->do_callback();
             minkcounter->do_callback();}
-        tooltip {set maximum key to the last pressed key} xywh {127 168 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
+        tooltip {set maximum key to the last pressed key} xywh {127 147 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
       }
       Fl_Button {} {
         label R
@@ -504,7 +508,7 @@ Offset}
             minkcounter->do_callback();
             maxkcounter->value(127);
             maxkcounter->do_callback();}
-        tooltip {reset the minimum key to 0 and maximum key to 127} xywh {127 152 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
+        tooltip {reset the minimum key to 0 and maximum key to 127} xywh {127 130 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
       }
     }
     Fl_Window ctlwindow {

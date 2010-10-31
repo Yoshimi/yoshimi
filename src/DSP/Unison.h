@@ -46,7 +46,7 @@ class Unison
         float base_freq;
         struct UnisonVoice {
             float step;     // base LFO
-            float position; 
+            float position;
             float realpos1; // the position regarding samples
             float realpos2;
             float relative_amplitude;

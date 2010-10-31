@@ -28,8 +28,7 @@ class MusicIO : protected MiscFuncs
 {
     public:
         MusicIO();
-        ~MusicIO();
-
+        ~MusicIO() { }
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
@@ -42,13 +41,12 @@ class MusicIO : protected MiscFuncs
         bool prepRecord(void);
         void getAudio(void);
         void InterleaveShorts(void);
-
         bool setThreadAttributes(pthread_attr_t *attr, bool schedfifo, bool midi = false);
-
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
+
         float *zynLeft;
         float *zynRight;
         short int *interleavedShorts;

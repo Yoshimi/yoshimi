@@ -85,11 +85,9 @@ void Unison::setBandwidth(float bandwidth)
         bandwidth = 0.0f;
     if (bandwidth > 1200.0f)
         bandwidth = 1200.0f;
-
-    cerr << "bandwidth " + Runtime.asString(bandwidth) << endl;
-#warning \
-    : todo: if bandwidth is too small the audio will be self canceled (because of the sign change of the outputs)
-    unison_bandwidth_cents = bandwidth;
+    //#warning
+    //    : todo: if bandwidth is too small the audio will be self canceled (because of the sign change of the outputs)
+    //    unison_bandwidth_cents = bandwidth;
     updateParameters();
 }
 
@@ -114,11 +112,9 @@ void Unison::updateParameters(void)
 
     float max_speed = powf(2.0f, unison_bandwidth_cents / 1200.0f);
     unison_amplitude_samples = 0.125f * (max_speed - 1.0f) * synth->samplerate_f / base_freq;
-    cerr << "unison_amplitude_samples " << Runtime.asString(unison_amplitude_samples)
-         << endl;
 
-#warning \
-    todo: test if unison_amplitude_samples is to big and reallocate bigger memory
+    //#warning
+    //    todo: test if unison_amplitude_samples is to big and reallocate bigger memory
     if(unison_amplitude_samples >= max_delay - 1)
         unison_amplitude_samples = max_delay - 2;
     updateUnisonData();

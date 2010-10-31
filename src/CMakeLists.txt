@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.060-pre5")
+set (YOSHIMI_VERSION "0.060-pre7")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -212,10 +212,10 @@ set (DSP_sources
 
 set (Effects_sources
     Effects/Alienwah.cpp  Effects/Chorus.cpp  Effects/Echo.cpp
-    Effects/EffectLFO.cpp  Effects/EffectMgr.cpp  Effects/Effect.cpp 
+    Effects/EffectLFO.cpp  Effects/EffectMgr.cpp  Effects/Effect.cpp
     Effects/Phaser.cpp  Effects/Reverb.cpp  Effects/EQ.cpp
     Effects/Distorsion.cpp  Effects/DynamicFilter.cpp
-) 
+)
 
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Microtonal.cpp
@@ -338,16 +338,27 @@ target_link_libraries (yoshimi ${ExternLibraries})
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
-#install (DIRECTORY ../banks DESTINATION share/yoshimi
-#    FILE_PERMISSIONS
-#        OWNER_READ OWNER_WRITE
-#        GROUP_READ GROUP_WRITE
-#        WORLD_READ
-#    DIRECTORY_PERMISSIONS
-#        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-#        GROUP_READ GROUP_WRITE GROUP_EXECUTE
-#        WORLD_READ WORLD_EXECUTE
-#)
+install (DIRECTORY ../banks DESTINATION share/yoshimi
+    FILE_PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ GROUP_WRITE
+        WORLD_READ
+    DIRECTORY_PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_WRITE GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+)
+
+install (DIRECTORY ../presets DESTINATION share/yoshimi
+    FILE_PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ GROUP_WRITE
+        WORLD_READ
+    DIRECTORY_PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_WRITE GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"

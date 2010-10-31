@@ -36,7 +36,7 @@ class MusicClient
 
         bool Open(void);
         virtual bool Start(void) = 0;
-        virtual void Close(void) = 0;
+        virtual void Close(void);
         virtual bool jacksessionReply(string cmdline) { return false; }
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
