@@ -45,7 +45,8 @@ using namespace std;
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     killallnotes(false),
     microtonal(microtonal_),
-    fft(fft_)
+    fft(fft_),
+    partMuted(0)
 {
     ctl = new Controller();
     partoutl = new float [synth->buffersize];
@@ -109,6 +110,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     defaults();
 }
 
+
 void Part::defaults(void)
 {
     Penabled = 0;
@@ -170,6 +172,7 @@ void Part::defaultsinstrument(void)
 // Cleanup the part
 void Part::cleanup(void)
 {
+    __sync_or_and_fetch (&partMuted, 0xFF);
     for (int k = 0; k < POLIPHONY; ++k)
         KillNotePos(k);
     memset(partoutl, 0, synth->bufferbytes);
@@ -186,6 +189,7 @@ void Part::cleanup(void)
         memset(partfxinputr[n], 0, synth->bufferbytes);
 
     }
+    __sync_and_and_fetch (&partMuted, 0);
 }
 
 
@@ -870,6 +874,13 @@ void Part::setkeylimit(unsigned char Pkeylimit)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
+    if (partMuted)
+    {
+        memset(partoutl, 0, synth->bufferbytes);
+        memset(partoutr, 0, synth->bufferbytes);
+        return;
+    }
+
     int k;
     int noteplay; // 0 if there is nothing activated
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx){
@@ -1040,20 +1051,26 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     bool resetallnotes = false;
     if (!Penabled_)
     {
+        kit[kititem].Pname.clear();
         if (kit[kititem].adpars)
+        {
             delete kit[kititem].adpars;
+            kit[kititem].adpars = NULL;
+        }
         if (kit[kititem].subpars)
+        {
             delete kit[kititem].subpars;
+            kit[kititem].subpars = NULL;
+        }
         if (kit[kititem].padpars)
         {
             delete kit[kititem].padpars;
+            kit[kititem].padpars = NULL;
             resetallnotes = true;
         }
-        kit[kititem].adpars = NULL;
-        kit[kititem].subpars = NULL;
-        kit[kititem].padpars = NULL;
-        kit[kititem].Pname.clear();
-    } else {
+    }
+    else
+    {
         if (!kit[kititem].adpars)
             kit[kititem].adpars = new ADnoteParameters(fft);
         if (!kit[kititem].subpars)
@@ -1211,18 +1228,26 @@ bool Part::loadXMLinstrument(string filename)
         Runtime.Log(filename + " is not an instrument file");
         return false;
     }
+    __sync_or_and_fetch (&partMuted, 0xFF);
+    defaultsinstrument();
     getfromXMLinstrument(xml);
+    applyparameters();
+    __sync_and_and_fetch (&partMuted, 0);
     xml->exitbranch();
     delete xml;
     return true;
 }
 
 
-void Part::applyparameters(bool islocked)
+void Part::applyparameters(void)
 {
+//    for (int n = 0; n < NUM_KIT_ITEMS; ++n)
+//        if (kit[n].padpars && kit[n].Ppadenabled)
+//            kit[n].padpars->applyparameters(islocked);
+
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
-        if (kit[n].padpars && kit[n].Ppadenabled)
-            kit[n].padpars->applyparameters(islocked);
+        if (kit[n].Ppadenabled && kit[n].padpars != NULL)
+            kit[n].padpars->applyparameters(true);
 }
 
 
@@ -1303,7 +1328,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
 
 void Part::getfromXML(XMLwrapper *xml)
 {
-    Penabled=xml->getparbool("enabled", Penabled);
+    Penabled = xml->getparbool("enabled", Penabled);
 
     setPvolume(xml->getpar127("volume", Pvolume));
     setPpanning(xml->getpar127("panning", Ppanning));

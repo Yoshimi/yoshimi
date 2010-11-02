@@ -180,14 +180,11 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
 // Loads the instrument from the bank
 void Bank::loadfromslot(unsigned int ninstrument, Part *part)
 {
-    if (ninstrument >= BANK_SIZE)
-    {
-        Runtime.Log("loadfromslot " + asString(ninstrument) + ", slot > BANK_SIZE");
-        return;
-    }
     if (emptyslot(ninstrument))
         return;
-    part->defaultsinstrument();
+    //part->defaultsinstrument();
+    //part->loadXMLinstrument(bank_instrument[ninstrument].filename);
+    
     part->loadXMLinstrument(bank_instrument[ninstrument].filename);
 }
 

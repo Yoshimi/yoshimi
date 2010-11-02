@@ -69,9 +69,7 @@ class Part : private MiscFuncs, SynthHelper
 
         void defaults(void);
         void defaultsinstrument(void);
-
-        void applyparameters(bool islocked);
-
+        void applyparameters(void);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
 
@@ -79,11 +77,16 @@ class Part : private MiscFuncs, SynthHelper
 
         // the part's kit
         struct {
-            unsigned char Penabled, Pmuted, Pminkey, Pmaxkey;
             string        Pname;
-            unsigned char Padenabled, Psubenabled, Ppadenabled;
+            unsigned char Penabled;
+            unsigned char Pmuted;
+            unsigned char Pminkey;
+            unsigned char Pmaxkey;
+            unsigned char Padenabled;
+            unsigned char Psubenabled;
+            unsigned char Ppadenabled;
             unsigned char Psendtoparteffect;
-            ADnoteParameters *adpars;
+            ADnoteParameters  *adpars;
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
         } kit[NUM_KIT_ITEMS];
@@ -120,7 +123,7 @@ class Part : private MiscFuncs, SynthHelper
 
         float *partoutl;
         float *partoutr;
-        
+
         float *partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass thru part effects
         float *partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
 
@@ -147,7 +150,7 @@ class Part : private MiscFuncs, SynthHelper
         void MonoMemRenote(void); // MonoMem stuff.
 
         bool killallnotes;
-        
+
         struct PartNotes {
             NoteStatus status;
             int note;          // if there is no note playing, "note" = -1
@@ -181,6 +184,8 @@ class Part : private MiscFuncs, SynthHelper
         float oldfreq; // for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;
+        
+        int partMuted;
 };
 
 #endif

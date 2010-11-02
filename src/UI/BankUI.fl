@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
-header_name {.h} 
+version 1.0110
+header_name {.h}
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
-} 
+}
 
 comment {BankUI.cc} {in_source not_in_header
-} 
+}
 
 comment {//
 // Original ZynAddSubFX author Nasca Octavian Paul
@@ -28,25 +28,25 @@ comment {//
 //
 // This file is a derivative of the ZynAddSubFX original, modified October 2010
 //} {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Button.H>} {public
-} 
+}
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public
-} 
+}
 
 decl {\#include <FL/Fl_Spinner.H>} {public
-} 
+}
 
 decl {\#include "Misc/Bank.h"} {public
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public
-} 
+}
 
 class BankProcess_ {open
 } {
@@ -54,7 +54,7 @@ class BankProcess_ {open
   } {}
   decl {Bank *bank;} {public
   }
-} 
+}
 
 class BankSlot {open : {public Fl_Button, BankProcess_}
 } {
@@ -119,7 +119,7 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {}
   decl {void (BankProcess_:: *fnc)(void);} {}
   decl {BankProcess_ *bp;} {}
-} 
+}
 
 class BankUI {open : {public BankProcess_}
 } {
@@ -309,24 +309,34 @@ class BankUI {open : {public BankProcess_}
             if (tmp != NULL)
                 bank->setname(slot, string(tmp), -1);
             bs[slot]->refresh();
+
             // Re-read from slot
-            synth->actionLock(lockmute);
+            //synth->actionLock(lockmute);
+            //bank->loadfromslot(slot, synth->part[*npart]);
+            //synth->part[*npart]->applyparameters(true);
+            //synth->actionLock(unlock);
+
             bank->loadfromslot(slot, synth->part[*npart]);
-            synth->part[*npart]->applyparameters(true);
-            synth->actionLock(unlock);
+            // synth->part[*npart]->applyparameters();
+
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
         }
 
         if (what == 1 && mode == 1 && !bank->emptyslot(slot))
-        {   // Reads from slot
-            synth->actionLock(lockmute);
+        {
+            // Reads from slot
+            //synth->actionLock(lockmute);
+            //bank->loadfromslot(slot, synth->part[*npart]);
+            //synth->part[*npart]->applyparameters(true);
+            //synth->actionLock(unlock);
+
             bank->loadfromslot(slot, synth->part[*npart]);
-            synth->part[*npart]->applyparameters(true);
-            synth->actionLock(unlock);
+            //synth->part[*npart]->applyparameters();
+
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
-     
+
             if (Runtime.BankUIAutoClose != 0)
                 bankuiwindow->hide();
         }
@@ -427,4 +437,4 @@ class BankUI {open : {public BankProcess_}
   decl {void (BankProcess_::* fnc)(void);} {}
   decl {Fl_Spinner *cbwig;} {public
   }
-} 
+}

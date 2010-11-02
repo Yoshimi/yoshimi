@@ -179,7 +179,7 @@ bool Config::Setup(int argc, char **argv)
     if (jackSessionUuid.size() && jackSessionFile.size() && isRegFile(jackSessionFile))
     {
         Log(string("Restore jack session requested, uuid ") + jackSessionUuid
-            + string(", session file ") + jackSessionFile, true);
+            + string(", session file ") + jackSessionFile);
         doRestoreJackSession = true;
     }
     AntiDenormals(true);
@@ -277,7 +277,7 @@ bool Config::loadConfig(void)
         cmd = string("mkdir -p ") + ConfigDir;
         if ((chk = system(cmd.c_str())) < 0)
         {
-            Log("Create config directory " + ConfigDir + " failed, status " + asString(chk), true);
+            Log("Create config directory " + ConfigDir + " failed, status " + asString(chk));
             return false;
         }
     }
@@ -285,18 +285,18 @@ bool Config::loadConfig(void)
     StateFile = ConfigDir + string("/yoshimi.state");
     if (!isRegFile(ConfigFile))
     {
-        Log("ConfigFile " + ConfigFile + " not found", true);
+        Log("ConfigFile " + ConfigFile + " not found");
         string oldConfigFile = string(getenv("HOME")) + string("/.yoshimiXML.cfg");
         if (isRegFile(oldConfigFile))
         {
-            Log("Copying old config file " + oldConfigFile + " to new location: " + ConfigFile, true);
+            Log("Copying old config file " + oldConfigFile + " to new location: " + ConfigFile);
             FILE *oldfle = fopen (oldConfigFile.c_str(), "r");
             FILE *newfle = fopen (ConfigFile.c_str(), "w");
             if (oldfle != NULL && newfle != NULL)
                 while (!feof(oldfle))
                     putc(getc(oldfle), newfle);
             else
-                Log("Failed to copy old config file " + oldConfigFile + " to " + ConfigFile, true);
+                Log("Failed to copy old config file " + oldConfigFile + " to " + ConfigFile);
             if (newfle)
                 fclose(newfle);
             if (oldfle)
@@ -306,17 +306,17 @@ bool Config::loadConfig(void)
 
     bool isok = true;
     if (!isRegFile(ConfigFile))
-        Log("ConfigFile " + ConfigFile + " still not found, will use default settings", true);
+        Log("ConfigFile " + ConfigFile + " still not found, will use default settings");
     else
     {
         XMLwrapper *xml = new XMLwrapper();
         if (!xml)
-            Log("loadConfig failed XMLwrapper allocation", true);
+            Log("loadConfig failed XMLwrapper allocation");
         else
         {
             if (xml->loadXMLfile(ConfigFile) < 0)
             {
-                Log("loadConfig loadXMLfile failed", true);
+                Log("loadConfig loadXMLfile failed");
                 return false;
             }
             isok = extractConfigData(xml);
@@ -465,9 +465,9 @@ void Config::saveConfig(void)
     }
     addConfigXML(xmltree);
     if (xmltree->saveXMLfile(ConfigFile))
-        Log("Config saved to " + ConfigFile, true);
+        Log("Config saved to " + ConfigFile);
      else
-        Log("Failed to save config to " + ConfigFile, true);
+        Log("Failed to save config to " + ConfigFile);
     delete xmltree;
 }
 
@@ -539,16 +539,16 @@ void Config::saveSessionData(string savefile)
     XMLwrapper *xmltree = new XMLwrapper();
     if (!xmltree)
     {
-        Log("saveState failed xmltree allocation", true);
+        Log("saveState failed xmltree allocation");
         return;
     }
     addConfigXML(xmltree);
     addRuntimeXML(xmltree);
     synth->add2XML(xmltree);
     if (xmltree->saveXMLfile(savefile))
-        Log("Session state saved to " + savefile, true);
+        Log("Session state saved to " + savefile);
     else
-        Log("Session state save to " + savefile + " failed", true);
+        Log("Session state save to " + savefile + " failed");
 }
 
 
@@ -564,7 +564,7 @@ bool Config::restoreSessionData(SynthEngine *synth, string sessionfile)
     bool ok = false;
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
-        Log("Session file " + sessionfile + " not available", true);
+        Log("Session file " + sessionfile + " not available");
         goto end_game;
     }
     if (!(xml = new XMLwrapper()))
@@ -766,11 +766,11 @@ void Config::sigHandler(int sig)
         case SIGHUP:
         case SIGTERM:
         case SIGQUIT:
-            Runtime.setInterruptActive(sig);
+            Runtime.setInterruptActive();
             break;
 
         case SIGUSR1:
-            Runtime.setLadi1Active(sig);
+            Runtime.setLadi1Active();
             sigaction(SIGUSR1, &sigAction, NULL);
             break;
 
@@ -783,25 +783,14 @@ void Config::sigHandler(int sig)
 
 void Config::signalCheck(void)
 {
-    if (ladi1IntActive)
-    {
-        saveState();
-        __sync_bool_compare_and_swap(&ladi1IntActive, ladi1IntActive, 0);
-    }
-
-    if (sigIntActive)
-        runSynth = false;
-
     #if defined(JACK_SESSION)
         switch (jsessionSave)
         {
             case JackSessionSave:
                 saveJackSession();
-                __sync_val_compare_and_swap(&jsessionSave, jsessionSave, 0);
                 break;
             case JackSessionSaveAndQuit:
                 saveJackSession();
-                __sync_bool_compare_and_swap(&jsessionSave, jsessionSave, 0);
                 runSynth = false;
                 break;
             case JackSessionSaveTemplate:
@@ -810,20 +799,28 @@ void Config::signalCheck(void)
             default:
                 break;
         }
+        __sync_and_and_fetch(&jsessionSave, 0);
     #endif
+    if (ladi1IntActive)
+    {
+        saveState();
+        __sync_and_and_fetch(&ladi1IntActive, 0);
+    }
+    if (sigIntActive)
+        runSynth = false;
 }
 
 
-void Config::setInterruptActive(int sig)
+void Config::setInterruptActive(void)
 {
-    Log("Interrupt received");
-    __sync_val_compare_and_swap(&sigIntActive, sigIntActive, 0);
+    Log("Interrupt received", true);
+    __sync_or_and_fetch(&sigIntActive, 0xFF);
 }
 
 
-void Config::setLadi1Active(int sig)
+void Config::setLadi1Active(void)
 {
-    __sync_val_compare_and_swap (&ladi1IntActive, ladi1IntActive, 0);
+    __sync_or_and_fetch(&ladi1IntActive, 0xFF);
 }
 
 
@@ -843,21 +840,18 @@ void Config::setJackSessionSave(int event_type, const char *session_dir, const c
     jackSessionUuid = string(client_uuid);
     jackSessionFile = "yoshimi-" + jackSessionUuid + ".xml";
     if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, event_type))
-        Log("setJackSessionSave, error setting jack session save flag", true);
+        Log("Error setting jack session save");
 }
 
 
 void Config::saveJackSession(void)
 {
-    if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, 0))
-        Log("saveJackSession, error clearing jack session save flag", true);
-    Log("saveJackSession, saving session to " + jackSessionDir + jackSessionFile, true);
     saveSessionData(jackSessionDir + jackSessionFile);
     string cmd = string("yoshimi --show-console -U ") + jackSessionUuid
                  + string(" -u ${SESSION_DIR}") + jackSessionFile;
-   Log("Jack session restart command: " + cmd);
+    Log("Jack session saved to " + jackSessionDir + jackSessionFile + ", restart command: " + cmd);
    if (!musicClient->jacksessionReply(cmd))
-        Log("Error on jack session reply", true);
+        Log("Error on jack session reply");
     jackSessionDir.clear();
     jackSessionUuid.clear();
     jackSessionFile.clear();

@@ -195,9 +195,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     {
         if (Runtime.paramsLoad.size())
         {
-            if (synth->loadXML(Runtime.paramsLoad) >= 0)
+            if (loadXML(Runtime.paramsLoad) >= 0)
             {
-                synth->applyparameters();
+                applyparameters();
                 Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
@@ -210,16 +210,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         if (!Runtime.instrumentLoad.empty())
         {
             int loadtopart = 0;
-            if (!synth->part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
+            if (!part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
             {
                 Runtime.Log("Failed to load instrument file " + Runtime.instrumentLoad);
                 goto bail_out;
             }
             else
-            {
-                synth->part[loadtopart]->applyparameters(true);
                 Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
-            }
         }
     }
     return true;
@@ -302,9 +299,9 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note,
                 fakepeakpart[npart] = velocity * 2;
                 if (part[npart]->Penabled)
                 {
-                    synth->actionLock(lock);
+                    actionLock(lock);
                     part[npart]->NoteOn(note, velocity, keyshift);
-                    synth->actionLock(unlock);
+                    actionLock(unlock);
                 }
             }
         }
@@ -319,9 +316,9 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
     {
         if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
         {
-            synth->actionLock(lock);
+            actionLock(lock);
             part[npart]->NoteOff(note);
-            synth->actionLock(unlock);
+            actionLock(unlock);
         }
     }
 }
@@ -548,12 +545,12 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 
     LFOParams::time++; // update the LFO's time
 
-    synth->vupeakLock(lock);
+    vupeakLock(lock);
     vuoutpeakl = 1e-12;
     vuoutpeakr = 1e-12;
     vurmspeakl = 1e-12;
     vurmspeakr = 1e-12;
-    synth->vupeakLock(unlock);
+    vupeakLock(unlock);
 
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
@@ -600,7 +597,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     if (shutup)
         ShutUp();
 
-    synth->vupeakLock(lock);
+    vupeakLock(lock);
     if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;
     if (vumaxoutpeakr < vuoutpeakr)  vumaxoutpeakr = vuoutpeakr;
 
@@ -634,7 +631,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     vuRmsPeakR =    vurmspeakr;
     vuClippedL =    clippedL;
     vuClippedR =    clippedR;
-    synth->vupeakLock(unlock);
+    vupeakLock(unlock);
 }
 
 
@@ -698,13 +695,13 @@ bool SynthEngine::actionLock(lockset request)
             break;
 
         case unlock:
-            __sync_val_compare_and_swap(&muted, muted, 0);
+            __sync_and_and_fetch(&muted, muted, 0);
             chk = pthread_mutex_unlock(processLock);
             break;
 
         case lockmute:
+            __sync_and_and_fetch(&muted, muted, 0xFF);
             chk = pthread_mutex_lock(processLock);
-            __sync_val_compare_and_swap(&muted, muted, 1);
             break;
 
         default:
@@ -737,7 +734,7 @@ bool SynthEngine::vupeakLock(lockset request)
 // Reset peaks and clear the "clipped" flag (for VU-meter)
 void SynthEngine::vuresetpeaks(void)
 {
-    synth->vupeakLock(lock);
+    vupeakLock(lock);
     vuOutPeakL = vuoutpeakl = 1e-12;
     vuOutPeakR = vuoutpeakr =  1e-12;
     vuMaxOutPeakL = vumaxoutpeakl = 1e-12;
@@ -745,7 +742,7 @@ void SynthEngine::vuresetpeaks(void)
     vuRmsPeakL = vurmspeakl = 1e-12;
     vuRmsPeakR = vurmspeakr = 1e-12;
     vuClippedL = vuClippedL = clippedL = clippedR = false;
-    synth->vupeakLock(unlock);
+    vupeakLock(unlock);
 }
 
 
@@ -753,7 +750,7 @@ void SynthEngine::applyparameters(void)
 {
     ShutUp();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        part[npart]->applyparameters(true);
+        part[npart]->applyparameters();
 }
 
 

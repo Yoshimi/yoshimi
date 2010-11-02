@@ -18,10 +18,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
-#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -383,10 +382,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_, int mid
     basefreq = freq_;
     velocity = velocity_;
     if (velocity > 1.0)
-    {
-        cerr << "!!! ADlegatonote, velocity > 1.0" << endl;
         velocity = 1.0f;
-    }
     portamento = portamento_;
     midinote = midinote_;
 

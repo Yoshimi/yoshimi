@@ -65,8 +65,8 @@ class Config : public MiscFuncs
         void saveJackSession(void);
 
         static void sigHandler(int sig);
-        void setInterruptActive(int sig);
-        void setLadi1Active(int sig);
+        void setInterruptActive(void);
+        void setLadi1Active(void);
         void signalCheck(void);
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
