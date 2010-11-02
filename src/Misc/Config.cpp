@@ -788,18 +788,20 @@ void Config::signalCheck(void)
         {
             case JackSessionSave:
                 saveJackSession();
+                __sync_and_and_fetch(&jsessionSave, 0);
                 break;
             case JackSessionSaveAndQuit:
                 saveJackSession();
                 runSynth = false;
+                __sync_and_and_fetch(&jsessionSave, 0);
                 break;
             case JackSessionSaveTemplate:
                 // not implemented
+                __sync_and_and_fetch(&jsessionSave, 0);
                 break;
             default:
                 break;
         }
-        __sync_and_and_fetch(&jsessionSave, 0);
     #endif
     if (ladi1IntActive)
     {
