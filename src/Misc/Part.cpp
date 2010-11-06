@@ -19,11 +19,12 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified 2010
 */
 
 #include <iostream>
 #include <cstring>
+#include <boost/shared_ptr.hpp>
 
 using namespace std;
 
@@ -41,12 +42,19 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
 #include "Synth/BodyDisposal.h"
+#include "Sql/ProgramBanks.h"
 #include "Misc/Part.h"
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
+    currentBank(0),
+    currentProgram(0),
+    Penabled(0),
+    jackDirect(0),
+    midichannel(0),
     killallnotes(false),
     microtonal(microtonal_),
-    fft(fft_)
+    fft(fft_),
+    partMuted(0xFF)
 {
     ctl = new Controller();
     partoutl = new float [synth->buffersize];
@@ -84,7 +92,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
         Pefxbypass[n] = false;
     }
 
-    oldfreq = -1.0;
+    oldfreq = -1.0f;
 
     int i, j;
     for (i = 0; i < POLIPHONY; ++i)
@@ -108,6 +116,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     lastpos = 0; // lastpos will store previously used NoteOn(...)'s pos.
     lastlegatomodevalid = false; // To store previous legatomodevalid value.
     defaults();
+    __sync_and_and_fetch (&partMuted, 0);
 }
 
 void Part::defaults(void)
@@ -131,15 +140,12 @@ void Part::defaults(void)
 
 void Part::defaultsinstrument(void)
 {
-    Pname.clear();
-
-    info.Ptype = 0;
+    Penabled = 0;
+    Pname = "<instrument defaults>";
     info.Pauthor.clear();
     info.Pcomments.clear();
-
     Pkitmode = 0;
     Pdrummode = 0;
-
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
         kit[n].Penabled = 0;
@@ -159,7 +165,6 @@ void Part::defaultsinstrument(void)
     kit[0].adpars->defaults();
     kit[0].subpars->defaults();
     kit[0].padpars->defaults();
-
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
         partefx[nefx]->defaults();
@@ -171,6 +176,7 @@ void Part::defaultsinstrument(void)
 // Cleanup the part
 void Part::cleanup(void)
 {
+    __sync_or_and_fetch (&partMuted, 0xFF);
     for (int k = 0; k < POLIPHONY; ++k)
         KillNotePos(k);
     memset(partoutl, 0, synth->bufferbytes);
@@ -187,6 +193,7 @@ void Part::cleanup(void)
         memset(partfxinputr[n], 0, synth->bufferbytes);
 
     }
+    __sync_and_and_fetch (&partMuted, 0);
 }
 
 
@@ -333,9 +340,9 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
         }
 
         // compute the velocity offset
-        float vel = velF(velocity / 127.0, Pvelsns) + (Pveloffs - 64.0) / 64.0;
-        vel = (vel < 0.0) ? 0.0 : vel;
-        vel = (vel > 1.0) ? 1.0 : vel;
+        float vel = velF(velocity / 127.0f, Pvelsns) + (Pveloffs - 64.0f) / 64.0f;
+        vel = (vel < 0.0f) ? 0.0f : vel;
+        vel = (vel > 1.0f) ? 1.0f : vel;
 
         // compute the keyshift
         int partkeyshift = (int)Pkeyshift - 64;
@@ -349,10 +356,10 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
             if (notebasefreq < 0.0)
                 return; // the key is no mapped
         } else
-            notebasefreq = 440.0 * powf(2.0, (note - 69.0) / 12.0);
+            notebasefreq = 440.0f * powf(2.0, (note - 69.0f) / 12.0f);
 
         // Portamento
-        if (oldfreq < 1.0)
+        if (oldfreq < 1.0f)
             oldfreq = notebasefreq; // this is only the first note is played
 
         // For Mono/Legato: Force Portamento Off on first
@@ -718,7 +725,7 @@ void Part::SetController(unsigned int type, int par)
         case C_allnotesoff: // 123
             RelaseAllKeys();
             break;
-            
+
         // more update to add here if I add controllers
     }
 }
@@ -867,6 +874,12 @@ void Part::setkeylimit(unsigned char Pkeylimit)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
+    if (partMuted)
+    {
+        memset(partoutl, 0, synth->bufferbytes);
+        memset(partoutr, 0, synth->bufferbytes);
+        return;
+    }
     int k;
     int noteplay; // 0 if there is nothing activated
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx){
@@ -1012,18 +1025,18 @@ void Part::ComputePartSmps(void)
 void Part::setPvolume(char value)
 {
     Pvolume = value;
-    volume  = dB2rap((Pvolume - 96.0) / 96.0 * 40.0) * ctl->expression.relvolume;
+    volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
 }
 
 
 void Part::setPpanning(char Ppanning_)
 {
     Ppanning = Ppanning_;
-    panning = Ppanning / 127.0 + ctl->panning.pan;
-    if (panning < 0.0)
-        panning = 0.0;
-    else if (panning > 1.0)
-        panning = 1.0;
+    panning = Ppanning / 127.0f + ctl->panning.pan;
+    if (panning < 0.0f)
+        panning = 0.0f;
+    else if (panning > 1.0f)
+        panning = 1.0f;
 }
 
 
@@ -1037,20 +1050,26 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     bool resetallnotes = false;
     if (!Penabled_)
     {
+        kit[kititem].Pname.clear();
         if (kit[kititem].adpars)
+        {
             delete kit[kititem].adpars;
+            kit[kititem].adpars = NULL;
+        }
         if (kit[kititem].subpars)
+        {
             delete kit[kititem].subpars;
+            kit[kititem].subpars = NULL;
+        }
         if (kit[kititem].padpars)
         {
             delete kit[kititem].padpars;
+            kit[kititem].padpars = NULL;
             resetallnotes = true;
         }
-        kit[kititem].adpars = NULL;
-        kit[kititem].subpars = NULL;
-        kit[kititem].padpars = NULL;
-        kit[kititem].Pname.clear();
-    } else {
+    }
+    else
+    {
         if (!kit[kititem].adpars)
             kit[kititem].adpars = new ADnoteParameters(fft);
         if (!kit[kititem].subpars)
@@ -1065,15 +1084,60 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 }
 
 
+bool Part::loadProgram(unsigned char bk, unsigned char prog)
+{
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    if (!xmlwrap)
+    {
+        Runtime.Log("Error, Part failed to instantiate new XMLwrapper");
+        return false;
+    }
+    currentBank = bk;
+    currentProgram = prog;
+    string xmldata = progBanks->programXml(bk, prog);
+    if (xmldata.empty())
+    {
+        cerr << "Part xml data is empty" << endl;
+    }
+    else
+    {
+        if (!xmlwrap->loadXML(xmldata))
+        {
+            Runtime.Log("Failed to load xml data for program " + asString(currentBank)
+                        + string(" : ") + asString(prog), true);
+            return false;
+        }
+    }
+    getfromXML(xmlwrap.get());
+    return true;
+}
+
+
+bool Part::saveProgram(unsigned char bk, unsigned char prog)
+{
+    XMLwrapper *xmlwrap = new XMLwrapper();
+    if (!xmlwrap)
+    {
+        Runtime.Log("Error, Part::partXML failed to instantiate new XMLwrapper");
+        return false;
+    }
+    xmlwrap->beginbranch("INSTRUMENT");
+    add2XMLinstrument(xmlwrap);
+    xmlwrap->endbranch();
+    bool ok = progBanks->addProgram(bk, prog, Pname, xmlwrap->xmldata);
+    delete xmlwrap;
+    return ok;
+}
+
+
 void Part::add2XMLinstrument(XMLwrapper *xml)
 {
     xml->beginbranch("INFO");
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
-    xml->addpar("type",info.Ptype);
+    //xml->addpar("type",info.Ptype);
     xml->endbranch();
-
 
     xml->beginbranch("INSTRUMENT_KIT");
     xml->addpar("kit_mode",Pkitmode);
@@ -1171,55 +1235,49 @@ void Part::add2XML(XMLwrapper *xml)
 }
 
 
+string Part::partXML(void)
+{
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    xmlwrap->beginbranch("INSTRUMENT");
+    add2XMLinstrument(xmlwrap.get());
+    xmlwrap->endbranch();
+    return xmlwrap->xmldata;
+}
+
+
 bool Part::saveXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
-    if (!xml)
-    {
-        Runtime.Log("Error, Part::saveXML failed to instantiate new XMLwrapper");
-        return false;
-    }
-    xml->beginbranch("INSTRUMENT");
-    add2XMLinstrument(xml);
-    xml->endbranch();
-    bool result = xml->saveXMLfile(filename);
-    delete xml;
-    return result;
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    xmlwrap->beginbranch("INSTRUMENT");
+    add2XMLinstrument(xmlwrap.get());
+    xmlwrap->endbranch();
+    return xmlwrap->saveXMLfile(filename);
 }
 
 
 bool Part::loadXMLinstrument(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
-    if (!xml)
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    if (!xmlwrap)
     {
-        Runtime.Log("Error, Part failed to instantiate new XMLwrapper");
+        Runtime.Log("Import instrument failed to instantiate new XMLwrapper", true);
         return false;
     }
-
-    if (!xml->loadXMLfile(filename))
+    if (!xmlwrap->loadXMLfile(filename))
     {
-        Runtime.Log("Error, Part failed to load instrument file " + filename);
-        delete xml;
+        Runtime.Log("Import instrument failed to xml->load file " + filename, true);
         return false;
     }
-    if (xml->enterbranch("INSTRUMENT") == 0)
-    {
-        Runtime.Log(filename + " is not an instrument file");
-        return false;
-    }
-    getfromXMLinstrument(xml);
-    xml->exitbranch();
-    delete xml;
+    getfromXML(xmlwrap.get());
     return true;
 }
 
 
-void Part::applyparameters(bool islocked)
+void Part::applyparameters(void)
 {
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
-        if (kit[n].padpars && kit[n].Ppadenabled)
-            kit[n].padpars->applyparameters(islocked);
+       if (kit[n].Ppadenabled && kit[n].padpars != NULL)
+            kit[n].padpars->applyparameters(true);
 }
 
 
@@ -1230,7 +1288,6 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         Pname = xml->getparstr("name");
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
-        info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
         xml->exitbranch();
     }
 
@@ -1300,33 +1357,38 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
 
 void Part::getfromXML(XMLwrapper *xml)
 {
-    Penabled=xml->getparbool("enabled", Penabled);
-
-    setPvolume(xml->getpar127("volume", Pvolume));
-    setPpanning(xml->getpar127("panning", Ppanning));
-
-    Pminkey = xml->getpar127("min_key", Pminkey);
-    Pmaxkey = xml->getpar127("max_key", Pmaxkey);
-    Pkeyshift = xml->getpar127("key_shift", Pkeyshift);
-    midichannel = xml->getpar127("rcv_chn", midichannel);
-
-    Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
-    Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
-
-    Pnoteon = xml->getparbool("note_on", Pnoteon);
-    Ppolymode = xml->getparbool("poly_mode", Ppolymode);
-    Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
-    if (!Plegatomode)
-        Plegatomode = xml->getpar127("legato_mode", Plegatomode);
-    Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
-    if (xml->enterbranch("INSTRUMENT"))
+    __sync_or_and_fetch (&partMuted, 0xFF);
+    defaultsinstrument();
+    if (!xml->xmldata.empty())
     {
-        getfromXMLinstrument(xml);
-        xml->exitbranch();
+        setPvolume(xml->getpar127("volume", Pvolume));
+        setPpanning(xml->getpar127("panning", Ppanning));
+        Pminkey = xml->getpar127("min_key", Pminkey);
+        Pmaxkey = xml->getpar127("max_key", Pmaxkey);
+        Pkeyshift = xml->getpar127("key_shift", Pkeyshift);
+        midichannel = xml->getpar127("rcv_chn", midichannel);
+        Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
+        Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
+        Pnoteon = xml->getparbool("note_on", Pnoteon);
+        Ppolymode = xml->getparbool("poly_mode", Ppolymode);
+        Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
+        if (!Plegatomode)
+            Plegatomode = xml->getpar127("legato_mode", Plegatomode);
+        Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
+        if (xml->enterbranch("INSTRUMENT"))
+        {
+            getfromXMLinstrument(xml);
+            xml->exitbranch();
+        }
+        if (xml->enterbranch("CONTROLLER"))
+        {
+            ctl->getfromXML(xml);
+            xml->exitbranch();
+        }
+        applyparameters();
     }
-    if (xml->enterbranch("CONTROLLER"))
-    {
-        ctl->getfromXML(xml);
-        xml->exitbranch();
-    }
+    else
+        cerr << "xmldata is empty, go with instrument defaults" << endl;
+    Penabled = 1;
+    __sync_and_and_fetch (&partMuted, 0);
 }

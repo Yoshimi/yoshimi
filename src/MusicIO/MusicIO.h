@@ -21,13 +21,14 @@
 #ifndef MUSIC_IO_H
 #define MUSIC_IO_H
 
+#include <inttypes.h>
 #include <string>
 #include <pthread.h>
-#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <jack/ringbuffer.h>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 #include "Misc/MiscFuncs.h"
-#include "MusicIO/Midi.h"
+//#include "MusicIO/Midi.h"
 #include "MusicIO/WavRecord.h"
 
 class MusicIO : protected MiscFuncs
@@ -42,7 +43,6 @@ class MusicIO : protected MiscFuncs
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool jacksessionReply(string cmdline) { return false; }
-
         string audioClientName(void) { return audioclientname; }
         string midiClientName(void) { return midiclientname; }
         int audioClientId(void) { return audioclientid; }
@@ -50,10 +50,14 @@ class MusicIO : protected MiscFuncs
         int audioLatency(void) { return audiolatency; }
         int midiLatency(void) { return midilatency; }
         void queueMidi(midimessage *msg);
+        void queueControlChange(unsigned char controltype, unsigned char chan,
+                                unsigned char val, uint32_t eventframe);
+        void queueProgramChange(unsigned char chan, unsigned short banknum,
+                                unsigned char prog, uint32_t eventframe);
+        void midiBankChange(unsigned char chan, unsigned short bank);
 
     protected:
         bool prepAudio(bool with_interleaved);
-        //bool prepMidi(void);
         void getAudio(void);
         void interleaveShorts(void);
         static void *_midiThread(void *arg);
@@ -74,14 +78,13 @@ class MusicIO : protected MiscFuncs
         WavRecord *wavRecorder;
 
     private:
-        void processControlChange(midimessage *msg);
-        //void applyMidi(unsigned char *bytes);
+        void processControlChange(unsigned char byte0,
+                                   unsigned char byte1,
+                                   unsigned char byte2);
         jack_ringbuffer_t *midiRingbuf;
         boost::interprocess::interprocess_semaphore *midiEventsUp;
         pthread_t  midiPthread;
-        int bankselectMsb;
-        int bankselectLsb;
-        
+
 };
 
 #endif

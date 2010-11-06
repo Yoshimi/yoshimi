@@ -631,11 +631,11 @@ void PADnoteParameters::applyparameters(bool islocked)
 
     // delete the additional samples that might exists and are not useful
     if (!islocked)
-        synth->lockExclusive();
+        synth->lockSharable();
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
         deletesample(i);
     if (!islocked)
-        synth->unlockExclusive();
+        synth->unlockSharable();
 }
 
 

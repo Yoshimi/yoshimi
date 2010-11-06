@@ -36,6 +36,8 @@ class MusicClient
         bool Open(void) { return openAudio(wavrecord) && openMidi(wavrecord); }
         virtual bool Start(void) { return wavrecord->Start(getSamplerate(), getBuffersize()); }
         virtual void Close(void) = 0;
+        virtual void queueProgramChange(unsigned char chan, unsigned short banknum,
+                                        unsigned char prog, uint32_t eventframe) = 0;
         virtual void queueMidi(midimessage *msg) = 0;
         virtual bool jacksessionReply(string cmdline) { return false; }
         virtual unsigned int getSamplerate(void) = 0;
@@ -47,16 +49,18 @@ class MusicClient
         virtual int audioLatency(void) = 0;
         virtual int midiLatency(void) = 0;
         static MusicClient *newMusicClient(void);
+
+        bool recordTrigger(void) { return wavrecord->Trigger(); }
         void startRecord(void)  { wavrecord->StartRecord(); }
         void stopRecord(void) { wavrecord->StopRecord(); };
         bool setRecordFile(const char* fpath, string& errmsg) { return wavrecord->SetFile(string(fpath), errmsg); }
         bool setRecordOverwrite(string& errmsg) { return wavrecord->SetOverwrite(errmsg); }
         string wavFilename(void) { return wavrecord->Filename(); }
+        WavRecord *wavrecord;
 
     protected:
         virtual bool openAudio(WavRecord *recorder) = 0;
         virtual bool openMidi(WavRecord *recorder) = 0;
-        WavRecord *wavrecord;
 };
 
 extern MusicClient *musicClient;

@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.062-pre1")
+set (YOSHIMI_VERSION "0.062-pre2")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -85,6 +85,14 @@ if (PKG_CONFIG_FOUND)
 else (PKG_CONFIG_FOUND)
     message(FATAL_ERROR "pkg-config required but not found")
 endif (PKG_CONFIG_FOUND)
+
+# sqlite3
+pkg_check_modules(SQLITE3 REQUIRED sqlite3)
+if (SQLITE3_FOUND)
+  message (STATUS "Found sqlite3 ${SQLITE3_VERSION}")
+else (SQLITE3_FOUND)
+    message(FATAL_ERROR "sqlite3 required but not found")
+endif(SQLITE3_FOUND)
 
 # libz
 set (CMAKE_REQUIRED_LIBRARIES z)
@@ -176,9 +184,9 @@ set (GuiFluids
     UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboardUI.fl
     UI/ConfigUI.fl  UI/SUBnoteUI.fl  UI/ResonanceUI.fl
     UI/OscilGenUI.fl  UI/ADnoteUI.fl  UI/PADnoteUI.fl
-    UI/EffUI.fl  UI/BankUI.fl  UI/PartUI.fl
+    UI/EffUI.fl  UI/PartUI.fl
     UI/MicrotonalUI.fl  UI/MasterUI.fl    UI/MasterMiscUI.fl
-    UI/ParametersUI.fl UI/ConsoleUI.fl
+    UI/ParametersUI.fl UI/ConsoleUI.fl  UI/ProgramBanksUI.fl
 )
 
 fltk_wrap_ui (yoshimi ${GuiFluids})
@@ -210,13 +218,13 @@ set (DSP_sources
 
 set (Effects_sources
     Effects/Alienwah.cpp  Effects/Chorus.cpp  Effects/Echo.cpp
-    Effects/EffectLFO.cpp  Effects/EffectMgr.cpp  Effects/Effect.cpp 
+    Effects/EffectLFO.cpp  Effects/EffectMgr.cpp  Effects/Effect.cpp
     Effects/Phaser.cpp  Effects/Reverb.cpp  Effects/EQ.cpp
     Effects/Distorsion.cpp  Effects/DynamicFilter.cpp
-) 
+)
 
 set (Misc_sources
-    Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Microtonal.cpp
+    Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Microtonal.cpp
     Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp
 )
 
@@ -239,6 +247,11 @@ set (MusicIO_sources
     MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp MusicIO/WavRecord.cpp
 )
 
+set (Sql_sources
+    Sql/ProgramBanks.cpp
+)
+
+
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
@@ -247,17 +260,15 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
-add_definitions (-DMAX_BANK_ROOT_DIRS=128)
+add_definitions (-DBANK_LIMIT=128)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
 add_definitions (-DPAD_MAX_SAMPLES=64)
-add_definitions (-DNUM_MIDI_PARTS=16)
-add_definitions (-DNUM_MIDI_CHANNELS=16)
+add_definitions (-DNUM_MIDI_CHANNELS=16 -DNUM_MIDI_PARTS=NUM_MIDI_CHANNELS)
 add_definitions (-DMAX_ENVELOPE_POINTS=40)
 
 add_definitions (-DPI=3.1415926536f -DLOG_2=0.693147181f)
 
-# these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
 add_definitions (-DPOLIPHONY=60)
 add_definitions (-DNUM_SYS_EFX=4)
@@ -308,6 +319,7 @@ set (ProgSources
     ${Params_sources}
     ${Synth_sources}
     ${MusicIO_sources}
+    ${Sql_sources}
 )
 
 include_directories (AFTER
@@ -317,6 +329,7 @@ include_directories (AFTER
     ${JACK_INCLUDE_DIRS}
     ${FONTCONFIG_INCLUDE_DIRS}
     ${FLTK_INCLUDE_DIR}
+    ${SQLITE3_INCLUDE_DIRS}
 )
 
 set(ExternLibraries
@@ -327,6 +340,7 @@ set(ExternLibraries
     ${ALSA_LIBRARIES}
     ${JACK_LIBRARIES}
     ${LIBSNDFILE_LIBRARIES}
+    ${SQLITE3_LIBRARIES}
     z
 )
 
@@ -336,16 +350,9 @@ target_link_libraries (yoshimi ${ExternLibraries})
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
-#install (DIRECTORY ../banks DESTINATION share/yoshimi
-#    FILE_PERMISSIONS
-#        OWNER_READ OWNER_WRITE
-#        GROUP_READ GROUP_WRITE
-#        WORLD_READ
-#    DIRECTORY_PERMISSIONS
-#        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-#        GROUP_READ GROUP_WRITE GROUP_EXECUTE
-#        WORLD_READ WORLD_EXECUTE
-#)
+install (FILES ../yoshimi-instruments.tar.gz DESTINATION share/yoshimi
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
+)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"

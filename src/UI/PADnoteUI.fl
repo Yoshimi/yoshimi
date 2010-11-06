@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2010
+This file is derivative of ZynAddSubFX original code, modified 2010
 } {in_source in_header
 }
 
@@ -33,7 +33,6 @@ decl {
     \#include <FL/Fl_Group.H>
     \#include <FL/Fl_File_Chooser.H>
     \#include <FL/fl_draw.H>
-    \#include "Params/PADnoteParameters.h"
     \#include "Misc/MiscFuncs.h"
     \#include "PresetsUI.h"
     \#include "WidgetPDialUI.h"
@@ -43,6 +42,7 @@ decl {
 } {global}
 
 decl {
+    \#include "Params/PADnoteParameters.h"
     \#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"

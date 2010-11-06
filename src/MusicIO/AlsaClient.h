@@ -31,19 +31,21 @@ class AlsaClient : public MusicClient
 
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
-        bool Start(void) { return alsaEngine.Start(); };
-        void queueMidi(midimessage *msg) { alsaEngine.queueMidi(msg); }
+        bool Start(void);
+        void queueMidi(midimessage *msg);
         void Stop(void);
-        void Close(void) { alsaEngine.Close(); }
-        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
-        int getBuffersize(void) { return alsaEngine.getBuffersize(); };
-        int audioLatency(void) { return alsaEngine.audioLatency(); };
-        int midiLatency(void) { return alsaEngine.midiLatency(); };
+        void Close(void);
+        void queueProgramChange(unsigned char chan, unsigned short banknum,
+                                unsigned char prog, uint32_t eventframe);
+        unsigned int getSamplerate(void);
+        int getBuffersize(void);
+        int audioLatency(void);
+        int midiLatency(void);
 
-        string audioClientName(void) { return alsaEngine.audioClientName(); };
-        string midiClientName(void) { return alsaEngine.midiClientName(); };
-        int audioClientId(void) { return alsaEngine.audioClientId(); };
-        int midiClientId(void) { return alsaEngine.midiClientId(); };
+        string audioClientName(void);
+        string midiClientName(void);
+        int audioClientId(void);
+        int midiClientId(void);
 
     protected:
         AlsaEngine alsaEngine;

@@ -254,7 +254,7 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 {
     bool midiactive = midiPort != NULL;
     bool audioactive = (audioPortL != NULL && audioPortR != NULL);
-    if (audioactive) 
+    if (audioactive)
     {
         __sync_bool_compare_and_swap(&periodstartframe, periodstartframe, jack_last_frame_time(jackClient));
         __sync_bool_compare_and_swap(&periodendframe, periodendframe, periodstartframe + jackNframes);
@@ -349,15 +349,15 @@ void JackEngine::_errorCallback(const char *msg)
     {
         return static_cast<JackEngine*>(arg)->jsessionCallback(event);
     }
-    
-    
+
+
     void JackEngine::jsessionCallback(jack_session_event_t *event)
     {
         lastevent = event;
         Runtime.setJackSessionSave(event->type, event->session_dir, event->client_uuid);
     }
-    
-    
+
+
     bool JackEngine::jacksessionReply(string cmdline)
     {
         lastevent->command_line = strdup(cmdline.c_str());

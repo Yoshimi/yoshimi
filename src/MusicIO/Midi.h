@@ -1,6 +1,6 @@
 /*
     Midi.h
-  
+
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
 
@@ -48,23 +48,23 @@ typedef enum {
     MSG_start =                  250,
     MSG_continue =               251,
     MSG_stop =                   252,
-    MSG_activesensing =          254, 
+    MSG_activesensing =          254,
 } midimsgtype;
 
 typedef enum {
     C_bankselectmsb =         0,
     C_modwheel =              1, // active
     C_breathcontroller =      2,
-    C_undefined3 =            3,         
+    C_undefined3 =            3,
     C_footcontroller =        4,
-    C_portamentotime =        5, 
+    C_portamentotime =        5,
     C_dataentrymsb =          6,
     C_volume =                7, // active
     C_balance =               8,
-    C_undefined9 =            9,         
+    C_undefined9 =            9,
     C_pan =                  10, // active
     C_expression =           11, // active
-    C_effectcontrol1 =       12, 
+    C_effectcontrol1 =       12,
     C_effectcontrol2 =       13,
     C_undefined14 =          14,
     C_undefined15 =          15,
@@ -84,10 +84,10 @@ typedef enum {
     C_undefined29 =          29,
     C_undefined30 =          30,
     C_undefined31 =          31,
-    C_bankselectlsb =        32,
+    C_bankselectlsb =        32, // active?
     C_modwheellsb =          33,
     C_breathcontrollerlsb =  34,
-    C_undefined3lsb =        35, 
+    C_undefined3lsb =        35,
     C_footcontrollerlsb =    36,
     C_portamentotimelsb =    37,
     C_dataentrylsb =         38,
@@ -100,7 +100,7 @@ typedef enum {
     C_effectcontrol2lsb =    45,
     C_undefined14lsb =       46,
     C_undefined15lsb =       47,
-    // ...  
+    // ...
     C_sustain =              64, // active
     C_portamento =           65, // active
     C_sostenuto =            66,
@@ -110,16 +110,16 @@ typedef enum {
     C_soundcontroller1 =     70,
     C_filterq =              71, // active
     C_soundcontroller3 =     72,
-    C_soundcontroller4 =     73, 
+    C_soundcontroller4 =     73,
     C_filtercutoff =         74, // active
     C_soundcontroller6 =     75, // active => bandwidth
     C_soundcontroller7 =     76, // active => fmamp
     C_soundcontroller8 =     77, // active => resonance center
-    C_soundcontroller9 =     78, // active => resonance bandwidth 
+    C_soundcontroller9 =     78, // active => resonance bandwidth
     C_soundcontroller10 =    79,
-    C_gpcontroller5lsb =     80, 
-    C_gpcontroller6lsb =     81, 
-    C_gpcontroller7lsb =     82, 
+    C_gpcontroller5lsb =     80,
+    C_gpcontroller6lsb =     81,
+    C_gpcontroller7lsb =     82,
     C_gpcontroller8lsb =     83,
     C_portamentolsb =        84,
     C_undefined85 =          85,
@@ -147,8 +147,8 @@ typedef enum {
     C_undefined118 =         118,
     C_undefined119 =         119,
     C_allsoundsoff =         120, // active
-    C_resetallcontrollers =  121, // active 
+    C_resetallcontrollers =  121, // active
     C_allnotesoff =          123, // active
-} midicontroltype;
+} midiControlChangeType;
 
 #endif

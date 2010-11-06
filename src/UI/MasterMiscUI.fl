@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
-header_name {.h} 
+version 1.0110
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -25,51 +25,51 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified January 2010
+This file is derivative of ZynAddSubFX original code, modified 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public
-} 
+}
 
 decl {using namespace std;} {public
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public
-} 
+}
 
 decl {\#include "EffUI.h"} {public
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public
-} 
+}
 
-decl {\#include "BankUI.h"} {public
-} 
+decl {\#include "ProgramBanksUI.h"} {public
+}
 
 decl {\#include "PartUI.h"} {public
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public
 }
@@ -100,14 +100,13 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
         float rmsdbr = synth->vuRmsPeakR;
         float maxdbl = synth->vuMaxOutPeakL;
         float maxdbr = synth->vuMaxOutPeakR;
-//        bool clipped = synth->vuClipped;
         dbl = rap2dB(dbl);
         dbr = rap2dB(dbr);
         rmsdbl = rap2dB(rmsdbl);
         rmsdbr = rap2dB(rmsdbr);
         maxdbl = rap2dB(maxdbl);
         maxdbr = rap2dB(maxdbr);
-        
+
         dbl = (MIN_DB - dbl) / MIN_DB;
         if (dbl < 0.0)
             dbl = 0.0;
@@ -289,7 +288,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
   decl {float olddbr;} {}
   decl {float oldrmsdbl;} {}
   decl {float oldrmsdbr;} {}
-} 
+}
 
 class SysEffSend {: {public WidgetPDial, private MiscFuncs}
 } {
@@ -325,7 +324,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
   decl {int neff1;} {}
   decl {int neff2;} {}
-} 
+}
 
 class Panellistitem {: {public Fl_Group, private MiscFuncs}
 } {
@@ -351,12 +350,8 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         }
         Fl_Button partname {
           label {  }
-          callback {if ((int)bankui->cbwig->value() != (npart + 1))
-              {
-                  bankui->cbwig->value(npart+1);
-                  bankui->cbwig->do_callback();
-              }
-              bankui->Show();}
+          callback {//
+              progbanksui->Show(0);}
           xywh {5 27 60 30} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
@@ -373,11 +368,6 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         Fl_Button {} {
           label edit
           callback {//
-              if ((int)bankui->cbwig->value() != (npart + 1))
-              {
-                  bankui->cbwig->value(npart+1);
-                  bankui->cbwig->do_callback();
-              }
           }
           xywh {15 235 40 20} box PLASTIC_UP_BOX labelsize 10
         }
@@ -405,11 +395,6 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
             else
             {
                 panellistitemgroup->activate();
-                if ((int)bankui->cbwig->value() != (npart + 1))
-                {
-                    bankui->cbwig->value(npart + 1);
-                    bankui->cbwig->do_callback();
-                }
             }
             o->redraw();}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 24
@@ -422,12 +407,12 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
     code {npart = 0;
-        bankui = NULL;} {}
+        progbanksui = NULL;} {}
   }
-  Function {init(int npart_, BankUI *bankui_)} {open
+  Function {init(int npart_, ProgramBanksUI *progbanksui_)} {open
   } {
     code {npart=npart_;
-        bankui = bankui_;
+        progbanksui = progbanksui_;
         make_window();
         panellistitem->show();
         end();} {}
@@ -444,16 +429,13 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         partpanning->value(synth->part[npart]->Ppanning);
         partrcv->value(synth->part[npart]->midichannel);
         partname->label(synth->part[npart]->Pname.c_str());
-        if ((int)bankui->cbwig->value() != (npart + 1))
-            panellistitemgroup->color(fl_rgb_color(160, 160, 160));
-        else
-            panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();} {}
+        panellistitemgroup->redraw();
+    } {}
   }
   Function {~Panellistitem()} {} {
     code {panellistitem->hide();} {}
   }
   decl {int npart;} {}
-  decl {BankUI *bankui;} {}
-} 
+  decl {ProgramBanksUI *progbanksui;} {}
+}
 

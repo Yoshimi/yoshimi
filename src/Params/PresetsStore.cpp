@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified 2010
 */
 
 #include <dirent.h>
@@ -92,6 +92,7 @@ void PresetsStore::clearpresets(void)
 
 void PresetsStore::rescanforpresets(string type)
 {
+/**
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
         presets[i].file.clear();
@@ -148,10 +149,13 @@ void PresetsStore::rescanforpresets(string type)
             }
         }
     }
+**/
 }
+
 
 void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
+    /**
     if (Runtime.presetsDirlist[0].empty())
         return;
     string filename;
@@ -162,6 +166,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
         dirname += "/";
     filename = dirname + "." + type + preset_extension;
     xml->saveXMLfile(filename);
+    **/
 }
 
 bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
@@ -173,6 +178,7 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
         return false;
     return xml->loadXMLfile(presets[npreset].file);
 }
+
 
 void PresetsStore::deletepreset(int npreset)
 {

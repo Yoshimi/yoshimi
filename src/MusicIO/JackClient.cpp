@@ -26,7 +26,7 @@ bool JackClient::openAudio(WavRecord *recorder)
         && !jackEngine.connectServer(Runtime.audioDevice))
     {
         Runtime.Log("Failed to connect to jack server");
-        return false;  
+        return false;
     }
     if (jackEngine.openAudio(recorder))
     {
@@ -45,7 +45,7 @@ bool JackClient::openMidi(WavRecord *recorder)
         && !jackEngine.connectServer(Runtime.midiDevice))
     {
         Runtime.Log("Failed to connect to jack server");
-        return false;  
+        return false;
     }
     if (jackEngine.openMidi(recorder))
         return true;
@@ -53,3 +53,43 @@ bool JackClient::openMidi(WavRecord *recorder)
         Runtime.Log("JackClient failed to open midi");
     return false;
 }
+
+bool JackClient::Start(void)
+    { return jackEngine.Start() && MusicClient::Start(); }
+
+void JackClient::queueMidi(midimessage *msg)
+    { jackEngine.queueMidi(msg); }
+
+void JackClient::Close(void)
+    { jackEngine.Close(); wavrecord->Close(); }
+
+void JackClient::queueProgramChange(unsigned char chan, unsigned short banknum,
+                                    unsigned char prog, uint32_t eventframe)
+    { return jackEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+
+bool JackClient::jacksessionReply(string cmdline)
+    { return jackEngine.jacksessionReply(cmdline); }
+
+unsigned int JackClient::getSamplerate(void)
+    { return jackEngine.getSamplerate(); }
+
+int JackClient::getBuffersize(void)
+    { return jackEngine.getBuffersize(); }
+
+int JackClient::audioLatency(void)
+    { return jackEngine.audioLatency(); }
+
+int JackClient::midiLatency(void)
+    { return jackEngine.midiLatency(); }
+
+string JackClient::audioClientName(void)
+    { return jackEngine.audioClientName(); }
+
+string JackClient::midiClientName(void)
+    { return jackEngine.midiClientName(); }
+
+int JackClient::audioClientId(void)
+    { return jackEngine.audioClientId(); }
+
+int JackClient::midiClientId(void)
+    { return jackEngine.midiClientId(); }

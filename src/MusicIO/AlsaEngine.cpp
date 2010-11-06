@@ -32,7 +32,7 @@ AlsaEngine::AlsaEngine()
     audio.period_size = 0;
     audio.buffer_size = 0;
     audio.pThread = 0;
-    
+
     midi.handle = NULL;
     midi.timerhandle = NULL;
     midi.decoder = NULL;
@@ -250,7 +250,7 @@ void AlsaEngine::Close(void)
         snd_timer_close(midi.timerhandle);
         midi.timerhandle = NULL;
     }
-        
+
 
 }
 
@@ -369,7 +369,7 @@ void *AlsaEngine::_audioThread(void *arg)
 
 
 void *AlsaEngine::audioThread(void)
-{  
+{
     if (NULL == audio.handle)
     {
         Runtime.Log("Null pcm handle into AlsaEngine::audioThread");

@@ -1,6 +1,6 @@
 /*
     JackAlsaClient.h - Jack audio + Alsa midi
-    
+
     Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
@@ -39,20 +39,21 @@ class JackAlsaClient : public MusicClient
         JackAlsaClient() : MusicClient() { };
         ~JackAlsaClient() { Close(); };
         bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder) { return alsaEngine.openMidi(recorder); }
-        bool Start(void) { return jackEngine.Start() && alsaEngine.Start(); }
-        void queueMidi(midimessage *msg) { alsaEngine.queueMidi(msg); }
-        void Close(void) { jackEngine.Close(); alsaEngine.Close(); }
-        bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
-
-        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); }
-        int getBuffersize(void) { return jackEngine.getBuffersize(); }
-        int audioLatency(void) { return jackEngine.audioLatency(); }
-        int midiLatency(void) { return alsaEngine.midiLatency(); }
-        string audioClientName(void) { return jackEngine.audioClientName(); }
-        string midiClientName(void) { return alsaEngine.midiClientName(); }
-        int audioClientId(void) { return jackEngine.audioClientId(); }
-        int midiClientId(void) { return alsaEngine.midiClientId(); }
+        bool openMidi(WavRecord *recorder);
+        bool Start(void);
+        void queueMidi(midimessage *msg);
+        void Close(void);
+        void queueProgramChange(unsigned char chan, unsigned short banknum,
+                                unsigned char prog, uint32_t eventframe);
+        bool jacksessionReply(string cmdline);
+        unsigned int getSamplerate(void);
+        int getBuffersize(void);
+        int audioLatency(void);
+        int midiLatency(void);
+        string audioClientName(void);
+        string midiClientName(void);
+        int audioClientId(void);
+        int midiClientId(void);
 
     private:
         JackEngine jackEngine;

@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified 2010
 */
 
 #include <iostream>
@@ -35,6 +35,7 @@
 using namespace std;
 
 #include "Synth/BodyDisposal.h"
+#include "Sql/ProgramBanks.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
@@ -106,6 +107,7 @@ Config::Config() :
     CheckPADsynth(1),
     rtprio(50),
     deadObjects(new BodyDisposal()),
+    progBanks(NULL),
     sse_level(0),
     programCmd("yoshimi")
 {
@@ -130,10 +132,10 @@ bool Config::Setup(int argc, char **argv)
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
-    clearBankrootDirlist();
-    clearPresetsDirlist();
+
     if (!loadConfig())
         return false;
+
     switch (audioEngine)
     {
         case alsa_audio:
@@ -184,6 +186,8 @@ bool Config::Setup(int argc, char **argv)
 
 Config::~Config()
 {
+    if (progBanks)
+        delete progBanks;
     AntiDenormals(false);
 }
 
@@ -246,19 +250,6 @@ string Config::historyFilename(int index)
 }
 
 
-void Config::clearBankrootDirlist(void)
-{
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        bankRootDirlist[i].clear();
-}
-
-
-void Config::clearPresetsDirlist(void)
-{
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        presetsDirlist[i].clear();
-}
-
 bool Config::loadConfig(void)
 {
     string cmd;
@@ -266,6 +257,19 @@ bool Config::loadConfig(void)
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
         homedir = string("/tmp");
+    DataDir = homedir + string("/.local/share/yoshimi");
+    if (!isDirectory(DataDir))
+    {
+        cmd = string("mkdir -p ") + DataDir;
+        if ((chk = system(cmd.c_str())) < 0)
+        {
+            Log("Create data directory " + DataDir + " failed, status " + asString(chk), true);
+            DataDir.clear();
+            return false;
+        }
+    }
+    DbFile = DataDir + "/yoshimi.db";
+
     ConfigDir = homedir + string("/.config/yoshimi");
     if (!isDirectory(ConfigDir))
     {
@@ -276,6 +280,7 @@ bool Config::loadConfig(void)
             return false;
         }
     }
+
     ConfigFile = ConfigDir + string("/yoshimi.config");
     StateFile = ConfigDir + string("/yoshimi.state");
     if (!isRegFile(ConfigFile))
@@ -298,7 +303,6 @@ bool Config::loadConfig(void)
                 fclose(oldfle);
         }
     }
-
     bool isok = true;
     if (!isRegFile(ConfigFile))
         Log("ConfigFile " + ConfigFile + " still not found, will use default settings", true);
@@ -351,71 +355,10 @@ bool Config::extractConfigData(XMLwrapper *xml)
     BankUIAutoClose = xml->getpar("bank_window_auto_close",
                                                BankUIAutoClose, 0, 1);
     currentBankDir = xml->getparstr("bank_current");
+    currentBank = xml->getpar("current_bank_number", currentBank, 0, 127);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
-
-    // get bank dirs
-    int count = 0;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-    {
-        if (xml->enterbranch("BANKROOT", i))
-        {
-            string dir = xml->getparstr("bank_root");
-            if (isDirectory(dir))
-                bankRootDirlist[count++] = dir;
-            xml->exitbranch();
-        }
-    }
-    if (!count)
-    {
-        string bankdirs[] = {
-            "/usr/share/yoshimi/banks",
-            "/usr/local/share/yoshimi/banks",
-            "/usr/share/zynaddsubfx/banks",
-            "/usr/local/share/zynaddsubfx/banks",
-            string(getenv("HOME")) + "/banks",
-            "../banks",
-            "banks"
-        };
-        const int defaultsCount = 7; // as per bankdirs[] size above
-        for (int i = 0; i < defaultsCount; ++i)
-        {
-            if (bankdirs[i].size() && isDirectory(bankdirs[i]))
-                bankRootDirlist[count++] = bankdirs[i];
-        }
-    }
-    if (!currentBankDir.size())
-        currentBankDir = bankRootDirlist[0];
-
-    // get preset dirs
-    count = 0;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-    {
-        if (xml->enterbranch("PRESETSROOT", i))
-        {
-            string dir = xml->getparstr("presets_root");
-            if (isDirectory(dir))
-                presetsDirlist[count++] = dir;
-            xml->exitbranch();
-        }
-    }
-    if (!count)
-    {
-        string presetdirs[]  = {
-            "/usr/share/yoshimi/presets",
-            "/usr/local/share/yoshimi/presets",
-            "/usr/share/zynaddsubfx/presets",
-            "/usr/local/share/zynaddsubfx/presets",
-            string(getenv("HOME")) + "/presets",
-            "../presets",
-            "presets"
-        };
-        const int defaultsCount = 7; // as per presetdirs[] above
-        for (int i = 0; i < defaultsCount; ++i)
-            if (presetdirs[i].size() && isDirectory(presetdirs[i]))
-                presetsDirlist[count++] = presetdirs[i];
-    }
 
     // alsa settings
     alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
@@ -479,23 +422,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("check_pad_synth", CheckPADsynth);
     xmltree->addparstr("bank_current", currentBankDir);
+    xmltree->addpar("current_bank_number", currentBank);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
-
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (bankRootDirlist[i].size())
-        {
-            xmltree->beginbranch("BANKROOT",i);
-            xmltree->addparstr("bank_root", bankRootDirlist[i]);
-            xmltree->endbranch();
-        }
-
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (presetsDirlist[i].size())
-        {
-            xmltree->beginbranch("PRESETSROOT",i);
-            xmltree->addparstr("presets_root", presetsDirlist[i]);
-            xmltree->endbranch();
-        }
     xmltree->addpar("interpolation", Interpolation);
 
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
@@ -759,11 +687,11 @@ void Config::sigHandler(int sig)
         case SIGHUP:
         case SIGTERM:
         case SIGQUIT:
-            Runtime.setInterruptActive(sig);
+            Runtime.setInterruptActive();
             break;
 
         case SIGUSR1:
-            Runtime.setLadi1Active(sig);
+            Runtime.setLadi1Active();
             sigaction(SIGUSR1, &sigAction, NULL);
             break;
 
@@ -776,46 +704,49 @@ void Config::sigHandler(int sig)
 
 void Config::signalCheck(void)
 {
-    if (ladi1IntActive)
-    {
-        saveState();
-        __sync_bool_compare_and_swap(&ladi1IntActive, ladi1IntActive, 0);
-    }
-
-    if (sigIntActive)
-        runSynth = false;
-
+    #if defined(JACK_SESSION)
     switch (jsessionSave)
     {
         case 1: // JackSessionSave
             saveJackSession();
-            __sync_bool_compare_and_swap(&jsessionSave, 1, 0);
+            __sync_and_and_fetch(&jsessionSave, 0);
             break;
         case 2: // JackSessionSaveAndQuit
             saveJackSession();
-            __sync_bool_compare_and_swap(&jsessionSave, 2, 0);
+            __sync_and_and_fetch(&jsessionSave, 0);
             usleep(3333);
             runSynth = false;
             break;
         case 3: // JackSessionSaveTemplate not implemented
-            __sync_bool_compare_and_swap(&jsessionSave, 3, 0);
+            __sync_and_and_fetch(&jsessionSave, 0);
             break;
         default:
+            __sync_and_and_fetch(&jsessionSave, 0);
             break;
     }
+    #endif
+
+    if (ladi1IntActive)
+    {
+        saveState();
+        __sync_and_and_fetch(&ladi1IntActive, 0);
+    }
+
+    if (sigIntActive)
+        runSynth = false;
 }
 
 
-void Config::setInterruptActive(int sig)
+void Config::setInterruptActive(void)
 {
     Log("Interrupt received");
-    __sync_bool_compare_and_swap(&sigIntActive, sigIntActive, 1);
+    __sync_or_and_fetch(&sigIntActive, 0xFF);
 }
 
 
-void Config::setLadi1Active(int sig)
+void Config::setLadi1Active(void)
 {
-    __sync_bool_compare_and_swap (&ladi1IntActive, ladi1IntActive, 1);
+    __sync_or_and_fetch(&ladi1IntActive, 0xFF);
 }
 
 
@@ -841,8 +772,7 @@ void Config::setJackSessionSave(int event_type, const char *session_dir, const c
 
 void Config::saveJackSession(void)
 {
-    if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, 0))
-        Log("saveJackSession, error clearing jack session save flag", true);
+    __sync_and_and_fetch(&jsessionSave, 0);
     saveSessionData(jackSessionDir + jackSessionFile);
     if (!musicClient->jacksessionReply(programCmd + string(" -U ") + jackSessionUuid
                                        + string(" -u ${SESSION_DIR}") + jackSessionFile))

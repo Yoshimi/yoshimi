@@ -43,9 +43,7 @@ MusicIO::MusicIO() :
     periodendframe(0u),
     wavRecorder(NULL),
     midiRingbuf(NULL),
-    midiEventsUp(NULL),
-    bankselectMsb(0),
-    bankselectLsb(0)
+    midiEventsUp(NULL)
 {
     baseclientname = "yoshimi";
     if (!Runtime.nameTag.empty())
@@ -133,6 +131,22 @@ void MusicIO::queueMidi(midimessage *msg)
 }
 
 
+void MusicIO::midiBankChange(unsigned char chan, unsigned short bank)
+{
+    midimessage msg;
+    msg.event_frame = 0;
+    msg.bytes[0] = MSG_control_change | chan;
+    msg.bytes[1] = C_bankselectmsb;
+    msg.bytes[2] = (bank / 128) & 0x0f;
+    queueMidi(&msg);
+
+    msg.bytes[0] = MSG_control_change | chan;
+    msg.bytes[1] = C_bankselectlsb;
+    msg.bytes[2] = bank & 0x0f;
+    queueMidi(&msg);
+}
+
+
 void MusicIO::Close(void)
 {
     if (NULL != zynLeft)
@@ -169,71 +183,6 @@ void MusicIO::interleaveShorts(void)
     }
 }
 
-/**
-void MusicIO::applyMidi(unsigned char* bytes)
-{
-    unsigned char channel = bytes[0] & 0x0f;
-    switch (bytes[0] & 0xf0)
-    {
-        case MSG_noteoff: // 128
-            synth->noteOff(channel, bytes[1]);
-            break;
-
-        case MSG_noteon: // 144
-            synth->noteOn(channel, bytes[1], bytes[2], wavRecorder->Trigger());
-            break;
-
-        case MSG_control_change: // 176
-            switch(bytes[1])
-            {
-                case C_dataentrymsb: //  6
-                    break;
-                    case C_modwheel:             //   1
-                    case C_volume:               //   7
-                    case C_pan:                  //  10
-                    case C_expression:           //  11
-                    case C_effectcontrol2:       //  13
-                    case C_sustain:              //  64
-                    case C_portamento:           //  65
-                    case C_filterq:              //  71
-                    case C_filtercutoff:         //  74
-                    case C_bandwidth:            //  75
-                    case C_fmamp:                //  76
-                    case C_resonance_center:     //  77
-                    case C_resonance_bandwidth:  //  78
-                    case C_allsoundsoff:         // 120
-                    case C_resetallcontrollers:  // 121
-                    case C_allnotesoff:          // 123
-                        synth->setController(channel, bytes[1], bytes[2]);
-                        break;
-
-                    case C_bankselectmsb:
-                        bankselectMsb = bytes[2];
-                        break;
-
-                    case C_bankselectlsb:
-                        bankselectLsb = bytes[2];
-                        break;
-
-                    default:
-                        break;
-            }
-            break;
-
-         case MSG_program_change: // 224
-             synth->programChange(bankselectMsb, bankselectLsb);
-             break;
-
-         case MSG_pitchwheel_control: // 224
-             synth->setController(channel, MSG_pitchwheel_control,
-                                  ((bytes[2] << 7) | bytes[1]) - 8192);
-             break;
-
-        default: // too difficult or just uninteresting
-            break;
-    }
-}
-**/
 
 void *MusicIO::_midiThread(void *arg)
 {
@@ -258,7 +207,7 @@ void *MusicIO::midiThread(void)
     }
     midimessage msg;
     unsigned int fetch;
-    pthread_cleanup_push(NULL, this);
+    pthread_cleanup_push(NULL, NULL);
     while (Runtime.runSynth)
     {
         pthread_testcancel();
@@ -280,79 +229,41 @@ void *MusicIO::midiThread(void)
             if (wait4it > 2 * frame_wait)
                 usleep(wait4it);
         }
-        unsigned char channel = msg.bytes[0] & 0x0f;
-        switch (msg.bytes[0] & 0xf0)
-        {
-            case MSG_noteoff: // 128
-                synth->noteOff(channel, msg.bytes[1]);
-                break;
-
-            case MSG_noteon: // 144
-               synth->noteOn(channel, msg.bytes[1], msg.bytes[2],
-                             (wavRecorder != NULL) ? wavRecorder->Trigger() : false);
-                break;
-
-            case MSG_control_change: // 176
-                processControlChange(&msg);
-                break;
-
-            case MSG_program_change: // 192
-                 synth->programChange(channel, bankselectMsb, bankselectLsb);
-                 break;
-
-             case MSG_pitchwheel_control: // 224
-                 synth->setPitchwheel(channel, ((msg.bytes[2] << 7) | msg.bytes[1]) - 8192);
-                 break;
-
-             default: // too difficult or just uninteresting
-                break;
-        }
+        synth->applyMidi(msg.bytes);
     }
     pthread_cleanup_pop(0);
     return NULL;
 }
 
 
-void MusicIO::processControlChange(midimessage *msg)
+void MusicIO::queueControlChange(unsigned char controltype, unsigned char chan,
+                                 unsigned char val, uint32_t eventframe)
 {
-    unsigned char channel = msg->bytes[0] & 0x0f;
-    switch(msg->bytes[1])
-    {
-        case C_dataentrymsb: //  6
-            break;
-        default:
-            switch (msg->bytes[1])
-            {
-                case C_bankselectmsb: // inactive
-                    bankselectMsb = msg->bytes[2];
-                    break;
+//    cerr << "Into MusicIO::queueControlChange, control type " << (int)controltype
+//         << ", chan " << (int)chan
+//         << ", value " << (int)val
+//         << ", event frame " << eventframe << endl;
+    midimessage msg;
+    msg.bytes[0] = MSG_control_change | chan;
+    msg.bytes[1] = controltype;
+    msg.bytes[2] = val;
+    msg.event_frame = eventframe;
+    queueMidi(&msg);
+}
 
-                case C_bankselectlsb: // inactive
-                    bankselectLsb = msg->bytes[2];
-                    break;
 
-                case C_modwheel:             //   1
-                case C_volume:               //   7
-                case C_pan:                  //  10
-                case C_expression:           //  11
-                case C_sustain:              //  64
-                case C_portamento:           //  65
-                case C_filterq:              //  71
-                case C_filtercutoff:         //  74
-                case C_soundcontroller6:     //  75 bandwidth
-                case C_soundcontroller7:     //  76 fmamp
-                case C_soundcontroller8:     //  77 resonance center     
-                case C_soundcontroller9:     //  78 resonance bandwidth
-                case C_allsoundsoff:         // 120
-                case C_resetallcontrollers:  // 121
-                case C_allnotesoff:          // 123
-                    synth->setController(channel, msg->bytes[1], msg->bytes[2]);
-                    break;
-
-                default:
-                    cerr << "Midi control change " << (int)msg->bytes[1] << " ignored" << endl; 
-                    break;
-            }
-            break;
-    }
+void MusicIO::queueProgramChange(unsigned char chan, unsigned short banknum,
+                                 unsigned char prog, uint32_t eventframe)
+{
+//    cerr << "Into MusicIO::queueProgramChange, chan " << (int)chan
+//         << ", banknum " << banknum
+//         << ", program " << (int)prog
+//         << ", event frame " << eventframe << endl;
+    queueControlChange(C_bankselectmsb, chan, 0, 0);
+    queueControlChange(C_bankselectlsb, chan, banknum, 0);
+    midimessage msg;
+    msg.bytes[0] = MSG_program_change | chan;
+    msg.bytes[1] = prog;
+    msg.bytes[2] = 0;
+    queueMidi(&msg);
 }

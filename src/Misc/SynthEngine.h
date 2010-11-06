@@ -18,13 +18,14 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified 2010
 */
 
 #ifndef SYNTHENGINE_H
 #define SYNTHENGINE_H
 
 #include <limits.h>
+#include <map>
 #include <cstdlib>
 #include <boost/interprocess/sync/interprocess_upgradable_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
@@ -32,16 +33,15 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
+#include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
 #include "Misc/Microtonal.h"
-#include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
-
-//typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
 class EffectMgr;
 class Part;
 class XMLwrapper;
+class FFTwrapper;
 class Controller;
 
 class SynthEngine : private SynthHelper, MiscFuncs
@@ -50,42 +50,53 @@ class SynthEngine : private SynthHelper, MiscFuncs
         SynthEngine();
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
-        void lockExclusive(void);
-        void unlockExclusive(void);
-        bool trylockExclusive(void);
-        bool timedlockExclusive(void);
-        void lockSharable(void);
-        void unlockSharable(void);
-        bool trylockSharable(void);
-        bool timedlockSharable(void);
 
         bool saveXML(string filename);
         void add2XML(XMLwrapper *xml);
         void defaults(void);
 
         bool loadXML(string filename);
-        void applyparameters(void);
-
         bool getfromXML(XMLwrapper *xml);
-
+        void applyparameters(void);
         int getalldata(char **data);
         void putalldata(char *data, int size);
 
         void ShutUp(void);
         void MasterAudio(float *outl, float *outr);
         void partOnOff(int npart, int what);
+        void partEnable(unsigned char npart, bool maybe);
 
-        // midi
-        void noteOn(unsigned char chan, unsigned char note,
-                    unsigned char velocity, bool record_trigger);
+        void applyMidi(unsigned char* bytes);
+        void noteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void noteOff(unsigned char chan, unsigned char note);
-        void setController(unsigned char chan, unsigned char type, short int par);
+        void setController(unsigned char ctrltype, unsigned char channel, unsigned char par);
         void setPitchwheel(unsigned char chan, short int par);
-        void programChange(unsigned char chan, int bankmsb, int banklsb);
+        void programChange(unsigned char midichan, unsigned char bank, unsigned char prog);
+        string bankName(unsigned char banknum);
+        string programName(unsigned char prog);
+
+        float numRandom(void);
+        unsigned int random(void);
+
+        void lockUpgradable(void);
+        void unlockUpgradable(void);
+        void upgradeLockExclusive(void);
+        void downgradeLockUpgradable(void);
+        bool timedUpgradeLockExclusive(void);
+        bool timedlockUpgradable(void);
+
+        void lockExclusive(void);
+        void unlockExclusive(void);
+        bool trylockExclusive(void);
+        bool timedlockExclusive(void);
+
+        void lockSharable(void);
+        void unlockSharable(void);
+        bool trylockSharable(void);
+        bool timedlockSharable(void);
 
         Part *part[NUM_MIDI_PARTS];
 
-        int muted;
         bool shutup;
 
         // parameters
@@ -99,6 +110,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float oscilsize_f;
         int halfoscilsize;
         float halfoscilsize_f;
+
+        uint32_t synthperiodStartFrame;
 
         unsigned char Pvolume;
         unsigned char Pkeyshift;
@@ -125,7 +138,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         // others ...
         Controller *ctl;
         Microtonal microtonal;
-        Bank bank;
         FFTwrapper *fft;
 
         // peaks for VU-meters
@@ -141,16 +153,17 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool recordPending;
 
-        float numRandom(void);
-        unsigned int random(void);
-
     private:
+        XMLwrapper *stateXMLtree;
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
         float *tmpmixl; // Temporary mixing samples for part samples
         float *tmpmixr; // which are sent to system effect
         int keyshift;
+
+        char midiBankLSB;
+        char midiBankMSB;
 
         float vuoutpeakl;
         float vuoutpeakr;
@@ -161,16 +174,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool clippedL;
         bool clippedR;
 
-        boost::interprocess::interprocess_upgradable_mutex synthMutex;
-        const boost::posix_time::time_duration lockwait;
-        boost::interprocess::interprocess_mutex meterMutex;
-
-        XMLwrapper *stateXMLtree;
-
         static char random_state[];
         static struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
+
+        boost::interprocess::interprocess_upgradable_mutex synthMutex;
+        const boost::posix_time::time_duration lockwait;
+        boost::interprocess::interprocess_mutex meterMutex;
 };
 
 extern SynthEngine *synth;

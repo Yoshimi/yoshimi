@@ -37,7 +37,7 @@ using namespace std;
 class JackEngine : public MusicIO
 {
     public:
-        JackEngine();    
+        JackEngine();
         ~JackEngine() { Close(); };
         bool connectServer(string server);
         bool isConnected(void) { return (NULL != jackClient); }

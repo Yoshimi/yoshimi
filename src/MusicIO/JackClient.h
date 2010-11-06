@@ -32,22 +32,23 @@ class JackClient : public MusicClient
     public:
         JackClient() : MusicClient() { };
         ~JackClient() { Close(); };
-
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
-        bool Start(void) { return jackEngine.Start() && MusicClient::Start(); }
-        void queueMidi(midimessage *msg) { jackEngine.queueMidi(msg); }
-        void Close(void) { jackEngine.Close(); wavrecord->Close(); }
-        bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
-        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); }
-        int getBuffersize(void) { return jackEngine.getBuffersize(); }
-        int audioLatency(void) { return jackEngine.audioLatency(); }
-        int midiLatency(void) { return jackEngine.midiLatency(); }
-        string audioClientName(void) { return jackEngine.audioClientName(); }
-        string midiClientName(void) { return jackEngine.midiClientName(); }
-        int audioClientId(void) { return jackEngine.audioClientId(); }
-        int midiClientId(void) { return jackEngine.midiClientId(); }
- 
+        bool Start(void);
+        void Close(void);
+        void queueMidi(midimessage *msg);
+        void queueProgramChange(unsigned char chan, unsigned short banknum,
+                                unsigned char prog, uint32_t eventframe);
+        bool jacksessionReply(string cmdline);
+        unsigned int getSamplerate(void);
+        int getBuffersize(void);
+        int audioLatency(void);
+        int midiLatency(void);
+        string audioClientName(void);
+        string midiClientName(void);
+        int audioClientId(void);
+        int midiClientId(void);
+
     private:
         JackEngine jackEngine;
 };

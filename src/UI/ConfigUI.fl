@@ -44,27 +44,22 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {writebankcfg();
-          o->hide();} open
-      xywh {1047 165 465 335} type Double hide
+      callback {o->hide();} open
+      xywh {1306 197 465 335} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 520 325}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 460 260} labelsize 12
+          xywh {5 26 460 312} labelsize 12
         } {
           Fl_Choice {} {
             label OscilSize
-            callback {Runtime.Oscilsize = 128 << o->value();}
+            callback {Runtime.Oscilsize = 128 << o->value();} open selected
             tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
           } {
-            MenuItem {} {
-              label 128
-              xywh {25 25 100 20} labelfont 1
-            }
             MenuItem {} {
               label 256
               xywh {35 35 100 20} labelfont 1
@@ -84,14 +79,6 @@ class ConfigUI {open : {private MiscFuncs}
             MenuItem {} {
               label 4096
               xywh {55 55 100 20} labelfont 1
-            }
-            MenuItem {} {
-              label 8192
-              xywh {65 65 100 20} labelfont 1
-            }
-            MenuItem {} {
-              label 16384
-              xywh {75 75 100 20} labelfont 1
             }
           }
           Fl_Choice {} {
@@ -134,10 +121,8 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Input SessionStateFile {
             label {Session state save file}
-            callback {
-              Runtime.StateFile = string(o->value());
-              SessionStateFile->changed();
-            }
+            callback {Runtime.StateFile = string(o->value());
+              SessionStateFile->changed();}
             xywh {159 216 235 25} labelsize 12 when 1 textsize 12
             code0 {o->value(Runtime.StateFile.c_str());}
           }
@@ -154,88 +139,6 @@ class ConfigUI {open : {private MiscFuncs}
                 }}
             xywh {404 218 49 20} labelsize 12
             code0 {/* code */}
-          }
-        }
-        Fl_Group {} {
-          label {Bank root dirs} open
-          xywh {5 25 460 287} labelsize 12 hide
-        } {
-          Fl_Browser rootsbrowse {
-            callback {activatebutton_rootdir(o->value()!=0);}
-            xywh {15 35 485 200} type Hold labelsize 12 textsize 13
-          }
-          Fl_Button {} {
-            label {Add root directory...}
-            callback {const char *dirname;
-                dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
-                if (dirname == NULL)
-                    return;
-                rootsbrowse->add(dirname);}
-            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-          }
-          Fl_Button removerootdirbutton {
-            label {Remove root dir...}
-            callback {if (rootsbrowse->value() != 0)
-                {
-                    rootsbrowse->remove(rootsbrowse->value());
-                }
-                activatebutton_rootdir(false);}
-            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-            code0 {o->deactivate();}
-          }
-          Fl_Button makedefaultrootdirbutton {
-            label {Make default}
-            callback {int n = rootsbrowse->value();
-                if (n != 0)
-                {
-                    rootsbrowse->move(1, n);
-                    rootsbrowse->value(1);
-                    rootsbrowse->redraw();
-                }
-                activatebutton_rootdir(true);}
-            xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-            code0 {o->deactivate();}
-          }
-        }
-        Fl_Group {} {
-          label {Presets dirs} open
-          xywh {5 25 460 260} labelsize 12 hide
-        } {
-          Fl_Browser presetbrowse {
-            callback {activatebutton_presetdir(o->value()!=0);}
-            xywh {15 35 485 200} type Hold labelsize 12 textsize 12
-          }
-          Fl_Button {} {
-            label {Add preset directory...}
-            callback {const char *dirname;
-                dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
-                if (dirname == NULL)
-                    return;
-                presetbrowse->add(dirname);}
-            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-          }
-          Fl_Button removepresetbutton {
-            label {Remove preset dir...}
-            callback {if (presetbrowse->value() != 0)
-                {
-                    presetbrowse->remove(presetbrowse->value());
-                }
-                activatebutton_presetdir(false);}
-            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-            code0 {o->deactivate();}
-          }
-          Fl_Button makedefaultpresetbutton {
-            label {Make default}
-            callback {int n = presetbrowse->value();
-                if (n != 0)
-                {
-                    presetbrowse->move(1, n);
-                    presetbrowse->value(1);
-                    presetbrowse->redraw();
-                }
-                activatebutton_presetdir(true);}
-            xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-            code0 {o->deactivate();}
           }
         }
         Fl_Group {} {
@@ -375,78 +278,23 @@ class ConfigUI {open : {private MiscFuncs}
       }
       Fl_Button {} {
         label Close
-        callback {configwindow->hide();
-            writebankcfg();
-            writepresetcfg();}
+        callback {configwindow->hide();}
         xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save Settings}
-        callback {Runtime.saveConfig();
-            writebankcfg();
-            writepresetcfg();}
+        callback {Runtime.saveConfig();}
         xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Box {} {
-        label {Most settings changes require a restart}
+        label {Some settings changes require a restart}
         xywh {104 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
       }
     }
   }
   Function {ConfigUI()} {open
   } {
-    code {make_window();
-        readbankcfg();
-        readpresetcfg();} {}
-  }
-  Function {activatebutton_rootdir(bool active)} {open
-  } {
-    code {if (active)
-        {
-            removerootdirbutton->activate();
-            makedefaultrootdirbutton->activate();
-        }
-        else
-        {
-            removerootdirbutton->deactivate();
-            makedefaultrootdirbutton->deactivate();
-        }} {}
-  }
-  Function {activatebutton_presetdir(bool active)} {} {
-    code {if (active)
-        {
-            removepresetbutton->activate();
-            makedefaultpresetbutton->activate();
-        }
-        else
-        {
-            removepresetbutton->deactivate();
-            makedefaultpresetbutton->deactivate();
-        }} {}
-  }
-  Function {readbankcfg()} {} {
-    code {rootsbrowse->clear();
-        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        {
-            if (Runtime.bankRootDirlist[i].size())
-                rootsbrowse->add(Runtime.bankRootDirlist[i].c_str());
-        }} {}
-  }
-  Function {writebankcfg()} {} {
-    code {Runtime.clearBankrootDirlist();
-        for (int n = 0; n < rootsbrowse->size(); ++n)
-            Runtime.bankRootDirlist[n] = string(rootsbrowse->text(n + 1));} {}
-  }
-  Function {readpresetcfg()} {} {
-    code {presetbrowse->clear();
-        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-            if (Runtime.presetsDirlist[i].size())
-                presetbrowse->add(Runtime.presetsDirlist[i].c_str());} {}
-  }
-  Function {writepresetcfg()} {} {
-    code {Runtime.clearPresetsDirlist();
-        for (int n = 0; n < presetbrowse->size(); ++n)
-            Runtime.presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
+    code {make_window();} {}
   }
   Function {Show()} {} {
     code {configwindow->show();} {}

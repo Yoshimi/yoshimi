@@ -24,13 +24,20 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
-#include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
+#include "Sql/ProgramBanks.h"
+#include "MasterUI.h"
 
 int main(int argc, char *argv[])
 {
     if (!Runtime.Setup(argc, argv))
         goto bail_out;
+
+    if (!((progBanks = new ProgramBanks()) && progBanks->Setup()))
+    {
+        Runtime.Log("Failed to establish program bank database");
+        goto bail_out;
+    }
 
     if (Runtime.showGui)
     {

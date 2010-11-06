@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2010
+    This file is derivative of ZynAddSubFX original code, modified 2010
 */
 
 #ifndef PART_H
@@ -48,32 +48,45 @@ class Part : private MiscFuncs, SynthHelper
     public:
         Part(Microtonal *microtonal_, FFTwrapper *fft_);
         ~Part();
+
+        bool loadProgram(unsigned char bk, unsigned char prog);
+        bool saveProgram(unsigned char bk, unsigned char prog);
+
+        void partEnable(unsigned char npart, bool maybe);
         void ComputePartSmps(void);
+        bool Active(void) { return (Penabled != 0 && !partMuted); }
         void cleanup(void);
         void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
         void NoteOff(unsigned char note);
         void AllNotesOff(void) { killallnotes = true; };
         void SetController(unsigned int type, int par);
-        void RelaseSustainedKeys(void); 
+        void RelaseSustainedKeys(void);
         void RelaseAllKeys(void);
 
+        string partXML(void);
         bool saveXML(string filename); // true for load ok, otherwise false
         bool loadXMLinstrument(string filename);
         void add2XML(XMLwrapper *xml);
         void add2XMLinstrument(XMLwrapper *xml);
+        void getfromXML(XMLwrapper *xml);
         void defaults(void);
         void defaultsinstrument(void);
-        void applyparameters(bool islocked);
-        void getfromXML(XMLwrapper *xml);
-        void getfromXMLinstrument(XMLwrapper *xml);
+
+        unsigned char currentBank;
+        unsigned char currentProgram;
 
         // the part's kit
         struct {
-            unsigned char Penabled, Pmuted, Pminkey, Pmaxkey;
             string        Pname;
-            unsigned char Padenabled, Psubenabled, Ppadenabled;
+            unsigned char Penabled;
+            unsigned char Pmuted;
+            unsigned char Pminkey;
+            unsigned char Pmaxkey;
+            unsigned char Padenabled;
+            unsigned char Psubenabled;
+            unsigned char Ppadenabled;
             unsigned char Psendtoparteffect;
-            ADnoteParameters *adpars;
+            ADnoteParameters  *adpars;
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
         } kit[NUM_KIT_ITEMS];
@@ -85,6 +98,7 @@ class Part : private MiscFuncs, SynthHelper
         void setPpanning(char Ppanning);
 
         unsigned char Penabled;
+        unsigned char jackDirect;
         unsigned char Pvolume;
         unsigned char Pminkey;
         unsigned char Pmaxkey;     // the maximum key that the part receives noteon messages
@@ -104,7 +118,6 @@ class Part : private MiscFuncs, SynthHelper
 
         string        Pname;       // name of the instrument
         struct {                   // instrument additional information
-            unsigned char Ptype;
             string        Pauthor;
             string        Pcomments;
         } info;
@@ -136,9 +149,11 @@ class Part : private MiscFuncs, SynthHelper
         int lastnote;
 
     private:
+        void applyparameters(void);
         void KillNotePos(int pos);
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
+        void getfromXMLinstrument(XMLwrapper *xml);
 
         bool killallnotes; // true if I want to kill all notes (ie, panic)
 
@@ -179,6 +194,7 @@ class Part : private MiscFuncs, SynthHelper
         float oldfreq; // for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;
+        int partMuted;
 };
 
 #endif

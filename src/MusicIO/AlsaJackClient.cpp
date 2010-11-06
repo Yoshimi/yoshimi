@@ -1,6 +1,6 @@
 /*
     AlsaJackClient.cpp - Jack audio / Alsa midi
-    
+
     Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
@@ -62,3 +62,41 @@ bool AlsaJackClient::Start(void)
         Runtime.Log("alsaEngine.Start() failed");
     return false;
 }
+
+
+void AlsaJackClient::queueMidi(midimessage *msg)
+    { jackEngine.queueMidi(msg); }
+
+void AlsaJackClient::Close(void)
+    { alsaEngine.Close(); jackEngine.Close(); }
+
+void AlsaJackClient::queueProgramChange(unsigned char chan, unsigned short banknum,
+                                        unsigned char prog, uint32_t eventframe)
+    { return jackEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+
+bool AlsaJackClient::jacksessionReply(string cmdline)
+    { return jackEngine.jacksessionReply(cmdline); }
+
+unsigned int AlsaJackClient::getSamplerate(void)
+    { return alsaEngine.getSamplerate(); }
+
+int AlsaJackClient::getBuffersize(void)
+    { return alsaEngine.getBuffersize(); }
+
+int AlsaJackClient::audioLatency(void)
+    { return alsaEngine.audioLatency(); }
+
+int AlsaJackClient::midiLatency(void)
+    { return jackEngine.midiLatency(); }
+
+string AlsaJackClient::audioClientName(void)
+    { return alsaEngine.audioClientName(); }
+
+string AlsaJackClient::midiClientName(void)
+    { return jackEngine.midiClientName(); }
+
+int AlsaJackClient::audioClientId(void)
+    { return alsaEngine.audioClientId(); }
+
+int AlsaJackClient::midiClientId(void)
+    { return jackEngine.midiClientId(); }

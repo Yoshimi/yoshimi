@@ -21,13 +21,12 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2009 - August 2010
+This file is derivative of ZynAddSubFX original code, modified 2010
 } {in_source in_header}
 
 decl {
     \#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
-    \#include "Params/ADnoteParameters.h"
     \#include "Misc/SynthEngine.h"
     \#include "WidgetPDialUI.h"
     \#include "FilterUI.h"
@@ -35,9 +34,10 @@ decl {
 } { global}
 
 decl {
+    \#include <string>
+    \#include "Params/ADnoteParameters.h"
     \#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
-    \#include <string>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"

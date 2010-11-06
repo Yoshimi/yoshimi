@@ -32,6 +32,7 @@ bool AlsaClient::openAudio(WavRecord *recorder)
     return false;
 }
 
+
 bool AlsaClient::openMidi(WavRecord *recorder)
 {
     if (alsaEngine.openMidi(recorder))
@@ -39,3 +40,41 @@ bool AlsaClient::openMidi(WavRecord *recorder)
     Runtime.Log("AlsaClient midi open failed");
     return false;
 }
+
+
+void AlsaClient::queueMidi(midimessage *msg)
+    { alsaEngine.queueMidi(msg); }
+
+void AlsaClient::Close(void)
+    { alsaEngine.Close(); }
+
+bool AlsaClient::Start(void)
+    { return alsaEngine.Start(); }
+
+void AlsaClient::queueProgramChange(unsigned char chan, unsigned short banknum,
+                                    unsigned char prog, uint32_t eventframe)
+    { return alsaEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+
+unsigned int AlsaClient::getSamplerate(void)
+    { return alsaEngine.getSamplerate(); }
+
+int AlsaClient::getBuffersize(void)
+    { return alsaEngine.getBuffersize(); }
+
+int AlsaClient::audioLatency(void)
+    { return alsaEngine.audioLatency(); }
+
+int AlsaClient::midiLatency(void)
+    { return alsaEngine.midiLatency(); }
+
+string AlsaClient::audioClientName(void)
+    { return alsaEngine.audioClientName(); }
+
+string AlsaClient::midiClientName(void)
+    { return alsaEngine.midiClientName(); }
+
+int AlsaClient::audioClientId(void)
+    { return alsaEngine.audioClientId(); }
+
+int AlsaClient::midiClientId(void)
+    { return alsaEngine.midiClientId(); }

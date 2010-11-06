@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified 2010
 */
 
 #ifndef CONFIG_H
@@ -38,11 +38,12 @@ using namespace std;
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 
-extern bool Pexitprogram;  // if the UI sets this true, the program will exit
+//extern bool Pexitprogram;  // if the UI sets this true, the program will exit
 
 class XMLwrapper;
 class BodyDisposal;
 class SynthEngine;
+class ProgramBanks;
 
 class Config : public MiscFuncs
 {
@@ -55,8 +56,6 @@ class Config : public MiscFuncs
         void Usage(void);
         void Log(string msg, bool tostderr = true);
         void flushLog(void);
-        void clearBankrootDirlist(void);
-        void clearPresetsDirlist(void);
         void saveConfig(void);
         void saveState(void);
         bool restoreState(SynthEngine *synth);
@@ -64,8 +63,8 @@ class Config : public MiscFuncs
         void setJackSessionSave(int save_type, const char *session_dir, const char *client_uuid);
 
         static void sigHandler(int sig);
-        void setInterruptActive(int sig);
-        void setLadi1Active(int sig);
+        void setInterruptActive(void);
+        void setLadi1Active(void);
         void signalCheck(void);
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
@@ -75,7 +74,9 @@ class Config : public MiscFuncs
         string historyFilename(int index);
 
         string ConfigDir;
+        string DataDir;
         string ConfigFile;
+        string DbFile;
         string paramsLoad;
         string instrumentLoad;
         bool   doRestoreState;
@@ -116,9 +117,8 @@ class Config : public MiscFuncs
 
         int    BankUIAutoClose;
         int    Interpolation;
-        string bankRootDirlist[MAX_BANK_ROOT_DIRS];
+        unsigned char currentBank;
         string currentBankDir;
-        string presetsDirlist[MAX_BANK_ROOT_DIRS];
         int    CheckPADsynth;
         int    rtprio;
 
@@ -127,6 +127,7 @@ class Config : public MiscFuncs
         static const unsigned short MaxParamsHistory;
         list<string> LogList;
         BodyDisposal *deadObjects;
+        ProgramBanks *progBanks;
 
     private:
         void loadCmdArgs(int argc, char **argv);
