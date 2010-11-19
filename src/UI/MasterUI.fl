@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2010
+This file is a derivative of the ZynAddSubFX original, modified November 2010
 } {in_source in_header
 }
 
@@ -102,7 +102,7 @@ class MasterUI {open : {private MiscFuncs}
       yoshiLog = NULL;} {}
   }
   Function {~MasterUI()} {} {
-    code {masterwindow->hide();
+    code {//
       aboutwindow->hide();
       delete aboutwindow;
       syseffsendwindow->hide();
@@ -114,10 +114,10 @@ class MasterUI {open : {private MiscFuncs}
         microtonalui->Hide();
         delete microtonalui;
       }
-      if (NULL !=bankui)
+      if (NULL != bankui)
       {
         bankui->Hide();
-        delete bankui;
+      delete bankui;
       }
       if (NULL != virkeyboard)
       {
@@ -144,7 +144,9 @@ class MasterUI {open : {private MiscFuncs}
         yoshiLog->Hide();
         delete yoshiLog;
       }
-      delete masterwindow;} {}
+      masterwindow->hide();
+      delete masterwindow;
+    } {}
   }
   Function {Init(void)} {} {
     code {microtonalui = new MicrotonalUI(&synth->microtonal);
@@ -237,21 +239,12 @@ class MasterUI {open : {private MiscFuncs}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-
-                //synth->actionLock(lockmute);
-                //synth->part[npart]->defaultsinstrument();
-                // load the instr. parameters
-                //bool result =
-                //    synth->part[npart]->loadXMLinstrument(string(filename));
-                //synth->part[npart]->applyparameters(true);
-                //synth->actionLock(unlock);
-                
                 bool result = synth->part[npart]->loadXMLinstrument(string(filename));
-
                 npartcounter->do_callback();
                 updatepanel();
                 if (!result)
-                    fl_alert("Failed to load instrument file");}
+                    fl_alert("Failed to load instrument file");
+            }
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -319,7 +312,8 @@ class MasterUI {open : {private MiscFuncs}
         } {
           MenuItem {} {
             label {&Load Scale Settings...}
-            callback {char *filename;
+            callback {//
+                char *filename;
                 filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
                 if (filename == NULL)
                     return;
@@ -337,7 +331,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           MenuItem {} {
             label {Save Sc&ale Settings ..}
-            callback {char *filename;
+            callback {//
+                char *filename;
                 filename = fl_file_chooser("Save:", "({*.xsz})", NULL, 0);
                 if (filename == NULL)
                     return;
@@ -373,7 +368,8 @@ class MasterUI {open : {private MiscFuncs}
         }
         Fl_Dial globalfinedetune {
           label Detune
-          callback {synth->microtonal.Pglobalfinedetune = o->value();
+          callback {//
+              synth->microtonal.Pglobalfinedetune = o->value();
               globalfinedetune->changed();}
           tooltip {global fine detune} xywh {126 33 25 25} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -381,7 +377,8 @@ class MasterUI {open : {private MiscFuncs}
         }
         Fl_Button {} {
           label Reset
-          callback {globalfinedetune->value(64.0);
+          callback {//
+              globalfinedetune->value(64.0);
               synth->microtonal.Pglobalfinedetune = globalfinedetune->value();
               globalfinedetune->changed();}
           tooltip {Master fine detune reset} xywh {153 72 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
@@ -394,7 +391,8 @@ class MasterUI {open : {private MiscFuncs}
         }
         Fl_Button {} {
           label Reset
-          callback {virkeyboard->relaseallkeys();
+          callback {//
+              virkeyboard->relaseallkeys();
               synth->actionLock(lockmute);
               synth->shutup = 1;
               synth->actionLock(unlock);}
@@ -412,7 +410,7 @@ class MasterUI {open : {private MiscFuncs}
         } {
           Fl_Button wavfilebutton {
             label Wav
-            callback {/* Runtime.settings.DefaultRecordDirectory.c_str() */
+            callback {//
               char* fpath = fl_file_chooser("Set wav file", "({*.wav})", NULL, 0);
               if (fpath == NULL)
                   return;
@@ -440,7 +438,8 @@ class MasterUI {open : {private MiscFuncs}
             tooltip {Set/select record file} xywh {335 35 50 20} box PLASTIC_UP_BOX color 228 selection_color 23 labelsize 11
           }
           Fl_Button recordbutton {
-            callback {if (!recording_indicator->visible())
+            callback {//
+              if (!recording_indicator->visible())
               {
                   if (!armed_indicator->visible()) // Arm recorder
                   {
@@ -458,14 +457,16 @@ class MasterUI {open : {private MiscFuncs}
                   Recorder->set_changed();
               }}
             image {record.a.png} deimage {record.b.png} xywh {335 60 50 27} box NO_BOX color 1 selection_color 67 labelfont 1 labelsize 1 labelcolor 48 deactivate
-            code0 {no_tip = "";
+            code0 {//
+              no_tip = "";
               arm_tip = "Arm recorder";
               disarm_tip = "Disarm recorder";
               start_record_tip = "Start recorder";
               stop_record_tip = "Stop recorder";}
           }
           Fl_Button stopbutton {
-            callback {if (recording_indicator->visible())
+            callback {//
+              if (recording_indicator->visible())
               {
                   musicClient->stopRecord();
                   recording_indicator->hide();
@@ -494,8 +495,9 @@ class MasterUI {open : {private MiscFuncs}
             tooltip {Pause/stop recording} image {stop.a.png} deimage {stop.b.png} xywh {282 60 50 24} box NO_BOX down_box DOWN_BOX color 186 selection_color 29 labelfont 1 labelsize 1 align 16 deactivate
           }
           Fl_Button overwritebutton {
-            callback {string msg =
-                string("Overwrite ") + string(musicClient->wavFilename()) + string("?");
+            callback {//
+              string msg =
+                  string("Overwrite ") + string(musicClient->wavFilename()) + string("?");
               if (fl_choice(msg.c_str(), "No", "Yes", NULL))
               {
                 o->deactivate();
@@ -538,10 +540,12 @@ class MasterUI {open : {private MiscFuncs}
       }
       Fl_Tabs {} {
         label {System/Insert}
-        callback {if (o->value() == SystemEffectsGrp)
-            showSysEfxUI();
-          else if (o->value() == InsertionEffectsGrp)
-            showInsEfxUI();} open
+        callback {//
+            if (o->value() == SystemEffectsGrp)
+                showSysEfxUI();
+           else if (o->value() == InsertionEffectsGrp)
+               showInsEfxUI();
+        } open
         xywh {0 97 390 60} box PLASTIC_THIN_UP_BOX color 44 selection_color 41 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
@@ -550,7 +554,8 @@ class MasterUI {open : {private MiscFuncs}
         } {
           Fl_Spinner syseffnocounter {
             label Effect
-            callback {nsyseff = o->value() - 1;
+            callback {//
+              nsyseff = o->value() - 1;
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
               syseffectui->refresh(synth->sysefx[nsyseff]);}
             xywh {80 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textsize 11
@@ -559,7 +564,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           Fl_Choice sysefftype {
             label Type
-            callback {synth->actionLock(lockmute);
+            callback {//
+              synth->actionLock(lockmute);
               synth->sysefx[nsyseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               syseffectui->refresh(synth->sysefx[nsyseff]);
@@ -616,7 +622,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           Fl_Button {} {
             label P
-            callback {synth->actionLock(lockmute);
+            callback {//
+              synth->actionLock(lockmute);
               presetsui->paste(synth->sysefx[nsyseff], syseffectui);
               synth->actionLock(unlock);}
             xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
@@ -628,7 +635,8 @@ class MasterUI {open : {private MiscFuncs}
         } {
           Fl_Spinner inseffnocounter {
             label Effect
-            callback {ninseff = o->value() - 1;
+            callback {//
+              ninseff = o->value() - 1;
               insefftype->value(synth->insefx[ninseff]->geteffect());
               inseffpart->value(synth->Pinsparts[ninseff] + 2);
               inseffectui->refresh(synth->insefx[ninseff]);
@@ -650,7 +658,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           Fl_Choice insefftype {
             label Type
-            callback {synth->actionLock(lockmute);
+            callback {//
+              synth->actionLock(lockmute);
               synth->insefx[ninseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff]);
@@ -698,7 +707,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           Fl_Choice inseffpart {
             label To
-            callback {synth->Pinsparts[ninseff] = o->value() - 2;
+            callback {//
+              synth->Pinsparts[ninseff] = o->value() - 2;
               if (o->value() == 1)
               {
                 inseffectuigroup->deactivate();
@@ -728,7 +738,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           Fl_Button {} {
             label P
-            callback {synth->actionLock(lockmute);
+            callback {//
+              synth->actionLock(lockmute);
               presetsui->paste(synth->insefx[ninseff], inseffectui);
               synth->actionLock(unlock);}
             xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
@@ -776,7 +787,8 @@ class MasterUI {open : {private MiscFuncs}
       }
       Fl_Spinner npartcounter {
         label Part
-        callback {int nval = o->value() - 1;
+        callback {//
+          int nval = o->value() - 1;
           partuigroup->remove(partui);
           delete partui;
           partui = new PartUI(0, 0, 765, 525);
@@ -879,9 +891,11 @@ ZynAddSubFX}
     }
   }
   Function {updatesendwindow()} {} {
-    code {for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
+    code {//
+        for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
             for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
-                syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);} {}
+                syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);
+    } {}
   }
   Function {updatepanel()} {} {
     code {for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -890,14 +904,16 @@ ZynAddSubFX}
       }} {}
   }
   Function {setMasterLabel(string name)} {} {
-    code {masterwindowlabel = "Yoshimi";
+    code {//
+        masterwindowlabel = "Yoshimi";
         if (name.size())
             masterwindowlabel += (" : " + name);
         masterwindow->label(masterwindowlabel.c_str());
         masterwindow->changed();} {}
   }
   Function {do_new_master()} {} {
-    code {if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
+    code {//
+        if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
             delete microtonalui;
 
@@ -911,7 +927,8 @@ ZynAddSubFX}
         updatepanel();} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
-    code {const char *fname;
+    code {//
+        const char *fname;
         if (NULL != file)
             fname = file;
         else
@@ -947,7 +964,8 @@ ZynAddSubFX}
         }} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
-    code {const char *fname;
+    code {//
+        const char *fname;
         char *tmp;
         bool result = false;
         if (file == NULL)
@@ -978,7 +996,8 @@ ZynAddSubFX}
         updatepanel();} {}
   }
   Function {refresh_master_ui()} {} {
-    code {ninseff = 0;
+    code {//
+        ninseff = 0;
         nsyseff = 0;
         npart = 0;
         npartcounter->do_callback();
@@ -1001,7 +1020,8 @@ ZynAddSubFX}
   }
   Function {record_activated(void)} {return_type void
   } {
-    code {musicClient->startRecord();
+    code {//
+        musicClient->startRecord();
         armed_indicator->hide();
         recording_indicator->show();
         on_air_armed ->hide();
@@ -1016,7 +1036,8 @@ ZynAddSubFX}
   }
   Function {showSysEfxUI(void)} {private
   } {
-    code {inseffectui->hide();
+    code {//
+      inseffectui->hide();
       inseffectui->deactivate();
       inseffectuigroup->deactivate();
       inseffectuigroup->hide();
@@ -1028,7 +1049,8 @@ ZynAddSubFX}
   }
   Function {showInsEfxUI(void)} {private
   } {
-    code {syseffectui->hide();
+    code {//
+      syseffectui->hide();
       syseffectui->deactivate();
       //->hide();
       syseffectuigroup->deactivate();

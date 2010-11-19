@@ -44,8 +44,7 @@ decl {\#include "Params/Presets.h"} {public
 class PresetsUI_ {} {
   Function {refresh()} {return_type {virtual void}
   } {}
-  Function {~PresetsUI_()} {return_type virtual
-  } {}
+  Function {~PresetsUI_()} {} {}
 } 
 
 class PresetsUI {} {
