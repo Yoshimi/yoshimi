@@ -1,4 +1,9 @@
 ----------------------------
+yoshimi-0.060.1
+
+drop --show-console from jack session restart command
+
+----------------------------
 yoshimi-0.060
 
 A minor advance on 0.0.58.1, it includes the Unison and Reverb updates by Paul

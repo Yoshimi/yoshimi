@@ -849,10 +849,10 @@ void Config::setJackSessionSave(int event_type, const char *session_dir, const c
 void Config::saveJackSession(void)
 {
     saveSessionData(jackSessionDir + jackSessionFile);
-    string cmd = string("yoshimi --show-console -U ") + jackSessionUuid
+    string cmd = string("yoshimi -U ") + jackSessionUuid
                  + string(" -u ${SESSION_DIR}") + jackSessionFile;
     Log("Jack session saved to " + jackSessionDir + jackSessionFile + ", restart command: " + cmd);
-   if (!musicClient->jacksessionReply(cmd))
+    if (!musicClient->jacksessionReply(cmd))
         Log("Error on jack session reply");
     jackSessionDir.clear();
     jackSessionUuid.clear();
