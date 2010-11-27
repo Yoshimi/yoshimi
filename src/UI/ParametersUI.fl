@@ -36,12 +36,12 @@ decl {\#include "MasterUI.h"} {global
 
 class ParametersUI {open
 } {
-  Function {make_window(void)} {open
+  Function {make_window(void)} {open return_type void
   } {
     Fl_Window Recent {
       label {Recent Parameters}
       callback {o->hide()} open
-      xywh {917 745 220 180} type Double labeltype NORMAL_LABEL labelfont 13 labelsize 12 align 0 visible
+      xywh {918 771 220 180} type Double labelfont 13 labelsize 12 align 0 visible
     } {
       Fl_Browser BrowseRecent {
         callback {if (o->value() > 0)
@@ -53,7 +53,7 @@ class ParametersUI {open
                 case FL_LEFT_MOUSE:
                     {
                         fle = Runtime.ParamsHistory.at(o->value() - 1).file;
-                        guiMaster->do_load_master(false, fle.c_str());
+                        guiMaster->loadXmz(false, fle.c_str());
                         guiMaster->setMasterLabel(Runtime.ParamsHistory.at(o->value() - 1).name);
                     }
                     break;
@@ -78,7 +78,8 @@ class ParametersUI {open
   } {
     code {make_window();} {}
   }
-  Function {loadRecent()} {} {
+  Function {loadRecent(void)} {open return_type void
+  } {
     code {BrowseRecent->clear();
         const int colwidths[] = { 64, 128, 0 };
         BrowseRecent->column_widths(colwidths);
@@ -92,19 +93,17 @@ class ParametersUI {open
         }
         BrowseRecent->set_changed();} {}
   }
-  Function {Show()} {open
+  Function {Show(void)} {open return_type void
   } {
-    code {
-      loadRecent();
-      Recent->show();} {selected
-    }
+    code {loadRecent();
+      Recent->show();} {}
   }
-  Function {Hide()} {open
+  Function {Hide(void)} {open selected return_type void
   } {
-    code {Recent->hide();} {selected
-    }
+    code {Recent->hide();} {}
   }
-  Function {~ParametersUI()} {} {
+  Function {~ParametersUI()} {open
+  } {
     code {Recent->hide();} {}
   }
 } 

@@ -34,20 +34,18 @@ PresetsStore presetsstore;
 PresetsStore::PresetsStore() :
     preset_extension(".xpz")
 {
-    clipboard.data = NULL;
-    clipboard.type.clear();
+//    clipboard.data.clear();
+//    clipboard.type.clear();
 
-    for (int i = 0; i < MAX_PRESETS; ++i)
-    {
-        presets[i].file.clear();
-        presets[i].name.clear();
-    }
+//    for (int i = 0; i < MAX_PRESETS; ++i)
+//    {
+//        presets[i].file.clear();
+//        presets[i].name.clear();
+//    }
 }
 
 PresetsStore::~PresetsStore()
 {
-    if (clipboard.data != NULL)
-        free(clipboard.data);
     clearpresets();
 }
 
@@ -56,14 +54,12 @@ PresetsStore::~PresetsStore()
 void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
 {
     clipboard.type = type;
-    if (clipboard.data != NULL)
-        free(clipboard.data);
     clipboard.data = xml->getXMLdata();
 }
 
 bool PresetsStore::pasteclipboard(XMLwrapper *xml)
 {
-    if (clipboard.data != NULL)
+    if (clipboard.data.size())
     {
         xml->putXMLdata(clipboard.data);
         return true;

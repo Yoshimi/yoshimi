@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified 2010
+    This file is somewhat derivative of ZynAddSubFX original code, modified 2010
 */
 
 #include <iostream>
@@ -34,8 +34,8 @@
 
 using namespace std;
 
-#include "Synth/BodyDisposal.h"
 #include "Sql/ProgramBanks.h"
+#include "Misc/BodyDisposal.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
@@ -80,6 +80,7 @@ static struct argp_option cmd_options[] = {
 
 
 Config::Config() :
+    BankSelectMethod(0),
     doRestoreState(false),
     doRestoreJackSession(false),
     Samplerate(48000),
@@ -133,8 +134,81 @@ bool Config::Setup(int argc, char **argv)
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
 
-    if (!loadConfig())
-        return false;
+    string homedir = string(getenv("HOME"));
+    if (homedir.empty() || !isDirectory(homedir))
+        homedir = string("/tmp");
+    ConfigDirectory = homedir + string("/.config/yoshimi");
+    if (!isDirectory(ConfigDirectory))
+    {
+        string cmd = string("mkdir -p ") + ConfigDirectory;
+        int chk  = system(cmd.c_str());
+        if (chk < 0)
+        {
+            Log("Create config directory " + ConfigDirectory + " failed, status " + asString(chk), true);
+            return false;
+        }
+    }
+
+    ConfigFile = ConfigDirectory + string("/yoshimi.config");
+    StateFile = ConfigDirectory + string("/yoshimi.state");
+    if (!isRegFile(ConfigFile))
+    {
+        Log("ConfigFile " + ConfigFile + " not found", true);
+        string oldConfigFile = string(getenv("HOME")) + string("/.yoshimiXML.cfg");
+        if (isRegFile(oldConfigFile))
+        {
+            Log("Copying old config file " + oldConfigFile + " to new location: " + ConfigFile);
+            FILE *oldfle = fopen (oldConfigFile.c_str(), "r");
+            FILE *newfle = fopen (ConfigFile.c_str(), "w");
+            if (oldfle != NULL && newfle != NULL)
+                while (!feof(oldfle))
+                    putc(getc(oldfle), newfle);
+            else
+                Log("Failed to copy old config file " + oldConfigFile + " to " + ConfigFile, true);
+            if (newfle)
+                fclose(newfle);
+            if (oldfle)
+                fclose(oldfle);
+        }
+    }
+    if (!isRegFile(ConfigFile))
+        Log("ConfigFile " + ConfigFile + " still not found, so using default settings");
+    else
+    {
+        boost::shared_ptr<XMLwrapper> xmltree = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+        if (!xmltree)
+            Log("loadConfig failed XMLwrapper allocation", true);
+        else
+        {
+            if (xmltree->loadXMLfile(ConfigFile) < 0)
+            {
+                Log("loadConfig loadXMLfile failed", true);
+                return false;
+            }
+            if (!extractConfigData(xmltree.get()))
+                return false;
+            Oscilsize = lrintf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
+            if (DefaultRecordDirectory.empty())
+                DefaultRecordDirectory = string("/tmp/");
+            if (DefaultRecordDirectory.at(DefaultRecordDirectory.size() - 1) != '/')
+                DefaultRecordDirectory += "/";
+            if (CurrentRecordDirectory.empty())
+                CurrentRecordDirectory = DefaultRecordDirectory;
+        }
+    }
+
+    DataDirectory = homedir + string("/.local/share/yoshimi");
+    if (!isDirectory(DataDirectory))
+    {
+        int chk;
+        string cmd = string("mkdir -p ") + DataDirectory;
+        if ((chk = system(cmd.c_str())) < 0)
+        {
+            Log("Failed to create data directory " + DataDirectory + ", status "
+                + asHexString(chk), true);
+            return false;
+        }
+    }
 
     switch (audioEngine)
     {
@@ -167,6 +241,7 @@ bool Config::Setup(int argc, char **argv)
     }
     if (!midiDevice.size())
         midiDevice = "default";
+
     loadCmdArgs(argc, argv);
     if (doRestoreState && !(StateFile.size() && isRegFile(StateFile)))
     {
@@ -176,7 +251,7 @@ bool Config::Setup(int argc, char **argv)
     if (jackSessionUuid.size() && jackSessionFile.size() && isRegFile(jackSessionFile))
     {
         Log(string("Restore jack session requested, uuid ") + jackSessionUuid
-            + string(", session file ") + jackSessionFile, true);
+            + string(", session file ") + jackSessionFile);
         doRestoreJackSession = true;
     }
     AntiDenormals(true);
@@ -250,92 +325,6 @@ string Config::historyFilename(int index)
 }
 
 
-bool Config::loadConfig(void)
-{
-    string cmd;
-    int chk;
-    string homedir = string(getenv("HOME"));
-    if (homedir.empty() || !isDirectory(homedir))
-        homedir = string("/tmp");
-    DataDir = homedir + string("/.local/share/yoshimi");
-    if (!isDirectory(DataDir))
-    {
-        cmd = string("mkdir -p ") + DataDir;
-        if ((chk = system(cmd.c_str())) < 0)
-        {
-            Log("Create data directory " + DataDir + " failed, status " + asString(chk), true);
-            DataDir.clear();
-            return false;
-        }
-    }
-    DbFile = DataDir + "/yoshimi.db";
-
-    ConfigDir = homedir + string("/.config/yoshimi");
-    if (!isDirectory(ConfigDir))
-    {
-        cmd = string("mkdir -p ") + ConfigDir;
-        if ((chk = system(cmd.c_str())) < 0)
-        {
-            Log("Create config directory " + ConfigDir + " failed, status " + asString(chk), true);
-            return false;
-        }
-    }
-
-    ConfigFile = ConfigDir + string("/yoshimi.config");
-    StateFile = ConfigDir + string("/yoshimi.state");
-    if (!isRegFile(ConfigFile))
-    {
-        Log("ConfigFile " + ConfigFile + " not found", true);
-        string oldConfigFile = string(getenv("HOME")) + string("/.yoshimiXML.cfg");
-        if (isRegFile(oldConfigFile))
-        {
-            Log("Copying old config file " + oldConfigFile + " to new location: " + ConfigFile, true);
-            FILE *oldfle = fopen (oldConfigFile.c_str(), "r");
-            FILE *newfle = fopen (ConfigFile.c_str(), "w");
-            if (oldfle != NULL && newfle != NULL)
-                while (!feof(oldfle))
-                    putc(getc(oldfle), newfle);
-            else
-                Log("Failed to copy old config file " + oldConfigFile + " to " + ConfigFile, true);
-            if (newfle)
-                fclose(newfle);
-            if (oldfle)
-                fclose(oldfle);
-        }
-    }
-    bool isok = true;
-    if (!isRegFile(ConfigFile))
-        Log("ConfigFile " + ConfigFile + " still not found, will use default settings", true);
-    else
-    {
-        XMLwrapper *xml = new XMLwrapper();
-        if (!xml)
-            Log("loadConfig failed XMLwrapper allocation", true);
-        else
-        {
-            if (xml->loadXMLfile(ConfigFile) < 0)
-            {
-                Log("loadConfig loadXMLfile failed", true);
-                return false;
-            }
-            isok = extractConfigData(xml);
-            if (isok)
-            {
-                Oscilsize = lrintf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
-                if (DefaultRecordDirectory.empty())
-                    DefaultRecordDirectory = string("/tmp/");
-                if (DefaultRecordDirectory.at(DefaultRecordDirectory.size() - 1) != '/')
-                    DefaultRecordDirectory += "/";
-                if (CurrentRecordDirectory.empty())
-                    CurrentRecordDirectory = DefaultRecordDirectory;
-            }
-            delete xml;
-        }
-    }
-    return isok;
-}
-
-
 bool Config::extractConfigData(XMLwrapper *xml)
 {
     if (!xml)
@@ -354,8 +343,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
                                         MAX_AD_HARMONICS * 2, 131072);
     BankUIAutoClose = xml->getpar("bank_window_auto_close",
                                                BankUIAutoClose, 0, 1);
-    currentBankDir = xml->getparstr("bank_current");
-    currentBank = xml->getpar("current_bank_number", currentBank, 0, 127);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
@@ -370,6 +357,10 @@ bool Config::extractConfigData(XMLwrapper *xml)
     // recorder settings
     DefaultRecordDirectory = xml->getparstr("DefaultRecordDirectory");
     Float32bitWavs = xml->getparbool("Float32bitWavs", false);
+    string datadir = xml->getparstr("DataDirectory");
+    if (!datadir.empty())
+        DataDirectory = datadir;
+    BankSelectMethod = xml->getpar("BankSelectMethod", BankSelectMethod, 0, 2);
 
     if (xml->enterbranch("XMZ_HISTORY"))
     {
@@ -387,7 +378,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
         }
         xml->exitbranch();
     }
-
     xml->exitbranch(); // CONFIGURATION
     return true;
 }
@@ -395,18 +385,17 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
 void Config::saveConfig(void)
 {
-    XMLwrapper *xmltree = new XMLwrapper();
+    boost::shared_ptr<XMLwrapper> xmltree = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
     if (!xmltree)
     {
         Log("saveConfig failed xmltree allocation");
         return;
     }
-    addConfigXML(xmltree);
+    addConfigXML(xmltree.get());
     if (xmltree->saveXMLfile(ConfigFile))
-        Log("Config saved to " + ConfigFile, true);
+        Log("Config saved to " + ConfigFile);
      else
         Log("Failed to save config to " + ConfigFile, true);
-    delete xmltree;
 }
 
 
@@ -421,8 +410,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("bank_window_auto_close", BankUIAutoClose);
 
     xmltree->addpar("check_pad_synth", CheckPADsynth);
-    xmltree->addparstr("bank_current", currentBankDir);
-    xmltree->addpar("current_bank_number", currentBank);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
     xmltree->addpar("interpolation", Interpolation);
 
@@ -431,6 +418,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addparstr("linux_jack_server", jackServer);
     xmltree->addparstr("DefaultRecordDirectory", DefaultRecordDirectory);
     xmltree->addpar("Float32bitWavs", Float32bitWavs);
+    xmltree->addparstr("DataDirectory", DataDirectory);
+    xmltree->addpar("BankSelectMethod", BankSelectMethod);
 
     // Parameters history
     if (ParamsHistory.size())
@@ -459,19 +448,19 @@ void Config::saveState(void)
 
 void Config::saveSessionData(string savefile)
 {
-    XMLwrapper *xmltree = new XMLwrapper();
+    boost::shared_ptr<XMLwrapper> xmltree = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
     if (!xmltree)
     {
         Log("saveState failed xmltree allocation", true);
         return;
     }
-    addConfigXML(xmltree);
-    addRuntimeXML(xmltree);
-    synth->add2XML(xmltree);
+    addConfigXML(xmltree.get());
+    addRuntimeXML(xmltree.get());
+    synth->add2XML(xmltree.get());
     if (xmltree->saveXMLfile(savefile))
-        Log("Session state saved to " + savefile, true);
+        Log("Session state saved to " + savefile);
     else
-        Log("Session state save to " + savefile + " failed", true);
+        Log("Session state save to " + savefile + " failed");
 }
 
 
@@ -483,30 +472,26 @@ bool Config::restoreState(SynthEngine *synth)
 
 bool Config::restoreSessionData(SynthEngine *synth, string sessionfile)
 {
-    XMLwrapper *xml = NULL;
-    bool ok = false;
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", true);
-        goto end_game;
+        return false;
     }
-    if (!(xml = new XMLwrapper()))
+
+    boost::shared_ptr<XMLwrapper> xmltree = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    if (!xmltree)
     {
         Log("Failed to init xmltree for restoreState");
-        goto end_game;
+        return false;
     }
-
-    if (xml->loadXMLfile(sessionfile) < 0)
+    if (xmltree->loadXMLfile(sessionfile) < 0)
     {
         Log("Failed to load xml file " + sessionfile);
-        goto end_game;
+        return false;
     }
-    ok = extractConfigData(xml) && extractRuntimeData(xml) && synth->getfromXML(xml);
-
-end_game:
-    if (xml)
-        delete xml;
-    return ok;
+    return extractConfigData(xmltree.get())
+           && extractRuntimeData(xmltree.get())
+           && synth->getfromXML(xmltree.get());
 }
 
 
@@ -588,8 +573,9 @@ void Config::StartupReport(void)
     Log("Oscilsize: " + asString(synth->oscilsize));
     Log("Samplerate: " + asString(synth->samplerate));
     Log("Buffersize: " + asString(synth->buffersize));
-    Log("Alleged minimum latency: " + asString(synth->buffersize) + " frames, "
-        + asString(synth->buffersize * 1000.0f / synth->samplerate) + " ms");
+    float period_milisecs =  1000.0f * synth->buffersize_f / synth->samplerate_f;
+    Log("Alleged minimum latency: "
+        + asString(synth->buffersize) + " frames, " + asString(period_milisecs) + " ms");
 }
 
 

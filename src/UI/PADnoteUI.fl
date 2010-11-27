@@ -1,11 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0107 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-}
+} 
+
 comment {PADNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -26,37 +27,36 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified 2010
 } {in_source in_header
-}
+} 
 
-decl {
-    \#include <FL/Fl_Box.H>
+decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
     \#include <FL/Fl_File_Chooser.H>
     \#include <FL/fl_draw.H>
-    \#include "Misc/MiscFuncs.h"
     \#include "PresetsUI.h"
     \#include "WidgetPDialUI.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
-    \#include "FilterUI.h"
-} {global}
+    \#include "FilterUI.h"} {global
+} 
 
-decl {
-    \#include "Params/PADnoteParameters.h"
+decl {\#include "Params/PADnoteParameters.h"
     \#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
-    \#include "OscilGenUI.h"
-} {public global}
+    \#include "OscilGenUI.h"} {public global
+} 
 
-class PADnoteHarmonicProfile {: {public Fl_Box}
+class PADnoteHarmonicProfile {open : {public Fl_Box}
 } {
   Function {PADnoteHarmonicProfile(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {pars=NULL;} {}
   }
-  Function {init(PADnoteParameters *pars)} {} {
+  Function {init(PADnoteParameters *pars)} {return_type void
+  } {
     code {this->pars=pars;} {}
   }
-  Function {draw()} {} {
+  Function {draw(void)} {return_type void
+  } {
     code {//
         int ox=x(),oy=y(),lx=w(),ly=h();
         if (!visible()) return;
@@ -110,22 +110,23 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         fl_line(ox+lx/2-rbw,oy,ox+lx/2-rbw,oy+ly-1);
         fl_line(ox+lx/2+rbw,oy,ox+lx/2+rbw,oy+ly-1);
     
-        fl_line_style(0);
-    } {}
+        fl_line_style(0);} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
 } 
 
-class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
+class PADnoteOvertonePosition {open : {public Fl_Box}
 } {
   Function {PADnoteOvertonePosition(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {pars=NULL;} {}
   }
-  Function {init(PADnoteParameters *pars)} {} {
+  Function {init(PADnoteParameters *pars)} {return_type void
+  } {
     code {this->pars=pars;} {}
   }
-  Function {draw()} {} {
+  Function {draw(void)} {return_type void
+  } {
     code {//
         if (!visible()) return;
         const int maxdb=60;
@@ -201,38 +202,42 @@ class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
                 else continue;
                 int yy=(int)(x*ly);
                 fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
-            }
-      } {}
+            }} {}
+  }
+  Function {dB2rap(float dB)} {open private return_type {inline float}
+  } {
+    code {return exp10f((dB) / 20.0f);} {}
+  }
+  Function {rap2dB(float rap)} {open private return_type {inline float}
+  } {
+    code {return 20.0f * log10f(rap);} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
 } 
 
-class PADnoteUI { : {public PresetsUI_, private SynthHelper}
+class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
 } {
-  Function {PADnoteUI(PADnoteParameters *parameters)} {
-  } {
-    code {
-        pars=parameters;
+  Function {PADnoteUI(PADnoteParameters *parameters)} {} {
+    code {pars=parameters;
         oscui=NULL;
         resui = new ResonanceUI(pars->resonance);
-        make_window();
-    } {}
+        make_window();} {}
   }
-  Function {make_window()} {
+  Function {make_window(void)} {open return_type void
   } {
     Fl_Window padnotewindow {
-      label {PAD synth Parameters}
-      xywh {281 302 535 450} type Double visible
+      label {PAD synth Parameters} open
+      xywh {144 194 535 450} type Double hide
     } {
       Fl_Tabs {} {
         callback {if (o->value()!=harmonicstructuregroup) applybutton->hide();
-	else applybutton->show();}
+	else applybutton->show();} open
         xywh {0 0 535 395}
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_BOX
+          label {Harmonic Structure} open
+          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Group bwprofilegroup {
             xywh {5 30 90 260} box ENGRAVED_BOX
@@ -415,8 +420,7 @@ cbwidget->do_callback();}
             callback {//
                 if (oscui != NULL)
                     delete oscui;   
-                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton);
-            }
+                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton);}
             xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Box cbwidget {
@@ -424,7 +428,7 @@ cbwidget->do_callback();}
             callback {overtonepos->redraw();
 applybutton->color(FL_RED);
 applybutton->redraw();}
-            xywh {125 135 205 20} align 16
+            xywh {125 135 205 20} labelsize 12 align 16
           }
           Fl_Button {} {
             label Resonance
@@ -456,7 +460,7 @@ cbwidget->do_callback();}
               callback {pars->Phrpos.type=o->value();
 overtonepos->redraw();
 cbwidget->do_callback();}
-              xywh {325 310 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
+              xywh {325 310 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Phrpos.type);}
             } {
               MenuItem {} {
@@ -520,7 +524,7 @@ cbwidget->do_callback();}
             label {Bandwidth Scale}
             callback {pars->Pbwscale=(int) o->value();
 cbwidget->do_callback();}
-            xywh {120 305 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
+            xywh {120 305 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 10
             code0 {o->value(pars->Pbwscale);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
           } {
@@ -566,7 +570,7 @@ cbwidget->do_callback();}
             label {Sample Size}
             callback {pars->Pquality.samplesize=(int) o->value();
 cbwidget->do_callback();}
-            xywh {375 190 115 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
+            xywh {375 190 115 20} down_box BORDER_BOX labelsize 10 align 5 textsize 10
             code0 {o->value(pars->Pquality.samplesize);}
           } {
             MenuItem {} {
@@ -602,7 +606,7 @@ cbwidget->do_callback();}
             label {smp/oct}
             callback {pars->Pquality.smpoct=(int) o->value();
 cbwidget->do_callback();}
-            xywh {430 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
+            xywh {430 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 10
             code0 {o->value(pars->Pquality.smpoct);}
           } {
             MenuItem {} {
@@ -638,7 +642,7 @@ cbwidget->do_callback();}
             label {no.oct}
             callback {pars->Pquality.oct=(int) o->value();
 cbwidget->do_callback();}
-            xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
+            xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 10
             code0 {o->value(pars->Pquality.oct);}
           } {
             MenuItem {} {
@@ -678,7 +682,7 @@ cbwidget->do_callback();}
             label base
             callback {pars->Pquality.basenote=(int) o->value();
 cbwidget->do_callback();}
-            xywh {375 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
+            xywh {375 155 50 20} down_box BORDER_BOX labelsize 10 align 5 textsize 10
             code0 {o->value(pars->Pquality.basenote);}
           } {
             MenuItem {} {
@@ -726,7 +730,7 @@ cbwidget->do_callback();}
           } {}
           Fl_Box {} {
             label {Profile of One Harmonic (Frequency Distribution)}
-            xywh {160 25 315 20}
+            xywh {160 25 315 20} labelsize 12
           }
           Fl_Choice spectrummode {
             label {Spectrum Mode}
@@ -749,7 +753,7 @@ if (pars->Pmode==0){
 };
 
 cbwidget->do_callback();}
-            xywh {220 305 90 20} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textsize 11
+            xywh {220 305 90 20} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textsize 10
             code0 {o->value(pars->Pmode);}
           } {
             MenuItem {} {
@@ -767,16 +771,16 @@ cbwidget->do_callback();}
           }
         }
         Fl_Group {} {
-          label {Envelopes&LFOs}
-          xywh {0 20 535 375} box ENGRAVED_BOX hide
+          label {Envelopes&LFOs} open
+          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12
         } {
           Fl_Group {} {
-            label FREQUENCY
+            label FREQUENCY open
             xywh {5 275 525 115} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 17
           } {
             Fl_Group freqenv {
               label {PADSynth - Frequency Envelope}
-              xywh {10 315 205 70} box FLAT_BOX color 51 align 144
+              xywh {10 315 205 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->FreqEnvelope);}
               class EnvelopeUI
             } {}
@@ -786,7 +790,7 @@ cbwidget->do_callback();}
 if (k<0) k+=16;
 pars->PCoarseDetune = k*1024+
    pars->PCoarseDetune%1024;}
-              tooltip Octave xywh {470 295 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+              tooltip Octave xywh {470 295 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 10
               code0 {int k=pars->PCoarseDetune/1024;}
               code1 {if (k>=8) k-=16;}
               code2 {o->value(k);}
@@ -797,9 +801,8 @@ pars->PCoarseDetune = k*1024+
                   int k=(int) o->value();
                   if (k < 0)
                       k += 1024;
-                  pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;
-              }
-              tooltip {Coarse Detune} xywh {455 365 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+                  pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;}
+              tooltip {Coarse Detune} xywh {455 365 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 10
               code0 {int k=pars->PCoarseDetune%1024;}
               code1 {if (k>=512) k-=1024;}
               code2 {o->value(k);}
@@ -807,7 +810,7 @@ pars->PCoarseDetune = k*1024+
             }
             Fl_Group freqlfo {
               label {Frequency LFO     }
-              xywh {215 315 230 70} box FLAT_BOX color 47 align 144
+              xywh {215 315 230 70} box FLAT_BOX color 47 labelsize 12 align 144
               code0 {o->init(pars->FreqLfo);}
               class LFOUI
             } {}
@@ -826,8 +829,7 @@ pars->PCoarseDetune = k*1024+
               label {Detune Type}
               callback {//
                   pars->PDetuneType = (int) o->value() + 1;
-                  detunevalueoutput->do_callback();
-              }
+                  detunevalueoutput->do_callback();}
               xywh {450 335 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->PDetuneType-1);}
@@ -840,8 +842,7 @@ pars->PCoarseDetune = k*1024+
                   if (x==0)
                       fixedfreqetdial->deactivate();
                   else
-                      fixedfreqetdial->activate();
-              }
+                      fixedfreqetdial->activate();}
               tooltip {set the base frequency to 440Hz} xywh {365 295 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->Pfixedfreq);}
             }
@@ -855,8 +856,8 @@ pars->PCoarseDetune = k*1024+
             }
           }
           Fl_Group {} {
-            label AMPLITUDE
-            xywh {5 25 240 250} box THIN_UP_FRAME labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 17
+            label AMPLITUDE open
+            xywh {5 25 240 250} box THIN_UP_FRAME labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 17
           } {
             Fl_Value_Slider volume {
               label Vol
@@ -907,45 +908,43 @@ pars->PCoarseDetune = k*1024+
             }
             Fl_Group ampenv {
               label {PADSynth - Amplitude Envelope}
-              xywh {10 95 205 70} box FLAT_BOX color 51 align 144
+              xywh {10 95 205 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->AmpEnvelope);}
               class EnvelopeUI
             } {}
             Fl_Group amplfo {
               label {Amplitude LFO     }
-              xywh {10 165 230 70} box FLAT_BOX color 47 align 144
+              xywh {10 165 230 70} box FLAT_BOX color 47 labelsize 12 align 144
               code0 {o->init(pars->AmpLfo);}
               class LFOUI
             } {}
             Fl_Check_Button stereo {
               label Stereo
-              callback {
-                  pars->PStereo =(o->value()) ? true : false;
-                  hprofile->redraw();
-              }
-              xywh {15 245 70 25} down_box DOWN_BOX
+              callback {pars->PStereo =(o->value()) ? true : false;
+                  hprofile->redraw();}
+              xywh {15 245 70 25} down_box DOWN_BOX labelsize 11
               code0 {o->value(pars->PStereo);}
             }
           }
           Fl_Group {} {
             label FILTER
-            xywh {245 25 285 250} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 17
+            xywh {245 25 285 250} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 12 align 17
           } {
             Fl_Group filterenv {
               label {PADSynth - Filter Envelope}
-              xywh {250 130 275 70} box FLAT_BOX color 51 align 144
+              xywh {250 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->FilterEnvelope);}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
               label {Filter LFO     }
-              xywh {250 200 230 70} box FLAT_BOX color 47 align 144
+              xywh {250 200 230 70} box FLAT_BOX color 47 labelsize 12 align 144
               code0 {o->init(pars->FilterLfo);}
               class LFOUI
             } {}
             Fl_Group filterui {
               label {PADsynth - Filter}
-              xywh {250 55 275 75} box FLAT_BOX color 50 align 144
+              xywh {250 55 275 75} box FLAT_BOX color 50 labelsize 12 align 144
               code0 {o->init(pars->GlobalFilter,&pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction);}
               class FilterUI
             } {}
@@ -966,29 +965,29 @@ pars->PCoarseDetune = k*1024+
             {
                 resui->applybutton->color(FL_GRAY);
                 resui->applybutton->redraw();
-            }
-        }
-        xywh {45 405 185 40} box THIN_UP_BOX labelfont 1 labelsize 16
+            }}
+        xywh {322 410 129 25} box THIN_UP_BOX labelfont 1 labelsize 13
         code0 {o->color(FL_RED);}
       }
       Fl_Button {} {
         label Close
         callback {padnotewindow->hide();}
-        xywh {320 405 175 40} box THIN_UP_BOX labelsize 17
+        xywh {473 410 50 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label C
         callback {presetsui->copy(pars);}
-        xywh {240 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {240 415 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {presetsui->paste(pars,this);}
-        xywh {270 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {270 415 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
   }
-  Function {refresh(void)} {} {
+  Function {refresh(void)} {selected return_type void
+  } {
     code {//
         volume->value(pars->PVolume);
         vsns->value(pars->PAmpVelocityScaleFunction);
@@ -1079,8 +1078,7 @@ pars->PCoarseDetune = k*1024+
         osc->redraw();
         pars->applyparameters(false);
         applybutton->color(FL_GRAY);
-        applybutton->parent()->redraw();
-    } {}
+        applybutton->parent()->redraw();} {}
   }
   Function {~PADnoteUI()} {} {
     code {//
@@ -1088,8 +1086,7 @@ pars->PCoarseDetune = k*1024+
         delete resui;
 
         padnotewindow->hide();
-        delete padnotewindow;
-    } {}
+        delete padnotewindow;} {}
   }
   decl {PADnoteParameters *pars;} {public
   }

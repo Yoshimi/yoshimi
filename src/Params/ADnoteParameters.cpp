@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #include <cmath>
@@ -27,18 +27,20 @@
 
 using namespace std;
 
+#include "Misc/Config.h"
+#include "Misc/BodyDisposal.h"
 #include "Params/ADnoteParameters.h"
 
 int ADnote_unison_sizes[] = {
-    //1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0
       1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 0
 };
 
 
-ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
+ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) :
+    Presets(),
+    fft(fft_)
 {
     setpresettype("Padsyth");
-    fft = fft_;
 
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
@@ -49,7 +51,7 @@ ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
     GlobalPar.AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1);
 
     GlobalPar.GlobalFilter = new FilterParams(2, 94, 40);
-    GlobalPar.FilterEnvelope=new EnvelopeParams(0, 1);
+    GlobalPar.FilterEnvelope = new EnvelopeParams(0, 1);
     GlobalPar.FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     GlobalPar.FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2);
     GlobalPar.Reson = new Resonance();
@@ -210,34 +212,34 @@ float ADnoteParameters::getUnisonFrequencySpreadCents(int nvoice)
 // Kill the voice
 void ADnoteParameters::killVoice(int nvoice)
 {
-    delete (VoicePar[nvoice].OscilSmp);
-    delete (VoicePar[nvoice].FMSmp);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].OscilSmp);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FMSmp);
 
-    delete (VoicePar[nvoice].AmpEnvelope);
-    delete (VoicePar[nvoice].AmpLfo);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].AmpEnvelope);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].AmpLfo);
 
-    delete (VoicePar[nvoice].FreqEnvelope);
-    delete (VoicePar[nvoice].FreqLfo);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FreqEnvelope);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FreqLfo);
 
-    delete (VoicePar[nvoice].VoiceFilter);
-    delete (VoicePar[nvoice].FilterEnvelope);
-    delete (VoicePar[nvoice].FilterLfo);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].VoiceFilter);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FilterEnvelope);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FilterLfo);
 
-    delete (VoicePar[nvoice].FMFreqEnvelope);
-    delete (VoicePar[nvoice].FMAmpEnvelope);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FMFreqEnvelope);
+    Runtime.deadObjects->addBody(VoicePar[nvoice].FMAmpEnvelope);
 }
+
 
 ADnoteParameters::~ADnoteParameters()
 {
-    delete(GlobalPar.FreqEnvelope);
-    delete(GlobalPar.FreqLfo);
-    delete(GlobalPar.AmpEnvelope);
-    delete(GlobalPar.AmpLfo);
-    delete(GlobalPar.GlobalFilter);
-    delete(GlobalPar.FilterEnvelope);
-    delete(GlobalPar.FilterLfo);
-    delete(GlobalPar.Reson);
-
+    Runtime.deadObjects->addBody(GlobalPar.FreqEnvelope);
+    Runtime.deadObjects->addBody(GlobalPar.FreqLfo);
+    Runtime.deadObjects->addBody(GlobalPar.AmpEnvelope);
+    Runtime.deadObjects->addBody(GlobalPar.AmpLfo);
+    Runtime.deadObjects->addBody(GlobalPar.GlobalFilter);
+    Runtime.deadObjects->addBody(GlobalPar.FilterEnvelope);
+    Runtime.deadObjects->addBody(GlobalPar.FilterLfo);
+    Runtime.deadObjects->addBody(GlobalPar.Reson);
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         killVoice(nvoice);
 }

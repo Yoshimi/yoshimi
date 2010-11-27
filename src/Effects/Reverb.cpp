@@ -546,5 +546,5 @@ unsigned char Reverb::getpar(int npar)
         case 12: return Pbandwidth;
         default: break;
     }
-    return 0; // in case of bogus "parameter"
+    return 0;
 }

@@ -72,19 +72,21 @@ typedef enum {
     C_generalpurpose2 =      17,
     C_generalpurpose3 =      18,
     C_generalpurpose4 =      19,
-    C_undefined20 =          20,
-    C_undefined21 =          21,
-    C_undefined22 =          22,
-    C_undefined23 =          23,
-    C_undefined24 =          24,
-    C_undefined25 =          25,
-    C_undefined26 =          26,
-    C_undefined27 =          27,
-    C_undefined28 =          28,
-    C_undefined29 =          29,
-    C_undefined30 =          30,
-    C_undefined31 =          31,
-    C_bankselectlsb =        32, // active?
+
+    C_controller20Msb =      20, // active => ADsynth LFO frequency
+    C_controller21Msb =      21, // active => ADsynth LFO depth
+    C_controller22Msb =      22,
+    C_controller23Msb =      23,
+    C_controller24Msb =      24,
+    C_controller25Msb =      25,
+    C_controller26Msb =      26,
+    C_controller27Msb =      27,
+    C_controller28Msb =      28,
+    C_controller29Msb =      29,
+    C_controller30Msb =      30,
+    C_controller31Msb =      31,
+
+    C_bankselectlsb =        32, // active
     C_modwheellsb =          33,
     C_breathcontrollerlsb =  34,
     C_undefined3lsb =        35,
@@ -100,7 +102,20 @@ typedef enum {
     C_effectcontrol2lsb =    45,
     C_undefined14lsb =       46,
     C_undefined15lsb =       47,
-    // ...
+
+    C_controller20Lsb =      52,
+    C_controller21Lsb =      53,
+    C_controller22Lsb =      54,
+    C_controller23Lsb =      55,
+    C_controller24Lsb =      56,
+    C_controller25Lsb =      57,
+    C_controller26Lsb =      58,
+    C_controller27Lsb =      59,
+    C_controller28Lsb =      60,
+    C_controller29Lsb =      61,
+    C_controller30Lsb =      62,
+    C_controller31Lsb =      63,
+
     C_sustain =              64, // active
     C_portamento =           65, // active
     C_sostenuto =            66,
@@ -128,6 +143,11 @@ typedef enum {
     C_undefined88 =          88,
     C_undefined89 =          89,
     C_undefined90 =          90,
+    C_effects1Depth =        91, // active => part effect 1 volume
+    C_effects2Depth =        92, // active => part effect 2 volume
+    C_effects3Depth =        93, // active => part effect 3 volume
+    C_effects4Depth =        94,
+    C_effects5Depth =        95,
     C_undefined102 =         102,
     C_undefined103 =         103,
     C_undefined104 =         104,

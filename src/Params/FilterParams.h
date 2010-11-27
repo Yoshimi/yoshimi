@@ -18,18 +18,20 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of  original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef FILTER_PARAMS_H
 #define FILTER_PARAMS_H
 
-#include "Misc/MiscFuncs.h"
+#include <cmath>
+
 #include "Params/Presets.h"
+#include "Misc/Carcass.h"
 
 class XMLwrapper;
 
-class FilterParams : public Presets, private MiscFuncs
+class FilterParams : public Presets, public Carcass
 {
     public:
         FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_);
@@ -96,6 +98,7 @@ class FilterParams : public Presets, private MiscFuncs
 
     private:
         void defaults(int n);
+        inline float rap2dB(float rap) { return 20.0f * log10f(rap); }
 
         // stored default parameters
         unsigned char Dtype;

@@ -24,7 +24,7 @@
 #ifndef PAD_NOTE_H
 #define PAD_NOTE_H
 
-#include "Synth/Carcass.h"
+#include "Misc/Carcass.h"
 #include "Misc/SynthHelper.h"
 #include "Synth/LegatoTypes.h"
 

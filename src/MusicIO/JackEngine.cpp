@@ -333,7 +333,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
 
 int JackEngine::_xrunCallback(void *arg)
 {
-    Runtime.Log("Jack xruns");
+    Runtime.Log("Jack xrun");
     return 0;
 }
 

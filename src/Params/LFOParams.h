@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2009
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #ifndef LFO_PARAMS_H
@@ -26,13 +26,14 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
+#include "Misc/Carcass.h"
 
-class LFOParams : public Presets
+class LFOParams : public Presets, public Carcass
 {
     public:
         LFOParams(char Pfreq_, char Pintensity_, char Pstartphase_, char PLFOtype_,
                   char Prandomness_, char Pdelay_, char Pcontinous, char fel_);
-        ~LFOParams() { };
+        ~LFOParams() { }
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);

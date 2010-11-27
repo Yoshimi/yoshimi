@@ -60,7 +60,7 @@ class PresetsStore : MiscFuncs
         void clearpresets(void);
     
         struct {
-            char *data;
+            string data;
             string type;
         } clipboard;
     

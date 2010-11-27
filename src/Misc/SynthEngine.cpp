@@ -19,10 +19,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified 2010
+    This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #include "MasterUI.h"
 #include "Sql/ProgramBanks.h"
@@ -53,7 +54,7 @@ SynthEngine::SynthEngine() :
     tmpmixr(NULL),
     midiBankLSB(-1),
     midiBankMSB(-1),
-    lockwait(boost::posix_time::microsec(666u))
+    synthMuted(0)
 {
     ctl = new Controller();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -93,7 +94,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     if (initstate_r(samplerate + buffersize + oscilsize, random_state,
                     sizeof(random_state), &random_buf))
-        Runtime.Log("SynthEngine Init failed on general randomness");
+        Runtime.Log("SynthEngine randomness fails, outcome unpredictable!", true);
 
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate / 2;
@@ -101,6 +102,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
+    lockgrace = boost::posix_time::microsec(roundf(333000.0f * synth->buffersize_f / synth->samplerate_f));
+                                                  // 1/3 period time?
 
     if (oscilsize < (buffersize / 2))
     {
@@ -108,7 +111,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
                     + asString(oscilsize) + " -> " + asString(buffersize / 2));
         oscilsize = buffersize / 2;
     }
-    
+
     if ((fft = new FFTwrapper(oscilsize)) == NULL)
     {
         Runtime.Log("SynthEngine failed to allocate fft");
@@ -156,7 +159,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
     }
-    defaults();
+    Defaults();
     if (Runtime.doRestoreJackSession)
     {
         if (!Runtime.restoreJsession(this))
@@ -179,7 +182,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         {
             if (loadXML(Runtime.paramsLoad) >= 0)
             {
-                applyparameters();
                 Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
@@ -235,8 +237,9 @@ bail_out:
 }
 
 
-void SynthEngine::defaults(void)
+void SynthEngine::Defaults(void)
 {
+    bool wasmuted = (__sync_fetch_and_or(&synthMuted, 0xFF)) ? true : false;
     setPvolume(90);
     setPkeyshift(64);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -260,7 +263,9 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
-    ShutUp();
+    cleanUp();
+    if (!wasmuted)
+        __sync_and_and_fetch (&synthMuted, 0);
 }
 
 
@@ -311,37 +316,51 @@ void SynthEngine::setController(unsigned char ctrltype, unsigned char channel, u
 {
     switch (ctrltype)
     {
-        case C_modwheel:             //   1
-        case C_volume:               //   7
-        case C_pan:                  //  10
-        case C_expression:           //  11
-        case C_sustain:              //  64
-        case C_portamento:           //  65
-        case C_filterq:              //  71
-        case C_filtercutoff:         //  74
-        case C_soundcontroller6:     //  75 bandwidth
-        case C_soundcontroller7:     //  76 fmamp
-        case C_soundcontroller8:     //  77 resonance center
-        case C_soundcontroller9:     //  78 resonance bandwidth
-        case C_allsoundsoff:         // 120
-        case C_resetallcontrollers:  // 121
-        case C_allnotesoff:          // 123
+        /**
+        case C_modwheel:            //   1
+        case C_volume:              //   7
+        case C_pan:                 //  10
+        case C_expression:          //  11
+        case C_controller20Msb:     //  20 LFO frequency
+        case C_controller21Msb:     //  21 LFO depth
+        case C_sustain:             //  64
+        case C_portamento:          //  65
+        case C_filterq:             //  71
+        case C_filtercutoff:        //  74
+        case C_soundcontroller6:    //  75 bandwidth
+        case C_soundcontroller7:    //  76 fmamp
+        case C_soundcontroller8:    //  77 resonance center
+        case C_soundcontroller9:    //  78 resonance bandwidth
+        case C_effects1Depth:       //  91 part effect 1 volume control
+        case C_effects2Depth:       //  92 part effect 2 volume control
+        case C_effects3Depth:       //  93 part effect 3 volume control
+        case C_allsoundsoff:        // 120
+        case C_resetallcontrollers: // 121
+        case C_allnotesoff:         // 123
             for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-                if (part[npart]->Penabled && channel == part[npart]->midichannel)
+                // send controller to all active parts assigned to the channel
+                if (channel == part[npart]->midichannel
+                    && part[npart]->Penabled)
                     part[npart]->SetController(ctrltype, val);
-                    // Send the controller to all active parts assigned to the channel
             break;
-
+        **/
+            
         case C_bankselectmsb:
+            cerr << "SynthEngine::setController midiBankMSB " << (int)val << endl;
             midiBankMSB = val;
             break;
 
         case C_bankselectlsb:
+            cerr << "SynthEngine::setController midiBankLSB " << (int)val << endl;
             midiBankLSB = val;
             break;
 
         default:
-            Runtime.Log(string("Ignoring midi control change type ") + asString(ctrltype), true);
+            for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+                // send controller to all active parts assigned to the channel
+                if (channel == part[npart]->midichannel
+                    && part[npart]->Penabled)
+                    part[npart]->SetController(ctrltype, val);
             break;
     }
 
@@ -360,8 +379,6 @@ void SynthEngine::setController(unsigned char ctrltype, unsigned char channel, u
 void SynthEngine::applyMidi(unsigned char* bytes)
 {
     unsigned char channel = bytes[0] & 0x0f;
-    char selectbank = -1;
-
     switch (bytes[0] & 0xf0)
     {
         case MSG_noteoff: // 128
@@ -377,15 +394,15 @@ void SynthEngine::applyMidi(unsigned char* bytes)
             break;
 
         case MSG_program_change: // 224
-            selectbank = (midiBankLSB < 0) ? midiBankMSB : midiBankLSB;
-            if (selectbank < 0)
-                Runtime.Log("Invalid bank selection for midi program");
-            else
             {
-                if (!part[channel]->loadProgram(selectbank, bytes[1]))
-                    Runtime.Log("Midi program change failed");
+                char bankselect = (midiBankLSB < 0) ? midiBankMSB : midiBankLSB;
+                bankselect = (bankselect < 0) ? 0 : bankselect;
+                for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+                    if (channel == part[npart]->midichannel
+                        && part[npart]->Penabled
+                        && !part[channel]->loadProgram(bankselect, bytes[1]))
+                            Runtime.Log("Midi program change failed");
             }
-            midiBankMSB = midiBankLSB = -1;
             break;
 
         case MSG_pitchwheel_control: // 224
@@ -403,21 +420,18 @@ void SynthEngine::applyMidi(unsigned char* bytes)
 // Enable/Disable a part
 void SynthEngine::partOnOff(int npart, int what)
 {
-    if (npart >= NUM_MIDI_PARTS)
-        return;
     fakepeakpart[npart] = 0;
-    lockSharable();
     if (what)
         part[npart]->Penabled = 1;
     else
-    {   // disabled part
-        part[npart]->Penabled = 0;
-        part[npart]->cleanup();
+    {
+        part[npart]->partDisable();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
+            {
                 insefx[nefx]->cleanup();
+            }
     }
-    unlockSharable();
 }
 
 
@@ -442,12 +456,13 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 {
     memset(outl, 0, bufferbytes);
     memset(outr, 0, bufferbytes);
-    // Compute part samples and store them npart]->partoutl, partoutr
+    if (synthMuted)
+        return;
+    // Compute part samples in part=>partoutl, partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Active())
         {
-            //if (trylockExclusive())
             if (timedlockExclusive())
             {
                 part[npart]->ComputePartSmps();
@@ -455,6 +470,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
             }
             else
             {
+                cerr << "skips ComputePartSmps()" << endl;
                 memset(part[npart]->partoutl, 0, bufferbytes);
                 memset(part[npart]->partoutr, 0, bufferbytes);
             }
@@ -567,9 +583,9 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         if (Pinsparts[nefx] == -2)
         {
-            lockSharable();
+//            lockSharable();
             insefx[nefx]->out(outl, outr);
-            unlockSharable();
+//            unlockSharable();
         }
 
     meterMutex.lock();
@@ -609,9 +625,9 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         }
     }
     if (shutup)
-        ShutUp();
+        cleanUp();
     synthperiodStartFrame += buffersize;
-    LFOParams::time++; // update the LFO's time
+    ++LFOParams::time; // update the LFO's time
 
     meterMutex.lock();
     if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;
@@ -681,8 +697,9 @@ void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
 
 
 // Panic! (Clean up all parts and effects)
-void SynthEngine::ShutUp(void)
+void SynthEngine::cleanUp(void)
 {
+    bool wasmuted = (__sync_fetch_and_or(&synthMuted, 0xFF)) ? true : false;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
@@ -694,6 +711,8 @@ void SynthEngine::ShutUp(void)
         sysefx[nefx]->cleanup();
     vuresetpeaks();
     shutup = false;
+    if (!wasmuted)
+        __sync_and_and_fetch(&synthMuted, 0);
 }
 
 
@@ -711,87 +730,6 @@ void SynthEngine::vuresetpeaks(void)
     meterMutex.unlock();
 }
 
-
-/**
-bool SynthEngine::loadProgram(int partnum, unsigned char bk, unsigned char prog)
-{
-    return part[partnum]->loadProgram(bk, prog);
-}
-**/
-
-
-void SynthEngine::lockUpgradable(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex. lock_upgradable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::lockUpgradable throws exception!");
-    }
-}
-
-
-void SynthEngine::unlockUpgradable(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.unlock_upgradable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::unlockUpgradable throws exception!");
-    }
-}
-
-
-void SynthEngine::upgradeLockExclusive(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.unlock_upgradable_and_lock(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::lockUpgradeExclusive throws exception!");
-    }
-}
-
-
-void SynthEngine::downgradeLockUpgradable(void)
-{
-    using namespace boost::interprocess;
-    try { synthMutex.unlock_and_lock_upgradable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::lockUpgradeExclusive throws exception!");
-    }
-}
-
-
-bool SynthEngine::timedlockUpgradable(void)
-{
-    bool ok = false;
-    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time() + lockwait;
-    using namespace boost::interprocess;
-    try { ok = synthMutex.timed_lock_upgradable(endtime); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::timedlockUpgradable throws exception!");
-        ok = false;
-    }
-    return ok;
-}
-
-
-bool SynthEngine::timedUpgradeLockExclusive(void)
-{
-    bool ok = false;
-    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time() + lockwait;
-    using namespace boost::interprocess;
-    try { ok = synthMutex.timed_lock_upgradable(endtime); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::timedlockUpgradable throws exception!");
-        ok = false;
-    }
-    return ok;
-}
 
 
 void SynthEngine::lockExclusive(void)
@@ -832,7 +770,7 @@ bool SynthEngine::trylockExclusive(void)
 bool SynthEngine::timedlockExclusive(void)
 {
     bool ok = false;
-    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time() + lockwait;
+    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time() + lockgrace;
     using namespace boost::interprocess;
     try { ok = synthMutex.timed_lock(endtime); }
     catch (interprocess_exception &ex)
@@ -865,45 +803,9 @@ void SynthEngine::unlockSharable(void)
     }
 }
 
-
-bool SynthEngine::trylockSharable(void)
-{
-    bool ok = false;
-    using namespace boost::interprocess;
-    try {ok = synthMutex.try_lock_sharable(); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::trylockSharable throws exception!");
-    }
-    return ok;
-}
-
-
-bool SynthEngine::timedlockSharable(void)
-{
-    bool ok = false;
-    boost::posix_time::ptime endtime = boost::posix_time::microsec_clock::local_time() + lockwait;
-    using namespace boost::interprocess;
-    try { ok = synthMutex.timed_lock_sharable(endtime); }
-    catch (interprocess_exception &ex)
-    {
-        Runtime.Log("SynthEngine::timedlockSharable throws exception!");
-        ok = false;
-    }
-    return ok;
-}
-
-
-void SynthEngine::applyparameters(void)
-{
-    ShutUp();
-}
-
-
 void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
-    lockSharable();
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
 
@@ -951,79 +853,53 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 
         xml->beginbranch("EFFECT");
         insefx[nefx]->add2XML(xml);
-        xml->endbranch();
-        xml->endbranch();
+        xml->endbranch(); // EFFECT
+        xml->endbranch(); // INSERTION_EFFECT
     }
-    xml->endbranch(); // INSERTION_EFFECTS
-    unlockSharable();
-    xml->endbranch(); // MASTER
-}
-
-
-int SynthEngine::getalldata(char **data)
-{
-    XMLwrapper *xml = new XMLwrapper();
-    add2XML(xml);
-    *data = xml->getXMLdata();
-    delete xml;
-    return strlen(*data) + 1;
+    xml->endbranch();     // INSERTION_EFFECTS
+    xml->endbranch();     // MASTER
 }
 
 
 void SynthEngine::putalldata(char *data, int size)
 {
-    XMLwrapper *xml = new XMLwrapper();
-    if (!xml->putXMLdata(data))
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    if (!xmlwrap->putXMLdata(data))
     {
         Runtime.Log("SynthEngine putXMLdata failed");
-        delete xml;
         return;
     }
-    if (xml->enterbranch("MASTER"))
+    if (xmlwrap->enterbranch("MASTER"))
     {
-        lockSharable();
-        getfromXML(xml);
-        unlockSharable();
-        xml->exitbranch();
+        getfromXML(xmlwrap.get());
+        xmlwrap->exitbranch();
     }
     else
         Runtime.Log("Master putAllData failed to enter MASTER branch");
-    delete xml;
 }
 
 
 bool SynthEngine::saveXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
-    add2XML(xml);
-    bool result = xml->saveXMLfile(filename);
-    delete xml;
-    return result;
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    add2XML(xmlwrap.get());
+    return xmlwrap->saveXMLfile(filename);
 }
 
 
 bool SynthEngine::loadXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
-    if (NULL == xml)
-    {
-        Runtime.Log("failed to init xml tree");
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    if (!xmlwrap->loadXMLfile(filename))
         return false;
-    }
-    if (!xml->loadXMLfile(filename))
-    {
-        delete xml;
-        return false;
-    }
-    defaults();
-    bool isok = getfromXML(xml);
-    delete xml;
-    return isok;
+    return getfromXML(xmlwrap.get());
 }
 
 
 bool SynthEngine::getfromXML(XMLwrapper *xml)
 {
+    __sync_or_and_fetch (&synthMuted, 0xFF);
+    Defaults();
     if (!xml->enterbranch("MASTER"))
     {
         Runtime.Log("SynthEngine getfromXML, no MASTER branch");
@@ -1034,12 +910,11 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
 
     part[0]->Penabled = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if (!xml->enterbranch("PART", npart))
-            continue;
-        part[npart]->getfromXML(xml);
-        xml->exitbranch();
-    }
+        if (xml->enterbranch("PART", npart))
+        {
+            part[npart]->getfromXML(xml);
+            xml->exitbranch();
+        }
 
     if (xml->enterbranch("MICROTONAL"))
     {
@@ -1097,5 +972,6 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
     xml->exitbranch(); // MASTER
+    __sync_and_and_fetch (&synthMuted, 0);
     return true;
 }

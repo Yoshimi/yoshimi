@@ -37,10 +37,7 @@ enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD };
 
 extern int ADnote_unison_sizes[];
 
-/*****************************************************************/
-/*                    GLOBAL PARAMETERS                          */
-/*****************************************************************/
-
+// Global parameters
 struct ADnoteGlobalParam {
     unsigned char PStereo;
 

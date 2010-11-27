@@ -1,11 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0105 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
-}
+} 
+
 comment {SubNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -26,7 +27,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public
 } 
@@ -46,9 +47,9 @@ decl {\#include "Misc/SynthHelper.h"} {public
 decl {\#include "Params/SUBnoteParameters.h"} {public
 } 
 
-class SUBnoteharmonic {: {public Fl_Group}
+class SUBnoteharmonic {open : {public Fl_Group}
 } {
-  Function {make_window()} {private
+  Function {make_window(void)} {private return_type void
   } {
     Fl_Window harmonic {
       xywh {329 403 90 225} type Double hide
@@ -61,7 +62,7 @@ if (Fl::event_button1()) x=127-(int)o->value();
 pars->Phmag[n]=x;
 if (pars->Phmag[n]==0) o->selection_color(0);
     else o->selection_color(222);}
-        tooltip {harmonic's magnitude} xywh {0 15 10 115} type {Vert Knob} box FLAT_BOX selection_color 222 labelcolor 0 maximum 127 step 1 value 127
+        tooltip {harmonic's magnitude} xywh {0 15 10 115} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
         code0 {o->value(127-pars->Phmag[n]);}
         code1 {if (pars->Phmag[n]==0) o->selection_color(0);}
       }
@@ -92,18 +93,19 @@ pars->Phrelbw[n]=x;}
   Function {SUBnoteharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
   }
-  Function {init(SUBnoteParameters *pars_,int n_)} {} {
+  Function {init(SUBnoteParameters *pars_,int n_)} {return_type void
+  } {
     code {pars=pars_;
 n=n_;
 make_window();
 harmonic->show();
 end();} {}
   }
-  Function {refresh()} {} {
+  Function {refresh(void)} {return_type void
+  } {
     code {mag->value(127-pars->Phmag[n]);
 if (pars->Phmag[n]==0) mag->selection_color(0);
-bw->value(127-pars->Phrelbw[n]);} {selected
-    }
+bw->value(127-pars->Phrelbw[n]);} {}
   }
   Function {~SUBnoteharmonic()} {} {
     code {harmonic->hide();
@@ -114,9 +116,10 @@ hide();
   decl {int n;} {}
 } 
 
-class SUBnoteUI {: {public PresetsUI_, SynthHelper}
+class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {} {
+  Function {make_window(void)} {return_type void
+  } {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
       xywh {26 214 735 390} type Double hide
@@ -179,23 +182,23 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           xywh {585 340 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Phmagtype);}
         } {
-          menuitem {} {
+          MenuItem {} {
             label Linear
             xywh {20 20 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label {-40dB}
             xywh {30 30 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label {-60dB}
             xywh {40 40 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label {-80dB}
             xywh {50 50 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label {-100dB}
             xywh {60 60 100 20} labelfont 1 labelsize 11
           }
@@ -206,15 +209,15 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
           xywh {670 340 50 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Pstart);}
         } {
-          menuitem {} {
+          MenuItem {} {
             label Zero
             xywh {30 30 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label RND
             xywh {40 40 100 20} labelfont 1 labelsize 11
           }
-          menuitem {} {
+          MenuItem {} {
             label {Max.}
             xywh {50 50 100 20} labelfont 1 labelsize 11
           }
@@ -393,7 +396,8 @@ globalfiltergroup->redraw();}
       }
     }
   }
-  Function {refresh()} {} {
+  Function {refresh(void)} {selected return_type void
+  } {
     code {for (int i=0;i<MAX_SUB_HARMONICS;i++) h[i]->refresh();
 vol->value(pars->PVolume);
 vsns->value(pars->PAmpVelocityScaleFunction);

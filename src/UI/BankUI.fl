@@ -8,8 +8,7 @@ comment {BankUI.h} {not_in_source in_header
 comment {BankUI.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
 
@@ -27,7 +26,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/Fl_Spinner.H>
@@ -54,7 +53,8 @@ class BankProcess_ {open
 
 class BankSlot {open : {public Fl_Button, BankProcess_}
 } {
-  Function {BankSlot(int x,int y, int w, int h, const char *label=0):Fl_Button(x,y,w,h,label)} {} {
+  Function {BankSlot(int x,int y, int w, int h, const char *label=0):Fl_Button(x,y,w,h,label)} {return_type void
+  } {
     code {//
         mousebutton = NULL;
         whatslot = NULL;
@@ -110,7 +110,8 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
             (bp->*fnc)();
         return tmp;} {}
   }
-  Function {init(int nslot_, int *mousebutton_, int *whatslot_, void (BankProcess_:: *fnc_)(void), BankProcess_ *bp_, Bank *bank_, int *nselected_)} {} {
+  Function {init(int nslot_, int *mousebutton_, int *whatslot_, void (BankProcess_:: *fnc_)(void), BankProcess_ *bp_, Bank *bank_, int *nselected_)} {return_type void
+  } {
     code {//
         nslot = nslot_;
         mousebutton = mousebutton_;
@@ -126,7 +127,8 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         highlight = 0;
         refresh();} {}
   }
-  Function {refresh()} {} {
+  Function {refresh()} {open return_type void
+  } {
     code {//
         if (bank->emptyslot(nslot))
         {
@@ -148,21 +150,21 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
 
 class BankUI {open : {public BankProcess_, private MiscFuncs}
 } {
-  Function {make_window()} {open
+  Function {make_window()} {return_type void
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {593 248 785 575} type Double
+      xywh {594 274 785 575} type Double hide
       code0 {o->label(bank->bankfiletitle.c_str());}
       code1 {if (!bank->bankfiletitle.size())
-            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");} visible
+            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
     } {
       Fl_Button {} {
         label Close
         callback {bankuiwindow->hide();}
         xywh {705 546 70 24} box THIN_UP_BOX labelsize 12
       }
-      Fl_Group theInstruments {open selected
+      Fl_Group theInstruments {
         xywh {5 34 772 491} box ENGRAVED_FRAME labelsize 12
       } {
         Fl_Pack {} {
@@ -340,7 +342,7 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
   } {
     code {bankuiwindow->hide(); delete(bankuiwindow);} {}
   }
-  Function {Show()} {open
+  Function {Show()} {open return_type void
   } {
     code {//
         bankuiwindow->show();
@@ -349,10 +351,11 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
         removeselection();
         modeselect->show();} {}
   }
-  Function {Hide()} {} {
+  Function {Hide()} {return_type void
+  } {
     code {bankuiwindow->hide();} {}
   }
-  Function {init(Fl_Spinner *cbwig_)} {open
+  Function {init(Fl_Spinner *cbwig_)} {open return_type void
   } {
     code {cbwig = cbwig_;rescan_for_banks();} {}
   }
@@ -376,10 +379,10 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
                 bank->setname(slot, string(tmp), -1);
             bs[slot]->refresh();
             // Re-read from slot
-            synth->lockExclusive();
+            synth->lockSharable();
             bank->loadfromslot(slot, synth->part[*npart]);
             synth->part[*npart]->applyparameters(true);
-            synth->unlockExclusive();
+            synth->unlockSharable();
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
         }
@@ -457,7 +460,7 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
         if (mode != 4)
             refreshmainwindow();} {}
   }
-  Function {refreshmainwindow()} {open
+  Function {refreshmainwindow()} {open return_type void
   } {
     code {//
         bankuiwindow->label(bank->bankfiletitle.c_str());
@@ -480,7 +483,8 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
         for (int i = 0; i < MAX_BANK_SIZE; ++i)
             bs[i]->refresh();} {}
   }
-  Function {removeselection()} {} {
+  Function {removeselection()} {return_type void
+  } {
     code {//
         if (nselected >= 0)
         {
@@ -489,7 +493,7 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
             bs[ns]->refresh();
         }} {}
   }
-  Function {rescan_for_banks()} {open
+  Function {rescan_for_banks()} {open return_type void
   } {
     code {//
         banklist->clear();

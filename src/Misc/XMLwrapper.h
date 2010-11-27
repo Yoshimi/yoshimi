@@ -42,7 +42,7 @@ class XMLwrapper : private MiscFuncs
 
         // SAVE to XML
         bool saveXMLfile(const string filename); // return true if ok, false otherwise
-        char *getXMLdata(void);
+        string getXMLdata(void);
         void addpar(const string name, int val); // add simple parameter: name, value
         void addparreal(const string name, float val);
         void addparbool(const string name, int val); // 1 => "yes", else "no"
@@ -53,8 +53,7 @@ class XMLwrapper : private MiscFuncs
                               // that contains child nodes)
         bool loadXML(const string xml);
         bool loadXMLfile(const string filename); 
-        string xmldata;
-        bool putXMLdata(char *xmldata); // used by the clipboard
+        bool putXMLdata(string xmldata); // used by the clipboard
         bool enterbranch(const string name); // enter branch, returns true if is ok
         bool enterbranch(const string name, int id); // enter branch with id, return true if ok
         void exitbranch(void) { pop(); };            // exit from a branch
@@ -82,6 +81,8 @@ class XMLwrapper : private MiscFuncs
         struct {
             unsigned char PADsynth_used;
         } information;
+
+        string xmlData;
 
     private:
         bool doloadfile(const string filename);

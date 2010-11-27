@@ -1,9 +1,9 @@
 /*
-    SUBnoteParameters.cpp - Parameters for SUBnote (SUBsynth)
+    SUBnoteParameters.cpp
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,9 +18,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2009
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
+#include "Misc/BodyDisposal.h"
+#include "Misc/Config.h"
 #include "Params/SUBnoteParameters.h"
 
 SUBnoteParameters::SUBnoteParameters() : Presets()
@@ -80,11 +82,11 @@ void SUBnoteParameters::defaults(void)
 
 SUBnoteParameters::~SUBnoteParameters()
 {
-    delete (AmpEnvelope);
-    delete (FreqEnvelope);
-    delete (BandWidthEnvelope);
-    delete (GlobalFilter);
-    delete (GlobalFilterEnvelope);
+    Runtime.deadObjects->addBody(AmpEnvelope);
+    Runtime.deadObjects->addBody(FreqEnvelope);
+    Runtime.deadObjects->addBody(BandWidthEnvelope);
+    Runtime.deadObjects->addBody(GlobalFilter);
+    Runtime.deadObjects->addBody(GlobalFilterEnvelope);
 }
 
 void SUBnoteParameters::add2XML(XMLwrapper *xml)
@@ -94,7 +96,8 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("start",Pstart);
 
     xml->beginbranch("HARMONICS");
-    for (int i=0;i<MAX_SUB_HARMONICS;i++) {
+    for (int i=0;i<MAX_SUB_HARMONICS;i++)
+    {
         if ((Phmag[i]==0)&&(xml->minimal)) continue;
         xml->beginbranch("HARMONIC",i);
         xml->addpar("mag",Phmag[i]);
@@ -125,14 +128,16 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("bandwidth_scale",Pbwscale);
 
     xml->addparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-    if ((PFreqEnvelopeEnabled!=0)||(!xml->minimal)) {
+    if ((PFreqEnvelopeEnabled!=0)||(!xml->minimal))
+    {
         xml->beginbranch("FREQUENCY_ENVELOPE");
         FreqEnvelope->add2XML(xml);
         xml->endbranch();
     }
 
     xml->addparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-    if ((PBandWidthEnvelopeEnabled!=0)||(!xml->minimal)) {
+    if ((PBandWidthEnvelopeEnabled!=0)||(!xml->minimal))
+    {
         xml->beginbranch("BANDWIDTH_ENVELOPE");
         BandWidthEnvelope->add2XML(xml);
         xml->endbranch();
@@ -141,7 +146,8 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
 
     xml->beginbranch("FILTER_PARAMETERS");
     xml->addparbool("enabled",PGlobalFilterEnabled);
-    if ((PGlobalFilterEnabled!=0)||(!xml->minimal)) {
+    if ((PGlobalFilterEnabled!=0)||(!xml->minimal))
+    {
         xml->beginbranch("FILTER");
         GlobalFilter->add2XML(xml);
         xml->endbranch();
@@ -162,7 +168,8 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
     Phmagtype=xml->getpar127("harmonic_mag_type",Phmagtype);
     Pstart=xml->getpar127("start",Pstart);
 
-    if (xml->enterbranch("HARMONICS")) {
+    if (xml->enterbranch("HARMONICS"))
+    {
         Phmag[0]=0;
         for (int i=0;i<MAX_SUB_HARMONICS;i++) {
             if (xml->enterbranch("HARMONIC",i)==0) continue;
@@ -187,7 +194,8 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("FREQUENCY_PARAMETERS")) {
+    if (xml->enterbranch("FREQUENCY_PARAMETERS"))
+    {
         Pfixedfreq=xml->getparbool("fixed_freq",Pfixedfreq);
         PfixedfreqET=xml->getpar127("fixed_freq_et",PfixedfreqET);
 
@@ -212,7 +220,8 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("FILTER_PARAMETERS")) {
+    if (xml->enterbranch("FILTER_PARAMETERS"))
+    {
         PGlobalFilterEnabled=xml->getparbool("enabled",PGlobalFilterEnabled);
         if (xml->enterbranch("FILTER")) {
             GlobalFilter->getfromXML(xml);

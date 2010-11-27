@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #ifndef EQ_H
@@ -41,9 +41,11 @@ class EQ : public Effect, private MiscFuncs
         float getfreqresponse(float freq);
 
     private:
+        void setvolume(unsigned char Pvolume_);
+        inline float rap2dB(float rap) { return 20.0f * log10f(rap); }
+
         // Parameters
         unsigned char Pvolume;
-        void setvolume(unsigned char Pvolume_);
         struct {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
             AnalogFilter *l, *r; // internal values

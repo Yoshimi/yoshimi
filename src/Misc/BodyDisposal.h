@@ -1,5 +1,5 @@
 /*
-    BodyDisposal.cpp
+    BodyDisposal.h
 
     Copyright 2010, Alan Calvert
 
@@ -17,16 +17,26 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Synth/BodyDisposal.h"
+#ifndef BODYDISPOSAL_H
+#define BODYDISPOSAL_H
 
-void BodyDisposal::addBody(Carcass *body)
-{
-    if (body != NULL)
-        corpses.push_back(body);
-}
+#include <iostream>
+#include <boost/ptr_container/ptr_list.hpp>
 
-void BodyDisposal::disposeBodies(void)
+using namespace std;
+
+#include "Misc/Carcass.h"
+
+class BodyDisposal
 {
-    for (int x = corpses.size(); x > 0; --x)
-        corpses.pop_front();
-}
+    public:
+        BodyDisposal() { corpses.clear(); }
+        ~BodyDisposal() {}
+        void addBody(Carcass *body);
+        void disposeBodies(void);
+
+    private:
+        boost::ptr_list<Carcass> corpses;
+};
+
+#endif

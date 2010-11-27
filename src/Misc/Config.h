@@ -38,8 +38,6 @@ using namespace std;
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 
-//extern bool Pexitprogram;  // if the UI sets this true, the program will exit
-
 class XMLwrapper;
 class BodyDisposal;
 class SynthEngine;
@@ -73,10 +71,10 @@ class Config : public MiscFuncs
         string addParamHistory(string file);
         string historyFilename(int index);
 
-        string ConfigDir;
-        string DataDir;
+        string ConfigDirectory;
+        string DataDirectory;
         string ConfigFile;
-        string DbFile;
+        int BankSelectMethod;
         string paramsLoad;
         string instrumentLoad;
         bool   doRestoreState;
@@ -117,8 +115,6 @@ class Config : public MiscFuncs
 
         int    BankUIAutoClose;
         int    Interpolation;
-        unsigned char currentBank;
-        string currentBankDir;
         int    CheckPADsynth;
         int    rtprio;
 
@@ -131,9 +127,9 @@ class Config : public MiscFuncs
 
     private:
         void loadCmdArgs(int argc, char **argv);
-        bool loadConfig(void);
         bool extractConfigData(XMLwrapper *xml);
         bool extractRuntimeData(XMLwrapper *xml);
+        bool checkProgramDb(string homedir);
         void addConfigXML(XMLwrapper *xml);
         void addRuntimeXML(XMLwrapper *xml);
         void saveSessionData(string savefile);

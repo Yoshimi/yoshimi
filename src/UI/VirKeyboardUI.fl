@@ -274,13 +274,13 @@ class VirKeys {: {public Fl_Box}
 
 class VirKeyboard {open : {private MiscFuncs}
 } {
-  Function {make_window()} {open
+  Function {make_window(void)} {open return_type void
   } {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
 virkeyboardwindow->hide();} open
-      xywh {172 207 650 130} type Double visible
+      xywh {173 233 650 130} type Double hide
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -449,7 +449,7 @@ virkeyboardwindow->hide();} open
         callback {//
             relaseallkeys();
             virkeys->midich = lrintf(o->value() - 1);
-            virkeys->take_focus();} selected
+            virkeys->take_focus();}
         tooltip {Select midi channel - 10 is conventionally Drums} xywh {21 108 42 18} labelsize 10 align 1 maximum 16 textsize 11
         code0 {o->value(virkeys->midich + 1);}
       }
@@ -464,14 +464,16 @@ virkeyboardwindow->hide();} open
   Function {~VirKeyboard()} {} {
     code {delete virkeyboardwindow;} {}
   }
-  Function {Show()} {open
+  Function {Show(void)} {open return_type void
   } {
     code {virkeyboardwindow->show();} {}
   }
-  Function {Hide()} {} {
+  Function {Hide(void)} {return_type void
+  } {
     code {virkeyboardwindow->hide();} {}
   }
-  Function {relaseallkeys()} {} {
+  Function {relaseallkeys(void)} {selected return_type void
+  } {
     code {virkeys->relaseallkeys(0);} {}
   }
   decl {int midictl;} {}

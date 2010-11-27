@@ -18,16 +18,17 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #ifndef ANALOG_FILTER_H
 #define ANALOG_FILTER_H
 
-#include "Misc/MiscFuncs.h"
+#include <cmath>
+
 #include "DSP/Filter_.h"
 
-class AnalogFilter : public Filter_, private MiscFuncs
+class AnalogFilter : public Filter_
 {
     public:
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
@@ -53,9 +54,10 @@ class AnalogFilter : public Filter_, private MiscFuncs
           oldx[MAX_FILTER_STAGES + 1],
           oldy[MAX_FILTER_STAGES + 1];
 
-        void singlefilterout(float *smp, fstage &x, fstage &y, float *c,
-                             float *d);
+        void singlefilterout(float *smp, fstage &x, fstage &y, float *c, float *d);
         void computefiltercoefs(void);
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
+
         int type;   // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
         int stages; // how many times the filter is applied (0->1,1->2,etc.)
         float freq; // Frequency given in Hz

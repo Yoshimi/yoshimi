@@ -1,25 +1,22 @@
 
-drop table if exists programbank;
+drop table if exists banks;
 
-create table programbank (
+create table banks (
   row INTEGER PRIMARY KEY AUTOINCREMENT,
-  banknumber TINYINT,
-  name VARCHAR(80),
-  dir VARCHAR(80)
+  banknum TINYINT,
+  name VARCHAR(80)
 );
 
-create unique index idx on programbank (row, banknumber);
+create unique index idx on banks (row, banknum);
 
-drop table if exists instrument;
+drop table if exists programs;
 
-create table instrument (
+create table programs (
   row INTEGER PRIMARY KEY AUTOINCREMENT,
-  banknumber TINYINT,
-  prognumber TINYINT,
+  banknum TINYINT,
+  prognum TINYINT,
   name VARCHAR(80),
-  xml TEXT,
-  PADsynth_used TINYINT
+  xml TEXT
 );
 
-create unique index bankinstidx on instrument (row, banknumber, prognumber);
-
+create unique index bankprogidx on programs (row, banknum, prognum);

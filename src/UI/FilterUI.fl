@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
-}
+} 
 
 comment {FilterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -28,7 +28,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {in_source in_header
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public
 } 
@@ -49,29 +49,29 @@ decl {\#include "PresetsUI.h"} {public
 } 
 
 decl {\#include "Params/FilterParams.h"} {public
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public
-}
+} 
 
 class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
 } {
   Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
-    code {
-        pars = NULL;
+    code {pars = NULL;
         nvowel = NULL;
         nformant = NULL;
-        graphpoints = NULL;
-    } {}
+        graphpoints = NULL;} {}
   }
-  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {} {
+  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {return_type void
+  } {
     code {pars = pars_;
         nvowel = nvowel_;
         nformant = nformant_;
         oldx = -1;
         graphpoints = new float [w()];} {}
   }
-  Function {draw_freq_line(float freq,int type)} {} {
+  Function {draw_freq_line(float freq,int type)} {return_type void
+  } {
     code {float freqx = pars->getfreqpos(freq);
         switch (type)
         {
@@ -89,7 +89,8 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
         if (freqx > 0.0 && freqx < 1.0)
             fl_line(x() + (int) (freqx * w()), y(), x() + (int)(freqx * w()), y() + h());} {}
   }
-  Function {draw()} {} {
+  Function {draw(void)} {return_type void
+  } {
     code {int maxdB = 30;
         int ox = x(), oy = y(), lx = w(), ly = h(), i, oiy;
         float freqx;
@@ -111,23 +112,23 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
         {
             if (i == 1)
             {
-                draw_freq_line(i * 100.0,0);
-                draw_freq_line(i * 1000.0,0);
+                draw_freq_line(i * 100.0f, 0);
+                draw_freq_line(i * 1000.0f, 0);
             }
             else if (i == 5)
             {
-                draw_freq_line(i * 100.0,2);
-                draw_freq_line(i * 1000.0,2);
+                draw_freq_line(i * 100.0f, 2);
+                draw_freq_line(i * 1000.0f, 2);
             }
             else
             {
-                draw_freq_line(i * 100.0,1);
-                draw_freq_line(i * 1000.0,1);
+                draw_freq_line(i * 100.0f, 1);
+                draw_freq_line(i * 1000.0f, 1);
             }
         }
 
-        draw_freq_line(10000.0,0);
-        draw_freq_line(20000.0,1);
+        draw_freq_line(10000.0f, 0);
+        draw_freq_line(20000.0f, 1);
 
         fl_line_style(FL_DOT);
         int GY = 10;
@@ -147,7 +148,7 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
 
             //show some information (like current formant frequency,amplitude)
             string tmpstr = asString((float)
-                (pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq) / 1000.0))
+                (pars->getformantfreq(pars->Pvowels[*nvowel].formants[*nformant].freq) / 1000.0f))
                     + " kHz";
             fl_draw(tmpstr.c_str(), ox + 1, oy + 1, 40, 12, FL_ALIGN_LEFT, NULL, 0);
             tmpstr = asString((int)
@@ -165,7 +166,7 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
         oiy = (int) ((graphpoints[0] / maxdB + 1.0) * ly / 2.0);
         for (i = 1; i < lx; ++i)
         {
-            int iy = (int) ((graphpoints[i] / maxdB + 1.0) * ly / 2.0);
+            int iy = lrintf((graphpoints[i] / maxdB + 1.0f) * ly / 2.0f);
             if (iy >= 0 && oiy >= 0 && iy < ly && oiy < lx)
                 fl_line(ox + i - 1, oy + ly - oiy, ox + i, oy + ly - iy);
             oiy = iy;
@@ -173,6 +174,10 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
   }
   Function {~FormantFilterGraph()} {} {
     code {delete [] graphpoints;} {}
+  }
+  Function {rap2dB(float rap)} {open private return_type {inline float}
+  } {
+    code {return 20.0f * log10f(rap);} {}
   }
   decl {FilterParams *pars;} {}
   decl {int oldx,oldy;} {}
@@ -197,7 +202,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         // delete (filterui);
         delete (formantparswindow);} {}
   }
-  Function {make_window()} {open
+  Function {make_window(void)} {open return_type void
   } {
     Fl_Window filterui {
       xywh {215 371 275 75} type Double color 50 labelfont 1 hide
@@ -276,7 +281,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         Fl_Choice filtertype {
           label Category
           callback {switchcategory((int)o->value()); pars->changed=true;}
-          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {10 20 60 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
+          tooltip {Filter category} xywh {10 20 60 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code0 {o->value(pars->Pcategory);}
         } {
           MenuItem {} {
@@ -336,7 +341,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         Fl_Choice stcounter {
           label St
-          callback {pars->Pstages = (int)o->value();
+          callback {pars->Pstages = lrintf(o->value());
               formantfiltergraph->redraw();
               pars->changed = true;}
           tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {235 5 35 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
@@ -361,11 +366,11 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       }
     }
   }
-  Function {make_formant_window()} {open
+  Function {make_formant_window(void)} {open return_type void
   } {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters} open
-      xywh {50 379 700 205} type Double visible
+      xywh {51 405 700 205} type Double hide
     } {
       Fl_Group {} {open
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -422,7 +427,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       } {
         Fl_Counter {} {
           label {Seq.Size}
-          callback {pars->Psequencesize = (int) o->value();
+          callback {//
+              pars->Psequencesize = (int) o->value();
               update_formant_window();
               pars->changed = true;}
           xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 11
@@ -502,7 +508,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         xywh {556 185 84 15} type {Horz Knob} box FLAT_BOX maximum 127
         code0 {o->value(pars->Poctavesfreq);}
       }
-      Fl_Box formantfiltergraph {selected
+      Fl_Box formantfiltergraph {
         xywh {5 5 475 195} box BORDER_BOX
         code0 {o->init(pars,&nvowel,&nformant);}
         class FormantFilterGraph
@@ -535,8 +541,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       }
     }
   }
-  Function {update_formant_window()} {} {
-    code {formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
+  Function {update_formant_window(void)} {return_type void
+  } {
+    code {//
+        formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
         if (nformant < pars->Pnumformants)
@@ -551,7 +559,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
 
         vowel_counter->value(pars->Psequence[nseqpos].nvowel);} {}
   }
-  Function {refresh()} {} {
+  Function {refresh(void)} {return_type void
+  } {
     code {update_formant_window();
         formantfiltergraph->redraw();
 
@@ -593,7 +602,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         filterparamswindow->redraw();} {}
   }
-  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_)} {} {
+  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_)} {return_type void
+  } {
     code {pars=filterpars_;
         velsnsamp = velsnsamp_;
         velsns = velsns_;
@@ -621,8 +631,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         formantparswindow->label(this->label());
         update_formant_window();} {}
   }
-  Function {switchcategory(int newcat)} {} {
-    code {if (pars->Pcategory != newcat)
+  Function {switchcategory(int newcat)} {return_type void
+  } {
+    code {//
+        if (pars->Pcategory != newcat)
         {
             pars->Pgain = 64;
             gaindial->value(64);
@@ -634,8 +646,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         pars->Pcategory=newcat;
         refresh();} {}
   }
-  Function {use_for_dynamic_filter()} {} {
-    code {freqtrdial->deactivate();
+  Function {use_for_dynamic_filter(void)} {selected return_type void
+  } {
+    code {//
+        freqtrdial->deactivate();
         gaindial->when(0);
 
         cfknob->when(FL_WHEN_RELEASE);

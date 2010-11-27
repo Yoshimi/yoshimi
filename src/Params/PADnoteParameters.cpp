@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #include <iostream>
@@ -32,6 +32,8 @@
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/BodyDisposal.h"
+#include "Misc/Config.h"
 #include "Params/PADnoteParameters.h"
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
@@ -65,15 +67,15 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
 PADnoteParameters::~PADnoteParameters()
 {
     deletesamples();
-    delete oscilgen;
-    delete resonance;
-    delete FreqEnvelope;
-    delete FreqLfo;
-    delete AmpEnvelope;
-    delete AmpLfo;
-    delete GlobalFilter;
-    delete FilterEnvelope;
-    delete FilterLfo;
+    Runtime.deadObjects->addBody(oscilgen);
+    Runtime.deadObjects->addBody(resonance);
+    Runtime.deadObjects->addBody(FreqEnvelope);
+    Runtime.deadObjects->addBody(FreqLfo);
+    Runtime.deadObjects->addBody(AmpEnvelope);
+    Runtime.deadObjects->addBody(AmpLfo);
+    Runtime.deadObjects->addBody(GlobalFilter);
+    Runtime.deadObjects->addBody(FilterEnvelope);
+    Runtime.deadObjects->addBody(FilterLfo);
 }
 
 void PADnoteParameters::defaults(void)

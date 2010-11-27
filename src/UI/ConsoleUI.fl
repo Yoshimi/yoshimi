@@ -36,7 +36,7 @@ decl {\#include "MasterUI.h"} {global
 
 class ConsoleUI {open
 } {
-  Function {make_window(void)} {open
+  Function {make_window(void)} {open return_type void
   } {
     Fl_Window logConsole {
       label {yoshimi console}
@@ -44,7 +44,7 @@ class ConsoleUI {open
       xywh {1077 699 320 180} type Double color 54 selection_color 36 labeltype NORMAL_LABEL labelfont 13 labelsize 13 align 0 when 1 hide resizable
     } {
       Fl_Text_Display logText {
-        label {log text} selected
+        label {log text}
         xywh {0 0 320 180} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
       }
     }
@@ -56,26 +56,30 @@ class ConsoleUI {open
       logText->buffer(txtbuf);
       logConsole->copy_label(string("yoshimi console").c_str());} {}
   }
-  Function {Show()} {} {
+  Function {Show()} {return_type void
+  } {
     code {logConsole->show();} {}
   }
-  Function {Hide()} {} {
-    code {logConsole->hide();} {}
+  Function {Hide()} {return_type void
+  } {
+    code {//
+        logConsole->visible();
+        logConsole->hide();} {}
   }
   Function {~ConsoleUI()} {} {
     code {logConsole->hide();
       if (NULL != txtbuf)
         delete txtbuf;} {}
   }
-  Function {log(string msg)} {} {
+  Function {log(string msg)} {return_type void
+  } {
     code {txtbuf->append(msg.c_str());
       txtbuf->append(string("\\n").c_str());
       logConsole->redraw();
       if (txtbuf->length() > 8000)
-        txtbuf->remove(0, txtbuf->line_end(1));
-    } {}
+        txtbuf->remove(0, txtbuf->line_end(1));} {}
   }
-  Function {setLabel(void)} {open return_type void
+  Function {setLabel(void)} {open selected return_type void
   } {
     code {logConsole->copy_label((musicClient->midiClientName()
                               + string(" console")).c_str());} {}

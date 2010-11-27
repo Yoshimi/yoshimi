@@ -18,18 +18,17 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
 #ifndef DISTORSION_H
 #define DISTORSION_H
 
 #include "Misc/WaveShapeSamples.h"
-#include "Misc/MiscFuncs.h"
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
-class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
+class Distorsion : public Effect, private WaveShapeSamples
 {
     public:
         Distorsion(bool insertion, float *efxoutl_, float *efxoutr_);
@@ -42,6 +41,8 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         void applyfilters(float *efxoutl, float *efxoutr);
 
     private:
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
+
         // Parametrii
         unsigned char Pvolume;       // Volumul or E/R
         unsigned char Ppanning;      // Panning

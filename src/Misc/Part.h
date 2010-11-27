@@ -51,10 +51,12 @@ class Part : private MiscFuncs, SynthHelper
 
         bool loadProgram(unsigned char bk, unsigned char prog);
         bool saveProgram(unsigned char bk, unsigned char prog);
+        bool saveProgram(void) { return saveProgram(partBank, partProgram); }
 
         void partEnable(unsigned char npart, bool maybe);
+        void partDisable(void) { Penabled = 0; cleanup(); }
         void ComputePartSmps(void);
-        bool Active(void) { return (Penabled != 0 && !partMuted); }
+        bool Active(void) { return Penabled && !__sync_fetch_and_or(&partMuted, 0); }
         void cleanup(void);
         void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
         void NoteOff(unsigned char note);
@@ -63,6 +65,7 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseSustainedKeys(void);
         void RelaseAllKeys(void);
 
+        bool importInstrument(string filename);
         string partXML(void);
         bool saveXML(string filename); // true for load ok, otherwise false
         bool loadXMLinstrument(string filename);
@@ -72,8 +75,8 @@ class Part : private MiscFuncs, SynthHelper
         void defaults(void);
         void defaultsinstrument(void);
 
-        unsigned char currentBank;
-        unsigned char currentProgram;
+        unsigned char partBank;
+        unsigned char partProgram;
 
         // the part's kit
         struct {
@@ -92,7 +95,7 @@ class Part : private MiscFuncs, SynthHelper
         } kit[NUM_KIT_ITEMS];
 
         // Part parameters
-        void setkeylimit(unsigned char Pkeylimit);
+        void setkeylimit(unsigned char keylimit);
         void setkititemstatus(int kititem, int Penabled_);
         void setPvolume(char Pvolume);
         void setPpanning(char Ppanning);
@@ -154,8 +157,7 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
         void getfromXMLinstrument(XMLwrapper *xml);
-
-        bool killallnotes; // true if I want to kill all notes (ie, panic)
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
 
         struct PartNotes {
             NoteStatus status;
@@ -170,6 +172,9 @@ class Part : private MiscFuncs, SynthHelper
             int time;
         };
 
+        unsigned char FilterLfoControlLsb;
+
+        bool killallnotes;        // true if I want to kill all notes (ie, panic)
         int lastpos, lastposb;    // To keep track of previously used pos and posb.
         bool lastlegatomodevalid; // To keep track of previous legatomodevalid.
 
@@ -194,7 +199,7 @@ class Part : private MiscFuncs, SynthHelper
         float oldfreq; // for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;
-        int partMuted;
+        char partMuted;
 };
 
 #endif

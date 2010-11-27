@@ -32,11 +32,10 @@ class ProgramBanks : private MiscFuncs
 {
     public:
         ProgramBanks();
-        ~ProgramBanks();
+        ~ProgramBanks() { if (dbConn) sqlite3_close(dbConn); }
         bool Setup(void);
         void scanInstrumentFiles(void);
-        bool addBank(unsigned char bank, string name, string dir);
-        void setBank(unsigned char bk) { loadProgramList(bankLsb = bk); }
+        bool addBank(unsigned char bank, string name);
         void loadBankList(void);
         bool addProgram(unsigned char bk, unsigned char prog, string name, string xmldata);
         string programXml(unsigned char bk, unsigned char prog);
@@ -45,14 +44,10 @@ class ProgramBanks : private MiscFuncs
         map<unsigned char, string> bankList;
         map<unsigned char, string> programList;
 
-        unsigned char bankLsb;
-        const unsigned char bankMsb;
-
     private:
         string dbQuoteSingles(string txt);
         string readXmlFile(const string filename);
         void dbErrorLog(string msg);
-
         const string xizext;
         sqlite3 *dbConn;
 };

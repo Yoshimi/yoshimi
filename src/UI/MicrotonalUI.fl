@@ -26,7 +26,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2009
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public
@@ -38,8 +38,10 @@ decl {\#include <FL/fl_ask.H>} {public
 decl {\#include "Misc/Microtonal.h"} {public
 } 
 
-class MicrotonalUI {} {
-  Function {make_window()} {} {
+class MicrotonalUI {open
+} {
+  Function {make_window(void)} {return_type void
+  } {
     Fl_Window microtonaluiwindow {
       label Scales
       xywh {99 164 405 450} type Double hide
@@ -239,7 +241,8 @@ class MicrotonalUI {} {
       }
     }
   }
-  Function {updateTuningsInput()} {} {
+  Function {updateTuningsInput(void)} {return_type void
+  } {
     code {char *tmpbuf = new char[100];
         tuningsinput->cut(0, tuningsinput->maximum_size());
         for (int i = 0; i < microtonal->getoctavesize(); ++i)
@@ -251,7 +254,8 @@ class MicrotonalUI {} {
         }
         delete [] tmpbuf;} {}
   }
-  Function {updateMappingInput()} {} {
+  Function {updateMappingInput(void)} {return_type void
+  } {
     code {char *tmpbuf = new char[100];
         mappinginput->cut(0, tuningsinput->maximum_size());
         for (int i = 0; i < microtonal->Pmapsize; ++i)
@@ -274,13 +278,16 @@ class MicrotonalUI {} {
     code {microtonaluiwindow->hide();
         delete(microtonaluiwindow);} {}
   }
-  Function {Show()} {} {
+  Function {Show(void)} {return_type void
+  } {
     code {microtonaluiwindow->show();} {}
   }
-  Function {Hide()} {} {
+  Function {Hide(void)} {return_type void
+  } {
     code {microtonaluiwindow->hide();} {}
   }
-  Function {apply()} {} {
+  Function {apply(void)} {return_type void
+  } {
     code {int err = microtonal->texttotunings(tuningsinput->value());
         if (err >= 0)
             fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");

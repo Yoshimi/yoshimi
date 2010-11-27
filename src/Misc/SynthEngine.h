@@ -50,18 +50,16 @@ class SynthEngine : private SynthHelper, MiscFuncs
         SynthEngine();
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
+        void Defaults(void);
 
         bool saveXML(string filename);
         void add2XML(XMLwrapper *xml);
-        void defaults(void);
 
         bool loadXML(string filename);
         bool getfromXML(XMLwrapper *xml);
-        void applyparameters(void);
-        int getalldata(char **data);
         void putalldata(char *data, int size);
 
-        void ShutUp(void);
+        void cleanUp(void);
         void MasterAudio(float *outl, float *outr);
         void partOnOff(int npart, int what);
         void partEnable(unsigned char npart, bool maybe);
@@ -74,26 +72,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void programChange(unsigned char midichan, unsigned char bank, unsigned char prog);
         string bankName(unsigned char banknum);
         string programName(unsigned char prog);
-
-        float numRandom(void);
-        unsigned int random(void);
-
-        void lockUpgradable(void);
-        void unlockUpgradable(void);
-        void upgradeLockExclusive(void);
-        void downgradeLockUpgradable(void);
-        bool timedUpgradeLockExclusive(void);
-        bool timedlockUpgradable(void);
-
         void lockExclusive(void);
         void unlockExclusive(void);
         bool trylockExclusive(void);
         bool timedlockExclusive(void);
-
         void lockSharable(void);
         void unlockSharable(void);
-        bool trylockSharable(void);
-        bool timedlockSharable(void);
+        float numRandom(void);
+        unsigned int random(void);
 
         Part *part[NUM_MIDI_PARTS];
 
@@ -139,6 +125,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Controller *ctl;
         Microtonal microtonal;
         FFTwrapper *fft;
+        bool recordPending;
 
         // peaks for VU-meters
         void vuresetpeaks(void);
@@ -151,20 +138,17 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool vuClippedL;
         bool vuClippedR;
 
-        bool recordPending;
-
     private:
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
         XMLwrapper *stateXMLtree;
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
-        float *tmpmixl; // Temporary mixing samples for part samples
-        float *tmpmixr; // which are sent to system effect
+        float *tmpmixl; // temp mix of part samples
+        float *tmpmixr; // to send to system effect
         int keyshift;
-
         char midiBankLSB;
         char midiBankMSB;
-
         float vuoutpeakl;
         float vuoutpeakr;
         float vumaxoutpeakl;
@@ -173,15 +157,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float vurmspeakr;
         bool clippedL;
         bool clippedR;
-
         static char random_state[];
         static struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
-
         boost::interprocess::interprocess_upgradable_mutex synthMutex;
-        const boost::posix_time::time_duration lockwait;
+        boost::posix_time::time_duration lockgrace;
         boost::interprocess::interprocess_mutex meterMutex;
+        char synthMuted;
 };
 
 extern SynthEngine *synth;

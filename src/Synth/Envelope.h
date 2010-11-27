@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef ENVELOPE_H
@@ -26,11 +26,9 @@
 
 #include <cmath>
 
-#include "Misc/MiscFuncs.h"
-
 class EnvelopeParams;
 
-class Envelope : private MiscFuncs
+class Envelope
 {
     public:
 
@@ -42,6 +40,9 @@ class Envelope : private MiscFuncs
         int finished(void) { return envfinish; };
 
     private:
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
+        inline float rap2dB(float rap) { return 20.0f * log10f(rap); }
+
         int envpoints;
         int envsustain; // "-1" means disabled
         float envdt[MAX_ENVELOPE_POINTS];  // milliseconds
@@ -53,8 +54,8 @@ class Envelope : private MiscFuncs
         int forcedrelase;
         char keyreleased; // if the key was released
         char envfinish;
-        float t; // the time from the last point
-        float inct; // the time increment
+        float t;         // the time from the last point
+        float inct;      // the time increment
         float envoutval; // used to do the forced release
 };
 

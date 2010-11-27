@@ -19,10 +19,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified 2010
+    This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
-#include <iostream>
 #include <cstring>
 #include <boost/shared_ptr.hpp>
 
@@ -41,16 +40,17 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
-#include "Synth/BodyDisposal.h"
+#include "Misc/BodyDisposal.h"
 #include "Sql/ProgramBanks.h"
 #include "Misc/Part.h"
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
-    currentBank(0),
-    currentProgram(0),
+    partBank(0),
+    partProgram(0),
     Penabled(0),
     jackDirect(0),
     midichannel(0),
+    FilterLfoControlLsb(0),
     killallnotes(false),
     microtonal(microtonal_),
     fft(fft_),
@@ -88,7 +88,6 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
         memset(partfxinputl[n], 0, synth->bufferbytes);
         partfxinputr[n] = new float[synth->buffersize];
         memset(partfxinputr[n], 0, synth->bufferbytes);
-
         Pefxbypass[n] = false;
     }
 
@@ -157,7 +156,7 @@ void Part::defaultsinstrument(void)
         kit[n].Ppadenabled = 0;
         kit[n].Pname.clear();
         kit[n].Psendtoparteffect = 0;
-        if (n != 0)
+        if (n)
             setkititemstatus(n, 0);
     }
     kit[0].Penabled = 1;
@@ -183,7 +182,6 @@ void Part::cleanup(void)
     memset(partoutr, 0, synth->bufferbytes);
     memset(tmpoutl, 0, synth->bufferbytes);
     memset(tmpoutr, 0, synth->bufferbytes);
-
     ctl->resetall();
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         partefx[nefx]->cleanup();
@@ -191,7 +189,6 @@ void Part::cleanup(void)
     {
         memset(partfxinputl[n], 0, synth->bufferbytes);
         memset(partfxinputr[n], 0, synth->bufferbytes);
-
     }
     __sync_and_and_fetch (&partMuted, 0);
 }
@@ -236,7 +233,7 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
         return;
     // Legato and MonoMem used vars:
     int posb = POLIPHONY - 1;     // Just a dummy initial value.
-    bool legatomodevalid = false;   // true when legato mode is determined applicable.
+    bool legatomodevalid = false; // true when legato mode is determined applicable.
     bool doinglegato = false;     // true when we determined we do a legato note.
     bool ismonofirstnote = false; // (In Mono/Legato) true when we determined
 				                  // no other notes are held down or sustained.*/
@@ -285,9 +282,9 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
             {
                 // At least one other key is held or sustained, and the
                 // previous note was played while in valid legato mode.
-                doinglegato=true; // So we'll do a legato note.
-                pos=lastpos; // A legato note uses same pos as previous..
-                posb=lastposb; // .. same goes for posb.
+                doinglegato = true; // So we'll do a legato note.
+                pos = lastpos;      // A legato note uses same pos as previous..
+                posb = lastposb;    // .. same goes for posb.
             }
             else
             {
@@ -314,7 +311,7 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
     else
     {
         // Legato mode is either off or non-applicable.
-        if (Ppolymode == 0)
+        if (!Ppolymode)
         {   // if the mode is 'mono' turn off all other notes
             for (int i = 0; i < POLIPHONY; ++i)
                 if (partnote[i].status == KEY_PLAYING)
@@ -353,10 +350,10 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
         if (Pdrummode == 0)
         {
             notebasefreq = microtonal->getnotefreq(note, keyshift);
-            if (notebasefreq < 0.0)
+            if (notebasefreq < 0.0f)
                 return; // the key is no mapped
         } else
-            notebasefreq = 440.0f * powf(2.0, (note - 69.0f) / 12.0f);
+            notebasefreq = 440.0f * powf(2.0f, (note - 69.0f) / 12.0f);
 
         // Portamento
         if (oldfreq < 1.0f)
@@ -643,11 +640,13 @@ void Part::SetController(unsigned int type, int par)
 {
     switch (type)
     {
-        case C_modwheel: // 1
+        // 1 Mod wheel
+        case C_modwheel:
             ctl->setmodwheel(par);
             break;
 
-        case C_volume: // 7
+        // 7 Volume
+        case C_volume:
             ctl->setvolume(par);
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
@@ -655,59 +654,176 @@ void Part::SetController(unsigned int type, int par)
                 setPvolume(Pvolume);
             break;
 
-        case C_pan: // 10
+        // 10 Panning
+        case C_pan:
             ctl->setpanning(par);
             setPpanning(Ppanning);
             break;
 
-        case C_expression: // 11
+        // 11 Expression
+        case C_expression:
             ctl->setexpression(par);
             setPvolume(Pvolume);
             break;
 
-        case C_sustain: // 64
+            
+        /**
+        > * Frequency (Freq. control of the Filter LFO) !!!
+        > > * Depth (Depth control of the Filter LFO)
+        > > * Attack (A. val of the Filter Envelope)
+        > > * Delay (D. val of the Filter Envelope)
+        > > * Release (R.val of the Filter Envelope)      
+        Along the lines with what Jeremy has suggested, I feel that MIDI CC
+        bindings for the ADSR for the amp and filter envelopes AND LFO params
+        like freq, depth, start and delay are at the top of my list. Also I
+        think it would be nifty to be able to change the filter category and
+        filter type on-the-fly via MIDI CC.
+        **/
+        
+
+        // 64 Sustain
+        case C_sustain:
             ctl->setsustain(par);
             if (!ctl->sustain.sustain)
                 RelaseSustainedKeys();
             break;
 
-        case C_portamento: // 65
+        // 65 Portamento
+        case C_portamento:
             ctl->setportamento(par);
             break;
 
-        case C_filterq: // 71
+         // 71 Filter Q
+         case C_filterq:
             ctl->setfilterq(par);
             break;
 
-        case C_filtercutoff: // 74
+        // 74 Filter cutoff
+        case C_filtercutoff:
             ctl->setfiltercutoff(par);
             break;
 
-        case C_soundcontroller6 : // 75 bandwidth
+        // 75 bandwidth, ref http://zynaddsubfx.sourceforge.net/doc_0.html
+        case C_soundcontroller6 :
             ctl->setbandwidth(par);
             break;
 
-        case C_soundcontroller7: // 76 fmamp:
-            ctl->setfmamp(par);
-            break;
+        // 76 Modulation amplitude - decreases the amplitude of ADsynth modulators, default value 127
+        case C_soundcontroller7:
+            ctl->setfmamp(par);         
+            break;                      
 
-        case C_soundcontroller8: // 77 resonance center
+        // 77 resonance center frequency
+        case C_soundcontroller8:    
             ctl->setresonancecenter(par);
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
                 if (kit[item].adpars)
                     kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, ctl->resonancecenter.relcenter);
             break;
 
-        case C_soundcontroller9: // 78 resonance bandwidth:
+        // 78 resonance bandwidth
+        case C_soundcontroller9:
             ctl->setresonancebw(par);
             kit[0].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, ctl->resonancebandwidth.relbw);
             break;
 
-        case C_allsoundsoff: // 120
+        case C_effects1Depth:   // 91 part effect 1 volume
+        case C_effects2Depth:   // 92 part effect 2 volume
+        case C_effects3Depth:   // 93 part effect 3 volume
+            partefx[type - C_effects1Depth]->seteffectpar(0, par);
+            break;
+
+        // 102 ADsynth Filter Category
+        case C_undefined102:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 2)
+            {
+                kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Pcategory = par;
+                kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->changed = true;
+            }
+            break;
+
+        // 103 ADsynth Filter Type
+        case C_undefined103:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 4)
+            {
+                kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Ptype = par;
+                kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->changed = true;
+            }
+            break;
+            
+        // 104 Set kit item number for ADsynth Filter LFO controls
+        case C_undefined104:
+            if (par >= 0 && par < 128)
+                FilterLfoControlLsb = par;
+            break;
+            
+        // 105 ADsynth Filter LFO Frequency
+        case C_undefined105:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pfreq = (float)par / 127.0f;
+            break;
+    
+        // 106 ADsynth Filter LFO Depth
+        case C_undefined106:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pintensity = par;
+            break;
+    
+        // 107 ADsynth Filter LFO Start 
+        case C_undefined107:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pstartphase = par;
+            break;
+
+        // 108 ADsynth Filter LFO Delay
+        case C_undefined108:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pdelay = par;
+            break;
+            
+        // 109 ADsynth Filter Envelope Start
+        case C_undefined109:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_val = par;
+            break;
+            
+        // 110 ADsynth Filter Envelope Attack
+        case C_undefined110:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_dt = par;
+            break;
+        
+        // 111 ADsynth Filter Envelope Decay Value
+        case C_undefined111:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_val = par;
+            break;
+        
+        // 112 ADsynth Filter Envelope Decay Time
+        case C_undefined112:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_dt = par;
+            break;
+
+        // 113 ADsynth Filter Envelope Release Time
+        case C_undefined113:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_dt = par;
+            break;
+
+        // 114 ADsynth Filter Envelope Release Value
+        case C_undefined114:
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_val = par;
+            break;
+
+        // 120 All Sound Off
+        case C_allsoundsoff:
             AllNotesOff();
             break;
 
-        case C_resetallcontrollers: // 121
+        // 121 Reset All Controllers 
+        case C_resetallcontrollers:
             ctl->resetall();
             RelaseSustainedKeys();
             if (ctl->volume.receive)
@@ -720,13 +836,17 @@ void Part::SetController(unsigned int type, int par)
                     kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, 1.0f);
                     kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, 1.0f);
                 }
+            FilterLfoControlLsb = 0;    
             break;
 
-        case C_allnotesoff: // 123
+        // 123 All Notes Off 
+        case C_allnotesoff:
             RelaseAllKeys();
             break;
 
-        // more update to add here if I add controllers
+        default:
+            Runtime.Log(string("Ignoring midi control change type ") + asString(type));
+            break;
     }
 }
 
@@ -751,11 +871,9 @@ void Part::RelaseSustainedKeys(void)
 void Part::RelaseAllKeys(void)
 {
     for (int i = 0; i < POLIPHONY; ++i)
-    {
         if (partnote[i].status != KEY_RELASED
-            && partnote[i].status != KEY_OFF) //thanks to Frank Neumann
+            && partnote[i].status != KEY_OFF) // thanks to Frank Neumann
             RelaseNotePos(i);
-    }
 }
 
 
@@ -765,15 +883,11 @@ void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
     monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
-    if (Pnoteon == 0)
-    {
+    if (!Pnoteon)
         RelaseNotePos(lastpos);
-    }
     else
-    {
         NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
                monomem[mmrtempnote].mkeyshift);
-    }
 }
 
 
@@ -834,25 +948,22 @@ void Part::KillNotePos(int pos)
 
 
 // Set Part's key limit
-void Part::setkeylimit(unsigned char Pkeylimit)
+void Part::setkeylimit(unsigned char keylimit)
 {
-    this->Pkeylimit = Pkeylimit;
-    int keylimit = Pkeylimit;
-    if (!keylimit)
-        keylimit = POLIPHONY - 5;
-
-    // release old keys if the number of notes>keylimit
+    int limit = Pkeylimit = keylimit;
+    if (!limit)
+        limit = POLIPHONY - 5;
+    // release old keys if the number of notes > limit
     if (Ppolymode)
     {
         int notecount = 0;
         for (int i = 0; i < POLIPHONY; ++i)
-        {
             if (partnote[i].status == KEY_PLAYING
                 || partnote[i].status == KEY_RELASED_AND_SUSTAINED)
                 notecount++;
-        }
-        int oldestnotepos = -1, maxtime = 0;
-        if (notecount > keylimit)
+        int oldestnotepos = -1;
+        int maxtime = 0;
+        if (notecount > limit)
         {   // find out the oldest note
             for (int i = 0; i < POLIPHONY; ++i)
             {
@@ -917,7 +1028,7 @@ void Part::ComputePartSmps(void)
                     partnote[k].kititem[item].adnote = NULL;
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
-                {   // add ADnote to part(mix)
+                {   // add ADnote to part mix
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
                 }
@@ -934,7 +1045,7 @@ void Part::ComputePartSmps(void)
                     memset(tmpoutr, 0, synth->bufferbytes);
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
-                {   // add SUBnote to part(mix)
+                {   // add SUBnote to part mix
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
@@ -963,7 +1074,7 @@ void Part::ComputePartSmps(void)
                     partnote[k].kititem[item].padnote = NULL;
                 }
                 for (int i = 0 ; i < synth->buffersize; ++i)
-                {   // add PADnote to part(mix)
+                {   // add PADnote to part mix
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
                     partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
@@ -999,7 +1110,6 @@ void Part::ComputePartSmps(void)
     memcpy(partoutl, partfxinputl[NUM_PART_EFX], synth->bufferbytes);
     memcpy(partoutr, partfxinputr[NUM_PART_EFX], synth->bufferbytes);
 
-    // Kill All Notes if killallnotes true
     if (killallnotes)
     {
         for (int i = 0; i < synth->buffersize; ++i)
@@ -1021,7 +1131,8 @@ void Part::ComputePartSmps(void)
 }
 
 
-// Parameter control
+// Parameter controls
+
 void Part::setPvolume(char value)
 {
     Pvolume = value;
@@ -1040,11 +1151,11 @@ void Part::setPpanning(char Ppanning_)
 }
 
 
-// Enable or disable a kit item
 void Part::setkititemstatus(int kititem, int Penabled_)
 {
-    if (kititem == 0 && kititem >= NUM_KIT_ITEMS)
-        return; // nonexistent kit item and the first kit item is always enabled
+    if (!kititem // first kit item is always enabled
+        || kititem >= NUM_KIT_ITEMS)
+        return;
     kit[kititem].Penabled = Penabled_;
 
     bool resetallnotes = false;
@@ -1084,49 +1195,38 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 }
 
 
+bool Part::saveProgram(unsigned char bk, unsigned char prog)
+{
+    return progBanks->addProgram(bk, prog, Pname, partXML());
+}
+
+
 bool Part::loadProgram(unsigned char bk, unsigned char prog)
 {
-    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
-    if (!xmlwrap)
+    partBank = bk;
+    partProgram = prog;
+    string xml = progBanks->programXml(bk, prog);
+    if (!xml.empty())
     {
-        Runtime.Log("Error, Part failed to instantiate new XMLwrapper");
-        return false;
-    }
-    currentBank = bk;
-    currentProgram = prog;
-    string xmldata = progBanks->programXml(bk, prog);
-    if (xmldata.empty())
-    {
-        cerr << "Part xml data is empty" << endl;
-    }
-    else
-    {
-        if (!xmlwrap->loadXML(xmldata))
+        boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+        if (xmlwrap->loadXML(xml))
+            getfromXML(xmlwrap.get());
+        else
         {
-            Runtime.Log("Failed to load xml data for program " + asString(currentBank)
+            Runtime.Log("Failed to load xml data for program " + asString(partBank)
                         + string(" : ") + asString(prog), true);
             return false;
         }
     }
-    getfromXML(xmlwrap.get());
-    return true;
-}
-
-
-bool Part::saveProgram(unsigned char bk, unsigned char prog)
-{
-    XMLwrapper *xmlwrap = new XMLwrapper();
-    if (!xmlwrap)
+    else
     {
-        Runtime.Log("Error, Part::partXML failed to instantiate new XMLwrapper");
-        return false;
+        __sync_or_and_fetch (&partMuted, 0xFF);
+        defaultsinstrument();
+        applyparameters();
+        Penabled = 1;
+        __sync_and_and_fetch (&partMuted, 0);
     }
-    xmlwrap->beginbranch("INSTRUMENT");
-    add2XMLinstrument(xmlwrap);
-    xmlwrap->endbranch();
-    bool ok = progBanks->addProgram(bk, prog, Pname, xmlwrap->xmldata);
-    delete xmlwrap;
-    return ok;
+    return true;
 }
 
 
@@ -1136,12 +1236,11 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
-    //xml->addpar("type",info.Ptype);
     xml->endbranch();
 
     xml->beginbranch("INSTRUMENT_KIT");
-    xml->addpar("kit_mode",Pkitmode);
-    xml->addparbool("drum_mode",Pdrummode);
+    xml->addpar("kit_mode", Pkitmode);
+    xml->addparbool("drum_mode", Pdrummode);
 
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
@@ -1206,8 +1305,8 @@ void Part::add2XML(XMLwrapper *xml)
 {
     // parameters
     xml->addparbool("enabled", Penabled);
-    if (!Penabled && xml->minimal)
-        return;
+//    if (!Penabled && xml->minimal)
+//        return;
 
     xml->addpar("volume", Pvolume);
     xml->addpar("panning", Ppanning);
@@ -1241,7 +1340,7 @@ string Part::partXML(void)
     xmlwrap->beginbranch("INSTRUMENT");
     add2XMLinstrument(xmlwrap.get());
     xmlwrap->endbranch();
-    return xmlwrap->xmldata;
+    return xmlwrap->getXMLdata();
 }
 
 
@@ -1281,114 +1380,127 @@ void Part::applyparameters(void)
 }
 
 
-void Part::getfromXMLinstrument(XMLwrapper *xml)
+bool Part::importInstrument(string filename)
 {
-    if (xml->enterbranch("INFO"))
+    boost::shared_ptr<XMLwrapper> xmlwrap = boost::shared_ptr<XMLwrapper>(new XMLwrapper());
+    if (!xmlwrap)
     {
-        Pname = xml->getparstr("name");
-        info.Pauthor = xml->getparstr("author");
-        info.Pcomments = xml->getparstr("comments");
-        xml->exitbranch();
+        Runtime.Log("Import instrument failed to instantiate new XMLwrapper", true);
+        return false;
+    }
+    if (!xmlwrap->loadXMLfile(filename))
+    {
+        Runtime.Log("Import instrument failed to xml->load file " + filename, true);
+        return false;
+    }
+    getfromXML(xmlwrap.get());
+    return progBanks->addProgram(partBank, partProgram, Pname, xmlwrap->getXMLdata());
+}
+
+
+void Part::getfromXMLinstrument(XMLwrapper *xmlwrap)
+{
+    if (xmlwrap->enterbranch("INFO"))
+    {
+        Pname = xmlwrap->getparstr("name");
+        info.Pauthor = xmlwrap->getparstr("author");
+        info.Pcomments = xmlwrap->getparstr("comments");
+        xmlwrap->exitbranch();
     }
 
-    if (xml->enterbranch("INSTRUMENT_KIT"))
+    if (xmlwrap->enterbranch("INSTRUMENT_KIT"))
     {
-        Pkitmode = xml->getpar127("kit_mode", Pkitmode);
-        Pdrummode = xml->getparbool("drum_mode", Pdrummode);
+        Pkitmode = xmlwrap->getpar127("kit_mode", Pkitmode);
+        Pdrummode = xmlwrap->getparbool("drum_mode", Pdrummode);
         setkititemstatus(0, 0);
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
-            if (!xml->enterbranch("INSTRUMENT_KIT_ITEM", i))
+            if (!xmlwrap->enterbranch("INSTRUMENT_KIT_ITEM", i))
                 continue;
-            setkititemstatus(i, xml->getparbool("enabled", kit[i].Penabled));
+            setkititemstatus(i, xmlwrap->getparbool("enabled", kit[i].Penabled));
             if (!kit[i].Penabled)
             {
-                xml->exitbranch();
+                xmlwrap->exitbranch();
                 continue;
             }
-            kit[i].Pname = xml->getparstr("name");
-            kit[i].Pmuted=xml->getparbool("muted", kit[i].Pmuted);
-            kit[i].Pminkey=xml->getpar127("min_key", kit[i].Pminkey);
-            kit[i].Pmaxkey=xml->getpar127("max_key", kit[i].Pmaxkey);
-            kit[i].Psendtoparteffect=xml->getpar127("send_to_instrument_effect",
-                                                    kit[i].Psendtoparteffect);
-            kit[i].Padenabled = xml->getparbool("add_enabled", kit[i].Padenabled);
-            if (xml->enterbranch("ADD_SYNTH_PARAMETERS"))
+            kit[i].Pname = xmlwrap->getparstr("name");
+            kit[i].Pmuted = xmlwrap->getparbool("muted", kit[i].Pmuted);
+            kit[i].Pminkey = xmlwrap->getpar127("min_key", kit[i].Pminkey);
+            kit[i].Pmaxkey = xmlwrap->getpar127("max_key", kit[i].Pmaxkey);
+            kit[i].Psendtoparteffect = xmlwrap->getpar127("send_to_instrument_effect",
+                                                          kit[i].Psendtoparteffect);
+            kit[i].Padenabled = xmlwrap->getparbool("add_enabled", kit[i].Padenabled);
+            if (xmlwrap->enterbranch("ADD_SYNTH_PARAMETERS"))
             {
-                kit[i].adpars->getfromXML(xml);
-                xml->exitbranch();
+                kit[i].adpars->getfromXML(xmlwrap);
+                xmlwrap->exitbranch();
             }
-            kit[i].Psubenabled=xml->getparbool("sub_enabled", kit[i].Psubenabled);
-            if (xml->enterbranch("SUB_SYNTH_PARAMETERS"))
+            kit[i].Psubenabled = xmlwrap->getparbool("sub_enabled", kit[i].Psubenabled);
+            if (xmlwrap->enterbranch("SUB_SYNTH_PARAMETERS"))
             {
-                kit[i].subpars->getfromXML(xml);
-                xml->exitbranch();
+                kit[i].subpars->getfromXML(xmlwrap);
+                xmlwrap->exitbranch();
             }
-            kit[i].Ppadenabled = xml->getparbool("pad_enabled", kit[i].Ppadenabled);
-            if (xml->enterbranch("PAD_SYNTH_PARAMETERS"))
+            kit[i].Ppadenabled = xmlwrap->getparbool("pad_enabled", kit[i].Ppadenabled);
+            if (xmlwrap->enterbranch("PAD_SYNTH_PARAMETERS"))
             {
-                kit[i].padpars->getfromXML(xml);
-                xml->exitbranch();
+                kit[i].padpars->getfromXML(xmlwrap);
+                xmlwrap->exitbranch();
             }
-            xml->exitbranch();
+            xmlwrap->exitbranch();
         }
-        xml->exitbranch();
+        xmlwrap->exitbranch();
     }
-    if (xml->enterbranch("INSTRUMENT_EFFECTS"))
+    if (xmlwrap->enterbranch("INSTRUMENT_EFFECTS"))
     {
         for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
         {
-            if (!xml->enterbranch("INSTRUMENT_EFFECT", nefx))
+            if (!xmlwrap->enterbranch("INSTRUMENT_EFFECT", nefx))
                 continue;
-            if (xml->enterbranch("EFFECT"))
+            if (xmlwrap->enterbranch("EFFECT"))
             {
-                partefx[nefx]->getfromXML(xml);
-                xml->exitbranch();
+                partefx[nefx]->getfromXML(xmlwrap);
+                xmlwrap->exitbranch();
             }
-            Pefxroute[nefx] = xml->getpar("route", Pefxroute[nefx], 0, NUM_PART_EFX);
+            Pefxroute[nefx] = xmlwrap->getpar("route", Pefxroute[nefx], 0, NUM_PART_EFX);
             partefx[nefx]->setdryonly(Pefxroute[nefx] == 2);
-            Pefxbypass[nefx] = xml->getparbool("bypass", Pefxbypass[nefx]);
-            xml->exitbranch();
+            Pefxbypass[nefx] = xmlwrap->getparbool("bypass", Pefxbypass[nefx]);
+            xmlwrap->exitbranch();
         }
-        xml->exitbranch();
+        xmlwrap->exitbranch();
     }
 }
 
 
-void Part::getfromXML(XMLwrapper *xml)
+void Part::getfromXML(XMLwrapper *xmlwrap)
 {
     __sync_or_and_fetch (&partMuted, 0xFF);
     defaultsinstrument();
-    if (!xml->xmldata.empty())
+    setPvolume(xmlwrap->getpar127("volume", Pvolume));
+    setPpanning(xmlwrap->getpar127("panning", Ppanning));
+    Pminkey = xmlwrap->getpar127("min_key", Pminkey);
+    Pmaxkey = xmlwrap->getpar127("max_key", Pmaxkey);
+    Pkeyshift = xmlwrap->getpar127("key_shift", Pkeyshift);
+    midichannel = xmlwrap->getpar127("rcv_chn", midichannel);
+    Pvelsns = xmlwrap->getpar127("velocity_sensing", Pvelsns);
+    Pveloffs = xmlwrap->getpar127("velocity_offset", Pveloffs);
+    Pnoteon = xmlwrap->getparbool("note_on", Pnoteon);
+    Ppolymode = xmlwrap->getparbool("poly_mode", Ppolymode);
+    Plegatomode = xmlwrap->getparbool("legato_mode", Plegatomode); // older versions
+    if (!Plegatomode)
+        Plegatomode = xmlwrap->getpar127("legato_mode", Plegatomode);
+    Pkeylimit = xmlwrap->getpar127("key_limit", Pkeylimit);
+    if (xmlwrap->enterbranch("INSTRUMENT"))
     {
-        setPvolume(xml->getpar127("volume", Pvolume));
-        setPpanning(xml->getpar127("panning", Ppanning));
-        Pminkey = xml->getpar127("min_key", Pminkey);
-        Pmaxkey = xml->getpar127("max_key", Pmaxkey);
-        Pkeyshift = xml->getpar127("key_shift", Pkeyshift);
-        midichannel = xml->getpar127("rcv_chn", midichannel);
-        Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
-        Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
-        Pnoteon = xml->getparbool("note_on", Pnoteon);
-        Ppolymode = xml->getparbool("poly_mode", Ppolymode);
-        Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
-        if (!Plegatomode)
-            Plegatomode = xml->getpar127("legato_mode", Plegatomode);
-        Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
-        if (xml->enterbranch("INSTRUMENT"))
-        {
-            getfromXMLinstrument(xml);
-            xml->exitbranch();
-        }
-        if (xml->enterbranch("CONTROLLER"))
-        {
-            ctl->getfromXML(xml);
-            xml->exitbranch();
-        }
-        applyparameters();
+        getfromXMLinstrument(xmlwrap);
+        xmlwrap->exitbranch();
     }
-    else
-        cerr << "xmldata is empty, go with instrument defaults" << endl;
+    if (xmlwrap->enterbranch("CONTROLLER"))
+    {
+        ctl->getfromXML(xmlwrap);
+        xmlwrap->exitbranch();
+    }
+    applyparameters();
     Penabled = 1;
     __sync_and_and_fetch (&partMuted, 0);
 }

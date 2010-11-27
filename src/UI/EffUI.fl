@@ -26,7 +26,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public
@@ -52,18 +52,18 @@ decl {\#include "PresetsUI.h"} {public
 
 class EQGraph {open : {public Fl_Box}
 } {
-  Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
+  Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open return_type void
   } {
     code {eff = NULL;
         maxdB = 30;} {}
   }
-  Function {init(EffectMgr *eff_)} {open
+  Function {init(EffectMgr *eff_)} {open return_type void
   } {
     code {eff = eff_;
         oldx = -1;
         khzval = -1;} {}
   }
-  Function {draw_freq_line(float freq, int type)} {open
+  Function {draw_freq_line(float freq, int type)} {open return_type void
   } {
     code {fl_color(FL_GRAY);
         float freqx = getfreqpos(freq);
@@ -88,7 +88,7 @@ class EQGraph {open : {public Fl_Box}
         fl_line(x() + (int) (freqx * w()), y(),
             x() + (int) (freqx * w()), y( ) + h());} {}
   }
-  Function {draw()} {open
+  Function {draw()} {open return_type void
   } {
     code {int ox = x(), oy = y(), lx = w(), ly = h(), i, iy, oiy;
         float freqx;
@@ -215,7 +215,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
             delete(filterwindow);
         }} {}
   }
-  Function {make_null_window()} {open
+  Function {make_null_window()} {open return_type void
   } {
     Fl_Window effnullwindow {open
       xywh {914 674 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
@@ -298,7 +298,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
       }
       Fl_Choice revp10 {
         label Type
-        callback {eff->seteffectpar(10,(int) o->value());} open
+        callback {eff->seteffectpar(10, lrintf(o->value()));} open
         xywh {240 13 75 15} down_box BORDER_BOX color 14 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -312,61 +312,61 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
       }
       Fl_Dial revp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp2 {
         label Time
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         tooltip {Duration of Effect} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp3 {
         label {I.del}
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {Initial Delay} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp4 {
         label {I.delfb}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {Initial Delay Feedback} xywh {155 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp5 {
         label {R.delay}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127 deactivate
         class WidgetPDial
       }
       Fl_Dial revp6 {
         label {E/R}
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127 deactivate
         class WidgetPDial
       }
       Fl_Dial revp7 {
         label LPF
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->seteffectpar(7, lrintf(o->value()));}
         tooltip {Low Pass Filter} xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp8 {
         label HPF
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->seteffectpar(8, lrintf(o->value()));}
         tooltip {High Pass Filter} xywh {305 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial revp9 {
         label Damp
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->seteffectpar(9, lrintf(o->value()));}
         tooltip Dampening xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 minimum 64 maximum 127 step 1
         class WidgetPDial
       }
@@ -381,7 +381,7 @@ eff->seteffectpar(11,x);}
       }
     }
   }
-  Function {make_echo_window()} {open
+  Function {make_echo_window()} {open return_type void
   } {
     Fl_Window effechowindow {open
       xywh {1129 700 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
@@ -436,49 +436,49 @@ refresh(eff);}
       }
       Fl_Dial echop0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial echop1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {59 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial echop2 {
         label Delay
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         xywh {111 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial echop3 {
         label {LRdl.}
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {Delay Between L/R} xywh {164 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial echop4 {
         label {LRc.}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {L/R Crossover} xywh {218 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial echop5 {
         label {Fb.}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         tooltip Feedback xywh {273 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial echop6 {
         label Damp
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         tooltip Dampening xywh {334 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
     }
   }
-  Function {make_chorus_window()} {open
+  Function {make_chorus_window()} {open return_type void
   } {
     Fl_Window effchoruswindow {open
       xywh {1075 219 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
@@ -537,72 +537,72 @@ refresh(eff);}
       }
       Fl_Dial chorusp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         tooltip {LFO Frequency} xywh {85 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {LFO Randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         tooltip {L/R Phase Shift} xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp6 {
         label Dpth
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         tooltip {LFO Depth} xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp7 {
         label Delay
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->seteffectpar(7, lrintf(o->value()));}
         xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp8 {
         label Fb
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->seteffectpar(8, lrintf(o->value()));}
         tooltip Feedback xywh {305 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial chorusp9 {
         label {L/R}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->seteffectpar(9, lrintf(o->value()));}
         tooltip {Channel Routing} xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Check_Button {} {
         label Flange
-        callback {eff->seteffectpar(10,(int) o->value());}
+        callback {eff->seteffectpar(10, lrintf(o->value()));}
         xywh {120 10 55 20} box THIN_UP_BOX down_box DOWN_BOX color 230 labelfont 1 labelsize 10 hide deactivate
         code0 {o->value(eff->geteffectpar(10));}
       }
       Fl_Check_Button chorusp11 {
         label Substract
-        callback {eff->seteffectpar(11,(int) o->value());}
+        callback {eff->seteffectpar(11, lrintf(o->value()));}
         tooltip {inverts the output} xywh {232 13 83 16} box THIN_UP_BOX down_box DOWN_BOX color 230 labelsize 11
       }
       Fl_Choice chorusp4 {
         label {LFO type}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {LFO function} xywh {154 50 43 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -616,7 +616,7 @@ refresh(eff);}
       }
     }
   }
-  Function {make_phaser_window()} {open
+  Function {make_phaser_window()} {open return_type void
   } {
     Fl_Window effphaserwindow {open
       xywh {1120 470 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
@@ -659,60 +659,60 @@ refresh(eff);} open
       }
       Fl_Dial phaserp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         tooltip {LFO frequency} xywh {85 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {LFO randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         tooltip {Left/Right Channel Phase Shift} xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp6 {
         label Dpth
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         tooltip {LFO Depth} xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp7 {
         label Fb
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->seteffectpar(7, lrintf(o->value()));}
         tooltip Feedback xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial phaserp9 {
         label {L/R}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->seteffectpar(9, lrintf(o->value()));}
         tooltip {Channel Routing} xywh {345 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Check_Button phaserp10 {
         label Substract
-        callback {eff->seteffectpar(10,(int) o->value());}
+        callback {eff->seteffectpar(10, lrintf(o->value()));}
         tooltip {inverts output} xywh {290 13 74 16} box THIN_UP_BOX down_box DOWN_BOX color 230 labelsize 10
       }
       Fl_Choice phaserp4 {
         label {LFO type}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {LFO function} xywh {153 50 44 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -726,19 +726,19 @@ refresh(eff);} open
       }
       Fl_Counter phaserp8 {
         label Stages
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->seteffectpar(8, lrintf(o->value()));}
         xywh {305 55 35 15} type Simple labelsize 11 minimum 0 maximum 127 step 1
         code0 {o->range(1,MAX_PHASER_STAGES);}
       }
       Fl_Dial phaserp11 {
         label Phase
-        callback {eff->seteffectpar(11,(int) o->value());}
+        callback {eff->seteffectpar(11, lrintf(o->value()));}
         xywh {252 10 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127
         class WidgetPDial
       }
     }
   }
-  Function {make_alienwah_window()} {open
+  Function {make_alienwah_window()} {open return_type void
   } {
     Fl_Window effalienwahwindow {open
       xywh {1039 300 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
@@ -773,55 +773,55 @@ refresh(eff);} open
       }
       Fl_Dial awp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         tooltip {LFO Frequency} xywh {85 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {LFO Randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         tooltip {Left/Right Channel Phase Shift} xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp6 {
         label Dpth
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         tooltip Depth xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp7 {
         label Fb
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->seteffectpar(7, lrintf(o->value()));}
         tooltip Feedback xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial awp9 {
         label {L/R}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->seteffectpar(9, lrintf(o->value()));}
         xywh {345 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Choice awp4 {
         label {LFO type}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {LFO function} xywh {155 50 43 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -835,19 +835,19 @@ refresh(eff);} open
       }
       Fl_Dial awp10 {
         label Phase
-        callback {eff->seteffectpar(10,(int) o->value());}
+        callback {eff->seteffectpar(10, lrintf(o->value()));}
         xywh {309 8 26 26} box ROUND_UP_BOX labelsize 11 align 4 maximum 127
         class WidgetPDial
       }
       Fl_Counter awp8 {
         label Delay
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->seteffectpar(8, lrintf(o->value()));}
         xywh {305 55 35 15} type Simple labelsize 11 minimum 0 maximum 127 step 1 textsize 11
         code0 {o->range(1,MAX_ALIENWAH_DELAY);}
       }
     }
   }
-  Function {make_distorsion_window()} {open
+  Function {make_distorsion_window()} {open return_type void
   } {
     Fl_Window effdistorsionwindow {open
       xywh {1008 712 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
@@ -890,49 +890,49 @@ refresh(eff);}
       }
       Fl_Dial distp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial distp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial distp2 {
         label {LRc.}
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         tooltip {L/R Mix} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial distp3 {
         label Drive
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {Input Amplification} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial distp4 {
         label Level
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {Output Amplification} xywh {155 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial distp7 {
         label LPF
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->seteffectpar(7, lrintf(o->value()));}
         tooltip {Low Pass Filter} xywh {285 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial distp8 {
         label HPF
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->seteffectpar(8, lrintf(o->value()));}
         tooltip {High Pass Filter} xywh {320 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Choice distp5 {
         label Type
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         xywh {190 50 60 20} box UP_BOX down_box BORDER_BOX labelsize 11 align 2 textsize 10
       } {
         MenuItem {} {
@@ -994,22 +994,22 @@ refresh(eff);}
       }
       Fl_Check_Button distp6 {
         label {Neg.}
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         xywh {260 55 15 15} down_box DOWN_BOX labelsize 11 align 2
       }
       Fl_Check_Button distp9 {
         label {St.}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->seteffectpar(9, lrintf(o->value()));}
         tooltip Stereo xywh {355 60 15 15} down_box DOWN_BOX labelsize 11 align 2
       }
       Fl_Check_Button distp10 {
         label PF
-        callback {eff->seteffectpar(10,(int) o->value());}
+        callback {eff->seteffectpar(10, lrintf(o->value()));}
         tooltip {Applies the filters(before or after) the distorsion} xywh {355 44 15 15} down_box DOWN_BOX labelsize 11 align 1
       }
     }
   }
-  Function {make_eq_window()} {open
+  Function {make_eq_window()} {open return_type void
   } {
     Fl_Window effeqwindow {open
       xywh {765 580 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
@@ -1021,36 +1021,35 @@ refresh(eff);}
       }
       Fl_Dial eqp0 {
         label Gain
-        callback {eff->seteffectpar(0,(int) o->value());
+        callback {eff->seteffectpar(0, lrintf(o->value()));
 eqgraph->redraw();}
         xywh {10 41 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Counter bandcounter {
         label {B.}
-        callback {eqband=(int) o->value();
-int npb=eqband*5+10;
-
-int type=eff->geteffectpar(npb);
-typechoice->value(type);
-
-if (type>6) gaindial->activate();
- else gaindial->deactivate();
-
-if (type==0) bandgroup->deactivate();
-else bandgroup->activate();
-
-int freq=eff->geteffectpar(npb+1);
-freqdial->value(freq);
-
-int gain=eff->geteffectpar(npb+2);
-gaindial->value(gain);
-
-int q=eff->geteffectpar(npb+3);
-qdial->value(q);
-
-int dbl=eff->geteffectpar(npb+4);
-stagescounter->value(dbl);}
+        callback {//
+            eqband = lrintf(o->value());
+            int npb=eqband*5+10;
+            int type = eff->geteffectpar(npb);
+            typechoice->value(type);
+            if (type > 6)
+                gaindial->activate();
+            else
+                gaindial->deactivate();
+            if (type == 0)
+                bandgroup->deactivate();
+            else
+                bandgroup->activate();
+            int freq = eff->geteffectpar(npb + 1);
+            freqdial->value(freq);
+            int gain = eff->geteffectpar(npb + 2);
+            gaindial->value(gain);
+            int q = eff->geteffectpar(npb + 3);
+            qdial->value(q);
+            int dbl = eff->geteffectpar(npb + 4);
+            stagescounter->value(dbl);
+        }
         tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 textsize 11
         code0 {o->bounds(0,MAX_EQ_BANDS-1);}
       }
@@ -1060,43 +1059,53 @@ stagescounter->value(dbl);}
       } {
         Fl_Dial freqdial {
           label Freq
-          callback {int np=eqband*5+11;
-eff->seteffectpar(np,(int) o->value());
-eqgraph->redraw();}
+          callback {//
+              int np = eqband * 5 + 11;
+              eff->seteffectpar(np, lrintf(o->value()));
+              eqgraph->redraw();
+          }
           xywh {250 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           class WidgetPDial
         }
         Fl_Dial gaindial {
           label Gain
-          callback {int np=eqband*5+12;
-eff->seteffectpar(np,(int) o->value());
-eqgraph->redraw();}
+          callback {//
+              int np = eqband * 5 + 12;
+              eff->seteffectpar(np, lrintf(o->value()));
+              eqgraph->redraw();
+          }
           xywh {280 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial qdial {
           label Q
-          callback {int np=eqband*5+13;
-eff->seteffectpar(np,(int) o->value());
-eqgraph->redraw();}
+          callback {//
+              int np=eqband*5+13;
+              eff->seteffectpar(np, lrintf(o->value()));
+              eqgraph->redraw();
+          }
           tooltip {Resonance/Bandwidth} xywh {310 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           class WidgetPDial
         }
         Fl_Counter stagescounter {
           label {St.}
-          callback {int np=eqband*5+14;
-eff->seteffectpar(np,(int) o->value());
-eqgraph->redraw();}
+          callback {//
+              int np=eqband*5+14;
+              eff->seteffectpar(np, lrintf(o->value()));
+              eqgraph->redraw();
+          }
           tooltip {Additional filter stages} xywh {340 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
         }
       }
       Fl_Choice typechoice {
         label {T.}
-        callback {int np=eqband*5+10;
-eff->seteffectpar(np,(int) o->value());
-bandcounter->do_callback();
-eqgraph->redraw();}
+        callback {//
+            int np=eqband*5+10;
+            eff->seteffectpar(np, lrintf(o->value()));
+            bandcounter->do_callback();
+            eqgraph->redraw();
+        }
         tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textsize 11
       } {
         MenuItem {} {
@@ -1147,7 +1156,7 @@ eqgraph->redraw();}
       }
     }
   }
-  Function {make_dynamicfilter_window()} {open
+  Function {make_dynamicfilter_window()} {open return_type void
   } {
     Fl_Window effdynamicfilterwindow {open
       xywh {1098 395 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
@@ -1155,8 +1164,10 @@ eqgraph->redraw();}
     } {
       Fl_Choice dfp {
         label Preset
-        callback {eff->changepreset((int)o->value());
-refresh(eff);}
+        callback {//
+            eff->changepreset((int)o->value());
+            refresh(eff);
+        }
         xywh {132 13 90 16} down_box BORDER_BOX color 14 selection_color 0 labelsize 10 textsize 10 textcolor 7
       } {
         MenuItem {} {
@@ -1186,43 +1197,43 @@ refresh(eff);}
       }
       Fl_Dial dfp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0, lrintf(o->value()));}
         tooltip {Effect Volume} xywh {6 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->seteffectpar(1, lrintf(o->value()));}
         xywh {42 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->seteffectpar(2, lrintf(o->value()));}
         tooltip {LFO Frequency} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->seteffectpar(3, lrintf(o->value()));}
         tooltip {LFO Randomness} xywh {118 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->seteffectpar(5, lrintf(o->value()));}
         tooltip {Left/Right Channel Phase Shift} xywh {205 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Dial dfp6 {
         label LfoD
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->seteffectpar(6, lrintf(o->value()));}
         tooltip {LFO Depth} xywh {240 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
       Fl_Choice dfp4 {
         label {LFO type}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->seteffectpar(4, lrintf(o->value()));}
         tooltip {LFO function} xywh {152 55 48 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -1244,25 +1255,25 @@ refresh(eff);}
       } {
         Fl_Dial dfp7 {
           label {A.S.}
-          callback {eff->seteffectpar(7,(int) o->value());}
+          callback {eff->seteffectpar(7, lrintf(o->value()));}
           tooltip {Filter vs Amplitude} xywh {280 45 25 25} box ROUND_UP_BOX labelsize 11 maximum 127
           class WidgetPDial
         }
         Fl_Dial dfp9 {
           label {A.M}
-          callback {eff->seteffectpar(9,(int) o->value());}
+          callback {eff->seteffectpar(9, lrintf(o->value()));}
           tooltip {rate that  amplitude changes the filter} xywh {309 45 25 25} box ROUND_UP_BOX labelsize 11 maximum 127
           class WidgetPDial
         }
         Fl_Check_Button dfp8 {
           label {A.Inv.}
-          callback {eff->seteffectpar(8,(int) o->value());}
+          callback {eff->seteffectpar(8, lrintf(o->value()));}
           tooltip {enable for filter frequency to lower with higher input amplitude} xywh {348 55 15 15} down_box DOWN_BOX labelsize 11 align 2
         }
       }
     }
   }
-  Function {make_filter_window()} {open
+  Function {make_filter_window()} {open return_type void
   } {
     Fl_Window filterwindow {
       label {Filter Parameters for DynFilter Eff.} open
@@ -1282,36 +1293,37 @@ refresh(eff);}
       }
     }
   }
-  Function {init(EffectMgr *eff_)} {} {
-    code {eff=eff_;
-
-make_null_window();
-make_reverb_window();
-make_echo_window();
-make_chorus_window();
-make_phaser_window();
-make_alienwah_window();
-make_distorsion_window();
-make_eq_window();
-make_dynamicfilter_window();
-
-int px=this->parent()->x();
-int py=this->parent()->y();
-
-effnullwindow->position(px,py);
-effreverbwindow->position(px,py);
-effechowindow->position(px,py);
-effchoruswindow->position(px,py);
-effphaserwindow->position(px,py);
-effalienwahwindow->position(px,py);
-effdistorsionwindow->position(px,py);
-effeqwindow->position(px,py);
-effdynamicfilterwindow->position(px,py);
-
-refresh(eff);} {}
+  Function {init(EffectMgr *eff_)} {return_type void
+  } {
+    code {//
+        eff = eff_;
+        make_null_window();
+        make_reverb_window();
+        make_echo_window();
+        make_chorus_window();
+        make_phaser_window();
+        make_alienwah_window();
+        make_distorsion_window();
+        make_eq_window();
+        make_dynamicfilter_window();
+        int px=this->parent()->x();
+        int py=this->parent()->y();
+        effnullwindow->position(px,py);
+        effreverbwindow->position(px,py);
+        effechowindow->position(px,py);
+        effchoruswindow->position(px,py);
+        effphaserwindow->position(px,py);
+        effalienwahwindow->position(px,py);
+        effdistorsionwindow->position(px,py);
+        effeqwindow->position(px,py);
+        effdynamicfilterwindow->position(px,py);
+        refresh(eff);
+    } {}
   }
-  Function {refresh(EffectMgr *eff_)} {} {
-    code {eff = eff_;
+  Function {refresh(EffectMgr *eff_)} {return_type void
+  } {
+    code {//
+        eff = eff_;
         this->hide();
         effnullwindow->hide();
         effreverbwindow->hide();
@@ -1326,8 +1338,8 @@ refresh(eff);} {}
         if (filterwindow != NULL)
         {
             filterwindow->hide();
-            delete(filterwindow);
-            filterwindow=NULL;
+            delete filterwindow;
+            filterwindow = NULL;
         }
         switch(eff->geteffect())
         {
@@ -1468,7 +1480,8 @@ refresh(eff);} {}
         }
         this->show();} {}
   }
-  Function {refresh()} {} {
+  Function {refresh(void)} {selected return_type void
+  } {
     code {refresh(eff);} {}
   }
   decl {EffectMgr *eff;} {}

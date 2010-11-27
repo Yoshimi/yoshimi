@@ -24,21 +24,26 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
-#include "Synth/BodyDisposal.h"
+#include "Misc/BodyDisposal.h"
 #include "Sql/ProgramBanks.h"
 #include "MasterUI.h"
 
 int main(int argc, char *argv[])
 {
-    if (!Runtime.Setup(argc, argv))
-        goto bail_out;
+    int failure = 0;
 
-    if (!((progBanks = new ProgramBanks()) && progBanks->Setup()))
+    if (!Runtime.Setup(argc, argv))
     {
-        Runtime.Log("Failed to establish program bank database");
+        failure  = 1;
         goto bail_out;
     }
-
+    if (!((progBanks = new ProgramBanks()) && progBanks->Setup()))
+    {
+        Runtime.Log("Failed to establish program bank database", true);
+        failure  = 2;
+        goto bail_out;
+    }
+    
     if (Runtime.showGui)
     {
         guiMaster = new MasterUI();
@@ -61,6 +66,7 @@ int main(int argc, char *argv[])
     if (!(musicClient->Open()))
     {
         Runtime.Log("Failed to open MusicClient");
+        failure  = 3;
         goto bail_out;
     }
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
@@ -68,11 +74,13 @@ int main(int argc, char *argv[])
         Runtime.Log("Master init failed");
         goto bail_out;
     }
+
     if (!musicClient->Start())
     {
         Runtime.Log("So sad, failed to start MusicIO");
         goto bail_out;
     }
+
     if (Runtime.showGui)
     {
         guiMaster->Init();
@@ -85,7 +93,7 @@ int main(int argc, char *argv[])
         if (Runtime.showGui)
         {
             if (!Runtime.LogList.empty())
-            { 
+            {
                 guiMaster->Log(Runtime.LogList.front());
                 Runtime.LogList.pop_front();
             }
@@ -109,9 +117,25 @@ int main(int argc, char *argv[])
 bail_out:
     Runtime.runSynth = false;
     usleep(33333); // contemplative pause ...
-    Runtime.Log("Yoshimi stages a strategic retreat :-(");
+    string msg = "Bad things happened, Yoshimi strategically retreats.";
+    switch (failure)
+    {
+    case 1:
+        msg += "\nConfig setup failed";
+        break;
+    case 2:
+        msg += "\nSerious problems dealing with the instrument database";
+        break;
+    case 3:
+        if (Runtime.audioEngine == jack_audio || Runtime.midiEngine == jack_midi)
+            msg += "\nIs jack running?";
+        break;
+    default:
+        break;            
+    }
+    Runtime.Log(msg);
     if (guiMaster)
-        guiMaster->strategicRetreat();
+        guiMaster->strategicRetreat(msg);
     Runtime.flushLog();
     exit(EXIT_FAILURE);
 }

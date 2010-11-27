@@ -18,20 +18,19 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef FILTER_H
 #define FILTER_H
 
-#include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
 #include "DSP/FormantFilter.h"
 #include "DSP/SVFilter.h"
 #include "Params/FilterParams.h"
 
-class Filter : private MiscFuncs
+class Filter
 {
     public:
         Filter(FilterParams *pars);
@@ -43,6 +42,8 @@ class Filter : private MiscFuncs
         float getrealfreq(float freqpitch);
 
     private:
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
+
         Filter_ *filter;
         unsigned char category;
 };

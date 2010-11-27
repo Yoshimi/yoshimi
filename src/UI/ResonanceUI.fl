@@ -1,11 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0107 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {ResonanceUI.h} {not_in_source in_header
-}
+} 
+
 comment {ResonanceUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -26,7 +27,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified January 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>} {public
 } 
@@ -37,7 +38,7 @@ decl {\#include <FL/fl_draw.H>} {public
 decl {\#include <FL/Fl_Value_Output.H>} {public
 } 
 
-decl {\#include <cmath>} {}
+decl {\#include <cmath>} {} 
 
 decl {\#include "WidgetPDialUI.h"} {public
 } 
@@ -46,23 +47,25 @@ decl {\#include "PresetsUI.h"} {public
 } 
 
 decl {\#include "Synth/Resonance.h"} {public
-}
+} 
 
-class ResonanceGraph {: {public Fl_Box}
+class ResonanceGraph {open : {public Fl_Box}
 } {
   Function {ResonanceGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {respar=NULL;
 cbwidget=NULL;
 applybutton=NULL;} {}
   }
-  Function {init(Resonance *respar_,Fl_Value_Output *khzvalue_,Fl_Value_Output *dbvalue_)} {} {
+  Function {init(Resonance *respar_,Fl_Value_Output *khzvalue_,Fl_Value_Output *dbvalue_)} {return_type void
+  } {
     code {respar=respar_;
 khzvalue=khzvalue_;
 dbvalue=dbvalue_;
 oldx=-1;
 khzval=-1;} {}
   }
-  Function {draw_freq_line(float freq,int type)} {} {
+  Function {draw_freq_line(float freq,int type)} {return_type void
+  } {
     code {float freqx=respar->getfreqpos(freq);
 switch(type){
   case 0:fl_line_style(FL_SOLID);break;
@@ -75,7 +78,8 @@ if ((freqx>0.0)&&(freqx<1.0))
    fl_line(x()+(int) (freqx*w()),y(),
    x()+(int) (freqx*w()),y()+h());} {}
   }
-  Function {draw()} {} {
+  Function {draw(void)} {return_type void
+  } {
     code {int ox=x(),oy=y(),lx=w(),ly=h(),i,ix,iy,oiy;
 float freqx;
 
@@ -187,7 +191,8 @@ if (event==FL_RELEASE) {
 
 return(1);} {}
   }
-  Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *applybutton)} {} {
+  Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *applybutton)} {return_type void
+  } {
     code {this->cbwidget=cbwidget;
 this->applybutton=applybutton;} {}
   }
@@ -200,12 +205,12 @@ this->applybutton=applybutton;} {}
   decl {Fl_Widget *cbwidget,*applybutton;} {}
 } 
 
-class ResonanceUI { : PresetsUI_
+class ResonanceUI {open : PresetsUI_
 } {
-  Function {make_window()} {
+  Function {make_window(void)} {return_type void
   } {
     Fl_Window resonancewindow {
-      label Resonance selected
+      label Resonance
       xywh {120 70 780 305} type Double hide
     } {
       Fl_Value_Output khzvalue {
@@ -231,38 +236,30 @@ class ResonanceUI { : PresetsUI_
       }
       Fl_Button {} {
         label Zero
-        callback {
-            for (int i = 0; i < N_RES_POINTS; ++i)
+        callback {for (int i = 0; i < N_RES_POINTS; ++i)
                 respar->setpoint(i, 64);
                 resonancewindow->redraw();
-                redrawPADnoteApply();
-        }
+                redrawPADnoteApply();}
         tooltip {Clear the resonance function} xywh {491 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Smooth
-        callback {
-            respar->smooth();
+        callback {respar->smooth();
             resonancewindow->redraw();
-            redrawPADnoteApply();
-        }
+            redrawPADnoteApply();}
         tooltip {Smooth the resonance function} xywh {491 282 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Check_Button enabled {
         label Enable
-        callback {
-            respar->Penabled = (int) o->value();
-            redrawPADnoteApply();
-        }
+        callback {respar->Penabled = (int) o->value();
+            redrawPADnoteApply();}
         xywh {6 270 78 27} box THIN_UP_BOX down_box DOWN_BOX
         code0 {o->value(respar->Penabled);}
       }
       Fl_Roller maxdb {
-        callback {
-            maxdbvo->value(o->value());
+        callback {maxdbvo->value(o->value());
             respar->PmaxdB = (int) o->value();
-            redrawPADnoteApply();
-        }
+            redrawPADnoteApply();}
         xywh {90 282 84 15} type Horizontal minimum 1 maximum 90 step 1 value 30
       }
       Fl_Value_Output maxdbvo {
@@ -317,38 +314,32 @@ redrawPADnoteApply();}
       }
       Fl_Button {} {
         label InterpP
-        callback {
-            int type;
+        callback {int type;
             if (Fl::event_button() == FL_LEFT_MOUSE)
                 type = 0;
             else
                 type = 1;
             respar->interpolatepeaks(type);
             resonancewindow->redraw();
-            redrawPADnoteApply();
-        }
+            redrawPADnoteApply();}
         tooltip {Interpolate the peaks} xywh {365 265 46 15} box THIN_UP_BOX labelfont 1 labelsize 10
       }
       Fl_Dial centerfreq {
         label {C.f.}
-        callback {
-            respar->Pcenterfreq=(int)o->value();
+        callback {respar->Pcenterfreq=(int)o->value();
             centerfreqvo->do_callback();
             rg->redraw();
-            redrawPADnoteApply();
-        }
+            redrawPADnoteApply();}
         xywh {245 265 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
         code0 {o->value(respar->Pcenterfreq);}
         class WidgetPDial
       }
       Fl_Dial octavesfreq {
         label {Oct.}
-        callback {
-            respar->Poctavesfreq=(int)o->value();
+        callback {respar->Poctavesfreq=(int)o->value();
             octavesfreqvo->do_callback();
             rg->redraw();
-            redrawPADnoteApply();
-        }
+            redrawPADnoteApply();}
         xywh {280 265 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
         code0 {o->value(respar->Poctavesfreq);}
         class WidgetPDial
@@ -365,50 +356,46 @@ redrawPADnoteApply();}
       }
       Fl_Button applybutton {
         label Apply
-        callback {
-            applybutton->color(FL_GRAY);
+        callback {applybutton->color(FL_GRAY);
             applybutton->redraw();
             if (cbapplywidget != NULL)
             {
                 cbapplywidget->do_callback();
                 cbapplywidget->color(FL_GRAY);
                 cbapplywidget->redraw();
-            }
-        }
+            }}
         xywh {690 265 85 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
     }
   }
   Function {ResonanceUI(Resonance *respar_)} {} {
-    code {
-        respar = respar_;
+    code {respar = respar_;
         cbwidget = NULL;
         cbapplywidget = NULL;
         make_window();
-        applybutton->hide();
-    } {}
+        applybutton->hide();} {}
   }
   Function {~ResonanceUI()} {} {
     code {resonancewindow->hide();} {}
   }
-  Function {redrawPADnoteApply()} {} {
+  Function {redrawPADnoteApply(void)} {return_type void
+  } {
     code {if (cbwidget!=NULL) {
 	cbwidget->do_callback();
 	applybutton->color(FL_RED);
 	applybutton->redraw();
 };} {}
   }
-  Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *cbapplywidget)} {} {
-    code {
-        this->cbwidget = cbwidget;
+  Function {setcbwidget(Fl_Widget *cbwidget,Fl_Widget *cbapplywidget)} {return_type void
+  } {
+    code {this->cbwidget = cbwidget;
         this->cbapplywidget = cbapplywidget;
         rg->setcbwidget(cbwidget, applybutton);
-        applybutton->show();
-    } {}
+        applybutton->show();} {}
   }
-  Function {refresh()} {} {
-    code {
-        redrawPADnoteApply();
+  Function {refresh(void)} {selected return_type void
+  } {
+    code {redrawPADnoteApply();
         enabled->value(respar->Penabled);
         maxdb->value(respar->PmaxdB);
         maxdbvo->value(respar->PmaxdB);
@@ -417,8 +404,7 @@ redrawPADnoteApply();}
         centerfreq->value(respar->Pcenterfreq);
         octavesfreq->value(respar->Poctavesfreq);
         p1st->value(respar->Pprotectthefundamental);
-        rg->redraw();
-    } {}
+        rg->redraw();} {}
   }
   decl {Resonance *respar;} {public
   }

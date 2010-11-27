@@ -18,21 +18,22 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #ifndef ENVELOPE_PARAMS_H
 #define ENVELOPE_PARAMS_H
 
 #include "Params/Presets.h"
+#include "Misc/Carcass.h"
 
 class XMLwrapper;
 
-class EnvelopeParams : public Presets
+class EnvelopeParams : public Presets, public Carcass
 {
     public:
         EnvelopeParams(unsigned char Penvstretch_, unsigned char Pforcedrelease_);
-        ~EnvelopeParams() { };
+        ~EnvelopeParams() { }
         void ADSRinit(char A_dt, char D_dt, char S_val, char R_dt);
         void ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt);
         void ASRinit(char A_val, char A_dt, char R_val, char R_dt);

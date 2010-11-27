@@ -18,16 +18,15 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef SV_FILTER_H
 #define SV_FILTER_H
 
-#include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
 
-class SVFilter : public Filter_, private MiscFuncs
+class SVFilter : public Filter_
 {
     public:
         SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages);
@@ -53,15 +52,18 @@ class SVFilter : public Filter_, private MiscFuncs
 
         void singlefilterout(float *smp, fstage &x, parameters &par);
         void computefiltercoefs(void);
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
+
         int type;      // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
         int stages;    // how many times the filter is applied (0->1,1->2,etc.)
-        float freq; // Frequency given in Hz
-        float q;    // Q factor (resonance or Q factor)
-        float gain; // the gain of the filter (if are shelf/peak) filters
+        float freq;    // Frequency given in Hz
+        float q;       // Q factor (resonance or Q factor)
+        float gain;    // the gain of the filter (if are shelf/peak) filters
 
         int abovenq;   // this is 1 if the frequency is above the nyquist
         int oldabovenq;
-        int needsinterpolation, firsttime;
+        int needsinterpolation;
+        int firsttime;
 };
 
 #endif

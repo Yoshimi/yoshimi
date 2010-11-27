@@ -41,31 +41,93 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Misc/Part.h"
 #include "Sql/ProgramBanks.h"
+#include "MasterUI.h"
 
 ProgramBanks *progBanks = NULL;
 
 ProgramBanks::ProgramBanks() :
-    bankLsb(Runtime.currentBank),
-    bankMsb(0),
     xizext(".xiz"),
     dbConn(NULL)
-{ }
-
-
-ProgramBanks::~ProgramBanks() { if (dbConn) sqlite3_close(dbConn); }
+{
+    for (int i = 0; i < BANK_LIMIT; ++i)
+    {
+        bankList[i] = string();
+        programList[i] = string();
+    }
+}
 
 
 bool ProgramBanks::Setup(void)
 {
-    if (Runtime.DbFile.empty() || !isRegFile(Runtime.DbFile))
+    string db = string("yoshimi.db");
+    string dbFile = Runtime.DataDirectory + string("/") + db;
+    string banksDir = Runtime.DataDirectory + string("/banks");
+    string presetsDir = Runtime.DataDirectory + string("/presets");
+    string instrumentsTarFile = string(BASE_INSTALL_DIR) + string("/share/yoshimi/yoshimi-instruments.tar.gz");
+
+    if (!isRegFile(dbFile))
     {
-        Runtime.Log("Database file [" + Runtime.DbFile + "] not found!");
+        if (!isRegFile(instrumentsTarFile))
+        {
+            Runtime.Log("Default instrument tar file " + instrumentsTarFile + " not found");
+            return false;
+        }
+        string cmd = string("cd ") + Runtime.DataDirectory + string(" && tar xzf ")
+                     + instrumentsTarFile + string(" ") + db;
+        if (system(cmd.c_str()) < 0)
+        {
+            Runtime.Log("Failed to install database to " + Runtime.DataDirectory, true);
+            return false;
+        }
+        else
+            Runtime.Log("Program bank database installed as " + dbFile);
+    }
+
+    if (!isDirectory(banksDir))
+    {
+        if (!isRegFile(instrumentsTarFile))
+        {
+            Runtime.Log("Default instrument tar file " + instrumentsTarFile + " not found");
+            return false;
+        }
+        string cmd = string("cd ") + Runtime.DataDirectory + string(" && tar xzf ")
+                     + instrumentsTarFile + string(" banks");
+        if (system(cmd.c_str()) < 0)
+        {
+            Runtime.Log("Failed to install instrument files to " + banksDir, true);
+            return false;
+        }
+        else
+            Runtime.Log("Instrument files installed in " + banksDir);
+    }
+
+    if (!isDirectory(presetsDir))
+    {
+        if (!isRegFile(instrumentsTarFile))
+        {
+            Runtime.Log("Default instrument tar file " + instrumentsTarFile + " not found");
+            return false;
+        }
+        string cmd = string("cd ") + Runtime.DataDirectory + string(" && tar xzf ")
+                     + instrumentsTarFile + string(" presets");
+        if (system(cmd.c_str()) < 0)
+        {
+            Runtime.Log("Failed to install presets to " + presetsDir, true);
+            return false;
+        }
+        else
+            Runtime.Log("Instrument presets installed in " + presetsDir);
+    }
+    if (!isRegFile(dbFile))
+    {
+        Runtime.Log("Database file " + dbFile + " still not found!");
         return false;
     }
-    if (SQLITE_OK != sqlite3_open_v2(Runtime.DbFile.c_str(), &dbConn,
+
+    if (SQLITE_OK != sqlite3_open_v2(dbFile.c_str(), &dbConn,
                                      SQLITE_OPEN_READWRITE, NULL))
     {
-        dbErrorLog("open database " + Runtime.DbFile + " failed");
+        dbErrorLog("open database " + dbFile + " failed");
         if (dbConn)
             sqlite3_close(dbConn);
         dbConn = NULL;
@@ -74,7 +136,6 @@ bool ProgramBanks::Setup(void)
     sqlite3_extended_result_codes(dbConn, 1);
     sqlite3_limit(dbConn, SQLITE_LIMIT_VARIABLE_NUMBER, 50);
     loadBankList();
-    setBank(Runtime.currentBank);
     return true;
 }
 
@@ -88,7 +149,7 @@ void ProgramBanks::dbErrorLog(string msg)
 
 void ProgramBanks::scanInstrumentFiles(void)
 {
-    string rootdir = Runtime.DataDir + "/banks/";
+    string rootdir = Runtime.DataDirectory + "/banks/";
     DIR *rootDIR = opendir(rootdir.c_str());
     if (rootDIR == NULL)
     {
@@ -105,7 +166,7 @@ void ProgramBanks::scanInstrumentFiles(void)
         sqlite3_finalize(stmt);
         return;
     }
-    qry = string("delete from instrument where 1 = 1; delete from programbank where 1 = 1");
+    qry = string("delete from programs where 1 = 1; delete from banks where 1 = 1");
     if (!(SQLITE_OK == sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL)
           && SQLITE_DONE == sqlite3_step(stmt)))
     {
@@ -134,6 +195,7 @@ void ProgramBanks::scanInstrumentFiles(void)
     string chkfile;
     string msg;
 
+    Runtime.Log("Loading program bank database from base .xiz files, which takes a while!");
     for (unsigned char bank = 0; bank < BANK_LIMIT && (dent = readdir(rootDIR)) != NULL;)
     {
         chkbank = string(dent->d_name);
@@ -148,7 +210,7 @@ void ProgramBanks::scanInstrumentFiles(void)
             Runtime.Log("Failed to open bank directory candidate: " + chkdir);
             continue;
         }
-        if (!addBank(bank, chkbank, chkdir))
+        if (!addBank(bank, chkbank))
         {
             Runtime.Log("Failed addBank " + asString(bank) + ", dir " + chkbank + " failed");
             continue;
@@ -184,27 +246,24 @@ void ProgramBanks::scanInstrumentFiles(void)
                     Runtime.Log("Weird parse on file " + chkpath);
                     continue;
                 }
-                if (addProgram(bank, prognum, progname, xmlwrap->xmldata))
-                    Runtime.Log("Bank " + asString(bank + 1) + " Program " + asString(++prognum)
-                                + " : " +  progname + " => " + chkfile);
-                else
+                if (!addProgram(bank, prognum++, progname, xmlwrap->xmlData))
                     Runtime.Log("Failed to add program " + chkpath);
             }
         }
         closedir(chkDIR);
+        Runtime.Log("Bank " + asString(bank) + " " + chkbank + " loaded");
         ++bank;
     }
-    Runtime.Log("Bank rescan complete");
+    Runtime.Log("Database reload complete.");
     closedir(rootDIR);
 }
 
 
 void ProgramBanks::loadBankList(void)
 {
-    bankList.clear();
-    for (unsigned char u = 0; u < BANK_LIMIT; ++u)
-        bankList[u] = string();
-    string qry = string("select banknumber, name from programbank order by banknumber");
+    for (int i = 0; i < BANK_LIMIT; ++i)
+        bankList[i].clear();
+    string qry = string("select banknum, name from banks order by banknum");
     sqlite3_stmt *stmt = NULL;
     if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
         dbErrorLog(qry);
@@ -216,11 +275,10 @@ void ProgramBanks::loadBankList(void)
 
 void ProgramBanks::loadProgramList(unsigned char bk)
 {
-    programList.clear();
-    for (unsigned char u = 0; u < BANK_LIMIT; ++u)
-        programList[u] = string();
-    string qry = string("select prognumber, name from instrument where banknumber=")
-                 + asString(bk) + string(" order by prognumber");
+    for (int i = 0; i < BANK_LIMIT; ++i)
+        programList[i].clear();
+    string qry = string("select prognum, name from programs where banknum=")
+                 + asString(bk) + string(" order by prognum");
     sqlite3_stmt *stmt = NULL;
     if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
         dbErrorLog(qry);
@@ -230,7 +288,7 @@ void ProgramBanks::loadProgramList(unsigned char bk)
 }
 
 
-bool ProgramBanks::addBank(unsigned char bank, string name, string dir)
+bool ProgramBanks::addBank(unsigned char bank, string name)
 {
     bool ok = false;
     sqlite3_int64 bankrow = -1;
@@ -244,7 +302,7 @@ bool ProgramBanks::addBank(unsigned char bank, string name, string dir)
         goto endgame;
     }
 
-    qry = string("select rowid from programbank where banknumber=") + asString((int)bank);
+    qry = string("select rowid from banks where banknum=") + asString((int)bank);
     if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
     {
         dbErrorLog(qry);
@@ -253,9 +311,8 @@ bool ProgramBanks::addBank(unsigned char bank, string name, string dir)
     if (SQLITE_ROW == sqlite3_step(stmt))
     {
         bankrow = sqlite3_column_int64(stmt, 0);
-        qry = string("update programbank set banknumber=") + asString((int)bank)
+        qry = string("update banks set banknum=") + asString((int)bank)
               + string(",name=") + dbQuoteSingles(name)
-              + string(",dir=") + dbQuoteSingles(dir)
               + string(" where row = ") + asString((long long)bankrow);
         if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
         {
@@ -270,9 +327,9 @@ bool ProgramBanks::addBank(unsigned char bank, string name, string dir)
     }
     else
     {
-        qry = string("insert into programbank (banknumber, name, dir) values (")
-              + asString((int)bank) + string(", ") + dbQuoteSingles(name) + string(", ")
-              + dbQuoteSingles(dir) + string(")");
+        qry = string("insert into banks (banknum, name) values (")
+              + asString((int)bank) + string(", ") + dbQuoteSingles(name)
+              + string(")");
         if (!(SQLITE_OK == sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL)
               && SQLITE_DONE == sqlite3_step(stmt)))
         {
@@ -303,8 +360,8 @@ bool ProgramBanks::addProgram(unsigned char bank, unsigned char prog, string nam
         dbErrorLog(qry);
         goto endgame;
     }
-    qry = string("select rowid from instrument where banknumber=") + asString((int)bank)
-          + string(" and prognumber = ") + asString((int)prog);
+    qry = string("select rowid from programs where banknum=") + asString((int)bank)
+          + string(" and prognum = ") + asString((int)prog);
     if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
     {
         dbErrorLog(qry);
@@ -313,7 +370,7 @@ bool ProgramBanks::addProgram(unsigned char bank, unsigned char prog, string nam
     if (SQLITE_ROW == sqlite3_step(stmt))
     {
         progrow = sqlite3_column_int64(stmt, 0);
-        qry = string("update instrument set name=") + dbQuoteSingles(name)
+        qry = string("update programs set name=") + dbQuoteSingles(name)
                      + string(",xml=") + dbQuoteSingles(xmldata)
                      + string(" where row = ") + asString((long long)progrow);
         if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
@@ -328,7 +385,7 @@ bool ProgramBanks::addProgram(unsigned char bank, unsigned char prog, string nam
     }
     else
     {
-        qry = string("insert into instrument (banknumber, prognumber, name, xml) values (")
+        qry = string("insert into programs (banknum, prognum, name, xml) values (")
               + asString((int)bank) + string(", ")
               + asString((int)prog) + string(", ")
               + dbQuoteSingles(name) + string(", ")
@@ -415,8 +472,8 @@ string ProgramBanks::programXml(unsigned char bank, unsigned char prog)
 {
     sqlite3_stmt *stmt = NULL;
     string xml;
-    string qry = string("select xml from instrument where banknumber=")
-                 + asString(bank) + string(" and prognumber=")
+    string qry = string("select xml from programs where banknum=")
+                 + asString(bank) + string(" and prognum=")
                  + asString(prog);
     if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
         dbErrorLog(string("programName prep: ") + qry);

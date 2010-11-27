@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.062-pre2")
+set (YOSHIMI_VERSION "0.062-pre3")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -226,6 +226,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Microtonal.cpp
     Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp
+    Misc/BodyDisposal.cpp
 )
 
 set (Params_sources
@@ -238,7 +239,6 @@ set (Params_sources
 set (Synth_sources
     Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp
     Synth/SUBnote.cpp  Synth/Resonance.cpp  Synth/PADnote.cpp
-    Synth/BodyDisposal.cpp
 )
 
 set (MusicIO_sources
@@ -353,6 +353,10 @@ install (TARGETS yoshimi RUNTIME DESTINATION bin)
 install (FILES ../yoshimi-instruments.tar.gz DESTINATION share/yoshimi
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ GROUP_WRITE WORLD_READ
 )
+
+configure_file (../desktop/yoshimi.desktop.in ../desktop/yoshimi.desktop)
+install (FILES ../desktop/yoshimi.desktop DESTINATION share/applications)
+install (FILES ../desktop/pink_robot_icon.png DESTINATION share/yoshimi)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"

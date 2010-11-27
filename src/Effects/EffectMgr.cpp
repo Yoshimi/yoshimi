@@ -133,9 +133,9 @@ void EffectMgr::changepreset_nolock(unsigned char npreset)
 // Change the preset of the current effect(with thread locking)
 void EffectMgr::changepreset(unsigned char npreset)
 {
-    synth->lockExclusive();
+    synth->lockSharable();
     changepreset_nolock(npreset);
-    synth->unlockExclusive();
+    synth->unlockSharable();
 }
 
 
@@ -150,9 +150,9 @@ void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
 // Change a parameter of the current effect (with thread locking)
 void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
-    synth->lockExclusive();
+    synth->lockSharable();
     seteffectpar_nolock(npar, value);
-    synth->unlockExclusive();
+    synth->unlockSharable();
 }
 
 // Get a parameter of the current effect
@@ -186,24 +186,22 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 
     if (nefx == 7)
     {   // this is need only for the EQ effect
-        // aca: another memcpy() candidate
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
-            smpsl[i] = efxoutl[i];
-            smpsr[i] = efxoutr[i];
-        }
+        memcpy(smpsl, efxoutl, synth->bufferbytes);
+        memcpy(smpsr, efxoutr, synth->bufferbytes);
         return;
     }
 
     // Insertion effect
-    if (insertion != 0)
+    if (insertion)
     {
         float v1, v2;
         if (volume < 0.5f)
         {
             v1 = 1.0f;
             v2 = volume * 2.0f;
-        } else {
+        }
+        else
+        {
             v1 = (1.0f - volume) * 2.0f;
             v2 = 1.0f;
         }
@@ -227,14 +225,16 @@ void EffectMgr::out(float *smpsl, float *smpsr)
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
         }
-    } else { // System effect
+    }
+    else // is System effect
+    {
         for (int i = 0; i < synth->buffersize; ++i)
         {
             efxoutl[i] *= 2.0f * volume;
             efxoutr[i] *= 2.0f * volume;
-            smpsl[i] = efxoutl[i];
-            smpsr[i] = efxoutr[i];
         }
+        memcpy(smpsl, efxoutl, synth->bufferbytes);
+        memcpy(smpsr, efxoutr, synth->bufferbytes);
     }
 }
 

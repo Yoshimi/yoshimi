@@ -28,7 +28,6 @@
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 
 #include "Misc/MiscFuncs.h"
-//#include "MusicIO/Midi.h"
 #include "MusicIO/WavRecord.h"
 
 class MusicIO : protected MiscFuncs

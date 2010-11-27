@@ -1,11 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {WidgetPDial.h} {not_in_source in_header
-}
+} 
+
 comment {WidgetPDial.cc} {in_source not_in_header
-}
+} 
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -26,31 +27,29 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
-} {in_source in_header}
+} {in_source in_header
+} 
 
-decl {
-    \#include <FL/Fl_Dial.H>
+decl {\#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
-    \#include "Misc/MiscFuncs.h"
-} {public global}
+    \#include "Misc/MiscFuncs.h"} {public global
+} 
 
-decl {
+decl {\#include <cmath>
     \#include <FL/fl_draw.H>
     \#include <FL/Fl_Tooltip.H>
-    \#include <FL/Fl_Group.H>
-} {global}
+    \#include <FL/Fl_Group.H>} {global
+} 
 
-class TipWin {: {public Fl_Menu_Window, MiscFuncs}
+class TipWin {open : {public Fl_Menu_Window, MiscFuncs}
 } {
   Function {TipWin():Fl_Menu_Window(1,1)} {} {
-    code {
-        tip.clear();
+    code {tip.clear();
         tip = string("X.XX");
         set_override();
-        end();
-    } {}
+        end();} {}
   }
-  Function {draw()} {return_type void
+  Function {draw(void)} {return_type void
   } {
     code {draw_box(FL_BORDER_BOX, 0, 0, w(), h(), Fl_Color(175));
         fl_color(FL_BLACK);
@@ -64,8 +63,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
   Function {value(float f)} {return_type void
   } {
-    code {
-        tip.clear();
+    code {tip.clear();
         tip = asString(f);
         textmode = false;
         // Recalc size of window
@@ -74,13 +72,11 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
         fl_measure(tip.c_str(), W, H, 0);
         W += 8;
         size(W, H);
-        redraw();
-    } {}
+        redraw();} {}
   }
   Function {setText(string c)} {return_type void
   } {
-    code {
-        text = c;
+    code {text = c;
         textmode = true;
         // Recalc size of window
         fl_font(labelfont(), labelsize());
@@ -88,48 +84,42 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
         fl_measure(text.c_str(), W, H, 0);
         W += 8;
         size(W, H);
-        redraw();
-    } {}
+        redraw();} {}
   }
   Function {setTextmode()} {return_type void
   } {
-    code {
-        textmode=true;
+    code {textmode=true;
         // Recalc size of window
         fl_font(labelfont(), labelsize());
         int W = w(), H = h();
         fl_measure(text.c_str(), W, H, 0);
         W += 8;
         size(W, H);
-        redraw();
-    } {}
+        redraw();} {}
   }
   decl {string tip;} {}
   decl {bool textmode;} {}
   decl {string text;} {}
-}
+} 
 
-class WidgetPDial {: {public Fl_Dial}
+class WidgetPDial {open : {public Fl_Dial}
 } {
   Function {WidgetPDial(int x, int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
-    code {
-        callback(value_cb, (void*)this);
+    code {callback(value_cb, (void*)this);
         Fl_Group *save = Fl_Group::current();
         tipwin = new TipWin();
         tipwin->hide();
         Fl_Group::current(save);
         oldvalue = 0.0f;
         pos = false;
-        textset = false;
-    } {}
+        textset = false;} {}
   }
   Function {~WidgetPDial()} {} {
     code {delete tipwin;} {}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {
-        double dragsize, v, min = minimum(), max = maximum();
+    code {double dragsize, v, min = minimum(), max = maximum();
         int my;
         switch (event)
         {
@@ -187,24 +177,20 @@ class WidgetPDial {: {public Fl_Dial}
                  return 1;
                  break;
         }
-        return 0;
-    } {selected
-    }
+        return 0;} {}
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {
-    code {
-        for (int i = (int)(m1 * sx); i < (int)(m2 * sx); ++i)
+    code {for (int i = (int)(m1 * sx); i < (int)(m2 * sx); ++i)
         {
             double tmp = 1.0 - powf( i * 1.0f / sx, 2.0f);
             pdialcolor(140 + (int) (tmp * 90), 140 + (int)(tmp * 90), 140 + (int)(tmp * 100));
             fl_arc(cx + sx / 2 - i / 2, cy + sx / 2 - i / 2, i, i, 0, 360);
-        }
-    } {}
+        }} {}
   }
-  Function {draw()} {} {
-    code {
-        int cx = x(), cy = y(), sx = w(), sy = h();
+  Function {draw(void)} {return_type void
+  } {
+    code {int cx = x(), cy = y(), sx = w(), sy = h();
         // clears the button face
         pdialcolor(190, 190, 200);
         fl_pie(cx - 1, cy - 1, sx + 2, sy + 2, 0, 360);
@@ -249,18 +235,16 @@ class WidgetPDial {: {public Fl_Dial}
         fl_vertex(-10, 4);
         fl_vertex(0, 0);
         fl_end_polygon();
-        fl_pop_matrix();
-    } {}
+        fl_pop_matrix();} {}
   }
-  Function {pdialcolor(int r,int g,int b)} {} {
-    code {
-        if (active_r())
+  Function {pdialcolor(int r,int g,int b)} {return_type void
+  } {
+    code {if (active_r())
             fl_color(r, g, b);
         else
-            fl_color(160 - (160 - r) / 3, 160 - (160 - b) / 3, 160 - (160 - b) / 3);
-    } {}
+            fl_color(160 - (160 - r) / 3, 160 - (160 - b) / 3, 160 - (160 - b) / 3);} {}
   }
-  Function {value_cb2()} {return_type void
+  Function {value_cb2(void)} {return_type void
   } {
     code {tipwin->value(value());} {}
   }
@@ -269,12 +253,10 @@ class WidgetPDial {: {public Fl_Dial}
     code {WidgetPDial *val = (WidgetPDial*)data;
         val->value_cb2();} {}
   }
-  Function {tooltip(const char * c)} {return_type void
+  Function {tooltip(const char * c)} {selected return_type void
   } {
-    code {
-        tipwin->setText(c);
-        textset = true;
-    } {}
+    code {tipwin->setText(c);
+        textset = true;} {}
   }
   decl {bool textset;} {}
   decl {bool pos;} {}

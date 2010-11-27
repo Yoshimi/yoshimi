@@ -25,7 +25,7 @@
 #define AD_NOTE_H
 
 #include "Misc/SynthHelper.h"
-#include "Synth/Carcass.h"
+#include "Misc/Carcass.h"
 #include "Synth/LegatoTypes.h"
 
 class ADnoteParameters;

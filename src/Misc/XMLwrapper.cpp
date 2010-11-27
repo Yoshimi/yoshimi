@@ -46,11 +46,11 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 }
 
 
-XMLwrapper::XMLwrapper()
+XMLwrapper::XMLwrapper() :
+    minimal(true),
+    stackpos(0)
 {
-    minimal = true;
     information.PADsynth_used = 0;
-    stackpos = 0;
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
@@ -61,7 +61,7 @@ XMLwrapper::XMLwrapper()
     mxmlElementSetAttr(root, "version-major", "1");
     mxmlElementSetAttr(root, "version-minor", "1");
 
-    info = addparams0("INFORMATION"); // specifications
+    info = addparams0("INFORMATION");
     beginbranch("BASE_PARAMETERS");
     addpar("max_midi_parts", NUM_MIDI_PARTS);
     addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
@@ -86,35 +86,31 @@ XMLwrapper::~XMLwrapper()
 
 bool XMLwrapper::saveXMLfile(const string filename)
 {
-    char *xmldata = getXMLdata();
-    if (!xmldata)
-    {
-        Runtime.Log("Error, failed to allocate xml data space");
-        return false;
-    }
+    string xml = getXMLdata();
     FILE *xmlfile = fopen(filename.c_str(), "w");
     if (!xmlfile)
     {
         Runtime.Log("Error, failed to open xml file " + filename + " for save");
         return false;
     }
-    fputs(xmldata, xmlfile);
+    fputs(xml.c_str(), xmlfile);
     fclose(xmlfile);
-    free(xmldata);
     return true;
 }
 
 
-char *XMLwrapper::getXMLdata(void)
+string XMLwrapper::getXMLdata(void)
 {
     xml_k = 0;
     memset(tabs, 0, STACKSIZE + 2);
-    mxml_node_t *oldnode=node;
+    mxml_node_t *oldnode = node;
     node = info;
     addpar("PADsynth_used", information.PADsynth_used);
     node = oldnode;
-    char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
-    return xmldata;
+    boost::shared_array<char> xml =
+        boost::shared_array<char>(mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback));
+    xmlData = string(xml.get());
+    return xmlData;
 }
 
 
@@ -171,26 +167,30 @@ bool XMLwrapper::loadXML(const string xml)
 {
     if (tree)
         mxmlDelete(tree);
-    tree = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
-    xmldata = xml;
-    root = tree = mxmlLoadString(NULL, xmldata.c_str(), MXML_OPAQUE_CALLBACK);
-    if (!tree)
+    xmlData.clear();
+    if (xml.empty())
     {
+        Runtime.Log("Empty xml data through XMLwrapper::loadXML()", true);
+        return false;
+    }
+    root = tree = mxmlLoadString(NULL, xml.c_str(), MXML_OPAQUE_CALLBACK);
+    if (!tree)
+    {   
         Runtime.Log("Xml string is not XML ===>>>[" + xml + "]<<<===");
         return false;
     }
     node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
     if (!root)
     {
-        Runtime.Log("Xml string doesn't contain valid data in this context: ===>>>"
-                    + xml + "]<<<===");
+        Runtime.Log("Invalid xml data in this context: " + xml, true);
         return false;
     }
     push(root);
     xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
     xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
+    xmlData = xml;
     return true;
 }
 
@@ -199,6 +199,7 @@ bool XMLwrapper::loadXMLfile(const string filename)
 {
     if (tree)
         mxmlDelete(tree);
+    xmlData.clear();
     tree = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
@@ -207,7 +208,7 @@ bool XMLwrapper::loadXMLfile(const string filename)
         Runtime.Log("Could not load xml file: " + filename);
          return false;
     }
-    root = tree = mxmlLoadString(NULL, xmldata.c_str(), MXML_OPAQUE_CALLBACK);
+    root = tree = mxmlLoadString(NULL, xmlData.c_str(), MXML_OPAQUE_CALLBACK);
     if (!tree)
     {
         Runtime.Log("File " + filename + " is not XML");
@@ -229,39 +230,38 @@ bool XMLwrapper::loadXMLfile(const string filename)
 bool XMLwrapper::doloadfile(const string filename)
 {
     bool ok = false;
-    xmldata.clear();
     gzFile gzf  = gzopen(filename.c_str(), "rb");
     if (!gzf)
     {
         Runtime.Log("Failed to open xml file " + filename + " for load, errno: "
                     + asString(errno) + "  " + string(strerror(errno)));
-        return NULL;
+        return ok;
     }
-    const int bufSize = 4096;
-    char fetchBuf[4097];
-    int this_read;
-    int total_bytes = 0;
+    xmlData.clear();
     stringstream readStream;
-    for (bool quit = false; !quit;)
+    char fetchBuf[4097];
+    int this_read = 0;
+    int total_bytes = 0;
+    for (bool quit = false; Runtime.runSynth && !quit;)
     {
         memset(fetchBuf, 0, sizeof(fetchBuf) * sizeof(char));
-        this_read = gzread(gzf, fetchBuf, bufSize);
+        this_read = gzread(gzf, fetchBuf, (sizeof(fetchBuf) - 1) * sizeof(char));
         if (this_read > 0)
         {
-            readStream << fetchBuf;
             total_bytes += this_read;
+            readStream << fetchBuf;
         }
         else if (this_read < 0)
         {
             int errnum;
-            Runtime.Log("Read error in zlib: " + string(gzerror(gzf, &errnum)));
+            Runtime.Log("zlib read error: " + string(gzerror(gzf, &errnum)));
             if (errnum == Z_ERRNO)
                 Runtime.Log("Filesystem error: " + string(strerror(errno)));
             quit = true;
         }
         else if (total_bytes > 0)
         {
-            xmldata = readStream.str();
+            xmlData = readStream.str();
             ok = quit = true;
         }
         Runtime.signalCheck();
@@ -271,16 +271,16 @@ bool XMLwrapper::doloadfile(const string filename)
 }
 
 
-bool XMLwrapper::putXMLdata(char *xmldata)
+bool XMLwrapper::putXMLdata(string xmldata)
 {
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
     memset(&parentstack, 0, sizeof(parentstack));
     stackpos = 0;
-    if (xmldata == NULL)
+    if (xmldata.empty())
         return false;
-    root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
+    root = tree = mxmlLoadString(NULL, xmldata.c_str(), MXML_OPAQUE_CALLBACK);
     if (tree == NULL)
         return false;
     node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
@@ -345,7 +345,7 @@ int XMLwrapper::getpar(const string name, int defaultpar, int min, int max)
 
 int XMLwrapper::getpar127(const string name, int defaultpar)
 {
-    return(getpar(name, defaultpar, 0, 127));
+    return getpar(name, defaultpar, 0, 127);
 }
 
 

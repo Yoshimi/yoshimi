@@ -18,20 +18,19 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef FORMANT_FILTER_H
 #define FORMANT_FILTER_H
 
-#include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
 #include "DSP/Filter_.h"
 #include "DSP/AnalogFilter.h"
 #include "Params/FilterParams.h"
 
 
-class FormantFilter : public Filter_, private MiscFuncs, SynthHelper
+class FormantFilter : public Filter_, private SynthHelper
 {
     public:
         FormantFilter(FilterParams *pars);
@@ -44,7 +43,7 @@ class FormantFilter : public Filter_, private MiscFuncs, SynthHelper
 
     private:
         void setpos(float input);
-
+        inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
 
         AnalogFilter *formant[FF_MAX_FORMANTS];
         float *inbuffer, *tmpbuf;

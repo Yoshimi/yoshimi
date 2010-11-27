@@ -23,41 +23,34 @@ This file is a derivative of the ZynAddSubFX original, modified January 2010
 } {in_source in_header
 } 
 
-decl {\#include <iostream>} {public
-} 
-
-decl {\#include <cmath>} {public
-} 
-
-decl {\#include <FL/Fl_File_Chooser.H>} {public
-} 
-
-decl {\#include "Misc/Config.h"} {public
-} 
-
-decl {\#include "Misc/MiscFuncs.h"} {public
+decl {\#include <iostream>
+    \#include <cmath>
+    \#include <FL/Fl_File_Chooser.H>
+    \#include "Misc/Config.h"
+    \#include "Sql/ProgramBanks.h"
+    \#include "Misc/MiscFuncs.h"} {public
 } 
 
 class ConfigUI {open : {private MiscFuncs}
 } {
-  Function {make_window()} {open
+  Function {make_window()} {open return_type void
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open
-      xywh {1306 197 465 335} type Double hide
+      xywh {354 485 465 335} type Double hide
     } {
       Fl_Tabs {} {open
-        xywh {5 5 520 325}
+        xywh {5 5 455 332}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 26 460 312} labelsize 12
+          xywh {5 25 455 310} selection_color 48 labelsize 12 hide
         } {
           Fl_Choice {} {
             label OscilSize
-            callback {Runtime.Oscilsize = 128 << o->value();} open selected
-            tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            callback {Runtime.Oscilsize = 128 << o->value();}
+            tooltip {ADSynth Oscillator Size (samples)} xywh {165 110 100 20} box THIN_DOWN_BOX down_box BORDER_BOX color 52 labelsize 12 textsize 12
             code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
           } {
             MenuItem {} {
@@ -84,7 +77,7 @@ class ConfigUI {open : {private MiscFuncs}
           Fl_Choice {} {
             label {PADsynth Interpolation}
             callback {Runtime.Interpolation=(int) o->value();}
-            xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            tooltip zzz xywh {165 145 100 20} box THIN_DOWN_BOX down_box BORDER_BOX color 52 labelsize 12 textsize 12
             code0 {o->value(Runtime.Interpolation);}
           } {
             MenuItem {} {
@@ -99,7 +92,7 @@ class ConfigUI {open : {private MiscFuncs}
           Fl_Choice {} {
             label {Virtual Keyboard Layout}
             callback {Runtime.VirKeybLayout=(int) o->value();;}
-            xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            tooltip zzz xywh {165 185 100 20} box THIN_DOWN_BOX down_box BORDER_BOX color 52 labelsize 12 textfont 1 textsize 12
             code0 {o->value(Runtime.VirKeybLayout);}
           } {
             MenuItem {} {
@@ -123,49 +116,50 @@ class ConfigUI {open : {private MiscFuncs}
             label {Session state save file}
             callback {Runtime.StateFile = string(o->value());
               SessionStateFile->changed();}
-            xywh {159 216 235 25} labelsize 12 when 1 textsize 12
+            tooltip zzz xywh {165 65 240 20} box THIN_DOWN_BOX labelsize 12 when 1 textsize 12
             code0 {o->value(Runtime.StateFile.c_str());}
           }
           Fl_Button StateFileButton {
             label Select
-            callback {const char *filename =
+            callback {//
+                const char *filename =
                     fl_file_chooser("Nominate session save state file", NULL,
                                     Runtime.StateFile.c_str(), 0);
-                if (NULL != filename)
+                if (filename)
                 {
                     Runtime.StateFile = string(filename);
                     SessionStateFile->value(Runtime.StateFile.c_str());
                     SessionStateFile->changed();
                 }}
-            xywh {404 218 49 20} labelsize 12
+            tooltip zzz xywh {410 65 48 20} box PLASTIC_UP_BOX color 48 labelsize 12
             code0 {/* code */}
           }
         }
         Fl_Group {} {
           label Jack open
-          xywh {5 25 460 260} labelsize 12 hide
+          xywh {5 25 455 310} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Jack Server}
             callback {Runtime.jackServer = string(o->value());}
-            tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
+            tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} box THIN_DOWN_BOX labelsize 12 textsize 12
             code0 {o->insert(Runtime.jackServer.c_str());}
           }
         }
         Fl_Group {} {
           label Alsa open
-          xywh {5 25 460 260} labelsize 12 hide
+          xywh {5 25 455 310} labelsize 12
         } {
           Fl_Input {} {
             label {Alsa Midi Device}
             callback {Runtime.alsaMidiDevice = string(o->value());}
-            tooltip {Alsa midi device - default, hw:0, ...} xywh {195 54 120 22} labelsize 12 textsize 12
+            tooltip {Alsa midi device - default, hw:0, ...} xywh {195 54 120 22} box THIN_DOWN_BOX labelsize 11 textsize 11
             code0 {o->insert(Runtime.alsaMidiDevice.c_str());}
           }
           Fl_Input {} {
             label {Alsa Audio Device}
             callback {Runtime.alsaAudioDevice = string(o->value());}
-            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 95 120 22} labelsize 12 textsize 12
+            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 95 120 22} box THIN_DOWN_BOX labelsize 11 textsize 11
             code0 {o->insert(Runtime.alsaAudioDevice.c_str());}
           }
           Fl_Check_Browser {} {
@@ -195,7 +189,7 @@ class ConfigUI {open : {private MiscFuncs}
                         break;
                 }
                 Runtime.Samplerate = sample_rate;}
-            xywh {195 133 84 50} labelsize 12 align 4 when 1 textsize 12
+            tooltip zzz xywh {195 133 84 50} box THIN_DOWN_BOX labelsize 11 align 4 when 1 textsize 11
             code0 {/* extra */
                 o->add("96000");
                 o->add("48000");
@@ -233,7 +227,7 @@ class ConfigUI {open : {private MiscFuncs}
                     default: buff_size = 256; break;
                 }
                 Runtime.Buffersize = buff_size;}
-            xywh {195 197 76 73} labelsize 12 align 4 when 1 textsize 12
+            tooltip zzz xywh {195 197 76 73} box THIN_DOWN_BOX labelsize 11 align 4 when 1 textsize 11
             code0 {//
                 o->add("64");
                 o->add("128");
@@ -256,8 +250,8 @@ class ConfigUI {open : {private MiscFuncs}
           }
         }
         Fl_Group {} {
-          label Recorder open
-          xywh {15 35 460 260} labelsize 12 hide
+          label Recorder
+          xywh {5 25 455 310} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Default Record Directory}
@@ -265,30 +259,30 @@ class ConfigUI {open : {private MiscFuncs}
                     fl_alert("Invalid directory");
                 else
                     Runtime.DefaultRecordDirectory = string(o->value());}
-            tooltip {Default directory for recordings} xywh {192 120 242 22} labelsize 12 textsize 12
+            tooltip {Default directory for recordings} xywh {192 120 242 22} box THIN_DOWN_BOX labelsize 12 textsize 11
             code0 {o->insert(Runtime.DefaultRecordDirectory.c_str());}
           }
           Fl_Check_Button {} {
             label {32 bit float wavs}
             callback {Runtime.Float32bitWavs = (o->value()) ? true : false;}
-            tooltip {Record in 32 bit float format} xywh {192 165 18 22} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Record in 32 bit float format} xywh {192 165 18 22} box THIN_DOWN_BOX down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((Runtime.Float32bitWavs) ? 1 : 0);}
           }
         }
       }
-      Fl_Button {} {
+      Fl_Button closebutton {
         label Close
         callback {configwindow->hide();}
-        xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
+        xywh {400 305 48 20} box PLASTIC_UP_BOX color 48 labelsize 12
       }
-      Fl_Button {} {
+      Fl_Button savesettingsbutton {
         label {Save Settings}
-        callback {Runtime.saveConfig();}
-        xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
+        callback {Runtime.saveConfig();} selected
+        xywh {175 280 105 20} box PLASTIC_UP_BOX color 48 labelsize 12
       }
       Fl_Box {} {
         label {Some settings changes require a restart}
-        xywh {104 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+        xywh {104 308 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
       }
     }
   }
@@ -299,7 +293,19 @@ class ConfigUI {open : {private MiscFuncs}
   Function {Show()} {} {
     code {configwindow->show();} {}
   }
-  Function {Hide()} {} {
+  Function {Hide(void)} {open return_type void
+  } {
     code {configwindow->hide();} {}
+  }
+  Function {checkDataDirectory(void)} {open return_type void
+  } {
+    code {//
+        if (!isDirectory(Runtime.DataDirectory + "/banks"))
+            fl_alert((string("Please note that directory ") + Runtime.DataDirectory
+                      + string("/banks does not actually exist!")).c_str());} {}
+  }
+  Function {visitDBsetup(void)} {open return_type void
+  } {
+    code {configwindow->show();} {}
   }
 } 

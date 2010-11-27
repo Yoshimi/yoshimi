@@ -1,5 +1,5 @@
 /*
-    Resonance.h - Resonance
+    Resonance.h
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -18,12 +18,13 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified September 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef RESONANCE_H
 #define RESONANCE_H
 
+#include "Misc/Carcass.h"
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
 
@@ -31,11 +32,11 @@
 
 class XMLwrapper;
 
-class Resonance : public Presets
+class Resonance : public Presets, public Carcass
 {
     public:
         Resonance();
-        ~Resonance() { };
+        ~Resonance() { }
         void setpoint(int n, unsigned char p);
         void applyres(int n, FFTFREQS& fftdata, float freq);
         void smooth(void);

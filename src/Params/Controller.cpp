@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified November 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #include <cmath>
@@ -63,7 +63,7 @@ void Controller::defaults(void)
     resonancecenter.depth = 64;
     resonancebandwidth.depth = 64;
 
-    initportamento(440.0, 440.0, false);
+    initportamento(440.0f, 440.0f, false);
     setportamento(0);
 }
 
@@ -139,7 +139,7 @@ void Controller::setbandwidth(int value)
     {
         float tmp = powf(25.0f, powf(bandwidth.depth / 127.0f, 1.5f)) - 1.0f;
         if (value < 64 && bandwidth.depth >= 64)
-            tmp = 1.0;
+            tmp = 1.0f;
         bandwidth.relbw = (value / 64.0f - 1.0f) * tmp + 1.0f;
         if (bandwidth.relbw < 0.01f)
             bandwidth.relbw = 0.01f;

@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef EFFECT_H
@@ -38,9 +38,9 @@ class Effect
         virtual unsigned char getpar(int npar) = 0;
         virtual void out(float *smpsl, float *smpsr) = 0;
         virtual void cleanup() { };
-        virtual float getfreqresponse(float freq) { return (0); };
+        virtual float getfreqresponse(float freq) { return (0.0f); }
 
-        unsigned char Ppreset; // Currentl preset
+        unsigned char Ppreset; // current preset
         float *const efxoutl;
         float *const efxoutr;
         float outvolume;
