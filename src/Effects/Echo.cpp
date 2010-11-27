@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #include "Misc/SynthEngine.h"
@@ -33,26 +33,18 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     Plrcross(100),
     Pfb(40),
     Phidamp(60),
-    lrdelay(0),
-    ldelay(NULL),
-    rdelay(NULL)
+    lrdelay(0)
 {
     setpreset(Ppreset);
     cleanup();
-}
-
-Echo::~Echo()
-{
-    delete [] ldelay;
-    delete [] rdelay;
 }
 
 
 // Cleanup the effect
 void Echo::cleanup(void)
 {
-    memset(ldelay, 0, dl * sizeof(float));
-    memset(rdelay, 0, dr * sizeof(float));
+    memset(ldelay.get(), 0, dl * sizeof(float));
+    memset(rdelay.get(), 0, dr * sizeof(float));
     oldl = oldr = 0.0f;
 }
 
@@ -63,18 +55,13 @@ void Echo::initdelays(void)
     // todo: make this adjust insted of destroy old delays
     kl = kr = 0;
     dl = delay - lrdelay;
-    if (dl < 1)
-        dl = 1;
+    dl = (dl < 1) ? 1 : dl;
     dr = delay + lrdelay;
-    if (dr < 1)
-        dr = 1;
-
-    if (ldelay != NULL)
-        delete [] ldelay;
-    if (rdelay != NULL)
-        delete [] rdelay;
-    ldelay = new float[dl];
-    rdelay = new float[dr];
+    dr = (dr < 1) ? 1 : dr;
+    ldelay.reset();
+    rdelay.reset();
+    ldelay = boost::shared_array<float>(new float[dl]);
+    rdelay = boost::shared_array<float>(new float[dr]);
     cleanup();
 }
 

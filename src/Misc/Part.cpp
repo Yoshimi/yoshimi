@@ -1502,5 +1502,5 @@ void Part::getfromXML(XMLwrapper *xmlwrap)
     }
     applyparameters();
     Penabled = 1;
-    __sync_and_and_fetch (&partMuted, 0);
+    __sync_and_and_fetch(&partMuted, 0);
 }

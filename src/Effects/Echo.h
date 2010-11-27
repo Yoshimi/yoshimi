@@ -18,11 +18,13 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #ifndef ECHO_H
 #define ECHO_H
+
+#include <boost/shared_array.hpp>
 
 #include "Effects/Effect.h"
 
@@ -30,7 +32,7 @@ class Echo : public Effect
 {
     public:
         Echo(bool insertion_, float *efxoutl_, float *efxoutr_);
-        ~Echo();
+        ~Echo() { }
 
         void out(float *smpsl, float *smpr);
         void setpreset(unsigned char npreset);
@@ -41,15 +43,7 @@ class Echo : public Effect
         void setdryonly(void);
 
     private:
-        // Parameters
-        unsigned char Pvolume;  // <#1 Volume or Dry/Wetness
-        unsigned char Ppanning; // <#2 Panning
-        unsigned char Pdelay;   // <#3 Delay of the Echo
-        unsigned char Plrdelay; // <#4 L/R delay difference
-        unsigned char Plrcross; // <#5 L/R Mixing
-        unsigned char Pfb;      // <#6 Feedback
-        unsigned char Phidamp;  // <#7 Dampening of the Echo
-
+        void initdelays(void);
         void setvolume(unsigned char Pvolume_);
         void setpanning(unsigned char Ppanning_);
         void setdelay(unsigned char Pdelay_);
@@ -58,17 +52,30 @@ class Echo : public Effect
         void setfb(unsigned char Pfb_);
         void sethidamp(unsigned char Phidamp_);
 
+        // Parameters
+        unsigned char Pvolume;  // #1 Volume or Dry/Wetness
+        unsigned char Ppanning; // #2 Panning
+        unsigned char Pdelay;   // #3 Delay of the Echo
+        unsigned char Plrdelay; // #4 L/R delay difference
+        unsigned char Plrcross; // #5 L/R Mixing
+        unsigned char Pfb;      // #6 Feedback
+        unsigned char Phidamp;  // #7 Dampening of the Echo
+
         // Real Parameters
-        float panning, lrcross, fb, hidamp;
-        int dl, dr, delay, lrdelay;
-
-        void initdelays(void);
-        float *ldelay;
-        float *rdelay;
-        float  oldl, oldr; // pt. lpf
-
-        int kl, kr;
+        float panning;
+        float lrcross;
+        float fb;
+        float hidamp;
+        int dl;
+        int dr;
+        int delay;
+        int lrdelay;
+        boost::shared_array<float> ldelay;
+        boost::shared_array<float> rdelay;
+        float oldl; // pt. lpf
+        float oldr;
+        int kl;
+        int kr;
 };
 
 #endif
-

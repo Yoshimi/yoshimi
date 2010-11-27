@@ -18,9 +18,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
+#include "Params/FilterParams.h"
+#include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
 
@@ -29,7 +31,8 @@ EffectMgr::EffectMgr(const bool insertion_) :
     filterpars(NULL),
     nefx(0),
     efx(NULL),
-    dryonly(false)
+    dryonly(false),
+    privatemoment(0)
 {
     setpresettype("Peffect");
     efxoutl = new float [synth->buffersize];
@@ -48,11 +51,13 @@ EffectMgr::~EffectMgr()
     delete [] efxoutr;
 }
 
+
 void EffectMgr::defaults(void)
 {
     changeeffect(0);
     setdryonly(false);
 }
+
 
 // Change the effect
 void EffectMgr::changeeffect(int _nefx)
@@ -100,11 +105,13 @@ void EffectMgr::changeeffect(int _nefx)
         filterpars = efx->filterpars;
 }
 
+
 // Obtain the effect number
 int EffectMgr::geteffect(void)
 {
     return (nefx);
 }
+
 
 // Cleanup the current effect
 void EffectMgr::cleanup(void)
@@ -130,6 +137,7 @@ void EffectMgr::changepreset_nolock(unsigned char npreset)
         efx->setpreset(npreset);
 }
 
+
 // Change the preset of the current effect(with thread locking)
 void EffectMgr::changepreset(unsigned char npreset)
 {
@@ -139,21 +147,17 @@ void EffectMgr::changepreset(unsigned char npreset)
 }
 
 
-// Change a parameter of the current effect
-void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
-{
-    if (!efx)
-        return;
-    efx->changepar(npar, value);
-}
-
 // Change a parameter of the current effect (with thread locking)
 void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
-    synth->lockSharable();
-    seteffectpar_nolock(npar, value);
-    synth->unlockSharable();
+    if (efx)
+    {
+        __sync_fetch_and_or (&privatemoment, 0xFF);
+        efx->changepar(npar, value);
+        __sync_and_and_fetch (&privatemoment, 0);
+    }
 }
+
 
 // Get a parameter of the current effect
 unsigned char EffectMgr::geteffectpar(int npar)
@@ -180,12 +184,15 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     }
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
-    efx->out(smpsl, smpsr);
 
+   if (__sync_fetch_and_and(&privatemoment, 0xFF))
+       return;
+
+    efx->out(smpsl, smpsr);
     float volume = efx->volume;
 
-    if (nefx == 7)
-    {   // this is need only for the EQ effect
+    if (nefx == 7) // this is need only for the EQ effect
+    { 
         memcpy(smpsl, efxoutl, synth->bufferbytes);
         memcpy(smpsr, efxoutr, synth->bufferbytes);
         return;
@@ -237,6 +244,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
         memcpy(smpsr, efxoutr, synth->bufferbytes);
     }
 }
+
 
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
@@ -295,11 +303,13 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
     {
         for (int n = 0; n < 128; ++n)
         {
-            seteffectpar_nolock(n, 0); // erase effect parameter
+            //seteffectpar_nolock(n, 0); // erase effect parameter
+            seteffectpar(n, 0); // erase effect parameter
             if (xml->enterbranch("par_no", n) == 0)
                 continue;
             int par = geteffectpar(n);
-            seteffectpar_nolock(n, xml->getpar127("par", par));
+            // seteffectpar_nolock(n, xml->getpar127("par", par));
+            seteffectpar(n, xml->getpar127("par", par));
             xml->exitbranch();
         }
         if (filterpars)

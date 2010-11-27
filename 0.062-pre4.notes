@@ -1,3 +1,7 @@
+yoshimi-0.062-pre4
+
+hopefully resolves segfault(s) during gui control of effects parameters.
+
 yoshimi-0.062-pre3
 
 Possibly the main reason for it's existence is that I felt a need to put a copy
