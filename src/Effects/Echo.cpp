@@ -43,31 +43,38 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
 // Cleanup the effect
 void Echo::cleanup(void)
 {
+    echomutex.lock();
     memset(ldelay.get(), 0, dl * sizeof(float));
     memset(rdelay.get(), 0, dr * sizeof(float));
     oldl = oldr = 0.0f;
+    echomutex.unlock();
 }
 
 
 // Initialize the delays
 void Echo::initdelays(void)
 {
-    // todo: make this adjust insted of destroy old delays
     kl = kr = 0;
     dl = delay - lrdelay;
     dl = (dl < 1) ? 1 : dl;
     dr = delay + lrdelay;
     dr = (dr < 1) ? 1 : dr;
+    echomutex.lock();
     ldelay.reset();
     rdelay.reset();
     ldelay = boost::shared_array<float>(new float[dl]);
     rdelay = boost::shared_array<float>(new float[dr]);
-    cleanup();
+    memset(ldelay.get(), 0, dl * sizeof(float));
+    memset(rdelay.get(), 0, dr * sizeof(float));
+    oldl = oldr = 0.0f;
+    echomutex.unlock();
 }
 
 // Effect output
 void Echo::out(float* smpsl, float* smpsr)
 {
+    if (!echomutex.try_lock())
+        return;
     float l, r;
     float ldl = ldelay[kl];
     float rdl = rdelay[kr];
@@ -75,13 +82,13 @@ void Echo::out(float* smpsl, float* smpsr)
     {
         ldl = ldelay[kl];
         rdl = rdelay[kr];
-        l = ldl * (1.0 - lrcross) + rdl * lrcross;
-        r = rdl * (1.0 - lrcross) + ldl * lrcross;
+        l = ldl * (1.0f - lrcross) + rdl * lrcross;
+        r = rdl * (1.0f - lrcross) + ldl * lrcross;
         ldl = l;
         rdl = r;
 
-        efxoutl[i] = ldl * 2.0f - 1e-20f; // anti-denormal - a very, very, very
-        efxoutr[i] = rdl * 2.0f - 1e-20f; // small dc bias
+        efxoutl[i] = ldl * 2.0f;
+        efxoutr[i] = rdl * 2.0f;
 
         ldl = smpsl[i] * (1.0f - panning) - ldl * fb;
         rdl = smpsr[i] * panning - rdl * fb;
@@ -91,19 +98,19 @@ void Echo::out(float* smpsl, float* smpsr)
         rdelay[kr] = rdl = rdl * hidamp + oldr * (1.0f - hidamp);
         oldl = ldl;
         oldr = rdl;
-
         if (++kl >= dl)
             kl = 0;
         if (++kr >= dr)
             kr = 0;
     }
+    echomutex.unlock();
 }
 
 // Parameter control
 void Echo::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    if (insertion == 0)
+    if (!insertion)
     {
         outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
         volume = 1.0f;
@@ -120,7 +127,7 @@ void Echo::setpanning(unsigned char Ppanning_)
     panning = (Ppanning + 0.5f) / 127.0f;
 }
 
-void Echo::setdelay(const unsigned char Pdelay_)
+void Echo::setdelay(unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
     delay = 1 + lrintf(Pdelay / 127.0f * synth->samplerate_f * 1.5f); // 0 .. 1.5 sec
@@ -134,7 +141,7 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
     tmp = (powf(2.0f, fabsf(Plrdelay - 64.0f) / 64.0f * 9.0f) -1.0f) / 1000.0f * synth->samplerate_f;
     if (Plrdelay < 64.0f)
         tmp = -tmp;
-    lrdelay = (int)tmp;
+    lrdelay = lrintf(tmp);
     initdelays();
 }
 
@@ -153,7 +160,7 @@ void Echo::setfb(unsigned char Pfb_)
 void Echo::sethidamp(unsigned char Phidamp_)
 {
     Phidamp = Phidamp_;
-    hidamp = 1.0 - Phidamp / 127.0f;
+    hidamp = 1.0f - Phidamp / 127.0f;
 }
 
 void Echo::setpreset(unsigned char npreset)

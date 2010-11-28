@@ -56,7 +56,7 @@ class Part : private MiscFuncs, SynthHelper
         void partEnable(unsigned char npart, bool maybe);
         void partDisable(void) { Penabled = 0; cleanup(); }
         void ComputePartSmps(void);
-        bool Active(void) { return Penabled && !__sync_fetch_and_or(&partMuted, 0); }
+        bool Active(void) { return Penabled && !partMuted; }
         void cleanup(void);
         void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
         void NoteOff(unsigned char note);
@@ -199,7 +199,7 @@ class Part : private MiscFuncs, SynthHelper
         float oldfreq; // for portamento
         Microtonal *microtonal;
         FFTwrapper *fft;
-        char partMuted;
+        int partMuted;
 };
 
 #endif

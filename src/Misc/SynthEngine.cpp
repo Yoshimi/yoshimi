@@ -312,47 +312,18 @@ void SynthEngine::setPitchwheel(unsigned char chan, short int par)
 }
 
 
-void SynthEngine::setController(unsigned char ctrltype, unsigned char channel, unsigned char val)
+void SynthEngine::setController(unsigned char channel, unsigned char ctrltype, unsigned char par)
 {
     switch (ctrltype)
     {
-        /**
-        case C_modwheel:            //   1
-        case C_volume:              //   7
-        case C_pan:                 //  10
-        case C_expression:          //  11
-        case C_controller20Msb:     //  20 LFO frequency
-        case C_controller21Msb:     //  21 LFO depth
-        case C_sustain:             //  64
-        case C_portamento:          //  65
-        case C_filterq:             //  71
-        case C_filtercutoff:        //  74
-        case C_soundcontroller6:    //  75 bandwidth
-        case C_soundcontroller7:    //  76 fmamp
-        case C_soundcontroller8:    //  77 resonance center
-        case C_soundcontroller9:    //  78 resonance bandwidth
-        case C_effects1Depth:       //  91 part effect 1 volume control
-        case C_effects2Depth:       //  92 part effect 2 volume control
-        case C_effects3Depth:       //  93 part effect 3 volume control
-        case C_allsoundsoff:        // 120
-        case C_resetallcontrollers: // 121
-        case C_allnotesoff:         // 123
-            for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-                // send controller to all active parts assigned to the channel
-                if (channel == part[npart]->midichannel
-                    && part[npart]->Penabled)
-                    part[npart]->SetController(ctrltype, val);
-            break;
-        **/
-            
         case C_bankselectmsb:
-            cerr << "SynthEngine::setController midiBankMSB " << (int)val << endl;
-            midiBankMSB = val;
+            cerr << "SynthEngine::setController midiBankMSB " << (int)par << endl;
+            midiBankMSB = par;
             break;
 
         case C_bankselectlsb:
-            cerr << "SynthEngine::setController midiBankLSB " << (int)val << endl;
-            midiBankLSB = val;
+            cerr << "SynthEngine::setController midiBankLSB " << (int)par << endl;
+            midiBankLSB = par;
             break;
 
         default:
@@ -360,7 +331,7 @@ void SynthEngine::setController(unsigned char ctrltype, unsigned char channel, u
                 // send controller to all active parts assigned to the channel
                 if (channel == part[npart]->midichannel
                     && part[npart]->Penabled)
-                    part[npart]->SetController(ctrltype, val);
+                    part[npart]->SetController(ctrltype, par);
             break;
     }
 

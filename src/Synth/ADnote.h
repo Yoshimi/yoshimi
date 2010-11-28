@@ -44,13 +44,12 @@ class ADnote : public Carcass, private SynthHelper
 {
     public:
         ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,
-               float velocity_, int portamento_, int midinote_,
-               bool besilent);
+               float velocity_, int portamento_, int midinote_, bool besilent);
         ~ADnote();
 
         int noteout(float *outl, float *outr);
-        void relasekey();
-        int finished() const;
+        void relasekey(void);
+        bool finished(void ) { return !NoteEnabled; }
         void ADlegatonote(float freq_, float velocity_, int portamento_,
                           int midinote_, bool externcall);
         char ready;

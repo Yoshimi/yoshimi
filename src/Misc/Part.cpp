@@ -22,6 +22,7 @@
     This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
+#include <iostream>
 #include <cstring>
 #include <boost/shared_ptr.hpp>
 
@@ -197,6 +198,7 @@ void Part::cleanup(void)
 Part::~Part()
 {
     cleanup();
+    __sync_or_and_fetch (&partMuted, 0xFF);
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {
         if (kit[n].adpars)
@@ -209,7 +211,6 @@ Part::~Part()
         kit[n].subpars = NULL;
         kit[n].padpars = NULL;
     }
-
     delete [] partoutl;
     delete [] partoutr;
     delete [] tmpoutl;
@@ -533,8 +534,8 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                     partnote[posb].itemsplaying++;
             }
         }
-        else
-        { // init the notes for the "kit mode"
+        else // init the notes for the "kit mode"
+        {
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
                 if (kit[item].Pmuted)
@@ -666,21 +667,6 @@ void Part::SetController(unsigned int type, int par)
             setPvolume(Pvolume);
             break;
 
-            
-        /**
-        > * Frequency (Freq. control of the Filter LFO) !!!
-        > > * Depth (Depth control of the Filter LFO)
-        > > * Attack (A. val of the Filter Envelope)
-        > > * Delay (D. val of the Filter Envelope)
-        > > * Release (R.val of the Filter Envelope)      
-        Along the lines with what Jeremy has suggested, I feel that MIDI CC
-        bindings for the ADSR for the amp and filter envelopes AND LFO params
-        like freq, depth, start and delay are at the top of my list. Also I
-        think it would be nifty to be able to change the filter category and
-        filter type on-the-fly via MIDI CC.
-        **/
-        
-
         // 64 Sustain
         case C_sustain:
             ctl->setsustain(par);
@@ -730,11 +716,13 @@ void Part::SetController(unsigned int type, int par)
         case C_effects1Depth:   // 91 part effect 1 volume
         case C_effects2Depth:   // 92 part effect 2 volume
         case C_effects3Depth:   // 93 part effect 3 volume
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             partefx[type - C_effects1Depth]->seteffectpar(0, par);
             break;
 
         // 102 ADsynth Filter Category
         case C_undefined102:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 2)
             {
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Pcategory = par;
@@ -744,6 +732,7 @@ void Part::SetController(unsigned int type, int par)
 
         // 103 ADsynth Filter Type
         case C_undefined103:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 4)
             {
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Ptype = par;
@@ -753,77 +742,90 @@ void Part::SetController(unsigned int type, int par)
             
         // 104 Set kit item number for ADsynth Filter LFO controls
         case C_undefined104:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (par >= 0 && par < 128)
                 FilterLfoControlLsb = par;
             break;
             
         // 105 ADsynth Filter LFO Frequency
         case C_undefined105:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pfreq = (float)par / 127.0f;
             break;
     
         // 106 ADsynth Filter LFO Depth
         case C_undefined106:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pintensity = par;
             break;
     
         // 107 ADsynth Filter LFO Start 
         case C_undefined107:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pstartphase = par;
             break;
 
         // 108 ADsynth Filter LFO Delay
         case C_undefined108:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pdelay = par;
             break;
             
         // 109 ADsynth Filter Envelope Start
         case C_undefined109:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_val = par;
             break;
             
         // 110 ADsynth Filter Envelope Attack
         case C_undefined110:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_dt = par;
             break;
         
         // 111 ADsynth Filter Envelope Decay Value
         case C_undefined111:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_val = par;
             break;
         
         // 112 ADsynth Filter Envelope Decay Time
         case C_undefined112:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_dt = par;
             break;
 
-        // 113 ADsynth Filter Envelope Release Time
+        // 113 ADsynth Filter Envelope Release Value
         case C_undefined113:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
-                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_dt = par;
-            break;
-
-        // 114 ADsynth Filter Envelope Release Value
-        case C_undefined114:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_val = par;
             break;
 
+        // 114 ADsynth Filter Envelope Release Time
+        case C_undefined114:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
+            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+                kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_dt = par;
+            break;
+
         // 120 All Sound Off
         case C_allsoundsoff:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             AllNotesOff();
             break;
 
         // 121 Reset All Controllers 
         case C_resetallcontrollers:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             ctl->resetall();
             RelaseSustainedKeys();
             if (ctl->volume.receive)
@@ -841,6 +843,7 @@ void Part::SetController(unsigned int type, int par)
 
         // 123 All Notes Off 
         case C_allnotesoff:
+            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             RelaseAllKeys();
             break;
 
@@ -985,11 +988,11 @@ void Part::setkeylimit(unsigned char keylimit)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
-    if (partMuted)
+    bool quiet_please = partMuted != 0;
+    if (quiet_please)
     {
         memset(partoutl, 0, synth->bufferbytes);
         memset(partoutr, 0, synth->bufferbytes);
-        return;
     }
     int k;
     int noteplay; // 0 if there is nothing activated
@@ -1015,39 +1018,33 @@ void Part::ComputePartSmps(void)
             if (adnote)
             {
                 noteplay++;
-                if (adnote->ready)
-                    adnote->noteout(tmpoutl, tmpoutr);
-                else
+                if (!quiet_please && adnote->ready)
                 {
-                    memset(tmpoutl, 0, synth->bufferbytes);
-                    memset(tmpoutr, 0, synth->bufferbytes);
+                    adnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->buffersize; ++i)
+                    {   // add ADnote to part mix
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
+                    }
                 }
                 if (adnote->finished())
                 {
                     Runtime.deadObjects->addBody(partnote[k].kititem[item].adnote);
                     partnote[k].kititem[item].adnote = NULL;
                 }
-                for (int i = 0; i < synth->buffersize; ++i)
-                {   // add ADnote to part mix
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
-                }
             }
             // get from the SUBnote
             if (subnote)
             {
                 noteplay++;
-                if (subnote->ready)
-                    subnote->noteout(tmpoutl, tmpoutr);
-                else
+                if (!quiet_please && subnote->ready)
                 {
-                    memset(tmpoutl, 0, synth->bufferbytes);
-                    memset(tmpoutr, 0, synth->bufferbytes);
-                }
-                for (int i = 0; i < synth->buffersize; ++i)
-                {   // add SUBnote to part mix
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    subnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->buffersize; ++i)
+                    {   // add SUBnote to part mix
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (subnote->finished())
                 {
@@ -1059,24 +1056,19 @@ void Part::ComputePartSmps(void)
             if (padnote)
             {
                 noteplay++;
-                if (padnote->ready)
+                if (!quiet_please && padnote->ready)
                 {
                     padnote->noteout(tmpoutl, tmpoutr);
-                }
-                else
-                {
-                    memset(tmpoutl, 0, synth->bufferbytes);
-                    memset(tmpoutr, 0, synth->bufferbytes);
+                    for (int i = 0 ; i < synth->buffersize; ++i)
+                    {   // add PADnote to part mix
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (padnote->finished())
                 {
                     Runtime.deadObjects->addBody(partnote[k].kititem[item].padnote);
                     partnote[k].kititem[item].padnote = NULL;
-                }
-                for (int i = 0 ; i < synth->buffersize; ++i)
-                {   // add PADnote to part mix
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
             }
         }
@@ -1114,7 +1106,7 @@ void Part::ComputePartSmps(void)
     {
         for (int i = 0; i < synth->buffersize; ++i)
         {
-            float tmp = (synth->buffersize - i) / synth->buffersize_f;
+            float tmp = (float)(synth->buffersize - i) / synth->buffersize_f;
             partoutl[i] *= tmp;
             partoutr[i] *= tmp;
         }

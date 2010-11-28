@@ -67,7 +67,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void applyMidi(unsigned char* bytes);
         void noteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void noteOff(unsigned char chan, unsigned char note);
-        void setController(unsigned char ctrltype, unsigned char channel, unsigned char par);
         void setPitchwheel(unsigned char chan, short int par);
         void programChange(unsigned char midichan, unsigned char bank, unsigned char prog);
         string bankName(unsigned char banknum);
@@ -139,6 +138,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool vuClippedR;
 
     private:
+        void setController(unsigned char channel, unsigned char ctrltype, unsigned char par);
         inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
         XMLwrapper *stateXMLtree;
         float volume;

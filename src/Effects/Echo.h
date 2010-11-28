@@ -25,6 +25,7 @@
 #define ECHO_H
 
 #include <boost/shared_array.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
 
 #include "Effects/Effect.h"
 
@@ -76,6 +77,7 @@ class Echo : public Effect
         float oldr;
         int kl;
         int kr;
+        boost::interprocess::interprocess_mutex echomutex;
 };
 
 #endif

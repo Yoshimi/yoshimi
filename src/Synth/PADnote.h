@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
 #ifndef PAD_NOTE_H
@@ -45,7 +45,7 @@ class PADnote : public Carcass, private SynthHelper
         void PADlegatonote(float freq, float velocity,
                            int portamento_, int midinote, bool externcall);
 
-        int noteout(float *outl,float *outr);
+        int noteout(float *outl, float *outr);
         bool finished(void) { return finished_; };
         void relasekey(void);
 

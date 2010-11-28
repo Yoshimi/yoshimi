@@ -1,3 +1,12 @@
+yoshimi-0.062-pre5
+
+the elusive filter and envelope controllers now appear to reaching the right
+place, whether they're tweaking the right synth internals is yet to be
+confirmed;
+
+take 2 on the segfault(s) during gui control of effects parameters; 
+
+------------------
 yoshimi-0.062-pre4
 
 hopefully resolves segfault(s) during gui control of effects parameters.

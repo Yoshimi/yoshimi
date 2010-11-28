@@ -47,7 +47,7 @@ class SUBnote : public Carcass, private SynthHelper
         int noteout(float *outl,float *outr); // note output, return 0 if the
                                               // note is finished
         void relasekey(void);
-        bool finished(void) { return !NoteEnabled; };
+        bool finished(void) { return !NoteEnabled; }
 
         bool ready; // if I can get the sampledata
 
@@ -69,7 +69,7 @@ class SUBnote : public Carcass, private SynthHelper
         Envelope *FreqEnvelope;
         Envelope *BandWidthEnvelope;
 
-        Filter *GlobalFilterL,*GlobalFilterR;
+        Filter *GlobalFilterL, *GlobalFilterR;
 
         Envelope *GlobalFilterEnvelope;
 

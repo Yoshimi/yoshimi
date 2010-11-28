@@ -185,7 +185,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
 
-   if (__sync_fetch_and_and(&privatemoment, 0xFF))
+   if (privatemoment)
        return;
 
     efx->out(smpsl, smpsr);

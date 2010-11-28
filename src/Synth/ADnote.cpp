@@ -1813,12 +1813,3 @@ void ADnote::relasekey(void)
     NoteGlobalPar.FilterEnvelope->relasekey();
     NoteGlobalPar.AmpEnvelope->relasekey();
 }
-
-// Check if the note is finished
-int ADnote::finished() const
-{
-    if (NoteEnabled)
-        return 0;
-    else
-        return 1;
-}

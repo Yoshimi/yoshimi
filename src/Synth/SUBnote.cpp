@@ -747,7 +747,7 @@ int SUBnote::noteout(float *outl, float *outr)
     }
 
     // Check if the note needs to be computed more
-    if (AmpEnvelope->finished() != 0)
+    if (AmpEnvelope->finished())
     {
         for (int i = 0; i < synth->buffersize; ++i)
         {   // fade-out
