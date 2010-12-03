@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.062-pre5")
+set (YOSHIMI_VERSION "0.062-pre6")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -145,11 +145,11 @@ else (JACK_FOUND)
 endif (JACK_FOUND)
 
 # Boost
-find_package (Boost)
+find_package (Boost REQUIRED)
 if (Boost_FOUND)
     message(STATUS "Found boost headers version " ${Boost_VERSION})
 else (Boost_FOUND)
-    message (FATAL_ERROR "Boost headers required but not found")
+    message (FATAL_ERROR "boost headers required but not found")
 endif (Boost_FOUND)
 
 # libsndfile
@@ -330,6 +330,7 @@ include_directories (AFTER
     ${FONTCONFIG_INCLUDE_DIRS}
     ${FLTK_INCLUDE_DIR}
     ${SQLITE3_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
 )
 
 set(ExternLibraries

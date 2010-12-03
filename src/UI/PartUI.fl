@@ -413,10 +413,7 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
                     break;
 
                 case FL_RIGHT_MOUSE:
-                    if (progbanksui->ProgramBrowser->value() > 0)
-                        showInstrumentEditWindow(part);
-                    else
-                        progbanksui->Show(npart);
+                    showInstrumentEditWindow(part);
                     break;
 
                 default:

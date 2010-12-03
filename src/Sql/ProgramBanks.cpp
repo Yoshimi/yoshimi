@@ -17,21 +17,15 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
 #include <sstream>
-#include <set>
 #include <list>
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include <sys/types.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <boost/shared_ptr.hpp>
 #include <errno.h>
 #include <zlib.h>
-#include <boost/shared_ptr.hpp>
 
 using namespace std;
 
@@ -46,7 +40,6 @@ using namespace std;
 ProgramBanks *progBanks = NULL;
 
 ProgramBanks::ProgramBanks() :
-    xizext(".xiz"),
     dbConn(NULL)
 {
     for (int i = 0; i < BANK_LIMIT; ++i)
@@ -149,6 +142,7 @@ void ProgramBanks::dbErrorLog(string msg)
 
 void ProgramBanks::scanInstrumentFiles(void)
 {
+    const string xizext = ".xiz";
     string rootdir = Runtime.DataDirectory + "/banks/";
     DIR *rootDIR = opendir(rootdir.c_str());
     if (rootDIR == NULL)
@@ -189,12 +183,14 @@ void ProgramBanks::scanInstrumentFiles(void)
     struct dirent *dent;
     struct dirent *subdent;
     DIR *chkDIR;
-    size_t xizpos;
     string chkbank;
     string chkpath;
     string chkfile;
     string msg;
-
+    size_t xizpos;
+    list<string> progfiles;
+    list<string>::iterator progitx;
+    
     Runtime.Log("Loading program bank database from base .xiz files, which takes a while!");
     for (unsigned char bank = 0; bank < BANK_LIMIT && (dent = readdir(rootDIR)) != NULL;)
     {
@@ -216,17 +212,21 @@ void ProgramBanks::scanInstrumentFiles(void)
             continue;
         }
 
+        progfiles.clear();
+        while ((subdent = readdir(chkDIR)) != NULL)
+            progfiles.push_back(string(subdent->d_name));
+        progfiles.sort();
         string progname;
-        for (unsigned char prognum = 0; prognum < BANK_LIMIT && (subdent = readdir(chkDIR)) != NULL;)
+        int prognum = 0;
+        for (progitx = progfiles.begin(); progitx != progfiles.end() && prognum < BANK_LIMIT; ++progitx)
         {
-            chkfile = string(subdent->d_name);
-            if (chkfile == "." || chkfile == ".." || chkfile.size() <= (xizext.size() + 5))
+            chkfile = *progitx;
+            if (chkfile == "." || chkfile == ".." || chkfile == ".bankdir")
                 continue;
+            xizpos = chkfile.rfind(xizext); // check for .xiz extension
             chkpath = chkdir + "/" + chkfile;
-            if (isRegFile(chkpath)
-                && (xizpos = chkfile.rfind(xizext)) != string::npos
-                && xizext.size() == (chkfile.size() - xizpos)) // just <name>.xiz files please
-            {                                                  // sa verific daca e si extensia dorita
+            if (xizpos != string::npos && (xizpos + xizext.size()) == chkfile.size())
+            {
                 if (!xmlwrap->loadXMLfile(chkpath))
                 {
                     Runtime.Log("Failed to xml->load file " + chkpath);
@@ -246,13 +246,19 @@ void ProgramBanks::scanInstrumentFiles(void)
                     Runtime.Log("Weird parse on file " + chkpath);
                     continue;
                 }
-                if (!addProgram(bank, prognum++, progname, xmlwrap->xmlData))
+                if (addProgram(bank, prognum, progname, xmlwrap->xmlData))
+                    ++prognum;
+                else
                     Runtime.Log("Failed to add program " + chkpath);
+            }
+            else
+            {
+                Runtime.Log("Not an xiz: " + chkpath);
+                continue;
             }
         }
         closedir(chkDIR);
-        Runtime.Log("Bank " + asString(bank) + " " + chkbank + " loaded");
-        ++bank;
+        Runtime.Log("Bank " + asString(++bank) + " " + chkbank + " loaded");
     }
     Runtime.Log("Database reload complete.");
     closedir(rootDIR);
@@ -261,8 +267,9 @@ void ProgramBanks::scanInstrumentFiles(void)
 
 void ProgramBanks::loadBankList(void)
 {
+    bankList.clear();
     for (int i = 0; i < BANK_LIMIT; ++i)
-        bankList[i].clear();
+        bankList[i] = string();
     string qry = string("select banknum, name from banks order by banknum");
     sqlite3_stmt *stmt = NULL;
     if (SQLITE_OK != sqlite3_prepare_v2(dbConn, qry.c_str(), qry.size() + 1, &stmt, NULL))
@@ -275,8 +282,9 @@ void ProgramBanks::loadBankList(void)
 
 void ProgramBanks::loadProgramList(unsigned char bk)
 {
+    programList.clear();
     for (int i = 0; i < BANK_LIMIT; ++i)
-        programList[i].clear();
+        programList[i] = string();
     string qry = string("select prognum, name from programs where banknum=")
                  + asString(bk) + string(" order by prognum");
     sqlite3_stmt *stmt = NULL;

@@ -53,7 +53,7 @@ class ProgramBanksUI {open : MiscFuncs
       callback {//
             guiMaster->partui->hideInstrumentEditWindow();
             ProgramBankWindow->hide();} open
-      xywh {392 569 560 465} type Single color 50 labelsize 12
+      xywh {394 621 560 465} type Double color 50 labelsize 12
       code0 {//
           labeltag = string("Part ") + asString(partnum + 1);
           o->copy_label(labeltag.c_str());} visible
@@ -141,18 +141,15 @@ class ProgramBanksUI {open : MiscFuncs
                         break;
 
                     case FL_RIGHT_MOUSE:
-                        if (prognum != part->partProgram)
+                        if (part->loadProgram(part->partBank, prognum))
                         {
-                            if (part->loadProgram(part->partBank, prognum))
-                            {
-                                progBanks->loadProgramList(part->partBank);
-                                progname = progBanks->programList[part->partProgram];
-                                guiMaster->partui->refreshInstrumentLabel(part->partBank,
-                                    progBanks->bankList[part->partBank], prognum, progname);
-                            }
-                            else
-                                fl_alert("Failed to load program");
+                            progBanks->loadProgramList(part->partBank);
+                            progname = progBanks->programList[part->partProgram];
+                            guiMaster->partui->refreshInstrumentLabel(part->partBank,
+                                progBanks->bankList[part->partBank], prognum, progname);
                         }
+                        else
+                            fl_alert("Failed to load program");
                         guiMaster->partui->showInstrumentEditWindow(part);
                         savetoprognum->value(tag);
                         savetogroup->activate();
@@ -165,8 +162,7 @@ class ProgramBanksUI {open : MiscFuncs
                     default:
                         break;
                 }
-            }
-        }
+            }}
         xywh {281 5 275 330} type Hold box ENGRAVED_BOX color 55 selection_color 246 labelfont 1 labelsize 11 align 6 textsize 11
         code0 {//
             o->value(0);}
@@ -258,42 +254,15 @@ class ProgramBanksUI {open : MiscFuncs
           tooltip {Clear database, rescan instrument files and load the database} xywh {179 360 96 18} box PLASTIC_UP_BOX color 246 labelsize 10
         }
       }
-      Fl_Group bankselectgroup {
-        label {Bank select method} open
-        xywh {30 435 177 24} box ENGRAVED_FRAME labelsize 11 when 6 hide deactivate
-      } {
-        Fl_Check_Button bsNormal {
-          label Normal
-          callback {//
-              Runtime.BankSelectMethod = 0;}
-          xywh {36 440 16 11} type Radio box ENGRAVED_FRAME down_box DOWN_BOX labelsize 10 when 6 hide deactivate
-          code0 {if (!Runtime.BankSelectMethod) o->value(1);}
-        }
-        Fl_Check_Button bsMSBonly {
-          label {MSB Only}
-          callback {//
-              Runtime.BankSelectMethod = 1;}
-          xywh {97 440 16 11} type Radio down_box DOWN_BOX labelsize 10 when 6 hide deactivate
-          code0 {if (Runtime.BankSelectMethod == 1) o->value(1);}
-        }
-        Fl_Check_Button bsLSB {
-          label LSB
-          callback {//
-              Runtime.BankSelectMethod = 2;} selected
-          xywh {165 440 16 11} type Radio down_box DOWN_BOX labelsize 10 when 6 hide deactivate
-          code0 {if (Runtime.BankSelectMethod == 2) o->value(1);}
-        }
-      }
     }
   }
-  Function {ProgramBanksUI(int partnum_) : empty_prog_format("@C48")} {return_type void
+  Function {ProgramBanksUI(int partnum_)} {return_type void
   } {
     code {//
         partnum = partnum_;
         part = synth->part[partnum];
         currentbank = part->partBank;
         currentprogram = part->partProgram;
-        banklabel = "<unassigned>";
         make_window();} {}
   }
   Function {~ProgramBanksUI()} {return_type virtual
@@ -306,9 +275,7 @@ class ProgramBanksUI {open : MiscFuncs
         partnum = partnum_;
         part = synth->part[partnum];
         if (progBanks)
-        {
             listPrograms();
-        }
         ProgramBankWindow->copy_label((string("Yoshimi, Part ") + asString(partnum + 1) + string(" program selection")).c_str());
         ProgramBankWindow->show();} {}
   }
@@ -349,21 +316,19 @@ class ProgramBanksUI {open : MiscFuncs
   Function {listPrograms(void)} {return_type void
   } {
     code {//
-        unsigned char prog;
-        string tag;
         progBanks->loadProgramList(part->partBank);
         ProgramBrowser->hide();
         ProgramBrowser->clear();
+        string proglabel;
+        string format;
         for (map<unsigned char, string>::iterator ix = progBanks->programList.begin();
              ix != progBanks->programList.end(); ++ix)
         {
-            prog = (*ix).first;
-            string format = ((*ix).second.empty()) ? empty_prog_format : string();
-            tag = "   " + asString(prog + 1);
-            tag = tag.substr(tag.length() - 3);
-            if (!(*ix).second.empty())
-                tag += (string(" ") + (*ix).second);
-            ProgramBrowser->add((format + tag).c_str(), (void*)prog);
+            if ((*ix).second.empty())
+                proglabel = string("@C048 ") + asString((*ix).first + 1);
+            else
+                proglabel = string(" ") + asString((*ix).first + 1) + string("\\t") + (*ix).second;
+            ProgramBrowser->add(proglabel.c_str(), (void*)(*ix).first);
         }
         ProgramBrowser->value(synth->part[partnum]->partProgram + 1);
         ProgramBrowser->show();} {}
@@ -385,8 +350,6 @@ class ProgramBanksUI {open : MiscFuncs
     unsigned char partnum;
     unsigned char currentbank;
     unsigned char currentprogram;
-    string banklabel;
     string labeltag;} {public
   }
-  decl {const string empty_prog_format;} {}
 } 

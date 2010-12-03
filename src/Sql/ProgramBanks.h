@@ -48,7 +48,6 @@ class ProgramBanks : private MiscFuncs
         string dbQuoteSingles(string txt);
         string readXmlFile(const string filename);
         void dbErrorLog(string msg);
-        const string xizext;
         sqlite3 *dbConn;
 };
 

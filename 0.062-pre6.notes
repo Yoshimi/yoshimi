@@ -1,3 +1,9 @@
+yoshimi-0.062-pre6
+
+instrument file scan attempts to honour sort order of the file names in
+program number allocation.
+
+------------------
 yoshimi-0.062-pre5
 
 the elusive filter and envelope controllers now appear to reaching the right

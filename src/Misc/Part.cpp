@@ -22,7 +22,6 @@
     This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
-#include <iostream>
 #include <cstring>
 #include <boost/shared_ptr.hpp>
 
@@ -716,13 +715,11 @@ void Part::SetController(unsigned int type, int par)
         case C_effects1Depth:   // 91 part effect 1 volume
         case C_effects2Depth:   // 92 part effect 2 volume
         case C_effects3Depth:   // 93 part effect 3 volume
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             partefx[type - C_effects1Depth]->seteffectpar(0, par);
             break;
 
         // 102 ADsynth Filter Category
         case C_undefined102:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 2)
             {
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Pcategory = par;
@@ -732,7 +729,6 @@ void Part::SetController(unsigned int type, int par)
 
         // 103 ADsynth Filter Type
         case C_undefined103:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 4)
             {
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Ptype = par;
@@ -742,90 +738,77 @@ void Part::SetController(unsigned int type, int par)
             
         // 104 Set kit item number for ADsynth Filter LFO controls
         case C_undefined104:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (par >= 0 && par < 128)
                 FilterLfoControlLsb = par;
             break;
             
         // 105 ADsynth Filter LFO Frequency
         case C_undefined105:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pfreq = (float)par / 127.0f;
             break;
     
         // 106 ADsynth Filter LFO Depth
         case C_undefined106:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pintensity = par;
             break;
     
         // 107 ADsynth Filter LFO Start 
         case C_undefined107:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pstartphase = par;
             break;
 
         // 108 ADsynth Filter LFO Delay
         case C_undefined108:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pdelay = par;
             break;
             
         // 109 ADsynth Filter Envelope Start
         case C_undefined109:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_val = par;
             break;
             
         // 110 ADsynth Filter Envelope Attack
         case C_undefined110:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_dt = par;
             break;
         
         // 111 ADsynth Filter Envelope Decay Value
         case C_undefined111:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_val = par;
             break;
         
         // 112 ADsynth Filter Envelope Decay Time
         case C_undefined112:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_dt = par;
             break;
 
         // 113 ADsynth Filter Envelope Release Value
         case C_undefined113:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_val = par;
             break;
 
         // 114 ADsynth Filter Envelope Release Time
         case C_undefined114:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_dt = par;
             break;
 
         // 120 All Sound Off
         case C_allsoundsoff:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             AllNotesOff();
             break;
 
         // 121 Reset All Controllers 
         case C_resetallcontrollers:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             ctl->resetall();
             RelaseSustainedKeys();
             if (ctl->volume.receive)
@@ -843,7 +826,6 @@ void Part::SetController(unsigned int type, int par)
 
         // 123 All Notes Off 
         case C_allnotesoff:
-            cerr << "Part::SetController " << (int)type << " - " << (int)par << endl;
             RelaseAllKeys();
             break;
 

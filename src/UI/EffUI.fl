@@ -1021,8 +1021,10 @@ refresh(eff);}
       }
       Fl_Dial eqp0 {
         label Gain
-        callback {eff->seteffectpar(0, lrintf(o->value()));
-eqgraph->redraw();}
+        callback {//
+            eff->seteffectpar(0, lrintf(o->value()));
+            eqgraph->redraw();
+        }
         xywh {10 41 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
