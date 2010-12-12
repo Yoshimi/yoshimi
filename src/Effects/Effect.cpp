@@ -30,6 +30,7 @@ Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
     efxoutl(efxoutl_),
     efxoutr(efxoutr_),
     filterpars(filterpars_),
+    effect_type(indeterminate),
     insertion(insertion_)
 { }
 

@@ -18,10 +18,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified November 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
-#include <iostream>
 #include <cmath>
 
 #include "Misc/XMLwrapper.h"
@@ -541,7 +540,8 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 // Applies the parameters (i.e. computes all the samples, based on parameters);
 void PADnoteParameters::applyparameters(bool islocked)
 {
-    const int samplesize = (((int)1) << (Pquality.samplesize + 14));
+//    const int samplesize = (((int)1) << (Pquality.samplesize + 14));
+    const int samplesize = 1 << (Pquality.samplesize + 14);
     int spectrumsize = samplesize / 2;
     float spectrum[spectrumsize];
     int profilesize = 512;

@@ -17,8 +17,6 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
 #include <boost/interprocess/creation_tags.hpp>
 #include <errno.h>
 #include <fcntl.h>
@@ -225,7 +223,7 @@ void *MusicIO::midiThread(void)
         {
             uint32_t frame_wait = 1000000u / getSamplerate();
             uint32_t wait4it = (msg.event_frame - endframe) * frame_wait;
-            cerr << "frame_wait " << frame_wait << ", wait4it " << wait4it << endl;
+            Runtime.Log(string("frame_wait ") + asString(frame_wait) + string(", wait4it ") + asString(wait4it));
             if (wait4it > 2 * frame_wait)
                 usleep(wait4it);
         }

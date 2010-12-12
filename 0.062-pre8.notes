@@ -1,0 +1,42 @@
+yoshimi-0.062-pre8
+
+Various fixes and some possible improvements to the program bank management
+interface. Regressions are highly possible.
+
+Midi controller 3 drives ADsynth & PADsynth Amplitude LFO depth (or at least
+tries)
+
+On a midi controlled program change, part volume is retained as was instead of
+being set to the loudish default value.
+
+First time setup of the instrument database has changed - no change to the db
+structure though. If the database isn't found on startup, a new one is created
+from sql (embedded in the app) and filled from the contents of of
+~/.local/share/yoshimi/banks/.
+
+The "Load Database" button is gone from the program banks panel. Instead there's
+"Load Database" and "New Database" menu items under "Instruments" in the main
+menu. By popular request, "New Database" simply wipes the existing database and
+creates an empty one.
+
+As noted (by I forget whom), the previously posted list of newly exposed midi
+controllers had 113 & 114 inverted wrt to what was actually coded. As best I can
+tell, this is how things stand -
+  3  ADsynth & PADsynth Amplitude LFO depth
+  91 part effect 1 volume
+  92 part effect 2 volume
+  93 part effect 3 volume
+  102 ADsynth Filter Category
+  103 ADsynth Filter Type
+  104 Set kit item number for ADsynth Filter controls (a silly idea, to be
+      dropped asap)
+  105 ADsynth Filter LFO Frequency
+  106 ADsynth Filter LFO Depth
+  107 ADsynth Filter LFO Start
+  108 ADsynth Filter LFO Delay
+  109 ADsynth Filter Envelope Start
+  110 ADsynth Filter Envelope Attack
+  111 ADsynth Filter Envelope Decay Value
+  112 ADsynth Filter Envelope Decay Time
+  113 ADsynth Filter Envelope Release Value
+  114 ADsynth Filter Envelope Release Time

@@ -26,6 +26,18 @@
 
 #include "Params/FilterParams.h"
 
+typedef enum {
+    indeterminate = 0,
+    reverb = 1,
+    echo = 2,
+    chorus = 3,
+    phaser = 4,
+    alienwah = 5,
+    distorsion = 6,
+    eq = 7,
+    dynamicfilter = 8
+} fx_type;
+
 class Effect
 {
     public:
@@ -46,10 +58,10 @@ class Effect
         float outvolume;
         float volume;
         FilterParams *filterpars;
+        fx_type effect_type;
 
     protected:
         bool insertion;
 };
 
 #endif
-

@@ -10,7 +10,7 @@ comment {MasterUI.cc} {in_source not_in_header
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
+Copyright 2009-2010, Alan Calvert 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of version 2 of the GNU General Public
@@ -25,8 +25,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified 2010
-} {in_source in_header
+This file is derivative of ZynAddSubFX original code, modified December 2010
+} {selected in_source in_header
 } 
 
 decl {//
@@ -36,9 +36,6 @@ decl {//
 } 
 
 decl {MasterUI *guiMaster;} {public
-} 
-
-decl {\#include <iostream>} {public
 } 
 
 decl {//
@@ -64,7 +61,8 @@ decl {\#include "MasterMiscUI.h"} {global
 class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(void)} {} {
-    code {ninseff = 0;
+    code {//
+      ninseff = 0;
       nsyseff = 0;
       npart = 0;
       for (int i = 0; i < NUM_SYS_EFX; ++i)
@@ -77,7 +75,8 @@ class MasterUI {open : {private MiscFuncs}
       configui = NULL;
       presetsui = NULL;
       paramsui = NULL;
-      yoshiLog = NULL;} {}
+      yoshiLog = NULL;
+      create_database = false;} {}
   }
   Function {~MasterUI()} {} {
     code {//
@@ -129,7 +128,7 @@ class MasterUI {open : {private MiscFuncs}
   Function {Init(void)} {} {
     code {//
       microtonalui = new MicrotonalUI(&synth->microtonal);
-      progbanksui = new ProgramBanksUI(npart);
+      progbanksui = new ProgramBanksUI(synth->part[npart]);
       virkeyboard = new VirKeyboard();
       configui = new ConfigUI();
       presetsui = new PresetsUI();
@@ -142,7 +141,18 @@ class MasterUI {open : {private MiscFuncs}
       if (Runtime.showConsole)
         yoshiLog->Show();
       else
-        yoshiLog->Hide();} {}
+        yoshiLog->Hide();
+      if (create_database)
+      {
+         fl_alert("Need to install the instrument database,\\nwhich takes a while ...");
+         if (!progBanks->newDatabase(true))
+         {
+           fl_alert("Instrument database install failed. This is not good.");
+           Runtime.runSynth = false;
+         }
+         yoshiLog->Show();
+      }
+      progbanksui->refreshBoth();} {}
   }
   Function {make_window()} {open
   } {
@@ -160,7 +170,7 @@ class MasterUI {open : {private MiscFuncs}
             default:
                 break;
         }} open
-      xywh {1313 109 390 455} type Double color 50 labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {484 459 390 455} type Double color 50 labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} color 50 labelsize 13
@@ -200,46 +210,77 @@ class MasterUI {open : {private MiscFuncs}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
+            label {&Virtual Keyboard...}
+            callback {virkeyboard->Show();}
+            xywh {10 10 100 20} labelsize 12
+          }
+          MenuItem {} {
             label {&Program Banks}
             callback {//
                 progbanksui->Show(0);}
             xywh {0 0 100 20} labelsize 12
           }
-          MenuItem {} {
-            label {&Virtual Keyboard...}
-            callback {virkeyboard->Show();}
-            xywh {10 10 100 20} labelsize 12
-          }
-        }
-        Submenu Parameters {
-          label {Para&meters}
-          xywh {0 0 70 21} labelsize 12
-          code0 {o = o; // suppress warning
-              if (Runtime.ParamsHistory.empty())
-                  RecentParams->deactivate();
-              else
-                  RecentParams->activate();}
-        } {
-          MenuItem RecentParams {
-            label {&Recent}
-            callback {paramsui->Show();}
-            xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem {} {
-            label {&Open}
+          MenuItem LoadDatabase {
+            label {Load database}
             callback {//
+                if (fl_choice("This will clear the program bank database\\n"
+                              "and reload it from the instrument files.\\n\\n"
+                              "Is this what you really want?", "No", "Yes", NULL))
+                {
+                    yoshiLog->Show();
+                    if (!progBanks->newDatabase(true))
+                        fl_alert("So sad, load instrument database tried, but failed.");
+                    else
+                        progbanksui->refreshBoth();
+                }
+            }
+            tooltip {Clear database, rescan instrument files and load the database} xywh {0 0 34 21} labelsize 12
+          }
+          MenuItem NewDatabase {
+            label {New database}
+            callback {//
+                if (fl_choice("This will wipe the program bank database\\n"
+                              "and create a new, empty database\\n"
+                              "Is this what you really want?", "No", "Yes", NULL))
+                {
+                    yoshiLog->Show();
+                    if (!progBanks->newDatabase(false))
+                        fl_alert("So sad, new database tried but failed.");
+                    else
+                        progbanksui->refreshBoth();
+                }
+            }
+            tooltip {Create new empty database} xywh {10 10 34 21} labelsize 12
+          }
+          Submenu Parameters {
+            label {Para&meters}
+            xywh {0 0 70 21} labelsize 12
+            code0 {o = o;
+                if (Runtime.ParamsHistory.empty())
+                  RecentParams->deactivate();
+                else
+                  RecentParams->activate();}
+          } {
+            MenuItem RecentParams {
+              label {&Recent}
+              callback {paramsui->Show();}
+              xywh {0 0 34 21} labelsize 12
+            }
+            MenuItem {} {
+              label {&Open}
+              callback {//
                 loadXmz(true, NULL);
                 paramsui->loadRecent();//}
-            tooltip {Load a parameters (.xmz) file} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem Save {
-            label {&Save}
-            callback {saveMaster();}
-            tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem {} {
-            label {&Clear}
-            callback {// do_new_master();
+              tooltip {Load a parameters (.xmz) file} xywh {0 0 34 21} labelsize 12
+            }
+            MenuItem Save {
+              label {&Save}
+              callback {saveMaster();}
+              tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
+            }
+            MenuItem {} {
+              label {&Clear}
+              callback {// do_new_master();
                 if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
                 {
                     delete microtonalui;
@@ -248,16 +289,16 @@ class MasterUI {open : {private MiscFuncs}
                     refresh_master_ui();
                 }
                 updatePanel();}
-            xywh {20 20 100 20} labelsize 12
+              xywh {20 20 100 20} labelsize 12
+            }
           }
-        }
-        Submenu Scales {
-          label {&Scales}
-          tooltip {Clear all parameters to default settings} xywh {0 0 70 21} labelsize 12
-        } {
-          MenuItem {} {
-            label {&Load Scale Settings...}
-            callback {char *filename;
+          Submenu Scales {
+            label {&Scales}
+            tooltip {Clear all parameters to default settings} xywh {0 0 70 21} labelsize 12
+          } {
+            MenuItem {} {
+              label {&Load Scale Settings...}
+              callback {char *filename;
                 filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
                 if (filename == NULL)
                     return;
@@ -271,11 +312,11 @@ class MasterUI {open : {private MiscFuncs}
                 microtonalui = new MicrotonalUI(&synth->microtonal);
                 if (!result)
                     fl_alert("Failed to load scale settings file");}
-            xywh {35 35 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {Save Sc&ale Settings ..}
-            callback {//
+              xywh {35 35 100 20} labelsize 12
+            }
+            MenuItem {} {
+              label {Save Sc&ale Settings ..}
+              callback {//
                 char *filename = fl_file_chooser("Save:", "({*.xsz})", NULL, 0);
                 if (!filename)
                     return;
@@ -289,12 +330,13 @@ class MasterUI {open : {private MiscFuncs}
                 if (!result)
                     fl_alert("Failed to save scale settings");
                 updatePanel();}
-            xywh {25 25 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {Show Scale Settings...}
-            callback {microtonalui->Show();}
-            xywh {0 0 100 20} labelsize 12
+              xywh {25 25 100 20} labelsize 12
+            }
+            MenuItem {} {
+              label {Show Scale Settings...}
+              callback {microtonalui->Show();}
+              xywh {0 0 100 20} labelsize 12
+            }
           }
         }
       }
@@ -738,8 +780,6 @@ class MasterUI {open : {private MiscFuncs}
               progbanksui->Show(nval);}
         xywh {37 259 40 18} color 50 labelfont 1 labelsize 11 minimum 0 maximum 127 textsize 10
         code0 {o->type(FL_INT_INPUT); o->range(1.0, NUM_MIDI_PARTS);}
-        code1 {//
-            //progbanksui->init(o);}
       }
     }
     Fl_Window aboutwindow {
@@ -1009,7 +1049,7 @@ ZynAddSubFX}
   } {
     code {partui->showInstrumentEditWindow(part_);} {}
   }
-  Function {hideInstrumentEditWindow(void)} {open selected return_type void
+  Function {hideInstrumentEditWindow(void)} {open return_type void
   } {
     code {partui->hideInstrumentEditWindow();} {}
   }
@@ -1032,4 +1072,6 @@ ZynAddSubFX}
   decl {const char *start_record_tip;} {}
   decl {const char *stop_record_tip;} {}
   decl {ConsoleUI *yoshiLog;} {}
+  decl {bool create_database;} {public
+  }
 } 

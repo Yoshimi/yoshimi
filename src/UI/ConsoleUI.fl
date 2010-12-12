@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
-header_name {.h} 
+version 1.0110
+header_name {.h}
 code_name {.cc}
 comment {Copyright 2010, Alan Calvert
 
@@ -17,22 +17,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } {in_source in_header
-} 
+}
 
-decl {\#include <set>} {public
-} 
+decl {
+    \#include <string>
+    using namespace std;
+} {public}
 
-decl {\#include <iostream>} {public
-} 
-
-decl {using namespace std;} {public
-} 
-
-decl {\#include "Misc/Config.h"} {global
-} 
-
-decl {\#include "MasterUI.h"} {global
-} 
+decl {
+    \#include "Misc/Config.h"
+    \#include "MasterUI.h"
+} {global}
 
 class ConsoleUI {open
 } {
@@ -41,11 +36,11 @@ class ConsoleUI {open
     Fl_Window logConsole {
       label {yoshimi console}
       callback {o->hide()} open
-      xywh {1077 699 320 180} type Double color 54 selection_color 36 labeltype NORMAL_LABEL labelfont 13 labelsize 13 align 0 when 1 hide resizable
+      xywh {379 169 480 240} type Double color 54 selection_color 36 labelfont 13 labelsize 13 align 0 when 1 resizable visible
     } {
       Fl_Text_Display logText {
-        label {log text}
-        xywh {0 0 320 180} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
+        label {log text} selected
+        xywh {0 0 480 240} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
       }
     }
   }
@@ -64,7 +59,12 @@ class ConsoleUI {open
   } {
     code {//
         logConsole->visible();
-        logConsole->hide();} {}
+        logConsole->hide();
+    } {}
+  }
+  Function {Visible(void)} {return_type int
+  } {
+    code {return logConsole->visible();} {}
   }
   Function {~ConsoleUI()} {} {
     code {logConsole->hide();
@@ -73,16 +73,19 @@ class ConsoleUI {open
   }
   Function {log(string msg)} {return_type void
   } {
-    code {txtbuf->append(msg.c_str());
+    code {//
+      txtbuf->append(msg.c_str());
       txtbuf->append(string("\\n").c_str());
+      if (txtbuf->length() > 1000)
+        txtbuf->remove(0, txtbuf->line_end(1));
       logConsole->redraw();
-      if (txtbuf->length() > 8000)
-        txtbuf->remove(0, txtbuf->line_end(1));} {}
+    } {}
   }
-  Function {setLabel(void)} {open selected return_type void
+  Function {setLabel(void)} {open return_type void
   } {
-    code {logConsole->copy_label((musicClient->midiClientName()
-                              + string(" console")).c_str());} {}
+    code {//
+        logConsole->copy_label((musicClient->midiClientName() + string(" console")).c_str());
+    } {}
   }
   decl {Fl_Text_Buffer *txtbuf;} {}
-} 
+}

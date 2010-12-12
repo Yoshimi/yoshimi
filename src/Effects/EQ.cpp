@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified November 2010
 */
 
 #include "Misc/SynthEngine.h"
@@ -27,6 +27,7 @@
 EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
+    effect_type = eq;
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
         filter[i].Ptype = 0;
@@ -34,8 +35,8 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
         filter[i].Pgain = 64;
         filter[i].Pq = 64;
         filter[i].Pstages = 0;
-        filter[i].l = new AnalogFilter(6, 1000.0, 1.0, 0);
-        filter[i].r = new AnalogFilter(6, 1000.0, 1.0, 0);
+        filter[i].l = new AnalogFilter(6, 1000.0f, 1.0f, 0);
+        filter[i].r = new AnalogFilter(6, 1000.0f, 1.0f, 0);
     }
     // default values
     Pvolume = 50;
@@ -68,10 +69,11 @@ void EQ::out(float *smpsl, float *smpsr)
     }
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
-        if (filter[i].Ptype == 0)
-            continue;
-        filter[i].l->filterout(efxoutl);
-        filter[i].r->filterout(efxoutr);
+        if (filter[i].Ptype)
+        {
+            filter[i].l->filterout(efxoutl);
+            filter[i].r->filterout(efxoutr);
+        }
     }
 }
 

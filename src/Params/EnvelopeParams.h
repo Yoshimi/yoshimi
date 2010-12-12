@@ -54,7 +54,7 @@ class EnvelopeParams : public Presets, public Carcass
         unsigned char Penvsustain; // 127 pentru dezactivat
         unsigned char Penvdt[MAX_ENVELOPE_POINTS];
         unsigned char Penvval[MAX_ENVELOPE_POINTS];
-        unsigned char Penvstretch; // 64=normal stretch (piano-like), 0=no stretch
+        unsigned char Penvstretch; // 64 = normal stretch (piano-like), 0 = no stretch
         unsigned char Pforcedrelease; // 0 - OFF, 1 - ON
         unsigned char Plinearenvelope; // if the amplitude envelope is linear
 

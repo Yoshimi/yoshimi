@@ -18,11 +18,10 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
 #include <cmath>
-#include <iostream>
 
 using namespace std;
 
@@ -35,7 +34,6 @@ using namespace std;
 
 Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
-    // defaults
     Pvolume(48),
     Ppan(64),
     Ptime(64),
@@ -56,6 +54,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     lpf(NULL),
     hpf(NULL) // no filter
 {
+    effect_type = reverb;
     inputbuf = new float[synth->buffersize];
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {

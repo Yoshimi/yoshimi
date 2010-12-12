@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110
-header_name {.h}
+version 1.0110 
+header_name {.h} 
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
-}
+} 
 
 comment {LFOUI.cc} {in_source not_in_header
-}
+} 
 
 comment {
  Original ZynAddSubFX author Nasca Octavian Paul
@@ -26,29 +26,23 @@ comment {
  yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
  Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
- This file is derivative original ZynAddSubFX code, modified November 2010
-} {in_source in_header}
+ This file is derivative original ZynAddSubFX code, modified December 2010
+} {in_source in_header
+} 
 
-decl {\#include "WidgetPDialUI.h"} {public
-}
+decl {
+    \#include "WidgetPDialUI.h"
+    \#include "PresetsUI.h"
+    \#include "Params/LFOParams.h"
+} {public global} 
 
-decl {\#include <FL/Fl_Group.H>} {public
-}
-
-decl {\#include <FL/Fl_Box.H>} {public
-}
-
-decl {\#include <FL/fl_draw.H>} {public
-}
-
-decl {\#include <FL/fl_ask.H>} {public
-}
-
-decl {\#include "PresetsUI.h"} {public
-}
-
-decl {\#include "Params/LFOParams.h"} {public
-}
+decl {
+    \#include <cmath>
+    \#include <FL/Fl_Group.H>
+    \#include <FL/Fl_Box.H>
+    \#include <FL/fl_draw.H>
+    \#include <FL/fl_ask.H>
+} {global} 
 
 class LFOUI {open : {public Fl_Group, PresetsUI_}
 } {
@@ -59,7 +53,6 @@ class LFOUI {open : {public Fl_Group, PresetsUI_}
     code {//
         lfoui->hide();
         hide();
-        //delete (lfoui);
     } {}
   }
   Function {make_window(void)} {return_type void
@@ -80,31 +73,31 @@ class LFOUI {open : {public Fl_Group, PresetsUI_}
         }
         Fl_Dial intensity {
           label Depth
-          callback {pars->Pintensity=(int)o->value();}
+          callback {pars->Pintensity=lrintf(o->value());}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial delay {
           label Delay
-          callback {pars->Pdelay=(int)o->value();}
+          callback {pars->Pdelay=lrintf(o->value());}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial startphase {
           label Start
-          callback {pars->Pstartphase=(int)o->value();}
+          callback {pars->Pstartphase=lrintf(o->value());}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial randomness {
           label {A.R.}
-          callback {pars->Prandomness=(int)o->value();}
+          callback {pars->Prandomness=lrintf(o->value());}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Choice LFOtype {
           label Type
-          callback {pars->PLFOtype=(int)o->value();}
+          callback {pars->PLFOtype=lrintf(o->value());}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
         } {
           MenuItem {} {
@@ -138,18 +131,18 @@ class LFOUI {open : {public Fl_Group, PresetsUI_}
         }
         Fl_Check_Button continous {
           label {C.}
-          callback {pars->Pcontinous=(int)o->value();}
+          callback {pars->Pcontinous=lrintf(o->value());}
           tooltip {Continous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
-          callback {pars->Pfreqrand=(int)o->value();}
+          callback {pars->Pfreqrand=lrintf(o->value());}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial stretch {
           label {Str.}
-          callback {pars->Pstretch=(int)o->value();}
+          callback {pars->Pstretch=lrintf(o->value());}
           tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
@@ -177,18 +170,18 @@ class LFOUI {open : {public Fl_Group, PresetsUI_}
         stretch->value(pars->Pstretch);
         randomness->value(pars->Prandomness);
         freqrand->value(pars->Pfreqrand);
-        LFOtype->value(pars->PLFOtype);
-    } {}
+        LFOtype->value(pars->PLFOtype);} {}
   }
-  Function {init(LFOParams *lfopars_)} {selected return_type void
+  Function {init(LFOParams *lfopars_)} {return_type void
   } {
-    code {pars=lfopars_;
+    code {//
+        pars = lfopars_;
         make_window();
         end();
         refresh();
-        lfoui->resize(this->x(),this->y(),this->w(),this->h());
+        lfoui->resize(this->x(), this->y(), this->w(), this->h());
         lfoparamswindow->label(this->label());
     } {}
   }
   decl {LFOParams *pars;} {}
-}
+} 

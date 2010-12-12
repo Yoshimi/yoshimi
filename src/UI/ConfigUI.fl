@@ -23,7 +23,7 @@ This file is a derivative of the ZynAddSubFX original, modified January 2010
 } {in_source in_header
 } 
 
-decl {\#include <iostream>
+decl {
     \#include <cmath>
     \#include <FL/Fl_File_Chooser.H>
     \#include "Misc/Config.h"

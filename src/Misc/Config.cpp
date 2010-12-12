@@ -57,23 +57,26 @@ static char prog_doc[] =
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
 static struct argp_option cmd_options[] = {
-    {"alsa-audio",        'A',  "<device>", 0x1,  "use alsa audio output" },
-    {"alsa-midi",         'a',  "<device>", 0x1,  "use alsa midi input" },
-    {"buffersize",        'b',  "<size>",     0,  "set alsa audio buffer size" },
-    {"show-console",      'c',  NULL,         0,  "show console on startup" },
-    {"no-gui",            'i',  NULL,         0,  "no gui"},
-    {"jack-audio",        'J',  "<server>", 0x1,  "use jack audio output" },
-    {"jack-midi",         'j',  "<device>", 0x1,  "use jack midi input" },
-    {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
-    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
-    {"load",              'l',  "<file>",     0,  "load .xmz file" },
-    {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
-    {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
-    {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
-    {"oscilsize",         'o',  "<size>",     0,  "set oscilsize" },
-    {"state",             'S',  "<file>",   0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
-    {"jack-session-file", 'u',  "<file>",     0,  "load jack session file" },
-    {"jack-session-file", 'U',  "<uuid>",     0,  "jack session uuid" },
+    {"alsa-audio",        'A',  "<device>",    0x1,  "use alsa audio output" },
+    {"alsa-midi",         'a',  "<device>",    0x1,  "use alsa midi input" },
+    {"buffersize",        'b',  "<size>",        0,  "set alsa audio buffer size" },
+    {"show-console",      'c',  NULL,            0,  "show console on startup" },
+    {"no-gui",            'i',  NULL,            0,  "no gui"},
+    {"no-stderr",         'e',  NULL,            0,  "no logging to stderr"},
+    {"jack-audio",        'J',  "<server>",    0x1,  "use jack audio output" },
+    {"jack-midi",         'j',  "<device>",    0x1,  "use jack midi input" },
+    {"autostart-jack",    'k',  NULL,            0,  "auto start jack server" },
+    {"auto-connect",      'K',  NULL,            0,  "auto connect jack audio" },
+    {"load",              'l',  "<file>",        0,  "load .xmz file" },
+    {"load-instrument",   'L',  "<file>",        0,  "load .xiz file" },
+    {"name-tag",          'N',  "<tag>",         0,  "add tag to clientname" },
+    {"samplerate",        'R',  "<rate>",        0,  "set alsa audio sample rate" },
+    {"oscilsize",         'o',  "<size>",        0,  "set oscilsize" },
+    {"state",             'S',  "<file>",      0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
+    {"jack-session-file", 'u',  "<file>",        0,  "load jack session file" },
+    {"jack-session-file", 'U',  "<uuid>",        0,  "jack session uuid" },
+    {"bank",              'B',  "<bank num>",    0,  "set initial bank number" },
+    {"program",           'P',  "<program num>", 0,  "select initial program number" },
     { 0, }
 };
 
@@ -89,6 +92,7 @@ Config::Config() :
     runSynth(true),
     showGui(true),
     showConsole(false),
+    noStderr(false),
     VirKeybLayout(1),
     audioDevice("default"),
     midiDevice("default"),
@@ -109,6 +113,8 @@ Config::Config() :
     rtprio(50),
     deadObjects(new BodyDisposal()),
     progBanks(NULL),
+    initialBank(-1),
+    initialProgram(-1),
     sse_level(0),
     programCmd("yoshimi")
 {
@@ -528,9 +534,9 @@ void Config::addRuntimeXML(XMLwrapper *xml)
 
 void Config::Log(string msg, bool tostderr)
 {
-    if (showGui && !tostderr)
+    if (showGui)
         LogList.push_back(msg);
-    else
+    if (!noStderr)
         cerr << msg << endl;
 }
 
@@ -647,6 +653,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
             }
             else
                 Log("Failed to set thread detach state: " + asString(chk));
+            pthread_attr_destroy(&attr);
         }
         else
             Log("Failed to initialise thread attributes: " + asString(chk));
@@ -874,9 +881,19 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 settings->midiDevice = string(arg);
                   break;
+        case 'B': // bank number
+            {
+                int x = Runtime.string2int(string(arg));
+                if (x >= 0 && x < 128)
+                    settings->initialBank = x;
+            }
+            break;
+        case 'e':
+            settings->noStderr = true; break;
         case 'i':
             settings->showGui = false;
             settings->showConsole = false;
+            settings->noStderr = false;
             break;
         case 'J':
             settings->audioEngine = jack_audio;
@@ -890,6 +907,13 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
         case 'k': settings->startJack = true; break;
         case 'K': settings->connectJackaudio = true; break;
+        case 'P': // program number
+            {
+                int x = Runtime.string2int(string(arg));
+                if (x >= 0 && x < 128)
+                    settings->initialProgram = x;
+            }
+            break;               
         case 'S':
             settings->doRestoreState = true;
             if (arg)

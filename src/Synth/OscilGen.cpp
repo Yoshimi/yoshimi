@@ -19,10 +19,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified November 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
-#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -399,10 +398,7 @@ void OscilGen::getbasefunction(float *smps)
             t = t - floorf(t);
 
             if (!smps)
-            {
-                cerr << "!!! smps is NULL through getbasefunction() !!!" << endl; 
                 return;
-            }
 
             switch (Pcurrentbasefunc)
             {
@@ -579,11 +575,6 @@ void OscilGen::changebasefunction(void)
 {
     if (Pcurrentbasefunc != 0)
     {
-        if (!tmpsmps)
-        {
-            cerr << "!!!! tmpsmps is NULL through OscilGen::changebasefunction" << endl;
-            cerr << "!!!! Pcurrentbasefunc is " << (int)Pcurrentbasefunc << endl;
-        }
         getbasefunction(tmpsmps.get());
         fft->smps2freqs(tmpsmps.get(), &basefuncFFTfreqs);
         basefuncFFTfreqs.c[0] = 0.0f;
@@ -1309,15 +1300,8 @@ void OscilGen::useasbase(void)
 // Get the base function for UI
 void OscilGen::getcurrentbasefunction(float *smps)
 {
-    if (!smps)
-    {
-        cerr << "!!!! NULL smps through OscilGen::getcurrentbasefunction()" << endl;
-        cerr << "!!!! ie Get the base function for UI" << endl;
-    }
     if (Pcurrentbasefunc)
-    {
         fft->freqs2smps(&basefuncFFTfreqs, smps);
-    }
     else
         getbasefunction(smps); // the sine case
 }

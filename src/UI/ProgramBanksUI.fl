@@ -33,7 +33,7 @@ decl {\#include <FL/Fl_Spinner.H>
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
-decl {\#include <iostream>
+decl {
     \#include <map>
     \#include <FL/Fl_Button.H>
     \#include <FL/Fl_File_Chooser.H>
@@ -53,7 +53,7 @@ class ProgramBanksUI {open : MiscFuncs
       callback {//
             guiMaster->partui->hideInstrumentEditWindow();
             ProgramBankWindow->hide();} open
-      xywh {394 621 560 465} type Double color 50 labelsize 12
+      xywh {395 640 560 465} type Double color 50 labelsize 12
       code0 {//
           labeltag = string("Part ") + asString(partnum + 1);
           o->copy_label(labeltag.c_str());} visible
@@ -68,22 +68,9 @@ class ProgramBanksUI {open : MiscFuncs
                 part->partBank = tag - 1;
                 switch (Fl::event_button())
                 {
-                    case FL_RIGHT_MOUSE:
-
-                      cerr << "Right mouse on banks" << endl;
-
-                      if ((tmp = fl_input((string("Bank ") + asString(tag) + string(" name:")).c_str(),
-                                           progBanks->bankList[part->partBank].c_str())))
-                      {
-                          o->copy_label(tmp);
-                          progBanks->addBank(part->partBank, string(tmp));
-                          fetchBankList();
-                      }
-
                     case FL_LEFT_MOUSE: // show details
-                    case FL_MIDDLE_MOUSE:
                         guiMaster->partui->hideInstrumentEditWindow();
-                        listPrograms();
+                        refreshPrograms();
                         CurrentBank->clear();
                         CurrentBank->copy_label((asString(tag) + ": " + progBanks->bankList[part->partBank]).c_str());
                         CurrentProgram->copy_label(NULL);
@@ -91,19 +78,33 @@ class ProgramBanksUI {open : MiscFuncs
                         savetogroup->deactivate();
                         break;
 
-                   default:
-                       cerr << "Bank event, " << (int)Fl::event_button() << endl;
+                    case FL_MIDDLE_MOUSE:
+                        break;
+
+                    case FL_RIGHT_MOUSE:
+
+                      Runtime.Log("Right mouse on banks");
+
+                      if ((tmp = fl_input((string("Bank ") + asString(tag) + string(" name:")).c_str(),
+                                           progBanks->bankList[part->partBank].c_str())))
+                      {
+                          o->copy_label(tmp);
+                          progBanks->updateBank(part->partBank, string(tmp));
+                          refreshBankList();
+                      }
+
+                  default:
+                       Runtime.Log("Bank event, " + asString((int)Fl::event_button()));
                        break;
                 }
-            }}
+            }
+        }
         xywh {2 5 275 330} type Hold box ENGRAVED_BOX color 55 selection_color 246 labelfont 1 labelsize 11 align 6 textsize 11
-        code0 {//
-            fetchBankList();
-            o->value(part->partBank);}
       }
       Fl_Button CurrentBank {
         callback {//
-            fetchBankList();}
+            refreshBankList();
+        }
         tooltip {Currently selected bank} xywh {38 333 239 18} box ENGRAVED_BOX color 54 selection_color 246 labelfont 1 labelsize 11 align 20 when 6
       }
       Fl_Browser ProgramBrowser {
@@ -156,7 +157,7 @@ class ProgramBanksUI {open : MiscFuncs
                         break;
 
                     case FL_MIDDLE_MOUSE:
-                        cerr << "Prog browser, middle mouse" << endl;
+                        Runtime.Log("Prog browser, middle mouse");
                         break;
 
                     default:
@@ -168,7 +169,7 @@ class ProgramBanksUI {open : MiscFuncs
             o->value(0);}
       }
       Fl_Button CurrentProgram {
-        callback {fetchBankList();}
+        callback {refreshBankList();}
         tooltip {Currently selected program} xywh {337 334 219 18} box ENGRAVED_BOX color 54 selection_color 246 labelfont 1 labelsize 11 align 20 when 6
       }
       Fl_Check_Button {} {
@@ -191,7 +192,7 @@ class ProgramBanksUI {open : MiscFuncs
         Fl_Button {} {
           label {Import XML}
           callback {importXmlFile();}
-          tooltip {Rescan the database, refresh the bank list} xywh {338 388 80 18} box PLASTIC_UP_BOX color 246 labelsize 10
+          tooltip {Import an xiz instrument file} xywh {338 388 80 18} box PLASTIC_UP_BOX color 246 labelsize 10
         }
         Fl_Button {} {
           label {Export XML}
@@ -208,7 +209,7 @@ class ProgramBanksUI {open : MiscFuncs
             //synth->unlockSharable();
             if (!result)
               fl_alert("Failed to save instrument file");}
-          tooltip {Rescan the database, refresh the bank list} xywh {473 388 80 18} box PLASTIC_UP_BOX color 246 labelsize 10
+          tooltip {Export instrument as an xiz file} xywh {473 388 80 18} box PLASTIC_UP_BOX color 246 labelsize 10
         }
       }
       Fl_Group savetogroup {
@@ -231,39 +232,23 @@ class ProgramBanksUI {open : MiscFuncs
           xywh {517 361 36 18} labelsize 10 maximum 128 textsize 9
         }
       }
-      Fl_Group databasegroup {open
-        xywh {38 355 237 100} labelsize 11
-      } {
-        Fl_Button {} {
-          label {Refresh banks}
-          callback {fetchBankList();}
-          tooltip {Scan database and refresh the bank list} xywh {39 360 82 18} box PLASTIC_UP_BOX color 246 labelsize 10
-        }
-        Fl_Button {} {
-          label {Reload database}
-          callback {//
-            if (fl_choice("This will clear the program bank database\\n"
-                          "and reload it from the instrument files.\\n\\n"
-                          "Is this what you really want?", "No", "Yes", NULL))
-            {
-                progBanks->scanInstrumentFiles();
-                fetchBankList();
-                listPrograms();
-                ProgramBrowser->value(part->partProgram + 1);
-            }}
-          tooltip {Clear database, rescan instrument files and load the database} xywh {179 360 96 18} box PLASTIC_UP_BOX color 246 labelsize 10
-        }
+      Fl_Button {} {
+        label {Refresh banks}
+        callback {refreshBankList();}
+        tooltip {Scan database and refresh the bank list} xywh {39 360 82 18} box PLASTIC_UP_BOX color 246 labelsize 10
       }
     }
   }
-  Function {ProgramBanksUI(int partnum_)} {return_type void
+  Function {ProgramBanksUI(Part *part_)} {return_type void
   } {
     code {//
-        partnum = partnum_;
-        part = synth->part[partnum];
+        //partnum = partnum_;
+        //part = synth->part[partnum];
+        part = part_;
         currentbank = part->partBank;
         currentprogram = part->partProgram;
-        make_window();} {}
+        make_window();
+    } {}
   }
   Function {~ProgramBanksUI()} {return_type virtual
   } {
@@ -275,7 +260,7 @@ class ProgramBanksUI {open : MiscFuncs
         partnum = partnum_;
         part = synth->part[partnum];
         if (progBanks)
-            listPrograms();
+            refreshPrograms();
         ProgramBankWindow->copy_label((string("Yoshimi, Part ") + asString(partnum + 1) + string(" program selection")).c_str());
         ProgramBankWindow->show();} {}
   }
@@ -287,7 +272,7 @@ class ProgramBanksUI {open : MiscFuncs
   } {
     code {return ProgramBankWindow->visible();} {}
   }
-  Function {fetchBankList(void)} {private return_type void
+  Function {refreshBankList(void)} {selected return_type void
   } {
     code {//
         if (!progBanks)
@@ -311,9 +296,11 @@ class ProgramBanksUI {open : MiscFuncs
             BankBrowser->select(part->partBank + 1, 1);
         }
         BankBrowser->set_changed();
-        BankBrowser->show();} {}
+        BankBrowser->value(part->partBank);
+        BankBrowser->show();
+    } {}
   }
-  Function {listPrograms(void)} {return_type void
+  Function {refreshPrograms(void)} {return_type void
   } {
     code {//
         progBanks->loadProgramList(part->partBank);
@@ -330,8 +317,16 @@ class ProgramBanksUI {open : MiscFuncs
                 proglabel = string(" ") + asString((*ix).first + 1) + string("\\t") + (*ix).second;
             ProgramBrowser->add(proglabel.c_str(), (void*)(*ix).first);
         }
-        ProgramBrowser->value(synth->part[partnum]->partProgram + 1);
+        //ProgramBrowser->value(synth->part[partnum]->partProgram + 1);
+        ProgramBrowser->value(part->partProgram + 1);
         ProgramBrowser->show();} {}
+  }
+  Function {refreshBoth(void)} {return_type void
+  } {
+    code {//
+        refreshBankList();
+        refreshPrograms();
+    } {}
   }
   Function {importXmlFile(void)} {open return_type void
   } {
@@ -343,7 +338,15 @@ class ProgramBanksUI {open : MiscFuncs
         if (!result)
             fl_alert("Failed to import instrument file");
         else
-            listPrograms();} {}
+            refreshPrograms();} {}
+  }
+  Function {setPart(Part *part_)} {return_type void
+  } {
+    code {
+        part = part_;
+        refreshBankList();
+        refreshPrograms();
+    } {}
   }
   decl {//
     Part *part;

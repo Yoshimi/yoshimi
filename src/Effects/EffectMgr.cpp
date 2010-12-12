@@ -109,7 +109,7 @@ void EffectMgr::changeeffect(int _nefx)
 // Obtain the effect number
 int EffectMgr::geteffect(void)
 {
-    return (nefx);
+    return nefx;
 }
 
 
@@ -147,10 +147,11 @@ void EffectMgr::changepreset(unsigned char npreset)
 }
 
 
-// Change a parameter of the current effect (with thread locking)
-void EffectMgr::seteffectpar(int npar, unsigned char value)
+// Change a parameter of the current effect
+void EffectMgr::seteffectpar(int npar, unsigned char value, bool midicontrol)
 {
-    if (efx)
+    // midi controllers 91-93 drive effect volume, but _not_ for Eq!
+    if (efx && !(midicontrol && efx->effect_type == eq && npar == 0))
     {
         __sync_fetch_and_or (&privatemoment, 0xFF);
         efx->changepar(npar, value);

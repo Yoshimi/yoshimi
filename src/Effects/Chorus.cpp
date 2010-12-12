@@ -29,6 +29,7 @@
 Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
+    effect_type = chorus;
     dlk = drk = 0;
     maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0f * synth->samplerate_f);
     delayl = new float[maxdelay];

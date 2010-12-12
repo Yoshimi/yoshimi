@@ -47,8 +47,13 @@ class EQ : public Effect, private MiscFuncs
         // Parameters
         unsigned char Pvolume;
         struct {
-            unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
-            AnalogFilter *l, *r; // internal values
+            unsigned char Ptype;
+            unsigned char Pfreq;
+            unsigned char Pgain;
+            unsigned char Pq;
+            unsigned char Pstages;
+            AnalogFilter *l;
+            AnalogFilter *r;
         } filter[MAX_EQ_BANDS];
 };
 

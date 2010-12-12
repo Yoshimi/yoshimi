@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified 2010
+    This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
 #ifndef SYNTHENGINE_H

@@ -118,7 +118,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     }
 
     lfilter = new bpfilter[numstages * numharmonics];
-    if (stereo != 0)
+    if (stereo)
         rfilter = new bpfilter[numstages * numharmonics];
 
     // how much the amplitude is normalised (because the harmonics)
@@ -161,7 +161,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
                 hgain = expf(hmagnew * log_0_00001);
                 break;
             default:
-                hgain = 1.0 - hmagnew;
+                hgain = 1.0f - hmagnew;
         }
         gain *= hgain;
         reduceamp += hgain;
@@ -183,11 +183,10 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 
     oldpitchwheel = 0;
     oldbandwidth = 64;
-    if (pars->Pfixedfreq == 0)
+    if (!pars->Pfixedfreq)
         initparameters(basefreq);
     else
         initparameters(basefreq / 440.0f * freq);
-
     oldamplitude = newamplitude;
     ready = 1;
 }
@@ -222,7 +221,7 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
             }
             else
             {
-                Legato.fade.m = 1.0;
+                Legato.fade.m = 1.0f;
                 Legato.msg = LM_FadeOut;
                 return;
             }
@@ -480,19 +479,19 @@ void SUBnote::filter(bpfilter &filter, float *smps)
 void SUBnote::initparameters(float freq)
 {
     AmpEnvelope = new Envelope(pars->AmpEnvelope, freq);
-    if (pars->PFreqEnvelopeEnabled != 0)
+    if (pars->PFreqEnvelopeEnabled)
         FreqEnvelope = new Envelope(pars->FreqEnvelope, freq);
     else
         FreqEnvelope = NULL;
-    if (pars->PBandWidthEnvelopeEnabled != 0)
+    if (pars->PBandWidthEnvelopeEnabled)
         BandWidthEnvelope = new Envelope(pars->BandWidthEnvelope, freq);
     else
         BandWidthEnvelope = NULL;
-    if (pars->PGlobalFilterEnabled != 0)
+    if (pars->PGlobalFilterEnabled)
     {
         globalfiltercenterq = pars->GlobalFilter->getq();
         GlobalFilterL = new Filter(pars->GlobalFilter);
-        if (stereo != 0)
+        if (stereo)
             GlobalFilterR = new Filter(pars->GlobalFilter);
         GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq);
         GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);

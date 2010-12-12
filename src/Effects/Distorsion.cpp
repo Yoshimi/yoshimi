@@ -27,6 +27,7 @@
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
+    effect_type = distorsion;
     lpfl = new AnalogFilter(2, 22000, 1, 0);
     lpfr = new AnalogFilter(2, 22000, 1, 0);
     hpfl = new AnalogFilter(3, 20, 1, 0);

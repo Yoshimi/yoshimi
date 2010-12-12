@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of a ZynAddSubFX original, modified October 2010
+This file is a derivative of a ZynAddSubFX original, modified December 2010
 } {in_source in_header
 }
 
@@ -43,7 +43,6 @@ decl {\#include "EffUI.h"
 
 decl {\#include <FL/fl_file_chooser.H>
     \#include <FL/fl_ask.H>
-    \#include <iostream>
     \#include "Sql/ProgramBanks.h"
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"
@@ -190,8 +189,10 @@ class PartKitItem {open : {public Fl_Group}
               if (tmp != NULL)
               {
                   part->kit[n].Pname = string(tmp);
+                  o->copy_label(part->kit[n].Pname.c_str());
                   partui->setSaveRequired();
-              }}
+              }
+          }
           xywh {85 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 50 labelfont 1 labelsize 10 align 20
           code0 {//
               o->copy_label(part->kit[n].Pname.c_str());}
@@ -973,8 +974,6 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
       code0 {//}
     } {
       Fl_Group parteditgroup {
-        callback {//
-            cerr << "Through parteditgroup callback" << endl;}
         xywh {0 0 420 267} box ENGRAVED_FRAME color 50
         code0 {//}
       } {
@@ -986,7 +985,7 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
               progbanksui->CurrentProgram->hide();
               progbanksui->CurrentProgram->show();
               progBanks->programList[part->partProgram] = string(o->value());
-              progbanksui->listPrograms();
+              progbanksui->refreshPrograms();
               setSaveRequired();}
           xywh {95 21 300 20} labelsize 11 textsize 11
           code0 {/*code*/}
@@ -1044,7 +1043,10 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
         label PADsynth
         callback {//
             if ((part->kit[0].Ppadenabled = lrintf(o->value())))
+            {
+                part->kit[0].padpars->applyparameters(false);
                 padeditbutton->activate();
+            }
             else
             {
                 if (padnoteui)
@@ -1123,8 +1125,6 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
   } {
     code {//
         progbanksui = progbanksui_;
-        if (!progbanksui)
-            cerr << " ==== progbanksui_ is NULL" << endl;
         part = part_;
         npart = npart_;
         ninseff = 0;
@@ -1241,7 +1241,7 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
   Function {showInstrumentEditWindow(Part *part_)} {open return_type void
   } {
     code {//
-        part = part_;
+        progbanksui->setPart(part = part_);
         programname->value(part->Pname.c_str());
         author->value(part->info.Pauthor.c_str());
         comments->value(part->info.Pcomments.c_str());
@@ -1275,7 +1275,8 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
             (string("Bank ") + asString(part->partBank + 1)
              + string(", Program ") + asString(part->partProgram + 1)
              + string(" ") + part->Pname).c_str());
-        instrumenteditwindow->show();} {}
+        instrumenteditwindow->show();
+    } {}
   }
   Function {hideInstrumentEditWindow(void)} {open return_type void
   } {
@@ -1300,7 +1301,7 @@ class PartUI {open : {public Fl_Group, private MiscFuncs}
         if(part->saveProgram())
         {
             saveRequired = false;
-            progbanksui->listPrograms();
+            progbanksui->refreshPrograms();
             return true;
         }
         else

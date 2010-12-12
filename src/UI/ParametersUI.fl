@@ -19,20 +19,15 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } {in_source in_header
 } 
 
-decl {\#include <set>} {public
-} 
+decl {
+    \#include <set>
+    using namespace std;
+} {public} 
 
-decl {\#include <iostream>} {public
-} 
-
-decl {using namespace std;} {public
-} 
-
-decl {\#include "Misc/Config.h"} {global
-} 
-
-decl {\#include "MasterUI.h"} {global
-} 
+decl {
+    \#include "Misc/Config.h"
+    \#include "MasterUI.h"
+} {global} 
 
 class ParametersUI {open
 } {

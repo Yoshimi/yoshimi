@@ -84,13 +84,14 @@ class Config : public MiscFuncs
         string jackSessionUuid;
         string jackSessionFile;
 
-        unsigned int  Samplerate;
-        unsigned int  Buffersize;
-        unsigned int  Oscilsize;
+        unsigned int Samplerate;
+        unsigned int Buffersize;
+        unsigned int Oscilsize;
 
         bool runSynth;
         bool showGui;
         bool showConsole;
+        bool noStderr;
         int  VirKeybLayout;
 
         string audioDevice;
@@ -124,7 +125,9 @@ class Config : public MiscFuncs
         list<string> LogList;
         BodyDisposal *deadObjects;
         ProgramBanks *progBanks;
-
+        char initialBank;
+        char initialProgram;
+        
     private:
         void loadCmdArgs(int argc, char **argv);
         bool extractConfigData(XMLwrapper *xml);

@@ -22,6 +22,7 @@
 
 #include <map>
 #include <sqlite3.h>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
 
 using namespace std;
 
@@ -33,11 +34,11 @@ class ProgramBanks : private MiscFuncs
     public:
         ProgramBanks();
         ~ProgramBanks() { if (dbConn) sqlite3_close(dbConn); }
-        bool Setup(void);
-        void scanInstrumentFiles(void);
-        bool addBank(unsigned char bank, string name);
+        int Setup(void);
+        bool newDatabase(bool load_instruments = true);
+        bool updateBank(unsigned char bank, string name);
+        bool updateProgram(unsigned char bank, unsigned char prog, string name, string xmldata);
         void loadBankList(void);
-        bool addProgram(unsigned char bk, unsigned char prog, string name, string xmldata);
         string programXml(unsigned char bk, unsigned char prog);
         void loadProgramList(unsigned char bk);
 
@@ -45,10 +46,21 @@ class ProgramBanks : private MiscFuncs
         map<unsigned char, string> programList;
 
     private:
+        bool loadInstrumentDatabase(void);
+        bool sqlStepExecute(string location, string qry);
+        
+        bool sqlPrep(string location, string qry, sqlite3_stmt **stmt);
+        bool sqlDoStep(string location, sqlite3_stmt *stmt);
+        bool sqlDoStepRow(string location, sqlite3_stmt *stmt);
+        bool sqlFinalize(string location, sqlite3_stmt **stmt);
         string dbQuoteSingles(string txt);
         string readXmlFile(const string filename);
         void dbErrorLog(string msg);
+        const string dbFile;
+        const string banksDir;
+        const string presetsDir;
         sqlite3 *dbConn;
+        boost::interprocess::interprocess_mutex dbLoadMutex;
 };
 
 extern ProgramBanks *progBanks;

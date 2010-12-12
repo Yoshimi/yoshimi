@@ -82,7 +82,7 @@ class MusicIO : protected MiscFuncs
                                    unsigned char byte2);
         jack_ringbuffer_t *midiRingbuf;
         boost::interprocess::interprocess_semaphore *midiEventsUp;
-        pthread_t  midiPthread;
+        pthread_t midiPthread;
 
 };
 

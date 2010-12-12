@@ -161,7 +161,7 @@ class Part : private MiscFuncs, SynthHelper
 
         struct PartNotes {
             NoteStatus status;
-            int note; // if there is no note playing, the "note"=-1
+            int note; // -1 if there is no note playing
             int itemsplaying;
             struct {
                 ADnote *adnote;

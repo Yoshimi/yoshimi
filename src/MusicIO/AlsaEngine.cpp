@@ -17,8 +17,6 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
@@ -476,7 +474,6 @@ void AlsaEngine::midiTimerCallback(void)
     int events = snd_seq_event_input_pending(midi.handle, 1); // - 1;
     while (--events >= 0 && Runtime.runSynth)
     {
-//        cerr << "alsa says events" << endl;
         int evsize;
         switch ((evsize = snd_seq_event_input(midi.handle, &event)))
         {
@@ -511,7 +508,6 @@ void AlsaEngine::midiTimerCallback(void)
                             {
                                 msg.event_frame = periodstartframe; // not good enough!
                                 memcpy(msg.bytes, midibuffer, MAX_MIDI_BYTES);
-//                                cerr << "alsa queues midi" << endl;
                                 queueMidi(&msg);
                             }
                             else if (decodecount < 0)

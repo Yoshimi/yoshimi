@@ -34,7 +34,7 @@ decl {\#include <FL/Fl_Spinner.H>
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
-decl {\#include <iostream>
+decl {
     \#include <FL/Fl_Button.H>
     \#include <FL/Fl_File_Chooser.H>
     \#include "MusicIO/MusicClient.h"
@@ -80,20 +80,16 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
                     switch (Fl::event_button())
                     {
                         case 1:
-                            cerr << "event button 1" << endl;
                             *mousebutton = 1;
                             break;
                         case 2:
-                            cerr << "event button 2" << endl;
                             *mousebutton = 2;
                             break;
 
                         case 3:
-                            cerr << "event button 3" << endl;
                             *mousebutton = 3;
                             break;
                         default:
-                            cerr << "strange event button " << (int)Fl::event_button() << endl;
                             break;
                     }
                     break;
@@ -298,9 +294,7 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
                 bs[i]->refresh();
             refreshmainwindow();} open
         xywh {8 8 305 20} down_box BORDER_BOX labelfont 1 labelsize 12 align 0 textsize 12
-        code0 {//
-            cerr << "currentBankNum " << currentBankNum << endl;
-            o->value(currentBankNum);}
+        code0 {o->value(currentBankNum);}
       } {}
       Fl_Button {} {
         label {Refresh bank list}
@@ -373,7 +367,6 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
         int slot = this->slot;
         if (mousebutton == 2 && !bank->emptyslot(slot) && mode != 4)
         {   // Rename slot
-            cerr << "Rename slot" << endl;
             const char *tmp = fl_input("Slot (instrument) name:", bank->getname(slot).c_str());
             if (tmp != NULL)
                 bank->setname(slot, string(tmp), -1);
@@ -408,7 +401,6 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
 
         if (mousebutton == 1 && mode == 2)
         {   // save(write) to slot
-            cerr << "Save/write to slot" << endl;
             bool doit = true;
             if (!bank->emptyslot(slot))
                 if (!fl_choice("Overwrite the slot no. %d ?", "No", "Yes", NULL, slot + 1))
@@ -427,7 +419,6 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
 
         if (mousebutton == 1 && mode == 3 && !bank->emptyslot(slot))
         {   // Clears the slot
-            cerr << "Clear the slot" << endl;
             if (fl_choice("Clear the slot no. %d ?", "No", "Yes", NULL, slot + 1))
             {
                 bank->clearslot(slot);
@@ -437,7 +428,6 @@ class BankUI {open : {public BankProcess_, private MiscFuncs}
 
         if (mode == 4)
         {   // swap
-            cerr << "Swap" << endl;
             bool done = false;
             if (mousebutton == 1 && nselected >= 0)
             {

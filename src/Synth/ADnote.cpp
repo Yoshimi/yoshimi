@@ -18,10 +18,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of original ZynAddSubFX code, modified December 2010
 */
 
-#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -365,7 +364,6 @@ ADnote::ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,
         tmpwave_unison[k] = new float[synth->buffersize];
         memset(tmpwave_unison[k], 0, synth->buffersize * sizeof(float));
     }
-
     initParameters();
     ready = 1;
 }
@@ -374,19 +372,14 @@ ADnote::ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,
 // ADlegatonote: This function is (mostly) a copy of ADnote(...) and
 // initParameters() stuck together with some lines removed so that it
 // only alter the already playing note (to perform legato). It is
-// possible I left stuff that is not required for this.
+// possible I (ie, Paul) left stuff that is not required for this.
 void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_, int midinote_, bool externcall)
 {
     ADnoteParameters *pars = partparams;
-    //Controller *ctl_=ctl;
-
     basefreq = freq_;
     velocity = velocity_;
     if (velocity > 1.0)
-    {
-        cerr << "!!! ADlegatonote, velocity > 1.0" << endl;
         velocity = 1.0f;
-    }
     portamento = portamento_;
     midinote = midinote_;
 

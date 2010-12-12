@@ -35,6 +35,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     Phidamp(60),
     lrdelay(0)
 {
+    effect_type = echo;
     setpreset(Ppreset);
     cleanup();
 }

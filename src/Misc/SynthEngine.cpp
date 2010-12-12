@@ -22,7 +22,6 @@
     This file is derivative of ZynAddSubFX original code, modified November 2010
 */
 
-#include <iostream>
 #include <boost/shared_ptr.hpp>
 
 #include "MasterUI.h"
@@ -317,12 +316,10 @@ void SynthEngine::setController(unsigned char channel, unsigned char ctrltype, u
     switch (ctrltype)
     {
         case C_bankselectmsb:
-            cerr << "SynthEngine::setController midiBankMSB " << (int)par << endl;
             midiBankMSB = par;
             break;
 
         case C_bankselectlsb:
-            cerr << "SynthEngine::setController midiBankLSB " << (int)par << endl;
             midiBankLSB = par;
             break;
 
@@ -371,7 +368,8 @@ void SynthEngine::applyMidi(unsigned char* bytes)
                 for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
                     if (channel == part[npart]->midichannel
                         && part[npart]->Penabled
-                        && !part[channel]->loadProgram(bankselect, bytes[1]))
+                        && !part[channel]->loadProgram(bankselect,
+                            bytes[1] - 1))
                             Runtime.Log("Midi program change failed");
             }
             break;
@@ -441,7 +439,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
             }
             else
             {
-                cerr << "skips ComputePartSmps()" << endl;
+                Runtime.Log("MasterAudio skips ComputePartSmps");
                 memset(part[npart]->partoutl, 0, bufferbytes);
                 memset(part[npart]->partoutr, 0, bufferbytes);
             }

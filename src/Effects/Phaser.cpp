@@ -31,6 +31,7 @@ Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_) :
     oldl(NULL),
     oldr(NULL)
 {
+    effect_type = phaser;
     setpreset(Ppreset);
     cleanup();
 }

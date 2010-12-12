@@ -24,6 +24,8 @@
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
 
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
+
 #include "Effects/Effect.h"
 #include "Effects/Reverb.h"
 #include "Effects/Echo.h"
@@ -55,7 +57,7 @@ class EffectMgr : public Presets
         void changepreset(unsigned char npreset);
         void changepreset_nolock(unsigned char npreset);
         unsigned char getpreset(void);
-        void seteffectpar(int npar, unsigned char value);
+        void seteffectpar(int npar, unsigned char value, bool midicontrol = false);
         unsigned char geteffectpar(int npar);
         float getEQfreqresponse(float freq); // used by UI
 

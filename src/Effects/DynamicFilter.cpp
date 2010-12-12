@@ -35,6 +35,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) 
     filterl(NULL),
     filterr(NULL)
 {
+    effect_type = dynamicfilter;
     setpreset(Ppreset);
     cleanup();
 }

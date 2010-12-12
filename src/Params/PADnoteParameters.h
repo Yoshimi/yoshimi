@@ -41,22 +41,19 @@ class PADnoteParameters : public Presets
         ~PADnoteParameters();
 
         void defaults(void);
+        void applyparameters(bool islocked);
+        float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
+        float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
-
-        //returns a value between 0.0-1.0 that represents the estimation
-        // perceived bandwidth
-        float getprofile(float *smp, int size);
-
-        //parameters
-
-        //the mode: 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continous
-        //the harmonic profile is used only on mode 0
-        unsigned char Pmode;
-
-        //Harmonic profile (the frequency distribution of a single harmonic)
-        struct {
-            struct {    //base function
+        float getprofile(float *smp, int size); // perceived bandwidth, returns
+                                                // a value between 0.0 - 1.0 that
+                                                // represents the estimation params
+        unsigned char Pmode; // 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continous
+                             // harmonic profile is used only on mode 0
+        
+        struct { // Harmonic profile (the frequency distribution of a single harmonic)
+            struct { // base function
                 unsigned char type;
                 unsigned char par1;
             } base;
@@ -90,60 +87,47 @@ class PADnoteParameters : public Presets
             unsigned char par1, par2, par3; // 0..255
         } Phrpos;
 
-        struct { // quality of the samples (how many samples, the length of them,etc.)
+        struct { // quality of the samples - how many samples, the length of them, etc
             unsigned char samplesize;
             unsigned char basenote, oct, smpoct;
         } Pquality;
 
         // frequency parameters
-        // If the base frequency is fixed to 440 Hz
-        unsigned char Pfixedfreq;
-
-        // Equal temperate (this is used only if the Pfixedfreq is enabled)
-        // If this parameter is 0, the frequency is fixed (to 440 Hz);
-        // if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone
-        unsigned char PfixedfreqET;
+        unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
+        unsigned char PfixedfreqET; // Equal temperate, this is used only if 
+                                    // Pfixedfreq is enabled. If this param is 0,
+                                    // the frequency is fixed to 440 Hz; if this
+                                    // param is 64, 1 MIDI halftone -> 1 frequency halftone
         unsigned short int PDetune;       // fine detune
         unsigned short int PCoarseDetune; // coarse detune+octave
         unsigned char PDetuneType;        // detune type
 
-        EnvelopeParams *FreqEnvelope; // Frequency Envelope
-        LFOParams *FreqLfo;           // Frequency LFO
+        EnvelopeParams *FreqEnvelope;
+        LFOParams *FreqLfo;
 
         // Amplitude parameters
         unsigned char PStereo;
-        // Panning -  0 - random
-        //            1 - left
-        //           64 - center
-        //          127 - right */
-        unsigned char PPanning;
-
+        unsigned char PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
         unsigned char PVolume;
-
         unsigned char PAmpVelocityScaleFunction;
 
         EnvelopeParams *AmpEnvelope;
 
         LFOParams *AmpLfo;
 
-        unsigned char PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;
+        unsigned char PPunchStrength;
+        unsigned char PPunchTime;
+        unsigned char PPunchStretch;
+        unsigned char PPunchVelocitySensing;
 
         // Filter Parameters
         FilterParams *GlobalFilter;
-
-        // filter velocity sensing
-        unsigned char PFilterVelocityScale;
-
-        // filter velocity sensing
-        unsigned char PFilterVelocityScaleFunction;
+        unsigned char PFilterVelocityScale; // filter velocity sensing
+        unsigned char PFilterVelocityScaleFunction; // filter velocity sensing
 
         EnvelopeParams *FilterEnvelope;
         LFOParams *FilterLfo;
 
-        float setPbandwidth(int Pbandwidth); // returns the BandWidth in cents
-        float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
-
-        void applyparameters(bool islocked);
 
         OscilGen *oscilgen;
         Resonance *resonance;
@@ -168,7 +152,7 @@ class PADnoteParameters : public Presets
         void deletesample(int n);
 
         FFTwrapper *fft;
-        pthread_mutex_t *mutex;
+//        pthread_mutex_t *mutex;
 };
 
 #endif

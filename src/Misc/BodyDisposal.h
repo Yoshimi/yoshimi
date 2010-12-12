@@ -20,7 +20,6 @@
 #ifndef BODYDISPOSAL_H
 #define BODYDISPOSAL_H
 
-#include <iostream>
 #include <boost/ptr_container/ptr_list.hpp>
 
 using namespace std;

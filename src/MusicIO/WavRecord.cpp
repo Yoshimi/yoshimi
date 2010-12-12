@@ -17,8 +17,6 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-
 #include <errno.h>
 #include <stdio_ext.h>
 #include <sys/stat.h>

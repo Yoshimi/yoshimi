@@ -214,7 +214,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       } {
         Fl_Choice analogfiltertypechoice {
           label FilterType
-          callback {pars->Ptype=(int)o->value(); pars->changed=true;}
+          callback {//
+              pars->Ptype = lrintf(o->value());
+              pars->changed = true;
+          }
           tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
@@ -257,7 +260,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         Fl_Choice svfiltertypechoice {
           label FilterType
-          callback {pars->Ptype=(int)o->value(); pars->changed=true;}
+          callback {//
+            pars->Ptype = lrintf(o->value());
+            pars->changed = true;
+          }
           tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
@@ -280,7 +286,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         Fl_Choice filtertype {
           label Category
-          callback {switchcategory((int)o->value()); pars->changed=true;}
+          callback {//
+            switchcategory(lrintf(o->value()));
+            pars->changed =true;
+          }
           tooltip {Filter category} xywh {10 20 60 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code0 {o->value(pars->Pcategory);}
         } {
@@ -299,14 +308,14 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         Fl_Dial cfreqdial {
           label {C.Freq}
-          callback {pars->Pfreq=(int)o->value();}
+          callback {pars->Pfreq=lrintf(o->value());}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {75 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pfreq);}
           class WidgetPDial
         }
         Fl_Dial qdial {
           label Q
-          callback {pars->Pq=(int)o->value(); formantfiltergraph->redraw();}
+          callback {pars->Pq=lrintf(o->value()); formantfiltergraph->redraw();}
           tooltip {Filter resonance or bandwidth} xywh {110 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
           class WidgetPDial
@@ -320,19 +329,19 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         Fl_Dial vsnsadial {
           label {V.SnsA.}
-          callback {if (velsnsamp!=NULL) *velsnsamp=(int)o->value();}
+          callback {if (velsnsamp!=NULL) *velsnsamp=lrintf(o->value());}
           tooltip {Velocity sensing amount of the Filter} xywh {145 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
           label {V.Sns.}
-          callback {if (velsns!=NULL) *velsns=(int)o->value();}
+          callback {if (velsns!=NULL) *velsns=lrintf(o->value());}
           tooltip {Velocity Sensing Function of the Filter} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial gaindial {
           label gain
-          callback {pars->Pgain = (int)o->value();
+          callback {pars->Pgain = lrintf(o->value());
               formantfiltergraph->redraw();
               pars->changed = true;}
           tooltip {Filter output gain/damp} xywh {250 35 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -494,7 +503,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         code0 {o->value(pars->getoctavesfreq());}
       }
       Fl_Slider cfknob {
-        callback {pars->Pcenterfreq = (int)o->value();
+        callback {pars->Pcenterfreq = lrintf(o->value());
             centerfreqvo->do_callback();
             formantfiltergraph->redraw();
             pars->changed = true;}
@@ -502,7 +511,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         code0 {o->value(pars->Pcenterfreq);}
       }
       Fl_Slider octknob {
-        callback {pars->Poctavesfreq=(int)o->value();
+        callback {pars->Poctavesfreq=lrintf(o->value());
             octavesfreqvo->do_callback();
             formantfiltergraph->redraw();}
         xywh {556 185 84 15} type {Horz Knob} box FLAT_BOX maximum 127
@@ -561,7 +570,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   }
   Function {refresh(void)} {return_type void
   } {
-    code {update_formant_window();
+    code {//
+        update_formant_window();
         formantfiltergraph->redraw();
 
         if (pars->Pcategory == 0)
@@ -604,7 +614,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_)} {return_type void
   } {
-    code {pars=filterpars_;
+    code {//
+        pars = filterpars_;
         velsnsamp = velsnsamp_;
         velsns = velsns_;
         make_window();
@@ -643,8 +654,9 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
             svfiltertypechoice->value(0);
             svfiltertypechoice->do_callback();
         }
-        pars->Pcategory=newcat;
-        refresh();} {}
+        pars->Pcategory = newcat;
+        refresh();
+    } {}
   }
   Function {use_for_dynamic_filter(void)} {selected return_type void
   } {
@@ -663,6 +675,6 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         strchdial->when(0);} {}
   }
   decl {FilterParams *pars;} {}
-  decl {unsigned char *velsnsamp,*velsns;} {}
-  decl {int nvowel,nformant,nseqpos;} {}
+  decl {unsigned char *velsnsamp, *velsns;} {}
+  decl {int nvowel, nformant, nseqpos;} {}
 } 

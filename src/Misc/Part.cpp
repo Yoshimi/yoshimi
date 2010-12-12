@@ -126,7 +126,7 @@ void Part::defaults(void)
     Pnoteon = 1;
     Ppolymode = 1;
     Plegatomode = 0;
-    setPvolume(96);
+    setPvolume(85);
     Pkeyshift = 64;
     midichannel = 0;
     setPpanning(64);
@@ -507,9 +507,11 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
                     new SUBnote(kit[0].subpars, ctl,notebasefreq, vel,
                                 portamento, note, false);
             if (kit[0].Ppadenabled)
+            {
                 partnote[pos].kititem[0].padnote =
                     new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
                                 portamento, note, false);
+            }
             if (kit[0].Padenabled || kit[0].Psubenabled || kit[0].Ppadenabled)
                 partnote[pos].itemsplaying++;
 
@@ -645,6 +647,17 @@ void Part::SetController(unsigned int type, int par)
             ctl->setmodwheel(par);
             break;
 
+        // 3 ADsynth + PADsynth amplitude LFO depth
+        case C_undefined3:
+            if (par >= 0 && par < 128)
+            {
+                if (kit[0].Padenabled)
+                    kit[0].adpars->GlobalPar.AmpLfo->Pintensity = par;
+                if (kit[0].Ppadenabled)
+                    kit[0].padpars->AmpLfo->Pintensity = par;
+            }
+            break;
+
         // 7 Volume
         case C_volume:
             ctl->setvolume(par);
@@ -695,11 +708,11 @@ void Part::SetController(unsigned int type, int par)
 
         // 76 Modulation amplitude - decreases the amplitude of ADsynth modulators, default value 127
         case C_soundcontroller7:
-            ctl->setfmamp(par);         
-            break;                      
+            ctl->setfmamp(par);
+            break;
 
         // 77 resonance center frequency
-        case C_soundcontroller8:    
+        case C_soundcontroller8:
             ctl->setresonancecenter(par);
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
                 if (kit[item].adpars)
@@ -715,12 +728,12 @@ void Part::SetController(unsigned int type, int par)
         case C_effects1Depth:   // 91 part effect 1 volume
         case C_effects2Depth:   // 92 part effect 2 volume
         case C_effects3Depth:   // 93 part effect 3 volume
-            partefx[type - C_effects1Depth]->seteffectpar(0, par);
+            partefx[type - C_effects1Depth]->seteffectpar(0, par, true);
             break;
 
         // 102 ADsynth Filter Category
         case C_undefined102:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 2)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 2)
             {
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Pcategory = par;
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->changed = true;
@@ -729,76 +742,76 @@ void Part::SetController(unsigned int type, int par)
 
         // 103 ADsynth Filter Type
         case C_undefined103:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 4)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 4)
             {
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->Ptype = par;
                 kit[FilterLfoControlLsb].adpars->GlobalPar.GlobalFilter->changed = true;
             }
             break;
-            
+
         // 104 Set kit item number for ADsynth Filter LFO controls
         case C_undefined104:
             if (par >= 0 && par < 128)
                 FilterLfoControlLsb = par;
             break;
-            
+
         // 105 ADsynth Filter LFO Frequency
         case C_undefined105:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pfreq = (float)par / 127.0f;
             break;
-    
+
         // 106 ADsynth Filter LFO Depth
         case C_undefined106:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pintensity = par;
             break;
-    
-        // 107 ADsynth Filter LFO Start 
+
+        // 107 ADsynth Filter LFO Start
         case C_undefined107:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pstartphase = par;
             break;
 
         // 108 ADsynth Filter LFO Delay
         case C_undefined108:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterLfo->Pdelay = par;
             break;
-            
+
         // 109 ADsynth Filter Envelope Start
         case C_undefined109:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_val = par;
             break;
-            
+
         // 110 ADsynth Filter Envelope Attack
         case C_undefined110:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PA_dt = par;
             break;
-        
+
         // 111 ADsynth Filter Envelope Decay Value
         case C_undefined111:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_val = par;
             break;
-        
+
         // 112 ADsynth Filter Envelope Decay Time
         case C_undefined112:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PD_dt = par;
             break;
 
         // 113 ADsynth Filter Envelope Release Value
         case C_undefined113:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_val = par;
             break;
 
         // 114 ADsynth Filter Envelope Release Time
         case C_undefined114:
-            if (kit[FilterLfoControlLsb].adpars != NULL && par >= 0 && par < 128)
+            if (kit[FilterLfoControlLsb].Padenabled && par >= 0 && par < 128)
                 kit[FilterLfoControlLsb].adpars->GlobalPar.FilterEnvelope->PR_dt = par;
             break;
 
@@ -807,7 +820,7 @@ void Part::SetController(unsigned int type, int par)
             AllNotesOff();
             break;
 
-        // 121 Reset All Controllers 
+        // 121 Reset All Controllers
         case C_resetallcontrollers:
             ctl->resetall();
             RelaseSustainedKeys();
@@ -821,10 +834,10 @@ void Part::SetController(unsigned int type, int par)
                     kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller8, 1.0f);
                     kit[item].adpars->GlobalPar.Reson->sendcontroller(C_soundcontroller9, 1.0f);
                 }
-            FilterLfoControlLsb = 0;    
+            FilterLfoControlLsb = 0;
             break;
 
-        // 123 All Notes Off 
+        // 123 All Notes Off
         case C_allnotesoff:
             RelaseAllKeys();
             break;
@@ -1055,7 +1068,7 @@ void Part::ComputePartSmps(void)
             }
         }
         // Kill note if there is no synth on that note
-        if (noteplay == 0)
+        if (!noteplay)
             KillNotePos(k);
     }
 
@@ -1171,7 +1184,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 
 bool Part::saveProgram(unsigned char bk, unsigned char prog)
 {
-    return progBanks->addProgram(bk, prog, Pname, partXML());
+    return progBanks->updateProgram(bk, prog, Pname, partXML());
 }
 
 
@@ -1195,8 +1208,10 @@ bool Part::loadProgram(unsigned char bk, unsigned char prog)
     else
     {
         __sync_or_and_fetch (&partMuted, 0xFF);
+        unsigned char oldvolume = Pvolume;
         defaultsinstrument();
         applyparameters();
+        setPvolume(oldvolume);
         Penabled = 1;
         __sync_and_and_fetch (&partMuted, 0);
     }
@@ -1368,7 +1383,7 @@ bool Part::importInstrument(string filename)
         return false;
     }
     getfromXML(xmlwrap.get());
-    return progBanks->addProgram(partBank, partProgram, Pname, xmlwrap->getXMLdata());
+    return progBanks->updateProgram(partBank, partProgram, Pname, xmlwrap->getXMLdata());
 }
 
 
