@@ -46,7 +46,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     killallnotes(false),
     microtonal(microtonal_),
     fft(fft_),
-    partMuted(0)
+    partMuted(0xFF)
 {
     ctl = new Controller();
     partoutl = new float [synth->buffersize];
@@ -108,6 +108,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     lastpos = 0; // lastpos will store previously used NoteOn(...)'s pos.
     lastlegatomodevalid = false; // To store previous legatomodevalid value.
     defaults();
+    __sync_and_and_fetch (&partMuted, 0);
 }
 
 
@@ -874,13 +875,12 @@ void Part::setkeylimit(unsigned char Pkeylimit)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
-    if (partMuted)
+    bool quiet_please = partMuted != 0;
+    if (quiet_please)
     {
         memset(partoutl, 0, synth->bufferbytes);
         memset(partoutr, 0, synth->bufferbytes);
-        return;
     }
-
     int k;
     int noteplay; // 0 if there is nothing activated
     for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx){
@@ -905,8 +905,15 @@ void Part::ComputePartSmps(void)
             if (adnote)
             {
                 noteplay++;
-                if (adnote->ready)
+                if (!quiet_please && adnote->ready)
+                {
                     adnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->buffersize; ++i)
+                    {   // add ADnote to part mix
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
+                    }
+                }
                 else
                 {
                     memset(tmpoutl, 0, synth->bufferbytes);
@@ -917,27 +924,19 @@ void Part::ComputePartSmps(void)
                     Runtime.deadObjects->addBody(partnote[k].kititem[item].adnote);
                     partnote[k].kititem[item].adnote = NULL;
                 }
-                for (int i = 0; i < synth->buffersize; ++i)
-                {   // add the ADnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
-                }
             }
             // get from the SUBnote
             if (subnote)
             {
                 noteplay++;
-                if (subnote->ready)
-                    subnote->noteout(tmpoutl, tmpoutr);
-                else
+                if (!quiet_please && subnote->ready)
                 {
-                    memset(tmpoutl, 0, synth->bufferbytes);
-                    memset(tmpoutr, 0, synth->bufferbytes);
-                }
-                for (int i = 0; i < synth->buffersize; ++i)
-                {   // add the SUBnote to part(mix)
-                    partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    subnote->noteout(tmpoutl, tmpoutr);
+                    for (int i = 0; i < synth->buffersize; ++i)
+                    {   // add SUBnote to part mix
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (subnote->finished())
                 {
@@ -949,14 +948,14 @@ void Part::ComputePartSmps(void)
             if (padnote)
             {
                 noteplay++;
-                if (padnote->ready)
+                if (!quiet_please && padnote->ready)
                 {
                     padnote->noteout(tmpoutl, tmpoutr);
-                }
-                else
-                {
-                    memset(tmpoutl, 0, synth->bufferbytes);
-                    memset(tmpoutr, 0, synth->bufferbytes);
+                    for (int i = 0 ; i < synth->buffersize; ++i)
+                    {   // add PADnote to part mix
+                        partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
+                        partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
+                    }
                 }
                 if (padnote->finished())
                 {
@@ -1241,10 +1240,6 @@ bool Part::loadXMLinstrument(string filename)
 
 void Part::applyparameters(void)
 {
-//    for (int n = 0; n < NUM_KIT_ITEMS; ++n)
-//        if (kit[n].padpars && kit[n].Ppadenabled)
-//            kit[n].padpars->applyparameters(islocked);
-
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
         if (kit[n].Ppadenabled && kit[n].padpars != NULL)
             kit[n].padpars->applyparameters(true);

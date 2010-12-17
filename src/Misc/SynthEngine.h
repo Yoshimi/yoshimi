@@ -121,10 +121,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank bank;
         FFTwrapper *fft;
 
-//        unsigned int getSamplerate(void) { return samplerate; };
-//        int getBuffersize(void) { return buffersize; };
-//        int getOscilsize(void) { return oscilsize; };
-
         // peaks for VU-meters
         void vuresetpeaks(void);
         float vuOutPeakL;

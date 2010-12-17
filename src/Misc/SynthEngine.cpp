@@ -400,7 +400,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        if (part[npart]->Penabled)
+        if (part[npart]->Active())
         {
             actionLock(lock);
             part[npart]->ComputePartSmps();
@@ -413,7 +413,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         if (Pinsparts[nefx] >= 0)
         {
             int efxpart = Pinsparts[nefx];
-            if (part[efxpart]->Penabled)
+            if (part[efxpart]->Active())
             {
                 actionLock(lock);
                 insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);

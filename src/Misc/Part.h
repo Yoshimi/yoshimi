@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified November 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
 #ifndef PART_H
@@ -58,6 +58,7 @@ class Part : private MiscFuncs, SynthHelper
         void RelaseAllKeys(void);
 
         void ComputePartSmps(void);
+        bool Active(void) { return Penabled && !partMuted; }
 
         // instrumentonly: 0 - save all, 1 - save only instrumnet,
         //                 2 - save only instrument without the name(used in bank)
@@ -185,7 +186,7 @@ class Part : private MiscFuncs, SynthHelper
         Microtonal *microtonal;
         FFTwrapper *fft;
         
-        int partMuted;
+        unsigned char partMuted;
 };
 
 #endif

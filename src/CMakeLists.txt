@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.060.2")
+set (YOSHIMI_VERSION "0.060.2-guess1")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -359,10 +359,6 @@ install (DIRECTORY ../presets DESTINATION share/yoshimi
         GROUP_READ GROUP_WRITE GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
 )
-
-configure_file (../desktop/yoshimi.desktop.in ../desktop/yoshimi.desktop)
-install (FILES ../desktop/yoshimi.desktop DESTINATION share/applications)
-install (FILES ../desktop/pink_robot_icon.png DESTINATION share/yoshimi)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
