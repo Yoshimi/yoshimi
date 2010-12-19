@@ -1,5 +1,13 @@
 ----------------------------
-yoshimi-0.060.2
+yoshimi-0.060.3
+
+Final guess at fixing the aberrant ADsynth notes problem - drop use of boost
+shared_array in FFTwrapper, revert to basic fftw_malloc for data allocs.
+
+----------------------------
+yoshimi-0.060.2-guess1
+
+First guess at fixing the aberrant ADsynth notes problem.
 
 includes a desktop icon suggested by Gabriel Beddingfield, derived from
     http://upload.wikimedia.org/wikipedia/commons/0/05/Robot_icon.svg

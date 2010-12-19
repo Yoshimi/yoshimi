@@ -18,19 +18,16 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
 #ifndef FFT_WRAPPER_H
 #define FFT_WRAPPER_H
 
 #include <fftw3.h>
-#include <boost/shared_array.hpp>
 
 typedef struct {
-    boost::shared_array<float> boost_s;  // sine and cosine components
     float *s;
-    boost::shared_array<float> boost_c;
     float *c;
 } FFTFREQS;
 
@@ -48,9 +45,7 @@ class FFTwrapper
     private:
         int fftsize;
         int half_fftsize;
-        boost::shared_array<float> boost_data1;
         float *data1;
-        boost::shared_array<float> boost_data2;
         float *data2;
         fftwf_plan planBasic;
         fftwf_plan planInv;

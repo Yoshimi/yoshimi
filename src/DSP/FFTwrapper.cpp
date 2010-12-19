@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified September 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
 #include <cstring>
@@ -33,11 +33,8 @@ FFTwrapper::FFTwrapper(int fftsize_) :
     fftsize(fftsize_),
     half_fftsize(fftsize_ / 2)
 {
-    boost_data1 = boost::shared_array<float>(new float[fftsize]);
-    data1 = boost_data1.get();
-    boost_data2 = boost::shared_array<float>(new float[fftsize]);
-    data2 = boost_data2.get();
-
+    data1 = (float*)fftwf_malloc(fftsize * sizeof(float));
+    data2 =  (float*)fftwf_malloc(fftsize * sizeof(float));
     planBasic = fftwf_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC, FFTW_ESTIMATE);
     planInv = fftwf_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R, FFTW_ESTIMATE);
 }
@@ -47,6 +44,8 @@ FFTwrapper::~FFTwrapper()
 {
     fftwf_destroy_plan(planBasic);
     fftwf_destroy_plan(planInv);
+    fftwf_free(data1);
+    fftwf_free(data2);
 }
 
 
@@ -66,7 +65,7 @@ void FFTwrapper::smps2freqs(float *smps, FFTFREQS *freqs)
 void FFTwrapper::freqs2smps(FFTFREQS *freqs, float *smps)
 {
     memcpy(data2, freqs->c, half_fftsize * sizeof(float));
-    data2[half_fftsize] = 0.0;
+    data2[half_fftsize] = 0.0f;
     for (int i = 1; i < half_fftsize; ++i)
         data2[fftsize - i] = freqs->s[i];
     fftwf_execute(planInv);
@@ -76,18 +75,18 @@ void FFTwrapper::freqs2smps(FFTFREQS *freqs, float *smps)
 
 void FFTwrapper::newFFTFREQS(FFTFREQS& f, int size)
 {
-    f.boost_c = boost::shared_array<float>(new float[size]);
-    f.c = f.boost_c.get();
+    f.c = (float*)fftwf_malloc(size * sizeof(float));
     memset(f.c, 0, size * sizeof(float));
-    f.boost_s = boost::shared_array<float>(new float[size]);
-    f.s = f.boost_s.get();
+    f.s = (float*)fftwf_malloc(size * sizeof(float));
     memset(f.s, 0, size * sizeof(float));
 }
 
 
 void FFTwrapper::deleteFFTFREQS(FFTFREQS& f)
 {
-    f.boost_s.reset();
-    f.boost_c.reset();
+    if (f.s)
+        fftwf_free(f.s);
+    if (f.c)
+        fftwf_free(f.c);
     f.s = f.c = NULL;
 }
