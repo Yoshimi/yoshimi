@@ -94,13 +94,13 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float halfoscilsize_f;
 
         unsigned char Pvolume;
-        unsigned char Pkeyshift;
+        int           Pkeyshift;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
 
         // parameters control
         void setPvolume(char value);
-        void setPkeyshift(char Pkeyshift_);
+        void setPkeyshift(int Pkeyshift_);
         void setPsysefxvol(int Ppart, int Pefx, char Pvol);
         void setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol);
 
@@ -120,6 +120,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Microtonal microtonal;
         Bank bank;
         FFTwrapper *fft;
+
+//        unsigned int getSamplerate(void) { return samplerate; };
+//        int getBuffersize(void) { return buffersize; };
+//        int getOscilsize(void) { return oscilsize; };
 
         // peaks for VU-meters
         void vuresetpeaks(void);

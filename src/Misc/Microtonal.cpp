@@ -18,9 +18,10 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified December 2010
 */
 
+#include <iostream>
 #include <cmath>
 
 #include "Misc/Config.h"
@@ -50,7 +51,7 @@ void Microtonal::defaults(void)
 
     for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
-        octave[i].tuning = tmpoctave[i].tuning = powf(2, (i % octavesize + 1) / 12.0);
+        octave[i].tuning = tmpoctave[i].tuning = powf(2.0f, (i % octavesize + 1) / 12.0f);
         octave[i].type = tmpoctave[i].type = 1;
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
         octave[i].x2 = tmpoctave[i].x2 = 0;
@@ -64,11 +65,6 @@ void Microtonal::defaults(void)
 }
 
 // Get the size of the octave
-unsigned char Microtonal::getoctavesize(void)
-{
-    return ((Penabled) ? octavesize : 12);
-}
-
 // Get the frequency according the note number
 float Microtonal::getnotefreq(int note, int keyshift)
 {
@@ -77,90 +73,85 @@ float Microtonal::getnotefreq(int note, int keyshift)
     // I had written this way because if I use var=a%b gives unwanted results when a<0
     // This is the same with divisions.
 
-    if (Pinvertupdown && (!Pmappingenabled || !Penabled))
+    if((Pinvertupdown != 0) && ((Pmappingenabled == 0) || (Penabled == 0)))
         note = (int) Pinvertupdowncenter * 2 - note;
 
-    // compute global fine detune
-    float globalfinedetunerap =
-        powf(2.0, (Pglobalfinedetune - 64.0) / 1200.0); // -64.0 .. 63.0 cents
+    //compute global fine detune
+    float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f); //-64.0 .. 63.0 cents
 
-    if (!Penabled)
-        return powf(2.0, (note - PAnote + keyshift) / 12.0)
-               * PAfreq * globalfinedetunerap; // 12tET
+    if(Penabled == 0)
+        return powf(2.0f, (note - PAnote + keyshift) / 12.0f) * PAfreq * globalfinedetunerap;                      //12tET
 
-    int scaleshift = ((int)Pscaleshift - 64 + (int) octavesize * 100) % octavesize;
+    int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
 
-    // compute the keyshift
-    float rap_keyshift = 1.0;
-    if (keyshift)
-    {
-        int kskey = (keyshift + (int)octavesize * 100) % octavesize;
-        int ksoct = (keyshift + (int)octavesize * 100) / octavesize - 100;
-        rap_keyshift = (!kskey) ? 1.0 : octave[kskey - 1].tuning;
+    //compute the keyshift
+    float rap_keyshift = 1.0f;
+    if(keyshift != 0) {
+        int kskey = (keyshift + octavesize * 100) % octavesize;
+        int ksoct = (keyshift + octavesize * 100) / octavesize - 100;
+        rap_keyshift  = (kskey == 0) ? 1.0f : (octave[kskey - 1].tuning);
         rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
     }
 
-    // if the mapping is enabled
-    if (Pmappingenabled)
-    {
-        if (note < Pfirstkey || note > Plastkey)
+    //if the mapping is enabled
+    if(Pmappingenabled != 0) {
+        if((note < Pfirstkey) || (note > Plastkey))
             return -1.0;
-        // Compute how many mapped keys are from middle note to reference note
-        // and find out the proportion between the freq. of middle note and "A" note
-        int tmp = PAnote - Pmiddlenote, minus = 0;
-        if (tmp < 0)
-        {
-            tmp = -tmp;
-            minus = 1;
+        //Compute how many mapped keys are from middle note to reference note
+        //and find out the proportion between the freq. of middle note and "A" note
+        int tmp = PAnote - Pmiddlenote;
+        bool minus = false;
+        if(tmp < 0) {
+            tmp   = -tmp;
+            minus = true;
         }
         int deltanote = 0;
-        for (int i = 0; i < tmp; ++i)
+        for(int i = 0; i < tmp; i++)
             if (Pmapping[i % Pmapsize] >= 0)
                 deltanote++;
-        float rap_anote_middlenote = (!deltanote) ? 1.0 : (octave[(deltanote - 1) % octavesize].tuning);
-        if (deltanote)
+        float rap_anote_middlenote = (deltanote == 0) ? 1.0f : (octave[(deltanote - 1) % octavesize].tuning);
+        if (deltanote != 0)
             rap_anote_middlenote *= powf(octave[octavesize - 1].tuning, (deltanote - 1) / octavesize);
         if (minus)
-            rap_anote_middlenote = 1.0 / rap_anote_middlenote;
+            rap_anote_middlenote = 1.0f / rap_anote_middlenote;
 
-        // Convert from note (midi) to degree (note from the tunning)
-        int degoct = (note - (int)Pmiddlenote + (int) Pmapsize * 200) / (int)Pmapsize - 200;
+        //Convert from note (midi) to degree (note from the tunning)
+        int degoct = (note - Pmiddlenote + (int) Pmapsize * 200) / (int)Pmapsize - 200;
         int degkey = (note - Pmiddlenote + (int)Pmapsize * 100) % Pmapsize;
         degkey = Pmapping[degkey];
-        if (degkey <0 )
-            return -1.0; // this key is not mapped
+        if(degkey < 0)
+            return -1.0f;           //this key is not mapped
 
-        // invert the keyboard upside-down if it is asked for
-        // TODO: do the right way by using Pinvertupdowncenter
-        if (Pinvertupdown)
+        //invert the keyboard upside-down if it is asked for
+        //TODO: do the right way by using Pinvertupdowncenter
+        if(Pinvertupdown != 0)
         {
             degkey = octavesize - degkey - 1;
             degoct = -degoct;
         }
-        // compute the frequency of the note
-        degkey = degkey + scaleshift;
+        //compute the frequency of the note
+        degkey  = degkey + scaleshift;
         degoct += degkey / octavesize;
         degkey %= octavesize;
 
-        float freq = (!degkey) ? 1.0 : octave[degkey - 1].tuning;
+        float freq = (degkey == 0) ? 1.0f : octave[degkey - 1].tuning;
         freq *= powf(octave[octavesize - 1].tuning, degoct);
         freq *= PAfreq / rap_anote_middlenote;
         freq *= globalfinedetunerap;
-        if (scaleshift)
+        if(scaleshift != 0)
             freq /= octave[scaleshift - 1].tuning;
         return freq * rap_keyshift;
     }
-    else
-    {   // if the mapping is disabled
-        int nt = note - PAnote + scaleshift;
-        int ntkey = (nt + (int)octavesize * 100) % octavesize;
-        int ntoct = (nt - ntkey) / octavesize;
+    else  //if the mapping is disabled
+    {   int nt = note - PAnote + scaleshift;
+        int ntkey     = (nt + octavesize * 100) % octavesize;
+        int ntoct     = (nt - ntkey) / octavesize;
 
-        float oct = octave[octavesize - 1].tuning;
-        float freq = octave[(ntkey + octavesize-1) % octavesize].tuning * powf(oct, ntoct) * PAfreq;
-        if (!ntkey)
+        float oct  = octave[octavesize - 1].tuning;
+        float freq = octave[(ntkey + octavesize - 1) % octavesize].tuning *powf(oct, ntoct) * PAfreq;
+        if(ntkey == 0)
             freq /= oct;
-        if (scaleshift)
+        if(scaleshift != 0)
             freq /= octave[scaleshift - 1].tuning;
 //	fprintf(stderr,"note=%d freq=%.3f cents=%d\n",note,freq,(int)floor(log(freq/PAfreq)/log(2.0)*1200.0+0.5));
         freq *= globalfinedetunerap;

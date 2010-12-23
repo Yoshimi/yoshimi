@@ -44,16 +44,16 @@ class Microtonal
         unsigned char Pinvertupdown;
         unsigned char Pinvertupdowncenter;
         unsigned char Penabled;
-        unsigned char PAnote;
-        unsigned char Pscaleshift;
-        float PAfreq;
+        int           PAnote;
+        int           Pscaleshift;
+        float         PAfreq;
 
         // first and last key (to retune)
         unsigned char Pfirstkey;
         unsigned char Plastkey;
 
         // The middle note where scale degree 0 is mapped to
-        unsigned char Pmiddlenote;
+        int           Pmiddlenote;
 
         // Map size
         unsigned char Pmapsize;
@@ -85,7 +85,7 @@ class Microtonal
         int loadline(FILE *file, char *line);
             // loads a line from the text file,
             // ignoring the lines beggining with "!"
-        unsigned char octavesize;
+        int octavesize;
         struct {
             unsigned char type; // 1 for cents or 2 for division
             // the real tuning (eg. +1.05946 for one halftone)
@@ -99,5 +99,10 @@ class Microtonal
       int buffersize;
       int oscilsize;
 };
+
+inline unsigned char Microtonal::getoctavesize(void)
+{
+    return ((Penabled) ? octavesize : 12);
+}
 
 #endif

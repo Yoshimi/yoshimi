@@ -27,6 +27,7 @@
 #include "Misc/SynthHelper.h"
 #include "Synth/Carcass.h"
 #include "Synth/LegatoTypes.h"
+#include "Misc/Float2Int.h"
 
 class ADnoteParameters;
 class Controller;
@@ -40,7 +41,7 @@ class Filter;
 
 #define OSCIL_SMP_EXTRA_SAMPLES 5
 
-class ADnote : public Carcass, private SynthHelper
+class ADnote : public Carcass, private SynthHelper, private Float2Int
 {
     public:
         ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,

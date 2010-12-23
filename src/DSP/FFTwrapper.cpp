@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified December 2010
+    This file is derivative of original ZynAddSubFX code, modified December 2010
 */
 
 #include <cstring>
@@ -65,7 +65,7 @@ void FFTwrapper::smps2freqs(float *smps, FFTFREQS *freqs)
 void FFTwrapper::freqs2smps(FFTFREQS *freqs, float *smps)
 {
     memcpy(data2, freqs->c, half_fftsize * sizeof(float));
-    data2[half_fftsize] = 0.0f;
+    data2[half_fftsize] = 0.0;
     for (int i = 1; i < half_fftsize; ++i)
         data2[fftsize - i] = freqs->s[i];
     fftwf_execute(planInv);

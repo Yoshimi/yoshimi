@@ -133,8 +133,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-    tmpmixl = new float[buffersize];
-    tmpmixr = new float[buffersize];
+    tmpmixl = (float*)fftwf_malloc(synth->bufferbytes);
+    tmpmixr = (float*)fftwf_malloc(synth->bufferbytes);
     if (tmpmixl == NULL || tmpmixr == NULL)
     {
         Runtime.Log("SynthEngine tmpmix allocations failed");
@@ -226,10 +226,10 @@ bail_out:
         delete fft;
     fft = NULL;
     if (tmpmixl != NULL)
-        delete tmpmixl;
+        fftwf_free(tmpmixl);
     tmpmixl = NULL;
     if (tmpmixr != NULL)
-        delete tmpmixr;
+        fftwf_free(tmpmixr);
     tmpmixr = NULL;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -400,7 +400,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        if (part[npart]->Active())
+        if (part[npart]->Penabled)
         {
             actionLock(lock);
             part[npart]->ComputePartSmps();
@@ -413,7 +413,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         if (Pinsparts[nefx] >= 0)
         {
             int efxpart = Pinsparts[nefx];
-            if (part[efxpart]->Active())
+            if (part[efxpart]->Penabled)
             {
                 actionLock(lock);
                 insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
@@ -433,10 +433,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         float oldvol_l = part[npart]->oldvolumel;
         float oldvol_r = part[npart]->oldvolumer;
         float pan = part[npart]->panning;
-        if (pan < 0.5)
-            newvol_l *= (1.0 - pan) * 2.0;
+        if (pan < 0.5f)
+            newvol_l *= (1.0f - pan) * 2.0f;
         else
-            newvol_r *= pan * 2.0;
+            newvol_r *= pan * 2.0f;
 
         actionLock(lock);
         if (aboveAmplitudeThreshold(oldvol_l, newvol_l)
@@ -546,10 +546,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     LFOParams::time++; // update the LFO's time
 
     vupeakLock(lock);
-    vuoutpeakl = 1e-12;
-    vuoutpeakr = 1e-12;
-    vurmspeakl = 1e-12;
-    vurmspeakr = 1e-12;
+    vuoutpeakl = 1e-12f;
+    vuoutpeakr = 1e-12f;
+    vurmspeakl = 1e-12f;
+    vurmspeakr = 1e-12f;
     vupeakLock(unlock);
 
     float absval;
@@ -565,27 +565,15 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         vurmspeakl += outl[idx] * outl[idx];  // RMS Peak
         vurmspeakr += outr[idx] * outr[idx];
 
-        // Clip as necessary
+        // check for clips
         if (outl[idx] > 1.0f)
-        {
-            outl[idx] = 1.0f;
             clippedL = true;
-        }
         else if (outl[idx] < -1.0f)
-        {
-            outl[idx] = -1.0f;
             clippedL = true;
-        }
         if (outr[idx] > 1.0f)
-        {
-            outr[idx] = 1.0f;
             clippedR = true;
-        }
         else if (outr[idx] < -1.0f)
-        {
-            outr[idx] = -1.0f;
             clippedR = true;
-        }
 
         if (shutup) // fade-out
         {
@@ -639,14 +627,14 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
 void SynthEngine::setPvolume(char control_value)
 {
     Pvolume = control_value;
-    volume  = dB2rap((Pvolume - 96.0) / 96.0 * 40.0);
+    volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f);
 }
 
 
-void SynthEngine::setPkeyshift(char Pkeyshift_)
+void SynthEngine::setPkeyshift(int Pkeyshift_)
 {
     Pkeyshift = Pkeyshift_;
-    keyshift = (int)Pkeyshift - 64;
+    keyshift = Pkeyshift - 64;
 }
 
 

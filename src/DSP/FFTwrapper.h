@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified December 2010
+    This file is derivative of  original ZynAddSubFX code, modified December 2010
 */
 
 #ifndef FFT_WRAPPER_H
@@ -50,4 +50,5 @@ class FFTwrapper
         fftwf_plan planBasic;
         fftwf_plan planInv;
 };
+
 #endif

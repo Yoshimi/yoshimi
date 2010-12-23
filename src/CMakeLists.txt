@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.060.3")
+set (YOSHIMI_VERSION "0.060.5")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -57,9 +57,8 @@ endif (HAS_JACK_SESSION)
 set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
 set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
 
-option (BuildForAMD_X86_64 "Build for AMD x86_64 system" ON)
+option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
-option (BuildFor32bit "Build for basic i686 system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
 set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
@@ -74,9 +73,9 @@ set (BuildOptions_X86_64Core2
   CACHE STRING "X86_64 compiler options"
 )
 
-set (BuildOptions32bit
-    "-O3 -march=pentium4 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
-    CACHE STRING "X86 complier options"
+set (BuildOptionsBasic
+    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
+    CACHE STRING "basic X86 complier options"
 )
 
 set (BuildOptionsDebug
@@ -200,11 +199,7 @@ else (BuildForDebug)
         if (BuildForCore2_X86_64)
             set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
         else (BuildForCore2_X86_64)
-            if (BuildFor32bit)  
-                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions32bit})
-            else (BuildFor32bit)  
-                message(FATAL_ERROR "Please choose one of the BuildForXXX options!")
-            endif (BuildFor32bit)  
+            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
         endif (BuildForCore2_X86_64)
     endif (BuildForAMD_X86_64)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")

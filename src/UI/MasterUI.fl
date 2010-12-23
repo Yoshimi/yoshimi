@@ -145,7 +145,6 @@ class MasterUI {open : {private MiscFuncs}
         delete yoshiLog;
       }
       masterwindow->hide();
-      delete masterwindow;
     } {}
   }
   Function {Init(void)} {} {
