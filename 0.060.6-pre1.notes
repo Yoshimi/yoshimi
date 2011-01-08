@@ -1,0 +1,7 @@
+yoshimi-0.060.6-pre1
+
+A baseline for testing on the Adnote pitvhing error.
+- some debug logging through ADnote.cpp to monitor freqencies in play.
+- testing for math exceptions through Microtonal.cpp base frequency calculations.
+
+

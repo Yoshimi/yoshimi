@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #ifndef MICROTONAL_H
@@ -28,24 +28,26 @@
 
 using namespace std;
 
+#include "Misc/MiscFuncs.h"
+
 class XMLwrapper;
 
 #define MAX_OCTAVE_SIZE 128
 
-class Microtonal
+class Microtonal : private MiscFuncs
 {
     public:
-        Microtonal() { };
+        Microtonal() : PAnote(69), PAfreq(440.0f) { }
         ~Microtonal() { };
         void defaults(void);
         float getnotefreq(int note, int keyshift);
 
         // Parameters
         unsigned char Pinvertupdown;
-        unsigned char Pinvertupdowncenter;
+        unsigned int  Pinvertupdowncenter;
         unsigned char Penabled;
         int           PAnote;
-        int           Pscaleshift;
+        unsigned int  Pscaleshift;
         float         PAfreq;
 
         // first and last key (to retune)
@@ -56,7 +58,7 @@ class Microtonal
         int           Pmiddlenote;
 
         // Map size
-        unsigned char Pmapsize;
+        int Pmapsize;
 
         // Mapping ON/OFF
         unsigned char Pmappingenabled;
@@ -66,7 +68,7 @@ class Microtonal
         unsigned char Pglobalfinedetune;
 
         // Functions
-        unsigned char getoctavesize(void);
+        int getoctavesize(void);
         void tuningtoline(int n, char *line, int maxn);
         int loadscl(string filename); // load the tunnings from a .scl file
         int loadkbm(string filename); // load the mapping from .kbm file
@@ -91,18 +93,10 @@ class Microtonal
             // the real tuning (eg. +1.05946 for one halftone)
             // or 2.0 for one octave
             float tuning;
-            unsigned int x1, x2; // the real tunning is x1/x2
+            unsigned int x1; // the real tunning is x1 / x2
+            unsigned int x2;
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
-
-      unsigned int samplerate;
-      int buffersize;
-      int oscilsize;
 };
-
-inline unsigned char Microtonal::getoctavesize(void)
-{
-    return ((Penabled) ? octavesize : 12);
-}
 
 #endif

@@ -21,6 +21,7 @@
     This file is derivative of original ZynAddSubFX code, modified November 2010
 */
 
+#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -949,9 +950,7 @@ void ADnote::setfreq(int nvoice, float in_freq)
     {
         float freq  = fabsf(in_freq) * unison_freq_rap[nvoice][k];
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
-        if (speed > synth->oscilsize_f)
-            speed = synth->oscilsize_f;
-
+        speed = (speed > synth->oscilsize_f) ? synth->oscilsize_f : speed;
         // F2I(speed, oscfreqhi[nvoice][k]);
         oscfreqhi[nvoice][k] = float2int(speed);
         oscfreqlo[nvoice][k] = speed - floorf(speed);
@@ -965,9 +964,7 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
     {
         float freq = fabsf(in_freq) * unison_freq_rap[nvoice][k];
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
-        if (speed > synth->oscilsize_f)
-            speed = synth->oscilsize_f;
-
+        speed = (speed > synth->oscilsize_f) ? synth->oscilsize_f : speed;
         //F2I(speed, oscfreqhiFM[nvoice][k]);
         oscfreqhiFM[nvoice][k] = float2int(speed);
         oscfreqloFM[nvoice][k] = speed - floorf(speed);
@@ -979,11 +976,19 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
 float ADnote::getVoiceBaseFreq(int nvoice) const
 {
     float detune =
-        NoteVoicePar[nvoice].Detune / 100.0f + NoteVoicePar[nvoice].FineDetune / 100.0f * ctl->bandwidth.relbw * bandwidthDetuneMultiplier + NoteGlobalPar.Detune / 100.0f;
+        NoteVoicePar[nvoice].Detune / 100.0f + NoteVoicePar[nvoice].FineDetune /
+        100.0f * ctl->bandwidth.relbw * bandwidthDetuneMultiplier
+        + NoteGlobalPar.Detune / 100.0f;
 
-    if (NoteVoicePar[nvoice].fixedfreq == 0)
-        return basefreq * powf(2.0f, detune / 12.0f);
-    else // the fixed freq is enabled
+    if (!NoteVoicePar[nvoice].fixedfreq)
+    {
+        //return basefreq * powf(2.0f, detune / 12.0f);
+        float retval = basefreq * powf(2.0f, detune / 12.0f);
+        Runtime.Log("ADnote, basefreq " + Runtime.asString(basefreq) + ", getVoiceBaseFreq "
+                    + Runtime.asString(retval), true);
+        return retval;
+    }
+    else // fixed freq is enabled
     {
         float fixedfreq = 440.0f;
         int fixedfreqET = NoteVoicePar[nvoice].fixedfreqET;
