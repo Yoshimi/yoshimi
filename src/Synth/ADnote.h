@@ -61,10 +61,10 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         void setfreq(int nvoice, float in_freq);
         void setfreqFM(int nvoice, float in_freq);
         void computeUnisonFreqRap(int nvoice);
-        void computeCurrentParameters();
-        void initParameters();
+        void computeCurrentParameters(void);
+        void initParameters(void);
         void killVoice(int nvoice);
-        void killNote();
+        void killNote(void);
         float getVoiceBaseFreq(int nvoice) const;
         float getFMVoiceBaseFreq(int nvoice) const;
         void computeVoiceOscillator_LinearInterpolation(int nvoice);

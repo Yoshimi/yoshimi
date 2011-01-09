@@ -48,11 +48,10 @@ inline float SynthHelper::interpolateAmplitude(float a, float b, int x, int size
 
 inline float SynthHelper::velF(float velocity, unsigned char scaling)
 {
-    float x = powf(VELOCITY_MAX_SCALE, (64.0f - (float)scaling) / 64.0f);
     if (scaling == 127 || velocity > 0.99f)
         return 1.0f;
     else
-        return powf(velocity, x);
+        return powf(velocity, (powf(8.0f, (64.0f - (float)scaling) / 64.0f)));
 }
 
 #endif

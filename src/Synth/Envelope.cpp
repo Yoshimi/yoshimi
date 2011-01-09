@@ -21,9 +21,6 @@
     This file is a derivative of a ZynAddSubFX original, modified january 2011
 */
 
-#include <errno.h>
-#include <fenv.h>
-
 #include "Misc/SynthEngine.h"
 #include "Params/EnvelopeParams.h"
 #include "Synth/Envelope.h"
@@ -107,8 +104,6 @@ void Envelope::relasekey(void)
 // Envelope Output
 float Envelope::envout(void)
 {
-    errno = 0;
-    feclearexcept(FE_ALL_EXCEPT);
     float out;
     if (envfinish != 0)
     {   // if the envelope is finished
@@ -161,9 +156,6 @@ float Envelope::envout(void)
     }
 
     envoutval = out;
-    if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-        Runtime.Log("Math error from Envelope envout(), errno " +
-                    asString(errno) + "  " + string(strerror(errno)));
     return out;
 }
 
