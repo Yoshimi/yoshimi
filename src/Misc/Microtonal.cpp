@@ -22,9 +22,9 @@
 */
 
 #include <iostream>
-#include <cmath>
 #include <errno.h>
 #include <fenv.h>
+#include <cmath>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -86,27 +86,23 @@ float Microtonal::getnotefreq(int note, int keyshift)
         note = (int) Pinvertupdowncenter * 2 - note;
 
     // compute global fine detune
+    errno = 0;
     feclearexcept(FE_ALL_EXCEPT);
     float globalfinedetunerap =
         powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f); // -64.0 .. 63.0 cents
     if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-    {
-        Runtime.Log("Math error 1 from notebasefreq calc", true);
-        Runtime.Log("errno " + asString(errno) + "  " + string(strerror(errno)));
-    }
+        cerr << "Math error 1 from notebasefreq calc, errno " << errno
+             << "  " << strerror(errno) << endl;
 
     if (!Penabled)
     {
-        //return powf(2.0f, (note - PAnote + keyshift) / 12.0f)
-        //       * PAfreq * globalfinedetunerap; // 12tET
+        errno = 0;
         feclearexcept(FE_ALL_EXCEPT);
         float retval = powf(2.0f, (note - PAnote + keyshift) / 12.0f)
                        * PAfreq * globalfinedetunerap; // 12tET
         if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-        {
-            Runtime.Log("Math error 2 from notebasefreq calc", true);
-            Runtime.Log("errno " + asString(errno) + "  " + string(strerror(errno)));
-        }
+            cerr << "Math error 2 from notebasefreq calc, errno " << errno
+                 << "  " << strerror(errno) << endl;
         return retval;
     }
     int scaleshift = ((int)Pscaleshift - 64 + (int) octavesize * 100) % octavesize;
@@ -117,7 +113,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
     {
         int kskey = (keyshift + (int)octavesize * 100) % octavesize;
         int ksoct = (keyshift + (int)octavesize * 100) / octavesize - 100;
-        rap_keyshift = (!kskey) ? 1.0 : octave[kskey - 1].tuning;
+        rap_keyshift = (!kskey) ? 1.0f : octave[kskey - 1].tuning;
         rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
     }
 
@@ -125,7 +121,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
     if (Pmappingenabled)
     {
         if (note < Pfirstkey || note > Plastkey)
-            return -1.0;
+            return -1.0f;
         // Compute how many mapped keys are from middle note to reference note
         // and find out the proportion between the freq. of middle note and "A" note
         int tmp = PAnote - Pmiddlenote, minus = 0;
@@ -138,17 +134,17 @@ float Microtonal::getnotefreq(int note, int keyshift)
         for (int i = 0; i < tmp; ++i)
             if (Pmapping[i % Pmapsize] >= 0)
                 deltanote++;
-        float rap_anote_middlenote = (!deltanote) ? 1.0 : (octave[(deltanote - 1) % octavesize].tuning);
+        float rap_anote_middlenote = (!deltanote) ? 1.0f : (octave[(deltanote - 1) % octavesize].tuning);
         if (deltanote)
             rap_anote_middlenote *= powf(octave[octavesize - 1].tuning, (deltanote - 1) / octavesize);
         if (minus)
-            rap_anote_middlenote = 1.0 / rap_anote_middlenote;
+            rap_anote_middlenote = 1.0f / rap_anote_middlenote;
 
         // Convert from note (midi) to degree (note from the tunning)
         int degoct = (note - (int)Pmiddlenote + (int) Pmapsize * 200) / (int)Pmapsize - 200;
         int degkey = (note - Pmiddlenote + (int)Pmapsize * 100) % Pmapsize;
         degkey = Pmapping[degkey];
-        if (degkey <0 )
+        if (degkey < 0 )
             return -1.0; // this key is not mapped
 
         // invert the keyboard upside-down if it is asked for
@@ -163,7 +159,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
         degoct += degkey / octavesize;
         degkey %= octavesize;
 
-        float freq = (!degkey) ? 1.0 : octave[degkey - 1].tuning;
+        float freq = (!degkey) ? 1.0f : octave[degkey - 1].tuning;
         freq *= powf(octave[octavesize - 1].tuning, degoct);
         freq *= PAfreq / rap_anote_middlenote;
         freq *= globalfinedetunerap;
@@ -194,7 +190,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
     int x1 = -1, x2 = -1, type = -1;
-    float x = -1.0, tmp, tuning = 1.0;
+    float x = -1.0f, tmp, tuning = 1.0f;
     if (strstr(line, "/") == NULL)
     {
         if (strstr(line, ".") == NULL)
@@ -206,7 +202,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         else
         {   // float number case
             sscanf(line, "%f", &x);
-            if (x < 0.000001)
+            if (x < 0.000001f)
                 return 1;
             type = 1; // float type(cents)
         }

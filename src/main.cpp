@@ -91,10 +91,7 @@ int main(int argc, char *argv[])
     if (Runtime.showGui)
     {
         if (guiMaster)
-        {
             delete guiMaster;
-            guiMaster = NULL;
-        }
     }
     Runtime.flushLog();
     exit(EXIT_SUCCESS);

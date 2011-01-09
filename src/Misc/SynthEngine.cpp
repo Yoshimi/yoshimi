@@ -32,6 +32,65 @@ SynthEngine *synth = NULL;
 char SynthEngine::random_state[256] = { 0, };
 struct random_data SynthEngine::random_buf;
 
+
+// -----------------------------
+
+// Get the detune in cents
+float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune,
+                             unsigned short int finedetune)
+{
+    float det = 0.0f;
+    float octdet = 0.0f;
+    float cdet = 0.0f;
+    float findet = 0.0f;
+
+    // Get Octave
+    int octave = coarsedetune / 1024;
+    if (octave >= 8)
+        octave -= 16;
+    octdet = octave * 1200.0f;
+
+    // Coarse and fine detune
+    int cdetune = coarsedetune % 1024;
+    if (cdetune > 512)
+        cdetune -= 1024;
+
+    int fdetune = finedetune - 8192;
+
+    switch (type)
+    {
+    //	case 1: is used for the default (see below)
+        case 2:
+            cdet = fabsf(cdetune * 10.0f);
+            findet = fabsf(fdetune / 8192.0f) * 10.0f;
+            break;
+        case 3:
+            cdet = fabsf(cdetune * 100.0f);
+            findet = powf(10.0f, fabsf(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
+            break;
+        case 4:
+            cdet = fabsf(cdetune * 701.95500087f); // perfect fifth
+            findet = (powf(2.0f, fabsf(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
+            break;
+            // case ...: need to update N_DETUNE_TYPES, if you'll add more
+        default:
+            cdet = fabsf(cdetune * 50.0f);
+            findet = fabsf(fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
+            break;
+    }
+    if (finedetune < 8192u)
+        findet = -findet;
+    if (cdetune < 0)
+        cdet = -cdet;
+
+    det = octdet + cdet + findet;
+    if (det != 0)
+        std::cerr << "detune " << det << " | ";
+    return det;
+}
+
+// -----------------------------
+
 SynthEngine::SynthEngine() :
     muted(0),
     shutup(false),

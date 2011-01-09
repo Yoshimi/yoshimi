@@ -20,6 +20,8 @@
 #ifndef FLOAT2INT_H
 #define FLOAT2INT_H
 
+//#include <cmath>
+
 class Float2Int {
     public:
         Float2Int() { }
@@ -29,8 +31,10 @@ class Float2Int {
         const int float2int(const float val) const;
 };
 
-// For rational, see <http://www.mega-nerd.com/FPcast/>
 inline const int Float2Int::float2int(const float val) const
-    { return ((val > 0.0f) ? lrintf(val) : lrintf((val - 1.0f))); }
+    { return (int)((isgreater(val, 0.0f)) ? lrintf(val) : lrintf((val - 1.0f))); }
+    // for rationale, see <http://www.mega-nerd.com/FPcast/>
 
 #endif
+
+//{ return (int)((val > 0.0f) ? lrintf(val) : lrintf((val - 1.0f))); }

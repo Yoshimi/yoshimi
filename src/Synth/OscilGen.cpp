@@ -180,8 +180,8 @@ void OscilGen::convert2sine(int magtype)
         if (max < mag[i])
             max = mag[i];
     }
-    if (max < 0.00001)
-        max = 1.0;
+    if (max < 0.00001f)
+        max = 1.0f;
 
     defaults();
 
@@ -190,7 +190,7 @@ void OscilGen::convert2sine(int magtype)
         float newmag = mag[i] / max;
         float newphase = phase[i];
 
-        Phmag[i] = (int) ((newmag) * 64.0f) + 64;
+        Phmag[i] = lrintf(newmag * 64.0f) + 64;
 
         Phphase[i] = 64 - lrintf(64.0f * newphase / PI);
         if (Phphase[i] > 127)
@@ -207,7 +207,7 @@ void OscilGen::convert2sine(int magtype)
 // Base Functions - START
 float OscilGen::basefunc_pulse(float x, float a)
 {
-    return (fmod(x, 1.0f) < a) ? -1.0f : 1.0f;
+    return (fmodf(x, 1.0f) < a) ? -1.0f : 1.0f;
 }
 
 
@@ -217,7 +217,7 @@ float OscilGen::basefunc_saw(float x, float a)
         a = 0.00001f;
     else if (a > 0.99999f)
         a = 0.99999f;
-    x = fmod(x, 1.0f);
+    x = fmodf(x, 1.0f);
     if (x < a)
         return x / a * 2.0f - 1.0f;
     else
@@ -227,7 +227,7 @@ float OscilGen::basefunc_saw(float x, float a)
 
 float OscilGen::basefunc_triangle(float x, float a)
 {
-    x = fmod(x + 0.25f, 1.0f);
+    x = fmodf(x + 0.25f, 1.0f);
     a = 1 - a;
     if (a < 0.00001f)
         a = 0.00001f;
@@ -246,7 +246,7 @@ float OscilGen::basefunc_triangle(float x, float a)
 
 float OscilGen::basefunc_power(float x, float a)
 {
-    x = fmod(x, 1.0f);
+    x = fmodf(x, 1.0f);
     if (a < 0.00001f)
         a = 0.00001f;
     else if (a > 0.99999f)
@@ -257,7 +257,7 @@ float OscilGen::basefunc_power(float x, float a)
 
 float OscilGen::basefunc_gauss(float x, float a)
 {
-    x = fmod(x, 1.0f) * 2.0f - 1.0f;
+    x = fmodf(x, 1.0f) * 2.0f - 1.0f;
     if (a < 0.00001f)
         a = 0.00001f;
     return expf(-x * x * (expf(a * 8.0f) + 5.0f)) * 2.0f - 1.0f;
@@ -280,7 +280,7 @@ float OscilGen::basefunc_diode(float x, float a)
 
 float OscilGen::basefunc_abssine(float x, float a)
 {
-    x = fmod(x, 1.0f);
+    x = fmodf(x, 1.0f);
     if (a < 0.00001f)
         a = 0.00001f;
     else if (a > 0.99999f)
@@ -293,7 +293,7 @@ float OscilGen::basefunc_pulsesine(float x, float a)
 {
     if (a < 0.00001f)
         a = 0.00001f;
-    x = (fmod(x, 1.0f) - 0.5f) * expf((a - 0.5f) * logf(128.0f));
+    x = (fmodf(x, 1.0f) - 0.5f) * expf((a - 0.5f) * logf(128.0f));
     if (x < -0.5f)
         x = -0.5f;
     else if (x > 0.5f)
@@ -305,7 +305,7 @@ float OscilGen::basefunc_pulsesine(float x, float a)
 
 float OscilGen::basefunc_stretchsine(float x, float a)
 {
-    x = fmod(x + 0.5f, 1.0f) * 2.0f - 1.0f;
+    x = fmodf(x + 0.5f, 1.0f) * 2.0f - 1.0f;
     a =(a - 0.5f) * 4.0f;
     if (a > 0.0f)
         a *= 2.0f;
@@ -319,7 +319,7 @@ float OscilGen::basefunc_stretchsine(float x, float a)
 
 float OscilGen::basefunc_chirp(float x, float a)
 {
-    x = fmod(x, 1.0f) * 2.0f * PI;
+    x = fmodf(x, 1.0f) * 2.0f * PI;
     a = (a - 0.5f) * 4.0f;
     if (a < 0.0f)
         a *= 2.0f;
@@ -330,7 +330,7 @@ float OscilGen::basefunc_chirp(float x, float a)
 
 float OscilGen::basefunc_absstretchsine(float x, float a)
 {
-    x = fmod(x + 0.5f, 1.0f) * 2.0f - 1.0f;
+    x = fmodf(x + 0.5f, 1.0f) * 2.0f - 1.0f;
     a = (a - 0.5f) * 9.0f;
     a = powf(3.0f, a);
     float b = powf(fabsf(x), a);
@@ -1002,7 +1002,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     {
         float h = i * rap;
         int high = (int)(i * rap);
-        float low = fmod(h, 1.0f);
+        float low = fmodf(h, 1.0f);
 
         if (high >= synth->halfoscilsize - 2)
         {

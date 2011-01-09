@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,9 +18,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
+#include <errno.h>
+#include <fenv.h>
 #include <cmath>
 
 #include "Misc/SynthEngine.h"
@@ -104,9 +106,9 @@ float LFO::lfoout(void)
             break;
         case 2: // LFO_SQUARE
             if (x < 0.5f)
-                out = -1.0;
+                out = -1.0f;
             else
-                out = 1.0;
+                out = 1.0f;
             break;
         case 3: // LFO_RAMPUP
             out = (x - 0.5f) * 2.0f;
@@ -155,7 +157,7 @@ float LFO::lfoout(void)
 float LFO::amplfoout(void)
 {
     float out;
-    out = 1.0 - lfointensity + lfoout();
+    out = 1.0f - lfointensity + lfoout();
     out = (out <- 1.0f) ? -1.0f : out;
     out = (out > 1.0f) ? 1.0f : out;
     return out;
@@ -164,8 +166,13 @@ float LFO::amplfoout(void)
 
 void LFO::computenextincrnd(void)
 {
+    errno = 0;
+    feclearexcept(FE_ALL_EXCEPT);   
     if (freqrndenabled == 0)
         return;
     incrnd = nextincrnd;
     nextincrnd = powf(0.5f, lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);
+    if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
+        Runtime.Log("Math error from LFO computenextincrnd, errno " +
+                    Runtime.asString(errno) + "  " + string(strerror(errno)));
 }
