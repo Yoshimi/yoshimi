@@ -47,8 +47,8 @@ class SUBnoteParameters : public Presets
         EnvelopeParams *AmpEnvelope;
 
         // Frequency Parameters
-        unsigned short int PDetune;
-        unsigned short int PCoarseDetune;
+        int PDetune;
+        int PCoarseDetune;
         unsigned char PDetuneType;
         unsigned char PFreqEnvelopeEnabled;
         EnvelopeParams *FreqEnvelope;

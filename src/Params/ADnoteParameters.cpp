@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #include <cmath>
@@ -192,7 +192,7 @@ void ADnoteParameters::enableVoice(int nvoice)
 // Get the Multiplier of the fine detunes of the voices
 float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 {
-    float bw = (GlobalPar.PBandwidth - 64.0) / 64.0;
+    float bw = (GlobalPar.PBandwidth - 64.0f) / 64.0f;
     bw = powf(2.0f, bw * powf(fabsf(bw), 0.2f) * 5.0f);
     return bw;
 }
@@ -201,8 +201,8 @@ float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 // Get the unison spread in cents for a voice
 float ADnoteParameters::getUnisonFrequencySpreadCents(int nvoice)
 {
-    float unison_spread = VoicePar[nvoice].Unison_frequency_spread / 127.0;
-    unison_spread = powf(unison_spread * 2.0f, 2.0f) * 50.0; //cents
+    float unison_spread = VoicePar[nvoice].Unison_frequency_spread / 127.0f;
+    unison_spread = powf(unison_spread * 2.0f, 2.0f) * 50.0f; //cents
     return unison_spread;
 }
 
@@ -210,33 +210,33 @@ float ADnoteParameters::getUnisonFrequencySpreadCents(int nvoice)
 // Kill the voice
 void ADnoteParameters::killVoice(int nvoice)
 {
-    delete (VoicePar[nvoice].OscilSmp);
-    delete (VoicePar[nvoice].FMSmp);
+    delete VoicePar[nvoice].OscilSmp;
+    delete VoicePar[nvoice].FMSmp;
 
-    delete (VoicePar[nvoice].AmpEnvelope);
-    delete (VoicePar[nvoice].AmpLfo);
+    delete VoicePar[nvoice].AmpEnvelope;
+    delete VoicePar[nvoice].AmpLfo;
 
-    delete (VoicePar[nvoice].FreqEnvelope);
-    delete (VoicePar[nvoice].FreqLfo);
+    delete VoicePar[nvoice].FreqEnvelope;
+    delete VoicePar[nvoice].FreqLfo;
 
-    delete (VoicePar[nvoice].VoiceFilter);
-    delete (VoicePar[nvoice].FilterEnvelope);
-    delete (VoicePar[nvoice].FilterLfo);
+    delete VoicePar[nvoice].VoiceFilter;
+    delete VoicePar[nvoice].FilterEnvelope;
+    delete VoicePar[nvoice].FilterLfo;
 
-    delete (VoicePar[nvoice].FMFreqEnvelope);
-    delete (VoicePar[nvoice].FMAmpEnvelope);
+    delete VoicePar[nvoice].FMFreqEnvelope;
+    delete VoicePar[nvoice].FMAmpEnvelope;
 }
 
 ADnoteParameters::~ADnoteParameters()
 {
-    delete(GlobalPar.FreqEnvelope);
-    delete(GlobalPar.FreqLfo);
-    delete(GlobalPar.AmpEnvelope);
-    delete(GlobalPar.AmpLfo);
-    delete(GlobalPar.GlobalFilter);
-    delete(GlobalPar.FilterEnvelope);
-    delete(GlobalPar.FilterLfo);
-    delete(GlobalPar.Reson);
+    delete GlobalPar.FreqEnvelope;
+    delete GlobalPar.FreqLfo;
+    delete GlobalPar.AmpEnvelope;
+    delete GlobalPar.AmpLfo;
+    delete GlobalPar.GlobalFilter;
+    delete GlobalPar.FilterEnvelope;
+    delete GlobalPar.FilterLfo;
+    delete GlobalPar.Reson;
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         killVoice(nvoice);
@@ -558,25 +558,27 @@ void ADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("RESONANCE")) {
+    if (xml->enterbranch("RESONANCE"))
+    {
         GlobalPar.Reson->getfromXML(xml);
         xml->exitbranch();
     }
 
-    for (int nvoice=0;nvoice<NUM_VOICES;nvoice++) {
+    for (int nvoice = 0; nvoice < NUM_VOICES; nvoice++)
+    {
         VoicePar[nvoice].Enabled=0;
-        if (xml->enterbranch("VOICE",nvoice)==0) continue;
-        getfromXMLsection(xml,nvoice);
+        if (xml->enterbranch("VOICE",nvoice) == 0) continue;
+        getfromXMLsection(xml, nvoice);
         xml->exitbranch();
     }
 }
 
-void ADnoteParameters::getfromXMLsection(XMLwrapper *xml,int n)
+void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 {
     int nvoice=n;
     if (nvoice>=NUM_VOICES) return;
 
-    VoicePar[nvoice].Enabled=xml->getparbool("enabled",0);
+    VoicePar[nvoice].Enabled=xml->getparbool("enabled", 0);
 
     VoicePar[nvoice].Unison_size =
         xml->getpar127("unison_size", VoicePar[nvoice].Unison_size);

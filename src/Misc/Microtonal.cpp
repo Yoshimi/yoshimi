@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,11 +18,10 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified December 2010
+    This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
 #include <iostream>
-#include <errno.h>
 #include <fenv.h>
 #include <cmath>
 
@@ -86,23 +85,13 @@ float Microtonal::getnotefreq(int note, int keyshift)
         note = (int) Pinvertupdowncenter * 2 - note;
 
     // compute global fine detune
-    errno = 0;
-    feclearexcept(FE_ALL_EXCEPT);
     float globalfinedetunerap =
         powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f); // -64.0 .. 63.0 cents
-    if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-        cerr << "Math error 1 from notebasefreq calc, errno " << errno
-             << "  " << strerror(errno) << endl;
 
     if (!Penabled)
     {
-        errno = 0;
-        feclearexcept(FE_ALL_EXCEPT);
         float retval = powf(2.0f, (note - PAnote + keyshift) / 12.0f)
                        * PAfreq * globalfinedetunerap; // 12tET
-        if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-            cerr << "Math error 2 from notebasefreq calc, errno " << errno
-                 << "  " << strerror(errno) << endl;
         return retval;
     }
     int scaleshift = ((int)Pscaleshift - 64 + (int) octavesize * 100) % octavesize;
@@ -145,7 +134,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
         int degkey = (note - Pmiddlenote + (int)Pmapsize * 100) % Pmapsize;
         degkey = Pmapping[degkey];
         if (degkey < 0 )
-            return -1.0; // this key is not mapped
+            return -1.0f; // this key is not mapped
 
         // invert the keyboard upside-down if it is asked for
         // TODO: do the right way by using Pinvertupdowncenter
@@ -230,9 +219,9 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     {
         case 1:
             x1 = (int) floorf(x);
-            tmp = fmodf(x, (float)1.0);
-            x2 = (int)(floorf(tmp * 1e6));
-            tuning = powf(2.0, x / 1200.0);
+            tmp = fmodf(x, 1.0f);
+            x2 = lrintf(floorf(tmp * 1e6f));
+            tuning = powf(2.0f, x / 1200.0f);
             break;
         case 2:
             x = ((float)x1) / x2;

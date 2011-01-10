@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #ifndef AD_NOTE_PARAMETERS_H
@@ -45,8 +45,8 @@ struct ADnoteGlobalParam {
     unsigned char PStereo;
 
     // Frequency global parameters
-    unsigned short int PDetune;// fine detune
-    unsigned short int PCoarseDetune; // coarse detune+octave
+    int           PDetune; // fine detune
+    int           PCoarseDetune; // coarse detune + octave
     unsigned char PDetuneType;// detune type
 
     unsigned char PBandwidth;// how much the relative fine detunes of the voices are changed
@@ -91,7 +91,7 @@ struct ADnoteVoiceParam {
     unsigned char Type;                     // Type of the voice 0 = Sound, 1 = Noise
     unsigned char PDelay;                   // Voice Delay
     unsigned char Presonance;               // If resonance is enabled for this voice
-    short int Pextoscil, PextFMoscil;       // What external oscil should I use,
+    int           Pextoscil, PextFMoscil;   // What external oscil should I use,
                                             // -1 for internal OscilSmp & FMSmp
                                             // it is not allowed that the externoscil,
                                             // externFMoscil => current voice
@@ -107,8 +107,8 @@ struct ADnoteVoiceParam {
                                 // the frequency is fixed (to 440 Hz); if this
                                 // parameter is 64, 1 MIDI halftone -> 1 frequency
                                 // halftone
-    unsigned short int PDetune;
-    unsigned short int PCoarseDetune;
+    int           PDetune;
+    int           PCoarseDetune;
     unsigned char PDetuneType;
 
 
@@ -145,7 +145,7 @@ struct ADnoteVoiceParam {
 
     // Modullator parameters
     unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM..
-    short int PFMVoice;       // Voice that I use as modullator instead of FMSmp.
+    int           PFMVoice;   // Voice that I use as modullator instead of FMSmp.
                               // It is -1 if I use FMSmp(default).
                               // It may not be equal or bigger than current voice
     OscilGen *FMSmp;          // Modullator oscillator
@@ -153,8 +153,8 @@ struct ADnoteVoiceParam {
     unsigned char PFMVolume;                // Modullator Volume
     unsigned char PFMVolumeDamp;            // Modullator damping at higher frequencies
     unsigned char PFMVelocityScaleFunction; // Modullator Velocity Sensing
-    unsigned short int PFMDetune;           // Fine Detune of the Modullator
-    unsigned short int PFMCoarseDetune;     // Coarse Detune of the Modullator
+    int           PFMDetune;                // Fine Detune of the Modullator
+    int           PFMCoarseDetune;          // Coarse Detune of the Modullator
     unsigned char PFMDetuneType;            // The detune type
     unsigned char PFMFreqEnvelopeEnabled;   // Frequency Envelope of the Modullator
     EnvelopeParams *FMFreqEnvelope;

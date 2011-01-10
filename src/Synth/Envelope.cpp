@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified january 2011
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #include "Misc/SynthEngine.h"
@@ -173,7 +173,7 @@ float Envelope::envout_dB(void)
         out = v1 + (v2 - v1) * t;
 
         t += inct;
-        if (t >= 1.0)
+        if (t >= 1.0f)
         {
             t = 0.0f;
             inct = envdt[2];

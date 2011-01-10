@@ -1,4 +1,8 @@
 yoshimi-0.060.6-pre3
+standardise on ints for detune vars through ADnote and friends, was a mixture
+of ints, short ints and unsigned short ints.
+
+yoshimi-0.060.6-pre3
 
 more granular testing of floating point ops through ADnote
 

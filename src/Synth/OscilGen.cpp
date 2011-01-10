@@ -93,10 +93,10 @@ void OscilGen::defaults(void)
     oldmodulationpar2 = 0;
     oldmodulationpar3 = 0;
 
+    memset(hmag, 0, MAX_AD_HARMONICS * sizeof(float));
+    memset(hphase, 0, MAX_AD_HARMONICS * sizeof(float));
     for (int i = 0; i < MAX_AD_HARMONICS; ++i)
     {
-        hmag[i] = 0.0;
-        hphase[i] = 0.0f;
         Phmag[i] = 64;
         Phphase[i] = 64;
     }
@@ -562,7 +562,7 @@ void OscilGen::oscilfilter(void)
                 gain = cosf(x * PI) * (1.0f - tmp) + 1.01f + tmp; // low shelf
                 break;
             case 13:
-                tmp = (int)powf(2.0f, ((1.0f - par) * 7.2f));
+                tmp = lrintf(powf(2.0f, ((1.0f - par) * 7.2f)));
                 gain = 1.0f;
                 if (i == tmp)
                     gain = powf(2.0f, par2 * par2 * 8.0f);
@@ -912,8 +912,8 @@ void OscilGen::prepare(void)
     {   // the sine case
         for (int i = 0; i < MAX_AD_HARMONICS; ++i)
         {
-            oscilFFTfreqs.c[i + 1] =- hmag[i] * sinf(hphase[i] * (i + 1)) / 2.0;
-            oscilFFTfreqs.s[i + 1] = hmag[i] * cosf(hphase[i] * (i + 1)) / 2.0;
+            oscilFFTfreqs.c[i + 1] =- hmag[i] * sinf(hphase[i] * (i + 1)) / 2.0f;
+            oscilFFTfreqs.s[i + 1] = hmag[i] * cosf(hphase[i] * (i + 1)) / 2.0f;
         }
     }
     else
@@ -1001,7 +1001,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     for (int i = 0; i < synth->halfoscilsize - 2; ++i)
     {
         float h = i * rap;
-        int high = (int)(i * rap);
+        int high = lrintf(i * rap);
         float low = fmodf(h, 1.0f);
 
         if (high >= synth->halfoscilsize - 2)
@@ -1089,16 +1089,15 @@ void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
 
 
 // Get the oscillator function
-short int OscilGen::get(float *smps, float freqHz)
+int OscilGen::get(float *smps, float freqHz)
 {
     return this->get(smps, freqHz, 0);
 }
 
 
 // Get the oscillator function
-short int OscilGen::get(float *smps, float freqHz, int resonance)
+int OscilGen::get(float *smps, float freqHz, int resonance)
 {
-    //int i;
     int nyquist, outpos;
 
     if (oldbasepar != Pbasefuncpar

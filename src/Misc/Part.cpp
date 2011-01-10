@@ -25,8 +25,6 @@
 #include <iostream>
 #include <cstring>
 #include <cmath>
-#include <errno.h>
-#include <fenv.h>
 
 using namespace std;
 
@@ -353,25 +351,13 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
         float notebasefreq;
         if (Pdrummode == 0)
         {
-            feclearexcept(FE_ALL_EXCEPT);
             if ((notebasefreq = microtonal->getnotefreq(note, keyshift)) < 0.0f)
             {
                 return; // the key is no mapped
-                if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-                {
-                    Runtime.Log("Math error from notebasefreq calc", true);
-                    Runtime.Log("errno " + asString(errno) + "  " + string(strerror(errno)), true);
-                }
             }
         }
         else
-        {
-            feclearexcept(FE_ALL_EXCEPT);
             notebasefreq = microtonal->PAfreq * powf(2.0f, (note - microtonal->PAnote) / 12.0f);
-            if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-                Runtime.Log("Math error from notebasefreq calc", true);
-                Runtime.Log("errno " + asString(errno) + "  " + string(strerror(errno)), true);
-        }
         
         // Portamento
         if (oldfreq < 1.0)

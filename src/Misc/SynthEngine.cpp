@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
 
     This file is part of yoshimi, which is free software: you can redistribute
@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
 using namespace std;
@@ -36,8 +36,7 @@ struct random_data SynthEngine::random_buf;
 // -----------------------------
 
 // Get the detune in cents
-float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune,
-                             unsigned short int finedetune)
+float SynthHelper::getDetune(unsigned char type, int coarsedetune, int finedetune)
 {
     float det = 0.0f;
     float octdet = 0.0f;
@@ -61,31 +60,28 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     {
     //	case 1: is used for the default (see below)
         case 2:
-            cdet = fabsf(cdetune * 10.0f);
-            findet = fabsf(fdetune / 8192.0f) * 10.0f;
+            cdet = fabsf((float)cdetune * 10.0f);
+            findet = fabsf((float)fdetune / 8192.0f) * 10.0f;
             break;
         case 3:
             cdet = fabsf(cdetune * 100.0f);
-            findet = powf(10.0f, fabsf(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
+            findet = powf(10.0f, fabsf((float)fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
             break;
         case 4:
-            cdet = fabsf(cdetune * 701.95500087f); // perfect fifth
-            findet = (powf(2.0f, fabsf(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
+            cdet = fabsf((float)cdetune * 701.95500087f); // perfect fifth
+            findet = (powf(2.0f, fabsf((float)fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
             break;
             // case ...: need to update N_DETUNE_TYPES, if you'll add more
         default:
-            cdet = fabsf(cdetune * 50.0f);
-            findet = fabsf(fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
+            cdet = fabsf((float)cdetune * 50.0f);
+            findet = fabsf((float)fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
             break;
     }
-    if (finedetune < 8192u)
+    if (finedetune < 8192)
         findet = -findet;
     if (cdetune < 0)
         cdet = -cdet;
-
     det = octdet + cdet + findet;
-    if (det != 0)
-        std::cerr << "detune " << det << " | ";
     return det;
 }
 

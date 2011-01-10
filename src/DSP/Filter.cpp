@@ -53,7 +53,7 @@ Filter::Filter(FilterParams *pars)
 
 Filter::~Filter()
 {
-    delete (filter);
+    delete filter;
 }
 
 void Filter::filterout(float *smp)

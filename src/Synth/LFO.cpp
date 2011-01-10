@@ -21,7 +21,6 @@
     This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
-#include <errno.h>
 #include <fenv.h>
 #include <cmath>
 
@@ -90,6 +89,7 @@ LFO::LFO(LFOParams *lfopars, float basefreq)
     computenextincrnd(); // twice because I want incrnd & nextincrnd to be random
 }
 
+
 // LFO out
 float LFO::lfoout(void)
 {
@@ -153,26 +153,24 @@ float LFO::lfoout(void)
     return out;
 }
 
+
 // LFO out (for amplitude)
 float LFO::amplfoout(void)
 {
     float out;
     out = 1.0f - lfointensity + lfoout();
-    out = (out <- 1.0f) ? -1.0f : out;
-    out = (out > 1.0f) ? 1.0f : out;
+    if (isless(out, -1.0f))
+        out = -1.0f;
+    else if (isgreater(out, 1.0f))
+        out = 1.0f;
     return out;
 }
 
 
 void LFO::computenextincrnd(void)
 {
-    errno = 0;
-    feclearexcept(FE_ALL_EXCEPT);   
     if (freqrndenabled == 0)
         return;
     incrnd = nextincrnd;
     nextincrnd = powf(0.5f, lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);
-    if (fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW |FE_UNDERFLOW))
-        Runtime.Log("Math error from LFO computenextincrnd, errno " +
-                    Runtime.asString(errno) + "  " + string(strerror(errno)));
 }

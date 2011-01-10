@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
 #ifndef OSCIL_GEN_H
@@ -40,10 +40,10 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         void prepare();
 
-        short get(float *smps, float freqHz);
+        int get(float *smps, float freqHz);
         // returns where should I start getting samples, used in block type randomness
 
-        short get(float *smps, float freqHz, int resonance);
+        int get(float *smps, float freqHz, int resonance);
         // if freqHz is smaller than 0, return the "un-randomized" sample for UI
 
         void getbasefunction(float *smps);
@@ -114,7 +114,7 @@ class OscilGen : public Presets, private WaveShapeSamples
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
         static float *tmpsmps; // this array stores some temporary data
-                                     // and it has SOUND_BUFFER_SIZE elements
+                               // and it has SOUND_BUFFER_SIZE elements
         static FFTFREQS outoscilFFTfreqs;
 
         float numRandom(void);
@@ -131,8 +131,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         void waveshape(void); // Waveshaping (no kidding!)
 
-        void oscilfilter();
-        // Filter the oscillator accotding to Pfiltertype and Pfilterpar
+        void oscilfilter(); // Filter the oscillator accotding to Pfiltertype and Pfilterpar
 
         void spectrumadjust(void); // Adjust the spectrum
 
@@ -217,6 +216,22 @@ inline float OscilGen::numRandom(void)
     if (!random_r(&random_buf, &random_result))
     {
         random_0_1 = (float)random_result / (float)INT_MAX;
+        if (isgreater(random_0_1, 1.0f))
+            random_0_1 = 1.0f;
+        else if (isless(random_0_1, 0.0f))
+            random_0_1 = 0.0f;
+        return random_0_1;
+    }
+    return 0.05f;
+}
+
+
+/**
+inline float OscilGen::numRandom(void)
+{
+    if (!random_r(&random_buf, &random_result))
+    {
+        random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
         random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
         return random_0_1;
@@ -224,6 +239,7 @@ inline float OscilGen::numRandom(void)
     return 0.05f;
 }
 
+**/
 
 inline float OscilGen::harmonicRandom(void)
 {
@@ -236,6 +252,7 @@ inline float OscilGen::harmonicRandom(void)
     }
     return 0.05f;
 }
+
 
 inline unsigned int OscilGen::random(void)
 {

@@ -31,8 +31,7 @@ class SynthHelper {
         bool aboveAmplitudeThreshold(float a, float b);
         float interpolateAmplitude(float a, float b, int x, int size);
         float velF(float velocity, unsigned char scaling);
-        float getDetune(unsigned char type, unsigned short int coarsedetune,
-                        unsigned short int finedetune);
+        float getDetune(unsigned char type, int coarsedetune, int finedetune);
 };
 
 inline bool SynthHelper::aboveAmplitudeThreshold(float a, float b)

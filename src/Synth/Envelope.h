@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010 Alan Calvert
+    Copyright 2009-2011 Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #ifndef ENVELOPE_H
@@ -43,7 +43,7 @@ class Envelope : private MiscFuncs
 
     private:
         int envpoints;
-        int envsustain; // "-1" means disabled
+        int envsustain;   // "-1" means disabled
         float envdt[MAX_ENVELOPE_POINTS];  // milliseconds
         float envval[MAX_ENVELOPE_POINTS]; // [0.0 .. 1.0]
         float envstretch;
@@ -53,9 +53,9 @@ class Envelope : private MiscFuncs
         int forcedrelase;
         char keyreleased; // if the key was released
         char envfinish;
-        float t; // the time from the last point
-        float inct; // the time increment
-        float envoutval; // used to do the forced release
+        float t;          // the time from the last point
+        float inct;       // the time increment
+        float envoutval;  // used to do the forced release
 };
 
 #endif

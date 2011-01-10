@@ -283,7 +283,7 @@ void AnalogFilter::computefiltercoefs(void)
                 beta = sqrtf(tmpgain) / tmpq;
                 tmp = (tmpgain + 1.0f) - (tmpgain - 1.0f) * cs + beta * sn;
 
-                c[0]=tmpgain * ((tmpgain + 1.0f) + (tmpgain - 1.0f) * cs + beta * sn) / tmp;
+                c[0] = tmpgain * ((tmpgain + 1.0f) + (tmpgain - 1.0f) * cs + beta * sn) / tmp;
                 c[1] = -2.0f * tmpgain * ((tmpgain - 1.0f) + (tmpgain + 1.0f) * cs) / tmp;
                 c[2] = tmpgain * ((tmpgain + 1.0f) + (tmpgain - 1.0f) * cs - beta * sn) / tmp;
                 d[1] = 2.0f * ((tmpgain - 1.0f) - (tmpgain + 1.0f) * cs) / tmp * -1.0f;
@@ -316,7 +316,7 @@ void AnalogFilter::setfreq(float frequency)
         rap = 1.0f / rap;
 
     oldabovenq = abovenq;
-    abovenq = frequency > (synth->halfsamplerate_f - 500.0);
+    abovenq = frequency > (synth->halfsamplerate_f - 500.0f);
 
     int nyquistthresh = (abovenq ^ oldabovenq);
 
@@ -388,7 +388,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
             smp[i] = y0;
         }
     }
-    if (order==2) {// Second order filter
+    if (order == 2) { // Second order filter
         for (int i = 0; i < synth->buffersize; ++i)
         {
             y0 = smp[i] * c[0] + x.c1 * c[1] + x.c2 * c[2] + y.c1 * d[1] + y.c2 * d[2];
