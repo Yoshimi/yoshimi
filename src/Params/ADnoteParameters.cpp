@@ -122,7 +122,7 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PVolume = 100;
     VoicePar[nvoice].PVolumeminus = 0;
     VoicePar[nvoice].PPanning = 64; // center
-    VoicePar[nvoice].PDetune = 8192; // 8192=0
+    VoicePar[nvoice].PDetune = 8192; // 8192 = 0
     VoicePar[nvoice].PCoarseDetune = 0;
     VoicePar[nvoice].PDetuneType = 0;
     VoicePar[nvoice].PFreqLfoEnabled = 0;

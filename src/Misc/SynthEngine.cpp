@@ -22,6 +22,8 @@
     This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
+#include <iostream>
+
 using namespace std;
 
 #include "MasterUI.h"
@@ -82,6 +84,7 @@ float SynthHelper::getDetune(unsigned char type, int coarsedetune, int finedetun
     if (cdetune < 0)
         cdet = -cdet;
     det = octdet + cdet + findet;
+    cerr << "getDetune " << det << endl;
     return det;
 }
 
@@ -339,7 +342,7 @@ void SynthEngine::defaults(void)
 
 // Note On Messages (velocity == 0 => NoteOff)
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note,
-                    unsigned char velocity, bool record_trigger)
+                         unsigned char velocity, bool record_trigger)
 {
     if (!velocity)
         this->NoteOff(chan, note);

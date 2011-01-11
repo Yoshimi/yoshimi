@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified November 2010
+    This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
 #include <iostream>
@@ -120,6 +120,7 @@ ADnote::ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,
 
         unison_base_freq_rap[nvoice] = new float[unison];
         unison_freq_rap[nvoice] = new float[unison];
+        *unison_freq_rap[nvoice] = 1.0f;
         unison_invert_phase[nvoice] = new bool[unison];
         float unison_spread = pars->getUnisonFrequencySpreadCents(nvoice);
         float unison_real_spread = powf(2.0f, (unison_spread * 0.5f) / 1200.0f);
@@ -379,7 +380,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_, int mid
     ADnoteParameters *pars = partparams;
     //Controller *ctl_=ctl;
 
-    basefreq = freq_;
+    //basefreq = freq_;
     velocity = velocity_;
     if (velocity > 1.0)
         velocity = 1.0f;
@@ -905,7 +906,8 @@ void ADnote::initParameters(void)
 float ADnote::getFMVoiceBaseFreq(int nvoice) const
 {
     float detune = NoteVoicePar[nvoice].FMDetune / 100.0f;
-    return getVoiceBaseFreq(nvoice) * powf(2.0f, detune / 12.0f);
+    float retval = getVoiceBaseFreq(nvoice) * powf(2.0f, detune / 12.0f);
+    //cerr << "getFMVoiceBaseFreq " << retval << " | ";
 }
 
 
@@ -913,9 +915,9 @@ float ADnote::getFMVoiceBaseFreq(int nvoice) const
 // This must be called before setfreq* functions
 void ADnote::computeUnisonFreqRap(int nvoice)
 {
-    if (unison_size[nvoice] == 1) // no unison
+    if (unison_size[nvoice] < 2) // no unison
     {
-        unison_freq_rap[nvoice][0] = 1.0f;
+        *unison_freq_rap[nvoice] = 1.0f;
         return;
     }
     float relbw = ctl->bandwidth.relbw * bandwidthDetuneMultiplier;
@@ -949,6 +951,8 @@ void ADnote::setfreq(int nvoice, float in_freq)
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float freq  = fabsf(in_freq) * unison_freq_rap[nvoice][k];
+        cerr << ", setfreq " << k << ", " << unison_freq_rap[nvoice][k]
+             << ", " << in_freq << ", " << freq << " >> ";
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (speed > synth->oscilsize_f)
             speed = synth->oscilsize_f;
@@ -964,6 +968,7 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float freq = fabsf(in_freq) * unison_freq_rap[nvoice][k];
+        cerr << "setfreqFM " << freq << " || ";
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (speed > synth->oscilsize_f)
             speed = synth->oscilsize_f;
@@ -1087,9 +1092,10 @@ void ADnote::computeCurrentParameters(void)
 
             if (NoteVoicePar[nvoice].FreqEnvelope != NULL)
                 voicepitch += NoteVoicePar[nvoice].FreqEnvelope->envout() / 100.0f;
+            cerr << "<< globalpitch " << globalpitch;   
             voicefreq = getVoiceBaseFreq(nvoice) * powf(2.0f, (voicepitch + globalpitch) / 12.0f); // Hz frequency
             if (basefreq != voicefreq)
-                cerr << "ADnote frequencies, " << basefreq << " != " << (voicefreq) << endl;
+                cerr << "!!!!! ADnote frequencies, " << basefreq << " != " << (voicefreq) << endl;
 
             voicefreq *= ctl->pitchwheel.relfreq; // change the frequency by the controller
             setfreq(nvoice, voicefreq * portamentofreqrap);
@@ -1154,7 +1160,8 @@ void ADnote::computeVoiceOscillator_LinearInterpolation(int nvoice)
         {
             tmpwave_unison[k][i] = smps[poshi] * (1.0f - poslo) + smps[poshi + 1] * poslo;
             poslo += freqlo;
-            if (poslo >= 1.0f)
+            //if (poslo >= 1.0f)
+            if (isgreater(poslo, 1.0f))
             {
                 poslo -= 1.0f;
                 poshi++;

@@ -340,8 +340,10 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
 
         // compute the velocity offset
         float vel = velF(velocity / 127.0, Pvelsns) + (Pveloffs - 64.0) / 64.0;
-        vel = (vel < 0.0) ? 0.0 : vel;
-        vel = (vel > 1.0) ? 1.0 : vel;
+        if (vel < 0.0f)
+            vel = 0.0f;
+        else if (vel > 1.0f)
+            vel = 1.0;
 
         // compute the keyshift
         int partkeyshift = (int)Pkeyshift - 64;
@@ -352,15 +354,13 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
         if (Pdrummode == 0)
         {
             if ((notebasefreq = microtonal->getnotefreq(note, keyshift)) < 0.0f)
-            {
                 return; // the key is no mapped
-            }
         }
         else
             notebasefreq = microtonal->PAfreq * powf(2.0f, (note - microtonal->PAnote) / 12.0f);
         
         // Portamento
-        if (oldfreq < 1.0)
+        if (oldfreq < 1.0f)
             oldfreq = notebasefreq; // this is only the first note is played
 
         // For Mono/Legato: Force Portamento Off on first
