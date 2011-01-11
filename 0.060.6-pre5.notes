@@ -1,4 +1,8 @@
-yoshimi-0.060.6-pre3
+yoshimi-0.060.6-pre5
+
+debug logging through ADnote
+
+yoshimi-0.060.6-pre4
 standardise on ints for detune vars through ADnote and friends, was a mixture
 of ints, short ints and unsigned short ints.
 
