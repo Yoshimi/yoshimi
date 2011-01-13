@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,11 +18,12 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified November 2010
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #include <iostream>
-
+#include <fenv.h>
+#include <errno.h>
 #include <cmath>
 #include <string>
 #include <argp.h>
@@ -55,7 +56,7 @@ unsigned short Config::nextHistoryIndex = numeric_limits<unsigned int>::max();
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
-    "Copyright 2009-2010 Alan Calvert";
+    "Copyright 2009-2011 Alan Calvert";
 
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
@@ -135,6 +136,8 @@ bool Config::Setup(int argc, char **argv)
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
+    if (sigaction(SIGFPE, &sigAction, NULL))
+        Log("Setting SIGFPE handler failed");
     clearBankrootDirlist();
     clearPresetsDirlist();
     if (!loadConfig())
@@ -774,6 +777,12 @@ void Config::sigHandler(int sig)
             sigaction(SIGUSR1, &sigAction, NULL);
             break;
 
+        case SIGFPE:
+            Runtime.Log("Floating point exception signal received", true);
+            errno = 0;
+            feclearexcept(FE_ALL_EXCEPT);
+            break;
+            
         case SIGUSR2:
         default:
             break;

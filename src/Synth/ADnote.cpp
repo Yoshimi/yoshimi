@@ -1092,7 +1092,7 @@ void ADnote::computeCurrentParameters(void)
 
             if (NoteVoicePar[nvoice].FreqEnvelope != NULL)
                 voicepitch += NoteVoicePar[nvoice].FreqEnvelope->envout() / 100.0f;
-            cerr << "<< globalpitch " << globalpitch;   
+            cerr << endl << "<< globalpitch " << globalpitch;   
             voicefreq = getVoiceBaseFreq(nvoice) * powf(2.0f, (voicepitch + globalpitch) / 12.0f); // Hz frequency
             if (basefreq != voicefreq)
                 cerr << "!!!!! ADnote frequencies, " << basefreq << " != " << (voicefreq) << endl;
