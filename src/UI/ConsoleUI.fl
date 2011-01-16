@@ -2,7 +2,7 @@
 version 1.0110 
 header_name {.h} 
 code_name {.cc}
-comment {Copyright 2010, Alan Calvert
+comment {Copyright 2010-2011, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -19,20 +19,16 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } {in_source in_header
 } 
 
-decl {\#include <set>} {public
-} 
+decl {
+    \#include <set>
+    \#include <string>
+    using namespace std;
+} {public} 
 
-decl {\#include <iostream>} {public
-} 
-
-decl {using namespace std;} {public
-} 
-
-decl {\#include "Misc/Config.h"} {global
-} 
-
-decl {\#include "MasterUI.h"} {global
-} 
+decl {
+    \#include "Misc/Config.h"
+    \#include "MasterUI.h"
+} {global} 
 
 class ConsoleUI {open
 } {

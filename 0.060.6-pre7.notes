@@ -1,3 +1,7 @@
+yoshimi-0.060.6-pre7
+
+debug logging contained within #ifdef FREQCHECK, a new baseline for testing.
+
 yoshimi-0.060.6-pre6
 
 clear all floating point exceptions on receipt of SIFGFPE

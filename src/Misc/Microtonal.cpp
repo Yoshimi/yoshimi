@@ -21,8 +21,6 @@
     This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
-#include <iostream>
-#include <fenv.h>
 #include <cmath>
 
 #include "Misc/Config.h"

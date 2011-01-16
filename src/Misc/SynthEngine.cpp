@@ -22,8 +22,6 @@
     This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
-#include <iostream>
-
 using namespace std;
 
 #include "MasterUI.h"
@@ -84,7 +82,9 @@ float SynthHelper::getDetune(unsigned char type, int coarsedetune, int finedetun
     if (cdetune < 0)
         cdet = -cdet;
     det = octdet + cdet + findet;
-    cerr << "getDetune " << det << endl;
+    #if defined(FREQCHECK)
+        cerr << "getDetune " << det << endl;
+    #endif
     return det;
 }
 

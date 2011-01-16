@@ -29,6 +29,9 @@
 
 using namespace std;
 
+//#define FREQCHECK 1
+#undef FREQCHECK
+
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
 #include "Misc/Microtonal.h"
