@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,10 +18,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified November 2010
+    This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
-#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -949,6 +948,10 @@ void ADnote::setfreq(int nvoice, float in_freq)
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float freq  = fabsf(in_freq) * unison_freq_rap[nvoice][k];
+        #if defined(FREQCHECK)
+            cerr << ", setfreq " << k << ", " << unison_freq_rap[nvoice][k]
+                 << ", " << in_freq << ", " << freq << " >> " << endl;
+        #endif
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (speed > synth->oscilsize_f)
             speed = synth->oscilsize_f;
@@ -964,6 +967,11 @@ void ADnote::setfreqFM(int nvoice, float in_freq)
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float freq = fabsf(in_freq) * unison_freq_rap[nvoice][k];
+        #if defined(FREQCHECK)
+            //cerr << "setfreqFM " << freq << " || ";
+            cerr << ", setfreqFM " << k << ", " << unison_freq_rap[nvoice][k]
+                 << ", " << in_freq << ", " << freq << " >> " << endl;
+        #endif
         float speed = freq * synth->oscilsize_f / synth->samplerate_f;
         if (speed > synth->oscilsize_f)
             speed = synth->oscilsize_f;
@@ -1088,8 +1096,9 @@ void ADnote::computeCurrentParameters(void)
             if (NoteVoicePar[nvoice].FreqEnvelope != NULL)
                 voicepitch += NoteVoicePar[nvoice].FreqEnvelope->envout() / 100.0f;
             voicefreq = getVoiceBaseFreq(nvoice) * powf(2.0f, (voicepitch + globalpitch) / 12.0f); // Hz frequency
-            if (basefreq != voicefreq)
-                cerr << "ADnote frequencies, " << basefreq << " != " << (voicefreq) << endl;
+            #if defined(FREQCHECK)
+                cerr << "<< globalpitch " << globalpitch << ", voicefreq " << voicefreq;   
+            #endif
 
             voicefreq *= ctl->pitchwheel.relfreq; // change the frequency by the controller
             setfreq(nvoice, voicefreq * portamentofreqrap);

@@ -1,7 +1,7 @@
 #
 #   CMakeLists.txt
 #
-#   Copyright 2009-2010, Alan Calvert
+#   Copyright 2009-2011, Alan Calvert
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.060.6-pre4")
+set (YOSHIMI_VERSION "0.060.6-pre8") 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -51,7 +51,7 @@ check_c_source_compiles (
 if (HAS_JACK_SESSION)
     option (JackSessionSupport "Include Jack Session Support" ON)
 else (HAS_JACK_SESSION)
-    option (JackSessionSupport "Include Jack Session Support" OFF)
+    set (JackSessionSupport OFF)
 endif (HAS_JACK_SESSION)
 
 set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
