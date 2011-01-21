@@ -123,6 +123,7 @@ class Config : public MiscFuncs
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;
         int           rtprio;
+        bool          configChanged;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;

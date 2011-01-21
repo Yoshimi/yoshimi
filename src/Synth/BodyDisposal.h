@@ -1,7 +1,7 @@
 /*
     BodyDisposal.h
 
-    Copyright 2010, Alan Calvert
+    Copyright 2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -20,7 +20,6 @@
 #ifndef BODYDISPOSAL_H
 #define BODYDISPOSAL_H
 
-#include <iostream>
 #include <boost/ptr_container/ptr_list.hpp>
 
 using namespace std;

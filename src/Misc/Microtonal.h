@@ -37,43 +37,41 @@ class XMLwrapper;
 class Microtonal : private MiscFuncs
 {
     public:
-        Microtonal() : PAnote(69), PAfreq(440.0f) { }
-        ~Microtonal() { };
+        Microtonal();
+        ~Microtonal() { }
         void defaults(void);
-        float getnotefreq(int note, int keyshift);
+        float getnotefreq(int note, int keyshift) const;
 
         // Parameters
         unsigned char Pinvertupdown;
         unsigned int  Pinvertupdowncenter;
         unsigned char Penabled;
         int           PAnote;
-        unsigned int  Pscaleshift;
-        float         PAfreq;
+        int           Pscaleshift;
+        long double   PAfreq;
 
         // first and last key (to retune)
-        unsigned char Pfirstkey;
-        unsigned char Plastkey;
+        int Pfirstkey;
+        int Plastkey;
 
         // The middle note where scale degree 0 is mapped to
-        int           Pmiddlenote;
+        int Pmiddlenote;
 
         // Map size
         int Pmapsize;
 
-        // Mapping ON/OFF
-        unsigned char Pmappingenabled;
-        // Mapping (keys)
-        short int Pmapping[128];
+        unsigned char Pmappingenabled; // Mapping ON/OFF
+        int Pmapping[128];       // Mapping (keys)
 
-        unsigned char Pglobalfinedetune;
+        long double Pglobalfinedetune;
 
-        // Functions
         int getoctavesize(void);
         void tuningtoline(int n, char *line, int maxn);
         int loadscl(string filename); // load the tunnings from a .scl file
         int loadkbm(string filename); // load the mapping from .kbm file
         int texttotunings(const char *text);
         void texttomapping(const char *text);
+
         string Pname;
         string Pcomment;
 
@@ -84,10 +82,10 @@ class Microtonal : private MiscFuncs
 
     private:
         int linetotunings(unsigned int nline, const char *line);
-        int loadline(FILE *file, char *line);
-            // loads a line from the text file,
-            // ignoring the lines beggining with "!"
+        int loadline(FILE *file, char *line); // loads a line from the text file,
+                                              // ignoring the lines beggining with "!"
         int octavesize;
+
         struct {
             unsigned char type; // 1 for cents or 2 for division
             // the real tuning (eg. +1.05946 for one halftone)
@@ -98,5 +96,12 @@ class Microtonal : private MiscFuncs
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
 };
+
+inline int Microtonal::getoctavesize(void)
+{
+    return ((Penabled != 0) ? octavesize : 12);
+}
+
+
 
 #endif

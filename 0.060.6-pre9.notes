@@ -1,3 +1,8 @@
+yoshimi-0.060.6-pre9
+
+Wherein there's some fiddling about with the wham(), zap(), pow() family of
+functions around frequency calculations.
+
 yoshimi-0.060.6-pre8
 
 pre7 was utterly stuffed, pre8 seems better.

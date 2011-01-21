@@ -227,7 +227,7 @@ Part::~Part()
 
 
 // Note On Messages
-void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift)
+void Part::NoteOn(int note, int velocity, int masterkeyshift)
 {
     if (!Pnoteon || note < Pminkey || note > Pmaxkey)
         return;
@@ -351,15 +351,13 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
         if (Pdrummode == 0)
         {
             if ((notebasefreq = microtonal->getnotefreq(note, keyshift)) < 0.0f)
-            {
                 return; // the key is no mapped
-            }
         }
         else
             notebasefreq = microtonal->PAfreq * powf(2.0f, (note - microtonal->PAnote) / 12.0f);
         
         // Portamento
-        if (oldfreq < 1.0)
+        if (oldfreq < 1.0f)
             oldfreq = notebasefreq; // this is only the first note is played
 
         // For Mono/Legato: Force Portamento Off on first
@@ -613,7 +611,7 @@ void Part::NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift
 }
 
 // Note Off Messages
-void Part::NoteOff(unsigned char note) //relase the key
+void Part::NoteOff(int note) //relase the key
 {
     int i;
 

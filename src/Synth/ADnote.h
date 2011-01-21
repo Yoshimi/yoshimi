@@ -67,8 +67,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         void killNote(void);
         float getVoiceBaseFreq(int nvoice) const;
         float getFMVoiceBaseFreq(int nvoice) const;
-        void computeVoiceOscillator_LinearInterpolation(int nvoice);
-        void computeVoiceOscillator_CubicInterpolation(int nvoice);
+        void computeVoiceOscillatorLinearInterpolation(int nvoice);
+        void computeVoiceOscillatorCubicInterpolation(int nvoice);
         void computeVoiceOscillatorMorph(int nvoice);
         void computeVoiceOscillatorRingModulation(int nvoice);
         void computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode);

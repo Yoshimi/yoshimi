@@ -27,13 +27,6 @@
 #include <limits.h>
 #include <cstdlib>
 
-//#define FREQCHECK 1
-#undef FREQCHECK
-#if defined(FREQCHECK)
-    #warning "FREQCHECK is in play!"
-    #include <iostream>
-#endif
-
 using namespace std;
 
 #include "Misc/MiscFuncs.h"

@@ -2,7 +2,7 @@
 version 1.0110 
 header_name {.h} 
 code_name {.cc}
-comment {Copyright 2010, Alan Calvert
+comment {Copyright 2011, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -20,9 +20,6 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } 
 
 decl {\#include <set>} {public
-} 
-
-decl {\#include <iostream>} {public
 } 
 
 decl {using namespace std;} {public

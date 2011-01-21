@@ -111,12 +111,13 @@ Config::Config() :
     Interpolation(0),
     CheckPADsynth(1),
     rtprio(50),
+    configChanged(false),
     deadObjects(NULL),
     sse_level(0),
     programCmd("yoshimi")
 {
     std::ios::sync_with_stdio(false);
-    cerr.precision(4);
+    cerr.precision(8);
     std::ios::sync_with_stdio(false);
     deadObjects = new BodyDisposal();
 }
@@ -190,7 +191,6 @@ bool Config::Setup(int argc, char **argv)
 
 Config::~Config()
 {
-    feclearexcept(FE_ALL_EXCEPT);
     AntiDenormals(false);
 }
 
@@ -776,12 +776,6 @@ void Config::sigHandler(int sig)
             sigaction(SIGUSR1, &sigAction, NULL);
             break;
 
-        case SIGFPE:
-            Runtime.Log("Floating point exception signal received", true);
-            errno = 0;
-            feclearexcept(FE_ALL_EXCEPT);
-            break;
-            
         case SIGUSR2:
         default:
             break;

@@ -1,7 +1,7 @@
 /*
     SynthHelper.h
 
-    Copyright 2010, Alan Calvert
+    Copyright 2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -20,7 +20,6 @@
 #ifndef SYNTHHELPER_H
 #define SYNTHHELPER_H
 
-#include <iostream>
 #include <cmath>
 
 class SynthHelper {

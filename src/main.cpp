@@ -17,7 +17,7 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
+#include <fenv.h>
 
 using namespace std;
 
@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
             delete guiMaster;
     }
     Runtime.flushLog();
+    feclearexcept(FE_ALL_EXCEPT);
     exit(EXIT_SUCCESS);
 
 bail_out:

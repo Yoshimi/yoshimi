@@ -103,6 +103,7 @@ class MasterUI {open : {private MiscFuncs}
   }
   Function {~MasterUI()} {} {
     code {//
+      masterwindow->hide();
       aboutwindow->hide();
       delete aboutwindow;
       syseffsendwindow->hide();
@@ -144,11 +145,12 @@ class MasterUI {open : {private MiscFuncs}
         yoshiLog->Hide();
         delete yoshiLog;
       }
-      masterwindow->hide();
+      delete masterwindow;
     } {}
   }
   Function {Init(void)} {} {
-    code {microtonalui = new MicrotonalUI(&synth->microtonal);
+    code {//
+      microtonalui = new MicrotonalUI(&synth->microtonal);
       bankui = new BankUI(&npart);
       virkeyboard = new VirKeyboard();
       configui = new ConfigUI();
@@ -162,24 +164,31 @@ class MasterUI {open : {private MiscFuncs}
       if (Runtime.showConsole)
         yoshiLog->Show();
       else
-        yoshiLog->Hide();} {}
+          yoshiLog->Hide();
+      aboutwindow->show();
+    } {}
   }
   Function {make_window()} {open
   } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {int r = fl_choice("Save session state?", "Cancel", "Save state", "Discard");
-        switch (r)
+      callback {//
+        if (Runtime.configChanged)
         {
-            case 1:
-                Runtime.saveState();
-            case 2:
-                Runtime.saveConfig();
-                Runtime.runSynth = false;
-                break;
-            default:
-                break;
-        }} open selected
+            int r = fl_choice("Save session state?", "Cancel", "Save config", "Discard");
+            switch (r)
+            {
+                case 1:
+                    Runtime.saveConfig();
+                case 2:
+                    Runtime.runSynth = false;
+                default:
+                    break;
+            }
+        }
+        else
+            Runtime.runSynth = false;
+      } open selected
       xywh {687 223 390 463} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {

@@ -132,19 +132,21 @@ void AnalogFilter::computefiltercoefs(void)
                 cs = cosf(omega);
                 alpha = sn / (2.0f * tmpq);
                 tmp = 1 + alpha;
-                c[0] = (1.0f - cs) / 2.0f / tmp;
                 c[1] = (1.0f - cs) / tmp;
-                c[2] = (1.0f - cs) / 2.0f / tmp;
+                c[0] = c[2] = c[1] / 2.0f;
                 d[1] = -2.0f * cs / tmp * -1.0f;
                 d[2] = (1.0f - alpha) / tmp * -1.0f;
+
+                //c[0] = (1.0f - cs) / 2.0f / tmp;
+                //c[1] = (1.0f - cs) / tmp;
+                //c[2] = (1.0f - cs) / 2.0f / tmp;
+                //d[1] = -2.0f * cs / tmp * -1.0f;
+                //d[2] = (1.0f - alpha) / tmp * -1.0f;
             }
             else
             {
                 c[0] = 1.0f;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
+                c[1] = c[2] = d[1] = d[2] = 0.0f;
             }
             order = 2;
             break;
@@ -163,13 +165,7 @@ void AnalogFilter::computefiltercoefs(void)
                 d[2] = (1.0f - alpha) / tmp * -1.0f;
             }
             else
-            {
-                c[0] = 0.0f;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
-            }
+                c[0] = c[1] = c[2] = d[1] = d[2] = 0.0f;
             order = 2;
             break;
         case 4: // BPF 2 poles
@@ -187,13 +183,7 @@ void AnalogFilter::computefiltercoefs(void)
                 d[2] = (1.0f - alpha) / tmp * -1.0f;
             }
             else
-            {
-                c[0] = 0.0f;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
-            }
+                c[0] = c[1] = c[2] = d[1] = d[2] = 0.0f;
             order = 2;
             break;
         case 5: // NOTCH 2 poles
@@ -213,10 +203,7 @@ void AnalogFilter::computefiltercoefs(void)
             else
             {
                 c[0] = 1.0f;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
+                c[1] = c[2] = d[1] = d[2] = 0.0f;
             }
             order = 2;
             break;
@@ -238,10 +225,7 @@ void AnalogFilter::computefiltercoefs(void)
             else
             {
                 c[0] = 1.0f;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
+                c[1] = c[2] = d[1] = d[2] = 0.0f;
             }
             order = 2;
             break;
@@ -265,10 +249,7 @@ void AnalogFilter::computefiltercoefs(void)
             else
             {
                 c[0] = tmpgain;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
+                c[1] = c[2] = d[1] = d[2] = 0.0f;
             }
             order = 2;
             break;
@@ -292,10 +273,7 @@ void AnalogFilter::computefiltercoefs(void)
             else
             {
                 c[0] = 1.0f;
-                c[1] = 0.0f;
-                c[2] = 0.0f;
-                d[1] = 0.0f;
-                d[2] = 0.0f;
+                c[1] = c[2] = d[1] = d[2] = 0.0f;
             }
             order = 2;
             break;

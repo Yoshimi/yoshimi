@@ -50,8 +50,8 @@ class Part : private MiscFuncs, SynthHelper
         ~Part();
 
         // Midi commands implemented
-        void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
-        void NoteOff(unsigned char note);
+        void NoteOn(int note, int velocity, int masterkeyshift);
+        void NoteOff(int note);
         void AllNotesOff(void) { killallnotes = true; }; // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
         void RelaseSustainedKeys(void);
