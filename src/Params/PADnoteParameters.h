@@ -102,10 +102,11 @@ class PADnoteParameters : public Presets
         // Equal temperate (this is used only if the Pfixedfreq is enabled)
         // If this parameter is 0, the frequency is fixed (to 440 Hz);
         // if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone
-        unsigned char PfixedfreqET;
-        int           PDetune;       // fine detune
-        int           PCoarseDetune; // coarse detune+octave
-        unsigned char PDetuneType;        // detune type
+        unsigned char      PfixedfreqET;
+
+        unsigned short int PDetune;       // fine detune
+        unsigned short int PCoarseDetune; // coarse detune+octave
+        unsigned char      PDetuneType;   // detune type
 
         EnvelopeParams *FreqEnvelope; // Frequency Envelope
         LFOParams *FreqLfo;           // Frequency LFO

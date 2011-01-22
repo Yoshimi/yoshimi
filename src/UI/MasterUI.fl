@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110
-header_name {.h}
+version 1.0110 
+header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-}
+} 
 
 comment {MasterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,61 +27,61 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified November 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include <string>} {public
-}
+} 
 
 decl {using namespace std;} {public
-}
+} 
 
 decl {\#include "ADnoteUI.h"} {public
-}
+} 
 
 decl {\#include "SUBnoteUI.h"} {public
-}
+} 
 
 decl {\#include "EffUI.h"} {public
-}
+} 
 
 decl {\#include "VirKeyboardUI.h"} {public
-}
+} 
 
 decl {\#include "ConfigUI.h"} {public
-}
+} 
 
 decl {\#include "BankUI.h"} {public
-}
+} 
 
 decl {\#include "PartUI.h"} {public
-}
+} 
 
 decl {\#include "MicrotonalUI.h"} {public
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public
-}
+} 
 
 decl {\#include "ParametersUI.h"} {public
-}
+} 
 
 decl {\#include "ConsoleUI.h"} {public
-}
+} 
 
 decl {\#include "MasterMiscUI.h"} {public
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public
-}
+} 
 
 decl {class MasterUI;} {public
-}
+} 
 
 decl {MasterUI *guiMaster;} {public
-}
+} 
 
 class MasterUI {open : {private MiscFuncs}
 } {
@@ -145,8 +145,7 @@ class MasterUI {open : {private MiscFuncs}
         yoshiLog->Hide();
         delete yoshiLog;
       }
-      delete masterwindow;
-    } {}
+      delete masterwindow;} {}
   }
   Function {Init(void)} {} {
     code {//
@@ -166,7 +165,7 @@ class MasterUI {open : {private MiscFuncs}
       else
           yoshiLog->Hide();
       aboutwindow->show();
-    } {}
+      yoshiLog->Show();} {}
   }
   Function {make_window()} {open
   } {
@@ -187,9 +186,8 @@ class MasterUI {open : {private MiscFuncs}
             }
         }
         else
-            Runtime.runSynth = false;
-      } open selected
-      xywh {687 223 390 463} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+            Runtime.runSynth = false;} open
+      xywh {688 249 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-5 0 690 25} labelsize 13
@@ -230,7 +228,8 @@ class MasterUI {open : {private MiscFuncs}
         } {
           MenuItem {} {
             label {&Clear Instrument...}
-            callback {if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
+            callback {//
+                if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
                 {
                     // int npart = (int)npartcounter->value() - 1;
                     synth->actionLock(lockmute);
@@ -243,7 +242,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           MenuItem {} {
             label {&Open Instrument...}
-            callback {const char *filename;
+            callback {//
+                const char *filename;
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
@@ -251,13 +251,13 @@ class MasterUI {open : {private MiscFuncs}
                 npartcounter->do_callback();
                 updatepanel();
                 if (!result)
-                    fl_alert("Failed to load instrument file");
-            }
+                    fl_alert("Failed to load instrument file");}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
             label {&Save Instrument ...}
-            callback {char *filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
+            callback {//
+                char *filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
                 filename = fl_filename_setext(filename, ".xiz");
@@ -299,7 +299,8 @@ class MasterUI {open : {private MiscFuncs}
           }
           MenuItem {} {
             label {&Open}
-            callback {do_load_master(true, NULL);
+            callback {//
+                do_load_master(true, NULL);
                 paramsui->loadRecent();}
             tooltip {Load a parameters (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
@@ -387,14 +388,14 @@ class MasterUI {open : {private MiscFuncs}
           label Reset
           callback {//
               globalfinedetune->value(64.0);
-              synth->microtonal.Pglobalfinedetune = globalfinedetune->value();
+              synth->microtonal.Pglobalfinedetune = 64.0f;
               globalfinedetune->changed();}
           tooltip {Master fine detune reset} xywh {153 72 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
         Fl_Check_Button nrpnbutton {
           label NRPN
-          callback {synth->ctl->NRPN.receive = o->value();}
-          tooltip {Receive NRPNs} xywh {66 35 10 13} down_box DOWN_BOX labelsize 10 align 8
+          callback {synth->ctl->NRPN.receive = o->value();} selected
+          tooltip {Receive NRPNs} xywh {66 35 10 13} down_box DOWN_BOX labelsize 10 align 8 deactivate
           code0 {o->value(synth->ctl->NRPN.receive);}
         }
         Fl_Button {} {
@@ -552,8 +553,7 @@ class MasterUI {open : {private MiscFuncs}
             if (o->value() == SystemEffectsGrp)
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
-               showInsEfxUI();
-        } open
+               showInsEfxUI();} open
         xywh {0 97 390 60} box PLASTIC_THIN_UP_BOX color 44 selection_color 41 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
@@ -902,8 +902,7 @@ ZynAddSubFX}
     code {//
         for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
             for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
-                syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);
-    } {}
+                syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);} {}
   }
   Function {updatepanel()} {} {
     code {for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -1015,7 +1014,7 @@ ZynAddSubFX}
         mastervolumedial->value(synth->Pvolume);
         globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
         microtonalui = new MicrotonalUI(&synth->microtonal);
-        nrpnbutton->value(synth->ctl->NRPN.receive);
+        //nrpnbutton->value(synth->ctl->NRPN.receive);
         updatesendwindow();
         updatepanel();
         bankui->Hide();} {}
@@ -1086,4 +1085,4 @@ ZynAddSubFX}
   decl {const char *start_record_tip;} {}
   decl {const char *stop_record_tip;} {}
   decl {ConsoleUI *yoshiLog;} {}
-}
+} 

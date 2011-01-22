@@ -350,11 +350,11 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         float notebasefreq;
         if (Pdrummode == 0)
         {
-            if ((notebasefreq = microtonal->getnotefreq(note, keyshift)) < 0.0f)
-                return; // the key is no mapped
+            if ((notebasefreq = microtonal->getNoteFreq(note, keyshift)) < 0.0f)
+                return; // the key is not mapped
         }
         else
-            notebasefreq = microtonal->PAfreq * powf(2.0f, (note - microtonal->PAnote) / 12.0f);
+            notebasefreq = microtonal->getNoteFreq(note);
         
         // Portamento
         if (oldfreq < 1.0f)
@@ -1027,18 +1027,18 @@ void Part::ComputePartSmps(void)
 void Part::setPvolume(char value)
 {
     Pvolume = value;
-    volume  = dB2rap((Pvolume - 96.0) / 96.0 * 40.0) * ctl->expression.relvolume;
+    volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
 }
 
 
 void Part::setPpanning(char Ppanning_)
 {
     Ppanning = Ppanning_;
-    panning = Ppanning / 127.0 + ctl->panning.pan;
-    if (panning < 0.0)
-        panning = 0.0;
-    else if (panning > 1.0)
-        panning = 1.0;
+    panning = Ppanning / 127.0f + ctl->panning.pan;
+    if (panning < 0.0f)
+        panning = 0.0f;
+    else if (panning > 1.0f)
+        panning = 1.0f;
 }
 
 
@@ -1242,10 +1242,6 @@ bool Part::loadXMLinstrument(string filename)
 
 void Part::applyparameters(void)
 {
-//    for (int n = 0; n < NUM_KIT_ITEMS; ++n)
-//        if (kit[n].padpars && kit[n].Ppadenabled)
-//            kit[n].padpars->applyparameters(islocked);
-
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
         if (kit[n].Ppadenabled && kit[n].padpars != NULL)
             kit[n].padpars->applyparameters(true);

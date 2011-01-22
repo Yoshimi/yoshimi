@@ -45,14 +45,13 @@ struct ADnoteGlobalParam {
     unsigned char PStereo;
 
     // Frequency global parameters
-    int           PDetune; // fine detune
-    int           PCoarseDetune; // coarse detune + octave
-    unsigned char PDetuneType;// detune type
-
-    unsigned char PBandwidth;// how much the relative fine detunes of the voices are changed
-
-    EnvelopeParams *FreqEnvelope; // Frequency Envelope
-    LFOParams *FreqLfo; // Frequency LFO
+    unsigned short int PDetune;       // fine detune
+    unsigned short int PCoarseDetune; // coarse detune + octave
+    unsigned char PDetuneType;        // detune type
+    unsigned char PBandwidth;         // how much the relative fine detunes of
+                                      // the voices are changed
+    EnvelopeParams *FreqEnvelope;     // Frequency Envelope
+    LFOParams *FreqLfo;               // Frequency LFO
 
     // Amplitude global parameters
     unsigned char PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
@@ -66,9 +65,8 @@ struct ADnoteGlobalParam {
     EnvelopeParams *AmpEnvelope;
     LFOParams *AmpLfo;
 
-    // Filter global parameters
-    FilterParams *GlobalFilter;
-    unsigned char PFilterVelocityScale;         // filter velocity sensing
+    FilterParams *GlobalFilter;         // Filter global parameters
+    unsigned char PFilterVelocityScale; // Filter velocity sensing
     unsigned char PFilterVelocityScaleFunction;
     EnvelopeParams *FilterEnvelope;
     LFOParams *FilterLfo;
@@ -77,9 +75,8 @@ struct ADnoteGlobalParam {
                                  // on more voices using the same oscillator
 };
 
-// Voice parameters
 
-struct ADnoteVoiceParam {
+struct ADnoteVoiceParam { // Voice parameters
     unsigned char Enabled;
     unsigned char Unison_size;              // How many subvoices are used in this voice
     unsigned char Unison_frequency_spread;  // How subvoices are spread
@@ -107,10 +104,9 @@ struct ADnoteVoiceParam {
                                 // the frequency is fixed (to 440 Hz); if this
                                 // parameter is 64, 1 MIDI halftone -> 1 frequency
                                 // halftone
-    int           PDetune;
-    int           PCoarseDetune;
+    unsigned short int PDetune;
+    unsigned short int PCoarseDetune;
     unsigned char PDetuneType;
-
 
     unsigned char PFreqEnvelopeEnabled; // Frequency Envelope
     EnvelopeParams *FreqEnvelope;
@@ -145,20 +141,20 @@ struct ADnoteVoiceParam {
 
     // Modullator parameters
     unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM..
-    int           PFMVoice;   // Voice that I use as modullator instead of FMSmp.
+    short int     PFMVoice;   // Voice that I use as modullator instead of FMSmp.
                               // It is -1 if I use FMSmp(default).
                               // It may not be equal or bigger than current voice
     OscilGen *FMSmp;          // Modullator oscillator
 
-    unsigned char PFMVolume;                // Modullator Volume
-    unsigned char PFMVolumeDamp;            // Modullator damping at higher frequencies
-    unsigned char PFMVelocityScaleFunction; // Modullator Velocity Sensing
-    int           PFMDetune;                // Fine Detune of the Modullator
-    int           PFMCoarseDetune;          // Coarse Detune of the Modullator
-    unsigned char PFMDetuneType;            // The detune type
-    unsigned char PFMFreqEnvelopeEnabled;   // Frequency Envelope of the Modullator
+    unsigned char      PFMVolume;                // Modulator Volume
+    unsigned char      PFMVolumeDamp;            // Modulator damping at higher frequencies
+    unsigned char      PFMVelocityScaleFunction; // Modulator Velocity Sensing
+    unsigned short int PFMDetune;                // Fine Detune of the Modulator
+    unsigned short int PFMCoarseDetune;          // Coarse Detune of the Modulator
+    unsigned char      PFMDetuneType;            // The detune type
+    unsigned char      PFMFreqEnvelopeEnabled;   // Frequency Envelope of the Modulator
     EnvelopeParams *FMFreqEnvelope;
-    unsigned char PFMAmpEnvelopeEnabled;    // Frequency Envelope of the Modullator
+    unsigned char PFMAmpEnvelopeEnabled;         // Frequency Envelope of the Modulator
     EnvelopeParams *FMAmpEnvelope;
 };
 

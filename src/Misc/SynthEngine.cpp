@@ -32,33 +32,24 @@ SynthEngine *synth = NULL;
 char SynthEngine::random_state[256] = { 0, };
 struct random_data SynthEngine::random_buf;
 
-
-// -----------------------------
-
-// Get the detune in cents
-float SynthHelper::getDetune(unsigned char type, int coarsedetune, int finedetune)
+float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune,
+                             unsigned short int finedetune) const
 {
-    float det = 0.0f;
-    float octdet = 0.0f;
-    float cdet = 0.0f;
-    float findet = 0.0f;
+    float det = 0.0f, octdet = 0.0f, cdet = 0.0f, findet = 0.0f;
 
-    // Get Octave
-    int octave = coarsedetune / 1024;
+    int octave = coarsedetune / 1024; // get Octave
     if (octave >= 8)
         octave -= 16;
     octdet = octave * 1200.0f;
 
-    // Coarse and fine detune
-    int cdetune = coarsedetune % 1024;
+    int cdetune = coarsedetune % 1024; // coarse and fine detune
     if (cdetune > 512)
         cdetune -= 1024;
-
     int fdetune = finedetune - 8192;
 
     switch (type)
     {
-    //	case 1: is used for the default (see below)
+        // case 1 is used for the default (see below)
         case 2:
             cdet = fabsf((float)cdetune * 10.0f);
             findet = fabsf((float)fdetune / 8192.0f) * 10.0f;
@@ -85,7 +76,6 @@ float SynthHelper::getDetune(unsigned char type, int coarsedetune, int finedetun
     return det;
 }
 
-// -----------------------------
 
 SynthEngine::SynthEngine() :
     muted(0),

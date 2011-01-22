@@ -39,11 +39,11 @@ class LFO
         float incx, incrnd, nextincrnd;
         float amp1, amp2; // used for randomness
         float lfointensity;
-        float lfornd, lfofreqrnd;
+        float lfornd;
+        float lfofreqrnd;
         float lfodelay;
         char lfotype;
         int freqrndenabled;
 };
 
 #endif
-

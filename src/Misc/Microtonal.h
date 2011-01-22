@@ -37,18 +37,19 @@ class XMLwrapper;
 class Microtonal : private MiscFuncs
 {
     public:
-        Microtonal();
+        Microtonal() { defaults(); }
         ~Microtonal() { }
         void defaults(void);
-        float getnotefreq(int note, int keyshift) const;
+        float getNoteFreq(int note, int keyshift) const;
+        float getNoteFreq(int note) const;
 
         // Parameters
         unsigned char Pinvertupdown;
-        unsigned int  Pinvertupdowncenter;
+        int           Pinvertupdowncenter;
         unsigned char Penabled;
         int           PAnote;
         int           Pscaleshift;
-        long double   PAfreq;
+        float         PAfreq;
 
         // first and last key (to retune)
         int Pfirstkey;
@@ -61,9 +62,9 @@ class Microtonal : private MiscFuncs
         int Pmapsize;
 
         unsigned char Pmappingenabled; // Mapping ON/OFF
-        int Pmapping[128];       // Mapping (keys)
+        int Pmapping[128];             // Mapping (keys)
 
-        long double Pglobalfinedetune;
+        float Pglobalfinedetune;
 
         int getoctavesize(void);
         void tuningtoline(int n, char *line, int maxn);
@@ -102,6 +103,9 @@ inline int Microtonal::getoctavesize(void)
     return ((Penabled != 0) ? octavesize : 12);
 }
 
-
+inline float Microtonal::getNoteFreq(int note) const
+{
+    return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
+}
 
 #endif

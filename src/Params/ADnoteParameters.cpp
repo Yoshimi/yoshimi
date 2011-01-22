@@ -34,10 +34,11 @@ int ADnote_unison_sizes[] = {
 };
 
 
-ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
+ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) :
+    Presets(),
+    fft(fft_)
 {
     setpresettype("Padsyth");
-    fft = fft_;
 
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
@@ -188,11 +189,12 @@ void ADnoteParameters::enableVoice(int nvoice)
     VoicePar[nvoice].FMAmpEnvelope->ADSRinit(80, 90, 127, 100);
 }
 
+
 // Get the Multiplier of the fine detunes of the voices
 float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 {
-    float bw = (GlobalPar.PBandwidth - 64.0f) / 64.0f;
-    bw = powf(2.0f, bw * powf(fabsf(bw), 0.2f) * 5.0f);
+    float bw = ((float)((int)(GlobalPar.PBandwidth) - 64)) / 64.0f;
+    bw = pow(2.0, bw * pow(fabs(bw), 0.2) * 5.0);
     return bw;
 }
 
@@ -226,6 +228,7 @@ void ADnoteParameters::killVoice(int nvoice)
     delete VoicePar[nvoice].FMAmpEnvelope;
 }
 
+
 ADnoteParameters::~ADnoteParameters()
 {
     delete GlobalPar.FreqEnvelope;
@@ -248,7 +251,6 @@ int ADnoteParameters::getUnisonSizeIndex(int nvoice)
         return 0;
     int index  = 0;
     int unison = VoicePar[nvoice].Unison_size;
-
     while (1)
     {
         if (ADnote_unison_sizes[index] >= unison)

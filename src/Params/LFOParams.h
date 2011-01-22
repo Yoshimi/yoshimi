@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2009
+    This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
 #ifndef LFO_PARAMS_H
@@ -49,9 +49,8 @@ class LFOParams : public Presets
         unsigned char Pcontinous;
         unsigned char Pstretch;
 
-        int fel;         // what kind is the LFO
-                         // (0 - frequency, 1 - amplitude, 2 - filter)
-        static int time; // is used by Pcontinous parameter
+        int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
+        static int time; // used by Pcontinous
 
     private:
         // Default parameters

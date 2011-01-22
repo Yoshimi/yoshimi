@@ -1,22 +1,25 @@
 /*
-  ZynAddSubFX - a software synthesizer
+    ZynAddSubFX - a software synthesizer
 
-  Unison.h - Unison effect (multivoice chorus)
-  Copyright (C) 2002-2009 Nasca Octavian Paul
-  Author: Nasca Octavian Paul
+    Unison.h - Unison effect (multivoice chorus)
+    Original author: Nasca Octavian Paul
+    Copyright (C) 2002-2009 Nasca Octavian Paul
+    Copyright 2009-2011, Alan Calvert
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of version 2 of the GNU General Public License
-  as published by the Free Software Foundation.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of version 2 of the GNU General Public License
+    as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License (version 2 or later) for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License (version 2 or later) for more details.
 
-  You should have received a copy of the GNU General Public License (version 2)
-  along with this program; if not, write to the Free Software Foundation,
-  Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+    You should have received a copy of the GNU General Public License (version 2)
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #ifndef UNISON_H

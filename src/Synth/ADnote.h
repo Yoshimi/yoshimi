@@ -44,7 +44,7 @@ class Filter;
 class ADnote : public Carcass, private SynthHelper, private Float2Int
 {
     public:
-        ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,
+        ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                float velocity_, int portamento_, int midinote_,
                bool besilent);
         ~ADnote();
@@ -82,7 +82,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
 
         // Globals
-        ADnoteParameters *partparams;
+        ADnoteParameters *adpars;
         unsigned char stereo; // allows note Panning
         int midinote;
         float velocity;
@@ -99,8 +99,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             LFO      *FreqLfo;
 
             // Amplitude global parameters
-            float  Volume;  // [ 0 .. 1 ]
-            float  Panning; // [ 0 .. 1 ]
+            float  Volume;  //  0 .. 1
+            float  Panning; //  0 .. 1
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
             struct {
@@ -122,25 +122,25 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         // Voice parameters
         struct ADnoteVoice {
             bool Enabled;
-            int noisetype; // (sound/noise)
+            int noisetype;    // (sound/noise)
             int filterbypass;
             int DelayTicks;
-            float *OscilSmp; // Waveform of the Voice
+            float *OscilSmp;  // Waveform of the Voice
 
             // Frequency parameters
             int fixedfreq;   // if the frequency is fixed to 440 Hz
             int fixedfreqET; // if the "fixed" frequency varies according to the note (ET)
 
-            // cents = basefreq*VoiceDetune
-            float Detune;
+
+            float Detune;     // cents = basefreq * VoiceDetune
             float FineDetune;
 
             Envelope *FreqEnvelope;
             LFO      *FreqLfo;
 
             // Amplitude parameters
-            float  Panning; // 0.0=left, 0.5 = center, 1.0 = right
-            float  Volume;  // [-1.0 .. 1.0]
+            float  Panning; // 0.0 = left, 0.5 = center, 1.0 = right
+            float  Volume;  // -1.0 .. 1.0
 
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
@@ -155,11 +155,11 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
 
-            // Modullator parameters
+            // Modulator parameters
             FMTYPE FMEnabled;
             int    FMVoice;
             float *VoiceOut; // Voice Output used by other voices if use this as modullator
-            float *FMSmp; // Wave of the Voice
+            float *FMSmp;    // Wave of the Voice
             float  FMVolume;
             float  FMDetune; // in cents
             Envelope *FMFreqEnvelope;
@@ -169,7 +169,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         // Internal values of the note and of the voices
         float time; // time from the start of the note
 
-        int unison_size[NUM_VOICES]; //the size of unison for a single voice
+        int unison_size[NUM_VOICES]; // the size of unison for a single voice
 
         float unison_stereo_spread[NUM_VOICES]; // stereo spread of subvoices (0.0=mono,1.0=max)
 
@@ -195,37 +195,30 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         unsigned int *oscposhiFM[NUM_VOICES];
         unsigned int *oscfreqhiFM[NUM_VOICES];
 
-        // used to compute and interpolate the amplitudes of voices and modullators
-        float oldamplitude[NUM_VOICES];
-        float newamplitude[NUM_VOICES];
+        float oldamplitude[NUM_VOICES];  // used to compute and interpolate the
+        float newamplitude[NUM_VOICES];  // amplitudes of voices and modullators
         float FMoldamplitude[NUM_VOICES];
         float FMnewamplitude[NUM_VOICES];
 
-        // used by Frequency Modulation (for integration)
-        float *FMoldsmp[NUM_VOICES];
+        float *FMoldsmp[NUM_VOICES]; // used by Frequency Modulation (for integration)
 
-        // temporary buffers
-        float *tmpwavel;
+        float *tmpwavel; // temporary buffers
         float *tmpwaver;
         float **tmpwave_unison;
         int max_unison;
 
-        // Filter bypass samples
-        float *bypassl;
+        float *bypassl; // Filter bypass samples
         float *bypassr;
 
-        // interpolate the amplitudes
-        float globaloldamplitude;
+        float globaloldamplitude; // interpolate the amplitudes
         float globalnewamplitude;
 
-        // 1 - if it is the fitst tick (used to fade in the sound)
-        char firsttick[NUM_VOICES];
+        char firsttick[NUM_VOICES]; // 1 - if it is the fitst tick.
+                                    // used to fade in the sound
 
-        // 1 if the note has portamento
-        int portamento;
+        int portamento; // 1 if the note has portamento
 
-        // how the fine detunes are made bigger or smaller
-        float bandwidthDetuneMultiplier;
+        float bandwidthDetuneMultiplier; // how the fine detunes are made bigger or smaller
 
         // Legato vars
         struct {
@@ -241,15 +234,18 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             } fade;
             struct {
                 // Note parameters
-                float freq, vel;
+                float freq;
+                float vel;
                 int portamento;
                 int midinote;
             } param;
         } Legato;
 };
 
+
+inline int ADnote::finished() const // Check if the note is finished
+{
+    return (NoteEnabled) ? 0 : 1;
+}
+
 #endif
-
-
-
-

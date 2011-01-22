@@ -30,7 +30,8 @@ class SynthHelper {
         bool aboveAmplitudeThreshold(float a, float b);
         float interpolateAmplitude(float a, float b, int x, int size);
         float velF(float velocity, unsigned char scaling);
-        float getDetune(unsigned char type, int coarsedetune, int finedetune);
+        float getDetune(unsigned char type, unsigned short int coarsedetune,
+                        unsigned short int finedetune) const;
 };
 
 inline bool SynthHelper::aboveAmplitudeThreshold(float a, float b)
@@ -51,5 +52,8 @@ inline float SynthHelper::velF(float velocity, unsigned char scaling)
     else
         return powf(velocity, (powf(8.0f, (64.0f - (float)scaling) / 64.0f)));
 }
+
+// -----------------------------
+
 
 #endif

@@ -206,7 +206,7 @@ class MicrotonalUI {} {
         Fl_Counter anotecounter {
           label {"A" Note}
           callback {microtonal->PAnote=(int) o->value();
-              if (microtonal->getnotefreq(microtonal->PAnote,0) < 0.0)
+              if (microtonal->getNoteFreq(microtonal->PAnote, 0) < 0.0)
                   o->textcolor(FL_RED);
               else
                   o->textcolor(FL_BLACK);

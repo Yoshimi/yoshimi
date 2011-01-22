@@ -1,0 +1,9 @@
+yoshimi-0.060.6-pre10
+
+clean up detune data types and handling, more conformant with the original.
+
+yoshimi-0.060.6-pre9
+
+Wherein there's some fiddling about with the wham(), zap(), pow() family of
+functions around frequency calculations.
+

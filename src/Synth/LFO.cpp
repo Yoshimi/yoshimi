@@ -21,7 +21,6 @@
     This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
-#include <fenv.h>
 #include <cmath>
 
 #include "Misc/SynthEngine.h"
@@ -35,8 +34,7 @@ LFO::LFO(LFOParams *lfopars, float basefreq)
     float lfostretch =
         powf(basefreq / 440.0f, (lfopars->Pstretch - 64.0f) / 63.0f); // max 2x/octave
 
-    float lfofreq =
-        (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
+    float lfofreq = (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
     incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
 
     if (lfopars->Pcontinous == 0)
@@ -52,7 +50,7 @@ LFO::LFO(LFOParams *lfopars, float basefreq)
         x = fmodf((float)((lfopars->Pstartphase - 64.0f) / 127.0f + 1.0f + tmp), 1.0f);
     }
 
-    // Limit the Frequency(or else...)
+    // Limit the Frequency (or else...)
     if (incx > 0.49999999f)
         incx = 0.499999999f;
 
@@ -132,7 +130,7 @@ float LFO::lfoout(void)
         out *= lfointensity * amp2;
     if (lfodelay < 0.00001f)
     {
-        if (freqrndenabled == 0)
+        if (!freqrndenabled)
             x += incx;
         else
         {
@@ -145,7 +143,6 @@ float LFO::lfoout(void)
             x = fmodf(x, 1.0f);
             amp1 = amp2;
             amp2 = (1 - lfornd) + lfornd * synth->numRandom();
-
             computenextincrnd();
         }
     } else
@@ -159,9 +156,9 @@ float LFO::amplfoout(void)
 {
     float out;
     out = 1.0f - lfointensity + lfoout();
-    if (isless(out, -1.0f))
+    if (out < -1.0f)
         out = -1.0f;
-    else if (isgreater(out, 1.0f))
+    else if (out > 1.0f)
         out = 1.0f;
     return out;
 }
@@ -169,7 +166,7 @@ float LFO::amplfoout(void)
 
 void LFO::computenextincrnd(void)
 {
-    if (freqrndenabled == 0)
+    if(!freqrndenabled)
         return;
     incrnd = nextincrnd;
     nextincrnd = powf(0.5f, lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);

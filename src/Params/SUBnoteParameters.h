@@ -40,15 +40,15 @@ class SUBnoteParameters : public Presets
         void getfromXML(XMLwrapper *xml);
 
         // Amplitude Parametrers
-        bool Pstereo; // streo = true, mono = false
+        bool Pstereo; // true = stereo, false = mono
         unsigned char PVolume;
         unsigned char PPanning;
         unsigned char PAmpVelocityScaleFunction;
         EnvelopeParams *AmpEnvelope;
 
         // Frequency Parameters
-        int PDetune;
-        int PCoarseDetune;
+        unsigned short int PDetune;
+        unsigned short int PCoarseDetune;
         unsigned char PDetuneType;
         unsigned char PFreqEnvelopeEnabled;
         EnvelopeParams *FreqEnvelope;
@@ -63,35 +63,29 @@ class SUBnoteParameters : public Presets
         EnvelopeParams *GlobalFilterEnvelope;
 
         // Other Parameters
+        unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
 
-        // If the base frequency is fixed to 440 Hz
-        unsigned char Pfixedfreq;
+        unsigned char PfixedfreqET; // Equal temperate (this is used only if the
+                                    // Pfixedfreq is enabled)
+                                    // If this parameter is 0, the frequency is
+                                    // fixed (to 440 Hz)
+                                    // if this parameter is 64,
+                                    // 1 MIDI halftone -> 1 frequency halftone
 
-        /* Equal temperate (this is used only if the Pfixedfreq is enabled)
-           If this parameter is 0, the frequency is fixed (to 440 Hz);
-           if this parameter is 64, 1 MIDI halftone -> 1 frequency halftone */
-        unsigned char PfixedfreqET;
-
-        // how many times the filters are applied
-        unsigned char Pnumstages;
-
-        // bandwidth
+        unsigned char Pnumstages;   // how many times the filters are applied
         unsigned char Pbandwidth;
 
-        // How the magnitudes are computed (0=linear,1=-60dB,2=-60dB)
-        unsigned char Phmagtype;
+        unsigned char Phmagtype;    // how the magnitudes are computed
+                                    // 0 = linear, 1 = -60dB, 2 = -60dB
 
-        // Magnitudes
-        unsigned char Phmag[MAX_SUB_HARMONICS];
+        unsigned char Phmag[MAX_SUB_HARMONICS];   // Magnitudes
 
-        // Relative BandWidth ("64"=1.0)
-        unsigned char Phrelbw[MAX_SUB_HARMONICS];
+        unsigned char Phrelbw[MAX_SUB_HARMONICS]; // Relative BandWidth ("64"=1.0)
 
-        // how much the bandwidth is increased according to lower/higher frequency; 64-default
-        unsigned char Pbwscale;
+        unsigned char Pbwscale; // how much the bandwidth is increased according
+                                // to lower/higher frequency; 64-default
 
-        // how the harmonics start("0"=0,"1"=random,"2"=1)
-        unsigned char Pstart;
+        unsigned char Pstart;   // how the harmonics start, "0" = 0, "1" = random, "2" = 1
 };
 
 #endif

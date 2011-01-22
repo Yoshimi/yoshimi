@@ -21,7 +21,6 @@
     This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
-#include <iostream>
 #include <fenv.h>
 #include <cmath>
 
@@ -31,12 +30,6 @@
 
 #define MAX_LINE_SIZE 80
         
-Microtonal::Microtonal()
-{
-    defaults();
-}
-
-
 void Microtonal::defaults(void)
 {
     Pinvertupdown = 0;
@@ -44,7 +37,7 @@ void Microtonal::defaults(void)
     octavesize = 12;
     Penabled = 0;
     PAnote = 69;
-    PAfreq = 440.0;
+    PAfreq = 440.0f;
     Pscaleshift = 64;
 
     Pfirstkey = 0;
@@ -73,7 +66,7 @@ void Microtonal::defaults(void)
 
 
 // Get the frequency according the note number
-float Microtonal::getnotefreq(int note, int keyshift) const
+float Microtonal::getNoteFreq(int note, int keyshift) const
 {
     // in this function will appears many times things like this:
     // var=(a+b*100)%b
@@ -81,29 +74,24 @@ float Microtonal::getnotefreq(int note, int keyshift) const
     // This is the same with divisions.
 
     if ((Pinvertupdown != 0) && ((Pmappingenabled == 0) || (Penabled == 0)))
-        note = (int)Pinvertupdowncenter * 2 - note;
+        note = Pinvertupdowncenter * 2 - note;
 
-    // compute global fine detune
-    long double globalfinedetunerap = powl((long double)2.0,
-                                           (Pglobalfinedetune - 64.0) / 1200.0); //-64.0 .. 63.0 cents
+    // compute global fine detune, -64.0 .. 63.0 cents
+    float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
+
     if (!Penabled)
-    {
-        float notefreq = powl((long double)2.0, (long double)(note + keyshift - PAnote) / 12.0)
-                         * PAfreq * globalfinedetunerap;
-        cerr << "note " << (int)note << "   " << notefreq << endl;
-        return notefreq;
-    }
+        return getNoteFreq(note + keyshift) * globalfinedetunerap;
 
-    int scaleshift = ((int)Pscaleshift - 64 + (int) octavesize * 100) % octavesize;
+    int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
 
     // compute the keyshift
     float rap_keyshift = 1.0f;
     if (keyshift)
     {
-        int kskey = (keyshift + (int)octavesize * 100) % octavesize;
-        int ksoct = (keyshift + (int)octavesize * 100) / octavesize - 100;
+        int kskey = (keyshift + octavesize * 100) % octavesize;
+        int ksoct = (keyshift + octavesize * 100) / octavesize - 100;
         rap_keyshift  = (kskey == 0) ? (1.0) : (octave[kskey - 1].tuning);
-        rap_keyshift *= pow(octave[octavesize - 1].tuning, ksoct);
+        rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
     }
 
     // if the mapping is enabled
@@ -132,12 +120,12 @@ float Microtonal::getnotefreq(int note, int keyshift) const
             rap_anote_middlenote = 1.0f / rap_anote_middlenote;
 
         // Convert from note (midi) to degree (note from the tunning)
-        int degoct = (note - (int)Pmiddlenote + (int) Pmapsize * 200)
-                      / (int)Pmapsize - 200;
-        int degkey = (note - Pmiddlenote + (int)Pmapsize * 100) % Pmapsize;
+        int degoct = (note - Pmiddlenote + Pmapsize * 200)
+                      / Pmapsize - 200;
+        int degkey = (note - Pmiddlenote + Pmapsize * 100) % Pmapsize;
         degkey = Pmapping[degkey];
-        if (degkey < 0)
-            return -1.0f;           //this key is not mapped
+        if (degkey < 0) // this key is not mapped
+            return -1.0f;
 
         // invert the keyboard upside-down if it is asked for
         // TODO: do the right way by using Pinvertupdowncenter
@@ -152,7 +140,7 @@ float Microtonal::getnotefreq(int note, int keyshift) const
         degkey %= octavesize;
 
         float freq = (degkey == 0) ? (1.0f) : octave[degkey - 1].tuning;
-        freq *= pow(octave[octavesize - 1].tuning, degoct);
+        freq *= powf(octave[octavesize - 1].tuning, degoct);
         freq *= PAfreq / rap_anote_middlenote;
         freq *= globalfinedetunerap;
         if(scaleshift != 0)
@@ -162,12 +150,12 @@ float Microtonal::getnotefreq(int note, int keyshift) const
     else // if the mapping is disabled
     {
         int nt = note - PAnote + scaleshift;
-        int ntkey = (nt + (int)octavesize * 100) % octavesize;
+        int ntkey = (nt + octavesize * 100) % octavesize;
         int ntoct = (nt - ntkey) / octavesize;
 
         float oct  = octave[octavesize - 1].tuning;
         float freq = octave[(ntkey + octavesize - 1) % octavesize].tuning
-                     * pow(oct, ntoct) * PAfreq;
+                     * powf(oct, ntoct) * PAfreq;
         if (ntkey == 0)
             freq /= oct;
         if (scaleshift != 0)
