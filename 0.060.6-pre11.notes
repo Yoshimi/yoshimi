@@ -1,0 +1,4 @@
+yoshimi-0.060.6-pre11
+
+more debug logging at the points through ADnote.cpp where the frequency can
+shift.

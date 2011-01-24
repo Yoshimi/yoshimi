@@ -51,21 +51,21 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     {
         // case 1 is used for the default (see below)
         case 2:
-            cdet = fabsf((float)cdetune * 10.0f);
-            findet = fabsf((float)fdetune / 8192.0f) * 10.0f;
+            cdet = fabs(cdetune * 10.0);
+            findet = fabs(fdetune / 8192.0) * 10.0;
             break;
         case 3:
-            cdet = fabsf(cdetune * 100.0f);
-            findet = powf(10.0f, fabsf((float)fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
+            cdet = fabsf(cdetune * 100.0);
+            findet = pow(10.0, fabs(fdetune / 8192.0) * 3.0) / 10.0 - 0.1;
             break;
         case 4:
-            cdet = fabsf((float)cdetune * 701.95500087f); // perfect fifth
-            findet = (powf(2.0f, fabsf((float)fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
+            cdet = fabs(cdetune * 701.95500087); // perfect fifth
+            findet = (pow(2.0, fabs(fdetune / 8192.0) * 12.0) - 1.0) / 4095.0 * 1200.0;
             break;
             // case ...: need to update N_DETUNE_TYPES, if you'll add more
         default:
-            cdet = fabsf((float)cdetune * 50.0f);
-            findet = fabsf((float)fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
+            cdet = fabs(cdetune * 50.0);
+            findet = fabs(fdetune / 8192.0) * 35.0; // almost like "Paul's Sound Designer 2"
             break;
     }
     if (finedetune < 8192)
