@@ -33,6 +33,8 @@
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
 
+class Microtonal;
+
 enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD };
 
 extern int ADnote_unison_sizes[];
@@ -162,7 +164,7 @@ struct ADnoteVoiceParam { // Voice parameters
 class ADnoteParameters : public Presets
 {
     public:
-        ADnoteParameters(FFTwrapper *fft_);
+        ADnoteParameters(FFTwrapper *fft_, Microtonal *micro_);
         ~ADnoteParameters();
         void defaults(void);
         void add2XML(XMLwrapper *xml);
@@ -174,6 +176,7 @@ class ADnoteParameters : public Presets
 
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
+        Microtonal *microtonal;
 
     private:
         void defaults(int n); // n is the nvoice

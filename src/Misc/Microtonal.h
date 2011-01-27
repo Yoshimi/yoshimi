@@ -40,8 +40,8 @@ class Microtonal : private MiscFuncs
         Microtonal() { defaults(); }
         ~Microtonal() { }
         void defaults(void);
-        float getNoteFreq(int note, int keyshift) const;
-        float getNoteFreq(int note) const;
+        float getNoteFreq(int note);
+        float getNoteFreq(int note, int keyshift);
 
         // Parameters
         unsigned char Pinvertupdown;
@@ -96,6 +96,8 @@ class Microtonal : private MiscFuncs
             unsigned int x2;
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
+          
+        static float note_12et[128];
 };
 
 inline int Microtonal::getoctavesize(void)
@@ -103,9 +105,10 @@ inline int Microtonal::getoctavesize(void)
     return ((Penabled != 0) ? octavesize : 12);
 }
 
-inline float Microtonal::getNoteFreq(int note) const
+inline float Microtonal::getNoteFreq(int note)
 {
-    return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
+    return (note > -1 && note < 128) ? note_12et[note] : -1.0f;
+    // return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
 }
 
 #endif

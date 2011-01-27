@@ -34,9 +34,10 @@ int ADnote_unison_sizes[] = {
 };
 
 
-ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) :
+ADnoteParameters::ADnoteParameters(FFTwrapper *fft_, Microtonal *micro_) :
     Presets(),
-    fft(fft_)
+    fft(fft_),
+    microtonal(micro_)
 {
     setpresettype("Padsyth");
 
@@ -193,8 +194,8 @@ void ADnoteParameters::enableVoice(int nvoice)
 // Get the Multiplier of the fine detunes of the voices
 float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 {
-    float bw = ((float)((int)(GlobalPar.PBandwidth) - 64)) / 64.0f;
-    bw = pow(2.0, bw * pow(fabs(bw), 0.2) * 5.0);
+    float bw = ((int)(GlobalPar.PBandwidth) - 64) / 64.0f;
+    bw = powf(2.0f, bw * powf(fabsf(bw), 0.2f) * 5.0f);
     return bw;
 }
 

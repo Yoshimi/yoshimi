@@ -117,7 +117,7 @@ Config::Config() :
     programCmd("yoshimi")
 {
     std::ios::sync_with_stdio(false);
-    cerr.precision(8);
+    cerr.precision(19);
     std::ios::sync_with_stdio(false);
     deadObjects = new BodyDisposal();
 }
@@ -137,6 +137,8 @@ bool Config::Setup(int argc, char **argv)
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
+    if (sigaction(SIGFPE, &sigAction, NULL))
+        Log("Setting SIGFPE handler failed");
     clearBankrootDirlist();
     clearPresetsDirlist();
     if (!loadConfig())
@@ -774,6 +776,11 @@ void Config::sigHandler(int sig)
         case SIGUSR1:
             Runtime.setLadi1Active();
             sigaction(SIGUSR1, &sigAction, NULL);
+            break;
+
+        case SIGFPE:
+            errno = 0;
+            feclearexcept(FE_ALL_EXCEPT);
             break;
 
         case SIGUSR2:

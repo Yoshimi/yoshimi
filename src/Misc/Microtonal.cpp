@@ -21,6 +21,7 @@
     This file is derivative of original ZynAddSubFX code, modified January 2011
 */
 
+#include <iostream>
 #include <fenv.h>
 #include <cmath>
 
@@ -29,7 +30,52 @@
 #include "Misc/Microtonal.h"
 
 #define MAX_LINE_SIZE 80
-        
+
+float Microtonal::note_12et[128] = {
+    8.175798416137695312, 8.661956787109375, 9.177021980285644531, 9.72271728515625,
+    10.30086135864257812, 10.91337966918945312, 11.56232547760009766, 12.24985790252685547,
+    12.97827339172363281, 13.75, 14.56761741638183594, 15.43385601043701172,
+
+    16.35159683227539062, 17.32391357421875, 18.3540496826171875, 19.4454345703125,
+    20.60172271728515625, 21.82676887512207031, 23.12465095520019531, 24.49971580505371094,
+    25.95654678344726562, 27.5, 29.13523292541503906, 30.86770439147949219,
+    32.70319366455078125, 34.64782333374023438, 36.70809173583984375, 38.890869140625,
+    41.20344161987304688, 43.65353012084960938, 46.24930191040039062, 48.99942398071289062,
+    51.91308975219726562,
+    
+    55, 58.27046585083007812, 61.73540878295898438, 65.4063873291015625,
+    69.29564666748046875, 73.4161834716796875, 77.78173828125, 82.406890869140625,
+    87.30706024169921875, 92.49860382080078125, 97.99886322021484375, 103.8261795043945312,
+    
+    110, 116.5409317016601562, 123.4708099365234375, 130.812774658203125,
+    138.59130859375, 146.832366943359375, 155.5634765625, 164.81378173828125,
+    174.614105224609375, 184.9972076416015625, 195.997711181640625, 207.6523590087890625,
+    
+    220, 233.0818634033203125, 246.9416351318359375, 261.62554931640625,
+    277.182586669921875, 293.66473388671875, 311.126953125, 329.6275634765625,
+    349.22821044921875, 369.994415283203125, 391.99542236328125, 415.3046875,
+    
+    440, 466.163726806640625, 493.883270263671875, 523.2510986328125,
+    554.36517333984375, 587.3294677734375, 622.25390625, 659.255126953125,
+    698.4564208984375, 739.98883056640625, 783.9908447265625, 830.609375,
+    
+    880, 932.32745361328125, 987.7664794921875, 1046.502197265625, 1108.73046875,
+    1174.658935546875, 1244.5078125, 1318.51025390625, 1396.912841796875,
+    1479.9776611328125, 1567.981689453125,
+    
+    1661.2186279296875, 1760, 1864.6549072265625, 1975.532958984375,
+    2093.00439453125, 2217.460693359375, 2349.317626953125, 2489.015625,
+    2637.020263671875, 2793.825927734375, 2959.955322265625, 3135.963134765625,
+
+    3322.437744140625, 3520, 3729.309814453125, 3951.066162109375,
+    4186.0087890625, 4434.92138671875, 4698.6357421875, 4978.03125,
+    5274.04052734375, 5587.65185546875, 5919.91064453125, 6271.92626953125,
+    
+    6644.87548828125, 7040, 7458.61767578125, 7902.1318359375,
+    8372.017578125, 8869.841796875, 9397.2705078125, 9956.0625,
+    10548.0791015625, 11175.30078125, 21839.8212890625, 12543.8505859375
+};
+
 void Microtonal::defaults(void)
 {
     Pinvertupdown = 0;
@@ -66,7 +112,7 @@ void Microtonal::defaults(void)
 
 
 // Get the frequency according the note number
-float Microtonal::getNoteFreq(int note, int keyshift) const
+float Microtonal::getNoteFreq(int note, int keyshift)
 {
     // in this function will appears many times things like this:
     // var=(a+b*100)%b
@@ -77,11 +123,20 @@ float Microtonal::getNoteFreq(int note, int keyshift) const
         note = Pinvertupdowncenter * 2 - note;
 
     // compute global fine detune, -64.0 .. 63.0 cents
-    float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
+    float globalfinedetunerap =
+        (Pglobalfinedetune > 64.0f || Pglobalfinedetune < 64.0f)
+            ? pow(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f)
+            : 1.0f;
+    // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
 
     if (!Penabled)
+    {
+        cerr << "note " << note << "\tkeyshift " << keyshift
+             << " \tglobalfinedetunerap " << globalfinedetunerap << "\t"
+             << getNoteFreq(note + keyshift) * globalfinedetunerap << endl;
         return getNoteFreq(note + keyshift) * globalfinedetunerap;
-
+    }
+    
     int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
 
     // compute the keyshift
@@ -90,7 +145,7 @@ float Microtonal::getNoteFreq(int note, int keyshift) const
     {
         int kskey = (keyshift + octavesize * 100) % octavesize;
         int ksoct = (keyshift + octavesize * 100) / octavesize - 100;
-        rap_keyshift  = (kskey == 0) ? (1.0) : (octave[kskey - 1].tuning);
+        rap_keyshift  = (!kskey) ? 1.0f : (octave[kskey - 1].tuning);
         rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
     }
 

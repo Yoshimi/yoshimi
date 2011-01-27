@@ -56,9 +56,12 @@ class FilterParams : public Presets, private MiscFuncs
 
         void formantfilterH(int nvowel, int nfreqs, float *freqs); // used by UI
 
-        float getformantfreq(unsigned char freq);
-        float getformantamp(unsigned char amp);
-        float getformantq(unsigned char q);
+        float getformantfreq(unsigned char freq) // Transforms a parameter to
+            { return getfreqx(freq / 127.0f); }  // the real value
+        float getformantamp(unsigned char amp) 
+            { return powf(0.1f, (1.0f - amp / 127.0f) * 4.0f); }
+        float getformantq(unsigned char q)
+            { return powf(25.0f, (q - 32.0f) / 64.0f); }
 
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)

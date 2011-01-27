@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #ifndef AD_NOTE_H
@@ -44,9 +44,9 @@ class Filter;
 class ADnote : public Carcass, private SynthHelper, private Float2Int
 {
     public:
-        ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
-               float velocity_, int portamento_, int midinote_,
-               bool besilent);
+        // was ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
+        ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
+               int portamento_, int midinote_, bool besilent);
         ~ADnote();
 
         int noteout(float *outl, float *outr);
@@ -65,8 +65,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         void initParameters(void);
         void killVoice(int nvoice);
         void killNote(void);
-        float getVoiceBaseFreq(int nvoice) const;
-        float getFMVoiceBaseFreq(int nvoice) const;
+        float getVoiceBaseFreq(int nvoice);
+        float getFMVoiceBaseFreq(int nvoice);
         void computeVoiceOscillatorLinearInterpolation(int nvoice);
         void computeVoiceOscillatorCubicInterpolation(int nvoice);
         void computeVoiceOscillatorMorph(int nvoice);
@@ -78,13 +78,13 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
         void computeVoiceNoise(int nvoice);
 
-        void fadein(float *smps) const;
+        void fadein(float *smps);
 
 
         // Globals
         ADnoteParameters *adpars;
         unsigned char stereo; // allows note Panning
-        int midinote;
+        int   midinote;
         float velocity;
         float basefreq;
 
