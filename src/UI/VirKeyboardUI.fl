@@ -11,7 +11,7 @@ comment {VirKeyboard.cc} {in_source not_in_header
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
+Copyright 2009-2011, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of version 2 of the GNU General Public
@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of origional ZynAddSubFX code, modified November 2010
+This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
 } 
 
@@ -247,10 +247,12 @@ class VirKeys {: {public Fl_Box}
         {
             vel = midivel * (127.0 - rndvelocity) / 127.0 + synth->numRandom() * rndvelocity;
         }
-        synth->NoteOn(midich, nk + midioct * 12, (int)vel, false);} {}
+        synth->NoteOn(midich, nk + midioct * 12, vel);
+    } {}
   }
   Function {relasekey(int nk,int type)} {} {
-    code {if (nk < 0 || nk >= N_OCT * 12)
+    code {//
+        if (nk < 0 || nk >= N_OCT * 12)
             return;
         if (pressed[nk] == 0)
             return; // the key is not pressed
@@ -351,7 +353,7 @@ virkeyboardwindow->hide();}
                 case 10: midictl = C_fmamp; break;
                 case 11: midictl = C_resonance_center; break;
                 case 12: midictl = C_resonance_bandwidth; break;
-                default: midictl = C_NULL; break;
+                default: midictl = C_null; break;
             }
             virkeys->take_focus();}
         xywh {435 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10

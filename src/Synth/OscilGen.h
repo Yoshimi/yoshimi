@@ -113,14 +113,13 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         bool ADvsPAD; // if it is used by ADsynth or by PADsynth
 
-        static float *tmpsmps; // this array stores some temporary data
-                               // and it has SOUND_BUFFER_SIZE elements
-        static FFTFREQS outoscilFFTfreqs;
-
         float numRandom(void);
         unsigned int random(void);
 
     private:
+        float *tmpsmps;
+        FFTFREQS outoscilFFTfreqs;
+
         float hmag[MAX_AD_HARMONICS], hphase[MAX_AD_HARMONICS];
         // the magnituides and the phases of the sine/nonsine harmonics
 

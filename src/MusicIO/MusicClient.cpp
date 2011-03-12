@@ -1,7 +1,7 @@
 /*
     MusicClient.h
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -27,9 +27,8 @@ MusicClient *musicClient = NULL;
 
 MusicClient::MusicClient() :
     audiodevice(string()),
-    mididevice(string()),
-    Recorder(NULL)
-{ Recorder = new WavRecord(); }
+    mididevice(string())
+{ }
 
 
 MusicClient *MusicClient::newMusicClient(void)
@@ -41,12 +40,12 @@ MusicClient *MusicClient::newMusicClient(void)
             switch (Runtime.midiEngine)
             {
                 case jack_midi:
-                    if (NULL == (musicObj = new JackClient()))
+                    if (!(musicObj = new JackClient()))
                         Runtime.Log("Failed to instantiate JackClient");
                     break;
 
                     case alsa_midi:
-                        if (NULL == (musicObj = new JackAlsaClient()))
+                        if (!(musicObj = new JackAlsaClient()))
                             Runtime.Log("Failed to instantiate JackAlsaClient");
                         break;
 
@@ -60,12 +59,12 @@ MusicClient *MusicClient::newMusicClient(void)
             switch (Runtime.midiEngine)
             {
                 case alsa_midi:
-                    if (NULL == (musicObj = new AlsaClient()))
+                    if (!(musicObj = new AlsaClient()))
                         Runtime.Log("Failed to instantiate AlsaClient");
                     break;
 
                     case jack_midi:
-                        if (NULL == (musicObj = new AlsaJackClient()))
+                        if (!(musicObj = new AlsaJackClient()))
                             Runtime.Log("Failed to instantiate AlsaJackClient");
                         break;
 
@@ -80,19 +79,4 @@ MusicClient *MusicClient::newMusicClient(void)
             break;
     }
     return musicObj;
-}
-
-
-bool MusicClient::Open(void)
-{
-    if (openAudio(Recorder) && openMidi(Recorder))
-        return Recorder->Prep(getSamplerate(), getBuffersize());
-    return false;
-}
-
-
-void MusicClient::Close(void)
-{
-    if (Recorder != NULL)
-        Recorder->Close();
 }

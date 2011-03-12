@@ -1,7 +1,7 @@
 /*
     JackClient.cpp
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -20,15 +20,14 @@
 #include "Misc/Config.h"
 #include "MusicIO/JackClient.h"
 
-bool JackClient::openAudio(WavRecord *recorder)
+bool JackClient::openAudio(void)
 {
-    if (!jackEngine.isConnected()
-        && !jackEngine.connectServer(Runtime.audioDevice))
+    if (!jackEngine.isConnected() && !jackEngine.connectServer(Runtime.audioDevice))
     {
         Runtime.Log("Failed to connect to jack server");
         return false;  
     }
-    if (jackEngine.openAudio(recorder))
+    if (jackEngine.openAudio())
     {
         Runtime.Samplerate = getSamplerate();
         Runtime.Buffersize = getBuffersize();
@@ -39,7 +38,7 @@ bool JackClient::openAudio(WavRecord *recorder)
     return false;
 }
 
-bool JackClient::openMidi(WavRecord *recorder)
+bool JackClient::openMidi(void)
 {
     if (!jackEngine.isConnected()
         && !jackEngine.connectServer(Runtime.midiDevice))
@@ -47,16 +46,9 @@ bool JackClient::openMidi(WavRecord *recorder)
         Runtime.Log("Failed to connect to jack server");
         return false;  
     }
-    if (jackEngine.openMidi(recorder))
+    if (jackEngine.openMidi())
         return true;
     else
         Runtime.Log("JackClient failed to open midi");
     return false;
-}
-
-
-void JackClient::Close(void)
-{
-    jackEngine.Close();
-    MusicClient::Close();
 }

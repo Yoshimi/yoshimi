@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #ifndef MICROTONAL_H
@@ -89,9 +89,8 @@ class Microtonal : private MiscFuncs
 
         struct {
             unsigned char type; // 1 for cents or 2 for division
-            // the real tuning (eg. +1.05946 for one halftone)
-            // or 2.0 for one octave
-            float tuning;
+            float tuning;       // the real tuning (eg. +1.05946 for one halftone)
+                                // or 2.0 for one octave
             unsigned int x1; // the real tunning is x1 / x2
             unsigned int x2;
         } octave[MAX_OCTAVE_SIZE],
@@ -107,8 +106,7 @@ inline int Microtonal::getoctavesize(void)
 
 inline float Microtonal::getNoteFreq(int note)
 {
-    return (note > -1 && note < 128) ? note_12et[note] : -1.0f;
-    // return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
+    return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
 }
 
 #endif

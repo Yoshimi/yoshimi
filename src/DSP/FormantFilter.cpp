@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009, James Morris
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #include "Misc/SynthEngine.h"
@@ -99,7 +99,7 @@ void FormantFilter::setpos(float input)
     if ((fabsf(oldinput-input) < 0.001f) && (fabsf(slowinput - input) < 0.001f) &&
             (fabsf(Qfactor - oldQfactor) < 0.001f))
     {
-//	oldinput=input; daca setez asta, o sa faca probleme la schimbari foarte lente
+        //	oldinput=input; daca setez asta, o sa faca probleme la schimbari foarte lente
         firsttime = 0;
         return;
     } else
@@ -109,14 +109,15 @@ void FormantFilter::setpos(float input)
     if (pos < 0.0f)
         pos += 1.0f;
 
-    float ff = pos * sequencesize;
+    //float ff = pos * sequencesize;
     // F2I(pos * sequencesize, p2);
-    p2 = (ff > 0.0f) ? lrintf(ff) : lrintf(ff - 1.0f);
-    p1=p2-1;
+    //p2 = (ff > 0.0f) ? lrintf(ff) : lrintf(ff - 1.0f);
+    p2 = float2int(pos * sequencesize);
+    p1 = p2 - 1;
     if (p1 < 0)
         p1 += sequencesize;
 
-    pos = fmodf(pos*sequencesize, 1.0f);
+    pos = fmodf(pos * sequencesize, 1.0f);
     if (pos < 0.0f)
         pos = 0.0f;
     else if (pos > 1.0f)

@@ -1,7 +1,7 @@
 /*
     MusicClient.h
 
-    Copyright 2009-2010 Alan Calvert
+    Copyright 2009-2011 Alan Calvert
     Copyright 2009 James Morris
 
     This file is part of yoshimi, which is free software: you can
@@ -26,17 +26,15 @@
 using namespace std;
 
 #include "MusicIO/MidiControl.h"
-#include "MusicIO/WavRecord.h"
 
 class MusicClient
 {
     public:
         MusicClient();
-        ~MusicClient() { };
-
-        bool Open(void);
+        ~MusicClient() { }
+        bool Open(void) { return openAudio() && openMidi(); }
         virtual bool Start(void) = 0;
-        virtual void Close(void);
+        virtual void Close(void) = 0;
         virtual bool jacksessionReply(string cmdline) { return false; }
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
@@ -47,26 +45,12 @@ class MusicClient
         virtual int midiClientId(void) = 0;
 
         static MusicClient *newMusicClient(void);
-
-        void startRecord(void)  { Recorder->Start(); };
-        void stopRecord(void) { Recorder->Stop(); };
-
-        bool setRecordFile(const char* fpath, string& errmsg)
-            { return Recorder->SetFile(string(fpath), errmsg); };
-
-        bool setRecordOverwrite(string& errmsg)
-            { return Recorder->SetOverwrite(errmsg); };
-
-        string wavFilename(void) { return Recorder->Filename(); };
-
         string      audiodevice;
         string      mididevice;
 
     protected:
-        virtual bool openAudio(WavRecord *recorder) = 0;
-        virtual bool openMidi(WavRecord *recorder) = 0;
-
-        WavRecord *Recorder;
+        virtual bool openAudio(void) = 0;
+        virtual bool openMidi(void) = 0;
 };
 
 extern MusicClient *musicClient;

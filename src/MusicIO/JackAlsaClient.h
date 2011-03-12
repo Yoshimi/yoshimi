@@ -39,10 +39,10 @@ class JackAlsaClient : public MusicClient
         JackAlsaClient() : MusicClient() { };
         ~JackAlsaClient() { Close(); };
 
-        bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder);
+        bool openAudio(void);
+        bool openMidi(void);
         bool Start(void);
-        void Close(void);
+        void Close(void) { jackEngine.Close(); alsaEngine.Close(); }
         bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
         int getBuffersize(void) { return jackEngine.getBuffersize(); };
@@ -53,7 +53,6 @@ class JackAlsaClient : public MusicClient
         string midiClientName(void) { return alsaEngine.midiClientName(); };
         int audioClientId(void) { return jackEngine.clientId(); };
         int midiClientId(void) { return alsaEngine.midiClientId(); };
-
 
     private:
         JackEngine jackEngine;

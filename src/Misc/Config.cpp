@@ -69,7 +69,6 @@ static struct argp_option cmd_options[] = {
     {"jack-audio",        'J',  "<server>", 0x1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>", 0x1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
-    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
     {"load",              'l',  "<file>",     0,  "load .xmz file" },
     {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
@@ -100,7 +99,6 @@ Config::Config() :
     midiDevice("default"),
     jackServer("default"),
     startJack(false),
-    connectJackaudio(false),
     alsaAudioDevice("default"),
     alsaSamplerate(48000),
     alsaBuffersize(256),
@@ -117,7 +115,7 @@ Config::Config() :
     programCmd("yoshimi")
 {
     std::ios::sync_with_stdio(false);
-    cerr.precision(19);
+    cerr.precision(4);
     std::ios::sync_with_stdio(false);
     deadObjects = new BodyDisposal();
 }
@@ -137,8 +135,6 @@ bool Config::Setup(int argc, char **argv)
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
-    if (sigaction(SIGFPE, &sigAction, NULL))
-        Log("Setting SIGFPE handler failed");
     clearBankrootDirlist();
     clearPresetsDirlist();
     if (!loadConfig())
@@ -201,7 +197,6 @@ void Config::flushLog(void)
 {
     if (LogList.size())
     {
-        cerr << "Flushing log:" << endl;
         while (LogList.size())
         {
             cerr << LogList.front() << endl;
@@ -310,7 +305,10 @@ bool Config::loadConfig(void)
 
     bool isok = true;
     if (!isRegFile(ConfigFile))
+    {
         Log("ConfigFile " + ConfigFile + " still not found, will use default settings");
+        configChanged = true;
+    }
     else
     {
         XMLwrapper *xml = new XMLwrapper();
@@ -683,7 +681,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, bool midi)
+                         bool schedfifo, bool lowprio)
 {
     pthread_attr_t attr;
     int chk;
@@ -715,7 +713,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     }
                     sched_param prio_params;
                     int prio = rtprio;
-                    if (midi)
+                    if (lowprio)
                         --prio;
                     prio_params.sched_priority = (prio > 0) ? prio : 0;
                     if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
@@ -742,6 +740,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
             }
             else
                 Log("Failed to set thread detach state: " + asString(chk));
+            pthread_attr_destroy(&attr);
         }
         else
             Log("Failed to initialise thread attributes: " + asString(chk));
@@ -778,12 +777,6 @@ void Config::sigHandler(int sig)
             sigaction(SIGUSR1, &sigAction, NULL);
             break;
 
-        case SIGFPE:
-            errno = 0;
-            feclearexcept(FE_ALL_EXCEPT);
-            break;
-
-        case SIGUSR2:
         default:
             break;
     }
@@ -989,7 +982,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 settings->midiDevice = string(arg);
             break;
         case 'k': settings->startJack = true; break;
-        case 'K': settings->connectJackaudio = true; break;
         case 'S':
             settings->doRestoreState = true;
             if (arg)

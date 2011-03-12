@@ -1,7 +1,7 @@
 /*
     AlsaClient.cpp - Alsa audio / Alsa midi
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -20,9 +20,9 @@
 #include "Misc/Config.h"
 #include "MusicIO/AlsaClient.h"
 
-bool AlsaClient::openAudio(WavRecord *recorder)
+bool AlsaClient::openAudio(void)
 {
-    if (alsaEngine.openAudio(recorder))
+    if (alsaEngine.openAudio())
     {
         Runtime.Samplerate = getSamplerate();
         Runtime.Buffersize = getBuffersize();
@@ -32,17 +32,10 @@ bool AlsaClient::openAudio(WavRecord *recorder)
     return false;
 }
 
-bool AlsaClient::openMidi(WavRecord *recorder)
+bool AlsaClient::openMidi(void)
 {
-    if (alsaEngine.openMidi(recorder))
+    if (alsaEngine.openMidi())
         return true;
     Runtime.Log("AlsaClient midi open failed");
     return false;
-}
-
-
-void AlsaClient::Close(void)
-{
-    alsaEngine.Close();
-    MusicClient::Close();
 }

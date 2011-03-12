@@ -1,0 +1,15 @@
+yoshimi-0.060.7-pre1
+
+Basically still just 0.058.1 plus Paul's unison and reverb enhancements, and
+jack session support.
+
+The 0.060.X series (and 0.062-preX) have been plagued by a strange issue
+affecting some but not all 32 bit builds. On a few 32 bit systems, ADnotes
+were incorrectly pitched on three or four notes per octave. As things now
+stand, it performs just fine for me on AV Linux 4.2. AV Linux featured regularly
+in the problem reports, so I'm hopeful.
+
+The built-in recorder is gone. Given the other recording tools now available,
+it was an anachronism, unnecessarily complicating things. While it worked ok,
+it depended on some fairly dubious practices in order to do so. It's gone, end
+of story.

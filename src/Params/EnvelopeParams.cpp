@@ -29,7 +29,14 @@
 
 EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
                                unsigned char Pforcedrelease_) :
-    Presets()
+    Presets(),
+    Pfreemode(1),
+    Penvpoints(1),
+    Penvsustain(1),
+    Penvstretch(Penvstretch_),
+    Pforcedrelease(Pforcedrelease_),
+    Plinearenvelope(0),
+    Envmode(1)
 {
     int i;
 
@@ -47,13 +54,6 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
         Penvval[i] = 64;
     }
     Penvdt[0] = 0; // no used
-    Penvsustain = 1;
-    Penvpoints = 1;
-    Envmode = 1;
-    Penvstretch = Penvstretch_;
-    Pforcedrelease = Pforcedrelease_;
-    Pfreemode = 1;
-    Plinearenvelope = 0;
     store2defaults();
 }
 

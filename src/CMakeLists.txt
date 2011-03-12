@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.060.6-pre12")
+set (YOSHIMI_VERSION "0.060.7-pre1")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -108,7 +108,7 @@ endif (HAS_LIBZ)
 # fftw3f
 pkg_check_modules (FFTW3F REQUIRED fftw3f>=0.22)
 if (FFTW3F_FOUND)
-    set (FFTW3F_LIBRARIES "${FFTW3F_LIBRARIES};fftw3f_threads")
+    set (FFTW3F_LIBRARIES "${FFTW3F_LIBRARIES}")
     message (STATUS "Found fftw3f ${FFTW3F_VERSION}")
 else (FFTW3F_FOUND)
     message (FATAL_ERROR "fftw3f >=0.22 required but not found")
@@ -238,7 +238,7 @@ set (Synth_sources
 set (MusicIO_sources
     MusicIO/MusicClient.cpp  MusicIO/MusicIO.cpp  MusicIO/JackEngine.cpp
     MusicIO/AlsaEngine.cpp  MusicIO/JackClient.cpp  MusicIO/AlsaClient.cpp
-    MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp MusicIO/WavRecord.cpp
+    MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp
 )
 
 add_definitions (
@@ -303,32 +303,32 @@ else (JackSessionSupport)
 endif (JackSessionSupport)
 
 set (ProgSources
-    ${yoshimi_FLTK_UI_SRCS}
-    ${DSP_sources}
-    ${Effects_sources}
     ${Misc_sources}
     ${Params_sources}
     ${Synth_sources}
+    ${DSP_sources}
+    ${Effects_sources}
     ${MusicIO_sources}
+    ${yoshimi_FLTK_UI_SRCS}
 )
 
 include_directories (AFTER
-    ${FFTW3F_INC_DIR}
     ${MXML_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
     ${JACK_INCLUDE_DIRS}
     ${FONTCONFIG_INCLUDE_DIRS}
     ${FLTK_INCLUDE_DIR}
+    ${FFTW3F_INC_DIR}
 )
 
 set(ExternLibraries
-    ${FFTW3F_LIBRARIES}
     ${FONTCONFIG_LIBRARIES}
     ${FLTK_LIBRARIES}
     ${MXML_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${JACK_LIBRARIES}
     ${LIBSNDFILE_LIBRARIES}
+    ${FFTW3F_LIBRARIES}
     z
 )
 

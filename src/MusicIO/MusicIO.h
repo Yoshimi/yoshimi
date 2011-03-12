@@ -1,7 +1,7 @@
 /*
     MusicIO.h
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
 
     This file is part of yoshimi, which is free software: you can
@@ -22,26 +22,23 @@
 #define MUSIC_IO_H
 
 #include "Misc/MiscFuncs.h"
-#include "MusicIO/WavRecord.h"
 
 class MusicIO : protected MiscFuncs
 {
     public:
         MusicIO();
-        ~MusicIO() { }
+        ~MusicIO();
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
-        virtual void Close(void);
+        virtual void Close(void) = 0;
         bool jacksessionReply(string cmdline) { return false; }
         int grossLatency(void) { return audioLatency + midiLatency; }
 
     protected:
         bool prepBuffers(bool with_interleaved);
-        bool prepRecord(void);
         void getAudio(void);
         void InterleaveShorts(void);
-        bool setThreadAttributes(pthread_attr_t *attr, bool schedfifo, bool midi = false);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);
         void setMidiNote(unsigned char chan, unsigned char note);
@@ -50,8 +47,6 @@ class MusicIO : protected MiscFuncs
         float *zynLeft;
         float *zynRight;
         short int *interleavedShorts;
-
-        WavRecord *wavRecorder;
         int rtprio;
         unsigned int audioLatency; // frames
         unsigned int midiLatency;  // ""

@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified January 2011
+    This file is derivative of original ZynAddSubFX code, modified March 2011
 */
 
 #ifndef PART_H
@@ -92,10 +92,10 @@ class Part : private MiscFuncs, SynthHelper
         } kit[NUM_KIT_ITEMS];
 
         // Part parameters
-        void setkeylimit(unsigned char Pkeylimit);
+        void setkeylimit(unsigned char Pkeylimit_);
         void setkititemstatus(int kititem, int Penabled_);
-        void setPvolume(char Pvolume);
-        void setPpanning(char Ppanning);
+        void setPvolume(char value);
+        void setPpanning(char panning);
 
         unsigned char Penabled;
         unsigned char Pvolume;
@@ -129,12 +129,12 @@ class Part : private MiscFuncs, SynthHelper
 
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
 
-        float volume;      // applied by Master,
-        float oldvolumel;  //
-        float oldvolumer;  //
-        float panning;     //
+        float volume;      // applied by MasterAudio
+        float oldvolumel;
+        float oldvolumer;
+        float panning;
 
-        Controller *ctl; // Part controllers
+        Controller *ctl;
 
         EffectMgr *partefx[NUM_PART_EFX];      // insertion part effects - part of the instrument
         unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is

@@ -44,7 +44,6 @@ class Filter;
 class ADnote : public Carcass, private SynthHelper, private Float2Int
 {
     public:
-        // was ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
                int portamento_, int midinote_, bool besilent);
         ~ADnote();
@@ -83,7 +82,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
         // Globals
         ADnoteParameters *adpars;
-        unsigned char stereo; // allows note Panning
+        bool stereo;
         int   midinote;
         float velocity;
         float basefreq;

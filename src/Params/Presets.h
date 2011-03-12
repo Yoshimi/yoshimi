@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #ifndef PRESETS_H
@@ -33,9 +33,9 @@ class Presets
         Presets();
         virtual ~Presets() { };
 
-        void copy(const char *name); // <if name==NULL, the clipboard is used
-        void paste(int npreset);     // npreset==0 for clipboard
-        bool checkclipboardtype();
+        void copy(const char *name); // <if name == NULL, the clipboard is used
+        void paste(int npreset);     // npreset == 0 for clipboard
+        bool checkclipboardtype(void);
         void deletepreset(int npreset);
         void setelement(int n);
         void rescanforpresets(void);

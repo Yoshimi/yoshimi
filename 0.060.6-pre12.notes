@@ -1,4 +1,0 @@
-yoshimi-0.060.6-pre12
-
-more debugging, use a table lookup for note frequencies in an attempt to narrow
-down the field of interest.

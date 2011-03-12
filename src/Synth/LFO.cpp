@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #include <cmath>
@@ -32,7 +32,7 @@ LFO::LFO(LFOParams *lfopars, float basefreq)
     if (lfopars->Pstretch == 0)
         lfopars->Pstretch = 1;
     float lfostretch =
-        powf(basefreq / 440.0f, (lfopars->Pstretch - 64.0f) / 63.0f); // max 2x/octave
+        powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
 
     float lfofreq = (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
     incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
@@ -42,12 +42,12 @@ LFO::LFO(LFOParams *lfopars, float basefreq)
         if (lfopars->Pstartphase == 0)
             x = synth->numRandom();
         else
-            x = fmodf((float)((lfopars->Pstartphase - 64.0) / 127.0f + 1.0f), 1.0f);
+            x = fmodf(((float)((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f), 1.0f);
     }
     else
     {
         float tmp = fmodf(lfopars->time * incx, 1.0f);
-        x = fmodf((float)((lfopars->Pstartphase - 64.0f) / 127.0f + 1.0f + tmp), 1.0f);
+        x = fmodf((((int)lfopars->Pstartphase - 64) / 127.0f + 1.0f + tmp), 1.0f);
     }
 
     // Limit the Frequency (or else...)

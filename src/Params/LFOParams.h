@@ -30,9 +30,10 @@
 class LFOParams : public Presets
 {
     public:
-        LFOParams(char Pfreq_, char Pintensity_, char Pstartphase_, char PLFOtype_,
-                  char Prandomness_, char Pdelay_, char Pcontinous, char fel_);
-        ~LFOParams() { };
+        LFOParams(float Pfreq_, unsigned char Pintensity_, unsigned char Pstartphase_,
+                  unsigned char PLFOtype_, unsigned char Prandomness_,
+                  unsigned char Pdelay_, unsigned char Pcontinous, int fel_);
+        ~LFOParams() { }
 
         void add2XML(XMLwrapper *xml);
         void defaults(void);

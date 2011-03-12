@@ -27,30 +27,31 @@
 
 int LFOParams::time = 0;
 
-LFOParams::LFOParams(char Pfreq_, char Pintensity_, char Pstartphase_,
-                     char PLFOtype_, char Prandomness_, char Pdelay_,
-                     char Pcontinous_, char fel_) :
+LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
+                     unsigned char Pstartphase_, unsigned char PLFOtype_,
+                     unsigned char Prandomness_, unsigned char Pdelay_,
+                     unsigned char Pcontinous_, int fel_) :
     Presets(),
+    fel(fel_),
+    Dfreq(Pfreq_),
     Dintensity(Pintensity_),
     Dstartphase(Pstartphase_),
     DLFOtype(PLFOtype_),
     Drandomness(Prandomness_),
     Ddelay(Pdelay_),
-    Dcontinous(Pcontinous_),
-    Dfreq(Pfreq_),
-    fel(fel_)
+    Dcontinous(Pcontinous_)
 {
-    switch (fel_)
+    switch (fel)
     {
-    case 0:
-        setpresettype("Plfofrequency");
-        break;
-    case 1:
-        setpresettype("Plfoamplitude");
-        break;
-    case 2:
-        setpresettype("Plfofilter");
-        break;
+        case 0:
+            setpresettype("Plfofrequency");
+            break;
+        case 1:
+            setpresettype("Plfoamplitude");
+            break;
+        case 2:
+            setpresettype("Plfofilter");
+            break;
     };
     defaults();
 }
@@ -72,27 +73,27 @@ void LFOParams::defaults(void)
 
 void LFOParams::add2XML(XMLwrapper *xml)
 {
-    xml->addparreal("freq",Pfreq);
-    xml->addpar("intensity",Pintensity);
-    xml->addpar("start_phase",Pstartphase);
-    xml->addpar("lfo_type",PLFOtype);
-    xml->addpar("randomness_amplitude",Prandomness);
-    xml->addpar("randomness_frequency",Pfreqrand);
-    xml->addpar("delay",Pdelay);
-    xml->addpar("stretch",Pstretch);
-    xml->addparbool("continous",Pcontinous);
+    xml->addparreal("freq", Pfreq);
+    xml->addpar("intensity", Pintensity);
+    xml->addpar("start_phase", Pstartphase);
+    xml->addpar("lfo_type", PLFOtype);
+    xml->addpar("randomness_amplitude", Prandomness);
+    xml->addpar("randomness_frequency", Pfreqrand);
+    xml->addpar("delay", Pdelay);
+    xml->addpar("stretch", Pstretch);
+    xml->addparbool("continous",    Pcontinous);
 }
 
 
 void LFOParams::getfromXML(XMLwrapper *xml)
 {
-    Pfreq = xml->getparreal("freq",Pfreq,0.0,1.0);
-    Pintensity = xml->getpar127("intensity",Pintensity);
-    Pstartphase = xml->getpar127("start_phase",Pstartphase);
-    PLFOtype = xml->getpar127("lfo_type",PLFOtype);
-    Prandomness = xml->getpar127("randomness_amplitude",Prandomness);
-    Pfreqrand = xml->getpar127("randomness_frequency",Pfreqrand);
-    Pdelay = xml->getpar127("delay",Pdelay);
-    Pstretch = xml->getpar127("stretch",Pstretch);
-    Pcontinous = xml->getparbool("continous",Pcontinous);
+    Pfreq = xml->getparreal("freq", Pfreq, 0.0, 1.0);
+    Pintensity = xml->getpar127("intensity", Pintensity);
+    Pstartphase = xml->getpar127("start_phase", Pstartphase);
+    PLFOtype = xml->getpar127("lfo_type", PLFOtype);
+    Prandomness = xml->getpar127("randomness_amplitude", Prandomness);
+    Pfreqrand = xml->getpar127("randomness_frequency", Pfreqrand);
+    Pdelay = xml->getpar127("delay", Pdelay);
+    Pstretch = xml->getpar127("stretch", Pstretch);
+    Pcontinous = xml->getparbool("continous", Pcontinous);
 }

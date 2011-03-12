@@ -1,7 +1,7 @@
 /*
     JackClient.h
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -33,10 +33,10 @@ class JackClient : public MusicClient
         JackClient() : MusicClient() { };
         ~JackClient() { Close(); };
 
-        bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder);
+        bool openAudio(void);
+        bool openMidi(void);
         bool Start(void) { return jackEngine.Start(); };
-        void Close(void);
+        void Close(void) { jackEngine.Close(); }
         bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
         int getBuffersize(void) { return jackEngine.getBuffersize(); };

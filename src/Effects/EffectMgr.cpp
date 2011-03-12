@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include "Misc/SynthEngine.h"
@@ -48,11 +48,13 @@ EffectMgr::~EffectMgr()
     delete [] efxoutr;
 }
 
+
 void EffectMgr::defaults(void)
 {
     changeeffect(0);
     setdryonly(false);
 }
+
 
 // Change the effect
 void EffectMgr::changeeffect(int _nefx)
@@ -100,11 +102,13 @@ void EffectMgr::changeeffect(int _nefx)
         filterpars = efx->filterpars;
 }
 
+
 // Obtain the effect number
 int EffectMgr::geteffect(void)
 {
     return (nefx);
 }
+
 
 // Cleanup the current effect
 void EffectMgr::cleanup(void)
@@ -123,12 +127,14 @@ unsigned char EffectMgr::getpreset(void)
         return 0;
 }
 
+
 // Change the preset of the current effect
 void EffectMgr::changepreset_nolock(unsigned char npreset)
 {
     if (efx)
         efx->setpreset(npreset);
 }
+
 
 // Change the preset of the current effect(with thread locking)
 void EffectMgr::changepreset(unsigned char npreset)
@@ -147,6 +153,7 @@ void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
     efx->changepar(npar, value);
 }
 
+
 // Change a parameter of the current effect (with thread locking)
 void EffectMgr::seteffectpar(int npar, unsigned char value)
 {
@@ -154,6 +161,7 @@ void EffectMgr::seteffectpar(int npar, unsigned char value)
     seteffectpar_nolock(npar, value);
     synth->actionLock(unlock);
 }
+
 
 // Get a parameter of the current effect
 unsigned char EffectMgr::geteffectpar(int npar)
@@ -238,6 +246,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     }
 }
 
+
 // Get the effect volume for the system effect
 float EffectMgr::sysefxgetvolume(void)
 {
@@ -256,6 +265,7 @@ void EffectMgr::setdryonly(bool value)
 {
     dryonly = value;
 }
+
 
 void EffectMgr::add2XML(XMLwrapper *xml)
 {
@@ -283,6 +293,7 @@ void EffectMgr::add2XML(XMLwrapper *xml)
     }
     xml->endbranch();
 }
+
 
 void EffectMgr::getfromXML(XMLwrapper *xml)
 {

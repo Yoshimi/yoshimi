@@ -34,8 +34,8 @@ class AlsaEngine : public MusicIO
         AlsaEngine();
         ~AlsaEngine() { };
         
-        bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder);
+        bool openAudio(void);
+        bool openMidi(void);
         bool Start(void);
         void Close(void);
         
@@ -61,8 +61,6 @@ class AlsaEngine : public MusicIO
         static void *_AudioThread(void *arg);
         void *MidiThread(void);
         static void *_MidiThread(void *arg);
-        static void _audioCleanup(void *arg) { };
-        static void _midiCleanup(void *arg) { };
 
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
                                       snd_pcm_uframes_t nframes);

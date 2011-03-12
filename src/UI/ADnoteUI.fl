@@ -6,7 +6,7 @@ comment {ADNoteUI.h} {not_in_source in_header}
 comment {ADNoteUI.cc} {in_source not_in_header}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
+Copyright 2009-2011, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of version 2 of the GNU General Public
@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2009 - August 2010
+This file is derivative of ZynAddSubFX original code, modified January 2011
 } {in_source in_header}
 
 decl {
@@ -36,6 +36,7 @@ decl {
 
 decl {
     \#include "Misc/SynthHelper.h"
+    \#include "Misc/MiscFuncs.h"
     \#include "ResonanceUI.h"
     \#include <string>
     \#include "EnvelopeUI.h"
@@ -184,7 +185,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   decl {Oscilloscope *osc;} {}
 }
 
-class ADvoiceUI {open : {public Fl_Group, SynthHelper}
+class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {open
   } {
@@ -639,11 +640,11 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper}
               tooltip {Unison size} xywh {10 545 75 20} down_box BORDER_BOX labelfont 1 align 5 textfont 1 textsize 10
               code0 {//
                   o->add("OFF");
-                  char tmp[100];
-                  for (int i = 1; ADnote_unison_sizes[i]; ++i)
+                  for (int i = 1; ADnoteParameters::ADnote_unison_sizes[i]; ++i)
                   {
-                      snprintf(tmp, 100, "size %d", ADnote_unison_sizes[i]);
-                      o->add(tmp);
+                      string tmp = string("size ")
+                                   + asString(ADnoteParameters::ADnote_unison_sizes[i]);
+                      o->add(tmp.c_str());
                   }
               }
               code1 {o->value(pars->getUnisonSizeIndex(nvoice));}
@@ -662,11 +663,13 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper}
               code0 {//
                   o->add("None");
                   o->add("Random");
-                  char tmp[100];
+                  //char tmp[100];
                   for (int i = 2; i <= 5; ++i)
                   {
-                      snprintf(tmp, 100, "%d %%", 100 / i);
-                      o->add(tmp);
+                      //snprintf(tmp, 100, "%d %%", 100 / i);
+                      //o->add(tmp);
+                      string tmp = asString(100 / i) + string(" %");
+                      o->add(tmp.c_str());
                   }
               }
               code1 {o->value(pars->VoicePar[nvoice].Unison_invert_phase);}

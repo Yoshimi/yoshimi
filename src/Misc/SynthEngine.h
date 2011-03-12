@@ -63,22 +63,20 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int getalldata(char **data);
         void putalldata(char *data, int size);
 
-        // midi in
-        void NoteOn(unsigned char chan, unsigned char note,
-                    unsigned char velocity, bool record_trigger);
+        void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
         void SetController(unsigned char chan, unsigned int type, short int par);
-        // void NRPN...
-
+        float numRandom(void);
+        unsigned int random(void);
         void ShutUp(void);
-
         void MasterAudio(float *outl, float *outr);
-
         void partonoff(int npart, int what);
 
-        Part *part[NUM_MIDI_PARTS];
+        inline void Mute(void) { __sync_or_and_fetch(&muted, muted, 0xFF); }
+        inline void Unmute(void) { __sync_and_and_fetch(&muted, muted, 0); }
+        inline int isMuted(void) { return __sync_fetch_and_add(&muted, 0); }
 
-        int muted;
+        Part *part[NUM_MIDI_PARTS];
         bool shutup;
 
         // parameters
@@ -121,10 +119,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank bank;
         FFTwrapper *fft;
 
-//        unsigned int getSamplerate(void) { return samplerate; };
-//        int getBuffersize(void) { return buffersize; };
-//        int getOscilsize(void) { return oscilsize; };
-
         // peaks for VU-meters
         void vuresetpeaks(void);
         float vuOutPeakL;
@@ -136,10 +130,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool vuClippedL;
         bool vuClippedR;
 
-        bool recordPending;
-
-        float numRandom(void);
-        unsigned int random(void);
 
     private:
         float volume;
@@ -148,7 +138,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float *tmpmixl; // Temporary mixing samples for part samples
         float *tmpmixr; // which are sent to system effect
         int keyshift;
-
+        int muted;
         float vuoutpeakl;
         float vuoutpeakr;
         float vumaxoutpeakl;

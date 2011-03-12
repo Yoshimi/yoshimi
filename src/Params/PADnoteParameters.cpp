@@ -566,7 +566,7 @@ void PADnoteParameters::applyparameters(bool islocked)
     // prepare a BIG FFT stuff
     FFTwrapper *fft = new FFTwrapper(samplesize);
     FFTFREQS fftfreqs;
-    FFTwrapper::newFFTFREQS(fftfreqs, samplesize / 2);
+    FFTwrapper::newFFTFREQS(&fftfreqs, samplesize / 2);
 
     float adj[samplemax]; // this is used to compute frequency relation to the base frequency
     for (int nsample = 0; nsample < samplemax; ++nsample)
@@ -626,7 +626,7 @@ void PADnoteParameters::applyparameters(bool islocked)
         newsample.smp = NULL;
     }
     delete fft;
-    FFTwrapper::deleteFFTFREQS(fftfreqs);
+    FFTwrapper::deleteFFTFREQS(&fftfreqs);
 
     // delete the additional samples that might exists and are not useful
     if (!islocked)

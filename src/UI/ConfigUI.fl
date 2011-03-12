@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified January 2011
+This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
 } 
 
@@ -41,16 +41,17 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {writebankcfg();
+      callback {//
+          writebankcfg();
           o->hide();} open
-      xywh {1047 165 465 335} type Double hide
+      xywh {1048 191 465 335} type Double visible
     } {
-      Fl_Tabs {} {open
+      Fl_Tabs {} {open selected
         xywh {5 5 520 325}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 460 260} labelsize 12
+          xywh {5 25 460 260} labelsize 12 hide
         } {
           Fl_Choice {} {
             label OscilSize
@@ -108,7 +109,7 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Choice {} {
             label {Virtual Keyboard Layout}
-            callback {Runtime.VirKeybLayout=(int) o->value();;}
+            callback {Runtime.VirKeybLayout=(int) o->value();}
             xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(Runtime.VirKeybLayout);}
           } {
@@ -131,7 +132,7 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Input SessionStateFile {
             label {Session state save file}
-            callback {
+            callback {//
               Runtime.StateFile = string(o->value());
               SessionStateFile->changed();
               Runtime.configChanged = true;
@@ -141,7 +142,8 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Button StateFileButton {
             label Select
-            callback {const char *filename =
+            callback {//
+                const char *filename =
                     fl_file_chooser("Nominate session save state file", NULL,
                                     Runtime.StateFile.c_str(), 0);
                 if (NULL != filename)
@@ -172,25 +174,25 @@ class ConfigUI {open : {private MiscFuncs}
                 if (dirname == NULL)
                     return;
                 rootsbrowse->add(dirname);
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removerootdirbutton {
             label {Remove root dir...}
-            callback {if (rootsbrowse->value() != 0)
+            callback {//
+                if (rootsbrowse->value() != 0)
                 {
                     rootsbrowse->remove(rootsbrowse->value());
                 }
                 activatebutton_rootdir(false);
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
           Fl_Button makedefaultrootdirbutton {
             label {Make default}
-            callback {int n = rootsbrowse->value();
+            callback {//
+                int n = rootsbrowse->value();
                 if (n != 0)
                 {
                     rootsbrowse->move(1, n);
@@ -198,8 +200,7 @@ class ConfigUI {open : {private MiscFuncs}
                     rootsbrowse->redraw();
                 }
                 activatebutton_rootdir(true);
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -214,24 +215,24 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Button {} {
             label {Add preset directory...}
-            callback {const char *dirname;
+            callback {//
+                const char *dirname;
                 dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
                 if (dirname == NULL)
                     return;
                 presetbrowse->add(dirname);
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removepresetbutton {
             label {Remove preset dir...}
-            callback {if (presetbrowse->value() != 0)
+            callback {//
+                if (presetbrowse->value() != 0)
                 {
                     presetbrowse->remove(presetbrowse->value());
                 }
                 activatebutton_presetdir(false);
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -245,8 +246,7 @@ class ConfigUI {open : {private MiscFuncs}
                     presetbrowse->redraw();
                 }
                 activatebutton_presetdir(true);
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -259,22 +259,20 @@ class ConfigUI {open : {private MiscFuncs}
             label {Jack Server}
             callback {//
                 Runtime.jackServer = string(o->value());
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.jackServer.c_str());}
           }
         }
         Fl_Group {} {
           label Alsa open
-          xywh {5 25 460 260} labelsize 12 hide
+          xywh {5 25 460 260} labelsize 12
         } {
           Fl_Input {} {
             label {Alsa Midi Device}
             callback {//
                 Runtime.alsaMidiDevice = string(o->value());
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             tooltip {Alsa midi device - default, hw:0, ...} xywh {195 54 120 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.alsaMidiDevice.c_str());}
           }
@@ -282,8 +280,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {Alsa Audio Device}
             callback {//
                 Runtime.alsaAudioDevice = string(o->value());
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 95 120 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.alsaAudioDevice.c_str());}
           }
@@ -314,8 +311,7 @@ class ConfigUI {open : {private MiscFuncs}
                         break;
                 }
                 Runtime.Samplerate = sample_rate;
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {195 133 84 50} labelsize 12 align 4 when 1 textsize 12
             code0 {/* extra */
                 o->add("96000");
@@ -354,8 +350,7 @@ class ConfigUI {open : {private MiscFuncs}
                     default: buff_size = 256; break;
                 }
                 Runtime.Buffersize = buff_size;
-                Runtime.configChanged = true;
-            }
+                Runtime.configChanged = true;}
             xywh {195 197 76 73} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("64");
@@ -378,29 +373,6 @@ class ConfigUI {open : {private MiscFuncs}
                 }}
           }
         }
-        Fl_Group {} {
-          label Recorder open
-          xywh {15 35 460 260} labelsize 12 hide
-        } {
-          Fl_Input {} {
-            label {Default Record Directory}
-            callback {if (NULL == o || !isDirectory(string(o->value())))
-                    fl_alert("Invalid directory");
-                else
-                    Runtime.DefaultRecordDirectory = string(o->value());}
-            tooltip {Default directory for recordings} xywh {192 120 242 22} labelsize 12 textsize 12
-            code0 {o->insert(Runtime.DefaultRecordDirectory.c_str());}
-          }
-          Fl_Check_Button {} {
-            label {32 bit float wavs}
-            callback {//
-                Runtime.Float32bitWavs = (o->value()) ? true : false;
-                Runtime.configChanged = true;
-            }
-            tooltip {Record in 32 bit float format} xywh {192 165 18 22} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value((Runtime.Float32bitWavs) ? 1 : 0);}
-          }
-        }
       }
       Fl_Button {} {
         label Close
@@ -414,8 +386,7 @@ class ConfigUI {open : {private MiscFuncs}
         callback {Runtime.saveConfig();
             writebankcfg();
             writepresetcfg();
-            Runtime.configChanged = false;
-        }
+            Runtime.configChanged = false;}
         xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Box {} {

@@ -1,7 +1,7 @@
 /*
     JackEngine.h
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -42,15 +42,15 @@ class JackEngine : public MusicIO
 
         bool isConnected(void) { return (NULL != jackClient); };
         bool connectServer(string server);
-        bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder);
+        bool openAudio(void);
+        bool openMidi(void);
         bool Start(void);
         void Close(void);
         #if defined(JACK_SESSION)
             bool jacksessionReply(string cmdline);
         #endif
-        unsigned int getSamplerate(void) { return audio.jackSamplerate; };
-        int getBuffersize(void) { return audio.jackNframes; };
+        unsigned int getSamplerate(void) { return jackSamplerate; };
+        int getBuffersize(void) { return jackNframes; };
         string clientName(void);
         int clientId(void);
 
@@ -64,8 +64,6 @@ class JackEngine : public MusicIO
         static int _processCallback(jack_nframes_t nframes, void *arg);
         static void *_midiThread(void *arg);
         void *midiThread(void);
-        void midiCleanup(void);
-        static void _midiCleanup(void *arg);
         static void _errorCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
@@ -75,21 +73,17 @@ class JackEngine : public MusicIO
             jack_session_event_t *lastevent;
         #endif
 
-        jack_client_t      *jackClient;
-        struct {
-            unsigned int  jackSamplerate;
-            unsigned int  jackNframes;
-            jack_port_t  *ports[2];
-            float        *portBuffs[2];
-        } audio;
-
-        struct {
-            jack_port_t*       port;
-            jack_ringbuffer_t *ringBuf;
-            pthread_t          pThread;
-            string             semName;
-            sem_t             *eventsUp;
-        } midi;
+        jack_client_t *jackClient;
+        unsigned int   jackSamplerate;
+        unsigned int   jackNframes;
+        jack_port_t   *jackaudioportL;
+        jack_port_t   *jackaudioportR;
+        jack_port_t   *jackmidiport;
+        float         *jackportbufL;
+        float         *jackportbufR;
+        sem_t          midisem;
+        pthread_t      midiPthread;
+        jack_ringbuffer_t *midiringbuf;
 
         struct midi_event {
             jack_nframes_t time;
@@ -99,3 +93,4 @@ class JackEngine : public MusicIO
 };
 
 #endif
+//sem_post(midi.eventsUp)

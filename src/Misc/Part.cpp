@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include <cstring>
@@ -50,13 +50,13 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     partMuted(0)
 {
     ctl = new Controller();
-    partoutl = (float*)fftwf_malloc(synth->bufferbytes);
+    partoutl = new float[synth->bufferbytes];
     memset(partoutl, 0, synth->bufferbytes);
-    partoutr = (float*)fftwf_malloc(synth->bufferbytes);
+    partoutr = new float[synth->bufferbytes];
     memset(partoutr, 0, synth->bufferbytes);
-    tmpoutl = (float*)fftwf_malloc(synth->bufferbytes);
+    tmpoutl = new float [synth->bufferbytes];
     memset(tmpoutl, 0, synth->bufferbytes);
-    tmpoutr = (float*)fftwf_malloc(synth->bufferbytes);
+    tmpoutr = new float[synth->bufferbytes];
     memset(tmpoutr, 0, synth->bufferbytes);
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
@@ -67,7 +67,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
         kit[n].padpars = NULL;
     }
 
-    kit[0].adpars = new ADnoteParameters(fft, microtonal);
+    kit[0].adpars = new ADnoteParameters(microtonal, fft);
     kit[0].subpars = new SUBnoteParameters();
     kit[0].padpars = new PADnoteParameters(fft);
 
@@ -77,15 +77,14 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
 
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
-        partfxinputl[n] = (float*)fftwf_malloc(synth->bufferbytes);
+        partfxinputl[n] = new float[synth->bufferbytes];
         memset(partfxinputl[n], 0, synth->bufferbytes);
-        partfxinputr[n] = (float*)fftwf_malloc(synth->bufferbytes);
+        partfxinputr[n] = new float[synth->bufferbytes];
         memset(partfxinputr[n], 0, synth->bufferbytes);
-
         Pefxbypass[n] = false;
     }
 
-    oldfreq = -1.0;
+    oldfreq = -1.0f;
 
     int i, j;
     for (i = 0; i < POLIPHONY; ++i)
@@ -104,7 +103,7 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     cleanup();
     Pname.clear();
 
-    oldvolumel = oldvolumer = 0.5;
+    oldvolumel = oldvolumer = 0.5f;
     lastnote = -1;
     lastpos = 0; // lastpos will store previously used NoteOn(...)'s pos.
     lastlegatomodevalid = false; // To store previous legatomodevalid value.
@@ -203,23 +202,24 @@ Part::~Part()
             delete kit[n].adpars;
         if (kit[n].subpars)
             delete kit[n].subpars;
-        if (kit[n].padpars )
+        if (kit[n].padpars)
             delete kit[n].padpars;
-        kit[n].adpars = NULL;
-        kit[n].subpars = NULL;
-        kit[n].padpars = NULL;
     }
-
-    fftwf_free(partoutl);
-    fftwf_free(partoutr);
-    fftwf_free(tmpoutl);
-    fftwf_free(tmpoutr);
+    delete [] partoutl;
+    delete [] partoutr;
+    delete [] tmpoutl;
+    delete [] tmpoutr;
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
-        delete partefx[nefx];
+    {
+        if (partefx[nefx])
+            delete partefx[nefx];
+    }
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
-        fftwf_free(partfxinputl[n]);
-        fftwf_free(partfxinputr[n]);
+        if (partfxinputl[n])
+            delete [] partfxinputl[n];
+        if (partfxinputr[n])
+            delete [] partfxinputr[n];
     }
     if (ctl)
         delete ctl;
@@ -621,9 +621,7 @@ void Part::NoteOff(int note) //relase the key
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
                 if (!Ppolymode && (not monomemnotes.empty()))
-                {
                     MonoMemRenote(); // To play most recent still held note.
-                }
                 else
                 {
                     RelaseNotePos(i);
@@ -762,14 +760,10 @@ void Part::MonoMemRenote(void)
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
     monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
     if (Pnoteon == 0)
-    {
         RelaseNotePos(lastpos);
-    }
     else
-    {
         NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
                monomem[mmrtempnote].mkeyshift);
-    }
 }
 
 
@@ -830,9 +824,9 @@ void Part::KillNotePos(int pos)
 
 
 // Set Part's key limit
-void Part::setkeylimit(unsigned char Pkeylimit)
+void Part::setkeylimit(unsigned char Pkeylimit_)
 {
-    this->Pkeylimit = Pkeylimit;
+    Pkeylimit = Pkeylimit_;
     int keylimit = Pkeylimit;
     if (!keylimit)
         keylimit = POLIPHONY - 5;
@@ -879,7 +873,8 @@ void Part::ComputePartSmps(void)
 
     int k;
     int noteplay; // 0 if there is nothing activated
-    for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx){
+    for (int nefx = 0; nefx < NUM_PART_EFX + 1; ++nefx)
+    {
         memset(partfxinputl[nefx], 0, synth->bufferbytes);
         memset(partfxinputr[nefx], 0, synth->bufferbytes);
     }
@@ -916,7 +911,7 @@ void Part::ComputePartSmps(void)
                 for (int i = 0; i < synth->buffersize; ++i)
                 {   // add the ADnote to part(mix)
                     partfxinputl[sendcurrenttofx][i] += tmpoutl[i];
-                    partfxinputr[sendcurrenttofx][i]+=tmpoutr[i];
+                    partfxinputr[sendcurrenttofx][i] += tmpoutr[i];
                 }
             }
             // get from the SUBnote
@@ -1026,9 +1021,9 @@ void Part::setPvolume(char value)
 }
 
 
-void Part::setPpanning(char Ppanning_)
+void Part::setPpanning(char value)
 {
-    Ppanning = Ppanning_;
+    Ppanning = value;
     panning = Ppanning / 127.0f + ctl->panning.pan;
     if (panning < 0.0f)
         panning = 0.0f;
@@ -1068,7 +1063,7 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     else
     {
         if (!kit[kititem].adpars)
-            kit[kititem].adpars = new ADnoteParameters(fft, microtonal);
+            kit[kititem].adpars = new ADnoteParameters(microtonal, fft);
         if (!kit[kititem].subpars)
             kit[kititem].subpars = new SUBnoteParameters();
         if (!kit[kititem].padpars)
@@ -1281,7 +1276,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
                 kit[i].adpars->getfromXML(xml);
                 xml->exitbranch();
             }
-            kit[i].Psubenabled=xml->getparbool("sub_enabled", kit[i].Psubenabled);
+            kit[i].Psubenabled = xml->getparbool("sub_enabled", kit[i].Psubenabled);
             if (xml->enterbranch("SUB_SYNTH_PARAMETERS"))
             {
                 kit[i].subpars->getfromXML(xml);
@@ -1343,6 +1338,7 @@ void Part::getfromXML(XMLwrapper *xml)
     {
         getfromXMLinstrument(xml);
         xml->exitbranch();
+        applyparameters();
     }
     if (xml->enterbranch("CONTROLLER"))
     {

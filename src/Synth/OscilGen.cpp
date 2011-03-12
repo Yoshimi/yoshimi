@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010 Alan Calvert
+    Copyright 2009-2011 Alan Calvert
     Copyright 2009 James Morris
 
     This file is part of yoshimi, which is free software: you can redistribute
@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #include <cmath>
@@ -31,46 +31,38 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Synth/OscilGen.h"
 
-FFTFREQS OscilGen::outoscilFFTfreqs;
-
-float *OscilGen::tmpsmps = NULL; // buffersize array for temporary data
-
 char OscilGen::random_state[256];
 struct random_data OscilGen::random_buf;
 char OscilGen::harmonic_random_state[256];
 struct random_data OscilGen::harmonic_random_buf;
 
-OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) : Presets()
+OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) :
+    Presets(),
+    ADvsPAD(false),
+    tmpsmps(new float[synth->oscilsize]),
+    fft(fft_),
+    res(res_),
+    randseed(1)
 {
-    if (NULL == tmpsmps)
-    {
-        FFTwrapper::newFFTFREQS(OscilGen::outoscilFFTfreqs, synth->halfoscilsize);
-        if (NULL == (tmpsmps = new float[synth->oscilsize]))
-            Runtime.Log("Very bad error, failed to allocate OscilGen::tmpsmps");
-        else
-            memset(tmpsmps, 0, synth->oscilsize * sizeof(float));
-    }
-
     setpresettype("Poscilgen");
-    fft = fft_;
-    res = res_;
-    FFTwrapper::newFFTFREQS(oscilFFTfreqs, synth->halfoscilsize);
-    FFTwrapper::newFFTFREQS(basefuncFFTfreqs, synth->halfoscilsize);
-
-    randseed = 1;
-    ADvsPAD = false;
+    FFTwrapper::newFFTFREQS(&outoscilFFTfreqs, synth->halfoscilsize);
+    if (!tmpsmps)
+        Runtime.Log("Very bad error, failed to allocate OscilGen::tmpsmps");
+    else
+        memset(tmpsmps, 0, synth->oscilsize * sizeof(float));
+    FFTwrapper::newFFTFREQS(&oscilFFTfreqs, synth->halfoscilsize);
+    FFTwrapper::newFFTFREQS(&basefuncFFTfreqs, synth->halfoscilsize);
     defaults();
 }
 
 OscilGen::~OscilGen()
 {
-    FFTwrapper::deleteFFTFREQS(basefuncFFTfreqs);
-    FFTwrapper::deleteFFTFREQS(oscilFFTfreqs);
+    FFTwrapper::deleteFFTFREQS(&basefuncFFTfreqs);
+    FFTwrapper::deleteFFTFREQS(&oscilFFTfreqs);
     if (NULL != tmpsmps)
     {
         delete [] tmpsmps;
-        tmpsmps = NULL;
-        FFTwrapper::deleteFFTFREQS(outoscilFFTfreqs);
+        FFTwrapper::deleteFFTFREQS(&outoscilFFTfreqs);
     }
 }
 
@@ -103,7 +95,8 @@ void OscilGen::defaults(void)
     Phmag[0] = 127;
     Phmagtype = 0;
     if (ADvsPAD)
-        Prand = 127; // max phase randomness (usefull if the oscil will be imported to a ADsynth from a PADsynth
+        Prand = 127; // max phase randomness (usefull if the oscil will be
+                     // imported to a ADsynth from a PADsynth
     else
         Prand = 64; // no randomness
 
@@ -162,12 +155,11 @@ void OscilGen::convert2sine(int magtype)
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
     float oscil[synth->oscilsize];
     FFTFREQS freqs;
-    FFTwrapper::newFFTFREQS(freqs, synth->halfoscilsize);
-
+    FFTwrapper::newFFTFREQS(&freqs, synth->halfoscilsize);
     get(oscil, -1.0f);
     FFTwrapper *fft = new FFTwrapper(synth->oscilsize);
     fft->smps2freqs(oscil, &freqs);
-    delete(fft);
+    delete fft;
 
     float max = 0.0f;
 
@@ -199,7 +191,7 @@ void OscilGen::convert2sine(int magtype)
         if (Phmag[i] == 64)
             Phphase[i] = 64;
     }
-    FFTwrapper::deleteFFTFREQS(freqs);
+    FFTwrapper::deleteFFTFREQS(&freqs);
     prepare();
 }
 
@@ -973,7 +965,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
         freq = 440.0f;
 
     FFTFREQS inf;
-    FFTwrapper::newFFTFREQS(inf, synth->halfoscilsize);
+    FFTwrapper::newFFTFREQS(&inf, synth->halfoscilsize);
     for (int i = 0; i < synth->halfoscilsize; ++i)
     {
         inf.s[i] = f.s[i];
@@ -1039,7 +1031,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     f.c[1] += f.c[0];
     f.s[1] += f.s[0];
     f.c[0] = f.s[0] = 0.0f;
-    FFTwrapper::deleteFFTFREQS(inf);
+    FFTwrapper::deleteFFTFREQS(&inf);
 }
 
 

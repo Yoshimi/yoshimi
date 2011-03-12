@@ -1,7 +1,7 @@
 /*
     AlsaClient.h
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -29,12 +29,11 @@ class AlsaClient : public MusicClient
         AlsaClient() : MusicClient() { };
         ~AlsaClient() { };
 
-        bool openAudio(WavRecord *recorder);
-        bool openMidi(WavRecord *recorder);
+        bool openAudio(void);
+        bool openMidi(void);
         bool Start(void) { return alsaEngine.Start(); };
         void Stop(void);
-        void Close(void);
-
+        void Close(void) { alsaEngine.Close(); }
         unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
         int getBuffersize(void) { return alsaEngine.getBuffersize(); };
         int grossLatency(void) { return alsaEngine.grossLatency(); };

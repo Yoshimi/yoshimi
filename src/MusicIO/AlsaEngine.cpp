@@ -1,7 +1,7 @@
 /*
     AlsaEngine.cpp
 
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -21,8 +21,7 @@
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
 
-AlsaEngine::AlsaEngine() :
-    MusicIO()
+AlsaEngine::AlsaEngine()
 {
     audio.handle = NULL;
     audio.period_time = 0;
@@ -39,7 +38,7 @@ AlsaEngine::AlsaEngine() :
 }
 
 
-bool AlsaEngine::openAudio(WavRecord *recorder)
+bool AlsaEngine::openAudio(void)
 {
     audio.device = Runtime.audioDevice;
     audio.samplerate = Runtime.Samplerate;
@@ -54,14 +53,13 @@ bool AlsaEngine::openAudio(WavRecord *recorder)
                 if (prepSwparams())
                     if (prepBuffers(true))
                         return true;
-
 bail_out:
     Close();
     return false;
 }
 
 
-bool AlsaEngine::openMidi(WavRecord *recorder)
+bool AlsaEngine::openMidi(void)
 {
     midi.device = Runtime.midiDevice;
     if (midi.device.empty())
@@ -82,7 +80,6 @@ bool AlsaEngine::openMidi(WavRecord *recorder)
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PGMCHANGE);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PITCHBEND);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_CONTROL14);
-    snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_NONREGPARAM);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_REGPARAM);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_RESET);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_SUBSCRIBED);
@@ -99,7 +96,6 @@ bool AlsaEngine::openMidi(WavRecord *recorder)
         Runtime.Log("Error, failed to acquire alsa midi port");
         goto bail_out;
     }
-    wavRecorder = recorder;
     midiLatency = getBuffersize();
     return true;
 
@@ -111,12 +107,6 @@ bail_out:
 
 void AlsaEngine::Close(void)
 {
-    if (NULL != audio.handle && audio.pThread)
-        if (pthread_cancel(audio.pThread))
-            Runtime.Log("Error, failed to cancel Alsa audio thread");
-    if (NULL != midi.handle && midi.pThread)
-        if (pthread_cancel(midi.pThread))
-            Runtime.Log("Error, failed to cancel Alsa midi thread");
     if (audio.handle != NULL)
         alsaBad(snd_pcm_close(audio.handle), "close pcm failed");
     audio.handle = NULL;
@@ -124,7 +114,6 @@ void AlsaEngine::Close(void)
         if (snd_seq_close(midi.handle) < 0)
             Runtime.Log("Error closing Alsa midi connection");
     midi.handle = NULL;
-    MusicIO::Close();
 }
 
 
@@ -266,16 +255,9 @@ void *AlsaEngine::_AudioThread(void *arg)
 
 void *AlsaEngine::AudioThread(void)
 {  
-    if (NULL == audio.handle)
-    {
-        Runtime.Log("Null pcm handle into AlsaEngine::AudioThread");
-        return NULL;
-    }
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
-    pthread_cleanup_push(_audioCleanup, this);
     while (Runtime.runSynth)
     {
-        pthread_testcancel();
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
         {
@@ -294,7 +276,7 @@ void *AlsaEngine::AudioThread(void)
                     alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
                     break;
                 default:
-                    Runtime.Log("AlsaEngine::AudioThread, weird SND_PCM_STATE: "
+                    Runtime.Log("Alsa AudioThread, weird SND_PCM_STATE: "
                                 + asString(audio.pcm_state));
                     break;
             }
@@ -302,15 +284,13 @@ void *AlsaEngine::AudioThread(void)
         }
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
-            pthread_testcancel();
             getAudio();
             InterleaveShorts();
             Write();
         }
         else
-            Runtime.Log("Audio pcm still not RUNNING");
+            Runtime.Log("Audio pcm still not running");
     }
-    pthread_cleanup_pop(1);
     return NULL;
 }
 
@@ -400,55 +380,23 @@ bool AlsaEngine::xrunRecover(void)
 
 bool AlsaEngine::Start(void)
 {
-    int chk;
-    pthread_attr_t attr;
-    if (NULL != audio.handle)
+    if (NULL != midi.handle && !Runtime.startThread(&midi.pThread, _MidiThread,
+                                                    this, true, true))
     {
-        chk = 999;
-        if (setThreadAttributes(&attr, true))
-        {
-            if ((chk = pthread_create(&audio.pThread, &attr, _AudioThread, this)))
-                Runtime.Log("Error, failed to start alsa audio thread (sched_fifo): "
-                            + asString(chk));
-        }
-        if (chk)
-        {
-            if (!setThreadAttributes(&attr, false))
-                goto bail_out;
-            if ((chk = pthread_create(&audio.pThread, &attr, _AudioThread, this)))
-            {
-                Runtime.Log("Failed to start alsa audio thread (other): "
-                            + asString(chk));
-                goto bail_out;
-            }
-        }
+        Runtime.Log("Failed to start Alsa midi thread");
+        goto bail_out;
+    }
+    if (NULL != audio.handle && !Runtime.startThread(&audio.pThread, _AudioThread,
+                                                     this, true, false))
+    {
+        Runtime.Log(" Failed to start Alsa audio thread");
+        goto bail_out;
     }
 
-    if (NULL != midi.handle)
-    {
-        chk = 999;
-        if (setThreadAttributes(&attr, true, true))
-        {
-            if ((chk = pthread_create(&midi.pThread, &attr, _MidiThread, this)))
-                Runtime.Log("Failed to start Alsa midi thread (schedfifo): "
-                            + asString(chk));
-        }
-        if (chk)
-        {
-            if (!setThreadAttributes(&attr, false))
-                goto bail_out;
-            if ((chk = pthread_create(&midi.pThread, &attr, _MidiThread, this)))
-            {
-                Runtime.Log("Failed to start Alsa midi thread (other): "
-                            + asString(chk));
-                goto bail_out;
-            }
-        }
-    }
     return true;
 
 bail_out:
-    Runtime.Log("Error - bail out of AlsaEngine::Start()");
+    Runtime.Log("Bailing from AlsaEngine Start");
     Close();
     return false;
 }
@@ -469,13 +417,10 @@ void *AlsaEngine::MidiThread(void)
     int ctrltype;
     int par;
     int chk;
-    pthread_cleanup_push(_midiCleanup, this);
     while (Runtime.runSynth)
     {
-        pthread_testcancel();
         while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)
         {
-            pthread_testcancel();
             if (!event)
                 continue;
             par = event->data.control.param;
@@ -535,7 +480,6 @@ void *AlsaEngine::MidiThread(void)
         if (chk < 0)
             Runtime.Log("ALSA midi input read failed: " + asString(chk));
     }
-    pthread_cleanup_pop(1);
     return NULL;
 }
 
