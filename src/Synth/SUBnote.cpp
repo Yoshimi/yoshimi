@@ -1,9 +1,10 @@
 /*
 
     SUBnote.cpp - The "subtractive" synthesizer
-    Copyright (C) 2002-2005 Nasca Octavian Paul
-    Author: Nasca Octavian Paul
-    Copyright 2009-2010 Alan Calvert
+
+    Original ZynAddSubFX author Nasca Octavian Paul
+    Copyright (C) 2002-2009 Nasca Octavian Paul
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,10 +19,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include <cmath>
+#include <fftw3.h>
 
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
@@ -45,8 +47,8 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 {
     ready = 0;
 
-    tmpsmp = new float[synth->buffersize];
-    tmprnd = new float[synth->buffersize];
+    tmpsmp = (float*)fftwf_malloc(synth->bufferbytes);
+    tmprnd = (float*)fftwf_malloc(synth->bufferbytes);
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
@@ -378,8 +380,8 @@ SUBnote::~SUBnote()
 {
     if (NoteEnabled)
         KillNote();
-    delete [] tmpsmp;
-    delete [] tmprnd;
+    fftwf_free(tmpsmp);
+    fftwf_free(tmprnd);
 }
 
 // Kill the note
@@ -595,8 +597,6 @@ int SUBnote::noteout(float *outl, float *outr)
         tmprnd[i] = synth->numRandom() * 2.0f - 1.0f;
     for (int n = 0; n < numharmonics; ++n)
     {
-        //for (int i = 0; i < synth->buffersize; ++i)
-        //    tmpsmp[i] = tmprnd[i];
         memcpy(tmpsmp, tmprnd, synth->bufferbytes);
         for (int nph = 0; nph < numstages; ++nph)
             filter(lfilter[nph + n * numstages], tmpsmp);

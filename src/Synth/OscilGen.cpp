@@ -133,11 +133,6 @@ void OscilGen::defaults(void)
     Padaptiveharmonicsbasefreq = 128;
     Padaptiveharmonicspar = 50;
 
-    //for (int i = 0 ; i < synth->halfoscilsize; ++i)
-    //{
-    //    oscilFFTfreqs.s[i] = oscilFFTfreqs.c[i] = 0.0;
-    //    basefuncFFTfreqs.s[i] = basefuncFFTfreqs.c[i] = 0.0;
-    //}
     memset(oscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
     memset(oscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
     memset(basefuncFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
@@ -672,14 +667,14 @@ void OscilGen::modulation(void)
             break;
         case 3:
             modulationpar1 = (powf(2.0f, modulationpar1 * 9.0f) - 1.0f) / 100.0f;
-            modulationpar3 = 0.01f + (powf(2, modulationpar3 * 16.0f) - 1.0f) / 10.0f;
+            modulationpar3 = 0.01f + (powf(2.0f, modulationpar3 * 16.0f) - 1.0f) / 10.0f;
             break;
     }
 
     int eighth_i = synth->oscilsize / 8;
     float eighth_f = synth->oscilsize_f / 8.0f;
 
-    oscilFFTfreqs.c[0] = 0.0; // remove the DC
+    oscilFFTfreqs.c[0] = 0.0f; // remove the DC
     // reduce the amplitude of the freqs near the nyquist
     for (int i = 1; i < eighth_i; ++i)
     {

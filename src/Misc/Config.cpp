@@ -115,9 +115,10 @@ Config::Config() :
     sse_level(0),
     programCmd("yoshimi")
 {
-    std::ios::sync_with_stdio(false);
+    // We need lrintf() to round toward zero. Special thanks go to
+    // Lars Luthman for this one!! 
+    fesetround(FE_TOWARDZERO);
     cerr.precision(4);
-    std::ios::sync_with_stdio(false);
     deadObjects = new BodyDisposal();
 }
 

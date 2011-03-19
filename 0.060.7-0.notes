@@ -1,9 +1,0 @@
-yoshimi-0.060.7-0
-
-Still basically just 0.058.1 plus Paul's unison amd reverb enhancements, and
-jack session support.
-
-The 0.060.X series have been plagued by a strange issue affecting some but not
-all 32 bit builds. On a few 32 bit systems, ADnotes are incorrectly pitched.
-Attempts to resolve this have been going on since last December. For me, this
-one works just fine on AV Linux 4.2.

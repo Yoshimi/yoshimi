@@ -25,11 +25,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified February 2011
+This file is a derivative of the ZynAddSubFX original, modified March 2011
 } {in_source in_header
-} 
-
-decl {\#include <fenv.h>} {public
 } 
 
 decl {\#include <string>} {public
