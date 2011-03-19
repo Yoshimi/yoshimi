@@ -38,8 +38,6 @@ using namespace std;
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 
-extern bool Pexitprogram;  // if the UI sets this true, the program will exit
-
 class XMLwrapper;
 class BodyDisposal;
 class SynthEngine;
@@ -58,11 +56,10 @@ class Config : public MiscFuncs
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
         void saveConfig(void);
-        void saveState(void);
-        bool restoreState(SynthEngine *synth);
+        void saveState(void) { saveSessionData(StateFile); }
+        bool stateRestore(SynthEngine *synth);
         bool restoreJsession(SynthEngine *synth);
-        void setJackSessionSave(int event_type, const char *session_dir, const char *client_uuid);
-        void saveJackSession(void);
+        void setJackSessionSave(int event_type, string session_file);
 
         static void sigHandler(int sig);
         void setInterruptActive(void);
@@ -79,10 +76,10 @@ class Config : public MiscFuncs
         string        ConfigFile;
         string        paramsLoad;
         string        instrumentLoad;
-        bool          doRestoreState;
+        bool          restoreState;
         string        StateFile;
         string        CurrentXMZ;
-        bool          doRestoreJackSession;
+        bool          restoreJackSession;
         const string  baseCmdLine;
         string        jackSessionFile;
 
@@ -102,6 +99,7 @@ class Config : public MiscFuncs
 
         string        jackServer;
         bool          startJack;        // false
+        bool          connectJackaudio; // false
         string        jackSessionUuid;
 
         string        alsaAudioDevice;
@@ -110,10 +108,6 @@ class Config : public MiscFuncs
 
         string        alsaMidiDevice;
         string        nameTag;
-
-        bool          Float32bitWavs;
-        string        DefaultRecordDirectory;
-        string        CurrentRecordDirectory;
 
         int           BankUIAutoClose;
         int           Interpolation;
@@ -141,11 +135,12 @@ class Config : public MiscFuncs
         bool restoreSessionData(SynthEngine *synth, string sessionfile);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
+        void saveJackSession(void);
 
         static unsigned short nextHistoryIndex;
         static struct sigaction sigAction;
-        static int sigIntActive;
-        static int ladi1IntActive;
+        int sigIntActive;
+        int ladi1IntActive;
         int sse_level;
         int jsessionSave;
         const string programCmd;

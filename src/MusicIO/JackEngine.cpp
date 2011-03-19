@@ -26,24 +26,21 @@
 using namespace std;
 
 #include "Misc/Config.h"
-#include "Misc/SynthEngine.h"
 #include "MusicIO/JackEngine.h"
 
-JackEngine::JackEngine() :
-    #if defined(JACK_SESSION)
-        lastevent(NULL),
-    #endif
-    jackClient(NULL),
-    jackSamplerate(0),
-    jackNframes(0),
-    jackaudioportL(NULL),
-    jackaudioportR(NULL),
-    jackmidiport(NULL),
-    jackportbufL(NULL),
-    jackportbufR(NULL),
-    midiPthread(0),
-    midiringbuf(NULL)
-{ }
+JackEngine::JackEngine() : jackClient(NULL)
+{
+    audio.jackSamplerate = 0;
+    audio.jackNframes = 0;
+    for (int i = 0; i < 2; ++i)
+    {
+        audio.ports[i] = NULL;
+        audio.portBuffs[i] = NULL;
+    }
+    midi.port = NULL;
+    midi.ringBuf = NULL;
+    midi.pThread = 0;
+}
 
 
 bool JackEngine::connectServer(string server)
@@ -56,45 +53,58 @@ bool JackEngine::connectServer(string server)
             usleep(3333);
         }
     }
-    if (!jackClient)
+    if (jackClient)
     {
-        Runtime.Log("Failed to open jack client on server " + server);
-        return false;
+        Runtime.setRtprio(jack_client_max_real_time_priority(jackClient));
+        audio.jackSamplerate = jack_get_sample_rate(jackClient);
+        audio.jackNframes = jack_get_buffer_size(jackClient);
+        return true;
     }
-    Runtime.setRtprio(jack_client_max_real_time_priority(jackClient));
-    jackSamplerate = jack_get_sample_rate(jackClient);
-    jackNframes = jack_get_buffer_size(jackClient);
-    return true;
+    else
+        Runtime.Log("Failed to open jack client on server " + server);
+    return false;
 }
 
 
 bool JackEngine::openJackClient(string server)
 {
+    int jopts = JackNullOption;
+    jack_status_t jstatus;
     string clientname = "yoshimi";
-    if (!Runtime.nameTag.empty())
+    if (Runtime.nameTag.size())
         clientname += ("-" + Runtime.nameTag);
-    bool named_server = !server.empty() && server.compare("default");
-    int jopts = ((named_server) ? JackServerName : JackNullOption)              // JackNoStartServer = 0x01
-                 | ((Runtime.startJack) ? JackNullOption : JackNoStartServer);  // JackServerName = 0x04
-    jack_status_t jstatus;                                                      // JackSessionID = 0x20
-    if (Runtime.doRestoreJackSession && !Runtime.jackSessionUuid.empty())
-    {
-        #if defined(JACK_SESSION)
+    bool named_server = server.size() > 0 && server.compare("default") != 0;
+    if (named_server)
+        jopts |= JackServerName;
+    if (!Runtime.startJack)
+        jopts |= JackNoStartServer;
+    #if defined(JACK_SESSION)
+        if (Runtime.restoreJackSession && Runtime.jackSessionUuid.size())
+        {
             jopts |= JackSessionID;
-        #endif
+            if (named_server)
+                jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
+                                              &jstatus, Runtime.jackServer.c_str(),
+                                              Runtime.jackSessionUuid.c_str());
+            else
+                jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
+                                              &jstatus, Runtime.jackSessionUuid.c_str());
+        }
+        else
+        {
+            if (named_server)
+                jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
+                                              &jstatus, Runtime.jackServer.c_str());
+            else
+                jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts, &jstatus);
+        }
+    #else
         if (named_server)
             jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
-                                          &jstatus, Runtime.jackServer.c_str(),
-                                          Runtime.jackSessionUuid.c_str());
+                                          &jstatus, Runtime.jackServer.c_str());
         else
-            jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
-                                          &jstatus, Runtime.jackSessionUuid.c_str());
-    }
-    else if (named_server)
-        jackClient = jack_client_open(clientname.c_str(), jack_options_t(jopts),
-                                      NULL, Runtime.jackServer.c_str());
-    else
-        jackClient = jack_client_open(clientname.c_str(), jack_options_t(jopts), NULL);
+            jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts, &jstatus);
+    #endif
     if (jackClient)
         return true;
     else
@@ -107,9 +117,9 @@ bool JackEngine::Start(void)
 {
     jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
-
     #if defined(JACK_SESSION)
-        if (jack_set_session_callback && jack_set_session_callback(jackClient, _jsessionCallback, this))
+        if (jack_set_session_callback
+            && jack_set_session_callback(jackClient, _jsessionCallback, this))
             Runtime.Log("Set jack session callback failed");
     #endif
 
@@ -119,24 +129,31 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    synth->actionLock(lockmute);
-    if (jackmidiport && !Runtime.startThread(&midiPthread, _midiThread, this,
-                                             true, true))
+    if (NULL != midi.port
+        && !Runtime.startThread(&midi.pThread, _midiThread, this, true, true))
     {
             Runtime.Log("Failed to start jack midi thread");
             goto bail_out;
     }
 
-    if (jack_activate(jackClient))
+    if (!jack_activate(jackClient)
+        && NULL != audio.ports[0]
+        && NULL != audio.ports[1])
+    {
+        if (!Runtime.restoreJackSession && Runtime.connectJackaudio && !connectJackPorts())
+        {
+            Runtime.Log("Failed to connect jack audio ports");
+            goto bail_out;
+        }
+    }
+    else
     {
         Runtime.Log("Failed to activate jack client");
         goto bail_out;
     }
-    synth->actionLock(unlock);
     return true;
 
 bail_out:
-    synth->actionLock(unlock);
     Close();
     return false;
 }
@@ -144,35 +161,28 @@ bail_out:
 
 void JackEngine::Close(void)
 {
-    if (jackClient)
+    if (NULL != jackClient)
     {
         int chk;
-        if (jackaudioportL)
+        for (int chan = 0; chan < 2; ++chan)
         {
-            if ((chk = jack_port_unregister(jackClient, jackaudioportL)))
-                Runtime.Log("Unregister jackaudioportL failed, status: " + asString(chk));
-            jackaudioportL = NULL;
+            if (NULL != audio.ports[chan])
+                jack_port_unregister(jackClient, audio.ports[chan]);
+            audio.ports[chan] = NULL;
         }
-        if (jackaudioportR)
+        if (NULL != midi.port)
         {
-            if ((chk = jack_port_unregister(jackClient, jackaudioportR)))
-                Runtime.Log("Unregister jackaudioportR failed, status: " + asString(chk));
-            jackaudioportR = NULL;
+            if ((chk = jack_port_unregister(jackClient, midi.port)))
+                Runtime.Log("Failed to close jack client, status: " + asString(chk));
+            midi.port = NULL;
         }
-        if (jackmidiport)
+        chk = jack_deactivate(jackClient);
+        if (chk)
+            Runtime.Log("Failed to close jack client, status: " + asString(chk));
+        if (NULL != midi.ringBuf)
         {
-            if ((chk = jack_port_unregister(jackClient, jackmidiport)))
-            {
-                Runtime.Log("Unregister jackmidiport failed, status: " + asString(chk));
-                jackmidiport = NULL;
-            }
-        }
-        if ((chk = jack_deactivate(jackClient)))
-            Runtime.Log("Deactivate jack client failed, status: " + asString(chk));
-        if (midiringbuf)
-        {
-            jack_ringbuffer_free(midiringbuf);
-            midiringbuf = NULL;
+            jack_ringbuffer_free(midi.ringBuf);
+            midi.ringBuf = NULL;
         }
         jackClient = NULL;
     }
@@ -182,79 +192,82 @@ void JackEngine::Close(void)
 bool JackEngine::openAudio(void)
 {
     const char *portnames[] = { "left", "right" };
-    if (!(jackaudioportL = jack_port_register(jackClient, portnames[0],
-                                              JACK_DEFAULT_AUDIO_TYPE,
-                                              JackPortIsOutput, 0)))
+    for (int port = 0; port < 2; ++port)
+        audio.ports[port] = jack_port_register(jackClient, portnames[port],
+                                               JACK_DEFAULT_AUDIO_TYPE,
+                                               JackPortIsOutput, 0);
+    if (audio.ports[0] && audio.ports[1])
     {
-        Runtime.Log("Failed to register jackaudioportL");
-        goto bail_out;
-    }
-    if (!(jackaudioportR = jack_port_register(jackClient, portnames[1],
-                                              JACK_DEFAULT_AUDIO_TYPE,
-                                              JackPortIsOutput, 0)))
-    {
-        Runtime.Log("Failed to register jackaudioportR");
-        goto bail_out;
-    }
-    if (prepBuffers(false))
-    {
-        if (jack_port_set_latency && jack_port_get_latency)
+        if (prepBuffers(false))
         {
-            jack_port_set_latency (jackaudioportL, jack_get_buffer_size(jackClient));
-            jack_port_set_latency (jackaudioportR, jack_get_buffer_size(jackClient));
-            if (jack_recompute_total_latencies)
-                jack_recompute_total_latencies(jackClient);
+            if (jack_port_set_latency)
+            {
+                jack_port_set_latency (audio.ports[0], jack_get_buffer_size(jackClient));
+                jack_port_set_latency (audio.ports[1], jack_get_buffer_size(jackClient));
+                if (jack_recompute_total_latencies)
+                    jack_recompute_total_latencies(jackClient);
+            }
+            if (jack_port_get_latency)
+                audioLatency = jack_port_get_latency(audio.ports[0]);
+            return true;
         }
-        if (jack_port_get_latency)
-            audioLatency = jack_port_get_latency(jackaudioportL);
-        return true;
     }
-
-bail_out:
-    if (jackaudioportL)
-            jack_port_unregister(jackClient, jackaudioportL);
-    if (jackaudioportR)
-            jack_port_unregister(jackClient, jackaudioportR);
-    jackaudioportL = jackaudioportR = NULL;
+    else
+        Runtime.Log("Failed to register jack audio ports");
+    Close();
     return false;
 }
 
 
 bool JackEngine::openMidi(void)
 {
-    const char *port_name = "midi in";
-    if (!(jackmidiport = jack_port_register(jackClient, port_name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            JackPortIsInput, 0)))
+    const char *port_name = "midi-in";
+    midi.port = jack_port_register(jackClient, port_name,
+                                   JACK_DEFAULT_MIDI_TYPE,
+                                   JackPortIsInput, 0);
+    if (!midi.port)
     {
         Runtime.Log("Failed to register jack midi port");
-        goto bail_out;
+        return false;
     }
-    if (!(midiringbuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096)))
+    midi.ringBuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096);
+    if (!midi.ringBuf)
     {
         Runtime.Log("Failed to create jack midi ringbuffer");
-        goto bail_out;
+        return false;
     }
     if (jack_port_set_latency)
-        jack_port_set_latency(jackmidiport, jack_get_buffer_size(jackClient));
+        jack_port_set_latency(midi.port, jack_get_buffer_size(jackClient));
     if (jack_recompute_total_latencies)
         jack_recompute_total_latencies(jackClient);
     if (jack_port_get_latency)
-        midiLatency = jack_port_get_latency(jackmidiport);
+        midiLatency = jack_port_get_latency(midi.port);
     return true;
-    
-bail_out:
-    if (jackmidiport)
+}
+
+
+bool JackEngine::connectJackPorts(void)
+{
+    const char** playback_ports = jack_get_ports(jackClient, NULL, NULL,
+                                                 JackPortIsPhysical|JackPortIsInput);
+	if (!playback_ports)
     {
-        jack_port_unregister(jackClient, jackmidiport);
-        jackmidiport = NULL;    
-    }
-    if (midiringbuf)
+        Runtime.Log("No physical jack playback ports found.");
+        return false;
+	}
+    int ret;
+    for (int port = 0; port < 2 && NULL != audio.ports[port]; ++port)
     {
-        jack_ringbuffer_free(midiringbuf);
-        midiringbuf = NULL;
+        const char *port_name = jack_port_name(audio.ports[port]);
+        if ((ret = jack_connect(jackClient, port_name, playback_ports[port])))
+        {
+            Runtime.Log("Cannot connect " + string(port_name)
+                        + " to jack port " + string(playback_ports[port])
+                        + ", status " + asString(ret));
+            return false;
+        }
     }
-    return false;
+    return true;
 }
 
 
@@ -288,9 +301,9 @@ int JackEngine::processCallback(jack_nframes_t nframes)
     bool okaudio = true;
     bool okmidi = true;
 
-    if (jackmidiport)
+    if (midi.port)
         okmidi = processMidi(nframes);
-    if (jackaudioportL && jackaudioportR)
+    if (audio.ports[0] && audio.ports[1])
         okaudio = processAudio(nframes);
     return (okaudio && okmidi) ? 0 : -1;
 }
@@ -298,33 +311,34 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
 bool JackEngine::processAudio(jack_nframes_t nframes)
 {
-    jackportbufL = (float*)jack_port_get_buffer(jackaudioportL, nframes);
-    jackportbufR = (float*)jack_port_get_buffer(jackaudioportR, nframes);
-    if (!jackportbufL || !jackportbufR)
+    for (int port = 0; port < 2; ++port)
     {
-            Runtime.Log("Failed to get jack audio port buffers");
+        audio.portBuffs[port] =
+            (float*)jack_port_get_buffer(audio.ports[port], nframes);
+        if (!audio.portBuffs[port])
+        {
+            Runtime.Log("Failed to get jack audio port buffer: " + asString(port));
             return false;
+        }
     }
-    memset(jackportbufL, 0, sizeof(float) * nframes);
-    memset(jackportbufR, 0, sizeof(float) * nframes);
-    if (synth)
-    {
-        getAudio();
-        memcpy(jackportbufL, zynLeft, sizeof(float) * nframes);
-        memcpy(jackportbufR, zynRight, sizeof(float) * nframes);
-    }
+    memset(audio.portBuffs[0], 0, sizeof(float) * nframes);
+    memset(audio.portBuffs[1], 0, sizeof(float) * nframes);
+    getAudio();
+    memcpy(audio.portBuffs[0], zynLeft, sizeof(float) * nframes);
+    memcpy(audio.portBuffs[1], zynRight, sizeof(float) * nframes);
     return true;
 }
 
 
 bool JackEngine::processMidi(jack_nframes_t nframes)
 {
-    void *portBuf = jack_port_get_buffer(jackmidiport, nframes);
+    void *portBuf = jack_port_get_buffer(midi.port, nframes);
     if (!portBuf)
     {
-        Runtime.Log("Bad get jack midi port buffer");
+        Runtime.Log("Bad midi jack_port_get_buffer");
         return  false;
     }
+
     unsigned int idx;
     unsigned int act_write;
     struct midi_event event;
@@ -335,39 +349,40 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
     for(idx = 0; idx < eventCount; ++idx)
     {
-        if (jack_midi_event_get(&jEvent, portBuf, idx))
+        if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            Runtime.Log("Jack midi event get failed");
-            continue;
-        }
-        if (jEvent.size < 1 || jEvent.size > sizeof(event.data))
-            continue; // no interest in zero sized or long events
-        event.time = jEvent.time;
-        memset(event.data, 0, sizeof(event.data));
-        memcpy(event.data, jEvent.buffer, jEvent.size);
-        wrote = tries = 0;
-        data = (char*)&event;
-        while (wrote < sizeof(struct midi_event) && tries < 3)
-        {
-            act_write = jack_ringbuffer_write(midiringbuf, (const char*)data,
-                                              sizeof(struct midi_event) - wrote);
-            wrote += act_write;
-            data += act_write;
-            ++tries;
-        }
-        if (wrote == sizeof(struct midi_event))
-        {
-            if (sem_post(&midisem) < 0)
-                Runtime.Log("processMidi semaphore post error, "
-                            + string(strerror(errno)));
+            if (jEvent.size < 1 || jEvent.size > sizeof(event.data))
+                continue; // no interest in zero sized or long events
+            event.time = jEvent.time;
+            memset(event.data, 0, sizeof(event.data));
+            memcpy(event.data, jEvent.buffer, jEvent.size);
+            wrote = 0;
+            tries = 0;
+            data = (char*)&event;
+            while (wrote < sizeof(struct midi_event) && tries < 3)
+            {
+                act_write = jack_ringbuffer_write(midi.ringBuf, (const char*)data,
+                                                  sizeof(struct midi_event) - wrote);
+                wrote += act_write;
+                data += act_write;
+                ++tries;
+            }
+            if (wrote == sizeof(struct midi_event))
+            {
+                if (sem_post(&midiSem) < 0)
+                    Runtime.Log("processMidi semaphore post error, "
+                                + string(strerror(errno)));
+            }
+            else
+            {
+                Runtime.Log("Bad write to midi ringbuffer: "
+                            + asString(wrote) + " / "
+                            + asString((int)sizeof(struct midi_event)));
+                return false;
+            }
         }
         else
-        {
-            Runtime.Log("Bad write to midi ringbuffer: "
-                        + asString(wrote) + " / "
-                        + asString((int)sizeof(struct midi_event)));
-            return false;
-        }
+            Runtime.Log("... jack midi read failed");
     }
     return true;
 }
@@ -384,7 +399,7 @@ int JackEngine::_xrunCallback(void *arg)
 
 void JackEngine::_errorCallback(const char *msg)
 {
-    Runtime.Log("Jack error report:" + string(msg));
+    Runtime.Log("Jack reports error: " + string(msg));
 }
 
 
@@ -401,35 +416,23 @@ void *JackEngine::midiThread(void)
     unsigned int fetch;
     unsigned int ev;
     struct midi_event midiEvent;
-    struct timespec waitperiod = { 0, 50000000 };
-    if (sem_init(&midisem, 0, 0) < 0)
+    if (sem_init(&midiSem, 0, 0) < 0)
     {
         Runtime.Log("Error on jack midi sem_init " + string(strerror(errno)));
         return false;
     }
+
     while (Runtime.runSynth)
     {
-        /*
-        if (sem_timedwait(&midisem, &waitperiod) < 0)
-        {
-            switch (errno)
-            {
-                case ETIMEDOUT:
-                    continue;
-                default:
-                    Runtime.Log("midiThread semaphore timedwait error, "
-                                + string(strerror(errno)));
-                    continue;
-            }
-        }
-        */
-        if (sem_wait(&midisem) < 0)
+        if (sem_wait(&midiSem) < 0)
         {
             Runtime.Log("midiThread semaphore wait error, "
                         + string(strerror(errno)));
             continue;
         }
-        fetch = jack_ringbuffer_read(midiringbuf, (char*)&midiEvent, sizeof(struct midi_event));
+        if (!Runtime.runSynth)
+            break;
+        fetch = jack_ringbuffer_read(midi.ringBuf, (char*)&midiEvent, sizeof(struct midi_event));
         if (fetch != sizeof(struct midi_event))
         {
             Runtime.Log("Short ringbuffer read, " + asString(fetch) + " / "
@@ -505,7 +508,7 @@ void *JackEngine::midiThread(void)
                 break;
         }
     }
-    sem_destroy(&midisem);
+    sem_destroy(&midiSem);
     return NULL;
 }
 
@@ -519,16 +522,14 @@ void *JackEngine::midiThread(void)
 
     void JackEngine::jsessionCallback(jack_session_event_t *event)
     {
-        lastevent = event;
-        Runtime.setJackSessionSave(event->type, event->session_dir, event->client_uuid);
-    }
-
-
-    bool JackEngine::jacksessionReply(string cmdline)
-    {
-        lastevent->command_line = strdup(cmdline.c_str());
-        bool ok = !jack_session_reply(jackClient, lastevent);
-        jack_session_event_free(lastevent);
-        return ok;
+        string uuid = string(event->client_uuid);
+        string filename = string("yoshimi-") + uuid + string(".xml");
+        string filepath = string(event->session_dir) + filename;
+        Runtime.setJackSessionSave((int)event->type, filepath);
+        string cmd = string("yoshimi -U ") + uuid + string(" -u ${SESSION_DIR}") + filename;
+        event->command_line = strdup(cmd.c_str());
+        if (jack_session_reply(jackClient, event))
+            Runtime.Log("Jack session reply failed");
+        jack_session_event_free(event);
     }
 #endif

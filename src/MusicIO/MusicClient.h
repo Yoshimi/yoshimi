@@ -35,7 +35,6 @@ class MusicClient
         bool Open(void) { return openAudio() && openMidi(); }
         virtual bool Start(void) = 0;
         virtual void Close(void) = 0;
-        virtual bool jacksessionReply(string cmdline) { return false; }
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual int grossLatency(void) = 0;
@@ -43,10 +42,9 @@ class MusicClient
         virtual string midiClientName(void) = 0;
         virtual int audioClientId(void) = 0;
         virtual int midiClientId(void) = 0;
-
         static MusicClient *newMusicClient(void);
-        string      audiodevice;
-        string      mididevice;
+        string audiodevice;
+        string mididevice;
 
     protected:
         virtual bool openAudio(void) = 0;

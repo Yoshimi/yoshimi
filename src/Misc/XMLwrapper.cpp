@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified January 2011
+    This file is derivative of original ZynAddSubFX code, modified March 2011
 */
 
 #include <zlib.h>
@@ -45,17 +45,17 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 }
 
 
-XMLwrapper::XMLwrapper()
+XMLwrapper::XMLwrapper() :
+    minimal(false),
+    stackpos(0)
 {
-    minimal = true;
     information.PADsynth_used = 0;
-    stackpos = 0;
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
     mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
 
-    node=root = mxmlNewElement(tree, "ZynAddSubFX-data");
+    node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
 
     mxmlElementSetAttr(root, "version-major", "1");
     mxmlElementSetAttr(root, "version-minor", "1");

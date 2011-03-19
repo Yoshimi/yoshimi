@@ -720,7 +720,7 @@ void ADnote::killVoice(int nvoice)
 
     if ((NoteVoicePar[nvoice].FMEnabled != NONE)
        && (NoteVoicePar[nvoice].FMVoice < 0))
-        delete [] NoteVoicePar[nvoice].FMSmp;
+        fftwf_free(NoteVoicePar[nvoice].FMSmp);
 
     if (NoteVoicePar[nvoice].VoiceOut != NULL)
         memset(NoteVoicePar[nvoice].VoiceOut, 0, synth->bufferbytes);
@@ -874,7 +874,7 @@ void ADnote::initParameters(void)
         {
             adpars->VoicePar[nvoice].FMSmp->newrandseed();
             NoteVoicePar[nvoice].FMSmp =
-                new float[synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES];
+                (float*)fftwf_malloc(synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES);
 
             // Perform Anti-aliasing only on MORPH or RING MODULATION
 

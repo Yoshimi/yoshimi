@@ -2,7 +2,7 @@
     MidiControl.h
   
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2011, Alan Calvert
+    Copyright 2009, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -22,7 +22,7 @@
 #define MIDI_CONTROL_H
 
 typedef enum {
-    C_null =                  0,
+    C_NULL =                  0,
     C_pitchwheel =         1000,
     C_expression =           11,
     C_panning =              10,
@@ -38,7 +38,11 @@ typedef enum {
     C_resetallcontrollers = 121,
     C_portamento =           65,
     C_resonance_center =     77,
-    C_resonance_bandwidth =  78
+    C_resonance_bandwidth =  78,
+    C_dataentryhi =        0x06,
+    C_dataentrylo =        0x26,
+    C_nrpnhi =               99,
+    C_nrpnlo =               98
 } MidiControllers;
 
 #endif

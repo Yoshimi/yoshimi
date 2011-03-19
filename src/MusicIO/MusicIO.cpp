@@ -19,6 +19,7 @@
 
 #include <errno.h>
 #include <cstring>
+#include <fftw3.h>
 
 using namespace std;   
 
@@ -39,17 +40,11 @@ MusicIO::MusicIO() :
 MusicIO::~MusicIO()
 {
     if (zynLeft)
-        delete [] zynLeft;
+        fftwf_free(zynLeft);
     if (zynRight)
-        delete [] zynRight;
+        fftwf_free(zynRight);
     if (interleavedShorts)
         delete [] interleavedShorts;
-}
-
-
- void MusicIO::getAudio(void)
-{
-    synth->MasterAudio(zynLeft, zynRight);
 }
 
 
@@ -70,7 +65,7 @@ void MusicIO::InterleaveShorts(void)
 
 int MusicIO::getMidiController(unsigned char b)
 {
-    int ctl = C_null;
+    int ctl = C_NULL;
     switch (b)
     {
 	    case 1: // Modulation Wheel
@@ -118,8 +113,21 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 123: // All Notes OFF
             ctl = C_allnotesoff;
 	        break;
+	    // RPN and NRPN
+	    case 0x06: // Data Entry (Coarse)
+            ctl = C_dataentryhi;
+	         break;
+	    case 0x26: // Data Entry (Fine)
+            ctl = C_dataentrylo;
+	         break;
+	    case 99:  // NRPN (Coarse)
+            ctl = C_nrpnhi;
+	         break;
+	    case 98: // NRPN (Fine)
+            ctl = C_nrpnlo;
+	        break;
 	    default: // an unrecognised controller!
-            ctl = C_null;
+            ctl = C_NULL;
             break;
 	}
     return ctl;
@@ -150,12 +158,12 @@ bool MusicIO::prepBuffers(bool with_interleaved)
     int buffersize = getBuffersize();
     if (buffersize > 0)
     {
-        zynLeft = new float[buffersize];
-        zynRight = new float[buffersize];
-        if (NULL == zynLeft || NULL == zynRight)
+        if (!(zynLeft = (float*)fftwf_malloc(buffersize * sizeof(float))))
             goto bail_out;
-        memset(zynLeft, 0, sizeof(float) * buffersize);
-        memset(zynRight, 0, sizeof(float) * buffersize);
+        if (!(zynRight = (float*)fftwf_malloc(buffersize * sizeof(float))))
+            goto bail_out;
+        memset(zynLeft, 0, buffersize * sizeof(float));
+        memset(zynRight, 0, buffersize * sizeof(float));
         if (with_interleaved)
         {
             interleavedShorts = new short int[buffersize * 2];
@@ -168,14 +176,20 @@ bool MusicIO::prepBuffers(bool with_interleaved)
 
 bail_out:
     Runtime.Log("Failed to allocate audio buffers, size " + asString(buffersize));
-    if (NULL != zynLeft)
-        delete [] zynLeft;
-    if (NULL != zynRight)
-        delete [] zynRight;
-    if (NULL != interleavedShorts)
+    if (zynLeft)
+    {
+        fftwf_free(zynLeft);
+        zynLeft = NULL;
+    }
+    if (zynRight)
+    {
+        fftwf_free(zynRight);
+        zynRight = NULL;
+    }
+    if (interleavedShorts)
+    {
         delete [] interleavedShorts;
-    zynLeft = NULL;
-    zynRight = NULL;
-    interleavedShorts = NULL;
+        interleavedShorts = NULL;
+    }
     return false;
 }

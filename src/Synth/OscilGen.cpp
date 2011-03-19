@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2011
+    This file is a derivative of a ZynAddSubFX original, modified March 2011
 */
 
 #include <cmath>
@@ -39,7 +39,7 @@ struct random_data OscilGen::harmonic_random_buf;
 OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) :
     Presets(),
     ADvsPAD(false),
-    tmpsmps(new float[synth->oscilsize]),
+    tmpsmps((float*)fftwf_malloc(synth->oscilsize * sizeof(float))),
     fft(fft_),
     res(res_),
     randseed(1)
@@ -59,9 +59,9 @@ OscilGen::~OscilGen()
 {
     FFTwrapper::deleteFFTFREQS(&basefuncFFTfreqs);
     FFTwrapper::deleteFFTFREQS(&oscilFFTfreqs);
-    if (NULL != tmpsmps)
+    if (tmpsmps)
     {
-        delete [] tmpsmps;
+        fftwf_free(tmpsmps);
         FFTwrapper::deleteFFTFREQS(&outoscilFFTfreqs);
     }
 }

@@ -93,9 +93,9 @@ SynthEngine::SynthEngine() :
     halfoscilsize_f(halfoscilsize),
     ctl(NULL),
     fft(NULL),
+    muted(0xFF),
     tmpmixl(NULL),
     tmpmixr(NULL),
-    muted(0),
     processLock(NULL),
     meterLock(NULL),
     stateXMLtree(NULL)
@@ -113,7 +113,6 @@ SynthEngine::SynthEngine() :
 
 SynthEngine::~SynthEngine()
 {
-    __sync_or_and_fetch(&muted, muted, 0xFF);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
             delete part[npart];
@@ -126,9 +125,9 @@ SynthEngine::~SynthEngine()
             delete sysefx[nefx];
 
     if (tmpmixl)
-        delete [] tmpmixl;
+        fftwf_free(tmpmixl);
     if (tmpmixr)
-        delete [] tmpmixr;
+        fftwf_free(tmpmixr);
     if (fft)
         delete fft;
     pthread_mutex_destroy(&processMutex);
@@ -182,8 +181,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-    tmpmixl = new float[synth->bufferbytes];
-    tmpmixr = new float[synth->bufferbytes];
+     tmpmixl = (float*)fftwf_malloc(synth->bufferbytes);
+     tmpmixr = (float*)fftwf_malloc(synth->bufferbytes);
     if (!tmpmixl || !tmpmixr)
     {
         Runtime.Log("SynthEngine tmpmix allocations failed");
@@ -198,7 +197,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        vuoutpeakpart[npart] = 1e-9f;
+        vuoutpeakpart[npart] = 1e-9;
         fakepeakpart[npart] = 0;
     }
 
@@ -222,7 +221,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
     }
     defaults();
-    if (Runtime.doRestoreJackSession)
+    if (Runtime.restoreJackSession)
     {
         if (!Runtime.restoreJsession(this))
         {
@@ -230,9 +229,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
     }
-    else if (Runtime.doRestoreState)
+    else if (Runtime.restoreState)
     {
-        if (!Runtime.restoreState(this))
+        if (!Runtime.stateRestore(this))
          {
              Runtime.Log("Restore state failed");
              goto bail_out;
@@ -273,10 +272,10 @@ bail_out:
         delete fft;
     fft = NULL;
     if (tmpmixl)
-        delete [] tmpmixl;
+        fftwf_free(tmpmixl);
     tmpmixl = NULL;
     if (tmpmixr)
-        delete [] tmpmixr;
+        fftwf_free(tmpmixr);
     tmpmixr = NULL;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -309,7 +308,7 @@ void SynthEngine::defaults(void)
         part[npart]->defaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
-    partonoff(0, 1); // always enable the first part
+    partonoff(0, 1); // enable the first part
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
@@ -334,7 +333,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
 {
     if (!velocity)
         this->NoteOff(chan, note);
-    else if (!muted)
+    else if (!isMuted())
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
             if (chan == part[npart]->Prcvchn)
@@ -369,18 +368,47 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 // Controllers
 void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
 {
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {   // Send the controller to all part assigned to the channel
-        if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-            part[npart]->SetController(type, par);
-    }
+    if (type == C_dataentryhi
+        || type == C_dataentrylo
+        || type == C_nrpnhi
+        || type == C_nrpnlo)
+    {
+        // Process RPN and NRPN by the Master (ignore the chan)
+        ctl->setparameternumber(type, par);
 
-    if (type == C_allsoundsoff)
-    {   // cleanup insertion/system FX
-        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-            sysefx[nefx]->cleanup();
-        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-            insefx[nefx]->cleanup();
+        int parhi = -1, parlo = -1, valhi = -1, vallo = -1;
+        if (!ctl->getnrpn(&parhi, &parlo, &valhi, &vallo))
+        {   // this is NRPN
+            // fprintf(stderr,"rcv. NRPN: %d %d %d %d\n",parhi,parlo,valhi,vallo);
+            switch (parhi)
+            {
+                case 0x04: // System Effects
+                    if (parlo < NUM_SYS_EFX)
+                        sysefx[parlo]->seteffectpar_nolock(valhi, vallo);
+                    break;
+            case 0x08: // Insertion Effects
+                if (parlo < NUM_INS_EFX)
+                    insefx[parlo]->seteffectpar_nolock(valhi, vallo);
+                break;
+
+            }
+        }
+    }
+    else
+    {   // other controllers
+        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        {   // Send the controller to all part assigned to the channel
+            if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                part[npart]->SetController(type, par);
+        }
+
+        if (type == C_allsoundsoff)
+        {   // cleanup insertion/system FX
+            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+                sysefx[nefx]->cleanup();
+            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+                insefx[nefx]->cleanup();
+        }
     }
 }
 
@@ -411,6 +439,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     memset(outr, 0, bufferbytes);
     if (isMuted())
         return;
+
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -761,6 +790,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     actionLock(lockmute);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
+    xml->addparbool("nrpn_receive", ctl->NRPN.receive);
 
     xml->beginbranch("MICROTONAL");
     microtonal.add2XML(xml);
@@ -886,6 +916,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     }
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar127("key_shift", Pkeyshift));
+    ctl->NRPN.receive = xml->getparbool("nrpn_receive", ctl->NRPN.receive);
 
     part[0]->Penabled = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)

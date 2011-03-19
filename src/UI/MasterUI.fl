@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified March 2011
+This file is a derivative of the ZynAddSubFX original, modified February 2011
 } {in_source in_header
 } 
 
@@ -102,8 +102,7 @@ class MasterUI {open : {private MiscFuncs}
       configui = NULL;
       presetsui = NULL;
       paramsui = NULL;
-      yoshiLog = NULL;
-      versiontext = string("Yoshimi " YOSHIMI_VERSION);} {}
+      yoshiLog = NULL;} {}
   }
   Function {~MasterUI()} {} {
     code {//
@@ -188,13 +187,13 @@ class MasterUI {open : {private MiscFuncs}
         }
         else
             Runtime.runSynth = false;} open
-      xywh {1412 565 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {1403 331 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
-      Fl_Menu_Bar mastermenu {open
+      Fl_Menu_Bar mastermenu {
         xywh {-5 0 690 25} labelsize 13
       } {
         Submenu {} {
-          label {&Yoshimi} open selected
+          label {&Yoshimi}
           xywh {0 0 100 20} labelsize 12
         } {
           MenuItem {} {
@@ -649,7 +648,7 @@ class MasterUI {open : {private MiscFuncs}
       Fl_Group partuigroup {open
         xywh {1 255 387 172} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {
+        Fl_Group partui {selected
           xywh {3 255 384 170} box FLAT_BOX color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
@@ -698,7 +697,7 @@ ZynAddSubFX}
         label {copyright notice}
         xywh {25 100 275 50} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
         code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others, "
-                                    "Copyright 2009-2010, Alan Calvert").c_str());}
+                               "Copyright 2009-2010, Alan Calvert").c_str());}
       }
       Fl_Box {} {
         label {copy terms}
@@ -711,7 +710,9 @@ ZynAddSubFX}
       Fl_Box {} {
         label { version}
         xywh {45 216 225 17} labelsize 11 labelcolor 145
-        code0 {o->copy_label(versiontext.c_str());}
+        code0 {//
+            o->copy_label((string("Yoshimi version ")
+                           + string( YOSHIMI_VERSION )).c_str());}
       }
       Fl_Button {} {
         label Close
@@ -796,9 +797,11 @@ ZynAddSubFX}
         if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
             delete microtonalui;
+
             synth->actionLock(lockmute);
             synth->defaults();
             synth->actionLock(unlock);
+
             npartcounter->value(1);
             refresh_master_ui();
         }
@@ -962,6 +965,5 @@ ZynAddSubFX}
   decl {int swapefftype;} {}
   decl {string masterwindowlabel;} {}
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {}
-  decl {string versiontext;} {}
   decl {ConsoleUI *yoshiLog;} {}
 } 

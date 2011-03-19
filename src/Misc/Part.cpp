@@ -50,13 +50,13 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
     partMuted(0)
 {
     ctl = new Controller();
-    partoutl = new float[synth->bufferbytes];
+    partoutl = (float*)fftwf_malloc(synth->bufferbytes);
     memset(partoutl, 0, synth->bufferbytes);
-    partoutr = new float[synth->bufferbytes];
+    partoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(partoutr, 0, synth->bufferbytes);
-    tmpoutl = new float [synth->bufferbytes];
+    tmpoutl = (float*)fftwf_malloc(synth->bufferbytes);
     memset(tmpoutl, 0, synth->bufferbytes);
-    tmpoutr = new float[synth->bufferbytes];
+    tmpoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(tmpoutr, 0, synth->bufferbytes);
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
@@ -77,9 +77,9 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
 
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
-        partfxinputl[n] = new float[synth->bufferbytes];
+        partfxinputl[n] = (float*)fftwf_malloc(synth->bufferbytes);
         memset(partfxinputl[n], 0, synth->bufferbytes);
-        partfxinputr[n] = new float[synth->bufferbytes];
+        partfxinputr[n] = (float*)fftwf_malloc(synth->bufferbytes);
         memset(partfxinputr[n], 0, synth->bufferbytes);
         Pefxbypass[n] = false;
     }
@@ -205,10 +205,10 @@ Part::~Part()
         if (kit[n].padpars)
             delete kit[n].padpars;
     }
-    delete [] partoutl;
-    delete [] partoutr;
-    delete [] tmpoutl;
-    delete [] tmpoutr;
+    fftwf_free(partoutl);
+    fftwf_free(partoutr);
+    fftwf_free(tmpoutl);
+    fftwf_free(tmpoutr);
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
     {
         if (partefx[nefx])
@@ -217,9 +217,9 @@ Part::~Part()
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
         if (partfxinputl[n])
-            delete [] partfxinputl[n];
+            fftwf_free(partfxinputl[n]);
         if (partfxinputr[n])
-            delete [] partfxinputr[n];
+            fftwf_free(partfxinputr[n]);
     }
     if (ctl)
         delete ctl;

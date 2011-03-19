@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
 
 #include <cmath>
@@ -51,6 +51,8 @@ void Controller::defaults(void)
     fmamp.receive = 1;
     volume.receive = 1;
     sustain.receive = 1;
+    NRPN.receive = 1;
+
     portamento.portamento = 0;
     portamento.used = 0;
     portamento.receive = 1;
@@ -81,6 +83,12 @@ void Controller::resetall()
     setsustain(0);
     setresonancecenter(64);
     setresonancebw(64);
+
+    //reset the NRPN
+    NRPN.parhi = -1;
+    NRPN.parlo = -1;
+    NRPN.valhi = -1;
+    NRPN.vallo = -1;
 }
 
 
@@ -283,6 +291,48 @@ void Controller::setresonancebw(int value)
 {
     resonancebandwidth.data = value;
     resonancebandwidth.relbw = powf(1.5f, (value - 64.0f) / 64.0f * (resonancebandwidth.depth / 127.0f));
+}
+
+
+// Returns 0 if there is NRPN or 1 if there is not
+int Controller::getnrpn(int *parhi, int *parlo, int *valhi, int *vallo)
+{
+    if (NRPN.receive == 0)
+        return 1;
+    if (NRPN.parhi < 0 || NRPN.parlo < 0 || NRPN.valhi < 0 || NRPN.vallo < 0)
+        return 1;
+
+    *parhi = NRPN.parhi;
+    *parlo = NRPN.parlo;
+    *valhi = NRPN.valhi;
+    *vallo = NRPN.vallo;
+    return 0;
+}
+
+
+void Controller::setparameternumber(unsigned int type,int value)
+{
+    switch (type)
+    {
+        case C_nrpnhi:
+            NRPN.parhi = value;
+            NRPN.valhi = -1;
+            NRPN.vallo = -1; // clear the values
+            break;
+        case C_nrpnlo:
+            NRPN.parlo = value;
+            NRPN.valhi = -1;
+            NRPN.vallo = -1; // clear the values
+            break;
+        case C_dataentryhi:
+            if (NRPN.parhi >= 0 && NRPN.parlo >= 0)
+                NRPN.valhi = value;
+            break;
+        case C_dataentrylo:
+            if (NRPN.parhi >= 0 && NRPN.parlo >= 0)
+                NRPN.vallo = value;
+            break;
+    }
 }
 
 

@@ -71,10 +71,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ShutUp(void);
         void MasterAudio(float *outl, float *outr);
         void partonoff(int npart, int what);
-
-        inline void Mute(void) { __sync_or_and_fetch(&muted, muted, 0xFF); }
-        inline void Unmute(void) { __sync_and_and_fetch(&muted, muted, 0); }
-        inline int isMuted(void) { return __sync_fetch_and_add(&muted, 0); }
+        void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
+        void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
+        bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
 
         Part *part[NUM_MIDI_PARTS];
         bool shutup;
@@ -132,13 +131,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
 
     private:
+        int muted;
         float volume;
         float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
         float *tmpmixl; // Temporary mixing samples for part samples
         float *tmpmixr; // which are sent to system effect
         int keyshift;
-        int muted;
+
         float vuoutpeakl;
         float vuoutpeakr;
         float vumaxoutpeakl;

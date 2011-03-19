@@ -53,21 +53,21 @@ int main(int argc, char *argv[])
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
-        Runtime.Log("Master init failed");
+        Runtime.Log("SynthEngine init failed");
         goto bail_out;
     }
 
-    if (!startMainThread())
-    {
-        Runtime.Log("Failed to start main thread");
-        goto bail_out;
-    }
     if (!musicClient->Start())
     {
         Runtime.Log("Failed to start MusicIO");
         goto bail_out;
     }
-    synth->Unmute();
+    if (!startMainThread())
+    {
+        Runtime.Log("Failed to start main thread");
+        goto bail_out;
+    }
+
     while (Runtime.runSynth)
     {
         Runtime.signalCheck();
@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
         if (Runtime.runSynth)
             usleep(50000); // where all the action is ...
     }
-    synth->Mute();
     musicClient->Close();
     delete musicClient;
     delete synth;
@@ -97,6 +96,7 @@ bail_out:
 
 static void *mainthread(void *arg)
 {
+    synth->Unmute();
     while (Runtime.runSynth)
     {
         if (!Runtime.LogList.empty())
@@ -110,6 +110,7 @@ static void *mainthread(void *arg)
     }
     if (guiMaster)
         delete guiMaster;
+    sleep(100);
     return NULL;
 }
 

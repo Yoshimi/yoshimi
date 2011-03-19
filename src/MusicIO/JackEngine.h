@@ -46,11 +46,11 @@ class JackEngine : public MusicIO
         bool openMidi(void);
         bool Start(void);
         void Close(void);
-        #if defined(JACK_SESSION)
-            bool jacksessionReply(string cmdline);
-        #endif
-        unsigned int getSamplerate(void) { return jackSamplerate; };
-        int getBuffersize(void) { return jackNframes; };
+        //#if defined(JACK_SESSION)
+        //    bool jacksessionReply(string cmdline);
+        //#endif
+        unsigned int getSamplerate(void) { return audio.jackSamplerate; };
+        int getBuffersize(void) { return audio.jackNframes; };
         string clientName(void);
         int clientId(void);
 
@@ -73,24 +73,28 @@ class JackEngine : public MusicIO
             jack_session_event_t *lastevent;
         #endif
 
-        jack_client_t *jackClient;
-        unsigned int   jackSamplerate;
-        unsigned int   jackNframes;
-        jack_port_t   *jackaudioportL;
-        jack_port_t   *jackaudioportR;
-        jack_port_t   *jackmidiport;
-        float         *jackportbufL;
-        float         *jackportbufR;
-        sem_t          midisem;
-        pthread_t      midiPthread;
-        jack_ringbuffer_t *midiringbuf;
+        jack_client_t      *jackClient;
+        struct {
+            unsigned int  jackSamplerate;
+            unsigned int  jackNframes;
+            jack_port_t  *ports[2];
+            float        *portBuffs[2];
+        } audio;
+
+        struct {
+            jack_port_t*       port;
+            jack_ringbuffer_t *ringBuf;
+            pthread_t          pThread;
+        } midi;
+        
+        sem_t midiSem;
 
         struct midi_event {
             jack_nframes_t time;
             char data[4]; // all events of interest are <= 4bytes
         };
-
+        
+        string sessionfile;
 };
 
 #endif
-//sem_post(midi.eventsUp)

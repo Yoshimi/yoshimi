@@ -21,7 +21,7 @@
 #ifndef MUSIC_IO_H
 #define MUSIC_IO_H
 
-#include "Misc/MiscFuncs.h"
+#include "Misc/SynthEngine.h"
 
 class MusicIO : protected MiscFuncs
 {
@@ -37,7 +37,7 @@ class MusicIO : protected MiscFuncs
 
     protected:
         bool prepBuffers(bool with_interleaved);
-        void getAudio(void);
+        void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         void InterleaveShorts(void);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);

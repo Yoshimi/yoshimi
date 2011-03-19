@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include <iostream>
@@ -46,8 +46,6 @@ using namespace std;
 
 Config Runtime;
 
-int Config::sigIntActive = 0;
-int Config::ladi1IntActive = 0;
 struct sigaction Config::sigAction;
 
 const unsigned short Config::MaxParamsHistory = 25;
@@ -56,7 +54,7 @@ unsigned short Config::nextHistoryIndex = numeric_limits<unsigned int>::max();
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
-    "Copyright 2009-2010 Alan Calvert";
+    "Copyright 2009-2011 Alan Calvert";
 
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
@@ -69,22 +67,24 @@ static struct argp_option cmd_options[] = {
     {"jack-audio",        'J',  "<server>", 0x1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>", 0x1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
+    {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
     {"load",              'l',  "<file>",     0,  "load .xmz file" },
     {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
     {"oscilsize",         'o',  "<size>",     0,  "set oscilsize" },
     {"state",             'S',  "<file>",   0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
-    {"jack-session-file", 'u',  "<file>",     0,  "load jack session file" },
-    {"jack-session-file", 'U',  "<uuid>",     0,  "jack session uuid" },
+    #if defined(JACK_SESSION)
+        {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
+        {"jack-session-file", 'u',  "<file>",     0,  "load jack session file" },
+    #endif
     { 0, }
 };
 
 
-
 Config::Config() :
-    doRestoreState(false),
-    doRestoreJackSession(false),
+    restoreState(false),
+    restoreJackSession(false),
     baseCmdLine("yoshimi"),
     Samplerate(48000),
     Buffersize(128),
@@ -99,18 +99,19 @@ Config::Config() :
     midiDevice("default"),
     jackServer("default"),
     startJack(false),
+    connectJackaudio(false),
     alsaAudioDevice("default"),
     alsaSamplerate(48000),
     alsaBuffersize(256),
     alsaMidiDevice("default"),
-    Float32bitWavs(false),
-    DefaultRecordDirectory("/tmp"),
     BankUIAutoClose(0),
     Interpolation(0),
     CheckPADsynth(1),
     rtprio(50),
     configChanged(false),
     deadObjects(NULL),
+    sigIntActive(0),
+    ladi1IntActive(0),
     sse_level(0),
     programCmd("yoshimi")
 {
@@ -171,16 +172,10 @@ bool Config::Setup(int argc, char **argv)
     if (!midiDevice.size())
         midiDevice = "default";
     loadCmdArgs(argc, argv);
-    if (doRestoreState && !(StateFile.size() && isRegFile(StateFile)))
+    if (restoreState && !(StateFile.size() && isRegFile(StateFile)))
     {
         Log("Invalid state file specified for restore: " + StateFile);
         return false;
-    }
-    if (jackSessionUuid.size() && jackSessionFile.size() && isRegFile(jackSessionFile))
-    {
-        Log(string("Restore jack session requested, uuid ") + jackSessionUuid
-            + string(", session file ") + jackSessionFile);
-        doRestoreJackSession = true;
     }
     AntiDenormals(true);
     return true;
@@ -323,15 +318,7 @@ bool Config::loadConfig(void)
             }
             isok = extractConfigData(xml);
             if (isok)
-            {
                 Oscilsize = lrintf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
-                if (DefaultRecordDirectory.empty())
-                    DefaultRecordDirectory = string("/tmp/");
-                if (DefaultRecordDirectory.at(DefaultRecordDirectory.size() - 1) != '/')
-                    DefaultRecordDirectory += "/";
-                if (CurrentRecordDirectory.empty())
-                    CurrentRecordDirectory = DefaultRecordDirectory;
-            }
             delete xml;
         }
     }
@@ -431,10 +418,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
     // jack settings
     jackServer = xml->getparstr("linux_jack_server");
 
-    // recorder settings
-    DefaultRecordDirectory = xml->getparstr("DefaultRecordDirectory");
-    Float32bitWavs = xml->getparbool("Float32bitWavs", false);
-
     if (xml->enterbranch("XMZ_HISTORY"))
     {
         int hist_size = xml->getpar("history_size", 0, 0, MaxParamsHistory);
@@ -508,8 +491,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
     xmltree->addparstr("linux_jack_server", jackServer);
-    xmltree->addparstr("DefaultRecordDirectory", DefaultRecordDirectory);
-    xmltree->addpar("Float32bitWavs", Float32bitWavs);
 
     // Parameters history
     if (ParamsHistory.size())
@@ -530,31 +511,25 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 }
 
 
-void Config::saveState(void)
-{
-    saveSessionData(StateFile);
-}
-
-
 void Config::saveSessionData(string savefile)
 {
     XMLwrapper *xmltree = new XMLwrapper();
     if (!xmltree)
     {
-        Log("saveState failed xmltree allocation");
+        Log("saveSessionData failed xmltree allocation");
         return;
     }
     addConfigXML(xmltree);
     addRuntimeXML(xmltree);
     synth->add2XML(xmltree);
     if (xmltree->saveXMLfile(savefile))
-        Log("Session state saved to " + savefile);
+        Log("Session data saved to " + savefile);
     else
-        Log("Session state save to " + savefile + " failed");
+        Log("Failed to save session data to " + savefile);
 }
 
 
-bool Config::restoreState(SynthEngine *synth)
+bool Config::stateRestore(SynthEngine *synth)
 {
     return restoreSessionData(synth, StateFile);
 }
@@ -562,11 +537,12 @@ bool Config::restoreState(SynthEngine *synth)
 
 bool Config::restoreSessionData(SynthEngine *synth, string sessionfile)
 {
+    Log("Into restoreSessionData, file " + sessionfile, true);
     XMLwrapper *xml = NULL;
     bool ok = false;
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
-        Log("Session file " + sessionfile + " not available");
+        Log("Session file " + sessionfile + " not available", true);
         goto end_game;
     }
     if (!(xml = new XMLwrapper()))
@@ -786,30 +762,33 @@ void Config::sigHandler(int sig)
 void Config::signalCheck(void)
 {
     #if defined(JACK_SESSION)
-        switch (jsessionSave)
+        int jsev = __sync_fetch_and_add(&jsessionSave, 0);
+        if (jsev != 0)
         {
-            case JackSessionSave:
-                saveJackSession();
-                __sync_and_and_fetch(&jsessionSave, 0);
-                break;
-            case JackSessionSaveAndQuit:
-                saveJackSession();
-                runSynth = false;
-                __sync_and_and_fetch(&jsessionSave, 0);
-                break;
-            case JackSessionSaveTemplate:
-                // not implemented
-                __sync_and_and_fetch(&jsessionSave, 0);
-                break;
-            default:
-                break;
+            __sync_and_and_fetch(&jsessionSave, 0);
+            switch (jsev)
+            {
+                case JackSessionSave:
+                    saveJackSession();
+                    break;
+                case JackSessionSaveAndQuit:
+                    saveJackSession();
+                    runSynth = false;
+                    break;
+                case JackSessionSaveTemplate: // not implemented
+                    break;
+                default:
+                    break;
+            }
         }
     #endif
+
     if (ladi1IntActive)
     {
-        saveState();
         __sync_and_and_fetch(&ladi1IntActive, 0);
+        saveSessionData(StateFile);
     }
+
     if (sigIntActive)
         runSynth = false;
 }
@@ -838,26 +817,17 @@ bool Config::restoreJsession(SynthEngine *synth)
 }
 
 
-void Config::setJackSessionSave(int event_type, const char *session_dir, const char *client_uuid)
+void Config::setJackSessionSave(int event_type, string session_file)
 {
-    jackSessionDir = string(session_dir);
-    jackSessionUuid = string(client_uuid);
-    jackSessionFile = "yoshimi-" + jackSessionUuid + ".xml";
-    if (!__sync_bool_compare_and_swap (&jsessionSave, jsessionSave, event_type))
-        Log("Error setting jack session save");
+    jackSessionFile = session_file;
+    __sync_and_and_fetch(&jsessionSave, 0);
+    __sync_or_and_fetch(&jsessionSave, event_type);
 }
 
 
 void Config::saveJackSession(void)
 {
-    saveSessionData(jackSessionDir + jackSessionFile);
-    string cmd = string("yoshimi -U ") + jackSessionUuid
-                 + string(" -u ${SESSION_DIR}") + jackSessionFile;
-    Log("Jack session saved to " + jackSessionDir + jackSessionFile + ", restart command: " + cmd);
-    if (!musicClient->jacksessionReply(cmd))
-        Log("Error on jack session reply");
-    jackSessionDir.clear();
-    jackSessionUuid.clear();
+    saveSessionData(jackSessionFile);
     jackSessionFile.clear();
 }
 
@@ -982,23 +952,22 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 settings->midiDevice = string(arg);
             break;
         case 'k': settings->startJack = true; break;
+        case 'K': settings->connectJackaudio = true; break;
         case 'S':
-            settings->doRestoreState = true;
+            settings->restoreState = true;
             if (arg)
                 settings->StateFile = string(arg);
             break;
-        case 'u':
-            #if defined(JACK_SESSION)
+        #if defined(JACK_SESSION)
+            case 'u':
                 if (arg)
                     settings->jackSessionFile = string(arg);
-            #endif
+                break;
+            case 'U':
+                    if (arg)
+                        settings->jackSessionUuid = string(arg);
             break;
-        case 'U':
-            #if defined(JACK_SESSION)
-                if (arg)
-                    settings->jackSessionUuid = string(arg);
-            #endif
-            break;
+        #endif
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;
@@ -1014,4 +983,6 @@ static struct argp cmd_argp = { cmd_options, parse_cmds, prog_doc };
 void Config::loadCmdArgs(int argc, char **argv)
 {
     argp_parse(&cmd_argp, argc, argv, 0, 0, this);
+    if (jackSessionUuid.size() && jackSessionFile.size())
+        restoreJackSession = true;
 }
