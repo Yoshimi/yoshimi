@@ -765,13 +765,16 @@ bool SynthEngine::vupeakLock(lockset request)
 void SynthEngine::vuresetpeaks(void)
 {
     vupeakLock(lock);
-    vuOutPeakL = vuoutpeakl = 1e-12;
-    vuOutPeakR = vuoutpeakr =  1e-12;
-    vuMaxOutPeakL = vumaxoutpeakl = 1e-12;
-    vuMaxOutPeakR = vumaxoutpeakr = 1e-12;
-    vuRmsPeakL = vurmspeakl = 1e-12;
-    vuRmsPeakR = vurmspeakr = 1e-12;
-    vuClippedL = vuClippedL = clippedL = clippedR = false;
+    vuOutPeakL = vuoutpeakl = 1e-12f;
+    vuOutPeakR = vuoutpeakr =  1e-12f;
+    vuMaxOutPeakL = vumaxoutpeakl = 1e-12f;
+    vuMaxOutPeakR = vumaxoutpeakr = 1e-12f;
+    vuRmsPeakL = vurmspeakl = 1e-12f;
+    vuRmsPeakR = vurmspeakr = 1e-12f;
+    vuClippedL = false;
+    vuClippedL = false;
+    clippedL = false;
+    clippedR = false;
     vupeakLock(unlock);
 }
 

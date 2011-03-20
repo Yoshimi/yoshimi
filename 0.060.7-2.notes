@@ -1,3 +1,8 @@
+yoshimi-0.060.7-2
+
+Fix for segfault on ADnotes using frequency modulation, eg Will's 'Ethereal',
+'Steel Wire' et al
+
 yoshimi-0.060.7-1
 
 Still basically just 0.058.1 plus Paul's unison amd reverb enhancements, and

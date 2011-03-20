@@ -874,7 +874,7 @@ void ADnote::initParameters(void)
         {
             adpars->VoicePar[nvoice].FMSmp->newrandseed();
             NoteVoicePar[nvoice].FMSmp =
-                (float*)fftwf_malloc(synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES);
+                (float*)fftwf_malloc((synth->oscilsize + OSCIL_SMP_EXTRA_SAMPLES) * sizeof(float));
 
             // Perform Anti-aliasing only on MORPH or RING MODULATION
 
@@ -1294,7 +1294,8 @@ void ADnote::computeVoiceOscillatorRingModulation(int nvoice)
                                            FMnewamplitude[nvoice],
                                            i, synth->buffersize);
                 int FMVoice = NoteVoicePar[nvoice].FMVoice;
-                for (i = 0; i < synth->buffersize; ++i)
+                // !!! another case of i being incorrectly clobbered??
+                // for (i = 0; i < synth->buffersize; ++i)
                     tw[i] *= (1.0f - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
             }
         }
