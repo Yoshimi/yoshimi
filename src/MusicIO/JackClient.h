@@ -37,16 +37,12 @@ class JackClient : public MusicClient
         bool openMidi(void);
         bool Start(void) { return jackEngine.Start(); };
         void Close(void) { jackEngine.Close(); }
-        bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
         int getBuffersize(void) { return jackEngine.getBuffersize(); };
-        int grossLatency(void) { return jackEngine.grossLatency(); };
-
         string audioClientName(void) { return jackEngine.clientName(); };
         string midiClientName(void) { return jackEngine.clientName(); };
         int audioClientId(void) { return jackEngine.clientId(); };
         int midiClientId(void) { return jackEngine.clientId(); };
-
 
     private:
         JackEngine jackEngine;

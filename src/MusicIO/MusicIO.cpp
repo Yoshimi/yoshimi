@@ -32,9 +32,7 @@ MusicIO::MusicIO() :
     zynLeft(NULL),
     zynRight(NULL),
     interleavedShorts(NULL),
-    rtprio(25),
-    audioLatency(0),
-    midiLatency(0)
+    rtprio(25)
 { }
 
 MusicIO::~MusicIO()

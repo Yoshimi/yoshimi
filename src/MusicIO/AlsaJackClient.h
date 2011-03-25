@@ -38,11 +38,8 @@ class AlsaJackClient : public MusicClient
         bool openMidi(void);
         bool Start(void);
         void Close(void) { alsaEngine.Close(); jackEngine.Close(); }
-        bool jacksessionReply(string cmdline) { return jackEngine.jacksessionReply(cmdline); }
         unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
         int getBuffersize(void) { return alsaEngine.getBuffersize(); };
-        int grossLatency(void)
-            { return alsaEngine.grossLatency() + jackEngine.grossLatency(); };
         string audioClientName(void) { return alsaEngine.audioClientName(); };
         string midiClientName(void) { return jackEngine.clientName(); };
         int audioClientId(void) { return alsaEngine.audioClientId(); };

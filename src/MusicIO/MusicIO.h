@@ -23,7 +23,7 @@
 
 #include "Misc/SynthEngine.h"
 
-class MusicIO : protected MiscFuncs
+class MusicIO : virtual protected MiscFuncs
 {
     public:
         MusicIO();
@@ -32,8 +32,6 @@ class MusicIO : protected MiscFuncs
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
         virtual void Close(void) = 0;
-        bool jacksessionReply(string cmdline) { return false; }
-        int grossLatency(void) { return audioLatency + midiLatency; }
 
     protected:
         bool prepBuffers(bool with_interleaved);
@@ -48,8 +46,6 @@ class MusicIO : protected MiscFuncs
         float *zynRight;
         short int *interleavedShorts;
         int rtprio;
-        unsigned int audioLatency; // frames
-        unsigned int midiLatency;  // ""
 };
 
 #endif

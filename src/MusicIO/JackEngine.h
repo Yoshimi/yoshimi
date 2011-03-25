@@ -39,16 +39,12 @@ class JackEngine : public MusicIO
     public:
         JackEngine();
         ~JackEngine() { Close(); };
-
         bool isConnected(void) { return (NULL != jackClient); };
         bool connectServer(string server);
         bool openAudio(void);
         bool openMidi(void);
         bool Start(void);
         void Close(void);
-        //#if defined(JACK_SESSION)
-        //    bool jacksessionReply(string cmdline);
-        //#endif
         unsigned int getSamplerate(void) { return audio.jackSamplerate; };
         int getBuffersize(void) { return audio.jackNframes; };
         string clientName(void);
@@ -56,10 +52,10 @@ class JackEngine : public MusicIO
 
     private:
         bool openJackClient(string server);
-        bool new_openJackClient(string server);
         bool connectJackPorts(void);
         bool processAudio(jack_nframes_t nframes);
         bool processMidi(jack_nframes_t nframes);
+        bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);
         static int _processCallback(jack_nframes_t nframes, void *arg);
         static void *_midiThread(void *arg);
@@ -67,11 +63,17 @@ class JackEngine : public MusicIO
         static void _errorCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
-        #if defined(JACK_SESSION)
+
+#if defined(JACK_SESSION)
             static void _jsessionCallback(jack_session_event_t *event, void *arg);
             void jsessionCallback(jack_session_event_t *event);
             jack_session_event_t *lastevent;
-        #endif
+#endif
+
+#if defined(JACK_LATENCY)
+            static void _latencyCallback(jack_latency_callback_mode_t mode, void *arg);
+            void latencyCallback(jack_latency_callback_mode_t mode);
+#endif
 
         jack_client_t      *jackClient;
         struct {
@@ -86,15 +88,13 @@ class JackEngine : public MusicIO
             jack_ringbuffer_t *ringBuf;
             pthread_t          pThread;
         } midi;
-        
+
         sem_t midiSem;
 
         struct midi_event {
             jack_nframes_t time;
             char data[4]; // all events of interest are <= 4bytes
         };
-        
-        string sessionfile;
 };
 
 #endif

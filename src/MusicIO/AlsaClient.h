@@ -36,8 +36,6 @@ class AlsaClient : public MusicClient
         void Close(void) { alsaEngine.Close(); }
         unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
         int getBuffersize(void) { return alsaEngine.getBuffersize(); };
-        int grossLatency(void) { return alsaEngine.grossLatency(); };
-
         string audioClientName(void) { return alsaEngine.audioClientName(); };
         string midiClientName(void) { return alsaEngine.midiClientName(); };
         int audioClientId(void) { return alsaEngine.audioClientId(); };

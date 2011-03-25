@@ -37,7 +37,6 @@ class MusicClient
         virtual void Close(void) = 0;
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
-        virtual int grossLatency(void) = 0;
         virtual string audioClientName(void) = 0;
         virtual string midiClientName(void) = 0;
         virtual int audioClientId(void) = 0;

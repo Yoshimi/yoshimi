@@ -85,9 +85,8 @@ static struct argp_option cmd_options[] = {
 Config::Config() :
     restoreState(false),
     restoreJackSession(false),
-    baseCmdLine("yoshimi"),
     Samplerate(48000),
-    Buffersize(128),
+    Buffersize(256),
     Oscilsize(1024),
     runSynth(true),
     showGui(true),
@@ -101,8 +100,6 @@ Config::Config() :
     startJack(false),
     connectJackaudio(false),
     alsaAudioDevice("default"),
-    alsaSamplerate(48000),
-    alsaBuffersize(256),
     alsaMidiDevice("default"),
     BankUIAutoClose(0),
     Interpolation(0),
@@ -113,11 +110,11 @@ Config::Config() :
     sigIntActive(0),
     ladi1IntActive(0),
     sse_level(0),
-    programCmd("yoshimi")
+    programcommand(string("yoshimi"))
 {
-    // We need lrintf() to round toward zero. Special thanks go to
-    // Lars Luthman for this one!! 
-    fesetround(FE_TOWARDZERO);
+    fesetround(FE_TOWARDZERO); // Special thanks go to Lars Luthman for
+                               // conquering the heffalump. We need lrintf() to
+                               // round toward zero.
     cerr.precision(4);
     deadObjects = new BodyDisposal();
 }
@@ -451,8 +448,11 @@ void Config::saveConfig(void)
     }
     addConfigXML(xmltree);
     if (xmltree->saveXMLfile(ConfigFile))
+    {
+        configChanged = false;
         Log("Config saved to " + ConfigFile);
-     else
+    }
+    else
         Log("Failed to save config to " + ConfigFile);
     delete xmltree;
 }
@@ -517,7 +517,7 @@ void Config::saveSessionData(string savefile)
     XMLwrapper *xmltree = new XMLwrapper();
     if (!xmltree)
     {
-        Log("saveSessionData failed xmltree allocation");
+        Log("saveSessionData failed xmltree allocation", true);
         return;
     }
     addConfigXML(xmltree);
@@ -526,7 +526,7 @@ void Config::saveSessionData(string savefile)
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
     else
-        Log("Failed to save session data to " + savefile);
+        Log("Failed to save session data to " + savefile, true);
 }
 
 
@@ -538,7 +538,6 @@ bool Config::stateRestore(SynthEngine *synth)
 
 bool Config::restoreSessionData(SynthEngine *synth, string sessionfile)
 {
-    Log("Into restoreSessionData, file " + sessionfile, true);
     XMLwrapper *xml = NULL;
     bool ok = false;
     if (!sessionfile.size() || !isRegFile(sessionfile))
@@ -548,7 +547,7 @@ bool Config::restoreSessionData(SynthEngine *synth, string sessionfile)
     }
     if (!(xml = new XMLwrapper()))
     {
-        Log("Failed to init xmltree for restoreState");
+        Log("Failed to init xmltree for restoreState", true);
         goto end_game;
     }
 
@@ -570,7 +569,7 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
 {
     if (!xml->enterbranch("RUNTIME"))
     {
-        Log("Config extractRuntimeData, no RUNTIME branch");
+        Log("Config extractRuntimeData, no RUNTIME branch", true);
         return false;
     }
     audioEngine = (audio_drivers)xml->getpar("audio_engine", DEFAULT_AUDIO, no_audio, alsa_audio);
@@ -643,9 +642,7 @@ void Config::StartupReport(void)
     Log(report);
     Log("Oscilsize: " + asString(synth->oscilsize));
     Log("Samplerate: " + asString(synth->samplerate));
-    Log("Buffersize: " + asString(synth->buffersize));
-    Log("Alleged minimum latency: " + asString(synth->buffersize) + " frames, "
-        + asString(synth->buffersize * 1000.0f / synth->samplerate) + " ms");
+    Log("Period size: " + asString(synth->buffersize));
 }
 
 
@@ -676,7 +673,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     {
                         Log("Failed to set SCHED_FIFO policy in thread attribute: "
                                     + string(strerror(errno))
-                                    + " (" + asString(chk) + ")");
+                                    + " (" + asString(chk) + ")", true);
                         schedfifo = false;
                         continue;
                     }
@@ -684,7 +681,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     {
                         Log("Failed to set inherit scheduler thread attribute: "
                                     + string(strerror(errno)) + " ("
-                                    + asString(chk) + ")");
+                                    + asString(chk) + ")", true);
                         schedfifo = false;
                         continue;
                     }
@@ -697,7 +694,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     {
                         Log("Failed to set thread priority attribute: ("
                                     + asString(chk) + ")  "
-                                    + string(strerror(errno)));
+                                    + string(strerror(errno)), true);
                         schedfifo = false;
                         continue;
                     }
@@ -716,21 +713,21 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                 break;
             }
             else
-                Log("Failed to set thread detach state: " + asString(chk));
+                Log("Failed to set thread detach state: " + asString(chk), true);
             pthread_attr_destroy(&attr);
         }
         else
-            Log("Failed to initialise thread attributes: " + asString(chk));
+            Log("Failed to initialise thread attributes: " + asString(chk), true);
 
         if (schedfifo)
         {
             Log("Failed to start thread (sched_fifo): " + asString(chk)
-                + "  " + string(strerror(errno)));
+                + "  " + string(strerror(errno)), true);
             schedfifo = false;
             continue;
         }
         Log("Failed to start thread (sched_other): " + asString(chk)
-            + "  " + string(strerror(errno)));
+            + "  " + string(strerror(errno)), true);
         outcome = false;
         break;
     }

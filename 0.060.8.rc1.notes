@@ -1,3 +1,8 @@
+yoshimi-0.060.8.rc1
+
+lots of redundant variable cleanups; tried to accomodate the new latency API
+of jack 0.120.1; an attempt to eliminate the annoy Save State? dialogue on exit.
+
 yoshimi-0.060.7-2
 
 Fix for segfault on ADnotes using frequency modulation, eg Will's 'Ethereal',
@@ -7,7 +12,6 @@ yoshimi-0.060.7-1
 
 Still basically just 0.058.1 plus Paul's unison amd reverb enhancements, and
 jack session support.
-
 
 The 0.060.X series have been plagued by a strange issue affecting some but not
 all 32 bit builds. On some 32 bit systems, ADnotes were incorrectly pitched.

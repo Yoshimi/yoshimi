@@ -96,7 +96,6 @@ bool AlsaEngine::openMidi(void)
         Runtime.Log("Error, failed to acquire alsa midi port");
         goto bail_out;
     }
-    midiLatency = getBuffersize();
     return true;
 
 bail_out:
@@ -208,7 +207,6 @@ bool AlsaEngine::prepHwparams(void)
     if (ask_buffersize != audio.period_size)
         Runtime.Log("Asked for buffersize " + asString(ask_buffersize)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size));
-    audioLatency = getBuffersize();
     return true;
 
 bail_out:

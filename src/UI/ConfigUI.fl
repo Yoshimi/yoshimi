@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
-header_name {.h} 
+version 1.0110
+header_name {.h}
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -21,19 +21,19 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
-} 
+}
 
 decl {\#include <cmath>} {public
-} 
+}
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public
-} 
+}
 
 class ConfigUI {open : {private MiscFuncs}
 } {
@@ -42,11 +42,31 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {//
-          writebankcfg();
-          o->hide();} open
-      xywh {1048 191 465 335} type Double visible
+          if (Runtime.configChanged)
+          {
+              int r = fl_choice("Save settings?", "Cancel", "Save", "Don't save");
+              switch (r)
+              {
+                  case 1:
+                      o->hide();
+                      savesettings();
+                      break;
+                  case 2:
+                      o->hide();
+                      break;
+                  default:
+                      break;
+              }
+          }
+          else
+              o->hide();
+
+          //writebankcfg();
+          o->hide();
+      } open
+      xywh {1049 217 465 335} type Double visible
     } {
-      Fl_Tabs {} {open selected
+      Fl_Tabs {} {open
         xywh {5 5 520 325}
       } {
         Fl_Group {} {
@@ -55,7 +75,9 @@ class ConfigUI {open : {private MiscFuncs}
         } {
           Fl_Choice {} {
             label OscilSize
-            callback {Runtime.Oscilsize = 128 << o->value();}
+            callback {//
+                Runtime.Oscilsize = 128 << o->value();
+                Runtime.configChanged = true;}
             tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
           } {
@@ -94,7 +116,9 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Choice {} {
             label {PADsynth Interpolation}
-            callback {Runtime.Interpolation=(int) o->value();}
+            callback {//
+                Runtime.Interpolation = (int) o->value();
+                Runtime.configChanged = true;}
             xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(Runtime.Interpolation);}
           } {
@@ -109,7 +133,9 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Choice {} {
             label {Virtual Keyboard Layout}
-            callback {Runtime.VirKeybLayout=(int) o->value();}
+            callback {//
+                Runtime.VirKeybLayout = (int) o->value();
+                Runtime.configChanged = true;}
             xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(Runtime.VirKeybLayout);}
           } {
@@ -134,26 +160,22 @@ class ConfigUI {open : {private MiscFuncs}
             label {Session state save file}
             callback {//
               Runtime.StateFile = string(o->value());
-              SessionStateFile->changed();
-              Runtime.configChanged = true;
-            }
+              SessionStateFile->changed();}
             xywh {159 216 235 25} labelsize 12 when 1 textsize 12
             code0 {o->value(Runtime.StateFile.c_str());}
           }
           Fl_Button StateFileButton {
             label Select
             callback {//
-                const char *filename =
-                    fl_file_chooser("Nominate session save state file", NULL,
-                                    Runtime.StateFile.c_str(), 0);
+                const char *filename = fl_file_chooser("Nominate session save state file",
+                                                       NULL, Runtime.StateFile.c_str(), 0);
                 if (NULL != filename)
                 {
                     Runtime.StateFile = string(filename);
                     SessionStateFile->value(Runtime.StateFile.c_str());
                     SessionStateFile->changed();
                     Runtime.configChanged = true;
-                }
-            }
+                }}
             xywh {404 218 49 20} labelsize 12
             code0 {/* code */}
           }
@@ -171,7 +193,7 @@ class ConfigUI {open : {private MiscFuncs}
             callback {//
                 const char *dirname;
                 dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
-                if (dirname == NULL)
+                if (!dirname)
                     return;
                 rootsbrowse->add(dirname);
                 Runtime.configChanged = true;}
@@ -181,9 +203,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {Remove root dir...}
             callback {//
                 if (rootsbrowse->value() != 0)
-                {
                     rootsbrowse->remove(rootsbrowse->value());
-                }
                 activatebutton_rootdir(false);
                 Runtime.configChanged = true;}
             xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
@@ -210,7 +230,7 @@ class ConfigUI {open : {private MiscFuncs}
           xywh {5 25 460 260} labelsize 12 hide
         } {
           Fl_Browser presetbrowse {
-            callback {activatebutton_presetdir(o->value()!=0);}
+            callback {activatebutton_presetdir(o->value() != 0);}
             xywh {15 35 485 200} type Hold labelsize 12 textsize 12
           }
           Fl_Button {} {
@@ -218,7 +238,7 @@ class ConfigUI {open : {private MiscFuncs}
             callback {//
                 const char *dirname;
                 dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
-                if (dirname == NULL)
+                if (!dirname)
                     return;
                 presetbrowse->add(dirname);
                 Runtime.configChanged = true;}
@@ -238,7 +258,8 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Button makedefaultpresetbutton {
             label {Make default}
-            callback {int n = presetbrowse->value();
+            callback {//
+                int n = presetbrowse->value();
                 if (n != 0)
                 {
                     presetbrowse->move(1, n);
@@ -286,7 +307,8 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Check_Browser {} {
             label Samplerate
-            callback {int chk = o->value();
+            callback {//
+                int chk = o->value();
                 if (o->nchecked() < 1)
                     o->set_checked(chk = 2);
                 else if (o->nchecked() > 1)
@@ -313,7 +335,7 @@ class ConfigUI {open : {private MiscFuncs}
                 Runtime.Samplerate = sample_rate;
                 Runtime.configChanged = true;}
             xywh {195 133 84 50} labelsize 12 align 4 when 1 textsize 12
-            code0 {/* extra */
+            code0 {//
                 o->add("96000");
                 o->add("48000");
                 o->add("44100");
@@ -327,7 +349,8 @@ class ConfigUI {open : {private MiscFuncs}
           }
           Fl_Check_Browser {} {
             label {Period Size}
-            callback {int chk = o->value();
+            callback {//
+                int chk = o->value();
                 if (o->nchecked() < 1)
                     o->set_checked(3);
                 else if (o->nchecked() > 1)
@@ -376,17 +399,13 @@ class ConfigUI {open : {private MiscFuncs}
       }
       Fl_Button {} {
         label Close
-        callback {configwindow->hide();
-            writebankcfg();
-            writepresetcfg();}
+        callback {configwindow->do_callback();
+        }
         xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save Settings}
-        callback {Runtime.saveConfig();
-            writebankcfg();
-            writepresetcfg();
-            Runtime.configChanged = false;}
+        callback {savesettings();}
         xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Box {} {
@@ -397,13 +416,15 @@ class ConfigUI {open : {private MiscFuncs}
   }
   Function {ConfigUI()} {open
   } {
-    code {make_window();
+    code {//
+        make_window();
         readbankcfg();
         readpresetcfg();} {}
   }
   Function {activatebutton_rootdir(bool active)} {open
   } {
-    code {if (active)
+    code {//
+        if (active)
         {
             removerootdirbutton->activate();
             makedefaultrootdirbutton->activate();
@@ -415,7 +436,8 @@ class ConfigUI {open : {private MiscFuncs}
         }} {}
   }
   Function {activatebutton_presetdir(bool active)} {} {
-    code {if (active)
+    code {//
+        if (active)
         {
             removepresetbutton->activate();
             makedefaultpresetbutton->activate();
@@ -424,29 +446,35 @@ class ConfigUI {open : {private MiscFuncs}
         {
             removepresetbutton->deactivate();
             makedefaultpresetbutton->deactivate();
-        }} {}
+        }
+    } {}
   }
   Function {readbankcfg()} {} {
-    code {rootsbrowse->clear();
+    code {//
+        rootsbrowse->clear();
         for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         {
             if (Runtime.bankRootDirlist[i].size())
                 rootsbrowse->add(Runtime.bankRootDirlist[i].c_str());
-        }} {}
+        }
+    } {}
   }
   Function {writebankcfg()} {} {
-    code {Runtime.clearBankrootDirlist();
+    code {//
+        Runtime.clearBankrootDirlist();
         for (int n = 0; n < rootsbrowse->size(); ++n)
             Runtime.bankRootDirlist[n] = string(rootsbrowse->text(n + 1));} {}
   }
   Function {readpresetcfg()} {} {
-    code {presetbrowse->clear();
+    code {//
+        presetbrowse->clear();
         for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
             if (Runtime.presetsDirlist[i].size())
                 presetbrowse->add(Runtime.presetsDirlist[i].c_str());} {}
   }
   Function {writepresetcfg()} {} {
-    code {Runtime.clearPresetsDirlist();
+    code {//
+        Runtime.clearPresetsDirlist();
         for (int n = 0; n < presetbrowse->size(); ++n)
             Runtime.presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
   }
@@ -456,4 +484,12 @@ class ConfigUI {open : {private MiscFuncs}
   Function {Hide()} {} {
     code {configwindow->hide();} {}
   }
-} 
+  Function {savesettings(void)} {selected private return_type void
+  } {
+    code {//
+        Runtime.saveConfig();
+        writebankcfg();
+        writepresetcfg();
+    } {}
+  }
+}

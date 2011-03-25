@@ -129,11 +129,16 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    if (NULL != midi.port
-        && !Runtime.startThread(&midi.pThread, _midiThread, this, true, true))
+    if (midi.port && !Runtime.startThread(&midi.pThread, _midiThread, this, true, true))
     {
             Runtime.Log("Failed to start jack midi thread");
             goto bail_out;
+    }
+
+    if (!latencyPrep())
+    {
+        Runtime.Log("Jack latency prep failed ");
+        goto bail_out;
     }
 
     if (!jack_activate(jackClient)
@@ -197,21 +202,7 @@ bool JackEngine::openAudio(void)
                                                JACK_DEFAULT_AUDIO_TYPE,
                                                JackPortIsOutput, 0);
     if (audio.ports[0] && audio.ports[1])
-    {
-        if (prepBuffers(false))
-        {
-            if (jack_port_set_latency)
-            {
-                jack_port_set_latency (audio.ports[0], jack_get_buffer_size(jackClient));
-                jack_port_set_latency (audio.ports[1], jack_get_buffer_size(jackClient));
-                if (jack_recompute_total_latencies)
-                    jack_recompute_total_latencies(jackClient);
-            }
-            if (jack_port_get_latency)
-                audioLatency = jack_port_get_latency(audio.ports[0]);
-            return true;
-        }
-    }
+        return prepBuffers(false) && latencyPrep();
     else
         Runtime.Log("Failed to register jack audio ports");
     Close();
@@ -221,7 +212,7 @@ bool JackEngine::openAudio(void)
 
 bool JackEngine::openMidi(void)
 {
-    const char *port_name = "midi-in";
+    const char *port_name = "midi in";
     midi.port = jack_port_register(jackClient, port_name,
                                    JACK_DEFAULT_MIDI_TYPE,
                                    JackPortIsInput, 0);
@@ -236,12 +227,6 @@ bool JackEngine::openMidi(void)
         Runtime.Log("Failed to create jack midi ringbuffer");
         return false;
     }
-    if (jack_port_set_latency)
-        jack_port_set_latency(midi.port, jack_get_buffer_size(jackClient));
-    if (jack_recompute_total_latencies)
-        jack_recompute_total_latencies(jackClient);
-    if (jack_port_get_latency)
-        midiLatency = jack_port_get_latency(midi.port);
     return true;
 }
 
@@ -513,23 +498,79 @@ void *JackEngine::midiThread(void)
 }
 
 
+bool JackEngine::latencyPrep(void)
+{
+#if defined(JACK_LATENCY)  // >= 0.120.1 API
+
+    if (jack_set_latency_callback(jackClient, _latencyCallback, this))
+    {
+        Runtime.Log("Set latency callback failed");
+        return false;
+    }
+    return true;
+
+#else // < 0.120.1 API
+
+    if (jack_port_set_latency && audio.ports[0] && audio.ports[1])
+    {
+        jack_port_set_latency(audio.ports[0], jack_get_buffer_size(jackClient));
+        jack_port_set_latency(audio.ports[1], jack_get_buffer_size(jackClient));
+        if (jack_recompute_total_latencies)
+            jack_recompute_total_latencies(jackClient);
+    }
+    return true;
+
+#endif
+}
+
 #if defined(JACK_SESSION)
-    void JackEngine::_jsessionCallback(jack_session_event_t *event, void *arg)
-    {
-        return static_cast<JackEngine*>(arg)->jsessionCallback(event);
-    }
+
+void JackEngine::_jsessionCallback(jack_session_event_t *event, void *arg)
+{
+    return static_cast<JackEngine*>(arg)->jsessionCallback(event);
+}
+
+void JackEngine::jsessionCallback(jack_session_event_t *event)
+{
+    string uuid = string(event->client_uuid);
+    string filename = string("yoshimi-") + uuid + string(".xml");
+    string filepath = string(event->session_dir) + filename;
+    Runtime.setJackSessionSave((int)event->type, filepath);
+    string cmd = Runtime.programCmd() + string(" -U ") + uuid
+                 + string(" -u ${SESSION_DIR}") + filename;
+    event->command_line = strdup(cmd.c_str());
+    if (jack_session_reply(jackClient, event))
+        Runtime.Log("Jack session reply failed");
+    jack_session_event_free(event);
+}
+
+#endif
 
 
-    void JackEngine::jsessionCallback(jack_session_event_t *event)
+#if defined(JACK_LATENCY)
+
+void JackEngine::_latencyCallback(jack_latency_callback_mode_t mode, void *arg)
+{
+    return static_cast<JackEngine*>(arg)->latencyCallback(mode);
+}
+
+
+void JackEngine::latencyCallback(jack_latency_callback_mode_t mode)
+{
+    if (mode == JackCaptureLatency)
     {
-        string uuid = string(event->client_uuid);
-        string filename = string("yoshimi-") + uuid + string(".xml");
-        string filepath = string(event->session_dir) + filename;
-        Runtime.setJackSessionSave((int)event->type, filepath);
-        string cmd = string("yoshimi -U ") + uuid + string(" -u ${SESSION_DIR}") + filename;
-        event->command_line = strdup(cmd.c_str());
-        if (jack_session_reply(jackClient, event))
-            Runtime.Log("Jack session reply failed");
-        jack_session_event_free(event);
+        if (audio.ports[0] && audio.ports[1])
+        {
+            jack_latency_range_t range[2];
+            for (int i = 0; i < 2; ++i)
+            {
+                jack_port_get_latency_range(audio.ports[i], mode, &range[i]);
+                range[i].min++;
+                range[i].max += audio.jackNframes;
+                jack_port_set_latency_range(audio.ports[i], JackPlaybackLatency, &range[i]);
+            }
+        }
     }
+}
+
 #endif

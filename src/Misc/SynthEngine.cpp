@@ -85,7 +85,7 @@ SynthEngine::SynthEngine() :
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
-    buffersize(0),
+    buffersize(256),
     buffersize_f(buffersize),
     oscilsize(1024),
     oscilsize_f(oscilsize),

@@ -25,8 +25,8 @@ using namespace std;
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
 
-bool startMainThread(void);
-static void *mainthread(void *arg);
+static void *guithread(void *arg);
+bool startGuiThread(void);
 
 int main(int argc, char *argv[])
 {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         Runtime.Log("Failed to start MusicIO");
         goto bail_out;
     }
-    if (!startMainThread())
+    if (!startGuiThread())
     {
         Runtime.Log("Failed to start main thread");
         goto bail_out;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         Runtime.signalCheck();
         Runtime.deadObjects->disposeBodies();
         if (Runtime.runSynth)
-            usleep(50000); // where all the action is ...
+            usleep(20000); // where all the action is ...
     }
     musicClient->Close();
     delete musicClient;
@@ -94,8 +94,24 @@ bail_out:
     exit(EXIT_FAILURE);
 }
 
-static void *mainthread(void *arg)
+bool startGuiThread(void)
 {
+    if (Runtime.showGui)
+    {
+        if (!(guiMaster = new MasterUI()))
+        {
+            Runtime.Log("Failed to instantiate guiMaster");
+            return false;
+        }
+        guiMaster->Init();
+    }
+    Runtime.StartupReport();
+    static pthread_t pThread;
+    return Runtime.startThread(&pThread, guithread, NULL, false, true);
+}
+static void *guithread(void *arg)
+{
+    usleep(10000);
     synth->Unmute();
     while (Runtime.runSynth)
     {
@@ -110,22 +126,6 @@ static void *mainthread(void *arg)
     }
     if (guiMaster)
         delete guiMaster;
-    sleep(100);
     return NULL;
 }
 
-bool startMainThread(void)
-{
-    if (Runtime.showGui)
-    {
-        if (!(guiMaster = new MasterUI()))
-        {
-            Runtime.Log("Failed to instantiate guiMaster");
-            return false;
-        }
-        guiMaster->Init();
-    }
-    Runtime.StartupReport();
-    static pthread_t pThread;
-    return Runtime.startThread(&pThread, mainthread, NULL, false, true);
-}

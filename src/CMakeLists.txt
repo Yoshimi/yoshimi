@@ -20,7 +20,7 @@ project (Yoshimi)
 cmake_minimum_required (VERSION 2.6)
 cmake_policy (VERSION 2.6)
 cmake_policy (SET CMP0004 OLD)
-set (YOSHIMI_VERSION "0.060.7-2")
+set (YOSHIMI_VERSION "0.060.8.rc1")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -45,14 +45,14 @@ check_c_source_compiles (
     {
         jack_session_event_type_t x = JackSessionSave;
         return 0;
-    }" HAS_JACK_SESSION
+    }" HasJackSession
 )
 
-if (HAS_JACK_SESSION)
+if (HasJackSession)
     option (JackSessionSupport "Include Jack Session Support" ON)
-else (HAS_JACK_SESSION)
+else (HasJackSession)
     set (JackSessionSupport OFF)
-endif (HAS_JACK_SESSION)
+endif (HasJackSession)
 
 set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
 set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
@@ -145,14 +145,6 @@ if (Boost_FOUND)
 else (Boost_FOUND)
     message (FATAL_ERROR "boost headers required, but not found")
 endif (Boost_FOUND)
-
-# libsndfile
-pkg_check_modules (LIBSNDFILE REQUIRED sndfile)
-if (LIBSNDFILE_FOUND)
-    message (STATUS "Found libsndfile ${LIBSNDFILE_VERSION}")
-else (LIBSNDFILE_FOUND)
-    message (FATAL_ERROR "libsndfile required but not found")
-endif (LIBSNDFILE_FOUND)
 
 # fontconfig
 pkg_check_modules (FONTCONFIG REQUIRED fontconfig>=0.22)
@@ -301,6 +293,22 @@ if (JackSessionSupport)
 else (JackSessionSupport)
     message(STATUS "Without jack session support")
 endif (JackSessionSupport)
+
+# Check for jack latency API >= 0.120.1
+check_c_source_compiles (
+    "#include <jack/jack.h>
+    int main(int argc, char **argv)
+    {
+        if (jack_set_latency_callback)
+            return 0;
+        else
+            return 1;
+    }" HasJackLatency
+)
+
+if (HasJackLatency)
+    add_definitions(-DJACK_LATENCY)
+endif (HasJackLatency)
 
 set (ProgSources
     ${Misc_sources}

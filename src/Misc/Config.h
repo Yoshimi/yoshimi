@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #ifndef CONFIG_H
@@ -71,6 +71,7 @@ class Config : public MiscFuncs
 
         string addParamHistory(string file);
         string historyFilename(int index);
+        string programCmd(void) { return programcommand; }
 
         string        ConfigDir;
         string        ConfigFile;
@@ -80,7 +81,6 @@ class Config : public MiscFuncs
         string        StateFile;
         string        CurrentXMZ;
         bool          restoreJackSession;
-        const string  baseCmdLine;
         string        jackSessionFile;
 
         unsigned int  Samplerate;
@@ -103,8 +103,6 @@ class Config : public MiscFuncs
         string        jackSessionUuid;
 
         string        alsaAudioDevice;
-        unsigned int  alsaSamplerate;
-        int           alsaBuffersize;
 
         string        alsaMidiDevice;
         string        nameTag;
@@ -143,7 +141,7 @@ class Config : public MiscFuncs
         int ladi1IntActive;
         int sse_level;
         int jsessionSave;
-        const string programCmd;
+        const string programcommand;
         string jackSessionDir;
 };
 
