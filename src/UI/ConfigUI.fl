@@ -60,9 +60,6 @@ class ConfigUI {open : {private MiscFuncs}
           }
           else
               o->hide();
-
-          //writebankcfg();
-          o->hide();
       } open
       xywh {1049 217 465 335} type Double visible
     } {
@@ -79,7 +76,7 @@ class ConfigUI {open : {private MiscFuncs}
                 Runtime.Oscilsize = 128 << o->value();
                 Runtime.configChanged = true;}
             tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
-            code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0 - 1.0) / logf(2.0)) + 1);}
+            code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
               label 128

@@ -30,7 +30,7 @@ using namespace std;
 class MusicClient
 {
     public:
-        MusicClient();
+        MusicClient() { }
         ~MusicClient() { }
         bool Open(void) { return openAudio() && openMidi(); }
         virtual bool Start(void) = 0;

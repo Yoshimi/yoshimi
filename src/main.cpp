@@ -25,9 +25,6 @@ using namespace std;
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
 
-static void *guithread(void *arg);
-bool startGuiThread(void);
-
 int main(int argc, char *argv[])
 {
     if (!Runtime.Setup(argc, argv))
@@ -35,7 +32,7 @@ int main(int argc, char *argv[])
 
     if (!(synth = new SynthEngine()))
     {
-        Runtime.Log("Failed to allocate Master");
+        Runtime.Log("Failed to allocate SynthEngine");
         goto bail_out;
     }
 
@@ -62,24 +59,42 @@ int main(int argc, char *argv[])
         Runtime.Log("Failed to start MusicIO");
         goto bail_out;
     }
-    if (!startGuiThread())
+
+    if (Runtime.showGui)
     {
-        Runtime.Log("Failed to start main thread");
-        goto bail_out;
+        if (!(guiMaster = new MasterUI()))
+        {
+            Runtime.Log("Failed to instantiate gui");
+            goto bail_out;
+        }
+        guiMaster->Init();
     }
 
+    synth->Unmute();
     while (Runtime.runSynth)
     {
         Runtime.signalCheck();
         Runtime.deadObjects->disposeBodies();
-        if (Runtime.runSynth)
-            usleep(20000); // where all the action is ...
+        if (Runtime.showGui)
+        {
+            for (int i = 0; !Runtime.LogList.empty() && i < 5; ++i)
+            {
+                guiMaster->Log(Runtime.LogList.front());
+                Runtime.LogList.pop_front();
+            }
+            if (Runtime.runSynth)
+                Fl::wait(0.033333);
+        }
+        else if (Runtime.runSynth)
+            usleep(33333); // where all the action is ...
     }
     musicClient->Close();
     delete musicClient;
     delete synth;
     Runtime.deadObjects->disposeBodies();
     Runtime.flushLog();
+    if (guiMaster)
+        delete guiMaster;
     exit(EXIT_SUCCESS);
 
 bail_out:
@@ -90,42 +105,10 @@ bail_out:
         musicClient->Close();
         delete musicClient;
     }
+    if (synth)
+        delete synth;
+    if (guiMaster)
+        delete guiMaster;
     Runtime.flushLog();
     exit(EXIT_FAILURE);
 }
-
-bool startGuiThread(void)
-{
-    if (Runtime.showGui)
-    {
-        if (!(guiMaster = new MasterUI()))
-        {
-            Runtime.Log("Failed to instantiate guiMaster");
-            return false;
-        }
-        guiMaster->Init();
-    }
-    Runtime.StartupReport();
-    static pthread_t pThread;
-    return Runtime.startThread(&pThread, guithread, NULL, false, true);
-}
-static void *guithread(void *arg)
-{
-    usleep(10000);
-    synth->Unmute();
-    while (Runtime.runSynth)
-    {
-        if (!Runtime.LogList.empty())
-        {
-            if (Runtime.showGui)
-                guiMaster->Log(Runtime.LogList.front());
-            Runtime.LogList.pop_front();
-        }
-        if (Runtime.runSynth)
-            Fl::wait(0.1);
-    }
-    if (guiMaster)
-        delete guiMaster;
-    return NULL;
-}
-

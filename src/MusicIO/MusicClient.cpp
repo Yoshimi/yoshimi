@@ -25,12 +25,6 @@
 
 MusicClient *musicClient = NULL;
 
-MusicClient::MusicClient() :
-    audiodevice(string()),
-    mididevice(string())
-{ }
-
-
 MusicClient *MusicClient::newMusicClient(void)
 {
     MusicClient *musicObj = NULL;

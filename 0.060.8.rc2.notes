@@ -1,3 +1,7 @@
+yoshimi-0.060.8.rc2
+
+couple more code cleanups, particularly in main.cpp
+
 yoshimi-0.060.8.rc1
 
 lots of redundant variable cleanups; tried to accomodate the new latency API

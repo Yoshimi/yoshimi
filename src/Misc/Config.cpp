@@ -112,9 +112,9 @@ Config::Config() :
     sse_level(0),
     programcommand(string("yoshimi"))
 {
-    fesetround(FE_TOWARDZERO); // Special thanks go to Lars Luthman for
-                               // conquering the heffalump. We need lrintf() to
-                               // round toward zero.
+    fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering 
+                               // the heffalump. We need lrintf() to round
+                               // toward zero.
     cerr.precision(4);
     deadObjects = new BodyDisposal();
 }
