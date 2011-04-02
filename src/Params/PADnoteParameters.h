@@ -41,7 +41,6 @@ class PADnoteParameters : public Presets
         ~PADnoteParameters();
 
         void defaults(void);
-        void setPan(char pan);
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
 
@@ -96,8 +95,9 @@ class PADnoteParameters : public Presets
             unsigned char basenote, oct, smpoct;
         } Pquality;
 
-        // Frequency parameters
-        unsigned char Pfixedfreq; // If the base frequency is fixed to 440 Hz
+        // frequency parameters
+        // If the base frequency is fixed to 440 Hz
+        unsigned char Pfixedfreq;
 
         // Equal temperate (this is used only if the Pfixedfreq is enabled)
         // If this parameter is 0, the frequency is fixed (to 440 Hz);
@@ -113,10 +113,11 @@ class PADnoteParameters : public Presets
 
         // Amplitude parameters
         unsigned char PStereo;
-        unsigned char PPanning;  // 0 random, 64 center, 127 right
-        float         pangainL;  // derived from PPanning
-        float         pangainR;  // ^^
-        bool          randomPan;
+        // Panning -  0 - random
+        //            1 - left
+        //           64 - center
+        //          127 - right */
+        unsigned char PPanning;
 
         unsigned char PVolume;
 
@@ -130,8 +131,12 @@ class PADnoteParameters : public Presets
 
         // Filter Parameters
         FilterParams *GlobalFilter;
-        unsigned char PFilterVelocityScale; // filter velocity sensing
-        unsigned char PFilterVelocityScaleFunction; // filter velocity sensing
+
+        // filter velocity sensing
+        unsigned char PFilterVelocityScale;
+
+        // filter velocity sensing
+        unsigned char PFilterVelocityScaleFunction;
 
         EnvelopeParams *FilterEnvelope;
         LFOParams *FilterLfo;

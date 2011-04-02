@@ -112,7 +112,7 @@ Config::Config() :
     sse_level(0),
     programcommand(string("yoshimi"))
 {
-    fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
+    fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering 
                                // the heffalump. We need lrintf() to round
                                // toward zero.
     cerr.precision(4);
@@ -530,7 +530,13 @@ void Config::saveSessionData(string savefile)
 }
 
 
-bool Config::restoreSessionData(string sessionfile)
+bool Config::stateRestore(SynthEngine *synth)
+{
+    return restoreSessionData(synth, StateFile);
+}
+
+
+bool Config::restoreSessionData(SynthEngine *synth, string sessionfile)
 {
     XMLwrapper *xml = NULL;
     bool ok = false;
@@ -799,10 +805,10 @@ void Config::setLadi1Active(void)
 }
 
 
-bool Config::restoreJsession(void)
+bool Config::restoreJsession(SynthEngine *synth)
 {
     #if defined(JACK_SESSION)
-        return restoreSessionData(jackSessionFile);
+        return restoreSessionData(synth, jackSessionFile);
     #else
         return false;
     #endif

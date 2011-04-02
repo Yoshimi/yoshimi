@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0109
 header_name {.h} 
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
-} 
+}
 
 comment {FilterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2011, Alan Calvert
+Copyright 2009-2010, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of version 2 of the GNU General Public
@@ -26,9 +26,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified March 2011
+This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {in_source in_header
-} 
+}
 
 decl {\#include "WidgetPDialUI.h"} {public
 } 
@@ -49,18 +49,20 @@ decl {\#include "PresetsUI.h"} {public
 } 
 
 decl {\#include "Params/FilterParams.h"} {public
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public
-} 
+}
 
 class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
 } {
   Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
-    code {pars = NULL;
+    code {
+        pars = NULL;
         nvowel = NULL;
         nformant = NULL;
-        graphpoints = NULL;} {}
+        graphpoints = NULL;
+    } {}
   }
   Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {} {
     code {pars = pars_;
@@ -180,8 +182,7 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
 
 class FilterUI {open : {public Fl_Group,PresetsUI_}
 } {
-  Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {pars=NULL;
         velsnsamp=NULL;
         velsns=NULL;
@@ -198,13 +199,13 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   }
   Function {make_window()} {open
   } {
-    Fl_Window filterui {open
-      xywh {454 462 275 75} type Double color 50 labelfont 1 labelsize 12
-      class Fl_Group visible
+    Fl_Window filterui {
+      xywh {215 371 275 75} type Double color 50 labelfont 1 hide
+      class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        label {Filter Params} open selected
-        xywh {0 0 275 75} box PLASTIC_UP_BOX color 183 labelfont 1 labelsize 11 align 17
+        label {Filter Parameters}
+        xywh {0 0 275 75} box PLASTIC_UP_BOX color 183 labeltype ENGRAVED_LABEL labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
           label FilterType
@@ -364,9 +365,9 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   } {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters} open
-      xywh {791 700 700 205} type Double labelfont 1 labelsize 12 visible
+      xywh {50 379 700 205} type Double visible
     } {
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {485 47 105 113} box THIN_UP_BOX
       } {
         Fl_Counter {} {
@@ -501,7 +502,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         xywh {556 185 84 15} type {Horz Knob} box FLAT_BOX maximum 127
         code0 {o->value(pars->Poctavesfreq);}
       }
-      Fl_Box formantfiltergraph {
+      Fl_Box formantfiltergraph {selected
         xywh {5 5 475 195} box BORDER_BOX
         code0 {o->init(pars,&nvowel,&nformant);}
         class FormantFilterGraph
@@ -534,8 +535,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       }
     }
   }
-  Function {update_formant_window()} {open
-  } {
+  Function {update_formant_window()} {} {
     code {formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);

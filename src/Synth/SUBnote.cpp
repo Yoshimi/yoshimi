@@ -66,8 +66,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     NoteEnabled = true;
     volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
-    if (pars->randomPan)
-        panning = synth->numRandom();
+    panning = (pars->PPanning) ? pars->PPanning / 127.0f : synth->numRandom();
     numstages = pars->Pnumstages;
     stereo = pars->Pstereo;
     start = pars->Pstart;
@@ -203,6 +202,9 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 void SUBnote::SUBlegatonote(float freq, float velocity,
                             int portamento_, int midinote, bool externcall)
 {
+    //SUBnoteParameters *parameters=pars;
+    //Controller *ctl_=ctl;
+
     // Manage legato stuff
     if (externcall)
         Legato.msg = LM_Norm;
@@ -235,7 +237,9 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
 
     volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
-    if (pars->randomPan)
+    if (pars->PPanning)
+        panning = pars->PPanning / 127.0f;
+    else
         panning = synth->numRandom();
 
     // start=pars->Pstart;
@@ -327,7 +331,7 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
                 hgain = expf(hmagnew * log_0_00001);
                 break;
             default:
-                hgain = 1.0f - hmagnew;
+                hgain = 1.0 - hmagnew;
         }
         gain *= hgain;
         reduceamp += hgain;
@@ -636,20 +640,6 @@ int SUBnote::noteout(float *outl, float *outr)
         firsttick = 0;
     }
 
-    float pangainL;
-    float pangainR;
-    if (!pars->randomPan)
-    {
-        float x = (2.0f * (float)(pars->PPanning - 1) / 126.0f) - 1.0f;
-        pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
-    else
-    {
-        pangainL = (1.0f - panning);
-        pangainR = panning;
-    }
-    
     if (aboveAmplitudeThreshold(oldamplitude, newamplitude))
     {
         // Amplitude interpolation
@@ -657,16 +647,16 @@ int SUBnote::noteout(float *outl, float *outr)
         {
             float tmpvol = interpolateAmplitude(oldamplitude, newamplitude, i,
                                                 synth->buffersize);
-            outl[i] *= tmpvol * pangainL;
-            outr[i] *= tmpvol * pangainR;
+            outl[i] *= tmpvol * (1.0f - panning);
+            outr[i] *= tmpvol * panning;
         }
     }
     else
     {
         for (int i = 0; i < synth->buffersize; ++i)
         {
-            outl[i] *= newamplitude * pangainL;
-            outr[i] *= newamplitude * pangainR;
+            outl[i] *= newamplitude * (1.0f - panning);
+            outr[i] *= newamplitude * panning;
         }
     }
     oldamplitude = newamplitude;

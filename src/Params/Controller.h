@@ -42,6 +42,7 @@ class Controller
         void setpitchwheel(int value);
         void setpitchwheelbendrange(unsigned short int value);
         void setexpression(int value);
+        void setpanning(int value);
         void setfiltercutoff(int value);
         void setfilterq(int value);
         void setbandwidth(int value);
@@ -52,9 +53,14 @@ class Controller
         void setportamento(int value);
         void setresonancecenter(int value);
         void setresonancebw(int value);
-        void setPanDepth(char par) { panning.data = par; panning.depth = (float)par / 64.0f; }
+
+
+        void setparameternumber(unsigned int type, int value); // used for rpn and nrpn's
+        int getnrpn(int *parhi, int *parlo, int *valhi, int *vallo);
+
         int initportamento(float oldfreq, float newfreq, bool in_progress);
         // returns 1 if the portamento's conditions are true, else return 0
+
         void updateportamento(void); // update portamento values
 
         // Controllers values
@@ -72,8 +78,10 @@ class Controller
 
         struct { // Panning
             int data;
-            float depth;
+            float pan;
+            unsigned char depth;
         } panning;
+
 
         struct { // Filter cutoff
             int data;
@@ -150,6 +158,14 @@ class Controller
             float relbw;
             unsigned char depth;
         } resonancebandwidth;
+
+        struct { // nrpn
+            int parhi;
+            int parlo;
+            int valhi;
+            int vallo;
+            unsigned char receive; // this is saved to disk by Master
+        } NRPN;
 };
 
 #endif

@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2011, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified April 2011
+    This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
 #ifndef EFFECT_H
@@ -48,15 +48,7 @@ class Effect
         FilterParams *filterpars;
 
     protected:
-        void setpanning(char Ppanning_);
-        void setlrcross(char Plrcross_);
-
         bool insertion;
-        char Ppanning;
-        float pangainL;
-        float pangainR;
-        char Plrcross; // L/R mix
-        float lrcross;
 };
 
 #endif

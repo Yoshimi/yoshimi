@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2011, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified March 2011
+    This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
 #include <cmath>
@@ -35,7 +35,7 @@
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
 {
-    setpresettype("PADnoteParameters");
+    setpresettype("Ppadsyth");
     fft = fft_;
 
     resonance = new Resonance();
@@ -119,7 +119,7 @@ void PADnoteParameters::defaults(void)
 
     // Amplitude Global Parameters
     PVolume = 90;
-    setPan(PPanning = 64); // center
+    PPanning = 64; // center
     PAmpVelocityScaleFunction = 64;
     AmpEnvelope->defaults();
     AmpLfo->defaults();
@@ -635,26 +635,6 @@ void PADnoteParameters::applyparameters(bool islocked)
         deletesample(i);
     if (!islocked)
         synth->actionLock(unlock);
-}
-
-
-void PADnoteParameters::setPan(char pan)
-{
-    PPanning = pan;
-    if (PPanning < 0)
-        PPanning = 0;
-    else if (PPanning > 127)
-        PPanning = 127;
-    if (--pan < 0)
-        randomPan = true;
-    else
-    {
-        randomPan = false;
-        if (pan > 126) pan = 126;
-        float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-        pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
 }
 
 

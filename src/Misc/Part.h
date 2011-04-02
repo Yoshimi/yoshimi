@@ -46,16 +46,8 @@ class FFTwrapper;
 class Part : private MiscFuncs, SynthHelper
 {
     public:
-        enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
-
         Part(Microtonal *microtonal_, FFTwrapper *fft_);
         ~Part();
-        inline float pannedVolLeft(void) { return volume * pangainL; }
-        inline float pannedVolRight(void) { return volume * pangainR; }
-        void defaults(void);
-        void defaultsinstrument(void);
-        void applyparameters(void);
-        void cleanup(void);
 
         // Midi commands implemented
         void NoteOn(int note, int velocity, int masterkeyshift);
@@ -64,18 +56,26 @@ class Part : private MiscFuncs, SynthHelper
         void SetController(unsigned int type, int par);
         void RelaseSustainedKeys(void);
         void RelaseAllKeys(void);
+
         void ComputePartSmps(void);
 
+        // instrumentonly: 0 - save all, 1 - save only instrumnet,
+        //                 2 - save only instrument without the name(used in bank)
         bool saveXML(string filename); // true for load ok, otherwise false
         bool loadXMLinstrument(string filename);
+
         void add2XML(XMLwrapper *xml);
         void add2XMLinstrument(XMLwrapper *xml);
+
+        void defaults(void);
+        void defaultsinstrument(void);
+        void applyparameters(void);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
 
-        Controller *ctl;
+        void cleanup(void);
 
-        // part's kit
+        // the part's kit
         struct {
             string        Pname;
             unsigned char Penabled;
@@ -94,7 +94,8 @@ class Part : private MiscFuncs, SynthHelper
         // Part parameters
         void setkeylimit(unsigned char Pkeylimit_);
         void setkititemstatus(int kititem, int Penabled_);
-        void setVolume(char value);
+        void setPvolume(char value);
+        void setPpanning(char panning);
 
         unsigned char Penabled;
         unsigned char Pvolume;
@@ -102,7 +103,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pmaxkey;
         unsigned char Pkeyshift;
         unsigned char Prcvchn;
-        char          Ppanning;
+        unsigned char Ppanning;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages
@@ -126,27 +127,29 @@ class Part : private MiscFuncs, SynthHelper
         float *partfxinputl[NUM_PART_EFX + 1]; // Left and right signal that pass thru part effects
         float *partfxinputr[NUM_PART_EFX + 1]; // [NUM_PART_EFX] is for "no effect" buffer
 
-        unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
-                                               // routed (to next effect/to out)
-        bool Pefxbypass[NUM_PART_EFX + 1];     // if the effects are bypassed,
-                                               // [NUM_PART_EFX] is for "no effect" buffer
-        EffectMgr *partefx[NUM_PART_EFX];      // insertion part effects - part of the instrument
+        enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
 
         float volume;      // applied by MasterAudio
         float oldvolumel;
         float oldvolumer;
-        float randompan;
-        int lastnote;
+        float panning;
 
+        Controller *ctl;
+
+        EffectMgr *partefx[NUM_PART_EFX];      // insertion part effects - part of the instrument
+        unsigned char Pefxroute[NUM_PART_EFX]; // how the effect's output is
+                                               // routed (to next effect/to out)
+        bool Pefxbypass[NUM_PART_EFX + 1];     // if the effects are bypassed,
+                                               // [NUM_PART_EFX] is for "no effect" buffer
+
+        int lastnote;
 
     private:
         void KillNotePos(int pos);
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
-        void setPan(char panning);
 
-        Microtonal *microtonal;
-        FFTwrapper *fft;
+        bool killallnotes;
 
         struct PartNotes {
             NoteStatus status;
@@ -161,22 +164,11 @@ class Part : private MiscFuncs, SynthHelper
             int time;
         };
 
-        PartNotes partnote[POLIPHONY];
-
-        int lastpos;              // previous pos and posb.
-        int lastposb;             // ^^
-        bool lastlegatomodevalid; // previous legatomodevalid.
-
-        float pangainL;
-        float pangainR;
-        float *tmpoutl;
-        float *tmpoutr;
-        float oldfreq; // for portamento
-        int partMuted;
-        bool killallnotes;
+        int lastpos, lastposb;    // to keep track of previously used pos and posb.
+        bool lastlegatomodevalid; // to keep track of previous legatomodevalid.
 
         // MonoMem stuff
-        list<unsigned char> monomemnotes; // held notes.
+        list<unsigned char> monomemnotes; // a list to remember held notes.
         struct {
             unsigned char velocity;
             int mkeyshift; // Not sure if masterkeyshift should be remembered.
@@ -186,6 +178,14 @@ class Part : private MiscFuncs, SynthHelper
                            // (the list only store note values). For example.
                            // 'monomem[note].velocity' would be the velocity
                            // value of the note 'note'.
+        PartNotes partnote[POLIPHONY];
+        float *tmpoutl;
+        float *tmpoutr;
+        float oldfreq; // for portamento
+        Microtonal *microtonal;
+        FFTwrapper *fft;
+        
+        int partMuted;
 };
 
 #endif

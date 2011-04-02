@@ -18,11 +18,10 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #include <cmath>
-#include <fftw3.h>
 
 using namespace std;
 
@@ -37,6 +36,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     // defaults
     Pvolume(48),
+    Ppan(64),
     Ptime(64),
     Pidelay(40),
     Pidelayfb(0),
@@ -55,7 +55,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     lpf(NULL),
     hpf(NULL) // no filter
 {
-    inputbuf = (float*)fftwf_malloc(synth->bufferbytes);
+    inputbuf = new float[synth->buffersize];
     for (int i = 0; i < REV_COMBS * 2; ++i)
     {
         comblen[i] = 800 + lrintf(synth->numRandom() * 1400.0f);
@@ -89,9 +89,9 @@ Reverb::~Reverb()
         delete [] ap[i];
     for (i = 0; i < REV_COMBS * 2; ++i)
         delete [] comb[i];
-    fftwf_free(inputbuf);
+    delete [] inputbuf;
 
-    if (bandwidth)
+    if(bandwidth)
         delete bandwidth;
 }
 
@@ -199,8 +199,8 @@ void Reverb::out(float *smps_l, float *smps_r)
     processmono(0, efxoutl); // left
     processmono(1, efxoutr); // right
 
-    float lvol = rs / REV_COMBS * pangainL;
-    float rvol = rs / REV_COMBS * pangainR;
+    float lvol = rs / REV_COMBS * pan;
+    float rvol = rs / REV_COMBS * (1.0f - pan);
     if (insertion != 0)
     {
         lvol *= 2.0f;
@@ -233,6 +233,13 @@ void Reverb::setvolume(unsigned char Pvolume_)
 }
 
 
+void Reverb::setpan(unsigned char Ppan_)
+{
+    Ppan = Ppan_;
+    pan = (float)Ppan / 127.0f;
+}
+
+
 void Reverb::settime(unsigned char Ptime_)
 {
     Ptime = Ptime_;
@@ -247,7 +254,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp_)
 {
     Plohidamp = (Plohidamp_ < 64) ? 64 : Plohidamp_;
                        // remove this when the high part from lohidamp is added
-    if (Plohidamp == 64)
+    if (Plohidamp == 64)             
     {
         lohidamptype = 0;
         lohifb = 0.0f;
@@ -335,13 +342,13 @@ void Reverb::settype(unsigned char Ptype_)
 
     int combtunings[NUM_TYPES][REV_COMBS] = {
         { 0, 0, 0, 0, 0, 0, 0, 0 }, // this is unused (for random)
-
+        
         // Freeverb by Jezar at Dreampoint
         { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 },
         // duplicate of Freeverb by Jezar at Dreampoint
         { 1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617 }
     };
-
+    
     int aptunings[NUM_TYPES][REV_APS] = {
         { 0, 0, 0, 0 },         // this is unused (for random)
         { 225, 341, 441, 556 }, // Freeverb by Jezar at Dreampoint
@@ -480,7 +487,7 @@ void Reverb::changepar(int npar, unsigned char value)
             setvolume(value);
             break;
         case 1:
-            setpanning(value);
+            setpan(value);
             break;
         case 2:
             settime(value);
@@ -522,7 +529,7 @@ unsigned char Reverb::getpar(int npar)
     switch (npar)
     {
         case 0:  return Pvolume;
-        case 1:  return Ppanning;
+        case 1:  return Ppan;
         case 2:  return Ptime;
         case 3:  return Pidelay;
         case 4:  return Pidelayfb;

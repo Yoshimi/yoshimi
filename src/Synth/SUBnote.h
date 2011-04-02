@@ -65,7 +65,6 @@ class SUBnote : public Carcass, private SynthHelper
         int start; // how the harmonics start
         float basefreq;
         float panning;
-
         Envelope *AmpEnvelope;
         Envelope *FreqEnvelope;
         Envelope *BandWidthEnvelope;

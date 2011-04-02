@@ -31,7 +31,7 @@ AlsaEngine::AlsaEngine()
     audio.buffer_size = 0;
     audio.alsaId = -1;
     audio.pThread = 0;
-
+    
     midi.handle = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
@@ -252,7 +252,7 @@ void *AlsaEngine::_AudioThread(void *arg)
 
 
 void *AlsaEngine::AudioThread(void)
-{
+{  
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
     while (Runtime.runSynth)
     {

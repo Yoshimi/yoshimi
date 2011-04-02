@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified March 2011
+    This file is a derivative of a ZynAddSubFX original, modified January 2011
 */
 
 #ifndef AD_NOTE_H
@@ -82,7 +82,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
         // Globals
         ADnoteParameters *adpars;
-        bool  stereo;
+        bool stereo;
         int   midinote;
         float velocity;
         float basefreq;
@@ -98,11 +98,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             LFO      *FreqLfo;
 
             // Amplitude global parameters
-            float Volume;  //  0 .. 1
-            float Panning; //  0 .. 1
-            float pangainL;
-            float pangainR;
-
+            float  Volume;  //  0 .. 1
+            float  Panning; //  0 .. 1
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
             struct {
@@ -141,10 +138,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             LFO      *FreqLfo;
 
             // Amplitude parameters
-            float Volume;  // -1.0 .. 1.0
-            float Panning; // 0.0 = left, 0.5 = center, 1.0 = right
-            float pangainL;
-            float pangainR;
+            float  Panning; // 0.0 = left, 0.5 = center, 1.0 = right
+            float  Volume;  // -1.0 .. 1.0
 
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;

@@ -19,10 +19,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified January 2011
 */
-
-#include <fftw3.h>
 
 #include "Misc/SynthEngine.h"
 #include "DSP/FormantFilter.h"
@@ -33,8 +31,8 @@ FormantFilter::FormantFilter(FilterParams *pars)
     for (int i = 0; i < numformants; ++i)
         formant[i] = new AnalogFilter(4/*BPF*/, 1000.0f, 10.0f, pars->Pstages);
     cleanup();
-    inbuffer = (float*)fftwf_malloc(synth->bufferbytes);
-    tmpbuf = (float*)fftwf_malloc(synth->bufferbytes);
+    inbuffer = new float [synth->buffersize];
+    tmpbuf = new float [synth->buffersize];
 
     for (int j = 0; j < FF_MAX_VOWELS; ++j)
         for (int i = 0; i < numformants; ++i)
@@ -69,7 +67,7 @@ FormantFilter::FormantFilter(FilterParams *pars)
     outgain = dB2rap(pars->getgain());
 
     oldinput = -1.0f;
-    Qfactor = 1.0f;
+    Qfactor = 1.0;
     oldQfactor = Qfactor;
     firsttime = 1;
 }
@@ -78,8 +76,8 @@ FormantFilter::~FormantFilter()
 {
     for (int i = 0; i < numformants; ++i)
         delete(formant[i]);
-    fftwf_free(inbuffer);
-    fftwf_free(tmpbuf);
+    delete [] inbuffer;
+    delete [] tmpbuf;
 }
 
 
@@ -111,6 +109,9 @@ void FormantFilter::setpos(float input)
     if (pos < 0.0f)
         pos += 1.0f;
 
+    //float ff = pos * sequencesize;
+    // F2I(pos * sequencesize, p2);
+    //p2 = (ff > 0.0f) ? lrintf(ff) : lrintf(ff - 1.0f);
     p2 = float2int(pos * sequencesize);
     p1 = p2 - 1;
     if (p1 < 0)

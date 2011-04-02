@@ -1,6 +1,6 @@
 /*
     AlsaJackClient.cpp - Jack audio / Alsa midi
-
+    
     Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can

@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2011, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
 #ifndef DISTORSION_H
@@ -44,6 +44,8 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
     private:
         // Parametrii
         unsigned char Pvolume;       // Volumul or E/R
+        unsigned char Ppanning;      // Panning
+        unsigned char Plrcross;      // L/R Mixing
         unsigned char Pdrive;        // the input amplification
         unsigned char Plevel;        // the output amplification
         unsigned char Ptype;         // Distorsion type
@@ -54,10 +56,14 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         unsigned char Pprefiltering; // if you want to do the filtering before the distorsion
 
         void setvolume(unsigned char Pvolume_);
+        void setpanning(unsigned char Ppanning_);
+        void setlrcross(unsigned char Plrcross_);
         void setlpf(unsigned char Plpf_);
         void sethpf(unsigned char Phpf_);
 
         // Real Parameters
+        float panning;
+        float lrcross;
         AnalogFilter *lpfl;
         AnalogFilter *lpfr;
         AnalogFilter *hpfl;

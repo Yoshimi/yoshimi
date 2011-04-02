@@ -37,7 +37,8 @@ ADnoteParameters::ADnoteParameters(Microtonal *micro_, FFTwrapper *fft_) :
     microtonal(micro_),
     fft(fft_)
 {
-    setpresettype("ADnoteParameters");
+    setpresettype("Padsyth");
+
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
     GlobalPar.FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0);
@@ -70,7 +71,7 @@ void ADnoteParameters::defaults(void)
 
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
-    setGlobalPan(GlobalPar.PPanning = 64); // center
+    GlobalPar.PPanning = 64; // center
     GlobalPar.PAmpVelocityScaleFunction = 64;
     GlobalPar.AmpEnvelope->defaults();
     GlobalPar.AmpLfo->defaults();
@@ -118,7 +119,7 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PDelay = 0;
     VoicePar[nvoice].PVolume = 100;
     VoicePar[nvoice].PVolumeminus = 0;
-    setVoicePan(nvoice, VoicePar[nvoice].PPanning = 64); // center
+    VoicePar[nvoice].PPanning = 64; // center
     VoicePar[nvoice].PDetune = 8192; // 8192 = 0
     VoicePar[nvoice].PCoarseDetune = 0;
     VoicePar[nvoice].PDetuneType = 0;
@@ -276,38 +277,6 @@ void ADnoteParameters::setUnisonSizeIndex(int nvoice, int index)
 }
 
 
-void ADnoteParameters::setGlobalPan(char pan)
-{
-    GlobalPar.PPanning = pan;
-    if ( --pan < 0)
-        GlobalPar.randomPan = true;
-    else
-    {
-        GlobalPar.randomPan = false;
-        if (pan > 126) pan = 126;
-        float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-        GlobalPar.pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        GlobalPar.pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
-}
-
-
-void ADnoteParameters::setVoicePan(int nvoice, char pan)
-{
-    VoicePar[nvoice].PPanning = pan;
-    if ( --pan < 0)
-        VoicePar[nvoice].randomPan = true;
-    else
-    {
-        VoicePar[nvoice].randomPan = false;
-        if (pan > 126) pan = 126;
-        float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-        VoicePar[nvoice].pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        VoicePar[nvoice].pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
-}
-
-
 void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
 {
     int nvoice = n;
@@ -459,14 +428,14 @@ void ADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addparbool("stereo", GlobalPar.PStereo);
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
-    xml->addpar("volume", GlobalPar.PVolume);
-    xml->addpar("panning", GlobalPar.PPanning);
-    xml->addpar("velocity_sensing", GlobalPar.PAmpVelocityScaleFunction);
-    xml->addpar("punch_strength", GlobalPar.PPunchStrength);
-    xml->addpar("punch_time", GlobalPar.PPunchTime);
-    xml->addpar("punch_stretch", GlobalPar.PPunchStretch);
-    xml->addpar("punch_velocity_sensing", GlobalPar.PPunchVelocitySensing);
-    xml->addpar("harmonic_randomness_grouping", GlobalPar.Hrandgrouping);
+    xml->addpar("volume",GlobalPar.PVolume);
+    xml->addpar("panning",GlobalPar.PPanning);
+    xml->addpar("velocity_sensing",GlobalPar.PAmpVelocityScaleFunction);
+    xml->addpar("punch_strength",GlobalPar.PPunchStrength);
+    xml->addpar("punch_time",GlobalPar.PPunchTime);
+    xml->addpar("punch_stretch",GlobalPar.PPunchStretch);
+    xml->addpar("punch_velocity_sensing",GlobalPar.PPunchVelocitySensing);
+    xml->addpar("harmonic_randomness_grouping",GlobalPar.Hrandgrouping);
 
     xml->beginbranch("AMPLITUDE_ENVELOPE");
     GlobalPar.AmpEnvelope->add2XML(xml);
@@ -478,12 +447,12 @@ void ADnoteParameters::add2XML(XMLwrapper *xml)
     xml->endbranch();
 
     xml->beginbranch("FREQUENCY_PARAMETERS");
-    xml->addpar("detune", GlobalPar.PDetune);
+    xml->addpar("detune",GlobalPar.PDetune);
 
-    xml->addpar("coarse_detune", GlobalPar.PCoarseDetune);
-    xml->addpar("detune_type", GlobalPar.PDetuneType);
+    xml->addpar("coarse_detune",GlobalPar.PCoarseDetune);
+    xml->addpar("detune_type",GlobalPar.PDetuneType);
 
-    xml->addpar("bandwidth", GlobalPar.PBandwidth);
+    xml->addpar("bandwidth",GlobalPar.PBandwidth);
 
     xml->beginbranch("FREQUENCY_ENVELOPE");
     GlobalPar.FreqEnvelope->add2XML(xml);
@@ -496,8 +465,8 @@ void ADnoteParameters::add2XML(XMLwrapper *xml)
 
 
     xml->beginbranch("FILTER_PARAMETERS");
-    xml->addpar("velocity_sensing_amplitude", GlobalPar.PFilterVelocityScale);
-    xml->addpar("velocity_sensing", GlobalPar.PFilterVelocityScaleFunction);
+    xml->addpar("velocity_sensing_amplitude",GlobalPar.PFilterVelocityScale);
+    xml->addpar("velocity_sensing",GlobalPar.PFilterVelocityScaleFunction);
 
     xml->beginbranch("FILTER");
     GlobalPar.GlobalFilter->add2XML(xml);
@@ -516,8 +485,7 @@ void ADnoteParameters::add2XML(XMLwrapper *xml)
     GlobalPar.Reson->add2XML(xml);
     xml->endbranch();
 
-    for (int nvoice=0;nvoice<NUM_VOICES;nvoice++)
-    {
+    for (int nvoice=0;nvoice<NUM_VOICES;nvoice++) {
         xml->beginbranch("VOICE",nvoice);
         add2XMLsection(xml,nvoice);
         xml->endbranch();
@@ -530,18 +498,18 @@ void ADnoteParameters::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
     {
-        GlobalPar.PVolume = xml->getpar127("volume", GlobalPar.PVolume);
-        GlobalPar.PPanning = xml->getpar127("panning", GlobalPar.PPanning);
+        GlobalPar.PVolume = xml->getpar127("volume",GlobalPar.PVolume);
+        GlobalPar.PPanning = xml->getpar127("panning",GlobalPar.PPanning);
         GlobalPar.PAmpVelocityScaleFunction =
-            xml->getpar127("velocity_sensing", GlobalPar.PAmpVelocityScaleFunction);
+            xml->getpar127("velocity_sensing",GlobalPar.PAmpVelocityScaleFunction);
         GlobalPar.PPunchStrength =
-            xml->getpar127("punch_strength", GlobalPar.PPunchStrength);
-        GlobalPar.PPunchTime = xml->getpar127("punch_time", GlobalPar.PPunchTime);
-        GlobalPar.PPunchStretch = xml->getpar127("punch_stretch", GlobalPar.PPunchStretch);
+            xml->getpar127("punch_strength",GlobalPar.PPunchStrength);
+        GlobalPar.PPunchTime = xml->getpar127("punch_time",GlobalPar.PPunchTime);
+        GlobalPar.PPunchStretch = xml->getpar127("punch_stretch",GlobalPar.PPunchStretch);
         GlobalPar.PPunchVelocitySensing =
-            xml->getpar127("punch_velocity_sensing", GlobalPar.PPunchVelocitySensing);
+            xml->getpar127("punch_velocity_sensing",GlobalPar.PPunchVelocitySensing);
         GlobalPar.Hrandgrouping =
-            xml->getpar127("harmonic_randomness_grouping", GlobalPar.Hrandgrouping);
+            xml->getpar127("harmonic_randomness_grouping",GlobalPar.Hrandgrouping);
 
         if (xml->enterbranch("AMPLITUDE_ENVELOPE"))
         {

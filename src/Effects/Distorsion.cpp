@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2011, Alan Calvert
+    Copyright 2009-2010, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,30 +18,33 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is a derivative of a ZynAddSubFX original, modified October 2010
 */
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Distorsion.h"
 
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
-    Pvolume(50),
-    Pdrive(90),
-    Plevel(64),
-    Ptype(0),
-    Pnegate(0),
-    Plpf(127),
-    Phpf(0),
-    Pstereo(0),
-    Pprefiltering(0)
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
     lpfl = new AnalogFilter(2, 22000, 1, 0);
     lpfr = new AnalogFilter(2, 22000, 1, 0);
     hpfl = new AnalogFilter(3, 20, 1, 0);
     hpfr = new AnalogFilter(3, 20, 1, 0);
+
+    // default values
+    Pvolume = 50;
+    Plrcross = 40;
+    Pdrive = 90;
+    Plevel = 64;
+    Ptype = 0;
+    Pnegate = 0;
+    Plpf = 127;
+    Phpf = 0;
+    Pstereo = 0;
+    Pprefiltering = 0;
+
     setpreset(Ppreset);
-    changepar(2, 40);
     cleanup();
 }
 
@@ -55,7 +58,7 @@ Distorsion::~Distorsion()
 }
 
 // Cleanup the effect
-void Distorsion::cleanup(void)
+void Distorsion::cleanup()
 {
     lpfl->cleanup();
     hpfl->cleanup();
@@ -69,48 +72,54 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 {
     lpfl->filterout(efxoutl);
     hpfl->filterout(efxoutl);
-    lpfr->filterout(efxoutr);
-    hpfr->filterout(efxoutr);
+    if (Pstereo != 0)
+    {   // stereo
+        lpfr->filterout(efxoutr);
+        hpfr->filterout(efxoutr);
+    }
 }
 
 
 // Effect output
 void Distorsion::out(float *smpsl, float *smpsr)
 {
-    float inputdrive = powf(5.0f, (Pdrive - 32.0f) / 127.0f);
-    if (Pnegate)
-        inputdrive *= -1.0f;
+    float l, r, lout, rout;
 
-    if (Pstereo) // Stereo
-    {
+    float inputvol = powf(5.0f, (Pdrive - 32.0f) / 127.0f);
+    if (Pnegate != 0)
+        inputvol *= -1.0f;
+
+    if (Pstereo != 0)
+    {   //Stereo
         for (int i = 0; i < synth->buffersize; ++i)
         {
-            efxoutl[i] = smpsl[i] * inputdrive * pangainL;
-            efxoutr[i] = smpsr[i] * inputdrive * pangainR;
+            efxoutl[i] = smpsl[i] * inputvol * (1.0f - panning);
+            efxoutr[i] = smpsr[i] * inputvol * panning;
+        }
+    } else {
+        for (int i = 0; i < synth->buffersize; ++i)
+        {
+            efxoutl[i] = (smpsl[i] * panning + smpsr[i] * (1.0f - panning)) * inputvol;
         }
     }
-    else // Mono
-    {
-        for (int i = 0; i < synth->buffersize; ++i)
-            efxoutl[i] = inputdrive * (smpsl[i] + smpsr[i]) * 0.444f;
-    }
 
-    if (Pprefiltering)
+    if (Pprefiltering != 0)
         applyfilters(efxoutl, efxoutr);
 
     // no optimised, yet (no look table)
     waveShapeSmps(synth->buffersize, efxoutl, Ptype + 1, Pdrive);
-    if (Pstereo)
+    if (Pstereo != 0)
         waveShapeSmps(synth->buffersize, efxoutr, Ptype + 1, Pdrive);
 
     if (Pprefiltering == 0)
         applyfilters(efxoutl, efxoutr);
 
-    if (!Pstereo)
+    if (Pstereo == 0)
         memcpy(efxoutr, efxoutl, synth->bufferbytes);
+        //for (i = 0; i < synth->buffersize; ++i)
+        //    efxoutr[i] = efxoutl[i];
 
     float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
-    float l, r, lout, rout;
     for (int i = 0; i < synth->buffersize; ++i)
     {
         lout = efxoutl[i];
@@ -119,8 +128,8 @@ void Distorsion::out(float *smpsl, float *smpsr)
         r = rout * (1.0f - lrcross) + lout * lrcross;
         lout = l;
         rout = r;
-        efxoutl[i] = lout * level;
-        efxoutr[i] = rout * level;
+        efxoutl[i] = lout * 2.0f * level;
+        efxoutr[i] = rout * 2.0f *level;
     }
 }
 
@@ -131,7 +140,7 @@ void Distorsion::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if(insertion == 0)
     {
-        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
+        outvolume = pow(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
         volume = 1.0f;
     }
     else
@@ -139,6 +148,21 @@ void Distorsion::setvolume(unsigned char Pvolume_)
     if (Pvolume == 0.0f)
         cleanup();
 }
+
+
+void Distorsion::setpanning(unsigned char Ppanning_)
+{
+    Ppanning = Ppanning_;
+    panning = (Ppanning + 0.5f) / 127.0f;
+}
+
+
+void Distorsion::setlrcross(unsigned char Plrcross_)
+{
+    Plrcross = Plrcross_;
+    lrcross = Plrcross / 127.0f;
+}
+
 
 void Distorsion::setlpf(unsigned char Plpf_)
 {
@@ -162,7 +186,7 @@ void Distorsion::setpreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 11;
     const int NUM_PRESETS = 6;
-    int presets[NUM_PRESETS][PRESET_SIZE] = {
+    unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
         // Overdrive 1
         { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
         // Overdrive 2
@@ -182,8 +206,7 @@ void Distorsion::setpreset(unsigned char npreset)
     for (int n = 0; n < PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
     if (!insertion)
-        // lower the volume if this is system effect
-        changepar(0, (int)roundf(((float)presets[npreset][0] * 0.7f)));
+        changepar(0, (int)(presets[npreset][0] / 1.5)); // lower the volume if this is system effect
     Ppreset = npreset;
     cleanup();
 }
