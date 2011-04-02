@@ -56,7 +56,10 @@ struct ADnoteGlobalParam {
     LFOParams      *FreqLfo;          // Frequency LFO
 
     // Amplitude global parameters
-    unsigned char PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
+    char  PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
+    bool  randomPan;
+    float pangainL; // derived from PPanning
+    float pangainR; // ^
     unsigned char PVolume;
     unsigned char PAmpVelocityScaleFunction;
     unsigned char PPunchStrength;
@@ -119,8 +122,12 @@ struct ADnoteVoiceParam { // Voice parameters
     // Amplitude parameters
     unsigned char PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
                             // panning is ignored if the instrument is mono
+    bool  randomPan;
+    float pangainL;         // derived from PPanning
+    float pangainR;         // ^
     unsigned char PVolume;
-    unsigned char PVolumeminus;
+    unsigned char PVolumeminus; // ?? doesn't seem to be currently associated
+                                // with anything
 
     unsigned char PAmpVelocityScaleFunction; // Velocity sensing
 
@@ -131,7 +138,6 @@ struct ADnoteVoiceParam { // Voice parameters
     LFOParams *AmpLfo;
 
     // Filter parameters
-
     unsigned char PFilterEnabled;            // Voice Filter
     FilterParams *VoiceFilter;
 
@@ -173,7 +179,9 @@ class ADnoteParameters : public Presets
         float getUnisonFrequencySpreadCents(int nvoice);
         int getUnisonSizeIndex(int nvoice);
         void setUnisonSizeIndex(int nvoice, int index);
-
+        void setGlobalPan(char pan);
+        void setVoicePan(int voice, char pan);
+        
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         Microtonal *microtonal;

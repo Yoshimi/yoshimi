@@ -21,7 +21,7 @@
 #include <cstring>
 #include <fftw3.h>
 
-using namespace std;   
+using namespace std;
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
@@ -110,19 +110,6 @@ int MusicIO::getMidiController(unsigned char b)
 	        break;
 	    case 123: // All Notes OFF
             ctl = C_allnotesoff;
-	        break;
-	    // RPN and NRPN
-	    case 0x06: // Data Entry (Coarse)
-            ctl = C_dataentryhi;
-	         break;
-	    case 0x26: // Data Entry (Fine)
-            ctl = C_dataentrylo;
-	         break;
-	    case 99:  // NRPN (Coarse)
-            ctl = C_nrpnhi;
-	         break;
-	    case 98: // NRPN (Fine)
-            ctl = C_nrpnlo;
 	        break;
 	    default: // an unrecognised controller!
             ctl = C_NULL;

@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include "Misc/SynthEngine.h"
@@ -27,10 +27,8 @@
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     Pvolume(50),
-    Ppanning(64),
     Pdelay(60),
     Plrdelay(100),
-    Plrcross(100),
     Pfb(40),
     Phidamp(60),
     lrdelay(0),
@@ -38,6 +36,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     rdelay(NULL)
 {
     setpreset(Ppreset);
+    changepar(4, 100); // lrcross
     cleanup();
 }
 
@@ -78,6 +77,7 @@ void Echo::initdelays(void)
     cleanup();
 }
 
+
 // Effect output
 void Echo::out(float* smpsl, float* smpsr)
 {
@@ -96,8 +96,8 @@ void Echo::out(float* smpsl, float* smpsr)
         efxoutl[i] = ldl * 2.0f - 1e-20f; // anti-denormal - a very, very, very
         efxoutr[i] = rdl * 2.0f - 1e-20f; // small dc bias
 
-        ldl = smpsl[i] * (1.0f - panning) - ldl * fb;
-        rdl = smpsr[i] * panning - rdl * fb;
+        ldl = smpsl[i] * pangainL - ldl * fb;
+        rdl = smpsr[i] * pangainR - rdl * fb;
 
         // LowPass Filter
         ldelay[kl] = ldl = ldl * hidamp + oldl * (1.0f - hidamp);
@@ -111,6 +111,7 @@ void Echo::out(float* smpsl, float* smpsr)
             kr = 0;
     }
 }
+
 
 // Parameter control
 void Echo::setvolume(unsigned char Pvolume_)
@@ -127,11 +128,6 @@ void Echo::setvolume(unsigned char Pvolume_)
         cleanup();
 }
 
-void Echo::setpanning(unsigned char Ppanning_)
-{
-    Ppanning = Ppanning_;
-    panning = (Ppanning + 0.5f) / 127.0f;
-}
 
 void Echo::setdelay(const unsigned char Pdelay_)
 {
@@ -139,6 +135,7 @@ void Echo::setdelay(const unsigned char Pdelay_)
     delay = 1 + lrintf(Pdelay / 127.0f * synth->samplerate_f * 1.5f); // 0 .. 1.5 sec
     initdelays();
 }
+
 
 void Echo::setlrdelay(unsigned char Plrdelay_)
 {
@@ -151,11 +148,6 @@ void Echo::setlrdelay(unsigned char Plrdelay_)
     initdelays();
 }
 
-void Echo::setlrcross(unsigned char Plrcross_)
-{
-    Plrcross = Plrcross_;
-    lrcross = Plrcross / 127.0f * 1.0f;
-}
 
 void Echo::setfb(unsigned char Pfb_)
 {
@@ -163,11 +155,13 @@ void Echo::setfb(unsigned char Pfb_)
     fb = Pfb / 128.0f;
 }
 
+
 void Echo::sethidamp(unsigned char Phidamp_)
 {
     Phidamp = Phidamp_;
     hidamp = 1.0 - Phidamp / 127.0f;
 }
+
 
 void Echo::setpreset(unsigned char npreset)
 {

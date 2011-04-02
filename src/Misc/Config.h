@@ -40,7 +40,6 @@ typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 
 class XMLwrapper;
 class BodyDisposal;
-class SynthEngine;
 
 class Config : public MiscFuncs
 {
@@ -57,8 +56,12 @@ class Config : public MiscFuncs
         void clearPresetsDirlist(void);
         void saveConfig(void);
         void saveState(void) { saveSessionData(StateFile); }
-        bool stateRestore(SynthEngine *synth);
-        bool restoreJsession(SynthEngine *synth);
+        void saveState(const string statefile)  { saveSessionData(statefile); }
+        bool loadState(const string statefile)
+            { return restoreSessionData(statefile); }
+        bool stateRestore(void)
+            { return restoreSessionData(StateFile); }
+        bool restoreJsession(void);
         void setJackSessionSave(int event_type, string session_file);
 
         static void sigHandler(int sig);
@@ -130,7 +133,7 @@ class Config : public MiscFuncs
         void addConfigXML(XMLwrapper *xml);
         void addRuntimeXML(XMLwrapper *xml);
         void saveSessionData(string savefile);
-        bool restoreSessionData(SynthEngine *synth, string sessionfile);
+        bool restoreSessionData(string sessionfile);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);

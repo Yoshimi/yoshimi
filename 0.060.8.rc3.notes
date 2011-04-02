@@ -1,3 +1,8 @@
+yoshimi-0.060.8.rc3
+
+ADnote & effects panning inversions corrected, plus a review and revision of
+panning in general.
+
 yoshimi-0.060.8.rc2
 
 couple more code cleanups, particularly in main.cpp
@@ -5,7 +10,8 @@ couple more code cleanups, particularly in main.cpp
 yoshimi-0.060.8.rc1
 
 lots of redundant variable cleanups; tried to accomodate the new latency API
-of jack 0.120.1; an attempt to eliminate the annoy Save State? dialogue on exit.
+of jack 0.120.1, mainly to quiet deprecated warnings; an attempt to eliminate
+the annoying "Save State?" dialogue on exit.
 
 yoshimi-0.060.7-2
 

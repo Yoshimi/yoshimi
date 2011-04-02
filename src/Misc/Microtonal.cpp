@@ -85,7 +85,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     {
         return getNoteFreq(note + keyshift) * globalfinedetunerap;
     }
-    
+
     int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
 
     // compute the keyshift
@@ -115,7 +115,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         for (int i = 0; i < tmp; ++i)
             if (Pmapping[i % Pmapsize] >= 0)
                 deltanote++;
-        float rap_anote_middlenote = 
+        float rap_anote_middlenote =
             (deltanote == 0) ? (1.0f) : (octave[(deltanote - 1) % octavesize].tuning);
         if(deltanote != 0)
             rap_anote_middlenote *= powf(octave[octavesize - 1].tuning,

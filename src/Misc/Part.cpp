@@ -44,10 +44,10 @@ using namespace std;
 #include "Misc/Part.h"
 
 Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
-    killallnotes(false),
     microtonal(microtonal_),
     fft(fft_),
-    partMuted(0)
+    partMuted(0),
+    killallnotes(false)
 {
     ctl = new Controller();
     partoutl = (float*)fftwf_malloc(synth->bufferbytes);
@@ -119,10 +119,10 @@ void Part::defaults(void)
     Pnoteon = 1;
     Ppolymode = 1;
     Plegatomode = 0;
-    setPvolume(96);
+    setVolume(96);
     Pkeyshift = 64;
     Prcvchn = 0;
-    setPpanning(64);
+    setPan(Ppanning = 64);
     Pvelsns = 64;
     Pveloffs = 64;
     Pkeylimit = 15;
@@ -355,7 +355,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         }
         else
             notebasefreq = microtonal->getNoteFreq(note);
-        
+
         // Portamento
         if (oldfreq < 1.0f)
             oldfreq = notebasefreq; // this is only the first note is played
@@ -552,7 +552,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                 {
                     partnote[pos].kititem[ci].adnote =
                         new ADnote(kit[item].adpars, ctl, vel, portamento, note, false); // not silent
-                } 
+                }
                 if (kit[item].subpars && kit[item].Psubenabled)
                     partnote[pos].kititem[ci].subnote =
                         new SUBnote(kit[item].subpars, ctl,notebasefreq, vel,
@@ -647,14 +647,13 @@ void Part::SetController(unsigned int type, int par)
             break;
         case C_expression:
             ctl->setexpression(par);
-            setPvolume(Pvolume);
+            setVolume(Pvolume);
             break;
         case C_portamento:
             ctl->setportamento(par);
             break;
         case C_panning:
-            ctl->setpanning(par);
-            setPpanning(Ppanning);
+            setPan(par);
             break;
         case C_filtercutoff:
             ctl->setfiltercutoff(par);
@@ -676,7 +675,7 @@ void Part::SetController(unsigned int type, int par)
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
             else
-                setPvolume(Pvolume);
+                setVolume(Pvolume);
             break;
         case C_sustain:
             ctl->setsustain(par);
@@ -691,8 +690,8 @@ void Part::SetController(unsigned int type, int par)
             RelaseSustainedKeys();
             if (ctl->volume.receive)
                 volume = ctl->volume.volume;
-            setPvolume(Pvolume);
-            setPpanning(Ppanning);
+            setVolume(Pvolume);
+            setPan(Ppanning);
 
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
@@ -1014,21 +1013,24 @@ void Part::ComputePartSmps(void)
 
 
 // Parameter control
-void Part::setPvolume(char value)
+void Part::setVolume(char value)
 {
     Pvolume = value;
     volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
 }
 
 
-void Part::setPpanning(char value)
-{
+void Part::setPan(char value)
+{   // * 1.4677987f;
     Ppanning = value;
-    panning = Ppanning / 127.0f + ctl->panning.pan;
-    if (panning < 0.0f)
-        panning = 0.0f;
-    else if (panning > 1.0f)
-        panning = 1.0f;
+    if (Ppanning < 0)
+        Ppanning = 0;
+    char pan = Ppanning - 1;
+    if (pan < 0)
+        pan = 0;
+    float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
+    pangainL = ((1.0f - x) * (0.7f + 0.2f * x));
+    pangainR = ((1.0f + x ) * (0.7f - 0.2f * x));
 }
 
 
@@ -1317,8 +1319,8 @@ void Part::getfromXML(XMLwrapper *xml)
 {
     Penabled = xml->getparbool("enabled", Penabled);
 
-    setPvolume(xml->getpar127("volume", Pvolume));
-    setPpanning(xml->getpar127("panning", Ppanning));
+    setVolume(xml->getpar127("volume", Pvolume));
+    setPan(xml->getpar127("panning", Ppanning));
 
     Pminkey = xml->getpar127("min_key", Pminkey);
     Pmaxkey = xml->getpar127("max_key", Pmaxkey);

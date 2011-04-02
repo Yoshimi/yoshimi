@@ -26,7 +26,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public
@@ -218,7 +218,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
   Function {make_null_window()} {open
   } {
     Fl_Window effnullwindow {open
-      xywh {914 674 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
+      xywh {915 700 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
       Fl_Text_Display {} {
@@ -229,13 +229,13 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
   }
   Function {make_reverb_window()} {open
   } {
-    Fl_Window effreverbwindow {open
-      xywh {951 544 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 hide
-      class Fl_Group
+    Fl_Window effreverbwindow {
+      xywh {952 570 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33
+      class Fl_Group visible
     } {
       Fl_Text_Display {} {
         label {Reverb }
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 labelcolor 36 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 labelcolor 36 align 8
       }
       Fl_Choice revp {
         label Preset
@@ -384,13 +384,13 @@ eff->seteffectpar(11,x);}
   Function {make_echo_window()} {open
   } {
     Fl_Window effechowindow {open
-      xywh {1129 700 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+      xywh {1130 726 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12
+      class Fl_Group visible
     } {
       Fl_Choice echop {
         label Preset
         callback {eff->changepreset((int)o->value());
-refresh(eff);}
+refresh(eff);} open
         xywh {102 13 96 15} down_box BORDER_BOX color 14 selection_color 0 labelsize 11 textsize 11 textcolor 7
       } {
         MenuItem {} {
@@ -432,7 +432,7 @@ refresh(eff);}
       }
       Fl_Text_Display {} {
         label Echo
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial echop0 {
         label Vol
@@ -481,8 +481,8 @@ refresh(eff);}
   Function {make_chorus_window()} {open
   } {
     Fl_Window effchoruswindow {open
-      xywh {1075 219 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+      xywh {1076 245 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Choice chorusp {
         label Preset
@@ -533,7 +533,7 @@ refresh(eff);}
       }
       Fl_Text_Display {} {
         label Chorus
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial chorusp0 {
         label Vol
@@ -619,8 +619,8 @@ refresh(eff);}
   Function {make_phaser_window()} {open
   } {
     Fl_Window effphaserwindow {open
-      xywh {1120 470 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
-      class Fl_Group
+      xywh {1121 496 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11
+      class Fl_Group visible
     } {
       Fl_Choice phaserp {
         label Preset
@@ -655,7 +655,7 @@ refresh(eff);} open
       }
       Fl_Text_Display {} {
         label Phaser
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial phaserp0 {
         label Vol
@@ -741,8 +741,8 @@ refresh(eff);} open
   Function {make_alienwah_window()} {open
   } {
     Fl_Window effalienwahwindow {open
-      xywh {1039 300 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+      xywh {1040 326 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Choice awp {
         label Preset
@@ -769,7 +769,7 @@ refresh(eff);} open
       }
       Fl_Text_Display {} {
         label AlienWah
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial awp0 {
         label Vol
@@ -850,8 +850,8 @@ refresh(eff);} open
   Function {make_distorsion_window()} {open
   } {
     Fl_Window effdistorsionwindow {open
-      xywh {1008 712 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+      xywh {1009 738 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Choice distp {
         label Preset
@@ -886,7 +886,7 @@ refresh(eff);}
       }
       Fl_Text_Display {} {
         label Distortion
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial distp0 {
         label Vol
@@ -1012,12 +1012,12 @@ refresh(eff);}
   Function {make_eq_window()} {open
   } {
     Fl_Window effeqwindow {open
-      xywh {765 580 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+      xywh {766 606 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Text_Display {} {
         label EQ
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial eqp0 {
         label Gain
@@ -1150,8 +1150,8 @@ eqgraph->redraw();}
   Function {make_dynamicfilter_window()} {open
   } {
     Fl_Window effdynamicfilterwindow {open
-      xywh {1098 395 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
-      class Fl_Group
+      xywh {1099 421 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Choice dfp {
         label Preset
@@ -1182,7 +1182,7 @@ refresh(eff);}
       }
       Fl_Text_Display {} {
         label DynFilter
-        xywh {10 10 0 20} box NO_BOX labeltype EMBOSSED_LABEL labelfont 1 align 8
+        xywh {10 10 0 20} box NO_BOX labelfont 1 labelsize 12 align 8
       }
       Fl_Dial dfp0 {
         label Vol
@@ -1265,8 +1265,8 @@ refresh(eff);}
   Function {make_filter_window()} {open
   } {
     Fl_Window filterwindow {
-      label {Filter Parameters for DynFilter Eff.} open
-      xywh {1185 753 290 110} type Double hide
+      label {Filter Parameters for DynFilter Eff.} open selected
+      xywh {1186 779 290 110} type Double visible
     } {
       Fl_Group {} {
         label {DynFilter effect  - Filter}

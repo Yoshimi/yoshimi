@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #ifndef ECHO_H
@@ -42,24 +42,20 @@ class Echo : public Effect
 
     private:
         // Parameters
-        unsigned char Pvolume;  // <#1 Volume or Dry/Wetness
-        unsigned char Ppanning; // <#2 Panning
-        unsigned char Pdelay;   // <#3 Delay of the Echo
-        unsigned char Plrdelay; // <#4 L/R delay difference
-        unsigned char Plrcross; // <#5 L/R Mixing
-        unsigned char Pfb;      // <#6 Feedback
-        unsigned char Phidamp;  // <#7 Dampening of the Echo
+        unsigned char Pvolume;  // 1 Volume or Dry/Wetness
+        unsigned char Pdelay;   // 3 Delay of the Echo
+        unsigned char Plrdelay; // 4 L/R delay difference
+        unsigned char Pfb;      // 6 Feedback
+        unsigned char Phidamp;  // 7 Dampening of the Echo
 
         void setvolume(unsigned char Pvolume_);
-        void setpanning(unsigned char Ppanning_);
         void setdelay(unsigned char Pdelay_);
         void setlrdelay(unsigned char Plrdelay_);
-        void setlrcross(unsigned char Plrcross_);
         void setfb(unsigned char Pfb_);
         void sethidamp(unsigned char Phidamp_);
 
         // Real Parameters
-        float panning, lrcross, fb, hidamp;
+        float fb, hidamp;
         int dl, dr, delay, lrdelay;
 
         void initdelays(void);

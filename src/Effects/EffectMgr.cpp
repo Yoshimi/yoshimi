@@ -18,8 +18,10 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
+
+#include <fftw3.h>
 
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
@@ -32,8 +34,8 @@ EffectMgr::EffectMgr(const bool insertion_) :
     dryonly(false)
 {
     setpresettype("Peffect");
-    efxoutl = new float [synth->buffersize];
-    efxoutr = new float [synth->buffersize];
+    efxoutl = (float*)fftwf_malloc(synth->bufferbytes);
+    efxoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
     defaults();
@@ -44,8 +46,8 @@ EffectMgr::~EffectMgr()
 {
     if (efx)
         delete efx;
-    delete [] efxoutl;
-    delete [] efxoutr;
+    fftwf_free(efxoutl);
+    fftwf_free(efxoutr);
 }
 
 
@@ -195,11 +197,13 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     if (nefx == 7)
     {   // this is need only for the EQ effect
         // aca: another memcpy() candidate
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
-            smpsl[i] = efxoutl[i];
-            smpsr[i] = efxoutr[i];
-        }
+        //for (int i = 0; i < synth->buffersize; ++i)
+        //{
+         //   smpsl[i] = efxoutl[i];
+         //   smpsr[i] = efxoutr[i];
+        //}
+        memcpy(smpsl, efxoutl, synth->bufferbytes);
+        memcpy(smpsr, efxoutr, synth->bufferbytes);
         return;
     }
 
