@@ -32,54 +32,6 @@ SynthEngine *synth = NULL;
 char SynthEngine::random_state[256] = { 0, };
 struct random_data SynthEngine::random_buf;
 
-float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune,
-                             unsigned short int finedetune) const
-{
-    float det = 0.0f;
-    float octdet = 0.0f;
-    float cdet = 0.0f;
-    float findet = 0.0f;
-
-    int octave = coarsedetune / 1024; // get Octave
-    if (octave >= 8)
-        octave -= 16;
-    octdet = octave * 1200.0f;
-
-    int cdetune = coarsedetune % 1024; // coarse and fine detune
-    if (cdetune > 512)
-        cdetune -= 1024;
-    int fdetune = finedetune - 8192;
-
-    switch (type)
-    {
-        // case 1 is used for the default (see below)
-        case 2:
-            cdet = fabs(cdetune * 10.0f);
-            findet = fabs(fdetune / 8192.0f) * 10.0f;
-            break;
-        case 3:
-            cdet = fabsf(cdetune * 100.0f);
-            findet = pow(10.0f, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
-            break;
-        case 4:
-            cdet = fabs(cdetune * 701.95500087f); // perfect fifth
-            findet = (pow(2.0f, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
-            break;
-            // case ...: need to update N_DETUNE_TYPES, if you'll add more
-        default:
-            cdet = fabs(cdetune * 50.0f);
-            findet = fabs(fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
-            break;
-    }
-    if (finedetune < 8192)
-        findet = -findet;
-    if (cdetune < 0)
-        cdet = -cdet;
-    det = octdet + cdet + findet;
-    return det;
-}
-
-
 SynthEngine::SynthEngine() :
     shutup(false),
     samplerate(48000),
@@ -116,7 +68,7 @@ SynthEngine::~SynthEngine()
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
             delete part[npart];
-       
+
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         if (insefx[nefx])
             delete insefx[nefx];
@@ -223,7 +175,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     defaults();
     if (Runtime.restoreJackSession)
     {
-        if (!Runtime.restoreJsession(this))
+        if (!Runtime.restoreJsession())
         {
             Runtime.Log("Restore jack session failed");
             goto bail_out;
@@ -231,7 +183,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     else if (Runtime.restoreState)
     {
-        if (!Runtime.stateRestore(this))
+        if (!Runtime.stateRestore())
          {
              Runtime.Log("Restore state failed");
              goto bail_out;
@@ -368,47 +320,18 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 // Controllers
 void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
 {
-    if (type == C_dataentryhi
-        || type == C_dataentrylo
-        || type == C_nrpnhi
-        || type == C_nrpnlo)
-    {
-        // Process RPN and NRPN by the Master (ignore the chan)
-        ctl->setparameternumber(type, par);
-
-        int parhi = -1, parlo = -1, valhi = -1, vallo = -1;
-        if (!ctl->getnrpn(&parhi, &parlo, &valhi, &vallo))
-        {   // this is NRPN
-            // fprintf(stderr,"rcv. NRPN: %d %d %d %d\n",parhi,parlo,valhi,vallo);
-            switch (parhi)
-            {
-                case 0x04: // System Effects
-                    if (parlo < NUM_SYS_EFX)
-                        sysefx[parlo]->seteffectpar_nolock(valhi, vallo);
-                    break;
-            case 0x08: // Insertion Effects
-                if (parlo < NUM_INS_EFX)
-                    insefx[parlo]->seteffectpar_nolock(valhi, vallo);
-                break;
-
-            }
-        }
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {   // Send the controller to all part assigned to the channel
+        if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+            part[npart]->SetController(type, par);
     }
-    else
-    {   // other controllers
-        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        {   // Send the controller to all part assigned to the channel
-            if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-                part[npart]->SetController(type, par);
-        }
 
-        if (type == C_allsoundsoff)
-        {   // cleanup insertion/system FX
-            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-                sysefx[nefx]->cleanup();
-            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-                insefx[nefx]->cleanup();
-        }
+    if (type == C_allsoundsoff)
+    {   // cleanup insertion/system FX
+        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+            sysefx[nefx]->cleanup();
+        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+            insefx[nefx]->cleanup();
     }
 }
 
@@ -471,16 +394,10 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         if (!part[npart]->Penabled)
             continue;
 
-        float newvol_l = part[npart]->volume;
-        float newvol_r = part[npart]->volume;
         float oldvol_l = part[npart]->oldvolumel;
         float oldvol_r = part[npart]->oldvolumer;
-        float pan = part[npart]->panning;
-        if (pan < 0.5f)
-            newvol_r *= pan * 2.0f;
-        else
-            newvol_l *= (1.0f - pan) * 2.0f;
-        actionLock(lock);
+        float newvol_l = part[npart]->pannedVolLeft();
+        float newvol_r = part[npart]->pannedVolRight();
         if (aboveAmplitudeThreshold(oldvol_l, newvol_l)
             || aboveAmplitudeThreshold(oldvol_r, newvol_r))
         {   // the volume or the panning has changed and needs interpolation
@@ -504,7 +421,6 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 part[npart]->partoutr[i] *= newvol_r;
             }
         }
-        actionLock(unlock);
     }
     // System effects
     for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
@@ -793,7 +709,6 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     actionLock(lockmute);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
-    xml->addparbool("nrpn_receive", ctl->NRPN.receive);
 
     xml->beginbranch("MICROTONAL");
     microtonal.add2XML(xml);
@@ -919,7 +834,6 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     }
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar127("key_shift", Pkeyshift));
-    ctl->NRPN.receive = xml->getparbool("nrpn_receive", ctl->NRPN.receive);
 
     part[0]->Penabled = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
@@ -988,3 +902,53 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     xml->exitbranch(); // MASTER
     return true;
 }
+
+
+float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune,
+                             unsigned short int finedetune) const
+{
+    float det = 0.0f;
+    float octdet = 0.0f;
+    float cdet = 0.0f;
+    float findet = 0.0f;
+
+    int octave = coarsedetune / 1024; // get Octave
+    if (octave >= 8)
+        octave -= 16;
+    octdet = octave * 1200.0f;
+
+    int cdetune = coarsedetune % 1024; // coarse and fine detune
+    if (cdetune > 512)
+        cdetune -= 1024;
+    int fdetune = finedetune - 8192;
+
+    switch (type)
+    {
+        // case 1 is used for the default (see below)
+        case 2:
+            cdet = fabs(cdetune * 10.0f);
+            findet = fabs(fdetune / 8192.0f) * 10.0f;
+            break;
+        case 3:
+            cdet = fabsf(cdetune * 100.0f);
+            findet = pow(10.0f, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
+            break;
+        case 4:
+            cdet = fabs(cdetune * 701.95500087f); // perfect fifth
+            findet = (pow(2.0f, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
+            break;
+            // case ...: need to update N_DETUNE_TYPES, if you'll add more
+        default:
+            cdet = fabs(cdetune * 50.0f);
+            findet = fabs(fdetune / 8192.0f) * 35.0f; // almost like "Paul's Sound Designer 2"
+            break;
+    }
+    if (finedetune < 8192)
+        findet = -findet;
+    if (cdetune < 0)
+        cdet = -cdet;
+    det = octdet + cdet + findet;
+    return det;
+}
+
+

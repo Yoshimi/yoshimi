@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
         guiMaster->Init();
     }
 
+    Runtime.StartupReport();
     synth->Unmute();
     while (Runtime.runSynth)
     {

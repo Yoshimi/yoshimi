@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified January 2010
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #ifndef ALIENWAH_H
@@ -49,25 +49,21 @@ class Alienwah : public Effect
         // Alienwah Parameters
         EffectLFO lfo; // lfo-ul Alienwah
         unsigned char Pvolume;
-        unsigned char Ppanning;
         unsigned char Pdepth;   // the depth of the Alienwah
         unsigned char Pfb;      // feedback
-        unsigned char Plrcross; // feedback
         unsigned char Pdelay;
         unsigned char Pphase;
 
 
         // Control Parameters
         void setvolume(unsigned char Pvolume_);
-        void setpanning(unsigned char Ppanning_);
         void setdepth(unsigned char Pdepth_);
         void setfb(unsigned char Pfb_);
-        void setlrcross(unsigned char Plrcross_);
         void setdelay(unsigned char Pdelay_);
         void setphase(unsigned char Pphase_);
 
         // Internal Values
-        float panning, fb, depth, lrcross, phase;
+        float fb, depth, phase;
         complex<float> *oldl, *oldr;
         complex<float> oldclfol, oldclfor;
         int oldk;

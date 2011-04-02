@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #ifndef REVERB_H
@@ -47,7 +47,6 @@ class Reverb : public Effect
     private:
         // Parametrii
         unsigned char Pvolume;
-        unsigned char Ppan;
         unsigned char Ptime;
         unsigned char Pidelay;
         unsigned char Pidelayfb;
@@ -62,7 +61,6 @@ class Reverb : public Effect
 
         // parameter control
         void setvolume(unsigned char Pvolume_);
-        void setpan(unsigned char Ppan_);
         void settime(unsigned char Ptime_);
         void setlohidamp(unsigned char Plohidamp_);
         void setidelay(unsigned char Pidelay_);
@@ -74,7 +72,6 @@ class Reverb : public Effect
         void setbandwidth(unsigned char Pbandwidth_);
         void processmono(int ch, float *output);
 
-        float pan;
         float erbalance;
 
         // Parametrii 2

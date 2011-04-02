@@ -1,8 +1,8 @@
 /*
     MidiControl.h
-  
+
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009, Alan Calvert
+    Copyright 2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -41,8 +41,6 @@ typedef enum {
     C_resonance_bandwidth =  78,
     C_dataentryhi =        0x06,
     C_dataentrylo =        0x26,
-    C_nrpnhi =               99,
-    C_nrpnlo =               98
 } MidiControllers;
 
 #endif

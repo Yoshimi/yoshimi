@@ -43,7 +43,7 @@ class FileListItem {
             else
                 return index < param.index;
         }
-        
+
         inline bool sameFile(const FileListItem& param) const
         {
             if (name < param.name)

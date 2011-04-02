@@ -43,7 +43,7 @@ class HistoryListItem {
         {
             return (index < param.index);
         }
-        
+
         inline bool sameFile(const string& fileparam) const
         {
             return (file == fileparam);

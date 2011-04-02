@@ -55,19 +55,15 @@ class Phaser : public Effect
     
         // Control Parametrii
         void setvolume(unsigned char Pvolume_);
-        void setpanning(unsigned char Ppanning_);
         void setdepth(unsigned char Pdepth_);
         void setfb(unsigned char Pfb_);
-        void setlrcross(unsigned char Plrcross_);
         void setstages(unsigned char Pstages_);
         void setphase(unsigned char Pphase_);
     
         // Internal Values
         // int insertion; // inherited from Effect
-        float   panning;
         float   fb;
         float   depth;
-        float   lrcross;
         float   fbl;
         float   fbr;
         float   phase;

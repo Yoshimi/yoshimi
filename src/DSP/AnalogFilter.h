@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified April 2011
 */
 
 #ifndef ANALOG_FILTER_H
@@ -72,6 +72,8 @@ class AnalogFilter : public Filter_, private MiscFuncs
         int needsinterpolation, firsttime;
         int abovenq;    // this is 1 if the frequency is above the nyquist
         int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
+        
+        float *tmpismp; // used if it needs interpolation in filterout()
 };
 
 #endif

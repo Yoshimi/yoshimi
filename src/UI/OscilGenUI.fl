@@ -1,11 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109 
+version 1.0110 
 header_name {.h} 
 code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
-}
+} 
+
 comment {OscilgenUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,7 +28,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is a derivative of the ZynAddSubFX original, modified October 2009 -
 January 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include "ResonanceUI.h"} {public
 } 
@@ -41,7 +42,7 @@ decl {\#include <FL/Fl_Group.H>} {public
 decl {\#include <FL/Fl_Slider.H>} {public
 } 
 
-decl {\#include <cmath>} {}
+decl {\#include <cmath>} {} 
 
 decl {\#include "WidgetPDialUI.h"} {public
 } 
@@ -59,28 +60,28 @@ decl {\#include "PresetsUI.h"} {public
 } 
 
 decl {\#include "Synth/OscilGen.h"} {public
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public
-}
+} 
 
-class OscilSpectrum {: {public Fl_Box, MiscFuncs}
+class OscilSpectrum {open : {public Fl_Box, MiscFuncs}
 } {
-  Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+  Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
+  } {
     code {oscil=NULL;} {}
   }
-  Function {init(OscilGen *oscil_,int oscbase_)} {} {
-    code {
-        oscil = oscil_;
-        oscbase = oscbase_;
-    } {}
+  Function {init(OscilGen *oscil_,int oscbase_)} {open
+  } {
+    code {oscil = oscil_;
+        oscbase = oscbase_;} {}
   }
-  Function {draw()} {} {
-    code {
-        int ox = x(), oy = y(), lx = w(), ly = h(), i;
+  Function {draw()} {open
+  } {
+    code {int ox = x(), oy = y(), lx = w(), ly = h(), i;
         const int maxdb = 60; // must be multiple of 10
         int GX = 2;
         int n = lx / GX - 1;
@@ -156,15 +157,13 @@ class OscilSpectrum {: {public Fl_Box, MiscFuncs}
             if (val > 0)
                 fl_line(ox + tmp, oy + ly - 2 - val, ox + tmp, oy + ly - 2);
         }
-        delete [] spc;
-    } {selected
-    }
+        delete [] spc;} {}
   }
   decl {OscilGen *oscil;} {}
   decl {int oscbase;} {}
 } 
 
-class PSlider {: {public Fl_Slider}
+class PSlider {open : {public Fl_Slider}
 } {
   Function {PSlider(int x,int y, int w, int h, const char *label=0):Fl_Slider(x,y,w,h,label)} {} {}
   Function {handle(int event)} {return_type int
@@ -192,7 +191,7 @@ return(1);} {}
   }
 } 
 
-class Oscilloscope {: {public Fl_Box}
+class Oscilloscope {open : {public Fl_Box}
 } {
   Function {Oscilloscope(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {oscil=NULL;
@@ -211,9 +210,9 @@ oscbase=oscbase_;} {}
 oscbase=oscbase_;
 phase=phase_;} {}
   }
-  Function {draw()} {} {
-    code {
-        int ox = x(), oy = y(), lx = w(), ly = h() - 1;
+  Function {draw()} {open
+  } {
+    code {int ox = x(), oy = y(), lx = w(), ly = h() - 1;
         float smps[synth->oscilsize];
         synth->actionLock(lock);
         if (oscbase == 0)
@@ -280,8 +279,7 @@ phase=phase_;} {}
                 float y2 = smps[k2 % synth->oscilsize] / max;
                 fl_line(i - 1 + ox, (int)(y1 * ly / 2.0) + oy + ly / 2, i + ox,
                        (int)(y2 * ly / 2.0) + oy + ly / 2);
-            }
-    } {}
+            }} {}
   }
   decl {OscilGen *oscil;} {}
   decl {int oscbase;} {}
@@ -289,12 +287,12 @@ phase=phase_;} {}
   }
 } 
 
-class Oscilharmonic {: {public Fl_Group}
+class Oscilharmonic {open : {public Fl_Group}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window harmonic {
-      private xywh {328 166 90 225} type Double hide
+      private xywh {329 192 90 225} type Double hide
       class Fl_Group
     } {
       Fl_Slider mag {
@@ -364,7 +362,8 @@ if (cbwidget!=NULL) {
       }
     }
   }
-  Function {Oscilharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+  Function {Oscilharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
+  } {
     code {n=0;
 oscil=NULL;
 display=NULL;
@@ -399,13 +398,14 @@ if (oscil->Phmag[n]==64) mag->selection_color(0);
   decl {Fl_Widget *oldosc,*cbwidget,*applybutton;} {}
 } 
 
-class OscilEditor {: {public PresetsUI_}
+class OscilEditor {open : {public PresetsUI_}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window osceditUI {
-      label {ADsynth Oscillator Editor}
-      xywh {131 90 735 595} type Double hide
-      code0 {if (oscil->ADvsPAD) o->label("PADsynth Harmonic Content Editor");}
+      label {ADsynth Oscillator Editor} open
+      xywh {132 116 735 595} type Double
+      code0 {if (oscil->ADvsPAD) o->label("PADsynth Harmonic Content Editor");} visible
     } {
       Fl_Button applybutton {
         label Apply
@@ -419,7 +419,7 @@ if (cbapplywidget!=NULL) {
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
-      Fl_Group oscildisplaygroup {
+      Fl_Group oscildisplaygroup {open
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
@@ -429,7 +429,7 @@ if (cbapplywidget!=NULL) {
         } {}
         Fl_Box {} {
           label Oscillator
-          xywh {120 10 110 20} box FLAT_BOX labelfont 1
+          xywh {120 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
         }
         Fl_Value_Slider rndslider {
           label rnd
@@ -563,8 +563,8 @@ if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodula
           }
         }
         Fl_Box {} {
-          label {Base Func.}
-          xywh {480 10 110 20} box FLAT_BOX labelfont 1
+          label {Base Func.} selected
+          xywh {480 10 110 20} box FLAT_BOX labelfont 1 labelsize 12
         }
         Fl_Group {} {
           xywh {370 30 350 50} box THIN_DOWN_BOX color 32 selection_color 218 labelcolor 63

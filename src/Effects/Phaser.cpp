@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified March 2011
 */
 
 #include "Misc/SynthEngine.h"
@@ -61,7 +61,7 @@ void Phaser::out(float *smpsl, float *smpsr)
 
     lgain = 1.0f - phase * (1.0f - depth) - (1.0f - phase) * lgain * depth;
     lgain = (lgain > 1.0f) ? 1.0f : lgain;
-    rgain = 1.0 - phase * (1.0f - depth) - (1.0f - phase) * rgain * depth;
+    rgain = 1.0f - phase * (1.0f - depth) - (1.0f - phase) * rgain * depth;
     rgain = (rgain > 1.0f) ? 1.0f : rgain;
 
     for (int i = 0; i < synth->buffersize; ++i)
@@ -70,8 +70,8 @@ void Phaser::out(float *smpsl, float *smpsr)
         float x1 = 1.0f - x;
         float gl = lgain * x + oldlgain * x1;
         float gr = rgain * x + oldrgain * x1;
-        float inl = smpsl[i] * (1.0f - panning) + fbl;
-        float inr = smpsr[i] * panning + fbr;
+        float inl = smpsl[i] * pangainL + fbl;
+        float inr = smpsr[i] * pangainR + fbr;
 
         // Phasing routine
         for (int j = 0; j < Pstages * 2; ++j)
@@ -136,19 +136,6 @@ void Phaser::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     outvolume = Pvolume / 127.0f;
     volume = (!insertion) ? 1.0f : outvolume;
-}
-
-
-void Phaser::setpanning(unsigned char Ppanning_)
-{
-    Ppanning = Ppanning_;
-    panning = Ppanning / 127.0f;
-}
-
-void Phaser::setlrcross(unsigned char Plrcross_)
-{
-    Plrcross = Plrcross_;
-    lrcross = Plrcross / 127.0f;
 }
 
 

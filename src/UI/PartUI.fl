@@ -10,7 +10,7 @@ comment {PartUI.cc} {in_source not_in_header
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
+Copyright 2009-2011, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of version 2 of the GNU General Public
@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of a ZynAddSubFX original, modified October 2010
+This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
 } 
 
@@ -111,7 +111,8 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Button {} {
           label m
-          callback {if (part->lastnote >= 0)
+          callback {//
+              if (part->lastnote >= 0)
                   minkcounter->value(part->lastnote);
               minkcounter->do_callback();
               maxkcounter->do_callback();}
@@ -119,7 +120,8 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Button {} {
           label M
-          callback {if (part->lastnote >= 0)
+          callback {//
+              if (part->lastnote >= 0)
                   maxkcounter->value(part->lastnote);
               maxkcounter->do_callback();
               minkcounter->do_callback();}
@@ -127,7 +129,8 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Button {} {
           label R
-          callback {minkcounter->value(0);
+          callback {//
+              minkcounter->value(0);
               minkcounter->do_callback();
               maxkcounter->value(127);
               maxkcounter->do_callback();}
@@ -159,7 +162,7 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Button labelbutton {
           label {Bass Drum}
-          callback {//const char *tmp=fl_input("Kit item name:",(const char *)part->kit[n].Pname);
+          callback {//
               const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
               if (tmp != NULL)
                 part->kit[n].Pname = string(tmp);}
@@ -167,7 +170,8 @@ class PartKitItem {: {public Fl_Group}
           code0 {o->copy_label(part->kit[n].Pname.c_str());}
         }
         Fl_Check_Button adcheck {
-          callback {part->kit[n].Padenabled = o->value();
+          callback {//
+              part->kit[n].Padenabled = o->value();
               if (part->kit[n].Padenabled)
                   adeditbutton->activate();
               else
@@ -187,7 +191,8 @@ class PartKitItem {: {public Fl_Group}
           code1 {if (n==0) o->hide();}
         }
         Fl_Choice sendtoeffect {
-          callback {if (o->value())
+          callback {//
+              if (o->value())
                   part->kit[n].Psendtoparteffect = o->value() - 1;
               else
                   part->kit[n].Psendtoparteffect = 127;}
@@ -203,7 +208,8 @@ class PartKitItem {: {public Fl_Group}
           code1 {if (n==0) o->hide();}
         }
         Fl_Check_Button padcheck {
-          callback {part->kit[n].Ppadenabled = o->value();
+          callback {//
+              part->kit[n].Ppadenabled = o->value();
               if (part->kit[n].Ppadenabled)
                   padeditbutton->activate();
               else
@@ -215,7 +221,8 @@ class PartKitItem {: {public Fl_Group}
       }
       Fl_Check_Button enabledcheck {
         label 01
-        callback {int answer = 1;
+        callback {//
+            int answer = 1;
             if (o->value() == 0)
                 answer = fl_choice("Delete the item?","No","Yes",NULL);
             if (answer != 0)
@@ -244,7 +251,8 @@ class PartKitItem {: {public Fl_Group}
     code {n=0;part=NULL;} {}
   }
   Function {refresh()} {} {
-    code {enabledcheck->value(part->kit[n].Penabled);
+    code {//
+        enabledcheck->value(part->kit[n].Penabled);
         if (!part->kit[n].Penabled)
             partkititemgroup->deactivate();
         else
@@ -263,7 +271,8 @@ class PartKitItem {: {public Fl_Group}
             sendtoeffect->value(0);
 
         this->redraw();} {
-      callback {int answer = 1;
+      callback {//
+          int answer = 1;
             if (!o->value())
                 answer = fl_choice("Delete the item?", "No", "Yes", NULL);
             if (answer)
@@ -285,7 +294,8 @@ class PartKitItem {: {public Fl_Group}
   }
   Function {init(Part *part_,int n_,PartUI_ *partui_)} {open
   } {
-    code {part = part_;
+    code {//
+      part = part_;
       n = n_;
       partui = partui_;
       make_window();
@@ -307,16 +317,17 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {1165 299 385 240} type Double
+      private xywh {1170 429 385 240} type Double
       class Fl_Group visible
     } {
-      Fl_Group partgroupui {open selected
+      Fl_Group partgroupui {open
         xywh {0 0 387 240}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
-        Fl_Button {} {
+        Fl_Button instrumentlabel {
           label Instrument
-          callback {int event = Fl::event_button();
+          callback {//
+              int event = Fl::event_button();
               const char *tmp = NULL;
               switch (event)
               {
@@ -361,16 +372,24 @@ Offset}
           code0 {o->value(part->Pveloffs);}
           class WidgetPDial
         }
-        Fl_Dial {} {
+        Fl_Dial partpan {
           label Pan
-          callback {part->setPpanning(o->value());}
+          callback {//
+              part->SetController(C_panning, (char)o->value());}
           xywh {299 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Ppanning);}
           class WidgetPDial
         }
+        Fl_Button {} {
+          label Centre
+          callback {//
+              part->SetController(C_panning, 64);
+              partpan->value(64);}
+          tooltip {Centre panning} xywh {307 84 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
+        }
         Fl_Dial {} {
           label Volume
-          callback {part->setPvolume(o->value());}
+          callback {part->setVolume(o->value());}
           tooltip {Part Volume} xywh {345 40 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
@@ -378,7 +397,8 @@ Offset}
       }
       Fl_Check_Button {} {
         label Enabled
-        callback {synth->actionLock(lockmute);
+        callback {//
+            synth->actionLock(lockmute);
             synth->partonoff(npart, o->value());
             synth->actionLock(unlock);
             if (!part->Penabled)
@@ -396,7 +416,8 @@ Offset}
       }
       Fl_Choice {} {
         label Mode
-        callback {switch (o->value())
+        callback {//
+            switch (o->value())
             {
                 case 0: // Poly (implies no legato)
                     part->Ppolymode = 1;
@@ -432,7 +453,8 @@ Offset}
       }
       Fl_Choice keylimitlist {
         label {Key Limit}
-        callback {int val = 0;
+        callback {//
+            int val = 0;
             val = atoi(o->text());
             part->setkeylimit(val);}
         tooltip {Key Limit} xywh {204 140 48 18} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
@@ -453,7 +475,8 @@ Offset}
           label {To Sys Efx} open
           xywh {264 114 118 64} type HORIZONTAL labeltype NO_LABEL labelsize 11 align 0
           code0 {o->spacing(6);}
-          code1 {for (int i = 0; i < NUM_SYS_EFX; ++i)
+          code1 {//
+              for (int i = 0; i < NUM_SYS_EFX; ++i)
             {
               psyef[i] = new PartSysEffSend(0, 0, 25, 25);
               psyef[i]->init(npart, i);
@@ -467,7 +490,8 @@ Offset}
       }
       Fl_Spinner minkcounter {
         label {Minimum Note}
-        callback {part->Pminkey = o->value();
+        callback {//
+            part->Pminkey = o->value();
             if (part->Pminkey>part->Pmaxkey)
                 o->textcolor(FL_RED);
             else
@@ -478,7 +502,8 @@ Offset}
       }
       Fl_Spinner maxkcounter {
         label {Maximum Note}
-        callback {part->Pmaxkey = o->value();
+        callback {//
+            part->Pmaxkey = o->value();
             if (part->Pminkey > part->Pmaxkey)
                 o->textcolor(FL_RED);
             else
@@ -489,7 +514,8 @@ Offset}
       }
       Fl_Button {} {
         label m
-        callback {if (part->lastnote >= 0)
+        callback {//
+            if (part->lastnote >= 0)
                 minkcounter->value(part->lastnote);
             minkcounter->do_callback();
             maxkcounter->do_callback();}
@@ -497,14 +523,16 @@ Offset}
       }
       Fl_Button {} {
         label M
-        callback {if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
+        callback {//
+            if (part->lastnote >= 0) maxkcounter->value(part->lastnote);
             maxkcounter->do_callback();
             minkcounter->do_callback();}
         tooltip {set maximum key to the last pressed key} xywh {127 147 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
       }
       Fl_Button {} {
         label R
-        callback {minkcounter->value(0);
+        callback {//
+            minkcounter->value(0);
             minkcounter->do_callback();
             maxkcounter->value(127);
             maxkcounter->do_callback();}
@@ -523,9 +551,9 @@ Offset}
       }
       Fl_Dial {} {
         label PanDpth
-        callback {part->ctl->panning.depth = o->value();}
+        callback {part->ctl->setPanDepth((char)o->value());}
         tooltip {Panning Depth} xywh {10 55 30 30} labelsize 10 maximum 127 step 1
-        code0 {o->value(part->ctl->panning.depth);}
+        code0 {o->value(part->ctl->panning.data);}
         class WidgetPDial
       }
       Fl_Dial {} {
@@ -577,7 +605,8 @@ Offset}
       }
       Fl_Check_Button {} {
         label Sustain
-        callback {part->ctl->sustain.receive = o->value();
+        callback {//
+            part->ctl->sustain.receive = o->value();
             if (part->ctl->sustain.receive == 0)
             {
                 part->RelaseSustainedKeys();
@@ -631,7 +660,8 @@ Offset}
         }
         Fl_Dial {} {
           label {t.dn/up}
-          callback {int x = o->value();
+          callback {//
+              int x = o->value();
               part->ctl->portamento.updowntimestretch = x;}
           tooltip {Portamento time stretch (up/down)} xywh {315 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
@@ -676,7 +706,8 @@ Offset}
     } {
       Fl_Counter inseffnocounter {
         label {FX No.}
-        callback {ninseff = o->value() - 1;
+        callback {//
+            ninseff = o->value() - 1;
             insefftype->value(part->partefx[ninseff]->geteffect());
             // insefftype->do_callback();
             inseffectui->refresh(part->partefx[ninseff]);
@@ -691,7 +722,8 @@ Offset}
       }
       Fl_Choice insefftype {
         label EffType
-        callback {synth->actionLock(lockmute);
+        callback {//
+            synth->actionLock(lockmute);
             part->partefx[ninseff]->changeeffect(o->value());
             synth->actionLock(unlock);
             inseffectui->refresh(part->partefx[ninseff]);}
@@ -751,7 +783,8 @@ Offset}
       }
       Fl_Choice sendtochoice {
         label {Send To.}
-        callback {int x = o->value();
+        callback {//
+            int x = o->value();
             part->Pefxroute[ninseff] = x;
             if (x == 2)
                 part->partefx[ninseff]->setdryonly(true);
@@ -787,7 +820,8 @@ Offset}
       }
       Fl_Button {} {
         label P
-        callback {synth->actionLock(lockmute);
+        callback {//
+            synth->actionLock(lockmute);
             presetsui->paste(part->partefx[ninseff], inseffectui);
             synth->actionLock(unlock);}
         xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
@@ -837,7 +871,8 @@ Offset}
       }
       Fl_Choice {} {
         label Mode
-        callback {part->Pkitmode = o->value();
+        callback {//
+            part->Pkitmode = o->value();
             if (part->Pkitmode == 0)
                 kitlist->deactivate();
             else
@@ -892,7 +927,8 @@ Offset}
           }
           Fl_Check_Button padsynenabledcheck {
             label Enabled
-            callback {int x = o->value();
+            callback {//
+                int x = o->value();
                 part->kit[0].Ppadenabled = x;
                 if (x == 0)
                     padeditbutton->deactivate();
@@ -908,7 +944,8 @@ Offset}
         } {
           Fl_Check_Button adsynenabledcheck {
             label Enabled
-            callback {int x = o->value();
+            callback {//
+                int x = o->value();
                 part->kit[0].Padenabled = x;
                 if (x == 0)
                     adeditbutton->deactivate();
@@ -930,7 +967,8 @@ Offset}
         } {
           Fl_Check_Button subsynenabledcheck {
             label Enabled
-            callback {int x = o->value();
+            callback {//
+                int x = o->value();
                 part->kit[0].Psubenabled = x;
                 if (x == 0)
                     subeditbutton->deactivate();
@@ -1059,14 +1097,16 @@ Offset}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
-    code {part = NULL;
+    code {//
+        part = NULL;
         adnoteui = NULL;
         subnoteui = NULL;
         padnoteui = NULL;
         lastkititem = -1;} {}
   }
   Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
-    code {bankui = bankui_;
+    code {//
+        bankui = bankui_;
         part = part_;
         npart = npart_;
         ninseff = 0;
@@ -1108,11 +1148,11 @@ Offset}
         if (kititem != lastkititem)
         {
             if (adnoteui != NULL)
-                delete (adnoteui);
+                delete adnoteui;
             if (subnoteui != NULL)
-                delete (subnoteui);
+                delete subnoteui;
             if (padnoteui != NULL)
-                delete (padnoteui);
+                delete padnoteui;
             adnoteui = NULL;
             subnoteui = NULL;
             padnoteui = NULL;
@@ -1123,13 +1163,13 @@ Offset}
             if (kititem < 0)
                 return;
 
-            if (part->kit[kititem].adpars != NULL)
+            if (part->kit[kititem].adpars)
                 adnoteui = new ADnoteUI(part->kit[kititem].adpars);
 
-            if (part->kit[kititem].subpars != NULL)
+            if (part->kit[kititem].subpars)
                 subnoteui = new SUBnoteUI(part->kit[kititem].subpars);
 
-            if (part->kit[kititem].padpars != NULL)
+            if (part->kit[kititem].padpars)
                 padnoteui = new PADnoteUI(part->kit[kititem].padpars);
         }
 
@@ -1141,24 +1181,25 @@ Offset}
             padnoteui->padnotewindow->show();} {}
   }
   Function {~PartUI()} {} {
-    code {if (adnoteui != NULL)
-            delete (adnoteui);
-        if (subnoteui != NULL)
-            delete (subnoteui);
-        if (padnoteui != NULL)
-            delete (padnoteui);
+    code {if (adnoteui)
+            delete adnoteui;
+        if (subnoteui)
+            delete subnoteui;
+        if (padnoteui)
+            delete padnoteui;
         partgroup->hide();
         // delete(partgroup);
         ctlwindow->hide();
-        delete(ctlwindow);
+        delete ctlwindow;
         partfx->hide();
-        delete(partfx);
+        delete partfx;
         instrumentkitlist->hide();
-        delete(instrumentkitlist);
+        delete instrumentkitlist;
         instrumenteditwindow->hide();
-        delete(instrumenteditwindow);} {}
+        delete instrumenteditwindow;} {}
   }
-  decl {Part *part;} {}
+  decl {Part *part;} {selected public
+  }
   decl {BankUI *bankui;} {}
   decl {ADnoteUI *adnoteui;} {}
   decl {SUBnoteUI *subnoteui;} {}

@@ -33,15 +33,15 @@ class AlsaEngine : public MusicIO
     public:
         AlsaEngine();
         ~AlsaEngine() { };
-        
+
         bool openAudio(void);
         bool openMidi(void);
         bool Start(void);
         void Close(void);
-        
+
         unsigned int getSamplerate(void) { return audio.samplerate; };
         int getBuffersize(void) { return audio.period_size; };
-        
+
         string audioClientName(void);
         string midiClientName(void);
         int audioClientId(void) { return audio.alsaId; };
@@ -56,7 +56,7 @@ class AlsaEngine : public MusicIO
         bool alsaBad(int op_result, string err_msg);
         void closeAudio(void);
         void closeMidi(void);
-        
+
         void *AudioThread(void);
         static void *_AudioThread(void *arg);
         void *MidiThread(void);

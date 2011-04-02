@@ -97,7 +97,7 @@ void Bank::setname(unsigned int ninstrument, string newname, int newslot)
 {
     if (emptyslot(ninstrument))
         return;
-    
+
     int slot = (newslot >= 0) ? newslot + 1 : ninstrument + 1;
     string filename = "0000" + asString(slot);
     filename = filename.substr(filename.size() - 4, 4) + "-" + newname + xizext;
@@ -184,7 +184,7 @@ void Bank::loadfromslot(unsigned int ninstrument, Part *part)
         return;
     //part->defaultsinstrument();
     //part->loadXMLinstrument(bank_instrument[ninstrument].filename);
-    
+
     part->loadXMLinstrument(bank_instrument[ninstrument].filename);
 }
 
@@ -293,7 +293,7 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
     if (emptyslot(n1) && emptyslot(n2))
         return;
     if (emptyslot(n1)) // make the empty slot the destination
-    {   
+    {
         int tmp = n2;
         n2 = n1;
         n1 = tmp;
@@ -519,7 +519,7 @@ bool Bank::check_bank_duplicate(string alias)
             return true;
     }
     return false;
-}    
+}
 
 
 bool Bank::isPADsynth_used(unsigned int ninstrument)

@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include "Misc/SynthEngine.h"
@@ -27,7 +27,6 @@
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64), 0),
     Pvolume(110),
-    Ppanning(64),
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
@@ -36,6 +35,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) 
     filterr(NULL)
 {
     setpreset(Ppreset);
+    changepar(1, 64); // pan
     cleanup();
 }
 
@@ -58,8 +58,8 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
 
     float lfol, lfor;
     lfo.effectlfoout(&lfol, &lfor);
-    lfol *= depth * 5.0;
-    lfor *= depth * 5.0;
+    lfol *= depth * 5.0f;
+    lfor *= depth * 5.0f;
     float freq = filterpars->getfreq();
     float q = filterpars->getq();
 
@@ -89,8 +89,8 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     // panning
     for (int i = 0; i < synth->buffersize; ++i)
     {
-        efxoutl[i] *= (1.0 - panning);
-        efxoutr[i] *= panning;
+        efxoutl[i] *= pangainL;
+        efxoutr[i] *= pangainR;
     }
 }
 
@@ -118,12 +118,6 @@ void DynamicFilter::setvolume(unsigned char Pvolume_)
         volume = 1.0f;
     else
         volume = outvolume;
-}
-
-void DynamicFilter::setpanning(unsigned char Ppanning_)
-{
-    Ppanning = Ppanning_;
-    panning = Ppanning / 127.0f;
 }
 
 
@@ -258,7 +252,8 @@ void DynamicFilter::setpreset(unsigned char npreset)
 //		printf("freq=%d  amp=%d  q=%d\n",filterpars->Pvowels[0].formants[i].freq,filterpars->Pvowels[0].formants[i].amp,filterpars->Pvowels[0].formants[i].q);
 //	    };
     if (insertion == 0)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
+        changepar(0, presets[npreset][0] * 0.5f); // lower the volume if this is
+                                                  // system effect
     Ppreset = npreset;
     reinitfilter();
 }

@@ -25,7 +25,7 @@ bool JackClient::openAudio(void)
     if (!jackEngine.isConnected() && !jackEngine.connectServer(Runtime.audioDevice))
     {
         Runtime.Log("Failed to connect to jack server");
-        return false;  
+        return false;
     }
     if (jackEngine.openAudio())
     {
@@ -44,7 +44,7 @@ bool JackClient::openMidi(void)
         && !jackEngine.connectServer(Runtime.midiDevice))
     {
         Runtime.Log("Failed to connect to jack server");
-        return false;  
+        return false;
     }
     if (jackEngine.openMidi())
         return true;

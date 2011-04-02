@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 using namespace std;
@@ -67,8 +67,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
         tmp = clfol * x + oldclfol * x1;
 
         out = tmp * oldl[oldk];
-        // was: out.real() += (1 - abs(fb)) * smpsr[i] * (1.0 - panning);
-        out.real() += (1 - abs(fb)) * smpsl[i] * (1.0f - panning);
+        out.real() += (1 - abs(fb)) * smpsl[i] * pangainL;
 
         oldl[oldk] = out;
         float l = out.real() * 10.0f * (fb + 0.1f);
@@ -77,8 +76,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
         tmp = clfor * x + oldclfor * x1;
 
         out = tmp * oldr[oldk];
-        // was: out.real() += (1 - abs(fb)) * smpsr[i] * (1.0 - panning);
-        out.real() += (1 - abs(fb)) * smpsr[i] * panning;
+        out.real() += (1 - abs(fb)) * smpsr[i] * pangainR;
 
         oldr[oldk] = out;
         float r = out.real() * 10.0f * (fb + 0.1f);
@@ -133,20 +131,6 @@ void Alienwah::setvolume(unsigned char _volume)
         volume = 1.0f;
     else
         volume = outvolume;
-}
-
-
-void Alienwah::setpanning(unsigned char _panning)
-{
-    Ppanning = _panning;
-    panning = Ppanning / 127.0f;
-}
-
-
-void Alienwah::setlrcross(unsigned char _lrcross)
-{
-    Plrcross = _lrcross;
-    lrcross = Plrcross / 127.0f;
 }
 
 

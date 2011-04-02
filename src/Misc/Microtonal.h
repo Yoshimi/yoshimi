@@ -95,7 +95,7 @@ class Microtonal : private MiscFuncs
             unsigned int x2;
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
-          
+
         static float note_12et[128];
 };
 
