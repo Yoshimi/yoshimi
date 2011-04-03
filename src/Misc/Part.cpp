@@ -1089,8 +1089,8 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 
 
     xml->beginbranch("INSTRUMENT_KIT");
-    xml->addpar("kit_mode",Pkitmode);
-    xml->addparbool("drum_mode",Pdrummode);
+    xml->addpar("kit_mode", Pkitmode);
+    xml->addparbool("drum_mode", Pdrummode);
 
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
     {
@@ -1154,7 +1154,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 void Part::add2XML(XMLwrapper *xml)
 {
     // parameters
-    xml->addparbool("enabled",Penabled);
+    xml->addparbool("enabled", Penabled);
     if (!Penabled && xml->minimal)
         return;
 

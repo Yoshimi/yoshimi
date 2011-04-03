@@ -645,11 +645,10 @@ void PADnoteParameters::setPan(char pan)
         PPanning = 0;
     else if (PPanning > 127)
         PPanning = 127;
-    if (--pan < 0)
-        randomPan = true;
+    if ((pan = PPanning - 1) < 0)
+        pan = 0;
     else
     {
-        randomPan = false;
         if (pan > 126) pan = 126;
         float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
         pangainL = (1.0f - x) * (0.7f + 0.2f * x);

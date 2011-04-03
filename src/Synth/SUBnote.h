@@ -64,7 +64,8 @@ class SUBnote : public Carcass, private SynthHelper
         int firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
         int start; // how the harmonics start
         float basefreq;
-        float panning;
+        float randpanL;
+        float randpanR;
 
         Envelope *AmpEnvelope;
         Envelope *FreqEnvelope;

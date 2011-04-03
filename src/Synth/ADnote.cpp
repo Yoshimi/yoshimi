@@ -73,10 +73,11 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
     if (adpars->GlobalPar.randomPan)
-        NoteGlobalPar.Panning = synth->numRandom();
-    //else
-    //    NoteGlobalPar.Panning = adpars->GlobalPar.PPanning / 128.0f;
-
+    {
+        float x = 2.0f * synth->numRandom() - 1.0f ;
+        NoteGlobalPar.randpanL = (1.0f - x) * (0.7f + 0.2f * x);
+        NoteGlobalPar.randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+    }
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq() // center freq
         + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f
@@ -443,9 +444,11 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
     if (adpars->GlobalPar.randomPan)
-        NoteGlobalPar.Panning = synth->numRandom();
-    //else
-    //    NoteGlobalPar.Panning = adpars->GlobalPar.PPanning / 128.0f;
+    {
+        float x = 2.0f * synth->numRandom() - 1.0f ;
+        NoteGlobalPar.randpanL =  (1.0f - x) * (0.7f + 0.2f * x);
+        NoteGlobalPar.randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+    }
 
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq()
@@ -589,11 +592,12 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             NoteVoicePar[nvoice].Volume = -NoteVoicePar[nvoice].Volume;
 
         if (adpars->VoicePar[nvoice].randomPan)
-            NoteVoicePar[nvoice].Panning = synth->numRandom(); // random panning
-        //else
-        //    NoteVoicePar[nvoice].Panning =
-        //        adpars->VoicePar[nvoice].PPanning / 128.0f;
-
+        {
+            float x = 2.0f * synth->numRandom() - 1.0f ;
+            NoteVoicePar[nvoice].randpanL =  (1.0f - x) * (0.7f + 0.2f * x);
+            NoteVoicePar[nvoice].randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+        }
+        
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled
            && NoteVoicePar[nvoice].AmpEnvelope != NULL)
@@ -811,20 +815,22 @@ void ADnote::initParameters(void)
             continue;
 
         NoteVoicePar[nvoice].noisetype = adpars->VoicePar[nvoice].Type;
-        /* Voice Amplitude Parameters Init */
+        // Voice Amplitude Parameters Init
         NoteVoicePar[nvoice].Volume =
             powf(0.1f, 3.0f * (1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)) // -60 dB .. 0 dB
-            * velF(velocity, adpars->VoicePar[nvoice].PAmpVelocityScaleFunction);                       //velocity
+                 * velF(velocity, adpars->VoicePar[nvoice].PAmpVelocityScaleFunction); // velocity
 
         if (adpars->VoicePar[nvoice].PVolumeminus)
             NoteVoicePar[nvoice].Volume = -NoteVoicePar[nvoice].Volume;
 
         if (adpars->VoicePar[nvoice].randomPan)
-            NoteVoicePar[nvoice].Panning = synth->numRandom(); // random panning
-        //else
-        //    NoteVoicePar[nvoice].Panning = adpars->VoicePar[nvoice].PPanning / 128.0f;
+        {
+            float x = 2.0f * synth->numRandom() - 1.0f ;
+            NoteVoicePar[nvoice].randpanL =  (1.0f - x) * (0.7f + 0.2f * x);
+            NoteVoicePar[nvoice].randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+        }
 
-        newamplitude[nvoice] = 1.0;
+        newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled)
         {
             NoteVoicePar[nvoice].AmpEnvelope =
@@ -1676,18 +1682,13 @@ int ADnote::noteout(float *outl, float *outr)
                     NoteVoicePar[nvoice].VoiceOut[i] = tmpwavel[i];
         }
 
-        float pangainL;
-        float pangainR;
-        if (!adpars->VoicePar[nvoice].randomPan) // is not random panning
+        // assume voice not random pan
+        pangainL = adpars->VoicePar[nvoice].pangainL;
+        pangainR = adpars->VoicePar[nvoice].pangainR;
+        if (adpars->VoicePar[nvoice].randomPan) // is not random panning
         {
-            float x = (2.0f * (float)(adpars->VoicePar[nvoice].PPanning - 1) / 126.0f) - 1.0f;
-            pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-            pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-        }
-        else // is random panning
-        {
-            pangainL = (1.0f - NoteVoicePar[nvoice].Panning) * 2.0f;
-            pangainR = NoteVoicePar[nvoice].Panning * 2.0f;
+            pangainL = NoteVoicePar[nvoice].randpanL;
+            pangainR = NoteVoicePar[nvoice].randpanR;
         }
         // Add the voice that do not bypass the filter to out
         if (!NoteVoicePar[nvoice].filterbypass) // no bypass
@@ -1697,10 +1698,8 @@ int ADnote::noteout(float *outl, float *outr)
                 
                 for (i = 0; i < synth->buffersize; ++i) // stereo
                 {
-                    outl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume
-                               * pangainL; // * 2.0f;
-                    outr[i] += tmpwaver[i] * NoteVoicePar[nvoice].Volume
-                               * pangainR; // * 2.0f;
+                    outl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume * pangainL;
+                    outr[i] += tmpwaver[i] * NoteVoicePar[nvoice].Volume * pangainR;
                 }
             }
             else
@@ -1715,10 +1714,8 @@ int ADnote::noteout(float *outl, float *outr)
                 {
                     bypassl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume
                                   * pangainL;
-                                  // * (1.0f - NoteVoicePar[nvoice].Panning) * 2.0f;
                     bypassr[i] += tmpwaver[i] * NoteVoicePar[nvoice].Volume
                                   * pangainR;
-                                  // * NoteVoicePar[nvoice].Panning * 2.0f;
                 }
             }
             else
@@ -1749,18 +1746,13 @@ int ADnote::noteout(float *outl, float *outr)
         outr[i] += bypassr[i];
     }
 
-    float pangainL;
-    float pangainR;
-    if (adpars->GlobalPar.PPanning > 0) // it's not random panning ...
+    // assume it's not random panning ...
+    pangainL = adpars->GlobalPar.pangainL;
+    pangainR = adpars->GlobalPar.pangainR;
+    if (adpars->GlobalPar.randomPan)
     {
-        float x = (2.0f * (float)(adpars->GlobalPar.PPanning - 1) / 126.0f) - 1.0f;
-        pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
-    else // it's random panning ...
-    {
-        pangainL = 1.0f - NoteGlobalPar.Panning;
-        pangainR = NoteGlobalPar.Panning;
+        pangainL = NoteGlobalPar.randpanL;
+        pangainR = NoteGlobalPar.randpanR;
     }
 
     if (aboveAmplitudeThreshold(globaloldamplitude, globalnewamplitude))

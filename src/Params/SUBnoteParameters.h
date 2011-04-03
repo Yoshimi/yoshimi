@@ -35,6 +35,7 @@ class SUBnoteParameters : public Presets
         SUBnoteParameters();
         ~SUBnoteParameters();
         void setPan(char pan);
+        bool randomPan(void) { return !PPanning; }
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
@@ -43,7 +44,6 @@ class SUBnoteParameters : public Presets
         bool Pstereo; // true = stereo, false = mono
         unsigned char PVolume;
         unsigned char PPanning;
-        bool  randomPan;
         float pangainL;         // derived from PPanning
         float pangainR;         // ^^
         unsigned char PAmpVelocityScaleFunction;

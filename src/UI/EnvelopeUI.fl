@@ -232,7 +232,7 @@ delete (freemodeeditwindow);} {}
   } {
     Fl_Window freemodeeditwindow {
       label Envelope open
-      xywh {622 203 575 180} type Double visible
+      xywh {623 229 575 180} type Double visible
     } {
       Fl_Box freeedit {
         label Envelope
@@ -354,12 +354,12 @@ envfree->redraw();}
   Function {make_ADSR_window()} {open
   } {
     Fl_Window envADSR {open
-      xywh {345 350 205 70} type Double color 50 labelfont 1
+      xywh {1326 253 205 70} type Double color 50 labelfont 1
       class Fl_Group visible
     } {
       Fl_Group {} {
-        label {Amplitude Envelope}
-        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 11 align 21
+        label {Amplitude Env} open
+        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e1adt {
           label {A.dt}
@@ -433,12 +433,12 @@ freeedit->redraw();}
   Function {make_ASR_window()} {open
   } {
     Fl_Window envASR {open
-      xywh {713 176 210 70} type Double
+      xywh {714 202 210 70} type Double
       class Fl_Group visible
     } {
       Fl_Group {} {
-        label {Frequency Envelope} selected
-        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 11 align 21
+        label {Frequency Env} open
+        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e2aval {
           label {A.val}
@@ -506,12 +506,12 @@ freeedit->redraw();}
   Function {make_ADSRfilter_window()} {open
   } {
     Fl_Window envADSRfilter {open
-      xywh {90 221 275 70} type Double color 50 labelfont 1
+      xywh {445 113 275 70} type Double color 50 labelfont 1
       class Fl_Group visible
     } {
       Fl_Group {} {
-        label {Filter Envelope}
-        xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 11 align 21
+        label {Filter Env}
+        xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e3aval {
           label {A.val}
@@ -595,12 +595,12 @@ freeedit->redraw();}
   Function {make_ASRbw_window()} {open
   } {
     Fl_Window envASRbw {open
-      xywh {227 617 210 70} type Double
+      xywh {1597 595 210 70} type Double
       class Fl_Group visible
     } {
       Fl_Group {} {
-        label {BandWidth Envelope}
-        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 11 align 21
+        label {BandWidth Env} selected
+        xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e4aval {
           label {A.val}
@@ -668,12 +668,12 @@ freeedit->redraw();}
   Function {make_free_window()} {open
   } {
     Fl_Window envfree {open
-      xywh {376 491 205 70} type Double color 50 labelfont 1 resizable
+      xywh {1539 374 205 70} type Double color 50 labelfont 1 resizable
       class Fl_Group visible
     } {
       Fl_Group envfreegroup {
-        label {Amplitude Envelope}
-        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 11 align 21 resizable
+        label {Amplitude Env}
+        xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17 resizable
       } {
         Fl_Box freeeditsmall {
           label Envelope

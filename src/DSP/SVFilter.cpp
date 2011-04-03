@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,10 +18,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #include <cstring>
+#include <fftw3.h>
 
 #include "Misc/SynthEngine.h"
 #include "DSP/SVFilter.h"
@@ -32,15 +33,23 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
     stages(Fstages),
     freq(Ffreq),
     q(Fq),
-    gain(1.0),
+    gain(1.0f),
     needsinterpolation(0),
     firsttime(1)
 {
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
-    outgain = 1.0;
+    outgain = 1.0f;
+    tmpismp = (float*)fftwf_malloc(synth->bufferbytes);
     cleanup();
     setfreq_and_q(Ffreq, Fq);
+}
+
+
+SVFilter::~SVFilter()
+{
+    if (tmpismp)
+        fftwf_free(tmpismp);
 }
 
 void SVFilter::cleanup()
@@ -151,30 +160,25 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
 
 void SVFilter::filterout(float *smp)
 {
-    float *ismp = NULL;
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
-        ismp = new float[synth->buffersize];
-        memcpy(ismp, smp, synth->bufferbytes);
+        memcpy(tmpismp, smp, synth->bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
-            singlefilterout(ismp, st[i],ipar);
+            singlefilterout(tmpismp, st[i],ipar);
     }
 
     for (int i = 0; i < stages + 1; ++i)
         singlefilterout(smp, st[i],par);
 
-    if (needsinterpolation != 0)
+    if (needsinterpolation)
     {
         for (int i = 0; i < synth->buffersize; ++i)
         {
             float x = (float)i / synth->buffersize_f;
-            smp[i] = ismp[i] * (1.0f - x) + smp[i] * x;
+            smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
         }
         needsinterpolation = 0;
     }
-    if (NULL != ismp)
-        delete [] ismp;
-
     for (int i = 0; i < synth->buffersize; ++i)
         smp[i] *= outgain;
 }

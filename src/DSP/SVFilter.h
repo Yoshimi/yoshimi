@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, modified April 2011
 */
 
 #ifndef SV_FILTER_H
@@ -31,7 +31,7 @@ class SVFilter : public Filter_, private MiscFuncs
 {
     public:
         SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages);
-        ~SVFilter() { };
+        ~SVFilter();
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);
@@ -62,6 +62,7 @@ class SVFilter : public Filter_, private MiscFuncs
         int abovenq;   // this is 1 if the frequency is above the nyquist
         int oldabovenq;
         int needsinterpolation, firsttime;
+        float *tmpismp; // used if it needs interpolation in filterout()
 };
 
 #endif

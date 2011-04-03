@@ -1,9 +1,9 @@
 /*
-    PADnote.cpp - The "pad" synthesizer
+    PADnote.cpp
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010 Alan Calvert
+    Copyright 2009-2011 Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 #include <cmath>
 
@@ -46,6 +46,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     ctl(ctl_)
 
 {
+//    tmpwave = (float*)fftwf_malloc(synth->bufferbytes);
+
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
     Legato.fade.length = lrintf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
@@ -65,7 +67,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         basefreq = freq;
     else
     {
-        basefreq = 440.0;
+        basefreq = 440.0f;
         int fixedfreqET = pars->PfixedfreqET;
         if (fixedfreqET != 0)
         {   // if the frequency varies according the keyboard note
@@ -102,20 +104,20 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     if (size == 0)
         size = 1;
 
-    poshi_l = (int)(synth->numRandom() * (size - 1));
+    poshi_l = lrintf(synth->numRandom() * (size - 1));
     if (pars->PStereo != 0)
         poshi_r = (poshi_l + size / 2) % size;
     else
         poshi_r = poshi_l;
-    poslo = 0.0;
+    poslo = 0.0f;
 
-    tmpwave = new float [synth->buffersize];
-
-    if (pars->PPanning == 0)
-        NoteGlobalPar.Panning = synth->numRandom();
-    else
-        NoteGlobalPar.Panning = pars->PPanning / 128.0;
-
+    if (pars->randomPan())
+    {
+        float x = 2.0f * synth->numRandom() - 1.0f ;
+        randpanL = (1.0f - x) * (0.7f + 0.2f * x);
+        randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+    }
+    
     NoteGlobalPar.FilterCenterPitch =
         pars->GlobalFilter->getfreq() + // center freq
             pars->PFilterVelocityScale / 127.0 * 6.0
@@ -252,10 +254,12 @@ void PADnote::PADlegatonote(float freq, float velocity,
     if (size == 0)
         size = 1;
 
-    if (pars->PPanning == 0)
-        NoteGlobalPar.Panning = synth->numRandom();
-    else
-        NoteGlobalPar.Panning = pars->PPanning / 128.0;
+    if (pars->randomPan())
+    {
+        float x = 2.0f * synth->numRandom() - 1.0f ;
+        randpanL = (1.0f - x) * (0.7f + 0.2f * x);
+        randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+    }
 
     NoteGlobalPar.FilterCenterPitch =
         pars->GlobalFilter->getfreq() // center freq
@@ -293,7 +297,7 @@ PADnote::~PADnote()
     delete NoteGlobalPar.GlobalFilterR;
     delete NoteGlobalPar.FilterEnvelope;
     delete NoteGlobalPar.FilterLfo;
-    delete [] tmpwave;
+//    fftwf_free(tmpwave);
 }
 
 
@@ -490,6 +494,14 @@ int PADnote::noteout(float *outl,float *outr)
         }
     }
 
+    float pangainL = pars->pangainL; // assume non random pan
+    float pangainR = pars->pangainR;
+    if (pars->randomPan())
+    {
+        pangainL = randpanL;
+        pangainR = randpanR;
+    }
+
     if (aboveAmplitudeThreshold(globaloldamplitude,globalnewamplitude))
     {
         // Amplitude Interpolation
@@ -498,14 +510,15 @@ int PADnote::noteout(float *outl,float *outr)
             float tmpvol = interpolateAmplitude(globaloldamplitude,
                                                 globalnewamplitude, i,
                                                 synth->buffersize);
-            outl[i] *= tmpvol * (1.0 - NoteGlobalPar.Panning);
-            outr[i] *= tmpvol * NoteGlobalPar.Panning;
+            outl[i] *= tmpvol * pangainL;
+            outr[i] *= tmpvol * pangainR;
         }
-    } else {
+    } else
+    {
         for (int i = 0; i < synth->buffersize; ++i)
         {
-            outl[i] *= globalnewamplitude * (1.0 - NoteGlobalPar.Panning);
-            outr[i] *= globalnewamplitude * NoteGlobalPar.Panning;
+            outl[i] *= globalnewamplitude * pangainL;
+            outr[i] *= globalnewamplitude * pangainR;
         }
     }
 
@@ -513,8 +526,8 @@ int PADnote::noteout(float *outl,float *outr)
     if (Legato.silent) { // Silencer
         if (Legato.msg != LM_FadeIn)
         {
-            memset(outl, 0, synth->buffersize * sizeof(float));
-            memset(outr, 0, synth->buffersize * sizeof(float));
+            memset(outl, 0, synth->bufferbytes);
+            memset(outr, 0, synth->bufferbytes);
         }
     }
     switch (Legato.msg)
@@ -600,7 +613,7 @@ int PADnote::noteout(float *outl,float *outr)
     {
         for (int i = 0 ; i < synth->buffersize; ++i)
         {   // fade-out
-            float tmp = 1.0 - (float)i / synth->buffersize_f;
+            float tmp = 1.0f - (float)i / synth->buffersize_f;
             outl[i] *= tmp;
             outr[i] *= tmp;
         }

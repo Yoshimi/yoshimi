@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified March 2011
+This file is a derivative of the ZynAddSubFX original, modified April 2011
 } {in_source in_header
 } 
 
@@ -172,25 +172,7 @@ class MasterUI {open : {private MiscFuncs}
   } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {//
-            if (Runtime.configChanged)
-            {
-                int r = fl_choice("Save settings?", "Cancel", "Save", "Don't save");
-                switch (r)
-                {
-                    case 1:
-                        Runtime.saveConfig();
-                        Runtime.runSynth = false;
-                        break;
-                    case 2:
-                        Runtime.runSynth = false;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else
-                Runtime.runSynth = false;} open
+      callback {Runtime.saveConfig(); Runtime.runSynth = false;} open
       xywh {1406 409 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {open
@@ -230,7 +212,6 @@ class MasterUI {open : {private MiscFuncs}
             callback {//
                 if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
                 {
-                    // int npart = (int)npartcounter->value() - 1;
                     synth->actionLock(lockmute);
                     synth->part[npart]->defaultsinstrument();
                     synth->actionLock(unlock);

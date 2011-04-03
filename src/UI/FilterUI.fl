@@ -56,20 +56,23 @@ decl {\#include "Misc/MiscFuncs.h"} {public
 
 class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
 } {
-  Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+  Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
+  } {
     code {pars = NULL;
         nvowel = NULL;
         nformant = NULL;
         graphpoints = NULL;} {}
   }
-  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {} {
+  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {open
+  } {
     code {pars = pars_;
         nvowel = nvowel_;
         nformant = nformant_;
         oldx = -1;
         graphpoints = new float [w()];} {}
   }
-  Function {draw_freq_line(float freq,int type)} {} {
+  Function {draw_freq_line(float freq,int type)} {open
+  } {
     code {float freqx = pars->getfreqpos(freq);
         switch (type)
         {
@@ -87,7 +90,8 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
         if (freqx > 0.0 && freqx < 1.0)
             fl_line(x() + (int) (freqx * w()), y(), x() + (int)(freqx * w()), y() + h());} {}
   }
-  Function {draw()} {} {
+  Function {draw()} {open
+  } {
     code {int maxdB = 30;
         int ox = x(), oy = y(), lx = w(), ly = h(), i, oiy;
         float freqx;
@@ -199,12 +203,12 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   Function {make_window()} {open
   } {
     Fl_Window filterui {open
-      xywh {454 462 275 75} type Double color 50 labelfont 1 labelsize 12
+      xywh {455 488 275 75} type Double color 50 labelfont 1 labelsize 12
       class Fl_Group visible
     } {
       Fl_Group filterparamswindow {
-        label {Filter Params} open selected
-        xywh {0 0 275 75} box PLASTIC_UP_BOX color 183 labelfont 1 labelsize 11 align 17
+        label {Filter Params} selected
+        xywh {0 0 275 75} box PLASTIC_UP_BOX color 183 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
           label FilterType
@@ -364,7 +368,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   } {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters} open
-      xywh {791 700 700 205} type Double labelfont 1 labelsize 12 visible
+      xywh {914 714 700 205} type Double labelfont 1 labelsize 12 visible
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX

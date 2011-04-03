@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #include <cmath>
@@ -66,8 +66,12 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     NoteEnabled = true;
     volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
-    if (pars->randomPan)
-        panning = synth->numRandom();
+    if (pars->randomPan())
+    {
+        float x = 2.0f * synth->numRandom() - 1.0f ;
+        randpanL = (1.0f - x) * (0.7f + 0.2f * x);
+        randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+    }
     numstages = pars->Pnumstages;
     stereo = pars->Pstereo;
     start = pars->Pstart;
@@ -235,9 +239,12 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
 
     volume = powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)); // -60 dB .. 0 dB
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
-    if (pars->randomPan)
-        panning = synth->numRandom();
-
+    if (pars->randomPan())
+    {
+        float x = 2.0f * synth->numRandom() - 1.0f ;
+        randpanL = (1.0f - x) * (0.7f + 0.2f * x);
+        randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+    }
     // start=pars->Pstart;
 
     int pos[MAX_SUB_HARMONICS];
@@ -636,20 +643,15 @@ int SUBnote::noteout(float *outl, float *outr)
         firsttick = 0;
     }
 
-    float pangainL;
-    float pangainR;
-    if (!pars->randomPan)
+
+    float pangainL = pars->pangainL; // assume non random pan
+    float pangainR = pars->pangainR;
+    if (pars->randomPan())
     {
-        float x = (2.0f * (float)(pars->PPanning - 1) / 126.0f) - 1.0f;
-        pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
+        pangainL = randpanL;
+        pangainR = randpanR;
     }
-    else
-    {
-        pangainL = (1.0f - panning);
-        pangainR = panning;
-    }
-    
+
     if (aboveAmplitudeThreshold(oldamplitude, newamplitude))
     {
         // Amplitude interpolation

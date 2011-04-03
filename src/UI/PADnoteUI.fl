@@ -25,7 +25,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified March 2011
+This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
 }
 
@@ -954,7 +954,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               label Pan
               callback {//
                   pars->setPan((char)o->value());
-                  randompan->value((pars->PPanning > 0) ? 0 : 1);}
+                  randompan->value((pars->randomPan()) ? 1 : 0);}
               tooltip {Panning - leftmost/zero is Random} xywh {175 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
               code0 {o->value(pars->PPanning);}
               class WidgetPDial
@@ -963,15 +963,15 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               label Centre
               callback {//
               pan->value(64);
-              pan->callback();
-              randompan->value((pars->randomPan) ? 1 : 0);}
+              pars->setPan(64);
+              randompan->value((pars->randomPan()) ? 1 : 0);}
               tooltip {Centre panning} xywh {213 56 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
             }
             Fl_Light_Button randompan {
               label Rand
               callback {/* callback */}
               tooltip {Random panning On} xywh {197 77 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
-              code0 {/* code */}
+              code0 {o->value((pars->randomPan()) ? 1 : 0);}
             }
             Fl_Dial pstr {
               label {P.Str.}

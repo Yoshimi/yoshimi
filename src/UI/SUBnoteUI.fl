@@ -167,7 +167,7 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
           label Rand
           callback {/* callback */}
           xywh {182 49 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
-          code0 {/* code */}
+          code0 {o->value((pars->PPanning > 0) ? 0 : 1);}
         }
         Fl_Button {} {
           label Centre

@@ -115,12 +115,14 @@ class PADnote : public Carcass, private SynthHelper
         } NoteGlobalPar;
 
 
+        Controller *ctl;
         float globaloldamplitude;
         float globalnewamplitude;
         float velocity;
         float realfreq;
-        float *tmpwave;
-        Controller *ctl;
+//        float *tmpwave;
+        float randpanL;
+        float randpanR;
 
         // Legato vars
         struct {
