@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #include <iostream>
@@ -105,7 +105,6 @@ Config::Config() :
     Interpolation(0),
     CheckPADsynth(1),
     rtprio(50),
-    configChanged(false),
     deadObjects(NULL),
     sigIntActive(0),
     ladi1IntActive(0),
@@ -298,10 +297,7 @@ bool Config::loadConfig(void)
 
     bool isok = true;
     if (!isRegFile(ConfigFile))
-    {
         Log("ConfigFile " + ConfigFile + " still not found, will use default settings");
-        configChanged = true;
-    }
     else
     {
         XMLwrapper *xml = new XMLwrapper();
@@ -447,12 +443,7 @@ void Config::saveConfig(void)
         return;
     }
     addConfigXML(xmltree);
-    if (xmltree->saveXMLfile(ConfigFile))
-    {
-        configChanged = false;
-        Log("Config saved to " + ConfigFile);
-    }
-    else
+    if (!xmltree->saveXMLfile(ConfigFile))
         Log("Failed to save config to " + ConfigFile);
     delete xmltree;
 }

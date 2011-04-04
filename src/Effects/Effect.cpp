@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified April 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #include "Effects/Effect.h"
@@ -40,11 +40,9 @@ Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
 void Effect::setpanning(char Ppanning_)
 {
     Ppanning = Ppanning_;
-    char pan = Ppanning - 1;
-    if (pan < 0) pan = 0;
-    float x = (2.0f * (float)pan / 126.0f) - 1.0f;
-    pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-    pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
+    float t = (Ppanning > 0) ? (float)(Ppanning - 1) / 126.0f : 0.0f;
+    pangainL = cosf(t * PI / 2.0f);
+    pangainR = cosf((1.0f - t) * PI / 2.0f);
 }
 
 

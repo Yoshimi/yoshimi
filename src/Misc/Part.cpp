@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #include <cstring>
@@ -172,7 +172,7 @@ void Part::defaultsinstrument(void)
 // Cleanup the part
 void Part::cleanup(void)
 {
-    __sync_or_and_fetch (&partMuted, 0xFF);
+    Mute();
     for (int k = 0; k < POLIPHONY; ++k)
         KillNotePos(k);
     memset(partoutl, 0, synth->bufferbytes);
@@ -189,7 +189,7 @@ void Part::cleanup(void)
         memset(partfxinputr[n], 0, synth->bufferbytes);
 
     }
-    __sync_and_and_fetch (&partMuted, 0);
+    Unmute();
 }
 
 
@@ -283,9 +283,9 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
             {
                 // At least one other key is held or sustained, and the
                 // previous note was played while in valid legato mode.
-                doinglegato=true; // So we'll do a legato note.
-                pos=lastpos; // A legato note uses same pos as previous..
-                posb=lastposb; // .. same goes for posb.
+                doinglegato = true; // So we'll do a legato note.
+                pos = lastpos; // A legato note uses same pos as previous..
+                posb = lastposb; // .. same goes for posb.
             }
             else
             {
@@ -499,7 +499,6 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
             partnote[pos].kititem[0].sendtoparteffect = 0;
             if (kit[0].Padenabled)
                 partnote[pos].kititem[0].adnote =
-                    // was new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
                     new ADnote(kit[0].adpars, ctl, vel, portamento, note, false ); // not silent
             if (kit[0].Psubenabled)
                 partnote[pos].kititem[0].subnote =
@@ -623,10 +622,7 @@ void Part::NoteOff(int note) //relase the key
                 if (!Ppolymode && (not monomemnotes.empty()))
                     MonoMemRenote(); // To play most recent still held note.
                 else
-                {
                     RelaseNotePos(i);
-                    /// break;
-                }
             }
             else
             {   // the sustain pedal is pushed
@@ -863,7 +859,7 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
 // Compute Part samples and store them in the partoutl[] and partoutr[]
 void Part::ComputePartSmps(void)
 {
-    if (partMuted)
+    if (isMuted())
     {
         memset(partoutl, 0, synth->bufferbytes);
         memset(partoutr, 0, synth->bufferbytes);
@@ -1021,16 +1017,11 @@ void Part::setVolume(char value)
 
 
 void Part::setPan(char value)
-{   // * 1.4677987f;
+{
     Ppanning = value;
-    if (Ppanning < 0)
-        Ppanning = 0;
-    char pan = Ppanning - 1;
-    if (pan < 0)
-        pan = 0;
-    float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-    pangainL = ((1.0f - x) * (0.7f + 0.2f * x));
-    pangainR = ((1.0f + x ) * (0.7f - 0.2f * x));
+    float t = ((Ppanning > 0) ? (float)(Ppanning - 1) : 0.0f) / 126.0f;
+    pangainL = cosf(t * PI / 2.0f);
+    pangainR = cosf((1.0f - t) * PI / 2.0f);
 }
 
 
@@ -1221,11 +1212,11 @@ bool Part::loadXMLinstrument(string filename)
         Runtime.Log(filename + " is not an instrument file");
         return false;
     }
-    __sync_or_and_fetch (&partMuted, 0xFF);
+    Mute();
     defaultsinstrument();
     getfromXMLinstrument(xml);
     applyparameters();
-    __sync_and_and_fetch (&partMuted, 0);
+    Unmute();
     xml->exitbranch();
     delete xml;
     return true;
@@ -1267,11 +1258,11 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
                 continue;
             }
             kit[i].Pname = xml->getparstr("name");
-            kit[i].Pmuted=xml->getparbool("muted", kit[i].Pmuted);
-            kit[i].Pminkey=xml->getpar127("min_key", kit[i].Pminkey);
-            kit[i].Pmaxkey=xml->getpar127("max_key", kit[i].Pmaxkey);
-            kit[i].Psendtoparteffect=xml->getpar127("send_to_instrument_effect",
-                                                    kit[i].Psendtoparteffect);
+            kit[i].Pmuted = xml->getparbool("muted", kit[i].Pmuted);
+            kit[i].Pminkey = xml->getpar127("min_key", kit[i].Pminkey);
+            kit[i].Pmaxkey = xml->getpar127("max_key", kit[i].Pmaxkey);
+            kit[i].Psendtoparteffect = xml->getpar127("send_to_instrument_effect",
+                                                      kit[i].Psendtoparteffect);
             kit[i].Padenabled = xml->getparbool("add_enabled", kit[i].Padenabled);
             if (xml->enterbranch("ADD_SYNTH_PARAMETERS"))
             {

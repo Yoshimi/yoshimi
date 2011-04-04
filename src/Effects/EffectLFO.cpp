@@ -3,7 +3,7 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
-    Copyright 2009-2010, Alan Calvert
+    Copyright 2009-2011, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of version 2 of the GNU General Public
@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
 #include <cstdlib>
@@ -26,23 +26,25 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectLFO.h"
 
-EffectLFO::EffectLFO()
+EffectLFO::EffectLFO() :
+    Pfreq(40),
+    Prandomness(0),
+    PLFOtype(0),
+    Pstereo(64),
+    xl(0.0f),
+    xr(0.0f),
+    ampl1(synth->numRandom()),
+    ampl2(synth->numRandom()),
+    ampr1(synth->numRandom()),
+    ampr2(synth->numRandom()),
+    lfornd(0.0f)
 {
-    xl = xr = 0.0;
-    Pfreq = 40;
-    Prandomness = 0;
-    PLFOtype = 0;
-    Pstereo = 96;
-
     updateparams();
-
-    ampl1 = (1 - lfornd) + lfornd * synth->numRandom();
-    ampl2 = (1 - lfornd) + lfornd * synth->numRandom();
-    ampr1 = (1 - lfornd) + lfornd * synth->numRandom();
-    ampr2 = (1 - lfornd) + lfornd * synth->numRandom();
 }
 
+
 EffectLFO::~EffectLFO() { }
+
 
 // Update the changed parameters
 void EffectLFO::updateparams(void)
@@ -58,9 +60,9 @@ void EffectLFO::updateparams(void)
     if (PLFOtype > 1)
         PLFOtype = 1; // this has to be updated if more lfo's are added
     lfotype = PLFOtype;
-
     xr = fmodf(xl + (Pstereo - 64.0f) / 127.0f + 1.0f, 1.0f);
 }
+
 
 // Compute the shape of the LFO
 float EffectLFO::getlfoshape(float x)
@@ -83,6 +85,7 @@ float EffectLFO::getlfoshape(float x)
     }
     return out;
 }
+
 
 // LFO output
 void EffectLFO::effectlfoout(float *outl, float *outr)

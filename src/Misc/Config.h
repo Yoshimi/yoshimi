@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #ifndef CONFIG_H
@@ -117,7 +117,6 @@ class Config : public MiscFuncs
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;
         int           rtprio;
-        bool          configChanged;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;

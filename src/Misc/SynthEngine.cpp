@@ -149,7 +149,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        vuoutpeakpart[npart] = 1e-9;
+        vuoutpeakpart[npart] = 1e-9f;
         fakepeakpart[npart] = 0;
     }
 

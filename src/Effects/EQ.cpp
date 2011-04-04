@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is derivative of ZynAddSubFX original code, modified October 2010
 */
 
 #include "Misc/SynthEngine.h"
@@ -63,8 +63,6 @@ void EQ::out(float *smpsl, float *smpsr)
     {
         efxoutl[i] *= volume;
         efxoutr[i] *= volume;
-        //efxoutl[i] = smpsl[i] * volume;
-        //efxoutr[i] = smpsr[i] * volume;
     }
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
@@ -91,10 +89,8 @@ void EQ::setpreset(unsigned char npreset)
     const int PRESET_SIZE = 1;
     const int NUM_PRESETS = 2;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
-        // EQ 1
-        { 67 },
-        // EQ 2
-        { 67 }
+        { 67 }, // EQ 1
+        { 67 }  // EQ 2
     };
 
     if (npreset >= NUM_PRESETS)

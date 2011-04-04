@@ -641,19 +641,14 @@ void PADnoteParameters::applyparameters(bool islocked)
 void PADnoteParameters::setPan(char pan)
 {
     PPanning = pan;
-    if (PPanning < 0)
-        PPanning = 0;
-    else if (PPanning > 127)
-        PPanning = 127;
-    if ((pan = PPanning - 1) < 0)
-        pan = 0;
-    else
+    if (!randomPan())
     {
-        if (pan > 126) pan = 126;
-        float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-        pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
+        float t = (float)(PPanning - 1) / 126.0f;
+        pangainL = cosf(t * PI / 2.0f);
+        pangainR = cosf((1.0f - t) * PI / 2.0f);
     }
+    else
+        pangainL = pangainR = 0.7f;
 }
 
 

@@ -243,7 +243,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
                 int midinote;
             } param;
         } Legato;
-        
+
         float pangainL;
         float pangainR;
 };

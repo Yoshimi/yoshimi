@@ -68,9 +68,9 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
     if (pars->randomPan())
     {
-        float x = 2.0f * synth->numRandom() - 1.0f ;
-        randpanL = (1.0f - x) * (0.7f + 0.2f * x);
-        randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+        float t = synth->numRandom();
+        randpanL = cosf(t * PI / 2.0f);
+        randpanR = cosf((1.0f - t) * PI / 2.0f);
     }
     numstages = pars->Pnumstages;
     stereo = pars->Pstereo;
@@ -241,11 +241,10 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
     volume *= velF(velocity, pars->PAmpVelocityScaleFunction);
     if (pars->randomPan())
     {
-        float x = 2.0f * synth->numRandom() - 1.0f ;
-        randpanL = (1.0f - x) * (0.7f + 0.2f * x);
-        randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+        float t = synth->numRandom();
+        randpanL = cosf(t * PI / 2.0f);
+        randpanR = cosf((1.0f - t) * PI / 2.0f);
     }
-    // start=pars->Pstart;
 
     int pos[MAX_SUB_HARMONICS];
 

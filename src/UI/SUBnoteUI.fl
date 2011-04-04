@@ -157,24 +157,31 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
           label Pan
           callback {//
               pars->setPan((char)o->value());
-              randompan->value((pars->PPanning > 0) ? 0 : 1);
+              randompan->value(pars->randomPan());
           }
-          tooltip {Panning - leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+          tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->PPanning);}
           class WidgetPDial
         }
         Fl_Light_Button randompan {
           label Rand
-          callback {/* callback */}
+          callback {//
+              if (pars->randomPan()) // set to full left
+              {
+                  pars->setPan(1);
+                  pan->value(1);
+              }
+              o->value(pars->randomPan());
+          }
           xywh {182 49 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
-          code0 {o->value((pars->PPanning > 0) ? 0 : 1);}
+          code0 {o->value(pars->randomPan());}
         }
         Fl_Button {} {
           label Centre
           callback {//
               pan->value(64);
               pars->setPan(64);
-              randompan->value((pars->PPanning > 0) ? 0 : 1);
+              randompan->value(pars->randomPan());
           }
           tooltip {Centre panning} xywh {192 32 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
         }

@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110
-header_name {.h}
+version 1.0110 
+header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -21,19 +21,19 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
-}
+} 
 
 decl {\#include <cmath>} {public
-}
+} 
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public
-}
+} 
 
 decl {\#include "Misc/Config.h"} {public
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public
-}
+} 
 
 class ConfigUI {open : {private MiscFuncs}
 } {
@@ -42,7 +42,7 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {//
-          if (Runtime.configChanged)
+          if (configChanged)
           {
               int r = fl_choice("Save settings?", "Cancel", "Save", "Don't save");
               switch (r)
@@ -59,9 +59,8 @@ class ConfigUI {open : {private MiscFuncs}
               }
           }
           else
-              o->hide();
-      } open
-      xywh {1049 217 465 335} type Double visible
+              o->hide();} open
+      xywh {1050 243 465 335} type Double visible
     } {
       Fl_Tabs {} {open
         xywh {5 5 520 325}
@@ -74,7 +73,7 @@ class ConfigUI {open : {private MiscFuncs}
             label OscilSize
             callback {//
                 Runtime.Oscilsize = 128 << o->value();
-                Runtime.configChanged = true;}
+                configChanged = true;}
             tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
@@ -115,7 +114,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {PADsynth Interpolation}
             callback {//
                 Runtime.Interpolation = (int) o->value();
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(Runtime.Interpolation);}
           } {
@@ -132,7 +131,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {Virtual Keyboard Layout}
             callback {//
                 Runtime.VirKeybLayout = (int) o->value();
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(Runtime.VirKeybLayout);}
           } {
@@ -171,7 +170,7 @@ class ConfigUI {open : {private MiscFuncs}
                     Runtime.StateFile = string(filename);
                     SessionStateFile->value(Runtime.StateFile.c_str());
                     SessionStateFile->changed();
-                    Runtime.configChanged = true;
+                    configChanged = true;
                 }}
             xywh {404 218 49 20} labelsize 12
             code0 {/* code */}
@@ -193,7 +192,7 @@ class ConfigUI {open : {private MiscFuncs}
                 if (!dirname)
                     return;
                 rootsbrowse->add(dirname);
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removerootdirbutton {
@@ -202,7 +201,7 @@ class ConfigUI {open : {private MiscFuncs}
                 if (rootsbrowse->value() != 0)
                     rootsbrowse->remove(rootsbrowse->value());
                 activatebutton_rootdir(false);
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -217,7 +216,7 @@ class ConfigUI {open : {private MiscFuncs}
                     rootsbrowse->redraw();
                 }
                 activatebutton_rootdir(true);
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -238,7 +237,7 @@ class ConfigUI {open : {private MiscFuncs}
                 if (!dirname)
                     return;
                 presetbrowse->add(dirname);
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removepresetbutton {
@@ -249,7 +248,7 @@ class ConfigUI {open : {private MiscFuncs}
                     presetbrowse->remove(presetbrowse->value());
                 }
                 activatebutton_presetdir(false);
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -264,7 +263,7 @@ class ConfigUI {open : {private MiscFuncs}
                     presetbrowse->redraw();
                 }
                 activatebutton_presetdir(true);
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -277,7 +276,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {Jack Server}
             callback {//
                 Runtime.jackServer = string(o->value());
-                Runtime.configChanged = true;}
+                configChanged = true;}
             tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.jackServer.c_str());}
           }
@@ -290,7 +289,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {Alsa Midi Device}
             callback {//
                 Runtime.alsaMidiDevice = string(o->value());
-                Runtime.configChanged = true;}
+                configChanged = true;}
             tooltip {Alsa midi device - default, hw:0, ...} xywh {195 54 120 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.alsaMidiDevice.c_str());}
           }
@@ -298,7 +297,7 @@ class ConfigUI {open : {private MiscFuncs}
             label {Alsa Audio Device}
             callback {//
                 Runtime.alsaAudioDevice = string(o->value());
-                Runtime.configChanged = true;}
+                configChanged = true;}
             tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 95 120 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.alsaAudioDevice.c_str());}
           }
@@ -330,7 +329,7 @@ class ConfigUI {open : {private MiscFuncs}
                         break;
                 }
                 Runtime.Samplerate = sample_rate;
-                Runtime.configChanged = true;}
+                configChanged = true;}
             xywh {195 133 84 50} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("96000");
@@ -349,7 +348,7 @@ class ConfigUI {open : {private MiscFuncs}
             callback {//
                 int chk = o->value();
                 if (o->nchecked() < 1)
-                    o->set_checked(3);
+                    o->set_checked(4);
                 else if (o->nchecked() > 1)
                 {
                     if (!chk)
@@ -365,12 +364,11 @@ class ConfigUI {open : {private MiscFuncs}
                     case 3: buff_size = 256; break;
                     case 4: buff_size = 512; break;
                     case 5: buff_size = 1024; break;
-                    case 6: buff_size = 2048; break;
-                    case 7: buff_size = 4096; break;
-                    default: buff_size = 256; break;
+                    default: buff_size = 512; break;
                 }
                 Runtime.Buffersize = buff_size;
-                Runtime.configChanged = true;}
+                configChanged = true;
+            }
             xywh {195 197 76 73} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("64");
@@ -378,8 +376,6 @@ class ConfigUI {open : {private MiscFuncs}
                 o->add("256");
                 o->add("512");
                 o->add("1024");
-                o->add("2048");
-                o->add("4096");
                 switch (Runtime.Buffersize)
                 {
                     case 64: o->set_checked(1); break;
@@ -387,17 +383,14 @@ class ConfigUI {open : {private MiscFuncs}
                     case 256: o->set_checked(3); break;
                     case 512: o->set_checked(4); break;
                     case 1024: o->set_checked(5); break;
-                    case 2048: o->set_checked(6); break;
-                    case 4096: o->set_checked(7); break;
-                    default: o->set_checked(5); break;
+                    default: o->set_checked(4); break;
                 }}
           }
         }
       }
       Fl_Button {} {
         label Close
-        callback {configwindow->do_callback();
-        }
+        callback {configwindow->do_callback();}
         xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
@@ -414,6 +407,7 @@ class ConfigUI {open : {private MiscFuncs}
   Function {ConfigUI()} {open
   } {
     code {//
+        configChanged = false;
         make_window();
         readbankcfg();
         readpresetcfg();} {}
@@ -443,8 +437,7 @@ class ConfigUI {open : {private MiscFuncs}
         {
             removepresetbutton->deactivate();
             makedefaultpresetbutton->deactivate();
-        }
-    } {}
+        }} {}
   }
   Function {readbankcfg()} {} {
     code {//
@@ -453,8 +446,7 @@ class ConfigUI {open : {private MiscFuncs}
         {
             if (Runtime.bankRootDirlist[i].size())
                 rootsbrowse->add(Runtime.bankRootDirlist[i].c_str());
-        }
-    } {}
+        }} {}
   }
   Function {writebankcfg()} {} {
     code {//
@@ -481,12 +473,13 @@ class ConfigUI {open : {private MiscFuncs}
   Function {Hide()} {} {
     code {configwindow->hide();} {}
   }
-  Function {savesettings(void)} {selected private return_type void
+  Function {savesettings(void)} {private return_type void
   } {
     code {//
         Runtime.saveConfig();
         writebankcfg();
-        writepresetcfg();
-    } {}
+        writepresetcfg();} {}
   }
-}
+  decl {bool configChanged;} {selected
+  }
+} 

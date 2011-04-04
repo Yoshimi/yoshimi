@@ -118,14 +118,10 @@ class PADnoteParameters : public Presets
         unsigned char PPanning;  // 0 random, 64 center, 127 right
         float         pangainL;  // derived from PPanning
         float         pangainR;  // ^^
-        //bool          randomPan;
-
         unsigned char PVolume;
-
         unsigned char PAmpVelocityScaleFunction;
 
         EnvelopeParams *AmpEnvelope;
-
         LFOParams *AmpLfo;
 
         unsigned char PPunchStrength, PPunchTime, PPunchStretch, PPunchVelocitySensing;

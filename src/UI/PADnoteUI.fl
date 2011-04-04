@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110
-header_name {.h}
+version 1.0110 
+header_name {.h} 
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-}
+} 
 
 comment {PADNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,7 +27,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -40,12 +40,12 @@ decl {\#include <FL/Fl_Box.H>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {global
-}
+} 
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
-}
+} 
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
@@ -121,12 +121,11 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
             fl_color(150, 160, 170);
         fl_line(ox + lx / 2 - rbw, oy, ox + lx / 2 - rbw, oy + ly - 1);
         fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);
-        fl_line_style(0);
-    } {}
+        fl_line_style(0);} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
-}
+} 
 
 class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
 } {
@@ -221,12 +220,11 @@ class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
                 continue;
             int yy = (int)(x * ly);
             fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
-        }
-    } {}
+        }} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
-}
+} 
 
 class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
 } {
@@ -235,22 +233,20 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
         pars = parameters;
         oscui = NULL;
         resui = new ResonanceUI(pars->resonance);
-        make_window();
-    } {}
+        make_window();} {}
   }
   Function {make_window()} {open
   } {
     Fl_Window padnotewindow {
       label {PAD synth Parameters} open
-      xywh {774 238 535 450} type Double visible
+      xywh {776 290 535 450} type Double visible
     } {
       Fl_Tabs {} {
         callback {//
             if (o->value() != harmonicstructuregroup)
                 applybutton->hide();
             else
-                applybutton->show();
-        } open
+                applybutton->show();} open
         xywh {0 0 535 395}
       } {
         Fl_Group harmonicstructuregroup {
@@ -266,8 +262,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.base.par1 = (int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {20 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.base.par1);}
               class WidgetPDial
@@ -277,8 +272,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.base.type=o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {15 45 75 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Php.base.type);}
             } {
@@ -300,8 +294,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.freqmult=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {55 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.freqmult);}
               class WidgetPDial
@@ -311,8 +304,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.modulator.par1=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {15 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.par1);}
               class WidgetPDial
@@ -322,8 +314,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.modulator.freq=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {40 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.freq);}
               class WidgetPDial
@@ -336,8 +327,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                 callback {//
                     pars->Php.amp.type=o->value();
                     hprofile->redraw();
-                    cbwidget->do_callback();
-                }
+                    cbwidget->do_callback();}
                 xywh {15 175 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
                 code0 {o->value(pars->Php.amp.type);}
               } {
@@ -363,8 +353,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                 callback {//
                     pars->Php.amp.mode=o->value();
                     hprofile->redraw();
-                    cbwidget->do_callback();
-                }
+                    cbwidget->do_callback();}
                 xywh {15 205 70 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
                 code0 {o->value(pars->Php.amp.mode);}
               } {
@@ -390,8 +379,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                 callback {//
                     pars->Php.amp.par1=(int) o->value();
                     hprofile->redraw();
-                    cbwidget->do_callback();
-                }
+                    cbwidget->do_callback();}
                 xywh {15 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par1);}
                 class WidgetPDial
@@ -401,8 +389,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                 callback {//
                     pars->Php.amp.par2=(int) o->value();
                     hprofile->redraw();
-                    cbwidget->do_callback();
-                }
+                    cbwidget->do_callback();}
                 xywh {55 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par2);}
                 class WidgetPDial
@@ -413,8 +400,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.autoscale=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {10 270 60 15} down_box DOWN_BOX labelsize 10
               code0 {o->value(pars->Php.autoscale);}
             }
@@ -422,8 +408,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.onehalf=o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {10 143 80 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
               code0 {o->value(pars->Php.onehalf);}
             } {
@@ -445,8 +430,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Php.width=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {65 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.width);}
               class WidgetPDial
@@ -461,8 +445,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             label Change
             callback {//
                 if (oscui!=NULL) delete (oscui);
-                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton);
-            }
+                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton);}
             xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Box cbwidget {
@@ -470,8 +453,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             callback {//
                 overtonepos->redraw();
                 applybutton->color(FL_RED);
-                applybutton->redraw();
-            }
+                applybutton->redraw();}
             xywh {125 135 205 20} labelsize 12 align 16
           }
           Fl_Button {} {
@@ -479,16 +461,14 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             callback {//
                 resui->resonancewindow->redraw();
                 resui->resonancewindow->show();
-                resui->setcbwidget(cbwidget, applybutton);
-            }
+                resui->setcbwidget(cbwidget, applybutton);}
             xywh {375 225 80 20} box THIN_UP_BOX labelsize 12
           }
           Fl_Dial bwdial {
             label BandWidth
             callback {//
                 bwcents->value(pars->setPbandwidth((int) o->value()));
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {15 295 35 35} box ROUND_UP_BOX labelsize 10 maximum 1000 step 1
             code0 {o->value(pars->Pbandwidth);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
@@ -508,8 +488,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Phrpos.type=o->value();
                   overtonepos->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {325 310 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
               code0 {o->value(pars->Phrpos.type);}
             } {
@@ -547,8 +526,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Phrpos.par1=(int) o->value();
                   overtonepos->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {425 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
               class WidgetPDial
@@ -558,8 +536,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Phrpos.par2=(int) o->value();
                   overtonepos->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {460 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
               class WidgetPDial
@@ -569,8 +546,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Phrpos.par3=(int) o->value();
                   overtonepos->redraw();
-                  cbwidget->do_callback();
-              }
+                  cbwidget->do_callback();}
               xywh {495 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
               class WidgetPDial
@@ -580,8 +556,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             label {Bandwidth Scale}
             callback {//
                 pars->Pbwscale=(int) o->value();
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {120 305 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Pbwscale);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
@@ -628,8 +603,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             label {Sample Size}
             callback {//
                 pars->Pquality.samplesize=(int) o->value();
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {375 190 115 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Pquality.samplesize);}
           } {
@@ -666,8 +640,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             label {smp/oct}
             callback {//
                 pars->Pquality.smpoct=(int) o->value();
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {430 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->Pquality.smpoct);}
           } {
@@ -704,8 +677,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             label {no.oct}
             callback {//
                 pars->Pquality.oct=(int) o->value();
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {480 155 45 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->Pquality.oct);}
           } {
@@ -746,8 +718,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             label base
             callback {//
                 pars->Pquality.basenote=(int) o->value();
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {375 155 50 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->Pquality.basenote);}
           } {
@@ -820,8 +791,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                     hprofile->color(48);
                     bwscale->deactivate();
                 }
-                cbwidget->do_callback();
-            }
+                cbwidget->do_callback();}
             xywh {220 305 90 20} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textsize 11
             code0 {o->value(pars->Pmode);}
           } {
@@ -859,8 +829,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                   int k=(int) o->value();
                   if (k<0) k+=16;
                   pars->PCoarseDetune = k*1024+
-                  pars->PCoarseDetune%1024;
-              }
+                  pars->PCoarseDetune%1024;}
               tooltip Octave xywh {470 295 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune/1024;}
               code1 {if (k>=8) k-=16;}
@@ -872,8 +841,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                   int k = (int) o->value();
                   if (k < 0)
                       k += 1024;
-                  pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;
-              }
+                  pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;}
               tooltip {Coarse Detune} xywh {455 365 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune%1024;}
               code1 {if (k>=512) k-=1024;}
@@ -889,8 +857,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             Fl_Slider detune {
               callback {//
                   pars->PDetune = (int)o->value() + 8192;
-                  detunevalueoutput->do_callback();
-              }
+                  detunevalueoutput->do_callback();}
               tooltip {Fine Detune (cents)} xywh {60 295 295 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
             }
@@ -904,8 +871,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               label {Detune Type}
               callback {//
                   pars->PDetuneType = (int) o->value() + 1;
-                  detunevalueoutput->do_callback();
-              }
+                  detunevalueoutput->do_callback();}
               xywh {450 335 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->PDetuneType-1);}
@@ -918,8 +884,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                   if (x == 0)
                       fixedfreqetdial->deactivate();
                   else
-                      fixedfreqetdial->activate();
-              }
+                      fixedfreqetdial->activate();}
               tooltip {set the base frequency to 440Hz} xywh {365 295 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->Pfixedfreq);}
             }
@@ -954,7 +919,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               label Pan
               callback {//
                   pars->setPan((char)o->value());
-                  randompan->value((pars->randomPan()) ? 1 : 0);}
+                  randompan->value(pars->randomPan());}
               tooltip {Panning - leftmost/zero is Random} xywh {175 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
               code0 {o->value(pars->PPanning);}
               class WidgetPDial
@@ -962,16 +927,24 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             Fl_Button {} {
               label Centre
               callback {//
-              pan->value(64);
-              pars->setPan(64);
-              randompan->value((pars->randomPan()) ? 1 : 0);}
+                  pan->value(64);
+                  pars->setPan(64);
+                  randompan->value(pars->randomPan());
+              }
               tooltip {Centre panning} xywh {213 56 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
             }
             Fl_Light_Button randompan {
               label Rand
-              callback {/* callback */}
-              tooltip {Random panning On} xywh {197 77 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
-              code0 {o->value((pars->randomPan()) ? 1 : 0);}
+              callback {//
+                  if (pars->randomPan())
+                  {   // set to full left
+                      pan->value(1);
+                      pars->setPan(1);
+                  }
+                  o->value(pars->randomPan());
+              }
+              tooltip {Random panning On/Off} xywh {197 77 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
+              code0 {o->value(pars->randomPan());}
             }
             Fl_Dial pstr {
               label {P.Str.}
@@ -1031,7 +1004,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
-              label {Filter LFO     } open selected
+              label {Filter LFO     } open
               xywh {250 200 230 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
               code0 {o->init(pars->FilterLfo);}
               class LFOUI
@@ -1181,8 +1154,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
         delete(resui);
 
         padnotewindow->hide();
-        delete(padnotewindow);
-    } {}
+        delete(padnotewindow);} {}
   }
   decl {PADnoteParameters *pars;} {public
   }
@@ -1192,4 +1164,4 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
   }
   decl {ResonanceUI *resui;} {public
   }
-}
+} 

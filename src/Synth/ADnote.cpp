@@ -72,11 +72,11 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
                                      adpars->GlobalPar.PDetune);
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
-    if (adpars->GlobalPar.randomPan)
+    if (adpars->randomGlobalPan())
     {
-        float x = 2.0f * synth->numRandom() - 1.0f ;
-        NoteGlobalPar.randpanL = (1.0f - x) * (0.7f + 0.2f * x);
-        NoteGlobalPar.randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+        float t = synth->numRandom();
+        NoteGlobalPar.randpanL = cosf(t * PI / 2.0f);
+        NoteGlobalPar.randpanR = cosf((1.0f - t) * PI / 2.0f);
     }
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq() // center freq
@@ -184,7 +184,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
         for (int k = 0; k < unison; ++k)
         {
             unison_vibratto[nvoice].position[k] = synth->numRandom() * 1.8f - 0.9f;
-            float vibratto_period = vibratto_base_period * powf(2.0f, synth->numRandom() * 2.0f - 1.0f);                                                        //make period to vary randomly from 50% to 200% vibratto base period
+            // make period to vary randomly from 50% to 200% vibratto base period
+            float vibratto_period = vibratto_base_period * powf(2.0f, synth->numRandom() * 2.0f - 1.0f);
             float m = 4.0f / (vibratto_period * increments_per_second);
             if (synth->numRandom() < 0.5f)
                 m = -m;
@@ -443,11 +444,11 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                                      adpars->GlobalPar.PDetune);
     bandwidthDetuneMultiplier = adpars->getBandwidthDetuneMultiplier();
 
-    if (adpars->GlobalPar.randomPan)
+    if (adpars->randomGlobalPan())
     {
-        float x = 2.0f * synth->numRandom() - 1.0f ;
-        NoteGlobalPar.randpanL =  (1.0f - x) * (0.7f + 0.2f * x);
-        NoteGlobalPar.randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+        float t = synth->numRandom();
+        NoteGlobalPar.randpanL = cosf(t * PI / 2.0f);
+        NoteGlobalPar.randpanR = cosf((1.0f - t) * PI / 2.0f);
     }
 
     NoteGlobalPar.FilterCenterPitch =
@@ -591,13 +592,13 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         if (adpars->VoicePar[nvoice].PVolumeminus)
             NoteVoicePar[nvoice].Volume = -NoteVoicePar[nvoice].Volume;
 
-        if (adpars->VoicePar[nvoice].randomPan)
+        if (adpars->randomVoicePan(nvoice))
         {
-            float x = 2.0f * synth->numRandom() - 1.0f ;
-            NoteVoicePar[nvoice].randpanL =  (1.0f - x) * (0.7f + 0.2f * x);
-            NoteVoicePar[nvoice].randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+            float t = synth->numRandom();
+            NoteVoicePar[nvoice].randpanL = cosf(t * PI / 2.0f);
+            NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * PI / 2.0f);
         }
-        
+
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled
            && NoteVoicePar[nvoice].AmpEnvelope != NULL)
@@ -815,6 +816,7 @@ void ADnote::initParameters(void)
             continue;
 
         NoteVoicePar[nvoice].noisetype = adpars->VoicePar[nvoice].Type;
+
         // Voice Amplitude Parameters Init
         NoteVoicePar[nvoice].Volume =
             powf(0.1f, 3.0f * (1.0f - adpars->VoicePar[nvoice].PVolume / 127.0f)) // -60 dB .. 0 dB
@@ -823,11 +825,11 @@ void ADnote::initParameters(void)
         if (adpars->VoicePar[nvoice].PVolumeminus)
             NoteVoicePar[nvoice].Volume = -NoteVoicePar[nvoice].Volume;
 
-        if (adpars->VoicePar[nvoice].randomPan)
+        if (adpars->randomVoicePan(nvoice))
         {
-            float x = 2.0f * synth->numRandom() - 1.0f ;
-            NoteVoicePar[nvoice].randpanL =  (1.0f - x) * (0.7f + 0.2f * x);
-            NoteVoicePar[nvoice].randpanR = (1.0f + x ) * (0.7f - 0.2f * x);
+            float t = synth->numRandom();
+            NoteVoicePar[nvoice].randpanL = cosf(t * PI / 2.0f);
+            NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * PI / 2.0f);
         }
 
         newamplitude[nvoice] = 1.0f;
@@ -1682,10 +1684,9 @@ int ADnote::noteout(float *outl, float *outr)
                     NoteVoicePar[nvoice].VoiceOut[i] = tmpwavel[i];
         }
 
-        // assume voice not random pan
-        pangainL = adpars->VoicePar[nvoice].pangainL;
+        pangainL = adpars->VoicePar[nvoice].pangainL; // assume voice not random pan
         pangainR = adpars->VoicePar[nvoice].pangainR;
-        if (adpars->VoicePar[nvoice].randomPan) // is not random panning
+        if (adpars->randomVoicePan(nvoice)) // is random panning
         {
             pangainL = NoteVoicePar[nvoice].randpanL;
             pangainR = NoteVoicePar[nvoice].randpanR;
@@ -1695,7 +1696,7 @@ int ADnote::noteout(float *outl, float *outr)
         {
             if (stereo)
             {
-                
+
                 for (i = 0; i < synth->buffersize; ++i) // stereo
                 {
                     outl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume * pangainL;
@@ -1746,10 +1747,9 @@ int ADnote::noteout(float *outl, float *outr)
         outr[i] += bypassr[i];
     }
 
-    // assume it's not random panning ...
-    pangainL = adpars->GlobalPar.pangainL;
+    pangainL = adpars->GlobalPar.pangainL; // assume it's not random panning ...
     pangainR = adpars->GlobalPar.pangainR;
-    if (adpars->GlobalPar.randomPan)
+    if (adpars->randomGlobalPan())         // it is random panning
     {
         pangainL = NoteGlobalPar.randpanL;
         pangainR = NoteGlobalPar.randpanR;

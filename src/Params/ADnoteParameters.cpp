@@ -281,38 +281,28 @@ void ADnoteParameters::setUnisonSizeIndex(int nvoice, int index)
 void ADnoteParameters::setGlobalPan(char pan)
 {
     GlobalPar.PPanning = pan;
-    if ( --pan < 0)
+    if (!randomGlobalPan())
     {
-        pan = 0;
-        GlobalPar.randomPan = true;
+        float t = (float)(GlobalPar.PPanning - 1) / 126.0f;
+        GlobalPar.pangainL = cosf(t * PI / 2.0f);
+        GlobalPar.pangainR = cosf((1.0f - t) * PI / 2.0f);
     }
     else
-    {
-        GlobalPar.randomPan = false;
-        if (pan > 126) pan = 126;
-        float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-        GlobalPar.pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        GlobalPar.pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
+        GlobalPar.pangainL = GlobalPar.pangainR = 0.7f;
 }
 
 
 void ADnoteParameters::setVoicePan(int nvoice, char pan)
 {
     VoicePar[nvoice].PPanning = pan;
-    if ( --pan < 0)
+    if (!randomVoicePan(nvoice))
     {
-        pan = 0;
-        VoicePar[nvoice].randomPan = true;
+        float t = (float)(VoicePar[nvoice].PPanning - 1) / 126.0f;
+        VoicePar[nvoice].pangainL = cosf(t * PI / 2.0f);
+        VoicePar[nvoice].pangainR = cosf((1.0f - t) * PI / 2.0f);
     }
     else
-    {
-        VoicePar[nvoice].randomPan = false;
-        if (pan > 126) pan = 126;
-        float x = (2.0f * (float)(pan) / 126.0f) - 1.0f;
-        VoicePar[nvoice].pangainL = (1.0f - x) * (0.7f + 0.2f * x);
-        VoicePar[nvoice].pangainR = (1.0f + x ) * (0.7f - 0.2f * x);
-    }
+        VoicePar[nvoice].pangainL = VoicePar[nvoice].pangainR = 0.7f;
 }
 
 

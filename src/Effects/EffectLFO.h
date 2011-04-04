@@ -34,14 +34,13 @@ class EffectLFO
         unsigned char Pfreq;
         unsigned char Prandomness;
         unsigned char PLFOtype;
-        unsigned char Pstereo; // "64"=0
+        unsigned char Pstereo; // 64 = centre
     private:
         float getlfoshape(float x);
 
         float xl,xr;
         float incx;
         float ampl1, ampl2, ampr1, ampr2; // necessary for "randomness"
-        float lfointensity;
         float lfornd;
         char lfotype;
 };

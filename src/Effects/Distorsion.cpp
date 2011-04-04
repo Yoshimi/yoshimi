@@ -33,7 +33,7 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Pnegate(0),
     Plpf(127),
     Phpf(0),
-    Pstereo(0),
+    Pstereo(1),
     Pprefiltering(0)
 {
     lpfl = new AnalogFilter(2, 22000, 1, 0);
@@ -85,38 +85,39 @@ void Distorsion::out(float *smpsl, float *smpsr)
     {
         for (int i = 0; i < synth->buffersize; ++i)
         {
-            efxoutl[i] = smpsl[i] * inputdrive * pangainL;
-            efxoutr[i] = smpsr[i] * inputdrive * pangainR;
+            efxoutl[i] = smpsl[i] * inputdrive;
+            efxoutr[i] = smpsr[i] * inputdrive;
         }
     }
     else // Mono
-    {
         for (int i = 0; i < synth->buffersize; ++i)
-            efxoutl[i] = inputdrive * (smpsl[i] + smpsr[i]) * 0.444f;
-    }
+            efxoutl[i] = inputdrive * (smpsl[i] + smpsr[i]) * 0.7f;
 
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
 
-    // no optimised, yet (no look table)
     waveShapeSmps(synth->buffersize, efxoutl, Ptype + 1, Pdrive);
     if (Pstereo)
         waveShapeSmps(synth->buffersize, efxoutr, Ptype + 1, Pdrive);
 
-    if (Pprefiltering == 0)
+    if (!Pprefiltering)
         applyfilters(efxoutl, efxoutr);
-
     if (!Pstereo)
         memcpy(efxoutr, efxoutl, synth->bufferbytes);
 
-    float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
-    float l, r, lout, rout;
     for (int i = 0; i < synth->buffersize; ++i)
     {
-        lout = efxoutl[i];
-        rout = efxoutr[i];
-        l = lout * (1.0f - lrcross) + rout * lrcross;
-        r = rout * (1.0f - lrcross) + lout * lrcross;
+        efxoutl[i] *= pangainL;
+        efxoutr[i] *= pangainR;
+    }
+
+    float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
+    for (int i = 0; i < synth->buffersize; ++i)
+    {
+        float lout = efxoutl[i];
+        float rout = efxoutr[i];
+        float l = lout * (1.0f - lrcross) + rout * lrcross;
+        float r = rout * (1.0f - lrcross) + lout * lrcross;
         lout = l;
         rout = r;
         efxoutl[i] = lout * level;
@@ -227,10 +228,7 @@ void Distorsion::changepar(int npar, unsigned char value)
             sethpf(value);
             break;
         case 9:
-            if (value > 1)
-                Pstereo = 1;
-            else
-                Pstereo = value;
+            Pstereo = (value > 0) ? 1 : 0; 
             break;
         case 10:
             Pprefiltering = value;

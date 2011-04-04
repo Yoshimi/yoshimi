@@ -57,7 +57,7 @@ struct ADnoteGlobalParam {
 
     // Amplitude global parameters
     char  PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
-    bool  randomPan;
+    //bool  randomPan;
     float pangainL; // derived from PPanning
     float pangainR; // ^
     unsigned char PVolume;
@@ -122,7 +122,7 @@ struct ADnoteVoiceParam { // Voice parameters
     // Amplitude parameters
     unsigned char PPanning; // 0 - random, 1 - left, 64 - center, 127 - right
                             // panning is ignored if the instrument is mono
-    bool  randomPan;
+    //bool  randomPan;
     float pangainL;         // derived from PPanning
     float pangainR;         // ^
     unsigned char PVolume;
@@ -181,7 +181,9 @@ class ADnoteParameters : public Presets
         void setUnisonSizeIndex(int nvoice, int index);
         void setGlobalPan(char pan);
         void setVoicePan(int voice, char pan);
-        
+        bool randomGlobalPan(void) { return !GlobalPar.PPanning; }
+        bool randomVoicePan(int nvoice) { return !VoicePar[nvoice].PPanning; }
+
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         Microtonal *microtonal;

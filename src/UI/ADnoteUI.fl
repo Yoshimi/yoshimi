@@ -47,15 +47,15 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "OscilGenUI.h"} {public global
 } 
 
-class ADvoicelistitem {: {public Fl_Group, SynthHelper}
+class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
-    Fl_Window ADnoteVoiceListItem {
-      private xywh {247 599 615 30} type Double hide
+    Fl_Window ADnoteVoiceListItem {open
+      private xywh {947 619 615 30} type Double hide
       class Fl_Group
     } {
-      Fl_Group voicelistitemgroup {
+      Fl_Group voicelistitemgroup {open
         private xywh {50 0 570 25} box FLAT_BOX
         code0 {if (pars->VoicePar[nvoice].Enabled == 0) o->deactivate();}
       } {
@@ -138,10 +138,12 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
       }
     }
   }
-  Function {ADvoicelistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+  Function {ADvoicelistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
+  } {
     code {nvoice = 0; pars = NULL;} {}
   }
-  Function {init(ADnoteParameters *parameters,int nvoice_)} {} {
+  Function {init(ADnoteParameters *parameters,int nvoice_)} {open
+  } {
     code {//
         pars = parameters;
         nvoice = nvoice_;
@@ -149,7 +151,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         ADnoteVoiceListItem->show();
         end();} {}
   }
-  Function {refreshlist()} {} {
+  Function {refreshlist()} {open
+  } {
     code {//
         voiceenabled->value(pars->VoicePar[nvoice].Enabled);
         voiceresonanceenabled->value(pars->VoicePar[nvoice].Presonance);
@@ -172,7 +175,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         voicepanning->do_callback();
         ADnoteVoiceListItem->redraw();} {}
   }
-  Function {~ADvoicelistitem()} {} {
+  Function {~ADvoicelistitem()} {open
+  } {
     code {//
         ADnoteVoiceListItem->hide();
         //delete(ADnoteVoiceListItem);} {}
@@ -188,7 +192,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
   } {
     Fl_Window ADnoteVoiceParameters {
       label Voice open
-      xywh {1041 134 765 575} type Double
+      xywh {1044 212 765 575} type Double
       class Fl_Group visible
     } {
       Fl_Group voiceparametersgroup {open
@@ -208,7 +212,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               xywh {535 220 220 145} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
               Fl_Group voiceFMfreqenvgroup {
-                label {ADSynth Modulator - Frequency Envelope}
+                label {ADSynth Modulator - Frequency Envelope} open
                 xywh {540 290 205 70} box FLAT_BOX color 51 align 144
                 code0 {o->init(pars->VoicePar[nvoice].FMFreqEnvelope);}
                 code1 {if (pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled==0) o->deactivate();}
@@ -281,7 +285,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               } {}
             }
             Fl_Group {} {
-              label {Mod AMPLITUDE}
+              label {Mod AMPLITUDE} open
               xywh {535 60 220 160} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
               Fl_Value_Slider {} {
@@ -323,7 +327,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               }
             }
             Fl_Group modoscil {
-              label {Mod Oscilator}
+              label {Mod Oscilator} open
               xywh {535 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
             } {
               Fl_Group fmoscil {open
@@ -408,7 +412,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                     voiceFMparametersgroup->deactivate();
                 else
                     voiceFMparametersgroup->activate();
-                o->redraw();}
+                o->redraw();} open
             xywh {535 40 80 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
@@ -438,7 +442,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             }
           }
           Fl_Group {} {
-            label FREQUENCY
+            label FREQUENCY open
             xywh {5 250 525 120} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -545,7 +549,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
             } {}
           }
-          Fl_Group voiceoscil {
+          Fl_Group voiceoscil {open
             xywh {80 375 445 145} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
             code0 {osc = new Oscilloscope(o->x(),o->y(),o->w(),o->h(), "");}
             code1 {//
@@ -608,7 +612,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Ext.%2d", i + 1); o->add(tmp);};}
             code3 {o->value(pars->VoicePar[nvoice].Pextoscil + 1);}
           } {}
-          Fl_Group {} {
+          Fl_Group {} {open
             xywh {5 525 515 45} box ENGRAVED_BOX
           } {
             Fl_Dial {} {
@@ -678,7 +682,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           }
         }
         Fl_Group amplitudegroup {
-          label AMPLITUDE open selected
+          label AMPLITUDE open
           xywh {5 40 240 210} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
         } {
           Fl_Dial voicevolume {
@@ -706,7 +710,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             label Pan
             callback {//
                  pars->setVoicePan(nvoice, lrintf(o->value()));
-                 voicerandompan->value((pars->VoicePar[nvoice].randomPan) ? 1 : 0);}
+                 voicerandompan->value(pars->randomVoicePan(nvoice));}
             tooltip {Voice panning - leftmost/zero gives random panning} xywh {174 56 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PPanning);}
             class WidgetPDial
@@ -715,17 +719,22 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             label Centre
             callback {//
               voicepan->value(64);
-              voicepan->callback();
-              pars->setGlobalPan(64);
-              voicerandompan->value((pars->VoicePar[nvoice].randomPan) ? 1 : 0);
-            }
+              pars->setVoicePan(nvoice, 64);
+              voicerandompan->value(pars->randomVoicePan(nvoice));}
             tooltip {Centre panning} xywh {213 69 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
           }
           Fl_Light_Button voicerandompan {
             label Rand
-            callback {o->value((pars->VoicePar[nvoice].randomPan) ? 1 : 0);}
-            tooltip {Random panning On} xywh {196 91 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
-            code0 {o->value((pars->VoicePar[nvoice].randomPan) ? 1 : 0);}
+            callback {//
+                if(pars->randomVoicePan(nvoice))
+                {
+                    voicepan->value(64);
+                    pars->setVoicePan(nvoice, 64);
+                }
+                o->value(pars->randomVoicePan(nvoice));
+            }
+            tooltip {Voice random panning On/Off} xywh {196 91 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
+            code0 {o->value(pars->randomVoicePan(nvoice));}
           }
           Fl_Check_Button {} {
             label Enable
@@ -766,7 +775,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           }
         }
         Fl_Group voicefiltergroup {
-          label FILTER
+          label FILTER open
           xywh {245 5 285 245} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
@@ -830,7 +839,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                   voicemodegroup->activate();
               else
                   voicemodegroup->deactivate();
-              noiselabel->do_callback();}
+              noiselabel->do_callback();} open
           tooltip {Oscillator Type (sound/noise)} xywh {5 500 65 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
           code0 {o->value(pars->VoicePar[nvoice].Type);}
           code1 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
@@ -850,7 +859,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           xywh {418 16 14 14} down_box DOWN_BOX labelfont 1 labelsize 10 align 136
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
-        Fl_Group {} {
+        Fl_Group {} {open
           xywh {115 5 95 35} box THIN_UP_BOX
         } {
           Fl_Value_Slider {} {
@@ -1008,8 +1017,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
               for (int i = 0; i < NUM_VOICES; ++i)
               {
                   voicelistitem[i]->refreshlist();
-              }
-          }
+              }}
           tooltip {Bandwidth - how the relative fine detune of the voice are changed} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
           class WidgetPDial
@@ -1037,7 +1045,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
           label Pan
           callback {//
               pars->setGlobalPan(lrintf(o->value()));
-              globalrandompan->value((pars->GlobalPar.randomPan) ? 1 : 0);
+              globalrandompan->value(pars->randomGlobalPan());
               amplitudegrp->changed();}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPanning);}
@@ -1045,16 +1053,23 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         }
         Fl_Light_Button globalrandompan {
           label Rand
-          callback {/* callback */}
+          callback {//
+              if (pars->randomGlobalPan()) // set to full left
+              {
+                  globalpan->value(1);
+                  pars->setGlobalPan(1);
+              }
+              o->value(pars->randomGlobalPan());
+          }
           xywh {194 57 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
-          code0 {/* code */}
+          code0 {o->value(pars->randomGlobalPan());}
         }
         Fl_Button {} {
           label Centre
           callback {//
               globalpan->value(64);
               pars->setGlobalPan(64);
-              globalrandompan->value((pars->GlobalPar.randomPan) ? 1 : 0);}
+              globalrandompan->value(pars->randomGlobalPan());}
           tooltip {Centre panning} xywh {213 36 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial pstr {

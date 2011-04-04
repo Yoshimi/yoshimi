@@ -18,7 +18,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified April 2011
+    This file is derivative of ZynAddSubFX original code, modified April 2011
 */
 
 #ifndef EFFECT_H
@@ -51,11 +51,11 @@ class Effect
         void setpanning(char Ppanning_);
         void setlrcross(char Plrcross_);
 
-        bool insertion;
-        char Ppanning;
+        bool  insertion;
+        char  Ppanning;
         float pangainL;
         float pangainR;
-        char Plrcross; // L/R mix
+        char  Plrcross; // L/R mix
         float lrcross;
 };
 
