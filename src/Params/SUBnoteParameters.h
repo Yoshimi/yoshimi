@@ -6,8 +6,9 @@
     Copyright 2009, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can redistribute
-    it and/or modify it under the terms of version 2 of the GNU General Public
-    License as published by the Free Software Foundation.
+    it and/or modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version.
 
     yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2009
+    This file is derivative of ZynAddSubFX original code, modified October 2009
 */
 
 #ifndef SUB_NOTE_PARAMETERS_H

@@ -13,8 +13,9 @@ Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 
 This file is part of yoshimi, which is free software: you can redistribute
-it and/or modify it under the terms of version 2 of the GNU General Public
-License as published by the Free Software Foundation.
+it and/or modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
 
 yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -719,8 +720,8 @@ ZynAddSubFX}
         xywh {10 160 300 53} labelsize 11 align 144 when 0
         code0 {//
             o->copy_label(string("This is free software, and comes with ABSOLUTELY NO WARRANTY; "
-                                 "you may redistribute it and/or modify it under certain conditions. "
-                                 "See file COPYING for details.\\n\\n").c_str());}
+                                 "you may redistribute it and/or modify it under the terms of "
+                                 "GPL version 2, or (at your option) any later version.\\n\\n").c_str());}
       }
       Fl_Box {} {
         label { version}
