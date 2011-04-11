@@ -721,7 +721,7 @@ ZynAddSubFX}
         code0 {//
             o->copy_label(string("This is free software, and comes with ABSOLUTELY NO WARRANTY; "
                                  "you may redistribute it and/or modify it under the terms of "
-                                 "GPL version 2, or (at your option) any later version.\\n\\n").c_str());}
+                                 "GPL version 3, or (at your option) any later version.\\n\\n").c_str());}
       }
       Fl_Box {} {
         label { version}
