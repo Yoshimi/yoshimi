@@ -25,25 +25,24 @@
 
 Filter::Filter(FilterParams *pars)
 {
-    unsigned char Ftype = pars->Ptype;
+    unsigned char Ftype   = pars->Ptype;
     unsigned char Fstages = pars->Pstages;
 
     category = pars->Pcategory;
 
-    switch (category)
-    {
+    switch(category) {
         case 1:
             filter = new FormantFilter(pars);
             break;
         case 2:
             filter = new SVFilter(Ftype, 1000.0f, pars->getq(), Fstages);
             filter->outgain = dB2rap(pars->getgain());
-            if (filter->outgain > 1.0f)
+            if(filter->outgain > 1.0f)
                 filter->outgain = sqrtf(filter->outgain);
             break;
         default:
             filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages);
-            if (Ftype >= 6 && Ftype <= 8)
+            if((Ftype >= 6) && (Ftype <= 8))
                 filter->setgain(pars->getgain());
             else
                 filter->outgain = dB2rap(pars->getgain());
@@ -78,7 +77,7 @@ void Filter::setq(float q_)
 
 float Filter::getrealfreq(float freqpitch)
 {
-    if (category == 0 || category == 2)
+    if((category == 0) || (category == 2))
         return powf(2.0f, freqpitch + 9.96578428f); // log2(1000)=9.95748
     else
         return freqpitch;

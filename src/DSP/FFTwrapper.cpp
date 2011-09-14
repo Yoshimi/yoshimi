@@ -29,17 +29,25 @@ using namespace std;
 #include "Misc/Config.h"
 #include "DSP/FFTwrapper.h"
 
-FFTwrapper::FFTwrapper(int fftsize_) :
-    fftsize(fftsize_),
-    half_fftsize(fftsize_ / 2)
+FFTwrapper::FFTwrapper(int fftsize_)
+    :fftsize(fftsize_),
+      half_fftsize(fftsize_ / 2)
 {
     boost_data1 = boost::shared_array<float>(new float[fftsize]);
     data1 = boost_data1.get();
     boost_data2 = boost::shared_array<float>(new float[fftsize]);
     data2 = boost_data2.get();
 
-    planBasic = fftwf_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC, FFTW_ESTIMATE);
-    planInv = fftwf_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R, FFTW_ESTIMATE);
+    planBasic = fftwf_plan_r2r_1d(fftsize,
+                                  data1,
+                                  data1,
+                                  FFTW_R2HC,
+                                  FFTW_ESTIMATE);
+    planInv = fftwf_plan_r2r_1d(fftsize,
+                                data2,
+                                data2,
+                                FFTW_HC2R,
+                                FFTW_ESTIMATE);
 }
 
 
@@ -56,7 +64,7 @@ void FFTwrapper::smps2freqs(float *smps, FFTFREQS *freqs)
     memcpy(data1, smps, fftsize * sizeof(float));
     fftwf_execute(planBasic);
     memcpy(freqs->c, data1, half_fftsize * sizeof(float));
-    for (int i = half_fftsize - 1; i > 0; --i)
+    for(int i = half_fftsize - 1; i > 0; --i)
         freqs->s[i] = data1[fftsize - i];
     data2[half_fftsize] = 0.0f;
 }
@@ -67,14 +75,14 @@ void FFTwrapper::freqs2smps(FFTFREQS *freqs, float *smps)
 {
     memcpy(data2, freqs->c, half_fftsize * sizeof(float));
     data2[half_fftsize] = 0.0;
-    for (int i = 1; i < half_fftsize; ++i)
+    for(int i = 1; i < half_fftsize; ++i)
         data2[fftsize - i] = freqs->s[i];
     fftwf_execute(planInv);
     memcpy(smps, data2, fftsize * sizeof(float));
 }
 
 
-void FFTwrapper::newFFTFREQS(FFTFREQS& f, int size)
+void FFTwrapper::newFFTFREQS(FFTFREQS &f, int size)
 {
     f.boost_c = boost::shared_array<float>(new float[size]);
     f.c = f.boost_c.get();
@@ -85,7 +93,7 @@ void FFTwrapper::newFFTFREQS(FFTFREQS& f, int size)
 }
 
 
-void FFTwrapper::deleteFFTFREQS(FFTFREQS& f)
+void FFTwrapper::deleteFFTFREQS(FFTFREQS &f)
 {
     f.boost_s.reset();
     f.boost_c.reset();

@@ -29,9 +29,11 @@ using namespace std;
 
 #include "Misc/MiscFuncs.h"
 
-typedef enum { nada = 0, ready, recording } record_state;
+typedef enum {
+    nada = 0, ready, recording
+} record_state;
 
-class WavRecord : private MiscFuncs
+class WavRecord:private MiscFuncs
 {
     public:
         WavRecord();
@@ -40,13 +42,13 @@ class WavRecord : private MiscFuncs
         void StartRecord(void);
         void StopRecord(void);
         void Close(void);
-        bool SetFile(string fpath, string& errmsg);
-        bool SetOverwrite(string& errmsg);
-        string Filename(void) { return wavFile; };
-        bool IsFloat(void) { return float32bit; };
-        void Feed(float* samples_left, float *samples_right);
-        inline bool Running(void) { return (recordState == recording); };
-        inline bool Trigger(void) { return (recordState == ready); };
+        bool SetFile(string fpath, string &errmsg);
+        bool SetOverwrite(string &errmsg);
+        string Filename(void) { return wavFile; }
+        bool IsFloat(void) { return float32bit; }
+        void Feed(float *samples_left, float *samples_right);
+        inline bool Running(void) { return recordState == recording;  }
+        inline bool Trigger(void) { return recordState == ready;  }
 
     private:
         void *recorderThread(void);
@@ -55,19 +57,19 @@ class WavRecord : private MiscFuncs
         void cleanup(void);
         void recordLog(string tag);
 
-        record_state  recordState;
-        unsigned int  samplerate;
-        unsigned int  buffersize;
+        record_state recordState;
+        unsigned int samplerate;
+        unsigned int buffersize;
         boost::shared_array<float> interleavedFloats;
 
-        string      wavFile;
-        bool        float32bit;
-        SF_INFO     wavOutInfo;
-        SNDFILE    *wavOutsnd;
-        pthread_t   pThread;
-        bool        threadRun;
-        string      recordFifo;
-        FILE       *toFifo;
+        string     wavFile;
+        bool       float32bit;
+        SF_INFO    wavOutInfo;
+        SNDFILE   *wavOutsnd;
+        pthread_t  pThread;
+        bool       threadRun;
+        string     recordFifo;
+        FILE      *toFifo;
         SF_INFO    fromFifoInfo;
         SNDFILE   *fromFifoSndfle;
         sf_count_t tferSamples;

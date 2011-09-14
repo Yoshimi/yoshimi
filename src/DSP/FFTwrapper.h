@@ -42,8 +42,8 @@ class FFTwrapper
         ~FFTwrapper();
         void smps2freqs(float *smps, FFTFREQS *freqs);
         void freqs2smps(FFTFREQS *freqs, float *smps);
-        static void newFFTFREQS(FFTFREQS& f, int size);
-        static void deleteFFTFREQS(FFTFREQS& f);
+        static void newFFTFREQS(FFTFREQS &f, int size);
+        static void deleteFFTFREQS(FFTFREQS &f);
 
     private:
         int fftsize;
@@ -51,7 +51,7 @@ class FFTwrapper
         boost::shared_array<float> boost_data1;
         float *data1;
         boost::shared_array<float> boost_data2;
-        float *data2;
+        float     *data2;
         fftwf_plan planBasic;
         fftwf_plan planInv;
 };

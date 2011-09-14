@@ -27,11 +27,13 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 #include "MusicIO/JackEngine.h"
 
-class JackClient : public MusicClient
+class JackClient:public MusicClient
 {
     public:
-        JackClient() : MusicClient() { };
-        ~JackClient() { Close(); };
+        JackClient():MusicClient() { }
+        ~JackClient() {
+            Close();
+        }
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
         bool Start(void);

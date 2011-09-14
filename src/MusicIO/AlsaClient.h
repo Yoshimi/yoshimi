@@ -23,11 +23,11 @@
 #include "MusicIO/MusicClient.h"
 #include "MusicIO/AlsaEngine.h"
 
-class AlsaClient : public MusicClient
+class AlsaClient:public MusicClient
 {
     public:
-        AlsaClient() : MusicClient() { };
-        ~AlsaClient() { };
+        AlsaClient():MusicClient() { }
+        ~AlsaClient() { }
 
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);

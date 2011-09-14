@@ -28,20 +28,18 @@ MusicClient *musicClient = NULL;
 MusicClient *MusicClient::newMusicClient(void)
 {
     MusicClient *musicObj = NULL;
-    switch (Runtime.audioEngine)
-    {
+    switch(Runtime.audioEngine) {
         case jack_audio:
-            switch (Runtime.midiEngine)
-            {
+            switch(Runtime.midiEngine) {
                 case jack_midi:
-                    if (NULL == (musicObj = new JackClient()))
+                    if(NULL == (musicObj = new JackClient()))
                         Runtime.Log("Failed to instantiate JackClient");
                     break;
 
-                    case alsa_midi:
-                        if (NULL == (musicObj = new JackAlsaClient()))
-                            Runtime.Log("Failed to instantiate JackAlsaClient");
-                        break;
+                case alsa_midi:
+                    if(NULL == (musicObj = new JackAlsaClient()))
+                        Runtime.Log("Failed to instantiate JackAlsaClient");
+                    break;
 
                 default:
                     Runtime.Log("Ooops, no midi!");
@@ -50,17 +48,16 @@ MusicClient *MusicClient::newMusicClient(void)
             break;
 
         case alsa_audio:
-            switch (Runtime.midiEngine)
-            {
+            switch(Runtime.midiEngine) {
                 case alsa_midi:
-                    if (NULL == (musicObj = new AlsaClient()))
+                    if(NULL == (musicObj = new AlsaClient()))
                         Runtime.Log("Failed to instantiate AlsaClient");
                     break;
 
-                    case jack_midi:
-                        if (NULL == (musicObj = new AlsaJackClient()))
-                            Runtime.Log("Failed to instantiate AlsaJackClient");
-                        break;
+                case jack_midi:
+                    if(NULL == (musicObj = new AlsaJackClient()))
+                        Runtime.Log("Failed to instantiate AlsaJackClient");
+                    break;
 
                 default:
                     Runtime.Log("Oops, alsa audio, no midi!");

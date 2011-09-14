@@ -30,28 +30,23 @@ int main(int argc, char *argv[])
 {
     int failure = 0;
 
-    if (!Runtime.Setup(argc, argv))
-    {
-        failure  = 1;
+    if(!Runtime.Setup(argc, argv)) {
+        failure = 1;
         goto bail_out;
     }
-    if (Runtime.showGui)
-    {
+    if(Runtime.showGui) {
         guiMaster = new MasterUI();
-        if (!guiMaster)
-        {
+        if(!guiMaster) {
             Runtime.Log("Failed to instantiate guiMaster");
             goto bail_out;
         }
     }
-    if (!(progBanks = new ProgramBanks()))
-    {
+    if(!(progBanks = new ProgramBanks())) {
         Runtime.Log("Failed to instantiate new ProgramBanks", true);
-        failure  = 2;
+        failure = 2;
         goto bail_out;
     }
-    switch (progBanks->Setup())
-    {
+    switch(progBanks->Setup()) {
         case 0: // is good
             break;
         case 1:
@@ -59,52 +54,44 @@ int main(int argc, char *argv[])
             break;
         default:
             Runtime.Log("Failed to establish program bank database", true);
-            failure  = 3;
+            failure = 3;
             goto bail_out;
             break;
     }
 
-    if (!(synth = new SynthEngine()))
-    {
+    if(!(synth = new SynthEngine())) {
         Runtime.Log("Failed to allocate Master");
         goto bail_out;
     }
-    if (!(musicClient = MusicClient::newMusicClient()))
-    {
+    if(!(musicClient = MusicClient::newMusicClient())) {
         Runtime.Log("Failed to instantiate MusicClient");
         goto bail_out;
     }
-    if (!(musicClient->Open()))
-    {
+    if(!(musicClient->Open())) {
         Runtime.Log("Failed to open MusicClient");
-        failure  = 4;
+        failure = 4;
         goto bail_out;
     }
-    if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
-    {
+    if(!synth->Init(musicClient->getSamplerate(),
+                    musicClient->getBuffersize())) {
         Runtime.Log("Master init failed");
         goto bail_out;
     }
 
-    if (!musicClient->Start())
-    {
+    if(!musicClient->Start()) {
         Runtime.Log("So sad, failed to start MusicIO");
         goto bail_out;
     }
 
-    if (Runtime.showGui)
-    {
+    if(Runtime.showGui) {
         guiMaster->Init();
         Runtime.StartupReport();
     }
-    while (Runtime.runSynth)
-    {
+    while(Runtime.runSynth) {
         Runtime.deadObjects->disposeBodies();
         Runtime.signalCheck();
-        if (Runtime.showGui)
-        {
-            if (!Runtime.LogList.empty())
-            {
+        if(Runtime.showGui) {
+            if(!Runtime.LogList.empty()) {
                 guiMaster->Log(Runtime.LogList.front());
                 Runtime.LogList.pop_front();
             }
@@ -114,14 +101,11 @@ int main(int argc, char *argv[])
             usleep(40000); // where all the action is ...
     }
     musicClient->Close();
-    if (Runtime.showGui)
-    {
-        if (guiMaster)
-        {
+    if(Runtime.showGui)
+        if(guiMaster) {
             delete guiMaster;
             guiMaster = NULL;
         }
-    }
     Runtime.flushLog();
     exit(EXIT_SUCCESS);
 
@@ -129,8 +113,7 @@ bail_out:
     Runtime.runSynth = false;
     usleep(33333); // contemplative pause ...
     string msg = "Bad things happened, Yoshimi strategically retreats. ";
-    switch (failure)
-    {
+    switch(failure) {
         case 1:
             msg += "Config setup failed";
             break;
@@ -139,14 +122,15 @@ bail_out:
             msg += "Serious problems dealing with the instrument database";
             break;
         case 4:
-            if (Runtime.audioEngine == jack_audio || Runtime.midiEngine == jack_midi)
+            if((Runtime.audioEngine == jack_audio)
+               || (Runtime.midiEngine == jack_midi))
                 msg += "Is jack running?";
             break;
         default:
-            break;            
+            break;
     }
     Runtime.Log(msg);
-    if (guiMaster)
+    if(guiMaster)
         guiMaster->strategicRetreat(msg);
     Runtime.flushLog();
     exit(EXIT_FAILURE);

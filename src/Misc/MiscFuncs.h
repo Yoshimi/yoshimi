@@ -28,7 +28,7 @@ class MiscFuncs
 {
     public:
         MiscFuncs() { }
-        ~MiscFuncs() { };
+        ~MiscFuncs() { }
         string asString(int n);
         string asString(long long n);
         string asString(long n);
@@ -42,7 +42,7 @@ class MiscFuncs
         bool isRegFile(string chkpath);
         bool isDirectory(string chkpath);
         bool isFifo(string chkpath);
-        void legit_filename(string& fname);
+        void legit_filename(string &fname);
 };
 
 #endif

@@ -29,15 +29,21 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "Misc/Part.h"
 
-class ProgramBanks : private MiscFuncs
+class ProgramBanks:private MiscFuncs
 {
     public:
         ProgramBanks();
-        ~ProgramBanks() { if (dbConn) sqlite3_close(dbConn); }
+        ~ProgramBanks() {
+            if(dbConn)
+                sqlite3_close(dbConn);
+        }
         int Setup(void);
         bool newDatabase(bool load_instruments = true);
         bool updateBank(unsigned char bank, string name);
-        bool updateProgram(unsigned char bank, unsigned char prog, string name, string xmldata);
+        bool updateProgram(unsigned char bank,
+                           unsigned char prog,
+                           string name,
+                           string xmldata);
         void loadBankList(void);
         string programXml(unsigned char bk, unsigned char prog);
         void loadProgramList(unsigned char bk);
@@ -48,7 +54,7 @@ class ProgramBanks : private MiscFuncs
     private:
         bool loadInstrumentDatabase(void);
         bool sqlStepExecute(string location, string qry);
-        
+
         bool sqlPrep(string location, string qry, sqlite3_stmt **stmt);
         bool sqlDoStep(string location, sqlite3_stmt *stmt);
         bool sqlDoStepRow(string location, sqlite3_stmt *stmt);
@@ -59,7 +65,7 @@ class ProgramBanks : private MiscFuncs
         const string dbFile;
         const string banksDir;
         const string presetsDir;
-        sqlite3 *dbConn;
+        sqlite3     *dbConn;
         boost::interprocess::interprocess_mutex dbLoadMutex;
 };
 

@@ -35,8 +35,8 @@ class XMLwrapper;
 class Microtonal
 {
     public:
-        Microtonal() { };
-        ~Microtonal() { };
+        Microtonal() { }
+        ~Microtonal() { }
         void defaults(void);
         float getnotefreq(int note, int keyshift);
 
@@ -83,8 +83,8 @@ class Microtonal
     private:
         int linetotunings(unsigned int nline, const char *line);
         int loadline(FILE *file, char *line);
-            // loads a line from the text file,
-            // ignoring the lines beggining with "!"
+        // loads a line from the text file,
+        // ignoring the lines beggining with "!"
         unsigned char octavesize;
         struct {
             unsigned char type; // 1 for cents or 2 for division
@@ -95,9 +95,9 @@ class Microtonal
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
 
-      unsigned int samplerate;
-      int buffersize;
-      int oscilsize;
+        unsigned int samplerate;
+        int buffersize;
+        int oscilsize;
 };
 
 #endif

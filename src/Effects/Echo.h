@@ -29,7 +29,7 @@
 
 #include "Effects/Effect.h"
 
-class Echo : public Effect
+class Echo:public Effect
 {
     public:
         Echo(bool insertion_, float *efxoutl_, float *efxoutr_);
@@ -67,16 +67,16 @@ class Echo : public Effect
         float lrcross;
         float fb;
         float hidamp;
-        int dl;
-        int dr;
-        int delay;
-        int lrdelay;
+        int   dl;
+        int   dr;
+        int   delay;
+        int   lrdelay;
         boost::shared_array<float> ldelay;
         boost::shared_array<float> rdelay;
         float oldl; // pt. lpf
         float oldr;
-        int kl;
-        int kr;
+        int   kl;
+        int   kr;
         boost::interprocess::interprocess_mutex echomutex;
 };
 

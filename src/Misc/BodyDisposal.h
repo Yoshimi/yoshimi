@@ -29,7 +29,9 @@ using namespace std;
 class BodyDisposal
 {
     public:
-        BodyDisposal() { corpses.clear(); }
+        BodyDisposal() {
+            corpses.clear();
+        }
         ~BodyDisposal() {}
         void addBody(Carcass *body);
         void disposeBodies(void);

@@ -31,7 +31,7 @@ class Presets
 {
     public:
         Presets();
-        virtual ~Presets() { };
+        virtual ~Presets() { }
 
         void copy(const char *name); // <if name==NULL, the clipboard is used
         void paste(int npreset);     // npreset==0 for clipboard
@@ -45,12 +45,12 @@ class Presets
         void setpresettype(const char *type);
 
     private:
-        virtual void add2XML(XMLwrapper *xml) = 0;
+        virtual void add2XML(XMLwrapper *xml)    = 0;
         virtual void getfromXML(XMLwrapper *xml) = 0;
         virtual void defaults(void) = 0;
-        virtual void add2XMLsection(XMLwrapper *xml, int n) { };
-        virtual void getfromXMLsection(XMLwrapper *xml, int n) { };
-        virtual void defaults(int n) { };
+        virtual void add2XMLsection(XMLwrapper *xml, int n) { }
+        virtual void getfromXMLsection(XMLwrapper *xml, int n) { }
+        virtual void defaults(int n) { }
         int nelement;
 };
 

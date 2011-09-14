@@ -34,10 +34,10 @@
 #include "Params/Presets.h"
 #include "Synth/Resonance.h"
 
-class OscilGen : public Presets, public Carcass, private WaveShapeSamples
+class OscilGen:public Presets, public Carcass, private WaveShapeSamples
 {
     public:
-        OscilGen(FFTwrapper *fft_,Resonance *res_);
+        OscilGen(FFTwrapper *fft_, Resonance *res_);
         ~OscilGen();
 
         void prepare();
@@ -61,7 +61,7 @@ class OscilGen : public Presets, public Carcass, private WaveShapeSamples
 
         // Make a new random seed for Amplitude Randomness,
         // should be called every noteon event
-        inline void newrandseed(void) { randseed = (unsigned int)random(); };
+        inline void newrandseed(void) { randseed = (unsigned int)random(); }
 
         // Parameters
 
@@ -198,12 +198,12 @@ class OscilGen : public Presets, public Carcass, private WaveShapeSamples
 
         unsigned int randseed;
 
-        float random_0_1;
+        float   random_0_1;
         int32_t random_result;
         static struct random_data random_buf;
         static char random_state[];
 
-        float harmonic_random_0_1;
+        float   harmonic_random_0_1;
         int32_t harmonic_random_result;
         static struct random_data harmonic_random_buf;
         static char harmonic_random_state[];
@@ -212,8 +212,7 @@ class OscilGen : public Presets, public Carcass, private WaveShapeSamples
 
 inline float OscilGen::numRandom(void)
 {
-    if (!random_r(&random_buf, &random_result))
-    {
+    if(!random_r(&random_buf, &random_result)) {
         random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
         random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
@@ -225,11 +224,12 @@ inline float OscilGen::numRandom(void)
 
 inline float OscilGen::harmonicRandom(void)
 {
-    if (!random_r(&harmonic_random_buf, &harmonic_random_result))
-    {
+    if(!random_r(&harmonic_random_buf, &harmonic_random_result)) {
         harmonic_random_0_1 = (float)harmonic_random_result / (float)INT_MAX;
-        harmonic_random_0_1 = (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
-        harmonic_random_0_1 = (harmonic_random_0_1 < 0.0f) ? 0.0f : harmonic_random_0_1;
+        harmonic_random_0_1 =
+            (harmonic_random_0_1 > 1.0f) ? 1.0f : harmonic_random_0_1;
+        harmonic_random_0_1 =
+            (harmonic_random_0_1 < 0.0f) ? 0.0f : harmonic_random_0_1;
         return harmonic_random_0_1;
     }
     return 0.05f;
@@ -237,7 +237,7 @@ inline float OscilGen::harmonicRandom(void)
 
 inline unsigned int OscilGen::random(void)
 {
-    if (!random_r(&random_buf, &random_result))
+    if(!random_r(&random_buf, &random_result))
         return random_result + INT_MAX / 2;
     return INT_MAX;
 }

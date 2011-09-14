@@ -28,7 +28,7 @@
 #include "Effects/EffectLFO.h"
 #include "Effects/Effect.h"
 
-class DynamicFilter : public Effect
+class DynamicFilter:public Effect
 {
     public:
         DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_);
@@ -40,11 +40,11 @@ class DynamicFilter : public Effect
         unsigned char getpar(int npar);
         void cleanup(void);
 
-    //	void setdryonly();
+        //	void setdryonly();
 
     private:
         // Parametrii DynamicFilter
-        EffectLFO lfo; // lfo-ul DynamicFilter
+        EffectLFO     lfo; // lfo-ul DynamicFilter
         unsigned char Pvolume;
         unsigned char Ppanning;
         unsigned char Pdepth;
@@ -63,8 +63,7 @@ class DynamicFilter : public Effect
         float panning, depth, ampsns, ampsmooth;
 
         Filter *filterl, *filterr;
-        float ms1, ms2, ms3, ms4; // mean squares
+        float   ms1, ms2, ms3, ms4; // mean squares
 };
 
 #endif
-

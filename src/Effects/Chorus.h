@@ -27,11 +27,11 @@
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
-class Chorus : public Effect
+class Chorus:public Effect
 {
     public:
         Chorus(bool insertion_, float *efxoutl_, float *efxoutr_);
-        ~Chorus() { };
+        ~Chorus() { }
 
         void out(float *smpsl, float *smpsr);
         void setpreset(unsigned char npreset);
@@ -49,7 +49,7 @@ class Chorus : public Effect
         unsigned char Plrcross;    // feedback
         unsigned char Pflangemode; // how the LFO is scaled, to result chorus or flange
         unsigned char Poutsub;     // if I wish to substract the output instead of the adding it
-        EffectLFO lfo;             // lfo-ul chorus
+        EffectLFO     lfo;         // lfo-ul chorus
 
 
         // Parameter Controls
@@ -76,14 +76,13 @@ class Chorus : public Effect
 
         float *delayl;
         float *delayr;
-        int maxdelay;
-        int dlk;
-        int drk;
-        int dlhi;
-        int dlhi2;
-        float dllo;
-        float mdel;
+        int    maxdelay;
+        int    dlk;
+        int    drk;
+        int    dlhi;
+        int    dlhi2;
+        float  dllo;
+        float  mdel;
 };
 
 #endif
-

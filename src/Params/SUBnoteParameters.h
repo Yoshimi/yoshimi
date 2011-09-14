@@ -29,7 +29,7 @@
 #include "Params/FilterParams.h"
 #include "Params/Presets.h"
 
-class SUBnoteParameters : public Presets
+class SUBnoteParameters:public Presets
 {
     public:
         SUBnoteParameters();
@@ -41,25 +41,25 @@ class SUBnoteParameters : public Presets
 
         // Amplitude Parametrers
         bool Pstereo; // streo = true, mono = false
-        unsigned char PVolume;
-        unsigned char PPanning;
-        unsigned char PAmpVelocityScaleFunction;
+        unsigned char   PVolume;
+        unsigned char   PPanning;
+        unsigned char   PAmpVelocityScaleFunction;
         EnvelopeParams *AmpEnvelope;
 
         // Frequency Parameters
         unsigned short int PDetune;
         unsigned short int PCoarseDetune;
-        unsigned char PDetuneType;
-        unsigned char PFreqEnvelopeEnabled;
-        EnvelopeParams *FreqEnvelope;
-        unsigned char PBandWidthEnvelopeEnabled;
-        EnvelopeParams *BandWidthEnvelope;
+        unsigned char      PDetuneType;
+        unsigned char      PFreqEnvelopeEnabled;
+        EnvelopeParams    *FreqEnvelope;
+        unsigned char      PBandWidthEnvelopeEnabled;
+        EnvelopeParams    *BandWidthEnvelope;
 
         // Filter Parameters (Global)
-        unsigned char PGlobalFilterEnabled;
-        FilterParams *GlobalFilter;
-        unsigned char PGlobalFilterVelocityScale;
-        unsigned char PGlobalFilterVelocityScaleFunction;
+        unsigned char   PGlobalFilterEnabled;
+        FilterParams   *GlobalFilter;
+        unsigned char   PGlobalFilterVelocityScale;
+        unsigned char   PGlobalFilterVelocityScaleFunction;
         EnvelopeParams *GlobalFilterEnvelope;
 
         // Other Parameters
@@ -95,6 +95,3 @@ class SUBnoteParameters : public Presets
 };
 
 #endif
-
-
-

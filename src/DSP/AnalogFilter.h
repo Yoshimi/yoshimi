@@ -28,7 +28,7 @@
 
 #include "DSP/Filter_.h"
 
-class AnalogFilter : public Filter_
+class AnalogFilter:public Filter_
 {
     public:
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
@@ -54,12 +54,16 @@ class AnalogFilter : public Filter_
           oldx[MAX_FILTER_STAGES + 1],
           oldy[MAX_FILTER_STAGES + 1];
 
-        void singlefilterout(float *smp, fstage &x, fstage &y, float *c, float *d);
+        void singlefilterout(float *smp,
+                             fstage &x,
+                             fstage &y,
+                             float *c,
+                             float *d);
         void computefiltercoefs(void);
         inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
 
-        int type;   // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
-        int stages; // how many times the filter is applied (0->1,1->2,etc.)
+        int   type; // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
+        int   stages; // how many times the filter is applied (0->1,1->2,etc.)
         float freq; // Frequency given in Hz
         float q;    // Q factor (resonance or Q factor)
         float gain; // the gain of the filter (if are shelf/peak) filters
@@ -71,9 +75,9 @@ class AnalogFilter : public Filter_
         float oldc[3], oldd[3]; // old coefficients(used only if some filter paremeters changes very fast, and it needs interpolation)
 
         float xd[3], yd[3]; // used if the filter is applied more times
-        int needsinterpolation, firsttime;
-        int abovenq;    // this is 1 if the frequency is above the nyquist
-        int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
+        int   needsinterpolation, firsttime;
+        int   abovenq;  // this is 1 if the frequency is above the nyquist
+        int   oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
 };
 
 #endif

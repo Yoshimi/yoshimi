@@ -35,43 +35,41 @@ using namespace std;
 #include "Synth/PADnote.h"
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-    float velocity, int portamento_, int midinote, bool besilent) :
-    ready(false),
-    finished_(false),
-    pars(parameters),
-    firsttime(true),
-    released(false),
-    nsample(0),
-    portamento(portamento_),
-    ctl(ctl_)
+                 float velocity, int portamento_, int midinote, bool besilent)
+    :ready(false),
+      finished_(false),
+      pars(parameters),
+      firsttime(true),
+      released(false),
+      nsample(0),
+      portamento(portamento_),
+      ctl(ctl_)
 
 {
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
     Legato.fade.length = lrintf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
-    if (Legato.fade.length < 1)
+    if(Legato.fade.length < 1)
         Legato.fade.length = 1; // (if something's fishy)
-    Legato.fade.step = (1.0f / Legato.fade.length);
-    Legato.decounter = -10;
+    Legato.fade.step  = (1.0f / Legato.fade.length);
+    Legato.decounter  = -10;
     Legato.param.freq = freq;
-    Legato.param.vel = velocity;
+    Legato.param.vel  = velocity;
     Legato.param.portamento = portamento_;
-    Legato.param.midinote = midinote;
+    Legato.param.midinote   = midinote;
     Legato.silent = besilent;
 
     this->velocity = velocity;
 
-    if (pars->Pfixedfreq == 0)
+    if(pars->Pfixedfreq == 0)
         basefreq = freq;
-    else
-    {
+    else {
         basefreq = 440.0f;
         int fixedfreqET = pars->PfixedfreqET;
-        if (fixedfreqET != 0)
-        {   // if the frequency varies according the keyboard note
+        if(fixedfreqET != 0) { // if the frequency varies according the keyboard note
             float tmp = (midinote - 69.0f) / 12.0f
-                              * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
-            if (fixedfreqET <= 64)
+                        * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
+            if(fixedfreqET <= 64)
                 basefreq *= powf(2.0f, tmp);
             else
                 basefreq *= powf(3.0f, tmp);
@@ -79,31 +77,31 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     }
 
     realfreq = basefreq;
-    NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
+    NoteGlobalPar.Detune = getDetune(pars->PDetuneType,
+                                     pars->PCoarseDetune,
+                                     pars->PDetune);
 
     // find out the closest note
     float logfreq = logf(basefreq * powf(2.0f, NoteGlobalPar.Detune / 1200.0f));
     float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001f));
-    for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
-    {
-        if (pars->sample[i].smp == NULL)
+    for(int i = 1; i < PAD_MAX_SAMPLES; ++i) {
+        if(pars->sample[i].smp == NULL)
             break;
         float dist = fabsf(logfreq - logf(pars->sample[i].basefreq + 0.0001f));
 //	printf("(mindist=%g) %i %g                  %g\n",mindist,i,dist,pars->sample[i].basefreq);
 
-        if (dist < mindist)
-        {
+        if(dist < mindist) {
             nsample = i;
             mindist = dist;
         }
     }
 
     int size = pars->sample[nsample].size;
-    if (size == 0)
+    if(size == 0)
         size = 1;
 
     poshi_l = (int)(synth->numRandom() * (size - 1));
-    if (pars->PStereo != 0)
+    if(pars->PStereo != 0)
         poshi_r = (poshi_l + size / 2) % size;
     else
         poshi_r = poshi_l;
@@ -111,44 +109,45 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     tmpwave = new float [synth->buffersize];
 
-    if (pars->PPanning == 0)
+    if(pars->PPanning == 0)
         NoteGlobalPar.Panning = synth->numRandom();
     else
         NoteGlobalPar.Panning = pars->PPanning / 128.0f;
 
     NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalFilter->getfreq() + // center freq
-            pars->PFilterVelocityScale / 127.0f * 6.0f
-            * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
+        pars->GlobalFilter->getfreq()   // center freq
+        + pars->PFilterVelocityScale / 127.0f * 6.0f
+        * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1);     // velocity sensing
 
-    if (pars->PPunchStrength != 0)
-    {
+    if(pars->PPunchStrength != 0) {
         NoteGlobalPar.Punch.Enabled = 1;
         NoteGlobalPar.Punch.t = 1.0f; // start from 1.0 and to 0.0
         NoteGlobalPar.Punch.initialvalue =
             (powf(10.0f, 1.5f * pars->PPunchStrength / 127.0f) - 1.0f)
-                    * velF(velocity, pars->PPunchVelocitySensing);
-        float time = powf(10.0f, 3.0f * pars->PPunchTime / 127.0f) / 10000.0f; // 0.1 .. 100 ms
+            * velF(velocity, pars->PPunchVelocitySensing);
+        float time =
+            powf(10.0f, 3.0f * pars->PPunchTime / 127.0f) / 10000.0f;          // 0.1 .. 100 ms
         float stretch = powf(440.0f / freq, pars->PPunchStretch / 64.0f);
         NoteGlobalPar.Punch.dt = 1.0f / (time * synth->samplerate_f * stretch);
-    } else
+    }
+    else
         NoteGlobalPar.Punch.Enabled = 0;
 
     NoteGlobalPar.FreqEnvelope = new Envelope(pars->FreqEnvelope, basefreq);
-    NoteGlobalPar.FreqLfo = new LFO(pars->FreqLfo, basefreq);
+    NoteGlobalPar.FreqLfo      = new LFO(pars->FreqLfo, basefreq);
 
     NoteGlobalPar.AmpEnvelope = new Envelope(pars->AmpEnvelope, basefreq);
-    NoteGlobalPar.AmpLfo = new LFO(pars->AmpLfo, basefreq);
+    NoteGlobalPar.AmpLfo      = new LFO(pars->AmpLfo, basefreq);
 
     NoteGlobalPar.Volume =
         4.0f * powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)) //-60 dB .. 0 dB
         * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
 
     NoteGlobalPar.AmpEnvelope->envout_dB(); // discard the first envelope output
-    globaloldamplitude =
+    globaloldamplitude     =
         globalnewamplitude = NoteGlobalPar.Volume
-        * NoteGlobalPar.AmpEnvelope->envout_dB()
-        * NoteGlobalPar.AmpLfo->amplfoout();
+                             * NoteGlobalPar.AmpEnvelope->envout_dB()
+                             * NoteGlobalPar.AmpLfo->amplfoout();
 
     NoteGlobalPar.GlobalFilterL =
         new Filter(pars->GlobalFilter);
@@ -156,14 +155,14 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         new Filter(pars->GlobalFilter);
 
     NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope, basefreq);
-    NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo, basefreq);
+    NoteGlobalPar.FilterLfo      = new LFO(pars->FilterLfo, basefreq);
     NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getfreqtracking(basefreq);
+    NoteGlobalPar.FilterFreqTracking = pars->GlobalFilter->getfreqtracking(
+        basefreq);
 
     ready = true; ///sa il pun pe asta doar cand e chiar gata
 
-    if (parameters->sample[nsample].smp == NULL)
-    {
+    if(parameters->sample[nsample].smp == NULL) {
         finished_ = true;
         return;
     }
@@ -181,45 +180,42 @@ void PADnote::PADlegatonote(float freq, float velocity,
     // Controller *ctl_=ctl; (an original comment)
 
     // Manage legato stuff
-    if (externcall)
+    if(externcall)
         Legato.msg = LM_Norm;
-    if (Legato.msg != LM_CatchUp)
-    {
-        Legato.lastfreq = Legato.param.freq;
+    if(Legato.msg != LM_CatchUp) {
+        Legato.lastfreq   = Legato.param.freq;
         Legato.param.freq = freq;
-        Legato.param.vel = velocity;
+        Legato.param.vel  = velocity;
         Legato.param.portamento = portamento_;
-        Legato.param.midinote = midinote;
-        if (Legato.msg == LM_Norm)
-        {
-            if (Legato.silent)
-            {
+        Legato.param.midinote   = midinote;
+        if(Legato.msg == LM_Norm) {
+            if(Legato.silent) {
                 Legato.fade.m = 0.0f;
-                Legato.msg = LM_FadeIn;
-            } else {
+                Legato.msg    = LM_FadeIn;
+            }
+            else {
                 Legato.fade.m = 1.0f;
-                Legato.msg = LM_FadeOut;
+                Legato.msg    = LM_FadeOut;
                 return;
             }
         }
-        if (Legato.msg == LM_ToNorm)
+        if(Legato.msg == LM_ToNorm)
             Legato.msg = LM_Norm;
     }
 
-    portamento = portamento_;
+    portamento     = portamento_;
     this->velocity = velocity;
-    finished_ = false;
+    finished_      = false;
 
-    if (pars->Pfixedfreq == 0)
+    if(pars->Pfixedfreq == 0)
         basefreq = freq;
     else {
         basefreq = 440.0f;
         int fixedfreqET = pars->PfixedfreqET;
-        if (fixedfreqET != 0)
-        {   // if the frequency varies according the keyboard note
+        if(fixedfreqET != 0) { // if the frequency varies according the keyboard note
             float tmp = (midinote - 69.0f) / 12.0f
-                               * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
-            if (fixedfreqET <= 64)
+                        * (powf(2.0f, (fixedfreqET - 1) / 63.0f) - 1.0f);
+            if(fixedfreqET <= 64)
                 basefreq *= powf(2.0f, tmp);
             else
                 basefreq *= powf(3.0f, tmp);
@@ -235,24 +231,22 @@ void PADnote::PADlegatonote(float freq, float velocity,
     float logfreq = logf(basefreq * powf(2.0f, NoteGlobalPar.Detune / 1200.0f));
     float mindist = fabsf(logfreq - logf(pars->sample[0].basefreq + 0.0001f));
     nsample = 0;
-    for (int i = 1; i < PAD_MAX_SAMPLES; ++i)
-    {
-        if (pars->sample[i].smp == NULL)
+    for(int i = 1; i < PAD_MAX_SAMPLES; ++i) {
+        if(pars->sample[i].smp == NULL)
             break;
         float dist = fabsf(logfreq - logf(pars->sample[i].basefreq + 0.0001f));
 
-        if (dist < mindist)
-        {
+        if(dist < mindist) {
             nsample = i;
             mindist = dist;
         }
     }
 
     int size = pars->sample[nsample].size;
-    if (size == 0)
+    if(size == 0)
         size = 1;
 
-    if (pars->PPanning == 0)
+    if(pars->PPanning == 0)
         NoteGlobalPar.Panning = synth->numRandom();
     else
         NoteGlobalPar.Panning = pars->PPanning / 128.0f;
@@ -267,16 +261,16 @@ void PADnote::PADlegatonote(float freq, float velocity,
         * velF(velocity, pars->PAmpVelocityScaleFunction); // velocity sensing
 
     NoteGlobalPar.AmpEnvelope->envout_dB(); // discard the first envelope output
-    globaloldamplitude =
+    globaloldamplitude     =
         globalnewamplitude =
             NoteGlobalPar.Volume * NoteGlobalPar.AmpEnvelope->envout_dB()
-                * NoteGlobalPar.AmpLfo->amplfoout();
+            * NoteGlobalPar.AmpLfo->amplfoout();
 
     NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+    NoteGlobalPar.FilterFreqTracking = pars->GlobalFilter->getfreqtracking(
+        basefreq);
 
-    if (parameters->sample[nsample].smp == NULL)
-    {
+    if(parameters->sample[nsample].smp == NULL) {
         finished_ = true;
         return;
     }
@@ -300,20 +294,19 @@ PADnote::~PADnote()
 inline void PADnote::fadein(float *smps)
 {
     int zerocrossings = 0;
-    for (int i = 1; i < synth->buffersize; ++i)
-        if (smps[i - 1] < 0.0f && smps[i] > 0.0f)
+    for(int i = 1; i < synth->buffersize; ++i)
+        if((smps[i - 1] < 0.0f) && (smps[i] > 0.0f))
             zerocrossings++; // this is only the possitive crossings
 
     float tmp = (synth->buffersize_f - 1.0f) / (zerocrossings + 1) / 3.0f;
-    if (tmp < 8.0f)
+    if(tmp < 8.0f)
         tmp = 8.0f;
 
     // F2I(tmp, n); // how many samples is the fade-in
     int n = (tmp > 0.0f) ? lrintf(tmp) : lrintf(tmp - 1.0f);
-    if (n > synth->buffersize)
+    if(n > synth->buffersize)
         n = synth->buffersize;
-    for (int i = 0; i < n; ++i)
-    {   // fade-in
+    for(int i = 0; i < n; ++i) { // fade-in
         float tmp = 0.5f - cosf((float)i / (float) n * PI) * 0.5f;
         smps[i] *= tmp;
     }
@@ -322,38 +315,38 @@ inline void PADnote::fadein(float *smps)
 
 void PADnote::computecurrentparameters()
 {
-    float globalpitch,globalfilterpitch;
+    float globalpitch, globalfilterpitch;
     globalpitch =
         0.01f * (NoteGlobalPar.FreqEnvelope->envout()
-        + NoteGlobalPar.FreqLfo->lfoout() * ctl->modwheel.relmod + NoteGlobalPar.Detune);
+                 + NoteGlobalPar.FreqLfo->lfoout() * ctl->modwheel.relmod
+                 + NoteGlobalPar.Detune);
     globaloldamplitude = globalnewamplitude;
     globalnewamplitude =
         NoteGlobalPar.Volume * NoteGlobalPar.AmpEnvelope->envout_dB()
         * NoteGlobalPar.AmpLfo->amplfoout();
 
     globalfilterpitch =
-        NoteGlobalPar.FilterEnvelope->envout() + NoteGlobalPar.FilterLfo->lfoout()
+        NoteGlobalPar.FilterEnvelope->envout()
+        + NoteGlobalPar.FilterLfo->lfoout()
         + NoteGlobalPar.FilterCenterPitch;
 
     float tmpfilterfreq =
-        globalfilterpitch+ctl->filtercutoff.relfreq + NoteGlobalPar.FilterFreqTracking;
+        globalfilterpitch + ctl->filtercutoff.relfreq
+        + NoteGlobalPar.FilterFreqTracking;
 
     tmpfilterfreq =
         NoteGlobalPar.GlobalFilterL->getrealfreq(tmpfilterfreq);
 
     float globalfilterq = NoteGlobalPar.FilterQ * ctl->filterq.relq;
-    NoteGlobalPar.GlobalFilterL->setfreq_and_q(tmpfilterfreq,globalfilterq);
-    NoteGlobalPar.GlobalFilterR->setfreq_and_q(tmpfilterfreq,globalfilterq);
+    NoteGlobalPar.GlobalFilterL->setfreq_and_q(tmpfilterfreq, globalfilterq);
+    NoteGlobalPar.GlobalFilterR->setfreq_and_q(tmpfilterfreq, globalfilterq);
 
     // compute the portamento, if it is used by this note
     float portamentofreqrap = 1.0f;
-    if (portamento != 0)
-    {   // this voice use portamento
+    if(portamento != 0) { // this voice use portamento
         portamentofreqrap = ctl->portamento.freqrap;
-        if (ctl->portamento.used == 0)
-        {   // the portamento has finished
+        if(ctl->portamento.used == 0)   // the portamento has finished
             portamento = 0; // this note is no longer "portamented"
-        }
     }
 
     realfreq = basefreq * portamentofreqrap * powf(2.0f, globalpitch / 12.0f)
@@ -364,26 +357,23 @@ void PADnote::computecurrentparameters()
 int PADnote::Compute_Linear(float *outl, float *outr, int freqhi, float freqlo)
 {
     float *smps = pars->sample[nsample].smp;
-    if (smps == NULL)
-    {
+    if(smps == NULL) {
         finished_ = true;
         return 1;
     }
     int size = pars->sample[nsample].size;
-    for (int i = 0; i < synth->buffersize; ++i)
-    {
+    for(int i = 0; i < synth->buffersize; ++i) {
         poshi_l += freqhi;
         poshi_r += freqhi;
-        poslo += freqlo;
-        if (poslo >= 1.0f)
-        {
+        poslo   += freqlo;
+        if(poslo >= 1.0f) {
             poshi_l += 1;
             poshi_r += 1;
-            poslo -= 1.0f;
+            poslo   -= 1.0f;
         }
-        if (poshi_l >= size)
+        if(poshi_l >= size)
             poshi_l %= size;
-        if (poshi_r >= size)
+        if(poshi_r >= size)
             poshi_r %= size;
 
         outl[i] = smps[poshi_l] * (1.0f - poslo) + smps[poshi_l + 1] * poslo;
@@ -395,46 +385,43 @@ int PADnote::Compute_Linear(float *outl, float *outr, int freqhi, float freqlo)
 int PADnote::Compute_Cubic(float *outl, float *outr, int freqhi, float freqlo)
 {
     float *smps = pars->sample[nsample].smp;
-    if (smps == NULL)
-    {
+    if(smps == NULL) {
         finished_ = true;
         return 1;
     }
-    int size = pars->sample[nsample].size;
+    int   size = pars->sample[nsample].size;
     float xm1, x0, x1, x2, a, b, c;
-    for (int i = 0; i < synth->buffersize; ++i)
-    {
+    for(int i = 0; i < synth->buffersize; ++i) {
         poshi_l += freqhi;
         poshi_r += freqhi;
-        poslo += freqlo;
-        if (poslo >= 1.0f)
-        {
+        poslo   += freqlo;
+        if(poslo >= 1.0f) {
             poshi_l += 1;
             poshi_r += 1;
-            poslo -= 1.0f;
+            poslo   -= 1.0f;
         }
-        if (poshi_l >= size)
+        if(poshi_l >= size)
             poshi_l %= size;
-        if (poshi_r >= size)
+        if(poshi_r >= size)
             poshi_r %= size;
 
         // left
-        xm1 = smps[poshi_l];
-        x0 = smps[poshi_l + 1];
-        x1 = smps[poshi_l + 2];
-        x2 = smps[poshi_l + 3];
-        a = (3.0f * (x0 - x1) - xm1 + x2) * 0.5f;
-        b = 2.0f * x1 + xm1 - (5.0f * x0 + x2) * 0.5f;
-        c = (x1 - xm1) * 0.5f;
+        xm1     = smps[poshi_l];
+        x0      = smps[poshi_l + 1];
+        x1      = smps[poshi_l + 2];
+        x2      = smps[poshi_l + 3];
+        a       = (3.0f * (x0 - x1) - xm1 + x2) * 0.5f;
+        b       = 2.0f * x1 + xm1 - (5.0f * x0 + x2) * 0.5f;
+        c       = (x1 - xm1) * 0.5f;
         outl[i] = (((a * poslo) + b) * poslo + c) * poslo + x0;
         // right
-        xm1 = smps[poshi_r];
-        x0 = smps[poshi_r + 1];
-        x1 = smps[poshi_r + 2];
-        x2 = smps[poshi_r + 3];
-        a = (3.0f * (x0 - x1) - xm1 + x2) * 0.5f;
-        b = 2.0f * x1 + xm1 - (5.0f * x0 + x2) * 0.5f;
-        c = (x1 - xm1) * 0.5f;
+        xm1     = smps[poshi_r];
+        x0      = smps[poshi_r + 1];
+        x1      = smps[poshi_r + 2];
+        x2      = smps[poshi_r + 3];
+        a       = (3.0f * (x0 - x1) - xm1 + x2) * 0.5f;
+        b       = 2.0f * x1 + xm1 - (5.0f * x0 + x2) * 0.5f;
+        c       = (x1 - xm1) * 0.5f;
         outr[i] = (((a * poslo) + b) * poslo + c) * poslo + x0;
     }
     return 1;
@@ -445,8 +432,7 @@ int PADnote::noteout(float *outl, float *outr)
 {
     computecurrentparameters();
     float *smps = pars->sample[nsample].smp;
-    if (smps == NULL)
-    {
+    if(smps == NULL) {
         memset(outl, 0, synth->buffersize * sizeof(float));
         memset(outr, 0, synth->buffersize * sizeof(float));
         return 1;
@@ -454,16 +440,15 @@ int PADnote::noteout(float *outl, float *outr)
     float smpfreq = pars->sample[nsample].basefreq;
 
     float freqrap = realfreq / smpfreq;
-    int freqhi = lrintf(floorf(freqrap));
-    float freqlo = freqrap - floorf(freqrap);
+    int   freqhi  = lrintf(floorf(freqrap));
+    float freqlo  = freqrap - floorf(freqrap);
 
-    if (Runtime.Interpolation)
+    if(Runtime.Interpolation)
         Compute_Cubic(outl, outr, freqhi, freqlo);
     else
         Compute_Linear(outl, outr, freqhi, freqlo);
 
-    if (firsttime)
-    {
+    if(firsttime) {
         fadein(outl);
         fadein(outr);
         firsttime = false;
@@ -473,133 +458,119 @@ int PADnote::noteout(float *outl, float *outr)
     NoteGlobalPar.GlobalFilterR->filterout(outr);
 
     // Apply the punch
-    if (NoteGlobalPar.Punch.Enabled != 0)
-    {
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
+    if(NoteGlobalPar.Punch.Enabled != 0)
+        for(int i = 0; i < synth->buffersize; ++i) {
             float punchamp =
                 NoteGlobalPar.Punch.initialvalue * NoteGlobalPar.Punch.t + 1.0;
             outl[i] *= punchamp;
             outr[i] *= punchamp;
             NoteGlobalPar.Punch.t -= NoteGlobalPar.Punch.dt;
-            if (NoteGlobalPar.Punch.t < 0.0f)
-            {
+            if(NoteGlobalPar.Punch.t < 0.0f) {
                 NoteGlobalPar.Punch.Enabled = 0;
                 break;
             }
         }
-    }
 
-    if (aboveAmplitudeThreshold(globaloldamplitude,globalnewamplitude))
-    {
+    if(aboveAmplitudeThreshold(globaloldamplitude, globalnewamplitude))
         // Amplitude Interpolation
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
+        for(int i = 0; i < synth->buffersize; ++i) {
             float tmpvol = interpolateAmplitude(globaloldamplitude,
                                                 globalnewamplitude, i,
                                                 synth->buffersize);
             outl[i] *= tmpvol * (1.0f - NoteGlobalPar.Panning);
             outr[i] *= tmpvol * NoteGlobalPar.Panning;
         }
-    } else {
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
+    else
+        for(int i = 0; i < synth->buffersize; ++i) {
             outl[i] *= globalnewamplitude * (1.0 - NoteGlobalPar.Panning);
             outr[i] *= globalnewamplitude * NoteGlobalPar.Panning;
         }
-    }
 
     // Apply legato-specific sound signal modifications
-    if (Legato.silent) { // Silencer
-        if (Legato.msg != LM_FadeIn)
-        {
+    if(Legato.silent)    // Silencer
+        if(Legato.msg != LM_FadeIn) {
             memset(outl, 0, synth->buffersize * sizeof(float));
             memset(outr, 0, synth->buffersize * sizeof(float));
         }
-    }
-    switch (Legato.msg)
-    {
-        case LM_CatchUp : // Continue the catch-up...
-            if (Legato.decounter == -10)
+    switch(Legato.msg) {
+        case LM_CatchUp:  // Continue the catch-up...
+            if(Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (int i = 0; i < synth->buffersize; ++i)
-            {   //Yea, could be done without the loop...
+            for(int i = 0; i < synth->buffersize; ++i) { //Yea, could be done without the loop...
                 Legato.decounter--;
-                if (Legato.decounter < 1)
-                {
+                if(Legato.decounter < 1) {
                     // Catching-up done, we can finally set
                     // the note to the actual parameters.
                     Legato.decounter = -10;
                     Legato.msg = LM_ToNorm;
-                    PADlegatonote(Legato.param.freq, Legato.param.vel,
-                                  Legato.param.portamento, Legato.param.midinote,
+                    PADlegatonote(Legato.param.freq,
+                                  Legato.param.vel,
+                                  Legato.param.portamento,
+                                  Legato.param.midinote,
                                   false);
                     break;
                 }
             }
             break;
-        case LM_FadeIn : // Fade-in
-            if (Legato.decounter == -10)
+        case LM_FadeIn:  // Fade-in
+            if(Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
             Legato.silent = false;
-            for (int i = 0; i < synth->buffersize; ++i)
-            {
+            for(int i = 0; i < synth->buffersize; ++i) {
                 Legato.decounter--;
-                if (Legato.decounter < 1)
-                {
+                if(Legato.decounter < 1) {
                     Legato.decounter = -10;
                     Legato.msg = LM_Norm;
                     break;
                 }
                 Legato.fade.m += Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
+                Legato.fade.m  = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }
             break;
-        case LM_FadeOut : // Fade-out, then set the catch-up
-            if (Legato.decounter == -10)
+        case LM_FadeOut:  // Fade-out, then set the catch-up
+            if(Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (int i = 0; i < synth->buffersize; ++i)
-            {
+            for(int i = 0; i < synth->buffersize; ++i) {
                 Legato.decounter--;
-                if (Legato.decounter < 1)
-                {
-                    for (int j = i; j < synth->buffersize; ++j)
+                if(Legato.decounter < 1) {
+                    for(int j = i; j < synth->buffersize; ++j)
                         outl[j] = outr[j] = 0.0f;
                     Legato.decounter = -10;
-                    Legato.silent = true;
+                    Legato.silent    = true;
                     // Fading-out done, now set the catch-up :
                     Legato.decounter = Legato.fade.length;
                     Legato.msg = LM_CatchUp;
                     float catchupfreq =
-                        Legato.param.freq * (Legato.param.freq / Legato.lastfreq);
-                        // This freq should make this now silent note to catch-up
-                        // (or should I say resync ?) with the heard note for
-                        // the same length it stayed at the previous freq during
-                        // the fadeout.
-                    PADlegatonote(catchupfreq, Legato.param.vel,
-                                  Legato.param.portamento, Legato.param.midinote,
+                        Legato.param.freq
+                        * (Legato.param.freq / Legato.lastfreq);
+                    // This freq should make this now silent note to catch-up
+                    // (or should I say resync ?) with the heard note for
+                    // the same length it stayed at the previous freq during
+                    // the fadeout.
+                    PADlegatonote(catchupfreq,
+                                  Legato.param.vel,
+                                  Legato.param.portamento,
+                                  Legato.param.midinote,
                                   false);
                     break;
                 }
                 Legato.fade.m -= Legato.fade.step;
-                Legato.fade.m = Legato.fade.m;
+                Legato.fade.m  = Legato.fade.m;
                 outl[i] *= Legato.fade.m;
                 outr[i] *= Legato.fade.m;
             }
             break;
-        default :
+        default:
             break;
     }
 
 
     // Check if the global amplitude is finished.
     // If it does, disable the note
-    if (NoteGlobalPar.AmpEnvelope->finished())
-    {
-        for (int i = 0 ; i < synth->buffersize; ++i)
-        {   // fade-out
+    if(NoteGlobalPar.AmpEnvelope->finished()) {
+        for(int i = 0; i < synth->buffersize; ++i) { // fade-out
             float tmp = 1.0f - (float)i / synth->buffersize_f;
             outl[i] *= tmp;
             outr[i] *= tmp;

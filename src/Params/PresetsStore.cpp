@@ -31,8 +31,8 @@
 
 PresetsStore presetsstore;
 
-PresetsStore::PresetsStore() :
-    preset_extension(".xpz")
+PresetsStore::PresetsStore()
+    :preset_extension(".xpz")
 {
 //    clipboard.data.clear();
 //    clipboard.type.clear();
@@ -59,8 +59,7 @@ void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
 
 bool PresetsStore::pasteclipboard(XMLwrapper *xml)
 {
-    if (clipboard.data.size())
-    {
+    if(clipboard.data.size()) {
         xml->putXMLdata(clipboard.data);
         return true;
     }
@@ -70,16 +69,15 @@ bool PresetsStore::pasteclipboard(XMLwrapper *xml)
 bool PresetsStore::checkclipboardtype(string type)
 {
     // makes LFO's compatible
-    if (type.find("Plfo") != string::npos
-        && clipboard.type.find("Plfo") != string::npos)
+    if((type.find("Plfo") != string::npos)
+       && (clipboard.type.find("Plfo") != string::npos))
         return true;
-    return (!type.compare(clipboard.type));
+    return !type.compare(clipboard.type);
 }
 
 void PresetsStore::clearpresets(void)
 {
-    for (int i = 0; i < MAX_PRESETS; ++i)
-    {
+    for(int i = 0; i < MAX_PRESETS; ++i) {
         presets[i].file.clear();
         presets[i].name.clear();
     }
@@ -167,10 +165,10 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 
 bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 {
-    if (npreset >= MAX_PRESETS || npreset < 1)
+    if((npreset >= MAX_PRESETS) || (npreset < 1))
         return false;
     npreset--;
-    if (presets[npreset].file.empty())
+    if(presets[npreset].file.empty())
         return false;
     return xml->loadXMLfile(presets[npreset].file);
 }
@@ -178,9 +176,9 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 
 void PresetsStore::deletepreset(int npreset)
 {
-    if (npreset >= MAX_PRESETS || npreset < 1)
+    if((npreset >= MAX_PRESETS) || (npreset < 1))
         return;
     npreset--;
-    if (!presets[npreset].file.empty())
+    if(!presets[npreset].file.empty())
         remove(presets[npreset].file.c_str());
 }

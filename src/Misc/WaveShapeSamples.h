@@ -29,153 +29,150 @@ class WaveShapeSamples
     public:
         WaveShapeSamples() { }
         ~WaveShapeSamples() { }
-        void waveShapeSmps(int n, float *smps, unsigned char type, unsigned char drive);
+        void waveShapeSmps(int n,
+                           float *smps,
+                           unsigned char type,
+                           unsigned char drive);
 };
 
 // Waveshape, used by OscilGen::waveshape and Distorsion::process
-inline void WaveShapeSamples::waveShapeSmps(int n, float *smps, unsigned char type, unsigned char drive)
+inline void WaveShapeSamples::waveShapeSmps(int n,
+                                            float *smps,
+                                            unsigned char type,
+                                            unsigned char drive)
 {
-    int i;
+    int   i;
     float ws = drive / 127.0f;
     float tmpv;
 
-    switch (type)
-    {
+    switch(type) {
         case 1:
-            ws = powf( 10.0f, ws * ws * 3.0f) - 1.0f + 0.001f; // Arctangent
-            for (i = 0; i < n; ++i)
+            ws = powf(10.0f, ws * ws * 3.0f) - 1.0f + 0.001f;  // Arctangent
+            for(i = 0; i < n; ++i)
                 smps[i] = atanf(smps[i] * ws) / atanf(ws);
             break;
         case 2:
-            ws = ws * ws * 32.0f + 0.0001f; // Asymmetric
+            ws   = ws * ws * 32.0f + 0.0001f; // Asymmetric
             tmpv = (ws < 1.0f) ? sinf(ws) + 0.1f : 1.1f;
-            for (i = 0; i < n; ++i)
+            for(i = 0; i < n; ++i)
                 smps[i] = sinf(smps[i] * (0.1f + ws - ws * smps[i])) / tmpv;
             break;
         case 3:
             ws = ws * ws * ws * 20.0f + 0.0001f; // Pow
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 smps[i] *= ws;
-                if (fabsf(smps[i]) < 1.0f)
-                {
+                if(fabsf(smps[i]) < 1.0f) {
                     smps[i] = (smps[i] - powf(smps[i], 3.0f)) * 3.0f;
-                    if (ws < 1.0f)
+                    if(ws < 1.0f)
                         smps[i] /= ws;
-                } else
+                }
+                else
                     smps[i] = 0.0f;
             }
             break;
         case 4:
-            ws = ws * ws * ws * 32.0f + 0.0001f; // Sine
+            ws   = ws * ws * ws * 32.0f + 0.0001f; // Sine
             tmpv = (ws < 1.57f) ? sinf(ws) : 1.0f;
-            for (i = 0; i < n; ++i)
+            for(i = 0; i < n; ++i)
                 smps[i] = sinf(smps[i] * ws) / tmpv;
             break;
         case 5:
             ws = ws * ws + 0.000001f; // Quantisize
-            for (i = 0; i < n; ++i)
+            for(i = 0; i < n; ++i)
                 smps[i] = floorf(smps[i] / ws + 0.5f) * ws;
             break;
         case 6:
-            ws = ws * ws * ws * 32.0f + 0.0001f; // Zigzag
+            ws   = ws * ws * ws * 32.0f + 0.0001f; // Zigzag
             tmpv = (ws < 1.0f) ? sinf(ws) : 1.0f;
-            for (i = 0; i < n; ++i)
+            for(i = 0; i < n; ++i)
                 smps[i] = asinf(sinf(smps[i] * ws)) / tmpv;
             break;
         case 7:
             ws = powf(2.0f, -ws * ws * 8.0f); // Limiter
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i];
-                if (fabsf(tmp) > ws)
-                {
+                if(fabsf(tmp) > ws)
                     smps[i] = (tmp >= 0.0f) ? 1.0f : -1.0f;
-                }
                 else
                     smps[i] /= ws;
             }
             break;
         case 8:
             ws = powf(2.0f, -ws * ws * 8.0f); // Upper Limiter
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i];
-                if (tmp > ws)
+                if(tmp > ws)
                     smps[i] = ws;
                 smps[i] *= 2.0f;
             }
             break;
         case 9:
             ws = powf(2.0f, -ws * ws * 8.0f); // Lower Limiter
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i];
-                if (tmp < -ws)
+                if(tmp < -ws)
                     smps[i] = -ws;
                 smps[i] *= 2.0f;
             }
             break;
         case 10:
             ws = (powf(2.0f, ws * 6.0f) - 1.0f) / powf(2.0f, 6.0f); // Inverse Limiter
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i];
-                if (fabsf(tmp) > ws)
-                {
+                if(fabsf(tmp) > ws)
                     smps[i] = (tmp >= 0.0f) ? (tmp - ws) : (tmp + ws);
-                }
                 else
                     smps[i] = 0.0f;
             }
             break;
         case 11:
             ws = powf(5.0f, ws * ws * 1.0f) - 1.0f; // Clip
-            for (i = 0; i < n; ++i)
-                smps[i] = smps[i] * (ws + 0.5f) * 0.9999f - floorf(0.5f + smps[i] * (ws + 0.5f) * 0.9999f);
+            for(i = 0; i < n; ++i)
+                smps[i] = smps[i]
+                          * (ws + 0.5f) * 0.9999f - floorf(
+                    0.5f + smps[i] * (ws + 0.5f) * 0.9999f);
             break;
         case 12:
-            ws = ws * ws * ws * 30.0f + 0.001f; // Asym2
+            ws   = ws * ws * ws * 30.0f + 0.001f; // Asym2
             tmpv = (ws < 0.3f) ? ws : 1.0f;
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i] * ws;
-                if (tmp > -2.0f && tmp < 1.0f)
+                if((tmp > -2.0f) && (tmp < 1.0f))
                     smps[i] = tmp * (1.0f - tmp) * (tmp + 2.0f) / tmpv;
                 else
                     smps[i] = 0.0f;
             }
             break;
         case 13:
-            ws = ws * ws * ws * 32.0f + 0.0001f; // Pow2
+            ws   = ws * ws * ws * 32.0f + 0.0001f; // Pow2
             tmpv = (ws < 1.0f) ? (ws * (1.0f + ws) / 2.0f) : 1.0f;
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i] * ws;
-                if (tmp >- 1.0 && tmp < 1.618034f)
+                if((tmp > -1.0) && (tmp < 1.618034f))
                     smps[i] = tmp * (1.0f - tmp) / tmpv;
-                else if (tmp > 0.0f)
+                else
+                if(tmp > 0.0f)
                     smps[i] = -1.0f;
                 else
                     smps[i] = -2.0f;
             }
             break;
         case 14:
-            ws = powf(ws, 5.0f) * 80.0f + 0.0001f; // sigmoid
+            ws   = powf(ws, 5.0f) * 80.0f + 0.0001f; // sigmoid
             tmpv = (ws > 10.0f) ? 0.5f : 0.5f - 1.0f / (expf(ws) + 1.0f);
-            for (i = 0; i < n; ++i)
-            {
+            for(i = 0; i < n; ++i) {
                 float tmp = smps[i] * ws;
-                if (tmp < -10.0f)
+                if(tmp < -10.0f)
                     tmp = -10.0f;
-                else if (tmp > 10.0f)
+                else
+                if(tmp > 10.0f)
                     tmp = 10.0f;
-                tmp = 0.5f - 1.0f / (expf(tmp) + 1.0f);
+                tmp     = 0.5f - 1.0f / (expf(tmp) + 1.0f);
                 smps[i] = tmp / tmpv;
             }
             break;
-        // todo update to Distorsion::changepar (Ptype max) if there is added
-        // more waveshapings functions
+            // todo update to Distorsion::changepar (Ptype max) if there is added
+            // more waveshapings functions
     }
 }
 

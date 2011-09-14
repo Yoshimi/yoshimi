@@ -24,16 +24,15 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
 
-EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
+EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_)
+    :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
     effect_type = eq;
-    for (int i = 0; i < MAX_EQ_BANDS; ++i)
-    {
-        filter[i].Ptype = 0;
-        filter[i].Pfreq = 64;
-        filter[i].Pgain = 64;
-        filter[i].Pq = 64;
+    for(int i = 0; i < MAX_EQ_BANDS; ++i) {
+        filter[i].Ptype   = 0;
+        filter[i].Pfreq   = 64;
+        filter[i].Pgain   = 64;
+        filter[i].Pq      = 64;
         filter[i].Pstages = 0;
         filter[i].l = new AnalogFilter(6, 1000.0f, 1.0f, 0);
         filter[i].r = new AnalogFilter(6, 1000.0f, 1.0f, 0);
@@ -48,8 +47,7 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
 // Cleanup the effect
 void EQ::cleanup(void)
 {
-    for (int i = 0; i < MAX_EQ_BANDS; ++i)
-    {
+    for(int i = 0; i < MAX_EQ_BANDS; ++i) {
         filter[i].l->cleanup();
         filter[i].r->cleanup();
     }
@@ -60,21 +58,17 @@ void EQ::out(float *smpsl, float *smpsr)
 {
     memcpy(efxoutl, smpsl, synth->bufferbytes);
     memcpy(efxoutr, smpsr, synth->bufferbytes);
-    for (int i = 0; i < synth->buffersize; ++i)
-    {
+    for(int i = 0; i < synth->buffersize; ++i) {
         efxoutl[i] *= volume;
         efxoutr[i] *= volume;
         //efxoutl[i] = smpsl[i] * volume;
         //efxoutr[i] = smpsr[i] * volume;
     }
-    for (int i = 0; i < MAX_EQ_BANDS; ++i)
-    {
-        if (filter[i].Ptype)
-        {
+    for(int i = 0; i < MAX_EQ_BANDS; ++i)
+        if(filter[i].Ptype) {
             filter[i].l->filterout(efxoutl);
             filter[i].r->filterout(efxoutr);
         }
-    }
 }
 
 
@@ -82,16 +76,16 @@ void EQ::out(float *smpsl, float *smpsr)
 
 void EQ::setvolume(unsigned char Pvolume_)
 {
-    Pvolume = Pvolume_;
+    Pvolume   = Pvolume_;
     outvolume = powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
-    volume = (!insertion) ? 1.0f : outvolume;
+    volume    = (!insertion) ? 1.0f : outvolume;
 }
 
 
 void EQ::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 1;
-    const int NUM_PRESETS = 2;
+    const int     PRESET_SIZE = 1;
+    const int     NUM_PRESETS = 2;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
         // EQ 1
         { 67 },
@@ -99,9 +93,9 @@ void EQ::setpreset(unsigned char npreset)
         { 67 }
     };
 
-    if (npreset >= NUM_PRESETS)
+    if(npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    for(int n = 0; n < PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
@@ -109,29 +103,26 @@ void EQ::setpreset(unsigned char npreset)
 
 void EQ::changepar(int npar, unsigned char value)
 {
-    switch (npar)
-    {
+    switch(npar) {
         case 0:
             setvolume(value);
             break;
     }
-    if (npar < 10)
+    if(npar < 10)
         return;
 
     int nb = (npar - 10) / 5; // number of the band (filter)
-    if (nb >= MAX_EQ_BANDS)
+    if(nb >= MAX_EQ_BANDS)
         return;
     int bp = npar % 5; // band paramenter
 
     float tmp;
-    switch (bp)
-    {
+    switch(bp) {
         case 0:
             filter[nb].Ptype = value;
-            if (value > 9)
+            if(value > 9)
                 filter[nb].Ptype = 0; // has to be changed if more filters will be added
-            if (filter[nb].Ptype != 0)
-            {
+            if(filter[nb].Ptype != 0) {
                 filter[nb].l->settype(value - 1);
                 filter[nb].r->settype(value - 1);
             }
@@ -156,7 +147,7 @@ void EQ::changepar(int npar, unsigned char value)
             break;
         case 4:
             filter[nb].Pstages = value;
-            if (value >= MAX_FILTER_STAGES)
+            if(value >= MAX_FILTER_STAGES)
                 filter[nb].Pstages = MAX_FILTER_STAGES - 1;
             filter[nb].l->setstages(value);
             filter[nb].r->setstages(value);
@@ -166,35 +157,33 @@ void EQ::changepar(int npar, unsigned char value)
 
 unsigned char EQ::getpar(int npar)
 {
-    switch (npar)
-    {
+    switch(npar) {
         case 0:
             return Pvolume;
             break;
     }
-    if (npar < 10)
+    if(npar < 10)
         return 0;
 
     int nb = (npar - 10) / 5; // number of the band (filter)
-    if (nb >= MAX_EQ_BANDS)
+    if(nb >= MAX_EQ_BANDS)
         return 0;
     int bp = npar % 5; // band paramenter
-    switch (bp)
-    {
+    switch(bp) {
         case 0:
-            return(filter[nb].Ptype);
+            return filter[nb].Ptype;
             break;
         case 1:
-            return(filter[nb].Pfreq);
+            return filter[nb].Pfreq;
             break;
         case 2:
-            return(filter[nb].Pgain);
+            return filter[nb].Pgain;
             break;
         case 3:
-            return(filter[nb].Pq);
+            return filter[nb].Pq;
             break;
         case 4:
-            return(filter[nb].Pstages);
+            return filter[nb].Pstages;
             break;
     }
     return 0; // in case of bogus parameter number
@@ -204,9 +193,8 @@ unsigned char EQ::getpar(int npar)
 float EQ::getfreqresponse(float freq)
 {
     float resp = 1.0f;
-    for (int i = 0; i < MAX_EQ_BANDS; ++i)
-    {
-        if (filter[i].Ptype == 0)
+    for(int i = 0; i < MAX_EQ_BANDS; ++i) {
+        if(filter[i].Ptype == 0)
             continue;
         resp *= filter[i].l->H(freq);
     }

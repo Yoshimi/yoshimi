@@ -28,11 +28,11 @@
 
 typedef enum {
     indeterminate = 0,
-    reverb = 1,
-    echo = 2,
-    chorus = 3,
-    phaser = 4,
-    alienwah = 5,
+    reverb     = 1,
+    echo       = 2,
+    chorus     = 3,
+    phaser     = 4,
+    alienwah   = 5,
     distorsion = 6,
     eq = 7,
     dynamicfilter = 8
@@ -43,22 +43,22 @@ class Effect
     public:
         Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
                FilterParams *filterpars_, unsigned char Ppreset_);
-        virtual ~Effect() { };
+        virtual ~Effect() { }
 
         virtual void setpreset(unsigned char npreset) = 0;
         virtual void changepar(int npar, unsigned char value) = 0;
         virtual unsigned char getpar(int npar) = 0;
         virtual void out(float *smpsl, float *smpsr) = 0;
-        virtual void cleanup() { };
-        virtual float getfreqresponse(float freq) { return (0.0f); }
+        virtual void cleanup() { }
+        virtual float getfreqresponse(float freq) { return 0.0f;  }
 
         unsigned char Ppreset; // current preset
-        float *const efxoutl;
-        float *const efxoutr;
+        float *const  efxoutl;
+        float *const  efxoutr;
         float outvolume;
         float volume;
         FilterParams *filterpars;
-        fx_type effect_type;
+        fx_type       effect_type;
 
     protected:
         bool insertion;

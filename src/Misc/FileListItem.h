@@ -22,36 +22,38 @@
 
 #include <limits>
 
-class FileListItem {
+class FileListItem
+{
     public:
-        FileListItem() : index(numeric_limits<unsigned short>::max()) { };
-        ~FileListItem() { };
+        FileListItem():index(numeric_limits<unsigned short>::max()) { }
+        ~FileListItem() { }
 
-        string  name;
-        string  file;
+        string name;
+        string file;
         unsigned int index;
 
-        inline bool operator ==(const FileListItem& param) const
+        inline bool operator ==(const FileListItem &param) const
         {
-            return (name == param.name && file == param.file);
+            return name == param.name && file == param.file;
         }
 
-        inline bool operator <(const FileListItem& param) const
+        inline bool operator <(const FileListItem &param) const
         {
-            if (index > 0)
-               return sameFile(param);
+            if(index > 0)
+                return sameFile(param);
             else
                 return index < param.index;
         }
-        
-        inline bool sameFile(const FileListItem& param) const
+
+        inline bool sameFile(const FileListItem &param) const
         {
-            if (name < param.name)
+            if(name < param.name)
                 return true;
-            else if (name > param.name)
+            else
+            if(name > param.name)
                 return false;
             else
-                return (file < param.file);
+                return file < param.file;
         }
 };
 

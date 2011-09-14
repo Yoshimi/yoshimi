@@ -31,11 +31,13 @@
 
 class XMLwrapper;
 
-class FilterParams : public Presets, public Carcass
+class FilterParams:public Presets, public Carcass
 {
     public:
-        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_);
-        ~FilterParams() { };
+        FilterParams(unsigned char Ptype_,
+                     unsigned char Pfreq,
+                     unsigned char Pq_);
+        ~FilterParams() { }
 
         void add2XML(XMLwrapper *xml);
         void add2XMLsection(XMLwrapper *xml, int n);
@@ -76,8 +78,8 @@ class FilterParams : public Presets, public Carcass
         unsigned char Pformantslowness; // how slow varies the formants
         unsigned char Pvowelclearness;  // how vowels are kept clean (how much try
                                         // to avoid "mixed" vowels)
-        unsigned char Pcenterfreq,Poctavesfreq; // the center frequency of the res.
-                                                // func., and the number of octaves
+        unsigned char Pcenterfreq, Poctavesfreq; // the center frequency of the res.
+                                                 // func., and the number of octaves
         struct {
             struct {
                 unsigned char freq, amp, q; // frequency,amplitude,Q
