@@ -120,7 +120,7 @@ typedef enum {
     C_portamento =           65, // active
     C_sostenuto =            66,
     C_softpedal =            67,
-    C_legatofootswitch =     68,
+    C_legatofootswitch =     68, // active
     C_hold2 =                69,
     C_soundcontroller1 =     70,
     C_filterq =              71, // active
