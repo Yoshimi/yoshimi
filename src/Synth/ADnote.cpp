@@ -35,14 +35,14 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Synth/ADnote.h"
 
-ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
-               int portamento_, int midinote_, bool besilent) :
+ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
+               float velocity_, int portamento_, int midinote_, bool besilent) :
     ready(0),
     adpars(adpars_),
     stereo(adpars->GlobalPar.PStereo),
     midinote(midinote_),
     velocity(velocity_),
-    basefreq(adpars->microtonal->getNoteFreq(midinote_)),
+    basefreq(freq_),
     NoteEnabled(true),
     ctl(ctl_),
     time(0.0f),
@@ -1039,7 +1039,7 @@ float ADnote::getVoiceBaseFreq(int nvoice)
         + NoteGlobalPar.Detune / 100.0f;
 
     if (!NoteVoicePar[nvoice].fixedfreq)
-        return adpars->microtonal->getNoteFreq(midinote) * powf(2.0f, detune / 12.0f);
+        return basefreq * powf(2.0f, detune / 12.0f);
     else // fixed freq is enabled
     {
         float fixedfreq = 440.0f;

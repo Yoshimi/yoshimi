@@ -35,9 +35,8 @@ int ADnoteParameters::ADnote_unison_sizes[] = {
     1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 0
 };
 
-ADnoteParameters::ADnoteParameters(Microtonal *micro_, FFTwrapper *fft_) :
+ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) :
     Presets(),
-    microtonal(micro_),
     fft(fft_)
 {
     setpresettype("ADnoteParameters");

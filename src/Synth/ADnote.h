@@ -45,7 +45,7 @@ class Filter;
 class ADnote : public Carcass, private SynthHelper, private Float2Int
 {
     public:
-        ADnote(ADnoteParameters *adpars_, Controller *ctl_, float velocity_,
+        ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
                int portamento_, int midinote_, bool besilent);
         ~ADnote();
 
