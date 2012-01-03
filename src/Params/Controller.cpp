@@ -80,6 +80,7 @@ void Controller::resetall()
     setfmamp(127);
     setvolume(127);
     setsustain(0);
+    setlegato(0);
     setresonancecenter(64);
     setresonancebw(64);
 }
@@ -193,6 +194,12 @@ void Controller::setsustain(int value)
         sustain.sustain = 0;
 }
 
+
+void Controller::setlegato(int value)
+{
+    legato.data = value;
+    legato.legato = (value < 64) ? 0 : 1;
+}
 
 void Controller::setportamento(int value)
 {

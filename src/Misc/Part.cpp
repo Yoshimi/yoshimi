@@ -242,7 +242,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     int lastnotecopy = lastnote;  // Useful after lastnote has been changed.
 
     // MonoMem stuff:
-    if (!Ppolymode) // if Poly is off
+    if (!Ppolymode || ctl->legato.legato) // if Poly is off
     {
         monomemnotes.push_back(note);            // Add note to the list.
         monomem[note].velocity = velocity;       // Store this note's velocity.
@@ -268,9 +268,9 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
             break;
         }
     }
-    if (Plegatomode && !Pdrummode)
+    if ((Plegatomode || ctl->legato.legato) && !Pdrummode)
     {
-        if (Ppolymode)
+        if (Ppolymode && Plegatomode)
         {
             Runtime.Log("Warning, poly and legato modes are both on.");
             Runtime.Log("That should not happen, so disabling legato mode");
@@ -366,7 +366,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         // still held down or sustained for the Portamento to activate
         // (that's like Legato).
         int portamento = 0;
-        if (Ppolymode || !ismonofirstnote)
+        if ((Ppolymode && !ctl->legato.legato) || !ismonofirstnote)
         {
             // I added a third argument to the
             // ctl->initportamento(...) function to be able
@@ -620,7 +620,7 @@ void Part::NoteOff(int note) //relase the key
         {
             if (!ctl->sustain.sustain)
             {   //the sustain pedal is not pushed
-                if (!Ppolymode && (not monomemnotes.empty()))
+                if ((!Ppolymode || ctl->legato.legato) && (not monomemnotes.empty()))
                     MonoMemRenote(); // To play most recent still held note.
                 else
                     RelaseNotePos(i);
@@ -679,6 +679,9 @@ void Part::SetController(unsigned int type, int par)
             if (!ctl->sustain.sustain)
                 RelaseSustainedKeys();
             break;
+        case C_legatofootswitch:
+            ctl->setlegato(par);
+            break;
         case C_allsoundsoff:
             AllNotesOff(); // Panic
             break;
@@ -725,7 +728,7 @@ void Part::SetController(unsigned int type, int par)
 void Part::RelaseSustainedKeys(void)
 {
     // Let's call MonoMemRenote() on some conditions:
-    if (Ppolymode == 0 && (not monomemnotes.empty()))
+    if ((Ppolymode == 0 || ctl->legato.legato) && (not monomemnotes.empty()))
         if (monomemnotes.back() != lastnote)
             // Sustain controller manipulation would cause repeated same note
             // respawn without this check.
@@ -828,7 +831,7 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
         keylimit = POLIPHONY - 5;
 
     // release old keys if the number of notes>keylimit
-    if (Ppolymode)
+    if (Ppolymode && !ctl->legato.legato)
     {
         int notecount = 0;
         for (int i = 0; i < POLIPHONY; ++i)

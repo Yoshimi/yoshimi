@@ -51,7 +51,7 @@ decl {\#include "Misc/SynthEngine.h"} {public
 class BankProcess_ {open
 } {
   Function {process(void)} {open return_type {virtual void}
-  } {}
+  } {code { ; } {} }
   decl {Bank *bank;} {public
   }
 }

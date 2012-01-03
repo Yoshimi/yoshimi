@@ -89,7 +89,7 @@ class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
 class PartUI_ {open
 } {
   Function {showparameters(int kititem,int engine)} {open return_type virtual
-  } {}
+  } {code { ; } {} }
 } 
 
 class PartKitItem {: {public Fl_Group}

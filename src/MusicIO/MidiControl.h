@@ -33,6 +33,7 @@ typedef enum {
     C_fmamp =                76,
     C_volume =                7,
     C_sustain =              64,
+    C_legatofootswitch =     68,
     C_allnotesoff =         123,
     C_allsoundsoff =        120,
     C_resetallcontrollers = 121,
