@@ -803,7 +803,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("AMPLITUDE_PARAMETERS")) {
         PVolume=xml->getpar127("volume",PVolume);
-        PPanning=xml->getpar127("panning",PPanning);
+        setPan(xml->getpar127("panning",PPanning));
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
         PPunchStrength=xml->getpar127("punch_strength",PPunchStrength);
         PPunchTime=xml->getpar127("punch_time",PPunchTime);

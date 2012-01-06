@@ -196,7 +196,7 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         int xpar = xml->getparbool("stereo", (Pstereo) ? 1 : 0);
         Pstereo = (xpar != 0) ? true : false;
         PVolume=xml->getpar127("volume",PVolume);
-        PPanning=xml->getpar127("panning",PPanning);
+        setPan(xml->getpar127("panning",PPanning));
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
         if (xml->enterbranch("AMPLITUDE_ENVELOPE")) {
             AmpEnvelope->getfromXML(xml);
