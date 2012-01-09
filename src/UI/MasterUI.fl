@@ -559,7 +559,8 @@ class MasterUI {open : {private MiscFuncs}
               synth->insefx[ninseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff]);
-              inseffectui->show();}
+              //inseffectui->show();
+              showInsEfxUI();}
             xywh {126 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -644,19 +645,21 @@ class MasterUI {open : {private MiscFuncs}
       }
       Fl_Group syseffectuigroup {open
         xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
+        code0 {o->show();}
       } {
         Fl_Group syseffectui {
           xywh {3 158 384 95} labeltype NO_LABEL
-          code0 {o->init(synth->sysefx[nsyseff]);o->activate();}
+          code0 {o->init(synth->sysefx[nsyseff]);o->activate();o->show();}
           class EffUI
         } {}
       }
       Fl_Group inseffectuigroup {open
         xywh {3 158 384 95} box FLAT_BOX color 48
+        code0 {o->hide();}
       } {
         Fl_Group inseffectui {open
           xywh {3 158 384 95} color 52
-          code0 {o->init(synth->insefx[ninseff]);}
+          code0 {o->init(synth->insefx[ninseff]);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}
@@ -941,8 +944,8 @@ ZynAddSubFX}
     code {//
       inseffectui->hide();
       inseffectui->deactivate();
-      inseffectuigroup->deactivate();
       inseffectuigroup->hide();
+      inseffectuigroup->deactivate();
 
       syseffectui->activate();
       syseffectui->show();
@@ -954,7 +957,7 @@ ZynAddSubFX}
     code {//
       syseffectui->hide();
       syseffectui->deactivate();
-      //->hide();
+      syseffectuigroup->hide();
       syseffectuigroup->deactivate();
 
       inseffectui->activate();
