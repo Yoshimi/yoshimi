@@ -211,6 +211,11 @@ else (BuildForDebug)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
 endif (BuildForDebug)
 
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.desktop.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop"
+    IMMEDIATE @ONLY)
+
 set (DSP_sources
     DSP/FFTwrapper.cpp  DSP/AnalogFilter.cpp  DSP/FormantFilter.cpp
     DSP/SVFilter.cpp  DSP/Filter.cpp  DSP/Unison.cpp
@@ -358,6 +363,11 @@ install (FILES ../yoshimi-instruments.tar.gz DESTINATION share/yoshimi
 configure_file (../desktop/yoshimi.desktop.in ../desktop/yoshimi.desktop)
 install (FILES ../desktop/yoshimi.desktop DESTINATION share/applications)
 install (FILES ../desktop/pink_robot_icon.png DESTINATION share/yoshimi)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
+    DESTINATION share/applications)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png
+    DESTINATION share/pixmaps)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
