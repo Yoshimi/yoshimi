@@ -18,6 +18,7 @@
 */
 
 #include <errno.h>
+#include <unistd.h>
 #include <jack/midiport.h>
 #include <jack/thread.h>
 #include <fcntl.h>
