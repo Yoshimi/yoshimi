@@ -22,8 +22,7 @@
 
 bool AlsaClient::openAudio(WavRecord *recorder)
 {
-    if (alsaEngine.openAudio(recorder))
-    {
+    if(alsaEngine.openAudio(recorder)) {
         Runtime.Samplerate = getSamplerate();
         Runtime.Buffersize = getBuffersize();
         return true;
@@ -35,7 +34,7 @@ bool AlsaClient::openAudio(WavRecord *recorder)
 
 bool AlsaClient::openMidi(WavRecord *recorder)
 {
-    if (alsaEngine.openMidi(recorder))
+    if(alsaEngine.openMidi(recorder))
         return true;
     Runtime.Log("AlsaClient midi open failed");
     return false;
@@ -43,38 +42,38 @@ bool AlsaClient::openMidi(WavRecord *recorder)
 
 
 void AlsaClient::queueMidi(midimessage *msg)
-    { alsaEngine.queueMidi(msg); }
+{ alsaEngine.queueMidi(msg); }
 
 void AlsaClient::Close(void)
-    { alsaEngine.Close(); }
+{ alsaEngine.Close(); }
 
 bool AlsaClient::Start(void)
-    { return alsaEngine.Start(); }
+{ return alsaEngine.Start(); }
 
 void AlsaClient::queueProgramChange(unsigned char chan, unsigned short banknum,
                                     unsigned char prog, uint32_t eventframe)
-    { return alsaEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+{ return alsaEngine.queueProgramChange(chan, banknum, prog, eventframe); }
 
 unsigned int AlsaClient::getSamplerate(void)
-    { return alsaEngine.getSamplerate(); }
+{ return alsaEngine.getSamplerate(); }
 
 int AlsaClient::getBuffersize(void)
-    { return alsaEngine.getBuffersize(); }
+{ return alsaEngine.getBuffersize(); }
 
 int AlsaClient::audioLatency(void)
-    { return alsaEngine.audioLatency(); }
+{ return alsaEngine.audioLatency(); }
 
 int AlsaClient::midiLatency(void)
-    { return alsaEngine.midiLatency(); }
+{ return alsaEngine.midiLatency(); }
 
 string AlsaClient::audioClientName(void)
-    { return alsaEngine.audioClientName(); }
+{ return alsaEngine.audioClientName(); }
 
 string AlsaClient::midiClientName(void)
-    { return alsaEngine.midiClientName(); }
+{ return alsaEngine.midiClientName(); }
 
 int AlsaClient::audioClientId(void)
-    { return alsaEngine.audioClientId(); }
+{ return alsaEngine.audioClientId(); }
 
 int AlsaClient::midiClientId(void)
-    { return alsaEngine.midiClientId(); }
+{ return alsaEngine.midiClientId(); }

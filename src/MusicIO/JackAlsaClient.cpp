@@ -21,10 +21,8 @@
 
 bool JackAlsaClient::openAudio(WavRecord *recorder)
 {
-    if (jackEngine.connectServer(Runtime.audioDevice))
-    {
-        if (jackEngine.openAudio(recorder))
-        {
+    if(jackEngine.connectServer(Runtime.audioDevice)) {
+        if(jackEngine.openAudio(recorder)) {
             Runtime.Samplerate = getSamplerate();
             Runtime.Buffersize = getBuffersize();
             return true;
@@ -40,44 +38,46 @@ bool JackAlsaClient::openAudio(WavRecord *recorder)
 
 
 bool JackAlsaClient::openMidi(WavRecord *recorder)
-    { return alsaEngine.openMidi(recorder); }
+{ return alsaEngine.openMidi(recorder); }
 
-void JackAlsaClient::queueProgramChange(unsigned char chan, unsigned short banknum,
-                                        unsigned char prog, uint32_t eventframe)
-    { return alsaEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+void JackAlsaClient::queueProgramChange(unsigned char chan,
+                                        unsigned short banknum,
+                                        unsigned char prog,
+                                        uint32_t eventframe)
+{ return alsaEngine.queueProgramChange(chan, banknum, prog, eventframe); }
 
 bool JackAlsaClient::Start(void)
-    { return jackEngine.Start() && alsaEngine.Start(); }
+{ return jackEngine.Start() && alsaEngine.Start(); }
 
 void JackAlsaClient::queueMidi(midimessage *msg)
-    { alsaEngine.queueMidi(msg); }
+{ alsaEngine.queueMidi(msg); }
 
 void JackAlsaClient::Close(void)
-    { jackEngine.Close(); alsaEngine.Close(); }
+{ jackEngine.Close(); alsaEngine.Close(); }
 
 bool JackAlsaClient::jacksessionReply(string cmdline)
-    { return jackEngine.jacksessionReply(cmdline); }
+{ return jackEngine.jacksessionReply(cmdline); }
 
 unsigned int JackAlsaClient::getSamplerate(void)
-    { return jackEngine.getSamplerate(); }
+{ return jackEngine.getSamplerate(); }
 
 int JackAlsaClient::getBuffersize(void)
-    { return jackEngine.getBuffersize(); }
+{ return jackEngine.getBuffersize(); }
 
 int JackAlsaClient::audioLatency(void)
-    { return jackEngine.audioLatency(); }
+{ return jackEngine.audioLatency(); }
 
 int JackAlsaClient::midiLatency(void)
-    { return alsaEngine.midiLatency(); }
+{ return alsaEngine.midiLatency(); }
 
 string JackAlsaClient::audioClientName(void)
-    { return jackEngine.audioClientName(); }
+{ return jackEngine.audioClientName(); }
 
 string JackAlsaClient::midiClientName(void)
-    { return alsaEngine.midiClientName(); }
+{ return alsaEngine.midiClientName(); }
 
 int JackAlsaClient::audioClientId(void)
-    { return jackEngine.audioClientId(); }
+{ return jackEngine.audioClientId(); }
 
 int JackAlsaClient::midiClientId(void)
-    { return alsaEngine.midiClientId(); }
+{ return alsaEngine.midiClientId(); }

@@ -25,7 +25,7 @@
 #include "Misc/SynthEngine.h"
 #include "Params/Presets.h"
 
-Presets::Presets() : nelement(-1)
+Presets::Presets():nelement(-1)
 {
     type[0] = 0;
 }
@@ -42,32 +42,30 @@ void Presets::copy(const char *name)
     XMLwrapper *xml = new XMLwrapper();
 
     //used only for the clipboard
-    if (name == NULL)
+    if(name == NULL)
         xml->minimal = false;
 
     char type[MAX_PRESETTYPE_SIZE];
-    strcpy(type,this->type);
-    if (nelement != -1)
+    strcpy(type, this->type);
+    if(nelement != -1)
         strcat(type, "n");
-    if (name == NULL)
-    {
-        if (strstr(type, "Plfo") != NULL)
+    if(name == NULL)
+        if(strstr(type, "Plfo") != NULL)
             strcpy(type, "Plfo");
-    }
 
     xml->beginbranch(type);
-    if (nelement == -1)
+    if(nelement == -1)
         add2XML(xml);
     else
         add2XMLsection(xml, nelement);
     xml->endbranch();
 
-    if (name == NULL)
+    if(name == NULL)
         presetsstore.copyclipboard(xml, type);
     else
-        presetsstore.copypreset(xml, type,name);
+        presetsstore.copypreset(xml, type, name);
 
-    delete(xml);
+    delete (xml);
     nelement = -1;
 }
 
@@ -76,54 +74,47 @@ void Presets::paste(int npreset)
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
-    if (nelement != -1)
+    if(nelement != -1)
         strcat(type, "n");
-    if (npreset == 0)
-    {
-        if (strstr(type, "Plfo") != NULL)
+    if(npreset == 0)
+        if(strstr(type, "Plfo") != NULL)
             strcpy(type, "Plfo");
-    }
 
     XMLwrapper *xml = new XMLwrapper();
-    if (npreset == 0)
-    {
-        if (!checkclipboardtype())
-        {
+    if(npreset == 0) {
+        if(!checkclipboardtype()) {
             nelement = -1;
-            delete(xml);
+            delete (xml);
             return;
         }
-        if (!presetsstore.pasteclipboard(xml))
-        {
-            delete(xml);
-            nelement = -1;
-            return;
-        }
-    } else {
-        if (!presetsstore.pastepreset(xml, npreset))
-        {
-            delete(xml);
+        if(!presetsstore.pasteclipboard(xml)) {
+            delete (xml);
             nelement = -1;
             return;
         }
     }
-
-    if (xml->enterbranch(type) == 0)
-    {
+    else
+    if(!presetsstore.pastepreset(xml, npreset)) {
+        delete (xml);
         nelement = -1;
         return;
     }
-    if (nelement == -1)
-    {
+
+    if(xml->enterbranch(type) == 0) {
+        nelement = -1;
+        return;
+    }
+    if(nelement == -1) {
         defaults();
         getfromXML(xml);
-    } else {
+    }
+    else {
         defaults(nelement);
         getfromXMLsection(xml, nelement);
     }
     xml->exitbranch();
 
-    delete(xml);
+    delete (xml);
     nelement = -1;
 }
 
@@ -132,7 +123,7 @@ bool Presets::checkclipboardtype(void)
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
-    if (nelement != -1)
+    if(nelement != -1)
         strcat(type, "n");
 
     return presetsstore.checkclipboardtype(type);

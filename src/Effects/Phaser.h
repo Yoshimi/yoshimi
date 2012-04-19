@@ -29,7 +29,7 @@
 
 #define MAX_PHASER_STAGES 12
 
-class Phaser : public Effect
+class Phaser:public Effect
 {
     public:
         Phaser(bool insertion_, float *efxoutl_, float *efxoutr_);
@@ -40,10 +40,10 @@ class Phaser : public Effect
         unsigned char getpar(int npar);
         void cleanup(void);
         void setdryonly(void);
-    
+
     private:
         // Parametrii Phaser
-        EffectLFO lfo;           // <lfo-ul Phaser
+        EffectLFO     lfo;       // <lfo-ul Phaser
         unsigned char Pvolume;
         unsigned char Ppanning;
         unsigned char Pdepth;    // <depth of Phaser
@@ -52,7 +52,7 @@ class Phaser : public Effect
         unsigned char Pstages;
         unsigned char Poutsub;   // <substract the output instead of adding it
         unsigned char Pphase;
-    
+
         // Control Parametrii
         void setvolume(unsigned char Pvolume_);
         void setpanning(unsigned char Ppanning_);
@@ -61,21 +61,21 @@ class Phaser : public Effect
         void setlrcross(unsigned char Plrcross_);
         void setstages(unsigned char Pstages_);
         void setphase(unsigned char Pphase_);
-    
+
         // Internal Values
         // int insertion; // inherited from Effect
-        float   panning;
-        float   fb;
-        float   depth;
-        float   lrcross;
-        float   fbl;
-        float   fbr;
-        float   phase;
+        float panning;
+        float fb;
+        float depth;
+        float lrcross;
+        float fbl;
+        float fbr;
+        float phase;
 
-        float  *oldl;
-        float  *oldr;
-        float   oldlgain;
-        float   oldrgain;
+        float *oldl;
+        float *oldr;
+        float  oldlgain;
+        float  oldrgain;
 };
 
 #endif

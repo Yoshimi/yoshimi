@@ -32,37 +32,37 @@ class PresetsStore;
 
 extern PresetsStore presetsstore;
 
-class PresetsStore : MiscFuncs
+class PresetsStore:MiscFuncs
 {
     public:
         PresetsStore();
         ~PresetsStore();
-    
+
         // Clipboard stuff
         void copyclipboard(XMLwrapper *xml, string type);
         bool pasteclipboard(XMLwrapper *xml);
         bool checkclipboardtype(string type);
-    
+
         // presets stuff
         void copypreset(XMLwrapper *xml, string type, string name);
         bool pastepreset(XMLwrapper *xml, int npreset);
         void deletepreset(int npreset);
-    
+
         struct presetstruct {
             string file;
             string name;
         };
         presetstruct presets[MAX_PRESETS];
-    
+
         void rescanforpresets(string type);
-    
+
     private:
         void clearpresets(void);
-    
+
         struct {
             string data;
             string type;
         } clipboard;
-    
+
         const string preset_extension;
 };

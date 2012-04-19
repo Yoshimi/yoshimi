@@ -24,8 +24,8 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/Distorsion.h"
 
-Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
+Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_)
+    :Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
 {
     effect_type = distorsion;
     lpfl = new AnalogFilter(2, 22000, 1, 0);
@@ -34,15 +34,15 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
     hpfr = new AnalogFilter(3, 20, 1, 0);
 
     // default values
-    Pvolume = 50;
-    Plrcross = 40;
-    Pdrive = 90;
-    Plevel = 64;
-    Ptype = 0;
-    Pnegate = 0;
-    Plpf = 127;
-    Phpf = 0;
-    Pstereo = 0;
+    Pvolume       = 50;
+    Plrcross      = 40;
+    Pdrive        = 90;
+    Plevel        = 64;
+    Ptype         = 0;
+    Pnegate       = 0;
+    Plpf          = 127;
+    Phpf          = 0;
+    Pstereo       = 0;
     Pprefiltering = 0;
 
     setpreset(Ppreset);
@@ -55,7 +55,6 @@ Distorsion::~Distorsion()
     delete lpfr;
     delete hpfl;
     delete hpfr;
-
 }
 
 // Cleanup the effect
@@ -73,8 +72,7 @@ void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
 {
     lpfl->filterout(efxoutl);
     hpfl->filterout(efxoutl);
-    if (Pstereo != 0)
-    {   // stereo
+    if(Pstereo != 0) { // stereo
         lpfr->filterout(efxoutr);
         hpfr->filterout(efxoutr);
     }
@@ -87,50 +85,45 @@ void Distorsion::out(float *smpsl, float *smpsr)
     float l, r, lout, rout;
 
     float inputvol = powf(5.0f, (Pdrive - 32.0f) / 127.0f);
-    if (Pnegate != 0)
+    if(Pnegate != 0)
         inputvol *= -1.0f;
 
-    if (Pstereo != 0)
-    {   //Stereo
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
+    if(Pstereo != 0)   //Stereo
+        for(int i = 0; i < synth->buffersize; ++i) {
             efxoutl[i] = smpsl[i] * inputvol * (1.0f - panning);
             efxoutr[i] = smpsr[i] * inputvol * panning;
         }
-    } else {
-        for (int i = 0; i < synth->buffersize; ++i)
-        {
-            efxoutl[i] = (smpsl[i] * panning + smpsr[i] * (1.0f - panning)) * inputvol;
-        }
-    }
+    else
+        for(int i = 0; i < synth->buffersize; ++i)
+            efxoutl[i] =
+                (smpsl[i] * panning + smpsr[i] * (1.0f - panning)) * inputvol;
 
-    if (Pprefiltering != 0)
+    if(Pprefiltering != 0)
         applyfilters(efxoutl, efxoutr);
 
     // no optimised, yet (no look table)
     waveShapeSmps(synth->buffersize, efxoutl, Ptype + 1, Pdrive);
-    if (Pstereo != 0)
+    if(Pstereo != 0)
         waveShapeSmps(synth->buffersize, efxoutr, Ptype + 1, Pdrive);
 
-    if (Pprefiltering == 0)
+    if(Pprefiltering == 0)
         applyfilters(efxoutl, efxoutr);
 
-    if (Pstereo == 0)
+    if(Pstereo == 0)
         memcpy(efxoutr, efxoutl, synth->bufferbytes);
-        //for (i = 0; i < synth->buffersize; ++i)
-        //    efxoutr[i] = efxoutl[i];
+    //for (i = 0; i < synth->buffersize; ++i)
+    //    efxoutr[i] = efxoutl[i];
 
     float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
-    for (int i = 0; i < synth->buffersize; ++i)
-    {
+    for(int i = 0; i < synth->buffersize; ++i) {
         lout = efxoutl[i];
         rout = efxoutr[i];
-        l = lout * (1.0f - lrcross) + rout * lrcross;
-        r = rout * (1.0f - lrcross) + lout * lrcross;
+        l    = lout * (1.0f - lrcross) + rout * lrcross;
+        r    = rout * (1.0f - lrcross) + lout * lrcross;
         lout = l;
         rout = r;
         efxoutl[i] = lout * 2.0f * level;
-        efxoutr[i] = rout * 2.0f *level;
+        efxoutr[i] = rout * 2.0f * level;
     }
 }
 
@@ -139,14 +132,13 @@ void Distorsion::out(float *smpsl, float *smpsr)
 void Distorsion::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
-    if(insertion == 0)
-    {
+    if(insertion == 0) {
         outvolume = pow(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
-        volume = 1.0f;
+        volume    = 1.0f;
     }
     else
-         volume = outvolume = Pvolume / 127.0f;
-    if (Pvolume == 0.0f)
+        volume = outvolume = Pvolume / 127.0f;
+    if(Pvolume == 0.0f)
         cleanup();
 }
 
@@ -154,14 +146,14 @@ void Distorsion::setvolume(unsigned char Pvolume_)
 void Distorsion::setpanning(unsigned char Ppanning_)
 {
     Ppanning = Ppanning_;
-    panning = (Ppanning + 0.5f) / 127.0f;
+    panning  = (Ppanning + 0.5f) / 127.0f;
 }
 
 
 void Distorsion::setlrcross(unsigned char Plrcross_)
 {
     Plrcross = Plrcross_;
-    lrcross = Plrcross / 127.0f;
+    lrcross  = Plrcross / 127.0f;
 }
 
 
@@ -185,28 +177,28 @@ void Distorsion::sethpf(unsigned char Phpf_)
 
 void Distorsion::setpreset(unsigned char npreset)
 {
-    const int PRESET_SIZE = 11;
-    const int NUM_PRESETS = 6;
+    const int     PRESET_SIZE = 11;
+    const int     NUM_PRESETS = 6;
     unsigned char presets[NUM_PRESETS][PRESET_SIZE] = {
         // Overdrive 1
-        { 127, 64, 35, 56, 70, 0, 0, 96, 0, 0, 0 },
+        { 127, 64, 35, 56, 70, 0, 0, 96,  0,   0, 0 },
         // Overdrive 2
-        { 127, 64, 35, 29, 75, 1, 0, 127, 0, 0, 0 },
+        { 127, 64, 35, 29, 75, 1, 0, 127, 0,   0, 0 },
         // A. Exciter 1
-        { 64, 64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
+        { 64,  64, 35, 75, 80, 5, 0, 127, 105, 1, 0 },
         // A. Exciter 2
-        { 64, 64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
+        { 64,  64, 35, 85, 62, 1, 0, 127, 118, 1, 0 },
         // Guitar Amp
-        { 127, 64, 35, 63, 75, 2, 0, 55, 0, 0, 0 },
+        { 127, 64, 35, 63, 75, 2, 0, 55,  0,   0, 0 },
         // Quantisize
-        { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
+        { 127, 64, 35, 88, 75, 4, 0, 127, 0,   1, 0 }
     };
 
-    if (npreset >= NUM_PRESETS)
+    if(npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
+    for(int n = 0; n < PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
-    if (!insertion)
+    if(!insertion)
         changepar(0, (int)(presets[npreset][0] / 1.5)); // lower the volume if this is system effect
     Ppreset = npreset;
     cleanup();
@@ -215,8 +207,7 @@ void Distorsion::setpreset(unsigned char npreset)
 
 void Distorsion::changepar(int npar, unsigned char value)
 {
-    switch (npar)
-    {
+    switch(npar) {
         case 0:
             setvolume(value);
             break;
@@ -233,13 +224,13 @@ void Distorsion::changepar(int npar, unsigned char value)
             Plevel = value;
             break;
         case 5:
-            if (value > 13)
+            if(value > 13)
                 Ptype = 13; // this must be increased if more distorsion types are added
             else
                 Ptype = value;
             break;
         case 6:
-            if (value > 1)
+            if(value > 1)
                 Pnegate = 1;
             else
                 Pnegate = value;
@@ -251,7 +242,7 @@ void Distorsion::changepar(int npar, unsigned char value)
             sethpf(value);
             break;
         case 9:
-            if (value > 1)
+            if(value > 1)
                 Pstereo = 1;
             else
                 Pstereo = value;
@@ -265,8 +256,7 @@ void Distorsion::changepar(int npar, unsigned char value)
 
 unsigned char Distorsion::getpar(int npar)
 {
-    switch (npar)
-    {
+    switch(npar) {
         case 0:  return Pvolume;
         case 1:  return Ppanning;
         case 2:  return Plrcross;

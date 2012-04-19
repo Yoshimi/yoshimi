@@ -22,8 +22,7 @@
 
 bool AlsaJackClient::openAudio(WavRecord *recorder)
 {
-    if (alsaEngine.openAudio(recorder))
-    {
+    if(alsaEngine.openAudio(recorder)) {
         Runtime.Samplerate = getSamplerate();
         Runtime.Buffersize = getBuffersize();
         return true;
@@ -36,9 +35,8 @@ bool AlsaJackClient::openAudio(WavRecord *recorder)
 
 bool AlsaJackClient::openMidi(WavRecord *recorder)
 {
-    if (jackEngine.connectServer(Runtime.midiDevice))
-    {
-        if (jackEngine.openMidi(recorder))
+    if(jackEngine.connectServer(Runtime.midiDevice)) {
+        if(jackEngine.openMidi(recorder))
             return true;
         else
             Runtime.Log("AlsaJackClient failed to open midi");
@@ -49,12 +47,9 @@ bool AlsaJackClient::openMidi(WavRecord *recorder)
 
 bool AlsaJackClient::Start(void)
 {
-    if (alsaEngine.Start())
-    {
-        if (jackEngine.Start())
-        {
+    if(alsaEngine.Start()) {
+        if(jackEngine.Start())
             return true;
-        }
         else
             Runtime.Log("jackEngine.Start() failed");
     }
@@ -65,38 +60,40 @@ bool AlsaJackClient::Start(void)
 
 
 void AlsaJackClient::queueMidi(midimessage *msg)
-    { jackEngine.queueMidi(msg); }
+{ jackEngine.queueMidi(msg); }
 
 void AlsaJackClient::Close(void)
-    { alsaEngine.Close(); jackEngine.Close(); }
+{ alsaEngine.Close(); jackEngine.Close(); }
 
-void AlsaJackClient::queueProgramChange(unsigned char chan, unsigned short banknum,
-                                        unsigned char prog, uint32_t eventframe)
-    { return jackEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+void AlsaJackClient::queueProgramChange(unsigned char chan,
+                                        unsigned short banknum,
+                                        unsigned char prog,
+                                        uint32_t eventframe)
+{ return jackEngine.queueProgramChange(chan, banknum, prog, eventframe); }
 
 bool AlsaJackClient::jacksessionReply(string cmdline)
-    { return jackEngine.jacksessionReply(cmdline); }
+{ return jackEngine.jacksessionReply(cmdline); }
 
 unsigned int AlsaJackClient::getSamplerate(void)
-    { return alsaEngine.getSamplerate(); }
+{ return alsaEngine.getSamplerate(); }
 
 int AlsaJackClient::getBuffersize(void)
-    { return alsaEngine.getBuffersize(); }
+{ return alsaEngine.getBuffersize(); }
 
 int AlsaJackClient::audioLatency(void)
-    { return alsaEngine.audioLatency(); }
+{ return alsaEngine.audioLatency(); }
 
 int AlsaJackClient::midiLatency(void)
-    { return jackEngine.midiLatency(); }
+{ return jackEngine.midiLatency(); }
 
 string AlsaJackClient::audioClientName(void)
-    { return alsaEngine.audioClientName(); }
+{ return alsaEngine.audioClientName(); }
 
 string AlsaJackClient::midiClientName(void)
-    { return jackEngine.midiClientName(); }
+{ return jackEngine.midiClientName(); }
 
 int AlsaJackClient::audioClientId(void)
-    { return alsaEngine.audioClientId(); }
+{ return alsaEngine.audioClientId(); }
 
 int AlsaJackClient::midiClientId(void)
-    { return jackEngine.midiClientId(); }
+{ return jackEngine.midiClientId(); }

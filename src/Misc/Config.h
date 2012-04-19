@@ -35,15 +35,19 @@ using namespace std;
 #include "Misc/HistoryListItem.h"
 #include "Misc/MiscFuncs.h"
 
-typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
-typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
+typedef enum {
+    no_audio = 0, jack_audio, alsa_audio,
+} audio_drivers;
+typedef enum {
+    no_midi = 0, jack_midi, alsa_midi,
+} midi_drivers;
 
 class XMLwrapper;
 class BodyDisposal;
 class SynthEngine;
 class ProgramBanks;
 
-class Config : public MiscFuncs
+class Config:public MiscFuncs
 {
     public:
         Config();
@@ -58,14 +62,16 @@ class Config : public MiscFuncs
         void saveState(void);
         bool restoreState(SynthEngine *synth);
         bool restoreJsession(SynthEngine *synth);
-        void setJackSessionSave(int save_type, const char *session_dir, const char *client_uuid);
+        void setJackSessionSave(int save_type,
+                                const char *session_dir,
+                                const char *client_uuid);
 
         static void sigHandler(int sig);
         void setInterruptActive(void);
         void setLadi1Active(void);
         void signalCheck(void);
         void setRtprio(int prio);
-        bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
+        bool startThread(pthread_t * pth, void *(*thread_fn)(void *), void *arg,
                          bool schedfifo, bool midi);
 
         string addParamHistory(string file);
@@ -74,7 +80,7 @@ class Config : public MiscFuncs
         string ConfigDirectory;
         string DataDirectory;
         string ConfigFile;
-        int BankSelectMethod;
+        int    BankSelectMethod;
         string paramsLoad;
         string instrumentLoad;
         bool   doRestoreState;
@@ -103,9 +109,9 @@ class Config : public MiscFuncs
         bool   startJack;        // false
         bool   connectJackaudio; // false
 
-        string        alsaAudioDevice;
-        unsigned int  alsaSamplerate;
-        int           alsaBuffersize;
+        string alsaAudioDevice;
+        unsigned int alsaSamplerate;
+        int alsaBuffersize;
 
         string alsaMidiDevice;
         string nameTag;
@@ -114,20 +120,20 @@ class Config : public MiscFuncs
         string DefaultRecordDirectory;
         string CurrentRecordDirectory;
 
-        int    BankUIAutoClose;
-        int    Interpolation;
-        int    CheckPADsynth;
-        int    rtprio;
+        int BankUIAutoClose;
+        int Interpolation;
+        int CheckPADsynth;
+        int rtprio;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
-        static const unsigned short MaxParamsHistory;
-        list<string> LogList;
+        static const unsigned short      MaxParamsHistory;
+        list<string>  LogList;
         BodyDisposal *deadObjects;
         ProgramBanks *progBanks;
         char initialBank;
         char initialProgram;
-        
+
     private:
         void loadCmdArgs(int argc, char **argv);
         bool extractConfigData(XMLwrapper *xml);
@@ -141,14 +147,14 @@ class Config : public MiscFuncs
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
 
-        static unsigned short nextHistoryIndex;
+        static unsigned short   nextHistoryIndex;
         static struct sigaction sigAction;
         static int sigIntActive;
         static int ladi1IntActive;
         int sse_level;
         int jsessionSave;
         const string programCmd;
-        string jackSessionDir;
+        string       jackSessionDir;
 };
 
 extern Config Runtime;

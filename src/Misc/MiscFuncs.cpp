@@ -31,8 +31,8 @@ using namespace std;
 bool MiscFuncs::isRegFile(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
-        if (S_ISREG(st.st_mode))
+    if(!lstat(chkpath.c_str(), &st))
+        if(S_ISREG(st.st_mode))
             return true;
     return false;
 }
@@ -41,8 +41,8 @@ bool MiscFuncs::isRegFile(string chkpath)
 bool MiscFuncs::isDirectory(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
-        if (S_ISDIR(st.st_mode))
+    if(!lstat(chkpath.c_str(), &st))
+        if(S_ISDIR(st.st_mode))
             return true;
     return false;
 }
@@ -51,8 +51,8 @@ bool MiscFuncs::isDirectory(string chkpath)
 bool MiscFuncs::isFifo(string chkpath)
 {
     struct stat st;
-    if (!lstat(chkpath.c_str(), &st))
-        if (S_ISFIFO(st.st_mode))
+    if(!lstat(chkpath.c_str(), &st))
+        if(S_ISFIFO(st.st_mode))
             return true;
     return false;
 }
@@ -75,17 +75,16 @@ int MiscFuncs::string2int(string str)
 }
 
 // make a filename legal
-void MiscFuncs::legit_filename(string& fname)
+void MiscFuncs::legit_filename(string &fname)
 {
-    for (unsigned int i = 0; i < fname.size(); ++i)
-    {
+    for(unsigned int i = 0; i < fname.size(); ++i) {
         char c = fname.at(i);
-        if (!((c >= '0' && c <= '9')
-              || (c >= 'A' && c <= 'Z')
-              || (c >= 'a' && c <= 'z')
-              || c == '-'
-              || c == ' '
-              || c == '.'))
+        if(!(((c >= '0') && (c <= '9'))
+             || ((c >= 'A') && (c <= 'Z'))
+             || ((c >= 'a') && (c <= 'z'))
+             || (c == '-')
+             || (c == ' ')
+             || (c == '.')))
             fname.at(i) = '_';
     }
 }
@@ -93,25 +92,25 @@ void MiscFuncs::legit_filename(string& fname)
 
 string MiscFuncs::asString(int n)
 {
-   ostringstream oss;
-   oss << n;
-   return string(oss.str());
+    ostringstream oss;
+    oss << n;
+    return string(oss.str());
 }
 
 
 string MiscFuncs::asString(long long n)
 {
-   ostringstream oss;
-   oss << n;
-   return string(oss.str());
+    ostringstream oss;
+    oss << n;
+    return string(oss.str());
 }
 
 
 string MiscFuncs::asString(long n)
 {
-   ostringstream oss;
-   oss << n;
-   return string(oss.str());
+    ostringstream oss;
+    oss << n;
+    return string(oss.str());
 }
 
 
@@ -120,8 +119,7 @@ string MiscFuncs::asString(unsigned int n, unsigned int width)
     ostringstream oss;
     oss << n;
     string val = string(oss.str());
-    if (width && val.size() < width)
-    {
+    if(width && (val.size() < width)) {
         val = string("000000000") + val;
         return val.substr(val.size() - width);
     }
@@ -131,25 +129,25 @@ string MiscFuncs::asString(unsigned int n, unsigned int width)
 
 string MiscFuncs::asString(float n)
 {
-   ostringstream oss;
-   oss.precision(3);
-   oss.width(3);
-   oss << n;
-   return oss.str();
+    ostringstream oss;
+    oss.precision(3);
+    oss.width(3);
+    oss << n;
+    return oss.str();
 }
 
 
 string MiscFuncs::asHexString(int x)
 {
-   ostringstream oss;
-   oss << hex << x;
-   return string(oss.str());
+    ostringstream oss;
+    oss << hex << x;
+    return string(oss.str());
 }
 
 
 string MiscFuncs::asHexString(unsigned int x)
 {
-   ostringstream oss;
-   oss << hex << x;
-   return string(oss.str());
+    ostringstream oss;
+    oss << hex << x;
+    return string(oss.str());
 }

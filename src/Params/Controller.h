@@ -31,7 +31,7 @@ class Controller
 {
     public:
         Controller();
-        ~Controller() { };
+        ~Controller() { }
         void resetall(void);
 
         void add2XML(XMLwrapper *xml);
@@ -59,59 +59,59 @@ class Controller
         void updateportamento(void); // update portamento values
 
         // Controllers values
-        struct { 
+        struct {
             int data;
             short int bendrange; // pitchwheel bendrange is in cents
-            float relfreq;       // relative frequency, default is 1.0
+            float     relfreq;   // relative frequency, default is 1.0
         } pitchwheel;
 
         struct { // Expression
-            int data;
+            int   data;
             float relvolume;
             unsigned char receive;
         } expression;
 
         struct { // Panning
-            int data;
+            int   data;
             float pan;
             unsigned char depth;
         } panning;
 
 
         struct { // Filter cutoff
-            int data;
+            int   data;
             float relfreq;
             unsigned char depth;
         } filtercutoff;
 
         struct { // Filter Q
-            int data;
+            int   data;
             float relq;
             unsigned char depth;
         } filterq;
 
         struct { // Bandwidth
-            int data;
+            int   data;
             float relbw;
             unsigned char depth;
             unsigned char exponential;
         } bandwidth;
 
         struct { // Modulation Wheel
-            int data;
+            int   data;
             float relmod;
             unsigned char depth;
             unsigned char exponential;
         } modwheel;
 
         struct { // FM amplitude
-            int data;
+            int   data;
             float relamp;
             unsigned char receive;
         } fmamp;
 
         struct { // Volume
-            int data;
+            int   data;
             float volume;
             unsigned char receive;
         } volume;
@@ -137,8 +137,8 @@ class Controller
             unsigned char pitchthreshtype;
             unsigned char updowntimestretch;
             float freqrap;
-            int noteusing;
-            int used;
+            int   noteusing;
+            int   used;
             // internal data
             float x;  // x is from 0.0 (start portamento) to 1.0 (finished portamento),
             float dx; // dx is x increment
@@ -146,17 +146,16 @@ class Controller
         } portamento;
 
         struct { // Resonance Center Frequency
-            int data;
+            int   data;
             float relcenter;
             unsigned char depth;
         } resonancecenter;
 
         struct { // Resonance Bandwidth
-            int data;
+            int   data;
             float relbw;
             unsigned char depth;
         } resonancebandwidth;
 };
 
 #endif
-

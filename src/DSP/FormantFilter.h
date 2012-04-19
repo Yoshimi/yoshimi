@@ -30,7 +30,7 @@
 #include "Params/FilterParams.h"
 
 
-class FormantFilter : public Filter_, private SynthHelper
+class FormantFilter:public Filter_, private SynthHelper
 {
     public:
         FormantFilter(FilterParams *pars);
@@ -59,7 +59,7 @@ class FormantFilter : public Filter_, private SynthHelper
 
         float oldformantamp[FF_MAX_FORMANTS];
 
-        int sequencesize, numformants, firsttime;
+        int   sequencesize, numformants, firsttime;
         float oldinput, slowinput;
         float Qfactor, formantslowness, oldQfactor;
         float vowelclearness, sequencestretch;
@@ -67,4 +67,3 @@ class FormantFilter : public Filter_, private SynthHelper
 
 
 #endif
-

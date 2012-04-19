@@ -44,7 +44,7 @@ class XMLwrapper;
 class FFTwrapper;
 class Controller;
 
-class SynthEngine : private SynthHelper, MiscFuncs
+class SynthEngine:private SynthHelper, MiscFuncs
 {
     public:
         SynthEngine();
@@ -64,11 +64,15 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partOnOff(int npart, int what);
         void partEnable(unsigned char npart, bool maybe);
 
-        void applyMidi(unsigned char* bytes);
-        void noteOn(unsigned char chan, unsigned char note, unsigned char velocity);
+        void applyMidi(unsigned char *bytes);
+        void noteOn(unsigned char chan,
+                    unsigned char note,
+                    unsigned char velocity);
         void noteOff(unsigned char chan, unsigned char note);
         void setPitchwheel(unsigned char chan, short int par);
-        void programChange(unsigned char midichan, unsigned char bank, unsigned char prog);
+        void programChange(unsigned char midichan,
+                           unsigned char bank,
+                           unsigned char prog);
         string bankName(unsigned char banknum);
         string programName(unsigned char prog);
         void lockExclusive(void);
@@ -88,12 +92,12 @@ class SynthEngine : private SynthHelper, MiscFuncs
         unsigned int samplerate;
         float samplerate_f;
         float halfsamplerate_f;
-        int buffersize;
+        int   buffersize;
         float buffersize_f;
-        int bufferbytes;
-        int oscilsize;
+        int   bufferbytes;
+        int   oscilsize;
         float oscilsize_f;
-        int halfoscilsize;
+        int   halfoscilsize;
         float halfoscilsize_f;
 
         uint32_t synthperiodStartFrame;
@@ -122,7 +126,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
                                                     // "peak" when the part is disabled
         // others ...
         Controller *ctl;
-        Microtonal microtonal;
+        Microtonal  microtonal;
         FFTwrapper *fft;
         bool recordPending;
 
@@ -134,33 +138,35 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float vuMaxOutPeakR;
         float vuRmsPeakL;
         float vuRmsPeakR;
-        bool vuClippedL;
-        bool vuClippedR;
+        bool  vuClippedL;
+        bool  vuClippedR;
 
     private:
-        void setController(unsigned char channel, unsigned char ctrltype, unsigned char par);
+        void setController(unsigned char channel,
+                           unsigned char ctrltype,
+                           unsigned char par);
         inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
         XMLwrapper *stateXMLtree;
-        float volume;
-        float sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
-        float sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
-        float *tmpmixl; // temp mix of part samples
-        float *tmpmixr; // to send to system effect
-        int keyshift;
-        char midiBankLSB;
-        char midiBankMSB;
+        float       volume;
+        float       sysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
+        float       sysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
+        float      *tmpmixl; // temp mix of part samples
+        float      *tmpmixr; // to send to system effect
+        int   keyshift;
+        char  midiBankLSB;
+        char  midiBankMSB;
         float vuoutpeakl;
         float vuoutpeakr;
         float vumaxoutpeakl;
         float vumaxoutpeakr;
         float vurmspeakl;
         float vurmspeakr;
-        bool clippedL;
-        bool clippedR;
+        bool  clippedL;
+        bool  clippedR;
         static char random_state[];
         static struct random_data random_buf;
         int32_t random_result;
-        float random_0_1;
+        float   random_0_1;
         boost::interprocess::interprocess_upgradable_mutex synthMutex;
         boost::posix_time::time_duration lockgrace;
         boost::interprocess::interprocess_mutex meterMutex;
@@ -171,8 +177,7 @@ extern SynthEngine *synth;
 
 inline float SynthEngine::numRandom(void)
 {
-    if (!random_r(&random_buf, &random_result))
-    {
+    if(!random_r(&random_buf, &random_result)) {
         random_0_1 = (float)random_result / (float)INT_MAX;
         random_0_1 = (random_0_1 > 1.0f) ? 1.0f : random_0_1;
         random_0_1 = (random_0_1 < 0.0f) ? 0.0f : random_0_1;
@@ -183,7 +188,7 @@ inline float SynthEngine::numRandom(void)
 
 inline unsigned int SynthEngine::random(void)
 {
-    if (!random_r(&random_buf, &random_result))
+    if(!random_r(&random_buf, &random_result))
         return random_result + INT_MAX / 2;
     return INT_MAX / 2;
 }

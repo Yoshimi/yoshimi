@@ -30,7 +30,7 @@ class LFO
 {
     public:
         LFO(LFOParams *lfopars, float basefreq);
-        ~LFO() { };
+        ~LFO() { }
         float lfoout(void);
         float amplfoout(void);
     private:
@@ -41,9 +41,8 @@ class LFO
         float lfointensity;
         float lfornd, lfofreqrnd;
         float lfodelay;
-        char lfotype;
-        int freqrndenabled;
+        char  lfotype;
+        int   freqrndenabled;
 };
 
 #endif
-

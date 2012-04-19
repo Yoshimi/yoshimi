@@ -30,13 +30,13 @@
 #include "Misc/MiscFuncs.h"
 #include "MusicIO/WavRecord.h"
 
-class MusicIO : protected MiscFuncs
+class MusicIO:protected MiscFuncs
 {
     public:
         MusicIO();
         ~MusicIO();
         virtual bool openAudio(WavRecord *recorder) = 0;
-        virtual bool openMidi(WavRecord *recorder) = 0;
+        virtual bool openMidi(WavRecord *recorder)  = 0;
         virtual bool Start(void);
         virtual void Close(void);
         virtual unsigned int getSamplerate(void) = 0;
@@ -62,28 +62,27 @@ class MusicIO : protected MiscFuncs
         static void *_midiThread(void *arg);
         void *midiThread(void);
 
-        string baseclientname;
-        string audioclientname;
-        string midiclientname;
-        int audioclientid;
-        int midiclientid;
-        int audiolatency;
-        int midilatency;
-        float *zynLeft;
-        float *zynRight;
+        string     baseclientname;
+        string     audioclientname;
+        string     midiclientname;
+        int        audioclientid;
+        int        midiclientid;
+        int        audiolatency;
+        int        midilatency;
+        float     *zynLeft;
+        float     *zynRight;
         short int *interleavedShorts;
-        uint32_t periodstartframe;
-        uint32_t periodendframe;
+        uint32_t   periodstartframe;
+        uint32_t   periodendframe;
         WavRecord *wavRecorder;
 
     private:
         void processControlChange(unsigned char byte0,
-                                   unsigned char byte1,
-                                   unsigned char byte2);
+                                  unsigned char byte1,
+                                  unsigned char byte2);
         jack_ringbuffer_t *midiRingbuf;
         boost::interprocess::interprocess_semaphore *midiEventsUp;
         pthread_t midiPthread;
-
 };
 
 #endif

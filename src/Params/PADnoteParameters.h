@@ -34,7 +34,7 @@ class EnvelopeParams;
 class LFOParams;
 class FilterParams;
 
-class PADnoteParameters : public Presets
+class PADnoteParameters:public Presets
 {
     public:
         PADnoteParameters(FFTwrapper *fft_);
@@ -51,7 +51,7 @@ class PADnoteParameters : public Presets
                                                 // represents the estimation params
         unsigned char Pmode; // 0 - bandwidth, 1 - discrete (bandwidth=0), 2 - continous
                              // harmonic profile is used only on mode 0
-        
+
         struct { // Harmonic profile (the frequency distribution of a single harmonic)
             struct { // base function
                 unsigned char type;
@@ -78,7 +78,7 @@ class PADnoteParameters : public Presets
         } Php;
 
 
-        unsigned int Pbandwidth; // the values are from 0 to 1000
+        unsigned int  Pbandwidth; // the values are from 0 to 1000
         unsigned char Pbwscale;  // how the bandwidth is increased according to
                                  // the harmonic's frequency
 
@@ -94,16 +94,16 @@ class PADnoteParameters : public Presets
 
         // frequency parameters
         unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
-        unsigned char PfixedfreqET; // Equal temperate, this is used only if 
+        unsigned char PfixedfreqET; // Equal temperate, this is used only if
                                     // Pfixedfreq is enabled. If this param is 0,
                                     // the frequency is fixed to 440 Hz; if this
                                     // param is 64, 1 MIDI halftone -> 1 frequency halftone
         unsigned short int PDetune;       // fine detune
         unsigned short int PCoarseDetune; // coarse detune+octave
-        unsigned char PDetuneType;        // detune type
+        unsigned char      PDetuneType;   // detune type
 
         EnvelopeParams *FreqEnvelope;
-        LFOParams *FreqLfo;
+        LFOParams      *FreqLfo;
 
         // Amplitude parameters
         unsigned char PStereo;
@@ -126,15 +126,15 @@ class PADnoteParameters : public Presets
         unsigned char PFilterVelocityScaleFunction; // filter velocity sensing
 
         EnvelopeParams *FilterEnvelope;
-        LFOParams *FilterLfo;
+        LFOParams      *FilterLfo;
 
 
-        OscilGen *oscilgen;
+        OscilGen  *oscilgen;
         Resonance *resonance;
 
         struct {
-            int size;
-            float basefreq;
+            int    size;
+            float  basefreq;
             float *smp;
         } sample[PAD_MAX_SAMPLES], newsample;
 

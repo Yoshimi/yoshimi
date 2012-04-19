@@ -29,10 +29,11 @@
 
 class XMLwrapper;
 
-class EnvelopeParams : public Presets, public Carcass
+class EnvelopeParams:public Presets, public Carcass
 {
     public:
-        EnvelopeParams(unsigned char Penvstretch_, unsigned char Pforcedrelease_);
+        EnvelopeParams(unsigned char Penvstretch_,
+                       unsigned char Pforcedrelease_);
         ~EnvelopeParams() { }
         void ADSRinit(char A_dt, char D_dt, char S_val, char R_dt);
         void ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt);

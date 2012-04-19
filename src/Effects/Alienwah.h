@@ -33,7 +33,7 @@ using namespace std;
 
 #define MAX_ALIENWAH_DELAY 100
 
-class Alienwah : public Effect
+class Alienwah:public Effect
 {
     public:
         Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_);
@@ -47,7 +47,7 @@ class Alienwah : public Effect
 
     private:
         // Alienwah Parameters
-        EffectLFO lfo; // lfo-ul Alienwah
+        EffectLFO     lfo; // lfo-ul Alienwah
         unsigned char Pvolume;
         unsigned char Ppanning;
         unsigned char Pdepth;   // the depth of the Alienwah
@@ -69,10 +69,8 @@ class Alienwah : public Effect
         // Internal Values
         float panning, fb, depth, lrcross, phase;
         complex<float> *oldl, *oldr;
-        complex<float> oldclfol, oldclfor;
+        complex<float>  oldclfol, oldclfor;
         int oldk;
-
 };
 
 #endif
-

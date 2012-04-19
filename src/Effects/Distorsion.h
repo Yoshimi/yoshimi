@@ -28,7 +28,7 @@
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
-class Distorsion : public Effect, private WaveShapeSamples
+class Distorsion:public Effect, private WaveShapeSamples
 {
     public:
         Distorsion(bool insertion, float *efxoutl_, float *efxoutr_);

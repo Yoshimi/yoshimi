@@ -22,7 +22,7 @@
 
 #include <boost/noncopyable.hpp>
 
-class Carcass : public boost::noncopyable
+class Carcass:public boost::noncopyable
 {
     public:
         virtual ~Carcass() {}

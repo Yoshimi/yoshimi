@@ -40,7 +40,7 @@
 class XMLwrapper;
 class FilterParams;
 
-class EffectMgr : public Presets
+class EffectMgr:public Presets
 {
     public:
         EffectMgr(const bool insertion_);
@@ -57,21 +57,22 @@ class EffectMgr : public Presets
         void changepreset(unsigned char npreset);
         void changepreset_nolock(unsigned char npreset);
         unsigned char getpreset(void);
-        void seteffectpar(int npar, unsigned char value, bool midicontrol = false);
+        void seteffectpar(int npar,
+                          unsigned char value,
+                          bool midicontrol = false);
         unsigned char geteffectpar(int npar);
         float getEQfreqresponse(float freq); // used by UI
 
         float *efxoutl;
         float *efxoutr;
-        bool insertion; // the effect is connected as insertion effect (or not)
+        bool   insertion; // the effect is connected as insertion effect (or not)
         FilterParams *filterpars;
 
     private:
-        int nefx;
+        int     nefx;
         Effect *efx;
-        bool dryonly;
-        int privatemoment;
+        bool    dryonly;
+        int     privatemoment;
 };
 
 #endif
-

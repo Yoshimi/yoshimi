@@ -22,31 +22,32 @@
 
 #include <limits>
 
-class HistoryListItem {
+class HistoryListItem
+{
     public:
-        HistoryListItem() :
-            index(numeric_limits<unsigned short>::max()),
-            program(0) { };
-        ~HistoryListItem() { };
+        HistoryListItem()
+            :index(numeric_limits<unsigned short>::max()),
+              program(0) { }
+        ~HistoryListItem() { }
 
-        string  name;
-        string  file;
-        unsigned int index;
+        string name;
+        string file;
+        unsigned int  index;
         unsigned char program;
 
-        inline bool operator ==(const HistoryListItem& param) const
+        inline bool operator ==(const HistoryListItem &param) const
         {
-            return (name == param.name && file == param.file);
+            return name == param.name && file == param.file;
         }
 
-        inline bool operator <(const HistoryListItem& param) const
+        inline bool operator <(const HistoryListItem &param) const
         {
-            return (index < param.index);
+            return index < param.index;
         }
-        
-        inline bool sameFile(const string& fileparam) const
+
+        inline bool sameFile(const string &fileparam) const
         {
-            return (file == fileparam);
+            return file == fileparam;
         }
 };
 

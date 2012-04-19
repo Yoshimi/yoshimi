@@ -34,22 +34,24 @@ using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
-class JackEngine : public MusicIO
+class JackEngine:public MusicIO
 {
     public:
         JackEngine();
-        ~JackEngine() { Close(); };
+        ~JackEngine() {
+            Close();
+        }
         bool connectServer(string server);
-        bool isConnected(void) { return (NULL != jackClient); }
+        bool isConnected(void) { return NULL != jackClient;  }
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
         bool Start(void);
         void Close(void);
         #if defined(JACK_SESSION)
-            bool jacksessionReply(string cmdline);
+        bool jacksessionReply(string cmdline);
         #endif
         unsigned int getSamplerate(void) { return jackSamplerate; }
-        int getBuffersize(void) { return jackNframes; };
+        int getBuffersize(void) { return jackNframes; }
 
     private:
         bool openJackClient(string server);
@@ -63,17 +65,17 @@ class JackEngine : public MusicIO
         static int _xrunCallback(void *arg);
 
         #if defined(JACK_SESSION)
-            static void _jsessionCallback(jack_session_event_t *event, void *arg);
-            void jsessionCallback(jack_session_event_t *event);
-            jack_session_event_t *lastevent;
+        static void _jsessionCallback(jack_session_event_t *event, void *arg);
+        void jsessionCallback(jack_session_event_t *event);
+        jack_session_event_t *lastevent;
         #endif
 
-        jack_client_t  *jackClient;
-        jack_port_t*    midiPort;
-        unsigned int    jackSamplerate;
-        unsigned int    jackNframes;
-        jack_port_t    *audioPortL;
-        jack_port_t    *audioPortR;
+        jack_client_t *jackClient;
+        jack_port_t   *midiPort;
+        unsigned int   jackSamplerate;
+        unsigned int   jackNframes;
+        jack_port_t   *audioPortL;
+        jack_port_t   *audioPortR;
 };
 
 #endif

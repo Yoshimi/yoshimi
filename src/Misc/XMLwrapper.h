@@ -34,7 +34,7 @@ using namespace std;
 // max tree depth
 #define STACKSIZE 128
 
-class XMLwrapper : private MiscFuncs
+class XMLwrapper:private MiscFuncs
 {
     public:
         XMLwrapper();
@@ -52,11 +52,11 @@ class XMLwrapper : private MiscFuncs
         void endbranch(void); // this must be called after each branch (nodes
                               // that contains child nodes)
         bool loadXML(const string xml);
-        bool loadXMLfile(const string filename); 
+        bool loadXMLfile(const string filename);
         bool putXMLdata(string xmldata); // used by the clipboard
         bool enterbranch(const string name); // enter branch, returns true if is ok
         bool enterbranch(const string name, int id); // enter branch with id, return true if ok
-        void exitbranch(void) { pop(); };            // exit from a branch
+        void exitbranch(void) { pop(); }             // exit from a branch
 
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it
@@ -72,9 +72,12 @@ class XMLwrapper : private MiscFuncs
         // the same as getpar, but the limits are 0 and 127
         int getpar127(const string name, int defaultpar);
         int getparbool(const string name, int defaultpar);
-         string getparstr(const string name);
+        string getparstr(const string name);
         float getparreal(const string name, float defaultpar);
-        float getparreal(const string name, float defaultpar, float min, float max);
+        float getparreal(const string name,
+                         float defaultpar,
+                         float min,
+                         float max);
 
         bool minimal; // false if all parameters will be stored (used only for clipboard)
 
@@ -95,14 +98,19 @@ class XMLwrapper : private MiscFuncs
         // <name>
         // returns the node
         //mxml_node_t *addparams0(const char *name);
-        mxml_node_t *addparams0(const string  name);
+        mxml_node_t *addparams0(const string name);
 
         // adds params like this: <name par1="val1">, returns the node
-        mxml_node_t *addparams1(const string name, const string par1, const string val1);
+        mxml_node_t *addparams1(const string name,
+                                const string par1,
+                                const string val1);
 
         // adds params like this: <name par1="val1" par2="val2">, returns the node
-        mxml_node_t *addparams2(const string name, const string par1, const string val1,
-                                const string par2, const string val2);
+        mxml_node_t *addparams2(const string name,
+                                const string par1,
+                                const string val1,
+                                const string par2,
+                                const string val2);
 
         // this is used to store the parents
         mxml_node_t *parentstack[STACKSIZE];

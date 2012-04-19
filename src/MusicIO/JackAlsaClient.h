@@ -33,11 +33,13 @@ using namespace std;
 #include "MusicIO/JackEngine.h"
 #include "MusicIO/AlsaEngine.h"
 
-class JackAlsaClient : public MusicClient
+class JackAlsaClient:public MusicClient
 {
     public:
-        JackAlsaClient() : MusicClient() { };
-        ~JackAlsaClient() { Close(); };
+        JackAlsaClient():MusicClient() { }
+        ~JackAlsaClient() {
+            Close();
+        }
         bool openAudio(WavRecord *recorder);
         bool openMidi(WavRecord *recorder);
         bool Start(void);

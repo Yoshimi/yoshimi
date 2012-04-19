@@ -22,14 +22,12 @@
 
 bool JackClient::openAudio(WavRecord *recorder)
 {
-    if (!jackEngine.isConnected()
-        && !jackEngine.connectServer(Runtime.audioDevice))
-    {
+    if(!jackEngine.isConnected()
+       && !jackEngine.connectServer(Runtime.audioDevice)) {
         Runtime.Log("Failed to connect to jack server");
         return false;
     }
-    if (jackEngine.openAudio(recorder))
-    {
+    if(jackEngine.openAudio(recorder)) {
         Runtime.Samplerate = getSamplerate();
         Runtime.Buffersize = getBuffersize();
         return true;
@@ -41,13 +39,12 @@ bool JackClient::openAudio(WavRecord *recorder)
 
 bool JackClient::openMidi(WavRecord *recorder)
 {
-    if (!jackEngine.isConnected()
-        && !jackEngine.connectServer(Runtime.midiDevice))
-    {
+    if(!jackEngine.isConnected()
+       && !jackEngine.connectServer(Runtime.midiDevice)) {
         Runtime.Log("Failed to connect to jack server");
         return false;
     }
-    if (jackEngine.openMidi(recorder))
+    if(jackEngine.openMidi(recorder))
         return true;
     else
         Runtime.Log("JackClient failed to open midi");
@@ -55,41 +52,41 @@ bool JackClient::openMidi(WavRecord *recorder)
 }
 
 bool JackClient::Start(void)
-    { return jackEngine.Start() && MusicClient::Start(); }
+{ return jackEngine.Start() && MusicClient::Start(); }
 
 void JackClient::queueMidi(midimessage *msg)
-    { jackEngine.queueMidi(msg); }
+{ jackEngine.queueMidi(msg); }
 
 void JackClient::Close(void)
-    { jackEngine.Close(); wavrecord->Close(); }
+{ jackEngine.Close(); wavrecord->Close(); }
 
 void JackClient::queueProgramChange(unsigned char chan, unsigned short banknum,
                                     unsigned char prog, uint32_t eventframe)
-    { return jackEngine.queueProgramChange(chan, banknum, prog, eventframe); }
+{ return jackEngine.queueProgramChange(chan, banknum, prog, eventframe); }
 
 bool JackClient::jacksessionReply(string cmdline)
-    { return jackEngine.jacksessionReply(cmdline); }
+{ return jackEngine.jacksessionReply(cmdline); }
 
 unsigned int JackClient::getSamplerate(void)
-    { return jackEngine.getSamplerate(); }
+{ return jackEngine.getSamplerate(); }
 
 int JackClient::getBuffersize(void)
-    { return jackEngine.getBuffersize(); }
+{ return jackEngine.getBuffersize(); }
 
 int JackClient::audioLatency(void)
-    { return jackEngine.audioLatency(); }
+{ return jackEngine.audioLatency(); }
 
 int JackClient::midiLatency(void)
-    { return jackEngine.midiLatency(); }
+{ return jackEngine.midiLatency(); }
 
 string JackClient::audioClientName(void)
-    { return jackEngine.audioClientName(); }
+{ return jackEngine.audioClientName(); }
 
 string JackClient::midiClientName(void)
-    { return jackEngine.midiClientName(); }
+{ return jackEngine.midiClientName(); }
 
 int JackClient::audioClientId(void)
-    { return jackEngine.audioClientId(); }
+{ return jackEngine.audioClientId(); }
 
 int JackClient::midiClientId(void)
-    { return jackEngine.midiClientId(); }
+{ return jackEngine.midiClientId(); }

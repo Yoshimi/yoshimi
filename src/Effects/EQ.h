@@ -28,11 +28,11 @@
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
-class EQ : public Effect, private MiscFuncs
+class EQ:public Effect, private MiscFuncs
 {
     public:
         EQ(bool insertion_, float *efxoutl_, float *efxoutr_);
-        ~EQ() { };
+        ~EQ() { }
         void out(float *smpsl, float *smpr);
         void setpreset(unsigned char npreset);
         void changepar(int npar, unsigned char value);
@@ -58,5 +58,3 @@ class EQ : public Effect, private MiscFuncs
 };
 
 #endif
-
-

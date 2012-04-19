@@ -32,13 +32,13 @@
 
 class XMLwrapper;
 
-class Resonance : public Presets, public Carcass
+class Resonance:public Presets, public Carcass
 {
     public:
         Resonance();
         ~Resonance() { }
         void setpoint(int n, unsigned char p);
-        void applyres(int n, FFTFREQS& fftdata, float freq);
+        void applyres(int n, FFTFREQS &fftdata, float freq);
         void smooth(void);
         void interpolatepeaks(int type);
         void randomize(int type);
@@ -56,9 +56,9 @@ class Resonance : public Presets, public Carcass
 
         // parameters
         unsigned char Penabled;                 //if the ressonance is enabled
-        unsigned char Prespoints[N_RES_POINTS];	// how many points define the resonance function
-        unsigned char PmaxdB;			        // how many dB the signal may be amplified
-        unsigned char Pcenterfreq,Poctavesfreq; // the center frequency of the res. func., and the number of octaves
+        unsigned char Prespoints[N_RES_POINTS]; // how many points define the resonance function
+        unsigned char PmaxdB;                   // how many dB the signal may be amplified
+        unsigned char Pcenterfreq, Poctavesfreq; // the center frequency of the res. func., and the number of octaves
         unsigned char Pprotectthefundamental;   // the fundamental (1-st harmonic) is not damped, even it resonance function is low
 
         // controllers

@@ -28,11 +28,17 @@
 #include "Params/Presets.h"
 #include "Misc/Carcass.h"
 
-class LFOParams : public Presets, public Carcass
+class LFOParams:public Presets, public Carcass
 {
     public:
-        LFOParams(char Pfreq_, char Pintensity_, char Pstartphase_, char PLFOtype_,
-                  char Prandomness_, char Pdelay_, char Pcontinous, char fel_);
+        LFOParams(char Pfreq_,
+                  char Pintensity_,
+                  char Pstartphase_,
+                  char PLFOtype_,
+                  char Prandomness_,
+                  char Pdelay_,
+                  char Pcontinous,
+                  char fel_);
         ~LFOParams() { }
 
         void add2XML(XMLwrapper *xml);

@@ -26,11 +26,14 @@
 
 #include "DSP/Filter_.h"
 
-class SVFilter : public Filter_
+class SVFilter:public Filter_
 {
     public:
-        SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages);
-        ~SVFilter() { };
+        SVFilter(unsigned char Ftype,
+                 float Ffreq,
+                 float Fq,
+                 unsigned char Fstages);
+        ~SVFilter() { }
         void filterout(float *smp);
         void setfreq(float frequency);
         void setfreq_and_q(float frequency, float q_);
@@ -54,8 +57,8 @@ class SVFilter : public Filter_
         void computefiltercoefs(void);
         inline float dB2rap(float dB) { return exp10f((dB) / 20.0f); }
 
-        int type;      // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
-        int stages;    // how many times the filter is applied (0->1,1->2,etc.)
+        int   type;    // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
+        int   stages;  // how many times the filter is applied (0->1,1->2,etc.)
         float freq;    // Frequency given in Hz
         float q;       // Q factor (resonance or Q factor)
         float gain;    // the gain of the filter (if are shelf/peak) filters

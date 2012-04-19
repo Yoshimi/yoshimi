@@ -35,7 +35,7 @@ class LFO;
 class Filter;
 class Controller;
 
-class PADnote : public Carcass, private SynthHelper
+class PADnote:public Carcass, private SynthHelper
 {
     public:
         PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
@@ -46,7 +46,7 @@ class PADnote : public Carcass, private SynthHelper
                            int portamento_, int midinote, bool externcall);
 
         int noteout(float *outl, float *outr);
-        bool finished(void) { return finished_; };
+        bool finished(void) { return finished_; }
         void relasekey(void);
 
         bool ready;
@@ -57,13 +57,13 @@ class PADnote : public Carcass, private SynthHelper
         bool finished_;
         PADnoteParameters *pars;
 
-        int poshi_l;
-        int poshi_r;
+        int   poshi_l;
+        int   poshi_r;
         float poslo;
 
         float basefreq;
-        bool firsttime;
-        bool released;
+        bool  firsttime;
+        bool  released;
 
         int nsample, portamento;
 
@@ -77,10 +77,10 @@ class PADnote : public Carcass, private SynthHelper
             //****************************
             // FREQUENCY GLOBAL PARAMETERS
             //****************************
-            float Detune;//cents
+            float Detune; //cents
 
             Envelope *FreqEnvelope;
-            LFO *FreqLfo;
+            LFO      *FreqLfo;
 
             //****************************
             // AMPLITUDE GLOBAL PARAMETERS
@@ -90,10 +90,10 @@ class PADnote : public Carcass, private SynthHelper
             float Panning; // [ 0 .. 1 ]
 
             Envelope *AmpEnvelope;
-            LFO *AmpLfo;
+            LFO      *AmpLfo;
 
             struct {
-                int Enabled;
+                int   Enabled;
                 float initialvalue;
                 float dt;
                 float t;
@@ -105,7 +105,7 @@ class PADnote : public Carcass, private SynthHelper
             Filter *GlobalFilterL;
             Filter *GlobalFilterR;
 
-            float FilterCenterPitch;//octaves
+            float FilterCenterPitch; //octaves
             float FilterQ;
             float FilterFreqTracking;
 
@@ -115,22 +115,22 @@ class PADnote : public Carcass, private SynthHelper
         } NoteGlobalPar;
 
 
-        float globaloldamplitude;
-        float globalnewamplitude;
-        float velocity;
-        float realfreq;
+        float  globaloldamplitude;
+        float  globalnewamplitude;
+        float  velocity;
+        float  realfreq;
         float *tmpwave;
         Controller *ctl;
 
         // Legato vars
         struct {
-            bool silent;
-            float lastfreq;
+            bool      silent;
+            float     lastfreq;
             LegatoMsg msg;
             int decounter;
             struct {
                 // Fade In/Out vars
-                int length;
+                int   length;
                 float m;
                 float step;
             } fade;
@@ -139,8 +139,8 @@ class PADnote : public Carcass, private SynthHelper
                 // Note parameters
                 float freq;
                 float vel;
-                int portamento;
-                int midinote;
+                int   portamento;
+                int   midinote;
             } param;
         } Legato;
 };

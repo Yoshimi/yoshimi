@@ -40,7 +40,7 @@ class Filter;
 
 #define OSCIL_SMP_EXTRA_SAMPLES 5
 
-class ADnote : public Carcass, private SynthHelper
+class ADnote:public Carcass, private SynthHelper
 {
     public:
         ADnote(ADnoteParameters *pars, Controller *ctl_, float freq_,
@@ -49,7 +49,7 @@ class ADnote : public Carcass, private SynthHelper
 
         int noteout(float *outl, float *outr);
         void relasekey(void);
-        bool finished(void ) { return !NoteEnabled; }
+        bool finished(void) { return !NoteEnabled; }
         void ADlegatonote(float freq_, float velocity_, int portamento_,
                           int midinote_, bool externcall);
         char ready;
@@ -70,7 +70,7 @@ class ADnote : public Carcass, private SynthHelper
         void computeVoiceOscillatorMorph(int nvoice);
         void computeVoiceOscillatorRingModulation(int nvoice);
         void computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode);
-            // FMmode = 0 for phase modulation, 1 for Frequency modulation
+        // FMmode = 0 for phase modulation, 1 for Frequency modulation
         //  void ComputeVoiceOscillatorFrequencyModulation(int nvoice);
         void computeVoiceOscillatorPitchModulation(int nvoice);
 
@@ -81,8 +81,8 @@ class ADnote : public Carcass, private SynthHelper
 
         // Globals
         ADnoteParameters *partparams;
-        unsigned char stereo; // allows note Panning
-        int midinote;
+        unsigned char     stereo; // allows note Panning
+        int   midinote;
         float velocity;
         float basefreq;
 
@@ -92,26 +92,26 @@ class ADnote : public Carcass, private SynthHelper
         // Global parameters
         struct ADnoteGlobal {
             // Frequency global parameters
-            float  Detune; // cents
+            float     Detune; // cents
             Envelope *FreqEnvelope;
             LFO      *FreqLfo;
 
             // Amplitude global parameters
-            float  Volume;  // [ 0 .. 1 ]
-            float  Panning; // [ 0 .. 1 ]
+            float     Volume; // [ 0 .. 1 ]
+            float     Panning; // [ 0 .. 1 ]
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
             struct {
-                int      Enabled;
+                int   Enabled;
                 float initialvalue, dt, t;
             } Punch;
 
             // Filter global parameters
-            Filter *GlobalFilterL;
-            Filter *GlobalFilterR;
-            float  FilterCenterPitch; // octaves
-            float  FilterQ;
-            float  FilterFreqTracking;
+            Filter   *GlobalFilterL;
+            Filter   *GlobalFilterR;
+            float     FilterCenterPitch; // octaves
+            float     FilterQ;
+            float     FilterFreqTracking;
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
         } NoteGlobalPar;
@@ -119,10 +119,10 @@ class ADnote : public Carcass, private SynthHelper
 
         // Voice parameters
         struct ADnoteVoice {
-            bool Enabled;
-            int noisetype; // (sound/noise)
-            int filterbypass;
-            int DelayTicks;
+            bool   Enabled;
+            int    noisetype; // (sound/noise)
+            int    filterbypass;
+            int    DelayTicks;
             float *OscilSmp; // Waveform of the Voice
 
             // Frequency parameters
@@ -137,29 +137,29 @@ class ADnote : public Carcass, private SynthHelper
             LFO      *FreqLfo;
 
             // Amplitude parameters
-            float  Panning; // 0.0=left, 0.5 = center, 1.0 = right
-            float  Volume;  // [-1.0 .. 1.0]
+            float Panning;  // 0.0=left, 0.5 = center, 1.0 = right
+            float Volume;   // [-1.0 .. 1.0]
 
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
 
             // Filter parameters
-            Filter   *VoiceFilterL;
-            Filter   *VoiceFilterR;
+            Filter *VoiceFilterL;
+            Filter *VoiceFilterR;
 
-            float  FilterCenterPitch;
-            float  FilterFreqTracking;
+            float FilterCenterPitch;
+            float FilterFreqTracking;
 
             Envelope *FilterEnvelope;
             LFO      *FilterLfo;
 
             // Modullator parameters
-            FMTYPE FMEnabled;
-            int    FMVoice;
-            float *VoiceOut; // Voice Output used by other voices if use this as modullator
-            float *FMSmp; // Wave of the Voice
-            float  FMVolume;
-            float  FMDetune; // in cents
+            FMTYPE    FMEnabled;
+            int       FMVoice;
+            float    *VoiceOut; // Voice Output used by other voices if use this as modullator
+            float    *FMSmp; // Wave of the Voice
+            float     FMVolume;
+            float     FMDetune; // in cents
             Envelope *FMFreqEnvelope;
             Envelope *FMAmpEnvelope;
         } NoteVoicePar[NUM_VOICES];
@@ -203,10 +203,10 @@ class ADnote : public Carcass, private SynthHelper
         float *FMoldsmp[NUM_VOICES];
 
         // temporary buffers
-        float *tmpwavel;
-        float *tmpwaver;
+        float  *tmpwavel;
+        float  *tmpwaver;
         float **tmpwave_unison;
-        int max_unison;
+        int     max_unison;
 
         // Filter bypass samples
         float *bypassl;
@@ -227,27 +227,23 @@ class ADnote : public Carcass, private SynthHelper
 
         // Legato vars
         struct {
-            bool silent;
-            float lastfreq;
+            bool      silent;
+            float     lastfreq;
             LegatoMsg msg;
             int decounter;
             struct {
                 // Fade In/Out vars
-                int length;
+                int   length;
                 float m;
                 float step;
             } fade;
             struct {
                 // Note parameters
                 float freq, vel;
-                int portamento;
-                int midinote;
+                int   portamento;
+                int   midinote;
             } param;
         } Legato;
 };
 
 #endif
-
-
-
-

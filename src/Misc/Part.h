@@ -43,7 +43,7 @@ class Microtonal;
 class EffectMgr;
 class FFTwrapper;
 
-class Part : private MiscFuncs, SynthHelper
+class Part:private MiscFuncs, SynthHelper
 {
     public:
         Part(Microtonal *microtonal_, FFTwrapper *fft_);
@@ -58,9 +58,11 @@ class Part : private MiscFuncs, SynthHelper
         void ComputePartSmps(void);
         bool Active(void) { return Penabled && !partMuted; }
         void cleanup(void);
-        void NoteOn(unsigned char note, unsigned char velocity, int masterkeyshift);
+        void NoteOn(unsigned char note,
+                    unsigned char velocity,
+                    int masterkeyshift);
         void NoteOff(unsigned char note);
-        void AllNotesOff(void) { killallnotes = true; };
+        void AllNotesOff(void) { killallnotes = true; }
         void SetController(unsigned int type, int par);
         void RelaseSustainedKeys(void);
         void RelaseAllKeys(void);
@@ -80,15 +82,15 @@ class Part : private MiscFuncs, SynthHelper
 
         // the part's kit
         struct {
-            string        Pname;
-            unsigned char Penabled;
-            unsigned char Pmuted;
-            unsigned char Pminkey;
-            unsigned char Pmaxkey;
-            unsigned char Padenabled;
-            unsigned char Psubenabled;
-            unsigned char Ppadenabled;
-            unsigned char Psendtoparteffect;
+            string Pname;
+            unsigned char      Penabled;
+            unsigned char      Pmuted;
+            unsigned char      Pminkey;
+            unsigned char      Pmaxkey;
+            unsigned char      Padenabled;
+            unsigned char      Psubenabled;
+            unsigned char      Ppadenabled;
+            unsigned char      Psendtoparteffect;
             ADnoteParameters  *adpars;
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
@@ -119,10 +121,10 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pkeylimit;   // how many keys are alowed to be played same
                                    // time (0=off), the older will be relased
 
-        string        Pname;       // name of the instrument
+        string Pname;              // name of the instrument
         struct {                   // instrument additional information
-            string        Pauthor;
-            string        Pcomments;
+            string Pauthor;
+            string Pcomments;
         } info;
 
         float *partoutl; // Left channel output of the part
@@ -133,7 +135,9 @@ class Part : private MiscFuncs, SynthHelper
         float *partfxinputl[NUM_PART_EFX + 1];
         float *partfxinputr[NUM_PART_EFX + 1];
 
-        enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
+        enum NoteStatus {
+            KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED
+        };
 
         float volume;      // applied by Master,
         float oldvolumel;  //
@@ -164,10 +168,10 @@ class Part : private MiscFuncs, SynthHelper
             int note; // -1 if there is no note playing
             int itemsplaying;
             struct {
-                ADnote *adnote;
+                ADnote  *adnote;
                 SUBnote *subnote;
                 PADnote *padnote;
-                int sendtoparteffect;
+                int      sendtoparteffect;
             } kititem[NUM_KIT_ITEMS];
             int time;
         };
@@ -175,7 +179,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char FilterLfoControlLsb;
 
         bool killallnotes;        // true if I want to kill all notes (ie, panic)
-        int lastpos, lastposb;    // To keep track of previously used pos and posb.
+        int  lastpos, lastposb;   // To keep track of previously used pos and posb.
         bool lastlegatomodevalid; // To keep track of previous legatomodevalid.
 
         // MonoMem stuff

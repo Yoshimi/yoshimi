@@ -33,7 +33,7 @@ class Controller;
 class Envelope;
 class Filter;
 
-class SUBnote : public Carcass, private SynthHelper
+class SUBnote:public Carcass, private SynthHelper
 {
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
@@ -44,8 +44,8 @@ class SUBnote : public Carcass, private SynthHelper
         void SUBlegatonote(float freq, float velocity,
                            int portamento_, int midinote, bool externcall);
 
-        int noteout(float *outl,float *outr); // note output, return 0 if the
-                                              // note is finished
+        int noteout(float *outl, float *outr); // note output, return 0 if the
+                                               // note is finished
         void relasekey(void);
         bool finished(void) { return !NoteEnabled; }
 
@@ -58,13 +58,13 @@ class SUBnote : public Carcass, private SynthHelper
 
         SUBnoteParameters *pars;
 
-        bool stereo;
-        int numstages; // number of stages of filters
-        int numharmonics; // number of harmonics (after the too higher hamonics are removed)
-        int firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
-        int start; // how the harmonics start
-        float basefreq;
-        float panning;
+        bool      stereo;
+        int       numstages; // number of stages of filters
+        int       numharmonics; // number of harmonics (after the too higher hamonics are removed)
+        int       firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
+        int       start; // how the harmonics start
+        float     basefreq;
+        float     panning;
         Envelope *AmpEnvelope;
         Envelope *FreqEnvelope;
         Envelope *BandWidthEnvelope;
@@ -74,9 +74,9 @@ class SUBnote : public Carcass, private SynthHelper
         Envelope *GlobalFilterEnvelope;
 
         // internal values
-        bool NoteEnabled;
-        int firsttick;
-        int portamento;
+        bool  NoteEnabled;
+        int   firsttick;
+        int   portamento;
         float volume;
         float oldamplitude;
         float newamplitude;
@@ -98,8 +98,15 @@ class SUBnote : public Carcass, private SynthHelper
             float yn2;   // filter internal values
         };
 
-        void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
-        void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
+        void initfilter(bpfilter &filter,
+                        float freq,
+                        float bw,
+                        float amp,
+                        float mag);
+        void computefiltercoefs(bpfilter &filter,
+                                float freq,
+                                float bw,
+                                float gain);
         void filter(bpfilter &filter, float *smps);
 
         bpfilter *lfilter;
@@ -109,19 +116,19 @@ class SUBnote : public Carcass, private SynthHelper
         float *tmprnd; // this is filled with random numbers
 
         Controller *ctl;
-        int oldpitchwheel;
-        int oldbandwidth;
+        int   oldpitchwheel;
+        int   oldbandwidth;
         float globalfiltercenterq;
 
         // Legato vars
         struct {
-            bool silent;
-            float lastfreq;
+            bool      silent;
+            float     lastfreq;
             LegatoMsg msg;
             int decounter;
             struct {
                 // Fade In/Out vars
-                int length;
+                int   length;
                 float m;
                 float step;
             } fade;
@@ -130,8 +137,8 @@ class SUBnote : public Carcass, private SynthHelper
                 // Note parameters
                 float freq;
                 float vel;
-                int portamento;
-                int midinote;
+                int   portamento;
+                int   midinote;
             } param;
         } Legato;
 
