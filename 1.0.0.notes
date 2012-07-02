@@ -1,3 +1,8 @@
+yoshimi-1.0.0
+
+* In memory of Alan Calvert who passed away exactly one year ago. Cal, we're pretty sure it's only angel horns you hear and no devil trombones!
+* Previously when microtonal loaded .xsz files, it did not convert the tunings back into their x.y format, which was displayed to the user, this patch corrects this mistake. Thanks to Mark McCurry for the patch.
+
 yoshimi-0.060.12
 
 * Fix for the keyshift/microtonal issue, patch provided by RPD (Rob). Thanks!
