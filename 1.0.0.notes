@@ -1,7 +1,11 @@
 yoshimi-1.0.0
 
 * In memory of Alan Calvert who passed away exactly one year ago. Cal, we're pretty sure it's only angel horns you hear and no devil trombones!
+* Modified INSTALL file and added instructions on how to build Yoshimi outside the source tree. Thanks to Jimmy for the instructions.
 * Previously when microtonal loaded .xsz files, it did not convert the tunings back into their x.y format, which was displayed to the user, this patch corrects this mistake. Thanks to Mark McCurry for the patch.
+* Renamed Yoshimi icon.
+* Applied patch from SourceForge ticket #3487751 (Simplify desktop file and install it and the icon file). Thanks to Tim harder for this patch.
+* Yoshimi likes GCC >= 4.7 again.
 
 yoshimi-0.060.12
 
