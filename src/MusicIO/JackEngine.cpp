@@ -307,8 +307,6 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
             return false;
         }
     }
-    memset(audio.portBuffs[0], 0, sizeof(float) * nframes);
-    memset(audio.portBuffs[1], 0, sizeof(float) * nframes);
     getAudio();
     memcpy(audio.portBuffs[0], zynLeft, sizeof(float) * nframes);
     memcpy(audio.portBuffs[1], zynRight, sizeof(float) * nframes);

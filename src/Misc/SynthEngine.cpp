@@ -364,14 +364,14 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     if (isMuted())
         return;
 
+    actionLock(lock);
+
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
         {
-            actionLock(lock);
             part[npart]->ComputePartSmps();
-            actionLock(unlock);
         }
     // Insertion effects
     int nefx;
@@ -382,9 +382,7 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
             int efxpart = Pinsparts[nefx];
             if (part[efxpart]->Penabled)
             {
-                actionLock(lock);
                 insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
-                actionLock(unlock);
             }
         }
     }
@@ -443,10 +441,8 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 float vol = sysefxvol[nefx][npart];
                 for (int i = 0; i < buffersize; ++i)
                 {
-                    actionLock(lock);
                     tmpmixl[i] += part[npart]->partoutl[i] * vol;
                     tmpmixr[i] += part[npart]->partoutr[i] * vol;
-                    actionLock(unlock);
                 }
             }
         }
@@ -459,10 +455,8 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
                 float v = sysefxsend[nefxfrom][nefx];
                 for (int i = 0; i < buffersize; ++i)
                 {
-                    actionLock(lock);
                     tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
                     tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
-                    actionLock(unlock);
                 }
             }
         }
@@ -472,10 +466,8 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
         float outvol = sysefx[nefx]->sysefxgetvolume();
         for (int i = 0; i < buffersize; ++i)
         {
-            actionLock(lock);
             outl[i] += tmpmixl[i] * outvol;
             outr[i] += tmpmixr[i] * outvol;
-            actionLock(unlock);
         }
     }
 
@@ -484,10 +476,8 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     {
         for (int i = 0; i < buffersize; ++i)
         {   // the volume did not change
-            actionLock(lock);
             outl[i] += part[npart]->partoutl[i];
             outr[i] += part[npart]->partoutr[i];
-            actionLock(unlock);
         }
     }
 
@@ -496,11 +486,11 @@ void SynthEngine::MasterAudio(float *outl, float *outr)
     {
         if (Pinsparts[nefx] == -2)
         {
-            actionLock(lock);
             insefx[nefx]->out(outl, outr);
-            actionLock(unlock);
         }
     }
+
+    actionLock(unlock);
 
     LFOParams::time++; // update the LFO's time
 
