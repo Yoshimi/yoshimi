@@ -152,6 +152,10 @@ class ConfigUI {open : {private MiscFuncs}
               label QWERTZ
               xywh {35 35 100 20} labelfont 1 labelsize 11
             }
+            MenuItem {} {
+              label AZERTY
+              xywh {45 45 100 20} labelfont 1 labelsize 11
+            }
           }
           Fl_Input SessionStateFile {
             label {Session state save file}
