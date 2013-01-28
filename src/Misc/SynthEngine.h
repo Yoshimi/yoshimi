@@ -77,7 +77,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
 
         Part *part[NUM_MIDI_PARTS];
-        bool wantJackPorts[NUM_MIDI_PARTS];
         bool shutup;
 
         // parameters
