@@ -110,9 +110,6 @@ class Config : public MiscFuncs
 
         string        alsaMidiDevice;
         string        nameTag;
-        string        masterPrefix;
-        bool          jackMulti;
-        unsigned long jackMultiMask;
 
         int           BankUIAutoClose;
         int           Interpolation;

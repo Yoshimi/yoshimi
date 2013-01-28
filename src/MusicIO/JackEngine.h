@@ -79,8 +79,8 @@ class JackEngine : public MusicIO
         struct {
             unsigned int  jackSamplerate;
             unsigned int  jackNframes;
-            jack_port_t  *ports[NUM_MIDI_PARTS * 2 + 2];
-            float        *portBuffs[NUM_MIDI_PARTS * 2 + 2];
+            jack_port_t  *ports[2];
+            float        *portBuffs[2];
         } audio;
 
         struct {

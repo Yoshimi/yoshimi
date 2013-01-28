@@ -69,12 +69,9 @@ static struct argp_option cmd_options[] = {
     {"jack-midi",         'j',  "<device>", 0x1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
     {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
-    {"jack-multi",        'M',  NULL,         0,  "use per-part jack outputs" },
-    {"jack-multi-mask",   'B',  "<value>",    0,  "16-bit mask for enabling jack outputs from parts, e.g. 0xffff" },
     {"load",              'l',  "<file>",     0,  "load .xmz file" },
     {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
-    {"master-prefix",     'P',  "<prefix>",   0,  "prefix to master out ports, default is none" },
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
     {"oscilsize",         'o',  "<size>",     0,  "set oscilsize" },
     {"state",             'S',  "<file>",   0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
@@ -105,9 +102,6 @@ Config::Config() :
     connectJackaudio(false),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
-    masterPrefix(""),
-    jackMulti(false),
-    jackMultiMask(0xFFFF),
     BankUIAutoClose(0),
     Interpolation(0),
     CheckPADsynth(1),
@@ -912,9 +906,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
     {
         case 'c': settings->showConsole = true; break;
         case 'N': settings->nameTag = string(arg); break;
-        case 'P': settings->masterPrefix = string(arg); break;
-        case 'M': settings->jackMulti = true; break;
-        case 'B': settings->jackMultiMask = strtoul(arg, NULL, 0); break;
         case 'l': settings->paramsLoad = string(arg); break;
         case 'L': settings->instrumentLoad = string(arg); break;
         case 'R': settings->Samplerate = Runtime.string2int(string(arg)); break;
