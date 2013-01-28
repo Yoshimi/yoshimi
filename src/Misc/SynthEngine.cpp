@@ -55,7 +55,10 @@ SynthEngine::SynthEngine() :
 {
     ctl = new Controller();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {
         part[npart] = NULL;
+        wantJackPorts[npart] = (Runtime.jackMultiMask >> npart) & 1;
+    }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx] = NULL;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
@@ -941,5 +944,3 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     det = octdet + cdet + findet;
     return det;
 }
-
-

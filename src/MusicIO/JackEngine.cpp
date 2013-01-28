@@ -207,7 +207,7 @@ bool JackEngine::openAudio(void)
     {
         string pname;
         for (int partn = 0; partn < NUM_MIDI_PARTS; ++partn)
-            if ((Runtime.jackMultiMask >> partn) & 1)
+            if (synth->wantJackPorts[partn])
             {
                 pname = string("_00_").replace((partn < 9 ? 2 : 1),
                                         (partn < 9 ? 1 : 2), Runtime.asString(partn + 1));
@@ -334,7 +334,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     if (Runtime.jackMulti)
         for (int partn = 0; partn < NUM_MIDI_PARTS; ++partn)
         {
-            if ((synth->part[partn]->Penabled) && ((Runtime.jackMultiMask >> partn) & 1))
+            if (synth->wantJackPorts[partn] && synth->part[partn] && synth->part[partn]->Penabled)
             {
                 memcpy(audio.portBuffs[2 * partn + 2], synth->part[partn]->partoutl, sizeof(float) * nframes);
                 memcpy(audio.portBuffs[2 * partn + 3], synth->part[partn]->partoutr, sizeof(float) * nframes);
