@@ -33,7 +33,7 @@ JackEngine::JackEngine() : jackClient(NULL)
 {
     audio.jackSamplerate = 0;
     audio.jackNframes = 0;
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < NUM_MIDI_PARTS * 2 + 2; ++i)
     {
         audio.ports[i] = NULL;
         audio.portBuffs[i] = NULL;
@@ -170,7 +170,7 @@ void JackEngine::Close(void)
     if (NULL != jackClient)
     {
         int chk;
-        for (int chan = 0; chan < 2; ++chan)
+        for (int chan = 0; chan < NUM_MIDI_PARTS * 2 + 2; ++chan)
         {
             if (NULL != audio.ports[chan])
                 jack_port_unregister(jackClient, audio.ports[chan]);
@@ -199,9 +199,26 @@ bool JackEngine::openAudio(void)
 {
     const char *portnames[] = { "left", "right" };
     for (int port = 0; port < 2; ++port)
-        audio.ports[port] = jack_port_register(jackClient, portnames[port],
-                                               JACK_DEFAULT_AUDIO_TYPE,
-                                               JackPortIsOutput, 0);
+        audio.ports[port] = jack_port_register(jackClient,
+                                string(Runtime.masterPrefix + portnames[port]).c_str(),
+                                JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+
+    if (Runtime.jackMulti)
+    {
+        string pname;
+        for (int partn = 0; partn < NUM_MIDI_PARTS; ++partn)
+            if ((Runtime.jackMultiMask >> partn) & 1)
+            {
+                pname = string("_00_").replace((partn < 9 ? 2 : 1),
+                                        (partn < 9 ? 1 : 2), Runtime.asString(partn + 1));
+                for (int chan = 0; chan < 2; ++chan)
+                    audio.ports[2 * partn + 2 + chan] = jack_port_register(jackClient,
+                                                        (pname + portnames[chan]).c_str(),
+                                                           JACK_DEFAULT_AUDIO_TYPE,
+                                                           JackPortIsOutput, 0);
+            }
+    }
+
     if (audio.ports[0] && audio.ports[1])
         return prepBuffers(false) && latencyPrep();
     else
@@ -236,11 +253,11 @@ bool JackEngine::connectJackPorts(void)
 {
     const char** playback_ports = jack_get_ports(jackClient, NULL, NULL,
                                                  JackPortIsPhysical|JackPortIsInput);
-	if (!playback_ports)
+    if (!playback_ports)
     {
         Runtime.Log("No physical jack playback ports found.");
         return false;
-	}
+    }
     int ret;
     for (int port = 0; port < 2 && NULL != audio.ports[port]; ++port)
     {
@@ -297,19 +314,33 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
 bool JackEngine::processAudio(jack_nframes_t nframes)
 {
-    for (int port = 0; port < 2; ++port)
+    for (int port = 0; port < NUM_MIDI_PARTS * 2 + 2; ++port)
     {
-        audio.portBuffs[port] =
-            (float*)jack_port_get_buffer(audio.ports[port], nframes);
-        if (!audio.portBuffs[port])
+        if (NULL != audio.ports[port])
         {
-            Runtime.Log("Failed to get jack audio port buffer: " + asString(port));
-            return false;
+            audio.portBuffs[port] =
+                (float*)jack_port_get_buffer(audio.ports[port], nframes);
+            if (!audio.portBuffs[port])
+            {
+                Runtime.Log("Failed to get jack audio port buffer: " + asString(port));
+                return false;
+            }
         }
     }
     getAudio();
     memcpy(audio.portBuffs[0], zynLeft, sizeof(float) * nframes);
     memcpy(audio.portBuffs[1], zynRight, sizeof(float) * nframes);
+
+    if (Runtime.jackMulti)
+        for (int partn = 0; partn < NUM_MIDI_PARTS; ++partn)
+        {
+            if ((synth->part[partn]->Penabled) && ((Runtime.jackMultiMask >> partn) & 1))
+            {
+                memcpy(audio.portBuffs[2 * partn + 2], synth->part[partn]->partoutl, sizeof(float) * nframes);
+                memcpy(audio.portBuffs[2 * partn + 3], synth->part[partn]->partoutr, sizeof(float) * nframes);
+            }
+        }
+
     return true;
 }
 
