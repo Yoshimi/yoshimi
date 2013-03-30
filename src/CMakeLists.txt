@@ -249,7 +249,7 @@ add_definitions (
 add_definitions (-DMAX_BANK_ROOT_DIRS=128)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
-add_definitions (-DPAD_MAX_SAMPLES=64)
+add_definitions (-DPAD_MAX_SAMPLES=96)
 add_definitions (-DNUM_MIDI_PARTS=16)
 add_definitions (-DNUM_MIDI_CHANNELS=16)
 add_definitions (-DMAX_ENVELOPE_POINTS=40)
