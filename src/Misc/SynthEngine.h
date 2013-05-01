@@ -70,7 +70,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);
-        void MasterAudio(float *outl, float *outr);
+        void MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS]);
         void partonoff(int npart, int what);
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }

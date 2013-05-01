@@ -23,6 +23,7 @@
 #include <jack/thread.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sstream>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ JackEngine::JackEngine() : jackClient(NULL)
 {
     audio.jackSamplerate = 0;
     audio.jackNframes = 0;
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < (2 * NUM_MIDI_PARTS + 2); ++i)
     {
         audio.ports[i] = NULL;
         audio.portBuffs[i] = NULL;
@@ -116,6 +117,7 @@ bool JackEngine::openJackClient(string server)
 
 bool JackEngine::Start(void)
 {
+    bool jackPortsRegistered = true;
     jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)
@@ -132,8 +134,8 @@ bool JackEngine::Start(void)
 
     if (midi.port && !Runtime.startThread(&midi.pThread, _midiThread, this, true, true))
     {
-            Runtime.Log("Failed to start jack midi thread");
-            goto bail_out;
+        Runtime.Log("Failed to start jack midi thread");
+        goto bail_out;
     }
 
     if (!latencyPrep())
@@ -142,9 +144,16 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    if (!jack_activate(jackClient)
-        && NULL != audio.ports[0]
-        && NULL != audio.ports[1])
+    for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port)
+    {
+        if (!audio.ports[port])
+        {
+            jackPortsRegistered = false;
+            break;
+        }
+    }
+
+    if (!jack_activate(jackClient) && jackPortsRegistered)
     {
         if (!Runtime.restoreJackSession && Runtime.connectJackaudio && !connectJackPorts())
         {
@@ -170,7 +179,7 @@ void JackEngine::Close(void)
     if (NULL != jackClient)
     {
         int chk;
-        for (int chan = 0; chan < 2; ++chan)
+        for (int chan = 0; chan < (2*NUM_MIDI_PARTS+2); ++chan)
         {
             if (NULL != audio.ports[chan])
                 jack_port_unregister(jackClient, audio.ports[chan]);
@@ -197,12 +206,28 @@ void JackEngine::Close(void)
 
 bool JackEngine::openAudio(void)
 {
-    const char *portnames[] = { "left", "right" };
-    for (int port = 0; port < 2; ++port)
-        audio.ports[port] = jack_port_register(jackClient, portnames[port],
-                                               JACK_DEFAULT_AUDIO_TYPE,
-                                               JackPortIsOutput, 0);
-    if (audio.ports[0] && audio.ports[1])
+    //Register mixer outputs for all channels
+    audio.ports[2 * NUM_MIDI_PARTS] = jack_port_register(jackClient, "left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+    audio.ports[2 * NUM_MIDI_PARTS + 1] = jack_port_register(jackClient, "right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+
+    for (int port = 0; port < 2 * NUM_MIDI_PARTS; ++port)
+    {
+        stringstream portName;
+        portName << "track_" << ((port / 2) + 1) << ((port % 2) ? "_r" : "_l");
+        audio.ports[port] = jack_port_register(jackClient, portName.str().c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+    }
+
+    bool jackPortsRegistered = true;
+    for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port)
+    {
+        if (!audio.ports[port])
+        {
+            jackPortsRegistered = false;
+            break;
+        }
+    }
+
+    if (jackPortsRegistered)
         return prepBuffers(false) && latencyPrep();
     else
         Runtime.Log("Failed to register jack audio ports");
@@ -242,7 +267,7 @@ bool JackEngine::connectJackPorts(void)
         return false;
 	}
     int ret;
-    for (int port = 0; port < 2 && NULL != audio.ports[port]; ++port)
+    for (int port = 0; (port < (2 * NUM_MIDI_PARTS)) && (NULL != audio.ports[port]); ++port)
     {
         const char *port_name = jack_port_name(audio.ports[port]);
         if ((ret = jack_connect(jackClient, port_name, playback_ports[port])))
@@ -297,7 +322,7 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
 bool JackEngine::processAudio(jack_nframes_t nframes)
 {
-    for (int port = 0; port < 2; ++port)
+    for (int port = 0; port < (2*NUM_MIDI_PARTS+2); ++port)
     {
         audio.portBuffs[port] =
             (float*)jack_port_get_buffer(audio.ports[port], nframes);
@@ -308,8 +333,14 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         }
     }
     getAudio();
-    memcpy(audio.portBuffs[0], zynLeft, sizeof(float) * nframes);
-    memcpy(audio.portBuffs[1], zynRight, sizeof(float) * nframes);
+    for (int port = 0; port < NUM_MIDI_PARTS; ++port)
+    {
+        memcpy(audio.portBuffs[port * 2], zynLeft[port], sizeof(float) * nframes);
+        memcpy(audio.portBuffs[port * 2 + 1], zynRight[port], sizeof(float) * nframes);
+    }
+    //And mixed outputs
+    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], sizeof(float) * nframes);
+    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], sizeof(float) * nframes);
     return true;
 }
 
