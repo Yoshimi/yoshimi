@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2013, Nikita Zlobin
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -29,6 +30,7 @@
 #include <string>
 #include <argp.h>
 #include <libgen.h>
+#include <limits.h>
 
 #if defined(__SSE__)
 #include <xmmintrin.h>
@@ -170,10 +172,22 @@ bool Config::Setup(int argc, char **argv)
     if (!midiDevice.size())
         midiDevice = "default";
     loadCmdArgs(argc, argv);
-    if (restoreState && !(StateFile.size() && isRegFile(StateFile)))
+    if (restoreState)
     {
-        Log("Invalid state file specified for restore: " + StateFile);
-        return false;
+        char * fp;
+        if (! StateFile.size()) goto no_state0;
+        else fp = new char [PATH_MAX];
+
+        if (! realpath (StateFile.c_str(), fp)) goto no_state1;
+        StateFile = fp;
+        delete (fp);
+
+        if (! isRegFile(StateFile))
+        {
+ no_state1: delete (fp);
+ no_state0: Log("Invalid state file specified for restore: " + StateFile);
+            return false;
+        }
     }
     AntiDenormals(true);
     return true;
