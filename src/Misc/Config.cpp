@@ -184,8 +184,8 @@ bool Config::Setup(int argc, char **argv)
 
         if (! isRegFile(StateFile))
         {
- no_state1: delete (fp);
- no_state0: Log("Invalid state file specified for restore: " + StateFile);
+            no_state1: delete (fp);
+            no_state0: Log("Invalid state file specified for restore: " + StateFile);
             return false;
         }
     }
