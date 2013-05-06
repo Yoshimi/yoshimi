@@ -835,7 +835,7 @@ Offset}
       Fl_Button {} {
         label {Close Window}
         callback {instrumentkitlist->hide();}
-        xywh {375 350 160 20} box THIN_UP_BOX
+        xywh {375 348 160 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
@@ -1092,7 +1092,7 @@ Offset}
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {150 335 95 25} box THIN_UP_BOX
+        xywh {150 333 95 25} box THIN_UP_BOX
       }
     }
   }
