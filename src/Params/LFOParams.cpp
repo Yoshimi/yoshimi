@@ -82,7 +82,7 @@ void LFOParams::add2XML(XMLwrapper *xml)
     xml->addpar("randomness_frequency", Pfreqrand);
     xml->addpar("delay", Pdelay);
     xml->addpar("stretch", Pstretch);
-    xml->addparbool("continous",    Pcontinous);
+    xml->addparbool("continuous",    Pcontinous);
 }
 
 
@@ -96,5 +96,5 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pfreqrand = xml->getpar127("randomness_frequency", Pfreqrand);
     Pdelay = xml->getpar127("delay", Pdelay);
     Pstretch = xml->getpar127("stretch", Pstretch);
-    Pcontinous = xml->getparbool("continous", Pcontinous);
+    Pcontinous = xml->getparbool("continuous", Pcontinous);
 }

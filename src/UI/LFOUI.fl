@@ -140,7 +140,7 @@ hide();
         Fl_Check_Button continous {
           label {C.}
           callback {pars->Pcontinous=(int)o->value();}
-          tooltip {Continous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
+          tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
