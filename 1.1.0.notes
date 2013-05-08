@@ -1,3 +1,14 @@
+yoshimi-1.1.0
+
+* LAC2013 Graz edition
+* Optimization patches provided by Kristian Amlie.
+* Added The Mysterious Bank by Florian Dupeyron aka My?terious.
+* Virtual keyboard AZERTY patch, thanks to David Adler.
+* Yoshimi has shiny new knobs! Thanks to Alessandro Preziosi aka licnep.
+* Multiple JACK outputs implementation by Andrew Deryabin..
+* Expand state file path before any check by Nikito Zlobin.
+* Some minor cosmetic changes (placement of Close buttons, resized the panel window).
+
 yoshimi-1.0.0
 
 * In memory of Alan Calvert who passed away exactly one year ago. Cal, we're pretty sure it's only angel horns you hear and no devil trombones!
