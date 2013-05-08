@@ -5,7 +5,7 @@ yoshimi-1.1.0
 * Added The Mysterious Bank by Florian Dupeyron aka My?terious.
 * Virtual keyboard AZERTY patch, thanks to David Adler.
 * Yoshimi has shiny new knobs! Thanks to Alessandro Preziosi aka licnep.
-* Multiple JACK outputs implementation by Andrew Deryabin..
+* Multiple JACK outputs implementation by Andrew Deryabin.
 * Expand state file path before any check by Nikita Zlobin.
 * Some minor cosmetic changes (placement of Close buttons, resized the panel window).
 
