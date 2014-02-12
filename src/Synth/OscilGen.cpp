@@ -341,6 +341,61 @@ float OscilGen::basefunc_sqr(float x, float a)
     return -atanf(sinf(x * 2.0f * PI) * a);
 }
 
+
+float OscilGen::basefunc_spike(float x, float a)
+{
+    float b = a * 0.66666; // the width of the range: if a == 0.5, b == 0.33333
+
+    if(x < 0.5)
+    {
+        if(x < (0.5 - (b / 2.0)))
+            return 0.0;
+        else
+	{
+            x = (x + (b / 2) - 0.5) * (2.0 / b); // shift to zero, and expand to range from 0 to 1
+            return x * (2.0 / b); // this is the slope: 1 / (b / 2)
+        }
+    }
+    else
+    {
+        if(x > (0.5 + (b / 2.0)))
+            return 0.0;
+        else
+	{
+            x = (x - 0.5) * (2.0 / b);
+            return (1 - x) * (2.0 / b);
+        }
+    }
+}
+
+
+float OscilGen::basefunc_circle(float x, float a)
+{
+    // a is parameter: 0 -> 0.5 -> 1 // O.5 = circle
+    float b, y;
+
+    b = 2 - (a * 2); // b goes from 2 to 0
+    x = x * 4;
+
+    if(x < 2)
+    {
+        x = x - 1; // x goes from -1 to 1
+        if((x < -b) || (x > b))
+            y = 0;
+        else
+            y = sqrt(1 - (pow(x, 2) / pow(b, 2)));  // normally * a^2, but a stays 1
+    }
+    else
+    {
+        x = x - 3; // x goes from -1 to 1 as well
+        if((x < -b) || (x > b))
+            y = 0;
+        else
+            y = -sqrt(1 - (pow(x, 2) / pow(b, 2)));
+    }
+    return y;
+}
+
 // Base Functions - END
 
 
@@ -446,6 +501,12 @@ void OscilGen::getbasefunction(float *smps)
                     break;
                 case 13:
                     smps[i] = basefunc_sqr(t, par);
+                    break;
+                case 14:
+                    smps[i] = basefunc_spike(t, par);
+                    break;
+                case 15:
+                    smps[i] = basefunc_circle(t, par);
                     break;
                 default:
                     smps[i] = -sinf(2.0f * PI * (float)i / synth->oscilsize_f);

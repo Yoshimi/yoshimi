@@ -163,6 +163,8 @@ class OscilGen : public Presets, private WaveShapeSamples
         float basefunc_absstretchsine(float x, float a);
         float basefunc_chebyshev(float x, float a);
         float basefunc_sqr(float x, float a);
+        float basefunc_spike(float x, float a);
+        float basefunc_circle(float x, float a);
 
         float harmonicRandom(void);
 

@@ -46,10 +46,10 @@ class Phaser : public Effect
         // Parametrii Phaser
         EffectLFO lfo;           // <lfo-ul Phaser
         unsigned char Pvolume;
-        unsigned char Ppanning;
+//        unsigned char Ppanning;
         unsigned char Pdepth;    // <depth of Phaser
         unsigned char Pfb;       // <feedback
-        unsigned char Plrcross;  // <feedback
+//        unsigned char Plrcross;  // <feedback
         unsigned char Pstages;
         unsigned char Poutsub;   // <substract the output instead of adding it
         unsigned char Pphase;

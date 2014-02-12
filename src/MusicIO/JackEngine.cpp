@@ -434,7 +434,7 @@ void *JackEngine::midiThread(void)
     if (sem_init(&midiSem, 0, 0) < 0)
     {
         Runtime.Log("Error on jack midi sem_init " + string(strerror(errno)));
-        return false;
+        return NULL;
     }
 
     while (Runtime.runSynth)
