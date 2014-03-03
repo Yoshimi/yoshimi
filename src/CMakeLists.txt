@@ -355,7 +355,6 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
-    z
 )
 
 set (CMAKE_EXE_LINKER_FLAGS "-ldl")

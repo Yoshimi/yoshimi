@@ -310,8 +310,9 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
         Fl_Value_Output detunevalueoutput {
           label Detune
           callback {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
-          xywh {448 25 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10
-          code0 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
+          xywh {448 25 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+          code0 {o->step(0.01, 1);}
+          code1 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
         }
         Fl_Check_Button hz440 {
           label 440Hz

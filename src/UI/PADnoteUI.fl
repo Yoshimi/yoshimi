@@ -477,9 +477,10 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
           }
           Fl_Value_Output bwcents {
             label cents
-            xywh {55 305 55 15} labelsize 10 align 6 maximum 10000 step 0.1
-            code0 {o->value(pars->setPbandwidth(pars->Pbandwidth));}
-            code1 {if (pars->Pmode!=0) o->deactivate();}
+            xywh {55 305 55 15} labelsize 10 align 6 maximum 10000
+            code0 {o->step(0.1, 1);}
+            code1 {o->value(pars->setPbandwidth(pars->Pbandwidth));}
+            code2 {if (pars->Pmode!=0) o->deactivate();}
           }
           Fl_Group {} {
             xywh {315 295 215 45} box ENGRAVED_BOX
@@ -865,8 +866,9 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
             Fl_Value_Output detunevalueoutput {
               label Detune
               callback {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
-              xywh {12 295 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10
-              code0 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
+              xywh {12 295 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+              code0 {o->step(0.01, 1);}
+              code1 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
             }
             Fl_Choice detunetype {
               label {Detune Type}

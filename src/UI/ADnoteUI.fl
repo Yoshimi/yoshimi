@@ -89,8 +89,9 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         } {}
         Fl_Value_Output detunevalueoutput {
           callback {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType), 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
-          xywh {265 5 45 20} labelsize 10 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10
-          code0 {o->value(getDetune(pars->VoicePar[nvoice].PDetuneType, 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
+          xywh {265 5 45 20} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+          code0 {o->step(0.01, 1);}
+          code1 {o->value(getDetune(pars->VoicePar[nvoice].PDetuneType, 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
         }
         Fl_Slider voicedetune {
           callback {//
@@ -266,9 +267,10 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Value_Output fmdetunevalueoutput {
                 label Detune
                 callback {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-                xywh {540 245 45 13} labelsize 8 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 8
-                code0 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-                code1 {//o->value(getdetune(pars->VoicePar[nvoice].PFMDetuneType,0,pars->VoicePar[nvoice].PFMDetune));}
+                xywh {540 245 45 13} labelsize 8 align 5 minimum -5000 maximum 5000 textfont 1 textsize 8
+                code0 {o->step(0.01, 1);}
+                code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
+                code2 {//o->value(getdetune(pars->VoicePar[nvoice].PFMDetuneType,0,pars->VoicePar[nvoice].PFMDetune));}
               }
               Fl_Choice {} {
                 label {Detune Type}
@@ -519,8 +521,9 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Value_Output detunevalueoutput {
               label Detune
               callback {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
-              xywh {10 272 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10
-              code0 {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
+              xywh {10 272 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+              code0 {o->step(0.01, 1);}
+              code1 {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
             }
             Fl_Check_Button {} {
               label 440Hz
@@ -670,8 +673,9 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Value_Output unisonspreadoutput {
               label {(cents)}
               callback {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
-              xywh {225 545 40 15} labelsize 10 align 5 maximum 1000 step 0.1 textfont 1 textsize 10
-              code0 {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
+              xywh {225 545 40 15} labelsize 10 align 5 maximum 1000 textfont 1 textsize 10
+              code0 {o->step(0.1, 1);}
+              code1 {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
             }
             Fl_Dial {} {
               label {Vib.speed}
@@ -994,8 +998,9 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Value_Output detunevalueoutput {
           label Detune
           callback {o->value(getDetune(pars->GlobalPar.PDetuneType,0,pars->GlobalPar.PDetune));}
-          xywh {12 275 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 step 0.01 textfont 1 textsize 10
-          code0 {o->value(getDetune(pars->GlobalPar.PDetuneType, 0, pars->GlobalPar.PDetune));}
+          xywh {12 275 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+          code0 {o->step(0.01, 1);}
+          code1 {o->value(getDetune(pars->GlobalPar.PDetuneType, 0, pars->GlobalPar.PDetune));}
         }
         Fl_Choice detunetype {
           label {Detune Type}
