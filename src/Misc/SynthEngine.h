@@ -67,6 +67,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
         void SetController(unsigned char chan, unsigned int type, short int par);
+        void SetProgram(unsigned char chan, unsigned char pgm);
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);

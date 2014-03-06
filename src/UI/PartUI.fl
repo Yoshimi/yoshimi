@@ -411,7 +411,7 @@ Offset}
       }
       Fl_Spinner {} {
         label {Midi Chan}
-        callback {part->Prcvchn = lrintf(o->value()) - 1;}
+        callback {part->Prcvchn = lrint(o->value()) - 1;}
         tooltip {Midi channel for this part} xywh {70 85 36 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
       }

@@ -197,7 +197,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
         {
             fl_font(FL_HELVETICA | FL_BOLD, 9);
             fl_color(255, 255, 255);
-            //snprintf(tmpstr, 7, "%+3li%s", lrintf(maxdbl + 0.5f), dbtag);
+            //snprintf(tmpstr, 7, "%+3li%s", lrint(maxdbl + 0.5f), dbtag);
             snprintf(tmpstr, 7, "%+3.f%s", maxdbl + 0.5f, dbtag);
             fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
                     lx - VULENX - 4, VULENY - 2, FL_ALIGN_RIGHT, NULL, 0);
@@ -206,7 +206,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
         {
             fl_font(FL_HELVETICA | FL_BOLD, 9);
             fl_color(255, 255, 255);
-            //snprintf(tmpstr, 7, "%+3li%s", lrintf(maxdbr + 0.5f), dbtag);
+            //snprintf(tmpstr, 7, "%+3li%s", lrint(maxdbr + 0.5f), dbtag);
             snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
             fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);

@@ -42,7 +42,7 @@ void Controller::defaults(void)
 {
     setpitchwheelbendrange(200); // 2 halftones
     expression.receive = 1;
-    panning.depth = 64.0f;
+    panning.depth = 64;
     filtercutoff.depth = 64;
     filterq.depth = 64;
     bandwidth.depth = 64;
@@ -181,7 +181,7 @@ void Controller::setvolume(int value)
     if (volume.receive)
         volume.volume = powf(0.1f, (127 - value) / 127.0f * 2.0f);
     else
-        volume.volume = 0.9f;
+        volume.volume = 1.0f;
 }
 
 

@@ -22,10 +22,13 @@
 #define MIDI_CONTROL_H
 
 typedef enum {
-    C_NULL =                  0,
+    C_NULL =               1002,
+    C_programchange =      1001,
     C_pitchwheel =         1000,
+    C_bankselectmsb =         0,
     C_expression =           11,
     C_panning =              10,
+    C_bankselectlsb =        32,
     C_filtercutoff =         74,
     C_filterq =              71,
     C_bandwidth =            75,

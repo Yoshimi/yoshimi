@@ -1447,7 +1447,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
 
         for (i = 0; i < synth->buffersize; ++i)
         {
-            // F2I(tw[i], FMmodfreqhi);
+            //F2I(tw[i], FMmodfreqhi);
             FMmodfreqhi = float2int(tw[i]);
             FMmodfreqlo = fmodf(tw[i] + 0.0000000001f, 1.0f);
             if (FMmodfreqhi < 0)

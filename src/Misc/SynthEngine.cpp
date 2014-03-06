@@ -27,6 +27,7 @@ using namespace std;
 
 #include "MasterUI.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/Config.h"
 
 SynthEngine *synth = NULL;
 
@@ -321,21 +322,45 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 // Controllers
 void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
 {
-    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {   // Send the controller to all part assigned to the channel
-        if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-            part[npart]->SetController(type, par);
+    if (type == Runtime.midi_bank_C) {
+        /*  we use either msb or lsb for bank changes
+	  128 banks is enough for anybody :-)
+        this configurable to suit different hardware synths
+        */
+        Runtime.Log("SynthEngine setController bankselect: " + asString(par));
+        bank.msb = (unsigned char)par + 1; //Bank indexes start from 1       
+        if(bank.msb <= MAX_NUM_BANKS) {
+            bank.loadbank(bank.banks[bank.msb].dir);
+            Runtime.Log("SynthEngine setController bankselect: Bank loaded " + bank.banks[bank.msb].name);
+	    printf("bank %d \n", bank.msb );
+        } else
+            Runtime.Log("SynthEngine setProgram: Value is out of range!");
+        return;        
     }
+    else{ // bank change doesn't directly affect parts.
+	for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+	{   // Send the controller to all part assigned to the channel
+	    if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+		part[npart]->SetController(type, par);
+	}
 
-    if (type == C_allsoundsoff)
-    {   // cleanup insertion/system FX
-        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-            sysefx[nefx]->cleanup();
-        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-            insefx[nefx]->cleanup();
+	if (type == C_allsoundsoff)
+	{   // cleanup insertion/system FX
+	    for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+		sysefx[nefx]->cleanup();
+	    for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+		insefx[nefx]->cleanup();
+	}
     }
 }
 
+void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
+{
+   for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        if(chan == part[npart]->Prcvchn)
+            bank.loadfromslot(pgm, part[npart]); //Programs indexes start from 0
+    Runtime.Log("SynthEngine setProgram: Program loaded " + bank.getname(pgm));
+}
 
 // Enable/Disable a part
 void SynthEngine::partonoff(int npart, int what)

@@ -41,12 +41,13 @@ using namespace std;
 
 Bank::Bank() :
     defaultinsname(string(" ")),
-    bank_size(160),
+    bank_size(BANK_SIZE),
     xizext(".xiz"),
     force_bank_dir_file(".bankdir") // if this file exists in a directory, the
                                     // directory is considered a bank, even if
                                     // it doesn't contain an instrument file
 {
+    msb = lsb = 0;
     for (int i = 0; i < BANK_SIZE; ++i)
     {
         bank_instrument[i].used = false;

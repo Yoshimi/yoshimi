@@ -421,7 +421,7 @@ void *AlsaEngine::MidiThread(void)
         {
             if (!event)
                 continue;
-            par = event->data.control.param;
+
             switch (event->type)
             {
                 case SND_SEQ_EVENT_NOTEON:
@@ -439,7 +439,14 @@ void *AlsaEngine::MidiThread(void)
                     note = event->data.note.note;
                     setMidiNote(channel, note);
                     break;
-
+                    
+                case SND_SEQ_EVENT_PGMCHANGE:
+                    channel = event->data.control.channel;
+                    ctrltype = C_programchange;
+                    par = event->data.control.value;
+                    setMidiProgram(channel, par);
+                    break;
+                    
                 case SND_SEQ_EVENT_PITCHBEND:
                     channel = event->data.control.channel;
                     ctrltype = C_pitchwheel;

@@ -104,8 +104,7 @@ void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
     store2defaults();
 }
 
-void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val,
-                                     char D_dt, char R_dt, char R_val)
+void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt, char R_dt, char R_val)
 {
     setpresettype("Penvfilter");
     Envmode = 4;

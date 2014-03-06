@@ -118,6 +118,8 @@ class Config : public MiscFuncs
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;
         int           rtprio;
+        unsigned int  midi_bank_C;
+        unsigned int  midi_upper_voice_C;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;

@@ -63,7 +63,8 @@ class Bank : private MiscFuncs
         void rescanforbanks(void);
         bool locked(void) { return (dirname.size() == 0); };
              // Check if the bank is locked (i.e. the file opened was readonly)
-
+        int msb;
+        int lsb;
         bankstruct_t banks[MAX_NUM_BANKS];
         string bankfiletitle; //this is shown on the UI of the bank (the title of the window)
 

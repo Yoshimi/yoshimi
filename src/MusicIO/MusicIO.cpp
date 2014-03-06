@@ -76,6 +76,9 @@ int MusicIO::getMidiController(unsigned char b)
     int ctl = C_NULL;
     switch (b)
     {
+	    case 0: // Bank Select MSB
+            ctl = C_bankselectmsb;
+            break;        
 	    case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
@@ -85,6 +88,9 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 10: // Panning
             ctl = C_panning;
             break;
+            case 32: // Bank Select LSB
+            ctl = C_bankselectlsb;
+            break;        
 	    case 11: // Expression
             ctl = C_expression;
             break;
@@ -131,9 +137,20 @@ int MusicIO::getMidiController(unsigned char b)
 
 void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param)
 {
-    synth->SetController(ch, ctrl, param);
+    if (ctrl != Runtime.midi_upper_voice_C)
+    {
+        synth->SetController(ch, ctrl, param);
+    }
+    else // it's really an upper set program change
+    {
+        synth->SetProgram(ch, (param & 0x1f) | 0x80);
+    }
 }
 
+void MusicIO::setMidiProgram(unsigned char ch, int pgm)
+{
+    synth->SetProgram(ch, pgm);
+}
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
                            unsigned char velocity)

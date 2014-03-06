@@ -61,22 +61,22 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         code0 {if (pars->VoicePar[nvoice].Enabled == 0) o->deactivate();}
       } {
         Fl_Value_Slider voicevolume {
-          callback {pars->VoicePar[nvoice].PVolume = lrintf(o->value());}
+          callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());}
           tooltip Volume xywh {90 5 115 20} type {Horz Knob} box FLAT_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
         }
         Fl_Check_Button voiceresonanceenabled {
-          callback {pars->VoicePar[nvoice].Presonance = lrintf(o->value());}
+          callback {pars->VoicePar[nvoice].Presonance = lrint(o->value());}
           tooltip {Resonance On/Off} xywh {245 7 15 17} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 align 4
           code0 {o->value(pars->VoicePar[nvoice].Presonance);}
         }
         Fl_Value_Slider voicelfofreq {
-          callback {pars->VoicePar[nvoice].FreqLfo->Pintensity = lrintf(o->value());}
+          callback {pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());}
           tooltip {Frequency LFO amount} xywh {500 5 115 20} type {Horz Knob} box FLAT_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
         }
         Fl_Dial voicepanning {
-          callback {pars->setVoicePan(nvoice, lrintf(o->value()));}
+          callback {pars->setVoicePan(nvoice, lrint(o->value()));}
           tooltip {Voice panning - zero/leftmost is Random} xywh {215 5 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PPanning);}
           class WidgetPDial
@@ -95,7 +95,7 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         }
         Fl_Slider voicedetune {
           callback {//
-              pars->VoicePar[nvoice].PDetune = lrintf(o->value()) + 8192;
+              pars->VoicePar[nvoice].PDetune = lrint(o->value()) + 8192;
               detunevalueoutput->do_callback();}
           tooltip {Fine Detune (cents)} xywh {315 5 185 20} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
@@ -128,7 +128,7 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
       Fl_Check_Button voiceenabled {
         label 01
         callback {//
-            pars->VoicePar[nvoice].Enabled = lrintf(o->value());
+            pars->VoicePar[nvoice].Enabled = lrint(o->value());
             if (o->value() == 0)
                 voicelistitemgroup->deactivate();
             else
@@ -223,7 +223,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Check_Button {} {
                 label Enable
                 callback {//
-                    pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrintf(o->value());
+                    pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(o->value());
                     if (o->value() == 0)
                         voiceFMfreqenvgroup->deactivate();
                     else
@@ -235,7 +235,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Counter {} {
                 label {Coarse Det.}
                 callback {//
-                    int k = lrintf(o->value());
+                    int k = lrint(o->value());
                     if (k < 0)
                         k += 1024;
                     pars->VoicePar[nvoice].PFMCoarseDetune = k + (pars->VoicePar[nvoice].PFMCoarseDetune / 1024) * 1024;}
@@ -248,7 +248,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Counter {} {
                 label Octave
                 callback {//
-                    int k = lrintf(o->value());
+                    int k = lrint(o->value());
                     if (k < 0)
                         k += 16;
                     pars->VoicePar[nvoice].PFMCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PFMCoarseDetune % 1024;}
@@ -259,7 +259,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               }
               Fl_Slider {} {
                 callback {//
-                    pars->VoicePar[nvoice].PFMDetune = lrintf(o->value()) + 8192;
+                    pars->VoicePar[nvoice].PFMDetune = lrint(o->value()) + 8192;
                     fmdetunevalueoutput->do_callback();}
                 tooltip {Fine Detune (cents)} xywh {590 245 160 10} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetune-8192);}
@@ -275,7 +275,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Choice {} {
                 label {Detune Type}
                 callback {//
-                    pars->VoicePar[nvoice].PFMDetuneType = lrintf(o->value());
+                    pars->VoicePar[nvoice].PFMDetuneType = lrint(o->value());
                     fmdetunevalueoutput->do_callback();} open
                 xywh {540 270 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
                 code0 {//
@@ -293,13 +293,13 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             } {
               Fl_Value_Slider {} {
                 label Vol
-                callback {pars->VoicePar[nvoice].PFMVolume = lrintf(o->value());}
+                callback {pars->VoicePar[nvoice].PFMVolume = lrint(o->value());}
                 tooltip Volume xywh {540 80 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolume);}
               }
               Fl_Value_Slider {} {
                 label {V.Sns}
-                callback {pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrintf(o->value());}
+                callback {pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(o->value());}
                 tooltip {Velocity Sensing Function - rightmost/max to disable)} xywh {540 100 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVelocityScaleFunction);}
               }
@@ -313,7 +313,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Check_Button {} {
                 label Enable
                 callback {//
-                    pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrintf(o->value());
+                    pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrint(o->value());
                     if (o->value() == 0)
                         voiceFMampenvgroup->deactivate();
                     else
@@ -324,7 +324,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               }
               Fl_Value_Slider {} {
                 label {F.Damp}
-                callback {pars->VoicePar[nvoice].PFMVolumeDamp = lrintf(o->value()) + 64;}
+                callback {pars->VoicePar[nvoice].PFMVolumeDamp = lrint(o->value()) + 64;}
                 tooltip {Modulator Damp at Higher frequency} xywh {540 120 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 minimum -64 maximum 63 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolumeDamp-64);}
               }
@@ -358,8 +358,8 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Slider {} {
                 label Phase
                 callback {//
-                    pars->VoicePar[nvoice].PFMoscilphase = 64 - lrintf(o->value());
-                    oscFM->phase = 64 - lrintf(o->value());
+                    pars->VoicePar[nvoice].PFMoscilphase = 64 - lrint(o->value());
+                    oscFM->phase = 64 - lrint(o->value());
                     fmoscil->redraw();}
                 xywh {665 400 65 10} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
                 code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
@@ -367,10 +367,10 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Choice {} {
                 label Use
                 callback {//
-                    pars->VoicePar[nvoice].PextFMoscil = lrintf(o->value()) - 1;
-                    if (lrintf(o->value()))
+                    pars->VoicePar[nvoice].PextFMoscil = lrint(o->value()) - 1;
+                    if (lrint(o->value()))
                     {
-                        oscFM->init(pars->VoicePar[lrintf(o->value()) - 1].FMSmp);
+                        oscFM->init(pars->VoicePar[lrint(o->value()) - 1].FMSmp);
                         changeFMoscilbutton->labelcolor(FL_BLUE);
                     }
                     else
@@ -388,8 +388,8 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Choice {} {
               label {External Mod.}
               callback {//
-                  pars->VoicePar[nvoice].PFMVoice = lrintf(o->value()) - 1;
-                  if (lrintf(o->value()))
+                  pars->VoicePar[nvoice].PFMVoice = lrint(o->value()) - 1;
+                  if (lrint(o->value()))
                   {
                       modoscil->deactivate();
                       modfrequency->deactivate();
@@ -404,13 +404,13 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               code0 {o->add("OFF");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtMod.%2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
-              code3 {if (lrintf(o->value())) {modoscil->deactivate(); modfrequency->deactivate();}}
+              code3 {if (lrint(o->value())) {modoscil->deactivate(); modfrequency->deactivate();}}
             } {}
           }
           Fl_Choice {} {
             label {Type:}
             callback {//
-                pars->VoicePar[nvoice].PFMEnabled = lrintf(o->value());
+                pars->VoicePar[nvoice].PFMEnabled = lrint(o->value());
                 if (o->value() == 0)
                     voiceFMparametersgroup->deactivate();
                 else
@@ -458,7 +458,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Check_Button {} {
               label Enable
               callback {//
-                  pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrintf(o->value());
+                  pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(o->value());
                   if (o->value() == 0)
                       voicefreqenvgroup->deactivate();
                   else
@@ -477,7 +477,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Check_Button {} {
               label Enable
               callback {//
-                  pars->VoicePar[nvoice].PFreqLfoEnabled = lrintf(o->value());
+                  pars->VoicePar[nvoice].PFreqLfoEnabled = lrint(o->value());
                   if (o->value() == 0)
                       voicefreqlfogroup->deactivate();
                   else
@@ -489,7 +489,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Counter {} {
               label Octave
               callback {//
-                  int k = lrintf(o->value());
+                  int k = lrint(o->value());
                   if (k < 0)
                       k += 16;
                   pars->VoicePar[nvoice].PCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PCoarseDetune % 1024;}
@@ -501,7 +501,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Counter {} {
               label {Coarse Det.}
               callback {//
-                  int k = lrintf(o->value());
+                  int k = lrint(o->value());
                   if (k < 0)
                       k += 1024;
                   pars->VoicePar[nvoice].PCoarseDetune = k + (pars->VoicePar[nvoice].PCoarseDetune / 1024) * 1024;}
@@ -513,7 +513,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             }
             Fl_Slider {} {
               callback {//
-                  pars->VoicePar[nvoice].PDetune = lrintf(o->value()) + 8192;
+                  pars->VoicePar[nvoice].PDetune = lrint(o->value()) + 8192;
                   detunevalueoutput->do_callback();}
               tooltip {Fine Detune (cents)} xywh {58 272 392 13} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->VoicePar[nvoice].PDetune-8192);}
@@ -528,7 +528,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Check_Button {} {
               label 440Hz
               callback {//
-                  int x = lrintf(o->value());
+                  int x = lrint(o->value());
                   pars->VoicePar[nvoice].Pfixedfreq = x;
                   if (x == 0)
                       fixedfreqetdial->deactivate();
@@ -539,7 +539,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             }
             Fl_Dial fixedfreqetdial {
               label {Eq.T.}
-              callback {pars->VoicePar[nvoice].PfixedfreqET = lrintf(o->value());}
+              callback {pars->VoicePar[nvoice].PfixedfreqET = lrint(o->value());}
               tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {405 255 15 15} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PfixedfreqET);}
               code1 {if (pars->VoicePar[nvoice].Pfixedfreq==0) o->deactivate();}
@@ -547,7 +547,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             }
             Fl_Choice {} {
               label {Detune Type}
-              callback {pars->VoicePar[nvoice].PDetuneType = lrintf(o->value()); detunevalueoutput->do_callback();} open
+              callback {pars->VoicePar[nvoice].PDetuneType = lrint(o->value()); detunevalueoutput->do_callback();} open
               xywh {450 305 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
@@ -583,24 +583,24 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           Fl_Slider {} {
             label Phase
             callback {//
-                pars->VoicePar[nvoice].Poscilphase =64 - lrintf(o->value());
-                osc->phase = 64 - lrintf(o->value());
+                pars->VoicePar[nvoice].Poscilphase =64 - lrint(o->value());
+                osc->phase = 64 - lrint(o->value());
                 voiceoscil->redraw();}
             xywh {10 420 65 10} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
             code0 {o->value(64-pars->VoicePar[nvoice].Poscilphase);}
           }
           Fl_Check_Button {} {
             label {R.}
-            callback {pars->VoicePar[nvoice].Presonance = lrintf(o->value());}
+            callback {pars->VoicePar[nvoice].Presonance = lrint(o->value());}
             tooltip {Resonance On/Off} xywh {210 5 35 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 11
             code0 {o->value(pars->VoicePar[nvoice].Presonance);}
           }
           Fl_Choice {} {
             label {Use Oscil.}
             callback {//
-                pars->VoicePar[nvoice].Pextoscil = lrintf(o->value()) - 1;
-                if (lrintf(o->value())) {
-                    osc->init(pars->VoicePar[lrintf(o->value()) - 1].OscilSmp);
+                pars->VoicePar[nvoice].Pextoscil = lrint(o->value()) - 1;
+                if (lrint(o->value())) {
+                    osc->init(pars->VoicePar[lrint(o->value()) - 1].OscilSmp);
                     changevoiceoscilbutton->labelcolor(FL_BLUE);
                 }
                 else
@@ -621,14 +621,14 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           } {
             Fl_Dial {} {
               label Stereo
-              callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrintf(o->value());}
+              callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrint(o->value());}
               tooltip {Stereo Spread} xywh {285 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
               class WidgetPDial
             }
             Fl_Choice {} {
               label Unison
-              callback {pars->setUnisonSizeIndex(nvoice, lrintf(o->value()));} open
+              callback {pars->setUnisonSizeIndex(nvoice, lrint(o->value()));} open
               tooltip {Unison size} xywh {10 545 75 20} down_box BORDER_BOX labelfont 1 labelsize 12 align 1 textfont 1 textsize 10
               code0 {//
                   o->add("OFF");
@@ -642,14 +642,14 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             } {}
             Fl_Dial {} {
               label Vibratto
-              callback {pars->VoicePar[nvoice].Unison_vibratto = lrintf(o->value());}
+              callback {pars->VoicePar[nvoice].Unison_vibratto = lrint(o->value());}
               tooltip Vibratto xywh {340 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
               class WidgetPDial
             }
             Fl_Choice {} {
               label Invert
-              callback {pars->VoicePar[nvoice].Unison_invert_phase = lrintf(o->value());} open
+              callback {pars->VoicePar[nvoice].Unison_invert_phase = lrint(o->value());} open
               tooltip {Phase Invert} xywh {445 545 65 15} down_box BORDER_BOX labelsize 11 align 1 textfont 1 textsize 10
               code0 {//
                   o->add("None");
@@ -665,7 +665,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Slider {} {
               label {Frequency Spread}
               callback {//
-                  pars->VoicePar[nvoice].Unison_frequency_spread = lrintf(o->value());
+                  pars->VoicePar[nvoice].Unison_frequency_spread = lrint(o->value());
                   unisonspreadoutput->do_callback();}
               tooltip {Frequency Spread of the Unison} xywh {95 547 125 13} type {Horz Knob} box FLAT_BOX labelsize 12 align 1 maximum 127 step 1 value 64
               code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
@@ -679,7 +679,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             }
             Fl_Dial {} {
               label {Vib.speed}
-              callback {pars->VoicePar[nvoice].Unison_vibratto_speed = lrintf(o->value());}
+              callback {pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(o->value());}
               tooltip {Vibratto Average Speed} xywh {390 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
               class WidgetPDial
@@ -692,14 +692,14 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
         } {
           Fl_Dial voicevolume {
             label Volume
-            callback {pars->VoicePar[nvoice].PVolume = lrintf(o->value());}
+            callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());}
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PVolume);}
             class WidgetPDial
           }
           Fl_Dial {} {
             label {Vel Sens}
-            callback {pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrintf(o->value());}
+            callback {pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(o->value());}
             tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {107 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
             class WidgetPDial
@@ -714,7 +714,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           Fl_Dial voicepan {
             label Pan
             callback {//
-                 pars->setVoicePan(nvoice, lrintf(o->value()));
+                 pars->setVoicePan(nvoice, lrint(o->value()));
                  voicerandompan->value(pars->randomVoicePan(nvoice));}
             tooltip {Voice panning - leftmost/zero gives random panning} xywh {174 56 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PPanning);}
@@ -744,7 +744,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           Fl_Check_Button {} {
             label Enable
             callback {//
-                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrintf(o->value());
+                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(o->value());
                 if (o->value() == 0)
                     voiceampenvgroup->deactivate();
                 else
@@ -763,7 +763,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           Fl_Check_Button {} {
             label Enable
             callback {//
-                pars->VoicePar[nvoice].PAmpLfoEnabled = lrintf(o->value());
+                pars->VoicePar[nvoice].PAmpLfoEnabled = lrint(o->value());
                 if (o->value() == 0)
                     voiceamplfogroup->deactivate();
                 else
@@ -774,7 +774,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           }
           Fl_Check_Button {} {
             label Minus
-            callback {pars->VoicePar[nvoice].PVolumeminus = lrintf(o->value());}
+            callback {pars->VoicePar[nvoice].PVolumeminus = lrint(o->value());}
             tooltip {Invert volume control action} xywh {10 45 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PVolumeminus);}
           }
@@ -800,7 +800,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           Fl_Check_Button {} {
             label Enable
             callback {//
-                pars->VoicePar[nvoice].PFilterEnvelopeEnabled = lrintf(o->value());
+                pars->VoicePar[nvoice].PFilterEnvelopeEnabled = lrint(o->value());
                 if (o->value() == 0)
                     voicefilterenvgroup->deactivate();
                 else
@@ -819,7 +819,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           Fl_Check_Button {} {
             label Enable
             callback {//
-                pars->VoicePar[nvoice].PFilterLfoEnabled = lrintf(o->value());
+                pars->VoicePar[nvoice].PFilterLfoEnabled = lrint(o->value());
                 if (o->value() == 0)
                     voicefilterlfogroup->deactivate();
                 else
@@ -838,7 +838,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               o->label(strdup(tmp));}
         } {}
         Fl_Choice {} {
-          callback {int x = lrintf(o->value());
+          callback {int x = lrint(o->value());
               pars->VoicePar[nvoice].Type = x;
               if (!x)
                   voicemodegroup->activate();
@@ -860,7 +860,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
         }
         Fl_Check_Button bypassfiltercheckbutton {
           label {Bypass Global F.}
-          callback {pars->VoicePar[nvoice].Pfilterbypass = lrintf(o->value());}
+          callback {pars->VoicePar[nvoice].Pfilterbypass = lrint(o->value());}
           xywh {418 16 14 14} down_box DOWN_BOX labelfont 1 labelsize 10 align 136
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
@@ -869,7 +869,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
         } {
           Fl_Value_Slider {} {
             label Delay
-            callback {pars->VoicePar[nvoice].PDelay = lrintf(o->value());}
+            callback {pars->VoicePar[nvoice].PDelay = lrint(o->value());}
             tooltip Volume xywh {120 21 84 12} type {Horz Knob} box FLAT_BOX labelsize 11 align 5 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
           }
@@ -877,7 +877,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
         Fl_Check_Button {} {
           label Enable
           callback {//
-              pars->VoicePar[nvoice].PFilterEnabled = lrintf(o->value());
+              pars->VoicePar[nvoice].PFilterEnabled = lrint(o->value());
               if (o->value() == 0)
                   voicefiltergroup->deactivate();
               else
@@ -897,7 +897,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
       Fl_Check_Button voiceonbutton {
         label On
         callback {//
-            pars->VoicePar[nvoice].Enabled = lrintf(o->value());
+            pars->VoicePar[nvoice].Enabled = lrint(o->value());
             if (o->value() == 0)
                 voiceparametersgroup->deactivate();
             else
@@ -962,7 +962,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter octave {
           label Octave
           callback {//
-              int k = lrintf(o->value());
+              int k = lrint(o->value());
               if (k < 0)
                   k += 16;
               pars->GlobalPar.PCoarseDetune = k * 1024 + pars->GlobalPar.PCoarseDetune % 1024;}
@@ -973,7 +973,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter coarsedet {
           label {Coarse det.}
           callback {//
-              int k = lrintf(o->value());
+              int k = lrint(o->value());
               if (k < 0)
                   k += 1024;
               pars->GlobalPar.PCoarseDetune = k + (pars->GlobalPar.PCoarseDetune / 1024) * 1024;}
@@ -990,7 +990,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         } {}
         Fl_Slider freq {
           callback {//
-              pars->GlobalPar.PDetune = lrintf(o->value()) + 8192;
+              pars->GlobalPar.PDetune = lrint(o->value()) + 8192;
               detunevalueoutput->do_callback();}
           tooltip {Fine Detune (cents)} xywh {60 275 385 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->GlobalPar.PDetune - 8192);}
@@ -1005,7 +1005,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Choice detunetype {
           label {Detune Type}
           callback {//
-              pars->GlobalPar.PDetuneType = lrintf(o->value()) + 1;
+              pars->GlobalPar.PDetuneType = lrint(o->value()) + 1;
               detunevalueoutput->do_callback();} open
           xywh {450 315 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {//
@@ -1018,7 +1018,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial {} {
           label relBW
           callback {//
-              pars->GlobalPar.PBandwidth = lrintf(o->value());
+              pars->GlobalPar.PBandwidth = lrint(o->value());
               pars->getBandwidthDetuneMultiplier();
               for (int i = 0; i < NUM_VOICES; ++i)
               {
@@ -1035,14 +1035,14 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
       } {
         Fl_Dial globalvolume {
           label Volume
-          callback {pars->GlobalPar.PVolume = lrintf(o->value());}
+          callback {pars->GlobalPar.PVolume = lrint(o->value());}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PVolume);}
           class WidgetPDial
         }
         Fl_Dial vsns {
           label {Vel Sens}
-          callback {pars->GlobalPar.PAmpVelocityScaleFunction = lrintf(o->value());}
+          callback {pars->GlobalPar.PAmpVelocityScaleFunction = lrint(o->value());}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           class WidgetPDial
@@ -1050,7 +1050,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial globalpan {
           label Pan
           callback {//
-              pars->setGlobalPan(lrintf(o->value()));
+              pars->setGlobalPan(lrint(o->value()));
               globalrandompan->value(pars->randomGlobalPan());
               amplitudegrp->changed();}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
@@ -1080,28 +1080,28 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         }
         Fl_Dial pstr {
           label {P.Str.}
-          callback {pars->GlobalPar.PPunchStrength = lrintf(o->value());}
+          callback {pars->GlobalPar.PPunchStrength = lrint(o->value());}
           tooltip {Punch Strength} xywh {125 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStrength);}
           class WidgetPDial
         }
         Fl_Dial pt {
           label {P.t.}
-          callback {pars->GlobalPar.PPunchTime = lrintf(o->value());}
+          callback {pars->GlobalPar.PPunchTime = lrint(o->value());}
           tooltip {Punch Time (duration)} xywh {155 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchTime);}
           class WidgetPDial
         }
         Fl_Dial pstc {
           label {P.Stc.}
-          callback {pars->GlobalPar.PPunchStretch = lrintf(o->value());}
+          callback {pars->GlobalPar.PPunchStretch = lrint(o->value());}
           tooltip {Punch Stretch} xywh {185 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStretch);}
           class WidgetPDial
         }
         Fl_Dial pvel {
           label {P.Vel.}
-          callback {pars->GlobalPar.PPunchVelocitySensing = lrintf(o->value());}
+          callback {pars->GlobalPar.PPunchVelocitySensing = lrint(o->value());}
           tooltip {Punch Velocity Sensing} xywh {215 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
           class WidgetPDial
@@ -1120,7 +1120,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         } {}
         Fl_Check_Button rndgrp {
           label {Rnd Grp}
-          callback {pars->GlobalPar.Hrandgrouping = lrintf(o->value());}
+          callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());}
           tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {70 225 40 25} down_box DOWN_BOX labelsize 10 align 148
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
         }
@@ -1150,7 +1150,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
       }
       Fl_Check_Button stereo {
         label Stereo
-        callback {pars->GlobalPar.PStereo = lrintf(o->value());}
+        callback {pars->GlobalPar.PStereo = lrint(o->value());}
         xywh {5 220 65 35} box ENGRAVED_BOX down_box DOWN_BOX labelfont 1 labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
@@ -1211,7 +1211,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
       Fl_Counter currentvoicecounter {
         label {Current Voice}
         callback {//
-            nvoice = lrintf(o->value()) - 1;
+            nvoice = lrint(o->value()) - 1;
             advoice->hide();
             ADnoteVoice->remove(advoice);
             delete advoice;

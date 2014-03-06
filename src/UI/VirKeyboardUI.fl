@@ -441,7 +441,7 @@ virkeyboardwindow->hide();}
         label {Midi Channel}
         callback {//
             relaseallkeys();
-            virkeys->midich = lrintf(o->value()) - 1;
+            virkeys->midich = lrint(o->value()) - 1;
             virkeys->take_focus();
         } selected
         xywh {25 108 36 17} labelsize 9 align 1 maximum 16 textsize 10

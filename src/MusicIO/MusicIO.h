@@ -39,6 +39,7 @@ class MusicIO : virtual protected MiscFuncs
         void InterleaveShorts(void);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param);
+        void setMidiProgram(unsigned char ch, int pgm);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 

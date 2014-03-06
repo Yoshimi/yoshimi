@@ -66,7 +66,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
                 break;
             case 3:
                 envval[i] =
-                    (powf(2.0f, 6.0f * fabsf(envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
+                    (powf(2.0f, 6.0f * fabs(envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
                 if (envpars->Penvval[i] < 64)
                     envval[i] = -envval[i];
                 break;
@@ -74,7 +74,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
                 envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 6.0f; // 6 octaves (filtru)
                 break;
             case 5:
-                envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 10.0f;
+                envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 10;
                 break;
             default:
                 envval[i] = envpars->Penvval[i] / 127.0f;
@@ -106,7 +106,7 @@ void Envelope::relasekey(void)
 float Envelope::envout(void)
 {
     float out;
-    if (envfinish != 0)
+    if (envfinish)
     {   // if the envelope is finished
         envoutval = envval[envpoints - 1];
         return envoutval;
@@ -185,7 +185,7 @@ float Envelope::envout_dB(void)
         if (out > 0.001f)
             envoutval = rap2dB(out);
         else
-            envoutval = -40.0f;
+            envoutval = MIN_ENVELOPE_DB;
     } else
         out = dB2rap(envout());
 

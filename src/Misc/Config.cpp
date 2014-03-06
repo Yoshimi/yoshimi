@@ -108,6 +108,8 @@ Config::Config() :
     Interpolation(0),
     CheckPADsynth(1),
     rtprio(50),
+    midi_bank_C(0),
+    midi_upper_voice_C(80),
     deadObjects(NULL),
     sigIntActive(0),
     ladi1IntActive(0),
@@ -427,6 +429,10 @@ bool Config::extractConfigData(XMLwrapper *xml)
     // jack settings
     jackServer = xml->getparstr("linux_jack_server");
 
+    // midi options
+    midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 32);
+    midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 14, 90);
+
     if (xml->enterbranch("XMZ_HISTORY"))
     {
         int hist_size = xml->getpar("history_size", 0, 0, MaxParamsHistory);
@@ -498,6 +504,9 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
     xmltree->addparstr("linux_jack_server", jackServer);
+
+    xmltree->addpar("midi_bank_C", midi_bank_C);
+    xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
 
     // Parameters history
     if (ParamsHistory.size())

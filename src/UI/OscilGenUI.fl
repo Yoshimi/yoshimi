@@ -271,11 +271,11 @@ phase=phase_;} {}
             int lw = 1;
             // if ((lx<135)||(ly<135)) lw=1;
             fl_line_style(0, lw);
-            int ph = lrintf((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
+            int ph = lrint((phase - 64.0) / 128.0 * synth->oscilsize_f + synth->oscilsize_f);
             for (int i = 1; i < lx; ++i)
             {
-                int k1 = lrintf(synth->oscilsize_f * (i - 1) / lx) + ph;
-                int k2 = lrintf(synth->oscilsize_f * i / lx) + ph;
+                int k1 = lrint(synth->oscilsize_f * (i - 1) / lx) + ph;
+                int k2 = lrint(synth->oscilsize_f * i / lx) + ph;
                 float y1 = smps[k1 % synth->oscilsize] / max;
                 float y2 = smps[k2 % synth->oscilsize] / max;
                 fl_line(i - 1 + ox, (int)(y1 * ly / 2.0) + oy + ly / 2, i + ox,
