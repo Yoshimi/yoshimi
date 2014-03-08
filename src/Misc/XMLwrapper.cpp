@@ -175,7 +175,7 @@ void XMLwrapper::addpar(const string& name, int val)
 
 void XMLwrapper::addparreal(const string& name, float val)
 {
-    addparams2("par_real","name", name.c_str(), "value", asString(val));
+    addparams2("par_real","name", name.c_str(), "value", asLongString(val));
 }
 
 

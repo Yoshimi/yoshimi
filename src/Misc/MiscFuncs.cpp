@@ -135,6 +135,14 @@ string MiscFuncs::asString(float n)
 }
 
 
+string MiscFuncs::asLongString(float n)
+{
+   ostringstream oss;
+   oss << n;
+   return oss.str();
+}
+
+
 string MiscFuncs::asHexString(int x)
 {
    ostringstream oss;

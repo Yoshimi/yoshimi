@@ -36,6 +36,7 @@ class MiscFuncs
         string asString(unsigned int n, unsigned int width = 0);
         string asString(unsigned char c) { return asString((unsigned int)c); }
         string asString(float n);
+        string asLongString(float n);
         string asHexString(int x);
         string asHexString(unsigned int x);
         float string2float(string str);
