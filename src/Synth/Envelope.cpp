@@ -66,7 +66,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
                 break;
             case 3:
                 envval[i] =
-                    (powf(2.0f, 6.0f * fabs(envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
+                    (powf(2.0f, 6.0f * fabsf(envpars->Penvval[i] - 64.0f) / 64.0f) - 1.0f) * 100.0f;
                 if (envpars->Penvval[i] < 64)
                     envval[i] = -envval[i];
                 break;
@@ -74,7 +74,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
                 envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 6.0f; // 6 octaves (filtru)
                 break;
             case 5:
-                envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 10;
+                envval[i] = (envpars->Penvval[i] - 64.0f) / 64.0f * 10.0f;
                 break;
             default:
                 envval[i] = envpars->Penvval[i] / 127.0f;

@@ -78,7 +78,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     // compute global fine detune, -64.0 .. 63.0 cents
     float globalfinedetunerap =
         (Pglobalfinedetune > 64.0f || Pglobalfinedetune < 64.0f)
-            ? pow(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f)
+            ? powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f)
             : 1.0f;
     // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
 

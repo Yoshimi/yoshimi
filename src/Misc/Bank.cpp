@@ -47,7 +47,7 @@ Bank::Bank() :
                                     // directory is considered a bank, even if
                                     // it doesn't contain an instrument file
 {
-    msb = lsb = 0;
+//    msb = lsb = 0;
     for (int i = 0; i < BANK_SIZE; ++i)
     {
         bank_instrument[i].used = false;

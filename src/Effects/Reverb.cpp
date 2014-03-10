@@ -222,7 +222,7 @@ void Reverb::setvolume(unsigned char Pvolume_)
     Pvolume = Pvolume_;
     if (!insertion)
     {
-        outvolume = pow(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
+        outvolume = powf(0.01f, (1.0f - Pvolume / 127.0f)) * 4.0f;
         volume = 1.0f;
     }
     else

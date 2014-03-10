@@ -978,11 +978,11 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
             break;
         case 3:
             cdet = fabsf(cdetune * 100.0f);
-            findet = pow(10.0f, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
+            findet = powf(10.0f, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
             break;
         case 4:
             cdet = fabs(cdetune * 701.95500087f); // perfect fifth
-            findet = (pow(2.0f, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
+            findet = (powf(2.0f, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
             break;
             // case ...: need to update N_DETUNE_TYPES, if you'll add more
         default:

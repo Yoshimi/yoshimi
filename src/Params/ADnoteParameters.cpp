@@ -193,7 +193,7 @@ void ADnoteParameters::enableVoice(int nvoice)
 float ADnoteParameters::getBandwidthDetuneMultiplier(void)
 {
     float bw = (GlobalPar.PBandwidth - 64.0f) / 64.0f;
-    bw = pow(2.0f, bw * pow(fabs(bw), 0.2f) * 5.0f);
+    bw = powf(2.0f, bw * pow(fabs(bw), 0.2f) * 5.0f);
     return bw;
 }
 
