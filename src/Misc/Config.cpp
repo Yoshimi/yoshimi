@@ -109,7 +109,7 @@ Config::Config() :
     CheckPADsynth(1),
     rtprio(50),
     midi_bank_C(0),
-    midi_upper_voice_C(80),
+    midi_upper_voice_C(128),
     deadObjects(NULL),
     sigIntActive(0),
     ladi1IntActive(0),
@@ -430,8 +430,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     jackServer = xml->getparstr("linux_jack_server");
 
     // midi options
-    midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 32);
-    midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 14, 90);
+    midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
+    midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 14, 128);
 
     if (xml->enterbranch("XMZ_HISTORY"))
     {

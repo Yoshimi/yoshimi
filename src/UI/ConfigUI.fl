@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -24,16 +24,16 @@ This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
 } 
 
-decl {\#include <cmath>} {public
+decl {\#include <cmath>} {public local
 } 
 
-decl {\#include <FL/Fl_File_Chooser.H>} {public
+decl {\#include <FL/Fl_File_Chooser.H>} {public local
 } 
 
-decl {\#include "Misc/Config.h"} {public
+decl {\#include "Misc/Config.h"} {public local
 } 
 
-decl {\#include "Misc/MiscFuncs.h"} {public
+decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
 class ConfigUI {open : {private MiscFuncs}
@@ -61,7 +61,7 @@ class ConfigUI {open : {private MiscFuncs}
           }
           else
               o->hide();} open
-      xywh {1050 243 465 335} type Double visible
+      xywh {934 243 465 335} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 520 325}
@@ -183,7 +183,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 460 287} labelsize 12 hide
+          xywh {5 25 495 287} labelsize 12 hide
         } {
           Fl_Browser rootsbrowse {
             callback {activatebutton_rootdir(o->value()!=0);}
@@ -228,7 +228,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Presets dirs} open
-          xywh {5 25 460 260} labelsize 12 hide
+          xywh {5 25 495 260} labelsize 12 hide
         } {
           Fl_Browser presetbrowse {
             callback {activatebutton_presetdir(o->value() != 0);}
@@ -288,14 +288,14 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label Alsa open
-          xywh {5 25 460 260} labelsize 12
+          xywh {5 23 460 260} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Alsa Midi Device}
             callback {//
                 Runtime.alsaMidiDevice = string(o->value());
                 configChanged = true;}
-            tooltip {Alsa midi device - default, hw:0, ...} xywh {195 54 120 22} labelsize 12 textsize 12
+            tooltip {Alsa midi device - default, hw:0, ...} xywh {195 52 120 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.alsaMidiDevice.c_str());}
           }
           Fl_Input {} {
@@ -303,7 +303,7 @@ class ConfigUI {open : {private MiscFuncs}
             callback {//
                 Runtime.alsaAudioDevice = string(o->value());
                 configChanged = true;}
-            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 95 120 22} labelsize 12 textsize 12
+            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 93 120 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.alsaAudioDevice.c_str());}
           }
           Fl_Check_Browser {} {
@@ -335,7 +335,7 @@ class ConfigUI {open : {private MiscFuncs}
                 }
                 Runtime.Samplerate = sample_rate;
                 configChanged = true;}
-            xywh {195 133 84 50} labelsize 12 align 4 when 1 textsize 12
+            xywh {195 131 84 50} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("96000");
                 o->add("48000");
@@ -372,9 +372,8 @@ class ConfigUI {open : {private MiscFuncs}
                     default: buff_size = 512; break;
                 }
                 Runtime.Buffersize = buff_size;
-                configChanged = true;
-            }
-            xywh {195 197 76 73} labelsize 12 align 4 when 1 textsize 12
+                configChanged = true;}
+            xywh {195 195 76 73} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("64");
                 o->add("128");
@@ -390,6 +389,50 @@ class ConfigUI {open : {private MiscFuncs}
                     case 1024: o->set_checked(5); break;
                     default: o->set_checked(4); break;
                 }}
+          }
+        }
+        Fl_Group {} {
+          label CCs open
+          tooltip {MIDI CC preferences} xywh {25 45 460 260} labelsize 12
+        } {
+          Fl_Spinner {} {
+            label {Extended Program Change}
+            callback {Runtime.midi_upper_voice_C = o->value();
+configChanged = true;}
+            tooltip {128 = off} xywh {270 160 53 24} labelsize 12 minimum 14 maximum 128 value 80 textsize 12
+            code0 {o->value(Runtime.midi_upper_voice_C);}
+          }
+          Fl_Choice bankchange {
+            label {Bank Change}
+            callback {switch (o->value())
+{
+	case 0:
+		Runtime.midi_bank_C = 32;
+		configChanged = true;
+		break;
+	case 1:
+		Runtime.midi_bank_C = 0;
+		configChanged = true;
+		break;
+	default:
+		Runtime.midi_bank_C = 128;
+		configChanged = true;
+}} open selected
+            tooltip {CC0 = msb, CC32 = lsb} xywh {270 74 60 24} down_box BORDER_BOX labelsize 12 textsize 12
+            code0 {if (Runtime.midi_bank_C == 32) o->value(0); else if (Runtime.midi_bank_C == 0) o->value(1); else o->value(2);}
+          } {
+            MenuItem banklsb {
+              label LSB
+              xywh {0 0 34 20} labelsize 12
+            }
+            MenuItem bankusb {
+              label MSB
+              xywh {0 0 34 20} labelsize 12
+            }
+            MenuItem bankoff {
+              label Off
+              xywh {0 0 34 20} labelsize 12
+            }
           }
         }
       }
@@ -485,6 +528,6 @@ class ConfigUI {open : {private MiscFuncs}
         writebankcfg();
         writepresetcfg();} {}
   }
-  decl {bool configChanged;} {selected
+  decl {bool configChanged;} {private local
   }
 } 
