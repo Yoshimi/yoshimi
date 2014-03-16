@@ -1,3 +1,22 @@
+yoshimi-1.2.0
+
+Added circle and spike AddSynth Waveshapes.
+
+Added MIDI bank and program change. Bank change can be selected as MSB, LSB or disabled. Included CC for patches 120 to 160. Also CC selectable and can be disabled.
+
+Finally resolved trailing zeros in detune bug.
+Fixed microtonal saving bug.
+
+Corrected parameter loading regression (that mainly affected the Overdrive sound).
+
+Corrected regression that stopped the -K option autoconnecting
+
+Other small bug fixes.
+
+Added and updated voice patches.
+
+Special thanks to Kristian Amlie and Tito Latini
+
 yoshimi-1.1.0
 
 * Optimization patches provided by Kristian Amlie.

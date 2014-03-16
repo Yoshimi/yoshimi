@@ -332,7 +332,6 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
         if(bank.msb <= MAX_NUM_BANKS) {
             bank.loadbank(bank.banks[bank.msb].dir);
             Runtime.Log("SynthEngine setController bankselect: Bank loaded " + bank.banks[bank.msb].name);
-	    printf("bank %d \n", bank.msb );
         } else
             Runtime.Log("SynthEngine setProgram: Value is out of range!");
         return;        
@@ -356,10 +355,15 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
 {
-   for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if(chan == part[npart]->Prcvchn)
             bank.loadfromslot(pgm, part[npart]); //Programs indexes start from 0
     Runtime.Log("SynthEngine setProgram: Program loaded " + bank.getname(pgm));
+    //update UI
+    guiMaster->updatepanel();
+    if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part) {
+        guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+    }
 }
 
 // Enable/Disable a part
