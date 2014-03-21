@@ -880,10 +880,10 @@ ZynAddSubFX}
             if (result == -10)
             {
                 msg += ",\\nit does not appear to be a valid parameter file.";
-                fl_alert(msg.c_str());
+                fl_alert("%s",msg.c_str());
             }
             else
-                fl_alert(msg.c_str());
+                fl_alert("%s",msg.c_str());
         }} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {

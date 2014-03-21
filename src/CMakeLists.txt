@@ -64,22 +64,22 @@ option (BuildForDebug "Include gdb debugging support" OFF)
 set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
 
 set (BuildOptions_x86_64AMD
-    "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer -ldl"
+    "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptions_X86_64Core2
-    "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer -ldl"
+    "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
 )
 
 set (BuildOptionsBasic
-    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer -ldl"
+    "-O3 -msse -msse2 -mfpmath=sse -ffast-math -fomit-frame-pointer"
     CACHE STRING "basic X86 complier options"
 )
 
 set (BuildOptionsDebug
-    "-O0 -g3 -ggdb -Wall -Wpointer-arith -ldl" CACHE STRING "Debug build flags")
+    "-O0 -g3 -ggdb -Wall -Wpointer-arith" CACHE STRING "Debug build flags")
 
 find_package (PkgConfig REQUIRED)
 if (PKG_CONFIG_FOUND)
@@ -356,9 +356,8 @@ set(ExternLibraries
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
     z
+    dl
 )
-
-set (CMAKE_EXE_LINKER_FLAGS "-ldl")
 
 add_executable (yoshimi ${ProgSources} main.cpp)
 

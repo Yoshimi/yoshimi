@@ -82,7 +82,7 @@ class VirKeys {: {public Fl_Box}
     code {for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
         midich = 0;
-        midivel = 75;
+        midivel = 100;
         midioct = 2;
         keyoct1 = 3;
         keyoct2 = 2;
