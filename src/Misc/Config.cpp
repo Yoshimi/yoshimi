@@ -432,6 +432,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     // midi options
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 14, 128);
+    enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
 
     if (xml->enterbranch("XMZ_HISTORY"))
     {
@@ -507,6 +508,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
+    xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
 
     // Parameters history
     if (ParamsHistory.size())

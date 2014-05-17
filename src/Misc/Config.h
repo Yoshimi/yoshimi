@@ -120,6 +120,7 @@ class Config : public MiscFuncs
         int           rtprio;
         unsigned int  midi_bank_C;
         unsigned int  midi_upper_voice_C;
+        int           enable_part_on_voice_load;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;

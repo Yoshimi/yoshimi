@@ -325,7 +325,7 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
     if (type == Runtime.midi_bank_C) {
         /*  we use either msb or lsb for bank changes
 	  128 banks is enough for anybody :-)
-        this configurable to suit different hardware synths
+        this is configurable to suit different hardware synths
         */
         Runtime.Log("SynthEngine setController bankselect: " + asString(par));
         bank.msb = (unsigned char)par + 1; //Bank indexes start from 1       
@@ -357,7 +357,13 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
 {
     for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if(chan == part[npart]->Prcvchn)
+        {
+            if (part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
+            {
+                partonoff(npart, 1);
+            }
             bank.loadfromslot(pgm, part[npart]); //Programs indexes start from 0
+        }
     Runtime.Log("SynthEngine setProgram: Program loaded " + bank.getname(pgm));
     //update UI
     guiMaster->updatepanel();

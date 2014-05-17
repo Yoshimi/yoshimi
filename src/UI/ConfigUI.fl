@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -61,7 +61,7 @@ class ConfigUI {open : {private MiscFuncs}
           }
           else
               o->hide();} open
-      xywh {934 243 465 335} type Double hide
+      xywh {783 148 465 335} type Double visible
     } {
       Fl_Tabs {} {open
         xywh {5 5 520 325}
@@ -418,7 +418,7 @@ configChanged = true;}
 		Runtime.midi_bank_C = 128;
 		configChanged = true;
 }} open selected
-            tooltip {CC0 = msb, CC32 = lsb} xywh {270 74 60 24} down_box BORDER_BOX labelsize 12 textsize 12
+            tooltip {CC0 = msb, CC32 = lsb} xywh {270 74 60 24} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (Runtime.midi_bank_C == 32) o->value(0); else if (Runtime.midi_bank_C == 0) o->value(1); else o->value(2);}
           } {
             MenuItem banklsb {
@@ -433,6 +433,13 @@ configChanged = true;}
               label Off
               xywh {0 0 34 20} labelsize 12
             }
+          }
+          Fl_Check_Button {} {
+            label {Enable On Load}
+            callback {Runtime.enable_part_on_voice_load = o->value();
+configChanged = true;}
+            tooltip {Part enabled if MIDI program changed} xywh {275 235 70 15} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(Runtime.enable_part_on_voice_load);}
           }
         }
       }
