@@ -110,6 +110,7 @@ Config::Config() :
     rtprio(50),
     midi_bank_C(0),
     midi_upper_voice_C(128),
+    enable_part_on_voice_load(0),
     deadObjects(NULL),
     sigIntActive(0),
     ladi1IntActive(0),
