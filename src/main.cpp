@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
     Runtime.flushLog();
     if (guiMaster)
         delete guiMaster;
+    Runtime.Log("Goodbye - Play again soon?");
     exit(EXIT_SUCCESS);
 
 bail_out:

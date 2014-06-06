@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -30,57 +30,59 @@ This file is a derivative of the ZynAddSubFX original, modified March 2011
 } {in_source in_header
 } 
 
-decl {\#include <string>} {public
+decl {\#include <string>} {public local
 } 
 
-decl {using namespace std;} {public
+decl {using namespace std;} {public local
 } 
 
-decl {\#include "ADnoteUI.h"} {public
+decl {\#include "ADnoteUI.h"} {public local
 } 
 
-decl {\#include "SUBnoteUI.h"} {public
+decl {\#include "SUBnoteUI.h"} {public local
 } 
 
-decl {\#include "EffUI.h"} {public
+decl {\#include "EffUI.h"} {public local
 } 
 
-decl {\#include "VirKeyboardUI.h"} {public
+decl {\#include "VirKeyboardUI.h"} {public local
 } 
 
-decl {\#include "ConfigUI.h"} {public
+decl {\#include "ConfigUI.h"} {public local
 } 
 
-decl {\#include "BankUI.h"} {public
+decl {\#include "BankUI.h"} {public local
 } 
 
-decl {\#include "PartUI.h"} {public
+decl {\#include "PartUI.h"} {public local
 } 
 
-decl {\#include "MicrotonalUI.h"} {public
+decl {\#include "MicrotonalUI.h"} {public local
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include "PresetsUI.h"} {public local
 } 
 
-decl {\#include "ParametersUI.h"} {public
+decl {\#include "ParametersUI.h"} {public local
 } 
 
-decl {\#include "ConsoleUI.h"} {public
+decl {\#include "ConsoleUI.h"} {public local
 } 
 
-decl {\#include "Misc/SynthEngine.h"} {public
+decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
-decl {\#include "Misc/MiscFuncs.h"} {public
-}
+decl {\#include "Misc/MiscFuncs.h"} {public local
+} 
 
 class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
-  Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
+  Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
+  } {
     code {npart=-1;} {}
   }
-  Function {init(int part_)} {} {
+  Function {init(int part_)} {open
+  } {
     code {// the "part_" parameters sets the part (if it is >=0), else it sets the master
         label(NULL);
         npart = part_;
@@ -210,15 +212,15 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
             snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
             fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
-        }
-    } {}
+        }} {}
   }
-  Function {draw_part()} {} {
+  Function {draw_part()} {open
+  } {
     code {\#define MIN_DB (-48)
-        int ox = x();
-        int oy = y();
-        int lx = w();
-        int ly = h();
+        int ox = x()+2;
+        int oy = y()+2;
+        int lx = w()-4;
+        int ly = h()-4;
         if (!active_r())
         {
             fl_rectf(ox, oy, lx, ly, 140, 140, 140);
@@ -238,8 +240,9 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
         db *= ly - 2;
         int idb = (int) db;
 
+        fl_rectf(ox, oy, lx, ly, 0, 0, 0);
         fl_rectf(ox, oy + ly - idb, lx, idb, 0, 200, 255);
-        fl_rectf(ox, oy, lx, ly - idb, 0, 0, 0);
+//        fl_rectf(ox, oy, lx, ly - idb, 0, 0, 0);
 
         // draw the scales
         float tmp = ly * 1.0 / MIN_DB;
@@ -282,11 +285,16 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
         }
         return 1;} {}
   }
-  decl {int npart;} {}
-  decl {float olddbl;} {}
-  decl {float olddbr;} {}
-  decl {float oldrmsdbl;} {}
-  decl {float oldrmsdbr;} {}
+  decl {int npart;} {private local
+  }
+  decl {float olddbl;} {private local
+  }
+  decl {float olddbr;} {private local
+  }
+  decl {float oldrmsdbl;} {private local
+  }
+  decl {float oldrmsdbr;} {private local
+  }
 } 
 
 class SysEffSend {: {public WidgetPDial, private MiscFuncs}
@@ -317,20 +325,22 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
         }
         return WidgetPDial::handle(event);} {}
   }
-  decl {int neff1;} {}
-  decl {int neff2;} {}
+  decl {int neff1;} {private local
+  }
+  decl {int neff2;} {private local
+  }
 } 
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {open : {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
-    Fl_Window panellistitem {
-      private xywh {315 213 70 260} type Double hide
+    Fl_Window panellistitem {open
+      private xywh {315 213 70 280} type Double hide
       class Fl_Group
     } {
-      Fl_Group panellistitemgroup {
-        private xywh {0 20 70 240} box PLASTIC_THIN_UP_BOX
+      Fl_Group panellistitemgroup {open
+        private xywh {0 20 71 258} box PLASTIC_THIN_UP_BOX
         code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
       } {
         Fl_Group {} {
@@ -354,8 +364,8 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
           xywh {5 27 60 30} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
-          callback {synth->part[npart]->setVolume(o->value());}
-          xywh {10 65 30 110} type {Vert Knob} box FLAT_BOX minimum 127 maximum 0 step 1 value 127
+          callback {synth->part[npart]->setVolume(o->value());} selected
+          xywh {10 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
           code0 {o->value(synth->part[npart]->Pvolume);}
         }
         Fl_Dial partpanning {
@@ -371,11 +381,11 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
                   bankui->cbwig->value(npart+1);
                   bankui->cbwig->do_callback();
               }}
-          xywh {15 235 40 20} box PLASTIC_UP_BOX labelsize 10
+          xywh {12 247 40 20} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Choice partrcv {
           callback {synth->part[npart]->Prcvchn=o->value();}
-          tooltip {receive from Midi channel} xywh {10 213 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+          tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
                 if (i != 9)
@@ -385,6 +395,24 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
             }}
           code1 {o->value(synth->part[npart]->Prcvchn);}
         } {}
+        Fl_Choice audiosend {
+          callback {Runtime.AudioSend[npart] = o->value() + 1;} open
+          tooltip {Audio Send} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 10 textsize 12
+          code0 {if (Runtime.AudioSend[npart] == 1) o->value(0); else if (Runtime.AudioSend[npart] == 2) o->value(1); else o->value(2);}
+        } {
+          MenuItem main {
+            label Main
+            xywh {5 0 34 20} labelsize 12
+          }
+          MenuItem part {
+            label Part
+            xywh {5 10 34 20} labelsize 12
+          }
+          MenuItem both {
+            label Both
+            xywh {5 20 34 20} labelsize 12
+          }
+        }
       }
       Fl_Check_Button partenabled {
         label 01
@@ -440,10 +468,12 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
             panellistitemgroup->color(fl_rgb_color(50,190,240));
         panellistitemgroup->redraw();} {}
   }
-  Function {~Panellistitem()} {} {
+  Function {~Panellistitem()} {open
+  } {
     code {panellistitem->hide();} {}
   }
-  decl {int npart;} {}
-  decl {BankUI *bankui;} {}
+  decl {int npart;} {private local
+  }
+  decl {BankUI *bankui;} {private local
+  }
 } 
-

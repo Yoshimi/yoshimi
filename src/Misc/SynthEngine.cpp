@@ -522,8 +522,11 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     {
         for (int i = 0; i < buffersize; ++i)
         {   // the volume did not change
-            outl[NUM_MIDI_PARTS][i] += outl[npart][i];
-            outr[NUM_MIDI_PARTS][i] += outr[npart][i];
+            if (Runtime.AudioSend[npart] & 1)
+            {
+                outl[NUM_MIDI_PARTS][i] += outl[npart][i];
+                outr[NUM_MIDI_PARTS][i] += outr[npart][i];
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -30,58 +30,58 @@ This file is a derivative of the ZynAddSubFX original, modified April 2011
 } {in_source in_header
 } 
 
-decl {\#include <string>} {public
+decl {\#include <string>} {public local
 } 
 
-decl {using namespace std;} {public
+decl {using namespace std;} {public local
 } 
 
-decl {\#include "ADnoteUI.h"} {public
+decl {\#include "ADnoteUI.h"} {public local
 } 
 
-decl {\#include "SUBnoteUI.h"} {public
+decl {\#include "SUBnoteUI.h"} {public local
 } 
 
-decl {\#include "EffUI.h"} {public
+decl {\#include "EffUI.h"} {public local
 } 
 
-decl {\#include "VirKeyboardUI.h"} {public
+decl {\#include "VirKeyboardUI.h"} {public local
 } 
 
-decl {\#include "ConfigUI.h"} {public
+decl {\#include "ConfigUI.h"} {public local
 } 
 
-decl {\#include "BankUI.h"} {public
+decl {\#include "BankUI.h"} {public local
 } 
 
-decl {\#include "PartUI.h"} {public
+decl {\#include "PartUI.h"} {public local
 } 
 
-decl {\#include "MicrotonalUI.h"} {public
+decl {\#include "MicrotonalUI.h"} {public local
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include "PresetsUI.h"} {public local
 } 
 
-decl {\#include "ParametersUI.h"} {public
+decl {\#include "ParametersUI.h"} {public local
 } 
 
-decl {\#include "ConsoleUI.h"} {public
+decl {\#include "ConsoleUI.h"} {public local
 } 
 
-decl {\#include "MasterMiscUI.h"} {public
+decl {\#include "MasterMiscUI.h"} {public local
 } 
 
-decl {\#include "Misc/SynthEngine.h"} {public
+decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
-decl {\#include "Misc/MiscFuncs.h"} {public
+decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
-decl {class MasterUI;} {public
+decl {class MasterUI;} {public local
 } 
 
-decl {MasterUI *guiMaster;} {public
+decl {MasterUI *guiMaster;} {public local
 } 
 
 class MasterUI {open : {private MiscFuncs}
@@ -102,8 +102,7 @@ class MasterUI {open : {private MiscFuncs}
       presetsui = NULL;
       paramsui = NULL;
       yoshiLog = NULL;
-      laststatefile = Runtime.StateFile;
-    } {}
+      laststatefile = Runtime.StateFile;} {}
   }
   Function {~MasterUI()} {} {
     code {//
@@ -174,7 +173,7 @@ class MasterUI {open : {private MiscFuncs}
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {Runtime.saveConfig(); Runtime.runSynth = false;} open
-      xywh {1406 409 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -264,14 +263,13 @@ class MasterUI {open : {private MiscFuncs}
             xywh {10 10 100 20} labelsize 12
           }
         }
-        
         Submenu {} {
-        label State open selected
-        xywh {0 0 70 21} labelsize 12
+          label State open
+          xywh {0 0 70 21} labelsize 12
         } {
-            MenuItem saveState {
-              label Save
-              callback {// for Alessandro
+          MenuItem saveState {
+            label Save
+            callback {// for Alessandro
 
                 char *fle = fl_file_chooser("Save:", "({*.state})",
                                             laststatefile.c_str(), 0);
@@ -279,13 +277,12 @@ class MasterUI {open : {private MiscFuncs}
                 {
                     laststatefile = string(fle);
                     Runtime.saveState(laststatefile);
-                }
-              }
-              tooltip {Save session state} xywh {10 10 34 21} labelsize 12
-            }
-            MenuItem loadState {
-              label Load
-              callback {// for Alessandro
+                }}
+            tooltip {Save session state} xywh {10 10 34 21} labelsize 12
+          }
+          MenuItem loadState {
+            label Load
+            callback {// for Alessandro
                 char *fle = fl_file_chooser("Load:", "({*.state})",
                                             laststatefile.c_str(), 0);
                 if (fle)
@@ -293,11 +290,9 @@ class MasterUI {open : {private MiscFuncs}
                     laststatefile = string(fle);
                     Runtime.loadState(laststatefile);
                 }
-                partui->instrumentlabel->copy_label(partui->part->Pname.c_str());
-
-              }
-              tooltip {Load session state} xywh {0 0 34 21} labelsize 12
-            }
+                partui->instrumentlabel->copy_label(partui->part->Pname.c_str());}
+            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
+          }
         }
         Submenu Parameters {
           label {&Parameters}
@@ -747,16 +742,13 @@ ZynAddSubFX}
         xywh {0 45 120 170} box FLAT_BOX resizable
         code0 {//
             for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
-                for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; neff2++)
-        }
-        code1 {
-            {
+                for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; neff2++)}
+        code1 {{
                 syseffsend[neff1][neff2] =
                     new SysEffSend(o->x()+(neff2 - 1) * 35, o->y() + 15 + neff1 * 50, 30, 30);
                 syseffsend[neff1][neff2]->label("aaa");
                 syseffsend[neff1][neff2]->init(neff1, neff2);
-            }
-        }
+            }}
       } {}
       Fl_Button {} {
         label Close
@@ -769,40 +761,38 @@ ZynAddSubFX}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Panel}
-      xywh {402 107 635 635} type Double labelfont 13 labelsize 13 hide
+      label {Yoshimi Panel} open
+      xywh {4 20 635 635} type Double labelfont 13 labelsize 13 hide
     } {
-      Fl_Scroll {} {
+      Fl_Scroll {} {open
         xywh {0 5 570 310} type HORIZONTAL box THIN_UP_BOX
       } {
         Fl_Pack {} {
-          xywh {5 10 560 285} type HORIZONTAL
+          xywh {5 10 560 300} type HORIZONTAL
           code0 {//
             for (int i = 0; i < NUM_MIDI_PARTS / 2; i++)
             {
                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
                 panellistitem[i]->init(i, bankui);
-            }
-          }
+            }}
         } {}
       }
-      Fl_Scroll {} {
+      Fl_Scroll {} {open
         xywh {0 320 570 310} type HORIZONTAL box THIN_UP_BOX
       } {
         Fl_Pack {} {
-          xywh {5 325 560 285} type HORIZONTAL
+          xywh {5 325 560 300} type HORIZONTAL
           code0 {//
               for (int i = NUM_MIDI_PARTS / 2; i < NUM_MIDI_PARTS; i++)
               {
                    panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
                    panellistitem[i]->init(i, bankui);
-              }
-          }
+              }}
         } {}
       }
       Fl_Button {} {
         label Close
-        callback {panelwindow->hide(); updatepanel();}
+        callback {panelwindow->hide(); updatepanel();} selected
         xywh {575 604 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
@@ -823,8 +813,7 @@ ZynAddSubFX}
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
        {
           panellistitem[npart]->refresh();
-       }
-     } {}
+       }} {}
   }
   Function {setMasterLabel(string name)} {} {
     code {//
@@ -965,18 +954,32 @@ ZynAddSubFX}
       inseffectuigroup->activate();
       inseffectuigroup->show();} {}
   }
-  decl {ConfigUI *configui;} {}
-  decl {ParametersUI *paramsui;} {}
-  decl {BankUI *bankui;} {}
-  decl {MicrotonalUI *microtonalui;} {}
-  decl {VirKeyboard *virkeyboard;} {}
-  decl {int ninseff;} {}
-  decl {int npart;} {}
-  decl {int nsyseff;} {}
-  decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {}
-  decl {int swapefftype;} {}
-  decl {string masterwindowlabel;} {}
-  decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {}
-  decl {ConsoleUI *yoshiLog;} {}
-  decl {string laststatefile;} {}
+  decl {ConfigUI *configui;} {private local
+  }
+  decl {ParametersUI *paramsui;} {private local
+  }
+  decl {BankUI *bankui;} {private local
+  }
+  decl {MicrotonalUI *microtonalui;} {private local
+  }
+  decl {VirKeyboard *virkeyboard;} {private local
+  }
+  decl {int ninseff;} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int nsyseff;} {private local
+  }
+  decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
+  }
+  decl {int swapefftype;} {private local
+  }
+  decl {string masterwindowlabel;} {private local
+  }
+  decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {private local
+  }
+  decl {ConsoleUI *yoshiLog;} {private local
+  }
+  decl {string laststatefile;} {private local
+  }
 } 

@@ -228,7 +228,13 @@ bool JackEngine::openAudio(void)
     }
 
     if (jackPortsRegistered)
+    {
+        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        {
+            Runtime.AudioSend[npart] = 1; // default - only need if running jack audio
+        }
         return prepBuffers(false) && latencyPrep();
+    }
     else
         Runtime.Log("Failed to register jack audio ports");
     Close();
@@ -335,8 +341,11 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     getAudio();
     for (int port = 0; port < NUM_MIDI_PARTS; ++port)
     {
-        memcpy(audio.portBuffs[port * 2], zynLeft[port], sizeof(float) * nframes);
-        memcpy(audio.portBuffs[port * 2 + 1], zynRight[port], sizeof(float) * nframes);
+        if (Runtime.AudioSend[port] & 2)
+        {
+            memcpy(audio.portBuffs[port * 2], zynLeft[port], sizeof(float) * nframes);
+            memcpy(audio.portBuffs[port * 2 + 1], zynRight[port], sizeof(float) * nframes);
+        }
     }
     //And mixed outputs
     memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], sizeof(float) * nframes);
