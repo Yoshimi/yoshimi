@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 
     Runtime.StartupReport();
     synth->Unmute();
+    Runtime.Log("Yay! We're up and running :-)");
     while (Runtime.runSynth)
     {
         Runtime.signalCheck();

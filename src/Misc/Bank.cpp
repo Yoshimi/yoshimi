@@ -63,6 +63,7 @@ Bank::Bank() :
         banks[i].alias.clear();
         banks[i].dir.clear();
     }
+    rescanforbanks(); // we need this here in case we are running with no GUI
     bankfiletitle = string(dirname);
     loadbank(Runtime.currentBankDir);
 }

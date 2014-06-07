@@ -259,6 +259,11 @@ bool JackEngine::openMidi(void)
         Runtime.Log("Failed to create jack midi ringbuffer");
         return false;
     }
+    if (jack_ringbuffer_mlock(midi.ringBuf))
+    {
+        Runtime.Log("Failed to lock memory");
+        return false;
+    }
     return true;
 }
 

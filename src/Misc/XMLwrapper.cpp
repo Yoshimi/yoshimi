@@ -121,7 +121,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
         node = root = tree = NULL;
         return false;
     }
-    information.PADsynth_used = getpar("PADsynth_used", 0, 0, 1);
+    information.PADsynth_used = getparbool("PADsynth_used",0);
     exitbranch();
     if (tree)
         mxmlDelete(tree);
@@ -160,7 +160,7 @@ char *XMLwrapper::getXMLdata()
     memset(tabs, 0, STACKSIZE + 2);
     mxml_node_t *oldnode=node;
     node = info;
-    addpar("PADsynth_used", information.PADsynth_used);
+    addparbool("PADsynth_used", information.PADsynth_used);
     node = oldnode;
     char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
     return xmldata;
@@ -386,7 +386,7 @@ int XMLwrapper::getparbool(const string& name, int defaultpar)
     const char *strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
-    return (strval[0] == 'Y' || strval[0] == 'y') ? 1 : 0;
+    return (strval[0] != '0' && strval[0] != 'N' && strval[0] != 'n') ? 1 : 0;
 }
 
 

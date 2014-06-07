@@ -327,16 +327,23 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
 	  128 banks is enough for anybody :-)
         this is configurable to suit different hardware synths
         */
-        Runtime.Log("SynthEngine setController bankselect: " + asString(par));
         bank.msb = (unsigned char)par + 1; //Bank indexes start from 1       
         if(bank.msb <= MAX_NUM_BANKS) {
-            bank.loadbank(bank.banks[bank.msb].dir);
-            Runtime.Log("SynthEngine setController bankselect: Bank loaded " + bank.banks[bank.msb].name);
-        } else
-            Runtime.Log("SynthEngine setProgram: Value is out of range!");
+            if (bank.loadbank(bank.banks[bank.msb].dir))
+            {
+                Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
+            }
+            else
+            {
+                Runtime.Log("SynthEngine setBank: No bank " + asString(par));
+            }
+        }
+        else
+            Runtime.Log("SynthEngine setBank: Value is out of range!");
         return;        
     }
-    else{ // bank change doesn't directly affect parts.
+    else
+    { // bank change doesn't directly affect parts.
 	for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
 	{   // Send the controller to all part assigned to the channel
 	    if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
@@ -364,11 +371,14 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
             }
             bank.loadfromslot(pgm, part[npart]); //Programs indexes start from 0
         }
-    Runtime.Log("SynthEngine setProgram: Program loaded " + bank.getname(pgm));
+    Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
     //update UI
-    guiMaster->updatepanel();
-    if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part) {
-        guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+    if (Runtime.showGui)
+    {
+        guiMaster->updatepanel();
+        if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part) {
+            guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+        }
     }
 }
 

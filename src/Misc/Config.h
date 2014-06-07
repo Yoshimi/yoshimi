@@ -51,7 +51,7 @@ class Config : public MiscFuncs
         void StartupReport(void);
         void Announce(void);
         void Usage(void);
-        void Log(string msg, bool tostdout = true); // was tostderr
+        void Log(string msg, bool tostderr = true);
         void flushLog(void);
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
