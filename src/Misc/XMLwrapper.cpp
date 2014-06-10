@@ -386,7 +386,9 @@ int XMLwrapper::getparbool(const string& name, int defaultpar)
     const char *strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
-    return (strval[0] != '0' && strval[0] != 'N' && strval[0] != 'n') ? 1 : 0;
+    char tmp = strval[0] | 0x20;
+    return (tmp != '0' && tmp != 'n' && tmp != 'f') ? 1 : 0;
+//    return (strval[0] != '0' && strval[0] != 'N' && strval[0] != 'n') ? 1 : 0;
 }
 
 

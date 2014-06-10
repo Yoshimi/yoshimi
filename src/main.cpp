@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     Runtime.StartupReport();
     synth->Unmute();
-    Runtime.Log("Yay! We're up and running :-)");
+    cout << "Yay! We're up and running :-)\n";
     while (Runtime.runSynth)
     {
         Runtime.signalCheck();
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     Runtime.flushLog();
     if (guiMaster)
         delete guiMaster;
-    Runtime.Log("Goodbye - Play again soon?");
+    cout << "Goodbye - Play again soon?\n";
     exit(EXIT_SUCCESS);
 
 bail_out:
