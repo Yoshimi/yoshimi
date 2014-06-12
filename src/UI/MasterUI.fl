@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -172,8 +172,28 @@ class MasterUI {open : {private MiscFuncs}
   } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {Runtime.saveConfig(); Runtime.runSynth = false;} open
-      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      callback {if (configui->configChanged)
+          {
+              int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
+              switch (r)
+              {
+                  case 0:
+                      Runtime.saveConfig();
+                      Runtime.runSynth = false;
+                      break;
+                  case 2:
+                      Runtime.runSynth = false;
+                      break;
+                  default:
+                      break;
+              }
+          }
+          else
+          {
+                  Runtime.saveConfig();
+                  Runtime.runSynth = false;
+          }} open selected
+      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -792,7 +812,7 @@ ZynAddSubFX}
       }
       Fl_Button {} {
         label Close
-        callback {panelwindow->hide(); updatepanel();} selected
+        callback {panelwindow->hide(); updatepanel();}
         xywh {575 604 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {

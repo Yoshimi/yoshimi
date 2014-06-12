@@ -105,6 +105,7 @@ Config::Config() :
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     BankUIAutoClose(0),
+    GzipCompression(3),
     Interpolation(0),
     CheckPADsynth(1),
     rtprio(50),
@@ -356,6 +357,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
                                         MAX_AD_HARMONICS * 2, 131072);
     BankUIAutoClose = xml->getpar("bank_window_auto_close",
                                                BankUIAutoClose, 0, 1);
+    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     currentBankDir = xml->getparstr("bank_current");
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
@@ -466,8 +468,12 @@ void Config::saveConfig(void)
         return;
     }
     addConfigXML(xmltree);
+    unsigned int tmp = GzipCompression;
+    GzipCompression = 0;
     if (!xmltree->saveXMLfile(ConfigFile))
         Log("Failed to save config to " + ConfigFile);
+    GzipCompression = tmp;
+
     delete xmltree;
 }
 
@@ -482,6 +488,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("oscil_size", Oscilsize);
     xmltree->addpar("bank_window_auto_close", BankUIAutoClose);
 
+    xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("check_pad_synth", CheckPADsynth);
     xmltree->addparstr("bank_current", currentBankDir);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);

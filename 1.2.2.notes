@@ -1,11 +1,30 @@
+yoshimi-1.2.2-rc
+
+- Started some documentation. Much more needed!
+- Improved config saving. I think we're there now :)
+- Fixed bug that caused segfault if MIDI voice changed with no GUI.
+- Fixed bug that stopped MIDI bank change with no GUI.
+- Added panel option to direct a part's audio to only main, only part or both.
+- Cleaned up panel display.
+- Added memory lock to jack ringbuffer (probably not needed).
+- Restored PADsynth highlights and made them more distinct.
+- Refined PADsynth and general boolean XML detection a little.
+- Enabled reporting to console. It doesn't seem to affect CPU usage.
+- Improved error reporting for missing bank or program.
+- Added Test directory with MIDI and Rosegarden bank and program change files.
+- Reinstated gzip compression on voice and parameter files.
+- Added compression level to settings. 0 = plain XML save.
+
+
 yoshimi-1.2.1
 
-Added alternative robot icon as an SVG. Thanks to Andrew Ter-Grigoryan
-Added option to enable a part if not already enabled, when doing a MIDI program change.
-Set Vkeyboard default velocity to 100 same as for ZynAddSubFX.
-Stopped settings asking twice about saving. Will do more on this!
-Rationalised linker flags.
-Added drumkits from Dario Straulino.
+- Added alternative robot icon as an SVG. Thanks to Andrew Ter-Grigoryan
+- Added option to enable a part if not already enabled, when doing a MIDI program change.
+- Set Vkeyboard default velocity to 100 same as for ZynAddSubFX.
+- Stopped settings asking twice about saving. Will do more on this!
+- Rationalised linker flags.
+- Added drumkits from Dario Straulino.
+
 
 yoshimi-1.2.0
 
@@ -26,6 +45,7 @@ Added and updated voice patches.
 
 Special thanks to Kristian Amlie and Tito Latini
 
+
 yoshimi-1.1.0
 
 * Optimization patches provided by Kristian Amlie.
@@ -36,6 +56,7 @@ yoshimi-1.1.0
 * Expand state file path before any check by Nikita Zlobin.
 * Some minor cosmetic changes (placement of Close buttons, resized the panel window).
 
+
 yoshimi-1.0.0
 
 * In memory of Alan Calvert who passed away exactly one year ago. Cal, we're pretty sure it's only angel horns you hear and no devil trombones!
@@ -44,6 +65,7 @@ yoshimi-1.0.0
 * Renamed Yoshimi icon.
 * Applied patch from SourceForge ticket #3487751 (Simplify desktop file and install it and the icon file). Thanks to Tim harder for this patch.
 * Yoshimi likes GCC >= 4.7 again.
+
 
 yoshimi-0.060.12
 
@@ -57,13 +79,16 @@ yoshimi-0.060.11
 
 Jeremy Jongepier <jeremy@autostatic.com>
 
+
 yoshimi-0.060.10
 
 COPYING file updated
 
+
 yoshimi-0.060.9
 
 licence anomalies corrected.
+
 
 yoshimi-0.060.8
 

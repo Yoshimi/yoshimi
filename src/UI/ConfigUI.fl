@@ -42,25 +42,7 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {//
-          if (configChanged)
-          {
-              int r = fl_choice("Save settings?", "Cancel", "Save", "Don't save");
-              switch (r)
-              {
-                  case 1:
-                      o->hide();
-                      savesettings();
-                      break;
-                  case 2:
-                      o->hide();
-                      break;
-                  default:
-                      break;
-              }
-          }
-          else
-              o->hide();} open
+      callback {o->hide();} open
       xywh {783 148 465 335} type Double hide
     } {
       Fl_Tabs {} {open
@@ -68,7 +50,7 @@ class ConfigUI {open : {private MiscFuncs}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 460 260} labelsize 12
+          xywh {5 25 460 260} labelsize 12 hide
         } {
           Fl_Choice {} {
             label OscilSize
@@ -76,8 +58,8 @@ class ConfigUI {open : {private MiscFuncs}
 		unsigned int tmp = Runtime.Oscilsize;
                 Runtime.Oscilsize = 128 << o->value();
                 if (Runtime.Oscilsize != tmp)
-                	configChanged = true;} open
-            tooltip {ADSynth Oscillator Size (samples)} xywh {196 52 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+                	configChanged = true;}
+            tooltip {ADSynth Oscillator Size (samples)} xywh {250 50 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(Runtime.Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
@@ -120,7 +102,7 @@ class ConfigUI {open : {private MiscFuncs}
                 Runtime.Interpolation = (int) o->value();
                 if (Runtime.Interpolation != tmp)
                 	configChanged = true;}
-            xywh {255 162 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            xywh {250 130 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(Runtime.Interpolation);}
           } {
             MenuItem {} {
@@ -138,8 +120,8 @@ class ConfigUI {open : {private MiscFuncs}
                 int tmp = Runtime.VirKeybLayout;
                 Runtime.VirKeybLayout = (int) o->value();
                 if (Runtime.VirKeybLayout != tmp)
-                	configChanged = true;} selected
-            xywh {255 108 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+                	configChanged = true;}
+            xywh {250 90 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(Runtime.VirKeybLayout);}
           } {
             MenuItem {} {
@@ -168,7 +150,7 @@ class ConfigUI {open : {private MiscFuncs}
             callback {//
               Runtime.StateFile = string(o->value());
               SessionStateFile->changed();}
-            xywh {159 216 235 25} labelsize 12 when 1 textsize 12
+            xywh {159 220 220 20} labelsize 12 when 1 textsize 12
             code0 {o->value(Runtime.StateFile.c_str());}
           }
           Fl_Button StateFileButton {
@@ -183,8 +165,18 @@ class ConfigUI {open : {private MiscFuncs}
                     SessionStateFile->changed();
                     configChanged = true;
                 }}
-            xywh {404 218 49 20} labelsize 12
+            xywh {400 220 49 20} labelsize 12
             code0 {/* code */}
+          }
+          Fl_Counter compression {
+            label {XML compression level}
+            callback {//
+		unsigned int tmp = Runtime.GzipCompression;
+		Runtime.GzipCompression = (unsigned int) o->value();
+		if(Runtime.GzipCompression != tmp)
+			configChanged = true;}
+            tooltip {gzip compression level (0 - uncompressed)} xywh {280 170 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
+            code0 {o->value(Runtime.GzipCompression);}
           }
         }
         Fl_Group {} {
@@ -399,7 +391,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label CCs open
-          tooltip {MIDI CC preferences} xywh {25 45 460 260} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {25 45 460 260} labelsize 12
         } {
           Fl_Spinner {} {
             label {Extended Program Change}
@@ -451,22 +443,23 @@ class ConfigUI {open : {private MiscFuncs}
 		int tmp = Runtime.enable_part_on_voice_load;
 		Runtime.enable_part_on_voice_load = o->value();
 		if (Runtime.enable_part_on_voice_load != tmp)
-			configChanged = true;}
-            tooltip {Part enabled if MIDI program changed} xywh {275 235 70 15} down_box DOWN_BOX labelsize 12 align 4
+			configChanged = true;} selected
+            tooltip {Part enabled if MIDI program changed} xywh {270 235 70 15} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(Runtime.enable_part_on_voice_load);}
           }
         }
       }
       Fl_Button {} {
-        label Close
+        label {Close Unsaved}
         callback {configwindow->do_callback();}
-        xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
+        xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
-        label {Save Settings}
+        label {Save and Close}
         callback {savesettings();
-configChanged = false;}
-        xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
+configChanged = false;
+configwindow->do_callback();}
+        xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Box {} {
         label {Most settings changes require a restart}
@@ -550,6 +543,6 @@ configChanged = false;}
         writebankcfg();
         writepresetcfg();} {}
   }
-  decl {bool configChanged;} {private local
+  decl {bool configChanged;} {public local
   }
 } 

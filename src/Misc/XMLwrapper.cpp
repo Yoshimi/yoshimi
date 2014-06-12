@@ -141,14 +141,35 @@ bool XMLwrapper::saveXMLfile(const string& filename)
         Runtime.Log("Error, failed to allocate xml data space");
         return false;
     }
-    FILE *xmlfile = fopen(filename.c_str(), "w");
-    if (!xmlfile)
+    unsigned int compression = Runtime.GzipCompression;
+    if (compression == 0)
     {
-        Runtime.Log("Error, failed to open xml file " + filename + " for save");
-        return false;
+        FILE *xmlfile = fopen(filename.c_str(), "w");
+        if (!xmlfile)
+        {
+            Runtime.Log("Error, failed to open xml file " + filename + " for save");
+            return false;
+        }
+        fputs(xmldata, xmlfile);
+        fclose(xmlfile);
     }
-    fputs(xmldata, xmlfile);
-    fclose(xmlfile);
+    else
+    {
+        if (compression > 9)
+            compression = 9;
+        char options[10];
+        snprintf(options, 10, "wb%d", compression);
+
+        gzFile gzfile;
+        gzfile = gzopen(filename.c_str(), options);
+        if (gzfile == NULL)
+        {
+            Runtime.Log("Error, gzopen() == NULL");
+            return false;
+        }
+        gzputs(gzfile, xmldata);
+        gzclose(gzfile);
+    }
     free(xmldata);
     return true;
 }
@@ -388,7 +409,6 @@ int XMLwrapper::getparbool(const string& name, int defaultpar)
         return defaultpar;
     char tmp = strval[0] | 0x20;
     return (tmp != '0' && tmp != 'n' && tmp != 'f') ? 1 : 0;
-//    return (strval[0] != '0' && strval[0] != 'N' && strval[0] != 'n') ? 1 : 0;
 }
 
 
