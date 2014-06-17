@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014 Jonathan Brickman <jeb@ponderworthy.com> -->
+<application>
+ <id type="desktop">yoshimi.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-2.0+</project_license>
+ <name>Yoshimi</name>
+ <summary>A Software Synthesizer for Linux</summary>
+ <description>
+  <p>
+  Yoshimi is a MIDI software synthesizer for Linux. It synthesizes in real time, can run polyphonic and/or 
+  monophonic in multiple simultaneous patches in one or more MIDI channels, has extensive microtonal 
+  capability, and much more. It includes extensive addititive, subtractive, and PAD synth capabilities 
+  which can be run simultaneously within the same patch. And it has extensive effects capabilities as well.
+  </p>
+  <p>
+  Originally based on the 2.4.0 version of ZynAddSubFX (Copyright 2002-2009 Nasca Octavian Paul), 
+  development of Yoshimi has continued for quite a while now in its own directions. These include 
+  extensive optimizations for audio and MIDI performance, and more recently progressive extension 
+  of user-level access to all controls. At the same time refinement continues, both visually and 
+  within the code.
+  </p>
+  <p>
+  Since the project's beginning, many amazing patches have since been written explicitly for 
+  Yoshimi, quite a few of which are now included. Come on in and join the fun!
+  </p>
+ </description>
+ <screenshots>
+  <screenshot type="default" width="1600" height="900">https://sourceforge.net/p/yoshimi/wiki/Home/attachment/yoshimi-adsynth-edit-with-keyboard.png</screenshot>
+  <screenshot width="880" height="495">https://sourceforge.net/p/yoshimi/wiki/Home/attachment/yoshimi-initial.png</screenshot>
+ </screenshots>
+ <url type="homepage">https://sourceforge.net/projects/yoshimi/</url>
+ <updatecontact>abrolag@users.sourceforge.net</updatecontact>
+</application>
+
