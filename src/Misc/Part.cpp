@@ -654,6 +654,7 @@ void Part::SetController(unsigned int type, int par)
             ctl->setportamento(par);
             break;
         case C_panning:
+            par = 64 + (par - 64) * (ctl->panning.depth / 64.0); // force float during calculation
             setPan(par);
             break;
         case C_filtercutoff:

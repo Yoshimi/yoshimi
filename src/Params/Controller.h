@@ -54,7 +54,7 @@ class Controller
         void setportamento(int value);
         void setresonancecenter(int value);
         void setresonancebw(int value);
-        void setPanDepth(char par) { panning.data = par; panning.depth = (float)par / 64.0f; }
+        void setPanDepth(char par) { panning.depth = par;}
         int initportamento(float oldfreq, float newfreq, bool in_progress);
         // returns 1 if the portamento's conditions are true, else return 0
         void updateportamento(void); // update portamento values
@@ -74,7 +74,7 @@ class Controller
 
         struct { // Panning
             int data;
-            float depth;
+            char depth;
         } panning;
 
         struct { // Filter cutoff

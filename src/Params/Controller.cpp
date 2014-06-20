@@ -42,7 +42,7 @@ void Controller::defaults(void)
 {
     setpitchwheelbendrange(200); // 2 halftones
     expression.receive = 1;
-    panning.depth = 64.0f;
+    panning.depth = 64;
     filtercutoff.depth = 64;
     filterq.depth = 64;
     bandwidth.depth = 64;

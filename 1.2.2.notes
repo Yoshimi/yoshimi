@@ -1,4 +1,4 @@
-yoshimi-1.2.2-rc2
+yoshimi-1.2.2
 
 - Started some documentation. Much more needed!
 - Improved config saving. I think we're there now :)
@@ -19,6 +19,7 @@ yoshimi-1.2.2-rc2
 - Revised 'make install' to make sure everything goes to the right place.
 - Changed position of Pitch bend roller in Vkeyboard to make things clearer.
 - Small update to Will_Godfrey_Companion bank.
+- Reinstated part Pan Depth control, but calling it Pan Width as that's more descriptive.
 
 
 yoshimi-1.2.1

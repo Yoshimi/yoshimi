@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -32,7 +32,7 @@ This file is derivative of ZynAddSubFX original code, modified March 2011
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
-    \#include "Misc/SynthEngine.h"} {global
+    \#include "Misc/SynthEngine.h"} {private global
 } 
 
 decl {\#include "EffUI.h"
@@ -45,7 +45,7 @@ decl {\#include "EffUI.h"
 } 
 
 decl {\#include "Misc/Part.h"
-    \#define MAX_INFO_TEXT_SIZE 256} {public
+    \#define MAX_INFO_TEXT_SIZE 256} {public local
 } 
 
 class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
@@ -82,17 +82,21 @@ class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
     code {syseffsend->hide();
         //delete(syseffsend);} {}
   }
-  decl {int neff;} {}
-  decl {int npart;} {}
+  decl {int neff;} {private local
+  }
+  decl {int npart;} {private local
+  }
 } 
 
 class PartUI_ {open
 } {
   Function {showparameters(int kititem,int engine)} {open return_type virtual
-  } {code { ; } {} }
+  } {
+    code {;} {}
+  }
 } 
 
-class PartKitItem {: {public Fl_Group}
+class PartKitItem {open : {public Fl_Group}
 } {
   Function {make_window()} {open private
   } {
@@ -307,10 +311,14 @@ class PartKitItem {: {public Fl_Group}
     code {partkititem->hide();
       //delete(partkititem);} {}
   }
-  decl {Part *part;} {}
-  decl {int n;} {}
-  decl {char label[10];} {}
-  decl {PartUI_ *partui;} {}
+  decl {Part *part;} {private local
+  }
+  decl {int n;} {private local
+  }
+  decl {char label[10];} {private local
+  }
+  decl {PartUI_ *partui;} {private local
+  }
 } 
 
 class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
@@ -318,8 +326,8 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {1170 429 385 240} type Double
-      class Fl_Group visible
+      private xywh {1014 429 385 240} type Double hide
+      class Fl_Group
     } {
       Fl_Group partgroupui {open
         xywh {0 0 387 240}
@@ -551,10 +559,10 @@ Offset}
         code0 {o->value(part->ctl->expression.receive);}
       }
       Fl_Dial {} {
-        label PanDpth
-        callback {part->ctl->setPanDepth((char)o->value());}
-        tooltip {Panning Depth} xywh {10 55 30 30} labelsize 10 maximum 127 step 1
-        code0 {o->value(part->ctl->panning.data);}
+        label PanWdth
+        callback {part->ctl->setPanDepth((char)o->value());} selected
+        tooltip {Panning Depth} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
+        code0 {o->value(part->ctl->panning.depth);}
         class WidgetPDial
       }
       Fl_Dial {} {
@@ -1199,15 +1207,27 @@ Offset}
         instrumenteditwindow->hide();
         delete instrumenteditwindow;} {}
   }
-  decl {Part *part;} {selected public
+  decl {Part *part;} {public local
   }
-  decl {BankUI *bankui;} {}
-  decl {ADnoteUI *adnoteui;} {}
-  decl {SUBnoteUI *subnoteui;} {}
-  decl {PADnoteUI *padnoteui;} {}
-  decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {}
-  decl {int npart;} {}
-  decl {int ninseff;} {}
-  decl {int lastkititem;} {}
-  decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {}
+  decl {BankUI *bankui;} {private local
+  }
+  decl {ADnoteUI *adnoteui;} {private local
+  }
+  decl {SUBnoteUI *subnoteui;} {private local
+  }
+  decl {PADnoteUI *padnoteui;} {private local
+  }
+  decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int ninseff;} {private local
+  }
+  decl {int lastkititem;} {private local
+  }
+  decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
+  }
+} 
+
+decl {int x;} {private local
 } 
