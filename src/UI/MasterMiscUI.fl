@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -364,7 +364,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           xywh {5 27 60 30} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
-          callback {synth->part[npart]->setVolume(o->value());} selected
+          callback {synth->part[npart]->setVolume(o->value());}
           xywh {10 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
           code0 {o->value(synth->part[npart]->Pvolume);}
         }
@@ -396,9 +396,9 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           code1 {o->value(synth->part[npart]->Prcvchn);}
         } {}
         Fl_Choice audiosend {
-          callback {Runtime.AudioSend[npart] = o->value() + 1;} open
+          callback {synth->part[npart]->Paudiodest = o->value() + 1;} open
           tooltip {Audio Send} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 10 textsize 12
-          code0 {if (Runtime.AudioSend[npart] == 1) o->value(0); else if (Runtime.AudioSend[npart] == 2) o->value(1); else o->value(2);}
+          code0 {if (synth->part[npart]->Paudiodest == 2) o->value(1); else if (synth->part[npart]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
           MenuItem main {
             label Main
@@ -462,11 +462,16 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
         partpanning->value(synth->part[npart]->Ppanning);
         partrcv->value(synth->part[npart]->Prcvchn);
         partname->label(synth->part[npart]->Pname.c_str());
+        int tmp = synth->part[npart]->Paudiodest - 1;
+        if (tmp < 0 or tmp > 3)
+            tmp = 0;
+        audiosend->value(tmp);
         if ((int)bankui->cbwig->value() != (npart + 1))
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));
         else
             panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();} {}
+        panellistitemgroup->redraw();} {selected
+    }
   }
   Function {~Panellistitem()} {open
   } {

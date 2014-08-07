@@ -122,7 +122,6 @@ class Config : public MiscFuncs
         unsigned int  midi_bank_C;
         unsigned int  midi_upper_voice_C;
         int           enable_part_on_voice_load;
-        char          AudioSend[NUM_MIDI_PARTS];
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;

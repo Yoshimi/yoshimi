@@ -192,8 +192,8 @@ class MasterUI {open : {private MiscFuncs}
           {
                   Runtime.saveConfig();
                   Runtime.runSynth = false;
-          }} open selected
-      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+          }} open
+      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -315,7 +315,7 @@ class MasterUI {open : {private MiscFuncs}
           }
         }
         Submenu Parameters {
-          label {&Parameters}
+          label {&Parameters} open
           xywh {0 0 70 21} labelsize 12
           code0 {o = o; // suppress warning
               if (Runtime.ParamsHistory.empty())
@@ -858,7 +858,8 @@ ZynAddSubFX}
         }
         updatepanel();} {}
   }
-  Function {do_load_master(bool updatehistory, const char* file)} {} {
+  Function {do_load_master(bool updatehistory, const char* file)} {open
+  } {
     code {//
         const char *fname;
         if (NULL != file)
@@ -893,7 +894,8 @@ ZynAddSubFX}
             }
             else
                 fl_alert("%s",msg.c_str());
-        }} {}
+        }} {selected
+    }
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -926,7 +928,8 @@ ZynAddSubFX}
         }
         updatepanel();} {}
   }
-  Function {refresh_master_ui()} {} {
+  Function {refresh_master_ui()} {open
+  } {
     code {//
         ninseff = 0;
         nsyseff = 0;

@@ -296,11 +296,8 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
     if (emptyslot(n1) && emptyslot(n2))
         return;
     if (emptyslot(n1)) // make the empty slot the destination
-    {
-        int tmp = n2;
-        n2 = n1;
-        n1 = tmp;
-    }
+        swap(n1, n2);
+    
     if (emptyslot(n2)) // this is just a movement to an empty slot
     {
         setname(n1, getname(n1), n2);

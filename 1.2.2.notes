@@ -1,3 +1,9 @@
+yoshimi-1.2.x
+- Some more minor bug fixes
+- INSTALL file now refers to V1.2.2
+- Enabled saving audio destination in parameters file
+    only relevant for jack output
+
 yoshimi-1.2.2
 
 - Started some documentation. Much more needed!

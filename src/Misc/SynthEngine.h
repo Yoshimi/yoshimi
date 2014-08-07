@@ -93,6 +93,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float halfoscilsize_f;
 
         unsigned char Pvolume;
+        int           Paudiodest;
         int           Pkeyshift;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
@@ -102,6 +103,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void setPkeyshift(int Pkeyshift_);
         void setPsysefxvol(int Ppart, int Pefx, char Pvol);
         void setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol);
+        void setPaudiodest(int value);
 
         // effects
         EffectMgr *sysefx[NUM_SYS_EFX]; // system

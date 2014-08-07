@@ -99,8 +99,6 @@ void AnalogFilter::computefiltercoefs(void)
     }
     else
     {
-        // tmpq = (q > 1.0) ? pow(q, (float)1.0 / (stages + 1)) : q;
-        // tmpgain = pow(gain, (float)1.0 / (stages + 1));
         tmpq = (q > 1.0f) ? powf(q, 1.0f / (stages + 1)) : q;
         tmpgain = powf(gain, 1.0f / (stages + 1));
     }

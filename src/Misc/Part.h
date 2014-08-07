@@ -29,6 +29,7 @@
 
 using namespace std;
 
+#include "Misc/Part.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
 
@@ -96,6 +97,7 @@ class Part : private MiscFuncs, SynthHelper
         void setkeylimit(unsigned char Pkeylimit_);
         void setkititemstatus(int kititem, int Penabled_);
         void setVolume(char value);
+        void setDestination(int value);
 
         unsigned char Penabled;
         unsigned char Pvolume;
@@ -114,6 +116,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Plegatomode; // 0 = normal, 1 = legato
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
+        int           Paudiodest;  // jack output routing
         string        Pname;
         struct {
             unsigned char Ptype;

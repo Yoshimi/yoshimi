@@ -539,7 +539,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     {
         for (int i = 0; i < buffersize; ++i)
         {   // the volume did not change
-            if (Runtime.AudioSend[npart] & 1)
+            if (part[npart]->Paudiodest & 1)
             {
                 outl[NUM_MIDI_PARTS][i] += outl[npart][i];
                 outr[NUM_MIDI_PARTS][i] += outr[npart][i];
@@ -684,6 +684,11 @@ void SynthEngine::setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol)
 {
     Psysefxsend[Pefxfrom][Pefxto] = Pvol;
     sysefxsend[Pefxfrom][Pefxto]  = powf(0.1f, (1.0f - Pvol / 96.0f) * 2.0f);
+}
+
+void SynthEngine::setPaudiodest(int value)
+{
+    Paudiodest = value;
 }
 
 

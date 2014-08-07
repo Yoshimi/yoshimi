@@ -87,7 +87,7 @@ void Unison::setBandwidth(float bandwidth)
         bandwidth = 1200.0f;
     //#warning
     //    : todo: if bandwidth is too small the audio will be self canceled (because of the sign change of the outputs)
-    //    unison_bandwidth_cents = bandwidth;
+    unison_bandwidth_cents = bandwidth;
     updateParameters();
 }
 

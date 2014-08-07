@@ -127,6 +127,7 @@ void Part::defaults(void)
     Pvelsns = 64;
     Pveloffs = 64;
     Pkeylimit = 15;
+    setDestination(1);
     defaultsinstrument();
     ctl->defaults();
 }
@@ -1024,6 +1025,11 @@ void Part::setVolume(char value)
     volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
 }
 
+void Part::setDestination(int value)
+{
+    Paudiodest = value;
+}
+
 
 void Part::setPan(char value)
 {
@@ -1037,7 +1043,7 @@ void Part::setPan(char value)
 // Enable or disable a kit item
 void Part::setkititemstatus(int kititem, int Penabled_)
 {
-    if (kititem == 0 && kititem >= NUM_KIT_ITEMS)
+    if (kititem == 0 || kititem >= NUM_KIT_ITEMS)
         return; // nonexistent kit item and the first kit item is always enabled
     kit[kititem].Penabled = Penabled_;
 
@@ -1173,6 +1179,7 @@ void Part::add2XML(XMLwrapper *xml)
     xml->addparbool("poly_mode", Ppolymode);
     xml->addpar("legato_mode", Plegatomode);
     xml->addpar("key_limit", Pkeylimit);
+    xml->addpar("destination", Paudiodest);
 
     xml->beginbranch("INSTRUMENT");
     add2XMLinstrument(xml);
@@ -1336,6 +1343,8 @@ void Part::getfromXML(XMLwrapper *xml)
     if (!Plegatomode)
         Plegatomode = xml->getpar127("legato_mode", Plegatomode);
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
+    setDestination(xml->getpar127("destination", Paudiodest));
+    
     if (xml->enterbranch("INSTRUMENT"))
     {
         getfromXMLinstrument(xml);
