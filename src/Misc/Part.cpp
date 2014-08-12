@@ -358,6 +358,9 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         else
             notebasefreq = microtonal->getNoteFreq(note);
 
+# warning - trial random detune commented out
+//        notebasefreq *= (1.01f-(synth->numRandom()/50.0f));
+
         // Portamento
         if (oldfreq < 1.0f)
             oldfreq = notebasefreq; // this is only the first note is played

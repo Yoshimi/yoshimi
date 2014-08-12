@@ -102,12 +102,16 @@ class SUBnote : public Carcass, private SynthHelper
         };
 
         void initfilter(bpfilter &filter, float freq, float bw, float amp, float mag);
+        float computerolloff(float freq);
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void filter(bpfilter &filter, float *smps);
 
         bpfilter *lfilter;
         bpfilter *rfilter;
 
+        float overtone_rolloff[MAX_SUB_HARMONICS];
+        float overtone_freq[MAX_SUB_HARMONICS];
+        
         float *tmpsmp;
         float *tmprnd; // this is filled with random numbers
 

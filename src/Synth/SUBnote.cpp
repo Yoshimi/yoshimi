@@ -134,7 +134,9 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 
     for (int n = 0; n < numharmonics; ++n)
     {
-        float freq = basefreq * (pos[n] + 1);
+        float freq =  basefreq * pars->POvertoneFreqMult[pos[n]];
+        overtone_freq[n] = freq;
+        overtone_rolloff[n] = computerolloff(freq);
 
         // the bandwidth is not absolute(Hz); it is relative to frequency
         float bw = powf(10.0f, (pars->Pbandwidth - 127.0f) / 127.0f * 4.0f) * numstages;
@@ -503,6 +505,25 @@ void SUBnote::initparameters(float freq)
         GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
     }
     computecurrentparameters();
+}
+
+
+// Compute how much to reduce amplitude near nyquist or subaudible frequencies.
+float SUBnote::computerolloff(float freq)
+{
+    const float lower_limit = 10.0f;
+    const float lower_width = 10.0f;
+    const float upper_width = 200.0f;
+    float upper_limit = synth->samplerate / 2.0f;
+
+    if (freq > lower_limit + lower_width &&
+            freq < upper_limit - upper_width)
+        return 1.0f;
+    if (freq <= lower_limit || freq >= upper_limit)
+        return 0.0f;
+    if (freq <= lower_limit + lower_width)
+        return (1.0f - cosf(M_PI * (freq - lower_limit) / lower_width)) / 2.0f;
+    return (1.0f - cosf(M_PI * (freq - upper_limit) / upper_width)) / 2.0f;
 }
 
 // Compute Parameters of SUBnote for each tick

@@ -40,6 +40,7 @@ class SUBnoteParameters : public Presets
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
+        void updateFrequencyMultipliers(void);
 
         // Amplitude Parametrers
         bool Pstereo; // true = stereo, false = mono
@@ -76,6 +77,15 @@ class SUBnoteParameters : public Presets
                                     // if this parameter is 64,
                                     // 1 MIDI halftone -> 1 frequency halftone
 
+        // Overtone spread parameters
+        struct {
+            unsigned char type;
+            unsigned char par1;
+            unsigned char par2;
+            unsigned char par3;
+        } POvertoneSpread;
+        float POvertoneFreqMult[MAX_SUB_HARMONICS];
+        
         unsigned char Pnumstages;   // how many times the filters are applied
         unsigned char Pbandwidth;
 
