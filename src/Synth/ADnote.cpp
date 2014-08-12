@@ -295,7 +295,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         for (int k = 0; k < unison; ++k)
         {
             oscposhi[nvoice][k] = oscposhi_start;
-            oscposhi_start = lrintf(synth->numRandom() * (synth->oscilsize - 1));
+            oscposhi_start = lrintf(synth->numRandom() * adpars->VoicePar[nvoice].Unison_phase_randomness /
+                        127.0f * (synth->oscilsize - 1));
             // put random starting point for other subvoices
         }
 

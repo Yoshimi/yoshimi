@@ -107,6 +107,7 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].Unison_vibratto = 64;
     VoicePar[nvoice].Unison_vibratto_speed = 64;
     VoicePar[nvoice].Unison_invert_phase = 0;
+    VoicePar[nvoice].Unison_phase_randomness = 127;
 
     VoicePar[nvoice].Type = 0;
     VoicePar[nvoice].Pfixedfreq = 0;
@@ -334,6 +335,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     xml->addpar("unison_vibratto", VoicePar[nvoice].Unison_vibratto);
     xml->addpar("unison_vibratto_speed", VoicePar[nvoice].Unison_vibratto_speed);
     xml->addpar("unison_invert_phase", VoicePar[nvoice].Unison_invert_phase);
+    xml->addpar("unison_phase_randomness", VoicePar[nvoice].Unison_phase_randomness);
 
     xml->addpar("delay", VoicePar[nvoice].PDelay);
     xml->addparbool("resonance", VoicePar[nvoice].Presonance);
@@ -643,6 +645,8 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
         xml->getpar127("unison_vibratto_speed", VoicePar[nvoice].Unison_vibratto_speed);
     VoicePar[nvoice].Unison_invert_phase =
         xml->getpar127("unison_invert_phase", VoicePar[nvoice].Unison_invert_phase);
+    VoicePar[nvoice].Unison_phase_randomness =
+        xml->getpar127("unison_phase_randomness", VoicePar[nvoice].Unison_phase_randomness);
 
     VoicePar[nvoice].Type = xml->getpar127("type", VoicePar[nvoice].Type);
     VoicePar[nvoice].PDelay = xml->getpar127("delay", VoicePar[nvoice].PDelay);

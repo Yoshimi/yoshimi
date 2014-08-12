@@ -4,6 +4,7 @@ yoshimi-1.2.x
 - Enabled saving audio destination in parameters file
     only relevant for jack output
 - Ported SubSynth overtones feature from Zyn. 2.4.4
+- Ported Unison phase randomisation control from Zyn. 2.4.4
 
 yoshimi-1.2.2
 

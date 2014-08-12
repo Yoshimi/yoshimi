@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
@@ -36,7 +36,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "Misc/SynthEngine.h"
     \#include "WidgetPDialUI.h"
     \#include "FilterUI.h"
-    \#include "PresetsUI.h"} {global
+    \#include "PresetsUI.h"} {private global
 } 
 
 decl {\#include "Misc/SynthHelper.h"
@@ -183,9 +183,12 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         ADnoteVoiceListItem->hide();
         //delete(ADnoteVoiceListItem);} {}
   }
-  decl {ADnoteParameters *pars;} {}
-  decl {int nvoice;} {}
-  decl {Oscilloscope *osc;} {}
+  decl {ADnoteParameters *pars;} {private local
+  }
+  decl {int nvoice;} {private local
+  }
+  decl {Oscilloscope *osc;} {private local
+  }
 } 
 
 class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
@@ -194,7 +197,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
   } {
     Fl_Window ADnoteVoiceParameters {
       label Voice open
-      xywh {1044 212 765 575} type Double
+      xywh {203 20 765 575} type Double
       class Fl_Group visible
     } {
       Fl_Group voiceparametersgroup {open
@@ -288,7 +291,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               } {}
             }
             Fl_Group {} {
-              label {Mod AMPLITUDE} open
+              label {Mod AMPLITUDE}
               xywh {535 60 220 160} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
               Fl_Value_Slider {} {
@@ -330,7 +333,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               }
             }
             Fl_Group modoscil {
-              label {Mod Oscilator} open
+              label {Mod Oscilator}
               xywh {535 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
             } {
               Fl_Group fmoscil {open
@@ -622,7 +625,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Dial {} {
               label Stereo
               callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrint(o->value());}
-              tooltip {Stereo Spread} xywh {285 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Stereo Spread} xywh {322 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
               class WidgetPDial
             }
@@ -641,9 +644,9 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               code1 {o->value(pars->getUnisonSizeIndex(nvoice));}
             } {}
             Fl_Dial {} {
-              label Vibratto
-              callback {pars->VoicePar[nvoice].Unison_vibratto = lrint(o->value());}
-              tooltip Vibratto xywh {340 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              label Vibrato
+              callback {pars->VoicePar[nvoice].Unison_vibratto = lrint(o->value());} selected
+              tooltip Vibratto xywh {367 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
               class WidgetPDial
             }
@@ -678,10 +681,17 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               code1 {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
             }
             Fl_Dial {} {
-              label {Vib.speed}
+              label {V.speed}
               callback {pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(o->value());}
-              tooltip {Vibratto Average Speed} xywh {390 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              tooltip {Vibratto Average Speed} xywh {412 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
+              class WidgetPDial
+            }
+            Fl_Dial {} {
+              label {Ph.rand}
+              callback {pars->VoicePar[nvoice].Unison_phase_randomness=lrint(o->value());}
+              tooltip {Phase randomness} xywh {279 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(pars->VoicePar[nvoice].Unison_phase_randomness);}
               class WidgetPDial
             }
           }
@@ -736,8 +746,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                     voicepan->value(64);
                     pars->setVoicePan(nvoice, 64);
                 }
-                o->value(pars->randomVoicePan(nvoice));
-            }
+                o->value(pars->randomVoicePan(nvoice));}
             tooltip {Voice random panning On/Off} xywh {196 91 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
             code0 {o->value(pars->randomVoicePan(nvoice));}
           }
@@ -934,11 +943,16 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
         }
         //delete (ADnoteVoiceParameters);} {}
   }
-  decl {int nvoice;} {}
-  decl {ADnoteParameters *pars;} {}
-  decl {OscilEditor *oscedit;} {}
-  decl {Oscilloscope *osc;} {}
-  decl {Oscilloscope *oscFM;} {}
+  decl {int nvoice;} {private local
+  }
+  decl {ADnoteParameters *pars;} {private local
+  }
+  decl {OscilEditor *oscedit;} {private local
+  }
+  decl {Oscilloscope *osc;} {private local
+  }
+  decl {Oscilloscope *oscFM;} {private local
+  }
 } 
 
 class ADnoteUI {: {public PresetsUI_, SynthHelper}
@@ -1065,8 +1079,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
                   globalpan->value(1);
                   pars->setGlobalPan(1);
               }
-              o->value(pars->randomGlobalPan());
-          }
+              o->value(pars->randomGlobalPan());}
           xywh {194 57 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
           code0 {o->value(pars->randomGlobalPan());}
         }
@@ -1338,8 +1351,12 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         resui->refresh();
         currentvoicecounter->do_callback();} {}
   }
-  decl {ADnoteParameters *pars;} {}
-  decl {ResonanceUI *resui;} {}
-  decl {int nvoice;} {}
-  decl {ADvoicelistitem *voicelistitem[NUM_VOICES];} {}
+  decl {ADnoteParameters *pars;} {private local
+  }
+  decl {ResonanceUI *resui;} {private local
+  }
+  decl {int nvoice;} {private local
+  }
+  decl {ADvoicelistitem *voicelistitem[NUM_VOICES];} {private local
+  }
 } 

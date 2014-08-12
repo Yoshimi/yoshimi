@@ -84,6 +84,7 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char Enabled;
     unsigned char Unison_size;              // How many subvoices are used in this voice
     unsigned char Unison_frequency_spread;  // How subvoices are spread
+    unsigned char Unison_phase_randomness;  // How much phase randomization
     unsigned char Unison_stereo_spread;     // Stereo spread of the subvoices
     unsigned char Unison_vibratto;          // Vibratto of the subvoices (which makes the unison more "natural")
     unsigned char Unison_vibratto_speed;    // Medium speed of the vibratto of the subvoices
