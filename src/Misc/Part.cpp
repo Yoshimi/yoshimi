@@ -836,8 +836,8 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
 {
     Pkeylimit = Pkeylimit_;
     int keylimit = Pkeylimit;
-    if (!keylimit)
-        keylimit = POLIPHONY - 5;
+/*    if (!keylimit) // not needed now
+        keylimit = POLIPHONY - 5;*/
 
     // release old keys if the number of notes>keylimit
     if (Ppolymode && !ctl->legato.legato)
@@ -1346,6 +1346,14 @@ void Part::getfromXML(XMLwrapper *xml)
     if (!Plegatomode)
         Plegatomode = xml->getpar127("legato_mode", Plegatomode);
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
+    if (Pkeylimit < 1)
+    {
+        Pkeylimit = POLIPHONY - 5;
+    }
+    else if(Pkeylimit > (POLIPHONY - 5))
+    {
+        Pkeylimit = POLIPHONY - 5;
+    }
     setDestination(xml->getpar127("destination", Paudiodest));
     
     if (xml->enterbranch("INSTRUMENT"))

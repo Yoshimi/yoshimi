@@ -25,6 +25,7 @@
 
 #include <cmath>
 #include <fftw3.h>
+#include <cassert>
 
 #include "Params/SUBnoteParameters.h"
 #include "Params/Controller.h"
@@ -468,20 +469,45 @@ void SUBnote::initfilter(bpfilter &filter, float freq, float bw, float amp, floa
 }
 
 // Do the filtering
+
+inline void SubFilterA(const float coeff[4], float &src, float work[4])
+{
+    work[3] = src*coeff[0]+work[1]*coeff[1]+work[2]*coeff[2]+work[3]*coeff[3];
+    work[1] = src;
+    src     = work[3];
+}
+
+inline void SubFilterB(const float coeff[4], float &src, float work[4])
+{
+    work[2] = src*coeff[0]+work[0]*coeff[1]+work[3]*coeff[2]+work[2]*coeff[3];
+    work[0] = src;
+    src     = work[2];
+}
+
+//This dance is designed to minimize unneeded memory operations which can result
+//in quite a bit of wasted time
 void SUBnote::filter(bpfilter &filter, float *smps)
 {
-    float out;
-    for (int i = 0; i < synth->buffersize; ++i)
-    {
-        out = smps[i] * filter.b0 + filter.b2 * filter.xn2
-              - filter.a1 * filter.yn1 - filter.a2 * filter.yn2;
-        filter.xn2 = filter.xn1;
-        filter.xn1 = smps[i];
-        filter.yn2 = filter.yn1;
-        filter.yn1 = out;
-        smps[i] = out;
+    assert(synth->buffersize % 8 == 0);
+    float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
+    float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
+
+    for(int i = 0; i < synth->buffersize; i += 8) {
+        SubFilterA(coeff, smps[i + 0], work);
+        SubFilterB(coeff, smps[i + 1], work);
+        SubFilterA(coeff, smps[i + 2], work);
+        SubFilterB(coeff, smps[i + 3], work);
+        SubFilterA(coeff, smps[i + 4], work);
+        SubFilterB(coeff, smps[i + 5], work);
+        SubFilterA(coeff, smps[i + 6], work);
+        SubFilterB(coeff, smps[i + 7], work);
     }
+    filter.xn1 = work[0];
+    filter.xn2 = work[1];
+    filter.yn1 = work[2];
+    filter.yn2 = work[3];
 }
+
 
 // Init Parameters
 void SUBnote::initparameters(float freq)
@@ -621,11 +647,12 @@ int SUBnote::noteout(float *outl, float *outr)
         tmprnd[i] = synth->numRandom() * 2.0f - 1.0f;
     for (int n = 0; n < numharmonics; ++n)
     {
+        float rolloff = overtone_rolloff[n];
         memcpy(tmpsmp, tmprnd, synth->bufferbytes);
         for (int nph = 0; nph < numstages; ++nph)
             filter(lfilter[nph + n * numstages], tmpsmp);
         for (int i = 0; i < synth->buffersize; ++i)
-            outl[i] += tmpsmp[i];
+            outl[i] += tmpsmp[i] * rolloff;
     }
 
     if (GlobalFilterL != NULL)
@@ -638,11 +665,12 @@ int SUBnote::noteout(float *outl, float *outr)
             tmprnd[i] = synth->numRandom() * 2.0f - 1.0f;
         for (int n = 0; n < numharmonics; ++n)
         {
+            float rolloff = overtone_rolloff[n];
             memcpy(tmpsmp, tmprnd, synth->bufferbytes);
             for (int nph = 0; nph < numstages; ++nph)
                 filter(rfilter[nph + n * numstages], tmpsmp);
             for (int i = 0; i < synth->buffersize; ++i)
-                outr[i] += tmpsmp[i];
+                outr[i] += tmpsmp[i] * rolloff;
         }
         if (GlobalFilterR != NULL)
             GlobalFilterR->filterout(outr);

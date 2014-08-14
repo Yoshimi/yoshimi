@@ -1,11 +1,19 @@
 yoshimi-1.2.x
-- Some more minor bug fixes
+- Some more minor bug fixes.
 - INSTALL file now refers to V1.2.2
 - Enabled saving audio destination in parameters file
-    only relevant for jack output
+    only relevant for jack output.
 - Ported SubSynth overtones feature from Zyn. 2.4.4
 - Ported Unison phase randomisation control from Zyn. 2.4.4
+- Ported SubSynth processing encancements from Zyn. 2.4.4
+- Changed part's key limit from a list to a spinner so you can set
+  any value up to the maximum poliphony - 5
+  This is error checked when parameter files are loaded.
+- Changed unison size from a list to an enable button and spinner
+  giving you finer grained control.
+  Values that match ZynAddSubFX are highlighted for compatibilty
 
+  
 yoshimi-1.2.2
 
 - Started some documentation. Much more needed!
