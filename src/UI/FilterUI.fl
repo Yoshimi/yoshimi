@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
@@ -31,28 +31,28 @@ This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
-decl {\#include <FL/Fl_Group.H>} {public
+decl {\#include <FL/Fl_Group.H>} {public local
 } 
 
-decl {\#include <FL/Fl_Box.H>} {public
+decl {\#include <FL/Fl_Box.H>} {public local
 } 
 
-decl {\#include <FL/fl_draw.H>} {public
+decl {\#include <FL/fl_draw.H>} {public local
 } 
 
-decl {\#include <FL/fl_ask.H>} {public
+decl {\#include <FL/fl_ask.H>} {public local
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include "PresetsUI.h"} {public local
 } 
 
-decl {\#include "Params/FilterParams.h"} {public
+decl {\#include "Params/FilterParams.h"} {public local
 } 
 
-decl {\#include "Misc/MiscFuncs.h"} {public
+decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
 class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
@@ -177,10 +177,14 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
   Function {~FormantFilterGraph()} {} {
     code {delete [] graphpoints;} {}
   }
-  decl {FilterParams *pars;} {}
-  decl {int oldx,oldy;} {}
-  decl {int *nvowel,*nformant;} {}
-  decl {float *graphpoints;} {}
+  decl {FilterParams *pars;} {private local
+  }
+  decl {int oldx,oldy;} {private local
+  }
+  decl {int *nvowel,*nformant;} {private local
+  }
+  decl {float *graphpoints;} {private local
+  }
 } 
 
 class FilterUI {open : {public Fl_Group,PresetsUI_}
@@ -204,12 +208,12 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   Function {make_window()} {open
   } {
     Fl_Window filterui {open
-      xywh {455 488 275 75} type Double color 50 labelfont 1 labelsize 12
+      xywh {455 488 275 75} type Double color 247 labelfont 1 labelsize 12
       class Fl_Group visible
     } {
       Fl_Group filterparamswindow {
         label {Filter Params} selected
-        xywh {0 0 275 75} box PLASTIC_UP_BOX color 183 labelfont 1 labelsize 10 align 17
+        xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
           label FilterType
@@ -369,7 +373,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   } {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters} open
-      xywh {914 714 700 205} type Double labelfont 1 labelsize 12 visible
+      xywh {699 714 700 205} type Double labelfont 1 labelsize 12 visible
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -654,7 +658,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         formant_amp_dial->when(0);
         strchdial->when(0);} {}
   }
-  decl {FilterParams *pars;} {}
-  decl {unsigned char *velsnsamp,*velsns;} {}
-  decl {int nvowel,nformant,nseqpos;} {}
+  decl {FilterParams *pars;} {private local
+  }
+  decl {unsigned char *velsnsamp,*velsns;} {private local
+  }
+  decl {int nvowel,nformant,nseqpos;} {private local
+  }
 } 

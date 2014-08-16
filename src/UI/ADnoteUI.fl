@@ -624,6 +624,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             callback {if (o->value() == 0)
 {
   pars->VoicePar[nvoice].Unison_size = lrint(o->value());
+  unisonsize->value(2);
   unisongroup->deactivate();
 }
 else

@@ -1,4 +1,4 @@
-yoshimi-1.2.x
+yoshimi-master
 - Some more minor bug fixes.
 - INSTALL file now refers to V1.2.2
 - Enabled saving audio destination in parameters file
@@ -12,6 +12,7 @@ yoshimi-1.2.x
 - Changed unison size from a list to an enable button and spinner
   giving you finer grained control.
   Values that match ZynAddSubFX are highlighted for compatibilty
+- Added 'naturalise' small random detune feature at note-on.
 
   
 yoshimi-1.2.2

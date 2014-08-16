@@ -1,0 +1,25 @@
+Yoshimi responds to the following messages.
+
+
+  0 or 32: Bank Change (user selectable and does *not* force a program change)
+  1: Modulation Wheel
+  7: Volume
+ 10: Panning
+ 11: Expression
+ 64: Sustain pedal
+ 65: Portamento
+ 71: Filter Q (Sound Timbre)
+ 74: Filter Cutoff (Brightness)
+ 75: BandWidth
+ 76: FM amplitude
+ 77: Resonance Center Frequency
+ 78: Resonance Bandwith
+120: All Sounds OFF
+121: Reset All Controllers
+123: All Notes OFF
+
+192: Program Change (voices 1 - 128) also user selectable CC for voices 128 -
+160 In the master branch there is an option for making Program Change enable a
+part if it's currently disabled.
+
+224: Pitch Bend

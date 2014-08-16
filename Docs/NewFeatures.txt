@@ -1,0 +1,11 @@
+When using the jack audio backend parts can be individually routed and/or sent to the main L/R outputs. This is controlled from the panel window, and the settings are saved with all the other parameters.
+
+Direct part outputs carry the part effects, but not insertion or system ones.
+
+
+
+As well as bank and program changes there is the ability to set a MIDI CC to access the vices from 129 to 160. All the Bank controls are contained in a tab in the settings window and take immediate effect.
+
+
+
+There is now the possibility to add a random pitch element to a part. This is found in the part edit window. The settings are not currently saved, but will be once the control values are settled, and there has been enough experience to decide whether it should be a part or voice setting.

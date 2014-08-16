@@ -469,7 +469,7 @@ Offset}
       }
       Fl_Spinner {} {
         label {Key Limit}
-        callback {part->setkeylimit(o->value());} selected
+        callback {part->setkeylimit(o->value());}
         xywh {204 140 47 18} labelsize 10 value 15 textsize 11
         code0 {o->range(1, POLIPHONY - 5);}
         code1 {o->value(part->Pkeylimit);}
@@ -917,10 +917,11 @@ Offset}
       }
     }
     Fl_Window instrumenteditwindow {
-      label {Instrument Edit} open
-      xywh {183 240 395 360} type Double hide
+      label {Instrument Edit} open selected
+      xywh {305 125 395 360} type Double
+      code0 {rnddet->value((int)(0.5+part->Pfrand*100));} visible
     } {
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
@@ -947,7 +948,7 @@ Offset}
           }
         }
         Fl_Group {} {
-          label ADDsynth
+          label ADDsynth open
           xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
@@ -1096,10 +1097,16 @@ Offset}
           }
         }
       }
+      Fl_Spinner rnddet {
+        label {Rnd. Det.}
+        callback {part->Pfrand = o->value() / 100.0f;}
+        xywh {113 335 44 19} labelsize 12 minimum 0 maximum 10 value 0 textsize 12
+        code0 {o->value((int)part->Pfrand*100);}
+      }
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {150 333 95 25} box THIN_UP_BOX
+        xywh {248 333 95 25} box THIN_UP_BOX
       }
     }
   }

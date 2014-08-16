@@ -127,6 +127,7 @@ void Part::defaults(void)
     Pvelsns = 64;
     Pveloffs = 64;
     Pkeylimit = 15;
+    Pfrand = 0;
     setDestination(1);
     defaultsinstrument();
     ctl->defaults();
@@ -358,8 +359,10 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         else
             notebasefreq = microtonal->getNoteFreq(note);
 
-# warning - trial random detune commented out
-//        notebasefreq *= (1.01f-(synth->numRandom()/50.0f));
+        if (Pfrand > 0.005)  // effective range 0.01 to 0.1
+        {
+          notebasefreq *= (1 + ((synth->numRandom() - 0.5f) * Pfrand));
+        }
 
         // Portamento
         if (oldfreq < 1.0f)
