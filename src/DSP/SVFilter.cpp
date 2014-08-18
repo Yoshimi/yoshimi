@@ -66,7 +66,7 @@ void SVFilter::computefiltercoefs(void)
     par.f = freq / synth->samplerate_f * 4.0f;
     if (par.f > 0.99999f)
         par.f = 0.99999f;
-    par.q = 1.0f - atanf(sqrtf(q)) * 2.0f / PI;
+    par.q = 1.0f - atanf(sqrtf(q)) * HALFPI;
     par.q = powf(par.q, 1.0f / (stages + 1));
     par.q_sqrt = sqrtf(par.q);
 }

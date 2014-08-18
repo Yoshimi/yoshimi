@@ -5,7 +5,7 @@ yoshimi-master
     only relevant for jack output.
 - Ported SubSynth overtones feature from Zyn. 2.4.4
 - Ported Unison phase randomisation control from Zyn. 2.4.4
-- Ported SubSynth processing encancements from Zyn. 2.4.4
+- Ported AddSynth & SubSynth processing encancements from Zyn. 2.4.4
 - Changed part's key limit from a list to a spinner so you can set
   any value up to the maximum poliphony - 5
   This is error checked when parameter files are loaded.
@@ -13,6 +13,7 @@ yoshimi-master
   giving you finer grained control.
   Values that match ZynAddSubFX are highlighted for compatibilty
 - Added 'naturalise' small random detune feature at note-on.
+- Performed lots of tiny optimsations.
 
   
 yoshimi-1.2.2

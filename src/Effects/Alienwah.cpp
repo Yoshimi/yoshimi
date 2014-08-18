@@ -55,8 +55,8 @@ void Alienwah::out(float *smpsl, float *smpsr)
     float lfor; // Left/Right LFOs
     complex<float> clfol, clfor, out, tmp;
     lfo.effectlfoout(&lfol, &lfor);
-    lfol *= depth * PI * 2.0f;
-    lfor *= depth * PI * 2.0f;
+    lfol *= depth * TWOPI;
+    lfor *= depth * TWOPI;
     clfol = complex<float>(cosf(lfol + phase) * fb, sinf(lfol + phase) * fb); //rework
     clfor = complex<float>(cosf(lfor + phase) * fb, sinf(lfor + phase) * fb); //rework
 

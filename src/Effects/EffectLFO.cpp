@@ -82,7 +82,7 @@ float EffectLFO::getlfoshape(float x)
             // \todo more to be added here; also ::updateParams() need to be
             // updated (to allow more lfotypes)
         default:
-            out = cosf(x * 2.0f * PI); // EffectLFO_SINE
+            out = cosf(x * TWOPI); // EffectLFO_SINE
     }
     return out;
 }

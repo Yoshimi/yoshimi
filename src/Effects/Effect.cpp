@@ -42,8 +42,8 @@ void Effect::setpanning(char Ppanning_)
 {
     Ppanning = Ppanning_;
     float t = (Ppanning > 0) ? (float)(Ppanning - 1) / 126.0f : 0.0f;
-    pangainL = cosf(t * PI / 2.0f);
-    pangainR = cosf((1.0f - t) * PI / 2.0f);
+    pangainL = cosf(t * HALFPI);
+    pangainR = cosf((1.0f - t) * HALFPI);
 }
 
 

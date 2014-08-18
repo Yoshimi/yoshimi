@@ -115,8 +115,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     if (pars->randomPan())
     {
         float t = synth->numRandom();
-        randpanL = cosf(t * PI / 2.0f);
-        randpanR = cosf((1.0f - t) * PI / 2.0f);
+        randpanL = cosf(t * HALFPI);
+        randpanR = cosf((1.0f - t) * HALFPI);
     }
     
     NoteGlobalPar.FilterCenterPitch =
@@ -258,8 +258,8 @@ void PADnote::PADlegatonote(float freq, float velocity,
     if (pars->randomPan())
     {
         float t = synth->numRandom();
-        randpanL = cosf(t * PI / 2.0f);
-        randpanR = cosf((1.0f - t) * PI / 2.0f);
+        randpanL = cosf(t * HALFPI);
+        randpanR = cosf((1.0f - t) * HALFPI);
     }
 
     NoteGlobalPar.FilterCenterPitch =

@@ -122,7 +122,7 @@ float LFO::lfoout(void)
             out = powf(0.001f, x) * 2.0f - 1.0f;
             break;
         default:
-            out = cosf( x * 2.0f * PI); // LFO_SINE
+            out = cosf( x * TWOPI); // LFO_SINE
     }
 
     if (lfotype == 0 || lfotype == 1)

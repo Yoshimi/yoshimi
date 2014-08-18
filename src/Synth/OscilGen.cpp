@@ -259,7 +259,7 @@ float OscilGen::basefunc_diode(float x, float a)
     else if (a > 0.99999f)
         a = 0.99999f;
     a = a * 2.0f - 1.0f;
-    x =cosf((x + 0.5f) * 2.0f * PI) - a;
+    x =cosf((x + 0.5f) * TWOPI) - a;
     if (x < 0.0f)
         x = 0.0f;
     return x / (1.0f - a) * 2.0f - 1.0f;
@@ -286,7 +286,7 @@ float OscilGen::basefunc_pulsesine(float x, float a)
         x = -0.5f;
     else if (x > 0.5f)
         x = 0.5f;
-    x = sinf(x * PI * 2.0f);
+    x = sinf(x * TWOPI);
     return x;
 }
 
@@ -307,7 +307,7 @@ float OscilGen::basefunc_stretchsine(float x, float a)
 
 float OscilGen::basefunc_chirp(float x, float a)
 {
-    x = fmodf(x, 1.0f) * 2.0f * PI;
+    x = fmodf(x, 1.0f) * TWOPI;
     a = (a - 0.5f) * 4.0f;
     if (a < 0.0f)
         a *= 2.0f;
@@ -338,7 +338,7 @@ float OscilGen::basefunc_chebyshev(float x, float a)
 float OscilGen::basefunc_sqr(float x, float a)
 {
     a = a * a * a * a * 160.0f + 0.001f;
-    return -atanf(sinf(x * 2.0f * PI) * a);
+    return -atanf(sinf(x * TWOPI) * a);
 }
 
 
@@ -446,14 +446,14 @@ void OscilGen::getbasefunction(float *smps)
         {
             case 1:
                 t = t * basefuncmodulationpar3 + sinf((t + basefuncmodulationpar2)
-                        * 2.0f * PI) * basefuncmodulationpar1; // rev
+                        * TWOPI) * basefuncmodulationpar1; // rev
                 break;
             case 2:
                 t = t + sinf((t * basefuncmodulationpar3 + basefuncmodulationpar2)
-                        * 2.0f * PI) * basefuncmodulationpar1; // sine
+                        * TWOPI) * basefuncmodulationpar1; // sine
                 break;
             case 3:
-                t = t + powf(((1.0f - cosf((t + basefuncmodulationpar2) * 2.0f * PI))
+                t = t + powf(((1.0f - cosf((t + basefuncmodulationpar2) * TWOPI))
                         * 0.5f), basefuncmodulationpar3) * basefuncmodulationpar1; // power
                 break;
             default:
@@ -509,7 +509,7 @@ void OscilGen::getbasefunction(float *smps)
                     smps[i] = basefunc_circle(t, par);
                     break;
                 default:
-                    smps[i] = -sinf(2.0f * PI * (float)i / synth->oscilsize_f);
+                    smps[i] = -sinf(TWOPI * (float)i / synth->oscilsize_f);
         }
     }
 }
@@ -771,15 +771,15 @@ void OscilGen::modulation(void)
         switch (Pmodulation)
         {
             case 1:
-                t = t * modulationpar3 + sinf((t + modulationpar2) * 2.0f * PI)
+                t = t * modulationpar3 + sinf((t + modulationpar2) * TWOPI)
                     * modulationpar1; // rev
                 break;
             case 2:
-                t = t + sinf((t * modulationpar3 + modulationpar2) * 2.0f * PI)
+                t = t + sinf((t * modulationpar3 + modulationpar2) * TWOPI)
                     * modulationpar1; // sine
                 break;
             case 3:
-                t = t + powf(((1.0f - cosf((t + modulationpar2) * 2.0f * PI))
+                t = t + powf(((1.0f - cosf((t + modulationpar2) * TWOPI))
                     * 0.5f), modulationpar3) * modulationpar1; // power
                 break;
         }
@@ -1262,7 +1262,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
             case 2:
                 power = power * 2.0f - 0.5f;
                 power = powf(15.0f, power) * 2.0f;
-                float rndfreq = 2 * PI * harmonicRandom();
+                float rndfreq = TWOPI * harmonicRandom();
                 for (int i = 1 ; i < nyquist - 1; ++i)
                 {
                     float amp = powf(fabsf(sinf(i * rndfreq)), power) * normalize;

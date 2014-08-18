@@ -71,8 +71,8 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     if (pars->randomPan())
     {
         float t = synth->numRandom();
-        randpanL = cosf(t * PI / 2.0f);
-        randpanR = cosf((1.0f - t) * PI / 2.0f);
+        randpanL = cosf(t * HALFPI);
+        randpanR = cosf((1.0f - t) * HALFPI);
     }
     numstages = pars->Pnumstages;
     stereo = pars->Pstereo;
@@ -246,8 +246,8 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
     if (pars->randomPan())
     {
         float t = synth->numRandom();
-        randpanL = cosf(t * PI / 2.0f);
-        randpanR = cosf((1.0f - t) * PI / 2.0f);
+        randpanL = cosf(t * HALFPI);
+        randpanR = cosf((1.0f - t) * HALFPI);
     }
 
     int pos[MAX_SUB_HARMONICS];
@@ -417,7 +417,7 @@ void SUBnote::computefiltercoefs(bpfilter &filter, float freq, float bw, float g
         freq = synth->halfsamplerate_f - 200.0f;
     }
 
-    float omega = 2.0f * PI * freq / synth->samplerate_f;
+    float omega = TWOPI * freq / synth->samplerate_f;
     float sn = sinf(omega);
     float cs = cosf(omega);
     float alpha = sn * sinhf(LOG_2 / 2.0f * bw * omega / sn);
@@ -447,11 +447,11 @@ void SUBnote::initfilter(bpfilter &filter, float freq, float bw, float amp, floa
     else
     {
         float a = 0.1f * mag; // empirically
-        float p = synth->numRandom() * 2.0f * PI;
+        float p = synth->numRandom() * TWOPI;
         if (start == 1)
             a *= synth->numRandom();
         filter.yn1 = a * cosf(p);
-        filter.yn2 = a * cosf(p + freq * 2.0f * PI / synth->samplerate_f);
+        filter.yn2 = a * cosf(p + freq * TWOPI / synth->samplerate_f);
 
         // correct the error of computation the start amplitude
         // at very high frequencies
@@ -484,6 +484,7 @@ inline void SubFilterB(const float coeff[4], float &src, float work[4])
     src     = work[2];
 }
 
+// ported from zynaddsubfx V 2.4.4
 //This dance is designed to minimize unneeded memory operations which can result
 //in quite a bit of wasted time
 void SUBnote::filter(bpfilter &filter, float *smps)
@@ -532,7 +533,7 @@ void SUBnote::initparameters(float freq)
     }
     computecurrentparameters();
 }
-
+//end of port
 
 // Compute how much to reduce amplitude near nyquist or subaudible frequencies.
 float SUBnote::computerolloff(float freq)

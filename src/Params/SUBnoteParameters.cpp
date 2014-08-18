@@ -102,8 +102,8 @@ void SUBnoteParameters::setPan(char pan)
     if (!randomPan())
     {
         float t = (float)(PPanning - 1) / 126.0f;
-        pangainL = cosf(t * PI / 2.0f);
-        pangainR = cosf((1.0f - t) * PI / 2.0f);
+        pangainL = cosf(t * HALFPI);
+        pangainR = cosf((1.0f - t) * HALFPI);
     }
     else
         pangainL = pangainR = 0.7f;

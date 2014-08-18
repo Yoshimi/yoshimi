@@ -287,8 +287,8 @@ void ADnoteParameters::setGlobalPan(char pan)
     if (!randomGlobalPan())
     {
         float t = (float)(GlobalPar.PPanning - 1) / 126.0f;
-        GlobalPar.pangainL = cosf(t * PI / 2.0f);
-        GlobalPar.pangainR = cosf((1.0f - t) * PI / 2.0f);
+        GlobalPar.pangainL = cosf(t * HALFPI);
+        GlobalPar.pangainR = cosf((1.0f - t) * HALFPI);
     }
     else
         GlobalPar.pangainL = GlobalPar.pangainR = 0.7f;
@@ -301,8 +301,8 @@ void ADnoteParameters::setVoicePan(int nvoice, char pan)
     if (!randomVoicePan(nvoice))
     {
         float t = (float)(VoicePar[nvoice].PPanning - 1) / 126.0f;
-        VoicePar[nvoice].pangainL = cosf(t * PI / 2.0f);
-        VoicePar[nvoice].pangainR = cosf((1.0f - t) * PI / 2.0f);
+        VoicePar[nvoice].pangainL = cosf(t * HALFPI);
+        VoicePar[nvoice].pangainR = cosf((1.0f - t) * HALFPI);
     }
     else
         VoicePar[nvoice].pangainL = VoicePar[nvoice].pangainR = 0.7f;

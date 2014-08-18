@@ -136,7 +136,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 2:// LPF 2 poles
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 alpha = sn / (2.0f * tmpq);
@@ -162,7 +162,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 3: // HPF 2 poles
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 alpha = sn / (2.0f * tmpq);
@@ -180,7 +180,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 4: // BPF 2 poles
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 alpha = sn / (2.0f * tmpq);
@@ -198,7 +198,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 5: // NOTCH 2 poles
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 alpha = sn / (2.0f * sqrtf(tmpq));
@@ -219,7 +219,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 6: // PEAK (2 poles)
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 tmpq *= 3.0f;
@@ -241,7 +241,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 7: // Low Shelf - 2 poles
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 tmpq = sqrtf(tmpq);
@@ -265,7 +265,7 @@ void AnalogFilter::computefiltercoefs(void)
         case 8: // High Shelf - 2 poles
             if (zerocoefs == 0)
             {
-                omega = 2.0f * PI * freq / synth->samplerate_f;
+                omega = TWOPI * freq / synth->samplerate_f;
                 sn = sinf(omega);
                 cs = cosf(omega);
                 tmpq = sqrtf(tmpq);
