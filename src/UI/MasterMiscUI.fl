@@ -75,7 +75,7 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
-class VUMeter {: {public Fl_Box, private MiscFuncs}
+class VUMeter {open : {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
   } {
@@ -224,9 +224,9 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
         if (!active_r())
         {
             fl_rectf(ox, oy, lx, ly, 140, 140, 140);
-            if (synth->fakepeakpart[npart] > 0)
+            if (synth->vuoutpeakpart[npart] > 0)
             {
-                int fakedb = synth->fakepeakpart[npart] / 255.0 * ly + 4;
+                int fakedb = synth->vuoutpeakpart[npart] / 255.0 * ly + 4;
                 fl_rectf(ox + 2, oy + ly - fakedb, lx - 4, fakedb, 0, 0, 0);
             }
             return;
@@ -339,9 +339,10 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
       private xywh {315 213 70 280} type Double hide
       class Fl_Group
     } {
-      Fl_Group panellistitemgroup {open
+      Fl_Group panellistitemgroup {open selected
         private xywh {0 20 71 258} box PLASTIC_THIN_UP_BOX
         code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
+        code1 {if (Runtime.audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
           xywh {45 65 15 110} box ENGRAVED_FRAME
@@ -396,8 +397,8 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           code1 {o->value(synth->part[npart]->Prcvchn);}
         } {}
         Fl_Choice audiosend {
-          callback {synth->part[npart]->Paudiodest = o->value() + 1;} open
-          tooltip {Audio Send} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 10 textsize 12
+          callback {synth->part[npart]->Paudiodest = o->value() + 1;}
+          tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 10 textsize 12
           code0 {if (synth->part[npart]->Paudiodest == 2) o->value(1); else if (synth->part[npart]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
           MenuItem main {
@@ -470,8 +471,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));
         else
             panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();} {selected
-    }
+        panellistitemgroup->redraw();} {}
   }
   Function {~Panellistitem()} {open
   } {

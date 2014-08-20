@@ -674,7 +674,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, bool lowprio)
+                         bool schedfifo, char priodec)
 {
     pthread_attr_t attr;
     int chk;
@@ -706,8 +706,8 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     }
                     sched_param prio_params;
                     int prio = rtprio;
-                    if (lowprio)
-                        --prio;
+                    if (priodec)
+                        prio -= priodec;
                     prio_params.sched_priority = (prio > 0) ? prio : 0;
                     if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
                     {

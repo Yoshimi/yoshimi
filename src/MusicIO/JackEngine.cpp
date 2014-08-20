@@ -132,7 +132,7 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    if (midi.port && !Runtime.startThread(&midi.pThread, _midiThread, this, true, true))
+    if (midi.port && !Runtime.startThread(&midi.pThread, _midiThread, this, true, 1))
     {
         Runtime.Log("Failed to start jack midi thread");
         goto bail_out;

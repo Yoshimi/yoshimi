@@ -197,8 +197,8 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
   } {
     Fl_Window ADnoteVoiceParameters {
       label Voice open
-      xywh {551 76 765 575} type Double
-      class Fl_Group visible
+      xywh {551 76 765 575} type Double hide
+      class Fl_Group
     } {
       Fl_Group voiceparametersgroup {open
         xywh {0 0 765 580} box THIN_UP_BOX color 48
@@ -644,8 +644,8 @@ else
        break;
     }
   }
-}} selected
-            xywh {31 543 19 15} box FLAT_BOX down_box DOWN_BOX labelfont 1 labelsize 12 align 1
+}}
+            tooltip {Enable/Disable} xywh {31 543 19 15} box FLAT_BOX down_box DOWN_BOX labelfont 1 labelsize 12 align 1
             code0 {int tmp = (pars->VoicePar[nvoice].Unison_size);}
             code1 {o->value(tmp > 1);}
           }
@@ -681,7 +681,7 @@ while(true)
 }
 
 o->redraw();}
-              xywh {90 541 40 20} color 7 labelsize 10 align 1 minimum 2 maximum 50 value 2
+              tooltip {Number of unison sub-voices} xywh {90 541 40 20} color 7 labelsize 10 align 1 minimum 2 maximum 50 value 2
               code0 {int tmp = pars->VoicePar[nvoice].Unison_size;}
               code1 {if (tmp < 2) tmp = 2;}
               code2 {o->value(tmp);}
@@ -695,7 +695,7 @@ o->redraw();}
             }
             Fl_Choice {} {
               label Invert
-              callback {pars->VoicePar[nvoice].Unison_invert_phase = lrint(o->value());} open
+              callback {pars->VoicePar[nvoice].Unison_invert_phase = lrint(o->value());} open selected
               tooltip {Phase Invert} xywh {451 545 67 15} down_box BORDER_BOX labelsize 11 align 1 textfont 1 textsize 10
               code0 {//
                   o->add("None");

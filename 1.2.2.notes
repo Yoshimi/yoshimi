@@ -12,8 +12,9 @@ yoshimi-master
 - Changed unison size from a list to an enable button and spinner
   giving you finer grained control.
   Values that match ZynAddSubFX are highlighted for compatibilty
-- Added 'naturalise' small random detune feature at note-on.
+- Added experimental 'naturalise' small random detune feature at note-on.
 - Performed lots of tiny optimsations.
+- Disabled audio out selectio if not running jack
 
   
 yoshimi-1.2.2

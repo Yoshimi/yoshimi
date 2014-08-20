@@ -379,13 +379,13 @@ bool AlsaEngine::xrunRecover(void)
 bool AlsaEngine::Start(void)
 {
     if (NULL != midi.handle && !Runtime.startThread(&midi.pThread, _MidiThread,
-                                                    this, true, true))
+                                                    this, true, 1))
     {
         Runtime.Log("Failed to start Alsa midi thread");
         goto bail_out;
     }
     if (NULL != audio.handle && !Runtime.startThread(&audio.pThread, _AudioThread,
-                                                     this, true, false))
+                                                     this, true, 0))
     {
         Runtime.Log(" Failed to start Alsa audio thread");
         goto bail_out;

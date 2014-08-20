@@ -152,7 +152,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
         vuoutpeakpart[npart] = 1e-9f;
-        fakepeakpart[npart] = 0;
     }
 
     // Insertion Effects init
@@ -292,13 +291,14 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         {
             if (chan == part[npart]->Prcvchn)
             {
-                fakepeakpart[npart] = velocity * 2;
-                if (part[npart]->Penabled)
+               if (part[npart]->Penabled)
                 {
                     actionLock(lock);
                     part[npart]->NoteOn(note, velocity, keyshift);
                     actionLock(unlock);
                 }
+                else
+                    vuoutpeakpart[npart] = velocity * 2;
             }
         }
 }
@@ -394,7 +394,7 @@ void SynthEngine::partonoff(int npart, int what)
 {
     if (npart >= NUM_MIDI_PARTS)
         return;
-    fakepeakpart[npart] = 0;
+    vuoutpeakpart[npart] = 0;
     if (what)
         part[npart]->Penabled = 1;
     else
@@ -629,10 +629,10 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
 
     // Part Peak computation (for Part vu meters/fake part vu meters)
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        vuoutpeakpart[npart] = 1.0e-12;
+    {       
         if (part[npart]->Penabled)
         {
+            vuoutpeakpart[npart] = 1.0e-12;
             float *outl = part[npart]->partoutl;
             float *outr = part[npart]->partoutr;
             for (int i = 0; i < buffersize; ++i)
@@ -643,8 +643,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
             }
             vuoutpeakpart[npart] *= volume; // how is part peak related to master volume??
         }
-        else if (fakepeakpart[npart] > 1)
-            fakepeakpart[npart]--;
+        else if (vuoutpeakpart[npart] > 1)
+            vuoutpeakpart[npart]--;
     }
     vuOutPeakL = vuoutpeakl;
     vuOutPeakR = vuoutpeakr;
@@ -698,7 +698,7 @@ void SynthEngine::ShutUp(void)
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
-        fakepeakpart[npart] = 0;
+        vuoutpeakpart[npart] = 0;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();

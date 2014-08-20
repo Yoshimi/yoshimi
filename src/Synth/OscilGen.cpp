@@ -592,7 +592,7 @@ void OscilGen::oscilfilter(void)
                 tmp = powf((i / 32.0f), tmp) * 32.0f;
                 if (Pfilterpar2 == 64)
                     tmp = i;
-                gain = cosf(par * par * PI / 2.0f * tmp); // cos
+                gain = cosf(par * par * HALFPI * tmp); // cos
                 gain *= gain;
                 break;
             case 11:
@@ -600,7 +600,7 @@ void OscilGen::oscilfilter(void)
                 tmp = powf((i / 32.0f), tmp) * 32.0f;
                 if (Pfilterpar2 == 64)
                     tmp = i;
-                gain = sinf(par * par * PI / 2.0f * tmp); // sin
+                gain = sinf(par * par * HALFPI * tmp); // sin
                 gain *= gain;
                 break;
             case 12:

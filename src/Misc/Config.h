@@ -71,7 +71,7 @@ class Config : public MiscFuncs
         void signalCheck(void);
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, bool lowprio);
+                         bool schedfifo, char lowprio);
 
         string addParamHistory(string file);
         string historyFilename(int index);

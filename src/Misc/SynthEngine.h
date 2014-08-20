@@ -114,8 +114,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         // peaks for part VU-meters
         float vuoutpeakpart[NUM_MIDI_PARTS];
-        unsigned char fakepeakpart[NUM_MIDI_PARTS]; // this is used to compute the
-                                                    // "peak" when the part is disabled
+
         // others ...
         Controller *ctl;
         Microtonal microtonal;
