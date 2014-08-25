@@ -5,6 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified March 2011
+    This file is derivative of original ZynAddSubFX code, modified August 2014
 */
 
 using namespace std;
@@ -151,7 +152,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        vuoutpeakpart[npart] = 1e-9f;
+        vuoutpeakpart[npart] = -1;
     }
 
     // Insertion Effects init
@@ -298,7 +299,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     actionLock(unlock);
                 }
                 else
-                    vuoutpeakpart[npart] = velocity * 2;
+                    vuoutpeakpart[npart] = -(1+velocity); // ensure it's always negative
             }
         }
 }
@@ -394,11 +395,14 @@ void SynthEngine::partonoff(int npart, int what)
 {
     if (npart >= NUM_MIDI_PARTS)
         return;
-    vuoutpeakpart[npart] = 0;
     if (what)
+    {
+        vuoutpeakpart[npart] = 1e-9f;
         part[npart]->Penabled = 1;
+    }
     else
     {   // disabled part
+        vuoutpeakpart[npart] = -1;
         part[npart]->Penabled = 0;
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -560,14 +564,6 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
 
     LFOParams::time++; // update the LFO's time
 
-    vupeakLock(lock);
-    vuoutpeakl = 1e-12f;
-    vuoutpeakr = 1e-12f;
-    vurmspeakl = 1e-12f;
-    vurmspeakr = 1e-12f;
-    vupeakLock(unlock);
-
-    float absval;
     //Per output master volume and fade
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -586,6 +582,13 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     }
 
     //Master volume and clip calculation for mixed outputs
+
+    vuoutpeakl = 1e-12f;
+    vuoutpeakr = 1e-12f;
+    vurmspeakl = 1e-12f;
+    vurmspeakr = 1e-12f;
+    float absval;
+    clipped = 0;
     for (int idx = 0; idx < buffersize; ++idx)
     {
         outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
@@ -599,14 +602,10 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         vurmspeakr += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
 
         // check for clips
-        if (outl[NUM_MIDI_PARTS][idx] > 1.0f)
-            clippedL = true;
-        else if (outl[NUM_MIDI_PARTS][idx] < -1.0f)
-            clippedL = true;
-        if (outr[NUM_MIDI_PARTS][idx] > 1.0f)
-            clippedR = true;
-        else if (outr[NUM_MIDI_PARTS][idx] < -1.0f)
-            clippedR = true;
+        if (fabsf(outl[NUM_MIDI_PARTS][idx]) > 1.0f)
+            clipped |= 1;
+        if (fabsf(outr[NUM_MIDI_PARTS][idx]) > 1.0f)
+            clipped |= 2;
 
         if (shutup) // fade-out
         {
@@ -618,21 +617,13 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     if (shutup)
         ShutUp();
 
-    vupeakLock(lock);
-    if (vumaxoutpeakl < vuoutpeakl)
-        vumaxoutpeakl = vuoutpeakl;
-    if (vumaxoutpeakr < vuoutpeakr)
-        vumaxoutpeakr = vuoutpeakr;
-
-    vurmspeakl = sqrtf(vurmspeakl / buffersize);
-    vurmspeakr = sqrtf(vurmspeakr / buffersize);
-
     // Part Peak computation (for Part vu meters/fake part vu meters)
+    vupeakLock(lock);
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {       
         if (part[npart]->Penabled)
         {
-            vuoutpeakpart[npart] = 1.0e-12;
+            vuoutpeakpart[npart] = 1.0e-9;
             float *outl = part[npart]->partoutl;
             float *outr = part[npart]->partoutr;
             for (int i = 0; i < buffersize; ++i)
@@ -643,17 +634,18 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
             }
             vuoutpeakpart[npart] *= volume; // how is part peak related to master volume??
         }
-        else if (vuoutpeakpart[npart] > 1)
-            vuoutpeakpart[npart]--;
+        else if (vuoutpeakpart[npart] < -1) // fake peak is a negative value
+            vuoutpeakpart[npart]+= 0.5f;
     }
     vuOutPeakL = vuoutpeakl;
     vuOutPeakR = vuoutpeakr;
-    vuMaxOutPeakL = vumaxoutpeakl;
-    vuMaxOutPeakR = vumaxoutpeakr;
-    vuRmsPeakL = vurmspeakl;
-    vuRmsPeakR = vurmspeakr;
-    vuClippedL = clippedL;
-    vuClippedR = clippedR;
+    if (vuOutPeakL > vuMaxOutPeakL)
+        vuMaxOutPeakL = vuOutPeakL;
+    if (vuOutPeakR > vuMaxOutPeakR)
+        vuMaxOutPeakR = vuOutPeakR;
+    vuRmsPeakL = vurmspeakl / buffersize;;
+    vuRmsPeakR = vurmspeakr / buffersize;;
+    vuClipped |= clipped;
     vupeakLock(unlock);
 }
 
@@ -698,7 +690,7 @@ void SynthEngine::ShutUp(void)
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
-        vuoutpeakpart[npart] = 0;
+        vuoutpeakpart[npart] = -1;//1e-9f;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();
@@ -760,19 +752,22 @@ bool SynthEngine::vupeakLock(lockset request)
 
 
 // Reset peaks and clear the "clipped" flag (for VU-meter)
+
+/*
+  We no longer reset the local values (vuoutpeakl etc.)
+  If someone manages to reset part way through the calculations
+  all it would do is make one frame display low in the GUI.
+ */
 void SynthEngine::vuresetpeaks(void)
 {
     vupeakLock(lock);
-    vuOutPeakL = vuoutpeakl = 1e-12f;
-    vuOutPeakR = vuoutpeakr =  1e-12f;
-    vuMaxOutPeakL = vumaxoutpeakl = 1e-12f;
-    vuMaxOutPeakR = vumaxoutpeakr = 1e-12f;
-    vuRmsPeakL = vurmspeakl = 1e-12f;
-    vuRmsPeakR = vurmspeakr = 1e-12f;
-    vuClippedL = false;
-    vuClippedL = false;
-    clippedL = false;
-    clippedR = false;
+    vuOutPeakL = 1e-12f;
+    vuOutPeakR =  1e-12f;
+    vuMaxOutPeakL = 1e-12f;
+    vuMaxOutPeakR = 1e-12f;
+    vuRmsPeakL = 1e-12f;
+    vuRmsPeakR = 1e-12f;
+    vuClipped = 0;
     vupeakLock(unlock);
 }
 

@@ -2,6 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,6 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    Last modified August 2014
 */
 
 #include "Misc/Config.h"
@@ -33,6 +35,7 @@ AlsaEngine::AlsaEngine()
     audio.pThread = 0;
 
     midi.handle = NULL;
+    midi.link = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
 }
@@ -62,10 +65,11 @@ bail_out:
 bool AlsaEngine::openMidi(void)
 {
     midi.device = Runtime.midiDevice;
-    if (midi.device.empty())
-        midi.device = "default";
+ //   if (midi.device.empty())
+ //       midi.device = "default";
     const char* port_name = "input";
-    if (snd_seq_open(&midi.handle, midi.device.c_str(), SND_SEQ_OPEN_INPUT, 0))
+//    if (snd_seq_open(&midi.handle, midi.device.c_str(), SND_SEQ_OPEN_INPUT, 0))
+    if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, 0) != 0)
     {
         Runtime.Log("Error, failed to open alsa midi device: " + midi.device);
         goto bail_out;
@@ -87,6 +91,16 @@ bool AlsaEngine::openMidi(void)
     if (0 > snd_seq_set_client_info(midi.handle, seq_info))
         Runtime.Log("Failed to set midi event filtering");
     snd_seq_set_client_name(midi.handle, midiClientName().c_str());
+    
+    if (!midi.device.empty())
+    {
+        Runtime.Log("\n"+midi.device+"\n");
+/*        if (snd_seq_parse_address(midi.handle,midi.link,midi.device.c_str()) != 0)
+        {
+            Runtime.Log("Error, failed to find link");
+            goto bail_out;
+        }*/
+    }
 
     if (0 > snd_seq_create_simple_port(midi.handle, port_name,
                                        SND_SEQ_PORT_CAP_WRITE

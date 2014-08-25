@@ -1,4 +1,4 @@
-yoshimi-master
+yoshimi-1.2.3
 - Some more minor bug fixes.
 - INSTALL file now refers to V1.2.2
 - Enabled saving audio destination in parameters file
@@ -14,7 +14,10 @@ yoshimi-master
   Values that match ZynAddSubFX are highlighted for compatibilty
 - Added experimental 'naturalise' small random detune feature at note-on.
 - Performed lots of tiny optimsations.
-- Disabled audio out selectio if not running jack
+- Disabled part audio out selection if not running jack.
+- Updated copyright notices.
+- Temporarily disabled ALSA MIDI auto connect till I can find out why 
+  it crashes - seems it's never worked.
 
   
 yoshimi-1.2.2

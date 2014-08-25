@@ -5,6 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code, modified August 2014
 */
 
 #include <iostream>
@@ -953,7 +954,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->midiEngine = alsa_midi;
             if (arg)
                 settings->midiDevice = string(arg);
-                  break;
+            break;
         case 'i':
             settings->showGui = false;
             settings->showConsole = false;

@@ -5,6 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
+Copyright 2014, Will Godfrey   
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -20,8 +21,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified March 2011
-} {in_source in_header
+This file is derivative of ZynAddSubFX original code, modified July 2014
+} {selected in_source in_header
 } 
 
 decl {\#include <cmath>} {public local
@@ -49,7 +50,7 @@ class ConfigUI {open : {private MiscFuncs}
         xywh {5 5 520 325}
       } {
         Fl_Group {} {
-          label {Main settings} open selected
+          label {Main settings} open
           xywh {5 25 460 260} labelsize 12
         } {
           Fl_Choice {} {
