@@ -80,7 +80,7 @@ class AlsaEngine : public MusicIO
         struct {
             string              device;
             snd_seq_t           *handle;
-            snd_seq_addr_t      *link;
+            snd_seq_addr_t      addr;
             int                 alsaId;
             pthread_t           pThread;
         } midi;

@@ -1,3 +1,8 @@
+
+yoshimi-1.2.x
+- ALSA MIDI can now auto-connect.
+- changed x.x.x.notes to Changelog as requested by packagers.
+
 yoshimi-1.2.3
 - Some more minor bug fixes.
 - INSTALL file now refers to V1.2.2
@@ -5,7 +10,9 @@ yoshimi-1.2.3
     only relevant for jack output.
 - Ported SubSynth overtones feature from Zyn. 2.4.4
 - Ported Unison phase randomisation control from Zyn. 2.4.4
-- Ported AddSynth & SubSynth processing encancements from Zyn. 2.4.4
+- Added checkbox in 'Settings' to allow a MIDI program change
+  to enable a part if it was previously disabled.
+- Ported AddSynth & SubSynth processing enhancements from Zyn. 2.4.4
 - Changed part's key limit from a list to a spinner so you can set
   any value up to the maximum poliphony - 5
   This is error checked when parameter files are loaded.
@@ -15,6 +22,7 @@ yoshimi-1.2.3
 - Added experimental 'naturalise' small random detune feature at note-on.
 - Performed lots of tiny optimsations.
 - Disabled part audio out selection if not running jack.
+- Put some more info in Docs - much more to do!
 - Updated copyright notices.
 - Temporarily disabled ALSA MIDI auto connect till I can find out why 
   it crashes - seems it's never worked.

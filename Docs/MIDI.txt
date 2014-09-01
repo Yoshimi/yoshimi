@@ -18,8 +18,7 @@ Yoshimi responds to the following messages.
 121: Reset All Controllers
 123: All Notes OFF
 
-192: Program Change (voices 1 - 128) also user selectable CC for voices 128 -
-160 In the master branch there is an option for making Program Change enable a
-part if it's currently disabled.
+192: Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
+     There is now an option for making Program Change enable a part if it's currently disabled.
 
 224: Pitch Bend

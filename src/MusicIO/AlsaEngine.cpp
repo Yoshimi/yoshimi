@@ -35,7 +35,6 @@ AlsaEngine::AlsaEngine()
     audio.pThread = 0;
 
     midi.handle = NULL;
-    midi.link = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
 }
@@ -65,10 +64,7 @@ bail_out:
 bool AlsaEngine::openMidi(void)
 {
     midi.device = Runtime.midiDevice;
- //   if (midi.device.empty())
- //       midi.device = "default";
     const char* port_name = "input";
-//    if (snd_seq_open(&midi.handle, midi.device.c_str(), SND_SEQ_OPEN_INPUT, 0))
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, 0) != 0)
     {
         Runtime.Log("Error, failed to open alsa midi device: " + midi.device);
@@ -90,18 +86,9 @@ bool AlsaEngine::openMidi(void)
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_UNSUBSCRIBED);
     if (0 > snd_seq_set_client_info(midi.handle, seq_info))
         Runtime.Log("Failed to set midi event filtering");
+    
     snd_seq_set_client_name(midi.handle, midiClientName().c_str());
     
-    if (!midi.device.empty())
-    {
-        Runtime.Log("\n"+midi.device+"\n");
-/*        if (snd_seq_parse_address(midi.handle,midi.link,midi.device.c_str()) != 0)
-        {
-            Runtime.Log("Error, failed to find link");
-            goto bail_out;
-        }*/
-    }
-
     if (0 > snd_seq_create_simple_port(midi.handle, port_name,
                                        SND_SEQ_PORT_CAP_WRITE
                                        | SND_SEQ_PORT_CAP_SUBS_WRITE,
@@ -109,6 +96,15 @@ bool AlsaEngine::openMidi(void)
     {
         Runtime.Log("Error, failed to acquire alsa midi port");
         goto bail_out;
+    }
+    if (!midi.device.empty())
+    {
+        if (snd_seq_parse_address(midi.handle,&midi.addr,midi.device.c_str()) == 0)
+        {
+            Runtime.Log("Found something"); // not sure about the port number being 0
+            if (snd_seq_connect_from(midi.handle, 0, midi.addr.client, midi.addr.port) == 0)
+               Runtime.Log("Connected "+midi.device);
+        }
     }
     return true;
 
