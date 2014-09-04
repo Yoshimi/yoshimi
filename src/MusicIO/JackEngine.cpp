@@ -166,6 +166,10 @@ bool JackEngine::Start(void)
         Runtime.Log("Failed to activate jack client");
         goto bail_out;
     }
+    
+    if (Runtime.midiEngine  == jack_midi and jack_connect(jackClient,Runtime.midiDevice.c_str(),jack_port_name(midi.port)))
+        Runtime.Log("Didn't find jack MIDI source '" + Runtime.midiDevice + "'");
+    
     return true;
 
 bail_out:

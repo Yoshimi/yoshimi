@@ -65,9 +65,10 @@ bool AlsaEngine::openMidi(void)
 {
     midi.device = Runtime.midiDevice;
     const char* port_name = "input";
+    int port_num;
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, 0) != 0)
     {
-        Runtime.Log("Error, failed to open alsa midi device: " + midi.device);
+        Runtime.Log("Error, failed to open alsa midi");
         goto bail_out;
     }
     snd_seq_client_info_t *seq_info;
@@ -89,22 +90,25 @@ bool AlsaEngine::openMidi(void)
     
     snd_seq_set_client_name(midi.handle, midiClientName().c_str());
     
-    if (0 > snd_seq_create_simple_port(midi.handle, port_name,
+    port_num = snd_seq_create_simple_port(midi.handle, port_name,
                                        SND_SEQ_PORT_CAP_WRITE
                                        | SND_SEQ_PORT_CAP_SUBS_WRITE,
-                                       SND_SEQ_PORT_TYPE_SYNTH))
+                                       SND_SEQ_PORT_TYPE_SYNTH);
+    if (port_num < 0)
     {
         Runtime.Log("Error, failed to acquire alsa midi port");
         goto bail_out;
     }
     if (!midi.device.empty())
     {
+        bool midiSource = false;
         if (snd_seq_parse_address(midi.handle,&midi.addr,midi.device.c_str()) == 0)
         {
-            Runtime.Log("Found something"); // not sure about the port number being 0
-            if (snd_seq_connect_from(midi.handle, 0, midi.addr.client, midi.addr.port) == 0)
-               Runtime.Log("Connected "+midi.device);
+            Runtime.Log("Found something");
+            midiSource = (snd_seq_connect_from(midi.handle, port_num, midi.addr.client, midi.addr.port) == 0);
         }
+        if (!midiSource)
+            Runtime.Log("Didn't find alsa MIDI source '" + midi.device + "'");
     }
     return true;
 
