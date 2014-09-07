@@ -22,3 +22,14 @@ Yoshimi responds to the following messages.
      There is now an option for making Program Change enable a part if it's currently disabled.
 
 224: Pitch Bend
+
+
+Both ALSA MIDI and Jack MIDI can autoconnect. So from the command line you'd use something like:
+
+ ./yoshimi -K --alsa-midi="Virtual Keyboard"
+
+or:
+
+ ./yoshimi -K --jack-midi="jack-keyboard:midi_out"
+
+ALSA can mostly manage with just the client name, but Jack needs the port as well (the part after the colon). These commands are case sensitive, and quite fussy about spaces etc. so it's wise to use quotes for the source name, even if they don't seem to be needed.

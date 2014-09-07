@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -90,15 +90,7 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
         olddbl = 0.0;
         olddbr = 0.0;
         oldrmsdbl = 0.0;
-        oldrmsdbr = 0.0;
-        maxstoredbl = 0.0;
-        maxstoredbr = 0.0;
-        clipped = 0;
-        synth->VUdata.values.vuOutPeakL = 0;
-        synth->VUdata.values.vuOutPeakR = 0;
-        synth->VUdata.values.vuRmsPeakL = 0;
-        synth->VUdata.values.vuRmsPeakR = 0;} {selected
-    }
+        oldrmsdbr = 0.0;} {}
   }
   Function {draw_master()} {open
   } {
@@ -107,24 +99,20 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
         int oy = y();
         int lx = w();
         int ly = h();
-        float dbl = synth->VUdata.values.vuOutPeakL;
-        float dbr = synth->VUdata.values.vuOutPeakR;
-        float rmsdbl =synth->VUdata.values.vuRmsPeakL;
-        float rmsdbr = synth->VUdata.values.vuRmsPeakR;
-        clipped |= synth->VUdata.values.vuClipped;
- 
-        if (dbl > maxstoredbl)
-        	maxstoredbl = dbl;
-        if (dbr > maxstoredbr)
-        	maxstoredbr = dbr;
-       
+        float dbl = synth->vuOutPeakL;
+        float dbr = synth->vuOutPeakR;
+        float rmsdbl = sqrt(synth->vuRmsPeakL);
+        float rmsdbr = sqrt(synth->vuRmsPeakR);
+        float maxdbl = synth->vuMaxOutPeakL;
+        float maxdbr = synth->vuMaxOutPeakR;
+//        bool clipped = synth->vuClipped;
         dbl = rap2dB(dbl);
         dbr = rap2dB(dbr);
         rmsdbl = rap2dB(rmsdbl);
         rmsdbr = rap2dB(rmsdbr);
-        float maxdbl = rap2dB(maxstoredbl);
-        float maxdbr = rap2dB(maxstoredbr);
-       
+        maxdbl = rap2dB(maxdbl);
+        maxdbr = rap2dB(maxdbr);
+        
         dbl = (MIN_DB - dbl) / MIN_DB;
         if (dbl < 0.0)
             dbl = 0.0;
@@ -196,12 +184,12 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, 255, 255, 0);
 
         // see red if clipped
-        if (clipped & 1)
+        if (synth->vuClipped & 1)
             fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 250, 10, 10);
         else
             fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 0, 0, 10);
 
-        if (clipped & 2)
+        if (synth->vuClipped & 2)
             fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 250, 10, 10);
         else
             fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 0, 0, 10);
@@ -226,7 +214,8 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
             fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
-        }} {}
+        }} {selected
+    }
   }
   Function {draw_part()} {open
   } {
@@ -235,16 +224,15 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
         int oy = y()+2;
         int lx = w()-4;
         int ly = h()-4;
-        float Vpeak = synth->VUdata.values.parts[npart];
-        if (Vpeak < 0)
+        if (synth->vuoutpeakpart[npart] < 0)
         {
             fl_rectf(ox, oy, lx, ly, 140, 140, 140);
-            int fakedb = (Vpeak / 127.0 * ly) - 2;
+            int fakedb = synth->vuoutpeakpart[npart] / 127.0 * ly - 2;
             fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
             return;
         }
         // draw the vu lines
-        float db = rap2dB(Vpeak);
+        float db = rap2dB(synth->vuoutpeakpart[npart]);
 
         db = (MIN_DB - db) / MIN_DB;
         db = (db > 1.0) ? 1.0 : db;
@@ -276,10 +264,9 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   Function {tick(void *v)} {open return_type {static void}
   } {
     code {tickdraw((VUMeter *) v);
-	synth->fetchMeterData(&synth->VUdata);
         Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {switch(event){
             case FL_SHOW:
@@ -289,12 +276,8 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
                 Fl::remove_timeout(tick, this);
                 break;
             case FL_PUSH:
-                if (npart < 0)
-                {
-               	    maxstoredbl = 0.0;
-               	    maxstoredbr = 0.0;
-               	    clipped = 0;
-                }
+                if (npart < 0) //if (npart >= 0) break;
+                    synth->vuresetpeaks();
                 break;
         }
         return 1;} {}
@@ -308,12 +291,6 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   decl {float oldrmsdbl;} {private local
   }
   decl {float oldrmsdbr;} {private local
-  }
-  decl {float maxstoredbl;} {private local
-  }
-  decl {float maxstoredbr;} {private local
-  }
-  decl {int clipped;} {private local
   }
 } 
 
@@ -459,7 +436,8 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
       }
     }
   }
-  Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+  Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
+  } {
     code {npart = 0;
         bankui = NULL;} {}
   }

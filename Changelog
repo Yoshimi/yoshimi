@@ -3,6 +3,7 @@ yoshimi-1.2.x
 - ALSA MIDI can now auto-connect.
 - changed x.x.x.notes to Changelog as requested by packagers.
 - Jack MIDI autoconnects too!
+- VU meters disengaged from synth via ring buffer.
 
 yoshimi-1.2.3
 - Some more minor bug fixes.

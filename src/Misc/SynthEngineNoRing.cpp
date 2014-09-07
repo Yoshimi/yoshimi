@@ -52,7 +52,7 @@ SynthEngine::SynthEngine() :
     tmpmixl(NULL),
     tmpmixr(NULL),
     processLock(NULL),
-    vuringbuf(NULL),
+    meterLock(NULL),
     stateXMLtree(NULL)
 {
     ctl = new Controller();
@@ -68,9 +68,6 @@ SynthEngine::SynthEngine() :
 
 SynthEngine::~SynthEngine()
 {
-    if (vuringbuf)
-        jack_ringbuffer_free(vuringbuf);
-    
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
             delete part[npart];
@@ -89,6 +86,7 @@ SynthEngine::~SynthEngine()
     if (fft)
         delete fft;
     pthread_mutex_destroy(&processMutex);
+    pthread_mutex_destroy(&meterMutex);
     if (ctl)
         delete ctl;
 }
@@ -112,6 +110,15 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
+    if (!pthread_mutex_init(&meterMutex, NULL))
+        meterLock = &meterMutex;
+    else
+    {
+        Runtime.Log("SynthEngine meterLock init fails :-(");
+        meterLock = NULL;
+        goto bail_out;
+    }
+
     if (initstate_r(samplerate + buffersize + oscilsize, random_state,
                     sizeof(random_state), &random_buf))
         Runtime.Log("SynthEngine Init failed on general randomness");
@@ -126,12 +133,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     if (!(fft = new FFTwrapper(oscilsize)))
     {
         Runtime.Log("SynthEngine failed to allocate fft");
-        goto bail_out;
-    }
-
-    if (!(vuringbuf = jack_ringbuffer_create(sizeof(VUtransfer))))
-    {
-        Runtime.Log("SynthEngine failed to create vu ringbuffer");
         goto bail_out;
     }
 
@@ -151,7 +152,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -0.5;
+        vuoutpeakpart[npart] = -1;
     }
 
     // Insertion Effects init
@@ -224,11 +225,6 @@ bail_out:
     if (fft)
         delete fft;
     fft = NULL;
-    
-    if (vuringbuf)
-        jack_ringbuffer_free(vuringbuf);
-    vuringbuf = NULL;
-
     if (tmpmixl)
         fftwf_free(tmpmixl);
     tmpmixl = NULL;
@@ -303,7 +299,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     actionLock(unlock);
                 }
                 else
-                    VUpeak.values.parts[npart] = -(0.5+velocity); // ensure fake is always negative
+                    vuoutpeakpart[npart] = -(1+velocity); // ensure it's always negative
             }
         }
 }
@@ -401,12 +397,12 @@ void SynthEngine::partonoff(int npart, int what)
         return;
     if (what)
     {
-        VUpeak.values.parts[npart] = 1e-9f;
+        vuoutpeakpart[npart] = 1e-9f;
         part[npart]->Penabled = 1;
     }
     else
     {   // disabled part
-        VUpeak.values.parts[npart] = -0.5;
+        vuoutpeakpart[npart] = -1;
         part[npart]->Penabled = 0;
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -587,29 +583,29 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
 
     //Master volume and clip calculation for mixed outputs
 
-    VUpeak.values.vuOutPeakL = 1e-12f;
-    VUpeak.values.vuOutPeakR = 1e-12f;
-    VUpeak.values.vuRmsPeakL = 1e-12f;
-    VUpeak.values.vuRmsPeakR = 1e-12f;
-    VUpeak.values.vuClipped = 0;
+    vuoutpeakl = 1e-12f;
+    vuoutpeakr = 1e-12f;
+    vurmspeakl = 1e-12f;
+    vurmspeakr = 1e-12f;
     float absval;
+    clipped = 0;
     for (int idx = 0; idx < buffersize; ++idx)
     {
         outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
         outr[NUM_MIDI_PARTS][idx] *= volume;
 
-        if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL) // Peak computation (for vumeters)
-            VUpeak.values.vuOutPeakL = absval;
-        if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
-            VUpeak.values.vuOutPeakR = absval;
-        VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx]; // RMS Peak
-        VUpeak.values.vuRmsPeakR += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
+        if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > vuoutpeakl) // Peak computation (for vumeters)
+            vuoutpeakl = absval;
+        if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > vuoutpeakr)
+            vuoutpeakr = absval;
+        vurmspeakl += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx]; // RMS Peak
+        vurmspeakr += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
 
         // check for clips
         if (fabsf(outl[NUM_MIDI_PARTS][idx]) > 1.0f)
-            VUpeak.values.vuClipped |= 1;
+            clipped |= 1;
         if (fabsf(outr[NUM_MIDI_PARTS][idx]) > 1.0f)
-            VUpeak.values.vuClipped |= 2;
+            clipped |= 2;
 
         if (shutup) // fade-out
         {
@@ -622,44 +618,35 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         ShutUp();
 
     // Part Peak computation (for Part vu meters/fake part vu meters)
-        
+    vupeakLock(lock);
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {       
         if (part[npart]->Penabled)
         {
-            VUpeak.values.parts[npart] = 1.0e-9;
+            vuoutpeakpart[npart] = 1.0e-9;
             float *outl = part[npart]->partoutl;
             float *outr = part[npart]->partoutr;
             for (int i = 0; i < buffersize; ++i)
             {
                 float tmp = fabsf(outl[i] + outr[i]);
-                if (tmp > VUpeak.values.parts[npart])
-                    VUpeak.values.parts[npart] = tmp;
+                if (tmp > vuoutpeakpart[npart])
+                    vuoutpeakpart[npart] = tmp;
             }
-            VUpeak.values.parts[npart] *= volume; // how is part peak related to master volume??
+            vuoutpeakpart[npart] *= volume; // how is part peak related to master volume??
         }
-        else if (VUpeak.values.parts[npart] < -1) // fake peak is a negative value
-            VUpeak.values.parts[npart]+= 0.5f;
+        else if (vuoutpeakpart[npart] < -1) // fake peak is a negative value
+            vuoutpeakpart[npart]+= 0.5f;
     }
-
-    if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
-    {
-        jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
-    }
-    VUpeak.values.parts[npart] = -0.5f;
-}
-
-
-bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
-{
-    if (jack_ringbuffer_read_space(vuringbuf) >= sizeof(VUtransfer))
-    {
-        jack_ringbuffer_read(vuringbuf, ( char*)VUdata->bytes, sizeof(VUtransfer));
-        VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / buffersize);
-        VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / buffersize);
-        return true;
-    }
-    return false;
+    vuOutPeakL = vuoutpeakl;
+    vuOutPeakR = vuoutpeakr;
+    if (vuOutPeakL > vuMaxOutPeakL)
+        vuMaxOutPeakL = vuOutPeakL;
+    if (vuOutPeakR > vuMaxOutPeakR)
+        vuMaxOutPeakR = vuOutPeakR;
+    vuRmsPeakL = vurmspeakl / buffersize;;
+    vuRmsPeakR = vurmspeakr / buffersize;;
+    vuClipped |= clipped;
+    vupeakLock(unlock);
 }
 
 
@@ -703,12 +690,13 @@ void SynthEngine::ShutUp(void)
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
-        VUpeak.values.parts[npart] = -0.5;
+        vuoutpeakpart[npart] = -1;//1e-9f;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
+    vuresetpeaks();
     shutup = false;
 }
 
@@ -740,6 +728,47 @@ bool SynthEngine::actionLock(lockset request)
             break;
     }
     return (chk == 0) ? true : false;
+}
+
+
+bool SynthEngine::vupeakLock(lockset request)
+{
+    int chk  = -1;
+    switch (request)
+    {
+        case lock:
+            chk = pthread_mutex_lock(meterLock);
+            break;
+
+        case unlock:
+            chk = pthread_mutex_unlock(meterLock);
+            break;
+
+        default:
+            break;
+    }
+    return (chk == 0) ? true : false;
+}
+
+
+// Reset peaks and clear the "clipped" flag (for VU-meter)
+
+/*
+  We no longer reset the local values (vuoutpeakl etc.)
+  If someone manages to reset part way through the calculations
+  all it would do is make one frame display low in the GUI.
+ */
+void SynthEngine::vuresetpeaks(void)
+{
+    vupeakLock(lock);
+    vuOutPeakL = 1e-12f;
+    vuOutPeakR =  1e-12f;
+    vuMaxOutPeakL = 1e-12f;
+    vuMaxOutPeakR = 1e-12f;
+    vuRmsPeakL = 1e-12f;
+    vuRmsPeakR = 1e-12f;
+    vuClipped = 0;
+    vupeakLock(unlock);
 }
 
 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -151,8 +151,7 @@ class MasterUI {open : {private MiscFuncs}
       }
       delete masterwindow;} {}
   }
-  Function {Init(void)} {open
-  } {
+  Function {Init(void)} {} {
     code {//
       microtonalui = new MicrotonalUI(&synth->microtonal);
       bankui = new BankUI(&npart);
@@ -426,13 +425,13 @@ class MasterUI {open : {private MiscFuncs}
           tooltip {Master fine detune reset} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
         Fl_Button {} {
-          label {Stop!}
+          label Reset
           callback {//
               virkeyboard->relaseallkeys();
               synth->actionLock(lockmute);
               synth->shutup = 1;
-              synth->actionLock(unlock);} selected
-          tooltip {Cease all sound immediately!} xywh {11 46 40 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
+              synth->actionLock(unlock);}
+          tooltip {Cease all sound immediately!} xywh {11 46 40 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -896,7 +895,8 @@ ZynAddSubFX}
             }
             else
                 fl_alert("%s",msg.c_str());
-        }} {}
+        }} {selected
+    }
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//

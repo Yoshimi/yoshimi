@@ -28,7 +28,6 @@
 
 #include <limits.h>
 #include <cstdlib>
-#include <jack/ringbuffer.h>
 
 using namespace std;
 
@@ -52,6 +51,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
         bool actionLock(lockset request);
+        bool vupeakLock(lockset request);
 
         bool saveXML(string filename);
         void add2XML(XMLwrapper *xml);
@@ -122,21 +122,15 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank bank;
         FFTwrapper *fft;
 
-        // peaks for VU-meters        
-        union VUtransfer{
-            struct{
-                int vuClipped;
-                float vuOutPeakL;
-                float vuOutPeakR;
-                float vuRmsPeakL;
-                float vuRmsPeakR;
-                float parts[NUM_MIDI_PARTS];
-            } values;
-            char bytes [sizeof(values)];
-        };
-        union VUtransfer VUpeak, VUdata;
-        
-        bool fetchMeterData(VUtransfer *VUdata);
+        // peaks for VU-meters
+        void vuresetpeaks(void);
+        float vuOutPeakL;
+        float vuOutPeakR;
+        float vuMaxOutPeakL;
+        float vuMaxOutPeakR;
+        float vuRmsPeakL;
+        float vuRmsPeakR;
+        int vuClipped;
 
 
     private:
@@ -148,13 +142,21 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float *tmpmixr; // which are sent to system effect
         int keyshift;
 
+        float vuoutpeakl;
+        float vuoutpeakr;
+        float vumaxoutpeakl;
+        float vumaxoutpeakr;
+        float vurmspeakl;
+        float vurmspeakr;
+        int clipped;
+
         pthread_mutex_t  processMutex;
         pthread_mutex_t *processLock;
+        pthread_mutex_t  meterMutex;
+        pthread_mutex_t *meterLock;
 
-        jack_ringbuffer_t *vuringbuf;
-        
         XMLwrapper *stateXMLtree;
-        
+
         static char random_state[];
         static struct random_data random_buf;
         int32_t random_result;
