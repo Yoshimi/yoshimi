@@ -76,6 +76,12 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
+decl {class VUMeter;} {selected public local
+} 
+
+decl {VUMeter *guiVUmeter;} {public local
+} 
+
 class VUMeter {open : {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
@@ -97,8 +103,7 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
         synth->VUdata.values.vuOutPeakL = 0;
         synth->VUdata.values.vuOutPeakR = 0;
         synth->VUdata.values.vuRmsPeakL = 0;
-        synth->VUdata.values.vuRmsPeakR = 0;} {selected
-    }
+        synth->VUdata.values.vuRmsPeakR = 0;} {}
   }
   Function {draw_master()} {open
   } {

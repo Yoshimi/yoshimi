@@ -192,9 +192,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     else
     {
-        if (Runtime.paramsLoad.size())
+        if (Runtime.paramsLoad.size()) // these are not fatal if failed
         {
-            if (loadXML(Runtime.paramsLoad) >= 0)
+            if (loadXML(Runtime.paramsLoad))
             {
                 applyparameters();
                 Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
@@ -203,19 +203,19 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             else
             {
                 Runtime.Log("Failed to load parameters " + Runtime.paramsLoad);
-                goto bail_out;
+                Runtime.paramsLoad = "";
             }
         }
-        if (!Runtime.instrumentLoad.empty())
+        else if (Runtime.instrumentLoad.size())
         {
             int loadtopart = 0;
-            if (!part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
+            if (part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
+                Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
+            else
             {
                 Runtime.Log("Failed to load instrument file " + Runtime.instrumentLoad);
-                goto bail_out;
+                Runtime.instrumentLoad = "";
             }
-            else
-                Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
         }
     }
     return true;
@@ -646,7 +646,6 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     {
         jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
     }
-    VUpeak.values.parts[npart] = -0.5f;
 }
 
 

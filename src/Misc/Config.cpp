@@ -109,6 +109,7 @@ Config::Config() :
     GzipCompression(3),
     Interpolation(0),
     CheckPADsynth(1),
+    EnableProgChange(0), // default will be inverted
     rtprio(50),
     midi_bank_C(0),
     midi_upper_voice_C(128),
@@ -175,7 +176,7 @@ bool Config::Setup(int argc, char **argv)
             break;
     }
     if (!midiDevice.size())
-        midiDevice = "default";
+        midiDevice = "";
     loadCmdArgs(argc, argv);
     if (restoreState)
     {
@@ -362,6 +363,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     currentBankDir = xml->getparstr("bank_current");
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
+    EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
     // get bank dirs
@@ -491,6 +493,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("check_pad_synth", CheckPADsynth);
+    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addparstr("bank_current", currentBankDir);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
@@ -658,6 +661,8 @@ void Config::StartupReport(void)
         default:
             report += "nada";
     }
+    if (!midiDevice.size())
+        midiDevice = "default";
     report += (" -> '" + midiDevice + "'");
     Log(report);
     Log("Oscilsize: " + asString(synth->oscilsize));

@@ -183,12 +183,8 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
 // Loads the instrument from the bank
 void Bank::loadfromslot(unsigned int ninstrument, Part *part)
 {
-    if (emptyslot(ninstrument))
-        return;
-    //part->defaultsinstrument();
-    //part->loadXMLinstrument(bank_instrument[ninstrument].filename);
-
-    part->loadXMLinstrument(bank_instrument[ninstrument].filename);
+    if (!emptyslot(ninstrument))
+        part->loadXMLinstrument(bank_instrument[ninstrument].filename);
 }
 
 
@@ -229,19 +225,26 @@ bool Bank::loadbank(string bankdirname)
                 {
                     // just NNNN-<name>.xiz files please
                     // sa verific daca e si extensia dorita
-                    if (candidate.at(4) == '-')
+
+                    // sorry Cal. They insisted :(
+
+                    int chk = 0;
+                    char ch = candidate.at(chk);
+                    while (ch >= '0' and ch <= '9' and chk < 4){
+                        chk += 1;
+                        ch = candidate.at(chk);
+                    }
+                    if (ch == '-')
                     {
-                        unsigned int chk;
-                        for (chk = 0; chk < 4; ++chk)
-                            if (candidate.at(chk) < '0' || candidate.at(chk) > '9')
-                                break;
-                        if (!(chk < 4))
-                        {
-                            int instnum = string2int(candidate.substr(0, 4));
-                            // remove "NNNN-" and .xiz extension for instrument name
-                            string instname = candidate.substr(5, candidate.size() - xizext.size() - 5);
-                            addtobank(instnum - 1, candidate, instname);
-                        }
+                        int instnum = string2int(candidate.substr(0, 4));
+                        // remove "NNNN-" and .xiz extension for instrument name
+                        string instname = candidate.substr(5, candidate.size() - xizext.size() - 5);
+                        addtobank(instnum - 1, candidate, instname);
+                    }
+                    else
+                    {
+                        string instname = candidate.substr(0, candidate.size() -  xizext.size());
+                        addtobank(-1, candidate, instname);
                     }
                 }
             }

@@ -141,7 +141,7 @@ void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param)
     {
         synth->SetController(ch, ctrl, param);
     }
-    else // it's really an upper set program change
+    else if (Runtime.EnableProgChange) // it's really an upper set program change
     {
         synth->SetProgram(ch, (param & 0x1f) | 0x80);
     }
@@ -149,7 +149,8 @@ void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param)
 
 void MusicIO::setMidiProgram(unsigned char ch, int pgm)
 {
-    synth->SetProgram(ch, pgm);
+    if (Runtime.EnableProgChange)
+        synth->SetProgram(ch, pgm);
 }
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,

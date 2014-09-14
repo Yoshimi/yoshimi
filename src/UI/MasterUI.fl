@@ -105,7 +105,8 @@ class MasterUI {open : {private MiscFuncs}
       yoshiLog = NULL;
       laststatefile = Runtime.StateFile;} {}
   }
-  Function {~MasterUI()} {} {
+  Function {~MasterUI()} {open
+  } {
     code {//
       masterwindow->hide();
       aboutwindow->hide();
@@ -429,6 +430,11 @@ class MasterUI {open : {private MiscFuncs}
           label {Stop!}
           callback {//
               virkeyboard->relaseallkeys();
+              /*
+              guiVUmeter->init(-1);
+              seems to compile OK but segfaults
+              don't know why so disabled
+              */
               synth->actionLock(lockmute);
               synth->shutup = 1;
               synth->actionLock(unlock);} selected

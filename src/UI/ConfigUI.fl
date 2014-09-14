@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -22,7 +22,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified July 2014
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <cmath>} {public local
@@ -44,7 +44,7 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open
-      xywh {783 148 465 335} type Double hide
+      xywh {789 108 465 335} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 520 325}
@@ -394,16 +394,6 @@ class ConfigUI {open : {private MiscFuncs}
           label CCs open
           tooltip {MIDI CC preferences} xywh {25 45 460 260} labelsize 12 hide
         } {
-          Fl_Spinner {} {
-            label {Extended Program Change}
-            callback {//
-		unsigned int tmp = Runtime.midi_upper_voice_C;
-		Runtime.midi_upper_voice_C = o->value();
-		if (Runtime.midi_upper_voice_C != tmp)
-			configChanged = true;}
-            tooltip {128 = off} xywh {270 160 53 24} labelsize 12 minimum 14 maximum 128 value 80 textsize 12
-            code0 {o->value(Runtime.midi_upper_voice_C);}
-          }
           Fl_Choice bankchange {
             label {Bank Change}
             callback {//
@@ -439,14 +429,34 @@ class ConfigUI {open : {private MiscFuncs}
             }
           }
           Fl_Check_Button {} {
-            label {Enable On Load}
+            label {Enable Program Change}
+            callback {//
+		int tmp = Runtime.EnableProgChange;
+		Runtime.EnableProgChange = o->value();
+		if (Runtime.EnableProgChange != tmp)
+			configChanged = true;}
+            tooltip {MIDI program change enable/disable} xywh {270 135 18 15} down_box DOWN_BOX value 1 labelsize 12 align 4
+            code0 {o->value(Runtime.EnableProgChange);}
+          }
+          Fl_Check_Button {} {
+            label {Enable Part On Change}
             callback {//
 		int tmp = Runtime.enable_part_on_voice_load;
 		Runtime.enable_part_on_voice_load = o->value();
 		if (Runtime.enable_part_on_voice_load != tmp)
 			configChanged = true;}
-            tooltip {Part enabled if MIDI program changed} xywh {270 235 70 15} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Part enabled if MIDI program changed} xywh {270 180 18 15} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(Runtime.enable_part_on_voice_load);}
+          }
+          Fl_Spinner {} {
+            label {Extended Program Change}
+            callback {//
+		unsigned int tmp = Runtime.midi_upper_voice_C;
+		Runtime.midi_upper_voice_C = o->value();
+		if (Runtime.midi_upper_voice_C != tmp)
+			configChanged = true;}
+            tooltip {128 = off} xywh {270 231 53 24} labelsize 12 minimum 14 maximum 128 value 80 textsize 12
+            code0 {o->value(Runtime.midi_upper_voice_C);}
           }
         }
       }
@@ -463,7 +473,7 @@ configwindow->do_callback();}
         xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Box {} {
-        label {Most settings changes require a restart}
+        label {Many settings changes require a restart} selected
         xywh {104 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
       }
     }

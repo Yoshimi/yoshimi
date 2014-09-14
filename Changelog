@@ -2,8 +2,13 @@
 yoshimi-1.2.x
 - ALSA MIDI can now auto-connect.
 - changed x.x.x.notes to Changelog as requested by packagers.
-- Jack MIDI autoconnects too!
+- Jack MIDI auto-connects too!
 - VU meters disengaged from synth via ring buffer.
+- Failing to load parameters or instruments at startup is no longer fatal.
+- Yoshimi accepts un-numbered instruments in banks again - under protest!
+- some more small UI and CL message refinements.
+- in settings added Enable/Disable MIDI program change - some seq's don't play nice :(
+  default is to enable. Compatible with Zyn's 'ignore program change'.
 
 yoshimi-1.2.3
 - Some more minor bug fixes.

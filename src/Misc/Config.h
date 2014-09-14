@@ -119,6 +119,7 @@ class Config : public MiscFuncs
         string        currentBankDir;
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;
+        int           EnableProgChange;
         int           rtprio;
         unsigned int  midi_bank_C;
         unsigned int  midi_upper_voice_C;

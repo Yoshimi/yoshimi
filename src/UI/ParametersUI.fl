@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
@@ -19,16 +19,16 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 } {in_source in_header
 } 
 
-decl {\#include <set>} {public
+decl {\#include <set>} {public local
 } 
 
-decl {using namespace std;} {public
+decl {using namespace std;} {public local
 } 
 
-decl {\#include "Misc/Config.h"} {global
+decl {\#include "Misc/Config.h"} {private global
 } 
 
-decl {\#include "MasterUI.h"} {global
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class ParametersUI {open
@@ -38,7 +38,7 @@ class ParametersUI {open
     Fl_Window Recent {
       label {Recent Parameters}
       callback {o->hide()} open
-      xywh {917 745 220 180} type Double labeltype NORMAL_LABEL labelfont 13 labelsize 12 align 0 visible
+      xywh {917 745 220 180} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Browser BrowseRecent {
         callback {if (o->value() > 0)
@@ -52,13 +52,14 @@ class ParametersUI {open
                         fle = Runtime.ParamsHistory.at(o->value() - 1).file;
                         guiMaster->do_load_master(false, fle.c_str());
                         guiMaster->setMasterLabel(Runtime.ParamsHistory.at(o->value() - 1).name);
+                        Recent->hide();
                     }
                     break;
     
                 default:
                     break;
               }
-          }}
+          }} selected
         xywh {0 0 220 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
         code0 {const int colwidths[] = { 150, 330, 0 };
           o->column_widths(colwidths);
@@ -75,7 +76,8 @@ class ParametersUI {open
   } {
     code {make_window();} {}
   }
-  Function {loadRecent()} {} {
+  Function {loadRecent()} {open
+  } {
     code {BrowseRecent->clear();
         const int colwidths[] = { 64, 128, 0 };
         BrowseRecent->column_widths(colwidths);
@@ -91,17 +93,15 @@ class ParametersUI {open
   }
   Function {Show()} {open
   } {
-    code {
-      loadRecent();
-      Recent->show();} {selected
-    }
+    code {loadRecent();
+      Recent->show();} {}
   }
   Function {Hide()} {open
   } {
-    code {Recent->hide();} {selected
-    }
+    code {Recent->hide();} {}
   }
-  Function {~ParametersUI()} {} {
+  Function {~ParametersUI()} {open
+  } {
     code {Recent->hide();} {}
   }
 } 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -51,10 +51,10 @@ decl {\#include "Misc/Part.h"
 
 class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window syseffsend {open
-      private xywh {916 1069 150 145} type Double hide
+      private xywh {916 904 150 145} type Double hide
       class Fl_Group
     } {
       Fl_Dial {} {
@@ -919,8 +919,8 @@ Offset}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {305 125 395 360} type Double
-      code0 {rnddet->value((int)(0.5+part->Pfrand*100));} visible
+      xywh {305 125 395 360} type Double hide
+      code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
     } {
       Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1100,7 +1100,7 @@ Offset}
       }
       Fl_Spinner rnddet {
         label {Rnd. Det.}
-        callback {part->Pfrand = o->value() / 100.0f;} selected
+        callback {part->Pfrand = o->value() / 100.0f;}
         tooltip {Small random detune - experimental!} xywh {113 335 44 19} labelsize 12 minimum 0 maximum 10 value 0 textsize 12
         code0 {o->value((int)part->Pfrand*100);}
       }
@@ -1214,6 +1214,6 @@ Offset}
   }
   decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
   }
-  decl {int x;} {private local
+  decl {int x;} {selected private local
   }
 } 

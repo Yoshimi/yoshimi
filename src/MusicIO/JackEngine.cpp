@@ -167,8 +167,11 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
     
-    if (Runtime.midiEngine  == jack_midi and jack_connect(jackClient,Runtime.midiDevice.c_str(),jack_port_name(midi.port)))
+    if (Runtime.midiEngine  == jack_midi and Runtime.midiDevice.size() and jack_connect(jackClient,Runtime.midiDevice.c_str(),jack_port_name(midi.port)))
+    {
         Runtime.Log("Didn't find jack MIDI source '" + Runtime.midiDevice + "'");
+        Runtime.midiDevice = "";
+    }
     
     return true;
 
