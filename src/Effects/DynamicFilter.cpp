@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified March 2011
+    This file is derivative of ZynAddSubFX original code, modified September 2014
 */
 
 #include "Misc/SynthEngine.h"
@@ -249,9 +250,6 @@ void DynamicFilter::setpreset(unsigned char npreset)
             break;
     }
 
-//	    for (int i=0;i<5;i++){
-//		printf("freq=%d  amp=%d  q=%d\n",filterpars->Pvowels[0].formants[i].freq,filterpars->Pvowels[0].formants[i].amp,filterpars->Pvowels[0].formants[i].q);
-//	    };
     if (insertion == 0)
         changepar(0, presets[npreset][0] * 0.5f); // lower the volume if this is
                                                   // system effect

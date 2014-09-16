@@ -1,6 +1,6 @@
 When using the jack audio backend, parts can be individually routed and/or sent to the main L/R outputs. This is controlled from the panel window, and the settings are saved with all the other parameters.
 
-Direct part outputs carry the part effects, but not insertion or system ones.
+Direct part outputs carry the part and insertion effects, but not system ones.
 
 
 

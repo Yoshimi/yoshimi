@@ -21,8 +21,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified August 2014
+    This file is derivative of original ZynAddSubFX code, modified September 2014
 */
+
+#include<stdio.h>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -495,8 +498,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         // Mix the channels according to the part settings about System Effect
         for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
-            // skip if part is disabled or has no output to effect
-            if (part[npart]->Penabled && Psysefxvol[nefx][npart])
+            // skip if part is disabled, doesn't go to main or has no output to effect
+            if (part[npart]->Penabled && Psysefxvol[nefx][npart]&& part[npart]->Paudiodest & 1)
             {
                 // the output volume of each part to system effect
                 float vol = sysefxvol[nefx][npart];
@@ -532,25 +535,22 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         }
     }
 
-    // Copy all parts
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        for (int i = 0; i < buffersize; ++i)
-        {
-            outl[npart][i] = part[npart]->partoutl[i];
-            outr[npart][i] = part[npart]->partoutr[i];
-        }
-    }
+        if (part[npart]->Paudiodest & 2){    // Copy separate parts
 
-    // Mix all parts to mixed outputs
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        for (int i = 0; i < buffersize; ++i)
-        {   // the volume did not change
-            if (part[npart]->Paudiodest & 1)
+            for (int i = 0; i < buffersize; ++i)
             {
-                outl[NUM_MIDI_PARTS][i] += outl[npart][i];
-                outr[NUM_MIDI_PARTS][i] += outr[npart][i];
+                outl[npart][i] = part[npart]->partoutl[i];
+                outr[npart][i] = part[npart]->partoutr[i];
+            }
+        }
+        if (part[npart]->Paudiodest & 1)    // Mix wanted parts to mains
+        {
+            for (int i = 0; i < buffersize; ++i)
+            {   // the volume did not change
+                outl[NUM_MIDI_PARTS][i] += part[npart]->partoutl[i];
+                outr[NUM_MIDI_PARTS][i] += part[npart]->partoutr[i];
             }
         }
     }
@@ -564,29 +564,30 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         }
     }
 
-    actionLock(unlock);
-
     LFOParams::time++; // update the LFO's time
 
-    //Per output master volume and fade
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    // All output master volume and fade
+    float fade;
+    for (int idx = 0; idx < buffersize; ++idx)
     {
-        for (int idx = 0; idx < buffersize; ++idx)
+        if (shutup) // fade-out
+            fade = (float) (buffersize - idx) / (float) buffersize;
+        for (npart = 0; npart <= NUM_MIDI_PARTS; ++npart) // include mains
         {
             outl[npart][idx] *= volume; // apply Master Volume
             outr[npart][idx] *= volume;
 
             if (shutup) // fade-out
-            {
-                float fade = (float) (buffersize - idx) / (float) buffersize;
+            { 
                 outl[npart][idx] *= fade;
                 outr[npart][idx] *= fade;
             }
         }
     }
 
-    //Master volume and clip calculation for mixed outputs
-
+    actionLock(unlock);
+    
+    // Clip calculation for mixed outputs   
     VUpeak.values.vuOutPeakL = 1e-12f;
     VUpeak.values.vuOutPeakR = 1e-12f;
     VUpeak.values.vuRmsPeakL = 1e-12f;
@@ -595,9 +596,6 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
     {
-        outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
-        outr[NUM_MIDI_PARTS][idx] *= volume;
-
         if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL) // Peak computation (for vumeters)
             VUpeak.values.vuOutPeakL = absval;
         if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
@@ -611,13 +609,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         if (fabsf(outr[NUM_MIDI_PARTS][idx]) > 1.0f)
             VUpeak.values.vuClipped |= 2;
 
-        if (shutup) // fade-out
-        {
-            float fade = (float) (buffersize - idx) / (float) buffersize;
-            outl[NUM_MIDI_PARTS][idx] *= fade;
-            outr[NUM_MIDI_PARTS][idx] *= fade;
-        }
     }
+
     if (shutup)
         ShutUp();
 

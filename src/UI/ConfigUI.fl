@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified July 2014
+This file is derivative of ZynAddSubFX original code, modified September 2014
 } {in_source in_header
 } 
 
@@ -44,14 +44,14 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open
-      xywh {789 108 465 335} type Double hide
+      xywh {789 108 465 335} type Double visible
     } {
       Fl_Tabs {} {open
-        xywh {5 5 520 325}
+        xywh {5 5 455 325}
       } {
         Fl_Group {} {
-          label {Main settings} open
-          xywh {5 25 460 260} labelsize 12
+          label {Main settings} open selected
+          xywh {5 25 455 280} labelsize 12
         } {
           Fl_Choice {} {
             label OscilSize
@@ -166,7 +166,7 @@ class ConfigUI {open : {private MiscFuncs}
                     SessionStateFile->changed();
                     configChanged = true;
                 }}
-            xywh {400 220 49 20} labelsize 12
+            xywh {400 220 49 20} box THIN_UP_BOX labelsize 12
             code0 {/* code */}
           }
           Fl_Counter compression {
@@ -179,6 +179,10 @@ class ConfigUI {open : {private MiscFuncs}
             tooltip {gzip compression level (0 - uncompressed)} xywh {280 170 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(Runtime.GzipCompression);}
           }
+          Fl_Box {} {
+            label {Most settings changes require a restart}
+            xywh {100 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
         }
         Fl_Group {} {
           label {Bank root dirs} open
@@ -186,7 +190,7 @@ class ConfigUI {open : {private MiscFuncs}
         } {
           Fl_Browser rootsbrowse {
             callback {activatebutton_rootdir(o->value()!=0);}
-            xywh {15 35 485 200} type Hold labelsize 12 textsize 13
+            xywh {10 35 445 200} type Hold labelsize 12 textsize 13
           }
           Fl_Button {} {
             label {Add root directory...}
@@ -224,14 +228,18 @@ class ConfigUI {open : {private MiscFuncs}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
+          Fl_Box {} {
+            label {Settings changes require a restart}
+            xywh {110 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
         }
         Fl_Group {} {
           label {Presets dirs} open
-          xywh {5 25 495 260} labelsize 12 hide
+          xywh {5 25 455 280} labelsize 12 hide
         } {
           Fl_Browser presetbrowse {
             callback {activatebutton_presetdir(o->value() != 0);}
-            xywh {15 35 485 200} type Hold labelsize 12 textsize 12
+            xywh {10 35 445 200} type Hold labelsize 12 textsize 12
           }
           Fl_Button {} {
             label {Add preset directory...}
@@ -271,10 +279,14 @@ class ConfigUI {open : {private MiscFuncs}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
+          Fl_Box {} {
+            label {Settings changes require a restart}
+            xywh {110 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
         }
         Fl_Group {} {
           label Jack open
-          xywh {5 25 460 260} labelsize 12 hide
+          xywh {5 25 455 280} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Jack Server}
@@ -284,10 +296,14 @@ class ConfigUI {open : {private MiscFuncs}
             tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
             code0 {o->insert(Runtime.jackServer.c_str());}
           }
+          Fl_Box {} {
+            label {Settings changes require a restart}
+            xywh {110 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
         }
         Fl_Group {} {
           label Alsa open
-          xywh {5 23 460 260} labelsize 12 hide
+          xywh {5 25 455 280} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Alsa Midi Device}
@@ -389,10 +405,14 @@ class ConfigUI {open : {private MiscFuncs}
                     default: o->set_checked(4); break;
                 }}
           }
+          Fl_Box {} {
+            label {Settings changes require a restart}
+            xywh {110 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
         }
         Fl_Group {} {
           label CCs open
-          tooltip {MIDI CC preferences} xywh {25 45 460 260} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12 hide
         } {
           Fl_Choice bankchange {
             label {Bank Change}
@@ -463,18 +483,14 @@ class ConfigUI {open : {private MiscFuncs}
       Fl_Button {} {
         label {Close Unsaved}
         callback {configwindow->do_callback();}
-        xywh {352 308 105 20} box THIN_UP_BOX labelsize 12
+        xywh {345 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save and Close}
         callback {savesettings();
 configChanged = false;
 configwindow->do_callback();}
-        xywh {238 308 105 20} box THIN_UP_BOX labelsize 12
-      }
-      Fl_Box {} {
-        label {Many settings changes require a restart} selected
-        xywh {104 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+        xywh {225 305 105 20} box THIN_UP_BOX labelsize 12
       }
     }
   }

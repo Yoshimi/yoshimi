@@ -2,6 +2,7 @@
     JackEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,6 +16,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Modified September 2014
 */
 
 #include <errno.h>
@@ -345,22 +348,23 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         }
     }
     getAudio();
+    int framesize = sizeof(float) * nframes;
     for (int port = 0; port < NUM_MIDI_PARTS; ++port)
     {
         if (synth->part[port]->Paudiodest & 2)
         {
-            memcpy(audio.portBuffs[port * 2], zynLeft[port], sizeof(float) * nframes);
-            memcpy(audio.portBuffs[port * 2 + 1], zynRight[port], sizeof(float) * nframes);
+            memcpy(audio.portBuffs[port * 2], zynLeft[port], framesize);
+            memcpy(audio.portBuffs[port * 2 + 1], zynRight[port], framesize);
         }
         else
         {
-            memset(audio.portBuffs[port * 2], 0, sizeof(float) * nframes);
-            memset(audio.portBuffs[port * 2 + 1], 0, sizeof(float) * nframes);
+            memset(audio.portBuffs[port * 2], 0, framesize);
+            memset(audio.portBuffs[port * 2 + 1], 0, framesize);
         }
     }
     //And mixed outputs
-    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], sizeof(float) * nframes);
-    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], sizeof(float) * nframes);
+    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
+    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
     return true;
 }
 

@@ -9,6 +9,11 @@ yoshimi-1.2.x
 - some more small UI and CL message refinements.
 - in settings added Enable/Disable MIDI program change - some seq's don't play nice :(
   default is to enable. Compatible with Zyn's 'ignore program change'.
+- settings layout tidied up.
+- incremental DSP improvement - we now only fill/copy buffers that have a destination!
+- bugfix - when a part's audio out was directed to part only, system effects were still
+  being generated and sent to main.
+- correction - audio to part *does* carry insertion effects if they are set.
 
 yoshimi-1.2.3
 - Some more minor bug fixes.

@@ -3,6 +3,7 @@ version 1.0300
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
+Copyright 2014, Will Godfrey   
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -16,6 +17,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+Modified September 2014
 } {in_source in_header
 } 
 
@@ -38,7 +41,7 @@ class ParametersUI {open
     Fl_Window Recent {
       label {Recent Parameters}
       callback {o->hide()} open
-      xywh {917 745 220 180} type Double labelfont 13 labelsize 12 align 0 hide
+      xywh {917 745 220 180} type Double labelfont 13 labelsize 12 align 0 visible
     } {
       Fl_Browser BrowseRecent {
         callback {if (o->value() > 0)
@@ -49,9 +52,11 @@ class ParametersUI {open
               {
                 case FL_LEFT_MOUSE:
                     {
+                    	CloseRecent->hide();
                         fle = Runtime.ParamsHistory.at(o->value() - 1).file;
                         guiMaster->do_load_master(false, fle.c_str());
                         guiMaster->setMasterLabel(Runtime.ParamsHistory.at(o->value() - 1).name);
+                        CloseRecent->show();
                         Recent->hide();
                     }
                     break;
@@ -59,16 +64,20 @@ class ParametersUI {open
                 default:
                     break;
               }
-          }} selected
+          }}
         xywh {0 0 220 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
         code0 {const int colwidths[] = { 150, 330, 0 };
           o->column_widths(colwidths);
           o->column_char('	');}
       }
+      Fl_Button Loading {
+        label Loading selected
+        xywh {83 159 57 20} box THIN_DOWN_BOX color 22 labelfont 1 labelsize 11
+      }
       Fl_Button CloseRecent {
         label Close
         callback {Recent->hide()}
-        xywh {88 159 46 20} labelfont 13 labelsize 12
+        xywh {83 159 57 20} labelfont 13 labelsize 12
       }
     }
   }
