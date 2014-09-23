@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
@@ -53,8 +53,8 @@ class SUBnoteharmonic {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window harmonic {open
-      xywh {558 534 90 310} type Double
-      class Fl_Group visible
+      xywh {558 534 90 310} type Double hide
+      class Fl_Group
     } {
       Fl_Slider mag {
         callback {int x=0;
@@ -75,7 +75,7 @@ pars->Phrelbw[n]=x;}
         tooltip {harmonic's bandwidth} xywh {0 156 10 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-pars->Phrelbw[n]);}
       }
-      Fl_Box {} {selected
+      Fl_Box {} {
         xywh {10 216 5 5} box FLAT_BOX color 39
         code0 {if (n+1==MAX_SUB_HARMONICS) o->hide();}
       }
@@ -123,12 +123,12 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
   } {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters} open
-      xywh {639 391 735 475} type Double visible
+      xywh {638 343 735 475} type Double hide
     } {
       Fl_Scroll {} {open
         xywh {5 140 434 325} type HORIZONTAL box THIN_UP_BOX
       } {
-        Fl_Pack harmonics {open
+        Fl_Pack harmonics {open selected
           xywh {10 145 425 325} type HORIZONTAL
           code0 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,15,o->h(),"");h[i]->init(pars,i);}}
         } {}
@@ -438,14 +438,14 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Group {} {
-        label OVERTONES
+        label OVERTONES open
         xywh {442 145 288 70} box UP_FRAME labeltype EMBOSSED_LABEL labelfont 1 align 17
       } {
         Fl_Choice spreadtype {
           label {Overtones  Position}
           callback {pars->POvertoneSpread.type = (int)o->value();
 pars->updateFrequencyMultipliers();} open
-          xywh {455 171 80 20} down_box BORDER_BOX labelsize 10 align 6 textsize 10
+          xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
           code0 {o->value(pars->POvertoneSpread.type);}
         } {
           MenuItem {} {
@@ -485,7 +485,7 @@ pars->updateFrequencyMultipliers();} open
           label Par1
           callback {pars->POvertoneSpread.par1 = o->value();
 pars->updateFrequencyMultipliers();}
-          xywh {561 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
+          xywh {572 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           class WidgetPDial
         }
@@ -493,7 +493,7 @@ pars->updateFrequencyMultipliers();}
           label Par2
           callback {pars->POvertoneSpread.par2 = o->value();
 pars->updateFrequencyMultipliers();}
-          xywh {619 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
+          xywh {626 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
           class WidgetPDial
         }
@@ -501,7 +501,7 @@ pars->updateFrequencyMultipliers();}
           label ForceH
           callback {pars->POvertoneSpread.par3 = o->value();
 pars->updateFrequencyMultipliers();}
-          xywh {677 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
+          xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           class WidgetPDial
         }

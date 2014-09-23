@@ -338,13 +338,9 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
         bank.msb = (unsigned char)par + 1; //Bank indexes start from 1       
         if(bank.msb <= MAX_NUM_BANKS) {
             if (bank.loadbank(bank.banks[bank.msb].dir))
-            {
                 Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
-            }
             else
-            {
                 Runtime.Log("SynthEngine setBank: No bank " + asString(par));
-            }
         }
         else
             Runtime.Log("SynthEngine setBank: Value is out of range!");
@@ -379,20 +375,17 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
         for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             if(chan == part[npart]->Prcvchn)
             {
-                if (part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
-                {
-                    partonoff(npart, 1);
-                }
                 bank.loadfromslot(pgm, part[npart]); //Programs indexes start from 0
+                if (part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
+                    partonoff(npart, 1);
             }
         Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
         //update UI
         if (Runtime.showGui)
         {
             guiMaster->updatepanel();
-            if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part) {
+            if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                 guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
-            }
         }
     }
 }
@@ -409,12 +402,12 @@ void SynthEngine::partonoff(int npart, int what)
     }
     else
     {   // disabled part
-        VUpeak.values.parts[npart] = -0.5;
         part[npart]->Penabled = 0;
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
+        VUpeak.values.parts[npart] = -0.5;
     }
 }
 
@@ -423,7 +416,7 @@ void SynthEngine::partonoff(int npart, int what)
 void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS])
 {
     int npart;
-    for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
+    for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
     {
         memset(outl[npart], 0, bufferbytes);
         memset(outr[npart], 0, bufferbytes);
@@ -436,9 +429,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     // Compute part samples and store them ->partoutl,partoutr
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
-        {
             part[npart]->ComputePartSmps();
-        }
 
     // Insertion effects
     int nefx;
@@ -448,9 +439,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         {
             int efxpart = Pinsparts[nefx];
             if (part[efxpart]->Penabled)
-            {
                 insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
-            }
         }
     }
 
@@ -559,9 +548,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         if (Pinsparts[nefx] == -2)
-        {
             insefx[nefx]->out(outl[NUM_MIDI_PARTS], outr[NUM_MIDI_PARTS]);
-        }
     }
 
     LFOParams::time++; // update the LFO's time
@@ -572,7 +559,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     {
         if (shutup) // fade-out
             fade = (float) (buffersize - idx) / (float) buffersize;
-        for (npart = 0; npart <= NUM_MIDI_PARTS; ++npart) // include mains
+        for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
         {
             outl[npart][idx] *= volume; // apply Master Volume
             outr[npart][idx] *= volume;
@@ -596,11 +583,14 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
     {
-        if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL) // Peak computation (for vumeters)
+        // Peak computation (for vumeters)
+        if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL)
             VUpeak.values.vuOutPeakL = absval;
         if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
             VUpeak.values.vuOutPeakR = absval;
-        VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx]; // RMS Peak
+
+        // RMS Peak
+        VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx];
         VUpeak.values.vuRmsPeakR += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
 
         // check for clips
@@ -608,7 +598,6 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
             VUpeak.values.vuClipped |= 1;
         if (fabsf(outr[NUM_MIDI_PARTS][idx]) > 1.0f)
             VUpeak.values.vuClipped |= 2;
-
     }
 
     if (shutup)
@@ -636,9 +625,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     }
 
     if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
-    {
         jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
-    }
 }
 
 

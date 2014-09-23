@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -118,8 +118,7 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         }
         if (*nselected == nslot)
             color(6);
-        label(bank->getnamenumbered(nslot).c_str());} {selected
-    }
+        label(bank->getnamenumbered(nslot).c_str());} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
@@ -135,7 +134,7 @@ class BankUI {open : {public BankProcess_}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {614 474 785 575} type Double hide
+      xywh {614 427 785 575} type Double hide
       code0 {o->label(bank->bankfiletitle.c_str());}
       code1 {if (!bank->bankfiletitle.size())
             o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
@@ -261,8 +260,8 @@ class BankUI {open : {public BankProcess_}
                          bank->banks[n].dir.c_str());
                 for (int i = 0; i < BANK_SIZE; ++i)
                     bs[i]->refresh();
-                refreshmainwindow();} open
-        xywh {5 8 220 20} down_box BORDER_BOX labelfont 1 labelsize 12 align 0 textsize 12
+                refreshmainwindow();} open selected
+        xywh {5 8 220 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
         label {Refresh bank list}

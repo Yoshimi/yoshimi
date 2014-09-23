@@ -1,19 +1,24 @@
 
-yoshimi-1.2.x
+yoshimi-1.2.4-rc
 - ALSA MIDI can now auto-connect.
-- changed x.x.x.notes to Changelog as requested by packagers.
+- Changed x.x.x.notes to Changelog as requested by packagers.
 - Jack MIDI auto-connects too!
 - VU meters disengaged from synth via ring buffer.
 - Failing to load parameters or instruments at startup is no longer fatal.
 - Yoshimi accepts un-numbered instruments in banks again - under protest!
-- some more small UI and CL message refinements.
-- in settings added Enable/Disable MIDI program change - some seq's don't play nice :(
+- Some more small UI and CL message refinements.
+- In settings added Enable/Disable MIDI program change - some seq's don't play nice :(
   default is to enable. Compatible with Zyn's 'ignore program change'.
-- settings layout tidied up.
-- incremental DSP improvement - we now only fill/copy buffers that have a destination!
-- bugfix - when a part's audio out was directed to part only, system effects were still
+- Settings layout tidied up.
+- Incremental DSP improvement - we now only fill/copy buffers that have a destination!
+- Bugfix - when a part's audio out was directed to part only, system effects were still
   being generated and sent to main.
-- correction - audio to part *does* carry insertion effects if they are set.
+- Correction - audio to part *does* carry insertion effects if they are set.
+- VU calculations now completely separated from sound generation and outside the mutex lock.
+- Changed envelope cut-off to -60dB (was -40).
+- Another addition to Will_Godfrey_Companion bank :)
+- Bugfix - missing 'include' in main.cpp stopped compilation - but not in all environments!
+- Changed unison size highlighting. With no code change, it stopped working for some reason!
 
 yoshimi-1.2.3
 - Some more minor bug fixes.

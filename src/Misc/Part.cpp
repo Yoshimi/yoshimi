@@ -144,6 +144,7 @@ void Part::defaultsinstrument(void)
 
     Pkitmode = 0;
     Pdrummode = 0;
+    Pfrand = 0;
 
     for (int n = 0; n < NUM_KIT_ITEMS; ++n)
     {

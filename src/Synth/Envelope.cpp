@@ -26,7 +26,7 @@
 #include "Params/EnvelopeParams.h"
 #include "Synth/Envelope.h"
 
-#define MIN_ENVELOPE_DB -40
+#define MIN_ENVELOPE_DB -60
 
 Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
 {

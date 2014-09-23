@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
@@ -621,7 +621,8 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
           } {}
           Fl_Check_Button {} {
             label Unison
-            callback {if (o->value() == 0)
+            callback {int colr = FL_BLACK;
+if (o->value() == 0)
 {
   pars->VoicePar[nvoice].Unison_size = lrint(o->value());
   unisonsize->value(2);
@@ -640,33 +641,26 @@ else
       break;
     if (pars->ADnote_unison_sizes[i] == tmp)
     {
-        unisonsize->color(239);
-       break;
+      colr = FL_RED;
+      break;
     }
   }
-}}
+}
+unisonsize->labelcolor(colr);}
             tooltip {Enable/Disable} xywh {31 543 19 15} box FLAT_BOX down_box DOWN_BOX labelfont 1 labelsize 12 align 1
             code0 {int tmp = (pars->VoicePar[nvoice].Unison_size);}
             code1 {o->value(tmp > 1);}
           }
           Fl_Group unisongroup {open
-            xywh {80 524 445 45} box PLASTIC_UP_BOX color 231 deactivate
+            xywh {80 524 445 48} box PLASTIC_UP_BOX color 231 deactivate
             code0 {int tmp = pars->VoicePar[nvoice].Unison_size; if (tmp > 1) o->activate();}
-            code1 {int i = -1; while (true){ i++; if(pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->color(239); break;}}}
+            code1 {unisonsize->labelcolor(FL_BLACK);int i = -1; while (true){ i++; if(pars->ADnote_unison_sizes[i] == 0) break; if (pars->ADnote_unison_sizes[i] == tmp){ unisonsize->labelcolor(FL_RED); break;}}}
           } {
-            Fl_Dial {} {
-              label Stereo
-              callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrint(o->value());}
-              tooltip {Stereo Spread} xywh {349 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-              code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
-              class WidgetPDial
-            }
             Fl_Spinner unisonsize {
               label Size
-              callback {pars->VoicePar[nvoice].Unison_size = lrint(o->value());
-int tmp = pars->VoicePar[nvoice].Unison_size;
-
-o->color(FL_WHITE);
+              callback {int tmp = lrint(o->value());
+pars->VoicePar[nvoice].Unison_size = tmp;
+int colr = FL_BLACK;
 int i = -1;
 while(true)
 {
@@ -675,16 +669,23 @@ while(true)
     break;
   if (pars->ADnote_unison_sizes[i] == tmp)
   {
-     o->color(239);
-     break;
+   colr = FL_RED;
+    break;
   }
 }
-
-o->redraw();}
-              tooltip {Number of unison sub-voices} xywh {90 541 40 20} color 7 labelsize 10 align 1 minimum 2 maximum 50 value 2
+o->labelcolor(colr);
+unisongroup->redraw();} selected
+              tooltip {Number of unison sub-voices} xywh {90 544 40 16} box THIN_UP_BOX color 7 labelfont 1 labelsize 11 align 5 minimum 2 maximum 50 value 2 textsize 12
               code0 {int tmp = pars->VoicePar[nvoice].Unison_size;}
               code1 {if (tmp < 2) tmp = 2;}
               code2 {o->value(tmp);}
+            }
+            Fl_Dial {} {
+              label Stereo
+              callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrint(o->value());}
+              tooltip {Stereo Spread} xywh {349 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
+              class WidgetPDial
             }
             Fl_Dial {} {
               label {Vib.}
@@ -695,7 +696,7 @@ o->redraw();}
             }
             Fl_Choice {} {
               label Invert
-              callback {pars->VoicePar[nvoice].Unison_invert_phase = lrint(o->value());} open selected
+              callback {pars->VoicePar[nvoice].Unison_invert_phase = lrint(o->value());} open
               tooltip {Phase Invert} xywh {451 545 67 15} down_box BORDER_BOX labelsize 11 align 1 textfont 1 textsize 10
               code0 {//
                   o->add("None");
