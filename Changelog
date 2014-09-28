@@ -1,5 +1,8 @@
+If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapsot'. This will give you a tarball of the current 'master'.
 
-yoshimi-1.2.4-rc
+
+yoshimi-1.2.4-rc2
+
 - ALSA MIDI can now auto-connect.
 - Changed x.x.x.notes to Changelog as requested by packagers.
 - Jack MIDI auto-connects too!
@@ -19,8 +22,11 @@ yoshimi-1.2.4-rc
 - Another addition to Will_Godfrey_Companion bank :)
 - Bugfix - missing 'include' in main.cpp stopped compilation - but not in all environments!
 - Changed unison size highlighting. With no code change, it stopped working for some reason!
+- Improved VU displays.
+
 
 yoshimi-1.2.3
+
 - Some more minor bug fixes.
 - INSTALL file now refers to V1.2.2
 - Enabled saving audio destination in parameters file

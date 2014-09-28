@@ -575,11 +575,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     actionLock(unlock);
     
     // Clip calculation for mixed outputs   
-    VUpeak.values.vuOutPeakL = 1e-12f;
-    VUpeak.values.vuOutPeakR = 1e-12f;
     VUpeak.values.vuRmsPeakL = 1e-12f;
-    VUpeak.values.vuRmsPeakR = 1e-12f;
-    VUpeak.values.vuClipped = 0;
+    VUpeak.values.vuRmsPeakR = 1e-12f;       
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
     {
@@ -604,7 +601,6 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         ShutUp();
 
     // Part Peak computation (for Part vu meters/fake part vu meters)
-        
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {       
         if (part[npart]->Penabled)
@@ -625,7 +621,12 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     }
 
     if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
+    {
         jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
+        VUpeak.values.vuOutPeakL = 1e-12f;
+        VUpeak.values.vuOutPeakR = 1e-12f;
+        VUpeak.values.vuClipped = 0;
+    }
 }
 
 

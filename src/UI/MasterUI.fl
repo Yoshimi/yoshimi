@@ -430,15 +430,11 @@ class MasterUI {open : {private MiscFuncs}
           label {Stop!}
           callback {//
               virkeyboard->relaseallkeys();
-              /*
-              guiVUmeter->init(-1);
-              seems to compile OK but segfaults
-              don't know why so disabled
-              */
+              vumeter->init(-1);
               synth->actionLock(lockmute);
               synth->shutup = 1;
-              synth->actionLock(unlock);} selected
-          tooltip {Cease all sound immediately!} xywh {11 46 40 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
+              synth->actionLock(unlock);}
+          tooltip {Cease all sound immediately!} xywh {11 46 50 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -450,12 +446,12 @@ class MasterUI {open : {private MiscFuncs}
         Fl_Button {} {
           label virKbd
           callback {virkeyboard->Show();}
-          tooltip {Virtual Keyboard} xywh {145 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {148 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button {} {
           label Panel
           callback {updatepanel(); panelwindow->show();}
-          tooltip {Panel Window} xywh {73 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
       Fl_Tabs {} {
@@ -680,7 +676,7 @@ class MasterUI {open : {private MiscFuncs}
         xywh {3 158 384 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
-        Fl_Group inseffectui {open
+        Fl_Group inseffectui {open selected
           xywh {3 158 384 95} color 52
           code0 {o->init(synth->insefx[ninseff]);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -700,7 +696,7 @@ class MasterUI {open : {private MiscFuncs}
       Fl_Group {} {open
         xywh {3 427 384 33} box ENGRAVED_BOX labelsize 12
       } {
-        Fl_Box {} {
+        Fl_Box vumeter {
           label {VU-Meter}
           xywh {3 427 384 33} box FLAT_BOX color 48 selection_color 75
           code0 {o->init(-1);}
