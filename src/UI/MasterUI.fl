@@ -195,7 +195,7 @@ class MasterUI {open : {private MiscFuncs}
           {
                   Runtime.saveConfig();
                   Runtime.runSynth = false;
-          }} open
+          }}
       xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
@@ -676,7 +676,7 @@ class MasterUI {open : {private MiscFuncs}
         xywh {3 158 384 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
-        Fl_Group inseffectui {open selected
+        Fl_Group inseffectui {open
           xywh {3 158 384 95} color 52
           code0 {o->init(synth->insefx[ninseff]);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -722,32 +722,34 @@ class MasterUI {open : {private MiscFuncs}
       }
     }
     Fl_Window aboutwindow {
-      label {About Yoshimi}
-      xywh {1173 908 320 270} type Double color 54 labelfont 13 labelsize 13 when 0 hide
+      label {About Yoshimi} open
+      xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
         label {Yoshimi
 meets
 ZynAddSubFX}
-        xywh {10 17 300 70} labeltype EMBOSSED_LABEL labelfont 13 labelsize 18 labelcolor 216 align 16 when 0
+        xywh {10 17 345 70} labeltype EMBOSSED_LABEL labelfont 13 labelsize 18 labelcolor 216 align 16 when 0
       }
       Fl_Box {} {
         label {copyright notice}
-        xywh {25 100 275 50} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
-        code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others, "
-                               "Copyright 2009-2011, Alan Calvert").c_str());}
+        xywh {25 100 315 70} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
+        code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
+                               "\\nCopyright 2009-2011, Alan Calvert"
+                               "\\nCopyright 2012-2013, Various"
+                               "\\nCopyright 2014, Will Godfrey and others").c_str());}
       }
       Fl_Box {} {
         label {copy terms}
-        xywh {10 160 300 53} labelsize 11 align 144 when 0
+        xywh {10 182 340 53} labelsize 11 align 144 when 0
         code0 {//
             o->copy_label(string("This is free software, and comes with ABSOLUTELY NO WARRANTY; "
                                  "you may redistribute it and/or modify it under the terms of "
                                  "GPL version 2, or (at your option) any later version.\\n\\n").c_str());}
       }
       Fl_Box {} {
-        label { version}
-        xywh {45 216 225 17} labelsize 11 labelcolor 145
+        label { version} selected
+        xywh {55 254 240 20} labelfont 1 labelsize 12 labelcolor 145
         code0 {//
             o->copy_label((string("Yoshimi version ")
                            + string( YOSHIMI_VERSION )).c_str());}
@@ -755,7 +757,7 @@ ZynAddSubFX}
       Fl_Button {} {
         label Close
         callback {aboutwindow->hide();}
-        xywh {267 239 43 22} box THIN_UP_BOX labelsize 11
+        xywh {305 253 43 22} box THIN_UP_BOX labelsize 11
       }
     }
     Fl_Window syseffsendwindow {
@@ -785,7 +787,7 @@ ZynAddSubFX}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Panel} open
+      label {Yoshimi Panel}
       xywh {4 20 635 635} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {open

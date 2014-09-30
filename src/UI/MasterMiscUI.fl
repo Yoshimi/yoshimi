@@ -76,6 +76,12 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
+decl {\#define MIN_DB -48.0} {public local
+} 
+
+decl {\#define NO_DB -68.0} {public local
+} 
+
 class VUMeter {open : {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
@@ -89,22 +95,25 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
         npart = part_;
         oldpeakl = 0;
         oldpeakr = 0;
-        oldrmsdbl = 0;
-        oldrmsdbr = 0;
-        maxdbl = -90.0;
-        maxdbr = -90.0;
+        oldrmsdbl = 0.0;
+        oldrmsdbr = 0.0;
+        maxdbl = NO_DB;
+        maxdbr = NO_DB;
         clipped = 0;
-        synth->VUdata.values.vuOutPeakL = 0;
-        synth->VUdata.values.vuOutPeakR = 0;
-        synth->VUdata.values.vuRmsPeakL = 0;
-        synth->VUdata.values.vuRmsPeakR = 0;
+        synth->VUdata.values.vuOutPeakL = 0.0;
+        synth->VUdata.values.vuOutPeakR = 0.0;
+        synth->VUdata.values.vuRmsPeakL = 0.0;
+        synth->VUdata.values.vuRmsPeakR = 0.0;
         for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-        	oldpartpeak[i] = 0;} {}
+        {
+            oldpartpeak[i] = 0;
+            partclip[i] = false;
+            synth->VUdata.values.parts[i] = 0.0;
+        }} {}
   }
   Function {draw_master()} {open
   } {
-    code {\#define MIN_DB (-48)
-        int ox = x();
+    code {int ox = x();
         int oy = y();
         int lx = w();
         int ly = h();
@@ -206,7 +215,7 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
         // show maxdB
         static char tmpstr[8];
         const char *dbtag = "dB";
-        if ((maxdbl > MIN_DB - 20))
+        if ((maxdbl > NO_DB))
         {
             fl_font(FL_HELVETICA | FL_BOLD, 9);
             fl_color(255, 255, 255);
@@ -214,20 +223,18 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
                     lx - VULENX - 4, VULENY - 2, FL_ALIGN_RIGHT, NULL, 0);
         }
-        if ((maxdbr > MIN_DB - 20))
+        if ((maxdbr > NO_DB))
         {
             fl_font(FL_HELVETICA | FL_BOLD, 9);
             fl_color(255, 255, 255);
             snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
             fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
-        }} {selected
-    }
+        }} {}
   }
   Function {draw_part()} {open
   } {
-    code {\#define MIN_DB (-48)
-        int ox = x()+2;
+    code {int ox = x()+2;
         int oy = y()+2;
         int lx = w()-4;
         int ly = h()-4;
@@ -239,9 +246,14 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
             return;
         }
+        
+	if (Vpeak > 1.0)
+	    partclip[npart] = true;
+	else if (oldpartpeak[npart] < 0.01)
+	    partclip[npart] = false;
+ 
         // draw the vu lines
         float db = rap2dB(Vpeak);
-
         db = (MIN_DB - db) / MIN_DB;
         db = (db > 1.0) ? 1.0 : db;
         db = db * ly - 2;
@@ -264,7 +276,10 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
                 fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
             if (i % 10 == 0)
                 fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
-        }} {}
+        }
+        if (partclip[npart])
+            fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {selected
+    }
   }
   Function {draw()} {open
   } {
@@ -293,9 +308,11 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             case FL_PUSH:
                 if (npart < 0)
                 {
-               	    maxdbl = -90.0;
-               	    maxdbr = -90.0;
+               	    maxdbl = NO_DB;
+               	    maxdbr = NO_DB;
                	    clipped = 0;
+               	    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+               	        partclip[i] = false;
                 }
                 break;
         }
@@ -311,13 +328,15 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   }
   decl {float maxdbr;} {private local
   }
+  decl {int oldpeakl;} {private local
+  }
+  decl {int oldpeakr;} {private local
+  }
   decl {int clipped;} {private local
   }
   decl {int oldpartpeak[NUM_MIDI_CHANNELS];} {private local
   }
-  decl {int oldpeakl;} {private local
-  }
-  decl {int oldpeakr;} {private local
+  decl {bool partclip[NUM_MIDI_CHANNELS];} {private local
   }
 } 
 

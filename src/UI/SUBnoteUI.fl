@@ -26,7 +26,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified March 2011
+This file is derivative of ZynAddSubFX original code, modified September 2014
 } {in_source in_header
 } 
 
@@ -128,7 +128,7 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
       Fl_Scroll {} {open
         xywh {5 140 434 325} type HORIZONTAL box THIN_UP_BOX
       } {
-        Fl_Pack harmonics {open selected
+        Fl_Pack harmonics {open
           xywh {10 145 425 325} type HORIZONTAL
           code0 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,15,o->h(),"");h[i]->init(pars,i);}}
         } {}
@@ -438,8 +438,8 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Group {} {
-        label OVERTONES open
-        xywh {442 145 288 70} box UP_FRAME labeltype EMBOSSED_LABEL labelfont 1 align 17
+        label OVERTONES open selected
+        xywh {442 145 288 70} box UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Choice spreadtype {
           label {Overtones  Position}
@@ -571,7 +571,8 @@ pars->updateFrequencyMultipliers();}
         filterui->refresh();
         filterenv->refresh();} {}
   }
-  Function {SUBnoteUI(SUBnoteParameters *parameters)} {} {
+  Function {SUBnoteUI(SUBnoteParameters *parameters)} {open
+  } {
     code {pars = parameters; make_window();} {}
   }
   Function {~SUBnoteUI()} {} {

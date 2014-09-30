@@ -47,22 +47,19 @@ Next is to compile (build) the application:
 When compilation is completed successfully, install it with:
 
    make install
+   
+Yoshimi will in fact run anywhere in userspace, which can be convenient as an alternative to installing it - especially when comparing different built versions. In this case banks and presets will remain in the yoshimi directory.
 
 
 ---- Build and command line options ----
 
-Unlike ZynAddSubFX, Yoshimi builds with both Jack and Alsa audio and midi
-options. The default audio and midi options to be used are nominated in the
-ccmake configuration stage. Other options can be nominated at runtime via
-command line parameters.
+Yoshimi builds with both Jack and Alsa audio and midi options. The default audio and midi options to be used are nominated in the
+ccmake configuration stage. Other options can be nominated at runtime via command line parameters.
 
 
 ---- Instrument banks ----
 
-Yoshimi now installs its own copy of the instrument banks (installed by default
-in usr/local/share/yoshimi/banks/). On startup, it also looks to the standard
-zynaddsubfx bank directories, and deals politely with any duplications that may
-exist there. You can tune your choice of bank directories via Settings.
+Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/). On startup, it also looks to the standard zynaddsubfx bank directories, and deals politely with any duplications that may exist there. You can tune your choice of bank directories via Settings.
 
 
 ---- Help ----

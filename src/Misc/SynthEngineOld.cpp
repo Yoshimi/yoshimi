@@ -154,7 +154,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -0.5;
     }
 
     // Insertion Effects init
@@ -305,8 +305,8 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     part[npart]->NoteOn(note, velocity, keyshift);
                     actionLock(unlock);
                 }
-                else if (VUpeak.values.parts[npart] < velocity)
-                    VUpeak.values.parts[npart] = -(1 + velocity); // ensure fake is always negative
+                else
+                    VUpeak.values.parts[npart] = -(0.5+velocity); // ensure fake is always negative
             }
         }
 }
@@ -407,7 +407,7 @@ void SynthEngine::partonoff(int npart, int what)
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -0.5;
     }
 }
 
@@ -553,16 +553,18 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
 
     LFOParams::time++; // update the LFO's time
 
-    // Master volume, and all output fade
+    // All output master volume and fade
     float fade;
     for (int idx = 0; idx < buffersize; ++idx)
     {
-        outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
-        outr[NUM_MIDI_PARTS][idx] *= volume;
         if (shutup) // fade-out
-        {
             fade = (float) (buffersize - idx) / (float) buffersize;
-            for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
+        for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
+        {
+            outl[npart][idx] *= volume; // apply Master Volume
+            outr[npart][idx] *= volume;
+
+            if (shutup) // fade-out
             { 
                 outl[npart][idx] *= fade;
                 outr[npart][idx] *= fade;
@@ -603,6 +605,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     {       
         if (part[npart]->Penabled)
         {
+            VUpeak.values.parts[npart] = 1.0e-9;
             float *outl = part[npart]->partoutl;
             float *outr = part[npart]->partoutr;
             for (int i = 0; i < buffersize; ++i)
@@ -611,27 +614,18 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
                 if (tmp > VUpeak.values.parts[npart])
                     VUpeak.values.parts[npart] = tmp;
             }
+            VUpeak.values.parts[npart] *= volume; // how is part peak related to master volume??
         }
+        else if (VUpeak.values.parts[npart] < -1) // fake peak is a negative value
+            VUpeak.values.parts[npart]+= 0.5f;
     }
 
     if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
     {
-/*        for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        {
-            if (part[npart]->Penabled)
-                VUpeak.values.parts[npart] *= volume; // how is part peak related to master volume??
-        }*/
         jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
         VUpeak.values.vuOutPeakL = 1e-12f;
         VUpeak.values.vuOutPeakR = 1e-12f;
         VUpeak.values.vuClipped = 0;
-        for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        {
-            if (part[npart]->Penabled)
-                VUpeak.values.parts[npart] = 1.0e-9;
-            else if (VUpeak.values.parts[npart] < -3) // fake peak is a negative value
-                VUpeak.values.parts[npart]+= 2;
-        }
     }
 }
 
@@ -689,7 +683,7 @@ void SynthEngine::ShutUp(void)
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -0.5;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();
