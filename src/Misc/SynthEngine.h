@@ -125,7 +125,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         // peaks for VU-meters        
         union VUtransfer{
             struct{
-                int vuClipped;
                 float vuOutPeakL;
                 float vuOutPeakR;
                 float vuRmsPeakL;

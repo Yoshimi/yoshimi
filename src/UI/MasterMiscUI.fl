@@ -91,42 +91,44 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   Function {init(int part_)} {open
   } {
     code {// the "part_" parameters sets the part (if it is >=0), else it sets the master
-        label(NULL);
-        npart = part_;
-        oldpeakl = 0;
-        oldpeakr = 0;
-        oldrmsdbl = 0.0;
-        oldrmsdbr = 0.0;
-        maxdbl = NO_DB;
-        maxdbr = NO_DB;
-        clipped = 0;
-        synth->VUdata.values.vuOutPeakL = 0.0;
-        synth->VUdata.values.vuOutPeakR = 0.0;
-        synth->VUdata.values.vuRmsPeakL = 0.0;
-        synth->VUdata.values.vuRmsPeakR = 0.0;
-        for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-        {
-            oldpartpeak[i] = 0;
-            partclip[i] = false;
-            synth->VUdata.values.parts[i] = 0.0;
-        }} {}
+    label(NULL);
+    npart = part_;
+    oldpeakl = 0;
+    oldpeakr = 0;
+    oldrmsdbl = 0.0;
+    oldrmsdbr = 0.0;
+    maxdbl = NO_DB;
+    maxdbr = NO_DB;
+    clipped = 0;
+    synth->VUdata.values.vuOutPeakL = 0.0;
+    synth->VUdata.values.vuOutPeakR = 0.0;
+    synth->VUdata.values.vuRmsPeakL = 0.0;
+    synth->VUdata.values.vuRmsPeakR = 0.0;
+    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+    {
+        panelpart.oldpeak[i] = 0;
+        panelpart.clip[i] = false;
+        synth->VUdata.values.parts[i] = 0.0;
+    }} {}
   }
   Function {draw_master()} {open
   } {
     code {int ox = x();
-        int oy = y();
-        int lx = w();
-        int ly = h();
-        float dbl = rap2dB(synth->VUdata.values.vuOutPeakL);
-        float dbr = rap2dB(synth->VUdata.values.vuOutPeakR);
-        float rmsdbl = rap2dB(synth->VUdata.values.vuRmsPeakL);
-        float rmsdbr = rap2dB( synth->VUdata.values.vuRmsPeakR);
-        clipped |= synth->VUdata.values.vuClipped;
+    int oy = y();
+    int lx = w();
+    int ly = h();
+    float dbl = rap2dB(synth->VUdata.values.vuOutPeakL);
+    float dbr = rap2dB(synth->VUdata.values.vuOutPeakR);
+    float rmsdbl = rap2dB(synth->VUdata.values.vuRmsPeakL);
+    float rmsdbr = rap2dB( synth->VUdata.values.vuRmsPeakR);
+//    clipped |= synth->VUdata.values.vuClipped;
 
-        if (dbl > maxdbl)
-        	maxdbl = dbl;
+    clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
+
+    if (dbl > maxdbl)
+        maxdbl = dbl;
         if (dbr > maxdbr)
-        	maxdbr = dbr;
+          maxdbr = dbr;
        
         dbl = (MIN_DB - dbl) / MIN_DB;
         if (dbl < 0.0)
@@ -230,61 +232,61 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
             fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
-        }} {}
+        }} {selected
+    }
   }
   Function {draw_part()} {open
   } {
     code {int ox = x()+2;
-        int oy = y()+2;
-        int lx = w()-4;
-        int ly = h()-4;
-        float Vpeak = synth->VUdata.values.parts[npart];
-        if (Vpeak < 0) // its a fake one
-        {
-            fl_rectf(ox, oy, lx, ly, 140, 140, 140);
-            int fakedb = (Vpeak / 127.0 * ly) - 2;
-            fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
-            return;
-        }
-        
-	if (Vpeak > 1.0)
-	    partclip[npart] = true;
-	else if (oldpartpeak[npart] < 0.01)
-	    partclip[npart] = false;
- 
-        // draw the vu lines
-        float db = rap2dB(Vpeak);
-        db = (MIN_DB - db) / MIN_DB;
-        db = (db > 1.0) ? 1.0 : db;
-        db = db * ly - 2;
-        if (db >= oldpartpeak[npart])
-            oldpartpeak[npart] = (int) db;
-        else if (oldpartpeak[npart] >= 4)
-            oldpartpeak[npart] -= 4;
-        else
-            oldpartpeak[npart] = 0;
-        
-        fl_rectf(ox, oy, lx, ly, 0, 0, 0);
-        fl_rectf(ox, oy + ly - oldpartpeak[npart], lx, oldpartpeak[npart], 0, 200, 255);
-
-        // draw the scales
-        float tmp = ly * 1.0 / MIN_DB;
-        for (int i = 1; i < 1 - MIN_DB; ++i)
-        {
-            int ty = ly + (int)(tmp * i);
-            if ( i % 5 == 0)
-                fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
-            if (i % 10 == 0)
-                fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
-        }
-        if (partclip[npart])
-            fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {selected
+    int oy = y()+2;
+    int lx = w()-4;
+    int ly = h()-4;
+    float Vpeak = synth->VUdata.values.parts[npart];
+    if (Vpeak < 0) // its a fake one
+    {
+        fl_rectf(ox, oy, lx, ly, 140, 140, 140);
+        int fakedb = Vpeak / 127.0 * (ly - 16); // fiddle to make it the same height as normal
+        fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
+        return;
     }
+        
+    if (Vpeak > 1.0)
+        panelpart.clip[npart] = true;
+    else if (panelpart.oldpeak[npart] < 0.01)
+        panelpart.clip[npart] = false;
+ 
+    // draw the vu lines
+    float db = rap2dB(Vpeak);
+    db = (MIN_DB - db) / MIN_DB;
+    db = (db > 1.0) ? 1.0 : db;
+    db = db * ly - 2;
+    if (db >= panelpart.oldpeak[npart])
+        panelpart.oldpeak[npart] = (int) db;
+    else if (panelpart.oldpeak[npart] >= 4)
+        panelpart.oldpeak[npart] -= 4;
+    else
+        panelpart.oldpeak[npart] = 0;
+        
+    fl_rectf(ox, oy, lx, ly, 0, 0, 0);
+    fl_rectf(ox, oy + ly - panelpart.oldpeak[npart], lx, panelpart.oldpeak[npart], 0, 200, 255);
+
+    // draw the scales
+    float tmp = ly * 1.0 / MIN_DB;
+    for (int i = 1; i < 1 - MIN_DB; ++i)
+    {
+        int ty = ly + (int)(tmp * i);
+        if ( i % 5 == 0)
+            fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
+        if (i % 10 == 0)
+            fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
+    }
+    if (panelpart.clip[npart])
+        fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {}
   }
   Function {draw()} {open
   } {
     code {if (npart>=0) draw_part();
-   else draw_master();} {}
+    else draw_master();} {}
   }
   Function {tickdraw(VUMeter *o)} {open return_type {static void}
   } {
@@ -293,28 +295,28 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   Function {tick(void *v)} {open return_type {static void}
   } {
     code {tickdraw((VUMeter *) v);
-	synth->fetchMeterData(&synth->VUdata);
-        Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
+    synth->fetchMeterData(&synth->VUdata);
+    Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
   }
   Function {handle(int event)} {open return_type int
   } {
     code {switch(event){
-            case FL_SHOW:
-                tick(this);
-                break;
-            case FL_HIDE:
-                Fl::remove_timeout(tick, this);
-                break;
-            case FL_PUSH:
-                if (npart < 0)
-                {
-               	    maxdbl = NO_DB;
-               	    maxdbr = NO_DB;
-               	    clipped = 0;
-               	    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-               	        partclip[i] = false;
-                }
-                break;
+        case FL_SHOW:
+            tick(this);
+            break;
+        case FL_HIDE:
+            Fl::remove_timeout(tick, this);
+            break;
+        case FL_PUSH:
+            if (npart < 0)
+            {
+                maxdbl = NO_DB;
+                maxdbr = NO_DB;
+                clipped = 0;
+                for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+                    panelpart.clip[i] = false;
+            }
+            break;
         }
         return 1;} {}
   }
@@ -334,9 +336,10 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   }
   decl {int clipped;} {private local
   }
-  decl {int oldpartpeak[NUM_MIDI_CHANNELS];} {private local
-  }
-  decl {bool partclip[NUM_MIDI_CHANNELS];} {private local
+  decl {struct{
+        int oldpeak[NUM_MIDI_PARTS];
+        bool clip[NUM_MIDI_CHANNELS];
+        } panelpart;} {private local
   }
 } 
 

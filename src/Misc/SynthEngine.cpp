@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified September 2014
+    This file is derivative of original ZynAddSubFX code, modified October 2014
 */
 
 #include<stdio.h>
@@ -154,7 +154,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             Runtime.Log("Failed to allocate new Part");
             goto bail_out;
         }
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -0.2;
     }
 
     // Insertion Effects init
@@ -306,7 +306,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     actionLock(unlock);
                 }
                 else if (VUpeak.values.parts[npart] < velocity)
-                    VUpeak.values.parts[npart] = -(1 + velocity); // ensure fake is always negative
+                    VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
             }
         }
 }
@@ -335,7 +335,7 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
 	  128 banks is enough for anybody :-)
         this is configurable to suit different hardware synths
         */
-        bank.msb = (unsigned char)par + 1; //Bank indexes start from 1       
+        bank.msb = (unsigned char)par + 1; // Bank indexes start from 1       
         if(bank.msb <= MAX_NUM_BANKS) {
             if (bank.loadbank(bank.banks[bank.msb].dir))
                 Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
@@ -375,12 +375,12 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
         for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             if(chan == part[npart]->Prcvchn)
             {
-                bank.loadfromslot(pgm, part[npart]); //Programs indexes start from 0
+                bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
                 if (part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
                     partonoff(npart, 1);
             }
         Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
-        //update UI
+        // update UI
         if (Runtime.showGui)
         {
             guiMaster->updatepanel();
@@ -407,7 +407,7 @@ void SynthEngine::partonoff(int npart, int what)
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -0.2;
     }
 }
 
@@ -572,13 +572,12 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
 
     actionLock(unlock);
     
-    // Clip calculation for mixed outputs   
+    // Peak calculation for mixed outputs   
     VUpeak.values.vuRmsPeakL = 1e-12f;
     VUpeak.values.vuRmsPeakR = 1e-12f;       
     float absval;
     for (int idx = 0; idx < buffersize; ++idx)
     {
-        // Peak computation (for vumeters)
         if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL)
             VUpeak.values.vuOutPeakL = absval;
         if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
@@ -587,27 +586,19 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         // RMS Peak
         VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx];
         VUpeak.values.vuRmsPeakR += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
-
-        // check for clips
-        if (fabsf(outl[NUM_MIDI_PARTS][idx]) > 1.0f)
-            VUpeak.values.vuClipped |= 1;
-        if (fabsf(outr[NUM_MIDI_PARTS][idx]) > 1.0f)
-            VUpeak.values.vuClipped |= 2;
     }
 
     if (shutup)
         ShutUp();
 
-    // Part Peak computation (for Part vu meters/fake part vu meters)
+    // Part Peak computation (for part vu meters/fake part vu meters)
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {       
         if (part[npart]->Penabled)
         {
-            float *outl = part[npart]->partoutl;
-            float *outr = part[npart]->partoutr;
             for (int i = 0; i < buffersize; ++i)
             {
-                float tmp = fabsf(outl[i] + outr[i]);
+                float tmp = fabsf(part[npart]->partoutl[i] + part[npart]->partoutr[i]);
                 if (tmp > VUpeak.values.parts[npart])
                     VUpeak.values.parts[npart] = tmp;
             }
@@ -616,20 +607,14 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
 
     if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
     {
-/*        for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        {
-            if (part[npart]->Penabled)
-                VUpeak.values.parts[npart] *= volume; // how is part peak related to master volume??
-        }*/
         jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
         VUpeak.values.vuOutPeakL = 1e-12f;
         VUpeak.values.vuOutPeakR = 1e-12f;
-        VUpeak.values.vuClipped = 0;
         for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
             if (part[npart]->Penabled)
                 VUpeak.values.parts[npart] = 1.0e-9;
-            else if (VUpeak.values.parts[npart] < -3) // fake peak is a negative value
+            else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
                 VUpeak.values.parts[npart]+= 2;
         }
     }
@@ -685,11 +670,13 @@ void SynthEngine::setPaudiodest(int value)
 
 // Panic! (Clean up all parts and effects)
 void SynthEngine::ShutUp(void)
-{
+{    
+    VUpeak.values.vuOutPeakL = 1e-12f;
+    VUpeak.values.vuOutPeakR = 1e-12f;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
-        VUpeak.values.parts[npart] = -1;
+        VUpeak.values.parts[npart] = -0.2;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         insefx[nefx]->cleanup();

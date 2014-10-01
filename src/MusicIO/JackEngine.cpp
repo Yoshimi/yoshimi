@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
     
-    Modified September 2014
+    Modified October 2014
 */
 
 #include <errno.h>
@@ -147,7 +147,7 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port)
+    for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port) // include mains
     {
         if (!audio.ports[port])
         {
@@ -216,10 +216,10 @@ void JackEngine::Close(void)
 
 bool JackEngine::openAudio(void)
 {
-    //Register mixer outputs for all channels
+    // Register mixed outputs
     audio.ports[2 * NUM_MIDI_PARTS] = jack_port_register(jackClient, "left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     audio.ports[2 * NUM_MIDI_PARTS + 1] = jack_port_register(jackClient, "right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-
+    // And individual parts
     for (int port = 0; port < 2 * NUM_MIDI_PARTS; ++port)
     {
         stringstream portName;
@@ -349,20 +349,21 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     }
     getAudio();
     int framesize = sizeof(float) * nframes;
-    for (int port = 0; port < NUM_MIDI_PARTS; ++port)
+    // Part outputs
+    for (int port, idx = 0; port < NUM_MIDI_PARTS; port++ , idx += 2)
     {
         if (synth->part[port]->Paudiodest & 2)
         {
-            memcpy(audio.portBuffs[port * 2], zynLeft[port], framesize);
-            memcpy(audio.portBuffs[port * 2 + 1], zynRight[port], framesize);
+            memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
+            memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
         }
         else
         {
-            memset(audio.portBuffs[port * 2], 0, framesize);
-            memset(audio.portBuffs[port * 2 + 1], 0, framesize);
+            memset(audio.portBuffs[idx], 0, framesize);
+            memset(audio.portBuffs[idx + 1], 0, framesize);
         }
     }
-    //And mixed outputs
+    // And mixed outputs
     memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
     memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
     return true;

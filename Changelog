@@ -26,6 +26,7 @@ yoshimi-1.2.4-rc3
 - Updated INSTALL instructions and removed duplicates of this and COPYING in /src
 - detached part outputs from main volume and added clip indication in panel (doesn't
   clear with 'Stop' so fundged)
+- some more minor adjustments
 
 
 yoshimi-1.2.3

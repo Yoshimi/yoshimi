@@ -24,7 +24,7 @@ Yoshimi responds to the following messages.
 224: Pitch Bend
 
 
-If you want to use bank changes it is a good idea to rename the bank direcories with a number prefix. That way, when you add new banks they won't upset the order of the existing ones, and you won't then run the risk of your older project files adressing the wrong bank.
+If you want to use bank changes it is a good idea to rename the bank directories with a number prefix. That way, when you add new banks they won't upset the order of the existing ones, and you won't then run the risk of your older project files adressing the wrong bank.
 
 Similarly instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
 

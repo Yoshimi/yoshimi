@@ -8,7 +8,7 @@ As well as bank and program changes there is the ability to set a MIDI CC to acc
 
 ###
 
-Bank and program changes can be completely disabled in 'settings' - some hardware sysnths don't play nice!
+Bank and program changes can be completely disabled in 'settings' - some hardware synths don't play nice!
 
 ###
 
