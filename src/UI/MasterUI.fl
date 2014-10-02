@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified September 2014
+This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
 } 
 
@@ -736,7 +736,7 @@ ZynAddSubFX}
         xywh {25 100 315 70} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
         code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
                                "\\nCopyright 2009-2011, Alan Calvert"
-                               "\\nCopyright 2012-2013, Various"
+                               "\\nCopyright 2012-2013, Jeremy Jongepier and others"
                                "\\nCopyright 2014, Will Godfrey and others").c_str());}
       }
       Fl_Box {} {

@@ -1,7 +1,7 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapsot'. This will give you a tarball of the current development version.
 
 
-yoshimi-1.2.4-rc3
+yoshimi-1.2.4
 
 - ALSA MIDI can now auto-connect.
 - Changed x.x.x.notes to Changelog as requested by packagers.
@@ -27,6 +27,7 @@ yoshimi-1.2.4-rc3
 - detached part outputs from main volume and added clip indication in panel (doesn't
   clear with 'Stop' so fundged)
 - some more minor adjustments
+- VU updates completed - and we're away!
 
 
 yoshimi-1.2.3
