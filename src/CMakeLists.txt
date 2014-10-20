@@ -61,6 +61,9 @@ option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
+#option to build lv2 plugin
+option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
+
 set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
 
 set (BuildOptions_x86_64AMD
@@ -421,4 +424,8 @@ add_custom_target (distclean
     COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "*.marks" | xargs -r rm -f
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
-add_dependencies (distclean clean)
+
+
+if (BuildLV2Plugin)
+add_subdirectory(LV2_Plugin)
+endif (BuildLV2Plugin)
