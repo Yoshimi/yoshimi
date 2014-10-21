@@ -322,7 +322,7 @@ class PartKitItem {open : {public Fl_Group}
   }
 } 
 
-class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {open private
   } {
@@ -1213,7 +1213,5 @@ Offset}
   decl {int lastkititem;} {private local
   }
   decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
-  }
-  decl {int x;} {selected private local
   }
 } 

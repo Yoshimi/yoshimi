@@ -305,7 +305,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     part[npart]->NoteOn(note, velocity, keyshift);
                     actionLock(unlock);
                 }
-                else if (VUpeak.values.parts[npart] < velocity)
+                else if (VUpeak.values.parts[npart] > (-velocity))
                     VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
             }
         }
@@ -591,16 +591,17 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     if (shutup)
         ShutUp();
 
-    // Part Peak computation (for part vu meters/fake part vu meters)
+    // Peak computation for part vu meters
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {       
         if (part[npart]->Penabled)
         {
-            for (int i = 0; i < buffersize; ++i)
+            for (int idx = 0; idx < buffersize; ++idx)
             {
-                float tmp = fabsf(part[npart]->partoutl[i] + part[npart]->partoutr[i]);
-                if (tmp > VUpeak.values.parts[npart])
-                    VUpeak.values.parts[npart] = tmp;
+                if ((absval = fabsf(part[npart]->partoutl[idx])) > VUpeak.values.parts[npart])
+                    VUpeak.values.parts[npart] = absval;
+                if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.parts[npart])
+                    VUpeak.values.parts[npart] = absval;
             }
         }
     }
