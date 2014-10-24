@@ -48,7 +48,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
-Config Runtime(NULL);
+Config Runtime;
 
 struct sigaction Config::sigAction;
 
@@ -86,7 +86,7 @@ static struct argp_option cmd_options[] = {
 };
 
 
-Config::Config(SynthEngine *_synth) :
+Config::Config() :
     restoreState(false),
     restoreJackSession(false),
     Samplerate(48000),
@@ -120,7 +120,7 @@ Config::Config(SynthEngine *_synth) :
     sse_level(0),
     programcommand(string("yoshimi")),
     lv2Plugin(false),
-    synth(_synth)
+    synth(NULL)
 {
     fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
@@ -130,9 +130,10 @@ Config::Config(SynthEngine *_synth) :
 }
 
 
-bool Config::Setup(int argc, char **argv)
+bool Config::Setup(int argc, char **argv, SynthEngine *_synth)
 {
     //danvd: It's safe to call these functions before everything else
+    synth = _synth;
     clearBankrootDirlist();
     clearPresetsDirlist();
     AntiDenormals(true);

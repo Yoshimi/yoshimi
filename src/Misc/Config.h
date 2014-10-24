@@ -48,9 +48,9 @@ class SynthEngine;
 class Config : public MiscFuncs
 {
     public:
-        Config(SynthEngine *_synth);
+        Config();
         ~Config();
-        bool Setup(int argc, char **argv);
+        bool Setup(int argc, char **argv, SynthEngine *_synth);
         void StartupReport(void);
         void Announce(void);
         void Usage(void);

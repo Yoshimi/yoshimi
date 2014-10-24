@@ -40,7 +40,7 @@ struct random_data OscilGen::harmonic_random_buf;
 OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth) :
     Presets(),
     ADvsPAD(false),
-    tmpsmps((float*)fftwf_malloc(synth->oscilsize * sizeof(float))),
+    tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
     fft(fft_),
     res(res_),
     randseed(1),

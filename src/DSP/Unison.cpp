@@ -36,7 +36,7 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_s
     uv(NULL),
     update_period_samples(update_period_samples_),
     update_period_sample_k(0),
-    max_delay(lrintf(synth->samplerate_f * max_delay_sec_) + 1),
+    max_delay(lrintf(_synth->samplerate_f * max_delay_sec_) + 1),
     delay_k(0),
     first_time(false),
     delay_buffer(NULL),

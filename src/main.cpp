@@ -30,7 +30,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     SynthEngine *synth = new SynthEngine();
-    if (!Runtime.Setup(argc, argv))
+    if (!Runtime.Setup(argc, argv, synth))
         goto bail_out;
 
     if (!synth)

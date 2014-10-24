@@ -45,8 +45,8 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double sampleRate, const char *bundlePath):
 bool YoshimiLV2Plugin::init()
 {
 
-    if(!Runtime.Setup(0, NULL))
-        return false;
+    //if(!Runtime.Setup(0, NULL))
+//        return false;
 
     return true;
 }
