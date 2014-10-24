@@ -427,5 +427,12 @@ add_custom_target (distclean
 
 
 if (BuildLV2Plugin)
+set(LV2_INSTALL_DIR lib/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+pkg_check_modules(LV2 REQUIRED lv2>=.0.1.0)
+if (LV2_FOUND)
+    message (STATUS "Found lv2 package ${LV2_VERSION}")
+else (LV2_FOUND)
+    message (FATAL_ERROR "LV2 package required but not found")
+endif (LV2_FOUND)
 add_subdirectory(LV2_Plugin)
 endif (BuildLV2Plugin)
