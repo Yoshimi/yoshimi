@@ -29,16 +29,17 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+    SynthEngine *synth = new SynthEngine();
     if (!Runtime.Setup(argc, argv))
         goto bail_out;
 
-    if (!(synth = new SynthEngine()))
+    if (!synth)
     {
         Runtime.Log("Failed to allocate SynthEngine");
         goto bail_out;
     }
 
-    if (!(musicClient = MusicClient::newMusicClient()))
+    if (!(musicClient = MusicClient::newMusicClient(synth)))
     {
         Runtime.Log("Failed to instantiate MusicClient");
         goto bail_out;
@@ -64,7 +65,7 @@ int main(int argc, char *argv[])
 
     if (Runtime.showGui)
     {
-        if (!(guiMaster = new MasterUI()))
+        if (!(guiMaster = new MasterUI(synth)))
         {
             Runtime.Log("Failed to instantiate gui");
             goto bail_out;

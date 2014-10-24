@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {EffUI.h} {not_in_source in_header
@@ -30,25 +30,25 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
-decl {\#include <string>} {public
+decl {\#include <string>} {public local
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
-decl {\#include "EnvelopeUI.h"} {public
+decl {\#include "EnvelopeUI.h"} {public local
 } 
 
-decl {\#include "FilterUI.h"} {public
+decl {\#include "FilterUI.h"} {public local
 } 
 
-decl {\#include "Misc/SynthEngine.h"} {public
+decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
-decl {\#include "Effects/EffectMgr.h"} {public
+decl {\#include "Effects/EffectMgr.h"} {public local
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include "PresetsUI.h"} {public local
 } 
 
 class EQGraph {open : {public Fl_Box}
@@ -60,9 +60,11 @@ class EQGraph {open : {public Fl_Box}
   }
   Function {init(EffectMgr *eff_)} {open
   } {
-    code {eff = eff_;
+    code {synth = eff_->getSynthEngine();
+eff = eff_;
         oldx = -1;
-        khzval = -1;} {}
+        khzval = -1;} {selected
+    }
   }
   Function {draw_freq_line(float freq, int type)} {open
   } {
@@ -185,11 +187,16 @@ class EQGraph {open : {public Fl_Box}
             freq = 0.00001;
         return logf(freq / 20.0) / logf(1000.0);} {}
   }
-  decl {int oldx,oldy;} {}
-  decl {float khzval;} {public
+  decl {int oldx,oldy;} {private local
   }
-  decl {EffectMgr *eff;} {}
-  decl {int maxdB;} {}
+  decl {float khzval;} {public local
+  }
+  decl {EffectMgr *eff;} {private local
+  }
+  decl {int maxdB;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
 
 class EffUI {open : {public Fl_Group,public PresetsUI_}
@@ -1266,7 +1273,7 @@ refresh(eff);}
   Function {make_filter_window()} {open
   } {
     Fl_Window filterwindow {
-      label {Filter Parameters for DynFilter Eff.} open selected
+      label {Filter Parameters for DynFilter Eff.} open
       xywh {1186 779 290 110} type Double visible
     } {
       Fl_Group {} {
@@ -1472,6 +1479,8 @@ refresh(eff);} {}
   Function {refresh()} {} {
     code {refresh(eff);} {}
   }
-  decl {EffectMgr *eff;} {}
-  decl {int eqband;} {}
+  decl {EffectMgr *eff;} {private local
+  }
+  decl {int eqband;} {private local
+  }
 } 

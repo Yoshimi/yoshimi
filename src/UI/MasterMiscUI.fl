@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -94,9 +94,10 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   } {
     code {npart=-1;} {}
   }
-  Function {init(int part_)} {open
+  Function {init(int part_, SynthEngine *_synth)} {open
   } {
     code {// the "part_" parameters sets the part (if it is >=0), else it sets the master
+synth = _synth;
     label(NULL);
     npart = part_;
     oldpeakl = 0;
@@ -298,7 +299,7 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   Function {tick(void *v)} {open return_type {static void}
   } {
     code {tickdraw((VUMeter *) v);
-    synth->fetchMeterData(&synth->VUdata);
+    ((VUMeter *)v)->synth->fetchMeterData(&((VUMeter *) v)->synth->VUdata);
     Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
   }
   Function {handle(int event)} {open return_type int
@@ -339,17 +340,20 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
   }
   decl {int clipped;} {private local
   }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
 
-class SysEffSend {: {public WidgetPDial, private MiscFuncs}
+class SysEffSend {open : {public WidgetPDial, private MiscFuncs}
 } {
   Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {open
   } {
     code {neff1=0; neff2=0;} {}
   }
-  Function {init(int neff1_,int neff2_)} {open
+  Function {init(int neff1_,int neff2_, SynthEngine *_synth)} {open
   } {
-    code {neff1 = neff1_;
+    code {synth = _synth;
+neff1 = neff1_;
         neff2 = neff2_;
         minimum(0);
         maximum(127);
@@ -375,9 +379,11 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
   decl {int neff2;} {private local
   }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
 
-class Panellistitem {open selected : {public Fl_Group, private MiscFuncs}
+class Panellistitem {open : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {open private
   } {
@@ -396,7 +402,7 @@ class Panellistitem {open selected : {public Fl_Group, private MiscFuncs}
           Fl_Box {} {
             label {V U}
             xywh {45 65 15 110} box FLAT_BOX color 0 selection_color 75 labelcolor 55 align 128
-            code0 {o->init(npart);}
+            code0 {o->init(npart, synth);}
             class VUMeter
           }
         }
@@ -489,12 +495,15 @@ class Panellistitem {open selected : {public Fl_Group, private MiscFuncs}
     code {npart = 0;
         bankui = NULL;} {}
   }
-  Function {init(int npart_, BankUI *bankui_)} {} {
-    code {npart=npart_;
+  Function {init(int npart_, BankUI *bankui_, SynthEngine *_synth)} {open
+  } {
+    code {synth = _synth;
+npart=npart_;
         bankui = bankui_;
         make_window();
         panellistitem->show();
-        end();} {}
+        end();} {selected
+    }
   }
   Function {refresh()} {} {
     code {partenabled->value(synth->part[npart]->Penabled);
@@ -522,5 +531,7 @@ class Panellistitem {open selected : {public Fl_Group, private MiscFuncs}
   decl {int npart;} {private local
   }
   decl {BankUI *bankui;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

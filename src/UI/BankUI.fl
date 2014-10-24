@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -260,7 +260,7 @@ class BankUI {open : {public BankProcess_}
                          bank->banks[n].dir.c_str());
                 for (int i = 0; i < BANK_SIZE; ++i)
                     bs[i]->refresh();
-                refreshmainwindow();} open selected
+                refreshmainwindow();} open
         xywh {5 8 220 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
@@ -278,9 +278,10 @@ class BankUI {open : {public BankProcess_}
       }
     }
   }
-  Function {BankUI(int *npart_)} {open
+  Function {BankUI(int *npart_, SynthEngine *_synth)} {open
   } {
-    code {fnc = &BankProcess_::process;
+    code {synth = _synth;
+fnc = &BankProcess_::process;
         npart = npart_;
         bank = &synth->bank;
         what = 0;
@@ -288,7 +289,8 @@ class BankUI {open : {public BankProcess_}
         make_window();
         mode = 1;} {}
   }
-  Function {~BankUI()} {} {
+  Function {~BankUI()} {selected return_type virtual
+  } {
     code {//
         bankuiwindow->hide();
         delete bankuiwindow;} {}
@@ -448,5 +450,7 @@ class BankUI {open : {public BankProcess_}
   decl {void (BankProcess_::* fnc)(void);} {private local
   }
   decl {Fl_Spinner *cbwig;} {public local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

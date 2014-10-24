@@ -33,7 +33,7 @@ class MusicClient
 {
     public:
         MusicClient() { }
-        ~MusicClient() { }
+        virtual ~MusicClient() { }
         bool Open(void) { return openAudio() && openMidi(); }
         virtual bool Start(void) = 0;
         virtual void Close(void) = 0;

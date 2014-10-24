@@ -186,6 +186,8 @@ class ADnoteParameters : public Presets
         bool randomGlobalPan(void) { return !GlobalPar.PPanning; }
         bool randomVoicePan(int nvoice) { return !VoicePar[nvoice].PPanning; }
 
+        SynthEngine *getSynthEngine() {return synth;}
+
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         static int ADnote_unison_sizes[15];

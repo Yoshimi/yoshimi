@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
@@ -84,8 +84,8 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         Fl_Group voiceoscil {open
           xywh {60 5 30 20} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
           code0 {osc = new Oscilloscope(o->x(), o->y(), o->w(), o->h(), "");}
-          code1 {osc->init(pars->VoicePar[nvoice].OscilSmp,0,pars->VoicePar[nvoice].Poscilphase);}
-          code2 {if (pars->VoicePar[nvoice].Pextoscil != -1) {osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp);}}
+          code1 {osc->init(pars->VoicePar[nvoice].OscilSmp,0,pars->VoicePar[nvoice].Poscilphase, synth);}
+          code2 {if (pars->VoicePar[nvoice].Pextoscil != -1) {osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp, synth);}}
         } {}
         Fl_Value_Output detunevalueoutput {
           callback {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType), 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
@@ -147,6 +147,7 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
   Function {init(ADnoteParameters *parameters,int nvoice_)} {open
   } {
     code {//
+	synth = parameters->getSynthEngine();
         pars = parameters;
         nvoice = nvoice_;
         make_window();
@@ -164,10 +165,10 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         voicelfofreq->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
         if (pars->VoicePar[nvoice].Pextoscil != -1)
         {
-            osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp, 0, pars->VoicePar[nvoice].Poscilphase);
+            osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp, 0, pars->VoicePar[nvoice].Poscilphase, synth);
         }
         else
-            osc->init(pars->VoicePar[nvoice].OscilSmp, 0, pars->VoicePar[nvoice].Poscilphase);
+            osc->init(pars->VoicePar[nvoice].OscilSmp, 0, pars->VoicePar[nvoice].Poscilphase, synth);
         if (pars->VoicePar[nvoice].Enabled == 0)
             voicelistitemgroup->deactivate();
         else
@@ -189,9 +190,11 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
   }
   decl {Oscilloscope *osc;} {private local
   }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
 
-class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {open
   } {
@@ -340,7 +343,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                 xywh {535 425 220 140} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
                 code0 {oscFM = new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
                 code1 {int nv=nvoice; if (pars->VoicePar[nvoice].PextFMoscil>=0) nv=pars->VoicePar[nvoice].PextFMoscil;}
-                code2 {oscFM->init(pars->VoicePar[nv].FMSmp,0,pars->VoicePar[nvoice].PFMoscilphase);}
+                code2 {oscFM->init(pars->VoicePar[nv].FMSmp,0,pars->VoicePar[nvoice].PFMoscilphase, synth);}
               } {}
               Fl_Box {} {
                 label {Mod.Oscillator}
@@ -354,7 +357,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                     int nv = nvoice;
                     if (pars->VoicePar[nvoice].PextFMoscil >= 0)
                         nv = pars->VoicePar[nvoice].PextFMoscil;
-                    oscedit = new OscilEditor(pars->VoicePar[nv].FMSmp, fmoscil, NULL, NULL);}
+                    oscedit = new OscilEditor(pars->VoicePar[nv].FMSmp, fmoscil, NULL, NULL, synth);}
                 xywh {704 368 43 12} box THIN_UP_BOX labelfont 1 labelsize 9
                 code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
               }
@@ -373,12 +376,12 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                     pars->VoicePar[nvoice].PextFMoscil = lrint(o->value()) - 1;
                     if (lrint(o->value()))
                     {
-                        oscFM->init(pars->VoicePar[lrint(o->value()) - 1].FMSmp);
+                        oscFM->init(pars->VoicePar[lrint(o->value()) - 1].FMSmp, synth);
                         changeFMoscilbutton->labelcolor(FL_BLUE);
                     }
                     else
                     {
-                        oscFM->init(pars->VoicePar[nvoice].FMSmp);
+                        oscFM->init(pars->VoicePar[nvoice].FMSmp, synth);
                         changeFMoscilbutton->labelcolor(FL_BLACK);
                     }
                     voiceFMparametersgroup->redraw();} open
@@ -565,7 +568,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                     nv = pars->VoicePar[nvoice].Pextoscil;}
             code2 {//
                 osc->init(pars->VoicePar[nv].OscilSmp, 0,
-                          pars->VoicePar[nvoice].Poscilphase);}
+                          pars->VoicePar[nvoice].Poscilphase, synth);}
           } {}
           Fl_Button changevoiceoscilbutton {
             label Change
@@ -575,7 +578,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                 int nv = nvoice;
                 if (pars->VoicePar[nvoice].Pextoscil >= 0)
                     nv=pars->VoicePar[nvoice].Pextoscil;
-                oscedit = new OscilEditor(pars->VoicePar[nv].OscilSmp, voiceoscil, NULL, NULL);}
+                oscedit = new OscilEditor(pars->VoicePar[nv].OscilSmp, voiceoscil, NULL, NULL, synth);}
             xywh {5 475 65 20} box THIN_UP_BOX labelfont 1 labelsize 11
             code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
           }
@@ -603,12 +606,12 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             callback {//
                 pars->VoicePar[nvoice].Pextoscil = lrint(o->value()) - 1;
                 if (lrint(o->value())) {
-                    osc->init(pars->VoicePar[lrint(o->value()) - 1].OscilSmp);
+                    osc->init(pars->VoicePar[lrint(o->value()) - 1].OscilSmp, synth);
                     changevoiceoscilbutton->labelcolor(FL_BLUE);
                 }
                 else
                 {
-                    osc->init(pars->VoicePar[nvoice].OscilSmp);
+                    osc->init(pars->VoicePar[nvoice].OscilSmp, synth);
                     changevoiceoscilbutton->labelcolor(FL_BLACK);
                 }
 
@@ -674,7 +677,7 @@ while(true)
   }
 }
 o->labelcolor(colr);
-unisongroup->redraw();} selected
+unisongroup->redraw();}
               tooltip {Number of unison sub-voices} xywh {90 544 40 16} box THIN_UP_BOX color 7 labelfont 1 labelsize 11 align 5 minimum 2 maximum 50 value 2 textsize 12
               code0 {int tmp = pars->VoicePar[nvoice].Unison_size;}
               code1 {if (tmp < 2) tmp = 2;}
@@ -971,6 +974,7 @@ unisongroup->redraw();} selected
   Function {init(ADnoteParameters *parameters,int nvoice_)} {open
   } {
     code {//
+	synth = parameters->getSynthEngine();
         pars = parameters;
         nvoice = nvoice_;
         make_window();
@@ -996,6 +1000,8 @@ unisongroup->redraw();} selected
   decl {Oscilloscope *osc;} {private local
   }
   decl {Oscilloscope *oscFM;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 
 
@@ -1339,14 +1345,17 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
       }
     }
   }
-  Function {ADnoteUI(ADnoteParameters *parameters)} {} {
+  Function {ADnoteUI(ADnoteParameters *parameters)} {open
+  } {
     code {//
+	synth = parameters->getSynthEngine();
         pars = parameters;
         nvoice = 0;
         resui = new ResonanceUI(pars->GlobalPar.Reson);
         make_window();} {}
   }
-  Function {~ADnoteUI()} {} {
+  Function {~ADnoteUI()} {selected return_type virtual
+  } {
     code {//
         ADnoteVoiceList->hide();
         ADnoteGlobalParameters->hide();
@@ -1402,5 +1411,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
   decl {int nvoice;} {private local
   }
   decl {ADvoicelistitem *voicelistitem[NUM_VOICES];} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

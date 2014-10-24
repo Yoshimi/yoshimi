@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -72,8 +72,10 @@ class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
     Fl_Group(x, y, w, h, NULL)} {} {
     code {neff = 0;npart = 0;} {}
   }
-  Function {init(int npart_,int neff_)} {} {
-    code {npart = npart_;
+  Function {init(int npart_,int neff_, SynthEngine *_synth)} {open
+  } {
+    code {synth = _synth;
+npart = npart_;
         neff = neff_;
         make_window();
         syseffsend->show();
@@ -86,6 +88,8 @@ class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
   decl {int neff;} {private local
   }
   decl {int npart;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 
 
@@ -301,12 +305,14 @@ class PartKitItem {open : {public Fl_Group}
   Function {init(Part *part_,int n_,PartUI_ *partui_)} {open
   } {
     code {//
+synth = part_->getSynthEngine();
       part = part_;
       n = n_;
       partui = partui_;
       make_window();
       //partkititem->show();
-      end();} {}
+      end();} {selected
+    }
   }
   Function {~PartKitItem()} {} {
     code {partkititem->hide();
@@ -320,9 +326,11 @@ class PartKitItem {open : {public Fl_Group}
   }
   decl {PartUI_ *partui;} {private local
   }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
 
-class PartUI {open selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {open private
   } {
@@ -488,7 +496,7 @@ Offset}
               for (int i = 0; i < NUM_SYS_EFX; ++i)
             {
               psyef[i] = new PartSysEffSend(0, 0, 25, 25);
-              psyef[i]->init(npart, i);
+              psyef[i]->init(npart, i, synth);
             }}
         } {}
       }
@@ -1120,8 +1128,10 @@ Offset}
         padnoteui = NULL;
         lastkititem = -1;} {}
   }
-  Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
+  Function {init(Part *part_,int npart_,BankUI *bankui_)} {open
+  } {
     code {//
+	synth = part_->getSynthEngine();
         bankui = bankui_;
         part = part_;
         npart = npart_;
@@ -1213,5 +1223,7 @@ Offset}
   decl {int lastkititem;} {private local
   }
   decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

@@ -102,6 +102,8 @@ class Part : private MiscFuncs, SynthHelper
         void setVolume(char value);
         void setDestination(int value);
 
+        SynthEngine *getSynthEngine() {return synth;}
+
         unsigned char Penabled;
         unsigned char Pvolume;
         unsigned char Pminkey;

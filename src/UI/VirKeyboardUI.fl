@@ -80,7 +80,7 @@ decl {const int keysoct1azerty[]={'a',233,'z','\\"','e','r','(','t','-','y',232,
 decl {const int keysoct2azerty[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {private local
 } 
 
-class VirKeys {: {public Fl_Box}
+class VirKeys {open : {public Fl_Box}
 } {
   decl {static const int N_OCT = 6;} {private local
   }
@@ -91,8 +91,9 @@ class VirKeys {: {public Fl_Box}
   Function {VirKeys(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {} {}
   }
-  Function {init(void)} {} {
-    code {for (int i = 0; i < N_OCT * 12 + 1; ++i)
+  Function {init(SynthEngine *_synth)} {} {
+    code {synth = _synth;
+for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
         midich = 0;
         midivel = 100;
@@ -298,6 +299,8 @@ class VirKeys {: {public Fl_Box}
   }
   decl {unsigned char rndvelocity;} {public local
   }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
 
 class VirKeyboard {open
@@ -308,12 +311,12 @@ class VirKeyboard {open
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
 virkeyboardwindow->hide();} open
-      xywh {689 217 650 130} type Double visible
+      xywh {891 212 650 130} type Double visible
     } {
       Fl_Box virkeys {
         label Keyboard
         xywh {32 10 590 80} box FLAT_BOX color 17
-        code0 {o->init();}
+        code0 {o->init(synth);}
         class VirKeys
       }
       Fl_Counter {} {
@@ -434,7 +437,7 @@ virkeyboardwindow->hide();}
       Fl_Roller pitchwheelroller {
         label Pwh
         callback {synth->SetController(virkeys->midich, C_pitchwheel, -(int) o->value());
-            virkeys->take_focus();} selected
+            virkeys->take_focus();}
         tooltip {Pitch Wheel} xywh {5 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
       }
       Fl_Button {} {
@@ -461,9 +464,12 @@ virkeyboardwindow->hide();}
       }
     }
   }
-  Function {VirKeyboard(void)} {} {
-    code {midictl = 75;
-        make_window();} {}
+  Function {VirKeyboard(SynthEngine *_synth)} {open
+  } {
+    code {synth = _synth;
+midictl = 75;
+        make_window();} {selected
+    }
   }
   Function {~VirKeyboard()} {} {
     code {delete virkeyboardwindow;} {}
@@ -478,5 +484,7 @@ virkeyboardwindow->hide();}
     code {virkeys->relaseallkeys(0);} {}
   }
   decl {int midictl;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

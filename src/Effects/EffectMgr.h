@@ -67,6 +67,8 @@ class EffectMgr : public Presets
         void seteffectpar_nolock(int npar, unsigned char value);
         unsigned char geteffectpar(int npar);
 
+        SynthEngine *getSynthEngine() {return synth;}
+
         float *efxoutl, *efxoutr;
         bool insertion; // the effect is connected as insertion effect (or not)
 

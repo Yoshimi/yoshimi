@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
@@ -40,7 +40,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "WidgetPDialUI.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
-    \#include "FilterUI.h"} {global
+    \#include "FilterUI.h"} {private global
 } 
 
 decl {\#include "Misc/SynthHelper.h"
@@ -124,17 +124,19 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
         fl_line(ox + lx / 2 + rbw, oy, ox + lx / 2 + rbw, oy + ly - 1);
         fl_line_style(0);} {}
   }
-  decl {PADnoteParameters *pars;} {public
+  decl {PADnoteParameters *pars;} {public local
   }
 } 
 
-class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
+class PADnoteOvertonePosition {open : {public Fl_Box, private MiscFuncs}
 } {
   Function {PADnoteOvertonePosition(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {pars=NULL;} {}
   }
-  Function {init(PADnoteParameters *pars)} {} {
-    code {this->pars=pars;} {}
+  Function {init(PADnoteParameters *pars)} {open
+  } {
+    code {synth = pars->getSynthEngine();
+this->pars=pars;} {}
   }
   Function {draw()} {} {
     code {//
@@ -223,18 +225,23 @@ class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
             fl_line(ox+i,oy+ly-1-yy,ox+i,oy+ly-1);
         }} {}
   }
-  decl {PADnoteParameters *pars;} {public
+  decl {PADnoteParameters *pars;} {public local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 
 
 class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
 } {
-  Function {PADnoteUI(PADnoteParameters *parameters)} {} {
+  Function {PADnoteUI(PADnoteParameters *parameters)} {open
+  } {
     code {//
+synth = parameters->getSynthEngine();
         pars = parameters;
         oscui = NULL;
         resui = new ResonanceUI(pars->resonance);
-        make_window();} {}
+        make_window();} {selected
+    }
   }
   Function {make_window()} {open
   } {
@@ -440,13 +447,13 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
           Fl_Group {} {
             xywh {100 155 270 135} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179 align 6
             code0 {osc=new Oscilloscope(o->x(),o->y(),o->w(),o->h(),"");}
-            code1 {osc->init(pars->oscilgen);}
+            code1 {osc->init(pars->oscilgen, synth);}
           } {}
           Fl_Button {} {
             label Change
             callback {//
                 if (oscui!=NULL) delete (oscui);
-                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton);}
+                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton, synth);}
             xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Box cbwidget {
@@ -932,8 +939,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
               callback {//
                   pan->value(64);
                   pars->setPan(64);
-                  randompan->value(pars->randomPan());
-              }
+                  randompan->value(pars->randomPan());}
               tooltip {Centre panning} xywh {213 56 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
             }
             Fl_Light_Button randompan {
@@ -944,8 +950,7 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
                       pan->value(1);
                       pars->setPan(1);
                   }
-                  o->value(pars->randomPan());
-              }
+                  o->value(pars->randomPan());}
               tooltip {Random panning On/Off} xywh {197 77 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
               code0 {o->value(pars->randomPan());}
             }
@@ -1151,7 +1156,8 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
         applybutton->color(FL_GRAY);
         applybutton->parent()->redraw();} {}
   }
-  Function {~PADnoteUI()} {} {
+  Function {~PADnoteUI()} {return_type virtual
+  } {
     code {//
         delete(oscui);
         delete(resui);
@@ -1159,12 +1165,14 @@ class PADnoteUI {open : {public PresetsUI_, private SynthHelper}
         padnotewindow->hide();
         delete(padnotewindow);} {}
   }
-  decl {PADnoteParameters *pars;} {public
+  decl {PADnoteParameters *pars;} {public local
   }
-  decl {OscilEditor *oscui;} {public
+  decl {OscilEditor *oscui;} {public local
   }
-  decl {Oscilloscope *osc;} {public
+  decl {Oscilloscope *osc;} {public local
   }
-  decl {ResonanceUI *resui;} {public
+  decl {ResonanceUI *resui;} {public local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

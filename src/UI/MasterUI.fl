@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -87,9 +87,10 @@ decl {MasterUI *guiMaster;} {public local
 
 class MasterUI {open : {private MiscFuncs}
 } {
-  Function {MasterUI(void)} {open
+  Function {MasterUI(SynthEngine *_synth)} {open
   } {
-    code {ninseff = 0;
+    code {synth = _synth;
+ninseff = 0;
       nsyseff = 0;
       npart = 0;
       for (int i = 0; i < NUM_SYS_EFX; ++i)
@@ -103,7 +104,8 @@ class MasterUI {open : {private MiscFuncs}
       presetsui = NULL;
       paramsui = NULL;
       yoshiLog = NULL;
-      laststatefile = Runtime.StateFile;} {}
+      laststatefile = Runtime.StateFile;} {selected
+    }
   }
   Function {~MasterUI()} {open
   } {
@@ -156,8 +158,8 @@ class MasterUI {open : {private MiscFuncs}
   } {
     code {//
       microtonalui = new MicrotonalUI(&synth->microtonal);
-      bankui = new BankUI(&npart);
-      virkeyboard = new VirKeyboard();
+      bankui = new BankUI(&npart, synth);
+      virkeyboard = new VirKeyboard(synth);
       configui = new ConfigUI();
       presetsui = new PresetsUI();
       paramsui = new ParametersUI();
@@ -430,7 +432,7 @@ class MasterUI {open : {private MiscFuncs}
           label {Stop!}
           callback {//
               virkeyboard->relaseallkeys();
-              vumeter->init(-1);
+              vumeter->init(-1, synth);
               synth->actionLock(lockmute);
               synth->shutup = 1;
               synth->actionLock(unlock);}
@@ -699,7 +701,7 @@ class MasterUI {open : {private MiscFuncs}
         Fl_Box vumeter {
           label {VU-Meter}
           xywh {3 427 384 33} box FLAT_BOX color 48 selection_color 75
-          code0 {o->init(-1);}
+          code0 {o->init(-1, synth);}
           class VUMeter
         }
       }
@@ -748,7 +750,7 @@ ZynAddSubFX}
                                  "GPL version 2, or (at your option) any later version.\\n\\n").c_str());}
       }
       Fl_Box {} {
-        label { version} selected
+        label { version}
         xywh {55 254 240 20} labelfont 1 labelsize 12 labelcolor 145
         code0 {//
             o->copy_label((string("Yoshimi version ")
@@ -773,7 +775,7 @@ ZynAddSubFX}
                 syseffsend[neff1][neff2] =
                     new SysEffSend(o->x()+(neff2 - 1) * 35, o->y() + 15 + neff1 * 50, 30, 30);
                 syseffsend[neff1][neff2]->label("aaa");
-                syseffsend[neff1][neff2]->init(neff1, neff2);
+                syseffsend[neff1][neff2]->init(neff1, neff2, synth);
             }}
       } {}
       Fl_Button {} {
@@ -799,7 +801,7 @@ ZynAddSubFX}
             for (int i = 0; i < NUM_MIDI_PARTS / 2; i++)
             {
                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
-                panellistitem[i]->init(i, bankui);
+                panellistitem[i]->init(i, bankui, synth);
             }}
         } {}
       }
@@ -812,7 +814,7 @@ ZynAddSubFX}
               for (int i = NUM_MIDI_PARTS / 2; i < NUM_MIDI_PARTS; i++)
               {
                    panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
-                   panellistitem[i]->init(i, bankui);
+                   panellistitem[i]->init(i, bankui, synth);
               }}
         } {}
       }
@@ -1009,5 +1011,7 @@ ZynAddSubFX}
   decl {ConsoleUI *yoshiLog;} {private local
   }
   decl {string laststatefile;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

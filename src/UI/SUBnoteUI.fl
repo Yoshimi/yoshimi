@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
@@ -438,7 +438,7 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Group {} {
-        label OVERTONES open selected
+        label OVERTONES open
         xywh {442 145 288 70} box UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Choice spreadtype {
@@ -575,7 +575,8 @@ pars->updateFrequencyMultipliers();}
   } {
     code {pars = parameters; make_window();} {}
   }
-  Function {~SUBnoteUI()} {} {
+  Function {~SUBnoteUI()} {selected return_type virtual
+  } {
     code {//for (int i=0;i<MAX_SUB_HARMONICS;i++) delete (h[i]);
         SUBparameters->hide();
         delete(SUBparameters);} {}

@@ -142,6 +142,8 @@ class PADnoteParameters : public Presets
 
         void applyparameters(bool islocked);
 
+        SynthEngine *getSynthEngine() {return synth;}
+
         OscilGen *oscilgen;
         Resonance *resonance;
 
