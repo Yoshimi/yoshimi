@@ -34,7 +34,7 @@ using namespace std;
 
 // todo: EarlyReflections, Prdelay, Perbalance
 
-Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
+Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     // defaults
     Pvolume(48),
@@ -54,7 +54,8 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     bandwidth(NULL),
     idelay(NULL),
     lpf(NULL),
-    hpf(NULL) // no filter
+    hpf(NULL), // no filter
+    synth(_synth)
 {
     inputbuf = (float*)fftwf_malloc(synth->bufferbytes);
     for (int i = 0; i < REV_COMBS * 2; ++i)
@@ -302,7 +303,7 @@ void Reverb::sethpf(unsigned char Phpf_)
     } else {
         float fr = expf(powf(Phpf / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f;
         if (hpf == NULL)
-            hpf = new AnalogFilter(3, fr, 1, 0);
+            hpf = new AnalogFilter(3, fr, 1, 0, synth);
         else
             hpf->setfreq(fr);
     }
@@ -320,7 +321,7 @@ void Reverb::setlpf(unsigned char Plpf_)
     } else {
         float fr = expf(powf(Plpf / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
         if (!lpf)
-            lpf = new AnalogFilter(2, fr, 1, 0);
+            lpf = new AnalogFilter(2, fr, 1, 0, synth);
         else
             lpf->setfreq(fr);
     }
@@ -397,7 +398,7 @@ void Reverb::settype(unsigned char Ptype_)
     bandwidth = NULL;
     if (Ptype == 2)
     { // bandwidth
-        bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f);
+        bandwidth = new Unison(synth->buffersize / 4 + 1, 2.0f, synth);
         bandwidth->setSize(50);
         bandwidth->setBaseFrequency(1.0f);
 #warning sa schimb size-ul

@@ -28,7 +28,8 @@
 
 #define MIN_ENVELOPE_DB -60
 
-Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
+Envelope::Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth):
+    synth(_synth)
 {
     envpoints = envpars->Penvpoints;
     if (envpoints > MAX_ENVELOPE_POINTS)

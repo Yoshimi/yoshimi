@@ -36,7 +36,7 @@ using namespace std;
 #include "Synth/PADnote.h"
 
 PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-    float velocity, int portamento_, int midinote, bool besilent) :
+    float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth) :
     ready(false),
     finished_(false),
     pars(parameters),
@@ -44,7 +44,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     released(false),
     nsample(0),
     portamento(portamento_),
-    ctl(ctl_)
+    ctl(ctl_),
+    synth(_synth)
 
 {
 //    tmpwave = (float*)fftwf_malloc(synth->bufferbytes);
@@ -137,11 +138,11 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     } else
         NoteGlobalPar.Punch.Enabled = 0;
 
-    NoteGlobalPar.FreqEnvelope = new Envelope(pars->FreqEnvelope, basefreq);
-    NoteGlobalPar.FreqLfo = new LFO(pars->FreqLfo, basefreq);
+    NoteGlobalPar.FreqEnvelope = new Envelope(pars->FreqEnvelope, basefreq, synth);
+    NoteGlobalPar.FreqLfo = new LFO(pars->FreqLfo, basefreq, synth);
 
-    NoteGlobalPar.AmpEnvelope = new Envelope(pars->AmpEnvelope, basefreq);
-    NoteGlobalPar.AmpLfo = new LFO(pars->AmpLfo, basefreq);
+    NoteGlobalPar.AmpEnvelope = new Envelope(pars->AmpEnvelope, basefreq, synth);
+    NoteGlobalPar.AmpLfo = new LFO(pars->AmpLfo, basefreq, synth);
 
     NoteGlobalPar.Volume =
         4.0f * powf(0.1f, 3.0f * (1.0f - pars->PVolume / 96.0f)) //-60 dB .. 0 dB
@@ -154,12 +155,12 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         * NoteGlobalPar.AmpLfo->amplfoout();
 
     NoteGlobalPar.GlobalFilterL =
-        new Filter(pars->GlobalFilter);
+        new Filter(pars->GlobalFilter, synth);
     NoteGlobalPar.GlobalFilterR =
-        new Filter(pars->GlobalFilter);
+        new Filter(pars->GlobalFilter, synth);
 
-    NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope, basefreq);
-    NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo, basefreq);
+    NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope, basefreq, synth);
+    NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo, basefreq, synth);
     NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
     NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getfreqtracking(basefreq);
 

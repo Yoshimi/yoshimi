@@ -23,7 +23,7 @@
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
 
-AlsaEngine::AlsaEngine()
+AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 {
     audio.handle = NULL;
     audio.period_time = 0;

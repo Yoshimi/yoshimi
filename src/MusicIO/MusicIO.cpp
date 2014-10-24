@@ -28,9 +28,10 @@ using namespace std;
 #include "MusicIO/MidiControl.h"
 #include "MusicIO/MusicIO.h"
 
-MusicIO::MusicIO() :
+MusicIO::MusicIO(SynthEngine *_synth) :
     interleavedShorts(NULL),
-    rtprio(25)
+    rtprio(25),
+    synth(_synth)
 {
     memset(zynLeft, 0, sizeof(float) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float) * (NUM_MIDI_PARTS + 1));

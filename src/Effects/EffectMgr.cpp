@@ -27,12 +27,13 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectMgr.h"
 
-EffectMgr::EffectMgr(const bool insertion_) :
+EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     insertion(insertion_),
     filterpars(NULL),
     nefx(0),
     efx(NULL),
-    dryonly(false)
+    dryonly(false),
+    synth(_synth)
 {
     setpresettype("Peffect");
     efxoutl = (float*)fftwf_malloc(synth->bufferbytes);
@@ -73,28 +74,28 @@ void EffectMgr::changeeffect(int _nefx)
     switch (nefx)
     {
         case 1:
-            efx = new Reverb(insertion, efxoutl, efxoutr);
+            efx = new Reverb(insertion, efxoutl, efxoutr, synth);
             break;
         case 2:
-            efx = new Echo(insertion, efxoutl, efxoutr);
+            efx = new Echo(insertion, efxoutl, efxoutr, synth);
             break;
         case 3:
-            efx = new Chorus(insertion, efxoutl, efxoutr);
+            efx = new Chorus(insertion, efxoutl, efxoutr, synth);
             break;
         case 4:
-            efx = new Phaser(insertion, efxoutl, efxoutr);
+            efx = new Phaser(insertion, efxoutl, efxoutr, synth);
             break;
         case 5:
-            efx = new Alienwah(insertion, efxoutl, efxoutr);
+            efx = new Alienwah(insertion, efxoutl, efxoutr, synth);
             break;
         case 6:
-            efx = new Distorsion(insertion, efxoutl, efxoutr);
+            efx = new Distorsion(insertion, efxoutl, efxoutr, synth);
             break;
         case 7:
-            efx = new EQ(insertion, efxoutl, efxoutr);
+            efx = new EQ(insertion, efxoutl, efxoutr, synth);
             break;
         case 8:
-            efx = new DynamicFilter(insertion, efxoutl, efxoutr);
+            efx = new DynamicFilter(insertion, efxoutl, efxoutr, synth);
             break;
             // put more effect here
         default:

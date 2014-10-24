@@ -28,11 +28,13 @@
 #include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
 
+class SynthEngine;
+
 class AnalogFilter : public Filter_, private MiscFuncs
 {
     public:
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
-                     unsigned char Fstages);
+                     unsigned char Fstages, SynthEngine *_synth);
         ~AnalogFilter();
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -75,6 +77,7 @@ class AnalogFilter : public Filter_, private MiscFuncs
         int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
         
         float *tmpismp; // used if it needs interpolation in filterout()
+        SynthEngine *synth;
 };
 
 #endif

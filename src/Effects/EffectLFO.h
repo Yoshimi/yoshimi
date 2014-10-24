@@ -25,10 +25,12 @@
 #ifndef EFFECT_LFO_H
 #define EFFECT_LFO_H
 
+class SynthEngine;
+
 class EffectLFO
 {
     public:
-        EffectLFO();
+        EffectLFO(SynthEngine *_synth);
         ~EffectLFO();
         void effectlfoout(float *outl, float *outr);
         void updateparams(void);
@@ -44,6 +46,8 @@ class EffectLFO
         float ampl1, ampl2, ampr1, ampr2; // necessary for "randomness"
         float lfornd;
         char lfotype;
+
+        SynthEngine *synth;
 };
 
 #endif

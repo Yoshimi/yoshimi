@@ -28,8 +28,10 @@
 
 #define MAX_CHORUS_DELAY 250.0f // ms
 
-Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
+Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    lfo(_synth),
+    synth(_synth)
 {
     dlk = drk = 0;
     maxdelay = (int)(MAX_CHORUS_DELAY / 1000.0f * synth->samplerate_f);

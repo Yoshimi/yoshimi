@@ -25,7 +25,7 @@
 
 MusicClient *musicClient = NULL;
 
-MusicClient *MusicClient::newMusicClient(void)
+MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
     MusicClient *musicObj = NULL;
     switch (Runtime.audioEngine)
@@ -34,12 +34,12 @@ MusicClient *MusicClient::newMusicClient(void)
             switch (Runtime.midiEngine)
             {
                 case jack_midi:
-                    if (!(musicObj = new JackClient()))
+                    if (!(musicObj = new JackClient(_synth)))
                         Runtime.Log("Failed to instantiate JackClient");
                     break;
 
                     case alsa_midi:
-                        if (!(musicObj = new JackAlsaClient()))
+                        if (!(musicObj = new JackAlsaClient(_synth)))
                             Runtime.Log("Failed to instantiate JackAlsaClient");
                         break;
 
@@ -53,12 +53,12 @@ MusicClient *MusicClient::newMusicClient(void)
             switch (Runtime.midiEngine)
             {
                 case alsa_midi:
-                    if (!(musicObj = new AlsaClient()))
+                    if (!(musicObj = new AlsaClient(_synth)))
                         Runtime.Log("Failed to instantiate AlsaClient");
                     break;
 
                     case jack_midi:
-                        if (!(musicObj = new AlsaJackClient()))
+                        if (!(musicObj = new AlsaJackClient(_synth)))
                             Runtime.Log("Failed to instantiate AlsaJackClient");
                         break;
 

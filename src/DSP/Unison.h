@@ -30,10 +30,12 @@
 
 #define UNISON_FREQ_SPAN 2.0f // how much the unison frequencies varies (always >= 1.0)
 
+class SynthEngine;
+
 class Unison
 {
     public:
-        Unison(int update_period_samples_, float max_delay_sec_);
+        Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth);
         ~Unison();
 
         void setSize(int new_size);
@@ -57,11 +59,13 @@ class Unison
             float lin_fpos;
             float lin_ffreq;
             UnisonVoice() {
-                position = synth->numRandom() * 1.8f - 0.9f;
                 realpos1 = 0.0f;
                 realpos2 = 0.0f;
                 step     = 0.0f;
                 relative_amplitude = 1.0f;
+            }
+            void setPosition(float newPos) {
+                position = newPos;
             }
         } *uv;
 
@@ -72,6 +76,8 @@ class Unison
         float        *delay_buffer;
         float         unison_amplitude_samples;
         float         unison_bandwidth_cents;
+
+        SynthEngine *synth;
 };
 #endif
 

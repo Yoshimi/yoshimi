@@ -23,10 +23,12 @@
 
 #include "Misc/SynthEngine.h"
 
+class SynthEngine;
+
 class MusicIO : virtual protected MiscFuncs
 {
     public:
-        MusicIO();
+        MusicIO(SynthEngine *_synth);
         ~MusicIO();
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
@@ -47,6 +49,8 @@ class MusicIO : virtual protected MiscFuncs
         float *zynRight [NUM_MIDI_PARTS + 1];
         short int *interleavedShorts;
         int rtprio;
+
+        SynthEngine *synth;
 };
 
 #endif

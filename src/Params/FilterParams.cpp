@@ -30,12 +30,13 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
 
-FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_) :
+FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, SynthEngine *_synth) :
     Presets(),
     changed(false),
     Dtype(Ptype_),
     Dfreq(Pfreq_),
-    Dq(Pq_)
+    Dq(Pq_),
+    synth(_synth)
 {
     setpresettype("Pfilter");
     defaults();

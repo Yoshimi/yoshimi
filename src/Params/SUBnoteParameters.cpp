@@ -24,7 +24,8 @@
 
 #include "Params/SUBnoteParameters.h"
 
-SUBnoteParameters::SUBnoteParameters() : Presets()
+SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(),
+    synth(_synth)
 {
     setpresettype("SUBnoteParameters");
     AmpEnvelope = new EnvelopeParams(64, 1);
@@ -34,7 +35,7 @@ SUBnoteParameters::SUBnoteParameters() : Presets()
     BandWidthEnvelope = new EnvelopeParams(64, 0);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
 
-    GlobalFilter = new FilterParams(2, 80, 40);
+    GlobalFilter = new FilterParams(2, 80, 40, synth);
     GlobalFilterEnvelope = new EnvelopeParams(0, 1);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     defaults();

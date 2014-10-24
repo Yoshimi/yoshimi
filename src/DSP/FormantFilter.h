@@ -32,11 +32,12 @@
 #include "DSP/AnalogFilter.h"
 #include "Params/FilterParams.h"
 
+class SynthEngine;
 
 class FormantFilter : public Filter_, private MiscFuncs, private SynthHelper, private Float2Int
 {
     public:
-        FormantFilter(FilterParams *pars);
+        FormantFilter(FilterParams *pars, SynthEngine *_synth);
         ~FormantFilter();
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -66,6 +67,8 @@ class FormantFilter : public Filter_, private MiscFuncs, private SynthHelper, pr
         float oldinput, slowinput;
         float Qfactor, formantslowness, oldQfactor;
         float vowelclearness, sequencestretch;
+
+        SynthEngine *synth;
 };
 
 

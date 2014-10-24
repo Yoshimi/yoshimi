@@ -26,15 +26,17 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/DynamicFilter.h"
 
-DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64), 0),
+DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, synth), 0),
+    lfo(_synth),
     Pvolume(110),
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
-    Pampsmooth(60),
+    Pampsmooth(60),    
     filterl(NULL),
-    filterr(NULL)
+    filterr(NULL),
+    synth(_synth)
 {
     setpreset(Ppreset);
     changepar(1, 64); // pan
@@ -138,8 +140,8 @@ void DynamicFilter::reinitfilter(void)
         delete filterl;
     if (filterr != NULL)
         delete filterr;
-    filterl = new Filter(filterpars);
-    filterr = new Filter(filterpars);
+    filterl = new Filter(filterpars, synth);
+    filterr = new Filter(filterpars, synth);
 }
 
 void DynamicFilter::setpreset(unsigned char npreset)

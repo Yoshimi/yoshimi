@@ -28,10 +28,12 @@
 
 class XMLwrapper;
 
+class SynthEngine;
+
 class Controller
 {
     public:
-        Controller();
+        Controller(SynthEngine *_synth);
         ~Controller() { };
         void resetall(void);
 
@@ -157,6 +159,8 @@ class Controller
             float relbw;
             unsigned char depth;
         } resonancebandwidth;
+private:
+        SynthEngine *synth;
 };
 
 #endif

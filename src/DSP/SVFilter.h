@@ -28,10 +28,12 @@
 #include "Misc/MiscFuncs.h"
 #include "DSP/Filter_.h"
 
+class SynthEngine;
+
 class SVFilter : public Filter_, private MiscFuncs
 {
     public:
-        SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages);
+        SVFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth);
         ~SVFilter();
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -64,6 +66,8 @@ class SVFilter : public Filter_, private MiscFuncs
         int oldabovenq;
         int needsinterpolation, firsttime;
         float *tmpismp; // used if it needs interpolation in filterout()
+
+        SynthEngine *synth;
 };
 
 #endif

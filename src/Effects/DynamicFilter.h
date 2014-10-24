@@ -29,10 +29,12 @@
 #include "Effects/EffectLFO.h"
 #include "Effects/Effect.h"
 
+class SynthEngine;
+
 class DynamicFilter : public Effect
 {
     public:
-        DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_);
+        DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~DynamicFilter();
         void out(float *smpsl, float *smpsr);
         void setpreset(unsigned char npreset);
@@ -61,6 +63,8 @@ class DynamicFilter : public Effect
 
         Filter *filterl, *filterr;
         float ms1, ms2, ms3, ms4; // mean squares
+
+        SynthEngine *synth;
 };
 
 #endif

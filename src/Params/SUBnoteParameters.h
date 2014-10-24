@@ -30,10 +30,12 @@
 #include "Params/FilterParams.h"
 #include "Params/Presets.h"
 
+class SynthEngine;
+
 class SUBnoteParameters : public Presets
 {
     public:
-        SUBnoteParameters();
+        SUBnoteParameters(SynthEngine *_synth);
         ~SUBnoteParameters();
         void setPan(char pan);
         bool randomPan(void) { return !PPanning; }
@@ -100,6 +102,8 @@ class SUBnoteParameters : public Presets
                                 // to lower/higher frequency; 64-default
 
         unsigned char Pstart;   // how the harmonics start, "0" = 0, "1" = random, "2" = 1
+private:
+        SynthEngine *synth;
 };
 
 #endif

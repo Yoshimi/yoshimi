@@ -37,9 +37,10 @@ using namespace std;
 int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
-ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) :
+ADnoteParameters::ADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) :
     Presets(),
-    fft(fft_)
+    fft(fft_),
+    synth(_synth)
 {
     setpresettype("ADnoteParameters");
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
@@ -50,11 +51,11 @@ ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) :
     GlobalPar.AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     GlobalPar.AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1);
 
-    GlobalPar.GlobalFilter = new FilterParams(2, 94, 40);
+    GlobalPar.GlobalFilter = new FilterParams(2, 94, 40, synth);
     GlobalPar.FilterEnvelope = new EnvelopeParams(0, 1);
     GlobalPar.FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     GlobalPar.FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2);
-    GlobalPar.Reson = new Resonance();
+    GlobalPar.Reson = new Resonance(synth);
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         enableVoice(nvoice);
@@ -169,8 +170,8 @@ void ADnoteParameters::defaults(int n)
 // Init the voice parameters
 void ADnoteParameters::enableVoice(int nvoice)
 {
-    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson);
-    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL);
+    VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth);
+    VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth);
 
     VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1);
     VoicePar[nvoice].AmpEnvelope->ADSRinit_dB(0, 100, 127, 100);
@@ -180,7 +181,7 @@ void ADnoteParameters::enableVoice(int nvoice)
     VoicePar[nvoice].FreqEnvelope->ASRinit(30, 40, 64, 60);
     VoicePar[nvoice].FreqLfo = new LFOParams(50, 40, 0, 0, 0, 0, 0, 0);
 
-    VoicePar[nvoice].VoiceFilter = new FilterParams(2, 50, 60);
+    VoicePar[nvoice].VoiceFilter = new FilterParams(2, 50, 60, synth);
     VoicePar[nvoice].FilterEnvelope = new EnvelopeParams(0, 0);
     VoicePar[nvoice].FilterEnvelope->ADSRinit_filter(90, 70, 40, 70, 10, 40);
     VoicePar[nvoice].FilterLfo = new LFOParams(50, 20, 64, 0, 0, 0, 0, 2);

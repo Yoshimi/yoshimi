@@ -28,11 +28,12 @@
 #include "Misc/SynthEngine.h"
 #include "DSP/FormantFilter.h"
 
-FormantFilter::FormantFilter(FilterParams *pars)
+FormantFilter::FormantFilter(FilterParams *pars, SynthEngine *_synth):
+    synth(_synth)
 {
     numformants = pars->Pnumformants;
     for (int i = 0; i < numformants; ++i)
-        formant[i] = new AnalogFilter(4/*BPF*/, 1000.0f, 10.0f, pars->Pstages);
+        formant[i] = new AnalogFilter(4/*BPF*/, 1000.0f, 10.0f, pars->Pstages, synth);
     cleanup();
     inbuffer = (float*)fftwf_malloc(synth->bufferbytes);
     tmpbuf = (float*)fftwf_malloc(synth->bufferbytes);

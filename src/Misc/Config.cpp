@@ -48,7 +48,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
-Config Runtime;
+Config Runtime(NULL);
 
 struct sigaction Config::sigAction;
 
@@ -86,7 +86,7 @@ static struct argp_option cmd_options[] = {
 };
 
 
-Config::Config() :
+Config::Config(SynthEngine *_synth) :
     restoreState(false),
     restoreJackSession(false),
     Samplerate(48000),
@@ -118,7 +118,9 @@ Config::Config() :
     sigIntActive(0),
     ladi1IntActive(0),
     sse_level(0),
-    programcommand(string("yoshimi"))
+    programcommand(string("yoshimi")),
+    lv2Plugin(false),
+    synth(_synth)
 {
     fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
@@ -130,6 +132,14 @@ Config::Config() :
 
 bool Config::Setup(int argc, char **argv)
 {
+    //danvd: It's safe to call these functions before everything else
+    clearBankrootDirlist();
+    clearPresetsDirlist();
+    AntiDenormals(true);
+
+    if(lv2Plugin) //skip further setup for lv2 plugin instance.
+        return true;
+
     memset(&sigAction, 0, sizeof(sigAction));
     sigAction.sa_handler = sigHandler;
     if (sigaction(SIGUSR1, &sigAction, NULL))
@@ -142,8 +152,7 @@ bool Config::Setup(int argc, char **argv)
         Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &sigAction, NULL))
         Log("Setting SIGQUIT handler failed");
-    clearBankrootDirlist();
-    clearPresetsDirlist();
+
     if (!loadConfig())
         return false;
     switch (audioEngine)
@@ -194,8 +203,7 @@ bool Config::Setup(int argc, char **argv)
             no_state0: Log("Invalid state file specified for restore: " + StateFile);
             return false;
         }
-    }
-    AntiDenormals(true);
+    }    
     return true;
 }
 

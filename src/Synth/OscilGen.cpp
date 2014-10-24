@@ -37,13 +37,14 @@ struct random_data OscilGen::random_buf;
 char OscilGen::harmonic_random_state[256];
 struct random_data OscilGen::harmonic_random_buf;
 
-OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) :
+OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth) :
     Presets(),
     ADvsPAD(false),
     tmpsmps((float*)fftwf_malloc(synth->oscilsize * sizeof(float))),
     fft(fft_),
     res(res_),
-    randseed(1)
+    randseed(1),
+    synth(_synth)
 {
     setpresettype("Poscilgen");
     FFTwrapper::newFFTFREQS(&outoscilFFTfreqs, synth->halfoscilsize);

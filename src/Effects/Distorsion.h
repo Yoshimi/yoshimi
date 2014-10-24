@@ -30,10 +30,12 @@
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
+class SynthEngine;
+
 class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
 {
     public:
-        Distorsion(bool insertion, float *efxoutl_, float *efxoutr_);
+        Distorsion(bool insertion, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Distorsion();
         void out(float *smpsl, float *smpr);
         void setpreset(unsigned char npreset);
@@ -63,6 +65,8 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         AnalogFilter *lpfr;
         AnalogFilter *hpfl;
         AnalogFilter *hpfr;
+
+        SynthEngine *synth;
 };
 
 #endif

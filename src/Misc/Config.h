@@ -43,10 +43,12 @@ typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 class XMLwrapper;
 class BodyDisposal;
 
+class SynthEngine;
+
 class Config : public MiscFuncs
 {
     public:
-        Config();
+        Config(SynthEngine *_synth);
         ~Config();
         bool Setup(int argc, char **argv);
         void StartupReport(void);
@@ -57,7 +59,7 @@ class Config : public MiscFuncs
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
         void saveConfig(void);
-        void saveState(void) { saveSessionData(StateFile); }
+        void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
         bool loadState(const string statefile)
             { return restoreSessionData(statefile); }
@@ -152,6 +154,11 @@ class Config : public MiscFuncs
         int jsessionSave;
         const string programcommand;
         string jackSessionDir;
+        bool lv2Plugin;
+
+        SynthEngine *synth;
+
+        friend class YoshimiLV2Plugin;
 };
 
 extern Config Runtime;

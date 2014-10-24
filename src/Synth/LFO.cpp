@@ -28,7 +28,8 @@
 #include "Synth/LFO.h"
 
 
-LFO::LFO(LFOParams *lfopars, float basefreq)
+LFO::LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth):
+    synth(_synth)
 {
     if (lfopars->Pstretch == 0)
         lfopars->Pstretch = 1;

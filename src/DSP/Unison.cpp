@@ -30,7 +30,7 @@ using namespace std;
 #include "Misc/Config.h"
 #include "DSP/Unison.h"
 
-Unison::Unison(int update_period_samples_, float max_delay_sec_) :
+Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_synth) :
     unison_size(0),
     base_freq(1.0f),
     uv(NULL),
@@ -41,7 +41,8 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_) :
     first_time(false),
     delay_buffer(NULL),
     unison_amplitude_samples(0.0f),
-    unison_bandwidth_cents(10.0f)
+    unison_bandwidth_cents(10.0f),
+    synth(_synth)
 {
     if(max_delay < 10)
         max_delay = 10;
@@ -66,7 +67,10 @@ void Unison::setSize(int new_size)
     unison_size = new_size;
     if (uv)
         delete [] uv;
-    uv = new UnisonVoice[unison_size];
+    uv = new UnisonVoice [unison_size];
+    for(int i = 0; i < unison_size; ++i) {
+        uv [i].setPosition(synth->numRandom() * 1.8f - 0.9f);
+    }
     first_time = true;
     updateParameters();
 }

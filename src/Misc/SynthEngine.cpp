@@ -33,8 +33,6 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
-SynthEngine *synth = NULL;
-
 char SynthEngine::random_state[256] = { 0, };
 struct random_data SynthEngine::random_buf;
 
@@ -58,7 +56,7 @@ SynthEngine::SynthEngine() :
     vuringbuf(NULL),
     stateXMLtree(NULL)
 {
-    ctl = new Controller();
+    ctl = new Controller(this);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -138,8 +136,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-     tmpmixl = (float*)fftwf_malloc(synth->bufferbytes);
-     tmpmixr = (float*)fftwf_malloc(synth->bufferbytes);
+     tmpmixl = (float*)fftwf_malloc(bufferbytes);
+     tmpmixr = (float*)fftwf_malloc(bufferbytes);
     if (!tmpmixl || !tmpmixr)
     {
         Runtime.Log("SynthEngine tmpmix allocations failed");
@@ -148,7 +146,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        part[npart] = new Part(&microtonal, fft);
+        part[npart] = new Part(&microtonal, fft, this);
         if (!part[npart])
         {
             Runtime.Log("Failed to allocate new Part");
@@ -160,7 +158,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     // Insertion Effects init
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        if (!(insefx[nefx] = new EffectMgr(1)))
+        if (!(insefx[nefx] = new EffectMgr(1, this)))
         {
             Runtime.Log("Failed to allocate new Insertion EffectMgr");
             goto bail_out;
@@ -170,7 +168,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     // System Effects init
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        if (!(sysefx[nefx] = new EffectMgr(0)))
+        if (!(sysefx[nefx] = new EffectMgr(0, this)))
         {
             Runtime.Log("Failed to allocate new System Effects EffectMgr");
             goto bail_out;

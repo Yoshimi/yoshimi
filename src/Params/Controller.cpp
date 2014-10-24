@@ -31,7 +31,8 @@ using namespace std;
 #include "MusicIO/MidiControl.h"
 #include "Params/Controller.h"
 
-Controller::Controller()
+Controller::Controller(SynthEngine *_synth):
+    synth(_synth)
 {
     defaults();
     resetall();

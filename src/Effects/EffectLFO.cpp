@@ -27,18 +27,19 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EffectLFO.h"
 
-EffectLFO::EffectLFO() :
+EffectLFO::EffectLFO(SynthEngine *_synth) :
     Pfreq(40),
     Prandomness(0),
     PLFOtype(0),
     Pstereo(64),
     xl(0.0f),
     xr(0.0f),
-    ampl1(synth->numRandom()),
-    ampl2(synth->numRandom()),
-    ampr1(synth->numRandom()),
-    ampr2(synth->numRandom()),
-    lfornd(0.0f)
+    ampl1(_synth->numRandom()),
+    ampl2(_synth->numRandom()),
+    ampr1(_synth->numRandom()),
+    ampr2(_synth->numRandom()),
+    lfornd(0.0f),
+    synth(_synth)
 {
     updateparams();
 }

@@ -34,19 +34,21 @@ using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
+class SynthEngine;
+
 class JackEngine : public MusicIO
 {
     public:
-        JackEngine();
-        ~JackEngine() { Close(); };
-        bool isConnected(void) { return (NULL != jackClient); };
+        JackEngine(SynthEngine *_synth);
+        ~JackEngine() { Close(); }
+        bool isConnected(void) { return (NULL != jackClient); }
         bool connectServer(string server);
         bool openAudio(void);
         bool openMidi(void);
         bool Start(void);
         void Close(void);
-        unsigned int getSamplerate(void) { return audio.jackSamplerate; };
-        int getBuffersize(void) { return audio.jackNframes; };
+        unsigned int getSamplerate(void) { return audio.jackSamplerate; }
+        int getBuffersize(void) { return audio.jackNframes; }
         string clientName(void);
         int clientId(void);
 

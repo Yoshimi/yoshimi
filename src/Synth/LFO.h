@@ -27,10 +27,12 @@
 
 #include "Params/LFOParams.h"
 
+class SynthEngine;
+
 class LFO
 {
     public:
-        LFO(LFOParams *lfopars, float basefreq);
+        LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth);
         ~LFO() { };
         float lfoout(void);
         float amplfoout(void);
@@ -45,6 +47,8 @@ class LFO
         float lfodelay;
         char lfotype;
         int freqrndenabled;
+
+        SynthEngine *synth;
 };
 
 #endif

@@ -28,7 +28,7 @@
 #include "Misc/SynthEngine.h"
 #include "DSP/AnalogFilter.h"
 
-AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages) :
+AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned char Fstages, SynthEngine *_synth) :
     type(Ftype),
     stages(Fstages),
     freq(Ffreq),
@@ -36,7 +36,8 @@ AnalogFilter::AnalogFilter(unsigned char Ftype, float Ffreq, float Fq, unsigned 
     gain(1.0),
     abovenq(0),
     oldabovenq(0),
-    tmpismp(NULL)
+    tmpismp(NULL),
+    synth(_synth)
 {
 
     for (int i = 0; i < 3; ++i)

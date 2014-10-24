@@ -30,10 +30,12 @@
 
 #define MAX_PHASER_STAGES 12
 
+class SynthEngine;
+
 class Phaser : public Effect
 {
     public:
-        Phaser(bool insertion_, float *efxoutl_, float *efxoutr_);
+        Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Phaser();
         void out(float *smpsl, float *smpsr);
         void setpreset(unsigned char npreset);
@@ -73,6 +75,8 @@ class Phaser : public Effect
         float  *oldr;
         float   oldlgain;
         float   oldrgain;
+
+        SynthEngine *synth;
 };
 
 #endif

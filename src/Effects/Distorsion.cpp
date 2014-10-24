@@ -25,7 +25,7 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/Distorsion.h"
 
-Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
+Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     Pvolume(50),
     Pdrive(90),
@@ -35,12 +35,13 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Plpf(127),
     Phpf(0),
     Pstereo(1),
-    Pprefiltering(0)
+    Pprefiltering(0),
+    synth(_synth)
 {
-    lpfl = new AnalogFilter(2, 22000, 1, 0);
-    lpfr = new AnalogFilter(2, 22000, 1, 0);
-    hpfl = new AnalogFilter(3, 20, 1, 0);
-    hpfr = new AnalogFilter(3, 20, 1, 0);
+    lpfl = new AnalogFilter(2, 22000, 1, 0, synth);
+    lpfr = new AnalogFilter(2, 22000, 1, 0, synth);
+    hpfl = new AnalogFilter(3, 20, 1, 0, synth);
+    hpfr = new AnalogFilter(3, 20, 1, 0, synth);
     setpreset(Ppreset);
     changepar(2, 40);
     cleanup();

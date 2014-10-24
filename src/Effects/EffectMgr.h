@@ -38,10 +38,12 @@
 #include "Params/FilterParams.h"
 #include "Params/Presets.h"
 
+class SynthEngine;
+
 class EffectMgr : public Presets
 {
     public:
-        EffectMgr(const bool insertion_);
+        EffectMgr(const bool insertion_, SynthEngine *_synth);
         ~EffectMgr();
 
         void add2XML(XMLwrapper *xml);
@@ -77,6 +79,8 @@ class EffectMgr : public Presets
         int nefx;
         Effect *efx;
         bool dryonly;
+
+        SynthEngine *synth;
 };
 
 #endif

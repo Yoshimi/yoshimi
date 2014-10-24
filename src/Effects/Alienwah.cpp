@@ -27,10 +27,12 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Effects/Alienwah.h"
 
-Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_) :
+Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    lfo(_synth),
     oldl(NULL),
-    oldr(NULL)
+    oldr(NULL),
+    synth(_synth)
 {
     setpreset(Ppreset);
     cleanup();

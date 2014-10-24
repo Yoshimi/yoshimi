@@ -33,7 +33,7 @@ using namespace std;
 #include "Misc/Config.h"
 #include "MusicIO/JackEngine.h"
 
-JackEngine::JackEngine() : jackClient(NULL)
+JackEngine::JackEngine(SynthEngine *_synth) : MusicIO(_synth), jackClient(NULL)
 {
     audio.jackSamplerate = 0;
     audio.jackNframes = 0;

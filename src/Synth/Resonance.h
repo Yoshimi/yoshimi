@@ -32,11 +32,13 @@
 
 #define N_RES_POINTS 256
 
+class SynthEngine;
+
 class Resonance : public Presets
 {
     public:
-        Resonance();
-        ~Resonance() { };
+        Resonance(SynthEngine *_synth);
+        ~Resonance() { }
         void setpoint(int n, unsigned char p);
         void applyres(int n, FFTFREQS fftdata, float freq);
         void smooth(void);
@@ -64,6 +66,9 @@ class Resonance : public Presets
         // controllers
         float ctlcenter; // center frequency(relative)
         float ctlbw;     // bandwidth(relative)
+private:
+        SynthEngine *synth;
+
 };
 
 #endif

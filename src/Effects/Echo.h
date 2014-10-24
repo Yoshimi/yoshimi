@@ -27,10 +27,12 @@
 
 #include "Effects/Effect.h"
 
+class SynthEngine;
+
 class Echo : public Effect
 {
     public:
-        Echo(bool insertion_, float *efxoutl_, float *efxoutr_);
+        Echo(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Echo();
 
         void out(float *smpsl, float *smpr);
@@ -65,6 +67,8 @@ class Echo : public Effect
         float  oldl, oldr; // pt. lpf
 
         int kl, kr;
+
+        SynthEngine *synth;
 };
 
 #endif

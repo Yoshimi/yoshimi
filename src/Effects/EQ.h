@@ -29,10 +29,12 @@
 #include "DSP/AnalogFilter.h"
 #include "Effects/Effect.h"
 
+class SynthEngine;
+
 class EQ : public Effect, private MiscFuncs
 {
     public:
-        EQ(bool insertion_, float *efxoutl_, float *efxoutr_);
+        EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~EQ() { };
         void out(float *smpsl, float *smpr);
         void setpreset(unsigned char npreset);
@@ -49,6 +51,8 @@ class EQ : public Effect, private MiscFuncs
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
             AnalogFilter *l, *r; // internal values
         } filter[MAX_EQ_BANDS];
+
+        SynthEngine *synth;
 };
 
 #endif

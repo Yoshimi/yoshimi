@@ -24,7 +24,8 @@
 
 #include "DSP/Filter.h"
 
-Filter::Filter(FilterParams *pars)
+Filter::Filter(FilterParams *pars, SynthEngine *_synth):
+    synth(_synth)
 {
     unsigned char Ftype = pars->Ptype;
     unsigned char Fstages = pars->Pstages;
@@ -34,16 +35,16 @@ Filter::Filter(FilterParams *pars)
     switch (category)
     {
         case 1:
-            filter = new FormantFilter(pars);
+            filter = new FormantFilter(pars, synth);
             break;
         case 2:
-            filter = new SVFilter(Ftype, 1000.0f, pars->getq(), Fstages);
+            filter = new SVFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
             filter->outgain = dB2rap(pars->getgain());
             if (filter->outgain > 1.0f)
                 filter->outgain = sqrtf(filter->outgain);
             break;
         default:
-            filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages);
+            filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
             if (Ftype >= 6 && Ftype <= 8)
                 filter->setgain(pars->getgain());
             else

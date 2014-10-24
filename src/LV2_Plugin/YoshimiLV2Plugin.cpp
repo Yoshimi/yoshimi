@@ -16,14 +16,68 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include "YoshimiLV2Plugin.h"
+#include "Misc/Config.h"
+#include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
+#include "MasterUI.h"
+#include "Synth/BodyDisposal.h"
 
 MusicClient *musicClient = NULL;
 
-MusicClient *MusicClient::newMusicClient(void)
+MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
     MusicClient *musicObj = NULL;
 
     return musicObj;
+}
+
+
+YoshimiLV2Plugin::YoshimiLV2Plugin(double sampleRate, const char *bundlePath):
+   _sampleRate(sampleRate),
+   _bundlePath(bundlePath)
+
+{
+    if(!Runtime.lv2Plugin)
+        Runtime.lv2Plugin = true;
+}
+
+bool YoshimiLV2Plugin::init()
+{
+
+    if(!Runtime.Setup(0, NULL))
+        return false;
+
+    return true;
+}
+
+
+LV2_Handle	yoshimiInstantiate (const struct _LV2_Descriptor *descriptor, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
+{
+   YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(sample_rate, bundle_path);
+   return static_cast<LV2_Handle>(inst);
+}
+
+LV2_Descriptor yoshimi_lv2_desc =
+{
+   "http://yoshimi.sourceforge.net",
+   yoshimiInstantiate,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL,
+   NULL
+};
+
+extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
+{
+    switch(index)
+    {
+    case 0:
+        return &yoshimi_lv2_desc;
+    default:
+        break;
+    }
+    return NULL;
 }

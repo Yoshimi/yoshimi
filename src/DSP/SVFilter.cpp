@@ -29,14 +29,15 @@
 #include "DSP/SVFilter.h"
 
 SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
-                   unsigned char Fstages) :
+                   unsigned char Fstages, SynthEngine *_synth) :
     type(Ftype),
     stages(Fstages),
     freq(Ffreq),
     q(Fq),
     gain(1.0f),
     needsinterpolation(0),
-    firsttime(1)
+    firsttime(1),
+    synth(_synth)
 {
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;

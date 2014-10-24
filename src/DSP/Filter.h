@@ -32,10 +32,12 @@
 #include "DSP/SVFilter.h"
 #include "Params/FilterParams.h"
 
+class SynthEngine;
+
 class Filter : private MiscFuncs
 {
     public:
-        Filter(FilterParams *pars);
+        Filter(FilterParams *pars, SynthEngine *_synth);
         ~Filter();
         void filterout(float *smp);
         void setfreq(float frequency);
@@ -46,6 +48,8 @@ class Filter : private MiscFuncs
     private:
         Filter_ *filter;
         unsigned char category;
+
+        SynthEngine *synth;
 };
 
 #endif

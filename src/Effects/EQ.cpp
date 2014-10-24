@@ -25,8 +25,9 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/EQ.h"
 
-EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
+EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    synth(_synth)
 {
     for (int i = 0; i < MAX_EQ_BANDS; ++i)
     {
@@ -35,8 +36,8 @@ EQ::EQ(bool insertion_, float *efxoutl_, float *efxoutr_) :
         filter[i].Pgain = 64;
         filter[i].Pq = 64;
         filter[i].Pstages = 0;
-        filter[i].l = new AnalogFilter(6, 1000.0, 1.0, 0);
-        filter[i].r = new AnalogFilter(6, 1000.0, 1.0, 0);
+        filter[i].l = new AnalogFilter(6, 1000.0, 1.0, 0, synth);
+        filter[i].r = new AnalogFilter(6, 1000.0, 1.0, 0, synth);
     }
     // default values
     Pvolume = 50;

@@ -36,7 +36,7 @@
 #include "Synth/SUBnote.h"
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
-                 float velocity, int portamento_, int midinote, bool besilent) :
+                 float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth) :
     pars(parameters),
     GlobalFilterL(NULL),
     GlobalFilterR(NULL),
@@ -46,7 +46,8 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
     log_0_01(logf(0.01f)),
     log_0_001(logf(0.001f)),
     log_0_0001(logf(0.0001f)),
-    log_0_00001(logf(0.00001f))
+    log_0_00001(logf(0.00001f)),
+    synth(_synth)
 {
     ready = 0;
 
@@ -514,22 +515,22 @@ void SUBnote::filter(bpfilter &filter, float *smps)
 // Init Parameters
 void SUBnote::initparameters(float freq)
 {
-    AmpEnvelope = new Envelope(pars->AmpEnvelope, freq);
+    AmpEnvelope = new Envelope(pars->AmpEnvelope, freq, synth);
     if (pars->PFreqEnvelopeEnabled != 0)
-        FreqEnvelope = new Envelope(pars->FreqEnvelope, freq);
+        FreqEnvelope = new Envelope(pars->FreqEnvelope, freq, synth);
     else
         FreqEnvelope = NULL;
     if (pars->PBandWidthEnvelopeEnabled != 0)
-        BandWidthEnvelope = new Envelope(pars->BandWidthEnvelope, freq);
+        BandWidthEnvelope = new Envelope(pars->BandWidthEnvelope, freq, synth);
     else
         BandWidthEnvelope = NULL;
     if (pars->PGlobalFilterEnabled != 0)
     {
         globalfiltercenterq = pars->GlobalFilter->getq();
-        GlobalFilterL = new Filter(pars->GlobalFilter);
+        GlobalFilterL = new Filter(pars->GlobalFilter, synth);
         if (stereo != 0)
-            GlobalFilterR = new Filter(pars->GlobalFilter);
-        GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq);
+            GlobalFilterR = new Filter(pars->GlobalFilter, synth);
+        GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq, synth);
         GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
     }
     computecurrentparameters();

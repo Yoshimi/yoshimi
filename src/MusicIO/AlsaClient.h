@@ -23,23 +23,25 @@
 #include "MusicIO/MusicClient.h"
 #include "MusicIO/AlsaEngine.h"
 
+class SynthEngine;
+
 class AlsaClient : public MusicClient
 {
     public:
-        AlsaClient() : MusicClient() { };
-        ~AlsaClient() { };
+        AlsaClient(SynthEngine *_synth) : MusicClient(), alsaEngine(_synth) { }
+        ~AlsaClient() { }
 
         bool openAudio(void);
         bool openMidi(void);
-        bool Start(void) { return alsaEngine.Start(); };
+        bool Start(void) { return alsaEngine.Start(); }
         void Stop(void);
         void Close(void) { alsaEngine.Close(); }
-        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
-        int getBuffersize(void) { return alsaEngine.getBuffersize(); };
-        string audioClientName(void) { return alsaEngine.audioClientName(); };
-        string midiClientName(void) { return alsaEngine.midiClientName(); };
-        int audioClientId(void) { return alsaEngine.audioClientId(); };
-        int midiClientId(void) { return alsaEngine.midiClientId(); };
+        unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); }
+        int getBuffersize(void) { return alsaEngine.getBuffersize(); }
+        string audioClientName(void) { return alsaEngine.audioClientName(); }
+        string midiClientName(void) { return alsaEngine.midiClientName(); }
+        int audioClientId(void) { return alsaEngine.audioClientId(); }
+        int midiClientId(void) { return alsaEngine.midiClientId(); }
 
     protected:
         AlsaEngine alsaEngine;

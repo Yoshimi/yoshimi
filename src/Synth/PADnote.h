@@ -36,11 +36,13 @@ class LFO;
 class Filter;
 class Controller;
 
+class SynthEngine;
+
 class PADnote : public Carcass, private SynthHelper
 {
     public:
         PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
-                float velocity, int portamento_, int midinote, bool besilent);
+                float velocity, int portamento_, int midinote, bool besilent, SynthEngine *_synth);
         ~PADnote();
 
         void PADlegatonote(float freq, float velocity,
@@ -146,6 +148,8 @@ class PADnote : public Carcass, private SynthHelper
                 int midinote;
             } param;
         } Legato;
+
+        SynthEngine *synth;
 };
 
 #endif

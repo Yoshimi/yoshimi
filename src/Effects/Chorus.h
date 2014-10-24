@@ -28,11 +28,13 @@
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
+class SynthEngine;
+
 class Chorus : public Effect
 {
     public:
-        Chorus(bool insertion_, float *efxoutl_, float *efxoutr_);
-        ~Chorus() { };
+        Chorus(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
+        ~Chorus() { }
 
         void out(float *smpsl, float *smpsr);
         void setpreset(unsigned char npreset);
@@ -78,6 +80,8 @@ class Chorus : public Effect
         int dlhi2;
         float dllo;
         float mdel;
+
+        SynthEngine *synth;
 };
 
 #endif

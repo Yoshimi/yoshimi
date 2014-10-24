@@ -38,7 +38,7 @@ using namespace std;
 #include "Synth/ADnote.h"
 
 ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
-               float velocity_, int portamento_, int midinote_, bool besilent) :
+               float velocity_, int portamento_, int midinote_, bool besilent, SynthEngine *_synth) :
     ready(0),
     adpars(adpars_),
     stereo(adpars->GlobalPar.PStereo),
@@ -48,7 +48,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     NoteEnabled(true),
     ctl(ctl_),
     time(0.0f),
-    portamento(portamento_)
+    portamento(portamento_),
+    synth(_synth)
 {
     if (velocity > 1.0f)
         velocity = 1.0f;
@@ -781,10 +782,10 @@ void ADnote::initParameters(void)
     int nvoice, i, voicetmp[NUM_VOICES];
 
     // Global Parameters
-    NoteGlobalPar.FreqEnvelope = new Envelope(adpars->GlobalPar.FreqEnvelope, basefreq);
-    NoteGlobalPar.FreqLfo = new LFO(adpars->GlobalPar.FreqLfo, basefreq);
-    NoteGlobalPar.AmpEnvelope = new Envelope(adpars->GlobalPar.AmpEnvelope, basefreq);
-    NoteGlobalPar.AmpLfo = new LFO(adpars->GlobalPar.AmpLfo, basefreq);
+    NoteGlobalPar.FreqEnvelope = new Envelope(adpars->GlobalPar.FreqEnvelope, basefreq, synth);
+    NoteGlobalPar.FreqLfo = new LFO(adpars->GlobalPar.FreqLfo, basefreq, synth);
+    NoteGlobalPar.AmpEnvelope = new Envelope(adpars->GlobalPar.AmpEnvelope, basefreq, synth);
+    NoteGlobalPar.AmpLfo = new LFO(adpars->GlobalPar.AmpLfo, basefreq, synth);
     NoteGlobalPar.Volume =
         4.0f * powf(0.1f, 3.0f * (1.0f - adpars->GlobalPar.PVolume / 96.0f))  //-60 dB .. 0 dB
         * velF(velocity, adpars->GlobalPar.PAmpVelocityScaleFunction); // velocity sensing
@@ -793,12 +794,12 @@ void ADnote::initParameters(void)
     globalnewamplitude = NoteGlobalPar.Volume
                          * NoteGlobalPar.AmpEnvelope->envout_dB()
                          * NoteGlobalPar.AmpLfo->amplfoout();
-    NoteGlobalPar.GlobalFilterL = new Filter(adpars->GlobalPar.GlobalFilter);
+    NoteGlobalPar.GlobalFilterL = new Filter(adpars->GlobalPar.GlobalFilter, synth);
     if (stereo)
-        NoteGlobalPar.GlobalFilterR = new Filter(adpars->GlobalPar.GlobalFilter);
+        NoteGlobalPar.GlobalFilterR = new Filter(adpars->GlobalPar.GlobalFilter, synth);
     NoteGlobalPar.FilterEnvelope =
-        new Envelope(adpars->GlobalPar.FilterEnvelope, basefreq);
-    NoteGlobalPar.FilterLfo = new LFO(adpars->GlobalPar.FilterLfo, basefreq);
+        new Envelope(adpars->GlobalPar.FilterEnvelope, basefreq, synth);
+    NoteGlobalPar.FilterLfo = new LFO(adpars->GlobalPar.FilterLfo, basefreq, synth);
     NoteGlobalPar.FilterQ = adpars->GlobalPar.GlobalFilter->getq();
     NoteGlobalPar.FilterFreqTracking =
         adpars->GlobalPar.GlobalFilter->getfreqtracking(basefreq);
@@ -835,7 +836,7 @@ void ADnote::initParameters(void)
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled)
         {
             NoteVoicePar[nvoice].AmpEnvelope =
-                new Envelope(adpars->VoicePar[nvoice].AmpEnvelope, basefreq);
+                new Envelope(adpars->VoicePar[nvoice].AmpEnvelope, basefreq, synth);
             NoteVoicePar[nvoice].AmpEnvelope->envout_dB(); // discard the first envelope sample
             newamplitude[nvoice] *= NoteVoicePar[nvoice].AmpEnvelope->envout_dB();
         }
@@ -843,36 +844,36 @@ void ADnote::initParameters(void)
         if (adpars->VoicePar[nvoice].PAmpLfoEnabled)
         {
             NoteVoicePar[nvoice].AmpLfo =
-                new LFO(adpars->VoicePar[nvoice].AmpLfo, basefreq);
+                new LFO(adpars->VoicePar[nvoice].AmpLfo, basefreq, synth);
             newamplitude[nvoice] *= NoteVoicePar[nvoice].AmpLfo->amplfoout();
         }
 
         // Voice Frequency Parameters Init
         if (adpars->VoicePar[nvoice].PFreqEnvelopeEnabled)
             NoteVoicePar[nvoice].FreqEnvelope =
-                new Envelope(adpars->VoicePar[nvoice].FreqEnvelope, basefreq);
+                new Envelope(adpars->VoicePar[nvoice].FreqEnvelope, basefreq, synth);
 
         if (adpars->VoicePar[nvoice].PFreqLfoEnabled)
             NoteVoicePar[nvoice].FreqLfo =
-                new LFO(adpars->VoicePar[nvoice].FreqLfo, basefreq);
+                new LFO(adpars->VoicePar[nvoice].FreqLfo, basefreq, synth);
 
         // Voice Filter Parameters Init
         if (adpars->VoicePar[nvoice].PFilterEnabled)
         {
             NoteVoicePar[nvoice].VoiceFilterL =
-                new Filter(adpars->VoicePar[nvoice].VoiceFilter);
+                new Filter(adpars->VoicePar[nvoice].VoiceFilter, synth);
             NoteVoicePar[nvoice].VoiceFilterR =
-                new Filter(adpars->VoicePar[nvoice].VoiceFilter);
+                new Filter(adpars->VoicePar[nvoice].VoiceFilter, synth);
         }
 
         if (adpars->VoicePar[nvoice].PFilterEnvelopeEnabled)
             NoteVoicePar[nvoice].FilterEnvelope =
                 new Envelope(adpars->VoicePar[nvoice].FilterEnvelope,
-                             basefreq);
+                             basefreq, synth);
 
         if (adpars->VoicePar[nvoice].PFilterLfoEnabled)
             NoteVoicePar[nvoice].FilterLfo =
-                new LFO(adpars->VoicePar[nvoice].FilterLfo, basefreq);
+                new LFO(adpars->VoicePar[nvoice].FilterLfo, basefreq, synth);
 
         NoteVoicePar[nvoice].FilterFreqTracking =
             adpars->VoicePar[nvoice].VoiceFilter->getfreqtracking(basefreq);
@@ -921,7 +922,7 @@ void ADnote::initParameters(void)
         if (adpars->VoicePar[nvoice].PFMFreqEnvelopeEnabled)
             NoteVoicePar[nvoice].FMFreqEnvelope =
                 new Envelope(adpars->VoicePar[nvoice].FMFreqEnvelope,
-                             basefreq);
+                             basefreq, synth);
 
         FMnewamplitude[nvoice] = NoteVoicePar[nvoice].FMVolume
                                  * ctl->fmamp.relamp;
@@ -930,7 +931,7 @@ void ADnote::initParameters(void)
         {
             NoteVoicePar[nvoice].FMAmpEnvelope =
                 new Envelope(adpars->VoicePar[nvoice].FMAmpEnvelope,
-                             basefreq);
+                             basefreq, synth);
             FMnewamplitude[nvoice] *=
                 NoteVoicePar[nvoice].FMAmpEnvelope->envout_dB();
         }

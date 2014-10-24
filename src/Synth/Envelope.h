@@ -31,11 +31,13 @@
 
 class EnvelopeParams;
 
+class SynthEngine;
+
 class Envelope : private MiscFuncs
 {
     public:
 
-        Envelope(EnvelopeParams *envpars, float basefreq);
+        Envelope(EnvelopeParams *envpars, float basefreq, SynthEngine *_synth);
         ~Envelope() { };
         void relasekey(void);
         float envout(void);
@@ -57,6 +59,8 @@ class Envelope : private MiscFuncs
         float t;          // the time from the last point
         float inct;       // the time increment
         float envoutval;  // used to do the forced release
+
+        SynthEngine *synth;
 };
 
 #endif

@@ -35,12 +35,14 @@ class Controller;
 class Envelope;
 class Filter;
 
+class SynthEngine;
+
 class SUBnote : public Carcass, private SynthHelper
 {
     public:
         SUBnote(SUBnoteParameters *parameters, Controller *ctl_,
                 float freq, float velocity, int portamento_,
-                int midinote, bool besilent);
+                int midinote, bool besilent, SynthEngine *_synth);
         ~SUBnote();
 
         void SUBlegatonote(float freq, float velocity,
@@ -147,6 +149,8 @@ class SUBnote : public Carcass, private SynthHelper
         const float log_0_001;   // logf(0.001);
         const float log_0_0001;  // logf(0.0001);
         const float log_0_00001; // logf(0.00001);
+
+        SynthEngine *synth;
 };
 
 #endif

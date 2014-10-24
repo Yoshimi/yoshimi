@@ -160,8 +160,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float random_0_1;
 };
 
-extern SynthEngine *synth;
-
 inline float SynthEngine::numRandom(void)
 {
     if (!random_r(&random_buf, &random_result))

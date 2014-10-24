@@ -46,12 +46,14 @@ class Microtonal;
 class EffectMgr;
 class FFTwrapper;
 
+class SynthEngine;
+
 class Part : private MiscFuncs, SynthHelper
 {
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
 
-        Part(Microtonal *microtonal_, FFTwrapper *fft_);
+        Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth);
         ~Part();
         inline float pannedVolLeft(void) { return volume * pangainL; }
         inline float pannedVolRight(void) { return volume * pangainR; }
@@ -195,6 +197,8 @@ class Part : private MiscFuncs, SynthHelper
                            // (the list only store note values). For example.
                            // 'monomem[note].velocity' would be the velocity
                            // value of the note 'note'.
+
+        SynthEngine *synth;
 };
 
 #endif

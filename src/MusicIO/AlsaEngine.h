@@ -28,11 +28,13 @@ using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
+class SynthEngine;
+
 class AlsaEngine : public MusicIO
 {
     public:
-        AlsaEngine();
-        ~AlsaEngine() { };
+        AlsaEngine(SynthEngine *_synth);
+        ~AlsaEngine() { }
 
         bool openAudio(void);
         bool openMidi(void);

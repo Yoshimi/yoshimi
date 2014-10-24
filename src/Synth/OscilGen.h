@@ -33,10 +33,12 @@
 #include "Params/Presets.h"
 #include "Synth/Resonance.h"
 
+class SynthEngine;
+
 class OscilGen : public Presets, private WaveShapeSamples
 {
     public:
-        OscilGen(FFTwrapper *fft_,Resonance *res_);
+        OscilGen(FFTwrapper *fft_,Resonance *res_, SynthEngine *_synth);
         ~OscilGen();
 
         void prepare();
@@ -210,6 +212,8 @@ class OscilGen : public Presets, private WaveShapeSamples
         int32_t harmonic_random_result;
         static struct random_data harmonic_random_buf;
         static char harmonic_random_state[];
+
+        SynthEngine *synth;
 };
 
 

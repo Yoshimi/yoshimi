@@ -45,13 +45,14 @@ using namespace std;
 #include "Synth/BodyDisposal.h"
 #include "Misc/Part.h"
 
-Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
+Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     microtonal(microtonal_),
     fft(fft_),
     partMuted(0),
-    killallnotes(false)
+    killallnotes(false),
+    synth(_synth)
 {
-    ctl = new Controller();
+    ctl = new Controller(synth);
     partoutl = (float*)fftwf_malloc(synth->bufferbytes);
     memset(partoutl, 0, synth->bufferbytes);
     partoutr = (float*)fftwf_malloc(synth->bufferbytes);
@@ -69,13 +70,13 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_) :
         kit[n].padpars = NULL;
     }
 
-    kit[0].adpars = new ADnoteParameters(fft);
-    kit[0].subpars = new SUBnoteParameters();
-    kit[0].padpars = new PADnoteParameters(fft);
+    kit[0].adpars = new ADnoteParameters(fft, synth);
+    kit[0].subpars = new SUBnoteParameters(synth);
+    kit[0].padpars = new PADnoteParameters(fft, synth);
 
     // Part's Insertion Effects init
     for (int nefx = 0; nefx < NUM_PART_EFX; ++nefx)
-        partefx[nefx] = new EffectMgr(1);
+        partefx[nefx] = new EffectMgr(1, synth);
 
     for (int n = 0; n < NUM_PART_EFX + 1; ++n)
     {
@@ -510,15 +511,15 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
             if (kit[0].Padenabled)
                 partnote[pos].kititem[0].adnote =
                     new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
-                                portamento, note, false ); // not silent
+                                portamento, note, false, synth); // not silent
             if (kit[0].Psubenabled)
                 partnote[pos].kititem[0].subnote =
                     new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
-                                portamento, note, false);
+                                portamento, note, false, synth);
             if (kit[0].Ppadenabled)
                 partnote[pos].kititem[0].padnote =
                     new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
-                                portamento, note, false);
+                                portamento, note, false, synth);
             if (kit[0].Padenabled || kit[0].Psubenabled || kit[0].Ppadenabled)
                 partnote[pos].itemsplaying++;
 
@@ -529,15 +530,15 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                 if (kit[0].Padenabled)
                     partnote[posb].kititem[0].adnote =
                         new ADnote(kit[0].adpars, ctl, notebasefreq, vel,
-                                    portamento, note, true); // silent
+                                    portamento, note, true, synth); // silent
                 if (kit[0].Psubenabled)
                     partnote[posb].kititem[0].subnote =
                         new SUBnote(kit[0].subpars, ctl, notebasefreq, vel,
-                                    portamento, note, true);
+                                    portamento, note, true, synth);
                 if (kit[0].Ppadenabled)
                     partnote[posb].kititem[0].padnote =
                         new PADnote(kit[0].padpars, ctl, notebasefreq, vel,
-                                    portamento, note, true);
+                                    portamento, note, true, synth);
                 if (kit[0].Padenabled || kit[0].Psubenabled || kit[0].Ppadenabled)
                     partnote[posb].itemsplaying++;
             }
@@ -563,17 +564,17 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                 {
                     partnote[pos].kititem[ci].adnote =
                         new ADnote(kit[item].adpars, ctl, notebasefreq, vel,
-                                    portamento, note, false); // not silent
+                                    portamento, note, false, synth); // not silent
                 }
                 if (kit[item].subpars && kit[item].Psubenabled)
                     partnote[pos].kititem[ci].subnote =
                         new SUBnote(kit[item].subpars, ctl, notebasefreq, vel,
-                                    portamento, note, false);
+                                    portamento, note, false, synth);
 
                 if (kit[item].padpars && kit[item].Ppadenabled)
                     partnote[pos].kititem[ci].padnote =
                         new PADnote(kit[item].padpars, ctl, notebasefreq, vel,
-                                    portamento, note, false);
+                                    portamento, note, false, synth);
 
                 // Spawn another note (but silent) if legatomodevalid==true
                 if (legatomodevalid)
@@ -587,16 +588,16 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     {
                         partnote[posb].kititem[ci].adnote =
                             new ADnote(kit[item].adpars, ctl, notebasefreq, 
-                                        vel, portamento, note, true); // silent
+                                        vel, portamento, note, true, synth); // silent
                     }
                     if (kit[item].subpars && kit[item].Psubenabled)
                         partnote[posb].kititem[ci].subnote =
                             new SUBnote(kit[item].subpars, ctl, notebasefreq,
-                                        vel, portamento, note, true);
+                                        vel, portamento, note, true, synth);
                     if (kit[item].padpars && kit[item].Ppadenabled)
                         partnote[posb].kititem[ci].padnote =
                             new PADnote(kit[item].padpars, ctl, notebasefreq,
-                                        vel, portamento, note, true);
+                                        vel, portamento, note, true, synth);
 
                     if (kit[item].adpars || kit[item].subpars)
                         partnote[posb].itemsplaying++;
@@ -1079,11 +1080,11 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     else
     {
         if (!kit[kititem].adpars)
-            kit[kititem].adpars = new ADnoteParameters(fft);
+            kit[kititem].adpars = new ADnoteParameters(fft, synth);
         if (!kit[kititem].subpars)
-            kit[kititem].subpars = new SUBnoteParameters();
+            kit[kititem].subpars = new SUBnoteParameters(synth);
         if (!kit[kititem].padpars)
-            kit[kititem].padpars = new PADnoteParameters(fft);
+            kit[kititem].padpars = new PADnoteParameters(fft, synth);
     }
 
     if (resetallnotes)

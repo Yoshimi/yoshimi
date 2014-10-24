@@ -25,7 +25,7 @@
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 
-Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
+Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
     Pvolume(50),
     Pdelay(60),
@@ -34,7 +34,8 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     Phidamp(60),
     lrdelay(0),
     ldelay(NULL),
-    rdelay(NULL)
+    rdelay(NULL),
+    synth(_synth)
 {
     setpreset(Ppreset);
     changepar(4, 100); // lrcross

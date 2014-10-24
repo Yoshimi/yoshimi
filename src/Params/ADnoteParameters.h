@@ -38,6 +38,8 @@ enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD };
 
 extern int ADnote_unison_sizes[];
 
+class SynthEngine;
+
 /*****************************************************************/
 /*                    GLOBAL PARAMETERS                          */
 /*****************************************************************/
@@ -170,7 +172,7 @@ struct ADnoteVoiceParam { // Voice parameters
 class ADnoteParameters : public Presets
 {
     public:
-        ADnoteParameters(FFTwrapper *fft_);
+        ADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
         ~ADnoteParameters();
         void defaults(void);
         void add2XML(XMLwrapper *xml);
@@ -196,6 +198,8 @@ class ADnoteParameters : public Presets
         void getfromXMLsection(XMLwrapper *xml, int n);
 
         FFTwrapper *fft;
+
+        SynthEngine *synth;
 };
 
 #endif

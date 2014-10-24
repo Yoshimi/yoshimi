@@ -33,22 +33,24 @@ using namespace std;
 #include "MusicIO/JackEngine.h"
 #include "MusicIO/AlsaEngine.h"
 
+class SynthEngine;
+
 class JackAlsaClient : public MusicClient
 {
     public:
-        JackAlsaClient() : MusicClient() { };
-        ~JackAlsaClient() { Close(); };
+        JackAlsaClient(SynthEngine *_synth) : MusicClient(), jackEngine(_synth), alsaEngine (_synth) { }
+        ~JackAlsaClient() { Close(); }
 
         bool openAudio(void);
         bool openMidi(void);
         bool Start(void);
         void Close(void) { jackEngine.Close(); alsaEngine.Close(); }
-        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
-        int getBuffersize(void) { return jackEngine.getBuffersize(); };
-        string audioClientName(void) { return jackEngine.clientName(); };
-        string midiClientName(void) { return alsaEngine.midiClientName(); };
-        int audioClientId(void) { return jackEngine.clientId(); };
-        int midiClientId(void) { return alsaEngine.midiClientId(); };
+        unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); }
+        int getBuffersize(void) { return jackEngine.getBuffersize(); }
+        string audioClientName(void) { return jackEngine.clientName(); }
+        string midiClientName(void) { return alsaEngine.midiClientName(); }
+        int audioClientId(void) { return jackEngine.clientId(); }
+        int midiClientId(void) { return alsaEngine.midiClientId(); }
 
     private:
         JackEngine jackEngine;

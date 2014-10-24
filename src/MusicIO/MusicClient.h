@@ -27,6 +27,8 @@ using namespace std;
 
 #include "MusicIO/MidiControl.h"
 
+class SynthEngine;
+
 class MusicClient
 {
     public:
@@ -41,7 +43,7 @@ class MusicClient
         virtual string midiClientName(void) = 0;
         virtual int audioClientId(void) = 0;
         virtual int midiClientId(void) = 0;
-        static MusicClient *newMusicClient(void);
+        static MusicClient *newMusicClient(SynthEngine *_synth);
         string audiodevice;
         string mididevice;
 

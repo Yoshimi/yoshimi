@@ -43,11 +43,13 @@ class Filter;
 
 #define OSCIL_SMP_EXTRA_SAMPLES 5
 
+class SynthEngine;
+
 class ADnote : public Carcass, private SynthHelper, private Float2Int
 {
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
-               int portamento_, int midinote_, bool besilent);
+               int portamento_, int midinote_, bool besilent, SynthEngine *_synth);
         ~ADnote();
 
         int noteout(float *outl, float *outr);
@@ -248,6 +250,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
         float pangainL;
         float pangainR;
+
+        SynthEngine *synth;
 };
 
 

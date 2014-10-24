@@ -27,10 +27,12 @@
 
 #define PHASER_LFO_SHAPE 2
 
-Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_) :
+Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    lfo(_synth),
     oldl(NULL),
-    oldr(NULL)
+    oldr(NULL),
+    synth(_synth)
 {
     setpreset(Ppreset);
     cleanup();

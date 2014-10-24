@@ -33,10 +33,12 @@
 class Unison;
 class AnalogFilter;
 
+class SynthEngine;
+
 class Reverb : public Effect
 {
     public:
-        Reverb(bool insertion_, float *efxoutl_, float *efxoutr_);
+        Reverb(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Reverb();
         void out(float *smps_l, float *smps_r);
         void cleanup(void);
@@ -99,6 +101,8 @@ class Reverb : public Effect
         AnalogFilter *lpf;  // filters
         AnalogFilter *hpf;
         float *inputbuf;
+
+        SynthEngine *synth;
 };
 
 #endif

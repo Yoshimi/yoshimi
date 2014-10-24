@@ -30,11 +30,13 @@
 
 class XMLwrapper;
 
+class SynthEngine;
+
 class FilterParams : public Presets, private MiscFuncs
 {
     public:
-        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_);
-        ~FilterParams() { };
+        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, SynthEngine *_synth);
+        ~FilterParams() { }
 
         void add2XML(XMLwrapper *xml);
         void add2XMLsection(XMLwrapper *xml, int n);
@@ -105,6 +107,8 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Dtype;
         unsigned char Dfreq;
         unsigned char Dq;
+
+        SynthEngine *synth;
 };
 
 #endif

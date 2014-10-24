@@ -34,10 +34,12 @@ using namespace std;
 
 #define MAX_ALIENWAH_DELAY 100
 
+class SynthEngine;
+
 class Alienwah : public Effect
 {
     public:
-        Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_);
+        Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth);
         ~Alienwah();
         void out(float *smpsl, float *smpsr);
 
@@ -68,6 +70,8 @@ class Alienwah : public Effect
         complex<float> *oldl, *oldr;
         complex<float> oldclfol, oldclfor;
         int oldk;
+
+        SynthEngine *synth;
 
 };
 

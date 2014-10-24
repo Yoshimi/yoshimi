@@ -35,10 +35,12 @@ class EnvelopeParams;
 class LFOParams;
 class FilterParams;
 
+class SynthEngine;
+
 class PADnoteParameters : public Presets
 {
     public:
-        PADnoteParameters(FFTwrapper *fft_);
+        PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
         ~PADnoteParameters();
 
         void defaults(void);
@@ -164,6 +166,8 @@ class PADnoteParameters : public Presets
 
         FFTwrapper *fft;
         //pthread_mutex_t *mutex;
+
+        SynthEngine *synth;
 };
 
 #endif
