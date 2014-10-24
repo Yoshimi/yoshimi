@@ -284,8 +284,7 @@ class VUMeter {open : {public Fl_Box, private MiscFuncs}
             fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
     }
     if (panelpart.clip[npart])
-        fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {selected
-    }
+        fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {}
   }
   Function {draw()} {open
   } {
@@ -378,7 +377,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {open selected : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {open private
   } {

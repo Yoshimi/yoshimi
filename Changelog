@@ -1,4 +1,9 @@
-If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapsot'. This will give you a tarball of the current development version.
+If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
+
+yoshimi-1.2.x
+- CMake policy change to stop warning message
+- Small correction in part peak representation
+- Copied some ancient history into Docs
 
 
 yoshimi-1.2.4
