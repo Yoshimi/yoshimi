@@ -38,18 +38,17 @@ char OscilGen::harmonic_random_state[256];
 struct random_data OscilGen::harmonic_random_buf;
 
 OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth) :
-    Presets(),
+    Presets(_synth),
     ADvsPAD(false),
     tmpsmps((float*)fftwf_malloc(_synth->oscilsize * sizeof(float))),
     fft(fft_),
     res(res_),
-    randseed(1),
-    synth(_synth)
+    randseed(1)
 {
     setpresettype("Poscilgen");
     FFTwrapper::newFFTFREQS(&outoscilFFTfreqs, synth->halfoscilsize);
     if (!tmpsmps)
-        Runtime.Log("Very bad error, failed to allocate OscilGen::tmpsmps");
+        synth->getRuntime().Log("Very bad error, failed to allocate OscilGen::tmpsmps");
     else
         memset(tmpsmps, 0, synth->oscilsize * sizeof(float));
     FFTwrapper::newFFTFREQS(&oscilFFTfreqs, synth->halfoscilsize);
@@ -913,7 +912,7 @@ void OscilGen::prepare(void)
     float a, b, c, d, hmagnew;
     if (initstate_r(synth->random(), random_state,
                     sizeof(random_state), &random_buf))
-        Runtime.Log("OscilGen failed to init general randomness");
+        synth->getRuntime().Log("OscilGen failed to init general randomness");
     if (oldbasepar != Pbasefuncpar
         || oldbasefunc != Pcurrentbasefunc
         || oldbasefuncmodulation != Pbasefuncmodulation
@@ -1245,7 +1244,7 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
 //        srandom_r(randseed, &harmonic_random_buf);
     if (initstate_r(randseed, harmonic_random_state,
                     sizeof(harmonic_random_state), &harmonic_random_buf))
-        Runtime.Log("OscilGen failed to init harmonic amplitude amplitude randomness");
+        synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");
         float power = Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
         switch (Pamprandtype)

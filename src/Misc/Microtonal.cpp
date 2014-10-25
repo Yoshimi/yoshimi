@@ -600,7 +600,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 
 bool Microtonal::saveXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(synth);
 
     xml->beginbranch("MICROTONAL");
     add2XML(xml);
@@ -613,7 +613,7 @@ bool Microtonal::saveXML(string filename)
 
 bool Microtonal::loadXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(synth);
     if (NULL == xml)
     {
         synth->getRuntime().Log("Microtonal loadXML fails to instantiate new XMLwrapper");

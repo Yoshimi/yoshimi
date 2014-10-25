@@ -42,9 +42,9 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 
 bool AlsaEngine::openAudio(void)
 {
-    audio.device = Runtime.audioDevice;
-    audio.samplerate = Runtime.Samplerate;
-    audio.period_size = Runtime.Buffersize;
+    audio.device = synth->getRuntime().audioDevice;
+    audio.samplerate = synth->getRuntime().Samplerate;
+    audio.period_size = synth->getRuntime().Buffersize;
     audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
     if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
                              SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
@@ -63,12 +63,12 @@ bail_out:
 
 bool AlsaEngine::openMidi(void)
 {
-    midi.device = Runtime.midiDevice;
+    midi.device = synth->getRuntime().midiDevice;
     const char* port_name = "input";
     int port_num;
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, 0) != 0)
     {
-        Runtime.Log("Error, failed to open alsa midi");
+        synth->getRuntime().Log("Error, failed to open alsa midi");
         goto bail_out;
     }
     snd_seq_client_info_t *seq_info;
@@ -86,7 +86,7 @@ bool AlsaEngine::openMidi(void)
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_SUBSCRIBED);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_UNSUBSCRIBED);
     if (0 > snd_seq_set_client_info(midi.handle, seq_info))
-        Runtime.Log("Failed to set midi event filtering");
+        synth->getRuntime().Log("Failed to set midi event filtering");
     
     snd_seq_set_client_name(midi.handle, midiClientName().c_str());
     
@@ -96,7 +96,7 @@ bool AlsaEngine::openMidi(void)
                                        SND_SEQ_PORT_TYPE_SYNTH);
     if (port_num < 0)
     {
-        Runtime.Log("Error, failed to acquire alsa midi port");
+        synth->getRuntime().Log("Error, failed to acquire alsa midi port");
         goto bail_out;
     }
     if (!midi.device.empty())
@@ -108,8 +108,8 @@ bool AlsaEngine::openMidi(void)
         }
         if (!midiSource)
         {
-            Runtime.Log("Didn't find alsa MIDI source '" + midi.device + "'");
-            Runtime.midiDevice = "";
+            synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
+            synth->getRuntime().midiDevice = "";
         }
         
     }
@@ -128,7 +128,7 @@ void AlsaEngine::Close(void)
     audio.handle = NULL;
     if (NULL != midi.handle)
         if (snd_seq_close(midi.handle) < 0)
-            Runtime.Log("Error closing Alsa midi connection");
+            synth->getRuntime().Log("Error closing Alsa midi connection");
     midi.handle = NULL;
 }
 
@@ -136,16 +136,16 @@ void AlsaEngine::Close(void)
 string AlsaEngine::audioClientName(void)
 {
     string name = "yoshimi";
-    if (!Runtime.nameTag.empty())
-        name += ("-" + Runtime.nameTag);
+    if (!synth->getRuntime().nameTag.empty())
+        name += ("-" + synth->getRuntime().nameTag);
     return name;
 }
 
 string AlsaEngine::midiClientName(void)
 {
     string name = "yoshimi";
-    if (!Runtime.nameTag.empty())
-        name += ("-" + Runtime.nameTag);
+    if (!synth->getRuntime().nameTag.empty())
+        name += ("-" + synth->getRuntime().nameTag);
     return name;
 }
 
@@ -222,7 +222,7 @@ bool AlsaEngine::prepHwparams(void)
                 NULL), "failed to get period size"))
         goto bail_out;
     if (ask_buffersize != audio.period_size)
-        Runtime.Log("Asked for buffersize " + asString(ask_buffersize)
+        synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size));
     return true;
 
@@ -271,7 +271,7 @@ void *AlsaEngine::_AudioThread(void *arg)
 void *AlsaEngine::AudioThread(void)
 {
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
-    while (Runtime.runSynth)
+    while (synth->getRuntime().runSynth)
     {
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
@@ -291,7 +291,7 @@ void *AlsaEngine::AudioThread(void)
                     alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
                     break;
                 default:
-                    Runtime.Log("Alsa AudioThread, weird SND_PCM_STATE: "
+                    synth->getRuntime().Log("Alsa AudioThread, weird SND_PCM_STATE: "
                                 + asString(audio.pcm_state));
                     break;
             }
@@ -304,7 +304,7 @@ void *AlsaEngine::AudioThread(void)
             Write();
         }
         else
-            Runtime.Log("Audio pcm still not running");
+            synth->getRuntime().Log("Audio pcm still not running");
     }
     return NULL;
 }
@@ -386,7 +386,7 @@ bool AlsaEngine::xrunRecover(void)
         if (!alsaBad(snd_pcm_drop(audio.handle), "pcm drop failed"))
             if (!alsaBad(snd_pcm_prepare(audio.handle), "pcm prepare failed"))
                 isgood = true;
-        Runtime.Log("Alsa xrun recovery "
+        synth->getRuntime().Log("Alsa xrun recovery "
                     + ((isgood) ? string("good") : string("not good")));
     }
     return isgood;
@@ -395,23 +395,23 @@ bool AlsaEngine::xrunRecover(void)
 
 bool AlsaEngine::Start(void)
 {
-    if (NULL != midi.handle && !Runtime.startThread(&midi.pThread, _MidiThread,
+    if (NULL != midi.handle && !synth->getRuntime().startThread(&midi.pThread, _MidiThread,
                                                     this, true, 1))
     {
-        Runtime.Log("Failed to start Alsa midi thread");
+        synth->getRuntime().Log("Failed to start Alsa midi thread");
         goto bail_out;
     }
-    if (NULL != audio.handle && !Runtime.startThread(&audio.pThread, _AudioThread,
+    if (NULL != audio.handle && !synth->getRuntime().startThread(&audio.pThread, _AudioThread,
                                                      this, true, 0))
     {
-        Runtime.Log(" Failed to start Alsa audio thread");
+        synth->getRuntime().Log(" Failed to start Alsa audio thread");
         goto bail_out;
     }
 
     return true;
 
 bail_out:
-    Runtime.Log("Bailing from AlsaEngine Start");
+    synth->getRuntime().Log("Bailing from AlsaEngine Start");
     Close();
     return false;
 }
@@ -432,7 +432,7 @@ void *AlsaEngine::MidiThread(void)
     int ctrltype;
     int par;
     int chk;
-    while (Runtime.runSynth)
+    while (synth->getRuntime().runSynth)
     {
         while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)
         {
@@ -485,22 +485,22 @@ void *AlsaEngine::MidiThread(void)
                     break;
 
                 case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
-                    Runtime.Log("Alsa midi port connected");
+                    synth->getRuntime().Log("Alsa midi port connected");
                     break;
 
                 case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
-                    Runtime.Log("Alsa midi port disconnected");
+                    synth->getRuntime().Log("Alsa midi port disconnected");
                     break;
 
                 default:
-                    Runtime.Log("Other non-handled midi event, type: "
+                    synth->getRuntime().Log("Other non-handled midi event, type: "
                                 + asString((int)event->type));
                     break;
             }
             snd_seq_free_event(event);
         }
         if (chk < 0)
-            Runtime.Log("ALSA midi input read failed: " + asString(chk));
+            synth->getRuntime().Log("ALSA midi input read failed: " + asString(chk));
     }
     return NULL;
 }
@@ -510,7 +510,7 @@ bool AlsaEngine::alsaBad(int op_result, string err_msg)
 {
     bool isbad = (op_result < 0); // (op_result < 0) -> is bad -> return true
     if (isbad)
-        Runtime.Log("Error, alsa audio: " +err_msg + ": "
+        synth->getRuntime().Log("Error, alsa audio: " +err_msg + ": "
                      + string(snd_strerror(op_result)));
     return isbad;
 }

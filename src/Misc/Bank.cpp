@@ -481,7 +481,7 @@ bool Bank::addtobank(int pos, const string filename, string name)
     // see if PADsynth is used
     if (synth->getRuntime().CheckPADsynth)
     {
-        XMLwrapper *xml = new XMLwrapper();
+        XMLwrapper *xml = new XMLwrapper(synth);
         xml->checkfileinformation(bank_instrument[pos].filename.c_str());
         bank_instrument[pos].PADsynth_used = xml->information.PADsynth_used;
         delete xml;

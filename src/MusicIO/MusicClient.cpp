@@ -28,48 +28,48 @@ MusicClient *musicClient = NULL;
 MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
     MusicClient *musicObj = NULL;
-    switch (Runtime.audioEngine)
+    switch (_synth->getRuntime().audioEngine)
     {
         case jack_audio:
-            switch (Runtime.midiEngine)
+            switch (_synth->getRuntime().midiEngine)
             {
                 case jack_midi:
                     if (!(musicObj = new JackClient(_synth)))
-                        Runtime.Log("Failed to instantiate JackClient");
+                        _synth->getRuntime().Log("Failed to instantiate JackClient");
                     break;
 
                     case alsa_midi:
                         if (!(musicObj = new JackAlsaClient(_synth)))
-                            Runtime.Log("Failed to instantiate JackAlsaClient");
+                            _synth->getRuntime().Log("Failed to instantiate JackAlsaClient");
                         break;
 
                 default:
-                    Runtime.Log("Ooops, no midi!");
+                    _synth->getRuntime().Log("Ooops, no midi!");
                     break;
             }
             break;
 
         case alsa_audio:
-            switch (Runtime.midiEngine)
+            switch (_synth->getRuntime().midiEngine)
             {
                 case alsa_midi:
                     if (!(musicObj = new AlsaClient(_synth)))
-                        Runtime.Log("Failed to instantiate AlsaClient");
+                        _synth->getRuntime().Log("Failed to instantiate AlsaClient");
                     break;
 
                     case jack_midi:
                         if (!(musicObj = new AlsaJackClient(_synth)))
-                            Runtime.Log("Failed to instantiate AlsaJackClient");
+                            _synth->getRuntime().Log("Failed to instantiate AlsaJackClient");
                         break;
 
                 default:
-                    Runtime.Log("Oops, alsa audio, no midi!");
+                    _synth->getRuntime().Log("Oops, alsa audio, no midi!");
                     break;
             }
             break;
 
         default:
-            Runtime.Log("Oops, no audio, no midi!");
+            _synth->getRuntime().Log("Oops, no audio, no midi!");
             break;
     }
     return musicObj;

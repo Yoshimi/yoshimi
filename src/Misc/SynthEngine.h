@@ -39,6 +39,7 @@ using namespace std;
 #include "Misc/SynthHelper.h"
 
 #include "Misc/Config.h"
+#include "Params/PresetsStore.h"
 
 typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
@@ -140,6 +141,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool fetchMeterData(VUtransfer *VUdata);
 
         Config &getRuntime() {return Runtime;}
+        PresetsStore &getPresetsStore() {return presetsstore;}
 
 
     private:
@@ -164,6 +166,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float random_0_1;
 
         Config Runtime;
+        PresetsStore presetsstore;
 };
 
 inline float SynthEngine::numRandom(void)

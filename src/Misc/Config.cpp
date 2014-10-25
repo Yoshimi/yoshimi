@@ -111,9 +111,9 @@ Config::Config(SynthEngine *_synth) :
     midi_upper_voice_C(128),
     enable_part_on_voice_load(0),
     deadObjects(NULL),
-    sigIntActive(0),
-    ladi1IntActive(0),
     nextHistoryIndex(numeric_limits<unsigned int>::max()),
+    sigIntActive(0),
+    ladi1IntActive(0),    
     sse_level(0),    
     programcommand(string("yoshimi")),    
     lv2Plugin(false),
@@ -313,7 +313,7 @@ bool Config::loadConfig(void)
         Log("ConfigFile " + ConfigFile + " still not found, will use default settings");
     else
     {
-        XMLwrapper *xml = new XMLwrapper();
+        XMLwrapper *xml = new XMLwrapper(synth);
         if (!xml)
             Log("loadConfig failed XMLwrapper allocation");
         else
@@ -456,7 +456,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
 void Config::saveConfig(void)
 {
-    XMLwrapper *xmltree = new XMLwrapper();
+    XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
         Log("saveConfig failed xmltree allocation");
@@ -535,7 +535,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
 void Config::saveSessionData(string savefile)
 {
-    XMLwrapper *xmltree = new XMLwrapper();
+    XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
         Log("saveSessionData failed xmltree allocation", true);
@@ -560,7 +560,7 @@ bool Config::restoreSessionData(string sessionfile)
         Log("Session file " + sessionfile + " not available", true);
         goto end_game;
     }
-    if (!(xml = new XMLwrapper()))
+    if (!(xml = new XMLwrapper(synth)))
     {
         Log("Failed to init xmltree for restoreState", true);
         goto end_game;

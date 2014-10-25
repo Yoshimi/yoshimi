@@ -28,12 +28,14 @@
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
 
+class SynthEngine;
+
 class LFOParams : public Presets
 {
     public:
         LFOParams(float Pfreq_, unsigned char Pintensity_, unsigned char Pstartphase_,
                   unsigned char PLFOtype_, unsigned char Prandomness_,
-                  unsigned char Pdelay_, unsigned char Pcontinous, int fel_);
+                  unsigned char Pdelay_, unsigned char Pcontinous, int fel_, SynthEngine *_synth);
         ~LFOParams() { }
 
         void add2XML(XMLwrapper *xml);

@@ -31,8 +31,8 @@ int LFOParams::time = 0;
 LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
                      unsigned char Pstartphase_, unsigned char PLFOtype_,
                      unsigned char Prandomness_, unsigned char Pdelay_,
-                     unsigned char Pcontinous_, int fel_) :
-    Presets(),
+                     unsigned char Pcontinous_, int fel_, SynthEngine *_synth) :
+    Presets(_synth),
     fel(fel_),
     Dfreq(Pfreq_),
     Dintensity(Pintensity_),

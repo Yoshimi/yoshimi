@@ -26,7 +26,7 @@
 #include "Misc/SynthEngine.h"
 #include "Params/Presets.h"
 
-Presets::Presets() : nelement(-1)
+Presets::Presets(SynthEngine *_synth) : nelement(-1), synth(_synth)
 {
     type[0] = 0;
 }
@@ -40,7 +40,7 @@ void Presets::setpresettype(const char *type_)
 
 void Presets::copy(const char *name)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(synth);
 
     // used only for the clipboard
     if (name == NULL)
@@ -64,9 +64,9 @@ void Presets::copy(const char *name)
     xml->endbranch();
 
     if (name == NULL)
-        presetsstore.copyclipboard(xml, type);
+        synth->getPresetsStore().copyclipboard(xml, type);
     else
-        presetsstore.copypreset(xml, type,name);
+        synth->getPresetsStore().copypreset(xml, type,name);
 
     delete(xml);
     nelement = -1;
@@ -85,7 +85,7 @@ void Presets::paste(int npreset)
             strcpy(type, "Plfo");
     }
 
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(synth);
     if (npreset == 0)
     {
         if (!checkclipboardtype())
@@ -94,14 +94,14 @@ void Presets::paste(int npreset)
             delete(xml);
             return;
         }
-        if (!presetsstore.pasteclipboard(xml))
+        if (!synth->getPresetsStore().pasteclipboard(xml))
         {
             delete(xml);
             nelement = -1;
             return;
         }
     } else {
-        if (!presetsstore.pastepreset(xml, npreset))
+        if (!synth->getPresetsStore().pastepreset(xml, npreset))
         {
             delete(xml);
             nelement = -1;
@@ -136,7 +136,7 @@ bool Presets::checkclipboardtype(void)
     if (nelement != -1)
         strcat(type, "n");
 
-    return presetsstore.checkclipboardtype(type);
+    return synth->getPresetsStore().checkclipboardtype(type);
 }
 
 
@@ -148,11 +148,11 @@ void Presets::setelement(int n)
 
 void Presets::rescanforpresets(void)
 {
-    presetsstore.rescanforpresets(type);
+    synth->getPresetsStore().rescanforpresets(type);
 }
 
 
 void Presets::deletepreset(int npreset)
 {
-    presetsstore.deletepreset(npreset);
+    synth->getPresetsStore().deletepreset(npreset);
 }

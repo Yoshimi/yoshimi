@@ -24,11 +24,11 @@ bool AlsaClient::openAudio(void)
 {
     if (alsaEngine.openAudio())
     {
-        Runtime.Samplerate = getSamplerate();
-        Runtime.Buffersize = getBuffersize();
+        synth->getRuntime().Samplerate = getSamplerate();
+        synth->getRuntime().Buffersize = getBuffersize();
         return true;
     }
-    Runtime.Log("AlsaClient audio open failed");
+    synth->getRuntime().Log("AlsaClient audio open failed");
     return false;
 }
 
@@ -36,6 +36,6 @@ bool AlsaClient::openMidi(void)
 {
     if (alsaEngine.openMidi())
         return true;
-    Runtime.Log("AlsaClient midi open failed");
+    synth->getRuntime().Log("AlsaClient midi open failed");
     return false;
 }

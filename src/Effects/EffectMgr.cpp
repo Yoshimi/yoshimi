@@ -28,12 +28,12 @@
 #include "Effects/EffectMgr.h"
 
 EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
+    Presets(_synth),
     insertion(insertion_),
     filterpars(NULL),
     nefx(0),
     efx(NULL),
-    dryonly(false),
-    synth(_synth)
+    dryonly(false)
 {
     setpresettype("Peffect");
     efxoutl = (float*)fftwf_malloc(synth->bufferbytes);

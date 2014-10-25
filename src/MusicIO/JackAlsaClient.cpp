@@ -21,19 +21,19 @@
 
 bool JackAlsaClient::openAudio(void)
 {
-    if (jackEngine.connectServer(Runtime.audioDevice))
+    if (jackEngine.connectServer(synth->getRuntime().audioDevice))
     {
         if (jackEngine.openAudio())
         {
-            Runtime.Samplerate = getSamplerate();
-            Runtime.Buffersize = getBuffersize();
+            synth->getRuntime().Samplerate = getSamplerate();
+            synth->getRuntime().Buffersize = getBuffersize();
             return true;
         }
         else
-            Runtime.Log("Error, failed to register audio");
+            synth->getRuntime().Log("Error, failed to register audio");
     }
     else
-        Runtime.Log("Error, failed to connect to jack server");
+        synth->getRuntime().Log("Error, failed to connect to jack server");
     return false;
 }
 

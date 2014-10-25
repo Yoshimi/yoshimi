@@ -27,8 +27,7 @@
 #include "Misc/SynthEngine.h"
 #include "Synth/Resonance.h"
 
-Resonance::Resonance(SynthEngine *_synth) : Presets(),
-    synth(_synth)
+Resonance::Resonance(SynthEngine *_synth) : Presets(_synth)
 {
     setpresettype("Presonance");
     defaults();

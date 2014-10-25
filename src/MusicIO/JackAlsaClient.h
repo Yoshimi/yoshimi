@@ -38,7 +38,7 @@ class SynthEngine;
 class JackAlsaClient : public MusicClient
 {
     public:
-        JackAlsaClient(SynthEngine *_synth) : MusicClient(), jackEngine(_synth), alsaEngine (_synth) { }
+        JackAlsaClient(SynthEngine *_synth) : MusicClient(_synth), jackEngine(_synth), alsaEngine (_synth) { }
         ~JackAlsaClient() { Close(); }
 
         bool openAudio(void);

@@ -277,8 +277,8 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     {
         if (Ppolymode && Plegatomode)
         {
-            Runtime.Log("Warning, poly and legato modes are both on.");
-            Runtime.Log("That should not happen, so disabling legato mode");
+            synth->getRuntime().Log("Warning, poly and legato modes are both on.");
+            synth->getRuntime().Log("That should not happen, so disabling legato mode");
             Plegatomode = 0;
         }
         else
@@ -331,7 +331,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     if (pos == -1)
     {
         // test
-        Runtime.Log("Too may notes - notes > poliphony, PartNoteOn()");
+        synth->getRuntime().Log("Too may notes - notes > poliphony, PartNoteOn()");
     }
     else
     {
@@ -815,17 +815,17 @@ void Part::KillNotePos(int pos)
     {
         if (partnote[pos].kititem[j].adnote)
         {
-            Runtime.deadObjects->addBody(partnote[pos].kititem[j].adnote);
+            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].adnote);
             partnote[pos].kititem[j].adnote = NULL;
         }
         if (partnote[pos].kititem[j].subnote)
         {
-            Runtime.deadObjects->addBody(partnote[pos].kititem[j].subnote);
+            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].subnote);
             partnote[pos].kititem[j].subnote = NULL;
         }
         if (partnote[pos].kititem[j].padnote)
         {
-            Runtime.deadObjects->addBody(partnote[pos].kititem[j].padnote);
+            synth->getRuntime().deadObjects->addBody(partnote[pos].kititem[j].padnote);
             partnote[pos].kititem[j].padnote = NULL;
         }
     }
@@ -919,7 +919,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (adnote->finished())
                 {
-                    Runtime.deadObjects->addBody(partnote[k].kititem[item].adnote);
+                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].adnote);
                     partnote[k].kititem[item].adnote = NULL;
                 }
                 for (int i = 0; i < synth->buffersize; ++i)
@@ -946,7 +946,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (subnote->finished())
                 {
-                    Runtime.deadObjects->addBody(partnote[k].kititem[item].subnote);
+                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].subnote);
                     partnote[k].kititem[item].subnote = NULL;
                 }
             }
@@ -965,7 +965,7 @@ void Part::ComputePartSmps(void)
                 }
                 if (padnote->finished())
                 {
-                    Runtime.deadObjects->addBody(partnote[k].kititem[item].padnote);
+                    synth->getRuntime().deadObjects->addBody(partnote[k].kititem[item].padnote);
                     partnote[k].kititem[item].padnote = NULL;
                 }
                 for (int i = 0 ; i < synth->buffersize; ++i)
@@ -1202,10 +1202,10 @@ void Part::add2XML(XMLwrapper *xml)
 
 bool Part::saveXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
-        Runtime.Log("Error, Part::saveXML failed to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Error, Part::saveXML failed to instantiate new XMLwrapper");
         return false;
     }
     xml->beginbranch("INSTRUMENT");
@@ -1219,22 +1219,22 @@ bool Part::saveXML(string filename)
 
 bool Part::loadXMLinstrument(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
-        Runtime.Log("Error, Part failed to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Error, Part failed to instantiate new XMLwrapper");
         return false;
     }
 
     if (!xml->loadXMLfile(filename))
     {
-        Runtime.Log("Error, Part failed to load instrument file " + filename);
+        synth->getRuntime().Log("Error, Part failed to load instrument file " + filename);
         delete xml;
         return false;
     }
     if (xml->enterbranch("INSTRUMENT") == 0)
     {
-        Runtime.Log(filename + " is not an instrument file");
+        synth->getRuntime().Log(filename + " is not an instrument file");
         return false;
     }
     Mute();

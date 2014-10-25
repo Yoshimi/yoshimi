@@ -32,7 +32,7 @@ class SynthEngine;
 class MusicClient
 {
     public:
-        MusicClient() { }
+        MusicClient(SynthEngine *_synth): synth(_synth) { }
         virtual ~MusicClient() { }
         bool Open(void) { return openAudio() && openMidi(); }
         virtual bool Start(void) = 0;
@@ -50,6 +50,8 @@ class MusicClient
     protected:
         virtual bool openAudio(void) = 0;
         virtual bool openMidi(void) = 0;
+
+        SynthEngine *synth;
 };
 
 extern MusicClient *musicClient;

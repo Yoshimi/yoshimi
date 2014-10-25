@@ -24,26 +24,26 @@ bool AlsaJackClient::openAudio(void)
 {
     if (alsaEngine.openAudio())
     {
-        Runtime.Samplerate = getSamplerate();
-        Runtime.Buffersize = getBuffersize();
+        synth->getRuntime().Samplerate = getSamplerate();
+        synth->getRuntime().Buffersize = getBuffersize();
         return true;
     }
     else
-        Runtime.Log("Failed to register audio");
+        synth->getRuntime().Log("Failed to register audio");
     return false;
 }
 
 
 bool AlsaJackClient::openMidi(void)
 {
-    if (jackEngine.connectServer(Runtime.midiDevice))
+    if (jackEngine.connectServer(synth->getRuntime().midiDevice))
     {
         if (jackEngine.openMidi())
         {
             return true;
         }
         else
-            Runtime.Log("AlsaJackClient failed to open midi");
+            synth->getRuntime().Log("AlsaJackClient failed to open midi");
     }
     return false;
 }
@@ -57,9 +57,9 @@ bool AlsaJackClient::Start(void)
             return true;
         }
         else
-            Runtime.Log("jackEngine.Start() failed");
+            synth->getRuntime().Log("jackEngine.Start() failed");
     }
     else
-        Runtime.Log("alsaEngine.Start() failed");
+        synth->getRuntime().Log("alsaEngine.Start() failed");
     return false;
 }

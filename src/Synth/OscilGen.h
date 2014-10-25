@@ -64,7 +64,7 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         // Make a new random seed for Amplitude Randomness -
         //   should be called every noteon event
-        inline void newrandseed(void) { randseed = (unsigned int)random(); };
+        inline void newrandseed(void) { randseed = (unsigned int)random(); }
 
         // Parameters
 
@@ -212,8 +212,6 @@ class OscilGen : public Presets, private WaveShapeSamples
         int32_t harmonic_random_result;
         static struct random_data harmonic_random_buf;
         static char harmonic_random_state[];
-
-        SynthEngine *synth;
 };
 
 

@@ -81,8 +81,6 @@ class EffectMgr : public Presets
         int nefx;
         Effect *efx;
         bool dryonly;
-
-        SynthEngine *synth;
 };
 
 #endif

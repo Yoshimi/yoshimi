@@ -28,7 +28,7 @@ class SynthEngine;
 class AlsaClient : public MusicClient
 {
     public:
-        AlsaClient(SynthEngine *_synth) : MusicClient(), alsaEngine(_synth) { }
+        AlsaClient(SynthEngine *_synth) : MusicClient(_synth), alsaEngine(_synth) { }
         ~AlsaClient() { }
 
         bool openAudio(void);

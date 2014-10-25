@@ -34,8 +34,7 @@
 #include "Misc/SynthEngine.h"
 #include "Params/PADnoteParameters.h"
 
-PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(),
-    synth(_synth)
+PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
     setpresettype("PADnoteParameters");
     fft = fft_;
@@ -44,18 +43,18 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
     oscilgen = new OscilGen(fft_, resonance, synth);
     oscilgen->ADvsPAD = true;
 
-    FreqEnvelope = new EnvelopeParams(0, 0);
+    FreqEnvelope = new EnvelopeParams(0, 0, synth);
     FreqEnvelope->ASRinit(64, 50, 64, 60);
-    FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0);
+    FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);
 
-    AmpEnvelope = new EnvelopeParams(64, 1);
+    AmpEnvelope = new EnvelopeParams(64, 1, synth);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
-    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1);
+    AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
 
     GlobalFilter = new FilterParams(2, 94, 40, synth);
-    FilterEnvelope = new EnvelopeParams(0, 1);
+    FilterEnvelope = new EnvelopeParams(0, 1, synth);
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
-    FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2);
+    FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
 
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
         sample[i].smp = NULL;

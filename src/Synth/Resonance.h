@@ -66,9 +66,6 @@ class Resonance : public Presets
         // controllers
         float ctlcenter; // center frequency(relative)
         float ctlbw;     // bandwidth(relative)
-private:
-        SynthEngine *synth;
-
 };
 
 #endif

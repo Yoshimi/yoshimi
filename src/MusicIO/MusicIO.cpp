@@ -138,11 +138,11 @@ int MusicIO::getMidiController(unsigned char b)
 
 void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param)
 {
-    if (ctrl != Runtime.midi_upper_voice_C)
+    if (ctrl != synth->getRuntime().midi_upper_voice_C)
     {
         synth->SetController(ch, ctrl, param);
     }
-    else if (Runtime.EnableProgChange) // it's really an upper set program change
+    else if (synth->getRuntime().EnableProgChange) // it's really an upper set program change
     {
         synth->SetProgram(ch, (param & 0x1f) | 0x80);
     }
@@ -150,7 +150,7 @@ void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param)
 
 void MusicIO::setMidiProgram(unsigned char ch, int pgm)
 {
-    if (Runtime.EnableProgChange)
+    if (synth->getRuntime().EnableProgChange)
         synth->SetProgram(ch, pgm);
 }
 
@@ -193,7 +193,7 @@ bool MusicIO::prepBuffers(bool with_interleaved)
     }
 
 bail_out:
-    Runtime.Log("Failed to allocate audio buffers, size " + asString(buffersize));
+    synth->getRuntime().Log("Failed to allocate audio buffers, size " + asString(buffersize));
     for (int part = 0; part < (NUM_MIDI_PARTS + 1); part++)
     {
         if (zynLeft[part])

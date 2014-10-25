@@ -463,7 +463,7 @@ int PADnote::noteout(float *outl,float *outr)
     int freqhi = (int) (floorf(freqrap));
     float freqlo = freqrap - floorf(freqrap);
 
-    if (Runtime.Interpolation)
+    if (synth->getRuntime().Interpolation)
         Compute_Cubic(outl, outr, freqhi, freqlo);
     else
         Compute_Linear(outl, outr, freqhi, freqlo);

@@ -102,8 +102,6 @@ class SUBnoteParameters : public Presets
                                 // to lower/higher frequency; 64-default
 
         unsigned char Pstart;   // how the harmonics start, "0" = 0, "1" = random, "2" = 1
-private:
-        SynthEngine *synth;
 };
 
 #endif

@@ -35,10 +35,12 @@ using namespace std;
 // max tree depth
 #define STACKSIZE 128
 
+class SynthEngine;
+
 class XMLwrapper : private MiscFuncs
 {
     public:
-        XMLwrapper();
+        XMLwrapper(SynthEngine *_synth);
         ~XMLwrapper();
 
         // SAVE to XML
@@ -80,7 +82,7 @@ class XMLwrapper : private MiscFuncs
         bool enterbranch(const string& name, int id);
 
         // exits from a branch
-        void exitbranch(void) { pop(); };
+        void exitbranch(void) { pop(); }
 
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it
@@ -146,6 +148,8 @@ class XMLwrapper : private MiscFuncs
             int major; // settings format version
             int minor;
         } xml_version;
+
+        SynthEngine *synth;
 };
 
 #endif

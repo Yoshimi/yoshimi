@@ -22,33 +22,33 @@
 
 bool JackClient::openAudio(void)
 {
-    if (!jackEngine.isConnected() && !jackEngine.connectServer(Runtime.audioDevice))
+    if (!jackEngine.isConnected() && !jackEngine.connectServer(synth->getRuntime().audioDevice))
     {
-        Runtime.Log("Failed to connect to jack server");
+        synth->getRuntime().Log("Failed to connect to jack server");
         return false;
     }
     if (jackEngine.openAudio())
     {
-        Runtime.Samplerate = getSamplerate();
-        Runtime.Buffersize = getBuffersize();
+        synth->getRuntime().Samplerate = getSamplerate();
+        synth->getRuntime().Buffersize = getBuffersize();
         return true;
     }
     else
-        Runtime.Log("Failed to register audio");
+        synth->getRuntime().Log("Failed to register audio");
     return false;
 }
 
 bool JackClient::openMidi(void)
 {
     if (!jackEngine.isConnected()
-        && !jackEngine.connectServer(Runtime.midiDevice))
+        && !jackEngine.connectServer(synth->getRuntime().midiDevice))
     {
-        Runtime.Log("Failed to connect to jack server");
+        synth->getRuntime().Log("Failed to connect to jack server");
         return false;
     }
     if (jackEngine.openMidi())
         return true;
     else
-        Runtime.Log("JackClient failed to open midi");
+        synth->getRuntime().Log("JackClient failed to open midi");
     return false;
 }

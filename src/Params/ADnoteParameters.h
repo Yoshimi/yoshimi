@@ -200,8 +200,6 @@ class ADnoteParameters : public Presets
         void getfromXMLsection(XMLwrapper *xml, int n);
 
         FFTwrapper *fft;
-
-        SynthEngine *synth;
 };
 
 #endif

@@ -107,8 +107,6 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Dtype;
         unsigned char Dfreq;
         unsigned char Dq;
-
-        SynthEngine *synth;
 };
 
 #endif

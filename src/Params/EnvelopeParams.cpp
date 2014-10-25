@@ -29,8 +29,8 @@
 #include "Params/EnvelopeParams.h"
 
 EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
-                               unsigned char Pforcedrelease_) :
-    Presets(),
+                               unsigned char Pforcedrelease_, SynthEngine *_synth) :
+    Presets(_synth),
     Pfreemode(1),
     Penvpoints(1),
     Penvsustain(1),

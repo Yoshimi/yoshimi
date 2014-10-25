@@ -168,8 +168,6 @@ class PADnoteParameters : public Presets
 
         FFTwrapper *fft;
         //pthread_mutex_t *mutex;
-
-        SynthEngine *synth;
 };
 
 #endif

@@ -28,11 +28,13 @@
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
 
+class SynthEngine;
+
 class Presets
 {
     public:
-        Presets();
-        virtual ~Presets() { };
+        Presets(SynthEngine *_synth);
+        virtual ~Presets() { }
 
         void copy(const char *name); // <if name == NULL, the clipboard is used
         void paste(int npreset);     // npreset == 0 for clipboard
@@ -49,10 +51,13 @@ class Presets
         virtual void add2XML(XMLwrapper *xml) = 0;
         virtual void getfromXML(XMLwrapper *xml) = 0;
         virtual void defaults(void) = 0;
-        virtual void add2XMLsection(XMLwrapper *xml, int n) { };
-        virtual void getfromXMLsection(XMLwrapper *xml, int n) { };
-        virtual void defaults(int n) { };
+        virtual void add2XMLsection(XMLwrapper *xml, int n) { }
+        virtual void getfromXMLsection(XMLwrapper *xml, int n) { }
+        virtual void defaults(int n) { }
         int nelement;
+
+    protected:
+        SynthEngine *synth;
 };
 
 #endif

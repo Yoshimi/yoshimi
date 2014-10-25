@@ -31,12 +31,11 @@ using namespace std;
 #include "Params/FilterParams.h"
 
 FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, SynthEngine *_synth) :
-    Presets(),
+    Presets(_synth),
     changed(false),
     Dtype(Ptype_),
     Dfreq(Pfreq_),
-    Dq(Pq_),
-    synth(_synth)
+    Dq(Pq_)
 {
     setpresettype("Pfilter");
     defaults();

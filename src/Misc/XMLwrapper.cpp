@@ -27,6 +27,7 @@
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
+#include "Misc/SynthEngine.h"
 
 int xml_k = 0;
 char tabs[STACKSIZE + 2];
@@ -46,9 +47,10 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 }
 
 
-XMLwrapper::XMLwrapper() :
+XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     minimal(false),
-    stackpos(0)
+    stackpos(0),
+    synth(_synth)
 {
     information.PADsynth_used = 0;
     memset(&parentstack, 0, sizeof(parentstack));
@@ -138,16 +140,16 @@ bool XMLwrapper::saveXMLfile(const string& filename)
     char *xmldata = getXMLdata();
     if (!xmldata)
     {
-        Runtime.Log("Error, failed to allocate xml data space");
+        synth->getRuntime().Log("Error, failed to allocate xml data space");
         return false;
     }
-    unsigned int compression = Runtime.GzipCompression;
+    unsigned int compression = synth->getRuntime().GzipCompression;
     if (compression == 0)
     {
         FILE *xmlfile = fopen(filename.c_str(), "w");
         if (!xmlfile)
         {
-            Runtime.Log("Error, failed to open xml file " + filename + " for save");
+            synth->getRuntime().Log("Error, failed to open xml file " + filename + " for save");
             return false;
         }
         fputs(xmldata, xmlfile);
@@ -164,7 +166,7 @@ bool XMLwrapper::saveXMLfile(const string& filename)
         gzfile = gzopen(filename.c_str(), options);
         if (gzfile == NULL)
         {
-            Runtime.Log("Error, gzopen() == NULL");
+            synth->getRuntime().Log("Error, gzopen() == NULL");
             return false;
         }
         gzputs(gzfile, xmldata);
@@ -249,20 +251,20 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     const char *xmldata = doloadfile(filename);
     if (xmldata == NULL)
     {
-        Runtime.Log("Could not load xml file: " + filename);
+        synth->getRuntime().Log("Could not load xml file: " + filename);
          return false;
     }
     root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (!tree)
     {
-        Runtime.Log("File " + filename + " is not XML");
+        synth->getRuntime().Log("File " + filename + " is not XML");
         return false;
     }
     node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
     if (!root)
     {
-        Runtime.Log("File " + filename + " doesn't contain valid data in this context");
+        synth->getRuntime().Log("File " + filename + " doesn't contain valid data in this context");
         return false;
     }
     push(root);
@@ -278,7 +280,7 @@ char *XMLwrapper::doloadfile(const string& filename)
     gzFile gzf  = gzopen(filename.c_str(), "rb");
     if (!gzf)
     {
-        Runtime.Log("Failed to open xml file " + filename + " for load, errno: "
+        synth->getRuntime().Log("Failed to open xml file " + filename + " for load, errno: "
                     + asString(errno) + "  " + string(strerror(errno)));
         return NULL;
     }
@@ -299,9 +301,9 @@ char *XMLwrapper::doloadfile(const string& filename)
         else if (this_read < 0)
         {
             int errnum;
-            Runtime.Log("Read error in zlib: " + string(gzerror(gzf, &errnum)));
+            synth->getRuntime().Log("Read error in zlib: " + string(gzerror(gzf, &errnum)));
             if (errnum == Z_ERRNO)
-                Runtime.Log("Filesystem error: " + string(strerror(errno)));
+                synth->getRuntime().Log("Filesystem error: " + string(strerror(errno)));
             quit = true;
         }
         else if (total_bytes > 0)
@@ -314,7 +316,7 @@ char *XMLwrapper::doloadfile(const string& filename)
             }
             quit = true;
         }
-        Runtime.signalCheck();
+        synth->getRuntime().signalCheck();
     }
     gzclose(gzf);
     return xmldata;
@@ -480,7 +482,7 @@ void XMLwrapper::push(mxml_node_t *node)
 {
     if (stackpos >= STACKSIZE - 1)
     {
-        Runtime.Log("Not good, XMLwrapper push on a full parentstack");
+        synth->getRuntime().Log("Not good, XMLwrapper push on a full parentstack");
         return;
     }
     stackpos++;
@@ -492,7 +494,7 @@ mxml_node_t *XMLwrapper::pop(void)
 {
     if (stackpos <= 0)
     {
-        Runtime.Log("Not good, XMLwrapper pop on empty parentstack");
+        synth->getRuntime().Log("Not good, XMLwrapper pop on empty parentstack");
         return root;
     }
     mxml_node_t *node = parentstack[stackpos];
@@ -506,7 +508,7 @@ mxml_node_t *XMLwrapper::peek(void)
 {
     if (stackpos <= 0)
     {
-        Runtime.Log("Not good, XMLwrapper peek on an empty parentstack");
+        synth->getRuntime().Log("Not good, XMLwrapper peek on an empty parentstack");
         return root;
     }
     return parentstack[stackpos];

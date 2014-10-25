@@ -57,7 +57,8 @@ SynthEngine::SynthEngine() :
     processLock(NULL),
     vuringbuf(NULL),
     stateXMLtree(NULL),
-    Runtime(this)
+    Runtime(this),
+    presetsstore(this)
 
 {
     ctl = new Controller(this);
@@ -789,7 +790,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 
 int SynthEngine::getalldata(char **data)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(this);
     add2XML(xml);
     *data = xml->getXMLdata();
     delete xml;
@@ -799,7 +800,7 @@ int SynthEngine::getalldata(char **data)
 
 void SynthEngine::putalldata(char *data, int size)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(this);
     if (!xml->putXMLdata(data))
     {
         Runtime.Log("SynthEngine putXMLdata failed");
@@ -821,7 +822,7 @@ void SynthEngine::putalldata(char *data, int size)
 
 bool SynthEngine::saveXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(this);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);
     delete xml;
@@ -831,7 +832,7 @@ bool SynthEngine::saveXML(string filename)
 
 bool SynthEngine::loadXML(string filename)
 {
-    XMLwrapper *xml = new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper(this);
     if (NULL == xml)
     {
         Runtime.Log("failed to init xml tree");

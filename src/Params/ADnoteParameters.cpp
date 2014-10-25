@@ -38,23 +38,22 @@ int ADnoteParameters::ADnote_unison_sizes[] =
 {2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 0};
 
 ADnoteParameters::ADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) :
-    Presets(),
-    fft(fft_),
-    synth(_synth)
+    Presets(_synth),
+    fft(fft_)
 {
     setpresettype("ADnoteParameters");
-    GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
+    GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0, synth);
     GlobalPar.FreqEnvelope->ASRinit(64, 50, 64, 60);
-    GlobalPar.FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0);
+    GlobalPar.FreqLfo = new LFOParams(70, 0, 64, 0, 0, 0, 0, 0, synth);
 
-    GlobalPar.AmpEnvelope = new EnvelopeParams(64, 1);
+    GlobalPar.AmpEnvelope = new EnvelopeParams(64, 1, synth);
     GlobalPar.AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
-    GlobalPar.AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1);
+    GlobalPar.AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
 
     GlobalPar.GlobalFilter = new FilterParams(2, 94, 40, synth);
-    GlobalPar.FilterEnvelope = new EnvelopeParams(0, 1);
+    GlobalPar.FilterEnvelope = new EnvelopeParams(0, 1, synth);
     GlobalPar.FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
-    GlobalPar.FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2);
+    GlobalPar.FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
     GlobalPar.Reson = new Resonance(synth);
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
@@ -173,22 +172,22 @@ void ADnoteParameters::enableVoice(int nvoice)
     VoicePar[nvoice].OscilSmp = new OscilGen(fft, GlobalPar.Reson, synth);
     VoicePar[nvoice].FMSmp = new OscilGen(fft, NULL, synth);
 
-    VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1);
+    VoicePar[nvoice].AmpEnvelope = new EnvelopeParams(64, 1, synth);
     VoicePar[nvoice].AmpEnvelope->ADSRinit_dB(0, 100, 127, 100);
-    VoicePar[nvoice].AmpLfo = new LFOParams(90, 32, 64, 0, 0, 30, 0, 1);
+    VoicePar[nvoice].AmpLfo = new LFOParams(90, 32, 64, 0, 0, 30, 0, 1, synth);
 
-    VoicePar[nvoice].FreqEnvelope = new EnvelopeParams(0, 0);
+    VoicePar[nvoice].FreqEnvelope = new EnvelopeParams(0, 0, synth);
     VoicePar[nvoice].FreqEnvelope->ASRinit(30, 40, 64, 60);
-    VoicePar[nvoice].FreqLfo = new LFOParams(50, 40, 0, 0, 0, 0, 0, 0);
+    VoicePar[nvoice].FreqLfo = new LFOParams(50, 40, 0, 0, 0, 0, 0, 0, synth);
 
     VoicePar[nvoice].VoiceFilter = new FilterParams(2, 50, 60, synth);
-    VoicePar[nvoice].FilterEnvelope = new EnvelopeParams(0, 0);
+    VoicePar[nvoice].FilterEnvelope = new EnvelopeParams(0, 0, synth);
     VoicePar[nvoice].FilterEnvelope->ADSRinit_filter(90, 70, 40, 70, 10, 40);
-    VoicePar[nvoice].FilterLfo = new LFOParams(50, 20, 64, 0, 0, 0, 0, 2);
+    VoicePar[nvoice].FilterLfo = new LFOParams(50, 20, 64, 0, 0, 0, 0, 2, synth);
 
-    VoicePar[nvoice].FMFreqEnvelope = new EnvelopeParams(0, 0);
+    VoicePar[nvoice].FMFreqEnvelope = new EnvelopeParams(0, 0, synth);
     VoicePar[nvoice].FMFreqEnvelope->ASRinit(20, 90, 40, 80);
-    VoicePar[nvoice].FMAmpEnvelope = new EnvelopeParams(64, 1);
+    VoicePar[nvoice].FMAmpEnvelope = new EnvelopeParams(64, 1, synth);
     VoicePar[nvoice].FMAmpEnvelope->ADSRinit(80, 90, 127, 100);
 }
 

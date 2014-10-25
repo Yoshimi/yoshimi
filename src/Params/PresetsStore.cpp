@@ -29,11 +29,11 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Params/PresetsStore.h"
+#include "Misc/SynthEngine.h"
 
-PresetsStore presetsstore;
-
-PresetsStore::PresetsStore() :
-    preset_extension(".xpz")
+PresetsStore::PresetsStore(SynthEngine *_synth) :
+    preset_extension(".xpz"),
+    synth(_synth)
 {
     clipboard.data = NULL;
     clipboard.type.clear();
@@ -103,9 +103,9 @@ void PresetsStore::rescanforpresets(string type)
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
-        if (Runtime.presetsDirlist[i].empty())
+        if (synth->getRuntime().presetsDirlist[i].empty())
             continue;
-        string dirname = Runtime.presetsDirlist[i];
+        string dirname = synth->getRuntime().presetsDirlist[i];
         DIR *dir = opendir(dirname.c_str());
         if (dir == NULL)
             continue;
@@ -153,12 +153,12 @@ void PresetsStore::rescanforpresets(string type)
 
 void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
-    if (Runtime.presetsDirlist[0].empty())
+    if (synth->getRuntime().presetsDirlist[0].empty())
         return;
     string filename;
     string tmpfilename = name;
     legit_filename(tmpfilename);
-    string dirname = Runtime.presetsDirlist[0];
+    string dirname = synth->getRuntime().presetsDirlist[0];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
     filename = dirname + "." + type + preset_extension;
