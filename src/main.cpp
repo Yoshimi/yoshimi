@@ -42,11 +42,11 @@ void yoshimiSigHandler(int sig)
         case SIGHUP:
         case SIGTERM:
         case SIGQUIT:
-            Runtime.setInterruptActive();
+            synth->getRuntime().setInterruptActive();
             break;
 
         case SIGUSR1:
-            Runtime.setLadi1Active();
+            synth->getRuntime().setLadi1Active();
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
     if (!synth)
     {
-        Runtime.Log("Failed to allocate SynthEngine");
+        std::cerr << "Failed to allocate SynthEngine" << std::endl;
         goto bail_out;
     }
 
@@ -83,71 +83,71 @@ int main(int argc, char *argv[])
 
     if (!(musicClient = MusicClient::newMusicClient(synth)))
     {
-        Runtime.Log("Failed to instantiate MusicClient");
+        synth->getRuntime().Log("Failed to instantiate MusicClient");
         goto bail_out;
     }
 
     if (!(musicClient->Open()))
     {
-        Runtime.Log("Failed to open MusicClient");
+        synth->getRuntime().Log("Failed to open MusicClient");
         goto bail_out;
     }
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
-        Runtime.Log("SynthEngine init failed");
+        synth->getRuntime().Log("SynthEngine init failed");
         goto bail_out;
     }
 
     if (!musicClient->Start())
     {
-        Runtime.Log("Failed to start MusicIO");
+        synth->getRuntime().Log("Failed to start MusicIO");
         goto bail_out;
     }
 
-    if (Runtime.showGui)
+    if (synth->getRuntime().showGui)
     {
         if (!(guiMaster = new MasterUI(synth)))
         {
-            Runtime.Log("Failed to instantiate gui");
+            synth->getRuntime().Log("Failed to instantiate gui");
             goto bail_out;
         }
         guiMaster->Init();
     }
 
-    Runtime.StartupReport();
+    synth->getRuntime().StartupReport();
     synth->Unmute();
     cout << "Yay! We're up and running :-)\n";
-    while (Runtime.runSynth)
+    while (synth->getRuntime().runSynth)
     {
         synth->getRuntime().signalCheck();
         synth->getRuntime().deadObjects->disposeBodies();
-        if (Runtime.showGui)
+        if (synth->getRuntime().showGui)
         {
-            for (int i = 0; !Runtime.LogList.empty() && i < 5; ++i)
+            for (int i = 0; !synth->getRuntime().LogList.empty() && i < 5; ++i)
             {
-                guiMaster->Log(Runtime.LogList.front());
-                Runtime.LogList.pop_front();
+                guiMaster->Log(synth->getRuntime().LogList.front());
+                synth->getRuntime().LogList.pop_front();
             }
-            if (Runtime.runSynth)
+            if (synth->getRuntime().runSynth)
                 Fl::wait(0.033333);
         }
-        else if (Runtime.runSynth)
+        else if (synth->getRuntime().runSynth)
             usleep(33333); // where all the action is ...
     }
     musicClient->Close();
     delete musicClient;
     delete synth;
-    Runtime.deadObjects->disposeBodies();
-    Runtime.flushLog();
+    synth->getRuntime().deadObjects->disposeBodies();
+    synth->getRuntime().flushLog();
     if (guiMaster)
         delete guiMaster;
     cout << "Goodbye - Play again soon?\n";
     exit(EXIT_SUCCESS);
 
 bail_out:
-    Runtime.runSynth = false;
-    Runtime.Log("Yoshimi stages a strategic retreat :-(");
+    synth->getRuntime().runSynth = false;
+    synth->getRuntime().Log("Yoshimi stages a strategic retreat :-(");
     if (musicClient)
     {
         musicClient->Close();
@@ -157,6 +157,6 @@ bail_out:
         delete synth;
     if (guiMaster)
         delete guiMaster;
-    Runtime.flushLog();
+    synth->getRuntime().flushLog();
     exit(EXIT_FAILURE);
 }

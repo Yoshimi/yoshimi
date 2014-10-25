@@ -208,17 +208,17 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
         const int *keysoct1 = keysoct1qwerty;
         const int *keysoct2 = keysoct2qwerty;
 
-        if (Runtime.VirKeybLayout == 2)
+        if (synth->getRuntime().VirKeybLayout == 2)
         {
             keysoct1 = keysoct1dw;
             keysoct2 = keysoct2dw;
         }
-        else if (Runtime.VirKeybLayout == 3)
+        else if (synth->getRuntime().VirKeybLayout == 3)
         {
             keysoct1 = keysoct1qwertz;
             keysoct2 = keysoct2qwertz;
         }
-        else if (Runtime.VirKeybLayout == 4) 
+        else if (synth->getRuntime().VirKeybLayout == 4) 
         {
             keysoct1 = keysoct1azerty;
             keysoct2 = keysoct2azerty;

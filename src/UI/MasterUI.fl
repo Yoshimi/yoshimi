@@ -104,7 +104,7 @@ ninseff = 0;
       presetsui = NULL;
       paramsui = NULL;
       yoshiLog = NULL;
-      laststatefile = Runtime.StateFile;} {selected
+      laststatefile = synth->getRuntime().StateFile;} {selected
     }
   }
   Function {~MasterUI()} {open
@@ -160,15 +160,15 @@ ninseff = 0;
       microtonalui = new MicrotonalUI(&synth->microtonal);
       bankui = new BankUI(&npart, synth);
       virkeyboard = new VirKeyboard(synth);
-      configui = new ConfigUI();
-      presetsui = new PresetsUI();
-      paramsui = new ParametersUI();
+      configui = new ConfigUI(synth);
+      presetsui = new PresetsUI(synth);
+      paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
       yoshiLog->setLabel();
       make_window();
-      setMasterLabel(Runtime.paramsLoad);
+      setMasterLabel(synth->getRuntime().paramsLoad);
       masterwindow->show();
-      if (Runtime.showConsole)
+      if (synth->getRuntime().showConsole)
         yoshiLog->Show();
       else
           yoshiLog->Hide();} {}
@@ -183,11 +183,11 @@ ninseff = 0;
               switch (r)
               {
                   case 0:
-                      Runtime.saveConfig();
-                      Runtime.runSynth = false;
+                      synth->getRuntime().saveConfig();
+                      synth->getRuntime().runSynth = false;
                       break;
                   case 2:
-                      Runtime.runSynth = false;
+                      synth->getRuntime().runSynth = false;
                       break;
                   default:
                       break;
@@ -195,8 +195,8 @@ ninseff = 0;
           }
           else
           {
-                  Runtime.saveConfig();
-                  Runtime.runSynth = false;
+                  synth->getRuntime().saveConfig();
+                  synth->getRuntime().runSynth = false;
           }}
       xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
@@ -301,7 +301,7 @@ ninseff = 0;
                 if (fle)
                 {
                     laststatefile = string(fle);
-                    Runtime.saveState(laststatefile);
+                    synth->getRuntime().saveState(laststatefile);
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
           }
@@ -313,7 +313,7 @@ ninseff = 0;
                 if (fle)
                 {
                     laststatefile = string(fle);
-                    Runtime.loadState(laststatefile);
+                    synth->getRuntime().loadState(laststatefile);
                 }
                 partui->instrumentlabel->copy_label(partui->part->Pname.c_str());}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
@@ -323,7 +323,7 @@ ninseff = 0;
           label {&Parameters} open
           xywh {0 0 70 21} labelsize 12
           code0 {o = o; // suppress warning
-              if (Runtime.ParamsHistory.empty())
+              if (synth->getRuntime().ParamsHistory.empty())
                   RecentParams->deactivate();
               else
                   RecentParams->activate();}
@@ -889,7 +889,7 @@ ZynAddSubFX}
         if (result >= 0)
         {
             if (updatehistory)
-                setMasterLabel(Runtime.addParamHistory(string(fname)));
+                setMasterLabel(synth->getRuntime().addParamHistory(string(fname)));
             RecentParams->activate();
         }
         else
@@ -930,7 +930,7 @@ ZynAddSubFX}
             fl_alert("Could not save the file.");
         else
         {
-            setMasterLabel(Runtime.addParamHistory(fname));
+            setMasterLabel(synth->getRuntime().addParamHistory(fname));
             RecentParams->activate();
         }
         updatepanel();} {}

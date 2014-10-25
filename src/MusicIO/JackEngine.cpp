@@ -89,17 +89,17 @@ bool JackEngine::openJackClient(string server)
             jopts |= JackSessionID;
             if (named_server)
                 jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
-                                              &jstatus, Runtime.jackServer.c_str(),
-                                              Runtime.jackSessionUuid.c_str());
+                                              &jstatus, synth->getRuntime().jackServer.c_str(),
+                                              synth->getRuntime().jackSessionUuid.c_str());
             else
                 jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
-                                              &jstatus, Runtime.jackSessionUuid.c_str());
+                                              &jstatus, synth->getRuntime().jackSessionUuid.c_str());
         }
         else
         {
             if (named_server)
                 jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
-                                              &jstatus, Runtime.jackServer.c_str());
+                                              &jstatus, synth->getRuntime().jackServer.c_str());
             else
                 jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts, &jstatus);
         }
@@ -113,7 +113,7 @@ bool JackEngine::openJackClient(string server)
     if (jackClient)
         return true;
     else
-        synth->getRuntime().Log("Failed jack_client_open(), status: " + Runtime.asHexString((int)jstatus), true);
+        synth->getRuntime().Log("Failed jack_client_open(), status: " + synth->getRuntime().asHexString((int)jstatus), true);
     return false;
 }
 
@@ -121,7 +121,8 @@ bool JackEngine::openJackClient(string server)
 bool JackEngine::Start(void)
 {
     bool jackPortsRegistered = true;
-    jack_set_error_function(_errorCallback);
+    //danvd: use default error callback function provided by jack
+    //jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)
         if (jack_set_session_callback
@@ -160,7 +161,7 @@ bool JackEngine::Start(void)
     {
         if (!synth->getRuntime().restoreJackSession && synth->getRuntime().connectJackaudio && !connectJackPorts())
         {
-            Runtime.Log("Failed to connect jack audio ports");
+            synth->getRuntime().Log("Failed to connect jack audio ports");
             goto bail_out;
         }
     }
@@ -432,14 +433,14 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
 
 int JackEngine::_xrunCallback(void *arg)
 {
-    synth->getRuntime().Log("xrun reported");
+    ((JackEngine *)arg)->synth->getRuntime().Log("xrun reported");
     return 0;
 }
 
 
 void JackEngine::_errorCallback(const char *msg)
 {
-    synth->getRuntime().Log("Jack reports error: " + string(msg));
+    //synth->getRuntime().Log("Jack reports error: " + string(msg));
 }
 
 
@@ -466,16 +467,16 @@ void *JackEngine::midiThread(void)
     {
         if (sem_wait(&midiSem) < 0)
         {
-            Runtime.Log("midiThread semaphore wait error, "
+            synth->getRuntime().Log("midiThread semaphore wait error, "
                         + string(strerror(errno)));
             continue;
         }
-        if (!Runtime.runSynth)
+        if (!synth->getRuntime().runSynth)
             break;
         fetch = jack_ringbuffer_read(midi.ringBuf, (char*)&midiEvent, sizeof(struct midi_event));
         if (fetch != sizeof(struct midi_event))
         {
-            Runtime.Log("Short ringbuffer read, " + asString(fetch) + " / "
+            synth->getRuntime().Log("Short ringbuffer read, " + asString(fetch) + " / "
                         + asString((int)sizeof(struct midi_event)));
             continue;
         }
@@ -550,7 +551,7 @@ void *JackEngine::midiThread(void)
                 break;
 
             default: // wot, more?
-                Runtime.Log("other event: " + asString((int)ev));
+                synth->getRuntime().Log("other event: " + asString((int)ev));
                 break;
         }
     }
@@ -597,11 +598,11 @@ void JackEngine::jsessionCallback(jack_session_event_t *event)
     string filename = string("yoshimi-") + uuid + string(".xml");
     string filepath = string(event->session_dir) + filename;
     synth->getRuntime().setJackSessionSave((int)event->type, filepath);
-    string cmd = Runtime.programCmd() + string(" -U ") + uuid
+    string cmd = synth->getRuntime().programCmd() + string(" -U ") + uuid
                  + string(" -u ${SESSION_DIR}") + filename;
     event->command_line = strdup(cmd.c_str());
     if (jack_session_reply(jackClient, event))
-        Runtime.Log("Jack session reply failed");
+        synth->getRuntime().Log("Jack session reply failed");
     jack_session_event_free(event);
 }
 

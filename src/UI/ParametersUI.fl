@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
@@ -34,6 +34,9 @@ decl {\#include "Misc/Config.h"} {private global
 decl {\#include "MasterUI.h"} {private global
 } 
 
+decl {\#include "Misc/SynthEngine.h"} {public global
+} 
+
 class ParametersUI {open
 } {
   Function {make_window(void)} {open
@@ -46,16 +49,16 @@ class ParametersUI {open
       Fl_Browser BrowseRecent {
         callback {if (o->value() > 0)
           {
-              deque<HistoryListItem>::iterator ix = Runtime.ParamsHistory.begin();
+              deque<HistoryListItem>::iterator ix = synth->getRuntime().ParamsHistory.begin();
               string fle;
               switch (Fl::event_button())
               {
                 case FL_LEFT_MOUSE:
                     {
                     	CloseRecent->hide();
-                        fle = Runtime.ParamsHistory.at(o->value() - 1).file;
+                        fle = synth->getRuntime().ParamsHistory.at(o->value() - 1).file;
                         guiMaster->do_load_master(false, fle.c_str());
-                        guiMaster->setMasterLabel(Runtime.ParamsHistory.at(o->value() - 1).name);
+                        guiMaster->setMasterLabel(synth->getRuntime().ParamsHistory.at(o->value() - 1).name);
                         CloseRecent->show();
                         Recent->hide();
                     }
@@ -71,7 +74,7 @@ class ParametersUI {open
           o->column_char('	');}
       }
       Fl_Button Loading {
-        label Loading selected
+        label Loading
         xywh {83 159 57 20} box THIN_DOWN_BOX color 22 labelfont 1 labelsize 11
       }
       Fl_Button CloseRecent {
@@ -81,9 +84,10 @@ class ParametersUI {open
       }
     }
   }
-  Function {ParametersUI()} {open
+  Function {ParametersUI(SynthEngine *_synth)} {open
   } {
-    code {make_window();} {}
+    code {synth = _synth;
+make_window();} {}
   }
   Function {loadRecent()} {open
   } {
@@ -91,11 +95,11 @@ class ParametersUI {open
         const int colwidths[] = { 64, 128, 0 };
         BrowseRecent->column_widths(colwidths);
         BrowseRecent->column_char('	');
-        Runtime.itx = Runtime.ParamsHistory.begin();
-        for (; Runtime.itx != Runtime.ParamsHistory.end(); ++Runtime.itx)
+        synth->getRuntime().itx = synth->getRuntime().ParamsHistory.begin();
+        for (; synth->getRuntime().itx != synth->getRuntime().ParamsHistory.end(); ++synth->getRuntime().itx)
         {
-            string tag = Runtime.itx->name;
-                // + "\\t" + Runtime.itx->file.substr(0, Runtime.itx->file.rfind("/") + 1);
+            string tag = synth->getRuntime().itx->name;
+                // + "\\t" + synth->getRuntime().itx->file.substr(0, synth->getRuntime().itx->file.rfind("/") + 1);
             BrowseRecent->add(tag.c_str());
         }
         BrowseRecent->set_changed();} {}
@@ -112,5 +116,7 @@ class ParametersUI {open
   Function {~ParametersUI()} {open
   } {
     code {Recent->hide();} {}
+  }
+  decl {SynthEngine *synth;} {selected private local
   }
 } 

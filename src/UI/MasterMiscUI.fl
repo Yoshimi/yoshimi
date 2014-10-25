@@ -394,7 +394,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
       Fl_Group panellistitemgroup {open
         private xywh {0 20 71 258} box PLASTIC_THIN_UP_BOX
         code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
-        code1 {if (Runtime.audioEngine != jack_audio) audiosend->deactivate();}
+        code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
           xywh {45 65 15 110} box ENGRAVED_FRAME

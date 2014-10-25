@@ -247,9 +247,9 @@ class BankUI {open : {public BankProcess_}
       }
       Fl_Check_Button {} {
         label {auto close}
-        callback {Runtime.BankUIAutoClose = (int) o->value();}
+        callback {synth->getRuntime().BankUIAutoClose = (int) o->value();}
         tooltip {automatically close the bank window if the instrument is loaded} xywh {705 529 60 15} down_box DOWN_BOX labelsize 10
-        code0 {o->value(Runtime.BankUIAutoClose);}
+        code0 {o->value(synth->getRuntime().BankUIAutoClose);}
       }
       Fl_Choice banklist {
         callback {int n = o->value();
@@ -271,10 +271,10 @@ class BankUI {open : {public BankProcess_}
       }
       Fl_Check_Button {} {
         label {Show PADsynth status}
-        callback {Runtime.CheckPADsynth = (int) o->value();
+        callback {synth->getRuntime().CheckPADsynth = (int) o->value();
             refreshmainwindow();}
         xywh {435 530 150 15} down_box DOWN_BOX labelsize 11
-        code0 {o->value(Runtime.CheckPADsynth);}
+        code0 {o->value(synth->getRuntime().CheckPADsynth);}
       }
     }
   }
@@ -347,7 +347,7 @@ fnc = &BankProcess_::process;
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
 
-            if (Runtime.BankUIAutoClose != 0)
+            if (synth->getRuntime().BankUIAutoClose != 0)
                 bankuiwindow->hide();
         }
 
