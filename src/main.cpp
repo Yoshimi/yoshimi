@@ -30,7 +30,7 @@ using namespace std;
 //global synth engine for app instance;
 SynthEngine *synth = NULL;
 
-//danvd: signal handling moved to main from Runtime
+//Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
 static struct sigaction yoshimiSigAction;
 
@@ -57,7 +57,7 @@ void yoshimiSigHandler(int sig)
 
 int main(int argc, char *argv[])
 {
-
+    MasterUI *guiMaster = NULL;
     synth = new SynthEngine(argc, argv);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
@@ -107,7 +107,8 @@ int main(int argc, char *argv[])
 
     if (synth->getRuntime().showGui)
     {
-        if (!(guiMaster = new MasterUI(synth)))
+        guiMaster = synth->getGuiMaster();
+        if (guiMaster == NULL)
         {
             synth->getRuntime().Log("Failed to instantiate gui");
             goto bail_out;

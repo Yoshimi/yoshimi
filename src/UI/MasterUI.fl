@@ -82,9 +82,6 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {class MasterUI;} {public local
 } 
 
-decl {MasterUI *guiMaster;} {public local
-} 
-
 class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {open
@@ -104,8 +101,7 @@ ninseff = 0;
       presetsui = NULL;
       paramsui = NULL;
       yoshiLog = NULL;
-      laststatefile = synth->getRuntime().StateFile;} {selected
-    }
+      laststatefile = synth->getRuntime().StateFile;} {}
   }
   Function {~MasterUI()} {open
   } {

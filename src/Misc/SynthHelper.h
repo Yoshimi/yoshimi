@@ -24,8 +24,8 @@
 
 class SynthHelper {
     public:
-        SynthHelper() {};
-        ~SynthHelper() {};
+        SynthHelper() {}
+        ~SynthHelper() {}
 
         bool aboveAmplitudeThreshold(float a, float b);
         float interpolateAmplitude(float a, float b, int x, int size);

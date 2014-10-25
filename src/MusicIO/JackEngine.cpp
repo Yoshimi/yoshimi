@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sstream>
+#include <stdio.h>
 
 using namespace std;
 
@@ -78,6 +79,18 @@ bool JackEngine::openJackClient(string server)
     string clientname = "yoshimi";
     if (synth->getRuntime().nameTag.size())
         clientname += ("-" + synth->getRuntime().nameTag);
+
+    //Andrew Deryabin: for multi-instance support add unique id to
+    //instances other then default (0)
+    unsigned int synthUniqueId = synth->getUniqueId();
+    if(synthUniqueId > 0)
+    {
+        char sUniqueId [256];
+        memset(sUniqueId, 0, sizeof(sUniqueId));
+        snprintf(sUniqueId, sizeof(sUniqueId), "%d", synthUniqueId);
+        clientname += ("-" + std::string(sUniqueId));
+    }
+
     bool named_server = server.size() > 0 && server.compare("default") != 0;
     if (named_server)
         jopts |= JackServerName;
@@ -121,7 +134,7 @@ bool JackEngine::openJackClient(string server)
 bool JackEngine::Start(void)
 {
     bool jackPortsRegistered = true;
-    //danvd: use default error callback function provided by jack
+    //Andrew Deryabin: use default error callback function provided by jack
     //jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)

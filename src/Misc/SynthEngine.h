@@ -48,6 +48,8 @@ class Part;
 class XMLwrapper;
 class Controller;
 
+class MasterUI;
+
 class SynthEngine : private SynthHelper, MiscFuncs
 {
     private:
@@ -145,7 +147,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}
-
+        unsigned int getUniqueId() {return uniqueId;}
+        MasterUI *getGuiMaster();
 
     private:
         int muted;
@@ -167,6 +170,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         static struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
+
+        unsigned int uniqueId;
+        MasterUI *guiMaster;
 
 };
 

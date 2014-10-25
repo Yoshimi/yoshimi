@@ -36,6 +36,8 @@ using namespace std;
 char SynthEngine::random_state[256] = { 0, };
 struct random_data SynthEngine::random_buf;
 
+static unsigned int synthNextId = 0;
+
 SynthEngine::SynthEngine(int argc, char **argv) :
     Runtime(this, argc, argv),
     presetsstore(this),
@@ -58,9 +60,11 @@ SynthEngine::SynthEngine(int argc, char **argv) :
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    stateXMLtree(NULL)
-
+    stateXMLtree(NULL),
+    guiMaster(NULL)
 {
+    //Andrew Deryabin: use uniqueId for naming different instances in jack client etc..
+    uniqueId = synthNextId++;
     ctl = new Controller(this);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
@@ -637,7 +641,6 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
     return false;
 }
 
-
 // Parameter control
 void SynthEngine::setPvolume(char control_value)
 {
@@ -976,4 +979,11 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     return det;
 }
 
-
+MasterUI *SynthEngine::getGuiMaster()
+{
+    if(guiMaster == NULL)
+    {
+        guiMaster = new MasterUI(this);
+    }
+    return guiMaster;
+}

@@ -131,7 +131,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    //danvd: It's safe to call these functions before everything else
+    //Andrew Deryabin: It's safe to call these functions before everything else
     clearBankrootDirlist();
     clearPresetsDirlist();
     AntiDenormals(true);
