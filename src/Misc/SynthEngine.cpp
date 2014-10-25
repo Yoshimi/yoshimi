@@ -38,7 +38,8 @@ struct random_data SynthEngine::random_buf;
 
 static unsigned int synthNextId = 0;
 
-SynthEngine::SynthEngine(int argc, char **argv) :
+SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
+    isLV2Plugin(_isLV2Plugin),
     Runtime(this, argc, argv),
     presetsstore(this),
     shutup(false),

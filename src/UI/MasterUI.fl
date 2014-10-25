@@ -87,6 +87,7 @@ class MasterUI {open : {private MiscFuncs}
   Function {MasterUI(SynthEngine *_synth)} {open
   } {
     code {synth = _synth;
+presetsui = NULL;
 ninseff = 0;
       nsyseff = 0;
       npart = 0;
@@ -101,7 +102,8 @@ ninseff = 0;
       presetsui = NULL;
       paramsui = NULL;
       yoshiLog = NULL;
-      laststatefile = synth->getRuntime().StateFile;} {}
+      laststatefile = synth->getRuntime().StateFile;} {selected
+    }
   }
   Function {~MasterUI()} {open
   } {
@@ -980,6 +982,10 @@ ZynAddSubFX}
       inseffectuigroup->activate();
       inseffectuigroup->show();} {}
   }
+  Function {getPresetsUi()} {open return_type {PresetsUI *}
+  } {
+    code {return presetsui;} {}
+  }
   decl {ConfigUI *configui;} {private local
   }
   decl {ParametersUI *paramsui;} {private local
@@ -1007,6 +1013,8 @@ ZynAddSubFX}
   decl {ConsoleUI *yoshiLog;} {private local
   }
   decl {string laststatefile;} {private local
+  }
+  decl {PresetsUI *presetsui;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

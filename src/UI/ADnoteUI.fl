@@ -48,7 +48,10 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "OscilGenUI.h"} {public global
 } 
 
-class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
+decl {\#include "MasterUI.h"} {selected private global
+} 
+
+class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
   Function {make_window()} {open private
   } {
@@ -1007,7 +1010,7 @@ unisongroup->redraw();}
 
 class ADnoteUI {open : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument} open
@@ -1247,12 +1250,12 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(pars);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
         xywh {405 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(pars,this);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {435 380 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
@@ -1288,12 +1291,12 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(pars,nvoice);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvoice);}
         xywh {700 590 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(pars,this,nvoice);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvoice);}
         xywh {730 590 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
@@ -1345,8 +1348,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
       }
     }
   }
-  Function {ADnoteUI(ADnoteParameters *parameters)} {open
-  } {
+  Function {ADnoteUI(ADnoteParameters *parameters)} {} {
     code {//
 	synth = parameters->getSynthEngine();
         pars = parameters;
@@ -1354,7 +1356,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
         resui = new ResonanceUI(pars->GlobalPar.Reson);
         make_window();} {}
   }
-  Function {~ADnoteUI()} {selected return_type virtual
+  Function {~ADnoteUI()} {return_type virtual
   } {
     code {//
         ADnoteVoiceList->hide();

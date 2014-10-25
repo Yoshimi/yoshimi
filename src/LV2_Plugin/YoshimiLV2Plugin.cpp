@@ -38,10 +38,16 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double sampleRate, const char *bundlePath):
    _bundlePath(bundlePath)
 
 {
-    /*
-    if(!Runtime.lv2Plugin)
-        Runtime.lv2Plugin = true;
-        */
+    _synth = new SynthEngine(0, NULL, true);
+}
+
+YoshimiLV2Plugin::~YoshimiLV2Plugin()
+{
+    if(_synth != NULL)
+    {
+        delete _synth;
+        _synth = NULL;
+    }
 }
 
 bool YoshimiLV2Plugin::init()

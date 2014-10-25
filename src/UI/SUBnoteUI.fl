@@ -48,6 +48,12 @@ decl {\#include "Misc/SynthHelper.h"} {public local
 decl {\#include "Params/SUBnoteParameters.h"} {public local
 } 
 
+decl {\#include "Misc/SynthEngine.h"} {public global
+} 
+
+decl {\#include "MasterUI.h"} {private global
+} 
+
 class SUBnoteharmonic {open : {public Fl_Group}
 } {
   Function {make_window()} {open private
@@ -429,12 +435,12 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(pars);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
         xywh {540 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(pars,this);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Group {} {
@@ -573,9 +579,12 @@ pars->updateFrequencyMultipliers();}
   }
   Function {SUBnoteUI(SUBnoteParameters *parameters)} {open
   } {
-    code {pars = parameters; make_window();} {}
+    code {pars = parameters; 
+synth = pars->getSynthEngine();
+make_window();} {selected
+    }
   }
-  Function {~SUBnoteUI()} {selected return_type virtual
+  Function {~SUBnoteUI()} {return_type virtual
   } {
     code {//for (int i=0;i<MAX_SUB_HARMONICS;i++) delete (h[i]);
         SUBparameters->hide();
@@ -584,5 +593,7 @@ pars->updateFrequencyMultipliers();}
   decl {SUBnoteParameters *pars;} {private local
   }
   decl {SUBnoteharmonic *h[MAX_SUB_HARMONICS];} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

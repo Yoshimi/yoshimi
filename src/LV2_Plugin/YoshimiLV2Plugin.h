@@ -20,13 +20,17 @@
 
 #include <string>
 
+#include "Misc/SynthEngine.h"
+
 class YoshimiLV2Plugin
 {
 private:
    double _sampleRate;
    std::string _bundlePath;
+   SynthEngine *_synth;
 public:
    YoshimiLV2Plugin(double sampleRate, const char *bundlePath);
+   virtual ~YoshimiLV2Plugin();
    bool init();
 
 };

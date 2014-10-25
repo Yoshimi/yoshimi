@@ -155,7 +155,6 @@ class Config : public MiscFuncs
         int jsessionSave;
         const string programcommand;
         string jackSessionDir;
-        bool lv2Plugin;
 
         SynthEngine *synth;
         bool bRuntimeSetupCompleted;

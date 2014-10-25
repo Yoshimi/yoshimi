@@ -55,6 +55,12 @@ decl {\#include "Params/FilterParams.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
+decl {\#include "MasterUI.h"} {private global
+} 
+
+decl {\#include "Misc/SynthEngine.h"} {public global
+} 
+
 class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
 } {
   Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
@@ -191,7 +197,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
-    code {pars=NULL;
+    code {synth = NULL;
+pars=NULL;
         velsnsamp=NULL;
         velsns=NULL;
         nvowel = 0;
@@ -205,14 +212,13 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         // delete (filterui);
         delete (formantparswindow);} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window filterui {open
       xywh {455 488 275 75} type Double color 247 labelfont 1 labelsize 12
       class Fl_Group visible
     } {
       Fl_Group filterparamswindow {
-        label {Filter Params} selected
+        label {Filter Params}
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -359,18 +365,17 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(pars);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
         xywh {186 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(pars,this);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {203 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
     }
   }
-  Function {make_formant_window()} {open
-  } {
+  Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters} open
       xywh {699 714 700 205} type Double labelfont 1 labelsize 12 visible
@@ -530,12 +535,12 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(pars,nvowel);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvowel);}
         xywh {635 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(pars,this,nvowel);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvowel);}
         xywh {665 25 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Box {} {
@@ -603,8 +608,10 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
         }
         filterparamswindow->redraw();} {}
   }
-  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_)} {} {
+  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_)} {open
+  } {
     code {pars=filterpars_;
+synth = pars->getSynthEngine();
         velsnsamp = velsnsamp_;
         velsns = velsns_;
         make_window();
@@ -629,7 +636,8 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
             vsnsdial->value(*velsns);
         switchcategory(pars->Pcategory);
         formantparswindow->label(this->label());
-        update_formant_window();} {}
+        update_formant_window();} {selected
+    }
   }
   Function {switchcategory(int newcat)} {} {
     code {if (pars->Pcategory != newcat)
@@ -663,5 +671,7 @@ class FilterUI {open : {public Fl_Group,PresetsUI_}
   decl {unsigned char *velsnsamp,*velsns;} {private local
   }
   decl {int nvowel,nformant,nseqpos;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
 } 

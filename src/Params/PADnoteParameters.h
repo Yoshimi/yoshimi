@@ -141,9 +141,6 @@ class PADnoteParameters : public Presets
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
         void applyparameters(bool islocked);
-
-        SynthEngine *getSynthEngine() {return synth;}
-
         OscilGen *oscilgen;
         Resonance *resonance;
 

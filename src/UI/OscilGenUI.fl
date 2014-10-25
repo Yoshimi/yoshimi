@@ -70,6 +70,9 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
+decl {\#include "MasterUI.h"} {selected private global
+} 
+
 class OscilSpectrum {open : {public Fl_Box, MiscFuncs}
 } {
   Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
@@ -1117,12 +1120,12 @@ refresh();}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(oscil);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(oscil);}
         xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(oscil,this);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(oscil,this);}
         xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Scroll _this_has_to_be_the_last {
@@ -1147,7 +1150,7 @@ make_window();
 refresh();
 osceditUI->show();} {}
   }
-  Function {~OscilEditor()} {open selected return_type virtual
+  Function {~OscilEditor()} {open return_type virtual
   } {
     code {osceditUI->hide();
 //for (int i=0;i<MAX_AD_HARMONICS;i++) delete (h[i]);

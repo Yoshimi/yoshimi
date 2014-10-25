@@ -49,6 +49,9 @@ decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
 } 
 
+decl {\#include "MasterUI.h"} {selected private global
+} 
+
 class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {open private
@@ -311,8 +314,7 @@ synth = part_->getSynthEngine();
       partui = partui_;
       make_window();
       //partkititem->show();
-      end();} {selected
-    }
+      end();} {}
   }
   Function {~PartKitItem()} {} {
     code {partkititem->hide();
@@ -832,14 +834,14 @@ Offset}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(part->partefx[ninseff]);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
         xywh {90 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {//
             synth->actionLock(lockmute);
-            presetsui->paste(part->partefx[ninseff], inseffectui);
+            synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
             synth->actionLock(unlock);}
         xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }

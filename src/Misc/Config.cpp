@@ -115,8 +115,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     sigIntActive(0),
     ladi1IntActive(0),    
     sse_level(0),    
-    programcommand(string("yoshimi")),    
-    lv2Plugin(false),
+    programcommand(string("yoshimi")),
     synth(_synth),
     bRuntimeSetupCompleted(false)
 {
@@ -136,7 +135,7 @@ bool Config::Setup(int argc, char **argv)
     clearPresetsDirlist();
     AntiDenormals(true);
 
-    if(lv2Plugin) //skip further setup for lv2 plugin instance.
+    if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
         return true;
 
     if (!loadConfig())

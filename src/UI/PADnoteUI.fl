@@ -48,6 +48,9 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "OscilGenUI.h"} {public global
 } 
 
+decl {\#include "MasterUI.h"} {selected private global
+} 
+
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
   Function {PADnoteHarmonicProfile(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
@@ -240,8 +243,7 @@ synth = parameters->getSynthEngine();
         pars = parameters;
         oscui = NULL;
         resui = new ResonanceUI(pars->resonance);
-        make_window();} {selected
-    }
+        make_window();} {}
   }
   Function {make_window()} {open
   } {
@@ -1051,12 +1053,12 @@ synth = parameters->getSynthEngine();
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(pars);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
         xywh {240 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(pars,this);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {270 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }

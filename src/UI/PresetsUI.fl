@@ -42,7 +42,7 @@ decl {using namespace std;} {public global
 decl {\#include "Params/Presets.h"} {public local
 } 
 
-decl {\#include "Misc/SynthEngine.h"} {selected public global
+decl {\#include "Misc/SynthEngine.h"} {public global
 } 
 
 class PresetsUI_ {} {
@@ -255,7 +255,4 @@ p = NULL;
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
-
-decl {PresetsUI *presetsui;} {public local
 } 

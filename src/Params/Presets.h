@@ -42,6 +42,9 @@ class Presets
         void deletepreset(int npreset);
         void setelement(int n);
         void rescanforpresets(void);
+
+        SynthEngine *getSynthEngine() {return synth;}
+
         char type[MAX_PRESETTYPE_SIZE];
 
     protected:

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {Envelope.h} {not_in_source in_header
@@ -31,25 +31,25 @@ This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {in_source in_header
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
-decl {\#include <FL/Fl_Group.H>} {public
+decl {\#include <FL/Fl_Group.H>} {public local
 } 
 
-decl {\#include <FL/Fl_Box.H>} {public
+decl {\#include <FL/Fl_Box.H>} {public local
 } 
 
-decl {\#include <FL/fl_draw.H>} {public
+decl {\#include <FL/fl_draw.H>} {public local
 } 
 
-decl {\#include <FL/fl_ask.H>} {public
+decl {\#include <FL/fl_ask.H>} {public local
 } 
 
-decl {\#include "Params/EnvelopeParams.h"} {public
+decl {\#include "Params/EnvelopeParams.h"} {public local
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include "PresetsUI.h"} {public local
 } 
 
 class EnvelopeFreeEdit {: {public Fl_Box}
@@ -203,19 +203,30 @@ if ((event==FL_DRAG)&&(currentpoint>=0)){
 
 return(1);} {}
   }
-  decl {Fl_Box *pair;} {}
-  decl {EnvelopeParams *env;} {}
-  decl {int oldx,oldy;} {}
-  decl {int currentpoint,cpx,cpdt;} {}
-  decl {int lastpoint;} {public
+  decl {Fl_Box *pair;} {private local
   }
+  decl {EnvelopeParams *env;} {private local
+  }
+  decl {int oldx,oldy;} {private local
+  }
+  decl {int currentpoint,cpx,cpdt;} {private local
+  }
+  decl {int lastpoint;} {public local
+  }
+} 
+
+decl {\#include "Misc/SynthEngine.h"} {public global
+} 
+
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
-    code {env=NULL;
+    code {synth = NULL;
+env=NULL;
 freemodeeditwindow=NULL;
 envADSR=NULL;
 envASR=NULL;
@@ -342,12 +353,12 @@ envfree->redraw();}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(env);}
+        callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
         xywh {465 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(env,this);}
+        callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
         xywh {482 160 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
     }
@@ -420,12 +431,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(env);}
+          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(env,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -488,12 +499,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(env);}
+          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(env,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -582,12 +593,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(env);}
+          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {220 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(env,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {237 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -600,7 +611,7 @@ freeedit->redraw();}
       class Fl_Group visible
     } {
       Fl_Group {} {
-        label {BandWidth Env} selected
+        label {BandWidth Env}
         xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e4aval {
@@ -650,12 +661,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(env);}
+          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {155 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(env,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {172 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -690,12 +701,12 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(env);}
+          callback {synth->getGuiMaster()->getPresetsUi()->copy(env);}
           xywh {150 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(env,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(env,this);}
           xywh {167 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -704,6 +715,7 @@ freeedit->redraw();}
   Function {init(EnvelopeParams *env_)} {open
   } {
     code {env=env_;
+synth = env->getSynthEngine();
 make_ADSR_window();
 make_ASR_window();
 make_ADSRfilter_window();
@@ -724,7 +736,8 @@ freeeditsmall->setpair(freeedit);
 freeedit->setpair(freeeditsmall);
 
 
-refresh();} {}
+refresh();} {selected
+    }
   }
   Function {reinit()} {open
   } {
@@ -871,6 +884,10 @@ envwindow->resize(this->x(),this->y(),this->w(),this->h());
 
 envwindow->show();} {}
   }
-  decl {EnvelopeParams *env;} {}
-  decl {Fl_Group *envwindow;} {}
+  decl {EnvelopeParams *env;} {private local
+  }
+  decl {Fl_Group *envwindow;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
 } 

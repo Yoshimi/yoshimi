@@ -65,7 +65,7 @@ option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
 #option to build lv2 plugin
-option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
+option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" OFF)
 
 set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
 

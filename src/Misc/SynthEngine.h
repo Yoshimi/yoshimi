@@ -53,10 +53,11 @@ class MasterUI;
 class SynthEngine : private SynthHelper, MiscFuncs
 {
     private:
+        bool isLV2Plugin;
         Config Runtime;
         PresetsStore presetsstore;
     public:
-        SynthEngine(int argc, char **argv);
+        SynthEngine(int argc, char **argv, bool _isLV2Plugin = false);
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
         bool actionLock(lockset request);
@@ -145,6 +146,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         
         bool fetchMeterData(VUtransfer *VUdata);
 
+        bool getIsLV2Plugin() {return isLV2Plugin; }
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
@@ -173,7 +175,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         unsigned int uniqueId;
         MasterUI *guiMaster;
-
 };
 
 inline float SynthEngine::numRandom(void)

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0110 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
@@ -31,32 +31,39 @@ This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {in_source in_header
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
-decl {\#include <FL/Fl_Group.H>} {public
+decl {\#include <FL/Fl_Group.H>} {public local
 } 
 
-decl {\#include <FL/Fl_Box.H>} {public
+decl {\#include <FL/Fl_Box.H>} {public local
 } 
 
-decl {\#include <FL/fl_draw.H>} {public
+decl {\#include <FL/fl_draw.H>} {public local
 } 
 
-decl {\#include <FL/fl_ask.H>} {public
+decl {\#include <FL/fl_ask.H>} {public local
 } 
 
-decl {\#include "PresetsUI.h"} {public
+decl {\#include "PresetsUI.h"} {public local
 } 
 
-decl {\#include "Params/LFOParams.h"} {public
+decl {\#include "Params/LFOParams.h"} {public local
+} 
+
+decl {\#include "Misc/SynthEngine.h"} {public global
+} 
+
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class LFOUI {open : {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
-    code {pars=NULL;} {}
+    code {synth = NULL;
+pars=NULL;} {}
   }
   Function {~LFOUI()} {} {
     code {lfoui->hide();
@@ -66,11 +73,11 @@ hide();
   Function {make_window()} {open
   } {
     Fl_Window lfoui {open
-      xywh {789 432 230 70} type Double color 50 labelfont 1 labelsize 12
+      xywh {1433 434 230 70} type Double color 50 labelfont 1 labelsize 12
       class Fl_Group visible
     } {
       Fl_Group lfoparamswindow {
-        label LFO selected
+        label LFO
         xywh {0 0 230 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial freq {
@@ -156,12 +163,12 @@ hide();
         }
         Fl_Button {} {
           label C
-          callback {presetsui->copy(pars);}
+          callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
           xywh {145 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
         Fl_Button {} {
           label P
-          callback {presetsui->paste(pars,this);}
+          callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
           xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
       }
@@ -178,9 +185,10 @@ randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);
 LFOtype->value(pars->PLFOtype);} {}
   }
-  Function {init(LFOParams *lfopars_)} {} {
+  Function {init(LFOParams *lfopars_)} {open
+  } {
     code {pars=lfopars_;
-
+synth = pars->getSynthEngine();
 make_window();
 end();
 
@@ -188,7 +196,11 @@ refresh();
 
 lfoui->resize(this->x(),this->y(),this->w(),this->h());
 
-lfoparamswindow->label(this->label());} {}
+lfoparamswindow->label(this->label());} {selected
+    }
   }
-  decl {LFOParams *pars;} {}
+  decl {LFOParams *pars;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
 } 
