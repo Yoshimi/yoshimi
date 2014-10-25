@@ -36,7 +36,9 @@ using namespace std;
 char SynthEngine::random_state[256] = { 0, };
 struct random_data SynthEngine::random_buf;
 
-SynthEngine::SynthEngine() :
+SynthEngine::SynthEngine(int argc, char **argv) :
+    Runtime(this, argc, argv),
+    presetsstore(this),
     shutup(false),
     samplerate(48000),
     samplerate_f(samplerate),
@@ -56,9 +58,7 @@ SynthEngine::SynthEngine() :
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    stateXMLtree(NULL),
-    Runtime(this),
-    presetsstore(this)
+    stateXMLtree(NULL)
 
 {
     ctl = new Controller(this);

@@ -50,8 +50,11 @@ class Controller;
 
 class SynthEngine : private SynthHelper, MiscFuncs
 {
+    private:
+        Config Runtime;
+        PresetsStore presetsstore;
     public:
-        SynthEngine();
+        SynthEngine(int argc, char **argv);
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
         bool actionLock(lockset request);
@@ -140,8 +143,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         
         bool fetchMeterData(VUtransfer *VUdata);
 
-        Config &getRuntime() {return Runtime;}
-        PresetsStore &getPresetsStore() {return presetsstore;}
+        inline Config &getRuntime() {return Runtime;}
+        inline PresetsStore &getPresetsStore() {return presetsstore;}
 
 
     private:
@@ -165,8 +168,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int32_t random_result;
         float random_0_1;
 
-        Config Runtime;
-        PresetsStore presetsstore;
 };
 
 inline float SynthEngine::numRandom(void)

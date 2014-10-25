@@ -48,7 +48,7 @@ class SynthEngine;
 class Config : public MiscFuncs
 {
     public:
-        Config(SynthEngine *_synth);
+        Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
         bool Setup(int argc, char **argv);
         void StartupReport(void);
@@ -79,6 +79,8 @@ class Config : public MiscFuncs
         string addParamHistory(string file);
         string historyFilename(int index);
         string programCmd(void) { return programcommand; }
+
+        bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
 
         string        ConfigDir;
         string        ConfigFile;
@@ -156,6 +158,7 @@ class Config : public MiscFuncs
         bool lv2Plugin;
 
         SynthEngine *synth;
+        bool bRuntimeSetupCompleted;
 
         friend class YoshimiLV2Plugin;
 };

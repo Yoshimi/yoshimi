@@ -58,8 +58,8 @@ void yoshimiSigHandler(int sig)
 int main(int argc, char *argv[])
 {
 
-    synth = new SynthEngine();
-    if (!synth->getRuntime().Setup(argc, argv))
+    synth = new SynthEngine(argc, argv);
+    if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
 
     if (!synth)
