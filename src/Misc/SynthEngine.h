@@ -168,8 +168,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         
         XMLwrapper *stateXMLtree;
         
-        static char random_state[];
-        static struct random_data random_buf;
+        char random_state[256];
+        struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
 

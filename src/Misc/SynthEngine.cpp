@@ -33,9 +33,6 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
-char SynthEngine::random_state[256] = { 0, };
-struct random_data SynthEngine::random_buf;
-
 static unsigned int synthNextId = 0;
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
@@ -66,6 +63,9 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
 {
     //Andrew Deryabin: use uniqueId for naming different instances in jack client etc..
     uniqueId = synthNextId++;
+
+    memset(&random_state, 0, sizeof(random_state));
+
     ctl = new Controller(this);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart] = NULL;
