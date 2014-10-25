@@ -48,12 +48,8 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
-Config Runtime;
-
-struct sigaction Config::sigAction;
 
 const unsigned short Config::MaxParamsHistory = 25;
-unsigned short Config::nextHistoryIndex = numeric_limits<unsigned int>::max();
 
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
@@ -86,7 +82,7 @@ static struct argp_option cmd_options[] = {
 };
 
 
-Config::Config() :
+Config::Config(SynthEngine *_synth) :
     restoreState(false),
     restoreJackSession(false),
     Samplerate(48000),
@@ -117,10 +113,11 @@ Config::Config() :
     deadObjects(NULL),
     sigIntActive(0),
     ladi1IntActive(0),
-    sse_level(0),
-    programcommand(string("yoshimi")),
+    nextHistoryIndex(numeric_limits<unsigned int>::max()),
+    sse_level(0),    
+    programcommand(string("yoshimi")),    
     lv2Plugin(false),
-    synth(NULL)
+    synth(_synth)
 {
     fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
@@ -130,29 +127,15 @@ Config::Config() :
 }
 
 
-bool Config::Setup(int argc, char **argv, SynthEngine *_synth)
+bool Config::Setup(int argc, char **argv)
 {
     //danvd: It's safe to call these functions before everything else
-    synth = _synth;
     clearBankrootDirlist();
     clearPresetsDirlist();
     AntiDenormals(true);
 
     if(lv2Plugin) //skip further setup for lv2 plugin instance.
         return true;
-
-    memset(&sigAction, 0, sizeof(sigAction));
-    sigAction.sa_handler = sigHandler;
-    if (sigaction(SIGUSR1, &sigAction, NULL))
-        Log("Setting SIGUSR1 handler failed");
-    if (sigaction(SIGINT, &sigAction, NULL))
-        Log("Setting SIGINT handler failed");
-    if (sigaction(SIGHUP, &sigAction, NULL))
-        Log("Setting SIGHUP handler failed");
-    if (sigaction(SIGTERM, &sigAction, NULL))
-        Log("Setting SIGTERM handler failed");
-    if (sigaction(SIGQUIT, &sigAction, NULL))
-        Log("Setting SIGQUIT handler failed");
 
     if (!loadConfig())
         return false;
@@ -769,28 +752,6 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
 }
 
 
-void Config::sigHandler(int sig)
-{
-    switch (sig)
-    {
-        case SIGINT:
-        case SIGHUP:
-        case SIGTERM:
-        case SIGQUIT:
-            Runtime.setInterruptActive();
-            break;
-
-        case SIGUSR1:
-            Runtime.setLadi1Active();
-            sigaction(SIGUSR1, &sigAction, NULL);
-            break;
-
-        default:
-            break;
-    }
-}
-
-
 void Config::signalCheck(void)
 {
     #if defined(JACK_SESSION)
@@ -956,9 +917,9 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'N': settings->nameTag = string(arg); break;
         case 'l': settings->paramsLoad = string(arg); break;
         case 'L': settings->instrumentLoad = string(arg); break;
-        case 'R': settings->Samplerate = Runtime.string2int(string(arg)); break;
-        case 'b': settings->Buffersize = Runtime.string2int(string(arg)); break;
-        case 'o': settings->Oscilsize = Runtime.string2int(string(arg)); break;
+        case 'R': settings->Samplerate = Config::string2int(string(arg)); break;
+        case 'b': settings->Buffersize = Config::string2int(string(arg)); break;
+        case 'o': settings->Oscilsize = Config::string2int(string(arg)); break;
         case 'A':
             settings->audioEngine = alsa_audio;
             if (arg)

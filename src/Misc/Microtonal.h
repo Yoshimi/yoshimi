@@ -35,10 +35,12 @@ class XMLwrapper;
 
 #define MAX_OCTAVE_SIZE 128
 
+class SynthEngine;
+
 class Microtonal : private MiscFuncs
 {
     public:
-        Microtonal() { defaults(); }
+        Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
         ~Microtonal() { }
         void defaults(void);
         float getNoteFreq(int note);
@@ -98,6 +100,8 @@ class Microtonal : private MiscFuncs
           tmpoctave[MAX_OCTAVE_SIZE];
 
         static float note_12et[128];
+
+        SynthEngine *synth;
 };
 
 inline int Microtonal::getoctavesize(void)

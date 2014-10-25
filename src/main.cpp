@@ -27,10 +27,39 @@ using namespace std;
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
 
+//global synth engine for app instance;
+SynthEngine *synth = NULL;
+
+//danvd: signal handling moved to main from Runtime
+//It's only suitable for single instance app support
+static struct sigaction yoshimiSigAction;
+
+void yoshimiSigHandler(int sig)
+{
+    switch (sig)
+    {
+        case SIGINT:
+        case SIGHUP:
+        case SIGTERM:
+        case SIGQUIT:
+            Runtime.setInterruptActive();
+            break;
+
+        case SIGUSR1:
+            Runtime.setLadi1Active();
+            sigaction(SIGUSR1, &yoshimiSigAction, NULL);
+            break;
+
+        default:
+            break;
+    }
+}
+
 int main(int argc, char *argv[])
 {
-    SynthEngine *synth = new SynthEngine();
-    if (!Runtime.Setup(argc, argv, synth))
+
+    synth = new SynthEngine();
+    if (!synth->getRuntime().Setup(argc, argv))
         goto bail_out;
 
     if (!synth)
@@ -38,6 +67,19 @@ int main(int argc, char *argv[])
         Runtime.Log("Failed to allocate SynthEngine");
         goto bail_out;
     }
+
+    memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
+    yoshimiSigAction.sa_handler = yoshimiSigHandler;
+    if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGUSR1 handler failed");
+    if (sigaction(SIGINT, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGINT handler failed");
+    if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGHUP handler failed");
+    if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGTERM handler failed");
+    if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGQUIT handler failed");
 
     if (!(musicClient = MusicClient::newMusicClient(synth)))
     {
@@ -78,8 +120,8 @@ int main(int argc, char *argv[])
     cout << "Yay! We're up and running :-)\n";
     while (Runtime.runSynth)
     {
-        Runtime.signalCheck();
-        Runtime.deadObjects->disposeBodies();
+        synth->getRuntime().signalCheck();
+        synth->getRuntime().deadObjects->disposeBodies();
         if (Runtime.showGui)
         {
             for (int i = 0; !Runtime.LogList.empty() && i < 5; ++i)

@@ -54,7 +54,7 @@ float Chorus::getdelay(float xlfo)
     //check if it is too big delay (caused bu erroneous setDelay() and setDepth()
     if ((result + 0.5) >= maxdelay)
     {
-        Runtime.Log("WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)");
+        synth->getRuntime().Log("WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)");
         result = maxdelay - 1.0;
     }
     return result;

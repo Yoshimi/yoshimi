@@ -39,8 +39,8 @@ class MiscFuncs
         string asLongString(float n);
         string asHexString(int x);
         string asHexString(unsigned int x);
-        float string2float(string str);
-        int string2int(string str);
+        static float string2float(string str);
+        static int string2int(string str);
         bool isRegFile(string chkpath);
         bool isDirectory(string chkpath);
         bool isFifo(string chkpath);

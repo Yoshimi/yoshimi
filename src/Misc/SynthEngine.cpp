@@ -48,13 +48,17 @@ SynthEngine::SynthEngine() :
     halfoscilsize(oscilsize / 2),
     halfoscilsize_f(halfoscilsize),
     ctl(NULL),
+    microtonal(this),
+    bank(this),
     fft(NULL),
     muted(0xFF),
     tmpmixl(NULL),
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    stateXMLtree(NULL)
+    stateXMLtree(NULL),
+    Runtime(this)
+
 {
     ctl = new Controller(this);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)

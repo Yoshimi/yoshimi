@@ -27,6 +27,7 @@
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"
+#include "Misc/SynthEngine.h"
 
 #define MAX_LINE_SIZE 80
 
@@ -615,7 +616,7 @@ bool Microtonal::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper();
     if (NULL == xml)
     {
-        Runtime.Log("Microtonal loadXML fails to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Microtonal loadXML fails to instantiate new XMLwrapper");
         return false;
     }
     if (!xml->loadXMLfile(filename))
@@ -625,7 +626,7 @@ bool Microtonal::loadXML(string filename)
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
-        Runtime.Log("Error, " + filename + " is not a scale file");
+        synth->getRuntime().Log("Error, " + filename + " is not a scale file");
         return false;
     }
     getfromXML(xml);

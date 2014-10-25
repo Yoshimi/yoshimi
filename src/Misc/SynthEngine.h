@@ -38,6 +38,8 @@ using namespace std;
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
 
+#include "Misc/Config.h"
+
 typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
 class EffectMgr;
@@ -137,6 +139,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         
         bool fetchMeterData(VUtransfer *VUdata);
 
+        Config &getRuntime() {return Runtime;}
+
 
     private:
         int muted;
@@ -158,6 +162,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         static struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
+
+        Config Runtime;
 };
 
 inline float SynthEngine::numRandom(void)

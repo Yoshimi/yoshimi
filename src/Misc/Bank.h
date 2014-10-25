@@ -42,10 +42,12 @@ typedef struct {
     string dir;
 } bankstruct_t;
 
+class SynthEngine;
+
 class Bank : private MiscFuncs
 {
     public:
-        Bank();
+        Bank(SynthEngine *_synth);
         ~Bank();
         string getname(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
@@ -96,6 +98,9 @@ class Bank : private MiscFuncs
         const int bank_size;
         const string xizext;
         const string force_bank_dir_file;
+
+        SynthEngine *synth;
+
 };
 
 #endif

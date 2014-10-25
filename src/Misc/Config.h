@@ -48,9 +48,9 @@ class SynthEngine;
 class Config : public MiscFuncs
 {
     public:
-        Config();
+        Config(SynthEngine *_synth);
         ~Config();
-        bool Setup(int argc, char **argv, SynthEngine *_synth);
+        bool Setup(int argc, char **argv);
         void StartupReport(void);
         void Announce(void);
         void Usage(void);
@@ -146,8 +146,7 @@ class Config : public MiscFuncs
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
 
-        static unsigned short nextHistoryIndex;
-        static struct sigaction sigAction;
+        unsigned short nextHistoryIndex;
         int sigIntActive;
         int ladi1IntActive;
         int sse_level;
@@ -160,7 +159,5 @@ class Config : public MiscFuncs
 
         friend class YoshimiLV2Plugin;
 };
-
-extern Config Runtime;
 
 #endif

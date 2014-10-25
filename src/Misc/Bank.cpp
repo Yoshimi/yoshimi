@@ -38,14 +38,16 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
+#include "Misc/SynthEngine.h"
 
-Bank::Bank() :
+Bank::Bank(SynthEngine *_synth) :
     defaultinsname(string(" ")),
     bank_size(BANK_SIZE),
     xizext(".xiz"),
-    force_bank_dir_file(".bankdir") // if this file exists in a directory, the
+    force_bank_dir_file(".bankdir"), // if this file exists in a directory, the
                                     // directory is considered a bank, even if
                                     // it doesn't contain an instrument file
+    synth(_synth)
 {
 //    msb = lsb = 0;
     for (int i = 0; i < BANK_SIZE; ++i)
@@ -65,7 +67,7 @@ Bank::Bank() :
     }
     rescanforbanks(); // we need this here in case we are running with no GUI
     bankfiletitle = string(dirname);
-    loadbank(Runtime.currentBankDir);
+    loadbank(synth->getRuntime().currentBankDir);
 }
 
 
@@ -113,7 +115,7 @@ void Bank::setname(unsigned int ninstrument, string newname, int newslot)
                      newfilepath.c_str());
     if (chk < 0)
     {
-        Runtime.Log("Error, bank setName failed renaming "
+        synth->getRuntime().Log("Error, bank setName failed renaming "
                     + bank_instrument[ninstrument].filename + " -> "
                     + newfilepath + " : " + string(strerror(errno)));
     }
@@ -143,7 +145,7 @@ void Bank::clearslot(unsigned int ninstrument)
     int chk = remove(bank_instrument[ninstrument].filename.c_str());
     if (chk < 0)
     {
-        Runtime.Log("clearSlot " + asString(ninstrument) + " failed to remove "
+        synth->getRuntime().Log("clearSlot " + asString(ninstrument) + " failed to remove "
                      + bank_instrument[ninstrument].filename + " "
                      + string(strerror(errno)));
     }
@@ -156,7 +158,7 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
 {
     if (ninstrument >= BANK_SIZE)
     {
-        Runtime.Log("savetoslot " + asString(ninstrument) + ", slot > BANK_SIZE");
+        synth->getRuntime().Log("savetoslot " + asString(ninstrument) + ", slot > BANK_SIZE");
         return;
     }
     clearslot(ninstrument);
@@ -172,7 +174,7 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
     {
         int chk = remove(filepath.c_str());
         if (chk < 0)
-            Runtime.Log("Bank saveToSlot failed to unlink " + filepath
+            synth->getRuntime().Log("Bank saveToSlot failed to unlink " + filepath
                         + ", " + string(strerror(errno)));
     }
     part->saveXML(filepath);
@@ -194,7 +196,7 @@ bool Bank::loadbank(string bankdirname)
     DIR *dir = opendir(bankdirname.c_str());
     if (dir == NULL)
     {
-        Runtime.Log("Failed to open bank directory " + bankdirname);
+        synth->getRuntime().Log("Failed to open bank directory " + bankdirname);
         return false;
     }
     clearbank();
@@ -251,7 +253,7 @@ bool Bank::loadbank(string bankdirname)
         }
     }
     closedir(dir);
-    Runtime.currentBankDir = dirname;
+    synth->getRuntime().currentBankDir = dirname;
     return true;
 }
 
@@ -259,23 +261,23 @@ bool Bank::loadbank(string bankdirname)
 // Makes a new bank, put it on a file and makes it current bank
 bool Bank::newbank(string newbankdir)
 {
-    if (Runtime.bankRootDirlist[0].empty())
+    if (synth->getRuntime().bankRootDirlist[0].empty())
     {
-        Runtime.Log("Default bank root directory not set");
+        synth->getRuntime().Log("Default bank root directory not set");
         return false;
     }
-    string newbankpath = Runtime.bankRootDirlist[0];
+    string newbankpath = synth->getRuntime().bankRootDirlist[0];
     if (newbankpath.at(newbankpath.size() - 1) != '/')
         newbankpath += "/";
     newbankpath += newbankdir;
     int result = mkdir(newbankpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (result < 0)
     {
-        Runtime.Log("Error, failed to mkdir " + newbankpath);
+        synth->getRuntime().Log("Error, failed to mkdir " + newbankpath);
         return false;
     }
     else
-        Runtime.Log("mkdir " + newbankpath + " succeeded");
+        synth->getRuntime().Log("mkdir " + newbankpath + " succeeded");
     string forcefile = newbankpath;
     if (forcefile.at(forcefile.size() - 1) != '/')
         forcefile += "/";
@@ -293,7 +295,7 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
         return;
     if (locked())
     {
-        Runtime.Log("swapslot requested, but is locked");
+        synth->getRuntime().Log("swapslot requested, but is locked");
         return;
     }
     if (emptyslot(n1) && emptyslot(n2))
@@ -334,8 +336,8 @@ void Bank::rescanforbanks(void)
 {
     set<string, less<string> > bankroots;
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (!Runtime.bankRootDirlist[i].empty())
-            bankroots.insert(Runtime.bankRootDirlist[i]);
+        if (!synth->getRuntime().bankRootDirlist[i].empty())
+            bankroots.insert(synth->getRuntime().bankRootDirlist[i]);
     bank_dir_list.clear();
     set<string, less<string> >::iterator dxr;
     for (dxr = bankroots.begin(); dxr != bankroots.end(); ++dxr)
@@ -364,7 +366,7 @@ void Bank::scanrootdir(string rootdir)
     DIR *dir = opendir(rootdir.c_str());
     if (dir == NULL)
     {
-        Runtime.Log("No such directory, root bank entry: " + rootdir);
+        synth->getRuntime().Log("No such directory, root bank entry: " + rootdir);
         return;
     }
     struct dirent *fn;
@@ -386,7 +388,7 @@ void Bank::scanrootdir(string rootdir)
         DIR *d = opendir(chkdir.c_str());
         if (d == NULL)
         {
-            Runtime.Log("Failed to open bank directory candidate: " + chkdir);
+            synth->getRuntime().Log("Failed to open bank directory candidate: " + chkdir);
             continue;
         }
         struct dirent *fname;
@@ -477,7 +479,7 @@ bool Bank::addtobank(int pos, const string filename, string name)
     bank_instrument[pos].filename = filepath;
 
     // see if PADsynth is used
-    if (Runtime.CheckPADsynth)
+    if (synth->getRuntime().CheckPADsynth)
     {
         XMLwrapper *xml = new XMLwrapper();
         xml->checkfileinformation(bank_instrument[pos].filename.c_str());
@@ -494,7 +496,7 @@ void Bank::deletefrombank(unsigned int pos)
 {
     if (pos >= BANK_SIZE)
     {
-        Runtime.Log("Error, deletefrombank pos " + asString(pos) + " > BANK_SIZE"
+        synth->getRuntime().Log("Error, deletefrombank pos " + asString(pos) + " > BANK_SIZE"
                     + asString(BANK_SIZE));
         return;
     }
@@ -527,5 +529,5 @@ bool Bank::check_bank_duplicate(string alias)
 
 bool Bank::isPADsynth_used(unsigned int ninstrument)
 {
-    return Runtime.CheckPADsynth && bank_instrument[ninstrument].PADsynth_used;
+    return synth->getRuntime().CheckPADsynth && bank_instrument[ninstrument].PADsynth_used;
 }
