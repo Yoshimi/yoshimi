@@ -1,5 +1,25 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
+yoshimi-2.4.x
+- Moved all global variables to per-instance ones.
+- Implemented multi-instance support:
+  Updated all constructors to take SynthEngine * as last argument and store it
+  in synth member variable. "Runtime" global var (of type Config*) and "guiMaster"
+  (of type MasterUI *) are moved to SynthEngine and accessible via SynthEngine::getRuntime()
+  (which returns reference to per-instance Config class) and SynthEngine::getGuiMaster()
+  (which creates, if not already created, and returns per-instance MasterUI class).
+  PresetsUI class instance is moved from global var to MasterUI class member var
+  and accessible via synth->getGuimaster()->getPresetsUi() method from UI classes.
+- Jack client instances will be named on per-instance basis.
+  Default one is "yoshimi" + "->optional tag" (as before),
+  next is "yosmimi-<optionoal tag>-<instance number>" starting at "1".
+  This may never be used (but who knows? Anyway, this is the more proper way),
+  because the default behavior for the yoshimi app is to create one global
+  SynthEngine instance to go on with it till exit. From the user point of view
+  nothing changed.
+- Gui class destructors made virtual to make recent compilers happy
+- Started initial LV2 plugin interface implementation (cmake option is OFF by default)
+
 yoshimi-1.2.x
 - CMake policy change to stop warning message
 - Small correction in part peak representation
