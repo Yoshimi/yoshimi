@@ -1,6 +1,9 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
-yoshimi-2.4.x
+yoshimi-1.2.x
+- CMake policy change to stop warning message
+- Small correction in part peak representation
+- Copied some ancient history into Docs
 - Moved all global variables to per-instance ones.
 - Implemented multi-instance support:
   Updated all constructors to take SynthEngine * as last argument and store it
@@ -19,12 +22,6 @@ yoshimi-2.4.x
   nothing changed.
 - Gui class destructors made virtual to make recent compilers happy
 - Started initial LV2 plugin interface implementation (cmake option is OFF by default)
-
-yoshimi-1.2.x
-- CMake policy change to stop warning message
-- Small correction in part peak representation
-- Copied some ancient history into Docs
-
 
 yoshimi-1.2.4
 
