@@ -39,19 +39,38 @@ file (GLOB yoshimi_synth_files
     ../Synth/BodyDisposal.h)
 file (GLOB yoshimi_musicio_files
     ../MusicIO/MusicIO.cpp ../MusicIO/MusicIO.h ../MusicIO/Runtime.h)
-file (GLOB yoshimi_ttl_files
-    manifest.ttl yoshimi.ttl)
+file (GLOB yoshimi_manifest_ttl
+    manifest.ttl)
+file (GLOB yoshimi_plugin_ttl
+    yoshimi.ttl)
+
+set (GuiFluids
+    ../UI/WidgetPDialUI.fl  ../UI/PresetsUI.fl  ../UI/EnvelopeUI.fl
+    ../UI/LFOUI.fl  ../UI/FilterUI.fl  ../UI/VirKeyboardUI.fl
+    ../UI/ConfigUI.fl  ../UI/SUBnoteUI.fl  ../UI/ResonanceUI.fl
+    ../UI/OscilGenUI.fl  ../UI/ADnoteUI.fl  ../UI/PADnoteUI.fl
+    ../UI/EffUI.fl  ../UI/BankUI.fl  ../UI/PartUI.fl
+    ../UI/MicrotonalUI.fl  ../UI/MasterUI.fl    ../UI/MasterMiscUI.fl
+    ../UI/ParametersUI.fl ../UI/ConsoleUI.fl
+)
+
+fltk_wrap_ui (yoshimi_lv2 ${GuiFluids})
+set_source_files_properties (../UI/MasterUI.h PROPERTIES GENERATED 1)
 
 add_library (yoshimi_lv2 MODULE
             ${yoshimi_lv2_plugin_files}
+            ${yoshimi_manifest_ttl}
+            ${yoshimi_plugin_ttl}
             ${yoshimi_dsp_files}
             ${yoshimi_effects_files}
             ${yoshimi_misc_files}
             ${yoshimi_params_files}
             ${yoshimi_synth_files}
-            ${yoshimi_FLTK_UI_SRCS})
+            ${yoshimi_lv2_FLTK_UI_SRCS})
+
 add_custom_target(yoshimi_lv2_ttl
-                   COMMAND touch ${yoshimi_ttl_files})
+                   COMMAND test -f ${yoshimi_manifest_ttl}
+                   COMMAND test -f ${yoshimi_plugin_ttl})
 
 SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES PREFIX "")
 target_include_directories (yoshimi_lv2 PUBLIC

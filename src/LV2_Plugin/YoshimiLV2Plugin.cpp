@@ -68,7 +68,7 @@ LV2_Handle	yoshimiInstantiate (const struct _LV2_Descriptor *descriptor, double 
 
 LV2_Descriptor yoshimi_lv2_desc =
 {
-   "http://yoshimi.sourceforge.net",
+   "http://yoshimi.sourceforge.net/lv2_plugin",
    yoshimiInstantiate,
    NULL,
    NULL,
