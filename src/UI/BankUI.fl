@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -241,7 +241,21 @@ class BankUI {open : {public BankProcess_}
             if (dirname == NULL)
                 return;
             if (!bank->newbank(string(dirname)))
+            {
                 fl_alert("Error, could not make a new bank directory... is the default bank root dir set?");
+            	refreshmainwindow();
+            	return;
+             }
+             
+            rescan_for_banks();
+            for (int i = 0; i < MAX_NUM_BANKS; i++) // should never be reached!
+            {
+              if (bank->banks[i].alias == dirname)
+              {
+                banklist->value(i);
+		i = MAX_NUM_BANKS;
+              }
+            }
             refreshmainwindow();}
         xywh {685 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -253,20 +267,20 @@ class BankUI {open : {public BankProcess_}
       }
       Fl_Choice banklist {
         callback {int n = o->value();
-            if (bank->banks[n].dir.empty())
+            if (n < 1 or bank->banks[n].dir.empty())
                 return;
             if (!bank->loadbank(bank->banks[n].dir))
                 fl_alert("Error: Could not load the bank from the directory\\n%s.",
                          bank->banks[n].dir.c_str());
                 for (int i = 0; i < BANK_SIZE; ++i)
                     bs[i]->refresh();
-                refreshmainwindow();} open
+                refreshmainwindow();} open selected
         xywh {5 8 220 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
         label {Refresh bank list}
         callback {rescan_for_banks();
-            banklist->value(0);}
+set_bank_slot();}
         tooltip {Refresh the bank list (rescan)} xywh {230 8 105 20} box THIN_UP_BOX color 50 labelsize 11
       }
       Fl_Check_Button {} {
@@ -289,7 +303,7 @@ fnc = &BankProcess_::process;
         make_window();
         mode = 1;} {}
   }
-  Function {~BankUI()} {selected return_type virtual
+  Function {~BankUI()} {return_type virtual
   } {
     code {//
         bankuiwindow->hide();
@@ -297,7 +311,9 @@ fnc = &BankProcess_::process;
   }
   Function {Show()} {open
   } {
-    code {bankuiwindow->show();
+    code {rescan_for_banks();
+	set_bank_slot();
+	bankuiwindow->show();
         readbutton->value(1);
         mode = 1;
         removeselection();
@@ -435,11 +451,24 @@ fnc = &BankProcess_::process;
   Function {rescan_for_banks()} {open
   } {
     code {banklist->clear();
-        banklist->add(" ");
+        banklist->add("Unknown");
         bank->rescanforbanks();
         for (int i = 1; i < MAX_NUM_BANKS; ++i)
             if (!bank->banks[i].name.empty() && !bank->banks[i].alias.empty())
                 banklist->add(bank->banks[i].alias.c_str());} {}
+  }
+  Function {set_bank_slot()} {open
+  } {
+    code {int slot = 0;
+for (int i = 0; i < MAX_NUM_BANKS; i++)
+{
+	if (bank->banks[i].dir == synth->getRuntime().currentBankDir)
+        {
+                slot = i;
+		i = MAX_NUM_BANKS;
+        }
+}
+banklist->value(slot);} {}
   }
   decl {BankSlot *bs[BANK_SIZE];} {private local
   }

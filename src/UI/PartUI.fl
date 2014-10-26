@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -49,7 +49,7 @@ decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
 } 
 
-decl {\#include "MasterUI.h"} {selected private global
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
@@ -345,7 +345,7 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
         Fl_Button instrumentlabel {
-          label Instrument
+          label {Simple Sound}
           callback {//
               int event = Fl::event_button();
               const char *tmp = NULL;
@@ -367,9 +367,9 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       break;
                   default:
                       break;
-              }}
-          tooltip {Left mousebutton: choose/save/.. from/to bank, Middle button: change the instrument information} xywh {82 7 260 20} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 20
-          code0 {o->copy_label(part->Pname.c_str());}
+              }} selected
+          tooltip {Left mousebutton: choose/save/.. from/to bank, Middle: change the instrument information, Right: name} xywh {82 7 260 20} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 20
+          code0 {if (part->Pname > " ") o->copy_label(part->Pname.c_str());}
         }
         Fl_Button {} {
           label Edit
