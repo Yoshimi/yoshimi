@@ -42,7 +42,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double _sampleRate, const char *bundlePath, c
         }
         else if(strcmp(f->URI, LV2_OPTIONS__options) == 0)
         {
-            options = static_case<LV2_Options_Option *>(f->data);
+            options = static_cast<LV2_Options_Option *>(f->data);
         }
         ++features;
     }
