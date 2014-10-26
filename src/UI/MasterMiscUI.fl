@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -388,8 +388,8 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {315 213 70 280} type Double hide
-      class Fl_Group
+      private xywh {1156 181 70 280} type Double
+      class Fl_Group visible
     } {
       Fl_Group panellistitemgroup {open
         private xywh {0 20 71 258} box PLASTIC_THIN_UP_BOX
@@ -502,10 +502,10 @@ npart=npart_;
         bankui = bankui_;
         make_window();
         panellistitem->show();
-        end();} {selected
-    }
+        end();} {}
   }
-  Function {refresh()} {} {
+  Function {refresh()} {open
+  } {
     code {partenabled->value(synth->part[npart]->Penabled);
         if (synth->part[npart]->Penabled != 0)
             panellistitemgroup->activate();
@@ -514,7 +514,10 @@ npart=npart_;
         partvolume->value(synth->part[npart]->Pvolume);
         partpanning->value(synth->part[npart]->Ppanning);
         partrcv->value(synth->part[npart]->Prcvchn);
-        partname->label(synth->part[npart]->Pname.c_str());
+        if (synth->part[npart]->Pname > " ")
+            partname->label(synth->part[npart]->Pname.c_str());
+        else
+            partname->label("Simple Sound");
         int tmp = synth->part[npart]->Paudiodest - 1;
         if (tmp < 0 or tmp > 3)
             tmp = 0;
@@ -523,7 +526,8 @@ npart=npart_;
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));
         else
             panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();} {}
+        panellistitemgroup->redraw();} {selected
+    }
   }
   Function {~Panellistitem()} {} {
     code {panellistitem->hide();} {}
