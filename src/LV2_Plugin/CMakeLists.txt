@@ -39,8 +39,8 @@ file (GLOB yoshimi_synth_files
     ../Synth/BodyDisposal.h)
 file (GLOB yoshimi_musicio_files
     ../MusicIO/MusicIO.cpp ../MusicIO/MusicIO.h ../MusicIO/Runtime.h)
-
-set(yoshimi_manifest_ttl manifest.ttl)
+file (GLOB yoshimi_ttl_files
+    manifest.ttl yoshimi.ttl)
 
 add_library (yoshimi_lv2 MODULE
             ${yoshimi_lv2_plugin_files}
@@ -50,6 +50,9 @@ add_library (yoshimi_lv2 MODULE
             ${yoshimi_params_files}
             ${yoshimi_synth_files}
             ${yoshimi_FLTK_UI_SRCS})
+add_custom_target(yoshimi_lv2_ttl
+                   COMMAND touch ${yoshimi_ttl_files})
+
 SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES PREFIX "")
 target_include_directories (yoshimi_lv2 PUBLIC
                             ${LV2_INCLUDE_DIRS}
@@ -71,7 +74,9 @@ target_link_libraries(yoshimi_lv2
                       dl
 )
 
+add_dependencies(yoshimi_lv2 yoshimi_lv2_ttl)
+
 install (TARGETS yoshimi_lv2 DESTINATION ${CMAKE_INSTALL_PREFIX}/${LV2_INSTALL_DIR}/yoshimi.lv2)
-install (FILES manifest.ttl yoshimi.ttl
+install (FILES ${yoshimi_ttl_files}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/${LV2_INSTALL_DIR}/yoshimi.lv2
 )
