@@ -621,7 +621,7 @@ void Config::Log(string msg, bool tostderr)
 }
 
 
-void Config::StartupReport(void)
+void Config::StartupReport(MusicClient *musicClient)
 {
     if (!showGui)
         return;

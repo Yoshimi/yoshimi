@@ -5,7 +5,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
 
-<http://yoshimi.sourceforge.net>
+<http://yoshimi.sourceforge.net/lv2_plugin>
     a lv2:InstrumentPlugin, lv2:Plugin ;
     doap:name "Yoshimi";
     doap:maintainer [

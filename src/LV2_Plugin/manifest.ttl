@@ -1,12 +1,12 @@
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-<http://yoshimi.sourceforge.net>
+<http://yoshimi.sourceforge.net/lv2_plugin>
   a lv2:Plugin, lv2:InstrumentPlugin;
   lv2:binary <yoshimi_lv2.so>;
   rdfs:seeAlso <yoshimi.ttl>.
 
-#<http://yoshimi.sourceforge.net#ExternalUI>
+#<http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI>
 #    a <http://kxstudio.sf.net/ns/lv2ext/external-ui#Widget> ;
 #    ui:binary <yoshimi_lv2.so> ;
 #    lv2:requiredFeature <http://lv2plug.in/ns/ext/instance-access> ;

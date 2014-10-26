@@ -102,8 +102,7 @@ ninseff = 0;
       presetsui = NULL;
       paramsui = NULL;
       yoshiLog = NULL;
-      laststatefile = synth->getRuntime().StateFile;} {selected
-    }
+      laststatefile = synth->getRuntime().StateFile;} {}
   }
   Function {~MasterUI()} {open
   } {
@@ -152,7 +151,7 @@ ninseff = 0;
       }
       delete masterwindow;} {}
   }
-  Function {Init(void)} {open
+  Function {Init(const char *_label)} {open
   } {
     code {//
       microtonalui = new MicrotonalUI(&synth->microtonal);
@@ -162,14 +161,15 @@ ninseff = 0;
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
-      yoshiLog->setLabel();
+      yoshiLog->setLabel(_label);
       make_window();
       setMasterLabel(synth->getRuntime().paramsLoad);
       masterwindow->show();
       if (synth->getRuntime().showConsole)
         yoshiLog->Show();
       else
-          yoshiLog->Hide();} {}
+          yoshiLog->Hide();} {selected
+    }
   }
   Function {make_window()} {open
   } {
@@ -182,10 +182,10 @@ ninseff = 0;
               {
                   case 0:
                       synth->getRuntime().saveConfig();
-                      synth->getRuntime().runSynth = false;
+                      synth->guiClosed(true);
                       break;
                   case 2:
-                      synth->getRuntime().runSynth = false;
+                      synth->guiClosed(true);
                       break;
                   default:
                       break;
@@ -194,7 +194,7 @@ ninseff = 0;
           else
           {
                   synth->getRuntime().saveConfig();
-                  synth->getRuntime().runSynth = false;
+                  synth->guiClosed(true);
           }}
       xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {

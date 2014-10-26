@@ -38,7 +38,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double sampleRate, const char *bundlePath):
    _bundlePath(bundlePath)
 
 {
-    _synth = new SynthEngine(0, NULL, true);
+    //_synth = new SynthEngine(0, NULL, true);
 }
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
@@ -68,7 +68,7 @@ LV2_Handle	yoshimiInstantiate (const struct _LV2_Descriptor *descriptor, double 
 
 LV2_Descriptor yoshimi_lv2_desc =
 {
-   "http://yoshimi.sourceforge.net",
+   "http://yoshimi.sourceforge.net/lv2_plugin",
    yoshimiInstantiate,
    NULL,
    NULL,

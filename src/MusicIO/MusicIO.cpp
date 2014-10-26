@@ -33,8 +33,8 @@ MusicIO::MusicIO(SynthEngine *_synth) :
     rtprio(25),
     synth(_synth)
 {
-    memset(zynLeft, 0, sizeof(float) * (NUM_MIDI_PARTS + 1));
-    memset(zynRight, 0, sizeof(float) * (NUM_MIDI_PARTS + 1));
+    memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
+    memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
 }
 
 MusicIO::~MusicIO()

@@ -54,6 +54,4 @@ class MusicClient
         SynthEngine *synth;
 };
 
-extern MusicClient *musicClient;
-
 #endif
