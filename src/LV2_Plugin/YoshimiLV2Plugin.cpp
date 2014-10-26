@@ -47,6 +47,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double _sampleRate, const char *bundlePath, c
         ++features;
     }
 
+
 }
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
