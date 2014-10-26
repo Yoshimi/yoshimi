@@ -352,6 +352,8 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
         if(bank.msb <= MAX_NUM_BANKS) {
             if (bank.loadbank(bank.banks[bank.msb].dir))
                 Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
+                if (Runtime.showGui)
+                    guiMaster->bankui->refreshmainwindow();
             else
                 Runtime.Log("SynthEngine setBank: No bank " + asString(par));
         }

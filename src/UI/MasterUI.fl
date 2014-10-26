@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -168,8 +168,7 @@ ninseff = 0;
       if (synth->getRuntime().showConsole)
         yoshiLog->Show();
       else
-          yoshiLog->Hide();} {selected
-    }
+          yoshiLog->Hide();} {}
   }
   Function {make_window()} {open
   } {
@@ -990,7 +989,7 @@ ZynAddSubFX}
   }
   decl {ParametersUI *paramsui;} {private local
   }
-  decl {BankUI *bankui;} {private local
+  decl {BankUI *bankui;} {selected public local
   }
   decl {MicrotonalUI *microtonalui;} {private local
   }

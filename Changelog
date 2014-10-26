@@ -4,6 +4,13 @@ yoshimi-1.2.x
 - CMake policy change to stop warning message
 - Small correction in part peak representation
 - Copied some ancient history into Docs
+- Part name always shows at least the words 'Simple Sound' so new users will
+  know what it does.
+- Bank selector always shows a name.
+- MIDI Bank changes now refresh the bank window contents.
+- There is now a compile time switch to direct errors to the console window
+  instead of stderr.
+
 - Moved all global variables to per-instance ones.
 - Implemented multi-instance support:
   Updated all constructors to take SynthEngine * as last argument and store it
