@@ -51,7 +51,7 @@ class Config : public MiscFuncs
         Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
         bool Setup(int argc, char **argv);
-        void StartupReport(void);
+        void StartupReport(MusicClient *musicClient);
         void Announce(void);
         void Usage(void);
         void Log(string msg, bool tostderr = true);

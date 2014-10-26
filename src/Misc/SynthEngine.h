@@ -151,6 +151,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
         MasterUI *getGuiMaster();
+        void guiClosed(bool stopSynth);
 
     private:
         int muted;

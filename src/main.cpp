@@ -30,6 +30,7 @@ using namespace std;
 //global synth engine for app instance;
 SynthEngine *synth = NULL;
 
+
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
 static struct sigaction yoshimiSigAction;
@@ -58,6 +59,7 @@ void yoshimiSigHandler(int sig)
 int main(int argc, char *argv[])
 {
     MasterUI *guiMaster = NULL;
+    MusicClient *musicClient = NULL;
     synth = new SynthEngine(argc, argv);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
@@ -113,10 +115,10 @@ int main(int argc, char *argv[])
             synth->getRuntime().Log("Failed to instantiate gui");
             goto bail_out;
         }
-        guiMaster->Init();
+        guiMaster->Init(musicClient->midiClientName().c_str());
     }
 
-    synth->getRuntime().StartupReport();
+    synth->getRuntime().StartupReport(musicClient);
     synth->Unmute();
     cout << "Yay! We're up and running :-)\n";
     while (synth->getRuntime().runSynth)
@@ -137,12 +139,13 @@ int main(int argc, char *argv[])
             usleep(33333); // where all the action is ...
     }
     musicClient->Close();
-    delete musicClient;
-    delete synth;
     synth->getRuntime().deadObjects->disposeBodies();
     synth->getRuntime().flushLog();
-    if (guiMaster)
-        delete guiMaster;
+    //guiMaster deleted from SynthEngine
+    //if (guiMaster)
+      //  delete guiMaster;
+    delete musicClient;
+    delete synth;
     cout << "Goodbye - Play again soon?\n";
     exit(EXIT_SUCCESS);
 
@@ -156,8 +159,8 @@ bail_out:
     }
     if (synth)
         delete synth;
-    if (guiMaster)
-        delete guiMaster;
+    //if (guiMaster)
+      //  delete guiMaster;
     synth->getRuntime().flushLog();
     exit(EXIT_FAILURE);
 }

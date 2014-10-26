@@ -79,6 +79,11 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
 
 SynthEngine::~SynthEngine()
 {
+    if(guiMaster != NULL)
+    {
+        delete guiMaster;
+        guiMaster = NULL;
+    }
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
     
@@ -988,3 +993,10 @@ MasterUI *SynthEngine::getGuiMaster()
     }
     return guiMaster;
 }
+
+void SynthEngine::guiClosed(bool stopSynth)
+{
+    if(stopSynth && !isLV2Plugin)
+        Runtime.runSynth = false;
+}
+

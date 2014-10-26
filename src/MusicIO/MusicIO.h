@@ -29,7 +29,7 @@ class MusicIO : virtual protected MiscFuncs
 {
     public:
         MusicIO(SynthEngine *_synth);
-        ~MusicIO();
+        virtual ~MusicIO();
         virtual unsigned int getSamplerate(void) = 0;
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;

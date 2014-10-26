@@ -38,7 +38,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double sampleRate, const char *bundlePath):
    _bundlePath(bundlePath)
 
 {
-    _synth = new SynthEngine(0, NULL, true);
+    //_synth = new SynthEngine(0, NULL, true);
 }
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()

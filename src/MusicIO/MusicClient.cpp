@@ -23,8 +23,6 @@
 #include "MusicIO/JackAlsaClient.h"
 #include "MusicIO/AlsaJackClient.h"
 
-MusicClient *musicClient = NULL;
-
 MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
     MusicClient *musicObj = NULL;
