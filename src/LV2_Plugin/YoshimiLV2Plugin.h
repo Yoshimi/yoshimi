@@ -26,10 +26,12 @@ class YoshimiLV2Plugin
 {
 private:
    double _sampleRate;
+   int _bufferSize;
    std::string _bundlePath;
    SynthEngine *_synth;
+   LV2_URID_Map _uridMap;
 public:
-   YoshimiLV2Plugin(double sampleRate, const char *bundlePath);
+   YoshimiLV2Plugin(double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
    bool init();
 

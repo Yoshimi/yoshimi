@@ -23,22 +23,30 @@
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
 
-MusicClient *musicClient = NULL;
 
-MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
-{
-    MusicClient *musicObj = NULL;
-
-    return musicObj;
-}
-
-
-YoshimiLV2Plugin::YoshimiLV2Plugin(double sampleRate, const char *bundlePath):
-   _sampleRate(sampleRate),
-   _bundlePath(bundlePath)
+YoshimiLV2Plugin::YoshimiLV2Plugin(double _sampleRate, const char *bundlePath, const LV2_Feature *const *features):
+    _sampleRate(_sampleRate),
+    _bufferSize(1024),
+    _bundlePath(bundlePath)
 
 {
-    //_synth = new SynthEngine(0, NULL, true);
+    _uridMap.handle = NULL;
+    _uridMap.map = NULL;
+    const LV2_Feature *f = NULL;
+    const LV2_Options_Option *options = NULL;
+    while((f = *features) != NULL)
+    {
+        if(strcmp(f->URI, LV2_URID__map) == 0)
+        {
+            _uridMap = *(static_cast<LV2_URID_Map *>(f->data));
+        }
+        else if(strcmp(f->URI, LV2_OPTIONS__options) == 0)
+        {
+            options = static_case<LV2_Options_Option *>(f->data);
+        }
+        ++features;
+    }
+
 }
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
@@ -52,30 +60,32 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 
 bool YoshimiLV2Plugin::init()
 {
-
-    //if(!Runtime.Setup(0, NULL))
-//        return false;
-
+    _synth = new SynthEngine(0, NULL, true);
+    _synth->Init((unsigned int)_sampleRate, _bufferSize);
     return true;
 }
 
 
-LV2_Handle	yoshimiInstantiate (const struct _LV2_Descriptor *descriptor, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
+LV2_Handle	yoshimiInstantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
-   YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(sample_rate, bundle_path);
-   return static_cast<LV2_Handle>(inst);
+
+
+    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(sample_rate, bundle_path, features);
+    if(inst->init())
+        return static_cast<LV2_Handle>(inst);
+    return NULL;
 }
 
 LV2_Descriptor yoshimi_lv2_desc =
 {
-   "http://yoshimi.sourceforge.net/lv2_plugin",
-   yoshimiInstantiate,
-   NULL,
-   NULL,
-   NULL,
-   NULL,
-   NULL,
-   NULL
+    "http://yoshimi.sourceforge.net/lv2_plugin",
+    yoshimiInstantiate,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 };
 
 extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)

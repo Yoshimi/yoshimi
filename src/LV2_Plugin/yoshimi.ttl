@@ -13,8 +13,8 @@
          foad:mbox "andrewderyabin@gmail.com"
     ] ;
 
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/buf-size#boundedBlockLength> ,
-                        <http://lv2plug.in/ns/ext/urid#map> ;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/urid#map> ;
+    lv2:optionalFeature <http://lv2plug.in/ns/ext/buf-size#boundedBlockLength>;
     lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ,
                       <http://kxstudio.sf.net/ns/lv2ext/programs#Interface> ;
 

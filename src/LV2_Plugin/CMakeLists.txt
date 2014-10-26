@@ -96,6 +96,6 @@ target_link_libraries(yoshimi_lv2
 add_dependencies(yoshimi_lv2 yoshimi_lv2_ttl)
 
 install (TARGETS yoshimi_lv2 DESTINATION ${CMAKE_INSTALL_PREFIX}/${LV2_INSTALL_DIR}/yoshimi.lv2)
-install (FILES ${yoshimi_ttl_files}
+install (FILES ${yoshimi_manifest_ttl} ${yoshimi_plugin_ttl}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/${LV2_INSTALL_DIR}/yoshimi.lv2
 )
