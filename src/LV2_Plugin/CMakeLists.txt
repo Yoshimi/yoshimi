@@ -66,6 +66,7 @@ add_library (yoshimi_lv2 MODULE
             ${yoshimi_misc_files}
             ${yoshimi_params_files}
             ${yoshimi_synth_files}
+            ${yoshimi_musicio_files}
             ${yoshimi_lv2_FLTK_UI_SRCS})
 
 add_custom_target(yoshimi_lv2_ttl

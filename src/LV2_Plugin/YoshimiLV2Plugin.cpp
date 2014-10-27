@@ -22,13 +22,23 @@
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
+#include <math.h>
 
 
-YoshimiLV2Plugin::YoshimiLV2Plugin(double _sampleRate, const char *bundlePath, const LV2_Feature *const *features):
-    _sampleRate(_sampleRate),
-    _bufferSize(1024),
-    _bundlePath(bundlePath)
+void YoshimiLV2Plugin::process(uint32_t sample_count)
+{
 
+}
+
+YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features):
+    MusicIO(synth),
+    _synth(synth),
+    _sampleRate(static_cast<uint32_t>(sampleRate)),
+    _bufferSize(0),
+    _bundlePath(bundlePath),
+    midiDataPort(NULL),
+    _midi_event_id(0),
+    _bufferPos(0)
 {
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
@@ -47,6 +57,32 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(double _sampleRate, const char *bundlePath, c
         ++features;
     }
 
+    if(_uridMap.map != NULL && options != NULL)
+    {
+        _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
+        LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__maxBlockLength);
+        LV2_URID minBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__minBlockLength);
+        LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
+        while(options->size > 0 && options->value != NULL)
+        {
+            if(options->context == LV2_OPTIONS_INSTANCE)
+            {
+                if((options->key == minBufSz || options->key == maxBufSz) && options->type == atomInt)
+                {
+                    uint32_t bufSz = *static_cast<const uint32_t *>(options->value);
+                    if(_bufferSize < bufSz)
+                        _bufferSize = bufSz;
+                }
+            }
+            ++options;
+        }
+
+    }
+
+    if(_bufferSize == 0)
+        _bufferSize = 1024;
+
+
 
 }
 
@@ -61,31 +97,89 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 
 bool YoshimiLV2Plugin::init()
 {
-    _synth = new SynthEngine(0, NULL, true);
-    _synth->Init((unsigned int)_sampleRate, _bufferSize);
+    if(_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0)
+        return false;
+    _synth->Init(_sampleRate, _bufferSize);
     return true;
 }
 
 
-LV2_Handle	yoshimiInstantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
+
+
+LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
-
-
-    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(sample_rate, bundle_path, features);
+    SynthEngine *synth = new SynthEngine(0, NULL, true);
+    if(synth == NULL)
+        return NULL;
+    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features);
     if(inst->init())
         return static_cast<LV2_Handle>(inst);
+    else
+        delete inst;
     return NULL;
 }
+
+void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *data_location)
+{
+    if(port > NUM_MIDI_PARTS + 1)
+        return;
+     YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
+     if(port == 0)//atom midi event port
+     {
+         inst->midiDataPort = data_location;
+         return;
+     }
+     --port;
+
+     int portIndex = static_cast<int>(floorf((float)port/2.0f));
+     if(port % 2 == 0) //left channel
+         inst->zynLeft[portIndex] = static_cast<float *>(data_location);
+     else
+         inst->zynRight[portIndex] = static_cast<float *>(data_location);
+
+}
+
+void YoshimiLV2Plugin::activate(LV2_Handle instance)
+{
+    YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
+    inst->Start();
+
+}
+
+void YoshimiLV2Plugin::deactivate(LV2_Handle instance)
+{
+    YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
+    inst->Close();
+}
+
+void YoshimiLV2Plugin::run(LV2_Handle instance, uint32_t sample_count)
+{
+    YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
+    inst->process(sample_count);
+}
+
+void YoshimiLV2Plugin::cleanup(LV2_Handle instance)
+{
+    YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
+    delete inst;
+}
+
+const void *YoshimiLV2Plugin::extension_data(const char *)
+{
+    return NULL;
+}
+
+
 
 LV2_Descriptor yoshimi_lv2_desc =
 {
     "http://yoshimi.sourceforge.net/lv2_plugin",
-    yoshimiInstantiate,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    YoshimiLV2Plugin::instantiate,
+    YoshimiLV2Plugin::connect_port,
+    YoshimiLV2Plugin::activate,
+    YoshimiLV2Plugin::run,
+    YoshimiLV2Plugin::deactivate,
+    YoshimiLV2Plugin::cleanup,
     NULL
 };
 

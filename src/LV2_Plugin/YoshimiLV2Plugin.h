@@ -21,18 +21,39 @@
 #include <string>
 
 #include "Misc/SynthEngine.h"
+#include "MusicIO/MusicIO.h"
 
-class YoshimiLV2Plugin
+class YoshimiLV2Plugin : public MusicIO
 {
 private:
-   double _sampleRate;
-   int _bufferSize;
-   std::string _bundlePath;
    SynthEngine *_synth;
+   uint32_t _sampleRate;
+   uint32_t _bufferSize;
+   std::string _bundlePath;   
    LV2_URID_Map _uridMap;
+   void *midiDataPort;
+   LV2_URID _midi_event_id;
+   uint32_t _bufferPos;
+
+   void process(uint32_t sample_count);
 public:
-   YoshimiLV2Plugin(double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
+   YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
    bool init();
+
+   //virtual methods from MusicIO
+   unsigned int getSamplerate(void) {return _sampleRate; }
+   int getBuffersize(void) {return _bufferSize; }
+   bool Start(void) {synth->Unmute(); return true; }
+   void Close(void) {synth->Mute();}
+
+   //static methods
+   static LV2_Handle	instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);
+   static void connect_port(LV2_Handle instance, uint32_t port, void *data_location);
+   static void activate(LV2_Handle instance);
+   static void deactivate(LV2_Handle instance);
+   static void run(LV2_Handle instance, uint32_t   sample_count);
+   static void cleanup(LV2_Handle instance);
+   static const void * extension_data(const char * uri);
 
 };
