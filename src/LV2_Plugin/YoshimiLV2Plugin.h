@@ -19,9 +19,11 @@
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
 
 #include <string>
+#include <semaphore.h>
 
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicIO.h"
+
 
 class YoshimiLV2Plugin : public MusicIO
 {
@@ -31,9 +33,14 @@ private:
    uint32_t _bufferSize;
    std::string _bundlePath;   
    LV2_URID_Map _uridMap;
-   void *midiDataPort;
+   LV2_Atom_Sequence *_midiDataPort;
    LV2_URID _midi_event_id;
    uint32_t _bufferPos;
+   uint32_t _offsetPos;
+   sem_t _midiSem;
+
+   float *lv2Left [NUM_MIDI_PARTS + 1];
+   float *lv2Right [NUM_MIDI_PARTS + 1];
 
    void process(uint32_t sample_count);
 public:
@@ -45,7 +52,7 @@ public:
    unsigned int getSamplerate(void) {return _sampleRate; }
    int getBuffersize(void) {return _bufferSize; }
    bool Start(void) {synth->Unmute(); return true; }
-   void Close(void) {synth->Mute();}
+   void Close(void) {synth->Mute(); synth->defaults();}
 
    //static methods
    static LV2_Handle	instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);
@@ -55,5 +62,10 @@ public:
    static void run(LV2_Handle instance, uint32_t   sample_count);
    static void cleanup(LV2_Handle instance);
    static const void * extension_data(const char * uri);
+   /*
+   static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
+   static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);
+   static LV2_Worker_Status	lv2_wrk_end_run(LV2_Handle instance);
+   */
 
 };

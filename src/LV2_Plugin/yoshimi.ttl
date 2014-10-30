@@ -3,6 +3,7 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix work:  <http://lv2plug.in/ns/ext/worker#> .
 @prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
 
 <http://yoshimi.sourceforge.net/lv2_plugin>
@@ -13,9 +14,11 @@
          foaf:mbox <mailto:andrewderyabin@gmail.com>;
     ] ;
 
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/urid#map> ;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/urid#map>,
+                        <http://lv2plug.in/ns/ext/worker#schedule>;
     lv2:optionalFeature <http://lv2plug.in/ns/ext/buf-size#boundedBlockLength>;
     lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ,
+                      <http://lv2plug.in/ns/ext/worker#interface> ,
                       <http://kxstudio.sf.net/ns/lv2ext/programs#Interface> ;
 
 #    ui:ui <http://yoshimi.sourceforge.net#ExternalUI> ;
