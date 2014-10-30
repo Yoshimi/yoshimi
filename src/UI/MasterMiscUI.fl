@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -80,12 +80,6 @@ decl {\#define MIN_DB -48.0} {public local
 } 
 
 decl {\#define NO_DB -68.0} {public local
-} 
-
-decl {struct{
-  int oldpeak[NUM_MIDI_PARTS];
-  bool clip[NUM_MIDI_CHANNELS];
-  } panelpart;} {private local
 } 
 
 class VUMeter {open : {public Fl_Box, private MiscFuncs}
@@ -342,6 +336,11 @@ synth = _synth;
   }
   decl {SynthEngine *synth;} {private local
   }
+  decl {struct{
+  int oldpeak[NUM_MIDI_PARTS];
+  bool clip[NUM_MIDI_CHANNELS];
+  } panelpart;} {selected private local
+  }
 } 
 
 class SysEffSend {open : {public WidgetPDial, private MiscFuncs}
@@ -526,8 +525,7 @@ npart=npart_;
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));
         else
             panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();} {selected
-    }
+        panellistitemgroup->redraw();} {}
   }
   Function {~Panellistitem()} {} {
     code {panellistitem->hide();} {}

@@ -146,6 +146,16 @@ string AlsaEngine::midiClientName(void)
     string name = "yoshimi";
     if (!synth->getRuntime().nameTag.empty())
         name += ("-" + synth->getRuntime().nameTag);
+    //Andrew Deryabin: for multi-instance support add unique id to
+    //instances other then default (0)
+    unsigned int synthUniqueId = synth->getUniqueId();
+    if(synthUniqueId > 0)
+    {
+        char sUniqueId [256];
+        memset(sUniqueId, 0, sizeof(sUniqueId));
+        snprintf(sUniqueId, sizeof(sUniqueId), "%d", synthUniqueId);
+        name += ("-" + std::string(sUniqueId));
+    }
     return name;
 }
 

@@ -26,7 +26,7 @@
 
 #include "Params/LFOParams.h"
 
-int LFOParams::time = 0;
+//int LFOParams::time = 0;
 
 LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
                      unsigned char Pstartphase_, unsigned char PLFOtype_,

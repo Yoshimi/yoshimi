@@ -54,7 +54,7 @@ class LFOParams : public Presets
         unsigned char Pstretch;
 
         int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
-        static int time; // used by Pcontinous
+       // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
 
     private:
         // Default parameters

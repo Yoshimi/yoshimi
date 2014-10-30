@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -77,6 +77,9 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
+} 
+
+decl {extern bool mainCreateNewInstance();} {private global
 } 
 
 decl {class MasterUI;} {public local
@@ -194,8 +197,8 @@ ninseff = 0;
           {
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
-          }}
-      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+          }} open
+      xywh {4 29 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -208,6 +211,11 @@ ninseff = 0;
             label {&About...}
             callback {aboutwindow->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {New instance}
+            callback {mainCreateNewInstance()}
+            xywh {0 0 100 20} labelsize 12
           }
           MenuItem {} {
             label {&Console}
@@ -722,7 +730,7 @@ ninseff = 0;
     }
     Fl_Window aboutwindow {
       label {About Yoshimi} open
-      xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
+      xywh {4 29 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
         label {Yoshimi
@@ -786,8 +794,8 @@ ZynAddSubFX}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Panel}
-      xywh {4 20 635 635} type Double labelfont 13 labelsize 13 hide
+      label {Yoshimi Panel} open
+      xywh {79 57 635 635} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {open
         xywh {0 5 570 310} type HORIZONTAL box THIN_UP_BOX
@@ -827,7 +835,8 @@ ZynAddSubFX}
       }
     }
   }
-  Function {updatesendwindow()} {} {
+  Function {updatesendwindow()} {open
+  } {
     code {//
         for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
             for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
@@ -840,13 +849,18 @@ ZynAddSubFX}
           panellistitem[npart]->refresh();
        }} {}
   }
-  Function {setMasterLabel(string name)} {} {
+  Function {setMasterLabel(string name)} {open
+  } {
     code {//
-        masterwindowlabel = "Yoshimi";
+        masterwindowlabel = synth->makeUniqueName("Yoshimi");
         if (name.size())
             masterwindowlabel += (" : " + name);
         masterwindow->label(masterwindowlabel.c_str());
-        masterwindow->changed();} {}
+        masterwindow->changed();
+        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel");
+        panelwindow->label(panelwindowlabel.c_str());
+        panelwindow->changed();} {selected
+    }
   }
   Function {do_new_master()} {} {
     code {//
@@ -989,7 +1003,7 @@ ZynAddSubFX}
   }
   decl {ParametersUI *paramsui;} {private local
   }
-  decl {BankUI *bankui;} {selected public local
+  decl {BankUI *bankui;} {public local
   }
   decl {MicrotonalUI *microtonalui;} {private local
   }
@@ -1016,5 +1030,7 @@ ZynAddSubFX}
   decl {PresetsUI *presetsui;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {string panelwindowlabel} {private local
   }
 } 

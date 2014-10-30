@@ -99,7 +99,7 @@ class Microtonal : private MiscFuncs
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
 
-        static float note_12et[128];
+        float note_12et[128];
 
         SynthEngine *synth;
 };

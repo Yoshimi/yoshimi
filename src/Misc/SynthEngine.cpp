@@ -33,6 +33,8 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 
+#include <iostream>
+
 static unsigned int synthNextId = 0;
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
@@ -59,7 +61,8 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     processLock(NULL),
     vuringbuf(NULL),
     stateXMLtree(NULL),
-    guiMaster(NULL)
+    guiMaster(NULL),
+    LFOtime(0)
 {
     //Andrew Deryabin: use uniqueId for naming different instances in jack client etc..
     uniqueId = synthNextId++;
@@ -569,7 +572,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
             insefx[nefx]->out(outl[NUM_MIDI_PARTS], outr[NUM_MIDI_PARTS]);
     }
 
-    LFOParams::time++; // update the LFO's time
+    LFOtime++; // update the LFO's time
 
     // Master volume, and all output fade
     float fade;
@@ -644,6 +647,7 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 {
     if (jack_ringbuffer_read_space(vuringbuf) >= sizeof(VUtransfer))
     {
+
         jack_ringbuffer_read(vuringbuf, ( char*)VUdata->bytes, sizeof(VUtransfer));
         VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / buffersize);
         VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / buffersize);
@@ -1001,7 +1005,21 @@ MasterUI *SynthEngine::getGuiMaster()
 
 void SynthEngine::guiClosed(bool stopSynth)
 {
-    if(stopSynth && !isLV2Plugin)
+    if(stopSynth && !isLV2Plugin && uniqueId == 0) //make this only for the first instance
         Runtime.runSynth = false;
+}
+
+std::string SynthEngine::makeUniqueName(const char *name)
+{
+    char strUniquePostfix [1024];
+    std::string newUniqueName = name;
+    memset(strUniquePostfix, 0, sizeof(strUniquePostfix));
+    if(uniqueId > 0)
+    {
+        snprintf(strUniquePostfix, sizeof(strUniquePostfix), "-%d", uniqueId);
+    }
+
+    newUniqueName += strUniquePostfix;
+    return newUniqueName;
 }
 

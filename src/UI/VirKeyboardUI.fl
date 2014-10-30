@@ -311,7 +311,7 @@ class VirKeyboard {open
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
 virkeyboardwindow->hide();} open
-      xywh {891 212 650 130} type Double visible
+      xywh {1157 239 650 130} type Double visible
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -468,7 +468,9 @@ virkeyboardwindow->hide();}
   } {
     code {synth = _synth;
 midictl = 75;
-        make_window();} {selected
+        make_window();
+        keyboardlabel = synth->makeUniqueName("Yoshimi Virtual Keyboard");
+        virkeyboardwindow->label(keyboardlabel.c_str());} {selected
     }
   }
   Function {~VirKeyboard()} {} {
@@ -486,5 +488,7 @@ midictl = 75;
   decl {int midictl;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {std::string keyboardlabel;} {private local
   }
 } 

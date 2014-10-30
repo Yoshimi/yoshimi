@@ -26,10 +26,13 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
+#include <map>
 
-//global synth engine for app instance;
-SynthEngine *synth = NULL;
+std::map<SynthEngine *, MusicClient *> synthInstances;
 
+static Config *firstRuntime = NULL;
+static int globalArgc = 0;
+static char **globalArgv = NULL;
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
@@ -43,11 +46,11 @@ void yoshimiSigHandler(int sig)
         case SIGHUP:
         case SIGTERM:
         case SIGQUIT:
-            synth->getRuntime().setInterruptActive();
+            firstRuntime->setInterruptActive();
             break;
 
         case SIGUSR1:
-            synth->getRuntime().setLadi1Active();
+            firstRuntime->setLadi1Active();
             sigaction(SIGUSR1, &yoshimiSigAction, NULL);
             break;
 
@@ -56,11 +59,11 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-int main(int argc, char *argv[])
+bool mainCreateNewInstance()
 {
     MasterUI *guiMaster = NULL;
     MusicClient *musicClient = NULL;
-    synth = new SynthEngine(argc, argv);
+    SynthEngine *synth = new SynthEngine(globalArgc, globalArgv);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
 
@@ -69,19 +72,6 @@ int main(int argc, char *argv[])
         std::cerr << "Failed to allocate SynthEngine" << std::endl;
         goto bail_out;
     }
-
-    memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
-    yoshimiSigAction.sa_handler = yoshimiSigHandler;
-    if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGUSR1 handler failed");
-    if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGINT handler failed");
-    if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGHUP handler failed");
-    if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGTERM handler failed");
-    if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGQUIT handler failed");
 
     if (!(musicClient = MusicClient::newMusicClient(synth)))
     {
@@ -121,6 +111,62 @@ int main(int argc, char *argv[])
     synth->getRuntime().StartupReport(musicClient);
     synth->Unmute();
     cout << "Yay! We're up and running :-)\n";
+
+    synthInstances.insert(std::make_pair<SynthEngine *, MusicClient *>(synth, musicClient));
+    return true;
+
+bail_out:
+    synth->getRuntime().runSynth = false;
+    synth->getRuntime().Log("Yoshimi stages a strategic retreat :-(");
+    if (musicClient)
+    {
+        musicClient->Close();
+        delete musicClient;
+    }
+    if (synth)
+    {
+        synth->getRuntime().flushLog();
+        delete synth;
+    }
+
+    return false;
+}
+
+
+int main(int argc, char *argv[])
+{
+    globalArgc = argc;
+    globalArgv = argv;
+    bool bExitSuccess = false;
+    MasterUI *guiMaster = NULL;
+    //MusicClient *musicClient = NULL;
+    SynthEngine *synth = NULL;
+    std::map<SynthEngine *, MusicClient *>::iterator it;
+
+    if (!mainCreateNewInstance())
+    {
+        goto bail_out;
+    }
+    it = synthInstances.begin();
+    synth = it->first;
+    //musicClient = it->second;
+    guiMaster = synth->getGuiMaster();
+
+    firstRuntime = &synth->getRuntime();
+
+    memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
+    yoshimiSigAction.sa_handler = yoshimiSigHandler;
+    if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGUSR1 handler failed");
+    if (sigaction(SIGINT, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGINT handler failed");
+    if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGHUP handler failed");
+    if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGTERM handler failed");
+    if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
+        synth->getRuntime().Log("Setting SIGQUIT handler failed");
+
     while (synth->getRuntime().runSynth)
     {
         synth->getRuntime().signalCheck();
@@ -138,29 +184,36 @@ int main(int argc, char *argv[])
         else if (synth->getRuntime().runSynth)
             usleep(33333); // where all the action is ...
     }
-    musicClient->Close();
-    synth->getRuntime().deadObjects->disposeBodies();
-    synth->getRuntime().flushLog();
-    //guiMaster deleted from SynthEngine
-    //if (guiMaster)
-      //  delete guiMaster;
-    delete musicClient;
-    delete synth;
-    cout << "Goodbye - Play again soon?\n";
-    exit(EXIT_SUCCESS);
 
-bail_out:
-    synth->getRuntime().runSynth = false;
-    synth->getRuntime().Log("Yoshimi stages a strategic retreat :-(");
-    if (musicClient)
+    cout << "Goodbye - Play again soon?\n";
+    bExitSuccess = true;
+
+bail_out:    
+    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
-        musicClient->Close();
-        delete musicClient;
+        SynthEngine *_synth = it->first;
+        MusicClient *_client = it->second;
+        _synth->getRuntime().runSynth = false;
+        if(!bExitSuccess)
+        {
+            _synth->getRuntime().Log("Yoshimi stages a strategic retreat :-(");
+        }
+
+        if (_client)
+        {
+            _client->Close();
+            delete _client;
+        }
+
+        if (synth)
+        {
+            _synth->getRuntime().deadObjects->disposeBodies();
+            _synth->getRuntime().flushLog();
+            delete _synth;
+        }
     }
-    if (synth)
-        delete synth;
-    //if (guiMaster)
-      //  delete guiMaster;
-    synth->getRuntime().flushLog();
-    exit(EXIT_FAILURE);
+    if(bExitSuccess)
+        exit(EXIT_SUCCESS);
+    else
+        exit(EXIT_FAILURE);
 }
