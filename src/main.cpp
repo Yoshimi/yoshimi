@@ -138,7 +138,8 @@ int main(int argc, char *argv[])
     globalArgc = argc;
     globalArgv = argv;
     bool bExitSuccess = false;
-    MasterUI *guiMaster = NULL;
+    bool bGuiWait = false;
+    //MasterUI *guiMaster = NULL;
     //MusicClient *musicClient = NULL;
     SynthEngine *synth = NULL;
     std::map<SynthEngine *, MusicClient *>::iterator it;
@@ -150,7 +151,7 @@ int main(int argc, char *argv[])
     it = synthInstances.begin();
     synth = it->first;
     //musicClient = it->second;
-    guiMaster = synth->getGuiMaster();
+    //guiMaster = synth->getGuiMaster();
 
     firstRuntime = &synth->getRuntime();
 
@@ -167,22 +168,34 @@ int main(int argc, char *argv[])
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
         synth->getRuntime().Log("Setting SIGQUIT handler failed");
 
+    bGuiWait = firstRuntime->showGui;
+
     while (synth->getRuntime().runSynth)
     {
-        synth->getRuntime().signalCheck();
-        synth->getRuntime().deadObjects->disposeBodies();
-        if (synth->getRuntime().showGui)
+        if(synth->getUniqueId() == 0)
         {
-            for (int i = 0; !synth->getRuntime().LogList.empty() && i < 5; ++i)
-            {
-                guiMaster->Log(synth->getRuntime().LogList.front());
-                synth->getRuntime().LogList.pop_front();
-            }
-            if (synth->getRuntime().runSynth)
-                Fl::wait(0.033333);
+            synth->getRuntime().signalCheck();
         }
-        else if (synth->getRuntime().runSynth)
-            usleep(33333); // where all the action is ...
+
+        for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+        {
+            SynthEngine *_synth = it->first;
+            _synth->getRuntime().deadObjects->disposeBodies();
+            if (bGuiWait)
+            {
+                for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
+                {
+                    _synth->getGuiMaster()->Log(_synth->getRuntime().LogList.front());
+                    _synth->getRuntime().LogList.pop_front();
+                }
+            }
+        }
+
+        // where all the action is ...
+        if(bGuiWait)
+            Fl::wait(0.033333);
+        else
+            usleep(33333);
     }
 
     cout << "Goodbye - Play again soon?\n";
