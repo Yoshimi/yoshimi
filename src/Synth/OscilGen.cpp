@@ -910,6 +910,8 @@ void OscilGen::prepare(void)
 {
     //int i, j, k;
     float a, b, c, d, hmagnew;
+    memset(random_state, 0, sizeof(random_state));
+    memset(&random_buf, 0, sizeof(random_buf));
     if (initstate_r(synth->random(), random_state,
                     sizeof(random_state), &random_buf))
         synth->getRuntime().Log("OscilGen failed to init general randomness");
@@ -1242,6 +1244,8 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     {
         // unsigned int realrnd = random();
 //        srandom_r(randseed, &harmonic_random_buf);
+        memset(harmonic_random_state, 0, sizeof(harmonic_random_state));
+        memset(&harmonic_random_buf, 0, sizeof(harmonic_random_buf));
     if (initstate_r(randseed, harmonic_random_state,
                     sizeof(harmonic_random_state), &harmonic_random_buf))
         synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");

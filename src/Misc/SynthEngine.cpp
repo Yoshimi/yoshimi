@@ -131,6 +131,10 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
+
+    memset(random_state, 0, sizeof(random_state));
+    memset(&random_buf, 0, sizeof(random_buf));
+
     if (initstate_r(samplerate + buffersize + oscilsize, random_state,
                     sizeof(random_state), &random_buf))
         Runtime.Log("SynthEngine Init failed on general randomness");

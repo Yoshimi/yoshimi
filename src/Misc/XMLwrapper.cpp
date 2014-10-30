@@ -316,7 +316,9 @@ char *XMLwrapper::doloadfile(const string& filename)
             }
             quit = true;
         }
-        synth->getRuntime().signalCheck();
+        //this call makes yoshimi crash sometimes
+        // comment it out - code in main.cpp already does this
+        //synth->getRuntime().signalCheck();
     }
     gzclose(gzf);
     return xmldata;
