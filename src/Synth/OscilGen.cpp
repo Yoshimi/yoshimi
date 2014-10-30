@@ -32,10 +32,10 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Synth/OscilGen.h"
 
-char OscilGen::random_state[256];
-struct random_data OscilGen::random_buf;
-char OscilGen::harmonic_random_state[256];
-struct random_data OscilGen::harmonic_random_buf;
+//char OscilGen::random_state[256];
+//struct random_data OscilGen::random_buf;
+//char OscilGen::harmonic_random_state[256];
+//struct random_data OscilGen::harmonic_random_buf;
 
 OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_, SynthEngine *_synth) :
     Presets(_synth),

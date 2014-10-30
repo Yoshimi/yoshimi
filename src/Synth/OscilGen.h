@@ -205,13 +205,13 @@ class OscilGen : public Presets, private WaveShapeSamples
 
         float random_0_1;
         int32_t random_result;
-        static struct random_data random_buf;
-        static char random_state[];
+        struct random_data random_buf;
+        char random_state[256];
 
         float harmonic_random_0_1;
         int32_t harmonic_random_result;
-        static struct random_data harmonic_random_buf;
-        static char harmonic_random_state[];
+        struct random_data harmonic_random_buf;
+        char harmonic_random_state[256];
 };
 
 
