@@ -184,6 +184,7 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
     
+    // style-wise I think the next bit is the wrong place
     if (synth->getRuntime().midiEngine  == jack_midi and synth->getRuntime().midiDevice.size() and jack_connect(jackClient,synth->getRuntime().midiDevice.c_str(),jack_port_name(midi.port)))
     {
         synth->getRuntime().Log("Didn't find jack MIDI source '" + synth->getRuntime().midiDevice + "'");

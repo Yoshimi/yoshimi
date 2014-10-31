@@ -110,8 +110,10 @@ bool mainCreateNewInstance()
 
     synth->getRuntime().StartupReport(musicClient);
     synth->Unmute();
-    cout << "Yay! We're up and running :-)\n";
-
+    if (synth->getUniqueId() == 0)
+        cout << "\nYay! We're up and running :-)\n";
+    else
+        cout << "\nStarted "<< synth->getUniqueId() << "\n";
     synthInstances.insert(std::make_pair<SynthEngine *, MusicClient *>(synth, musicClient));
     return true;
 
@@ -198,6 +200,7 @@ int main(int argc, char *argv[])
                 }
 
                 synthInstances.erase(it);
+                cout << "\nStopped " << _synth->getUniqueId() << "\n";
                 break;
             }
             if (bGuiWait)
@@ -217,7 +220,7 @@ int main(int argc, char *argv[])
             usleep(33333);
     }
 
-    cout << "Goodbye - Play again soon?\n";
+    cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
 
 bail_out:    
