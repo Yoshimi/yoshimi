@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     bool bGuiWait = false;
     //MasterUI *guiMaster = NULL;
     //MusicClient *musicClient = NULL;
-    SynthEngine *synth = NULL;
+    SynthEngine *firstSynth = NULL;
     std::map<SynthEngine *, MusicClient *>::iterator it;
 
     if (!mainCreateNewInstance())
@@ -149,38 +149,57 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
     it = synthInstances.begin();
-    synth = it->first;
+    firstSynth = it->first;
     //musicClient = it->second;
     //guiMaster = synth->getGuiMaster();
 
-    firstRuntime = &synth->getRuntime();
+    firstRuntime = &firstSynth->getRuntime();
 
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGUSR1 handler failed");
+        firstSynth->getRuntime().Log("Setting SIGUSR1 handler failed");
     if (sigaction(SIGINT, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGINT handler failed");
+        firstSynth->getRuntime().Log("Setting SIGINT handler failed");
     if (sigaction(SIGHUP, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGHUP handler failed");
+        firstSynth->getRuntime().Log("Setting SIGHUP handler failed");
     if (sigaction(SIGTERM, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGTERM handler failed");
+        firstSynth->getRuntime().Log("Setting SIGTERM handler failed");
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
-        synth->getRuntime().Log("Setting SIGQUIT handler failed");
+        firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
 
     bGuiWait = firstRuntime->showGui;
 
-    while (synth->getRuntime().runSynth)
+    while (firstSynth->getRuntime().runSynth)
     {
-        if(synth->getUniqueId() == 0)
+        if(firstSynth->getUniqueId() == 0)
         {
-            synth->getRuntime().signalCheck();
+            firstSynth->getRuntime().signalCheck();
         }
 
         for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
+            MusicClient *_client = it->second;
             _synth->getRuntime().deadObjects->disposeBodies();
+            if(!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
+            {
+                if (_client)
+                {
+                    _client->Close();
+                    delete _client;
+                }
+
+                if (_synth)
+                {
+                    _synth->getRuntime().deadObjects->disposeBodies();
+                    _synth->getRuntime().flushLog();
+                    delete _synth;
+                }
+
+                synthInstances.erase(it);
+                break;
+            }
             if (bGuiWait)
             {
                 for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
@@ -218,7 +237,7 @@ bail_out:
             delete _client;
         }
 
-        if (synth)
+        if (_synth)
         {
             _synth->getRuntime().deadObjects->disposeBodies();
             _synth->getRuntime().flushLog();

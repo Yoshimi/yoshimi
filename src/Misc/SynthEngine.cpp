@@ -1009,8 +1009,8 @@ MasterUI *SynthEngine::getGuiMaster()
 
 void SynthEngine::guiClosed(bool stopSynth)
 {
-    if(stopSynth && !isLV2Plugin && uniqueId == 0) //make this only for the first instance
-        Runtime.runSynth = false;
+    if(stopSynth && !isLV2Plugin) //make this only for the first instance
+        Runtime.runSynth = false;    
 }
 
 std::string SynthEngine::makeUniqueName(const char *name)
