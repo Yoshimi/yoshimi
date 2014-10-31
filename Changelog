@@ -8,7 +8,7 @@ yoshimi-1.2.x
   3) Windows names (main window, panel, keyboad) are named according
      to instance number with unique postfix.
   4) Only main window of the first instance exits process. Other windows
-     deregiser instances and closed.
+     deregister instances and closed.
 
 - CMake policy change to stop warning message
 - Small correction in part peak representation
