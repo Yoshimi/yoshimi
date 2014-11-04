@@ -66,7 +66,7 @@ bool AlsaEngine::openMidi(void)
     midi.device = synth->getRuntime().midiDevice;
     const char* port_name = "input";
     int port_num;
-    if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, 0) != 0)
+    if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, SND_SEQ_NONBLOCK) != 0)
     {
         synth->getRuntime().Log("Error, failed to open alsa midi");
         goto bail_out;
@@ -123,6 +123,16 @@ bail_out:
 
 void AlsaEngine::Close(void)
 {
+    if(!synth->getRuntime().runSynth) //wait for midi thread to finish
+    {
+        if(midi.pThread != 0)
+        {
+            void *ret = NULL;
+            pthread_join(midi.pThread, &ret);
+            midi.pThread = 0;
+        }
+
+    }
     if (audio.handle != NULL)
         alsaBad(snd_pcm_close(audio.handle), "close pcm failed");
     audio.handle = NULL;
@@ -509,8 +519,12 @@ void *AlsaEngine::MidiThread(void)
             }
             snd_seq_free_event(event);
         }
-        if (chk < 0)
-            synth->getRuntime().Log("ALSA midi input read failed: " + asString(chk));
+        //if (chk < 0)
+            //synth->getRuntime().Log("ALSA midi input read failed: " + asString(chk));
+        if(chk < 0)
+        {
+            usleep(1024);
+        }
     }
     return NULL;
 }
