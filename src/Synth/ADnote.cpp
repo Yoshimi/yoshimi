@@ -1162,7 +1162,7 @@ void ADnote::computeCurrentParameters(void)
             }
         }
     }
-    time += synth->buffersize_f / synth->samplerate_f;
+    time += synth->p_buffersize_f / synth->samplerate_f;
 }
 
 
@@ -1170,18 +1170,18 @@ void ADnote::computeCurrentParameters(void)
 void ADnote::fadein(float *smps)
 {
     int zerocrossings = 0;
-    for (int i = 1; i < synth->buffersize; ++i)
+    for (int i = 1; i < synth->p_buffersize; ++i)
         if (smps[i - 1] < 0.0f && smps[i] > 0.0f)
             zerocrossings++; // this is only the positive crossings
 
-    float tmp = (synth->buffersize - 1.0f) / (zerocrossings + 1) / 3.0f;
+    float tmp = (synth->p_buffersize - 1.0f) / (zerocrossings + 1) / 3.0f;
     if (tmp < 8.0f)
         tmp = 8.0f;
 
     // F2I(tmp, n); // how many samples is the fade-in
     int fadein = float2int((tmp < 8.0f) ? 8.0f : tmp); // how many samples is the fade-in
-    if (fadein > synth->buffersize)
-        fadein = synth->buffersize;
+    if (fadein > synth->p_buffersize)
+        fadein = synth->p_buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
     {
         smps[i] *= (0.5 - cos(PI * i / fadein) * 0.5f);
@@ -1202,7 +1202,7 @@ void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
         float freqlo = oscfreqlo[nvoice][k];
         float *smps = NoteVoicePar[nvoice].OscilSmp;
         float *tw = tmpwave_unison[k];
-        for (int i = 0; i < synth->buffersize; ++i)
+        for (int i = 0; i < synth->p_buffersize; ++i)
         {
             tw[i] = smps[poshi] * (1.0f - poslo) + smps[poshi + 1] * poslo;
             poslo += freqlo;
@@ -1249,7 +1249,7 @@ inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
         float *smps   = NoteVoicePar[nvoice].OscilSmp;
         float *tw     = tmpwave_unison[k];
         assert(oscfreqlo[nvoice][k] < 1.0f);
-        for(int i = 0; i < synth->buffersize; ++i) {
+        for(int i = 0; i < synth->p_buffersize; ++i) {
             tw[i]  = (smps[poshi] * ((1<<24) - poslo) + smps[poshi + 1] * poslo)/(1.0f*(1<<24));
             poslo += freqlo;
             poshi += freqhi + (poslo>>24);
@@ -1281,11 +1281,11 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (int i = 0; i < synth->buffersize; ++i)
+            for (int i = 0; i < synth->p_buffersize; ++i)
             {
                 amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice], i,
-                                           synth->buffersize);
+                                           synth->p_buffersize);
                 tw[i] *= (1.0f - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
             }
         }
@@ -1299,11 +1299,11 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
             int freqhiFM = oscfreqhiFM[nvoice][k];
             float freqloFM = oscfreqloFM[nvoice][k];
             float *tw = tmpwave_unison[k];
-            for (int i = 0; i < synth->buffersize; ++i)
+            for (int i = 0; i < synth->p_buffersize; ++i)
             {
                 amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice], i,
-                                           synth->buffersize);
+                                           synth->p_buffersize);
                 tw[i] *= (1.0f - amp) + amp * (NoteVoicePar[nvoice].FMSmp[poshiFM]
                           * (1 - posloFM) + NoteVoicePar[nvoice].FMSmp[poshiFM + 1]
                           * posloFM);
@@ -1338,11 +1338,11 @@ void ADnote::computeVoiceOscillatorRingModulation(int nvoice)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (int i = 0; i < synth->buffersize; ++i)
+            for (int i = 0; i < synth->p_buffersize; ++i)
             {
                 amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice],
-                                           i, synth->buffersize);
+                                           i, synth->p_buffersize);
                 int FMVoice = NoteVoicePar[nvoice].FMVoice;
                 tw[i] *= (1.0f - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
             }
@@ -1358,11 +1358,11 @@ void ADnote::computeVoiceOscillatorRingModulation(int nvoice)
             float freqloFM = oscfreqloFM[nvoice][k];
             float *tw = tmpwave_unison[k];
 
-            for (int i = 0; i < synth->buffersize; ++i)
+            for (int i = 0; i < synth->p_buffersize; ++i)
             {
                 amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice], i,
-                                           synth->buffersize);
+                                           synth->p_buffersize);
                 tw[i] *= (NoteVoicePar[nvoice].FMSmp[poshiFM] * (1.0 - posloFM)
                           + NoteVoicePar[nvoice].FMSmp[poshiFM + 1] * posloFM)
                           * amp + (1.0 - amp);
@@ -1408,7 +1408,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
             int freqhiFM = oscfreqhiFM[nvoice][k];
             float freqloFM = oscfreqloFM[nvoice][k];
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
             {
                 tw[i] = (NoteVoicePar[nvoice].FMSmp[poshiFM] * (1.0f - posloFM)
                          + NoteVoicePar[nvoice].FMSmp[poshiFM + 1] * posloFM);
@@ -1431,10 +1431,10 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
                 tw[i] *= interpolateAmplitude(FMoldamplitude[nvoice],
                                               FMnewamplitude[nvoice], i,
-                                              synth->buffersize);
+                                              synth->p_buffersize);
         }
     }
     else
@@ -1442,7 +1442,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
                 tw[i] *= FMnewamplitude[nvoice];
         }
     }
@@ -1456,7 +1456,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         {
             float *tw = tmpwave_unison[k];
             float  fmold = FMoldsmp[nvoice][k];
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
             {
                 fmold = fmodf(fmold + tw[i] * normalize, synth->oscilsize_f);
                 tw[i] = fmold;
@@ -1470,7 +1470,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
                 tw[i] *= normalize;
         }
     }
@@ -1484,7 +1484,7 @@ void ADnote::computeVoiceOscillatorFrequencyModulation(int nvoice, int FMmode)
         int freqhi = oscfreqhi[nvoice][k];
         float freqlo = oscfreqlo[nvoice][k];
 
-        for (i = 0; i < synth->buffersize; ++i)
+        for (i = 0; i < synth->p_buffersize; ++i)
         {
             //F2I(tw[i], FMmodfreqhi);
             FMmodfreqhi = float2int(tw[i]);
@@ -1534,7 +1534,7 @@ void ADnote::computeVoiceNoise(int nvoice)
     for (int k = 0; k < unison_size[nvoice]; ++k)
     {
         float *tw = tmpwave_unison[k];
-        for (int i = 0; i < synth->buffersize; ++i)
+        for (int i = 0; i < synth->p_buffersize; ++i)
             tw[i] = synth->numRandom() * 2.0f - 1.0f;
     }
 }
@@ -1544,14 +1544,14 @@ void ADnote::computeVoiceNoise(int nvoice)
 int ADnote::noteout(float *outl, float *outr)
 {
     int i, nvoice;
-    memset(outl, 0, synth->bufferbytes);
-    memset(outr, 0, synth->bufferbytes);
+    memset(outl, 0, synth->p_bufferbytes);
+    memset(outr, 0, synth->p_bufferbytes);
 
     if (!NoteEnabled)
         return 0;
 
-    memset(bypassl, 0, synth->bufferbytes);
-    memset(bypassr, 0, synth->bufferbytes);
+    memset(bypassl, 0, synth->p_bufferbytes);
+    memset(bypassr, 0, synth->p_bufferbytes);
     computeCurrentParameters();
 
     for (nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
@@ -1592,9 +1592,9 @@ int ADnote::noteout(float *outl, float *outr)
             computeVoiceNoise(nvoice);
 
         // Mix subvoices into voice
-        memset(tmpwavel, 0, synth->bufferbytes);
+        memset(tmpwavel, 0, synth->p_bufferbytes);
         if (stereo)
-            memset(tmpwaver, 0, synth->bufferbytes);
+            memset(tmpwaver, 0, synth->p_bufferbytes);
         for (int k = 0; k < unison_size[nvoice]; ++k)
         {
             float *tw = tmpwave_unison[k];
@@ -1630,13 +1630,13 @@ int ADnote::noteout(float *outl, float *outr)
                     rvol = -rvol;
                 }
 
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     tmpwavel[i] += tw[i] * lvol;
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     tmpwaver[i] += tw[i] * rvol;
             }
             else
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     tmpwavel[i] += tw[i];
         }
 
@@ -1649,34 +1649,34 @@ int ADnote::noteout(float *outl, float *outr)
 
         if (aboveAmplitudeThreshold(oldam, newam))
         {
-            int rest = synth->buffersize;
+            int rest = synth->p_buffersize;
             // test if the amplitude if rising and the difference is high
             if (newam > oldam && (newam - oldam) > 0.25f)
             {
                 rest = 10;
-                if (rest > synth->buffersize)
-                    rest = synth->buffersize;
-                for (int i = 0; i < synth->buffersize - rest; ++i)
+                if (rest > synth->p_buffersize)
+                    rest = synth->p_buffersize;
+                for (int i = 0; i < synth->p_buffersize - rest; ++i)
                     tmpwavel[i] *= oldam;
                 if (stereo)
-                    for (int i = 0; i < synth->buffersize - rest; ++i)
+                    for (int i = 0; i < synth->p_buffersize - rest; ++i)
                         tmpwaver[i] *= oldam;
             }
             // Amplitude interpolation
             for (i = 0; i < rest; ++i)
             {
                 float amp = interpolateAmplitude(oldam, newam, i, rest);
-                tmpwavel[i + (synth->buffersize - rest)] *= amp;
+                tmpwavel[i + (synth->p_buffersize - rest)] *= amp;
                 if (stereo)
-                    tmpwaver[i + (synth->buffersize - rest)] *= amp;
+                    tmpwaver[i + (synth->p_buffersize - rest)] *= amp;
             }
         }
         else
         {
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
                 tmpwavel[i] *= newam;
             if (stereo)
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     tmpwaver[i] *= newam;
         }
 
@@ -1702,11 +1702,11 @@ int ADnote::noteout(float *outl, float *outr)
         {
             if (NoteVoicePar[nvoice].AmpEnvelope->finished())
             {
-                for (i = 0; i < synth->buffersize; ++i)
-                    tmpwavel[i] *= 1.0f - (float)i / synth->buffersize_f;
+                for (i = 0; i < synth->p_buffersize; ++i)
+                    tmpwavel[i] *= 1.0f - (float)i / synth->p_buffersize_f;
                 if (stereo)
-                    for (i = 0; i < synth->buffersize; ++i)
-                        tmpwaver[i] *= 1.0f - (float)i / synth->buffersize_f;
+                    for (i = 0; i < synth->p_buffersize; ++i)
+                        tmpwaver[i] *= 1.0f - (float)i / synth->p_buffersize_f;
             }
             // the voice is killed later
         }
@@ -1717,10 +1717,10 @@ int ADnote::noteout(float *outl, float *outr)
         if (NoteVoicePar[nvoice].VoiceOut)
         {
             if (stereo)
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     NoteVoicePar[nvoice].VoiceOut[i] = tmpwavel[i] + tmpwaver[i];
             else // mono
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     NoteVoicePar[nvoice].VoiceOut[i] = tmpwavel[i];
         }
 
@@ -1737,21 +1737,21 @@ int ADnote::noteout(float *outl, float *outr)
             if (stereo)
             {
 
-                for (i = 0; i < synth->buffersize; ++i) // stereo
+                for (i = 0; i < synth->p_buffersize; ++i) // stereo
                 {
                     outl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume * pangainL;
                     outr[i] += tmpwaver[i] * NoteVoicePar[nvoice].Volume * pangainR;
                 }
             }
             else
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     outl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume * 0.7f; // mono
         }
         else // bypass the filter
         {
             if (stereo)
             {
-                for (i = 0; i < synth->buffersize; ++i) // stereo
+                for (i = 0; i < synth->p_buffersize; ++i) // stereo
                 {
                     bypassl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume
                                   * pangainL;
@@ -1760,7 +1760,7 @@ int ADnote::noteout(float *outl, float *outr)
                 }
             }
             else
-                for (i = 0; i < synth->buffersize; ++i)
+                for (i = 0; i < synth->p_buffersize; ++i)
                     bypassl[i] += tmpwavel[i] * NoteVoicePar[nvoice].Volume; // mono
         }
         // check if there is necesary to proces the voice longer
@@ -1775,13 +1775,13 @@ int ADnote::noteout(float *outl, float *outr)
 
     if (!stereo) // set the right channel=left channel
     {
-        memcpy(outr, outl, synth->bufferbytes);
-        memcpy(bypassr, bypassl, synth->bufferbytes);
+        memcpy(outr, outl, synth->p_bufferbytes);
+        memcpy(bypassr, bypassl, synth->p_bufferbytes);
     }
     else
         NoteGlobalPar.GlobalFilterR->filterout(outr);
 
-    for (i = 0; i < synth->buffersize; ++i)
+    for (i = 0; i < synth->p_buffersize; ++i)
     {
         outl[i] += bypassl[i];
         outr[i] += bypassr[i];
@@ -1798,18 +1798,18 @@ int ADnote::noteout(float *outl, float *outr)
     if (aboveAmplitudeThreshold(globaloldamplitude, globalnewamplitude))
     {
         // Amplitude Interpolation
-        for (i = 0; i < synth->buffersize; ++i)
+        for (i = 0; i < synth->p_buffersize; ++i)
         {
             float tmpvol = interpolateAmplitude(globaloldamplitude,
                                                 globalnewamplitude, i,
-                                                synth->buffersize);
+                                                synth->p_buffersize);
             outl[i] *= tmpvol * pangainL;
             outr[i] *= tmpvol * pangainR;
         }
     }
     else
     {
-        for (i = 0; i < synth->buffersize; ++i)
+        for (i = 0; i < synth->p_buffersize; ++i)
         {
             outl[i] *= globalnewamplitude * pangainL;
             outr[i] *= globalnewamplitude * pangainR;
@@ -1819,7 +1819,7 @@ int ADnote::noteout(float *outl, float *outr)
     // Apply the punch
     if (NoteGlobalPar.Punch.Enabled)
     {
-        for (i = 0; i < synth->buffersize; ++i)
+        for (i = 0; i < synth->p_buffersize; ++i)
         {
             float punchamp = NoteGlobalPar.Punch.initialvalue
                              * NoteGlobalPar.Punch.t + 1.0f;
@@ -1838,15 +1838,15 @@ int ADnote::noteout(float *outl, float *outr)
     if (Legato.silent)    // Silencer
         if (Legato.msg != LM_FadeIn)
         {
-            memset(outl, 0, synth->bufferbytes);
-            memset(outr, 0, synth->bufferbytes);
+            memset(outl, 0, synth->p_bufferbytes);
+            memset(outr, 0, synth->p_bufferbytes);
         }
     switch(Legato.msg)
     {
         case LM_CatchUp:  // Continue the catch-up...
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (i = 0; i < synth->buffersize; ++i) { // Yea, could be done without the loop...
+            for (i = 0; i < synth->p_buffersize; ++i) { // Yea, could be done without the loop...
                 Legato.decounter--;
                 if (Legato.decounter < 1)
                 {
@@ -1868,7 +1868,7 @@ int ADnote::noteout(float *outl, float *outr)
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
             Legato.silent = false;
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
             {
                 Legato.decounter--;
                 if (Legato.decounter < 1)
@@ -1886,12 +1886,12 @@ int ADnote::noteout(float *outl, float *outr)
         case LM_FadeOut:  // Fade-out, then set the catch-up
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (i = 0; i < synth->buffersize; ++i)
+            for (i = 0; i < synth->p_buffersize; ++i)
             {
                 Legato.decounter--;
                 if (Legato.decounter < 1)
                 {
-                    for (int j = i; j < synth->buffersize; j++)
+                    for (int j = i; j < synth->p_buffersize; j++)
                         outl[j] = outr[j] = 0.0f;
                     Legato.decounter = -10;
                     Legato.silent = true;
@@ -1922,9 +1922,9 @@ int ADnote::noteout(float *outl, float *outr)
     // If it does, disable the note
     if (NoteGlobalPar.AmpEnvelope->finished())
     {
-        for (i = 0; i < synth->buffersize; ++i) // fade-out
+        for (i = 0; i < synth->p_buffersize; ++i) // fade-out
         {
-            float tmp = 1.0f - (float)i / synth->buffersize_f;
+            float tmp = 1.0f - (float)i / synth->p_buffersize_f;
             outl[i] *= tmp;
             outr[i] *= tmp;
         }

@@ -373,7 +373,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
     float y0;
     if (order == 1)
     {   // First order filter
-        for (int i = 0; i < synth->buffersize; ++i)
+        for (int i = 0; i < synth->p_buffersize; ++i)
         {
             y0 = smp[i] * c[0] + x.c1 * c[1] + y.c1 * d[1];
             y.c1 = y0;
@@ -382,7 +382,7 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
         }
     }
     if (order == 2) { // Second order filter
-        for (int i = 0; i < synth->buffersize; ++i)
+        for (int i = 0; i < synth->p_buffersize; ++i)
         {
             y0 = smp[i] * c[0] + x.c1 * c[1] + x.c2 * c[2] + y.c1 * d[1] + y.c2 * d[2];
             y.c2 = y.c1;
@@ -409,15 +409,15 @@ void AnalogFilter::filterout(float *smp)
 
     if (needsinterpolation != 0)
     {
-        for (int i = 0; i < synth->buffersize; ++i)
+        for (int i = 0; i < synth->p_buffersize; ++i)
         {
-            float x = (float)i / synth->buffersize_f;
+            float x = (float)i / synth->p_buffersize_f;
             smp[i] = tmpismp[i] * (1.0f - x) + smp[i] * x;
         }
         needsinterpolation = 0;
     }
 
-    for (int i = 0; i < synth->buffersize; ++i)
+    for (int i = 0; i < synth->p_buffersize; ++i)
         smp[i] *= outgain;
 }
 

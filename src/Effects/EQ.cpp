@@ -59,9 +59,9 @@ void EQ::cleanup(void)
 // Effect output
 void EQ::out(float *smpsl, float *smpsr)
 {
-    memcpy(efxoutl, smpsl, synth->bufferbytes);
-    memcpy(efxoutr, smpsr, synth->bufferbytes);
-    for (int i = 0; i < synth->buffersize; ++i)
+    memcpy(efxoutl, smpsl, synth->p_bufferbytes);
+    memcpy(efxoutr, smpsr, synth->p_bufferbytes);
+    for (int i = 0; i < synth->p_buffersize; ++i)
     {
         efxoutl[i] *= volume;
         efxoutr[i] *= volume;

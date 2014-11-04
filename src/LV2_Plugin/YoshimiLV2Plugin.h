@@ -20,6 +20,8 @@
 
 #include <string>
 #include <semaphore.h>
+#include <jack/jack.h>
+#include <jack/ringbuffer.h>
 
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicIO.h"
@@ -39,10 +41,22 @@ private:
    uint32_t _offsetPos;
    sem_t _midiSem;
 
+   struct midi_event {
+       jack_nframes_t time;
+       char data[4]; // all events of interest are <= 4bytes
+   };
+
+   float *_bFreeWheel;
+
+   jack_ringbuffer_t *_midiRingBuf;
+   pthread_t _pMidiThread;
+
    float *lv2Left [NUM_MIDI_PARTS + 1];
    float *lv2Right [NUM_MIDI_PARTS + 1];
 
    void process(uint32_t sample_count);
+   void processMidiMessage(const uint8_t *msg);
+   void *midiThread(void);
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
@@ -62,6 +76,7 @@ public:
    static void run(LV2_Handle instance, uint32_t   sample_count);
    static void cleanup(LV2_Handle instance);
    static const void * extension_data(const char * uri);
+   static void *static_midiThread(void *arg);
    /*
    static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
    static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);

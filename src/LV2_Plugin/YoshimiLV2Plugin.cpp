@@ -32,6 +32,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     uint32_t next_frame = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
+    struct midi_event intMidiEvent;
     for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
     {
         tmpLeft [i] = lv2Left [i];
@@ -45,17 +46,20 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         if(event == NULL)
             continue;
+        if(event->body.size > sizeof(intMidiEvent.data))
+            continue;
+
         if(event->body.type == _midi_event_id)
         {
-            next_frame = event->time.frames;
+            next_frame = event->time.frames;            
             if(next_frame >= real_sample_count)
                 continue;
             uint32_t to_process = next_frame - offs;
             if(to_process > 0)
             {
-                _synth->buffersize_f = _synth->buffersize = to_process;
-                _synth->bufferbytes = to_process * sizeof(float);
-                _synth->MasterAudio(tmpLeft, tmpRight);
+                //_synth->buffersize_f = _synth->buffersize = to_process;
+                //_synth->bufferbytes = to_process * sizeof(float);
+                _synth->MasterAudio(tmpLeft, tmpRight, to_process);
                 offs = next_frame;
                 for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
                 {
@@ -64,85 +68,45 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 }
             }
             //process this midi event
-            const uint8_t* const msg = (const uint8_t*)(event + 1);
-            unsigned char channel, note, velocity;
-            int ctrltype;
-            int par = 0;
-            unsigned int ev;
-            channel = msg[0] & 0x0F;
-            switch ((ev = msg[0] & 0xF0))
+            const uint8_t *msg = (const uint8_t*)(event + 1);
+            bool bMidiProcessed = false;
+            if(_bFreeWheel != NULL)
             {
-                case 0x01: // modulation wheel or lever
-                    ctrltype = C_modwheel;
-                    par = msg[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0x07: // channel volume (formerly main volume)
-                    ctrltype = C_volume;
-                    par = msg[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0x0B: // expression controller
-                    ctrltype = C_expression;
-                    par = msg[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0x78: // all sound off
-                    ctrltype = C_allsoundsoff;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case 0x79: // reset all controllers
-                    ctrltype = C_resetallcontrollers;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case 0x7B:  // all notes off
-                    ctrltype = C_allnotesoff;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case 0x80: // note-off
-                    note = msg[1];
-                    setMidiNote(channel, note);
-                    break;
-
-                case 0x90: // note-on
-                    if ((note = msg[1])) // skip note == 0
-                    {
-                        velocity = msg[2];
-                        setMidiNote(channel, note, velocity);
-                    }
-                    break;
-
-                case 0xB0: // controller
-                    ctrltype = getMidiController(msg[1]);
-                    par = msg[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0xC0: // program change
-                    ctrltype = C_programchange;
-                    par = msg[1];
-                    setMidiProgram(channel, par);
-                    break;
-
-                case 0xE0: // pitch bend
-                    ctrltype = C_pitchwheel;
-                    par = ((msg[2] << 7) | msg[1]) - 8192;
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0xF0: // system exclusive
-                    break;
-
-                default: // wot, more?
-                    synth->getRuntime().Log("other event: " + asString((int)ev));
-                    break;
+                if(*_bFreeWheel != 0)
+                {
+                    processMidiMessage(msg);
+                    bMidiProcessed = true;
+                }
             }
+            if(!bMidiProcessed)
+            {
+                intMidiEvent.time = next_frame;
+                memset(intMidiEvent.data, 0, sizeof(intMidiEvent.data));
+                memcpy(intMidiEvent.data, msg, event->body.size);
+                unsigned int wrote = 0;
+                int tries = 0;
+                while (wrote < sizeof(struct midi_event) && tries < 3)
+                {
+                    int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(msg), sizeof(struct midi_event) - wrote);
+                    wrote += act_write;
+                    msg += act_write;
+                    ++tries;
+                }
+                if (wrote == sizeof(struct midi_event))
+                {
+                    if (sem_post(&_midiSem) < 0)
+                        _synth->getRuntime().Log("processMidi semaphore post error, "
+                                    + string(strerror(errno)));
+                }
+                else
+                {
+                    _synth->getRuntime().Log("Bad write to midi ringbuffer: "
+                                + asString(wrote) + " / "
+                                + asString((int)sizeof(struct midi_event)));
+                }
+
+            }
+
         }
     }
 
@@ -151,14 +115,122 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         uint32_t to_process = real_sample_count - offs;
         if(to_process > 0)
         {
-            _synth->buffersize_f = _synth->buffersize = to_process;
-            _synth->bufferbytes = to_process * sizeof(float);
-            _synth->MasterAudio(tmpLeft, tmpRight);
+            //_synth->buffersize_f = _synth->buffersize = to_process;
+            //_synth->bufferbytes = to_process * sizeof(float);
+            _synth->MasterAudio(tmpLeft, tmpRight, to_process);
             offs = next_frame;
         }
 
     }
 
+}
+
+void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
+{
+    unsigned char channel, note, velocity;
+    int ctrltype;
+    int par = 0;
+    unsigned int ev;
+    channel = msg[0] & 0x0F;
+    switch ((ev = msg[0] & 0xF0))
+    {
+        case 0x01: // modulation wheel or lever
+            ctrltype = C_modwheel;
+            par = msg[2];
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0x07: // channel volume (formerly main volume)
+            ctrltype = C_volume;
+            par = msg[2];
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0x0B: // expression controller
+            ctrltype = C_expression;
+            par = msg[2];
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0x78: // all sound off
+            ctrltype = C_allsoundsoff;
+            setMidiController(channel, ctrltype, 0);
+            break;
+
+        case 0x79: // reset all controllers
+            ctrltype = C_resetallcontrollers;
+            setMidiController(channel, ctrltype, 0);
+            break;
+
+        case 0x7B:  // all notes off
+            ctrltype = C_allnotesoff;
+            setMidiController(channel, ctrltype, 0);
+            break;
+
+        case 0x80: // note-off
+            note = msg[1];
+            setMidiNote(channel, note);
+            break;
+
+        case 0x90: // note-on
+            if ((note = msg[1])) // skip note == 0
+            {
+                velocity = msg[2];
+                setMidiNote(channel, note, velocity);
+            }
+            break;
+
+        case 0xB0: // controller
+            ctrltype = getMidiController(msg[1]);
+            par = msg[2];
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0xC0: // program change
+            ctrltype = C_programchange;
+            par = msg[1];
+            setMidiProgram(channel, par);
+            break;
+
+        case 0xE0: // pitch bend
+            ctrltype = C_pitchwheel;
+            par = ((msg[2] << 7) | msg[1]) - 8192;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0xF0: // system exclusive
+            break;
+
+        default: // wot, more?
+            synth->getRuntime().Log("other event: " + asString((int)ev));
+            break;
+    }
+
+}
+
+void *YoshimiLV2Plugin::midiThread()
+{
+    struct midi_event midiEvent;
+    while (synth->getRuntime().runSynth)
+    {
+        if (sem_wait(&_midiSem) < 0)
+        {
+            _synth->getRuntime().Log("midiThread semaphore wait error, "
+                        + string(strerror(errno)));
+            continue;
+        }
+        if (!_synth->getRuntime().runSynth)
+            break;
+        size_t fetch = jack_ringbuffer_read(_midiRingBuf, (char*)&midiEvent, sizeof(struct midi_event));
+        if (fetch != sizeof(struct midi_event))
+        {
+            _synth->getRuntime().Log("Short ringbuffer read, " + asString((float)fetch) + " / "
+                        + asString((int)sizeof(struct midi_event)));
+            continue;
+        }
+        processMidiMessage(reinterpret_cast<const uint8_t *>(midiEvent.data));
+    }
+    return NULL;
 }
 
 YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features):
@@ -170,7 +242,9 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _midiDataPort(NULL),
     _midi_event_id(0),
     _bufferPos(0),
-    _offsetPos(0)
+    _offsetPos(0),
+    _bFreeWheel(NULL),
+    _midiRingBuf(NULL)
 {
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
@@ -219,10 +293,15 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 {
     if(_synth != NULL)
     {
-        _synth->getRuntime().runSynth = false;
+        _synth->getRuntime().runSynth = false;        
         sem_post(&_midiSem);
         sem_wait(&_midiSem);
         sem_destroy(&_midiSem);
+        if(_midiRingBuf != NULL)
+        {
+            jack_ringbuffer_free(_midiRingBuf);
+            _midiRingBuf = NULL;
+        }
         delete _synth;
         _synth = NULL;
     }
@@ -234,10 +313,29 @@ bool YoshimiLV2Plugin::init()
         return false;
     if(!prepBuffers(false))
         return false;
-
-
     if(sem_init(&_midiSem, 0, 0) != 0)
+    {
+        _synth->getRuntime().Log("Failed to create midi semaphore");
         return false;
+    }
+
+    _midiRingBuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096);
+    if (!_midiRingBuf)
+    {
+        _synth->getRuntime().Log("Failed to create midi ringbuffer");
+        return false;
+    }
+    if (jack_ringbuffer_mlock(_midiRingBuf))
+    {
+        _synth->getRuntime().Log("Failed to lock memory");
+        return false;
+    }
+
+    if(!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1))
+    {
+        synth->getRuntime().Log("Failed to start jack midi thread");
+        return false;
+    }
 
     _synth->Init(_sampleRate, _bufferSize);
 
@@ -274,8 +372,13 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
      {
          inst->_midiDataPort = static_cast<LV2_Atom_Sequence *>(data_location);
          return;
+     }else if(port == 1) //freewheel control port
+     {
+         inst->_bFreeWheel = static_cast<float *>(data_location);
+         return;
      }
-     --port;
+
+     port -=2;
 
      int portIndex = static_cast<int>(floorf((float)port/2.0f));
      if(port % 2 == 0) //left channel
@@ -326,6 +429,11 @@ const void *YoshimiLV2Plugin::extension_data(const char *uri)
     /*if(strcmp(uri, LV2_WORKER__interface) == 0)
         return static_cast<const void *>(&yoshimi_wrk_iface);*/
     return NULL;
+}
+
+void *YoshimiLV2Plugin::static_midiThread(void *arg)
+{
+    return static_cast<YoshimiLV2Plugin *>(arg)->midiThread();
 }
 /*
 LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data)

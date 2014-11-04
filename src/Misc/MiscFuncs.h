@@ -29,7 +29,7 @@ class MiscFuncs
 {
     public:
         MiscFuncs() { }
-        ~MiscFuncs() { };
+        ~MiscFuncs() { }
         string asString(int n);
         string asString(long long n);
         string asString(long n);

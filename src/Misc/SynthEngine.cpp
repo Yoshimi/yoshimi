@@ -51,6 +51,10 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     oscilsize_f(oscilsize),
     halfoscilsize(oscilsize / 2),
     halfoscilsize_f(halfoscilsize),
+    processOffset(0),
+    p_buffersize(0),
+    p_bufferbytes(0),
+    p_buffersize_f(0),
     ctl(NULL),
     microtonal(this),
     bank(this),
@@ -438,212 +442,239 @@ void SynthEngine::partonoff(int npart, int what)
 
 
 // Master audio out (the final sound)
-void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS])
-{
+void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS], int to_process)
+{    
+
+    p_buffersize = buffersize;
+    p_bufferbytes = bufferbytes;
+    p_buffersize_f = buffersize_f;
+
+    if(to_process > 0)
+    {
+        p_buffersize = to_process;
+        p_bufferbytes = p_buffersize * sizeof(float);
+        p_buffersize_f = p_buffersize;
+
+        if(p_buffersize + processOffset > buffersize)
+        {
+            p_buffersize = buffersize;
+            p_bufferbytes = bufferbytes;
+            p_buffersize_f = buffersize_f;
+        }
+    }
+
     int npart;
     for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
     {
-        memset(outl[npart], 0, bufferbytes);
-        memset(outr[npart], 0, bufferbytes);
+        memset(outl[npart], 0, p_bufferbytes);
+        memset(outr[npart], 0, p_bufferbytes);
     }
-    if (isMuted())
-        return;
 
-    actionLock(lock);
-
-    // Compute part samples and store them ->partoutl,partoutr
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        if (part[npart]->Penabled)
-            part[npart]->ComputePartSmps();
-
-    // Insertion effects
-    int nefx;
-    for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+    if (!isMuted())
     {
-        if (Pinsparts[nefx] >= 0)
+
+        actionLock(lock);
+
+        // Compute part samples and store them ->partoutl,partoutr
+        for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+            if (part[npart]->Penabled)
+                part[npart]->ComputePartSmps();
+
+        // Insertion effects
+        int nefx;
+        for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         {
-            int efxpart = Pinsparts[nefx];
-            if (part[efxpart]->Penabled)
-                insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
-        }
-    }
-
-    // Apply the part volumes and pannings (after insertion effects)
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if (!part[npart]->Penabled)
-            continue;
-
-        float oldvol_l = part[npart]->oldvolumel;
-        float oldvol_r = part[npart]->oldvolumer;
-        float newvol_l = part[npart]->pannedVolLeft();
-        float newvol_r = part[npart]->pannedVolRight();
-        if (aboveAmplitudeThreshold(oldvol_l, newvol_l) || aboveAmplitudeThreshold(oldvol_r, newvol_r))
-        {   // the volume or the panning has changed and needs interpolation
-            for (int i = 0; i < buffersize; ++i)
+            if (Pinsparts[nefx] >= 0)
             {
-                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i, buffersize);
-                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i, buffersize);
-                part[npart]->partoutl[i] *= vol_l;
-                part[npart]->partoutr[i] *= vol_r;
-            }
-            part[npart]->oldvolumel = newvol_l;
-            part[npart]->oldvolumer = newvol_r;
-        }
-        else
-        {
-            for (int i = 0; i < buffersize; ++i)
-            {   // the volume did not change
-                part[npart]->partoutl[i] *= newvol_l;
-                part[npart]->partoutr[i] *= newvol_r;
+                int efxpart = Pinsparts[nefx];
+                if (part[efxpart]->Penabled)
+                    insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
             }
         }
-    }
-    // System effects
-    for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-    {
-        if (!sysefx[nefx]->geteffect())
-            continue; // is disabled
 
-        // Clean up the samples used by the system effects
-        memset(tmpmixl, 0, bufferbytes);
-        memset(tmpmixr, 0, bufferbytes);
-
-        // Mix the channels according to the part settings about System Effect
+        // Apply the part volumes and pannings (after insertion effects)
         for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
-            // skip if part is disabled, doesn't go to main or has no output to effect
-            if (part[npart]->Penabled && Psysefxvol[nefx][npart]&& part[npart]->Paudiodest & 1)
-            {
-                // the output volume of each part to system effect
-                float vol = sysefxvol[nefx][npart];
-                for (int i = 0; i < buffersize; ++i)
+            if (!part[npart]->Penabled)
+                continue;
+
+            float oldvol_l = part[npart]->oldvolumel;
+            float oldvol_r = part[npart]->oldvolumer;
+            float newvol_l = part[npart]->pannedVolLeft();
+            float newvol_r = part[npart]->pannedVolRight();
+            if (aboveAmplitudeThreshold(oldvol_l, newvol_l) || aboveAmplitudeThreshold(oldvol_r, newvol_r))
+            {   // the volume or the panning has changed and needs interpolation
+                for (int i = 0; i < p_buffersize; ++i)
                 {
-                    tmpmixl[i] += part[npart]->partoutl[i] * vol;
-                    tmpmixr[i] += part[npart]->partoutr[i] * vol;
+                    float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i, p_buffersize);
+                    float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i, p_buffersize);
+                    part[npart]->partoutl[i] *= vol_l;
+                    part[npart]->partoutr[i] *= vol_r;
+                }
+                part[npart]->oldvolumel = newvol_l;
+                part[npart]->oldvolumer = newvol_r;
+            }
+            else
+            {
+                for (int i = 0; i < p_buffersize; ++i)
+                {   // the volume did not change
+                    part[npart]->partoutl[i] *= newvol_l;
+                    part[npart]->partoutr[i] *= newvol_r;
+                }
+            }
+        }
+        // System effects
+        for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+        {
+            if (!sysefx[nefx]->geteffect())
+                continue; // is disabled
+
+            // Clean up the samples used by the system effects
+            memset(tmpmixl, 0, p_bufferbytes);
+            memset(tmpmixr, 0, p_bufferbytes);
+
+            // Mix the channels according to the part settings about System Effect
+            for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+            {
+                // skip if part is disabled, doesn't go to main or has no output to effect
+                if (part[npart]->Penabled && Psysefxvol[nefx][npart]&& part[npart]->Paudiodest & 1)
+                {
+                    // the output volume of each part to system effect
+                    float vol = sysefxvol[nefx][npart];
+                    for (int i = 0; i < p_buffersize; ++i)
+                    {
+                        tmpmixl[i] += part[npart]->partoutl[i] * vol;
+                        tmpmixr[i] += part[npart]->partoutr[i] * vol;
+                    }
+                }
+            }
+
+            // system effect send to next ones
+            for (int nefxfrom = 0; nefxfrom < nefx; ++nefxfrom)
+            {
+                if (Psysefxsend[nefxfrom][nefx])
+                {
+                    float v = sysefxsend[nefxfrom][nefx];
+                    for (int i = 0; i < p_buffersize; ++i)
+                    {
+                        tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
+                        tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
+                    }
+                }
+            }
+            sysefx[nefx]->out(tmpmixl, tmpmixr);
+
+            // Add the System Effect to sound output
+            float outvol = sysefx[nefx]->sysefxgetvolume();
+            for (int i = 0; i < p_buffersize; ++i)
+            {
+                outl[NUM_MIDI_PARTS][i] += tmpmixl[i] * outvol;
+                outr[NUM_MIDI_PARTS][i] += tmpmixr[i] * outvol;
+            }
+        }
+
+        for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        {
+            if (part[npart]->Paudiodest & 2){    // Copy separate parts
+
+                for (int i = 0; i < p_buffersize; ++i)
+                {
+                    outl[npart][i] = part[npart]->partoutl[i];
+                    outr[npart][i] = part[npart]->partoutr[i];
+                }
+            }
+            if (part[npart]->Paudiodest & 1)    // Mix wanted parts to mains
+            {
+                for (int i = 0; i < p_buffersize; ++i)
+                {   // the volume did not change
+                    outl[NUM_MIDI_PARTS][i] += part[npart]->partoutl[i];
+                    outr[NUM_MIDI_PARTS][i] += part[npart]->partoutr[i];
                 }
             }
         }
 
-        // system effect send to next ones
-        for (int nefxfrom = 0; nefxfrom < nefx; ++nefxfrom)
+        // Insertion effects for Master Out
+        for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         {
-            if (Psysefxsend[nefxfrom][nefx])
+            if (Pinsparts[nefx] == -2)
+                insefx[nefx]->out(outl[NUM_MIDI_PARTS], outr[NUM_MIDI_PARTS]);
+        }
+
+        LFOtime++; // update the LFO's time
+
+        // Master volume, and all output fade
+        float fade;
+        for (int idx = 0; idx < p_buffersize; ++idx)
+        {
+            outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
+            outr[NUM_MIDI_PARTS][idx] *= volume;
+            if (shutup) // fade-out
             {
-                float v = sysefxsend[nefxfrom][nefx];
-                for (int i = 0; i < buffersize; ++i)
+                fade = (float) (p_buffersize - idx) / (float) p_buffersize;
+                for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
                 {
-                    tmpmixl[i] += sysefx[nefxfrom]->efxoutl[i] * v;
-                    tmpmixr[i] += sysefx[nefxfrom]->efxoutr[i] * v;
+                    outl[npart][idx] *= fade;
+                    outr[npart][idx] *= fade;
                 }
             }
         }
-        sysefx[nefx]->out(tmpmixl, tmpmixr);
 
-        // Add the System Effect to sound output
-        float outvol = sysefx[nefx]->sysefxgetvolume();
-        for (int i = 0; i < buffersize; ++i)
+        actionLock(unlock);
+
+        // Peak calculation for mixed outputs
+        VUpeak.values.vuRmsPeakL = 1e-12f;
+        VUpeak.values.vuRmsPeakR = 1e-12f;
+        float absval;
+        for (int idx = 0; idx < p_buffersize; ++idx)
         {
-            outl[NUM_MIDI_PARTS][i] += tmpmixl[i] * outvol;
-            outr[NUM_MIDI_PARTS][i] += tmpmixr[i] * outvol;
+            if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL)
+                VUpeak.values.vuOutPeakL = absval;
+            if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
+                VUpeak.values.vuOutPeakR = absval;
+
+            // RMS Peak
+            VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx];
+            VUpeak.values.vuRmsPeakR += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
         }
-    }
 
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        if (part[npart]->Paudiodest & 2){    // Copy separate parts
+        if (shutup)
+            ShutUp();
 
-            for (int i = 0; i < buffersize; ++i)
-            {
-                outl[npart][i] = part[npart]->partoutl[i];
-                outr[npart][i] = part[npart]->partoutr[i];
-            }
-        }
-        if (part[npart]->Paudiodest & 1)    // Mix wanted parts to mains
-        {
-            for (int i = 0; i < buffersize; ++i)
-            {   // the volume did not change
-                outl[NUM_MIDI_PARTS][i] += part[npart]->partoutl[i];
-                outr[NUM_MIDI_PARTS][i] += part[npart]->partoutr[i];
-            }
-        }
-    }
-
-    // Insertion effects for Master Out
-    for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-    {
-        if (Pinsparts[nefx] == -2)
-            insefx[nefx]->out(outl[NUM_MIDI_PARTS], outr[NUM_MIDI_PARTS]);
-    }
-
-    LFOtime++; // update the LFO's time
-
-    // Master volume, and all output fade
-    float fade;
-    for (int idx = 0; idx < buffersize; ++idx)
-    {
-        outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
-        outr[NUM_MIDI_PARTS][idx] *= volume;
-        if (shutup) // fade-out
-        {
-            fade = (float) (buffersize - idx) / (float) buffersize;
-            for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
-            { 
-                outl[npart][idx] *= fade;
-                outr[npart][idx] *= fade;
-            }
-        }
-    }
-
-    actionLock(unlock);
-    
-    // Peak calculation for mixed outputs   
-    VUpeak.values.vuRmsPeakL = 1e-12f;
-    VUpeak.values.vuRmsPeakR = 1e-12f;       
-    float absval;
-    for (int idx = 0; idx < buffersize; ++idx)
-    {
-        if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL)
-            VUpeak.values.vuOutPeakL = absval;
-        if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
-            VUpeak.values.vuOutPeakR = absval;
-
-        // RMS Peak
-        VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx];
-        VUpeak.values.vuRmsPeakR += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
-    }
-
-    if (shutup)
-        ShutUp();
-
-    // Peak computation for part vu meters
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {       
-        if (part[npart]->Penabled)
-        {
-            for (int idx = 0; idx < buffersize; ++idx)
-            {
-                if ((absval = fabsf(part[npart]->partoutl[idx])) > VUpeak.values.parts[npart])
-                    VUpeak.values.parts[npart] = absval;
-                if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.parts[npart])
-                    VUpeak.values.parts[npart] = absval;
-            }
-        }
-    }
-
-    if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
-    {
-        jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
-        VUpeak.values.vuOutPeakL = 1e-12f;
-        VUpeak.values.vuOutPeakR = 1e-12f;
+        // Peak computation for part vu meters
         for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
             if (part[npart]->Penabled)
-                VUpeak.values.parts[npart] = 1.0e-9;
-            else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
-                VUpeak.values.parts[npart]+= 2;
+            {
+                for (int idx = 0; idx < p_buffersize; ++idx)
+                {
+                    if ((absval = fabsf(part[npart]->partoutl[idx])) > VUpeak.values.parts[npart])
+                        VUpeak.values.parts[npart] = absval;
+                    if ((absval = fabsf(part[npart]->partoutr[idx])) > VUpeak.values.parts[npart])
+                        VUpeak.values.parts[npart] = absval;
+                }
+            }
+        }
+
+        VUpeak.values.p_buffersize = p_buffersize;
+
+        if (jack_ringbuffer_write_space(vuringbuf) >= sizeof(VUtransfer))
+        {
+            jack_ringbuffer_write(vuringbuf, ( char*)VUpeak.bytes, sizeof(VUtransfer));
+            VUpeak.values.vuOutPeakL = 1e-12f;
+            VUpeak.values.vuOutPeakR = 1e-12f;
+            for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+            {
+                if (part[npart]->Penabled)
+                    VUpeak.values.parts[npart] = 1.0e-9;
+                else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
+                    VUpeak.values.parts[npart]+= 2;
+            }
         }
     }
+
+    processOffset += p_buffersize;
+    if(processOffset >= buffersize)
+        processOffset = 0;
 }
 
 
@@ -653,8 +684,8 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
     {
 
         jack_ringbuffer_read(vuringbuf, ( char*)VUdata->bytes, sizeof(VUtransfer));
-        VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / buffersize);
-        VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / buffersize);
+        VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / VUdata->values.p_buffersize);
+        VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / VUdata->values.p_buffersize);
         return true;
     }
     return false;

@@ -81,7 +81,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);
-        void MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS]);
+        void MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS], int to_process = 0);
         void partonoff(int npart, int what);
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
@@ -101,6 +101,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float oscilsize_f;
         int halfoscilsize;
         float halfoscilsize_f;
+
+        int processOffset; //used for variable length runs
+        int p_buffersize; //used for variable length runs
+        int p_bufferbytes; //used for variable length runs
+        float p_buffersize_f; //used for variable length runs
 
         unsigned char Pvolume;
         int           Paudiodest;
@@ -139,6 +144,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
                 float vuRmsPeakL;
                 float vuRmsPeakR;
                 float parts[NUM_MIDI_PARTS];
+                int p_buffersize;
             } values;
             char bytes [sizeof(values)];
         };

@@ -183,15 +183,15 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     {
         if (!insertion)
         {
-            memset(smpsl, 0, synth->bufferbytes);
-            memset(smpsr, 0, synth->bufferbytes);
-            memset(efxoutl, 0, synth->bufferbytes);
-            memset(efxoutr, 0, synth->bufferbytes);
+            memset(smpsl, 0, synth->p_bufferbytes);
+            memset(smpsr, 0, synth->p_bufferbytes);
+            memset(efxoutl, 0, synth->p_bufferbytes);
+            memset(efxoutr, 0, synth->p_bufferbytes);
         }
         return;
     }
-    memset(efxoutl, 0, synth->bufferbytes);
-    memset(efxoutr, 0, synth->bufferbytes);
+    memset(efxoutl, 0, synth->p_bufferbytes);
+    memset(efxoutr, 0, synth->p_bufferbytes);
     efx->out(smpsl, smpsr);
 
     float volume = efx->volume;
@@ -199,13 +199,13 @@ void EffectMgr::out(float *smpsl, float *smpsr)
     if (nefx == 7)
     {   // this is need only for the EQ effect
         // aca: another memcpy() candidate
-        //for (int i = 0; i < synth->buffersize; ++i)
+        //for (int i = 0; i < synth->p_buffersize; ++i)
         //{
          //   smpsl[i] = efxoutl[i];
          //   smpsr[i] = efxoutr[i];
         //}
-        memcpy(smpsl, efxoutl, synth->bufferbytes);
-        memcpy(smpsr, efxoutr, synth->bufferbytes);
+        memcpy(smpsl, efxoutl, synth->p_bufferbytes);
+        memcpy(smpsr, efxoutr, synth->p_bufferbytes);
         return;
     }
 
@@ -226,7 +226,7 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 
         if (dryonly)
         {   // this is used for instrument effect only
-            for (int i = 0; i < synth->buffersize; ++i)
+            for (int i = 0; i < synth->p_buffersize; ++i)
             {
                 smpsl[i] *= v1;
                 smpsr[i] *= v1;
@@ -235,14 +235,14 @@ void EffectMgr::out(float *smpsl, float *smpsr)
             }
         } else {
             // normal instrument/insertion effect
-            for (int i = 0; i < synth->buffersize; ++i)
+            for (int i = 0; i < synth->p_buffersize; ++i)
             {
                 smpsl[i] = smpsl[i] * v1 + efxoutl[i] * v2;
                 smpsr[i] = smpsr[i] * v1 + efxoutr[i] * v2;
             }
         }
     } else { // System effect
-        for (int i = 0; i < synth->buffersize; ++i)
+        for (int i = 0; i < synth->p_buffersize; ++i)
         {
             efxoutl[i] *= 2.0f * volume;
             efxoutr[i] *= 2.0f * volume;
