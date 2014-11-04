@@ -135,11 +135,11 @@ bool Config::Setup(int argc, char **argv)
     clearPresetsDirlist();
     AntiDenormals(true);
 
-    if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
-        return true;
-
     if (!loadConfig())
         return false;
+
+    if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
+        return true;
     switch (audioEngine)
     {
         case alsa_audio:

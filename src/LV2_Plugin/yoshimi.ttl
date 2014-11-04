@@ -48,14 +48,14 @@
 
     lv2:port [
         a lv2:OutputPort, lv2:AudioPort ;
-        lv2:index 1 ;
+        lv2:index 2 ;
         lv2:symbol "outl" ;
         lv2:name "Main left" ;
     ];
 
     lv2:port [
         a lv2:OutputPort, lv2:AudioPort ;
-        lv2:index 2 ;
+        lv2:index 3 ;
         lv2:symbol "outr" ;
         lv2:name "Main right" ;
     ].

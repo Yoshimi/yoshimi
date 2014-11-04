@@ -50,6 +50,7 @@ private:
 
    jack_ringbuffer_t *_midiRingBuf;
    pthread_t _pMidiThread;
+   pthread_t _pIdleThread;
 
    float *lv2Left [NUM_MIDI_PARTS + 1];
    float *lv2Right [NUM_MIDI_PARTS + 1];
@@ -57,6 +58,7 @@ private:
    void process(uint32_t sample_count);
    void processMidiMessage(const uint8_t *msg);
    void *midiThread(void);
+   void *idleThread(void);
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
@@ -77,6 +79,7 @@ public:
    static void cleanup(LV2_Handle instance);
    static const void * extension_data(const char * uri);
    static void *static_midiThread(void *arg);
+   static void *static_idleThread(void *arg);
    /*
    static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
    static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);

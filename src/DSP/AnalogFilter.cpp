@@ -399,7 +399,7 @@ void AnalogFilter::filterout(float *smp)
 {
     if (needsinterpolation != 0)
     {
-        memcpy(tmpismp, smp, synth->bufferbytes);
+        memcpy(tmpismp, smp, synth->p_bufferbytes);
         for (int i = 0; i < stages + 1; ++i)
             singlefilterout(tmpismp, oldx[i], oldy[i], oldc, oldd);
     }

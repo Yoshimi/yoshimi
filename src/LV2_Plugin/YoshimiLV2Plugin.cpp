@@ -85,9 +85,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 memcpy(intMidiEvent.data, msg, event->body.size);
                 unsigned int wrote = 0;
                 int tries = 0;
-                while (wrote < sizeof(struct midi_event) && tries < 3)
+                while (wrote < sizeof(intMidiEvent) && tries < 3)
                 {
-                    int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(msg), sizeof(struct midi_event) - wrote);
+                    int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(&intMidiEvent), sizeof(intMidiEvent) - wrote);
                     wrote += act_write;
                     msg += act_write;
                     ++tries;
@@ -233,6 +233,30 @@ void *YoshimiLV2Plugin::midiThread()
     return NULL;
 }
 
+void *YoshimiLV2Plugin::idleThread()
+{
+    //temporary
+    _synth->getRuntime().showGui = true;
+    MasterUI *guiMaster = _synth->getGuiMaster();
+    if (guiMaster == NULL)
+    {
+        _synth->getRuntime().Log("Failed to instantiate gui");
+        return NULL;
+    }
+    guiMaster->Init("yoshimi lv2 plugin");
+
+    while (_synth->getRuntime().runSynth)
+    {
+        _synth->getRuntime().deadObjects->disposeBodies();
+        // where all the action is ...
+        if(_synth->getRuntime().showGui)
+            Fl::wait(0.033333);
+        else
+            usleep(33333);
+    }
+    return NULL;
+}
+
 YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features):
     MusicIO(synth),
     _synth(synth),
@@ -244,7 +268,9 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _bufferPos(0),
     _offsetPos(0),
     _bFreeWheel(NULL),
-    _midiRingBuf(NULL)
+    _midiRingBuf(NULL),
+    _pMidiThread(0),
+    _pIdleThread(0)
 {
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
@@ -302,6 +328,8 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
             jack_ringbuffer_free(_midiRingBuf);
             _midiRingBuf = NULL;
         }
+        pthread_join(_pMidiThread, NULL);
+        pthread_join(_pIdleThread, NULL);
         delete _synth;
         _synth = NULL;
     }
@@ -331,18 +359,25 @@ bool YoshimiLV2Plugin::init()
         return false;
     }
 
-    if(!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1))
-    {
-        synth->getRuntime().Log("Failed to start jack midi thread");
-        return false;
-    }
-
     _synth->Init(_sampleRate, _bufferSize);
 
     memset(lv2Left, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(lv2Right, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
 
     _synth->getRuntime().runSynth = true;
+
+    if(!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1))
+    {
+        synth->getRuntime().Log("Failed to start midi thread");
+        return false;
+    }
+
+    if(!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0))
+    {
+        synth->getRuntime().Log("Failed to start idle thread");
+        return false;
+    }
+
 
     return true;
 }
@@ -365,7 +400,7 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double
 
 void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *data_location)
 {
-    if(port > NUM_MIDI_PARTS + 1)
+    if(port > NUM_MIDI_PARTS + 2)
         return;
      YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
      if(port == 0)//atom midi event port
@@ -379,6 +414,14 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
      }
 
      port -=2;
+
+     if(port == 0) //main outl
+         port = NUM_MIDI_PARTS * 2;
+     else if(port == 1) //main outr
+         port = NUM_MIDI_PARTS * 2 + 1;
+     else
+         port -= 2;
+
 
      int portIndex = static_cast<int>(floorf((float)port/2.0f));
      if(port % 2 == 0) //left channel
@@ -435,6 +478,11 @@ void *YoshimiLV2Plugin::static_midiThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->midiThread();
 }
+
+void *YoshimiLV2Plugin::static_idleThread(void *arg)
+{
+    return static_cast<YoshimiLV2Plugin *>(arg)->idleThread();
+}
 /*
 LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data)
 {
@@ -476,4 +524,9 @@ extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
         break;
     }
     return NULL;
+}
+
+bool mainCreateNewInstance() //stub
+{
+    return true;
 }
