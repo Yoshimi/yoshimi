@@ -1,6 +1,8 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
-yoshimi-1.2.5-rc
+yoshimi-1.2.x
+
+yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:
   1) Added "New instance" menu item in "Yoshimi" submemu.
   2) Jack/alsa midi/audio port names are named "yoshimi" + postfix
