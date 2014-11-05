@@ -232,22 +232,22 @@ void *YoshimiLV2Plugin::midiThread()
 void *YoshimiLV2Plugin::idleThread()
 {
     //temporary
-    _synth->getRuntime().showGui = true;
-    MasterUI *guiMaster = _synth->getGuiMaster();
-    if (guiMaster == NULL)
-    {
-        _synth->getRuntime().Log("Failed to instantiate gui");
-        return NULL;
-    }
-    guiMaster->Init("yoshimi lv2 plugin");
+//    _synth->getRuntime().showGui = true;
+//    MasterUI *guiMaster = _synth->getGuiMaster();
+//    if (guiMaster == NULL)
+//    {
+//        _synth->getRuntime().Log("Failed to instantiate gui");
+//        return NULL;
+//    }
+//    guiMaster->Init("yoshimi lv2 plugin");
 
     while (_synth->getRuntime().runSynth)
     {
         _synth->getRuntime().deadObjects->disposeBodies();
-        // where all the action is ...
-        if(_synth->getRuntime().showGui)
-            Fl::wait(0.033333);
-        else
+//        // where all the action is ...
+//        if(_synth->getRuntime().showGui)
+//            Fl::wait(0.033333);
+//        else
             usleep(33333);
     }
     return NULL;
@@ -520,9 +520,20 @@ YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2U
     }
 }
 
+YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
+{
+    if(uiHost.plugin_human_id != NULL)
+    {
+        free(const_cast<char *>(uiHost.plugin_human_id));
+        uiHost.plugin_human_id = NULL;
+    }
+}
+
+
+
 bool YoshimiLV2PluginUI::init()
 {
-    if(_plugin == NULL)
+    if(_plugin == NULL || uiHost.ui_closed == NULL)
         return false;
     return true;
 }
@@ -543,8 +554,26 @@ LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor
 
 void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
 {
+    YoshimiLV2PluginUI *uiinst = static_cast<YoshimiLV2PluginUI *>(ui);
+    delete uiinst;
+}
+
+void YoshimiLV2PluginUI::run(_LV2_External_UI_Widget *_this_)
+{
 
 }
+
+void YoshimiLV2PluginUI::show(_LV2_External_UI_Widget *_this_)
+{
+
+}
+
+void YoshimiLV2PluginUI::hide(_LV2_External_UI_Widget *_this_)
+{
+
+}
+
+
 
 
 

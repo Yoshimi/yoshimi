@@ -95,10 +95,19 @@ class YoshimiLV2PluginUI
 private:
     YoshimiLV2Plugin *_plugin;
     LV2_External_UI_Host uiHost;
+    struct
+    {
+        LV2_External_UI_Widget uiWidget;
+        YoshimiLV2PluginUI *uiinst;
+    } LV2_External_UI_Yoshimi;
     MasterUI *_masterUI;
 public:
     YoshimiLV2PluginUI(const char *, LV2UI_Write_Function, LV2UI_Controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
+    ~YoshimiLV2PluginUI();
     bool init();
     static LV2UI_Handle	instantiate(const struct _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     static void cleanup(LV2UI_Handle ui);
+    void run(struct _LV2_External_UI_Widget * _this_);
+    void show(struct _LV2_External_UI_Widget * _this_);
+    void hide(struct _LV2_External_UI_Widget * _this_);
 };
