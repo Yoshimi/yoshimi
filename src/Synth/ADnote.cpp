@@ -60,7 +60,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
-    Legato.fade.length = lrintf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
+    Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
     if (Legato.fade.length < 1)  // (if something's fishy)
         Legato.fade.length = 1;
     Legato.fade.step = (1.0f / Legato.fade.length);
@@ -290,7 +290,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
             NoteVoicePar[nvoice].OscilSmp[synth->oscilsize + i] = NoteVoicePar[nvoice].OscilSmp[i];
 
-        oscposhi_start += lrintf((adpars->VoicePar[nvoice].Poscilphase - 64.0f)
+        oscposhi_start += (int)truncf((adpars->VoicePar[nvoice].Poscilphase - 64.0f)
                                   / 128.0f * synth->oscilsize_f
                                   + synth->oscilsize_f * 4.0f);
         oscposhi_start %= synth->oscilsize;
@@ -298,7 +298,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         for (int k = 0; k < unison; ++k)
         {
             oscposhi[nvoice][k] = oscposhi_start;
-            oscposhi_start = lrintf(synth->numRandom() * adpars->VoicePar[nvoice].Unison_phase_randomness /
+            oscposhi_start = (int)truncf(synth->numRandom() * adpars->VoicePar[nvoice].Unison_phase_randomness /
                         127.0f * (synth->oscilsize - 1));
             // put random starting point for other subvoices
             // done earlier?
@@ -382,7 +382,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
         firsttick[nvoice] = 1;
         NoteVoicePar[nvoice].DelayTicks =
-            lrintf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
+            (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
                          * logf(50.0f)) - 1.0f) / synth->buffersize / 10.0f
                          * synth->samplerate_f);
     }
@@ -556,7 +556,7 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             velF(velocity, adpars->VoicePar[nvoice].PFMVelocityScaleFunction);
 
         NoteVoicePar[nvoice].DelayTicks =
-            lrintf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
+            (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
                          * logf(50.0f)) - 1.0f) / synth->buffersize_f / 10.0f
                          * synth->samplerate_f);
     }
@@ -909,7 +909,7 @@ void ADnote::initParameters(void)
             for (int i = 0; i < OSCIL_SMP_EXTRA_SAMPLES; ++i)
                 NoteVoicePar[nvoice].FMSmp[synth->oscilsize + i] =
                     NoteVoicePar[nvoice].FMSmp[i];
-            int oscposhiFM_add = lrintf((adpars->VoicePar[nvoice].PFMoscilphase - 64.0f)
+            int oscposhiFM_add = (int)truncf((adpars->VoicePar[nvoice].PFMoscilphase - 64.0f)
                                          / 128.0f * synth->oscilsize_f
                                          + synth->oscilsize_f * 4.0f);
             for (int k = 0; k < unison_size[nvoice]; ++k)
@@ -1009,6 +1009,8 @@ void ADnote::setfreq(int nvoice, float in_freq)
         // F2I(speed, oscfreqhi[nvoice][k]);
         oscfreqhi[nvoice][k] = float2int(speed);
         oscfreqlo[nvoice][k] = speed - floor(speed);
+        //needed for rouding control:
+        //fprintf(stderr, "nvoice=%d, in_freq=%f, speed=%f, oschreqhi=%d, oscfreqlo=%f\n", nvoice, in_freq, speed, oscfreqhi[nvoice][k], oscfreqlo[nvoice][k]);
     }
 }
 

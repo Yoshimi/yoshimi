@@ -218,7 +218,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         case 1:
             x1 = (int) floorf(x);
             tmp = fmodf(x, 1.0f);
-            x2 = lrintf(floorf(tmp * 1e6f));
+            x2 = (int)truncf(floorf(tmp * 1e6f));
             tuning = powf(2.0f, x / 1200.0f);
             break;
         case 2:

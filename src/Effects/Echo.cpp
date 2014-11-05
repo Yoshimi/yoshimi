@@ -134,7 +134,7 @@ void Echo::setvolume(unsigned char Pvolume_)
 void Echo::setdelay(const unsigned char Pdelay_)
 {
     Pdelay = Pdelay_;
-    delay = 1 + lrintf(Pdelay / 127.0f * synth->samplerate_f * 1.5f); // 0 .. 1.5 sec
+    delay = 1 + (int)truncf(Pdelay / 127.0f * synth->samplerate_f * 1.5f); // 0 .. 1.5 sec
     initdelays();
 }
 

@@ -36,7 +36,7 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_s
     uv(NULL),
     update_period_samples(update_period_samples_),
     update_period_sample_k(0),
-    max_delay(lrintf(_synth->samplerate_f * max_delay_sec_) + 1),
+    max_delay((int)truncf(_synth->samplerate_f * max_delay_sec_) + 1),
     delay_k(0),
     first_time(false),
     delay_buffer(NULL),
@@ -152,7 +152,7 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
             float vpos = uv[k].realpos1 * (1.0f - xpos) + uv[k].realpos2 * xpos;
             float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
             // F2I(pos, posi);
-            int posi = (pos > 0.0f) ? lrintf(pos) : lrintf(pos - 1.0f);
+            int posi = (pos > 0.0f) ? (int)truncf(pos) : (int)truncf(pos - 1.0f);
             if (posi >= max_delay)
                 posi -= max_delay;
             float posf = pos - floorf(pos);

@@ -120,7 +120,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     bRuntimeSetupCompleted(false)
 {
     fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
-                               // the heffalump. We need lrintf() to round
+                               // the heffalump. We need (int)truncf() to round
                                // toward zero.
     cerr.precision(4);
     deadObjects = new BodyDisposal();
@@ -326,7 +326,7 @@ bool Config::loadConfig(void)
             }
             isok = extractConfigData(xml);
             if (isok)
-                Oscilsize = lrintf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
+                Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
         }
     }

@@ -178,9 +178,9 @@ void OscilGen::convert2sine(int magtype)
         float newmag = mag[i] / max;
         float newphase = phase[i];
 
-        Phmag[i] = lrintf(newmag * 64.0f) + 64;
+        Phmag[i] = (int)truncf(newmag * 64.0f) + 64;
 
-        Phphase[i] = 64 - lrintf(64.0f * newphase / PI);
+        Phphase[i] = 64 - (int)truncf(64.0f * newphase / PI);
         if (Phphase[i] > 127)
             Phphase[i] = 127;
 
@@ -611,7 +611,7 @@ void OscilGen::oscilfilter(void)
                 gain = cosf(x * PI) * (1.0f - tmp) + 1.01f + tmp; // low shelf
                 break;
             case 13:
-                tmp = lrintf(powf(2.0f, ((1.0f - par) * 7.2f)));
+                tmp = (int)truncf(powf(2.0f, ((1.0f - par) * 7.2f)));
                 gain = 1.0f;
                 if (i == tmp)
                     gain = powf(2.0f, par2 * par2 * 8.0f);
@@ -786,7 +786,7 @@ void OscilGen::modulation(void)
 
         t = (t - floorf(t)) * synth->oscilsize_f;
 
-        int poshi = lrintf(t);
+        int poshi = (int)truncf(t);
         float poslo = t - floorf(t);
 
         tmpsmps[i] = in[poshi] * (1.0f - poslo) + in[poshi + 1] * poslo;
@@ -1052,7 +1052,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     for (int i = 0; i < synth->halfoscilsize - 2; ++i)
     {
         float h = i * rap;
-        int high = lrintf(i * rap);
+        int high = (int)truncf(i * rap);
         float low = fmodf(h, 1.0f);
 
         if (high >= synth->halfoscilsize - 2)
@@ -1188,13 +1188,13 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
     if (oscilprepared != 1)
         prepare();
 
-    outpos = lrintf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
+    outpos = (int)truncf((numRandom() * 2.0f - 1.0f) * synth->oscilsize_f * (Prand - 64.0f) / 64.0f);
     outpos = (outpos + 2 * synth->oscilsize) % synth->oscilsize;
 
     memset(outoscilFFTfreqs.c, 0, synth->halfoscilsize * sizeof(float));
     memset(outoscilFFTfreqs.s, 0, synth->halfoscilsize * sizeof(float));
 
-    nyquist = lrintf(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
+    nyquist = (int)truncf(0.5f * synth->samplerate_f / fabsf(freqHz)) + 2;
     if (ADvsPAD)
         nyquist = synth->halfoscilsize;
     if (nyquist > synth->halfoscilsize)

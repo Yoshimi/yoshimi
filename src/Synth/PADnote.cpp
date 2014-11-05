@@ -52,7 +52,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     // Initialise some legato-specific vars
     Legato.msg = LM_Norm;
-    Legato.fade.length = lrintf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
+    Legato.fade.length = (int)truncf(synth->samplerate_f * 0.005f); // 0.005 seems ok.
     if (Legato.fade.length < 1)
         Legato.fade.length = 1; // (if something's fishy)
     Legato.fade.step = (1.0 / Legato.fade.length);
@@ -106,7 +106,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
     if (size == 0)
         size = 1;
 
-    poshi_l = lrintf(synth->numRandom() * (size - 1));
+    poshi_l = (int)truncf(synth->numRandom() * (size - 1));
     if (pars->PStereo != 0)
         poshi_r = (poshi_l + size / 2) % size;
     else
@@ -315,7 +315,7 @@ inline void PADnote::fadein(float *smps)
         tmp = 8.0;
 
     // F2I(tmp, n); // how many samples is the fade-in
-    int n = (tmp > 0.0f) ? lrintf(tmp) : lrintf(tmp - 1.0f);
+    int n = (tmp > 0.0f) ? (int)truncf(tmp) : (int)truncf(tmp - 1.0f);
     if (n > synth->p_buffersize)
         n = synth->p_buffersize;
     for (int i = 0; i < n; ++i)
