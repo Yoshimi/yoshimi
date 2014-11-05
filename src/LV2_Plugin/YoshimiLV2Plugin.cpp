@@ -57,8 +57,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             uint32_t to_process = next_frame - offs;
             if(to_process > 0)
             {
-                //_synth->buffersize_f = _synth->buffersize = to_process;
-                //_synth->bufferbytes = to_process * sizeof(float);
                 _synth->MasterAudio(tmpLeft, tmpRight, to_process);
                 offs = next_frame;
                 for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
@@ -115,8 +113,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         uint32_t to_process = real_sample_count - offs;
         if(to_process > 0)
         {
-            //_synth->buffersize_f = _synth->buffersize = to_process;
-            //_synth->bufferbytes = to_process * sizeof(float);
             _synth->MasterAudio(tmpLeft, tmpRight, to_process);
             offs = next_frame;
         }
@@ -320,16 +316,15 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
     if(_synth != NULL)
     {
         _synth->getRuntime().runSynth = false;        
-        sem_post(&_midiSem);
-        sem_wait(&_midiSem);
+        sem_post(&_midiSem);        
+        pthread_join(_pMidiThread, NULL);
+        pthread_join(_pIdleThread, NULL);
         sem_destroy(&_midiSem);
         if(_midiRingBuf != NULL)
         {
             jack_ringbuffer_free(_midiRingBuf);
             _midiRingBuf = NULL;
         }
-        pthread_join(_pMidiThread, NULL);
-        pthread_join(_pIdleThread, NULL);
         delete _synth;
         _synth = NULL;
     }
