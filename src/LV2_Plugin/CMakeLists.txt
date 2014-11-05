@@ -1,6 +1,7 @@
 file (GLOB yoshimi_lv2_plugin_files
         YoshimiLV2Plugin.cpp
-        YoshimiLV2Plugin.h)
+        YoshimiLV2Plugin.h
+        lv2extui.h)
 file (GLOB yoshimi_dsp_files
     ../DSP/FFTwrapper.cpp  ../DSP/AnalogFilter.cpp  ../DSP/FormantFilter.cpp
     ../DSP/SVFilter.cpp  ../DSP/Filter.cpp  ../DSP/Unison.cpp

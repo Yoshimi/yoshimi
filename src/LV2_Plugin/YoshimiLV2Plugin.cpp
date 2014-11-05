@@ -1,7 +1,7 @@
 /*
     YoshimiLV2Plugin
 
-    Copyright 2014, Andrew Deryabin
+    Copyright 2014, Andrew Deryabin <andrewderyabin@gmail.com>
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -198,7 +198,7 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
             break;
 
         default: // wot, more?
-            synth->getRuntime().Log("other event: " + asString((int)ev));
+            //synth->getRuntime().Log("other event: " + asString((int)ev));
             break;
     }
 
@@ -497,6 +497,57 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 */
 
 
+
+YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2UI_Controller , LV2UI_Widget *widget, const LV2_Feature * const *features)
+    :_plugin(NULL),
+     _masterUI(NULL)
+{
+    uiHost.plugin_human_id = NULL;
+    uiHost.ui_closed = NULL;
+    const LV2_Feature *f = NULL;
+    while((f = *features) != NULL)
+    {
+        if(strcmp(f->URI, LV2_INSTANCE_ACCESS_URI) == 0)
+        {
+            _plugin = static_cast<YoshimiLV2Plugin *>(f->data);
+        }
+        else if(strcmp(f->URI, LV2_EXTERNAL_UI__Host) == 0)
+        {
+            uiHost.plugin_human_id = strdup(static_cast<LV2_External_UI_Host *>(f->data)->plugin_human_id);
+            uiHost.ui_closed = static_cast<LV2_External_UI_Host *>(f->data)->ui_closed;
+        }
+        ++features;
+    }
+}
+
+bool YoshimiLV2PluginUI::init()
+{
+    if(_plugin == NULL)
+        return false;
+    return true;
+}
+
+
+LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
+{
+    YoshimiLV2PluginUI *uiinst = new YoshimiLV2PluginUI(bundle_path, write_function, controller, widget, features);
+    if(uiinst->init())
+    {
+        return static_cast<LV2UI_Handle>(uiinst);
+    }
+    else
+        delete uiinst;
+    return NULL;
+
+}
+
+void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
+{
+
+}
+
+
+
 LV2_Descriptor yoshimi_lv2_desc =
 {
     "http://yoshimi.sourceforge.net/lv2_plugin",
@@ -519,6 +570,28 @@ extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
         break;
     }
     return NULL;
+}
+
+LV2UI_Descriptor yoshimi_lv2ui_desc =
+{
+    "http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI",
+    YoshimiLV2PluginUI::instantiate,
+    YoshimiLV2PluginUI::cleanup,
+    NULL,
+    NULL
+};
+
+extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
+{
+    switch(index)
+    {
+    case 0:
+        return &yoshimi_lv2ui_desc;
+    default:
+        break;
+    }
+    return NULL;
+
 }
 
 bool mainCreateNewInstance() //stub

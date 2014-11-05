@@ -1,4 +1,5 @@
 #include "lv2/lv2plug.in/ns/ext/data-access/data-access.h"
+#include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
 #include "lv2/lv2plug.in/ns/ext/state/state.h"
 #include "lv2/lv2plug.in/ns/ext/atom/atom.h"
 #include "lv2/lv2plug.in/ns/ext/midi/midi.h"
@@ -17,6 +18,7 @@
 #include "lv2/lv2plug.in/ns/ext/port-props/port-props.h"
 #include "lv2/lv2plug.in/ns/ext/atom/forge.h"
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
+#include "lv2extui.h"
 
 #include <string>
 #include <semaphore.h>
@@ -86,4 +88,17 @@ public:
    static LV2_Worker_Status	lv2_wrk_end_run(LV2_Handle instance);
    */
 
+};
+
+class YoshimiLV2PluginUI
+{
+private:
+    YoshimiLV2Plugin *_plugin;
+    LV2_External_UI_Host uiHost;
+    MasterUI *_masterUI;
+public:
+    YoshimiLV2PluginUI(const char *, LV2UI_Write_Function, LV2UI_Controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
+    bool init();
+    static LV2UI_Handle	instantiate(const struct _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
+    static void cleanup(LV2UI_Handle ui);
 };

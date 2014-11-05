@@ -21,7 +21,7 @@
                       <http://lv2plug.in/ns/ext/worker#interface> ,
                       <http://kxstudio.sf.net/ns/lv2ext/programs#Interface> ;
 
-#    ui:ui <http://yoshimi.sourceforge.net#ExternalUI> ;
+    ui:ui <http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI> ;
 
     lv2:port [
         a lv2:InputPort, atom:AtomPort ;
