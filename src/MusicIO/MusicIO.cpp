@@ -31,7 +31,9 @@ using namespace std;
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleavedShorts(NULL),
     rtprio(25),
-    synth(_synth)
+    synth(_synth),
+    pBankThread(0),
+    pPrgThread(0)
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
@@ -39,6 +41,17 @@ MusicIO::MusicIO(SynthEngine *_synth) :
 
 MusicIO::~MusicIO()
 {
+    pthread_t tmpBankThread = 0;
+    pthread_t tmpPrgThread = 0;
+    void *threadRet = NULL;
+    tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
+    if(tmpBankThread != 0)
+        pthread_join(tmpBankThread, &threadRet);
+    threadRet = NULL;
+    tmpPrgThread = __sync_fetch_and_add(&pPrgThread, 0);
+    if(tmpPrgThread != 0)
+        pthread_join(tmpPrgThread, &threadRet);
+
     for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
     {
         if (zynLeft[npart])
@@ -136,22 +149,43 @@ int MusicIO::getMidiController(unsigned char b)
 }
 
 
-void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param)
+void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param, bool in_place)
 {
     if (ctrl != synth->getRuntime().midi_upper_voice_C)
     {
-        synth->SetController(ch, ctrl, param);
+        if(ctrl == synth->getRuntime().midi_bank_C)
+            setMidiBank((short)param, in_place);
+        else
+            synth->SetController(ch, ctrl, param);
     }
-    else if (synth->getRuntime().EnableProgChange) // it's really an upper set program change
+    else // it's really an upper set program change
     {
-        synth->SetProgram(ch, (param & 0x1f) | 0x80);
+        setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
     }
 }
 
-void MusicIO::setMidiProgram(unsigned char ch, int pgm)
+void MusicIO::setMidiBank(short banknum, bool in_place)
+{
+    if(in_place)
+        synth->SetBank(banknum);
+    else
+    {
+
+    }
+
+}
+
+void MusicIO::setMidiProgram(unsigned char ch, int pgm, bool in_place)
 {
     if (synth->getRuntime().EnableProgChange)
-        synth->SetProgram(ch, pgm);
+    {
+        if(in_place)
+            synth->SetProgram(ch, pgm);
+        else
+        {
+
+        }
+    }
 }
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
@@ -159,7 +193,6 @@ void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
 {
     synth->NoteOn(channel, note, velocity);
 }
-
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 {
@@ -214,3 +247,15 @@ bail_out:
     }
     return false;
 }
+
+
+void *MusicIO::static_BankThread(void *arg)
+{
+
+}
+
+void *MusicIO::static_PrgThread(void *arg)
+{
+
+}
+

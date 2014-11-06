@@ -40,8 +40,9 @@ class MusicIO : virtual protected MiscFuncs
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         void InterleaveShorts(void);
         int getMidiController(unsigned char b);
-        void setMidiController(unsigned char ch, unsigned int ctrl, int param);
-        void setMidiProgram(unsigned char ch, int pgm);
+        void setMidiController(unsigned char ch, unsigned int ctrl, int param, bool in_place = false);
+        void setMidiBank(short banknum, bool in_place = false);
+        void setMidiProgram(unsigned char ch, int pgm, bool in_place = false);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 
@@ -51,6 +52,20 @@ class MusicIO : virtual protected MiscFuncs
         int rtprio;
 
         SynthEngine *synth;
+    private:
+        pthread_t pBankThread;
+        pthread_t pPrgThread;
+        struct
+        {
+            short banknum;
+            int ch;
+            int prg;
+        }bankPrgChange;
+
+        void RealBankChange();
+        void RealPrgChange();
+        static void *static_BankThread(void *arg);
+        static void *static_PrgThread(void *arg);
 };
 
 #endif

@@ -120,8 +120,12 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     bRuntimeSetupCompleted(false)
 {
     fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
-                               // the heffalump. We need (int)truncf() to round
+                               // the heffalump. We need lrintf() to round
                                // toward zero.
+    //^^^^^^^^^^^^^^^ This call is not needed aymore
+    //as all calls to lrintf() are replaced with (int)truncf()
+    //which befaves exactly the same when flag FE_TOWARDZERO is set
+
     cerr.precision(4);
     deadObjects = new BodyDisposal();
     bRuntimeSetupCompleted = Setup(argc, argv);

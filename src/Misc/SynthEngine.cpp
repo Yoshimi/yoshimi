@@ -355,42 +355,47 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
 {
     if (type == Runtime.midi_bank_C) {
-        /*  we use either msb or lsb for bank changes
-	  128 banks is enough for anybody :-)
-        this is configurable to suit different hardware synths
-        */
-        bank.msb = (unsigned char)par + 1; // Bank indexes start from 1       
-        if(bank.msb <= MAX_NUM_BANKS) {
-            if (bank.loadbank(bank.banks[bank.msb].dir))
-                Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
-                if (Runtime.showGui)
-                {
-                    guiMaster->bankui->set_bank_slot();
-                    guiMaster->bankui->refreshmainwindow();
-                }
-            else
-                Runtime.Log("SynthEngine setBank: No bank " + asString(par));
-        }
-        else
-            Runtime.Log("SynthEngine setBank: Value is out of range!");
-        return;        
+        SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
     }
     else
     { // bank change doesn't directly affect parts.
-	for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-	{   // Send the controller to all part assigned to the channel
-	    if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-		part[npart]->SetController(type, par);
-	}
+        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        {   // Send the controller to all part assigned to the channel
+            if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                part[npart]->SetController(type, par);
+        }
 
-	if (type == C_allsoundsoff)
-	{   // cleanup insertion/system FX
-	    for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-		sysefx[nefx]->cleanup();
-	    for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-		insefx[nefx]->cleanup();
-	}
+        if (type == C_allsoundsoff)
+        {   // cleanup insertion/system FX
+            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+                sysefx[nefx]->cleanup();
+            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+                insefx[nefx]->cleanup();
+        }
     }
+}
+
+void SynthEngine::SetBank(short banknum)
+{
+    /*  we use either msb or lsb for bank changes
+128 banks is enough for anybody :-)
+    this is configurable to suit different hardware synths
+    */
+    bank.msb = (unsigned char)banknum + 1; // Bank indexes start from 1
+    if(bank.msb <= MAX_NUM_BANKS) {
+        if (bank.loadbank(bank.banks[bank.msb].dir))
+            Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
+        if (Runtime.showGui)
+        {
+            guiMaster->bankui->set_bank_slot();
+            guiMaster->bankui->refreshmainwindow();
+        }
+        else
+            Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
+    }
+    else
+        Runtime.Log("SynthEngine setBank: Value is out of range!");
+    return;
 }
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
