@@ -284,8 +284,7 @@ bail_out:
 
 void *MusicIO::bankChange_Thread()
 {
-    usleep(100000);
-    std::cerr << "MusicIO::bankChange_Thread(). banknum = " << bankToChange << std::endl;
+    //std::cerr << "MusicIO::bankChange_Thread(). banknum = " << bankToChange << std::endl;
     synth->SetBank(bankToChange);
     pBankThread = 0; // done
     return NULL;
@@ -297,12 +296,12 @@ void *MusicIO::prgChange_Thread(_prgChangeCmd *pCmd)
     tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
     if(tmpBankThread != 0) // wait for active bank thread to finish before continue
     {
-        std::cerr << "Waiting for MusicIO::bankChange_Thread()..." << std::endl;
+        //std::cerr << "Waiting for MusicIO::bankChange_Thread()..." << std::endl;
         void *threadRet = NULL;
         pthread_join(pBankThread, &threadRet);
     }
 
-    std::cerr << "MusicIO::prgChange_Thread(). ch = " << pCmd->ch << ", prg = " << pCmd->prg << std::endl;
+    //std::cerr << "MusicIO::prgChange_Thread(). ch = " << pCmd->ch << ", prg = " << pCmd->prg << std::endl;
 
     synth->SetProgram(pCmd->ch, pCmd->prg);
     pCmd->pPrgThread = 0; //done
