@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -339,7 +339,7 @@ synth = _synth;
   decl {struct{
   int oldpeak[NUM_MIDI_PARTS];
   bool clip[NUM_MIDI_CHANNELS];
-  } panelpart;} {selected private local
+  } panelpart;} {private local
   }
 } 
 
@@ -386,8 +386,8 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {open private
   } {
-    Fl_Window panellistitem {open
-      private xywh {1156 181 70 280} type Double
+    Fl_Window panellistitem {open selected
+      private xywh {1156 10 70 280} type Double
       class Fl_Group visible
     } {
       Fl_Group panellistitemgroup {open
