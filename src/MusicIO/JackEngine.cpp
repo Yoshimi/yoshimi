@@ -149,7 +149,7 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    if (midi.port && !synth->getRuntime().startThread(&midi.pThread, _midiThread, this, true, 1))
+    if (midi.port && !synth->getRuntime().startThread(&midi.pThread, _midiThread, this, true, 1, false))
     {
         synth->getRuntime().Log("Failed to start jack midi thread");
         goto bail_out;
@@ -201,6 +201,22 @@ bail_out:
 
 void JackEngine::Close(void)
 {
+    if(synth->getRuntime().runSynth)
+    {
+        synth->getRuntime().runSynth = false;
+    }
+
+    if (sem_post(&midiSem) == 0)
+    {
+
+        if(midi.pThread != 0) //wait for midi thread to finish
+        {
+            void *ret = NULL;
+            pthread_join(midi.pThread, &ret);
+            midi.pThread = 0;
+        }
+    }
+
     if (NULL != jackClient)
     {
         int chk;
