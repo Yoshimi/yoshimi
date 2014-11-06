@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -198,7 +198,7 @@ ninseff = 0;
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 29 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -234,7 +234,7 @@ ninseff = 0;
           }
         }
         Submenu {} {
-          label {&Instrument}
+          label {&Instrument} open
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
@@ -289,8 +289,8 @@ ninseff = 0;
           }
           MenuItem {} {
             label {&Virtual Keyboard...}
-            callback {virkeyboard->Show();}
-            xywh {10 10 100 20} labelsize 12
+            callback {virkeyboard->Show();} selected
+            xywh {15 15 100 20} labelsize 12
           }
         }
         Submenu {} {
@@ -795,7 +795,7 @@ ZynAddSubFX}
     }
     Fl_Window panelwindow {
       label {Yoshimi Panel} open
-      xywh {79 57 635 635} type Double labelfont 13 labelsize 13 hide
+      xywh {4 21 575 665} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {open
         xywh {0 5 570 310} type HORIZONTAL box THIN_UP_BOX
@@ -826,12 +826,12 @@ ZynAddSubFX}
       Fl_Button {} {
         label Close
         callback {panelwindow->hide(); updatepanel();}
-        xywh {575 604 55 25} box THIN_UP_BOX labelsize 13
+        xywh {515 635 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label Refresh
         callback {updatepanel();}
-        xywh {575 570 55 25} box THIN_UP_BOX labelsize 13
+        xywh {440 635 55 25} box THIN_UP_BOX labelsize 13
       }
     }
   }
@@ -859,8 +859,7 @@ ZynAddSubFX}
         masterwindow->changed();
         panelwindowlabel = synth->makeUniqueName("Yoshimi Panel");
         panelwindow->label(panelwindowlabel.c_str());
-        panelwindow->changed();} {selected
-    }
+        panelwindow->changed();} {}
   }
   Function {do_new_master()} {} {
     code {//
