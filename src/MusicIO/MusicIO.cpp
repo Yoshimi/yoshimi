@@ -28,15 +28,18 @@ using namespace std;
 #include "MusicIO/MidiControl.h"
 #include "MusicIO/MusicIO.h"
 
+#include <unistd.h>
+#include <iostream>
+
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleavedShorts(NULL),
     rtprio(25),
     synth(_synth),
-    pBankThread(0),
-    pPrgThread(0)
+    pBankThread(0)
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
+    memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
 }
 
 MusicIO::~MusicIO()
@@ -47,10 +50,13 @@ MusicIO::~MusicIO()
     tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
     if(tmpBankThread != 0)
         pthread_join(tmpBankThread, &threadRet);
-    threadRet = NULL;
-    tmpPrgThread = __sync_fetch_and_add(&pPrgThread, 0);
-    if(tmpPrgThread != 0)
-        pthread_join(tmpPrgThread, &threadRet);
+    for(int i = 0; i < NUM_MIDI_PARTS; ++i)
+    {
+        threadRet = NULL;
+        tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [i].pPrgThread, 0);
+        if(tmpPrgThread != 0)
+            pthread_join(tmpPrgThread, &threadRet);
+    }
 
     for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
     {
@@ -170,19 +176,46 @@ void MusicIO::setMidiBank(short banknum, bool in_place)
         synth->SetBank(banknum);
     else
     {
+        pthread_t tmpBankThread = 0;
+        tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
+        if(tmpBankThread == 0) // don't allow more than one bank change process at a time
+        {
+            bankToChange = banknum;
+            if(!synth->getRuntime().startThread(&pBankThread, MusicIO::static_BankChangeThread, this, false, 0, false))
+            {
+                synth->getRuntime().Log("MusicIO::setMidiBank: failed to start midi bank change thread!");
+            }
 
+
+        }
     }
 
 }
 
-void MusicIO::setMidiProgram(unsigned char ch, int pgm, bool in_place)
+void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
 {
+    if(ch >= NUM_MIDI_PARTS)
+        return;
     if (synth->getRuntime().EnableProgChange)
     {
         if(in_place)
-            synth->SetProgram(ch, pgm);
+            synth->SetProgram(ch, prg);
         else
         {
+            pthread_t tmpPrgThread = 0;
+            tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [ch].pPrgThread , 0);
+            if(tmpPrgThread == 0) // don't allow more than one program change process at a time
+            {
+                prgChangeCmd [ch].ch = ch;
+                prgChangeCmd [ch].prg = prg;
+                prgChangeCmd [ch]._this_ = this;
+                if(!synth->getRuntime().startThread(&prgChangeCmd [ch].pPrgThread, MusicIO::static_PrgChangeThread, &prgChangeCmd [ch], false, 0, false))
+                {
+                    synth->getRuntime().Log("MusicIO::setMidiProgram: failed to start midi program change thread!");
+                }
+
+
+            }
 
         }
     }
@@ -249,13 +282,41 @@ bail_out:
 }
 
 
-void *MusicIO::static_BankThread(void *arg)
+void *MusicIO::bankChange_Thread()
 {
-
+    usleep(100000);
+    std::cerr << "MusicIO::bankChange_Thread(). banknum = " << bankToChange << std::endl;
+    synth->SetBank(bankToChange);
+    pBankThread = 0; // done
+    return NULL;
 }
 
-void *MusicIO::static_PrgThread(void *arg)
+void *MusicIO::prgChange_Thread(_prgChangeCmd *pCmd)
 {
+    pthread_t tmpBankThread = 0;
+    tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
+    if(tmpBankThread != 0) // wait for active bank thread to finish before continue
+    {
+        std::cerr << "Waiting for MusicIO::bankChange_Thread()..." << std::endl;
+        void *threadRet = NULL;
+        pthread_join(pBankThread, &threadRet);
+    }
 
+    std::cerr << "MusicIO::prgChange_Thread(). ch = " << pCmd->ch << ", prg = " << pCmd->prg << std::endl;
+
+    synth->SetProgram(pCmd->ch, pCmd->prg);
+    pCmd->pPrgThread = 0; //done
+    return NULL;
+}
+
+void *MusicIO::static_BankChangeThread(void *arg)
+{
+    return static_cast<MusicIO *>(arg)->bankChange_Thread();
+}
+
+void *MusicIO::static_PrgChangeThread(void *arg)
+{
+    _prgChangeCmd *pCmd = static_cast<_prgChangeCmd *>(arg);
+    return pCmd->_this_->prgChange_Thread(pCmd);
 }
 

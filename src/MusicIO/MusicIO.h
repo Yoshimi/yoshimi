@@ -42,7 +42,7 @@ class MusicIO : virtual protected MiscFuncs
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, unsigned int ctrl, int param, bool in_place = false);
         void setMidiBank(short banknum, bool in_place = false);
-        void setMidiProgram(unsigned char ch, int pgm, bool in_place = false);
+        void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 
@@ -53,19 +53,21 @@ class MusicIO : virtual protected MiscFuncs
 
         SynthEngine *synth;
     private:
-        pthread_t pBankThread;
-        pthread_t pPrgThread;
-        struct
-        {
-            short banknum;
+        pthread_t pBankThread;        
+        short bankToChange;
+        struct _prgChangeCmd
+        {            
             int ch;
             int prg;
-        }bankPrgChange;
+            MusicIO *_this_;
+            pthread_t pPrgThread;
+        };
+        _prgChangeCmd prgChangeCmd [NUM_MIDI_PARTS];
 
-        void RealBankChange();
-        void RealPrgChange();
-        static void *static_BankThread(void *arg);
-        static void *static_PrgThread(void *arg);
+        void *bankChange_Thread();
+        void *prgChange_Thread(_prgChangeCmd *pCmd);
+        static void *static_BankChangeThread(void *arg);
+        static void *static_PrgChangeThread(void *arg);
 };
 
 #endif

@@ -677,7 +677,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char priodec)
+                         bool schedfifo, char priodec, bool create_detached)
 {
     pthread_attr_t attr;
     int chk;
@@ -687,7 +687,11 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
     {
         if (!(chk = pthread_attr_init(&attr)))
         {
-            if (!(chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)))
+            if(create_detached)
+            {
+               chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+            }
+            if(!chk)
             {
                 if (schedfifo)
                 {
