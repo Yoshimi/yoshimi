@@ -13,6 +13,9 @@ int main(int argc, char **argv)
         std::cerr << "yoshimi-cmdline supported commands:" <<  std::endl;
         std::cerr << "noteon <instancenum> <channel> <note> <velocity>" <<  std::endl;
         std::cerr << "noteoff <instancenum> <channel> <note>" <<  std::endl;
+        std::cerr << "controller <instancenum> <channel> <type> <parameter>" <<  std::endl;
+        std::cerr << "bank <instancenum> <bank>" <<  std::endl;
+        std::cerr << "program <instancenum> <channel> <prg_num>" <<  std::endl;
         return 0;
     }
     int fd = open(YOSHIMI_CMDLINE_FIFO_NAME, O_WRONLY);

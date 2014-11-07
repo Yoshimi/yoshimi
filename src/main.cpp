@@ -146,108 +146,127 @@ bail_out:
 }
 
 #ifdef YOSHIMI_CMDLINE_INTERFACE
+
 void *cmdLineThread(void *arg)
 {
     std::map<SynthEngine *, MusicClient *>::iterator it;
+    bool working = true;
     if(mkfifo(YOSHIMI_CMDLINE_FIFO_NAME, 0666) != 0)
     {
         firstRuntime->Log("Can't create fifo file for cmdline access", true);
-        goto bail_out;
+        working = false;
     }
     cmdLineFifoFD = open(YOSHIMI_CMDLINE_FIFO_NAME, O_RDWR);
     if(cmdLineFifoFD == -1)
     {
         firstRuntime->Log("Can't open fifo file for cmdline access", true);
-        goto bail_out;
+        working = false;
     }
 
-    while(firstRuntime->runSynth)
+    if(working)
     {
-        char buf[4096];
-        memset(buf, 0, sizeof(buf));
-        read(cmdLineFifoFD, buf, sizeof(buf));
-        printf("Received: %s\n", buf);
-        istringstream iss(buf);
-        vector<string> vals;
-        copy(istream_iterator<string>(iss),
-             istream_iterator<string>(),
-             back_inserter(vals));
-        size_t idx = 0;
-        size_t sz = vals.size();
-        while(idx < sz)
+        while(firstRuntime->runSynth)
         {
-            if(vals.at(idx) == "noteon")
+            char buf[4096];
+            memset(buf, 0, sizeof(buf));
+            read(cmdLineFifoFD, buf, sizeof(buf));
+            printf("Received: %s\n", buf);
+            istringstream iss(buf);
+            vector<string> vals;
+            copy(istream_iterator<string>(iss),
+                 istream_iterator<string>(),
+                 back_inserter(vals));
+            size_t sz = vals.size();
+            if(sz > 0)
             {
-                ++idx;
-                if(idx < sz)
+                if(vals.at(0) == "noteon" && vals.size() >= 5)
                 {
-                    int instnum = atoi(vals.at(idx).c_str());
-                    ++idx;
-                    if(idx < sz)
+                    int instnum = atoi(vals.at(1).c_str());
+                    int ch = atoi(vals.at(2).c_str());
+                    int note = atoi(vals.at(3).c_str());
+                    int vel = atoi(vals.at(4).c_str());
+
+                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
                     {
-                        int ch = atoi(vals.at(idx).c_str());
-                        ++idx;
-                        if(idx < sz)
+                        SynthEngine *_synth = it->first;
+                        if(_synth->getUniqueId() == (size_t)instnum)
                         {
-                            int note = atoi(vals.at(idx).c_str());
-                            ++idx;
-                            if(idx < sz)
-                            {
+                            _synth->NoteOn(ch, note, vel);
+                            break;
+                        }
+                    }
 
-                                int vel = atoi(vals.at(idx).c_str());
-                                ++idx;
-                                for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                                {
-                                    SynthEngine *_synth = it->first;
-                                    if(_synth->getUniqueId() == (size_t)instnum)
-                                    {
-                                        _synth->NoteOn(ch, note, vel);
-                                        break;
-                                    }
-                                }
-                            }
+                }
+                else if(vals.at(0) == "noteoff" && vals.size() >= 4)
+                {
+                    int instnum = atoi(vals.at(1).c_str());
+                    int ch = atoi(vals.at(2).c_str());
+                    int note = atoi(vals.at(3).c_str());
+                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+                    {
+                        SynthEngine *_synth = it->first;
+                        if(_synth->getUniqueId() == (size_t)instnum)
+                        {
+                            _synth->NoteOff(ch, note);
+                            break;
+                        }
+                    }
 
+
+                }
+                else if(vals.at(0) == "controller" && vals.size() >= 5)
+                {
+                    int instnum = atoi(vals.at(1).c_str());
+                    int ch = atoi(vals.at(2).c_str());
+                    int type = atoi(vals.at(3).c_str());
+                    int par = atoi(vals.at(4).c_str());
+
+                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+                    {
+                        SynthEngine *_synth = it->first;
+                        if(_synth->getUniqueId() == (size_t)instnum)
+                        {
+                            _synth->SetController(ch, type, par);
+                            break;
                         }
                     }
                 }
-            }
-            else if(vals.at(idx) == "noteoff")
-            {
-                ++idx;
-                if(idx < sz)
+                else if(vals.at(0) == "bank" && vals.size() >= 3)
                 {
-                    int instnum = atoi(vals.at(idx).c_str());
-                    ++idx;
-                    if(idx < sz)
+                    int instnum = atoi(vals.at(1).c_str());
+                    int banknum = atoi(vals.at(2).c_str());
+
+                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
                     {
-                        int ch = atoi(vals.at(idx).c_str());
-                        ++idx;
-                        if(idx < sz)
+                        SynthEngine *_synth = it->first;
+                        if(_synth->getUniqueId() == (size_t)instnum)
                         {
-                            int note = atoi(vals.at(idx).c_str());
-                            ++idx;
-                            for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                            {
-                                SynthEngine *_synth = it->first;
-                                if(_synth->getUniqueId() == (size_t)instnum)
-                                {
-                                    _synth->NoteOff(ch, note);
-                                    break;
-                                }
-                            }
+                            _synth->SetBank(banknum);
+                            break;
+                        }
+                    }
+                }
+                else if(vals.at(0) == "program" && vals.size() >= 4)
+                {
+                    int instnum = atoi(vals.at(1).c_str());
+                    int ch = atoi(vals.at(2).c_str());
+                    int prg = atoi(vals.at(3).c_str());
+
+                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+                    {
+                        SynthEngine *_synth = it->first;
+                        if(_synth->getUniqueId() == (size_t)instnum)
+                        {
+                            _synth->SetProgram(ch,prg);
+                            break;
                         }
                     }
                 }
 
             }
-            else
-                ++idx;
         }
-        if(strcmp(buf, "close")); //any message to unblock read() call
-
-
     }
-bail_out:
+
     if(cmdLineFifoFD != -1)
         close(cmdLineFifoFD);
     unlink(YOSHIMI_CMDLINE_FIFO_NAME);
