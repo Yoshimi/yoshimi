@@ -159,6 +159,12 @@ class SynthEngine : private SynthHelper, MiscFuncs
         unsigned int getUniqueId() {return uniqueId;}
         MasterUI *getGuiMaster();
         void guiClosed(bool stopSynth);
+        void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
+        {
+            guiClosedCallback = _guiClosedCallback;
+            guiCallbackArg = arg;
+        }
+        void closeGui();
         int getLFOtime() {return LFOtime;}
         std::string makeUniqueName(const char *name);
 
@@ -185,6 +191,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         unsigned int uniqueId;
         MasterUI *guiMaster;
+        void( *guiClosedCallback)(void*);
+        void *guiCallbackArg;
 
         int LFOtime; // used by Pcontinous
 };

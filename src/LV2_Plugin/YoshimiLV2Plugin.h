@@ -81,33 +81,40 @@ public:
    static void cleanup(LV2_Handle instance);
    static const void * extension_data(const char * uri);
    static void *static_midiThread(void *arg);
-   static void *static_idleThread(void *arg);
+   static void *static_idleThread(void *arg);   
    /*
    static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
    static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);
    static LV2_Worker_Status	lv2_wrk_end_run(LV2_Handle instance);
    */
+   friend class YoshimiLV2PluginUI;
 
 };
 
-class YoshimiLV2PluginUI
+class YoshimiLV2PluginUI: public LV2_External_UI_Widget
 {
 private:
     YoshimiLV2Plugin *_plugin;
-    LV2_External_UI_Host uiHost;
-    struct
-    {
-        LV2_External_UI_Widget uiWidget;
-        YoshimiLV2PluginUI *uiinst;
-    } LV2_External_UI_Yoshimi;
+    LV2_External_UI_Host uiHost;    
     MasterUI *_masterUI;
+    LV2UI_Controller _controller;
+    struct _externalUI
+    {
+        LV2_External_UI_Widget uiWIdget;
+        YoshimiLV2PluginUI *uiInst;
+    };
+    _externalUI externalUI;
 public:
     YoshimiLV2PluginUI(const char *, LV2UI_Write_Function, LV2UI_Controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     ~YoshimiLV2PluginUI();
     bool init();
     static LV2UI_Handle	instantiate(const struct _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     static void cleanup(LV2UI_Handle ui);
-    void run(struct _LV2_External_UI_Widget * _this_);
-    void show(struct _LV2_External_UI_Widget * _this_);
-    void hide(struct _LV2_External_UI_Widget * _this_);
+    static void static_guiClosed(void *arg);
+    void run();
+    void show();
+    void hide();
+    static void static_Run(struct _LV2_External_UI_Widget * _this_);
+    static void static_Show(struct _LV2_External_UI_Widget * _this_);
+    static void static_Hide(struct _LV2_External_UI_Widget * _this_);
 };

@@ -361,13 +361,13 @@ bool YoshimiLV2Plugin::init()
 
     _synth->getRuntime().runSynth = true;
 
-    if(!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1))
+    if(!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false))
     {
         synth->getRuntime().Log("Failed to start midi thread");
         return false;
     }
 
-    if(!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0))
+    if(!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false))
     {
         synth->getRuntime().Log("Failed to start idle thread");
         return false;
@@ -478,6 +478,7 @@ void *YoshimiLV2Plugin::static_idleThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->idleThread();
 }
+
 /*
 LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data)
 {
@@ -498,13 +499,18 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 
 
 
-YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2UI_Controller , LV2UI_Widget *widget, const LV2_Feature * const *features)
+YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
     :_plugin(NULL),
-     _masterUI(NULL)
+     _masterUI(NULL),
+     _controller(controller)
 {
     uiHost.plugin_human_id = NULL;
     uiHost.ui_closed = NULL;
     const LV2_Feature *f = NULL;
+    externalUI.uiWIdget.run = YoshimiLV2PluginUI::static_Run;
+    externalUI.uiWIdget.show = YoshimiLV2PluginUI::static_Show;
+    externalUI.uiWIdget.hide = YoshimiLV2PluginUI::static_Hide;
+    externalUI.uiInst = this;
     while((f = *features) != NULL)
     {
         if(strcmp(f->URI, LV2_INSTANCE_ACCESS_URI) == 0)
@@ -518,6 +524,7 @@ YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2U
         }
         ++features;
     }
+    *widget = &externalUI;
 }
 
 YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
@@ -527,6 +534,7 @@ YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
         free(const_cast<char *>(uiHost.plugin_human_id));
         uiHost.plugin_human_id = NULL;
     }
+    _plugin->_synth->closeGui();
 }
 
 
@@ -535,6 +543,7 @@ bool YoshimiLV2PluginUI::init()
 {
     if(_plugin == NULL || uiHost.ui_closed == NULL)
         return false;
+    _plugin->_synth->setGuiClosedCallback(YoshimiLV2PluginUI::static_guiClosed, this);
     return true;
 }
 
@@ -544,7 +553,7 @@ LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor
     YoshimiLV2PluginUI *uiinst = new YoshimiLV2PluginUI(bundle_path, write_function, controller, widget, features);
     if(uiinst->init())
     {
-        return static_cast<LV2UI_Handle>(uiinst);
+        return static_cast<LV2_External_UI_Widget *>(uiinst);
     }
     else
         delete uiinst;
@@ -558,18 +567,60 @@ void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
     delete uiinst;
 }
 
-void YoshimiLV2PluginUI::run(_LV2_External_UI_Widget *_this_)
+void YoshimiLV2PluginUI::static_guiClosed(void *arg)
 {
+    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = NULL;
+    static_cast<YoshimiLV2PluginUI *>(arg)->_plugin->_synth->closeGui();
+}
+
+void YoshimiLV2PluginUI::run()
+{
+    if(_masterUI != NULL)
+        Fl::check();
+    else
+    {
+        if(uiHost.ui_closed != NULL)
+            uiHost.ui_closed(_controller);
+    }
+}
+
+void YoshimiLV2PluginUI::show()
+{
+    _plugin->_synth->getRuntime().showGui = true;
+    bool bInit = false;
+    if(_masterUI == NULL)
+        bInit = true;
+    _masterUI = _plugin->_synth->getGuiMaster();
+    if (_masterUI == NULL)
+    {
+        _plugin->_synth->getRuntime().Log("Failed to instantiate gui");
+        return;
+    }
+    if(bInit)
+        _masterUI->Init("yoshimi lv2 plugin");
 
 }
 
-void YoshimiLV2PluginUI::show(_LV2_External_UI_Widget *_this_)
+void YoshimiLV2PluginUI::hide()
 {
+    if(_masterUI)
+        _masterUI->masterwindow->hide();
+}
+
+void YoshimiLV2PluginUI::static_Run(_LV2_External_UI_Widget *_this_)
+{
+    reinterpret_cast<_externalUI *>(_this_)->uiInst->run();
 
 }
 
-void YoshimiLV2PluginUI::hide(_LV2_External_UI_Widget *_this_)
+void YoshimiLV2PluginUI::static_Show(_LV2_External_UI_Widget *_this_)
 {
+    reinterpret_cast<_externalUI *>(_this_)->uiInst->show();
+}
+
+void YoshimiLV2PluginUI::static_Hide(_LV2_External_UI_Widget *_this_)
+{
+    reinterpret_cast<_externalUI *>(_this_)->uiInst->hide();
 
 }
 

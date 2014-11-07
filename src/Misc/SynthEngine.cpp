@@ -66,6 +66,8 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     vuringbuf(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
+    guiClosedCallback(NULL),
+    guiCallbackArg(NULL),
     LFOtime(0)
 {
     //Andrew Deryabin: use uniqueId for naming different instances in jack client etc..
@@ -86,11 +88,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
 
 SynthEngine::~SynthEngine()
 {
-    if(guiMaster != NULL)
-    {
-        delete guiMaster;
-        guiMaster = NULL;
-    }
+    closeGui();
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
     
@@ -1045,8 +1043,19 @@ MasterUI *SynthEngine::getGuiMaster()
 
 void SynthEngine::guiClosed(bool stopSynth)
 {
-    if(stopSynth && !isLV2Plugin) //make this only for the first instance
+    if(stopSynth && !isLV2Plugin)
         Runtime.runSynth = false;    
+    if(guiClosedCallback != NULL)
+        guiClosedCallback(guiCallbackArg);
+}
+
+void SynthEngine::closeGui()
+{
+    if(guiMaster != NULL)
+    {
+        delete guiMaster;
+        guiMaster = NULL;
+    }
 }
 
 std::string SynthEngine::makeUniqueName(const char *name)
