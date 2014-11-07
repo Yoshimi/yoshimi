@@ -28,8 +28,19 @@ using namespace std;
 #include "Synth/BodyDisposal.h"
 #include <map>
 
+#ifdef YOSHIMI_CMDLINE_INTERFACE
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <vector>
+#include <string>
+#include <sstream>
+static int cmdLineFifoFD = 0;
+#endif
+
 std::map<SynthEngine *, MusicClient *> synthInstances;
 
+static SynthEngine *firstSynth = NULL;
 static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
@@ -134,6 +145,117 @@ bail_out:
     return false;
 }
 
+#ifdef YOSHIMI_CMDLINE_INTERFACE
+void *cmdLineThread(void *arg)
+{
+    std::map<SynthEngine *, MusicClient *>::iterator it;
+    if(mkfifo(YOSHIMI_CMDLINE_FIFO_NAME, 0666) != 0)
+    {
+        firstRuntime->Log("Can't create fifo file for cmdline access", true);
+        goto bail_out;
+    }
+    cmdLineFifoFD = open(YOSHIMI_CMDLINE_FIFO_NAME, O_RDWR);
+    if(cmdLineFifoFD == -1)
+    {
+        firstRuntime->Log("Can't open fifo file for cmdline access", true);
+        goto bail_out;
+    }
+
+    while(firstRuntime->runSynth)
+    {
+        char buf[4096];
+        memset(buf, 0, sizeof(buf));
+        read(cmdLineFifoFD, buf, sizeof(buf));
+        printf("Received: %s\n", buf);
+        istringstream iss(buf);
+        vector<string> vals;
+        copy(istream_iterator<string>(iss),
+             istream_iterator<string>(),
+             back_inserter(vals));
+        size_t idx = 0;
+        size_t sz = vals.size();
+        while(idx < sz)
+        {
+            if(vals.at(idx) == "noteon")
+            {
+                ++idx;
+                if(idx < sz)
+                {
+                    int instnum = atoi(vals.at(idx).c_str());
+                    ++idx;
+                    if(idx < sz)
+                    {
+                        int ch = atoi(vals.at(idx).c_str());
+                        ++idx;
+                        if(idx < sz)
+                        {
+                            int note = atoi(vals.at(idx).c_str());
+                            ++idx;
+                            if(idx < sz)
+                            {
+
+                                int vel = atoi(vals.at(idx).c_str());
+                                ++idx;
+                                for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+                                {
+                                    SynthEngine *_synth = it->first;
+                                    if(_synth->getUniqueId() == (size_t)instnum)
+                                    {
+                                        _synth->NoteOn(ch, note, vel);
+                                        break;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            else if(vals.at(idx) == "noteoff")
+            {
+                ++idx;
+                if(idx < sz)
+                {
+                    int instnum = atoi(vals.at(idx).c_str());
+                    ++idx;
+                    if(idx < sz)
+                    {
+                        int ch = atoi(vals.at(idx).c_str());
+                        ++idx;
+                        if(idx < sz)
+                        {
+                            int note = atoi(vals.at(idx).c_str());
+                            ++idx;
+                            for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+                            {
+                                SynthEngine *_synth = it->first;
+                                if(_synth->getUniqueId() == (size_t)instnum)
+                                {
+                                    _synth->NoteOff(ch, note);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            else
+                ++idx;
+        }
+        if(strcmp(buf, "close")); //any message to unblock read() call
+
+
+    }
+bail_out:
+    if(cmdLineFifoFD != -1)
+        close(cmdLineFifoFD);
+    unlink(YOSHIMI_CMDLINE_FIFO_NAME);
+
+    return NULL;
+
+}
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -141,9 +263,11 @@ int main(int argc, char *argv[])
     globalArgv = argv;
     bool bExitSuccess = false;
     bool bGuiWait = false;
+#ifdef YOSHIMI_CMDLINE_INTERFACE
+    pthread_t pCmdLine = 0;
+#endif
     //MasterUI *guiMaster = NULL;
-    //MusicClient *musicClient = NULL;
-    SynthEngine *firstSynth = NULL;
+    //MusicClient *musicClient = NULL;    
     std::map<SynthEngine *, MusicClient *>::iterator it;
 
     if (!mainCreateNewInstance())
@@ -171,6 +295,13 @@ int main(int argc, char *argv[])
         firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
 
     bGuiWait = firstRuntime->showGui;
+#ifdef YOSHIMI_CMDLINE_INTERFACE
+    if(!firstRuntime->startThread(&pCmdLine, cmdLineThread, 0, false, 0, false))
+    {
+        pCmdLine = 0;
+        firstRuntime->Log("Can't start cmd line thread!", true);
+    }
+#endif
 
     while (firstSynth->getRuntime().runSynth)
     {
@@ -222,6 +353,15 @@ int main(int argc, char *argv[])
 
     cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
+#ifdef YOSHIMI_CMDLINE_INTERFACE
+    if(pCmdLine != 0)
+    {
+        void *vRet = NULL;
+        if(cmdLineFifoFD != -1)
+            write(cmdLineFifoFD, "close", 6);
+        pthread_join(pCmdLine, &vRet);
+    }
+#endif
 
 bail_out:    
     for(it = synthInstances.begin(); it != synthInstances.end(); ++it)

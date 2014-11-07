@@ -67,6 +67,8 @@ option (ReportErrorsToConsole "Show errors in console window" ON)
 
 #option to build lv2 plugin
 option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" OFF)
+#option to build cmdline interface
+option (BuildCmdLine "Build yoshimi command line interface" OFF)
 
 set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
 
@@ -343,6 +345,11 @@ if (HasJackLatency)
     add_definitions(-DJACK_LATENCY)
 endif (HasJackLatency)
 
+if (BuildCmdLine)
+add_definitions(-DYOSHIMI_CMDLINE_INTERFACE=1)
+add_definitions(-DYOSHIMI_CMDLINE_FIFO_NAME="/tmp/yoshimi-cmdline")
+endif (BuildCmdLine)
+
 set (ProgSources
     ${Misc_sources}
     ${Params_sources}
@@ -447,3 +454,7 @@ else (LV2_FOUND)
 endif (LV2_FOUND)
 add_subdirectory(LV2_Plugin)
 endif (BuildLV2Plugin)
+
+if (BuildCmdLine)
+add_subdirectory(CmdLine)
+endif (BuildCmdLine)
