@@ -91,6 +91,7 @@ target_link_libraries(yoshimi_lv2
                       ${LIBSNDFILE_LIBRARIES}
                       ${FFTW3F_LIBRARIES}
                       ${LIBCAIRO_LIBRARIES}
+                      ${JACK_LIBRARIES}
                       z
                       dl
 )

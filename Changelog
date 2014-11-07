@@ -2,6 +2,16 @@ If you want the latest and (hopefully) greatest, click on the 'code' tab and the
 
 yoshimi-1.2.x
 - Just a few GUI improvements
+- Made support for variable length runs. This provides sample-accurate midi processing
+  for offline rendering and lv2 plugin.
+- Removed strict requerements of Subnote on 8x multiple buffer size.
+  Adopted SUBnote::filter() method for variable-length runs
+- Initial LV2 plugin support (OFF by default)! Tested in Ardour 3,
+  Carla and qtractor  - works both plugin and gui.
+- replaced all calls to lrint() with (int)truncf(). When fesetround(FE_TOWARDZERO)
+  was called, lrintf() behaves exactly as (int)truncf() with that difference, that
+  (int)truncf() returns always the same result not depending on external factors.
+- Made command line control for yoshimi instances (OFF by default)
 
 yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:
