@@ -75,7 +75,7 @@ add_custom_target(yoshimi_lv2_ttl
                    COMMAND test -f ${yoshimi_plugin_ttl})
 
 SET_TARGET_PROPERTIES(yoshimi_lv2 PROPERTIES PREFIX "")
-target_include_directories (yoshimi_lv2 PUBLIC
+include_directories (AFTER
                             ${LV2_INCLUDE_DIRS}
                             ${FLTK_INCLUDE_DIR}
                             ${MXML_INCLUDE_DIRS}
