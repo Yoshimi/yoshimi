@@ -854,7 +854,7 @@ int SynthEngine::getalldata(char **data)
 }
 
 
-void SynthEngine::putalldata(char *data, int size)
+void SynthEngine::putalldata(const char *data, int size)
 {
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml->putXMLdata(data))
@@ -863,15 +863,16 @@ void SynthEngine::putalldata(char *data, int size)
         delete xml;
         return;
     }
-    if (xml->enterbranch("MASTER"))
-    {
+    //if (xml->enterbranch("MASTER"))
+    //{
         actionLock(lock);
+        defaults();
         getfromXML(xml);
         actionLock(unlock);
         xml->exitbranch();
-    }
-    else
-        Runtime.Log("Master putAllData failed to enter MASTER branch");
+    //}
+    //else
+        //Runtime.Log("Master putAllData failed to enter MASTER branch");
     delete xml;
 }
 

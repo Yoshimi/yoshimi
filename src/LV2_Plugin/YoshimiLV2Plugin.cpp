@@ -23,6 +23,9 @@
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
 #include <math.h>
+#include <stdio.h>
+
+#define YOSHIMI_STATE_URI "http://yoshimi.sourceforge.net/lv2_plugin#state"
 
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
@@ -288,6 +291,8 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     if(_uridMap.map != NULL && options != NULL)
     {
         _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
+        _yosmihi_state_id = _uridMap.map(_uridMap.handle, YOSHIMI_STATE_URI);
+        _atom_string_id = _uridMap.map(_uridMap.handle, LV2_ATOM__String);
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
@@ -332,7 +337,7 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 
 bool YoshimiLV2Plugin::init()
 {
-    if(_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0)
+    if(_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yosmihi_state_id == 0 || _atom_string_id == 0)
         return false;
     if(!prepBuffers(false))
         return false;
@@ -464,9 +469,47 @@ LV2_Worker_Interface yoshimi_wrk_iface =
 
 const void *YoshimiLV2Plugin::extension_data(const char *uri)
 {
+    static const LV2_State_Interface state_iface = { YoshimiLV2Plugin::static_StateSave, YoshimiLV2Plugin::static_StateRestore };
+    if (!strcmp(uri, LV2_STATE__interface))
+    {
+        return &state_iface;
+    }
     /*if(strcmp(uri, LV2_WORKER__interface) == 0)
         return static_cast<const void *>(&yoshimi_wrk_iface);*/
+
     return NULL;
+}
+
+LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
+{
+    char *data = NULL;
+    int sz = _synth->getalldata(&data);
+    FILE *f = fopen("/tmp/y1.state", "w+");
+    fwrite(data, 1, sz, f);
+    fclose(f);
+    store(handle, _yosmihi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
+    free(data);
+    return LV2_STATE_SUCCESS;
+}
+
+LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
+{
+    size_t sz = 0;
+    LV2_URID type = 0;
+    uint32_t new_flags;
+
+    const char *data = (const char *)retrieve(handle, _yosmihi_state_id, &sz, &type, &new_flags);
+
+    FILE *f = fopen("/tmp/y2.state", "w+");
+    fwrite(data, 1, sz, f);
+    fclose(f);
+
+    if(sz > 0)
+    {
+
+        _synth->putalldata(data, sz);
+    }
+    return LV2_STATE_SUCCESS;
 }
 
 void *YoshimiLV2Plugin::static_midiThread(void *arg)
@@ -477,6 +520,16 @@ void *YoshimiLV2Plugin::static_midiThread(void *arg)
 void *YoshimiLV2Plugin::static_idleThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->idleThread();
+}
+
+LV2_State_Status YoshimiLV2Plugin::static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
+{
+    return static_cast<YoshimiLV2Plugin *>(instance)->stateSave(store, handle, flags, features);
+}
+
+LV2_State_Status YoshimiLV2Plugin::static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
+{
+    return static_cast<YoshimiLV2Plugin *>(instance)->stateRestore(retrieve, handle, flags, features);
 }
 
 /*

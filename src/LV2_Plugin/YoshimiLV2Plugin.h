@@ -39,6 +39,8 @@ private:
    LV2_URID_Map _uridMap;
    LV2_Atom_Sequence *_midiDataPort;
    LV2_URID _midi_event_id;
+   LV2_URID _yosmihi_state_id;
+   LV2_URID _atom_string_id;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
    sem_t _midiSem;
@@ -80,8 +82,15 @@ public:
    static void run(LV2_Handle instance, uint32_t   sample_count);
    static void cleanup(LV2_Handle instance);
    static const void * extension_data(const char * uri);
+
+   LV2_State_Status stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
+   LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
+
    static void *static_midiThread(void *arg);
    static void *static_idleThread(void *arg);   
+
+   static LV2_State_Status static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
+   static LV2_State_Status static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
    /*
    static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
    static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);

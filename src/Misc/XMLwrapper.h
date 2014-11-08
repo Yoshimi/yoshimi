@@ -71,7 +71,7 @@ class XMLwrapper : private MiscFuncs
         bool loadXMLfile(const string& filename); // true if loaded ok
 
         // used by the clipboard
-        bool putXMLdata(char *xmldata);
+        bool putXMLdata(const char *xmldata);
 
         // enter into the branch
         // returns 1 if is ok, or 0 otherwise

@@ -72,7 +72,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool getfromXML(XMLwrapper *xml);
 
         int getalldata(char **data);
-        void putalldata(char *data, int size);
+        void putalldata(const char *data, int size);
 
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);

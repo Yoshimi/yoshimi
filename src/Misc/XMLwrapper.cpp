@@ -325,7 +325,7 @@ char *XMLwrapper::doloadfile(const string& filename)
 }
 
 
-bool XMLwrapper::putXMLdata(char *xmldata)
+bool XMLwrapper::putXMLdata(const char *xmldata)
 {
     if (tree)
         mxmlDelete(tree);
