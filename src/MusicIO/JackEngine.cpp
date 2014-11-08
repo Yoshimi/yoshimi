@@ -119,7 +119,7 @@ bool JackEngine::openJackClient(string server)
     #else
         if (named_server)
             jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts,
-                                          &jstatus, Runtime.jackServer.c_str());
+                                          &jstatus, synth->getRuntime().jackServer.c_str());
         else
             jackClient = jack_client_open(clientname.c_str(), (jack_options_t)jopts, &jstatus);
     #endif
