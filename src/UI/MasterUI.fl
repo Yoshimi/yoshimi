@@ -198,7 +198,7 @@ ninseff = 0;
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -442,7 +442,10 @@ ninseff = 0;
               {
               	if(panelwindow)              
               	{
-              		panellistitem[i]->partVUMeter->init(i, synth);
+	              	if(panellistitem[i]->partVUMeter)
+	              	{
+	              		panellistitem[i]->partVUMeter->resetPart();
+	              	}
               	}              	
               }
               synth->actionLock(lockmute);
