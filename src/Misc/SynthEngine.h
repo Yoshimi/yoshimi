@@ -157,7 +157,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
-        MasterUI *getGuiMaster();
+        MasterUI *getGuiMaster(bool createGui = true);
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
         {

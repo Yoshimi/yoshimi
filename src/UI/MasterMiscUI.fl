@@ -70,6 +70,9 @@ decl {\#include "ParametersUI.h"} {public local
 decl {\#include "ConsoleUI.h"} {public local
 } 
 
+decl {\#include "MasterUI.h"} {selected private global
+} 
+
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
@@ -311,8 +314,13 @@ synth = _synth;
                 maxdbl = NO_DB;
                 maxdbr = NO_DB;
                 clipped = 0;
-                for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-                    panelpart.clip[i] = false;
+                //for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+                    //panelpart.clip[i] = false;
+               	MasterUI *masterUI = synth->getGuiMaster(false);
+               	if(masterUI)               
+               	{
+               		masterUI->resetPartsClip();
+               	}
             }
             break;
         }
@@ -341,15 +349,17 @@ synth = _synth;
   bool clip[NUM_MIDI_CHANNELS];
   } panelpart;} {private local
   }
-  Function {resetPart()} {open
+  Function {resetPart(bool clipOnly = false)} {open
   } {
     code {for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
       {
-          panelpart.oldpeak[i] = 0;
           panelpart.clip[i] = false;
-          synth->VUdata.values.parts[i] = 0.0;
-      }} {selected
-    }
+      	  if(!clipOnly)
+      	  {
+	          panelpart.oldpeak[i] = 0;
+	          synth->VUdata.values.parts[i] = 0.0;
+	  }
+      }} {}
   }
 } 
 
@@ -397,7 +407,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {1156 20 70 280} type Double
+      private xywh {1156 29 70 280} type Double
       class Fl_Group visible
     } {
       Fl_Group panellistitemgroup {open

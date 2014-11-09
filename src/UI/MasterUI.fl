@@ -173,8 +173,7 @@ ninseff = 0;
       else
           yoshiLog->Hide();} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {if (configui->configChanged)
@@ -450,7 +449,7 @@ ninseff = 0;
               }
               synth->actionLock(lockmute);
               synth->shutup = 1;
-              synth->actionLock(unlock);} selected
+              synth->actionLock(unlock);}
           tooltip {Cease all sound immediately!} xywh {11 46 50 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -1007,6 +1006,17 @@ ZynAddSubFX}
   Function {getPresetsUi()} {open return_type {PresetsUI *}
   } {
     code {return presetsui;} {}
+  }
+  Function {resetPartsClip()} {open
+  } {
+    code {for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+{
+	if(panellistitem[i] && panellistitem[i]->partVUMeter)
+	{
+	     panellistitem[i]->partVUMeter->resetPart(true);
+	}
+}} {selected
+    }
   }
   decl {ConfigUI *configui;} {private local
   }

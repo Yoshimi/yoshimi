@@ -1033,9 +1033,9 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     return det;
 }
 
-MasterUI *SynthEngine::getGuiMaster()
+MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {
-    if(guiMaster == NULL)
+    if(guiMaster == NULL && createGui)
     {
         guiMaster = new MasterUI(this);
     }
