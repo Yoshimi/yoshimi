@@ -185,9 +185,9 @@ void MusicIO::setMidiBank(short banknum, bool in_place)
             {
                 synth->getRuntime().Log("MusicIO::setMidiBank: failed to start midi bank change thread!");
             }
-
-
         }
+        else
+            synth->getRuntime().Log("Midi bank changes too close together");
     }
 
 }
