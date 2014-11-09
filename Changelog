@@ -14,6 +14,8 @@ yoshimi-1.2.x
 - Made command line control for yoshimi instances (OFF by default)
 - Added error message if midi bank chnags to close
 - Ported portamento rate and depth to controllers from Zyn.
+- Added state interface support for lv2 interface. now saving/restoring
+  yoshimi lv2 plugin settings works.
 
 yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:
