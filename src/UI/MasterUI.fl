@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0300 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -173,7 +173,8 @@ ninseff = 0;
       else
           yoshiLog->Hide();} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {if (configui->configChanged)
@@ -804,43 +805,43 @@ ZynAddSubFX}
     }
     Fl_Window panelwindow {
       label {Yoshimi Panel} open
-      xywh {4 21 575 665} type Double labelfont 13 labelsize 13 hide
+      xywh {572 20 550 675} type Double labelfont 13 labelsize 13 visible
     } {
-      Fl_Scroll {} {open
-        xywh {0 5 570 310} type HORIZONTAL box THIN_UP_BOX
-      } {
-        Fl_Pack {} {
-          xywh {5 10 560 300} type HORIZONTAL
-          code0 {//
+      Fl_Pack {} {open
+        xywh {8 10 533 286} type HORIZONTAL
+        code0 {//
             for (int i = 0; i < NUM_MIDI_PARTS / 2; i++)
             {
                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
                 panellistitem[i]->init(i, bankui, synth);
             }}
-        } {}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Box {} {
+        xywh {-4 316 563 7} box THIN_DOWN_BOX
       }
-      Fl_Scroll {} {open
-        xywh {0 320 570 310} type HORIZONTAL box THIN_UP_BOX
-      } {
-        Fl_Pack {} {
-          xywh {5 325 560 300} type HORIZONTAL
-          code0 {//
+      Fl_Pack {} {
+        xywh {8 325 533 286} type HORIZONTAL
+        code0 {//
               for (int i = NUM_MIDI_PARTS / 2; i < NUM_MIDI_PARTS; i++)
               {
                    panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
                    panellistitem[i]->init(i, bankui, synth);
               }}
-        } {}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Box {} {selected
+        xywh {-4 632 563 7} box THIN_DOWN_BOX
       }
       Fl_Button {} {
         label Close
         callback {panelwindow->hide(); updatepanel();}
-        xywh {515 635 55 25} box THIN_UP_BOX labelsize 13
+        xywh {482 645 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label Refresh
         callback {updatepanel();}
-        xywh {440 635 55 25} box THIN_UP_BOX labelsize 13
+        xywh {414 645 55 25} box THIN_UP_BOX labelsize 13
       }
     }
   }
@@ -1015,8 +1016,7 @@ ZynAddSubFX}
 	{
 	     panellistitem[i]->partVUMeter->resetPart(true);
 	}
-}} {selected
-    }
+}} {}
   }
   decl {ConfigUI *configui;} {private local
   }

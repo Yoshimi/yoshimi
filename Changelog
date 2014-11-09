@@ -4,7 +4,7 @@ yoshimi-1.2.x
 - Just a few GUI improvements
 - Made support for variable length runs. This provides sample-accurate midi processing
   for offline rendering and lv2 plugin.
-- Removed strict requerements of Subnote on 8x multiple buffer size.
+- Removed strict requirements of Subnote on 8x multiple buffer size.
   Adopted SUBnote::filter() method for variable-length runs
 - Initial LV2 plugin support (OFF by default)! Tested in Ardour 3,
   Carla and qtractor  - works both plugin and gui.
@@ -12,7 +12,7 @@ yoshimi-1.2.x
   was called, lrintf() behaves exactly as (int)truncf() with that difference, that
   (int)truncf() returns always the same result not depending on external factors.
 - Made command line control for yoshimi instances (OFF by default)
-- Added error message if midi bank chnags to close
+- Added error message if midi bank changs too close
 - Ported portamento rate and depth to controllers from Zyn.
 - Added state interface support for lv2 interface. now saving/restoring
   yoshimi lv2 plugin settings works.
