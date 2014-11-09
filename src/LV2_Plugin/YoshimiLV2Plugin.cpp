@@ -27,6 +27,33 @@
 
 #define YOSHIMI_STATE_URI "http://yoshimi.sourceforge.net/lv2_plugin#state"
 
+#define YOSHIMI_LV2_BUF_SIZE_URI    "http://lv2plug.in/ns/ext/buf-size"
+#define YOSHIMI_LV2_BUF_SIZE_PREFIX YOSHIMI_LV2_BUF_SIZE_URI "#"
+
+#define YOSHIMI_LV2_BUF_SIZE__maxBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "maxBlockLength"
+#define YOSHIMI_LV2_BUF_SIZE__minBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "minBlockLength"
+
+#define YOSHIMI_LV2_OPTIONS_URI    "http://lv2plug.in/ns/ext/options"
+#define YOSHIMI_LV2_OPTIONS_PREFIX YOSHIMI_LV2_OPTIONS_URI "#"
+
+#define YOSHIMI_LV2_OPTIONS__Option          YOSHIMI_LV2_OPTIONS_PREFIX "Option"
+#define YOSHIMI_LV2_OPTIONS__options         YOSHIMI_LV2_OPTIONS_PREFIX "options"
+
+typedef enum {
+    LV2_OPTIONS_INSTANCE,
+    LV2_OPTIONS_RESOURCE,
+    LV2_OPTIONS_BLANK,
+    LV2_OPTIONS_PORT
+} Yoshimi_LV2_Options_Context;
+
+typedef struct _Yoshimi_LV2_Options_Option {
+ Yoshimi_LV2_Options_Context context;  /**< Context (type of subject). */
+ uint32_t            subject;  /**< Subject. */
+ LV2_URID            key;      /**< Key (property). */
+ uint32_t            size;     /**< Size of value in bytes. */
+ LV2_URID            type;     /**< Type of value (datatype). */
+ const void*         value;    /**< Pointer to value (object). */
+} Yoshimi_LV2_Options_Option;
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
@@ -274,16 +301,16 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
     const LV2_Feature *f = NULL;
-    const LV2_Options_Option *options = NULL;
+    const Yoshimi_LV2_Options_Option *options = NULL;
     while((f = *features) != NULL)
     {
         if(strcmp(f->URI, LV2_URID__map) == 0)
         {
             _uridMap = *(static_cast<LV2_URID_Map *>(f->data));
         }
-        else if(strcmp(f->URI, LV2_OPTIONS__options) == 0)
+        else if(strcmp(f->URI, YOSHIMI_LV2_OPTIONS__options) == 0)
         {
-            options = static_cast<LV2_Options_Option *>(f->data);
+            options = static_cast<Yoshimi_LV2_Options_Option *>(f->data);
         }
         ++features;
     }
@@ -293,8 +320,8 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
         _yosmihi_state_id = _uridMap.map(_uridMap.handle, YOSHIMI_STATE_URI);
         _atom_string_id = _uridMap.map(_uridMap.handle, LV2_ATOM__String);
-        LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__maxBlockLength);
-        LV2_URID minBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__minBlockLength);
+        LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
+        LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
         while(options->size > 0 && options->value != NULL)
         {
