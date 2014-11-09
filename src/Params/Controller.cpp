@@ -56,6 +56,9 @@ void Controller::defaults(void)
 
     portamento.portamento = 0;
     portamento.used = 0;
+    portamento.proportional = 0;
+    portamento.propRate     = 80;
+    portamento.propDepth    = 90;
     portamento.receive = 1;
     portamento.time = 64;
     portamento.updowntimestretch = 64;
@@ -228,6 +231,22 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
 
     float portamentotime = powf(100.0f, portamento.time / 127.0f) / 50.0f; // portamento time in seconds
 
+    if(portamento.proportional) {
+        //If there is a min(float,float) and a max(float,float) then they
+        //could be used here
+        //Linear functors could also make this nicer
+        if(oldfreq > newfreq) //2 is the center of propRate
+            portamentotime *=
+                powf(oldfreq / newfreq
+                     / (portamento.propRate / 127.0f * 3 + .05),
+                     (portamento.propDepth / 127.0f * 1.6f + .2));
+        else                  //1 is the center of propDepth
+            portamentotime *=
+                powf(newfreq / oldfreq
+                     / (portamento.propRate / 127.0f * 3 + .05),
+                     (portamento.propDepth / 127.0f * 1.6f + .2));
+    }
+
     if (portamento.updowntimestretch >= 64 && newfreq < oldfreq)
     {
         if (portamento.updowntimestretch == 127)
@@ -310,6 +329,9 @@ void Controller::add2XML(XMLwrapper *xml)
     xml->addpar("portamento_pitchthreshtype",portamento.pitchthreshtype);
     xml->addpar("portamento_portamento",portamento.portamento);
     xml->addpar("portamento_updowntimestretch",portamento.updowntimestretch);
+    xml->addpar("portamento_proportional", portamento.proportional);
+    xml->addpar("portamento_proprate", portamento.propRate);
+    xml->addpar("portamento_propdepth", portamento.propDepth);
 
     xml->addpar("resonance_center_depth",resonancecenter.depth);
     xml->addpar("resonance_bandwidth_depth",resonancebandwidth.depth);
@@ -337,6 +359,9 @@ void Controller::getfromXML(XMLwrapper *xml)
     portamento.pitchthreshtype=xml->getpar127("portamento_pitchthreshtype",portamento.pitchthreshtype);
     portamento.portamento=xml->getpar127("portamento_portamento",portamento.portamento);
     portamento.updowntimestretch=xml->getpar127("portamento_updowntimestretch",portamento.updowntimestretch);
+    portamento.proportional = xml->getpar127("portamento_proportional",portamento.proportional);
+    portamento.propRate = xml->getpar127("portamento_proprate",portamento.propRate);
+    portamento.propDepth = xml->getpar127("portamento_propdepth",portamento.propDepth);
 
     resonancecenter.depth=xml->getpar127("resonance_center_depth",resonancecenter.depth);
     resonancebandwidth.depth=xml->getpar127("resonance_bandwidth_depth",resonancebandwidth.depth);

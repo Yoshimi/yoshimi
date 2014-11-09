@@ -1,0 +1,23 @@
+Packages known to be needed to build in debian wheezy.
+Some of these will pull in other ones.
+
+    automake
+    build-essential
+    ccmake
+    dssi-dev
+    fluid
+    libboost-dev
+    libcairo2-dev
+    libfftw3-dev
+    libfltk1.3-dev
+    libglu1-mesa-dev
+    libjack-jackd2-dev
+    libjpeg8-dev
+    libxft-dev
+    libxinerama-dev
+    libxml2-dev
+    pkg-config
+    xutils-dev
+
+Other distros may have slightly different names or versions,
+and may even have these installed be default.

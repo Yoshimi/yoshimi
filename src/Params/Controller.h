@@ -134,6 +134,9 @@ class Controller
 
             unsigned char receive;
             unsigned char time;
+            unsigned char proportional;
+            unsigned char propRate;
+            unsigned char propDepth;
             unsigned char pitchthresh;
             unsigned char pitchthreshtype;
 
