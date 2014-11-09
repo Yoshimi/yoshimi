@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -198,7 +198,7 @@ ninseff = 0;
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -289,7 +289,7 @@ ninseff = 0;
           }
           MenuItem {} {
             label {&Virtual Keyboard...}
-            callback {virkeyboard->Show();} selected
+            callback {virkeyboard->Show();}
             xywh {15 15 100 20} labelsize 12
           }
         }
@@ -438,9 +438,16 @@ ninseff = 0;
           callback {//
               virkeyboard->relaseallkeys();
               vumeter->init(-1, synth);
+              for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
+              {
+              	if(panelwindow)              
+              	{
+              		panellistitem[i]->partVUMeter->init(i, synth);
+              	}              	
+              }
               synth->actionLock(lockmute);
               synth->shutup = 1;
-              synth->actionLock(unlock);}
+              synth->actionLock(unlock);} selected
           tooltip {Cease all sound immediately!} xywh {11 46 50 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
