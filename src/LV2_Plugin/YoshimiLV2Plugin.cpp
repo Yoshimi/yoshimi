@@ -64,8 +64,8 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 offs = next_frame;
                 for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
                 {
-                    tmpLeft [i] += offs;
-                    tmpRight [i] += offs;
+                    tmpLeft [i] += to_process;
+                    tmpRight [i] += to_process;
                 }
             }
             //process this midi event
