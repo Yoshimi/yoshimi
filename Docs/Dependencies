@@ -26,6 +26,8 @@ LV2 plugin adds one more dependency:
     https://packages.debian.org/search?searchon=sourcenames&keywords=lv2
     There is lv2 1.10.0 version at the time of writing which will be just enough.
     These versions are installed smoothly on wheezy.
+    Fetch package, then:
+    dpkg -i {package name}
 
 Other distros may have slightly different names or versions,
 and may even have these installed be default.
