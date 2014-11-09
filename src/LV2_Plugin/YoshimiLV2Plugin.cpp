@@ -27,6 +27,12 @@
 
 #define YOSHIMI_STATE_URI "http://yoshimi.sourceforge.net/lv2_plugin#state"
 
+#define YOSHIMI_LV2_BUF_SIZE_URI    "http://lv2plug.in/ns/ext/buf-size"
+#define YOSHIMI_LV2_BUF_SIZE_PREFIX YOSHIMI_LV2_BUF_SIZE_URI "#"
+
+#define YOSHIMI_LV2_BUF_SIZE__maxBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "maxBlockLength"
+#define YOSHIMI_LV2_BUF_SIZE__minBlockLength      YOSHIMI_LV2_BUF_SIZE_PREFIX "minBlockLength"
+
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
@@ -293,8 +299,8 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
         _yosmihi_state_id = _uridMap.map(_uridMap.handle, YOSHIMI_STATE_URI);
         _atom_string_id = _uridMap.map(_uridMap.handle, LV2_ATOM__String);
-        LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__maxBlockLength);
-        LV2_URID minBufSz = _uridMap.map(_uridMap.handle, LV2_BUF_SIZE__minBlockLength);
+        LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
+        LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
         while(options->size > 0 && options->value != NULL)
         {
