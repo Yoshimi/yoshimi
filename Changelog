@@ -6,7 +6,7 @@ yoshimi-1.2.x
   for offline rendering and lv2 plugin.
 - Removed strict requirements of Subnote on 8x multiple buffer size.
   Adopted SUBnote::filter() method for variable-length runs
-- Initial LV2 plugin support (OFF by default)! Tested in Ardour 3,
+- Initial LV2 plugin support (OFF by default)! Tested in MusE, Ardour 3,
   Carla and qtractor  - works both plugin and gui.
 - replaced all calls to lrint() with (int)truncf(). When fesetround(FE_TOWARDZERO)
   was called, lrintf() behaves exactly as (int)truncf() with that difference, that
