@@ -16,6 +16,8 @@ yoshimi-1.2.x
 - Ported portamento rate and depth to controllers from Zyn.
 - Added state interface support for lv2 interface. now saving/restoring
   yoshimi lv2 plugin settings works.
+- Added per instance ability to change panel window between 2x8 or 1x16.
+  Haven't decided on best way to store setting.
 
 yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -117,6 +117,8 @@ ninseff = 0;
       delete syseffsendwindow;
       panelwindow->hide();
       delete panelwindow;
+      widepanelwindow->hide();
+      delete widepanelwindow;
       if (microtonalui)
       {
         microtonalui->Hide();
@@ -467,7 +469,11 @@ ninseff = 0;
         }
         Fl_Button {} {
           label Panel
-          callback {updatepanel(); panelwindow->show();}
+          callback {updatepanel();
+if (widepanel)
+   widepanelwindow->show();
+else
+    panelwindow->show();}
           tooltip {Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
@@ -804,8 +810,8 @@ ZynAddSubFX}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Panel} open
-      xywh {572 20 550 675} type Double labelfont 13 labelsize 13 visible
+      label {Yoshimi Panel 2 x 8} open
+      xywh {4 20 550 675} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Pack {} {open
         xywh {8 10 533 286} type HORIZONTAL
@@ -830,7 +836,7 @@ ZynAddSubFX}
               }}
         code1 {o->spacing(-3);}
       } {}
-      Fl_Box {} {selected
+      Fl_Box {} {
         xywh {-4 632 563 7} box THIN_DOWN_BOX
       }
       Fl_Button {} {
@@ -843,6 +849,45 @@ ZynAddSubFX}
         callback {updatepanel();}
         xywh {414 645 55 25} box THIN_UP_BOX labelsize 13
       }
+      Fl_Button {} {
+        label {1 x 16}
+        callback {widepanel = true;
+widepanelwindow->show();
+panelwindow->hide();}
+        xywh {345 645 55 25} box THIN_UP_BOX labelsize 13
+      }
+    }
+    Fl_Window widepanelwindow {
+      label {Yoshimi Panel 1 x 16} open selected
+      xywh {4 91 1085 345} type Double labelfont 13 labelsize 13 hide
+    } {
+      Fl_Pack {} {open
+        xywh {8 10 1066 286} type HORIZONTAL
+        code0 {//
+            for (int i = 0; i < NUM_MIDI_PARTS; i++)
+            {
+                panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+                panellistitem[i]->init(i, bankui, synth);
+            }}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Button {} {
+        label Close
+        callback {panelwindow->hide(); updatepanel();}
+        xywh {1017 314 55 25} box THIN_UP_BOX labelsize 13
+      }
+      Fl_Button {} {
+        label Refresh
+        callback {updatepanel();}
+        xywh {949 314 55 25} box THIN_UP_BOX labelsize 13
+      }
+      Fl_Button {} {
+        label {2 x 8}
+        callback {widepanel = false;
+panelwindow->show();
+widepanelwindow->hide();}
+        xywh {883 314 55 25} box THIN_UP_BOX labelsize 13
+      }
     }
   }
   Function {updatesendwindow()} {open
@@ -852,7 +897,8 @@ ZynAddSubFX}
             for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
                 syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);} {}
   }
-  Function {updatepanel()} {} {
+  Function {updatepanel()} {open
+  } {
     code {//
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
        {
@@ -1051,5 +1097,7 @@ ZynAddSubFX}
   decl {SynthEngine *synth;} {private local
   }
   decl {string panelwindowlabel} {private local
+  }
+  decl {bool widepanel;} {private local
   }
 } 
