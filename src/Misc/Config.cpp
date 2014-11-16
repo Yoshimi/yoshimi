@@ -110,6 +110,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     midi_bank_C(0),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(0),
+    single_row_panel(0),
     deadObjects(NULL),
     nextHistoryIndex(numeric_limits<unsigned int>::max()),
     sigIntActive(0),
@@ -436,6 +437,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 14, 128);
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
+    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
 
     if (xml->enterbranch("XMZ_HISTORY"))
     {
@@ -518,6 +520,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
+    xmltree->addpar("single_row_panel", single_row_panel);
 
     // Parameters history
     if (ParamsHistory.size())

@@ -18,6 +18,8 @@ yoshimi-1.2.x
   yoshimi lv2 plugin settings works.
 - Added per instance ability to change panel window between 2x8 or 1x16.
   Haven't decided on best way to store setting.
+- Fixed bug in wide panel window
+- panel settings saved to yoshimi.config
 
 yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:

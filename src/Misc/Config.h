@@ -132,6 +132,7 @@ class Config : public MiscFuncs
         unsigned int  midi_bank_C;
         unsigned int  midi_upper_voice_C;
         int           enable_part_on_voice_load;
+        int           single_row_panel;
 
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;

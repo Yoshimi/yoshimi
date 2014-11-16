@@ -470,7 +470,7 @@ ninseff = 0;
         Fl_Button {} {
           label Panel
           callback {updatepanel();
-if (widepanel)
+if (synth->getRuntime().single_row_panel)
    widepanelwindow->show();
 else
     panelwindow->show();}
@@ -851,14 +851,14 @@ ZynAddSubFX}
       }
       Fl_Button {} {
         label {1 x 16}
-        callback {widepanel = true;
+        callback {synth->getRuntime().single_row_panel = 1;
 widepanelwindow->show();
 panelwindow->hide();}
         xywh {345 645 55 25} box THIN_UP_BOX labelsize 13
       }
     }
     Fl_Window widepanelwindow {
-      label {Yoshimi Panel 1 x 16} open selected
+      label {Yoshimi Panel 1 x 16} open
       xywh {4 91 1085 345} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Pack {} {open
@@ -873,7 +873,7 @@ panelwindow->hide();}
       } {}
       Fl_Button {} {
         label Close
-        callback {panelwindow->hide(); updatepanel();}
+        callback {widepanelwindow->hide(); updatepanel();}
         xywh {1017 314 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
@@ -883,9 +883,9 @@ panelwindow->hide();}
       }
       Fl_Button {} {
         label {2 x 8}
-        callback {widepanel = false;
+        callback {synth->getRuntime().single_row_panel = 0;
 panelwindow->show();
-widepanelwindow->hide();}
+widepanelwindow->hide();} selected
         xywh {883 314 55 25} box THIN_UP_BOX labelsize 13
       }
     }
@@ -1097,7 +1097,5 @@ widepanelwindow->hide();}
   decl {SynthEngine *synth;} {private local
   }
   decl {string panelwindowlabel} {private local
-  }
-  decl {bool widepanel;} {private local
   }
 } 
