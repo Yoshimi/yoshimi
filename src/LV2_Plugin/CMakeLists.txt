@@ -1,7 +1,8 @@
 file (GLOB yoshimi_lv2_plugin_files
         YoshimiLV2Plugin.cpp
         YoshimiLV2Plugin.h
-        lv2extui.h)
+        lv2extui.h
+        lv2extprg.h)
 file (GLOB yoshimi_dsp_files
     ../DSP/FFTwrapper.cpp  ../DSP/AnalogFilter.cpp  ../DSP/FormantFilter.cpp
     ../DSP/SVFilter.cpp  ../DSP/Filter.cpp  ../DSP/Unison.cpp
@@ -57,6 +58,8 @@ set (GuiFluids
 
 fltk_wrap_ui (yoshimi_lv2 ${GuiFluids})
 set_source_files_properties (../UI/MasterUI.h PROPERTIES GENERATED 1)
+
+add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
 
 add_library (yoshimi_lv2 MODULE
             ${yoshimi_lv2_plugin_files}

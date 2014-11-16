@@ -55,6 +55,8 @@ typedef struct _Yoshimi_LV2_Options_Option {
  const void*         value;    /**< Pointer to value (object). */
 } Yoshimi_LV2_Options_Option;
 
+using namespace std;
+
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
     uint real_sample_count = min(sample_count, _bufferSize);
@@ -283,6 +285,219 @@ void *YoshimiLV2Plugin::idleThread()
     return NULL;
 }
 
+
+bool YoshimiLV2Plugin::chkBankDup(const list<bankstruct_t> &bank_dir_list, string alias)
+{
+    list<bankstruct_t>::const_iterator x;
+    for(x = bank_dir_list.begin(); x != bank_dir_list.end(); ++x)
+    {
+        if (alias == (*x).alias)
+            return true;
+    }
+    return false;
+}
+
+void YoshimiLV2Plugin::addBankPrg(list<bankstruct_t> &bank_dir_list, string name, string dir)
+{
+    bankstruct_t newbank = { name, name, dir };
+    while (chkBankDup(bank_dir_list, newbank.alias))
+        newbank.alias += " *";
+    bank_dir_list.push_back(newbank);
+
+}
+
+void YoshimiLV2Plugin::addtobank(uint32_t banknum, string bankname, bool bank_instrument [BANK_SIZE], int pos, string prgname)
+{
+    if (pos >= 0 && pos < BANK_SIZE)
+    {
+        if (bank_instrument[pos])
+            pos = -1; // force it to find a new free position
+    }
+    else if (pos >= BANK_SIZE)
+        pos = -1;
+
+    if (pos < 0)
+    {   //find a free position
+        for (int i = BANK_SIZE - 1; i >= 0; i--)
+            if (!bank_instrument[i])
+            {
+                pos = i;
+                break;
+            }
+    }
+    if (pos < 0)
+        return; // the bank is full
+
+    bank_instrument[pos] = true;
+    unsigned char _newpos = pos;
+    LV2_Program_Descriptor bankprg = {banknum, _newpos, strdup((bankname + string(". ") + prgname).c_str())};
+    flatbankprgs.push_back(bankprg);
+}
+
+void YoshimiLV2Plugin::scanBankPrg()
+{
+    flatbankprgs.clear();
+    bool bank_instrument[BANK_SIZE];
+    set<string, less<string> > bankroots;
+    list<bankstruct_t> bank_dir_list;
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        if (!synth->getRuntime().bankRootDirlist[i].empty())
+            bankroots.insert(synth->getRuntime().bankRootDirlist[i]);
+    bank_dir_list.clear();
+    string xizext = ".xiz";
+    string force_bank_dir_file = ".bankdir"; // if this file exists in a directory, the
+                                    // directory is considered a bank, even if
+                                    // it doesn't contain an instrument file
+    set<string, less<string> >::iterator dxr;
+    for (dxr = bankroots.begin(); dxr != bankroots.end(); ++dxr)
+    {
+        string rootdir = *dxr;
+        //scanrootdir(*dxr);
+        if (rootdir.empty() || !isDirectory(rootdir))
+            continue;
+        DIR *dir = opendir(rootdir.c_str());
+        if (dir == NULL)
+        {
+            synth->getRuntime().Log("No such directory, root bank entry: " + rootdir);
+            continue;
+        }
+        struct dirent *fn;
+        struct stat st;
+        size_t xizpos;
+        while ((fn = readdir(dir)))
+        {
+            string candidate = string(fn->d_name);
+            if (candidate == "." || candidate == "..")
+                continue;
+            string chkdir = rootdir;
+            if (chkdir.at(chkdir.size() - 1) != '/')
+                chkdir += "/";
+            chkdir += candidate;
+            lstat(chkdir.c_str(), &st);
+            if (!S_ISDIR(st.st_mode))
+                continue;
+            // check if directory contains an instrument or .bankdir
+            DIR *d = opendir(chkdir.c_str());
+            if (d == NULL)
+            {
+                synth->getRuntime().Log("Failed to open bank directory candidate: " + chkdir);
+                continue;
+            }
+            struct dirent *fname;
+            int idx;
+            char x;
+            while ((fname = readdir(d)))
+            {
+                string possible = string(fname->d_name);
+                if (possible == "." || possible == "..")
+                    continue;
+                if (possible == force_bank_dir_file)
+                {   // .bankdir file exists, so add the bank
+                    addBankPrg(bank_dir_list, candidate, chkdir);
+                    break;
+                }
+                if (possible.size() <= (xizext.size() + 5))
+                    continue;
+                // check for an instrument starting with "NNNN-" prefix
+                for (idx = 0; idx < 4; ++idx)
+                {
+                    x = possible.at(idx);
+                    if (x < '0' || x > '9')
+                        break;
+                }
+                if (idx < 4 || possible.at(idx) != '-')
+                    continue;
+                {
+                    string chkpath = chkdir + possible;
+                    lstat(chkpath.c_str(), &st);
+                    if (st.st_mode & (S_IFREG | S_IRGRP))
+                    {
+                        // check for .xiz extension
+                        if ((xizpos = possible.rfind(xizext)) != string::npos)
+                        {
+                            if (xizext.size() == (possible.size() - xizpos))
+                            {   // is an instrument, so add the bank
+                                addBankPrg(bank_dir_list, candidate, chkdir);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            closedir(d);
+        }
+        closedir(dir);
+    }
+
+    bank_dir_list.sort(Bank::bankCmp);
+    list<bankstruct_t>::iterator x;
+    uint32_t idx = 1;
+    for(x = bank_dir_list.begin(); x != bank_dir_list.end() && idx < MAX_NUM_BANKS; ++x, idx++)
+    {
+        DIR *dir = opendir((*x).dir.c_str());
+        if (dir == NULL)
+        {
+            synth->getRuntime().Log("Failed to open bank directory " + (*x).dir);
+            continue;
+        }
+        struct dirent *fn;
+        struct stat st;
+        string chkpath;
+        string candidate;
+        size_t xizpos;
+        for(int i = 0; i < BANK_SIZE; ++i)
+        {
+            bank_instrument [i] = false;
+        }
+        while ((fn = readdir(dir)))
+        {
+            candidate = string(fn->d_name);
+            if (candidate == "."
+                || candidate == ".."
+                || candidate.size() <= (xizext.size() + 5))
+                continue;
+            chkpath = (*x).dir;
+            if (chkpath.at(chkpath.size() - 1) != '/')
+                chkpath += "/";
+            chkpath += candidate;
+            lstat(chkpath.c_str(), &st);
+            if (S_ISREG(st.st_mode))
+            {
+                if ((xizpos = candidate.rfind(xizext)) != string::npos)
+                {
+                    if (xizext.size() == (candidate.size() - xizpos))
+                    {
+                        // just NNNN-<name>.xiz files please
+                        // sa verific daca e si extensia dorita
+
+                        // sorry Cal. They insisted :(
+
+                        int chk = 0;
+                        char ch = candidate.at(chk);
+                        while (ch >= '0' and ch <= '9' and chk < 4){
+                            chk += 1;
+                            ch = candidate.at(chk);
+                        }
+                        if (ch == '-')
+                        {
+                            int instnum = string2int(candidate.substr(0, 4));
+                            // remove "NNNN-" and .xiz extension for instrument name
+                            string instname = candidate.substr(5, candidate.size() - xizext.size() - 5);
+                            addtobank(idx, (*x).name, bank_instrument, instnum - 1, instname);
+                        }
+                        else
+                        {
+                            string instname = candidate.substr(0, candidate.size() -  xizext.size());
+                            addtobank(idx, (*x).name, bank_instrument, -1, instname);
+                        }
+                    }
+                }
+            }
+        }
+        closedir(dir);
+    }
+}
+
 YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features):
     MusicIO(synth),
     _synth(synth),
@@ -298,6 +513,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _pMidiThread(0),
     _pIdleThread(0)
 {
+    flatbankprgs.clear();
     _uridMap.handle = NULL;
     _uridMap.map = NULL;
     const LV2_Feature *f = NULL;
@@ -387,6 +603,8 @@ bool YoshimiLV2Plugin::init()
     }
 
     _synth->Init(_sampleRate, _bufferSize);
+
+    _synth->getRuntime().showGui = false;
 
     memset(lv2Left, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(lv2Right, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
@@ -494,15 +712,25 @@ LV2_Worker_Interface yoshimi_wrk_iface =
 };
 */
 
+LV2_Programs_Interface yoshimi_prg_iface =
+{
+    YoshimiLV2Plugin::static_GetProgram,
+    NULL,
+    YoshimiLV2Plugin::static_SelectProgram
+};
+
 const void *YoshimiLV2Plugin::extension_data(const char *uri)
 {
     static const LV2_State_Interface state_iface = { YoshimiLV2Plugin::static_StateSave, YoshimiLV2Plugin::static_StateRestore };
     if (!strcmp(uri, LV2_STATE__interface))
     {
-        return &state_iface;
+        return static_cast<const void *>(&state_iface);
+
     }
-    /*if(strcmp(uri, LV2_WORKER__interface) == 0)
-        return static_cast<const void *>(&yoshimi_wrk_iface);*/
+    else if(strcmp(uri, LV2_PROGRAMSNEW__Interface) == 0)
+    {
+        return static_cast<const void *>(&yoshimi_prg_iface);
+    }
 
     return NULL;
 }
@@ -539,6 +767,38 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     return LV2_STATE_SUCCESS;
 }
 
+const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
+{
+    if(flatbankprgs.empty())
+    {
+        scanBankPrg();
+    }
+
+    if(index >= flatbankprgs.size())
+    {
+        for(size_t i = 0; i < flatbankprgs.size(); ++i)
+        {
+            if(flatbankprgs [i].name != NULL)
+            {
+                free(const_cast<char *>(flatbankprgs [i].name));
+            }
+        }
+        flatbankprgs.clear();
+        return NULL;
+    }
+
+    return &flatbankprgs [index];
+}
+
+void YoshimiLV2Plugin::selectProgram(unsigned char channel, uint32_t bank, uint32_t program)
+{
+    bool isFreeWheel = false;
+    if(_bFreeWheel && *_bFreeWheel == 1)
+        isFreeWheel = true;
+    setMidiBank((short)bank, isFreeWheel);
+    setMidiProgram(channel, program, isFreeWheel);
+}
+
 void *YoshimiLV2Plugin::static_midiThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->midiThread();
@@ -557,6 +817,16 @@ LV2_State_Status YoshimiLV2Plugin::static_StateSave(LV2_Handle instance, LV2_Sta
 LV2_State_Status YoshimiLV2Plugin::static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
     return static_cast<YoshimiLV2Plugin *>(instance)->stateRestore(retrieve, handle, flags, features);
+}
+
+const LV2_Program_Descriptor *YoshimiLV2Plugin::static_GetProgram(LV2_Handle handle, uint32_t index)
+{
+    return static_cast<YoshimiLV2Plugin *>(handle)->getProgram(index);
+}
+
+void YoshimiLV2Plugin::static_SelectProgram(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program)
+{
+    return static_cast<YoshimiLV2Plugin *>(handle)->selectProgram(channel, bank, program);
 }
 
 /*
