@@ -7,15 +7,16 @@
 #include "lv2/lv2plug.in/ns/ext/urid/urid.h"
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
 #include "lv2extui.h"
+#include "lv2extprg.h"
 
 #include <string>
+#include <vector>
 #include <semaphore.h>
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
 
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicIO.h"
-
 
 class YoshimiLV2Plugin : public MusicIO
 {
@@ -51,6 +52,11 @@ private:
    void processMidiMessage(const uint8_t *msg);
    void *midiThread(void);
    void *idleThread(void);
+   std::vector <LV2_Program_Descriptor> flatbankprgs;
+   bool chkBankDup(const list<bankstruct_t> &bank_dir_list, string alias);
+   void addBankPrg(list<bankstruct_t> &bank_dir_list, string name, string dir);
+   void addtobank(uint32_t banknum, string bankname, bool bank_instrument[], int pos, string prgname);
+   void scanBankPrg();
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
@@ -74,11 +80,22 @@ public:
    LV2_State_Status stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
    LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
 
+   const LV2_Program_Descriptor * getProgram(uint32_t index);
+   void selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program);
+
    static void *static_midiThread(void *arg);
    static void *static_idleThread(void *arg);   
 
    static LV2_State_Status static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
    static LV2_State_Status static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
+
+   static const LV2_Program_Descriptor * static_GetProgram(LV2_Handle handle, uint32_t index);
+   static void static_SelectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program);
+   static void static_SelectProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
+   {
+       static_SelectProgramNew(handle, 0, bank, program);
+   }
+
    /*
    static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
    static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);

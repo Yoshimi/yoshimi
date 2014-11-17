@@ -46,6 +46,9 @@ class SynthEngine;
 
 class Bank : private MiscFuncs
 {
+#ifdef YOSHIMI_LV2_PLUGIN
+    friend class YoshimiLV2Plugin;
+#endif
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
