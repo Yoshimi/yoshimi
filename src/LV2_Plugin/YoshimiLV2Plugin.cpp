@@ -733,6 +733,10 @@ const void *YoshimiLV2Plugin::extension_data(const char *uri)
     {
         return static_cast<const void *>(&yoshimi_prg_iface);
     }
+    else if(strcmp(uri, LV2_PROGRAMS__Interface) == 0)
+    {
+        return static_cast<const void *>(&yoshimi_prg_iface);
+    }
 
     return NULL;
 }
