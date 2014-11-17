@@ -911,8 +911,7 @@ widepanelwindow->hide();}
        {
           panellistitem[npart]->refresh();
           widepanellistitem[npart]->refresh();
-       }} {selected
-    }
+       }} {}
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -926,8 +925,9 @@ widepanelwindow->hide();}
         panelwindow->label(panelwindowlabel.c_str());
         panelwindow->changed();
         widepanelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16");
-        widepanelwindow->label(panelwindowlabel.c_str());
-        widepanelwindow->changed();} {}
+        widepanelwindow->label(widepanelwindowlabel.c_str());
+        widepanelwindow->changed();} {selected
+    }
   }
   Function {do_new_master()} {} {
     code {//
