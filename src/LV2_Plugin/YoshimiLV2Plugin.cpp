@@ -330,7 +330,9 @@ void YoshimiLV2Plugin::addtobank(uint32_t banknum, string bankname, bool bank_in
 
     bank_instrument[pos] = true;
     unsigned char _newpos = pos;
-    LV2_Program_Descriptor bankprg = {banknum, _newpos, strdup((bankname + string(". ") + prgname).c_str())};
+    stringstream ss;
+    ss << banknum  << "." << pos << ": " << prgname;
+    LV2_Program_Descriptor bankprg = {banknum - 1, _newpos, strdup(ss.str().c_str())};
     flatbankprgs.push_back(bankprg);
 }
 
@@ -715,8 +717,8 @@ LV2_Worker_Interface yoshimi_wrk_iface =
 LV2_Programs_Interface yoshimi_prg_iface =
 {
     YoshimiLV2Plugin::static_GetProgram,
-    NULL,
-    YoshimiLV2Plugin::static_SelectProgram
+    YoshimiLV2Plugin::static_SelectProgram,
+    YoshimiLV2Plugin::static_SelectProgramNew
 };
 
 const void *YoshimiLV2Plugin::extension_data(const char *uri)
@@ -790,7 +792,7 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
     return &flatbankprgs [index];
 }
 
-void YoshimiLV2Plugin::selectProgram(unsigned char channel, uint32_t bank, uint32_t program)
+void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program)
 {
     bool isFreeWheel = false;
     if(_bFreeWheel && *_bFreeWheel == 1)
@@ -824,9 +826,9 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::static_GetProgram(LV2_Handle han
     return static_cast<YoshimiLV2Plugin *>(handle)->getProgram(index);
 }
 
-void YoshimiLV2Plugin::static_SelectProgram(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program)
+void YoshimiLV2Plugin::static_SelectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program)
 {
-    return static_cast<YoshimiLV2Plugin *>(handle)->selectProgram(channel, bank, program);
+    return static_cast<YoshimiLV2Plugin *>(handle)->selectProgramNew(channel, bank, program);
 }
 
 /*

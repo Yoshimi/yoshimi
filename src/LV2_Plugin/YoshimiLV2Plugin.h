@@ -81,7 +81,7 @@ public:
    LV2_State_Status stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
 
    const LV2_Program_Descriptor * getProgram(uint32_t index);
-   void selectProgram(unsigned char channel, uint32_t bank, uint32_t program);
+   void selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program);
 
    static void *static_midiThread(void *arg);
    static void *static_idleThread(void *arg);   
@@ -90,7 +90,12 @@ public:
    static LV2_State_Status static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
 
    static const LV2_Program_Descriptor * static_GetProgram(LV2_Handle handle, uint32_t index);
-   static void static_SelectProgram(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program);
+   static void static_SelectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program);
+   static void static_SelectProgram(LV2_Handle handle, uint32_t bank, uint32_t program)
+   {
+       static_SelectProgramNew(handle, 0, bank, program);
+   }
+
    /*
    static LV2_Worker_Status lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data);
    static LV2_Worker_Status lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body);
