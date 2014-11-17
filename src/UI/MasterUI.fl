@@ -442,7 +442,7 @@ ninseff = 0;
               vumeter->init(-1, synth);
               for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
               {
-              	if(panelwindow)              
+              	if(panelwindow or widepanelwindow)              
               	{
 	              	if(panellistitem[i]->partVUMeter)
 	              	{
@@ -785,7 +785,7 @@ ZynAddSubFX}
     }
     Fl_Window syseffsendwindow {
       label {System Effects Send}
-      xywh {175 338 120 250} type Double labelfont 13 labelsize 13 hide resizable
+      xywh {4 20 120 250} type Double labelfont 13 labelsize 13 hide resizable
     } {
       Fl_Scroll {} {
         xywh {0 45 120 170} box FLAT_BOX resizable
@@ -813,7 +813,7 @@ ZynAddSubFX}
       label {Yoshimi Panel 2 x 8} open
       xywh {4 20 550 675} type Double labelfont 13 labelsize 13 hide
     } {
-      Fl_Pack {} {open
+      Fl_Pack {} {
         xywh {8 10 533 286} type HORIZONTAL
         code0 {//
             for (int i = 0; i < NUM_MIDI_PARTS / 2; i++)
@@ -856,19 +856,22 @@ widepanelwindow->show();
 panelwindow->hide();}
         xywh {345 645 55 25} box THIN_UP_BOX labelsize 13
       }
+      Fl_Text_Display {} {
+        label {Change to :-}
+        xywh {225 645 25 25} box NO_BOX align 8
+      }
     }
     Fl_Window widepanelwindow {
       label {Yoshimi Panel 1 x 16} open
-      xywh {4 91 1085 345} type Double labelfont 13 labelsize 13 hide
+      xywh {4 20 1085 345} type Double labelfont 13 labelsize 13 hide
     } {
-      Fl_Pack {} {open
+      Fl_Pack {} {
         xywh {8 10 1066 286} type HORIZONTAL
         code0 {//
             for (int i = 0; i < NUM_MIDI_PARTS; i++)
             {
-                panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
-                panellistitem[i]->init(i, bankui, synth);
-            }}
+                widepanellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+        widepanellistitem[i]->init(i, bankui, synth);        }}
         code1 {o->spacing(-3);}
       } {}
       Fl_Button {} {
@@ -885,8 +888,12 @@ panelwindow->hide();}
         label {2 x 8}
         callback {synth->getRuntime().single_row_panel = 0;
 panelwindow->show();
-widepanelwindow->hide();} selected
+widepanelwindow->hide();}
         xywh {883 314 55 25} box THIN_UP_BOX labelsize 13
+      }
+      Fl_Text_Display {} {
+        label {Change to :-}
+        xywh {763 314 25 25} box NO_BOX align 8
       }
     }
   }
@@ -903,7 +910,9 @@ widepanelwindow->hide();} selected
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
        {
           panellistitem[npart]->refresh();
-       }} {}
+          widepanellistitem[npart]->refresh();
+       }} {selected
+    }
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -913,9 +922,12 @@ widepanelwindow->hide();} selected
             masterwindowlabel += (" : " + name);
         masterwindow->label(masterwindowlabel.c_str());
         masterwindow->changed();
-        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel");
+        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8");
         panelwindow->label(panelwindowlabel.c_str());
-        panelwindow->changed();} {}
+        panelwindow->changed();
+        widepanelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16");
+        widepanelwindow->label(panelwindowlabel.c_str());
+        widepanelwindow->changed();} {}
   }
   Function {do_new_master()} {} {
     code {//
@@ -1088,6 +1100,8 @@ widepanelwindow->hide();} selected
   }
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {private local
   }
+  decl {Panellistitem *widepanellistitem[NUM_MIDI_PARTS];} {private local
+  }
   decl {ConsoleUI *yoshiLog;} {private local
   }
   decl {string laststatefile;} {private local
@@ -1097,5 +1111,7 @@ widepanelwindow->hide();} selected
   decl {SynthEngine *synth;} {private local
   }
   decl {string panelwindowlabel} {private local
+  }
+  decl {string widepanelwindowlabel} {private local
   }
 } 
