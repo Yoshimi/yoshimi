@@ -743,7 +743,7 @@ class MasterUI {open : {private MiscFuncs}
     }
     Fl_Window aboutwindow {
       label {About Yoshimi} open
-      xywh {4 29 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
+      xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
         label {Yoshimi
@@ -809,6 +809,8 @@ ZynAddSubFX}
     Fl_Window panelwindow {
       label {Yoshimi Panel 2 x 8} open
       xywh {4 20 550 675} type Double labelfont 13 labelsize 13 hide
+      code0 {if (synth->getRuntime().single_row_panel)
+       Panelbox1->hide();}
     } {
       Fl_Pack Panelpack1 {
         xywh {8 10 533 286} type HORIZONTAL
@@ -821,7 +823,7 @@ ZynAddSubFX}
         code1 {o->spacing(-3);}
       } {}
       Fl_Box Panelbox1 {
-        xywh {-4 316 563 7} box THIN_DOWN_BOX
+        xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
       }
       Fl_Pack Panelpack2 {
         xywh {8 325 533 286} type HORIZONTAL
@@ -834,7 +836,7 @@ ZynAddSubFX}
         code1 {o->spacing(-3);}
       } {}
       Fl_Box PanelBox2 {
-        xywh {-4 632 563 7} box THIN_DOWN_BOX
+        xywh {-4 632 563 7} box THIN_DOWN_BOX deactivate
       }
       Fl_Button Panelclose {
         label Close
@@ -852,7 +854,7 @@ ZynAddSubFX}
             Panelbox1->hide();
             synth->getRuntime().single_row_panel = 1;
             updatepanel();}
-        xywh {285 645 116 25} box THIN_UP_BOX labelsize 13
+        xywh {283 645 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label {Change to 2 x 8}
@@ -860,7 +862,7 @@ ZynAddSubFX}
             synth->getRuntime().single_row_panel = 0;
             updatepanel();
             Panelbox1->show();}
-        xywh {824 314 116 25} box THIN_UP_BOX labelsize 13
+        xywh {821 314 116 25} box THIN_UP_BOX labelsize 13
       }
     }
   }
@@ -878,18 +880,23 @@ ZynAddSubFX}
             panellistitem[npart]->refresh();
         if (synth->getRuntime().single_row_panel)
         {
-        	panelwindow->resize(4,20,1085,345);
+        	panelwindow->size(1085,345);
 	        Panelpack2->position(544,10);
-	        Panelclose->position(1017,314);
-	        Panelrefresh->position(949,314);
+	        Panelclose->position(1018,314);
+	        Panelrefresh->position(950,314);
+	        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16 ");
         }
         else
         {
-	        panelwindow->resize(4,20,550,675);
+	        panelwindow->size(550,675);
 	        Panelpack2->position(8,325);
 	        Panelclose->position(482,645);
 	        Panelrefresh->position(414,645);
-        }} {}
+	       	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8 ");
+
+        }
+        panelwindow->label(panelwindowlabel.c_str());
+        panelwindow->changed();} {}
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -898,13 +905,8 @@ ZynAddSubFX}
         if (name.size())
             masterwindowlabel += (" : " + name);
         masterwindow->label(masterwindowlabel.c_str());
-        masterwindow->changed();
-        if (synth->getRuntime().single_row_panel)
-        	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16 ");
-        else
-        	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8 ");
-        panelwindow->label(panelwindowlabel.c_str());
-        panelwindow->changed();} {}
+        masterwindow->changed();} {selected
+    }
   }
   Function {do_new_master()} {} {
     code {//
@@ -1005,8 +1007,7 @@ ZynAddSubFX}
         microtonalui = new MicrotonalUI(&synth->microtonal);
         updatesendwindow();
         updatepanel();
-        bankui->Hide();} {selected
-    }
+        bankui->Hide();} {}
   }
   Function {strategicRetreat(void)} {} {
     code {fl_alert("Bad things happened,\\nYoshimi strategically retreats.");} {}
