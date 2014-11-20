@@ -398,6 +398,7 @@ void SynthEngine::SetBank(short banknum)
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
 {
+    bool partOK = false;
     if (bank.getname(pgm) < "!") // can't get a program name less than this
     {
         Runtime.Log("SynthEngine setProgram: No Program " + asString(pgm));
@@ -407,18 +408,29 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
         for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             if(chan == part[npart]->Prcvchn)
             {
-                bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
-                if (part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
+                partOK = bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
+                if (partOK and part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
+                {
                     partonoff(npart, 1);
+                    if (Runtime.showGui)
+                    {
+                        guiMaster->partui->partgroupui->activate();
+                        guiMaster->partui->partGroupEnable->value(1);
+                    }
+                }
+           }
+        if (partOK){
+            Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
+            // update UI
+            if (Runtime.showGui)
+            {
+                guiMaster->updatepanel();
+                if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
+                    guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
             }
-        Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
-        // update UI
-        if (Runtime.showGui)
-        {
-            guiMaster->updatepanel();
-            if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
-                guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
         }
+        else
+            Runtime.Log("SynthEngine setProgram: Invalid program");
     }
 }
 

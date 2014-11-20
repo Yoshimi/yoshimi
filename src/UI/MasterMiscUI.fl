@@ -70,7 +70,7 @@ decl {\#include "ParametersUI.h"} {public local
 decl {\#include "ConsoleUI.h"} {public local
 } 
 
-decl {\#include "MasterUI.h"} {selected private global
+decl {\#include "MasterUI.h"} {private global
 } 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
@@ -407,8 +407,8 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {1195 47 60 275} type Double
-      class Fl_Group visible
+      private xywh {1195 47 60 275} type Double hide
+      class Fl_Group
     } {
       Fl_Group panellistitemgroup {open
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
@@ -419,7 +419,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           xywh {42 64 16 112} box ENGRAVED_FRAME
         } {
           Fl_Box partVUMeter {
-            label {V U}
+            label {V U} selected
             xywh {43 65 14 110} box FLAT_BOX color 0 selection_color 75 labelcolor 55 align 128
             code0 {partVUMeter->init(npart, synth);}
             class VUMeter

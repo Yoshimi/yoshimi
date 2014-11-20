@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -412,7 +412,7 @@ Offset}
           class WidgetPDial
         }
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button partGroupEnable {
         label Enabled
         callback {//
             synth->actionLock(lockmute);
@@ -422,7 +422,7 @@ Offset}
                 partgroupui->deactivate();
             else
                 partgroupui->activate();
-            synth->getGuiMaster()->updatepanel();}
+            synth->getGuiMaster()->updatepanel();} selected
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled);}
       }
@@ -696,7 +696,7 @@ Offset}
           label {Proprt.}
           callback {part->ctl->portamento.proportional=(int) o->value();
 if(o->value()){propta->activate();proptb->activate();}
-else {propta->deactivate();proptb->deactivate();}} selected
+else {propta->deactivate();proptb->deactivate();}}
           tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {285 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if(o->value()){propta->activate();proptb->activate();}}

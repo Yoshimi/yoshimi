@@ -183,10 +183,13 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
 
 
 // Loads the instrument from the bank
-void Bank::loadfromslot(unsigned int ninstrument, Part *part)
+bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
 {
+    bool flag = false;
     if (!emptyslot(ninstrument))
-        part->loadXMLinstrument(bank_instrument[ninstrument].filename);
+        flag = part->loadXMLinstrument(bank_instrument[ninstrument].filename);
+
+    return flag;
 }
 
 
