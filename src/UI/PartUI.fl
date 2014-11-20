@@ -421,7 +421,8 @@ Offset}
             if (!part->Penabled)
                 partgroupui->deactivate();
             else
-                partgroupui->activate();}
+                partgroupui->activate();
+            synth->getGuiMaster()->updatepanel();}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled);}
       }

@@ -497,11 +497,10 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
             {
                 panellistitemgroup->activate();
                 if ((int)bankui->cbwig->value() != (npart + 1))
-                {
                     bankui->cbwig->value(npart + 1);
-                    bankui->cbwig->do_callback();
-                }
             }
+            if ((int)bankui->cbwig->value() == (npart + 1))
+                bankui->cbwig->do_callback();
             o->redraw();}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 24
         code0 {string tmp = asString(npart + 1);
