@@ -160,39 +160,40 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
     int par = 0;
     unsigned int ev;
     channel = msg[0] & 0x0F;
+    bool in_place = _bFreeWheel ? ((*_bFreeWheel == 0) ? false : true) : false;
     switch ((ev = msg[0] & 0xF0))
     {
         case 0x01: // modulation wheel or lever
             ctrltype = C_modwheel;
             par = msg[2];
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0x07: // channel volume (formerly main volume)
             ctrltype = C_volume;
             par = msg[2];
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0x0B: // expression controller
             ctrltype = C_expression;
             par = msg[2];
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0x78: // all sound off
             ctrltype = C_allsoundsoff;
-            setMidiController(channel, ctrltype, 0);
+            setMidiController(channel, ctrltype, 0, in_place);
             break;
 
         case 0x79: // reset all controllers
             ctrltype = C_resetallcontrollers;
-            setMidiController(channel, ctrltype, 0);
+            setMidiController(channel, ctrltype, 0, in_place);
             break;
 
         case 0x7B:  // all notes off
             ctrltype = C_allnotesoff;
-            setMidiController(channel, ctrltype, 0);
+            setMidiController(channel, ctrltype, 0, in_place);
             break;
 
         case 0x80: // note-off
@@ -211,19 +212,19 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
         case 0xB0: // controller
             ctrltype = getMidiController(msg[1]);
             par = msg[2];
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xC0: // program change
             ctrltype = C_programchange;
             par = msg[1];
-            setMidiProgram(channel, par);
+            setMidiProgram(channel, par, in_place);
             break;
 
         case 0xE0: // pitch bend
             ctrltype = C_pitchwheel;
             par = ((msg[2] << 7) | msg[1]) - 8192;
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xF0: // system exclusive

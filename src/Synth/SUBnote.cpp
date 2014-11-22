@@ -492,48 +492,46 @@ inline void SubFilterB(const float coeff[4], float &src, float work[4])
 //in quite a bit of wasted time
 void SUBnote::filter(bpfilter &filter, float *smps)
 {
-    //assert(synth->buffersize % 8 == 0); //too strict. make it selectable for arbitarary buffer sizes
-    //if this modifiction in wrong (I can't test all cases),
-    //please let me know: andrewderyabin@gmail.com
+    if(synth->getIsLV2Plugin()){
+        filterVarRun(filter, smps);
+        return;
+    }
+
+    assert(synth->buffersize % 8 == 0);
     float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
     float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
 
-    if(synth->p_buffersize % 8 == 0) {
-
-        for(int i = 0; i < synth->p_buffersize; i += 8) {
-            SubFilterA(coeff, smps[i + 0], work);
-            SubFilterB(coeff, smps[i + 1], work);
-            SubFilterA(coeff, smps[i + 2], work);
-            SubFilterB(coeff, smps[i + 3], work);
-            SubFilterA(coeff, smps[i + 4], work);
-            SubFilterB(coeff, smps[i + 5], work);
-            SubFilterA(coeff, smps[i + 6], work);
-            SubFilterB(coeff, smps[i + 7], work);
-        }
-        filter.xn1 = work[0];
-        filter.xn2 = work[1];
-        filter.yn1 = work[2];
-        filter.yn2 = work[3];
-
-        filterStep = 0;
+    for(int i = 0; i < synth->p_buffersize; i += 8) {
+        SubFilterA(coeff, smps[i + 0], work);
+        SubFilterB(coeff, smps[i + 1], work);
+        SubFilterA(coeff, smps[i + 2], work);
+        SubFilterB(coeff, smps[i + 3], work);
+        SubFilterA(coeff, smps[i + 4], work);
+        SubFilterB(coeff, smps[i + 5], work);
+        SubFilterA(coeff, smps[i + 6], work);
+        SubFilterB(coeff, smps[i + 7], work);
     }
-    else{
-        for(int i = 0; i < synth->p_buffersize; ++i){
-            if(filterStep % 2 == 0){
-                SubFilterA(coeff, smps [i], work);
-            }else{
-                SubFilterB(coeff, smps [i], work);
-            }
-            if(++filterStep > 7){
-                filterStep = 0;
-                filter.xn1 = work[0];
-                filter.xn2 = work[1];
-                filter.yn1 = work[2];
-                filter.yn2 = work[3];
-            }
+    filter.xn1 = work[0];
+    filter.xn2 = work[1];
+    filter.yn1 = work[2];
+    filter.yn2 = work[3];
+}
 
-        }
+//Andrew Deryabin: support for variable-length runs
+//currently only for lv2 plugin
+void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
+{
+    float tmpout;
+    for(int i = 0; i < synth->p_buffersize; ++i){
+        tmpout=smps[i] * filter.b0 + filter.b2 * filter.xn2
+               -filter.a1 * filter.yn1 - filter.a2 * filter.yn2;
+        filter.xn2=filter.xn1;
+        filter.xn1=smps[i];
+        filter.yn2=filter.yn1;
+        filter.yn1=tmpout;
+        smps[i]=tmpout;
     }
+
 }
 
 

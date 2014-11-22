@@ -108,6 +108,7 @@ class SUBnote : public Carcass, private SynthHelper
         float computerolloff(float freq);
         void computefiltercoefs(bpfilter &filter, float freq, float bw, float gain);
         void filter(bpfilter &filter, float *smps);
+        void filterVarRun(bpfilter &filter, float *smps);
 
         bpfilter *lfilter;
         bpfilter *rfilter;

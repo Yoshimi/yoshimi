@@ -153,7 +153,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         
         bool fetchMeterData(VUtransfer *VUdata);
 
-        bool getIsLV2Plugin() {return isLV2Plugin; }
+        inline bool getIsLV2Plugin() {return isLV2Plugin; }
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
