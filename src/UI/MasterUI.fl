@@ -199,7 +199,7 @@ class MasterUI {open : {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 390 460} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {349 56 390 460} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25} labelsize 13
@@ -481,11 +481,11 @@ class MasterUI {open : {private MiscFuncs}
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
                showInsEfxUI();} open
-        xywh {0 88 390 68} box PLASTIC_THIN_UP_BOX color 44 selection_color 41 labeltype NO_LABEL labelsize 12 align 5
+        xywh {3 88 380 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
-          label {System Efx}
-          xywh {0 116 390 40} color 51 selection_color 31 labelsize 11 labelcolor 33 align 20
+          label {System Effects} open selected
+          xywh {3 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
             label Effect
@@ -493,7 +493,7 @@ class MasterUI {open : {private MiscFuncs}
               nsyseff = o->value() - 1;
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
               syseffectui->refresh(synth->sysefx[nsyseff]);}
-            xywh {80 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textsize 11
+            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
           }
@@ -505,7 +505,7 @@ class MasterUI {open : {private MiscFuncs}
               synth->actionLock(unlock);
               syseffectui->refresh(synth->sysefx[nsyseff]);
               showSysEfxUI();} open
-            xywh {140 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
+            xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
             MenuItem {} {
@@ -548,12 +548,12 @@ class MasterUI {open : {private MiscFuncs}
           Fl_Button {} {
             label {Send to}
             callback {syseffsendwindow->show();}
-            xywh {266 127 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
+            xywh {260 127 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
           }
           Fl_Button {} {
             label C
             callback {presetsui->copy(synth->sysefx[nsyseff]);}
-            xywh {360 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {350 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
           Fl_Button {} {
             label P
@@ -561,12 +561,12 @@ class MasterUI {open : {private MiscFuncs}
               synth->actionLock(lockmute);
               presetsui->paste(synth->sysefx[nsyseff], syseffectui);
               synth->actionLock(unlock);}
-            xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
         Fl_Group InsertionEffectsGrp {
-          label {Insertion Efx}
-          xywh {2 116 386 40} color 51 selection_color 31 labelsize 11 labelcolor 33 align 20 hide
+          label {Insertion Effects} open
+          xywh {3 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
             label Effect
@@ -587,7 +587,7 @@ class MasterUI {open : {private MiscFuncs}
                 inseffectui->deactivate();
                 inseffectuigroup->deactivate();
               }}
-            xywh {80 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textsize 11
+            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
           }
@@ -600,7 +600,7 @@ class MasterUI {open : {private MiscFuncs}
               inseffectui->refresh(synth->insefx[ninseff]);
               //inseffectui->show();
               showInsEfxUI();}
-            xywh {126 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
+            xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           } {
@@ -642,7 +642,7 @@ class MasterUI {open : {private MiscFuncs}
             }
           }
           Fl_Choice inseffpart {
-            label To
+            label {To }
             callback {//
               synth->Pinsparts[ninseff] = o->value() - 2;
               if (o->value() == 1)
@@ -658,7 +658,7 @@ class MasterUI {open : {private MiscFuncs}
                 inseffectui->activate();
               }
               synth->insefx[ninseff]->cleanup();}
-            xywh {243 127 110 20} down_box BORDER_BOX labelsize 11 textsize 11
+            xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textsize 11
             code0 {o->add("Master Out");o->add("Off");}
             code1 {for (int i = 0; i < NUM_MIDI_PARTS; ++i)
               {
@@ -670,7 +670,7 @@ class MasterUI {open : {private MiscFuncs}
           Fl_Button {} {
             label C
             callback {presetsui->copy(synth->insefx[ninseff]);}
-            xywh {360 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {350 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
           Fl_Button {} {
             label P
@@ -678,7 +678,7 @@ class MasterUI {open : {private MiscFuncs}
               synth->actionLock(lockmute);
               presetsui->paste(synth->insefx[ninseff], inseffectui);
               synth->actionLock(unlock);}
-            xywh {360 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
       }
@@ -707,7 +707,7 @@ class MasterUI {open : {private MiscFuncs}
         xywh {1 255 387 172} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
-          xywh {3 255 384 170} box FLAT_BOX color 47
+          xywh {3 255 384 170} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
           class PartUI
@@ -905,8 +905,7 @@ ZynAddSubFX}
         if (name.size())
             masterwindowlabel += (" : " + name);
         masterwindow->label(masterwindowlabel.c_str());
-        masterwindow->changed();} {selected
-    }
+        masterwindow->changed();} {}
   }
   Function {do_new_master()} {} {
     code {//
