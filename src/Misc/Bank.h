@@ -61,7 +61,7 @@ class Bank : private MiscFuncs
         bool emptyslot(unsigned int ninstrument);
         void clearslot(unsigned int ninstrument);
         void savetoslot(unsigned int ninstrument, Part *part);
-        void loadfromslot(unsigned int ninstrument, Part *part);
+        bool loadfromslot(unsigned int ninstrument, Part *part);
         void swapslot(unsigned int n1, unsigned int n2);
         bool loadbank(string bankdirname);
         bool newbank(string newbankdirname);
