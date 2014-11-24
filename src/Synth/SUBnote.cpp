@@ -522,7 +522,30 @@ void SUBnote::filter(bpfilter &filter, float *smps)
 void SUBnote::filterVarRun(SUBnote::bpfilter &filter, float *smps)
 {
     float tmpout;
-    for(int i = 0; i < synth->p_buffersize; ++i){
+    int runLength = synth->p_buffersize;
+    int i = 0;
+    if(runLength >= 8){
+        float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
+        float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
+        while(runLength >= 8){
+            SubFilterA(coeff, smps[i + 0], work);
+            SubFilterB(coeff, smps[i + 1], work);
+            SubFilterA(coeff, smps[i + 2], work);
+            SubFilterB(coeff, smps[i + 3], work);
+            SubFilterA(coeff, smps[i + 4], work);
+            SubFilterB(coeff, smps[i + 5], work);
+            SubFilterA(coeff, smps[i + 6], work);
+            SubFilterB(coeff, smps[i + 7], work);
+            i += 8;
+            runLength -= 8;
+        }
+        filter.xn1 = work[0];
+        filter.xn2 = work[1];
+        filter.yn1 = work[2];
+        filter.yn2 = work[3];
+    }
+
+    for(; i < synth->p_buffersize; ++i){
         tmpout=smps[i] * filter.b0 + filter.b2 * filter.xn2
                -filter.a1 * filter.yn1 - filter.a2 * filter.yn2;
         filter.xn2=filter.xn1;
