@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -167,12 +167,20 @@ class MasterUI {open : {private MiscFuncs}
       yoshiLog = new ConsoleUI();
       yoshiLog->setLabel(_label);
       make_window();
-      setMasterLabel(synth->getRuntime().paramsLoad);
+      if(synth->getIsLV2Plugin())
+      {
+      	masterwindow->label(_label);
+      }
+      else
+      {
+	setMasterLabel(synth->getRuntime().paramsLoad);
+      }
       masterwindow->show();
       if (synth->getRuntime().showConsole)
         yoshiLog->Show();
       else
-          yoshiLog->Hide();} {}
+          yoshiLog->Hide();} {selected
+    }
   }
   Function {make_window()} {open
   } {
@@ -484,7 +492,7 @@ class MasterUI {open : {private MiscFuncs}
         xywh {3 88 380 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
-          label {System Effects} open selected
+          label {System Effects} open
           xywh {3 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
