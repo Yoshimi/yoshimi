@@ -513,9 +513,9 @@ void *AlsaEngine::MidiThread(void)
                     synth->getRuntime().Log("Alsa midi port disconnected");
                     break;
 
-                default:
-                    synth->getRuntime().Log("Other non-handled midi event, type: "
-                                + asString((int)event->type));
+                default:// commented out some progs spam us :(
+                    /* synth->getRuntime().Log("Other non-handled midi event, type: "
+                                + asString((int)event->type));*/
                     break;
             }
             snd_seq_free_event(event);

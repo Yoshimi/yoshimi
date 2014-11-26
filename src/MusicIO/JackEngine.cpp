@@ -580,8 +580,8 @@ void *JackEngine::midiThread(void)
             case 0xF0: // system exclusive
                 break;
 
-            default: // wot, more?
-                synth->getRuntime().Log("other event: " + asString((int)ev));
+            default: // wot, more? commented out some progs spam us :(
+                // synth->getRuntime().Log("other event: " + asString((int)ev));
                 break;
         }
     }

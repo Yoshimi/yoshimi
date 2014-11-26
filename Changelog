@@ -1,6 +1,6 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
-yoshimi-1.2.x
+yoshimi-1.3.0-rc
 - Just a few GUI improvements
 - Made support for variable length runs. This provides sample-accurate midi processing
   for offline rendering and lv2 plugin.
@@ -22,6 +22,7 @@ yoshimi-1.2.x
 - panel settings saved to yoshimi.config.
 - patch provided by xnakos fixes part enable sync between panel and main window.
   This revealed it wasn't done properly for MIDI so that's been added too. 
+- removed spammy default midi messages
 
 yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:
