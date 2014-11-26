@@ -28,16 +28,6 @@ using namespace std;
 #include "Synth/BodyDisposal.h"
 #include <map>
 
-#ifdef YOSHIMI_CMDLINE_INTERFACE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <vector>
-#include <string>
-#include <sstream>
-static int cmdLineFifoFD = 0;
-#endif
-
 std::map<SynthEngine *, MusicClient *> synthInstances;
 
 static SynthEngine *firstSynth = NULL;
@@ -145,146 +135,12 @@ bail_out:
     return false;
 }
 
-#ifdef YOSHIMI_CMDLINE_INTERFACE
-
-void *cmdLineThread(void *arg)
-{
-    std::map<SynthEngine *, MusicClient *>::iterator it;
-    bool working = true;
-    if(mkfifo(YOSHIMI_CMDLINE_FIFO_NAME, 0666) != 0)
-    {
-        firstRuntime->Log("Can't create fifo file for cmdline access", true);
-        working = false;
-    }
-    cmdLineFifoFD = open(YOSHIMI_CMDLINE_FIFO_NAME, O_RDWR);
-    if(cmdLineFifoFD == -1)
-    {
-        firstRuntime->Log("Can't open fifo file for cmdline access", true);
-        working = false;
-    }
-
-    if(working)
-    {
-        while(firstRuntime->runSynth)
-        {
-            char buf[4096];
-            memset(buf, 0, sizeof(buf));
-            read(cmdLineFifoFD, buf, sizeof(buf));
-            printf("Received: %s\n", buf);
-            istringstream iss(buf);
-            vector<string> vals;
-            copy(istream_iterator<string>(iss),
-                 istream_iterator<string>(),
-                 back_inserter(vals));
-            size_t sz = vals.size();
-            if(sz > 0)
-            {
-                if(vals.at(0) == "noteon" && vals.size() >= 5)
-                {
-                    int instnum = atoi(vals.at(1).c_str());
-                    int ch = atoi(vals.at(2).c_str());
-                    int note = atoi(vals.at(3).c_str());
-                    int vel = atoi(vals.at(4).c_str());
-
-                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                    {
-                        SynthEngine *_synth = it->first;
-                        if(_synth->getUniqueId() == (size_t)instnum)
-                        {
-                            _synth->NoteOn(ch, note, vel);
-                            break;
-                        }
-                    }
-
-                }
-                else if(vals.at(0) == "noteoff" && vals.size() >= 4)
-                {
-                    int instnum = atoi(vals.at(1).c_str());
-                    int ch = atoi(vals.at(2).c_str());
-                    int note = atoi(vals.at(3).c_str());
-                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                    {
-                        SynthEngine *_synth = it->first;
-                        if(_synth->getUniqueId() == (size_t)instnum)
-                        {
-                            _synth->NoteOff(ch, note);
-                            break;
-                        }
-                    }
-
-
-                }
-                else if(vals.at(0) == "controller" && vals.size() >= 5)
-                {
-                    int instnum = atoi(vals.at(1).c_str());
-                    int ch = atoi(vals.at(2).c_str());
-                    int type = atoi(vals.at(3).c_str());
-                    int par = atoi(vals.at(4).c_str());
-
-                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                    {
-                        SynthEngine *_synth = it->first;
-                        if(_synth->getUniqueId() == (size_t)instnum)
-                        {
-                            _synth->SetController(ch, type, par);
-                            break;
-                        }
-                    }
-                }
-                else if(vals.at(0) == "bank" && vals.size() >= 3)
-                {
-                    int instnum = atoi(vals.at(1).c_str());
-                    int banknum = atoi(vals.at(2).c_str());
-
-                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                    {
-                        SynthEngine *_synth = it->first;
-                        if(_synth->getUniqueId() == (size_t)instnum)
-                        {
-                            _synth->SetBank(banknum);
-                            break;
-                        }
-                    }
-                }
-                else if(vals.at(0) == "program" && vals.size() >= 4)
-                {
-                    int instnum = atoi(vals.at(1).c_str());
-                    int ch = atoi(vals.at(2).c_str());
-                    int prg = atoi(vals.at(3).c_str());
-
-                    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-                    {
-                        SynthEngine *_synth = it->first;
-                        if(_synth->getUniqueId() == (size_t)instnum)
-                        {
-                            _synth->SetProgram(ch,prg);
-                            break;
-                        }
-                    }
-                }
-
-            }
-        }
-    }
-
-    if(cmdLineFifoFD != -1)
-        close(cmdLineFifoFD);
-    unlink(YOSHIMI_CMDLINE_FIFO_NAME);
-
-    return NULL;
-
-}
-#endif
-
 int main(int argc, char *argv[])
 {
     globalArgc = argc;
     globalArgv = argv;
     bool bExitSuccess = false;
     bool bGuiWait = false;
-#ifdef YOSHIMI_CMDLINE_INTERFACE
-    pthread_t pCmdLine = 0;
-#endif
     //MasterUI *guiMaster = NULL;
     //MusicClient *musicClient = NULL;    
     std::map<SynthEngine *, MusicClient *>::iterator it;
@@ -314,13 +170,6 @@ int main(int argc, char *argv[])
         firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
 
     bGuiWait = firstRuntime->showGui;
-#ifdef YOSHIMI_CMDLINE_INTERFACE
-    if(!firstRuntime->startThread(&pCmdLine, cmdLineThread, 0, false, 0, false))
-    {
-        pCmdLine = 0;
-        firstRuntime->Log("Can't start cmd line thread!", true);
-    }
-#endif
 
     while (firstSynth->getRuntime().runSynth)
     {
@@ -372,15 +221,6 @@ int main(int argc, char *argv[])
 
     cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
-#ifdef YOSHIMI_CMDLINE_INTERFACE
-    if(pCmdLine != 0)
-    {
-        void *vRet = NULL;
-        if(cmdLineFifoFD != -1)
-            write(cmdLineFifoFD, "close", 6);
-        pthread_join(pCmdLine, &vRet);
-    }
-#endif
 
 bail_out:    
     for(it = synthInstances.begin(); it != synthInstances.end(); ++it)

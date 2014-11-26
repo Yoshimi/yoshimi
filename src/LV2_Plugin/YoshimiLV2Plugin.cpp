@@ -947,7 +947,7 @@ void YoshimiLV2PluginUI::run()
     {
         for (int i = 0; !_plugin->_synth->getRuntime().LogList.empty() && i < 5; ++i)
         {
-            _plugin->_synth->getGuiMaster()->Log(_plugin->_synth->getRuntime().LogList.front());
+            _masterUI->Log(_plugin->_synth->getRuntime().LogList.front());
             _plugin->_synth->getRuntime().LogList.pop_front();
         }
         Fl::check();
