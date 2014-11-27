@@ -66,7 +66,7 @@ option (BuildForDebug "Include gdb debugging support" OFF)
 option (ReportErrorsToConsole "Show errors in console window" ON)
 
 #option to build lv2 plugin
-option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" OFF)
+option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
 set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
 

@@ -1,6 +1,8 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
 yoshimi-1.3.0-rc
+- Made LV2 plugin ON by default
+- Removed command line control. The reason: useless, not thread-safe code
 - Just a few GUI improvements
 - Made support for variable length runs. This provides sample-accurate midi processing
   for offline rendering and lv2 plugin.
@@ -11,6 +13,7 @@ yoshimi-1.3.0-rc
 - replaced all calls to lrint() with (int)truncf(). When fesetround(FE_TOWARDZERO)
   was called, lrintf() behaves exactly as (int)truncf() with that difference, that
   (int)truncf() returns always the same result not depending on external factors.
+- Made command line control for yoshimi instances (OFF by default)
 - Added error message if midi bank changs too close
 - Ported portamento rate and depth to controllers from Zyn.
 - Added state interface support for lv2 interface. now saving/restoring

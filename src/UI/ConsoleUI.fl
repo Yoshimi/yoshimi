@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
@@ -77,7 +77,7 @@ class ConsoleUI {open
   Function {setLabel(const char *_label)} {open return_type void
   } {
     code {logConsole->copy_label((string(_label)
-                              + string(" console")).c_str());} {selected
+                              + string(" reports")).c_str());} {selected
     }
   }
   decl {Fl_Text_Buffer *txtbuf;} {private local
