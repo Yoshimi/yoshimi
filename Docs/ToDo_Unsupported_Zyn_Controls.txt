@@ -1,0 +1,8 @@
+Reverb
+    Type - Bandwidth
+    Activates - bw control
+
+Phaser
+    switches - hyp.  Analog
+    control - Dist
+    selections - Aphaser 1 to 6
