@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -108,17 +108,27 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
   Function {refresh()} {open
   } {
     code {if (bank->emptyslot(nslot))
-        {
+    {
+        if (nslot < 128)
             color(46);
-        } else {
-            if (bank->isPADsynth_used(nslot))
-                color(126);
-		else
-            color(51);
+        else
+            color(16);
+    }
+    else
+    {
+        if (bank->isPADsynth_used(nslot))
+            color(126);
+	else
+	{
+            if (nslot < 128)
+                color(51);
+            else
+                color(17);
         }
-        if (*nselected == nslot)
-            color(6);
-        label(bank->getnamenumbered(nslot).c_str());} {}
+    }
+    if (*nselected == nslot)
+        color(6);
+    label(bank->getnamenumbered(nslot).c_str());} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
@@ -134,7 +144,7 @@ class BankUI {open : {public BankProcess_}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {614 427 785 575} type Double hide
+      xywh {22 107 785 575} type Double hide
       code0 {o->label(bank->bankfiletitle.c_str());}
       code1 {if (!bank->bankfiletitle.size())
             o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
@@ -144,7 +154,7 @@ class BankUI {open : {public BankProcess_}
         callback {bankuiwindow->hide();}
         xywh {705 546 70 24} box THIN_UP_BOX labelsize 12
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {5 34 772 491} box ENGRAVED_FRAME
       } {
         Fl_Pack {} {
@@ -188,7 +198,7 @@ class BankUI {open : {public BankProcess_}
             }}
         } {}
         Fl_Pack {} {
-          xywh {622 39 150 481} box BORDER_BOX
+          xywh {622 39 150 481} box BORDER_BOX color 48
           code0 {o->box(FL_NO_BOX);}
           code1 {for (int i = 128; i < 160; ++i)
             {
@@ -198,7 +208,7 @@ class BankUI {open : {public BankProcess_}
             }}
         } {}
       }
-      Fl_Group modeselect {
+      Fl_Group modeselect {open
         xywh {5 528 425 42} box ENGRAVED_BOX
       } {
         Fl_Light_Button writebutton {
@@ -213,7 +223,7 @@ class BankUI {open : {public BankProcess_}
           label READ
           callback {if (o->value() > 0.5)
                   mode = 1;
-              removeselection();}
+              removeselection();} selected
           xywh {11 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {o->value(1);}
         }
@@ -274,7 +284,7 @@ class BankUI {open : {public BankProcess_}
                          bank->banks[n].dir.c_str());
                 for (int i = 0; i < BANK_SIZE; ++i)
                     bs[i]->refresh();
-                refreshmainwindow();} open selected
+                refreshmainwindow();} open
         xywh {5 8 220 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
@@ -289,6 +299,10 @@ set_bank_slot();}
             refreshmainwindow();}
         xywh {435 530 150 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(synth->getRuntime().CheckPADsynth);}
+      }
+      Fl_Text_Display {} {
+        label {Column 5 uses extended Program Change}
+        xywh {442 566 255 3} box NO_BOX labelsize 11
       }
     }
   }

@@ -402,7 +402,7 @@ Offset}
           callback {//
               part->SetController(C_panning, 64);
               partpan->value(64);}
-          tooltip {Centre panning} xywh {307 84 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
+          tooltip {Centre panning} xywh {307 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial {} {
           label Volume
@@ -422,7 +422,7 @@ Offset}
                 partgroupui->deactivate();
             else
                 partgroupui->activate();
-            synth->getGuiMaster()->updatepanel();} selected
+            synth->getGuiMaster()->updatepanel();}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled);}
       }
@@ -483,7 +483,7 @@ Offset}
         xywh {264 114 118 64} labelsize 11
       } {
         Fl_Pack {} {
-          label {To Sys Efx} open
+          label {To Sys Efx} open selected
           xywh {264 114 118 64} type HORIZONTAL labeltype NO_LABEL labelsize 11 align 0
           code0 {o->spacing(6);}
           code1 {//

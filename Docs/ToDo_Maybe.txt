@@ -1,0 +1,12 @@
+
+Sychronise Volume and Pan across Part, Panel & V keyboard
+
+Make instrument changes directly update panel istrument item instead of refereshing the entire panel.
+
+Don't load banks/programs if they are already current
+
+Give prefence to numbered banks (makes MIDI selection more reliable, and change UI simiar to instruments.
+
+Change concept of default bank to *current* bank and only have instruments that it has visible (already only ones that MIDI can see)
+
+Make bank root dirs dynamically changable.
