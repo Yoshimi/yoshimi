@@ -764,7 +764,8 @@ ZynAddSubFX}
         code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
                                "\\nCopyright 2009-2011, Alan Calvert"
                                "\\nCopyright 2012-2013, Jeremy Jongepier and others"
-                               "\\nCopyright 2014, Will Godfrey and others").c_str());}
+                               "\\nCopyright 2014, Will Godfrey and others"
+                               "\\nLV2 plugin Copyright 2014, Andrew Derybain").c_str());}
       }
       Fl_Box {} {
         label {copy terms}
