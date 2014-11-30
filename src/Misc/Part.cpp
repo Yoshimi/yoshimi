@@ -137,7 +137,7 @@ void Part::defaults(void)
 
 void Part::defaultsinstrument(void)
 {
-    Pname.clear();
+    Pname = "Simple Sound";
 
     info.Ptype = 0;
     info.Pauthor.clear();

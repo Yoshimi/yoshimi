@@ -345,7 +345,6 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
         Fl_Button instrumentlabel {
-          label {Simple Sound}
           callback {//
               int event = Fl::event_button();
               const char *tmp = NULL;
@@ -356,7 +355,7 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       break;
                   case FL_RIGHT_MOUSE:
                       tmp = fl_input("Instrument name:", part->Pname.c_str());
-                      if (tmp != NULL and string(tmp) > " ")
+                      if (tmp != NULL and not string(tmp).empty())
                       {
                           part->Pname = string(tmp);
                           o->copy_label(part->Pname.c_str());
@@ -366,7 +365,7 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       break;
               }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 260 20} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 16
-          code0 {if (part->Pname > " ") o->copy_label(part->Pname.c_str());}
+          code0 {o->copy_label(part->Pname.c_str());}
         }
         Fl_Button {} {
           label Edit

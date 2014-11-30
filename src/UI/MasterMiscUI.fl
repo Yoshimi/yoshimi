@@ -533,10 +533,7 @@ npart=npart_;
         partvolume->value(synth->part[npart]->Pvolume);
         partpanning->value(synth->part[npart]->Ppanning);
         partrcv->value(synth->part[npart]->Prcvchn);
-        if (synth->part[npart]->Pname > " ")
-            partname->label(synth->part[npart]->Pname.c_str());
-        else
-            partname->label("Simple Sound");
+        partname->label(synth->part[npart]->Pname.c_str());
         int tmp = synth->part[npart]->Paudiodest - 1;
         if (tmp < 0 or tmp > 3)
             tmp = 0;
