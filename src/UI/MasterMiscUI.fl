@@ -85,7 +85,7 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 } 
 
-class VUMeter {open : {public Fl_Box, private MiscFuncs}
+class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
   } {
@@ -117,7 +117,8 @@ synth = _synth;
   }
   Function {draw_master()} {open
   } {
-    code {int ox = x();
+    code {//
+    int ox = x();
     int oy = y();
     int lx = w();
     int ly = h();
@@ -125,8 +126,7 @@ synth = _synth;
     float dbr = rap2dB(synth->VUdata.values.vuOutPeakR);
     float rmsdbl = rap2dB(synth->VUdata.values.vuRmsPeakL);
     float rmsdbr = rap2dB( synth->VUdata.values.vuRmsPeakR);
-//    clipped |= synth->VUdata.values.vuClipped;
-
+    
     clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
 
     if (dbl > maxdbl)
@@ -377,11 +377,12 @@ neff1 = neff1_;
         minimum(0);
         maximum(127);
         step(1);
-        labelfont(1);
-        labelsize(10);
+        labelfont(0);
+        labelsize(11);
         align(FL_ALIGN_TOP);
         value(synth->Psysefxsend[neff1][neff2]);
-        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());} {}
+        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());} {selected
+    }
   }
   Function {~SysEffSend()} {} {
     code {hide();} {}
@@ -419,7 +420,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           xywh {42 64 16 112} box ENGRAVED_FRAME
         } {
           Fl_Box partVUMeter {
-            label {V U} selected
+            label {V U}
             xywh {43 65 14 110} box FLAT_BOX color 0 selection_color 75 labelcolor 55 align 128
             code0 {partVUMeter->init(npart, synth);}
             class VUMeter
