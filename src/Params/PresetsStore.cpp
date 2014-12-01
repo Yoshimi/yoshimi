@@ -31,6 +31,8 @@
 #include "Params/PresetsStore.h"
 #include "Misc/SynthEngine.h"
 
+PresetsStore::_clipboard PresetsStore::clipboard;
+
 PresetsStore::PresetsStore(SynthEngine *_synth) :
     preset_extension(".xpz"),
     synth(_synth)
@@ -48,7 +50,11 @@ PresetsStore::PresetsStore(SynthEngine *_synth) :
 PresetsStore::~PresetsStore()
 {
     if (clipboard.data != NULL)
-        free(clipboard.data);
+    {
+        char *_data = __sync_fetch_and_and(&clipboard.data, 0);
+        free(_data);
+
+    }
     clearpresets();
 }
 

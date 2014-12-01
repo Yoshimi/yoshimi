@@ -63,10 +63,11 @@ class PresetsStore : MiscFuncs
     private:
         void clearpresets(void);
     
-        struct {
+        struct _clipboard{
             char *data;
             string type;
-        } clipboard;
+        };
+        static _clipboard clipboard;
     
         const string preset_extension;
 
