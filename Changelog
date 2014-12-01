@@ -24,10 +24,12 @@ yoshimi-1.3.0-rc
 - panel settings saved to yoshimi.config.
 - patch provided by xnakos fixes part enable sync between panel and main window.
   This revealed it wasn't done properly for MIDI so that's been added too. 
-- removed spammy default midi messages
-- patch provided by xnakos to fix bug in Simple Sound representation
-- better resolution yoshimi icon
-- instrument updates
+- removed spammy default midi messages.
+- patch provided by xnakos to fix bug in Simple Sound representation.
+- better resolution yoshimi icon.
+- instrument updates.
+- separated out examples from presets and put in their own directory.
+- a few more GUI adjustments.
 
 yoshimi-1.2.5
 - Made yoshimi support multiple in-process instances:

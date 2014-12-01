@@ -337,11 +337,11 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {745 434 385 205} type Double hide
-      class Fl_Group
+      private xywh {43 582 375 165} type Double
+      class Fl_Group visible
     } {
       Fl_Group partgroupui {open
-        xywh {0 0 387 240}
+        xywh {0 0 375 166}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
         Fl_Button instrumentlabel {
@@ -364,19 +364,19 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                   default:
                       break;
               }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 260 20} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 16
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 240 20} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 16
           code0 {o->copy_label(part->Pname.c_str());}
         }
         Fl_Button {} {
           label Edit
           callback {instrumenteditwindow->show();}
-          xywh {345 8 36 19} box PLASTIC_UP_BOX color 22 labelsize 11
+          xywh {332 8 36 19} box PLASTIC_UP_BOX color 22 labelsize 11
         }
         Fl_Dial {} {
           label {Velocity
 Sens}
           callback {part->Pvelsns = o->value();}
-          tooltip {Velocity Sensing Function} xywh {200 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity Sensing Function} xywh {198 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvelsns);}
           class WidgetPDial
         }
@@ -384,7 +384,7 @@ Sens}
           label {Velocity
 Offset}
           callback {part->Pveloffs = o->value();}
-          tooltip {Velocity Offset} xywh {253 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity Offset} xywh {244 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pveloffs);}
           class WidgetPDial
         }
@@ -392,7 +392,7 @@ Offset}
           label Pan
           callback {//
               part->SetController(C_panning, (char)o->value());}
-          xywh {299 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {290 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Ppanning);}
           class WidgetPDial
         }
@@ -401,14 +401,17 @@ Offset}
           callback {//
               part->SetController(C_panning, 64);
               partpan->value(64);}
-          tooltip {Centre panning} xywh {307 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
+          tooltip {Centre panning} xywh {300 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial {} {
           label Volume
           callback {part->setVolume(o->value());}
-          tooltip {Part Volume} xywh {345 40 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Part Volume} xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
+        }
+        Fl_Box {} {
+          xywh {245 97 132 69} box ENGRAVED_FRAME
         }
       }
       Fl_Check_Button partGroupEnable {
@@ -465,26 +468,26 @@ Offset}
       Fl_Spinner {} {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
-        xywh {206 116 42 18} labelsize 10 minimum -12 maximum 12 textsize 11
+        xywh {202 116 38 18} labelsize 10 minimum -12 maximum 12 textsize 11
         code0 {o->range(-12.0, 12.0);}
         code1 {o->value(part->Pkeyshift - 64);}
       }
       Fl_Spinner {} {
         label {Key Limit}
         callback {part->setkeylimit(o->value());}
-        tooltip {Maximum keys for this part} xywh {206 140 42 18} labelsize 10 value 15 textsize 11
+        tooltip {Maximum keys for this part} xywh {202 140 38 18} labelsize 10 value 15 textsize 11
         code0 {o->range(1, POLIPHONY - 5);}
         code1 {o->value(part->Pkeylimit);}
       }
       Fl_Scroll toSysEfx {
         label {System Effect Sends
 } open
-        xywh {264 114 118 64} labelsize 11
+        xywh {248 114 127 52} labelsize 11
       } {
         Fl_Pack {} {
           label {To Sys Efx} open selected
-          xywh {264 114 118 64} type HORIZONTAL labeltype NO_LABEL labelsize 11 align 0
-          code0 {o->spacing(6);}
+          xywh {249 116 126 48} type HORIZONTAL labeltype NO_LABEL labelsize 11 align 0
+          code0 {o->spacing(8);}
           code1 {//
               for (int i = 0; i < NUM_SYS_EFX; ++i)
             {
