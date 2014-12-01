@@ -765,7 +765,7 @@ ZynAddSubFX}
                                "\\nCopyright 2009-2011, Alan Calvert"
                                "\\nCopyright 2012-2013, Jeremy Jongepier and others"
                                "\\nCopyright 2014, Will Godfrey and others"
-                               "\\nLV2 plugin Copyright 2014, Andrew Derybain").c_str());}
+                               "\\nLV2 plugin Copyright 2014, Andrew Deryabin").c_str());}
       }
       Fl_Box {} {
         label {copy terms}
