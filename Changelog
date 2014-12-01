@@ -1,5 +1,9 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
+yoshimi-1.3.x
+2014-12-1 Andrew
+- Enabled cross-instance copy and paste.
+
 yoshimi-1.3.0
 - Made LV2 plugin ON by default
 - Removed command line control. The reason: useless, not thread-safe code
