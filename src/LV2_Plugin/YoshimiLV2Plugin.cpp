@@ -24,6 +24,10 @@
 #include "Synth/BodyDisposal.h"
 #include <math.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 
 #define YOSHIMI_STATE_URI "http://yoshimi.sourceforge.net/lv2_plugin#state"
 
