@@ -64,7 +64,11 @@ void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
 {
     clipboard.type = type;
     if (clipboard.data != NULL)
-        free(clipboard.data);
+    {
+        char *_data = __sync_fetch_and_and(&clipboard.data, 0);
+        free(_data);
+
+    }
     clipboard.data = xml->getXMLdata();
 }
 
