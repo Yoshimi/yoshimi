@@ -19,7 +19,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of the ZynAddSubFX original, modified October 2009
+    This file is a derivative of the ZynAddSubFX original
+    Last modified December 2014
 */
 
 #ifndef PHASER_H
@@ -65,9 +66,9 @@ class Phaser : public Effect
         void setvolume(unsigned char Pvolume_);
         void setdepth(unsigned char Pdepth_);
         void setfb(unsigned char Pfb_);
-        void setdistortion(unsigned char Pdistortion);
-        void setwidth(unsigned char Pwidth);
-        void setoffset(unsigned char Poffset);
+        void setdistortion(unsigned char Pdistortion_);
+        void setwidth(unsigned char Pwidth_);
+        void setoffset(unsigned char Poffset_);
         void setstages(unsigned char Pstages_);
         void setphase(unsigned char Pphase_);
     

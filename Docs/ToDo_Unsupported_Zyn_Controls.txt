@@ -7,5 +7,4 @@ Phaser
     control - Dist
     selections - Aphaser 1 to 6
 
-Both in progress :)
-    
+Phaser done :)

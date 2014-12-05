@@ -629,14 +629,14 @@ refresh(eff);}
   }
   Function {make_phaser_window()} {open
   } {
-    Fl_Window effphaserwindow {open
+    Fl_Window effphaserwindow {
       xywh {866 341 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11
       class Fl_Group visible
     } {
       Fl_Choice phaserp {
         label Preset
         callback {eff->changepreset((int)o->value());
-refresh(eff);} open
+refresh(eff);} selected
         xywh {80 21 82 15} box UP_BOX down_box BORDER_BOX color 31 selection_color 7 labelsize 11 align 1 textsize 11
       } {
         MenuItem {} {
@@ -718,11 +718,11 @@ refresh(eff);} open
       }
       Fl_Choice phaserp4 {
         label LFO
-        callback {eff->seteffectpar(4,(int) o->value());}
-        tooltip {LFO function} xywh {320 60 40 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
+        callback {eff->seteffectpar(4,(int) o->value());} open
+        tooltip {LFO function} xywh {314 60 50 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
-          label SIN
+          label SINE
           xywh {15 15 100 20} labelfont 1 labelsize 10
         }
         MenuItem {} {
@@ -750,7 +750,7 @@ refresh(eff);} open
       }
       Fl_Counter phaserp8 {
         label Stages
-        callback {eff->seteffectpar(8,(int) o->value());} selected
+        callback {eff->seteffectpar(8,(int) o->value());}
         xywh {265 23 35 15} type Simple labelsize 11 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 11
         code0 {o->range(1,MAX_PHASER_STAGES);}
       }
@@ -772,9 +772,9 @@ refresh(eff);} open
         class WidgetPDial
       }
       Fl_Check_Button phaserp12 {
-        label {hyp.}
+        label hyper
         callback {eff->seteffectpar(12,(int) o->value());}
-        tooltip hyper xywh {314 25 55 15} down_box DOWN_BOX labelsize 11
+        tooltip {hyper-sine} xywh {314 25 55 15} down_box DOWN_BOX labelsize 11
       }
       Fl_Dial phaserp13 {
         label dist
@@ -785,7 +785,7 @@ refresh(eff);} open
       Fl_Check_Button phaserp14 {
         label Analog
         callback {eff->seteffectpar(14,(int) o->value());}
-        xywh {314 40 70 15} down_box DOWN_BOX labelsize 11
+        tooltip {Emulates FET} xywh {314 40 70 15} down_box DOWN_BOX labelsize 11
       }
     }
   }
@@ -1448,6 +1448,9 @@ refresh(eff);} {}
                 phaserp9->value(eff->geteffectpar(9));
                 phaserp10->value(eff->geteffectpar(10));
                 phaserp11->value(eff->geteffectpar(11));
+                phaserp12->value(eff->geteffectpar(12));
+                phaserp13->value(eff->geteffectpar(13));
+                phaserp14->value(eff->geteffectpar(14));
                 effphaserwindow->show();
                 break;
              case 5:
