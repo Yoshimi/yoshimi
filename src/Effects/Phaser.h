@@ -49,33 +49,70 @@ class Phaser : public Effect
         EffectLFO lfo;           // <lfo-ul Phaser
         unsigned char Pvolume;
 //        unsigned char Ppanning;
-        unsigned char Pdepth;    // <depth of Phaser
+        unsigned char Pdistortion;  // Model distortion added by FET element
+        unsigned char Pdepth;    // <depth of Phaser sweep
+        unsigned char Pwidth;       //Phaser width (LFO amplitude)
         unsigned char Pfb;       // <feedback
+        unsigned char Poffset;      //Model mismatch between variable resistors
 //        unsigned char Plrcross;  // <feedback
         unsigned char Pstages;
         unsigned char Poutsub;   // <substract the output instead of adding it
         unsigned char Pphase;
+        unsigned char Phyper;       //lfo^2 -- converts tri into hyper-sine
+        unsigned char Panalog;
     
         // Control Parametrii
         void setvolume(unsigned char Pvolume_);
         void setdepth(unsigned char Pdepth_);
         void setfb(unsigned char Pfb_);
+        void setdistortion(unsigned char Pdistortion);
+        void setwidth(unsigned char Pwidth);
+        void setoffset(unsigned char Poffset);
         void setstages(unsigned char Pstages_);
         void setphase(unsigned char Pphase_);
     
         // Internal Values
         // int insertion; // inherited from Effect
+        bool    barber; // Barber pole phasing flag
+        float   distortion;
+        float   width;
+        float   offsetpct;
         float   fb;
         float   depth;
         float   fbl;
         float   fbr;
         float   phase;
+        float   invperiod;
+        float   offset[12];
 
         float  *oldl;
         float  *oldr;
+        float  *xn1l;
+        float  *xn1r;
+        float  *yn1l;
+        float  *yn1r;
+        
+        float   diffl;
+        float   diffr;
         float   oldlgain;
         float   oldrgain;
 
+        float mis;
+        float Rmin;     // 3N5457 typical on resistance at Vgs = 0
+        float Rmax;     // Resistor parallel to FET
+        float Rmx;      // Rmin/Rmax to avoid division in loop
+        float Rconst;   // Handle parallel resistor relationship
+        float C;        // Capacitor
+        float CFs;      // A constant derived from capacitor and resistor relationships
+        void analog_setup();
+        void AnalogPhase(float *smpsl, float *smpsr);
+        //analog case
+        float applyPhase(float x, float g, float fb,
+                         float &hpf, float *yn1, float *xn1);
+
+        void NormalPhase(float *smpsl, float *smpsr);
+        float applyPhase(float x, float g, float *old);
+        
         SynthEngine *synth;
 };
 

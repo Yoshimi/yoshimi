@@ -7,7 +7,7 @@ Don't load banks/programs if they are already current.
 
 Give prefence to numbered banks (makes MIDI selection more reliable, and change UI simiar to instruments.
 
-Change concept of default bank to *current* bank and only have instruments that it has visible (already only ones that MIDI can see).
+Change concept of default bank root dirs to *current* root dir and only have its banks visible (already only ones that MIDI can see).
 
 Make bank root dirs dynamically changable.
 
