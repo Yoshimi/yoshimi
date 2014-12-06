@@ -430,7 +430,7 @@ void Reverb::setbandwidth(unsigned char Pbandwidth_)
 {
     Pbandwidth = Pbandwidth_;
     float v = Pbandwidth / 127.0f;
-    if (NULL != bandwidth)
+    if (bandwidth)
         bandwidth->setBandwidth(powf(v, 2.0f) * 200.0f);
 }
 

@@ -24,6 +24,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <stdio.h>
 
 using namespace std;
 
@@ -89,6 +90,7 @@ void Unison::setBandwidth(float bandwidth)
         bandwidth = 0.0f;
     if (bandwidth > 1200.0f)
         bandwidth = 1200.0f;
+//    printf("band %f\n", bandwidth);
     //#warning
     //    : todo: if bandwidth is too small the audio will be self canceled (because of the sign change of the outputs)
     unison_bandwidth_cents = bandwidth;
@@ -98,7 +100,7 @@ void Unison::setBandwidth(float bandwidth)
 
 void Unison::updateParameters(void)
 {
-    if(uv)
+    if(!uv)
         return;
     float increments_per_second = synth->samplerate_f / (float)update_period_samples;
 //	printf("#%g, %g\n",increments_per_second,base_freq);
@@ -115,6 +117,7 @@ void Unison::updateParameters(void)
     }
 
     float max_speed = powf(2.0f, unison_bandwidth_cents / 1200.0f);
+//    printf("speed %f\n", max_speed);
     unison_amplitude_samples = 0.125f * (max_speed - 1.0f) * synth->samplerate_f / base_freq;
 
     //#warning
@@ -153,10 +156,13 @@ void Unison::process(int bufsize, float *inbuf, float *outbuf)
             float pos  = (float)(delay_k + max_delay) - vpos - 1.0f;
             // F2I(pos, posi);
             int posi = (pos > 0.0f) ? (int)truncf(pos) : (int)truncf(pos - 1.0f);
+            int posi_next = posi + 1;
             if (posi >= max_delay)
                 posi -= max_delay;
+            if(posi_next >= max_delay)
+                posi_next -= max_delay;
             float posf = pos - floorf(pos);
-            out += ((1.0f - posf) * delay_buffer[posi] + posf * delay_buffer[posi + 1]) * sign;
+            out += ((1.0f - posf) * delay_buffer[posi] + posf * delay_buffer[posi_next]) * sign;
             sign = -sign;
         }
         outbuf[i] = out * volume;
