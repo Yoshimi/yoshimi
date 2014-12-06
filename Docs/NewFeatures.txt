@@ -35,9 +35,10 @@ Supported features:
 2. State save/restore support via LV2_State_Interface.
 3. Working UI support via LV2_External_UI_Widget.
 4. Programs interface support via LV2_Programs_Interface.
+5. Multi channel audio output. 'outl' and 'outr' have lv2 index 2 and 3. All individual ports numbers start at 4.
 
 Planned features:
-1. Multi channel audio output. Now only 'outl' and 'outr' are routed to lv2 plugin instance.
+
 2. Controls automation support. This will be a part of a common controls interface.
 
 ###
