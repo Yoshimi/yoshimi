@@ -87,6 +87,13 @@ void MiscFuncs::legit_filename(string& fname)
 }
 
 
+void invSignal(float *sig, size_t len)
+{
+    for(size_t i = 0; i < len; ++i)
+        sig[i] *= -1.0f;
+}
+
+
 string MiscFuncs::asString(int n)
 {
    ostringstream oss;

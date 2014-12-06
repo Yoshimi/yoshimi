@@ -198,12 +198,6 @@ void EffectMgr::out(float *smpsl, float *smpsr)
 
     if (nefx == 7)
     {   // this is need only for the EQ effect
-        // aca: another memcpy() candidate
-        //for (int i = 0; i < synth->p_buffersize; ++i)
-        //{
-         //   smpsl[i] = efxoutl[i];
-         //   smpsr[i] = efxoutr[i];
-        //}
         memcpy(smpsl, efxoutl, synth->p_bufferbytes);
         memcpy(smpsr, efxoutr, synth->p_bufferbytes);
         return;

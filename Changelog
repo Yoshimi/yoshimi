@@ -1,6 +1,14 @@
 If you want the latest and (hopefully) greatest, click on the 'code' tab and then 'Download Snapshot'. This will give you a tarball of the current development version.
 
 yoshimi-1.3.x
+2014-12-5 Will
+- Reverb and Phaser additions
+  Reverb bandwidth control sending right numbers
+    but not changing the sound produced :(
+  Phaser additions work correctly, but GUI controls
+    Analog, Hyp., Dist. not sychronised :(
+- Phaser done (silly mistake)
+
 2014-12-1 Andrew
 - Enabled cross-instance copy and paste.
 

@@ -49,6 +49,14 @@ class MiscFuncs
         float rap2dB(float rap);
 };
 
+void invSignal(float *sig, size_t len);
+
+template<class T>
+T limit(T val, T min, T max)
+{
+    return val < min ? min : (val > max ? max : val);
+}
+
 inline float MiscFuncs::dB2rap(float dB) { return exp10f((dB) / 20.0f); }
 inline float MiscFuncs::rap2dB(float rap) { return 20.0f * log10f(rap); }
 
