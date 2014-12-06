@@ -57,4 +57,198 @@
         lv2:index 3 ;
         lv2:symbol "outr" ;
         lv2:name "Main right" ;
+    ]
+
+lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 4 ;
+        lv2:symbol "track_1_l" ;
+        lv2:name "Track 1 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 5 ;
+        lv2:symbol "track_1_r" ;
+        lv2:name "Track 1 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 6 ;
+        lv2:symbol "track_2_l" ;
+        lv2:name "Track 2 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 7 ;
+        lv2:symbol "track_2_r" ;
+        lv2:name "Track 2 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 8 ;
+        lv2:symbol "track_3_l" ;
+        lv2:name "Track 3 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 9 ;
+        lv2:symbol "track_3_r" ;
+        lv2:name "Track 3 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 10 ;
+        lv2:symbol "track_4_l" ;
+        lv2:name "Track 4 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 11 ;
+        lv2:symbol "track_4_r" ;
+        lv2:name "Track 4 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 12 ;
+        lv2:symbol "track_5_l" ;
+        lv2:name "Track 5 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 13 ;
+        lv2:symbol "track_5_r" ;
+        lv2:name "Track 5 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 14 ;
+        lv2:symbol "track_6_l" ;
+        lv2:name "Track 6 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 15 ;
+        lv2:symbol "track_6_r" ;
+        lv2:name "Track 6 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 16 ;
+        lv2:symbol "track_7_l" ;
+        lv2:name "Track 7 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 17 ;
+        lv2:symbol "track_7_r" ;
+        lv2:name "Track 7 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 18 ;
+        lv2:symbol "track_8_l" ;
+        lv2:name "Track 8 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 19 ;
+        lv2:symbol "track_8_r" ;
+        lv2:name "Track 8 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 20 ;
+        lv2:symbol "track_9_l" ;
+        lv2:name "Track 9 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 21 ;
+        lv2:symbol "track_9_r" ;
+        lv2:name "Track 9 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 22 ;
+        lv2:symbol "track_10_l" ;
+        lv2:name "Track 10 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 23 ;
+        lv2:symbol "track_10_r" ;
+        lv2:name "Track 10 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 24 ;
+        lv2:symbol "track_11_l" ;
+        lv2:name "Track 11 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 25 ;
+        lv2:symbol "track_11_r" ;
+        lv2:name "Track 11 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 26 ;
+        lv2:symbol "track_12_l" ;
+        lv2:name "Track 12 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 27 ;
+        lv2:symbol "track_12_r" ;
+        lv2:name "Track 12 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 28 ;
+        lv2:symbol "track_13_l" ;
+        lv2:name "Track 13 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 29 ;
+        lv2:symbol "track_13_r" ;
+        lv2:name "Track 13 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 30 ;
+        lv2:symbol "track_14_l" ;
+        lv2:name "Track 14 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 31 ;
+        lv2:symbol "track_14_r" ;
+        lv2:name "Track 14 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 32 ;
+        lv2:symbol "track_15_l" ;
+        lv2:name "Track 15 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 33 ;
+        lv2:symbol "track_15_r" ;
+        lv2:name "Track 15 right" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 34 ;
+        lv2:symbol "track_16_l" ;
+        lv2:name "Track 16 left" ;
+    ];
+    lv2:port [
+        a lv2:OutputPort, lv2:AudioPort ;
+        lv2:index 35 ;
+        lv2:symbol "track_16_r" ;
+        lv2:name "Track 16 right" ;
     ].
+
