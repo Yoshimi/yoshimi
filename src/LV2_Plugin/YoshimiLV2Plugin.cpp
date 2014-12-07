@@ -1017,7 +1017,7 @@ LV2_Descriptor yoshimi_lv2_desc =
     YoshimiLV2Plugin::extension_data
 };
 
-LV2_Descriptor yoshimi_lv2_stereo_desc =
+LV2_Descriptor yoshimi_lv2_multi_desc =
 {
     "http://yoshimi.sourceforge.net/lv2_plugin_multi",
     YoshimiLV2Plugin::instantiate,
@@ -1036,7 +1036,7 @@ extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
     case 0:
         return &yoshimi_lv2_desc;
     case 1:
-        return &yoshimi_lv2_stereo_desc;
+        return &yoshimi_lv2_multi_desc;
     default:
         break;
     }
