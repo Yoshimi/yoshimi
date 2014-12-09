@@ -122,8 +122,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 char *_data = (char *)&intMidiEvent;
                 while (wrote < sizeof(intMidiEvent) && tries < 3)
                 {
-                    if(tries > 0)
-                        fprintf(stderr, "tries = %d\n", tries);
                     int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(_data), sizeof(intMidiEvent) - wrote);
                     wrote += act_write;
                     _data += act_write;
