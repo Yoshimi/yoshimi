@@ -119,11 +119,14 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 memcpy(intMidiEvent.data, msg, event->body.size);
                 unsigned int wrote = 0;
                 int tries = 0;
+                char *_data = (char *)&intMidiEvent;
                 while (wrote < sizeof(intMidiEvent) && tries < 3)
                 {
-                    int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(&intMidiEvent), sizeof(intMidiEvent) - wrote);
+                    if(tries > 0)
+                        fprintf(stderr, "tries = %d\n", tries);
+                    int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(_data), sizeof(intMidiEvent) - wrote);
                     wrote += act_write;
-                    msg += act_write;
+                    _data += act_write;
                     ++tries;
                 }
                 if (wrote == sizeof(struct midi_event))
