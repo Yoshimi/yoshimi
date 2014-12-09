@@ -102,19 +102,21 @@ Reverb::~Reverb()
 void Reverb::cleanup(void)
 {
     int i, j;
+    memset(lpcomb, 0, sizeof(float) * REV_COMBS * 2);
     for (i = 0; i < REV_COMBS * 2; ++i)
     {
-        lpcomb[i] = 0.0f;
+//        lpcomb[i] = 0.0f;
         for (j = 0; j < comblen[i]; ++j)
-            comb[i][j] = 0.0f;
+            comb[i][j] = 0.0f; // not sure how to memset this!
     }
     for (i = 0; i < REV_APS * 2; ++i)
         for (j = 0; j < aplen[i]; ++j)
             ap[i][j] = 0.0f;
 
     if (idelay)
-        for (i = 0; i < idelaylen; ++i)
-            idelay[i] = 0.0f;
+        memset(idelay, 0, sizeof(float) * idelaylen);
+//        for (i = 0; i < idelaylen; ++i)
+//            idelay[i] = 0.0f;
     if (hpf)
         hpf->cleanup();
     if (lpf)
