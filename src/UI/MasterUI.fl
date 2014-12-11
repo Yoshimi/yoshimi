@@ -206,7 +206,7 @@ class MasterUI {open : {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
@@ -275,19 +275,24 @@ class MasterUI {open : {private MiscFuncs}
           MenuItem {} {
             label {&Save Instrument ...}
             callback {//
-                char *filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
-                if (filename == NULL)
-                    return;
-                filename = fl_filename_setext(filename, ".xiz");
-                if (isRegFile(string(filename)))
-                    if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
-                        return;
-                synth->actionLock(lockmute);
-                bool result = synth->part[npart]->saveXML(string(filename));
-                synth->actionLock(unlock);
-                if (!result)
-                    fl_alert("Failed to save instrument file");
-                updatepanel();}
+    if (synth->part[npart]->Pname == "Simple Sound")
+    {
+        fl_alert("Nothing to save!");
+        return;
+    }
+    char *filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
+    if (filename == NULL)
+        return;
+    filename = fl_filename_setext(filename, ".xiz");
+    if (isRegFile(string(filename)))
+        if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
+            return;
+    synth->actionLock(lockmute);
+    bool result = synth->part[npart]->saveXML(string(filename));
+    synth->actionLock(unlock);
+    if (!result)
+        fl_alert("Failed to save instrument file");
+    updatepanel();}
             tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
@@ -355,7 +360,18 @@ class MasterUI {open : {private MiscFuncs}
           }
           MenuItem Save {
             label {&Save}
-            callback {do_save_master();}
+            callback {//
+    bool valid = false;
+    for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
+        if (synth->part[npart]->Pname != "Simple Sound")
+        {
+            valid = true;
+            npart = NUM_MIDI_PARTS;
+        }
+    if (valid)
+        do_save_master();
+    else
+        fl_alert("Nothing to save!");} selected
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem {} {
@@ -789,8 +805,8 @@ ZynAddSubFX}
       }
     }
     Fl_Window syseffsendwindow {
-      label {System Effects Send} open selected
-      xywh {4 20 120 250} type Double labelfont 13 labelsize 13 visible
+      label {System Effects Send} open
+      xywh {4 20 120 250} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {open
         xywh {10 45 107 170} box FLAT_BOX

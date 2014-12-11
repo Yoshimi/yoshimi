@@ -1095,6 +1095,8 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 
 void Part::add2XMLinstrument(XMLwrapper *xml)
 {
+    if (Pname == "Simple Sound")
+        return;
     xml->beginbranch("INFO");
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
@@ -1208,6 +1210,8 @@ bool Part::saveXML(string filename)
         synth->getRuntime().Log("Error, Part::saveXML failed to instantiate new XMLwrapper");
         return false;
     }
+    if (Pname < "!") // this shouldn't be possible
+        Pname = "No Title";
     xml->beginbranch("INSTRUMENT");
     add2XMLinstrument(xml);
     xml->endbranch();
@@ -1261,6 +1265,8 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     if (xml->enterbranch("INFO"))
     {
         Pname = xml->getparstr("name");
+        if (Pname < "!")
+            Pname = "No Title";
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         info.Ptype = xml->getpar("type", info.Ptype, 0, 16);

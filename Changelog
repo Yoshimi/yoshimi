@@ -2,6 +2,11 @@ If you want the latest and (hopefully) greatest, click on the 'code' tab and the
 
 yoshimi-1.3.x
 
+2014-12-11 Will
+- Updated parameter & instrument load & save
+    will not save 'empty' files
+    inserts "No Title" when loading untitled instruments
+
 2014-12-9 Andrew
 - lv2 plugin: fixed ringbuffer write when midi message
   should be splitted into chunks (this is a very rare condition)
