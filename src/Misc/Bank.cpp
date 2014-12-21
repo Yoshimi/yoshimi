@@ -264,12 +264,12 @@ bool Bank::loadbank(string bankdirname)
 // Makes a new bank, put it on a file and makes it current bank
 bool Bank::newbank(string newbankdir)
 {
-    if (synth->getRuntime().bankRootDirlist[0].empty())
+    if (synth->getRuntime().currentRootDir.empty())
     {
-        synth->getRuntime().Log("Default bank root directory not set");
+        synth->getRuntime().Log("Current bank root directory not set");
         return false;
     }
-    string newbankpath = synth->getRuntime().bankRootDirlist[0];
+    string newbankpath = synth->getRuntime().currentRootDir;
     if (newbankpath.at(newbankpath.size() - 1) != '/')
         newbankpath += "/";
     newbankpath += newbankdir;
@@ -337,14 +337,20 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
 // Re-scan for directories containing instrument banks
 void Bank::rescanforbanks(void)
 {
-    set<string, less<string> > bankroots;
+/*    set<string, less<string> > bankroots;
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         if (!synth->getRuntime().bankRootDirlist[i].empty())
             bankroots.insert(synth->getRuntime().bankRootDirlist[i]);
     bank_dir_list.clear();
     set<string, less<string> >::iterator dxr;
     for (dxr = bankroots.begin(); dxr != bankroots.end(); ++dxr)
-            scanrootdir(*dxr);
+            scanrootdir(*dxr);*/
+    bank_dir_list.clear();
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        if (!synth->getRuntime().bankRootDirlist[i].empty())
+            scanrootdir(i);
+
+
     for (int i = 0; i < MAX_NUM_BANKS; ++i)
     {
         banks[i].name.clear();
@@ -362,8 +368,10 @@ void Bank::rescanforbanks(void)
 
 // private affairs
 
-void Bank::scanrootdir(string rootdir)
+//void Bank::scanrootdir(string rootdir)
+void Bank::scanrootdir(int root_idx)
 {
+    string rootdir = synth->getRuntime().bankRootDirlist[root_idx];
     if (rootdir.empty() || !isDirectory(rootdir))
         return;
     DIR *dir = opendir(rootdir.c_str());
@@ -404,7 +412,7 @@ void Bank::scanrootdir(string rootdir)
                 continue;
             if (possible == force_bank_dir_file)
             {   // .bankdir file exists, so add the bank
-                add_bank(candidate, chkdir);
+                add_bank(candidate, chkdir, root_idx);
                 break;
             }
             if (possible.size() <= (xizext.size() + 5))
@@ -428,7 +436,7 @@ void Bank::scanrootdir(string rootdir)
                     {
                         if (xizext.size() == (possible.size() - xizpos))
                         {   // is an instrument, so add the bank
-                            add_bank(candidate, chkdir);
+                            add_bank(candidate, chkdir, root_idx);
                             break;
                         }
                     }
@@ -509,16 +517,20 @@ void Bank::deletefrombank(unsigned int pos)
 }
 
 
-void Bank::add_bank(string name, string dir)
+void Bank::add_bank(string name, string dir, int idx)
 {
-    bankstruct_t newbank = { name, name, dir };
-    while (check_bank_duplicate(newbank.alias))
-        newbank.alias += " *";
+    bankstruct_t newbank = { name, name, dir , synth->getRuntime().bankRootDirID[idx]};
+
+//    while (check_bank_duplicate(newbank.alias))
+//        newbank.alias += " *";
+//    newbank.ID = synth->getRuntime().bankRootDirID[idx];
+# warning Tidy this lot up!
+    newbank.alias = newbank.alias + "   (" + asString(newbank.ID) + ")";
     bank_dir_list.push_back(newbank);
 }
 
 
-bool Bank::check_bank_duplicate(string alias)
+/*bool Bank::check_bank_duplicate(string alias)
 {
     list<bankstruct_t>::iterator x;
     for(x = bank_dir_list.begin(); x != bank_dir_list.end(); ++x)
@@ -527,7 +539,7 @@ bool Bank::check_bank_duplicate(string alias)
             return true;
     }
     return false;
-}
+}*/
 
 
 bool Bank::isPADsynth_used(unsigned int ninstrument)

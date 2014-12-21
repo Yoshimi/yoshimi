@@ -264,7 +264,50 @@ string Config::historyFilename(int index)
 void Config::clearBankrootDirlist(void)
 {
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
         bankRootDirlist[i].clear();
+        bankRootDirID[i] = -1; // probably not necessary
+    }
+}
+
+
+void Config::insertroot(string newpath)
+{
+    int i = 0;
+    while (i < MAX_BANK_ROOT_DIRS and synth->getRuntime().bankRootDirlist[i] > "")
+        i++;
+    int candidate = 1; // want to avoid zero as that is/was default root
+    synth->getRuntime().bankRootDirlist[i] = newpath;
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        if (synth->getRuntime().bankRootDirID[i] == candidate)
+            candidate += 1;
+    }
+    synth->getRuntime().bankRootDirID[i] = candidate;
+}
+
+
+void Config::removeroot(string oldpath)
+{
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        if (synth->getRuntime().bankRootDirlist[i] == oldpath)
+        {
+            synth->getRuntime().bankRootDirlist[i] = "";
+            synth->getRuntime().bankRootDirID[i] = -1;
+        }
+}
+
+
+void Config::setrootdefault(string newpath)
+{
+    currentRootDir = newpath;
+    cout << newpath << "\n";
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        if (synth->getRuntime().bankRootDirlist[i] == newpath)
+        {
+            currentRootID = synth->getRuntime().bankRootDirID[i];
+            break;
+        }
 }
 
 
@@ -358,6 +401,11 @@ bool Config::extractConfigData(XMLwrapper *xml)
     BankUIAutoClose = xml->getpar("bank_window_auto_close",
                                                BankUIAutoClose, 0, 1);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
+    currentRootDir = xml->getparstr("root_current");
+    if (currentRootDir > "")
+        currentRootID = xml->getpar("root_current_ID", 0, 0, 127);
+    else
+        currentRootID = 0;
     currentBankDir = xml->getparstr("bank_current");
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
@@ -372,7 +420,10 @@ bool Config::extractConfigData(XMLwrapper *xml)
         {
             string dir = xml->getparstr("bank_root");
             if (isDirectory(dir))
+            {
+                bankRootDirID[count] = i;
                 bankRootDirlist[count++] = dir;
+            }
             xml->exitbranch();
         }
     }
@@ -493,13 +544,15 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("check_pad_synth", CheckPADsynth);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
+    xmltree->addparstr("root_current", currentRootDir);
+    xmltree->addpar("root_current_ID", currentRootID);
     xmltree->addparstr("bank_current", currentBankDir);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         if (bankRootDirlist[i].size())
         {
-            xmltree->beginbranch("BANKROOT",i);
+            xmltree->beginbranch("BANKROOT",bankRootDirID[i]);
             xmltree->addparstr("bank_root", bankRootDirlist[i]);
             xmltree->endbranch();
         }

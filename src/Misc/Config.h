@@ -62,6 +62,9 @@ class Config : public MiscFuncs
         void flushLog(void);
         void clearBankrootDirlist(void);
         void clearPresetsDirlist(void);
+        void insertroot(string newpath);
+        void removeroot(string oldpath);
+        void setrootdefault(string newpath);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
@@ -124,6 +127,9 @@ class Config : public MiscFuncs
         unsigned int  GzipCompression;
         int           Interpolation;
         string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
+        int           bankRootDirID[MAX_BANK_ROOT_DIRS];
+        string        currentRootDir;
+        int           currentRootID;
         string        currentBankDir;
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;

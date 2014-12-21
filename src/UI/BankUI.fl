@@ -144,10 +144,10 @@ class BankUI {open : {public BankProcess_}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {22 107 785 575} type Double
+      xywh {22 107 785 575} type Double hide
       code0 {o->label(bank->bankfiletitle.c_str());}
       code1 {if (!bank->bankfiletitle.size())
-            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");} visible
+            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
     } {
       Fl_Button {} {
         label Close
@@ -252,7 +252,7 @@ class BankUI {open : {public BankProcess_}
                 return;
             if (!bank->newbank(string(dirname)))
             {
-                fl_alert("Error, could not make a new bank directory... is the default bank root dir set?");
+                fl_alert("Could not make a new bank directory. Is the current root dir set and writeable?");
             	refreshmainwindow();
             	return;
              }
@@ -266,7 +266,7 @@ class BankUI {open : {public BankProcess_}
 		i = MAX_NUM_BANKS;
               }
             }
-            refreshmainwindow();}
+            refreshmainwindow();} selected
         xywh {685 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Check_Button {} {
@@ -315,8 +315,7 @@ fnc = &BankProcess_::process;
         what = 0;
         nselected = -1;
         make_window();
-        mode = 1;} {selected
-    }
+        mode = 1;} {}
   }
   Function {~BankUI()} {return_type virtual
   } {

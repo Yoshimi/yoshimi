@@ -40,6 +40,7 @@ typedef struct {
     string name;
     string alias;
     string dir;
+    int ID;
 } bankstruct_t;
 
 class SynthEngine;
@@ -80,10 +81,10 @@ class Bank : private MiscFuncs
 
         void deletefrombank(unsigned int pos);
         void clearbank(void);
-        void scanrootdir(string rootdir); // scans a root dir for banks
+        void scanrootdir(int root_idx); // scans a root dir for banks
         static bool bankCmp(bankstruct_t lhs, bankstruct_t rhs)
             { return lhs.name < rhs.name; };
-        void add_bank(string name, string dir);
+        void add_bank(string name, string dir, int idx);
         bool check_bank_duplicate(string alias);
 
         string dirname;
