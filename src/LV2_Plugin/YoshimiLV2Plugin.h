@@ -1,3 +1,6 @@
+#ifndef YOSHIMI_LV2_PLUGIN_H
+#define YOSHIMI_LV2_PLUGIN_H
+
 #include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
 #include "lv2/lv2plug.in/ns/ext/state/state.h"
 #include "lv2/lv2plug.in/ns/ext/atom/atom.h"
@@ -132,3 +135,5 @@ public:
     static void static_Show(struct _LV2_External_UI_Widget * _this_);
     static void static_Hide(struct _LV2_External_UI_Widget * _this_);
 };
+
+#endif
