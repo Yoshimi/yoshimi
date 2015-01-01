@@ -212,8 +212,12 @@ class ConfigUI {open : {private MiscFuncs}
             label {Remove root dir...}
             callback {//
     int n = rootsbrowse->value();
+    string tmp;
+    int pos;
     if ( n > 0)
-        synth->getRuntime().removeroot(rootsbrowse->text(n));
+        tmp = rootsbrowse->text(rootsbrowse->value());
+        pos = tmp.find_first_of(" (");
+        synth->getRuntime().removeroot(tmp.substr(0, pos));
 //        rootsbrowse->remove(rootsbrowse->value());
     readbankcfg();
     activatebutton_rootdir(false);
@@ -225,8 +229,13 @@ class ConfigUI {open : {private MiscFuncs}
             label {Make current}
             callback {//
     int n = rootsbrowse->value();
+    string tmp;
+    int pos;
     if ( n > 0)
-        synth->getRuntime().setrootdefault(rootsbrowse->text(rootsbrowse->value()));
+        tmp = rootsbrowse->text(rootsbrowse->value());
+        pos = tmp.find_first_of(" (");
+        synth->getRuntime().setrootdefault(tmp.substr(0, pos));
+        readbankcfg();
 /*                if (n != 0)
                 {
                     rootsbrowse->move(1, n);
@@ -234,7 +243,7 @@ class ConfigUI {open : {private MiscFuncs}
                     rootsbrowse->redraw();
                 }*/
     activatebutton_rootdir(true);
-    configChanged = true;} selected
+    configChanged = true;}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
@@ -539,12 +548,24 @@ configwindow->do_callback();}
   Function {readbankcfg()} {open
   } {
     code {//
-        rootsbrowse->clear();
-        for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    string tmp;
+    int ID;
+    rootsbrowse->clear();
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+         tmp = synth->getRuntime().bankRootDirlist[i];
+        if (tmp.size())
         {
-            if (synth->getRuntime().bankRootDirlist[i].size())
-                rootsbrowse->add(synth->getRuntime().bankRootDirlist[i].c_str());
-        }} {}
+            ID = synth->getRuntime().bankRootDirID[i];
+            tmp += " (";
+            tmp += asString(ID);
+            tmp += ")";
+            if (ID == synth->getRuntime().currentRootID)
+                tmp += " *";
+            rootsbrowse->add(tmp.c_str());
+         }
+    }} {selected
+    }
   }
   Function {writebankcfg()} {open
   } {
