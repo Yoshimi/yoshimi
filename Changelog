@@ -4,7 +4,7 @@ yoshimi-1.3.x
 
 2015-1-1 Will
 - Settings->Bank root dirs now displays root IDs and marks
-  current root.
+  current root and MIDI banks changes only see current root.
 
 2014-12-21 Will
 - Changed concept of default root dir to current root dir.

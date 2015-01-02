@@ -363,6 +363,9 @@ void Bank::rescanforbanks(void)
     for(x = bank_dir_list.begin(); x != bank_dir_list.end() && idx < MAX_NUM_BANKS; ++x)
         banks[idx++] = *x;
     bank_dir_list.clear();
+//    for (int i = 0; i < MAX_NUM_BANKS; ++i)
+//        if (!banks[i].name.empty())
+//            synth->getRuntime().Log(banks[i].name+"  "+asString(banks[i].ID));           
 }
 
 

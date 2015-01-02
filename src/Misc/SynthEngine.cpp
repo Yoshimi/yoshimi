@@ -373,16 +373,28 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
     }
 }
 
-void SynthEngine::SetBank(short banknum)
+void SynthEngine::SetBank(int banknum)
 {
     /*  we use either msb or lsb for bank changes
-128 banks is enough for anybody :-)
+    128 banks is enough for anybody :-)
     this is configurable to suit different hardware synths
     */
-    bank.msb = (unsigned char)banknum + 1; // Bank indexes start from 1
-    if(bank.msb <= MAX_NUM_BANKS) {
-        if (bank.loadbank(bank.banks[bank.msb].dir))
-            Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[bank.msb].name);
+    int offset = 0;
+#warning this needs improving.
+    for (int idx = 0; idx < MAX_NUM_BANKS; ++ idx)
+    {
+        if (bank.banks[idx].ID == Runtime.currentRootID and offset == banknum)
+        {
+            banknum = idx; // Set absolute bank location
+            break;
+        }
+        else if (bank.banks[idx].ID == Runtime.currentRootID)
+            offset += 1;
+    }
+
+    if(banknum <= MAX_NUM_BANKS) {
+        if (bank.loadbank(bank.banks[banknum].dir))
+            Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[banknum].name);
         if (Runtime.showGui)
         {
             guiMaster->bankui->set_bank_slot();
