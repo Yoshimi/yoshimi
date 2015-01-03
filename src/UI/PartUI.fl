@@ -337,8 +337,8 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {43 582 375 165} type Double
-      class Fl_Group visible
+      private xywh {43 582 375 165} type Double hide
+      class Fl_Group
     } {
       Fl_Group partgroupui {open
         xywh {0 0 375 166}
@@ -391,7 +391,8 @@ Offset}
         Fl_Dial partpan {
           label Pan
           callback {//
-              part->SetController(C_panning, (char)o->value());}
+              part->SetController(C_panning, (char)o->value());
+              synth->getGuiMaster()->setPanelPartPanWidget(npart, o->value());}
           xywh {290 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Ppanning);}
           class WidgetPDial
@@ -400,12 +401,15 @@ Offset}
           label Centre
           callback {//
               part->SetController(C_panning, 64);
-              partpan->value(64);}
+              partpan->value(64);
+              synth->getGuiMaster()->setPanelPartPanWidget(npart, 64);} selected
           tooltip {Centre panning} xywh {300 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
-        Fl_Dial {} {
+        Fl_Dial partvol {
           label Volume
-          callback {part->setVolume(o->value());}
+          callback {//
+              part->setVolume(o->value());
+              synth->getGuiMaster()->setPanelPartVolWidget(npart, o->value());}
           tooltip {Part Volume} xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
@@ -1210,8 +1214,7 @@ else {propta->deactivate();proptb->deactivate();}}
     if (engine == 1 && subnoteui != NULL)
         subnoteui->SUBparameters->show();
     if (engine == 2 && adnoteui != NULL)
-        padnoteui->padnotewindow->show();} {selected
-    }
+        padnoteui->padnotewindow->show();} {}
   }
   Function {~PartUI()} {} {
     code {if (adnoteui)

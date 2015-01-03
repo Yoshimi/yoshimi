@@ -68,7 +68,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool loadXML(string filename);
         void applyparameters(void);
-
+        int loadParameters(string filename);
+        
         bool getfromXML(XMLwrapper *xml);
 
         int getalldata(char **data);

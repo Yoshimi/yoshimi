@@ -206,7 +206,7 @@ class MasterUI {open : {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {6 39 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
@@ -265,11 +265,13 @@ class MasterUI {open : {private MiscFuncs}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-                bool result = synth->part[npart]->loadXMLinstrument(string(filename));
+                int result = synth->part[npart]->loadXMLinstrument(string(filename));
                 npartcounter->do_callback();
                 updatepanel();
-                if (!result)
-                    fl_alert("Failed to load instrument file");}
+                if (result == 0)
+                    fl_alert("Failed to load instrument file");
+                else if (result == 3)
+                    fl_alert("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save.");}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -371,7 +373,7 @@ class MasterUI {open : {private MiscFuncs}
     if (valid)
         do_save_master();
     else
-        fl_alert("Nothing to save!");} selected
+        fl_alert("Nothing to save!");}
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem {} {
@@ -958,19 +960,17 @@ ZynAddSubFX}
             if (fname == NULL)
                 return;
         }
-        synth->actionLock(lockmute);
-        synth->defaults(); // clear all parameters
-        int result = synth->loadXML(fname); // load the data
-        synth->applyparameters();
-        synth->actionLock(unlock);
+        int result = synth->loadParameters(fname);
         npartcounter->value(1);
         refresh_master_ui();
         updatepanel();
-        if (result >= 0)
+        if (result >= 0) // shouldn't this be just > ?
         {
             if (updatehistory)
                 setMasterLabel(synth->getRuntime().addParamHistory(string(fname)));
             RecentParams->activate();
+            if(result > 1)
+            	fl_alert("At least one instrument is called 'Simple Sound', the name of Yoshimi's basic sound. You should change this if you wish to re-save.");
         }
         else
         {
@@ -982,7 +982,8 @@ ZynAddSubFX}
             }
             else
                 fl_alert("%s",msg.c_str());
-        }} {}
+        }} {selected
+    }
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -1070,13 +1071,36 @@ ZynAddSubFX}
   }
   Function {resetPartsClip()} {open
   } {
-    code {for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-{
-	if(panellistitem[i] && panellistitem[i]->partVUMeter)
-	{
-	     panellistitem[i]->partVUMeter->resetPart(true);
-	}
-}} {}
+    code {//
+        for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+        {
+            if(panellistitem[i] && panellistitem[i]->partVUMeter)
+            {
+                panellistitem[i]->partVUMeter->resetPart(true);
+            }
+        }} {}
+  }
+  Function {setPartVolWidget(int _npart, float _value)} {open
+  } {
+    code {//
+        if (_npart == npart)
+            partui->partvol->value(_value);} {}
+  }
+  Function {setPartPanWidget(int _npart, float _value)} {open
+  } {
+    code {//
+        if (_npart == npart)
+            partui->partpan->value(_value);} {}
+  }
+  Function {setPanelPartVolWidget(int _npart, float _value)} {open
+  } {
+    code {//
+        panellistitem[_npart]->partvolume->value(_value);} {}
+  }
+  Function {setPanelPartPanWidget(int _npart, float _value)} {open
+  } {
+    code {//
+        panellistitem[_npart]->partpanning->value(_value);} {}
   }
   decl {ConfigUI *configui;} {private local
   }

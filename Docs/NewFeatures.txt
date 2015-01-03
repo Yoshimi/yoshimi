@@ -42,3 +42,11 @@ Planned features:
 2. Controls automation support. This will be a part of a common controls interface.
 
 ###
+
+Bank root dirs are better identified, with IDs that can be changed by the user in the GUI. This will soon also be made available for selecting over MIDI.
+
+MIDI only sees banks in the *current* root dir, but all banks are accessible to the GUI.
+
+In the 'banks' list each bank is now identified by the ID of the root dir it belongs to.
+
+###

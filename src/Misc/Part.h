@@ -72,7 +72,7 @@ class Part : private MiscFuncs, SynthHelper
         void ComputePartSmps(void);
 
         bool saveXML(string filename); // true for load ok, otherwise false
-        bool loadXMLinstrument(string filename);
+        int loadXMLinstrument(string filename);
         void add2XML(XMLwrapper *xml);
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);

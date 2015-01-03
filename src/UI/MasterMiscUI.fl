@@ -437,12 +437,16 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           xywh {4 27 55 30} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
-          callback {synth->part[npart]->setVolume(o->value());}
+          callback {//
+              synth->part[npart]->setVolume(o->value());
+              synth->getGuiMaster()->setPartVolWidget(npart, o->value());}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
           code0 {o->value(synth->part[npart]->Pvolume);}
         }
         Fl_Dial partpanning {
-          callback {synth->part[npart]->SetController(C_panning, (char)o->value());}
+          callback {//
+              synth->part[npart]->SetController(C_panning, (char)o->value());
+              synth->getGuiMaster()->setPartPanWidget(npart, o->value());}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart]->Ppanning);}
           class WidgetPDial

@@ -808,6 +808,23 @@ void SynthEngine::applyparameters(void)
 }
 
 
+int SynthEngine::loadParameters(string fname)
+{
+    int result = 0;
+    Runtime.SimpleCheck = false;
+    actionLock(lockmute);
+    defaults(); // clear all parameters
+    if(loadXML(fname)) // load the data
+    {
+        result = 1; // this is messy, but can't trust bool to int conversions
+        if (Runtime.SimpleCheck)
+            result = 3;
+    }
+    actionLock(unlock);
+    return result;
+}
+
+
 void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
