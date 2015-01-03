@@ -1,16 +1,8 @@
 
 Removed root dir should not crash yoshi!
 
-Sychronise Volume and Pan across Part, Panel & V keyboard
-
-Make instrument changes directly update panel instrument item instead of refreshing the entire panel.
-
 Don't load banks/programs if they are already current.
 
 Give prefence to numbered banks (makes MIDI selection more reliable, and change UI simiar to instruments.
-
-Change concept of default bank root dirs to *current* root dir and only have its banks visible and only ones that MIDI can see.
-
-Make bank root dirs dynamically changable - they are!
 
 Improve Copy & Paste functionality.

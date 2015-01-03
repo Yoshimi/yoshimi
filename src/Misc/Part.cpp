@@ -1221,25 +1221,26 @@ bool Part::saveXML(string filename)
 }
 
 
-bool Part::loadXMLinstrument(string filename)
+int Part::loadXMLinstrument(string filename)
 {
+    synth->getRuntime().SimpleCheck = false;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
         synth->getRuntime().Log("Error, Part failed to instantiate new XMLwrapper");
-        return false;
+        return 0;
     }
 
     if (!xml->loadXMLfile(filename))
     {
         synth->getRuntime().Log("Error, Part failed to load instrument file " + filename);
         delete xml;
-        return false;
+        return 0;
     }
     if (xml->enterbranch("INSTRUMENT") == 0)
     {
         synth->getRuntime().Log(filename + " is not an instrument file");
-        return false;
+        return 0;
     }
     Mute();
     defaultsinstrument();
@@ -1248,7 +1249,9 @@ bool Part::loadXMLinstrument(string filename)
     Unmute();
     xml->exitbranch();
     delete xml;
-    return true;
+    if (synth->getRuntime().SimpleCheck)
+        return 3;
+    return 1;
 }
 
 
@@ -1267,6 +1270,8 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         Pname = xml->getparstr("name");
         if (Pname < "!")
             Pname = "No Title";
+        else if (Pname == "Simple Sound") // there should be a better way to do this!
+            synth->getRuntime().SimpleCheck = true;
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
