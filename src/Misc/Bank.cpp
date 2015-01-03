@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010, Alan Calvert
+    Copyright 2014-2015, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2010
+    This file is a derivative of a ZynAddSubFX original, last modified January 2015
 */
 
 #include <set>
@@ -337,14 +338,6 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
 // Re-scan for directories containing instrument banks
 void Bank::rescanforbanks(void)
 {
-/*    set<string, less<string> > bankroots;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (!synth->getRuntime().bankRootDirlist[i].empty())
-            bankroots.insert(synth->getRuntime().bankRootDirlist[i]);
-    bank_dir_list.clear();
-    set<string, less<string> >::iterator dxr;
-    for (dxr = bankroots.begin(); dxr != bankroots.end(); ++dxr)
-            scanrootdir(*dxr);*/
     bank_dir_list.clear();
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         if (!synth->getRuntime().bankRootDirlist[i].empty())
@@ -363,9 +356,6 @@ void Bank::rescanforbanks(void)
     for(x = bank_dir_list.begin(); x != bank_dir_list.end() && idx < MAX_NUM_BANKS; ++x)
         banks[idx++] = *x;
     bank_dir_list.clear();
-//    for (int i = 0; i < MAX_NUM_BANKS; ++i)
-//        if (!banks[i].name.empty())
-//            synth->getRuntime().Log(banks[i].name+"  "+asString(banks[i].ID));           
 }
 
 
@@ -523,26 +513,9 @@ void Bank::deletefrombank(unsigned int pos)
 void Bank::add_bank(string name, string dir, int idx)
 {
     bankstruct_t newbank = { name, name, dir , synth->getRuntime().bankRootDirID[idx]};
-
-//    while (check_bank_duplicate(newbank.alias))
-//        newbank.alias += " *";
-//    newbank.ID = synth->getRuntime().bankRootDirID[idx];
-# warning Tidy this lot up!
     newbank.alias = newbank.alias + "   (" + asString(newbank.ID) + ")";
     bank_dir_list.push_back(newbank);
 }
-
-
-/*bool Bank::check_bank_duplicate(string alias)
-{
-    list<bankstruct_t>::iterator x;
-    for(x = bank_dir_list.begin(); x != bank_dir_list.end(); ++x)
-    {
-        if (alias == (*x).alias)
-            return true;
-    }
-    return false;
-}*/
 
 
 bool Bank::isPADsynth_used(unsigned int ninstrument)

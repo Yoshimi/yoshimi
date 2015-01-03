@@ -46,15 +46,15 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open
-      xywh {934 126 465 335} type Double hide
+      callback {o->hide();} open selected
+      xywh {830 378 465 335} type Double hide
     } {
       Fl_Tabs {} {open
-        xywh {5 5 455 325}
+        xywh {5 5 457 325}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 455 280} labelsize 12 hide
+          xywh {5 25 455 280} labelsize 12
         } {
           Fl_Choice {} {
             label OscilSize
@@ -189,10 +189,15 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 495 287} labelsize 12
+          xywh {5 25 457 295} labelsize 12 hide
         } {
           Fl_Browser rootsbrowse {
-            callback {activatebutton_rootdir(o->value()!=0);}
+            callback {int tmp = o->value();
+activatebutton_rootdir(tmp!=0);
+if (tmp)
+    rootselected = o->text(tmp);
+    
+changeIDbutton->value(recoverID());}
             xywh {10 35 445 200} type Hold labelsize 12 textsize 13
           }
           Fl_Button {} {
@@ -204,48 +209,59 @@ class ConfigUI {open : {private MiscFuncs}
       return;
     synth->getRuntime().insertroot(dirname);
     readbankcfg();
-//    rootsbrowse->add(dirname);
     configChanged = true;}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removerootdirbutton {
             label {Remove root dir...}
             callback {//
-    int n = rootsbrowse->value();
-    string tmp;
     int pos;
-    if ( n > 0)
-        tmp = rootsbrowse->text(rootsbrowse->value());
-        pos = tmp.find_first_of(" (");
-        synth->getRuntime().removeroot(tmp.substr(0, pos));
-//        rootsbrowse->remove(rootsbrowse->value());
-    readbankcfg();
-    activatebutton_rootdir(false);
-    configChanged = true;}
-            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+    if (!rootselected.empty())
+    {
+        pos = rootselected.find_first_of(" (");
+        synth->getRuntime().removeroot(rootselected.substr(0, pos));
+        readbankcfg();
+        configChanged = true;
+    }
+    activatebutton_rootdir(false);}
+            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
           }
           Fl_Button makedefaultrootdirbutton {
             label {Make current}
             callback {//
-    int n = rootsbrowse->value();
-    string tmp;
     int pos;
-    if ( n > 0)
-        tmp = rootsbrowse->text(rootsbrowse->value());
-        pos = tmp.find_first_of(" (");
-        synth->getRuntime().setrootdefault(tmp.substr(0, pos));
+    if (!rootselected.empty())
+    {
+        pos = rootselected.find_first_of(" (");
+        synth->getRuntime().setrootdefault(rootselected.substr(0, pos));
         readbankcfg();
-/*                if (n != 0)
-                {
-                    rootsbrowse->move(1, n);
-                    rootsbrowse->value(1);
-                    rootsbrowse->redraw();
-                }*/
-    activatebutton_rootdir(true);
-    configChanged = true;}
-            xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+        configChanged = true;
+    }
+    activatebutton_rootdir(true);}
+            xywh {195 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
+          }
+          Fl_Return_Button changeIDok {
+            label OK
+            callback {//
+    int pos;
+    if (!rootselected.empty())
+        pos = rootselected.find_first_of(" (");
+        if (synth->getRuntime().setrootID(rootselected.substr(0, pos), changeIDbutton->value()))
+        {
+            readbankcfg();
+            configChanged = true;
+        }
+        else
+            fl_alert("ID already in use!");
+    changeIDbutton->deactivate();
+    activatebutton_rootdir(true);}
+            xywh {330 247 45 35} box NO_BOX labelsize 12 align 8 deactivate
+          }
+          Fl_Spinner changeIDbutton {
+            label {Change ID}
+            xywh {305 256 45 19} labelsize 12 align 5 textsize 12 deactivate
           }
         }
         Fl_Group {} {
@@ -516,7 +532,8 @@ configwindow->do_callback();}
         configChanged = false;
         make_window();
         readbankcfg();
-        readpresetcfg();} {}
+        readpresetcfg();
+//        rootselected = "";} {}
   }
   Function {activatebutton_rootdir(bool active)} {open
   } {
@@ -525,14 +542,19 @@ configwindow->do_callback();}
         {
             removerootdirbutton->activate();
             makedefaultrootdirbutton->activate();
+            changeIDbutton->activate();
+            changeIDok->activate();
         }
         else
         {
             removerootdirbutton->deactivate();
             makedefaultrootdirbutton->deactivate();
+            changeIDbutton->deactivate();
+            changeIDok->deactivate();
         }} {}
   }
-  Function {activatebutton_presetdir(bool active)} {} {
+  Function {activatebutton_presetdir(bool active)} {open
+  } {
     code {//
         if (active)
         {
@@ -564,15 +586,18 @@ configwindow->do_callback();}
                 tmp += " *";
             rootsbrowse->add(tmp.c_str());
          }
-    }} {selected
-    }
+    }} {}
   }
-  Function {writebankcfg()} {open
+  Function {recoverID()} {open return_type int
   } {
     code {//
-//        synth->getRuntime().clearBankrootDirlist();
-//        for (int n = 0; n < rootsbrowse->size(); ++n)
-//            synth->getRuntime().bankRootDirlist[n] = string(rootsbrowse->text(n + 1));} {}
+    if (!rootselected.empty())
+    {
+        int pos1 = rootselected.find_first_of(" (");
+        int pos2 = rootselected.find_first_of(")");
+        return string2int(rootselected.substr(pos1+2, pos2));
+    }
+    return 0;} {}
   }
   Function {readpresetcfg()} {} {
     code {//
@@ -597,11 +622,12 @@ configwindow->do_callback();}
   } {
     code {//
         synth->getRuntime().saveConfig();
-        writebankcfg();
         writepresetcfg();} {}
   }
   decl {bool configChanged;} {public local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {string rootselected;} {private local
   }
 } 

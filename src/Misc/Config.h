@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2015, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified August 2014
+    This file is derivative of ZynAddSubFX original code, last modified January 2015
 */
 
 #ifndef CONFIG_H
@@ -65,6 +65,7 @@ class Config : public MiscFuncs
         void insertroot(string newpath);
         void removeroot(string oldpath);
         void setrootdefault(string newpath);
+        bool setrootID(string path, int newID);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }

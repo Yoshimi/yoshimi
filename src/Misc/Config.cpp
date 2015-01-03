@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2015, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified August 2014
+    This file is derivative of ZynAddSubFX original code, last modified January 2015
 */
 
 #include <iostream>
@@ -276,7 +276,7 @@ void Config::insertroot(string newpath)
     int i = 0;
     while (i < MAX_BANK_ROOT_DIRS and synth->getRuntime().bankRootDirlist[i] > "")
         i++;
-    int candidate = 1; // want to avoid zero as that is/was default root
+    int candidate = 0;
     synth->getRuntime().bankRootDirlist[i] = newpath;
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
@@ -301,7 +301,6 @@ void Config::removeroot(string oldpath)
 void Config::setrootdefault(string newpath)
 {
     currentRootDir = newpath;
-    cout << newpath << "\n";
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         if (synth->getRuntime().bankRootDirlist[i] == newpath)
         {
@@ -311,11 +310,31 @@ void Config::setrootdefault(string newpath)
 }
 
 
+bool Config::setrootID(string path, int newID)
+{
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+       if (synth->getRuntime().bankRootDirID[i] == newID)
+           return false; // already in use
+
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+        if (synth->getRuntime().bankRootDirlist[i] == path)
+        {
+            if (currentRootID == synth->getRuntime().bankRootDirID[i])
+                currentRootID = newID;
+            synth->getRuntime().bankRootDirID[i] = newID;
+            break;
+        }
+    return true;
+}
+
+
+
 void Config::clearPresetsDirlist(void)
 {
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         presetsDirlist[i].clear();
 }
+
 
 bool Config::loadConfig(void)
 {
