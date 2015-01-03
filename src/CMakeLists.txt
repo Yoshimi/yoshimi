@@ -450,7 +450,16 @@ add_custom_target (distclean
 
 
 if (BuildLV2Plugin)
-set(LV2_INSTALL_DIR lib/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+
+get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
+
+if ("${LIB64}" STREQUAL "TRUE")
+    set(LIBSUFFIX 64)
+else()
+    set(LIBSUFFIX "")
+endif()
+
+set(LV2_INSTALL_DIR lib${LIBSUFFIX}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
 pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
 if (LV2_FOUND)
     message (STATUS "Found lv2 package ${LV2_VERSION}")
