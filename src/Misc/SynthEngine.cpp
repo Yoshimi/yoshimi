@@ -350,7 +350,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
+void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
     if (type == Runtime.midi_bank_C) {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
@@ -372,6 +372,27 @@ void SynthEngine::SetController(unsigned char chan, unsigned int type, short int
         }
     }
 }
+
+
+void SynthEngine::SetBankRoot(int rootnum)
+{
+    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+        if (Runtime.bankRootDirID[i] == rootnum)
+        {
+            Runtime.currentRootID = rootnum;
+            Runtime.currentRootDir = Runtime.bankRootDirlist[i];
+            Runtime.Log("Found (" + asString(rootnum) + ")  " + Runtime.currentRootDir);
+            if (Runtime.showGui)
+            {
+//                guiMaster->configui->readbankcfg(); // doean't compile - private?
+            }
+            return;
+        }
+    }
+    Runtime.Log("No match for root ID " + asString(rootnum));
+}
+
 
 void SynthEngine::SetBank(int banknum)
 {
@@ -407,6 +428,7 @@ void SynthEngine::SetBank(int banknum)
         Runtime.Log("SynthEngine setBank: Value is out of range!");
     return;
 }
+
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
 {
@@ -445,6 +467,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
             Runtime.Log("SynthEngine setProgram: Invalid program");
     }
 }
+
 
 // Enable/Disable a part
 void SynthEngine::partonoff(int npart, int what)

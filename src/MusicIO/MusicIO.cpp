@@ -155,20 +155,26 @@ int MusicIO::getMidiController(unsigned char b)
 }
 
 
-void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl, int param, bool in_place)
+void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
-    if (ctrl != synth->getRuntime().midi_upper_voice_C)
-    {
-        if(ctrl == synth->getRuntime().midi_bank_C)
-            setMidiBank((short)param, in_place);
-        else
-            synth->SetController(ch, ctrl, param);
-    }
-    else // it's really an upper set program change
-    {
-        setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
-    }
+    if (ctrl == synth->getRuntime().midi_bank_root)
+        setMidiRoot(param);
+    else if (ctrl == synth->getRuntime().midi_bank_C)
+        setMidiBank((short)param, in_place);
+    else if (ctrl == synth->getRuntime().midi_upper_voice_C)
+        setMidiProgram(ch, (param & 0x1f) | 0x80, in_place); // it's really an upper set program change
+    else
+        synth->SetController(ch, ctrl, param);
 }
+
+
+void MusicIO::setMidiRoot(int rootnum)
+{
+    if (rootnum == synth->getRuntime().currentRootID)
+        return; // nothing to do!
+    synth->SetBankRoot(rootnum);
+}
+
 
 void MusicIO::setMidiBank(short banknum, bool in_place)
 {
@@ -189,8 +195,8 @@ void MusicIO::setMidiBank(short banknum, bool in_place)
         else
             synth->getRuntime().Log("Midi bank changes too close together");
     }
-
 }
+
 
 void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
 {
@@ -213,19 +219,18 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
                 {
                     synth->getRuntime().Log("MusicIO::setMidiProgram: failed to start midi program change thread!");
                 }
-
-
             }
-
         }
     }
 }
+
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
                            unsigned char velocity)
 {
     synth->NoteOn(channel, note, velocity);
 }
+
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 {
