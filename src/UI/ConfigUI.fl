@@ -189,7 +189,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 295} labelsize 12 hide
+          xywh {5 25 457 295} labelsize 12
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
@@ -197,7 +197,8 @@ activatebutton_rootdir(tmp!=0);
 if (tmp)
     rootselected = o->text(tmp);
     
-changeIDbutton->value(recoverID());}
+changeIDbutton->value(recoverID());
+oldrootID = changeIDbutton->value();} selected
             xywh {10 35 445 200} type Hold labelsize 12 textsize 13
           }
           Fl_Button {} {
@@ -238,7 +239,7 @@ changeIDbutton->value(recoverID());}
         readbankcfg();
         configChanged = true;
     }
-    activatebutton_rootdir(true);}
+    activatebutton_rootdir(false);}
             xywh {195 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
           }
@@ -246,22 +247,29 @@ changeIDbutton->value(recoverID());}
             label Set
             callback {//
     int pos;
-    if (!rootselected.empty())
-        pos = rootselected.find_first_of(" (");
-        if (synth->getRuntime().setrootID(rootselected.substr(0, pos), changeIDbutton->value()))
-        {
-            readbankcfg();
-            configChanged = true;
-        }
-        else
-            fl_alert("ID already in use!");
-    changeIDbutton->deactivate();
-    activatebutton_rootdir(true);}
+    if (changeIDbutton->value() != oldrootID)
+    {
+        if (!rootselected.empty())
+            pos = rootselected.find_first_of(" (");
+            if (synth->getRuntime().setrootID(rootselected.substr(0, pos), changeIDbutton->value()))
+            {
+                readbankcfg();
+                configChanged = true;
+            }
+            else
+            {
+                changeIDbutton->value(oldrootID);
+                fl_alert("ID already in use!");
+            }
+        oldrootID = changeIDbutton->value();
+        activatebutton_rootdir(false);
+    }}
             xywh {305 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
             label {Change ID}
-            xywh {305 256 45 19} labelsize 12 align 5 textsize 12 deactivate
+            xywh {305 256 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
+            code0 {oldrootID = o->value();}
           }
         }
         Fl_Group {} {
@@ -467,7 +475,7 @@ changeIDbutton->value(recoverID());}
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12
+          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -613,7 +621,7 @@ changeIDbutton->value(recoverID());}
           }
           Fl_Spinner EPCspinner {
             label {Extended Program Change}
-            callback {EPCok->activate();} selected
+            callback {EPCok->activate();}
             xywh {275 241 53 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
@@ -764,5 +772,7 @@ configwindow->do_callback();}
   decl {int BankRootvalue;} {private local
   }
   decl {int oldBank;} {private local
+  }
+  decl {int oldrootID;} {private local
   }
 } 
