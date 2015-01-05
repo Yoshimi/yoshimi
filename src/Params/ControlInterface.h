@@ -98,6 +98,7 @@ public:
     void set(string id, float val);
     bool get(string id, float *val);
     void unregisterControl(string groupName, string controlName);
+    void dump();
 
 };
 

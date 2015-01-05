@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "Params/ControlInterface.h"
+#include <iostream>
 
 string ControlInterface::makeIdWithChannel(char _channel, const string &groupName, const string &controlName)
 {
@@ -163,5 +164,21 @@ void ControlInterface::unregisterControl(string groupName, string controlName)
             groups.erase(groupName);
         }
     }
+
+}
+
+void ControlInterface::dump()
+{
+    cout << "<------------Dumping controls by group:------------>" << endl << endl;
+    for(YoshimiControlGroupMapIterator itg = groups.begin(); itg != groups.end(); ++itg)
+    {
+        cout << "\t[GRP] " << *(itg) << endl;
+        for(YoshimiControlMapIterator it = controls.lower_bound(*(itg)); it != controls.upper_bound(*(itg)); ++it)
+        {
+            cout << "\t\t[CTRL] chn=" << it->second.channel << ", id=" << it->first << ", name=" << it->second.controlName << endl;
+        }
+
+    }
+
 
 }
