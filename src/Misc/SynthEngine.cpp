@@ -385,7 +385,7 @@ void SynthEngine::SetBankRoot(int rootnum)
             Runtime.Log("Found (" + asString(rootnum) + ")  " + Runtime.currentRootDir);
             if (Runtime.showGui)
             {
-//                guiMaster->configui->readbankcfg(); // doean't compile - private?
+                guiMaster->updateBankRootDirs();
             }
             return;
         }

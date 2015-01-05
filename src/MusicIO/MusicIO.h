@@ -41,8 +41,8 @@ class MusicIO : virtual protected MiscFuncs
         void InterleaveShorts(void);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
-        void setMidiRoot(int rootnum);
-        void setMidiBank(short banknum, bool in_place = false);
+        //if setBank is false then set RootDir number else current bank number
+        void setMidiBankOrRootDir(int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
@@ -54,8 +54,9 @@ class MusicIO : virtual protected MiscFuncs
 
         SynthEngine *synth;
     private:
-        pthread_t pBankThread;        
-        short bankToChange;
+        pthread_t pBankOrRootDirThread;
+        int bankOrRootDirToChange;
+        bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank
         struct _prgChangeCmd
         {            
             int ch;
@@ -65,9 +66,9 @@ class MusicIO : virtual protected MiscFuncs
         };
         _prgChangeCmd prgChangeCmd [NUM_MIDI_PARTS];
 
-        void *bankChange_Thread();
+        void *bankOrRootDirChange_Thread();
         void *prgChange_Thread(_prgChangeCmd *pCmd);
-        static void *static_BankChangeThread(void *arg);
+        static void *static_BankOrRootDirChangeThread(void *arg);
         static void *static_PrgChangeThread(void *arg);
 };
 

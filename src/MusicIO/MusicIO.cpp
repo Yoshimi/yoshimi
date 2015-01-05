@@ -35,7 +35,7 @@ MusicIO::MusicIO(SynthEngine *_synth) :
     interleavedShorts(NULL),
     rtprio(25),
     synth(_synth),
-    pBankThread(0)
+    pBankOrRootDirThread(0)
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
@@ -47,7 +47,7 @@ MusicIO::~MusicIO()
     pthread_t tmpBankThread = 0;
     pthread_t tmpPrgThread = 0;
     void *threadRet = NULL;
-    tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
+    tmpBankThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
     if(tmpBankThread != 0)
         pthread_join(tmpBankThread, &threadRet);
     for(int i = 0; i < NUM_MIDI_PARTS; ++i)
@@ -158,42 +158,38 @@ int MusicIO::getMidiController(unsigned char b)
 void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
     if (ctrl == synth->getRuntime().midi_bank_root)
-        setMidiRoot(param);
+        setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)
-        setMidiBank((short)param, in_place);
+        setMidiBankOrRootDir(param, in_place);
     else if (ctrl == synth->getRuntime().midi_upper_voice_C)
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place); // it's really an upper set program change
     else
         synth->SetController(ch, ctrl, param);
 }
 
-
-void MusicIO::setMidiRoot(int rootnum)
+//bank change and root dir change change share the same thread
+//to make changes consistent
+void MusicIO::setMidiBankOrRootDir(int bank_or_root_num, bool in_place, bool setRootDir)
 {
-    if (rootnum == synth->getRuntime().currentRootID)
+    if (setRootDir && (bank_or_root_num == synth->getRuntime().currentRootID))
         return; // nothing to do!
-    synth->SetBankRoot(rootnum);
-}
-
-
-void MusicIO::setMidiBank(short banknum, bool in_place)
-{
     if(in_place)
-        synth->SetBank(banknum);
+        setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
     else
-    {
-        pthread_t tmpBankThread = 0;
-        tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
-        if(tmpBankThread == 0) // don't allow more than one bank change process at a time
+    {        
+        pthread_t tmpBankOrRootDirThread = 0;
+        tmpBankOrRootDirThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
+        if(tmpBankOrRootDirThread == 0) // don't allow more than one bank change/root dir change process at a time
         {
-            bankToChange = banknum;
-            if(!synth->getRuntime().startThread(&pBankThread, MusicIO::static_BankChangeThread, this, false, 0, false))
+            isRootDirChangeRequested = setRootDir;
+            bankOrRootDirToChange = bank_or_root_num;
+            if(!synth->getRuntime().startThread(&pBankOrRootDirThread, MusicIO::static_BankOrRootDirChangeThread, this, false, 0, false))
             {
-                synth->getRuntime().Log("MusicIO::setMidiBank: failed to start midi bank change thread!");
+                synth->getRuntime().Log("MusicIO::setMidiBankOrRootDir: failed to start midi bank/root dir change thread!");
             }
         }
         else
-            synth->getRuntime().Log("Midi bank changes too close together");
+            synth->getRuntime().Log("Midi bank/root dir changes too close together");
     }
 }
 
@@ -287,23 +283,23 @@ bail_out:
 }
 
 
-void *MusicIO::bankChange_Thread()
+void *MusicIO::bankOrRootDirChange_Thread()
 {
     //std::cerr << "MusicIO::bankChange_Thread(). banknum = " << bankToChange << std::endl;
-    synth->SetBank(bankToChange);
-    pBankThread = 0; // done
+    isRootDirChangeRequested ? synth->SetBankRoot(bankOrRootDirToChange) : synth->SetBank(bankOrRootDirToChange);
+    pBankOrRootDirThread = 0; // done
     return NULL;
 }
 
 void *MusicIO::prgChange_Thread(_prgChangeCmd *pCmd)
 {
     pthread_t tmpBankThread = 0;
-    tmpBankThread = __sync_fetch_and_add(&pBankThread, 0);
+    tmpBankThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
     if(tmpBankThread != 0) // wait for active bank thread to finish before continue
     {
         //std::cerr << "Waiting for MusicIO::bankChange_Thread()..." << std::endl;
         void *threadRet = NULL;
-        pthread_join(pBankThread, &threadRet);
+        pthread_join(pBankOrRootDirThread, &threadRet);
     }
 
     //std::cerr << "MusicIO::prgChange_Thread(). ch = " << pCmd->ch << ", prg = " << pCmd->prg << std::endl;
@@ -313,9 +309,9 @@ void *MusicIO::prgChange_Thread(_prgChangeCmd *pCmd)
     return NULL;
 }
 
-void *MusicIO::static_BankChangeThread(void *arg)
+void *MusicIO::static_BankOrRootDirChangeThread(void *arg)
 {
-    return static_cast<MusicIO *>(arg)->bankChange_Thread();
+    return static_cast<MusicIO *>(arg)->bankOrRootDirChange_Thread();
 }
 
 void *MusicIO::static_PrgChangeThread(void *arg)

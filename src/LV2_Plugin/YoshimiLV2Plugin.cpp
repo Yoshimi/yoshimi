@@ -810,7 +810,7 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
         isFreeWheel = true;
     if(_synth->getRuntime().midi_bank_C != 128)
     {
-        setMidiBank((short)bank, isFreeWheel);
+        setMidiBankOrRootDir((short)bank, isFreeWheel);
     }
     setMidiProgram(channel, program, isFreeWheel);
 }

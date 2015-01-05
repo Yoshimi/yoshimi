@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -181,8 +181,7 @@ class MasterUI {open : {private MiscFuncs}
       else
           yoshiLog->Hide();} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {if (configui->configChanged)
@@ -982,8 +981,7 @@ ZynAddSubFX}
             }
             else
                 fl_alert("%s",msg.c_str());
-        }} {selected
-    }
+        }} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
@@ -1101,6 +1099,11 @@ ZynAddSubFX}
   } {
     code {//
         panellistitem[_npart]->partpanning->value(_value);} {}
+  }
+  Function {updateBankRootDirs()} {open
+  } {
+    code {configui->readbankcfg();} {selected
+    }
   }
   decl {ConfigUI *configui;} {private local
   }
