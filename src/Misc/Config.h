@@ -66,6 +66,7 @@ class Config : public MiscFuncs
         void removeroot(string oldpath);
         void setrootdefault(string newpath);
         bool setrootID(string path, int newID);
+        string testCCvalue(int cc);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
@@ -137,8 +138,9 @@ class Config : public MiscFuncs
         bool          SimpleCheck;
         int           EnableProgChange;
         int           rtprio;
-        unsigned int  midi_bank_C;
-        unsigned int  midi_upper_voice_C;
+        int           midi_bank_root;
+        int           midi_bank_C;
+        int           midi_upper_voice_C;
         int           enable_part_on_voice_load;
         int           single_row_panel;
 

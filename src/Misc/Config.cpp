@@ -107,6 +107,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     CheckPADsynth(1),
     EnableProgChange(0), // default will be inverted
     rtprio(50),
+    midi_bank_root(128),
     midi_bank_C(0),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(0),
@@ -328,6 +329,69 @@ bool Config::setrootID(string path, int newID)
 }
 
 
+string Config::testCCvalue(int cc)
+{
+    string result = "";
+    switch (cc)
+    {
+        case 1:
+            result = "mod wheel";
+            break;
+        case 7:
+            result = "volume";
+            break;
+        case 10:
+            result = "panning";
+            break;
+        case 11:
+            result = "expression";
+            break;
+        case 64:
+            result = "sustain pedal";
+            break;
+        case 65:
+            result = "partamento";
+            break;
+        case 71:
+            result = "filter Q";
+            break;
+        case 74:
+            result = "filter cutoff";
+            break;
+        case 75:
+            result = "bandwidth";
+            break;
+        case 76:
+            result = "FM amplitude";
+            break;
+        case 77:
+            result = "resonance centre";
+            break;
+        case 78:
+            result = "resonance bandwidth";
+            break;
+        case 120:
+            result = "all sounds off";
+            break;
+        case 121:
+            result = "reset all controllers";
+            break;
+        case 123:
+            result = "all notes off";
+            break;
+        default:
+        {
+            if (cc == synth->getRuntime().midi_bank_C)
+                result = "bank change";
+            else if (cc == synth->getRuntime().midi_bank_root)
+                result = "bank root change";
+            else if (cc == synth->getRuntime().midi_upper_voice_C)
+                result = "extended program change";
+        }
+    }
+    return result;
+}
+
 
 void Config::clearPresetsDirlist(void)
 {
@@ -504,8 +568,9 @@ bool Config::extractConfigData(XMLwrapper *xml)
     jackServer = xml->getparstr("linux_jack_server");
 
     // midi options
+    midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
-    midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 14, 128);
+    midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
 
@@ -589,6 +654,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
     xmltree->addparstr("linux_jack_server", jackServer);
 
+    xmltree->addpar("midi_bank_root", midi_bank_root);
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);

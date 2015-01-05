@@ -40,7 +40,8 @@ class MusicIO : virtual protected MiscFuncs
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         void InterleaveShorts(void);
         int getMidiController(unsigned char b);
-        void setMidiController(unsigned char ch, unsigned int ctrl, int param, bool in_place = false);
+        void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
+        void setMidiRoot(int rootnum);
         void setMidiBank(short banknum, bool in_place = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
         void setMidiNote(unsigned char chan, unsigned char note);
