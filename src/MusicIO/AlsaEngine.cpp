@@ -134,6 +134,14 @@ void AlsaEngine::Close(void)
         pthread_join(midi.pThread, &ret);
         midi.pThread = 0;
     }
+
+    if(audio.pThread != 0) //wait for audio thread to finish
+    {
+        void *ret = NULL;
+        pthread_join(audio.pThread, &ret);
+        audio.pThread = 0;
+    }
+
     if (audio.handle != NULL)
         alsaBad(snd_pcm_close(audio.handle), "close pcm failed");
     audio.handle = NULL;
@@ -423,7 +431,7 @@ bool AlsaEngine::Start(void)
         goto bail_out;
     }
     if (NULL != audio.handle && !synth->getRuntime().startThread(&audio.pThread, _AudioThread,
-                                                     this, true, 0))
+                                                     this, true, 1, false))
     {
         synth->getRuntime().Log(" Failed to start Alsa audio thread");
         goto bail_out;
