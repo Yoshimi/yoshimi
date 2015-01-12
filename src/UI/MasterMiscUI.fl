@@ -369,10 +369,11 @@ class SysEffSend {open : {public WidgetPDial, private MiscFuncs}
   } {
     code {neff1=0; neff2=0;} {}
   }
-  Function {init(int neff1_,int neff2_, SynthEngine *_synth)} {open
+  Function {init(int neff1_, int neff2_, SynthEngine *_synth)} {open
   } {
-    code {synth = _synth;
-neff1 = neff1_;
+    code {//
+        synth = _synth;
+        neff1 = neff1_;
         neff2 = neff2_;
         minimum(0);
         maximum(127);
@@ -453,15 +454,22 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
         }
         Fl_Button {} {
           label Edit
-          callback {if ((int)bankui->cbwig->value() != (npart + 1))
+          callback {//
+              if ((int)bankui->cbwig->value() != (npart + 1))
               {
                   bankui->cbwig->value(npart+1);
                   bankui->cbwig->do_callback();
-              }}
+              }
+              if (Fl::event() == FL_RELEASE and Fl::event_button() == FL_RIGHT_MOUSE)
+                  synth->getGuiMaster()->showInstrumentEditWindow(npart);}
+          tooltip {Left mouse button: Part select
+Right mouse button: Instrument edit}
           xywh {12 247 40 20} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Choice partrcv {
-          callback {synth->part[npart]->Prcvchn=o->value();}
+          callback {//
+              synth->part[npart]->Prcvchn=o->value();
+              synth->getGuiMaster()->setPartMidiWidget(npart, o->value() + 1);}
           tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {

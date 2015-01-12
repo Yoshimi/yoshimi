@@ -75,10 +75,11 @@ class PartSysEffSend {open : {public Fl_Group, private MiscFuncs}
     Fl_Group(x, y, w, h, NULL)} {} {
     code {neff = 0;npart = 0;} {}
   }
-  Function {init(int npart_,int neff_, SynthEngine *_synth)} {open
+  Function {init(int npart_, int neff_, SynthEngine *_synth)} {open
   } {
-    code {synth = _synth;
-npart = npart_;
+    code {//
+        synth = _synth;
+        npart = npart_;
         neff = neff_;
         make_window();
         syseffsend->show();
@@ -305,10 +306,10 @@ class PartKitItem {open : {public Fl_Group}
                 o->value(1);}
     }
   }
-  Function {init(Part *part_,int n_,PartUI_ *partui_)} {open
+  Function {init(Part *part_, int n_, PartUI_ *partui_)} {open
   } {
     code {//
-synth = part_->getSynthEngine();
+      synth = part_->getSynthEngine();
       part = part_;
       n = n_;
       partui = partui_;
@@ -432,9 +433,11 @@ Offset}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled);}
       }
-      Fl_Spinner {} {
+      Fl_Spinner midich {
         label Midi
-        callback {part->Prcvchn = lrint(o->value()) - 1;}
+        callback {//
+            part->Prcvchn = lrint(o->value()) - 1;
+            synth->getGuiMaster()->setPanelPartMidiWidget(npart, o->value() - 1);}
         tooltip {Midi channel for this part} xywh {35 36 40 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
       }
