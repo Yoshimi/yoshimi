@@ -2,6 +2,11 @@ If you want the latest and (hopefully) greatest, click on the 'code' tab and the
 
 yoshimi-1.3.x
 
+2015-1-12 Will
+- Applied patches from Harry
+  MIDI channel selection now in sync between main window and panel and
+  right click on panel 'Edit' opens the actual edit menu.
+
 2015-1-8 Andrew
 - Fixed segfault on exit if Alsa audio engine is used
 

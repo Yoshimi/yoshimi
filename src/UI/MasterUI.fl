@@ -1100,6 +1100,23 @@ ZynAddSubFX}
     code {//
         panellistitem[_npart]->partpanning->value(_value);} {}
   }
+  Function {setPartMidiWidget(int _npart, unsigned char _value)} {open
+  } {
+    code {//
+        if (_npart == npart)
+            partui->midich->value(_value);} {}
+  }
+  Function {setPanelPartMidiWidget(int _npart, unsigned char _value)} {open
+  } {
+    code {//
+        panellistitem[_npart]->partrcv->value(_value);} {}
+  }
+  Function {showInstrumentEditWindow(int _npart)} {open
+  } {
+    code {//
+        if (_npart == npart)
+            partui->instrumenteditwindow->show();} {}
+  }
   Function {updateBankRootDirs()} {open
   } {
     code {configui->readbankcfg();} {selected
