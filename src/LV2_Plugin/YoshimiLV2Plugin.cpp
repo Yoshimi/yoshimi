@@ -66,6 +66,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     uint real_sample_count = min(sample_count, _bufferSize);
     uint32_t offs = 0;
     uint32_t next_frame = 0;
+    uint32_t processed = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
@@ -91,7 +92,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             if(next_frame >= real_sample_count)
                 continue;
             uint32_t to_process = next_frame - offs;
-            if(to_process > 0)
+            if((to_process > 0)
+               && (processed < real_sample_count)
+               && (to_process <= (real_sample_count - processed)))
             {
                 _synth->MasterAudio(tmpLeft, tmpRight, to_process);
                 offs = next_frame;
@@ -100,6 +103,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                     tmpLeft [i] += to_process;
                     tmpRight [i] += to_process;
                 }
+                processed += to_process;
             }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
@@ -145,9 +149,9 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if(offs < real_sample_count)
+    if(processed < real_sample_count)
     {
-        uint32_t to_process = real_sample_count - offs;
+        uint32_t to_process = real_sample_count - processed;
         if(to_process > 0)
         {
             _synth->MasterAudio(tmpLeft, tmpRight, to_process);
