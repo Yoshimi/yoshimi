@@ -121,10 +121,11 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     synth(_synth),
     bRuntimeSetupCompleted(false)
 {
-    fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
+    if(!synth->getIsLV2Plugin())
+        fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
                                // toward zero.
-    //^^^^^^^^^^^^^^^ This call is not needed aymore
+    //^^^^^^^^^^^^^^^ This call is not needed aymore (at least for lv2 plugin)
     //as all calls to lrintf() are replaced with (int)truncf()
     //which befaves exactly the same when flag FE_TOWARDZERO is set
 
@@ -1008,6 +1009,10 @@ int Config::SSEcapability(void)
 
 void Config::AntiDenormals(bool set_daz_ftz)
 {
+    if(synth->getIsLV2Plugin())
+    {
+        return;// no need to set floating point rules for lv2 - host should control it.
+    }
     #if defined(__SSE__)
         if (set_daz_ftz)
         {
