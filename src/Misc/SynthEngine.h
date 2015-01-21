@@ -52,8 +52,9 @@ class MasterUI;
 
 class SynthEngine : private SynthHelper, MiscFuncs
 {
-    private:
+    private:    
         bool isLV2Plugin;
+        Bank bank;
         Config Runtime;
         PresetsStore presetsstore;
     public:
@@ -135,8 +136,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         // others ...
         Controller *ctl;
-        Microtonal microtonal;
-        Bank bank;
+        Microtonal microtonal;        
         FFTwrapper *fft;
 
         // peaks for VU-meters        
@@ -170,6 +170,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int getLFOtime() {return LFOtime;}
         std::string makeUniqueName(const char *name);
 
+        Bank &getBankRef() {return bank;}
+        Bank *getBankPtr() {return &bank;}
     private:
         int muted;
         float volume;

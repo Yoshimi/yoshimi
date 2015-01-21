@@ -32,17 +32,76 @@ using namespace std;
 
 #include "Misc/MiscFuncs.h"
 #include "Misc/Part.h"
+#include <map>
+#include <vector>
 
 #define BANK_SIZE 160
 
 #define MAX_NUM_BANKS 2000
-
+/*
 typedef struct {
     string name;
     string alias;
     string dir;
     int ID;
 } bankstruct_t;
+*/
+typedef struct _InstrumentEntry
+{
+    string name;
+    string filename;
+    bool used;
+    bool PADsynth_used;
+    _InstrumentEntry()
+        :name(""),
+         filename(""),
+         used(false),
+         PADsynth_used(false)
+    {
+
+    }
+    void clear()
+    {
+        used = false;
+        name.clear();
+        filename.clear();
+        PADsynth_used = false;
+    }
+} InstrumentEntry; // Contains the leafname of the instrument.
+
+typedef map<int, InstrumentEntry> InstrumentEntryMap; // Maps instrument id to instrument entry.
+
+typedef struct _BankEntry
+{
+    string dirname;
+    InstrumentEntryMap instruments;
+    _BankEntry()
+        :dirname("")
+    {
+        instruments.clear();
+    }
+    _BankEntry(string _dirname)
+        :dirname(_dirname)
+    {
+        instruments.clear();
+    }
+
+} BankEntry; // Contains the bank directory name and the instrument map of the bank.
+
+typedef vector<BankEntry> BankEntryMap; // Maps bank id to bank entry.
+
+typedef struct _RootEntry
+{
+    string path;
+    BankEntryMap banks;
+    _RootEntry(string _path)
+        :path(_path)
+    {
+        banks.clear();
+    }
+} RootEntry; // Contains the root path and the bank map of the root.
+
+typedef vector<RootEntry> RootEntryMap; // Maps root id to root entry.
 
 class SynthEngine;
 
@@ -65,30 +124,51 @@ class Bank : private MiscFuncs
         void savetoslot(unsigned int ninstrument, Part *part);
         bool loadfromslot(unsigned int ninstrument, Part *part);
         void swapslot(unsigned int n1, unsigned int n2);
-        bool loadbank(string bankdirname);
+        bool loadbank(size_t rootID, size_t banknum);
         bool newbank(string newbankdirname);
         void rescanforbanks(void);
-        bool locked(void) { return (dirname.size() == 0); };
+        //bool locked(void) { return (dirname.size() == 0); }
              // Check if the bank is locked (i.e. the file opened was readonly)
-        bankstruct_t banks[MAX_NUM_BANKS];
-        string bankfiletitle; //this is shown on the UI of the bank (the title of the window)
+        //bankstruct_t banks[MAX_NUM_BANKS];
+        void clearBankrootDirlist(void);        
+        void removeRoot(size_t rootID);
+        bool changeRootID(size_t oldID, size_t newID);
 
+        bool setCurrentRootID(size_t newRootID);
+        bool setCurrentBankID(size_t newBankID);
+        size_t getCurrentRootID() {return currentRootID;}
+        size_t getCurrentBankID() {return currentBankID;}
+        void addRootDir(string newRootDir);
+        void parseConfigFile(XMLwrapper *xml);
+        void saveToConfigFile(XMLwrapper *xml);
+
+        string getBankPath(size_t rootID, size_t bankID);
+        string getRootPath(size_t rootID);
+        string getFullPath(size_t rootID, size_t bankID, size_t ninstrument);
+
+        const BankEntryMap &getBanks(size_t rootID);
+        const RootEntryMap &getRoots();
+        const BankEntry &getBank(size_t bankID);
+
+
+        bool locked() {return false;}
+        string getBankFileTitle() {return getBankPath(currentRootID, currentBankID);}
     private:
-        bool addtobank(int pos, string filename, string name);
+        bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
              // add an instrument to the bank, if pos is -1 try to find a position
              // returns true if the instrument was added
 
-        void deletefrombank(unsigned int pos);
-        void clearbank(void);
+        void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         void scanrootdir(int root_idx); // scans a root dir for banks
-        static bool bankCmp(bankstruct_t lhs, bankstruct_t rhs)
-            { return lhs.name < rhs.name; };
-        void add_bank(string name, string dir, int idx);
+        /*static bool bankCmp(bankstruct_t lhs, bankstruct_t rhs)
+            { return lhs.name < rhs.name; };*/
+        size_t add_bank(string name, string fullDir, size_t idx);
         bool check_bank_duplicate(string alias);
 
-        string dirname;
+        //string dirname;
         const string defaultinsname;
 
+        /*
         string tmpinsname[BANK_SIZE]; // this keeps the numbered names
         struct bank_instrument_t {
             string name;
@@ -96,13 +176,26 @@ class Bank : private MiscFuncs
             bool used;
             unsigned char PADsynth_used;
         } bank_instrument[BANK_SIZE];
+        */
 
-        list<bankstruct_t> bank_dir_list;
-        const int bank_size;
+        /*list<bankstruct_t> bank_dir_list;*/
+        //const int bank_size;
         const string xizext;
         const string force_bank_dir_file;
-
         SynthEngine *synth;
+
+        /*
+        string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
+        int           bankRootDirID[MAX_BANK_ROOT_DIRS];
+        */
+        //string        currentRootDir;
+        size_t           currentRootID;
+        size_t        currentBankID;
+
+        RootEntryMap  roots;
+
+        InstrumentEntry &getInstrumentReference(size_t ninstrument );
+        InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
 
 };
 

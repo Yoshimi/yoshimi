@@ -42,7 +42,7 @@ class MusicIO : virtual protected MiscFuncs
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
         //if setBank is false then set RootDir number else current bank number
-        void setMidiBankOrRootDir(int bank_or_root_num, bool in_place = false, bool setRootDir = false);
+        void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);

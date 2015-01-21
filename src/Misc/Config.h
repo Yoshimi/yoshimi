@@ -60,12 +60,9 @@ class Config : public MiscFuncs
         void Log(string msg, bool tostderr = true);
     #endif
         void flushLog(void);
-        void clearBankrootDirlist(void);
+
         void clearPresetsDirlist(void);
-        void insertroot(string newpath);
-        void removeroot(string oldpath);
-        void setrootdefault(string newpath);
-        bool setrootID(string path, int newID);
+
         string testCCvalue(int cc);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
@@ -127,12 +124,7 @@ class Config : public MiscFuncs
 
         int           BankUIAutoClose;
         unsigned int  GzipCompression;
-        int           Interpolation;
-        string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
-        int           bankRootDirID[MAX_BANK_ROOT_DIRS];
-        string        currentRootDir;
-        int           currentRootID;
-        string        currentBankDir;
+        int           Interpolation;        
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;
         bool          SimpleCheck;

@@ -39,6 +39,7 @@ static unsigned int synthNextId = 0;
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     isLV2Plugin(_isLV2Plugin),
+    bank(this),
     Runtime(this, argc, argv),
     presetsstore(this),
     shutup(false),
@@ -56,9 +57,8 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     p_bufferbytes(0),
     p_buffersize_f(0),
     ctl(NULL),
-    microtonal(this),
-    bank(this),
-    fft(NULL),
+    microtonal(this),    
+    fft(NULL),    
     muted(0xFF),
     tmpmixl(NULL),
     tmpmixr(NULL),
@@ -376,21 +376,20 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 
 void SynthEngine::SetBankRoot(int rootnum)
 {
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    if(bank.setCurrentRootID(rootnum))
     {
-        if (Runtime.bankRootDirID[i] == rootnum)
-        {
-            Runtime.currentRootID = rootnum;
-            Runtime.currentRootDir = Runtime.bankRootDirlist[i];
-            Runtime.Log("Found (" + asString(rootnum) + ")  " + Runtime.currentRootDir);
-            if (Runtime.showGui)
-            {
-                guiMaster->updateBankRootDirs();
-            }
-            return;
-        }
+        Runtime.Log("Found (" + asString(rootnum) + ")  " + bank.getRootPath(bank.getCurrentRootID()));
     }
-    Runtime.Log("No match for root ID " + asString(rootnum));
+    else
+    {
+        Runtime.Log("No match for root ID " + asString(rootnum));
+    }
+    if (Runtime.showGui)
+    {
+        guiMaster->updateBankRootDirs();
+    }
+
+
 }
 
 
@@ -400,6 +399,23 @@ void SynthEngine::SetBank(int banknum)
     128 banks is enough for anybody :-)
     this is configurable to suit different hardware synths
     */
+
+    //new implementation uses only 1 call :)
+    if(bank.setCurrentBankID(banknum))
+    {
+        guiMaster->bankui->set_bank_slot();
+        guiMaster->bankui->refreshmainwindow();
+        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
+        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
+
+    }
+    else
+    {
+        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
+    }
+
+
+    /*
     int offset = 0;
 #warning this needs improving.
     for (int idx = 0; idx < MAX_NUM_BANKS; ++ idx)
@@ -415,7 +431,7 @@ void SynthEngine::SetBank(int banknum)
 
     if(banknum <= MAX_NUM_BANKS) {
         if (bank.loadbank(bank.banks[banknum].dir))
-            Runtime.Log("SynthEngine setBank: Loaded " + bank.banks[banknum].name);
+            Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
         if (Runtime.showGui)
         {
             guiMaster->bankui->set_bank_slot();
@@ -427,6 +443,7 @@ void SynthEngine::SetBank(int banknum)
     else
         Runtime.Log("SynthEngine setBank: Value is out of range!");
     return;
+    */
 }
 
 

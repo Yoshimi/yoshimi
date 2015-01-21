@@ -169,9 +169,9 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 
 //bank change and root dir change change share the same thread
 //to make changes consistent
-void MusicIO::setMidiBankOrRootDir(int bank_or_root_num, bool in_place, bool setRootDir)
+void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place, bool setRootDir)
 {
-    if (setRootDir && (bank_or_root_num == synth->getRuntime().currentRootID))
+    if (setRootDir && (bank_or_root_num == synth->getBankRef().getCurrentRootID()))
         return; // nothing to do!
     if(in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);

@@ -56,10 +56,6 @@ private:
    void *midiThread(void);
    void *idleThread(void);
    std::vector <LV2_Program_Descriptor> flatbankprgs;
-   bool chkBankDup(const list<bankstruct_t> &bank_dir_list, string alias);
-   void addBankPrg(list<bankstruct_t> &bank_dir_list, string name, string dir);
-   void addtobank(uint32_t banknum, string bankname, bool bank_instrument[], int pos, string prgname);
-   void scanBankPrg();
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();

@@ -137,8 +137,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
 
 bool Config::Setup(int argc, char **argv)
 {
-    //Andrew Deryabin: It's safe to call these functions before everything else
-    clearBankrootDirlist();
     clearPresetsDirlist();
     AntiDenormals(true);
 
@@ -260,73 +258,6 @@ string Config::historyFilename(int index)
         return itx->file;
     }
     return string();
-}
-
-
-void Config::clearBankrootDirlist(void)
-{
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-    {
-        bankRootDirlist[i].clear();
-        bankRootDirID[i] = -1; // probably not necessary
-    }
-}
-
-
-void Config::insertroot(string newpath)
-{
-    int i = 0;
-    while (i < MAX_BANK_ROOT_DIRS and synth->getRuntime().bankRootDirlist[i] > "")
-        i++;
-    int candidate = 0;
-    synth->getRuntime().bankRootDirlist[i] = newpath;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-    {
-        if (synth->getRuntime().bankRootDirID[i] == candidate)
-            candidate += 1;
-    }
-    synth->getRuntime().bankRootDirID[i] = candidate;
-}
-
-
-void Config::removeroot(string oldpath)
-{
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (synth->getRuntime().bankRootDirlist[i] == oldpath)
-        {
-            synth->getRuntime().bankRootDirlist[i] = "";
-            synth->getRuntime().bankRootDirID[i] = -1;
-        }
-}
-
-
-void Config::setrootdefault(string newpath)
-{
-    currentRootDir = newpath;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (synth->getRuntime().bankRootDirlist[i] == newpath)
-        {
-            currentRootID = synth->getRuntime().bankRootDirID[i];
-            break;
-        }
-}
-
-
-bool Config::setrootID(string path, int newID)
-{
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-       if (synth->getRuntime().bankRootDirID[i] == newID)
-           return false; // already in use
-
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (synth->getRuntime().bankRootDirlist[i] == path)
-        {
-            if (currentRootID == synth->getRuntime().bankRootDirID[i])
-                currentRootID = newID;
-            synth->getRuntime().bankRootDirID[i] = newID;
-            break;
-        }
-    return true;
 }
 
 
@@ -485,55 +416,16 @@ bool Config::extractConfigData(XMLwrapper *xml)
     BankUIAutoClose = xml->getpar("bank_window_auto_close",
                                                BankUIAutoClose, 0, 1);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    currentRootDir = xml->getparstr("root_current");
-    if (currentRootDir > "")
-        currentRootID = xml->getpar("root_current_ID", 0, 0, 127);
-    else
-        currentRootID = 0;
-    currentBankDir = xml->getparstr("bank_current");
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
     // get bank dirs
-    int count = 0;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-    {
-        if (xml->enterbranch("BANKROOT", i))
-        {
-            string dir = xml->getparstr("bank_root");
-            if (isDirectory(dir))
-            {
-                bankRootDirID[count] = i;
-                bankRootDirlist[count++] = dir;
-            }
-            xml->exitbranch();
-        }
-    }
-    if (!count)
-    {
-        string bankdirs[] = {
-            "/usr/share/yoshimi/banks",
-            "/usr/local/share/yoshimi/banks",
-            "/usr/share/zynaddsubfx/banks",
-            "/usr/local/share/zynaddsubfx/banks",
-            string(getenv("HOME")) + "/banks",
-            "../banks",
-            "banks"
-        };
-        const int defaultsCount = 7; // as per bankdirs[] size above
-        for (int i = 0; i < defaultsCount; ++i)
-        {
-            if (bankdirs[i].size() && isDirectory(bankdirs[i]))
-                bankRootDirlist[count++] = bankdirs[i];
-        }
-    }
-    if (!currentBankDir.size())
-        currentBankDir = bankRootDirlist[0];
+    synth->getBankRef().parseConfigFile(xml);
 
     // get preset dirs
-    count = 0;
+    int count = 0;
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
         if (xml->enterbranch("PRESETSROOT", i))
@@ -628,19 +520,10 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("check_pad_synth", CheckPADsynth);
-    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
-    xmltree->addparstr("root_current", currentRootDir);
-    xmltree->addpar("root_current_ID", currentRootID);
-    xmltree->addparstr("bank_current", currentBankDir);
+    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));    
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        if (bankRootDirlist[i].size())
-        {
-            xmltree->beginbranch("BANKROOT",bankRootDirID[i]);
-            xmltree->addparstr("bank_root", bankRootDirlist[i]);
-            xmltree->endbranch();
-        }
+    synth->getBankRef().saveToConfigFile(xmltree);
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         if (presetsDirlist[i].size())

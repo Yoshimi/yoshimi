@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -40,6 +40,9 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {private local
 } 
 
+decl {\#include "Misc/Bank.h"} {private local
+} 
+
 class ConfigUI {open : {private MiscFuncs}
 } {
   Function {make_window()} {open
@@ -47,7 +50,7 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open
-      xywh {376 436 465 335} type Double hide
+      xywh {336 158 465 335} type Double visible
     } {
       Fl_Tabs {} {open
         xywh {5 5 457 325}
@@ -189,16 +192,18 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 295} labelsize 12
+          xywh {5 25 457 295} labelsize 12 hide
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
 activatebutton_rootdir(tmp!=0);
 if (tmp)
-    rootselected = o->text(tmp);
+{
+    selectedRootID = reinterpret_cast<long>(o->data(tmp));
+}
     
 changeIDbutton->value(recoverID());
-oldrootID = changeIDbutton->value();} selected
+oldrootID = changeIDbutton->value();}
             xywh {10 35 445 200} type Hold labelsize 12 textsize 13
           }
           Fl_Button {} {
@@ -208,7 +213,7 @@ oldrootID = changeIDbutton->value();} selected
     dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
     if (!dirname)
       return;
-    synth->getRuntime().insertroot(dirname);
+    synth->getBankRef().addRootDir(dirname);
     readbankcfg();
     configChanged = true;}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
@@ -216,11 +221,9 @@ oldrootID = changeIDbutton->value();} selected
           Fl_Button removerootdirbutton {
             label {Remove root dir...}
             callback {//
-    int pos;
-    if (!rootselected.empty())
+    if (selectedRootID >= 0)
     {
-        pos = rootselected.find_first_of(" (");
-        synth->getRuntime().removeroot(rootselected.substr(0, pos));
+        synth->getBankRef().removeRoot(selectedRootID);
         readbankcfg();
         configChanged = true;
     }
@@ -231,11 +234,9 @@ oldrootID = changeIDbutton->value();} selected
           Fl_Button makedefaultrootdirbutton {
             label {Make current}
             callback {//
-    int pos;
-    if (!rootselected.empty())
+    if (selectedRootID >= 0)
     {
-        pos = rootselected.find_first_of(" (");
-        synth->getRuntime().setrootdefault(rootselected.substr(0, pos));
+        synth->getBankRef().setCurrentRootID(selectedRootID);
         readbankcfg();
         configChanged = true;
     }
@@ -246,12 +247,11 @@ oldrootID = changeIDbutton->value();} selected
           Fl_Return_Button changeIDok {
             label Set
             callback {//
-    int pos;
     if (changeIDbutton->value() != oldrootID)
     {
-        if (!rootselected.empty())
-            pos = rootselected.find_first_of(" (");
-            if (synth->getRuntime().setrootID(rootselected.substr(0, pos), changeIDbutton->value()))
+        if (selectedRootID >= 0)
+        {
+            if (synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value()))
             {
                 readbankcfg();
                 configChanged = true;
@@ -261,6 +261,7 @@ oldrootID = changeIDbutton->value();} selected
                 changeIDbutton->value(oldrootID);
                 fl_alert("ID already in use!");
             }
+        }
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
     }}
@@ -274,7 +275,7 @@ oldrootID = changeIDbutton->value();} selected
         }
         Fl_Group {} {
           label {Presets dirs} open
-          xywh {5 25 455 280} labelsize 12 hide
+          xywh {5 25 455 280} labelsize 12
         } {
           Fl_Browser presetbrowse {
             callback {activatebutton_presetdir(o->value() != 0);}
@@ -670,7 +671,7 @@ configwindow->do_callback();}
         make_window();
         readbankcfg();
         readpresetcfg();
-//        rootselected = "";} {}
+	selectedRootID = -1;} {}
   }
   Function {activatebutton_rootdir(bool active)} {open
   } {
@@ -708,31 +709,25 @@ configwindow->do_callback();}
   } {
     code {//
     string tmp;
-    int ID;
     rootsbrowse->clear();
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    const RootEntryMap &roots = synth->getBankRef().getRoots();
+    for(unsigned int i = 0; i < roots.size(); i++)
     {
-         tmp = synth->getRuntime().bankRootDirlist[i];
-        if (tmp.size())
-        {
-            ID = synth->getRuntime().bankRootDirID[i];
-            tmp += " (";
-            tmp += asString(ID);
-            tmp += ")";
-            if (ID == synth->getRuntime().currentRootID)
-                tmp += " *";
-            rootsbrowse->add(tmp.c_str());
-         }
-    }} {}
+    	tmp = asString(i) + ". " + roots [i].path;
+    	if(i == synth->getBankRef().getCurrentRootID())    
+    	{
+    	   tmp += " *";
+    	}
+    	rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(i)));    	
+    }} {selected
+    }
   }
   Function {recoverID()} {open return_type int
   } {
     code {//
-    if (!rootselected.empty())
+    if (selectedRootID >= 0)
     {
-        int pos1 = rootselected.find_first_of(" (");
-        int pos2 = rootselected.find_first_of(")");
-        return string2int(rootselected.substr(pos1+2, pos2));
+        return selectedRootID;
     }
     return 0;} {}
   }
@@ -765,7 +760,7 @@ configwindow->do_callback();}
   }
   decl {SynthEngine *synth;} {private local
   }
-  decl {string rootselected;} {private local
+  decl {long selectedRootID;} {private local
   }
   decl {int EPCvalue;} {private local
   }
