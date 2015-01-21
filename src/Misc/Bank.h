@@ -85,10 +85,15 @@ typedef struct _BankEntry
     {
         instruments.clear();
     }
+    bool operator==(const string &s2)
+    {
+        return dirname == s2;
+    }
 
 } BankEntry; // Contains the bank directory name and the instrument map of the bank.
 
 typedef vector<BankEntry> BankEntryMap; // Maps bank id to bank entry.
+
 
 typedef struct _RootEntry
 {
@@ -196,6 +201,9 @@ class Bank : private MiscFuncs
 
         InstrumentEntry &getInstrumentReference(size_t ninstrument );
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
+
+        void addDefaultRootDirs();
+        void sortBanks(size_t rootID);
 
 };
 

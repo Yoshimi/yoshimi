@@ -55,6 +55,7 @@ Bank::Bank(SynthEngine *_synth) :
     currentBankID(0)
 {
     roots.clear();
+    addDefaultRootDirs();
 }
 
 
@@ -283,7 +284,15 @@ bool Bank::newbank(string newbankdir)
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
     fclose(tmpfile);
     size_t newbanknum = add_bank(newbankdir, newbankdir, currentRootID);
-    return loadbank(currentRootID, newbanknum);
+    currentBankID = 0;
+    sortBanks(currentRootID);
+    BankEntryMap &banks = roots.at(currentRootID).banks;
+    BankEntryMap::iterator it = find(banks.begin(), banks.end(), newbankdir);
+    if(it != banks.end())
+    {
+        currentBankID = it - banks.begin();
+    }
+    return true;
 }
 
 
@@ -300,9 +309,12 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
     if (emptyslot(n1) && emptyslot(n2))
         return;
     if (emptyslot(n1)) // make the empty slot the destination
-        swap(n1, n2);
-
-    if (emptyslot(n2)) // this is just a movement to an empty slot
+    {
+        setname(n2, getname(n2), n1);
+        getInstrumentReference(n1) = getInstrumentReference(n2);
+        getInstrumentReference(n2).clear();
+    }
+    else if (emptyslot(n2)) // this is just a movement to an empty slot
     {
         setname(n1, getname(n1), n2);
         getInstrumentReference(n2) = getInstrumentReference(n1);
@@ -310,8 +322,8 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
     }
     else
     {   // if both slots are used
-        InstrumentEntry instrRef1 = getInstrumentReference(n1);
-        InstrumentEntry instrRef2 = getInstrumentReference(n2);
+        InstrumentEntry &instrRef1 = getInstrumentReference(n1);
+        InstrumentEntry &instrRef2 = getInstrumentReference(n2);
         if (instrRef1.name == instrRef2.name)
         {
             // change the name of the second instrument if the name are equal
@@ -337,13 +349,12 @@ void Bank::rescanforbanks(void)
 
 }
 
-
 // private affairs
 
 void Bank::scanrootdir(int root_idx)
 {
 
-    string rootdir = roots [root_idx].path;
+    string rootdir = roots.at(root_idx).path;
     if (rootdir.empty() || !isDirectory(rootdir))
         return;
     DIR *dir = opendir(rootdir.c_str());
@@ -419,10 +430,11 @@ void Bank::scanrootdir(int root_idx)
         closedir(d);
     }
     closedir(dir);
+    sortBanks(root_idx);
 }
 
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
-{
+{    
     BankEntry &bank = roots.at(rootID).banks.at(bankID);
     if (pos >= 0 && pos < BANK_SIZE)
     {
@@ -484,8 +496,9 @@ size_t Bank::add_bank(string name, string fullDir, size_t idx)
     if(idx >= roots.size())
         return 0;
     roots [idx].banks.push_back(BankEntry(name));
-    loadbank(idx, roots [idx].banks.size() - 1);
-    return 0;
+    size_t newIndex = roots [idx].banks.size() - 1;
+    loadbank(idx, newIndex);
+    return newIndex;
 }
 
 InstrumentEntry &Bank::getInstrumentReference(size_t ninstrument)
@@ -495,7 +508,40 @@ InstrumentEntry &Bank::getInstrumentReference(size_t ninstrument)
 
 InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument)
 {
-    return roots [rootID].banks [bankID].instruments [ninstrument];
+    return roots.at(rootID).banks.at(bankID).instruments [ninstrument];
+}
+
+void Bank::addDefaultRootDirs()
+{
+    string bankdirs[] = {
+        "/usr/share/yoshimi/banks",
+        "/usr/local/share/yoshimi/banks",
+        "/usr/share/zynaddsubfx/banks",
+        "/usr/local/share/zynaddsubfx/banks",
+        string(getenv("HOME")) + "/banks",
+        "../banks",
+        "banks"
+    };
+    for (unsigned int i = 0; i < (sizeof(bankdirs) / sizeof(bankdirs [0])); ++i)
+    {
+        addRootDir(bankdirs [i]);
+    }
+}
+
+
+bool bankEntrySortFn(const BankEntry &e1, const BankEntry &e2)
+{
+    string d1 = e1.dirname;
+    string d2 = e2.dirname;
+    transform(d1.begin(), d1.end(), d1.begin(), ::toupper);
+    transform(d2.begin(), d2.end(), d2.begin(), ::toupper);
+    return d1 < d2;
+}
+
+void Bank::sortBanks(size_t rootID)
+{
+    BankEntryMap &banks = roots.at(rootID).banks;
+    sort(banks.begin(), banks.end(), bankEntrySortFn);
 }
 
 string Bank::getBankPath(size_t rootID, size_t bankID)
@@ -544,7 +590,7 @@ const RootEntryMap &Bank::getRoots()
 
 const BankEntry &Bank::getBank(size_t bankID)
 {
-    return roots [currentRootID].banks [bankID];
+    return roots.at(currentRootID).banks.at(bankID);
 }
 
 
@@ -582,10 +628,12 @@ bool Bank::changeRootID(size_t oldID, size_t newID)
     if(newID >= roots.size())
     {
         roots.push_back(newRoot);
+        setCurrentRootID(roots.size() - 1);
     }
     else
     {
         roots.insert(roots.begin() + newID, newRoot);
+        setCurrentRootID(newID);
     }
 
     return true;
@@ -593,11 +641,11 @@ bool Bank::changeRootID(size_t oldID, size_t newID)
 
 bool Bank::setCurrentRootID(size_t newRootID)
 {
-    if(newRootID >= roots.size() || roots [newRootID].path.empty())
+    if(newRootID >= roots.size() || roots.at(newRootID).path.empty())
     {
         return false;
     }
-    currentRootID = newRootID;
+    currentRootID = newRootID;    
     setCurrentBankID(0);
     return true;
 }
@@ -638,19 +686,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
     }
     if (!count)
     {
-        string bankdirs[] = {
-            "/usr/share/yoshimi/banks",
-            "/usr/local/share/yoshimi/banks",
-            "/usr/share/zynaddsubfx/banks",
-            "/usr/local/share/zynaddsubfx/banks",
-            string(getenv("HOME")) + "/banks",
-            "../banks",
-            "banks"
-        };
-        for (unsigned int i = 0; i < (sizeof(bankdirs) / sizeof(bankdirs [0])); ++i)
-        {
-            addRootDir(bankdirs [i]);
-        }
+        addDefaultRootDirs();
     }
 
     rescanforbanks();
