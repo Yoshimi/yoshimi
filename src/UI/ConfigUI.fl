@@ -43,6 +43,9 @@ decl {\#include "Misc/SynthEngine.h"} {private local
 decl {\#include "Misc/Bank.h"} {private local
 } 
 
+decl {\#include "MasterUI.h"} {private local
+} 
+
 class ConfigUI {open : {private MiscFuncs}
 } {
   Function {make_window()} {open
@@ -192,7 +195,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 295} labelsize 12 hide
+          xywh {5 25 457 295} labelsize 12
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
@@ -238,6 +241,7 @@ oldrootID = changeIDbutton->value();}
     {
         synth->getBankRef().setCurrentRootID(selectedRootID);
         readbankcfg();
+        synth->getGuiMaster()->bankui->rescan_for_banks(true);
         configChanged = true;
     }
     activatebutton_rootdir(false);}
@@ -254,6 +258,7 @@ oldrootID = changeIDbutton->value();}
             if (synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value()))
             {
                 readbankcfg();
+                synth->getGuiMaster()->bankui->rescan_for_banks(true);
                 configChanged = true;
             }
             else
@@ -264,7 +269,7 @@ oldrootID = changeIDbutton->value();}
         }
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
-    }}
+    }} selected
             xywh {305 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
@@ -275,7 +280,7 @@ oldrootID = changeIDbutton->value();}
         }
         Fl_Group {} {
           label {Presets dirs} open
-          xywh {5 25 455 280} labelsize 12
+          xywh {5 25 455 280} labelsize 12 hide
         } {
           Fl_Browser presetbrowse {
             callback {activatebutton_presetdir(o->value() != 0);}
@@ -711,16 +716,16 @@ configwindow->do_callback();}
     string tmp;
     rootsbrowse->clear();
     const RootEntryMap &roots = synth->getBankRef().getRoots();
-    for(unsigned int i = 0; i < roots.size(); i++)
-    {
-    	tmp = asString(i) + ". " + roots [i].path;
-    	if(i == synth->getBankRef().getCurrentRootID())    
-    	{
-    	   tmp += " *";
-    	}
-    	rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(i)));    	
-    }} {selected
-    }
+      RootEntryMap::const_iterator it;
+      for(it = roots.begin(); it != roots.end(); ++it)
+      {
+        tmp = asString(it->first) + ". " + it->second.path;
+        if(it->first == synth->getBankRef().getCurrentRootID())
+      	{
+      	   tmp += " *";
+      	}
+        rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
+      }} {}
   }
   Function {recoverID()} {open return_type int
   } {

@@ -403,15 +403,17 @@ void SynthEngine::SetBank(int banknum)
     //new implementation uses only 1 call :)
     if(bank.setCurrentBankID(banknum))
     {
-        guiMaster->bankui->set_bank_slot();
-        guiMaster->bankui->refreshmainwindow();
-        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
-        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
+        if(Runtime.showGui && guiMaster && guiMaster->bankui)
+        {
+            guiMaster->bankui->set_bank_slot();
+            guiMaster->bankui->refreshmainwindow();
+        }
+        Runtime.Log("SynthEngine setBank: Loaded bank " + asString(banknum));
 
     }
     else
     {
-        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
+        Runtime.Log("SynthEngine setBank: Can't load bank " + asString(banknum));
     }
 
 

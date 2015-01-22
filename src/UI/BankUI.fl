@@ -141,16 +141,16 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
   }
 } 
 
-class BankUI {open : {public BankProcess_}
+class BankUI {open : {public BankProcess_, MiscFuncs}
 } {
   Function {make_window()} {open
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {251 348 785 575} type Double hide
+      xywh {695 340 785 575} type Double
       code0 {o->copy_label(bank->getBankFileTitle().c_str());}
       code1 {if (!bank->getBankFileTitle().size())
-            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
+            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");} visible
     } {
       Fl_Button {} {
         label Close
@@ -261,13 +261,15 @@ class BankUI {open : {public BankProcess_}
              }
              
             rescan_for_banks(true);
-            const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
-            for (size_t i = 0; i < banks.size(); i++) // should never be reached!
+           const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
+            BankEntryMap::const_iterator it;
+            int i = 0;
+            for (it = banks.begin(); it != banks.end(); ++it, ++i) // should never be reached!
             {
-              if (banks [i].dirname == dirname)
+              if (it->second.dirname == dirname)
               {
                 banklist->value(i);
-		i = MAX_NUM_BANKS;
+		break;
               }
             }
             refreshmainwindow();}
@@ -347,8 +349,7 @@ fnc = &BankProcess_::process;
   }
   Function {init(Fl_Spinner *cbwig_)} {open
   } {
-    code {cbwig = cbwig_;rescan_for_banks(true);} {selected
-    }
+    code {cbwig = cbwig_;rescan_for_banks(true);} {}
   }
   Function {process()} {open return_type void
   } {
@@ -479,30 +480,43 @@ if(reload)
 {
         bank->rescanforbanks();
 }
-        const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
-        for (size_t i = 0; i < banks.size(); i++)
-        {
-            if (!banks [i].dirname.empty())
-            {
-                int n = banklist->add(banks [i].dirname.c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(i));
-                if(i == bank->getCurrentBankID())
-                {
-	                banklist->value(n);
-	        }
-            }   
-        }} {}
+       const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
+          BankEntryMap::const_iterator it;
+          for (it = banks.begin(); it != banks.end(); ++it)
+          {
+              if (!it->second.dirname.empty())
+              {
+                  int n = banklist->add((asString(it->first + 1) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
+                  if(it->first == bank->getCurrentBankID())
+                  {
+  	                banklist->value(n);
+  	        }
+              }   
+          }
+          refreshmainwindow();} {selected
+    }
   }
   Function {set_bank_slot()} {open
   } {
-    code {const Fl_Menu_Item *item = banklist->find_item(bank->getBank(bank->getCurrentBankID()).dirname.c_str());
-  if(item)
+    code {// 
+  size_t curID = bank->getCurrentBankID();
+  const Fl_Menu_Item *curItem = 0;
+  for(int i = 0; i < banklist->size(); i++)
   {
-      banklist->value(item);
+      const Fl_Menu_Item *item = banklist->menu() + i;
+      if(curID == reinterpret_cast<size_t>(item->user_data()))
+      {
+          curItem = item;
+      }
   }
-  else
-  {
-      banklist->value(0);
-  }} {}
+    if(curItem)
+    {
+        banklist->value(curItem);
+    }
+    else
+    {
+        banklist->value(0);
+    }} {}
   }
   decl {BankSlot *bs[BANK_SIZE];} {private local
   }
@@ -516,4 +530,9 @@ if(reload)
   }
   decl {SynthEngine *synth;} {private local
   }
+} 
+
+Function {findBankItemCb(Fl_Widget *m, void *data)} {open return_type {static void}
+} {
+  code {printf("Hello, World!\\n");} {}
 } 

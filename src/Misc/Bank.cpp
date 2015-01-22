@@ -114,11 +114,9 @@ void Bank::setname(unsigned int ninstrument, string newname, int newslot)
 // Check if there is no instrument on a slot from the bank
 bool Bank::emptyslot(unsigned int ninstrument)
 {
-    if (currentRootID >= roots.size() || currentBankID >= roots [currentRootID].banks.size())
+    if(roots.count(currentRootID) == 0 || roots [currentRootID].banks.count(currentBankID) == 0)
         return true;
-    if(ninstrument >= roots [currentRootID].banks[currentBankID].instruments.size())
-        return true;
-    InstrumentEntry &instr = roots [currentRootID].banks[currentBankID].instruments [ninstrument];
+    InstrumentEntry &instr = roots [currentRootID].banks [currentBankID].instruments [ninstrument];
     if (!instr.used)
         return true;
     if (instr.name.empty() || instr.filename.empty())
@@ -185,10 +183,6 @@ bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
 // Makes current a bank directory
 bool Bank::loadbank(size_t rootID, size_t banknum)
 {
-    if(banknum >= roots [rootID].banks.size())
-    {
-        return false;
-    }
     string bankdirname = getBankPath(rootID, banknum);
     if(bankdirname.empty())
     {
@@ -283,15 +277,7 @@ bool Bank::newbank(string newbankdir)
     forcefile += force_bank_dir_file;
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
     fclose(tmpfile);
-    size_t newbanknum = add_bank(newbankdir, newbankdir, currentRootID);
-    currentBankID = 0;
-    sortBanks(currentRootID);
-    BankEntryMap &banks = roots.at(currentRootID).banks;
-    BankEntryMap::iterator it = find(banks.begin(), banks.end(), newbankdir);
-    if(it != banks.end())
-    {
-        currentBankID = it - banks.begin();
-    }
+    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
     return true;
 }
 
@@ -341,9 +327,10 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
 // Re-scan for directories containing instrument banks
 void Bank::rescanforbanks(void)
 {
-    for (size_t i = 0; i < roots.size(); i++)
+    RootEntryMap::const_iterator it;
+    for (it = roots.begin(); it != roots.end(); ++it)
     {
-        scanrootdir(i);
+        scanrootdir(it->first);
     }
 
 
@@ -354,7 +341,7 @@ void Bank::rescanforbanks(void)
 void Bank::scanrootdir(int root_idx)
 {
 
-    string rootdir = roots.at(root_idx).path;
+    string rootdir = roots [root_idx].path;
     if (rootdir.empty() || !isDirectory(rootdir))
         return;
     DIR *dir = opendir(rootdir.c_str());
@@ -430,12 +417,11 @@ void Bank::scanrootdir(int root_idx)
         closedir(d);
     }
     closedir(dir);
-    sortBanks(root_idx);
 }
 
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
 {    
-    BankEntry &bank = roots.at(rootID).banks.at(bankID);
+    BankEntry &bank = roots [rootID].banks [bankID];
     if (pos >= 0 && pos < BANK_SIZE)
     {
         if (bank.instruments [pos].used)
@@ -491,13 +477,12 @@ void Bank::deletefrombank(size_t rootID, size_t bankID, unsigned int pos)
 }
 
 
-size_t Bank::add_bank(string name, string fullDir, size_t idx)
+size_t Bank::add_bank(string name, string , size_t rootID)
 {
-    if(idx >= roots.size())
-        return 0;
-    roots [idx].banks.push_back(BankEntry(name));
-    size_t newIndex = roots [idx].banks.size() - 1;
-    loadbank(idx, newIndex);
+    size_t newIndex = getNewBankIndex(rootID);
+    roots [rootID].banks [newIndex].dirname = name;
+
+    loadbank(rootID, newIndex);
     return newIndex;
 }
 
@@ -508,7 +493,7 @@ InstrumentEntry &Bank::getInstrumentReference(size_t ninstrument)
 
 InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument)
 {
-    return roots.at(rootID).banks.at(bankID).instruments [ninstrument];
+    return roots [rootID].banks [bankID].instruments [ninstrument];
 }
 
 void Bank::addDefaultRootDirs()
@@ -538,19 +523,39 @@ bool bankEntrySortFn(const BankEntry &e1, const BankEntry &e2)
     return d1 < d2;
 }
 
-void Bank::sortBanks(size_t rootID)
+size_t Bank::getNewRootIndex()
 {
-    BankEntryMap &banks = roots.at(rootID).banks;
-    sort(banks.begin(), banks.end(), bankEntrySortFn);
+    if(roots.empty())
+    {
+        return 0;
+    }
+
+    return roots.rbegin()->first + 1;
+
+
+}
+
+size_t Bank::getNewBankIndex(size_t rootID)
+{
+    if(roots [rootID].banks.empty())
+    {
+        return 0;
+    }
+
+    return roots [rootID].banks.rbegin()->first + 1;
 }
 
 string Bank::getBankPath(size_t rootID, size_t bankID)
 {
-    if(roots.at(rootID).path.empty() || roots.at(rootID).banks.at(bankID).dirname.empty())
+    if(roots.count(rootID) == 0 || roots [rootID].banks.count(bankID) == 0)
     {
         return string("");
     }
-    string chkdir = getRootPath(rootID) + string("/") + roots.at(rootID).banks.at(bankID).dirname;
+    if(roots [rootID].path.empty() || roots [rootID].banks [bankID].dirname.empty())
+    {
+        return string("");
+    }
+    string chkdir = getRootPath(rootID) + string("/") + roots [rootID].banks [bankID].dirname;
     if(chkdir.at(chkdir.size() - 1) == '/')
     {
         chkdir = chkdir.substr(0, chkdir.size() - 1);
@@ -560,11 +565,11 @@ string Bank::getBankPath(size_t rootID, size_t bankID)
 
 string Bank::getRootPath(size_t rootID)
 {
-    if(roots.at(rootID).path.empty())
+    if(roots.count(rootID) == 0 || roots [rootID].path.empty())
     {
         return string("");
     }
-    string chkdir = roots.at(rootID).path;
+    string chkdir = roots [rootID].path;
     if(chkdir.at(chkdir.size() - 1) == '/')
     {
         chkdir = chkdir.substr(0, chkdir.size() - 1);
@@ -575,7 +580,14 @@ string Bank::getRootPath(size_t rootID)
 
 string Bank::getFullPath(size_t rootID, size_t bankID, size_t ninstrument)
 {
-    return getBankPath(rootID, bankID) + string("/") + getInstrumentReference(rootID, bankID, ninstrument).filename;
+    string bankPath = getBankPath(rootID, bankID);
+    if(!bankPath.empty())
+    {
+        string instrFname = getInstrumentReference(rootID, bankID, ninstrument).filename;
+        return bankPath + string("/") + instrFname;
+    }
+    return string("");
+
 }
 
 const BankEntryMap &Bank::getBanks(size_t rootID)
@@ -590,7 +602,7 @@ const RootEntryMap &Bank::getRoots()
 
 const BankEntry &Bank::getBank(size_t bankID)
 {
-    return roots.at(currentRootID).banks.at(bankID);
+    return roots [currentRootID].banks [bankID];
 }
 
 
@@ -612,28 +624,24 @@ void Bank::removeRoot(size_t rootID)
     {
         currentRootID = 0;
     }
-    roots.erase(roots.begin() + rootID);
+    roots.erase(rootID);
 
 }
 
 
 bool Bank::changeRootID(size_t oldID, size_t newID)
 {
-    if(oldID >= roots.size())
+    RootEntry oldRoot = roots [oldID];
+    roots [oldID] = roots [newID];
+    roots [newID] = oldRoot;
+    setCurrentRootID(newID);
+    RootEntryMap::iterator it;
+    for(it = roots.begin(); it != roots.end(); ++it)
     {
-        return false;
-    }
-    RootEntry newRoot = roots [oldID];
-    roots.erase(roots.begin() + oldID);
-    if(newID >= roots.size())
-    {
-        roots.push_back(newRoot);
-        setCurrentRootID(roots.size() - 1);
-    }
-    else
-    {
-        roots.insert(roots.begin() + newID, newRoot);
-        setCurrentRootID(newID);
+        if(it->second.path.empty())
+        {
+            roots.erase(it);
+        }
     }
 
     return true;
@@ -641,7 +649,7 @@ bool Bank::changeRootID(size_t oldID, size_t newID)
 
 bool Bank::setCurrentRootID(size_t newRootID)
 {
-    if(newRootID >= roots.size() || roots.at(newRootID).path.empty())
+    if(roots.count(newRootID) == 0)
     {
         return false;
     }
@@ -660,31 +668,44 @@ bool Bank::setCurrentBankID(size_t newBankID)
     return false;
 }
 
-void Bank::addRootDir(string newRootDir)
+size_t Bank::addRootDir(string newRootDir)
 {
 
     if(newRootDir.empty() || !isDirectory(newRootDir))
     {
-        return;
+        return 0;
     }
-    roots.push_back(RootEntry(newRootDir));
+    size_t newIndex = getNewRootIndex();
+    roots [newIndex].path = newRootDir;
+    return newIndex;
 }
 
 void Bank::parseConfigFile(XMLwrapper *xml)
 {
     roots.clear();
-    int count = 0;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    string nodename = "BANKROOT";
+    if(synth->getUniqueId() > 0)
     {
-        if (xml->enterbranch("BANKROOT", i))
+        nodename += "_" + asString(synth->getUniqueId());
+    }
+    for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    {
+
+        if (xml->enterbranch(nodename, i))
         {
             string dir = xml->getparstr("bank_root");
-            addRootDir(dir);
-            xml->exitbranch();
-            count++;
+            if(!dir.empty())
+            {
+                size_t newIndex = addRootDir(dir);
+                if(newIndex != i)
+                {
+                    changeRootID(newIndex, i);
+                }
+                xml->exitbranch();
+            }
         }
     }
-    if (!count)
+    if (roots.size() == 0)
     {
         addDefaultRootDirs();
     }
@@ -697,12 +718,16 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 
 void Bank::saveToConfigFile(XMLwrapper *xml)
 {
-    RootEntryMap::iterator it;
-    for (size_t i = 0; i < roots.size(); i++)
+    for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; i++)
     {
-        if (!roots [i].path.empty())
+        if (roots.count(i) > 0 && !roots [i].path.empty())
         {
-            xml->beginbranch("BANKROOT", i);
+            string nodename = "BANKROOT";
+            if(synth->getUniqueId() > 0)
+            {
+                nodename += "_" + asString(synth->getUniqueId());
+            }
+            xml->beginbranch(nodename, i);
             xml->addparstr("bank_root", roots [i].path);
             xml->endbranch();
         }

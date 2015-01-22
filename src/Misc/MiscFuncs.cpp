@@ -109,6 +109,13 @@ string MiscFuncs::asString(long long n)
    return string(oss.str());
 }
 
+string MiscFuncs::asString(size_t n)
+{
+    ostringstream oss;
+    oss << n;
+    return string(oss.str());
+}
+
 
 string MiscFuncs::asString(long n)
 {

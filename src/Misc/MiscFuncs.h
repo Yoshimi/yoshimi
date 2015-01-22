@@ -32,6 +32,7 @@ class MiscFuncs
         ~MiscFuncs() { }
         string asString(int n);
         string asString(long long n);
+        string asString(size_t n);
         string asString(long n);
         string asString(unsigned int n, unsigned int width = 0);
         string asString(unsigned char c) { return asString((unsigned int)c); }

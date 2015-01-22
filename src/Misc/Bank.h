@@ -75,38 +75,18 @@ typedef struct _BankEntry
 {
     string dirname;
     InstrumentEntryMap instruments;
-    _BankEntry()
-        :dirname("")
-    {
-        instruments.clear();
-    }
-    _BankEntry(string _dirname)
-        :dirname(_dirname)
-    {
-        instruments.clear();
-    }
-    bool operator==(const string &s2)
-    {
-        return dirname == s2;
-    }
-
 } BankEntry; // Contains the bank directory name and the instrument map of the bank.
 
-typedef vector<BankEntry> BankEntryMap; // Maps bank id to bank entry.
+typedef map<size_t, BankEntry> BankEntryMap; // Maps bank id to bank entry.
 
 
 typedef struct _RootEntry
 {
     string path;
     BankEntryMap banks;
-    _RootEntry(string _path)
-        :path(_path)
-    {
-        banks.clear();
-    }
 } RootEntry; // Contains the root path and the bank map of the root.
 
-typedef vector<RootEntry> RootEntryMap; // Maps root id to root entry.
+typedef map<size_t, RootEntry> RootEntryMap; // Maps root id to root entry.
 
 class SynthEngine;
 
@@ -143,7 +123,7 @@ class Bank : private MiscFuncs
         bool setCurrentBankID(size_t newBankID);
         size_t getCurrentRootID() {return currentRootID;}
         size_t getCurrentBankID() {return currentBankID;}
-        void addRootDir(string newRootDir);
+        size_t addRootDir(string newRootDir);
         void parseConfigFile(XMLwrapper *xml);
         void saveToConfigFile(XMLwrapper *xml);
 
@@ -157,7 +137,10 @@ class Bank : private MiscFuncs
 
 
         bool locked() {return false;}
-        string getBankFileTitle() {return getBankPath(currentRootID, currentBankID);}
+        string getBankFileTitle()
+        {
+            return string("Root #") + asString(currentRootID) + ", Bank #" + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
+        }
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
              // add an instrument to the bank, if pos is -1 try to find a position
@@ -165,36 +148,16 @@ class Bank : private MiscFuncs
 
         void deletefrombank(size_t rootID, size_t bankID, unsigned int pos);
         void scanrootdir(int root_idx); // scans a root dir for banks
-        /*static bool bankCmp(bankstruct_t lhs, bankstruct_t rhs)
-            { return lhs.name < rhs.name; };*/
-        size_t add_bank(string name, string fullDir, size_t idx);
+        size_t add_bank(string name, string, size_t rootID);
         bool check_bank_duplicate(string alias);
 
         //string dirname;
         const string defaultinsname;
-
-        /*
-        string tmpinsname[BANK_SIZE]; // this keeps the numbered names
-        struct bank_instrument_t {
-            string name;
-            string filename;
-            bool used;
-            unsigned char PADsynth_used;
-        } bank_instrument[BANK_SIZE];
-        */
-
-        /*list<bankstruct_t> bank_dir_list;*/
-        //const int bank_size;
         const string xizext;
         const string force_bank_dir_file;
         SynthEngine *synth;
 
-        /*
-        string        bankRootDirlist[MAX_BANK_ROOT_DIRS];
-        int           bankRootDirID[MAX_BANK_ROOT_DIRS];
-        */
-        //string        currentRootDir;
-        size_t           currentRootID;
+        size_t        currentRootID;
         size_t        currentBankID;
 
         RootEntryMap  roots;
@@ -203,8 +166,9 @@ class Bank : private MiscFuncs
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );
 
         void addDefaultRootDirs();
-        void sortBanks(size_t rootID);
 
+        size_t getNewRootIndex();
+        size_t getNewBankIndex(size_t rootID);
 };
 
 #endif
