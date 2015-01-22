@@ -452,6 +452,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     instrRef.used = true;
     instrRef.name = name;
     instrRef.filename = filename;
+    instrRef.PADsynth_used = false;
 
     // see if PADsynth is used
     if (synth->getRuntime().CheckPADsynth)

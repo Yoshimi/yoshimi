@@ -103,10 +103,22 @@ bool XMLwrapper::checkfileinformation(const string& filename)
         delete [] xmldata;
         return false;
     }
+    //Andrew: just make it simple
+    bool bRet = false;
+    if(strstr(start, "name=\"PADsynth_used\" value=\"yes\""))
+    {
+        information.PADsynth_used = 1;
+        bRet = true;
+    }
+    delete [] xmldata;
+    return bRet;
+
+
+    /*
     end += strlen("</INFORMATION>");
-    end[0] = '\0';
-    tree = mxmlNewElement(MXML_NO_PARENT, "?xml");
-    node = root = mxmlLoadString(tree, xmldata, MXML_OPAQUE_CALLBACK);
+    //end[0] = '\0';
+    //tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
+    tree = node = root = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
     if (!root)
     {
         delete [] xmldata;
@@ -130,6 +142,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     delete [] xmldata;
     node = root = tree = NULL;
     return true;
+    */
 }
 
 
