@@ -88,6 +88,8 @@ typedef struct _RootEntry
 
 typedef map<size_t, RootEntry> RootEntryMap; // Maps root id to root entry.
 
+typedef map<size_t, map<string, size_t> > BankHintsMap;
+
 class SynthEngine;
 
 class Bank : private MiscFuncs
@@ -161,6 +163,7 @@ class Bank : private MiscFuncs
         size_t        currentBankID;
 
         RootEntryMap  roots;
+        BankHintsMap hints;
 
         InstrumentEntry &getInstrumentReference(size_t ninstrument );
         InstrumentEntry &getInstrumentReference(size_t rootID, size_t bankID, size_t ninstrument );

@@ -55,7 +55,7 @@ Bank::Bank(SynthEngine *_synth) :
     currentBankID(0)
 {
     roots.clear();
-    addDefaultRootDirs();
+    //addDefaultRootDirs();
 }
 
 
@@ -481,6 +481,20 @@ void Bank::deletefrombank(size_t rootID, size_t bankID, unsigned int pos)
 size_t Bank::add_bank(string name, string , size_t rootID)
 {
     size_t newIndex = getNewBankIndex(rootID);
+    map<string, size_t>::iterator it = hints [rootID].find(name);
+    if(it != hints [rootID].end())
+    {
+        size_t hintIndex = it->second;
+        if(roots [rootID].banks.count(hintIndex) == 0) //don't use hint if bank id is already used
+        {
+            newIndex = hintIndex;
+        }
+    }
+    else //add bank name to hints map
+    {
+        hints [rootID] [name] = newIndex;
+    }
+
     roots [rootID].banks [newIndex].dirname = name;
 
     loadbank(rootID, newIndex);
@@ -684,11 +698,8 @@ size_t Bank::addRootDir(string newRootDir)
 void Bank::parseConfigFile(XMLwrapper *xml)
 {
     roots.clear();
+    hints.clear();
     string nodename = "BANKROOT";
-    if(synth->getUniqueId() > 0)
-    {
-        nodename += "_" + asString(synth->getUniqueId());
-    }
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
 
@@ -702,8 +713,17 @@ void Bank::parseConfigFile(XMLwrapper *xml)
                 {
                     changeRootID(newIndex, i);
                 }
-                xml->exitbranch();
+                for(size_t k = 0; k < BANK_SIZE; k++)
+                {
+                    if(xml->enterbranch("bank_id", k))
+                    {
+                        string bankDirname = xml->getparstr("dirname");
+                        hints [i] [bankDirname] = k;
+                        xml->exitbranch();
+                    }
+                }
             }
+            xml->exitbranch();
         }
     }
     if (roots.size() == 0)
@@ -724,16 +744,21 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
         if (roots.count(i) > 0 && !roots [i].path.empty())
         {
             string nodename = "BANKROOT";
-            if(synth->getUniqueId() > 0)
-            {
-                nodename += "_" + asString(synth->getUniqueId());
-            }
+
             xml->beginbranch(nodename, i);
             xml->addparstr("bank_root", roots [i].path);
+            BankEntryMap::const_iterator it;
+            for(it = roots [i].banks.begin(); it != roots [i].banks.end(); ++it)
+            {
+                xml->beginbranch("bank_id", it->first);
+                xml->addparstr("dirname", it->second.dirname);
+                xml->endbranch();
+            }
+
             xml->endbranch();
         }
     }
-    xml->addpar("root_current_ID", currentRootID);
-    xml->addpar("bank_current_ID", currentBankID);
+    xml->addpar(string("root_current_ID"), currentRootID);
+    xml->addpar(string("bank_current_ID"), currentBankID);
 
 }

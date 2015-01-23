@@ -351,20 +351,25 @@ bool Config::loadConfig(void)
     }
     ConfigFile = ConfigDir + string("/yoshimi.config");
     StateFile = ConfigDir + string("/yoshimi.state");
-    if (!isRegFile(ConfigFile))
+    string resConfigFile = ConfigFile;
+    if(synth->getUniqueId() > 0)
     {
-        Log("ConfigFile " + ConfigFile + " not found");
+        resConfigFile += asString(synth->getUniqueId());
+    }
+    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+    {
+        Log("ConfigFile " + resConfigFile + " not found");
         string oldConfigFile = string(getenv("HOME")) + string("/.yoshimiXML.cfg");
         if (isRegFile(oldConfigFile))
         {
-            Log("Copying old config file " + oldConfigFile + " to new location: " + ConfigFile);
+            Log("Copying old config file " + oldConfigFile + " to new location: " + resConfigFile);
             FILE *oldfle = fopen (oldConfigFile.c_str(), "r");
-            FILE *newfle = fopen (ConfigFile.c_str(), "w");
+            FILE *newfle = fopen (resConfigFile.c_str(), "w");
             if (oldfle != NULL && newfle != NULL)
                 while (!feof(oldfle))
                     putc(getc(oldfle), newfle);
             else
-                Log("Failed to copy old config file " + oldConfigFile + " to " + ConfigFile);
+                Log("Failed to copy old config file " + oldConfigFile + " to " + resConfigFile);
             if (newfle)
                 fclose(newfle);
             if (oldfle)
@@ -373,8 +378,8 @@ bool Config::loadConfig(void)
     }
 
     bool isok = true;
-    if (!isRegFile(ConfigFile))
-        Log("ConfigFile " + ConfigFile + " still not found, will use default settings");
+    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+        Log("ConfigFile " + resConfigFile + " still not found, will use default settings");
     else
     {
         XMLwrapper *xml = new XMLwrapper(synth);
@@ -382,10 +387,13 @@ bool Config::loadConfig(void)
             Log("loadConfig failed XMLwrapper allocation");
         else
         {
-            if (xml->loadXMLfile(ConfigFile) < 0)
-            {
-                Log("loadConfig loadXMLfile failed");
-                return false;
+            if (!xml->loadXMLfile(resConfigFile))
+            {                
+                if((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
+                {
+                    Log("loadConfig loadXMLfile failed");
+                    return false;
+                }
             }
             isok = extractConfigData(xml);
             if (isok)
@@ -500,8 +508,16 @@ void Config::saveConfig(void)
     addConfigXML(xmltree);
     unsigned int tmp = GzipCompression;
     GzipCompression = 0;
-    if (!xmltree->saveXMLfile(ConfigFile))
-        Log("Failed to save config to " + ConfigFile);
+
+    string resConfigFile = ConfigFile;
+    if(synth->getUniqueId() > 0)
+    {
+        resConfigFile += asString(synth->getUniqueId());
+    }
+    if (!xmltree->saveXMLfile(resConfigFile))
+    {
+        Log("Failed to save config to " + resConfigFile);
+    }
     GzipCompression = tmp;
 
     delete xmltree;

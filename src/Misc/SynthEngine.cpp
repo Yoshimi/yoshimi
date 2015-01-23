@@ -38,6 +38,7 @@ using namespace std;
 static unsigned int synthNextId = 0;
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
+    uniqueId(synthNextId++),
     isLV2Plugin(_isLV2Plugin),
     bank(this),
     Runtime(this, argc, argv),
@@ -69,9 +70,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
     LFOtime(0)
-{
-    //Andrew Deryabin: use uniqueId for naming different instances in jack client etc..
-    uniqueId = synthNextId++;
+{    
 
     memset(&random_state, 0, sizeof(random_state));
 

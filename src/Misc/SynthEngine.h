@@ -53,6 +53,7 @@ class MasterUI;
 class SynthEngine : private SynthHelper, MiscFuncs
 {
     private:    
+        unsigned int uniqueId;
         bool isLV2Plugin;
         Bank bank;
         Config Runtime;
@@ -193,7 +194,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int32_t random_result;
         float random_0_1;
 
-        unsigned int uniqueId;
         MasterUI *guiMaster;
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
