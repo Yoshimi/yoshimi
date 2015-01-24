@@ -108,14 +108,14 @@ string MiscFuncs::asString(long long n)
    oss << n;
    return string(oss.str());
 }
-
+#ifdef __x86_64__
 string MiscFuncs::asString(size_t n)
 {
     ostringstream oss;
     oss << n;
     return string(oss.str());
 }
-
+#endif
 
 string MiscFuncs::asString(long n)
 {
