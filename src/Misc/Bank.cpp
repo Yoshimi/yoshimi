@@ -52,7 +52,7 @@ Bank::Bank(SynthEngine *_synth) :
                                     // it doesn't contain an instrument file
     synth(_synth),
     currentRootID(0),
-    currentBankID(10)
+    currentBankID(0)
 {
     roots.clear();
     //addDefaultRootDirs();
@@ -417,6 +417,12 @@ void Bank::scanrootdir(int root_idx)
         closedir(d);
     }
     closedir(dir);
+    size_t idStep = (size_t)128 / (bankDirsMap.size() + 2);
+    if(idStep > 1)
+    {
+        roots [root_idx].bankIdStep = idStep;
+    }
+
     map<string, string>::iterator it;
     for(it = bankDirsMap.begin(); it != bankDirsMap.end(); ++it)
     {
@@ -559,10 +565,15 @@ size_t Bank::getNewBankIndex(size_t rootID)
 {
     if(roots [rootID].banks.empty())
     {
-        return 10;
+        if(roots [rootID].bankIdStep <= 1)
+        {
+            return 0;
+        }
+
+        return roots [rootID].bankIdStep;
     }
 
-    return roots [rootID].banks.rbegin()->first + 10;
+    return roots [rootID].banks.rbegin()->first + roots [rootID].bankIdStep;
 }
 
 string Bank::getBankPath(size_t rootID, size_t bankID)
@@ -671,15 +682,37 @@ bool Bank::setCurrentRootID(size_t newRootID)
 {
     if(roots.count(newRootID) == 0)
     {
-        return false;
+        if(roots.size() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            currentRootID = roots.begin()->first;
+        }
     }
-    currentRootID = newRootID;    
+    else
+    {
+        currentRootID = newRootID;
+    }
+
     setCurrentBankID(0);
     return true;
 }
 
 bool Bank::setCurrentBankID(size_t newBankID)
 {
+    if(roots [currentRootID].banks.count(newBankID) == 0)
+    {
+        if(roots [currentRootID].banks.size() == 0)
+        {
+            return false;
+        }
+        else
+        {
+            newBankID = roots [currentRootID].banks.begin()->first;
+        }
+    }
     if(loadbank(currentRootID, newBankID))
     {
         currentBankID = newBankID;

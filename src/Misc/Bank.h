@@ -84,6 +84,9 @@ typedef struct _RootEntry
 {
     string path;
     BankEntryMap banks;
+    size_t bankIdStep;
+    _RootEntry(): bankIdStep(1)
+    {}
 } RootEntry; // Contains the root path and the bank map of the root.
 
 typedef map<size_t, RootEntry> RootEntryMap; // Maps root id to root entry.
