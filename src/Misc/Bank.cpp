@@ -386,7 +386,10 @@ void Bank::scanrootdir(int root_idx)
                 bankDirsMap [candidate] = chkdir;
                 break;
             }
-            if (possible.size() <= (xizext.size() + 5))
+
+// we don't need these checks as non-prefixed instruments are valid.
+# warning this needs tidying up
+/*            if (possible.size() <= (xizext.size() + 5))
                 continue;
             // check for an instrument starting with "NNNN-" prefix
             for (idx = 0; idx < 4; ++idx)
@@ -396,7 +399,7 @@ void Bank::scanrootdir(int root_idx)
                     break;
             }
             if (idx < 4 || possible.at(idx) != '-')
-                continue;
+                continue;*/
             {
                 string chkpath = chkdir + "/" + possible;
                 lstat(chkpath.c_str(), &st);

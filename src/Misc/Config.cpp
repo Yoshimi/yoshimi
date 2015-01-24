@@ -313,12 +313,15 @@ string Config::testCCvalue(int cc)
             break;
         default:
         {
-            if (cc == synth->getRuntime().midi_bank_C)
-                result = "bank change";
-            else if (cc == synth->getRuntime().midi_bank_root)
-                result = "bank root change";
-            else if (cc == synth->getRuntime().midi_upper_voice_C)
-                result = "extended program change";
+            if (cc < 128) // don't compare with 'disabled' state
+            {
+                if (cc == synth->getRuntime().midi_bank_C)
+                    result = "bank change";
+                else if (cc == synth->getRuntime().midi_bank_root)
+                    result = "bank root change";
+                else if (cc == synth->getRuntime().midi_upper_voice_C)
+                    result = "extended program change";
+            }
         }
     }
     return result;

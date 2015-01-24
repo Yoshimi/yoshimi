@@ -144,6 +144,8 @@ int main(int argc, char *argv[])
     //MasterUI *guiMaster = NULL;
     //MusicClient *musicClient = NULL;    
     std::map<SynthEngine *, MusicClient *>::iterator it;
+    
+    cout << "Yoshimi is starting" << endl;
 
     if (!mainCreateNewInstance(0))
     {
