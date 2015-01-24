@@ -70,6 +70,14 @@ int MiscFuncs::string2int(string str)
     return intval;
 }
 
+unsigned int MiscFuncs::string2uint(string str)
+{
+    istringstream machine(str);
+    unsigned int intval;
+    machine >> intval;
+    return intval;
+}
+
 // make a filename legal
 void MiscFuncs::legit_filename(string& fname)
 {

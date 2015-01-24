@@ -269,7 +269,7 @@ oldrootID = changeIDbutton->value();}
         }
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
-    }} selected
+    }}
             xywh {305 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
@@ -725,7 +725,8 @@ configwindow->do_callback();}
       	   tmp += " *";
       	}
         rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
-      }} {}
+      }} {selected
+    }
   }
   Function {recoverID()} {open return_type int
   } {

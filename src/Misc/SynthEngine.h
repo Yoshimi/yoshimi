@@ -59,7 +59,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Config Runtime;
         PresetsStore presetsstore;
     public:
-        SynthEngine(int argc, char **argv, bool _isLV2Plugin = false);
+        SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
         bool Init(unsigned int audiosrate, int audiobufsize);
         bool actionLock(lockset request);

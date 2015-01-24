@@ -52,7 +52,7 @@ Bank::Bank(SynthEngine *_synth) :
                                     // it doesn't contain an instrument file
     synth(_synth),
     currentRootID(0),
-    currentBankID(0)
+    currentBankID(10)
 {
     roots.clear();
     //addDefaultRootDirs();
@@ -326,7 +326,7 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
 
 // Re-scan for directories containing instrument banks
 void Bank::rescanforbanks(void)
-{
+{    
     RootEntryMap::const_iterator it;
     for (it = roots.begin(); it != roots.end(); ++it)
     {
@@ -340,7 +340,7 @@ void Bank::rescanforbanks(void)
 
 void Bank::scanrootdir(int root_idx)
 {
-
+    map<string, string> bankDirsMap;
     string rootdir = roots [root_idx].path;
     if (rootdir.empty() || !isDirectory(rootdir))
         return;
@@ -383,7 +383,7 @@ void Bank::scanrootdir(int root_idx)
                 continue;
             if (possible == force_bank_dir_file)
             {   // .bankdir file exists, so add the bank
-                add_bank(candidate, chkdir, root_idx);
+                bankDirsMap [candidate] = chkdir;
                 break;
             }
             if (possible.size() <= (xizext.size() + 5))
@@ -407,7 +407,7 @@ void Bank::scanrootdir(int root_idx)
                     {
                         if (xizext.size() == (possible.size() - xizpos))
                         {   // is an instrument, so add the bank
-                            add_bank(candidate, chkdir, root_idx);
+                            bankDirsMap [candidate] = chkdir;
                             break;
                         }
                     }
@@ -417,6 +417,11 @@ void Bank::scanrootdir(int root_idx)
         closedir(d);
     }
     closedir(dir);
+    map<string, string>::iterator it;
+    for(it = bankDirsMap.begin(); it != bankDirsMap.end(); ++it)
+    {
+        add_bank(it->first, it->second, root_idx);
+    }
 }
 
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
@@ -554,10 +559,10 @@ size_t Bank::getNewBankIndex(size_t rootID)
 {
     if(roots [rootID].banks.empty())
     {
-        return 0;
+        return 10;
     }
 
-    return roots [rootID].banks.rbegin()->first + 1;
+    return roots [rootID].banks.rbegin()->first + 10;
 }
 
 string Bank::getBankPath(size_t rootID, size_t bankID)
@@ -726,6 +731,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
             xml->exitbranch();
         }
     }
+
     if (roots.size() == 0)
     {
         addDefaultRootDirs();

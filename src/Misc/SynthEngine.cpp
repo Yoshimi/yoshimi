@@ -26,6 +26,7 @@
 
 #include<stdio.h>
 #include <sys/time.h>
+#include <set>
 
 using namespace std;
 
@@ -35,10 +36,37 @@ using namespace std;
 
 #include <iostream>
 
-static unsigned int synthNextId = 0;
 
-SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
-    uniqueId(synthNextId++),
+static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
+{
+    static set<unsigned int> idMap;
+    if(remove)
+    {
+        if(idMap.count(idx) > 0)
+        {
+            idMap.erase(idx);
+        }
+        return 0;
+    }
+    else if(idx > 0)
+    {
+        if(idMap.count(idx) == 0)
+        {
+            idMap.insert(idx);
+            return idx;
+        }
+    }
+    set<unsigned int>::const_iterator itEnd = idMap.end();
+    set<unsigned int>::const_iterator it;
+    unsigned int nextId = 0;
+    for(it = idMap.begin(); it != itEnd && nextId == *it; ++it, ++nextId)
+    {}
+    idMap.insert(nextId);
+    return nextId;
+}
+
+SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
+    uniqueId(getRemoveSynthId(false, forceId)),
     isLV2Plugin(_isLV2Plugin),
     bank(this),
     Runtime(this, argc, argv),
@@ -71,7 +99,10 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin) :
     guiCallbackArg(NULL),
     LFOtime(0)
 {    
-
+    if(bank.roots.empty())
+    {
+        bank.addDefaultRootDirs();
+    }
     memset(&random_state, 0, sizeof(random_state));
 
     ctl = new Controller(this);
@@ -111,6 +142,7 @@ SynthEngine::~SynthEngine()
     pthread_mutex_destroy(&processMutex);
     if (ctl)
         delete ctl;
+    getRemoveSynthId(true, uniqueId);
 }
 
 
@@ -1138,6 +1170,7 @@ void SynthEngine::closeGui()
     {
         delete guiMaster;
         guiMaster = NULL;
+        Runtime.showGui = false;
     }
 }
 

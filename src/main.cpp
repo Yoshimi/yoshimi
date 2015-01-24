@@ -60,11 +60,11 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-bool mainCreateNewInstance()
+bool mainCreateNewInstance(unsigned int forceId)
 {
     MasterUI *guiMaster = NULL;
     MusicClient *musicClient = NULL;
-    SynthEngine *synth = new SynthEngine(globalArgc, globalArgv);
+    SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
         goto bail_out;
 
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     //MusicClient *musicClient = NULL;    
     std::map<SynthEngine *, MusicClient *>::iterator it;
 
-    if (!mainCreateNewInstance())
+    if (!mainCreateNewInstance(0))
     {
         goto bail_out;
     }

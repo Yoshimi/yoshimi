@@ -79,7 +79,7 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
-decl {extern bool mainCreateNewInstance();} {private global
+decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
 decl {class MasterUI;} {public local
@@ -181,7 +181,8 @@ class MasterUI {open : {private MiscFuncs}
       else
           yoshiLog->Hide();} {}
   }
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {if (configui->configChanged)
@@ -221,8 +222,25 @@ class MasterUI {open : {private MiscFuncs}
           }
           MenuItem {} {
             label {&New instance}
-            callback {mainCreateNewInstance()}
+            callback {mainCreateNewInstance(0)}
             xywh {0 0 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {New instance with id...}
+            callback {if(synth->getIsLV2Plugin())
+{
+	return;
+}
+const char *sId = fl_input("Enter desired instance id...", "0");
+unsigned int forceId = 0;
+if(sId == NULL)
+{
+	return;
+}
+forceId = string2uint(sId);
+
+mainCreateNewInstance(forceId);} selected
+            xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
             label {&Reports}
@@ -1119,8 +1137,7 @@ ZynAddSubFX}
   }
   Function {updateBankRootDirs()} {open
   } {
-    code {configui->readbankcfg();} {selected
-    }
+    code {configui->readbankcfg();} {}
   }
   decl {ConfigUI *configui;} {private local
   }

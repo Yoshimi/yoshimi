@@ -371,6 +371,10 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 {
     if(_synth != NULL)
     {
+        if(!flatbankprgs.empty())
+        {
+            getProgram(flatbankprgs.size() + 1);
+        }
         _synth->getRuntime().runSynth = false;        
         sem_post(&_midiSem);        
         pthread_join(_pMidiThread, NULL);
@@ -584,7 +588,28 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
 {
     if(flatbankprgs.empty())
     {
-
+        Bank &bankObj = synth->getBankRef();
+        const BankEntryMap &banks = bankObj.getBanks(bankObj.getCurrentRootID());
+        BankEntryMap::const_iterator itB;
+        InstrumentEntryMap::const_iterator itI;
+        for(itB = banks.begin(); itB != banks.end(); ++itB)
+        {
+            string bankName = itB->second.dirname;
+            if(!bankName.empty())
+            {
+                for(itI = itB->second.instruments.begin(); itI != itB->second.instruments.end(); ++itI)
+                {
+                    if(!itI->second.name.empty())
+                    {
+                        LV2_Program_Descriptor desc;
+                        desc.bank = itB->first;
+                        desc.program = itI->first;
+                        desc.name = strdup((bankName + " -> " + itI->second.name).c_str());
+                        flatbankprgs.push_back(desc);
+                    }
+                }
+            }
+        }
     }
 
     if(index >= flatbankprgs.size())
@@ -742,7 +767,7 @@ void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
 
 void YoshimiLV2PluginUI::static_guiClosed(void *arg)
 {
-    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = NULL;
+    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = NULL;    
     static_cast<YoshimiLV2PluginUI *>(arg)->_plugin->_synth->closeGui();
 }
 
@@ -866,7 +891,7 @@ extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 
 }
 
-bool mainCreateNewInstance() //stub
+bool mainCreateNewInstance(unsigned int) //stub
 {
     return true;
 }

@@ -55,7 +55,7 @@ private:
    void processMidiMessage(const uint8_t *msg);
    void *midiThread(void);
    void *idleThread(void);
-   std::vector <LV2_Program_Descriptor> flatbankprgs;
+   std::vector <LV2_Program_Descriptor> flatbankprgs;   
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
