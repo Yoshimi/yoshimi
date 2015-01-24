@@ -157,10 +157,10 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
     if(processed < real_sample_count)
     {
-        if(processed != 0)
+        /*if(processed != 0)
         {
             fprintf(stderr, "Processed = %u\n", processed);
-        }
+        }*/
         uint32_t to_process = real_sample_count - processed;
         if(to_process > 0)
         {
