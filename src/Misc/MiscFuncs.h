@@ -32,7 +32,10 @@ class MiscFuncs
         ~MiscFuncs() { }
         string asString(int n);
         string asString(long long n);
+#ifdef __x86_64__
+        //remove ambiguity while compiling for x64 arch
         string asString(size_t n);
+#endif
         string asString(long n);
         string asString(unsigned int n, unsigned int width = 0);
         string asString(unsigned char c) { return asString((unsigned int)c); }
