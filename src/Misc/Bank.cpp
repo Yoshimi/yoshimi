@@ -374,8 +374,8 @@ void Bank::scanrootdir(int root_idx)
             continue;
         }
         struct dirent *fname;
-        int idx;
-        char x;
+        //int idx;
+        //char x;
         while ((fname = readdir(d)))
         {
             string possible = string(fname->d_name);
@@ -388,7 +388,7 @@ void Bank::scanrootdir(int root_idx)
             }
 
 // we don't need these checks as non-prefixed instruments are valid.
-# warning this needs tidying up
+//# warning this needs tidying up
 /*            if (possible.size() <= (xizext.size() + 5))
                 continue;
             // check for an instrument starting with "NNNN-" prefix
@@ -457,7 +457,13 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         {
             pos = BANK_SIZE-1;
             while (!emptyslot(pos))
+            {
                 pos -= 1;
+                if(pos < 0)
+                {
+                    break;
+                }
+            }
         }
     }
     if (pos < 0)
