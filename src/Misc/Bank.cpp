@@ -455,7 +455,9 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         }
         else
         {
-            pos = 0;
+            pos = BANK_SIZE-1;
+            while (!emptyslot(pos))
+                pos -= 1;
         }
     }
     if (pos < 0)
