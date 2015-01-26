@@ -112,11 +112,11 @@ void Bank::setname(unsigned int ninstrument, string newname, int newslot)
 
 
 // Check if there is no instrument on a slot from the bank
-bool Bank::emptyslot(unsigned int ninstrument)
+bool Bank::emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument)
 {
-    if(roots.count(currentRootID) == 0 || roots [currentRootID].banks.count(currentBankID) == 0)
+    if(roots.count(rootID) == 0 || roots [rootID].banks.count(bankID) == 0)
         return true;
-    InstrumentEntry &instr = roots [currentRootID].banks [currentBankID].instruments [ninstrument];
+    InstrumentEntry &instr = roots [rootID].banks [bankID].instruments [ninstrument];
     if (!instr.used)
         return true;
     if (instr.name.empty() || instr.filename.empty())
@@ -457,7 +457,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
         else
         {
             pos = BANK_SIZE-1;
-            while (!emptyslot(pos))
+            while (!emptyslotWithID(rootID, bankID, pos))
             {
                 pos -= 1;
                 if(pos < 0)

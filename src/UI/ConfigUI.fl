@@ -241,7 +241,7 @@ oldrootID = changeIDbutton->value();}
     {
         synth->getBankRef().setCurrentRootID(selectedRootID);
         readbankcfg();
-        synth->getGuiMaster()->bankui->rescan_for_banks(true);
+        synth->getGuiMaster()->bankui->rescan_for_banks(false);
         configChanged = true;
     }
     activatebutton_rootdir(false);}

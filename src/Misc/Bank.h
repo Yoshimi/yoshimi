@@ -110,7 +110,8 @@ class Bank : private MiscFuncs
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         bool isPADsynth_used(unsigned int ninstrument);
-        bool emptyslot(unsigned int ninstrument);
+        bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
+        bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         void clearslot(unsigned int ninstrument);
         void savetoslot(unsigned int ninstrument, Part *part);
         bool loadfromslot(unsigned int ninstrument, Part *part);
