@@ -431,6 +431,7 @@ void Bank::scanrootdir(int root_idx)
     {
         add_bank(it->first, it->second, root_idx);
     }
+    roots [root_idx].bankIdStep = 0;
 }
 
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
@@ -584,7 +585,30 @@ size_t Bank::getNewBankIndex(size_t rootID)
         return roots [rootID].bankIdStep;
     }
 
-    return roots [rootID].banks.rbegin()->first + roots [rootID].bankIdStep;
+    size_t idStep = 1;
+
+    if(roots [rootID].bankIdStep == 0)
+    {
+        size_t startId = 127;
+        size_t i;
+        for(i = startId; i > 0; --i)
+        {
+            if(roots [rootID].banks.count(i) == 0)
+            {
+                break;
+            }
+        }
+        if(i > 0) //id found
+        {
+            return i;
+        }
+    }
+    else
+    {
+        idStep = roots [rootID].bankIdStep;
+    }
+
+    return roots [rootID].banks.rbegin()->first + idStep;
 }
 
 string Bank::getBankPath(size_t rootID, size_t bankID)
@@ -724,12 +748,8 @@ bool Bank::setCurrentBankID(size_t newBankID)
             newBankID = roots [currentRootID].banks.begin()->first;
         }
     }
-    if(loadbank(currentRootID, newBankID))
-    {
-        currentBankID = newBankID;
-        return true;
-    }
-    return false;
+    currentBankID = newBankID;
+    return true;
 }
 
 size_t Bank::addRootDir(string newRootDir)
