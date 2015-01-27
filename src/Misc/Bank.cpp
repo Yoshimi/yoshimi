@@ -206,7 +206,7 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
         candidate = string(fn->d_name);
         if (candidate == "."
             || candidate == ".."
-            || candidate.size() <= (xizext.size() + 5))
+            || candidate.size() <= (xizext.size() + 2)) // actually a 3 char filename!
             continue;
         chkpath = bankdirname;
         if (chkpath.at(chkpath.size() - 1) != '/')
