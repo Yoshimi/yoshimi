@@ -444,7 +444,7 @@ void SynthEngine::SetBank(int banknum)
     }
     else
     {
-        Runtime.Log("SynthEngine setBank: Can't load bank " + asString(banknum));
+        Runtime.Log("SynthEngine setBank: Can't load bank " + asString(banknum)+ " from this root");
     }
 
 
@@ -485,7 +485,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
     bool partOK = false;
     if (bank.getname(pgm) < "!") // can't get a program name less than this
     {
-        Runtime.Log("SynthEngine setProgram: No Program " + asString(pgm));
+        Runtime.Log("SynthEngine setProgram: No Program " + asString(pgm) + " in this bank");
     }
     else
     {
