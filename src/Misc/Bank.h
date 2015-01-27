@@ -127,7 +127,7 @@ class Bank : private MiscFuncs
         bool changeRootID(size_t oldID, size_t newID);
 
         bool setCurrentRootID(size_t newRootID);
-        bool setCurrentBankID(size_t newBankID);
+        bool setCurrentBankID(size_t newBankID, bool ignoreMissing = false);
         size_t getCurrentRootID() {return currentRootID;}
         size_t getCurrentBankID() {return currentBankID;}
         size_t addRootDir(string newRootDir);

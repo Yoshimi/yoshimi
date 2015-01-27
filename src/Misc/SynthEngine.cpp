@@ -432,7 +432,7 @@ void SynthEngine::SetBank(int banknum)
     */
 
     //new implementation uses only 1 call :)
-    if(bank.setCurrentBankID(banknum))
+    if(bank.setCurrentBankID(banknum, true))
     {
         if(Runtime.showGui && guiMaster && guiMaster->bankui)
         {
@@ -496,7 +496,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                 if (partOK and part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
                 {
                     partonoff(npart, 1);
-                    if (Runtime.showGui)
+                    if (Runtime.showGui && guiMaster)
                     {
                         guiMaster->partui->partgroupui->activate();
                         guiMaster->partui->partGroupEnable->value(1);
@@ -506,7 +506,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
         if (partOK){
             Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
             // update UI
-            if (Runtime.showGui)
+            if (Runtime.showGui && guiMaster)
             {
                 guiMaster->updatepanel();
                 if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)

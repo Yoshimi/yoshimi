@@ -27,13 +27,24 @@ using namespace std;
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
 #include <map>
+#include <list>
+#include <pthread.h>
 
-std::map<SynthEngine *, MusicClient *> synthInstances;
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Shared_Image.H>
+#include <FL/Fl_PNG_Image.H>
+#include "yoshimi-logo.h"
+
+
+map<SynthEngine *, MusicClient *> synthInstances;
+list<string> splashMessages;
 
 static SynthEngine *firstSynth = NULL;
 static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
+bool bShowGui = true;
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
@@ -58,6 +69,118 @@ void yoshimiSigHandler(int sig)
         default:
             break;
     }
+}
+
+void splashTimeout(void *splashWin)
+{
+    (static_cast<Fl_Window *>(splashWin))->hide();
+}
+
+static void *mainGuiThread(void *)
+{
+    for(int i = 0; i < globalArgc; ++i)
+    {
+        if(!strcmp(globalArgv [i], "-i")
+           || !strcmp(globalArgv [i], "--no-gui")
+           || !strcmp(globalArgv [i], "--help")
+           || !strcmp(globalArgv [i], "-?"))
+        {
+            bShowGui = false;
+        }
+    }
+
+    map<SynthEngine *, MusicClient *>::iterator it;
+    fl_register_images();
+    Fl_Window winSplash(400, 300, "yoshimi splash screen");
+    Fl_Box box(0, 0, 400,300);
+    //Fl_Pixmap pix(yoshimi_logo);
+    Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
+    box.image(pix);
+    Fl_Box boxLb(10, 300-30, 400-20, 30);
+    boxLb.box(FL_NO_BOX);
+    boxLb.align(FL_ALIGN_CENTER);
+    boxLb.labelsize(20);
+    boxLb.labeltype(FL_NORMAL_LABEL);
+    boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
+    boxLb.label("Yoshimi is starting up");
+
+    winSplash.set_non_modal();
+    winSplash.clear_border();
+    winSplash.border(false);
+
+    if(bShowGui)
+    {
+        //o->Rectangle::set(Fl_Monitor::find(0,0),o->w(),o->h(),fltk::ALIGN_CENTER);
+        winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
+        winSplash.show();
+        Fl::add_timeout(2.0, splashTimeout, &winSplash);
+
+    }
+
+    do
+    {
+        if(bShowGui)
+        {
+            Fl::wait(0.033333);
+            while(!splashMessages.empty())
+            {
+                boxLb.copy_label(splashMessages.front().c_str());
+                splashMessages.pop_front();
+            }
+        }
+        else
+            usleep(33333);
+    }
+    while (firstSynth == NULL);
+
+    while (firstSynth->getRuntime().runSynth)
+    {
+        if(firstSynth->getUniqueId() == 0)
+        {
+            firstSynth->getRuntime().signalCheck();
+        }
+
+        for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+        {
+            SynthEngine *_synth = it->first;
+            MusicClient *_client = it->second;
+            _synth->getRuntime().deadObjects->disposeBodies();
+            if(!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
+            {
+                if (_client)
+                {
+                    _client->Close();
+                    delete _client;
+                }
+
+                if (_synth)
+                {
+                    _synth->getRuntime().deadObjects->disposeBodies();
+                    _synth->getRuntime().flushLog();
+                    delete _synth;
+                }
+
+                synthInstances.erase(it);
+                cout << "\nStopped " << _synth->getUniqueId() << "\n";
+                break;
+            }
+            if (bShowGui)
+            {
+                for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
+                {
+                    _synth->getGuiMaster()->Log(_synth->getRuntime().LogList.front());
+                    _synth->getRuntime().LogList.pop_front();
+                }
+            }
+        }
+
+        // where all the action is ...
+        if(bShowGui)
+            Fl::wait(0.033333);
+        else
+            usleep(33333);
+    }
+    return NULL;
 }
 
 bool mainCreateNewInstance(unsigned int forceId)
@@ -139,13 +262,30 @@ int main(int argc, char *argv[])
 {
     globalArgc = argc;
     globalArgv = argv;
-    bool bExitSuccess = false;
-    bool bGuiWait = false;
+    bool bExitSuccess = false;    
     //MasterUI *guiMaster = NULL;
     //MusicClient *musicClient = NULL;    
-    std::map<SynthEngine *, MusicClient *>::iterator it;
-    
-    cout << "Yoshimi is starting" << endl;
+    map<SynthEngine *, MusicClient *>::iterator it;
+    bool guiStarted = false;
+    pthread_t thr;
+    pthread_attr_t attr;
+    if(pthread_attr_init(&attr) == 0)
+    {
+        if(pthread_create(&thr, &attr, mainGuiThread, 0) == 0)
+        {
+            guiStarted = true;
+        }
+        pthread_attr_destroy(&attr);
+    }
+
+    if(!guiStarted)
+    {
+        cout << "Yoshimi can't start main gui loop!" << endl;
+        goto bail_out;
+    }
+
+    //cout << "Yoshimi is starting" << endl;
+    splashMessages.push_back("Starting synth engine...");
 
     if (!mainCreateNewInstance(0))
     {
@@ -171,55 +311,10 @@ int main(int argc, char *argv[])
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
         firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
 
-    bGuiWait = firstRuntime->showGui;
+    splashMessages.push_back("Startup complete!");
 
-    while (firstSynth->getRuntime().runSynth)
-    {
-        if(firstSynth->getUniqueId() == 0)
-        {
-            firstSynth->getRuntime().signalCheck();
-        }
-
-        for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
-        {
-            SynthEngine *_synth = it->first;
-            MusicClient *_client = it->second;
-            _synth->getRuntime().deadObjects->disposeBodies();
-            if(!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
-            {
-                if (_client)
-                {
-                    _client->Close();
-                    delete _client;
-                }
-
-                if (_synth)
-                {
-                    _synth->getRuntime().deadObjects->disposeBodies();
-                    _synth->getRuntime().flushLog();
-                    delete _synth;
-                }
-
-                synthInstances.erase(it);
-                cout << "\nStopped " << _synth->getUniqueId() << "\n";
-                break;
-            }
-            if (bGuiWait)
-            {
-                for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
-                {
-                    _synth->getGuiMaster()->Log(_synth->getRuntime().LogList.front());
-                    _synth->getRuntime().LogList.pop_front();
-                }
-            }
-        }
-
-        // where all the action is ...
-        if(bGuiWait)
-            Fl::wait(0.033333);
-        else
-            usleep(33333);
-    }
+    void *ret;
+    pthread_join(thr, &ret);
 
     cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;

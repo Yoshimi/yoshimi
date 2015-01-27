@@ -735,11 +735,11 @@ bool Bank::setCurrentRootID(size_t newRootID)
     return true;
 }
 
-bool Bank::setCurrentBankID(size_t newBankID)
+bool Bank::setCurrentBankID(size_t newBankID, bool ignoreMissing)
 {
     if(roots [currentRootID].banks.count(newBankID) == 0)
     {
-        if(roots [currentRootID].banks.size() == 0)
+        if((roots [currentRootID].banks.size() == 0) || ignoreMissing)
         {
             return false;
         }

@@ -2,6 +2,10 @@ If you want the latest and (hopefully) greatest, click on the 'code' tab and the
 
 yoshimi-1.3.2-rc1
 
+2015-1-27 Andrew
+- Added splash window showing current loading status
+- Ignore midi bank/prg change if no bank/prg found
+
 2015-1-26 Andrew
 - make new bank id search start from 127 downwards
 - do not reload bank on id change
