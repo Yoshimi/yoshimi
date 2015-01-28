@@ -104,6 +104,7 @@ class Bank : private MiscFuncs
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
+        bool readOnlyInstrument(int ninstrument);
         string getname(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
         void setname(unsigned int ninstrument, string newname, int newslot);
