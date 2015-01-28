@@ -176,7 +176,14 @@ static void *mainGuiThread(void *)
 
         // where all the action is ...
         if(bShowGui)
+        {
             Fl::wait(0.033333);
+            while(!splashMessages.empty())
+            {
+                boxLb.copy_label(splashMessages.front().c_str());
+                splashMessages.pop_front();
+            }
+        }
         else
             usleep(33333);
     }
