@@ -29,6 +29,7 @@ using namespace std;
 #include <map>
 #include <list>
 #include <pthread.h>
+#include <semaphore.h>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -76,8 +77,9 @@ void splashTimeout(void *splashWin)
     (static_cast<Fl_Window *>(splashWin))->hide();
 }
 
-static void *mainGuiThread(void *)
+static void *mainGuiThread(void *arg)
 {
+
     for(int i = 0; i < globalArgc; ++i)
     {
         if(!strcmp(globalArgv [i], "-i")
@@ -88,6 +90,10 @@ static void *mainGuiThread(void *)
             bShowGui = false;
         }
     }
+
+    Fl::lock();
+
+    sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
     fl_register_images();
@@ -134,7 +140,7 @@ static void *mainGuiThread(void *)
     while (firstSynth == NULL);
 
     while (firstSynth->getRuntime().runSynth)
-    {
+    {        
         if(firstSynth->getUniqueId() == 0)
         {
             firstSynth->getRuntime().signalCheck();
@@ -168,8 +174,12 @@ static void *mainGuiThread(void *)
             {
                 for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
                 {
-                    _synth->getGuiMaster()->Log(_synth->getRuntime().LogList.front());
-                    _synth->getRuntime().LogList.pop_front();
+                    MasterUI *guiMaster = _synth->getGuiMaster(false);
+                    if(guiMaster)
+                    {
+                        guiMaster->Log(_synth->getRuntime().LogList.front());
+                        _synth->getRuntime().LogList.pop_front();
+                    }
                 }
             }
         }
@@ -183,6 +193,18 @@ static void *mainGuiThread(void *)
                 boxLb.copy_label(splashMessages.front().c_str());
                 splashMessages.pop_front();
             }
+            void *msg = Fl::thread_message();
+            if(msg)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg);
+                MasterUI *guiMaster = synth->getGuiMaster();
+                if(!guiMaster)
+                {
+                    cerr << "Error starting Main UI!" << endl;
+                    return (void *)1;
+                }
+                guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            }
         }
         else
             usleep(33333);
@@ -192,7 +214,6 @@ static void *mainGuiThread(void *)
 
 bool mainCreateNewInstance(unsigned int forceId)
 {
-    MasterUI *guiMaster = NULL;
     MusicClient *musicClient = NULL;
     SynthEngine *synth = new SynthEngine(globalArgc, globalArgv, false, forceId);
     if (!synth->getRuntime().isRuntimeSetupCompleted())
@@ -230,13 +251,8 @@ bool mainCreateNewInstance(unsigned int forceId)
 
     if (synth->getRuntime().showGui)
     {
-        guiMaster = synth->getGuiMaster();
-        if (guiMaster == NULL)
-        {
-            synth->getRuntime().Log("Failed to instantiate gui");
-            goto bail_out;
-        }
-        guiMaster->Init(musicClient->midiClientName().c_str());
+        synth->setWindowTitle(musicClient->midiClientName());
+        Fl::awake((void *)synth);
     }
 
     synth->getRuntime().StartupReport(musicClient);
@@ -270,26 +286,30 @@ int main(int argc, char *argv[])
     globalArgc = argc;
     globalArgv = argv;
     bool bExitSuccess = false;    
-    //MasterUI *guiMaster = NULL;
-    //MusicClient *musicClient = NULL;    
     map<SynthEngine *, MusicClient *>::iterator it;
     bool guiStarted = false;
     pthread_t thr;
     pthread_attr_t attr;
-    if(pthread_attr_init(&attr) == 0)
+    sem_t semGui;
+    if(sem_init(&semGui, 0, 0) == 0)
     {
-        if(pthread_create(&thr, &attr, mainGuiThread, 0) == 0)
+        if(pthread_attr_init(&attr) == 0)
         {
-            guiStarted = true;
+            if(pthread_create(&thr, &attr, mainGuiThread, (void *)&semGui) == 0)
+            {
+                guiStarted = true;
+            }
+            pthread_attr_destroy(&attr);
         }
-        pthread_attr_destroy(&attr);
     }
 
     if(!guiStarted)
-    {
+    {        
         cout << "Yoshimi can't start main gui loop!" << endl;
         goto bail_out;
     }
+    sem_wait(&semGui);
+    sem_destroy(&semGui);
 
     //cout << "Yoshimi is starting" << endl;
     splashMessages.push_back("Starting synth engine...");
@@ -299,11 +319,8 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
     it = synthInstances.begin();
+    firstRuntime = &it->first->getRuntime();
     firstSynth = it->first;
-    //musicClient = it->second;
-    //guiMaster = synth->getGuiMaster();
-
-    firstRuntime = &firstSynth->getRuntime();
 
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
@@ -321,7 +338,11 @@ int main(int argc, char *argv[])
     splashMessages.push_back("Startup complete!");
 
     void *ret;
-    pthread_join(thr, &ret);
+    pthread_join(thr, &ret);    
+    if(ret == (void *)1)
+    {
+        goto bail_out;
+    }
 
     cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;

@@ -239,7 +239,7 @@ if(sId == NULL)
 }
 forceId = string2uint(sId);
 
-mainCreateNewInstance(forceId);} selected
+mainCreateNewInstance(forceId);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
@@ -1138,6 +1138,11 @@ ZynAddSubFX}
   Function {updateBankRootDirs()} {open
   } {
     code {configui->readbankcfg();} {}
+  }
+  Function {getSynth()} {open return_type {SynthEngine *}
+  } {
+    code {return synth;} {selected
+    }
   }
   decl {ConfigUI *configui;} {private local
   }

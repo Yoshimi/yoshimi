@@ -97,7 +97,8 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     guiMaster(NULL),
     guiClosedCallback(NULL),
     guiCallbackArg(NULL),
-    LFOtime(0)
+    LFOtime(0),
+    windowTitle("Yoshimi" + asString(uniqueId))
 {    
     if(bank.roots.empty())
     {
@@ -1186,5 +1187,13 @@ std::string SynthEngine::makeUniqueName(const char *name)
 
     newUniqueName += strUniquePostfix;
     return newUniqueName;
+}
+
+void SynthEngine::setWindowTitle(string _windowTitle)
+{
+    if(!_windowTitle.empty())
+    {
+        windowTitle = _windowTitle;
+    }
 }
 

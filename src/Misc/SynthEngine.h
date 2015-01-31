@@ -173,6 +173,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}
+        string getWindowTitle() {return windowTitle;}
+        void setWindowTitle(string _windowTitle = "");
     private:
         int muted;
         float volume;
@@ -199,6 +201,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void *guiCallbackArg;
 
         int LFOtime; // used by Pcontinous
+        string windowTitle;
 };
 
 inline float SynthEngine::numRandom(void)
