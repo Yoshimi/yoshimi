@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -353,43 +353,36 @@ fnc = &BankProcess_::process;
   }
   Function {process()} {open return_type void
   } {
-    code {int slot = this->slot;
+    code {//
+	int slot = this->slot;
+        if (what == 1 && mode == 1 && !bank->emptyslot(slot))
+        {
+            // Reads from slot
+            bank->loadfromslot(slot, synth->part[*npart]);
+            synth->part[*npart]->Pname = bank->getname(slot);
+            cbwig->do_callback();
+
+            if (synth->getRuntime().BankUIAutoClose != 0)
+                bankuiwindow->hide();
+            refreshmainwindow();
+            return;
+        }
+
+        if (bank->readOnlyInstrument(nselected))
+        {
+            fl_alert("This instrument file cannot be changed");
+            return;
+        }
+
         if (what == 2 && !bank->emptyslot(slot) && mode != 4)
         {   // Rename slot
             const char *tmp = fl_input("Slot (instrument) name:", bank->getname(slot).c_str());
             if (tmp != NULL)
                 bank->setname(slot, string(tmp), -1);
             bs[slot]->refresh();
-
-            // Re-read from slot
-            //synth->actionLock(lockmute);
-            //bank->loadfromslot(slot, synth->part[*npart]);
-            //synth->part[*npart]->applyparameters(true);
-            //synth->actionLock(unlock);
-
             bank->loadfromslot(slot, synth->part[*npart]);
-            // synth->part[*npart]->applyparameters();
-
             synth->part[*npart]->Pname = bank->getname(slot);
             cbwig->do_callback();
-        }
-
-        if (what == 1 && mode == 1 && !bank->emptyslot(slot))
-        {
-            // Reads from slot
-            //synth->actionLock(lockmute);
-            //bank->loadfromslot(slot, synth->part[*npart]);
-            //synth->part[*npart]->applyparameters(true);
-            //synth->actionLock(unlock);
-
-            bank->loadfromslot(slot, synth->part[*npart]);
-            //synth->part[*npart]->applyparameters();
-
-            synth->part[*npart]->Pname = bank->getname(slot);
-            cbwig->do_callback();
-
-            if (synth->getRuntime().BankUIAutoClose != 0)
-                bankuiwindow->hide();
         }
 
         if (what == 1 && mode == 2)
@@ -441,7 +434,8 @@ fnc = &BankProcess_::process;
             }
         }
         if (mode != 4)
-            refreshmainwindow();} {}
+            refreshmainwindow();} {selected
+    }
   }
   Function {refreshmainwindow()} {open
   } {
@@ -493,8 +487,7 @@ if(reload)
   	        }
               }   
           }
-          refreshmainwindow();} {selected
-    }
+          refreshmainwindow();} {}
   }
   Function {set_bank_slot()} {open
   } {

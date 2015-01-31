@@ -65,6 +65,13 @@ Bank::~Bank()
 }
 
 
+bool Bank::readOnlyInstrument(int ninstrument)
+{
+    const char * file = getFullPath(currentRootID, currentBankID, ninstrument).c_str();
+    return access(file, W_OK);
+}
+
+
 // Get the name of an instrument from the bank
 string Bank::getname(unsigned int ninstrument)
 {

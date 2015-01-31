@@ -5,6 +5,10 @@ yoshimi-1.3.2-rc2
 2015-1-31 Andrew
 - Start guis only from main gui thread
 
+2015-1-28 Will
+- Added check to prevent attempt to change non-writable instrument files
+  *before* GUI entries written
+
 2015-1-27 Will
 - Allow instrument name of just 3 chars
 - Bumped version number to rc2
