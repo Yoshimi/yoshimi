@@ -419,6 +419,7 @@ void SynthEngine::SetBankRoot(int rootnum)
     if (Runtime.showGui)
     {
         guiMaster->updateBankRootDirs();
+        guiMaster->bankui->rescan_for_banks(false);
     }
 
 
