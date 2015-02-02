@@ -1,8 +1,4 @@
 
-Removed root dir should not crash yoshi!
-
 Don't load banks/programs if they are already current.
-
-Give prefence to numbered banks (makes MIDI selection more reliable, and change UI simiar to instruments.
 
 Improve Copy & Paste functionality.

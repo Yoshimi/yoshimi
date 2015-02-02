@@ -24,17 +24,6 @@ Yoshimi responds to the following messages.
 224: Pitch Bend
 
 
-If you want to use bank changes it is a good idea to rename the bank directories with a number prefix. That way, when you add new banks they won't upset the order of the existing ones, and you won't then run the risk of your older project files adressing the wrong bank.
+For more details of bank changes see Banks.txt
 
-Similarly instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
-
-
-Both ALSA MIDI and Jack MIDI can autoconnect. So from the command line you'd use something like:
-
- ./yoshimi -K --alsa-midi="Virtual Keyboard"
-
-or:
-
- ./yoshimi -K --jack-midi="jack-keyboard:midi_out"
-
-ALSA can mostly manage with just the client name, but Jack needs the port as well (the part after the colon). These commands are case sensitive, and quite fussy about spaces etc. so it's wise to use quotes for the source name, even if they don't seem to be needed.
+Instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
