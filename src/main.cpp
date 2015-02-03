@@ -30,6 +30,8 @@ using namespace std;
 #include <list>
 #include <pthread.h>
 #include <semaphore.h>
+#include <cstdio>
+#include <unistd.h>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -97,10 +99,27 @@ static void *mainGuiThread(void *arg)
 
     map<SynthEngine *, MusicClient *>::iterator it;
     fl_register_images();
+#if (FL_MAJOR_VERSION == 1 && FL_MINOR_VERSION >= 3)
+    char *fname = tmpnam(NULL);
+    if(fname)
+    {
+        FILE *f = fopen(fname, "wb");
+        if(f)
+        {
+            fwrite(yoshimi_logo_png, sizeof(yoshimi_logo_png), 1, f);
+            fclose(f);
+        }
+    }
+    Fl_PNG_Image pix(fname);
+    if(fname)
+    unlink(fname);
+#else
+    Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
+#endif
     Fl_Window winSplash(400, 300, "yoshimi splash screen");
     Fl_Box box(0, 0, 400,300);
     //Fl_Pixmap pix(yoshimi_logo);
-    Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
+
     box.image(pix);
     Fl_Box boxLb(10, 300-30, 400-20, 30);
     boxLb.box(FL_NO_BOX);
