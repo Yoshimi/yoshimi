@@ -23,8 +23,7 @@ e.g.
  ./yoshimi -K --alsa-midi="Virtual Keyboard"
  ./yoshimi -K --jack-midi="jack-keyboard:midi_out"
  
-Alsa can often manage with just the client name, but jack needs the port as
-well.
+Alsa can often manage with just the client name, but jack needs the port as well. These commands are case sensitive, and quite fussy about spaces etc. so it's wise to use quotes for the source name, even if they don't seem to be needed.
 
 ###
 
@@ -43,10 +42,10 @@ Planned features:
 
 ###
 
-Bank root dirs are better identified, with IDs that can be changed by the user in the GUI. This will soon also be made available for selecting over MIDI.
+Bank root dirs are better identified, with IDs that can be changed by the user in the GUI. This is also made available for selecting over MIDI.
 
 MIDI only sees banks in the *current* root dir, but all banks are accessible to the GUI.
 
-In the 'banks' list each bank is now identified by the ID of the root dir it belongs to.
+More details in Banks.txt
 
 ###
