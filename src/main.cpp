@@ -99,7 +99,7 @@ static void *mainGuiThread(void *arg)
 
     map<SynthEngine *, MusicClient *>::iterator it;
     fl_register_images();
-#if (FL_MAJOR_VERSION == 1 && FL_MINOR_VERSION >= 3)
+#if (FL_MAJOR_VERSION == 1 && FL_MINOR_VERSION < 3)
     char *fname = tmpnam(NULL);
     if(fname)
     {
