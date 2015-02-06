@@ -410,11 +410,11 @@ void SynthEngine::SetBankRoot(int rootnum)
 {
     if(bank.setCurrentRootID(rootnum))
     {
-        Runtime.Log("Found (" + asString(rootnum) + ")  " + bank.getRootPath(bank.getCurrentRootID()));
+        Runtime.Log("SynthEngine setBank: Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
     }
     else
     {
-        Runtime.Log("No match for root ID " + asString(rootnum));
+        Runtime.Log("SynthEngine setBank: No match for root ID " + asString(rootnum));
     }
     if (Runtime.showGui)
     {
@@ -441,12 +441,12 @@ void SynthEngine::SetBank(int banknum)
             guiMaster->bankui->set_bank_slot();
             guiMaster->bankui->refreshmainwindow();
         }
-        Runtime.Log("SynthEngine setBank: Loaded bank " + asString(banknum));
+        Runtime.Log("SynthEngine setBank: Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
 
     }
     else
     {
-        Runtime.Log("SynthEngine setBank: Can't load bank " + asString(banknum)+ " from this root");
+        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum)+ " in this root");
     }
 
 
@@ -506,7 +506,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                 }
            }
         if (partOK){
-            Runtime.Log("SynthEngine setProgram: Loaded " + bank.getname(pgm));
+            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm));
             // update UI
             if (Runtime.showGui && guiMaster)
             {
@@ -515,8 +515,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                     guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
             }
         }
-        else
-            Runtime.Log("SynthEngine setProgram: Invalid program");
+        else // I think XML traps this. Should it?
+            Runtime.Log("SynthEngine setProgram: Invalid program data");
     }
 }
 

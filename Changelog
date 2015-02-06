@@ -1,7 +1,13 @@
+yoshimi 1.3.*
 
-yoshimi-1.3.2
+2015-2-6 Will
+- Unified root bank insturment log messages
+- Updated MIDI test files
+
 2015-2-3 Andrew
 - Fix png image creation on fltk < 1.3
+
+yoshimi-1.3.2
 
 2015-2-2 Will
 - Final updates to files for full release
