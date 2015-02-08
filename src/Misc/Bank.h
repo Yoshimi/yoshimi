@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, last modified Jamuary 2015
+    This file is a derivative of a ZynAddSubFX original, last modified February 2015
 */
 
 #ifndef BANK_H
@@ -35,9 +35,10 @@ using namespace std;
 #include <map>
 #include <vector>
 
+#define ROOT_SIZE 128
 #define BANK_SIZE 160
 
-#define MAX_NUM_BANKS 2000
+// not needed anymore? #define MAX_NUM_BANKS 2000
 /*
 typedef struct {
     string name;
