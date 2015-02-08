@@ -187,6 +187,25 @@ bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
 }
 
 
+//Gets a bank name
+string Bank::getBankName(int bankID)
+{
+    if (roots [currentRootID].banks [bankID].dirname.empty())
+        return "";
+    return string(roots [currentRootID].banks [bankID].dirname);
+}
+
+
+//Gets a bank name with ID
+string Bank::getBankIDname(int bankID)
+{
+    string retname = getBankName(bankID);
+    if (!retname.empty())
+        retname = asString(bankID) + ". " + retname;
+    return retname;
+}
+
+
 // Makes current a bank directory
 bool Bank::loadbank(size_t rootID, size_t banknum)
 {

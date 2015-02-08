@@ -117,6 +117,8 @@ class Bank : private MiscFuncs
         void savetoslot(unsigned int ninstrument, Part *part);
         bool loadfromslot(unsigned int ninstrument, Part *part);
         void swapslot(unsigned int n1, unsigned int n2);
+        string getBankName(int bankID);
+        string getBankIDname(int bankID);
         bool loadbank(size_t rootID, size_t banknum);
         bool newbank(string newbankdirname);
         void rescanforbanks(void);
@@ -148,6 +150,10 @@ class Bank : private MiscFuncs
         string getBankFileTitle()
         {
             return string("Root #") + asString(currentRootID) + ", Bank #" + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
+        }
+        string getRootFileTitle()
+        {
+            return string("Root #") + asString(currentRootID) + " - " + getRootPath(currentRootID);
         }
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
