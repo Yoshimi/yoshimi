@@ -228,8 +228,8 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
   Function {make_window()} {open
   } {
     Fl_Window bankuiwindow {
-      label Bank open
-      xywh {179 344 780 570} type Double hide
+      label Bank open selected
+      xywh {52 290 780 575} type Double hide
       code0 {o->copy_label(bank->getBankFileTitle().c_str());}
       code1 {if (!bank->getBankFileTitle().size())
             o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
@@ -237,7 +237,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
       Fl_Button {} {
         label Close
         callback {bankuiwindow->hide();}
-        xywh {705 546 70 24} box THIN_UP_BOX labelsize 12
+        xywh {703 546 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {open
         xywh {5 34 772 491} box ENGRAVED_FRAME
@@ -355,12 +355,12 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
               }
             }
             refreshmainwindow();}
-        xywh {685 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        xywh {650 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Check_Button {} {
         label {auto close}
         callback {synth->getRuntime().BankUIAutoClose = (int) o->value();}
-        tooltip {automatically close the bank window if the instrument is loaded} xywh {705 529 60 15} down_box DOWN_BOX labelsize 10
+        tooltip {automatically close the bank window if the instrument is loaded} xywh {703 529 60 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(synth->getRuntime().BankUIAutoClose);}
       }
       Fl_Choice banklist {
@@ -398,25 +398,26 @@ set_bank_slot();}
       Fl_Button {} {
         label Banks
         callback {rootuiwindow->show();
-bankuiwindow->hide();}
-        xywh {475 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+if (synth->getRuntime().BankUIAutoClose != 0)
+    bankuiwindow->hide();}
+        xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
     }
     Fl_Window rootuiwindow {
       label Root open
-      xywh {68 317 630 575} type Double hide
+      xywh {505 214 775 575} type Double hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
         label Close
         callback {rootuiwindow->hide();}
-        xywh {549 546 70 24} box THIN_UP_BOX labelsize 12
+        xywh {647 546 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {open
-        xywh {5 34 621 491} box ENGRAVED_FRAME
+        xywh {5 34 766 491} box ENGRAVED_FRAME
       } {
         Fl_Pack {} {
-          xywh {10 39 150 481} box BORDER_BOX
+          xywh {10 39 186 481} box BORDER_BOX
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 0; i < 32; ++i)
@@ -428,7 +429,7 @@ bankuiwindow->hide();}
           }}
         } {}
         Fl_Pack {} {
-          xywh {163 39 150 481} box BORDER_BOX
+          xywh {200 39 186 481} box BORDER_BOX
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 32; i < 64; ++i)
@@ -440,7 +441,7 @@ bankuiwindow->hide();}
           }}
         } {}
         Fl_Pack {} {
-          xywh {316 39 150 481} box BORDER_BOX
+          xywh {390 39 186 481} box BORDER_BOX
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 64; i < 96; ++i)
@@ -452,7 +453,7 @@ bankuiwindow->hide();}
           }}
         } {}
         Fl_Pack {} {
-          xywh {469 39 150 481} box BORDER_BOX
+          xywh {580 39 185 481} box BORDER_BOX
           code0 {o->box(FL_NO_BOX);}
           code1 {//
             for (int i = 96; i < 128; ++i)
@@ -502,15 +503,16 @@ bankuiwindow->hide();}
       }
       Fl_Check_Button {} {
         label {auto close}
-        callback {//synth->getRuntime().RoottoClose = (int) o->value();}
-        tooltip {automatically close the root window if the bank is selected} xywh {550 529 68 15} down_box DOWN_BOX labelsize 10 deactivate
-        code0 {//o->value(synth->getRuntime().RootUIAutoClose);}
+        callback {synth->getRuntime().RootUIAutoClose = (int) o->value();}
+        tooltip {automatically close the root window if the bank is selected} xywh {647 529 68 15} down_box DOWN_BOX labelsize 10
+        code0 {o->value(synth->getRuntime().RootUIAutoClose);}
       }
       Fl_Button {} {
         label Instruments
         callback {bankuiwindow->show();
-rootuiwindow->hide();}
-        xywh {265 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+if (synth->getRuntime().RootUIAutoClose != 0)
+    rootuiwindow->hide();}
+        xywh {438 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
     }
   }
@@ -654,7 +656,8 @@ fnr = &RootProcess_::rootprocess;
                 bankEntry.dirname.c_str());
         refreshmainwindow();
         bankuiwindow->show();
-        rootuiwindow->hide();
+        if (synth->getRuntime().RootUIAutoClose != 0)
+            rootuiwindow->hide();
      }} {}
   }
   Function {refreshmainwindow()} {open
@@ -713,8 +716,7 @@ if(reload)
   	        }
               }   
           }
-          refreshmainwindow();} {selected
-    }
+          refreshmainwindow();} {}
   }
   Function {set_bank_slot()} {open
   } {

@@ -102,6 +102,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     BankUIAutoClose(0),
+    RootUIAutoClose(0),
     GzipCompression(3),
     Interpolation(0),
     CheckPADsynth(1),
@@ -426,6 +427,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
                                         MAX_AD_HARMONICS * 2, 131072);
     BankUIAutoClose = xml->getpar("bank_window_auto_close",
                                                BankUIAutoClose, 0, 1);
+    RootUIAutoClose = xml->getpar("root_window_auto_close",
+                                               RootUIAutoClose, 0, 1);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
@@ -536,6 +539,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("sound_buffer_size", Buffersize);
     xmltree->addpar("oscil_size", Oscilsize);
     xmltree->addpar("bank_window_auto_close", BankUIAutoClose);
+    xmltree->addpar("root_window_auto_close", RootUIAutoClose);
 
     xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("check_pad_synth", CheckPADsynth);
