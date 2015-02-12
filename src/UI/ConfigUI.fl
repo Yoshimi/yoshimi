@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -53,7 +53,7 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open
-      xywh {336 158 465 335} type Double visible
+      xywh {336 158 465 335} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 457 325}
@@ -219,7 +219,7 @@ oldrootID = changeIDbutton->value();}
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
     configChanged = true;}
-            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+            xywh {10 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removerootdirbutton {
             label {Remove root dir...}
@@ -231,7 +231,7 @@ oldrootID = changeIDbutton->value();}
         configChanged = true;
     }
     activatebutton_rootdir(false);}
-            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+            xywh {95 244 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
           }
           Fl_Button makedefaultrootdirbutton {
@@ -245,8 +245,14 @@ oldrootID = changeIDbutton->value();}
         configChanged = true;
     }
     activatebutton_rootdir(false);}
-            xywh {195 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+            xywh {180 244 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
+          }
+          Fl_Button showdefaultrootdirbutton {
+            label {Open current}
+            callback {//
+    synth->getGuiMaster()->bankui->rootuiwindow->show();} selected
+            xywh {265 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Return_Button changeIDok {
             label Set
@@ -270,11 +276,11 @@ oldrootID = changeIDbutton->value();}
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
     }}
-            xywh {305 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
+            xywh {350 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
             label {Change ID}
-            xywh {305 256 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
+            xywh {350 256 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
             code0 {oldrootID = o->value();}
           }
         }
@@ -495,7 +501,7 @@ oldrootID = changeIDbutton->value();}
         if (!name.empty())
         {
             name = "In use for " + name;
-            fl_alert(name.c_str());
+            fl_alert("%s", name.c_str());
             BankRoot->value(BankRootvalue);
             BankRoot->redraw();
         }
@@ -560,7 +566,7 @@ oldrootID = changeIDbutton->value();}
     	o->value(oldBank);
     	o->redraw();
         name = "In use for " + name;
-        fl_alert(name.c_str());
+        fl_alert("%s", name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         configChanged = true;} open
@@ -611,7 +617,7 @@ oldrootID = changeIDbutton->value();}
         if (!name.empty())
         {
             name = "In use for " + name;
-            fl_alert(name.c_str());
+            fl_alert("%s", name.c_str());
             EPCspinner->value(EPCvalue);
             EPCspinner->redraw();
         }
@@ -725,8 +731,7 @@ configwindow->do_callback();}
       	   tmp += " *";
       	}
         rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
-      }} {selected
-    }
+      }} {}
   }
   Function {recoverID()} {open return_type int
   } {

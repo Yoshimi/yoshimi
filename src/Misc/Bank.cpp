@@ -190,7 +190,7 @@ bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
 //Gets a bank name
 string Bank::getBankName(int bankID)
 {
-    if (roots [currentRootID].banks [bankID].dirname.empty())
+    if (roots [currentRootID].banks.count(bankID) == 0)
         return "";
     return string(roots [currentRootID].banks [bankID].dirname);
 }
