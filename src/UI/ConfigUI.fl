@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -52,7 +52,7 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open
+      callback {o->hide();} open selected
       xywh {336 158 465 335} type Double visible
     } {
       Fl_Tabs {} {open
@@ -195,7 +195,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 295} labelsize 12
+          xywh {5 25 457 295} labelsize 12 hide
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
@@ -481,7 +481,7 @@ oldrootID = changeIDbutton->value();}
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -495,7 +495,7 @@ oldrootID = changeIDbutton->value();}
         if (!name.empty())
         {
             name = "In use for " + name;
-            fl_alert(name.c_str());
+            fl_alert("%s",name.c_str());
             BankRoot->value(BankRootvalue);
             BankRoot->redraw();
         }
@@ -560,7 +560,7 @@ oldrootID = changeIDbutton->value();}
     	o->value(oldBank);
     	o->redraw();
         name = "In use for " + name;
-        fl_alert(name.c_str());
+        fl_alert("%s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         configChanged = true;} open
@@ -611,7 +611,7 @@ oldrootID = changeIDbutton->value();}
         if (!name.empty())
         {
             name = "In use for " + name;
-            fl_alert(name.c_str());
+            fl_alert("%s",name.c_str());
             EPCspinner->value(EPCvalue);
             EPCspinner->redraw();
         }
@@ -725,8 +725,7 @@ configwindow->do_callback();}
       	   tmp += " *";
       	}
         rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
-      }} {selected
-    }
+      }} {}
   }
   Function {recoverID()} {open return_type int
   } {
