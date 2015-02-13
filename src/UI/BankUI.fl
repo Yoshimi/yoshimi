@@ -228,10 +228,10 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {52 290 780 575} type Double
+      xywh {52 290 780 575} type Double hide
       code0 {o->copy_label(bank->getBankFileTitle().c_str());}
       code1 {if (!bank->getBankFileTitle().size())
-            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");} visible
+            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");}
     } {
       Fl_Button {} {
         label Close
@@ -399,19 +399,20 @@ set_bank_slot();}
         callback {rootuiwindow->show();
 if (synth->getRuntime().BankUIAutoClose != 0)
     bankuiwindow->hide();}
-        xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show banks in current root} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
         label Roots
-        callback {//synth->getGuiMaster()->configui->Show();
-if (synth->getRuntime().BankUIAutoClose != 0)
-    bankuiwindow->hide();} selected
-        xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        callback {//
+    pathwindow->show();
+    if (synth->getRuntime().BankUIAutoClose != 0)
+        bankuiwindow->hide();}
+        tooltip {Show root paths} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
     }
     Fl_Window rootuiwindow {
-      label Root open
-      xywh {505 214 775 575} type Double hide
+      label Root open selected
+      xywh {33 163 775 575} type Double hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -518,7 +519,119 @@ if (synth->getRuntime().BankUIAutoClose != 0)
         callback {bankuiwindow->show();
 if (synth->getRuntime().RootUIAutoClose != 0)
     rootuiwindow->hide();}
-        xywh {438 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show instruments in current bank} xywh {438 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+      }
+      Fl_Button {} {
+        label Roots
+        callback {// 
+    pathwindow->show();
+    if (synth->getRuntime().BankUIAutoClose != 0)
+        bankuiwindow->hide();}
+        tooltip {Show root paths} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+      }
+    }
+    Fl_Window pathwindow {
+      label {Bank Root Paths}
+      callback {o->hide();} open
+      xywh {366 188 465 335} type Double hide
+      code0 {readbankcfg();}
+    } {
+      Fl_Browser rootsbrowse {
+        callback {int tmp = o->value();
+activatebutton_rootdir(tmp!=0);
+if (tmp)
+{
+    selectedRootID = reinterpret_cast<long>(o->data(tmp));
+}
+    
+changeIDbutton->value(recoverID());
+oldrootID = changeIDbutton->value();}
+        xywh {20 45 445 200} type Hold labelsize 12 textsize 13
+      }
+      Fl_Button {} {
+        label {Add root directory...}
+        callback {//
+    const char *dirname;
+    dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
+    if (!dirname)
+      return;
+    synth->getBankRef().addRootDir(dirname);
+    readbankcfg();}
+        xywh {20 254 75 35} box THIN_UP_BOX labelsize 12 align 128
+      }
+      Fl_Button removerootdirbutton {
+        label {Remove root dir...}
+        callback {//
+    if (selectedRootID >= 0)
+    {
+        synth->getBankRef().removeRoot(selectedRootID);
+        readbankcfg();
+    }
+    activatebutton_rootdir(false);}
+        xywh {105 254 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+        code0 {o->deactivate();}
+      }
+      Fl_Button makedefaultrootdirbutton {
+        label {Make current}
+        callback {//
+    if (selectedRootID >= 0)
+    {
+        synth->getBankRef().setCurrentRootID(selectedRootID);
+        readbankcfg();
+        rescan_for_banks(false);
+    }
+    activatebutton_rootdir(false);}
+        xywh {190 254 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+        code0 {o->deactivate();}
+      }
+      Fl_Button showdefaultrootdirbutton {
+        label {Open current}
+        callback {//
+    rootuiwindow->show();}
+        xywh {275 254 75 35} box THIN_UP_BOX labelsize 12 align 128
+      }
+      Fl_Return_Button changeIDok {
+        label Set
+        callback {//
+    if (changeIDbutton->value() != oldrootID)
+    {
+        if (selectedRootID >= 0)
+        {
+            if (synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value()))
+            {
+                readbankcfg();
+                rescan_for_banks(true);
+            }
+            else
+            {
+                changeIDbutton->value(oldrootID);
+                fl_alert("ID already in use!");
+            }
+        }
+        oldrootID = changeIDbutton->value();
+        activatebutton_rootdir(false);
+    }}
+        xywh {360 265 74 20} box NO_BOX labelsize 12 align 8 deactivate
+      }
+      Fl_Spinner changeIDbutton {
+        label {Change ID}
+        xywh {360 266 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
+        code0 {oldrootID = o->value();}
+      }
+      Fl_Button {} {
+        label {Close Unsaved}
+        callback {pathwindow->do_callback();}
+        xywh {345 305 105 20} box THIN_UP_BOX labelsize 12
+      }
+      Fl_Button {} {
+        label {Save and Close}
+        callback {//synth->getRuntime().saveConfig();
+pathwindow->do_callback();}
+        xywh {225 305 105 20} box THIN_UP_BOX labelsize 12
+      }
+      Fl_Text_Display {} {
+        label {Currently always saves}
+        xywh {5 302 50 25} box NO_BOX align 8
       }
     }
   }
@@ -749,6 +862,50 @@ if(reload)
         banklist->value(0);
     }} {}
   }
+  Function {activatebutton_rootdir(bool active)} {open
+  } {
+    code {//
+        if (active)
+        {
+            removerootdirbutton->activate();
+            makedefaultrootdirbutton->activate();
+            changeIDbutton->activate();
+            changeIDok->activate();
+        }
+        else
+        {
+            removerootdirbutton->deactivate();
+            makedefaultrootdirbutton->deactivate();
+            changeIDbutton->deactivate();
+            changeIDok->deactivate();
+        }} {}
+  }
+  Function {readbankcfg()} {open
+  } {
+    code {//
+    string tmp;
+    rootsbrowse->clear();
+    const RootEntryMap &roots = synth->getBankRef().getRoots();
+      RootEntryMap::const_iterator it;
+      for(it = roots.begin(); it != roots.end(); ++it)
+      {
+        tmp = asString(it->first) + ". " + it->second.path;
+        if(it->first == synth->getBankRef().getCurrentRootID())
+      	{
+      	   tmp += " *";
+      	}
+        rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
+      }} {}
+  }
+  Function {recoverID()} {open return_type int
+  } {
+    code {//
+    if (selectedRootID >= 0)
+    {
+        return selectedRootID;
+    }
+    return 0;} {}
+  }
   decl {BankSlot *bs[BANK_SIZE];} {private local
   }
   decl {RootSlot *rs[ROOT_SIZE];} {private local
@@ -765,9 +922,14 @@ if(reload)
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
-
-Function {findBankItemCb(Fl_Widget *m, void *data)} {open return_type {static void}
-} {
-  code {printf("Hello, World!\\n");} {}
+  decl {long selectedRootID;} {private local
+  }
+  decl {int EPCvalue;} {private local
+  }
+  decl {int BankRootvalue;} {private local
+  }
+  decl {int oldBank;} {private local
+  }
+  decl {int oldrootID;} {private local
+  }
 } 
