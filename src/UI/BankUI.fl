@@ -363,25 +363,25 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         code0 {o->value(synth->getRuntime().BankUIAutoClose);}
       }
       Fl_Choice banklist {
-        callback {int n = o->value();
-            if (n < 0)
-                return;
-            const Fl_Menu_Item &item = o->menu()[n]; 
-            int nbank = reinterpret_cast<long>(item.user_data());
-            const BankEntry &bankEntry = bank->getBank(nbank);
-            if (!bank->setCurrentBankID(nbank))
-                fl_alert("Error: Could not load the bank from the directory\\n%s.",
-                        bankEntry.dirname.c_str());
-                for (int i = 0; i < BANK_SIZE; ++i)
-                    bs[i]->refresh();
-                refreshmainwindow();} open
-        xywh {5 8 220 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
+        callback {//
+    int n = o->value();
+    if (n < 0)
+        return;
+    const Fl_Menu_Item &item = o->menu()[n]; 
+    int nbank = reinterpret_cast<long>(item.user_data());
+    const BankEntry &bankEntry = bank->getBank(nbank);
+    if (!bank->setCurrentBankID(nbank))
+        fl_alert("Error: Could not load the bank from the directory\\n%s.", bankEntry.dirname.c_str());
+    for (int i = 0; i < BANK_SIZE; ++i)
+        bs[i]->refresh();
+    refreshmainwindow();} open
+        xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
-        label {Refresh bank list}
+        label {Refresh banks}
         callback {rescan_for_banks(true);
 set_bank_slot();}
-        tooltip {Refresh the bank list (rescan)} xywh {230 8 105 20} box THIN_UP_BOX color 50 labelsize 11
+        tooltip {Refresh the bank list (rescan)} xywh {212 5 102 25} box PLASTIC_UP_BOX color 50 labelfont 1 labelsize 11
       }
       Fl_Check_Button {} {
         label {Show PADsynth status}
@@ -411,7 +411,7 @@ if (synth->getRuntime().BankUIAutoClose != 0)
       }
     }
     Fl_Window rootuiwindow {
-      label Root open selected
+      label Root open
       xywh {33 163 775 575} type Double hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
@@ -477,35 +477,35 @@ if (synth->getRuntime().BankUIAutoClose != 0)
       } {
         Fl_Light_Button rootwritebutton {
           label ADD
-          callback {//if (o->value() > 0.5)
-//                  mode = 2;
-//              removeselection();}
+          callback {if (o->value() > 0.5)
+    mode = 2;
+removeselection();}
           xywh {116 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12 deactivate
-          code0 {//if (bank->locked()) o->deactivate();}
+          code0 {if (bank->locked()) o->deactivate();}
         }
         Fl_Light_Button rootreadbutton {
           label SELECT
-          callback {//if (o->value() > 0.5)
-//                  mode = 1;
-//              removeselection();}
+          callback {if (o->value() > 0.5)
+    mode = 1;
+removeselection();}
           xywh {11 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 101 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {o->value(1);}
         }
         Fl_Light_Button rootclearbutton {
           label CLEAR
-          callback {//if (o->value() > 0.5)
-//                  mode = 3;
-//              removeselection();}
+          callback {if (o->value() > 0.5)
+  mode = 3;
+removeselection();}
           xywh {221 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 0 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12 deactivate
-          code0 {//if (bank->locked()) o->deactivate();}
+          code0 {if (bank->locked()) o->deactivate();}
         }
         Fl_Light_Button rootswapbutton {
           label SWAP
-          callback {//if (o->value() > 0.5)
-//                  mode = 4;
-//              removeselection();}
-          xywh {325 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12 deactivate
-          code0 {//if (bank->locked()) o->deactivate();}
+          callback {if (o->value() > 0.5)
+  mode = 4;
+removeselection();}
+          xywh {325 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 227 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
+          code0 {if (bank->locked()) o->deactivate();}
         }
       }
       Fl_Check_Button {} {
@@ -654,7 +654,9 @@ fnr = &RootProcess_::rootprocess;
         bankuiwindow->hide();
         delete bankuiwindow;
         rootuiwindow->hide();
-        delete rootuiwindow;} {}
+        delete rootuiwindow;
+        pathwindow->hide();
+        delete pathwindow;} {}
   }
   Function {Show()} {open
   } {
@@ -765,18 +767,101 @@ fnr = &RootProcess_::rootprocess;
   Function {rootprocess()} {open return_type void
   } {
     code {//
-    int slot = this->slot;
-    if (!bank->getBankName(slot).empty())
-    {
-        const BankEntry &bankEntry = bank->getBank(slot);
-        if (!bank->setCurrentBankID(slot))
-            fl_alert("Error: Could not load the bank from the directory\\n%s.",
-                bankEntry.dirname.c_str());
-        refreshmainwindow();
-        bankuiwindow->show();
-        if (synth->getRuntime().RootUIAutoClose != 0)
-            rootuiwindow->hide();
-     }} {}
+    unsigned int slot = this->slot;
+    
+        if (what == 1 && mode == 1 && !bank->getBankName(slot).empty())
+        {
+            // Reads from slot
+            const BankEntry &bankEntry = bank->getBank(slot);
+            if (!bank->setCurrentBankID(slot))
+                fl_alert("Error: Could not load the bank from the directory\\n%s.",
+                    bankEntry.dirname.c_str());
+            cbwig->do_callback();
+            bankuiwindow->show();
+            if (synth->getRuntime().RootUIAutoClose != 0)
+                rootuiwindow->hide();
+            set_bank_slot(); // needed by 'old' menu selector
+            refreshmainwindow();
+            return;
+        }
+
+/*        if (bank->readOnlyBank(nselected))
+        {
+            fl_alert("This bank directory cannot be changed");
+            return;
+        }*/
+        
+/*        if (what == 2 && !bank->emptyslot(slot) && mode != 4)
+        {   // Rename slot
+            const char *tmp = fl_input("Slot (instrument) name:", bank->getname(slot).c_str());
+            if (tmp != NULL)
+                bank->setname(slot, string(tmp), -1);
+            rs[slot]->refresh();
+            bank->loadfromslot(slot, synth->part[*npart]);
+            synth->part[*npart]->Pname = bank->getname(slot);
+            cbwig->do_callback();
+        }*/
+
+/*        if (what == 1 && mode == 2)
+        {   // create new bank and save to file
+            bool doit = true;
+            if (!bank->emptyslot(slot))
+                if (!fl_choice("Overwrite the slot no. %d ?", "No", "Yes", NULL, slot + 1))
+                    doit = false;
+            if (doit)
+            {
+                synth->actionLock(lockmute);
+                bank->savetoslot(slot,synth->part[*npart]);
+                synth->actionLock(unlock);
+                rs[slot]->refresh();
+                mode = 1;
+                rootreadbutton->value(1);
+                rootwritebutton->value(0);
+            }
+        }*/
+
+/*        if (what == 1 && mode == 3 && !bank->emptyslot(slot))
+        {   // remove bank and file contents
+            if (fl_choice("Delete this bank and all contents?", "No", "Yes", NULL, slot + 1))
+            {
+                bank->clearslot(slot);
+                rs[slot]->refresh();
+            }
+        }*/
+
+        if (mode == 4)
+        {   // swap
+            bool done = false;
+            if (what == 1 && nselected >= 0)
+            {
+                bank->swapbanks(nselected, slot);
+                if ((unsigned int) nselected == bank->getCurrentBankID() or (unsigned int) slot == bank->getCurrentBankID())
+                    refreshmainwindow();
+                else
+                {
+                    int ns = nselected;
+                    rs[slot]->refresh();
+                    rs[ns]->refresh();
+                }
+                nselected = -1;
+                mode = 1;
+                rootreadbutton->value(1);
+                rootswapbutton->value(0);
+                done = true;
+            }
+            if ((nselected < 0 || what == 2) && !done)
+            {
+                int ns = nselected;
+                nselected = slot;
+                if (rs > 0)
+                    rs[ns]->refresh();
+                rs[slot]->refresh();
+            }
+        }
+
+        if (mode != 4)
+            refreshmainwindow();} {selected
+    }
   }
   Function {refreshmainwindow()} {open
   } {

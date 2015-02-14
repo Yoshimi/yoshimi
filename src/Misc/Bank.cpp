@@ -187,6 +187,14 @@ bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
 }
 
 
+bool Bank::readOnlyBank(int bankID)
+{
+    const char * file = getBankPath(currentRootID, bankID).c_str();
+    synth->getRuntime().Log("Bank " + getBankPath(currentRootID, bankID));
+    return access(file, W_OK);
+}
+
+
 //Gets a bank name
 string Bank::getBankName(int bankID)
 {
@@ -347,6 +355,64 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
         instrRef1 = instrRef2;
         instrRef2 = instrTmp;
     }
+}
+
+// intelligently moves or swaps banks preserving instrument details
+void Bank::swapbanks(unsigned int firstID, unsigned int secondID)
+{
+    if (firstID == secondID)
+    {
+        synth->getRuntime().Log("Nothing to move!");
+        return;
+    }
+        
+    string firstname = getBankName(firstID); // this needs improving
+    string secondname = getBankName(secondID);
+    if (firstname.empty() and secondname.empty())
+    {
+        synth->getRuntime().Log("Nothing to move!");
+        return;
+    }
+    if (secondname.empty())
+    {
+        synth->getRuntime().Log("Moving " + firstname);
+        roots [currentRootID].banks [secondID] = roots [currentRootID].banks [firstID];
+        roots [currentRootID].banks.erase(firstID);
+    }
+    else if (firstname.empty())
+    {
+        synth->getRuntime().Log("Moving " + secondname);
+        roots [currentRootID].banks [firstID] = roots [currentRootID].banks [secondID];
+        roots [currentRootID].banks.erase(secondID);
+    }
+    else
+    { // may need some cleaning up - non erased entries?
+        synth->getRuntime().Log("Swapping " + firstname + " with " + secondname );
+        roots [currentRootID].banks [firstID].dirname = secondname;
+        roots [currentRootID].banks [secondID].dirname = firstname;
+        for(int pos = 0; pos < BANK_SIZE; ++ pos)
+        {
+            InstrumentEntry &instrRef_1 = getInstrumentReference(currentRootID, firstID, pos);
+            InstrumentEntry &instrRef_2 = getInstrumentReference(currentRootID, secondID, pos);
+
+            InstrumentEntry tmp = instrRef_2;
+            
+            if (instrRef_1.name == "")
+                roots [currentRootID].banks [secondID].instruments.erase(pos);
+            else
+                instrRef_2 = instrRef_1;
+            
+            if (tmp.name == "")
+                roots [currentRootID].banks [firstID].instruments.erase(pos);
+            else
+                instrRef_1 = tmp;
+        }
+    }
+    
+    if (firstID == currentBankID)
+        currentBankID = secondID;
+    else if(secondID == currentBankID)
+        currentBankID = firstID;
 }
 
 
@@ -549,6 +615,7 @@ size_t Bank::add_bank(string name, string , size_t rootID)
     loadbank(rootID, newIndex);
     return newIndex;
 }
+
 
 InstrumentEntry &Bank::getInstrumentReference(size_t ninstrument)
 {

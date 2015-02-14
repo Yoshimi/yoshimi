@@ -118,6 +118,8 @@ class Bank : private MiscFuncs
         void savetoslot(unsigned int ninstrument, Part *part);
         bool loadfromslot(unsigned int ninstrument, Part *part);
         void swapslot(unsigned int n1, unsigned int n2);
+        void swapbanks(unsigned int firstID, unsigned int secondID);
+        bool readOnlyBank(int bankID);
         string getBankName(int bankID);
         string getBankIDname(int bankID);
         bool loadbank(size_t rootID, size_t banknum);
