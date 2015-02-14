@@ -67,6 +67,10 @@ Bank::~Bank()
 
 bool Bank::readOnlyInstrument(int ninstrument)
 {
+    if (readOnlyBank(currentBankID))
+        return true; // root and bank not writable
+    if (emptyslot(ninstrument)) // nothing there so must be OK to write
+        return false;
     const char * file = getFullPath(currentRootID, currentBankID, ninstrument).c_str();
     return access(file, W_OK);
 }
@@ -189,8 +193,12 @@ bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
 
 bool Bank::readOnlyBank(int bankID)
 {
+    const char * root = getRootPath(currentRootID).c_str();
+    if (access(root, W_OK)) // root not writable
+        return true;
+    if (getBankName(bankID).empty())
+        return false; // not there so must be OK to write
     const char * file = getBankPath(currentRootID, bankID).c_str();
-    synth->getRuntime().Log("Bank " + getBankPath(currentRootID, bankID));
     return access(file, W_OK);
 }
 

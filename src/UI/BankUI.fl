@@ -205,13 +205,12 @@ class RootSlot {open : {public Fl_Button, RootProcess_}
     string bankName = root->getBankIDname(nslot);
     if (bankName.empty())
         color(46);
+    else if ((unsigned int) nslot == root->getCurrentBankID())
+    	color(252);
     else
-    {
         color(51);
-        //if (*nselected == nslot)
-          //  color(6);
-       // bankName = bank[idx].dirname;
-    }
+    if (*nselected == nslot)
+        color(6);
     copy_label(bankName.c_str());} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
@@ -411,8 +410,8 @@ if (synth->getRuntime().BankUIAutoClose != 0)
       }
     }
     Fl_Window rootuiwindow {
-      label Root open
-      xywh {33 163 775 575} type Double hide
+      label Root open selected
+      xywh {10 464 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -492,7 +491,7 @@ removeselection();}
           code0 {o->value(1);}
         }
         Fl_Light_Button rootclearbutton {
-          label CLEAR
+          label DELETE
           callback {if (o->value() > 0.5)
   mode = 3;
 removeselection();}
@@ -519,7 +518,7 @@ removeselection();}
         callback {bankuiwindow->show();
 if (synth->getRuntime().RootUIAutoClose != 0)
     rootuiwindow->hide();}
-        tooltip {Show instruments in current bank} xywh {438 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+        tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
         label Roots
@@ -528,6 +527,10 @@ if (synth->getRuntime().RootUIAutoClose != 0)
     if (synth->getRuntime().BankUIAutoClose != 0)
         bankuiwindow->hide();}
         tooltip {Show root paths} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
+      }
+      Fl_Button {} {
+        label {current bank}
+        tooltip {Show instruments in current bank} xywh {394 10 178 15} box THIN_UP_BOX down_box THIN_UP_BOX color 252 selection_color 252 labelsize 12 align 128
       }
     }
     Fl_Window pathwindow {
@@ -696,8 +699,13 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
 
-        if (bank->readOnlyInstrument(nselected))
+        if (mode > 1 and bank->readOnlyInstrument(nselected))
         {
+            mode = 1;
+            readbutton->value(1);
+            writebutton->value(0);
+            clearbutton->value(0);
+            swapbutton->value(0);
             fl_alert("This instrument file cannot be changed");
             return;
         }
@@ -785,11 +793,16 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
 
-/*        if (bank->readOnlyBank(nselected))
+        if (mode > 1 and bank->readOnlyBank(nselected))
         {
-            fl_alert("This bank directory cannot be changed");
+            mode = 1;
+            rootreadbutton->value(1);
+            rootwritebutton->value(0);
+            rootclearbutton->value(0);
+            rootswapbutton->value(0);
+             fl_alert("This bank directory cannot be changed");
             return;
-        }*/
+        }
         
 /*        if (what == 2 && !bank->emptyslot(slot) && mode != 4)
         {   // Rename slot
@@ -860,8 +873,7 @@ fnr = &RootProcess_::rootprocess;
         }
 
         if (mode != 4)
-            refreshmainwindow();} {selected
-    }
+            refreshmainwindow();} {}
   }
   Function {refreshmainwindow()} {open
   } {
