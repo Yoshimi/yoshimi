@@ -124,6 +124,8 @@ class Bank : private MiscFuncs
         string getBankIDname(int bankID);
         bool loadbank(size_t rootID, size_t banknum);
         bool newbank(string newbankdirname);
+        bool newIDbank(string newbankdir, unsigned int bankID);
+        bool newbankfile(string newbankdir);
         void rescanforbanks(void);
         //bool locked(void) { return (dirname.size() == 0); }
              // Check if the bank is locked (i.e. the file opened was readonly)

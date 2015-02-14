@@ -296,7 +296,28 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 // Makes a new bank, put it on a file and makes it current bank
 bool Bank::newbank(string newbankdir)
 {
-    if (getRootPath(currentRootID).empty())
+    if (!newbankfile(newbankdir))
+        return false;
+    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
+    return true;
+}
+
+
+// Makes a new bank with known ID and makes it current
+bool Bank::newIDbank(string newbankdir, unsigned int bankID)
+{
+    if (!newbankfile(newbankdir))
+        return false;
+    roots [currentRootID].banks [bankID].dirname = newbankdir;
+    hints [currentRootID] [newbankdir] = bankID; // why do we need this?
+    return true;
+}
+
+
+// performs the actual file operation for new banks
+bool Bank::newbankfile(string newbankdir)
+{
+     if (getRootPath(currentRootID).empty())
     {
         synth->getRuntime().Log("Current bank root directory not set");
         return false;
@@ -319,7 +340,6 @@ bool Bank::newbank(string newbankdir)
     forcefile += force_bank_dir_file;
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
     fclose(tmpfile);
-    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
     return true;
 }
 
@@ -394,10 +414,13 @@ void Bank::swapbanks(unsigned int firstID, unsigned int secondID)
         roots [currentRootID].banks.erase(secondID);
     }
     else
-    { // may need some cleaning up - non erased entries?
+    {
         synth->getRuntime().Log("Swapping " + firstname + " with " + secondname );
         roots [currentRootID].banks [firstID].dirname = secondname;
         roots [currentRootID].banks [secondID].dirname = firstname;
+        hints [currentRootID] [secondname] = firstID; // why do we need these?
+        hints [currentRootID] [firstname] = secondID;
+
         for(int pos = 0; pos < BANK_SIZE; ++ pos)
         {
             InstrumentEntry &instrRef_1 = getInstrumentReference(currentRootID, firstID, pos);

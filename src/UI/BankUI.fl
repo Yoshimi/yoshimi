@@ -410,7 +410,7 @@ if (synth->getRuntime().BankUIAutoClose != 0)
       }
     }
     Fl_Window rootuiwindow {
-      label Root open selected
+      label Root open
       xywh {10 464 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
@@ -479,7 +479,7 @@ if (synth->getRuntime().BankUIAutoClose != 0)
           callback {if (o->value() > 0.5)
     mode = 2;
 removeselection();}
-          xywh {116 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12 deactivate
+          xywh {116 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 1 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {if (bank->locked()) o->deactivate();}
         }
         Fl_Light_Button rootreadbutton {
@@ -804,34 +804,37 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
         
-/*        if (what == 2 && !bank->emptyslot(slot) && mode != 4)
-        {   // Rename slot
-            const char *tmp = fl_input("Slot (instrument) name:", bank->getname(slot).c_str());
-            if (tmp != NULL)
-                bank->setname(slot, string(tmp), -1);
-            rs[slot]->refresh();
-            bank->loadfromslot(slot, synth->part[*npart]);
-            synth->part[*npart]->Pname = bank->getname(slot);
-            cbwig->do_callback();
-        }*/
 
-/*        if (what == 1 && mode == 2)
-        {   // create new bank and save to file
-            bool doit = true;
-            if (!bank->emptyslot(slot))
-                if (!fl_choice("Overwrite the slot no. %d ?", "No", "Yes", NULL, slot + 1))
-                    doit = false;
-            if (doit)
+        if (what == 1 && mode == 2)
+        {   // Create new bank and save to file
+            
+            string warn = bank->getBankName(slot);
+            if (!warn.empty())
             {
-                synth->actionLock(lockmute);
-                bank->savetoslot(slot,synth->part[*npart]);
-                synth->actionLock(unlock);
-                rs[slot]->refresh();
-                mode = 1;
-                rootreadbutton->value(1);
-                rootwritebutton->value(0);
+                warn = "Bank already in use for "+ warn;
+                fl_alert("%s",warn.c_str());
+                return;
             }
-        }*/
+            const char *dirname;
+            dirname = fl_input("New empty Bank:");
+            if (dirname == NULL)
+                return;
+                
+            if (!bank->newIDbank(dirname, (unsigned int)slot))
+            {
+                fl_alert("Could not make a new bank directory.");
+            	refreshmainwindow();
+            	return;
+            }
+            bank->setCurrentBankID(slot);
+            rs[slot]->refresh();
+            rescan_for_banks(false);
+            set_bank_slot();
+            mode = 1;
+            rootreadbutton->value(1);
+            rootwritebutton->value(0);
+            refreshmainwindow();
+        }
 
 /*        if (what == 1 && mode == 3 && !bank->emptyslot(slot))
         {   // remove bank and file contents
@@ -857,6 +860,7 @@ fnr = &RootProcess_::rootprocess;
                     rs[ns]->refresh();
                 }
                 nselected = -1;
+                rescan_for_banks(false);
                 mode = 1;
                 rootreadbutton->value(1);
                 rootswapbutton->value(0);
@@ -873,7 +877,8 @@ fnr = &RootProcess_::rootprocess;
         }
 
         if (mode != 4)
-            refreshmainwindow();} {}
+            refreshmainwindow();} {selected
+    }
   }
   Function {refreshmainwindow()} {open
   } {

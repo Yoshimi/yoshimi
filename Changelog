@@ -5,6 +5,8 @@ yoshimi 1.3.*
   but not checked for unwritable locations
 - Now checked
 - Added highlighing of current bank
+- Implemented adding banks
+- corrected bugs in bank swaps
 
 2015-2-13 Will
 - Basic structure complete and working
