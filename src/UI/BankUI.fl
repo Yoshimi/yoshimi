@@ -495,7 +495,7 @@ removeselection();}
           callback {if (o->value() > 0.5)
   mode = 3;
 removeselection();}
-          xywh {221 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 0 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12 deactivate
+          xywh {221 534 99 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 0 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
           code0 {if (bank->locked()) o->deactivate();}
         }
         Fl_Light_Button rootswapbutton {
@@ -795,12 +795,8 @@ fnr = &RootProcess_::rootprocess;
 
         if (mode > 1 and bank->readOnlyBank(nselected))
         {
-            mode = 1;
-            rootreadbutton->value(1);
-            rootwritebutton->value(0);
-            rootclearbutton->value(0);
-            rootswapbutton->value(0);
-             fl_alert("This bank directory cannot be changed");
+            setread();
+            fl_alert("This bank directory cannot be changed");
             return;
         }
         
@@ -811,39 +807,52 @@ fnr = &RootProcess_::rootprocess;
             string warn = bank->getBankName(slot);
             if (!warn.empty())
             {
-                warn = "Bank already in use for "+ warn;
-                fl_alert("%s",warn.c_str());
+                setread();
+                fl_alert("Bank %d already in use for %s", slot,warn.c_str());
                 return;
             }
             const char *dirname;
             dirname = fl_input("New empty Bank:");
             if (dirname == NULL)
+            {
+                setread();
                 return;
+            }
                 
             if (!bank->newIDbank(dirname, (unsigned int)slot))
             {
+                setread();
                 fl_alert("Could not make a new bank directory.");
-            	refreshmainwindow();
             	return;
             }
             bank->setCurrentBankID(slot);
             rs[slot]->refresh();
             rescan_for_banks(false);
             set_bank_slot();
-            mode = 1;
-            rootreadbutton->value(1);
-            rootwritebutton->value(0);
+            setread();
             refreshmainwindow();
         }
 
-/*        if (what == 1 && mode == 3 && !bank->emptyslot(slot))
-        {   // remove bank and file contents
-            if (fl_choice("Delete this bank and all contents?", "No", "Yes", NULL, slot + 1))
+        if (what == 1 && mode == 3 && !bank->getBankName(slot).empty())
+        {   // remove bank and file contents (choices reversed for 'No' priority)
+            if (!fl_choice("Completely remove bank %d?", "Yes", "No", NULL, slot))
             {
-                bank->clearslot(slot);
-                rs[slot]->refresh();
+                int clearit = true;
+                int count = bank->getBankSize(slot);
+//                synth->getRuntime().Log("Bank size " + asString(count));
+                if (count > 1)
+                    clearit = !fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted", "Continue", "STOP !", NULL, count);
+                if (clearit)
+                {
+//                    synth->getRuntime().Log("We're going");
+                    if (bank->removebank(slot));
+                        rescan_for_banks(false);
+                        rs[slot]->refresh();
+                }
             }
-        }*/
+            setread();
+            refreshmainwindow();
+        }
 
         if (mode == 4)
         {   // swap
@@ -861,9 +870,7 @@ fnr = &RootProcess_::rootprocess;
                 }
                 nselected = -1;
                 rescan_for_banks(false);
-                mode = 1;
-                rootreadbutton->value(1);
-                rootswapbutton->value(0);
+                setread();
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
@@ -874,11 +881,16 @@ fnr = &RootProcess_::rootprocess;
                     rs[ns]->refresh();
                 rs[slot]->refresh();
             }
-        }
-
-        if (mode != 4)
-            refreshmainwindow();} {selected
+        }} {selected
     }
+  }
+  Function {setread()} {open
+  } {
+    code {mode = 1;
+            rootreadbutton->value(1);
+            rootwritebutton->value(0);
+            rootclearbutton->value(0);
+            rootswapbutton->value(0);} {}
   }
   Function {refreshmainwindow()} {open
   } {

@@ -222,6 +222,16 @@ string Bank::getBankIDname(int bankID)
 }
 
 
+// finds the number of instruments in a bank
+int Bank::getBankSize(int bankID)
+{
+    int found = 0;
+    for (int i = 0; i < BANK_SIZE; ++ i)
+        if (!roots [currentRootID].banks [bankID].instruments [i].name.empty())
+            found += 1;
+    return found;
+}
+
 // Makes current a bank directory
 bool Bank::loadbank(size_t rootID, size_t banknum)
 {
@@ -341,6 +351,43 @@ bool Bank::newbankfile(string newbankdir)
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
     fclose(tmpfile);
     return true;
+}
+
+
+bool Bank::removebank(unsigned int bankID)
+{
+    int chk;
+
+    for (int inst = 0; inst < BANK_SIZE; ++ inst)
+        if (!roots [currentRootID].banks [bankID].instruments [inst].name.empty())
+        {
+            chk = remove(getFullPath(currentRootID, bankID, inst).c_str());
+            if (chk < 0)
+            {
+                synth->getRuntime().Log("removebank " + asString(inst) + " failed to remove "
+                     + getFullPath(currentRootID, bankID, inst) + " "
+                     + string(strerror(errno)));
+                return false;
+            }
+            deletefrombank(currentRootID, bankID, inst);
+        }
+        string tmp = getBankPath(currentRootID, bankID)+"/.bankdir";
+        chk = remove(tmp.c_str());
+        if (chk < 0)
+            synth->getRuntime().Log("removebank  failed to remove bank ID "
+                                                  + string(strerror(errno)));
+        chk = remove(getBankPath(currentRootID, bankID).c_str());
+        if (chk < 0)
+            return false;
+        chk = roots [currentRootID].banks.erase(bankID);
+        if (chk < 0)
+        {
+            synth->getRuntime().Log("removebank  failed to remove bank "
+                                    + asString(bankID) + " - "
+                                    + string(strerror(errno)));
+            return false;
+        }
+   return true;
 }
 
 
