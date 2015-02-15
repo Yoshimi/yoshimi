@@ -776,10 +776,12 @@ fnr = &RootProcess_::rootprocess;
   } {
     code {//
     unsigned int slot = this->slot;
+    string thisname = bank->getBankName(slot);
+
     
         if (what == 1 && mode == 1 && !bank->getBankName(slot).empty())
         {
-            // Reads from slot
+            // Selects from slot
             const BankEntry &bankEntry = bank->getBank(slot);
             if (!bank->setCurrentBankID(slot))
                 fl_alert("Error: Could not load the bank from the directory\\n%s.",
@@ -793,7 +795,7 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
 
-        if (mode > 1 and bank->readOnlyBank(nselected))
+        if (mode > 1 and mode != 4 and bank->readOnlyBank(nselected))
         {
             setread();
             fl_alert("This bank directory cannot be changed");
@@ -803,12 +805,10 @@ fnr = &RootProcess_::rootprocess;
 
         if (what == 1 && mode == 2)
         {   // Create new bank and save to file
-            
-            string warn = bank->getBankName(slot);
-            if (!warn.empty())
+            if (!thisname.empty())
             {
                 setread();
-                fl_alert("Bank %d already in use for %s", slot,warn.c_str());
+                fl_alert("Bank %d already in use for %s", slot, thisname.c_str());
                 return;
             }
             const char *dirname;
@@ -833,21 +833,29 @@ fnr = &RootProcess_::rootprocess;
             refreshmainwindow();
         }
 
-        if (what == 1 && mode == 3 && !bank->getBankName(slot).empty())
-        {   // remove bank and file contents (choices reversed for 'No' priority)
-            if (!fl_choice("Completely remove bank %d?", "Yes", "No", NULL, slot))
+        if (what == 1 && mode == 3 && !thisname.empty())
+        {   // Remove bank and file contents (choices reversed for 'No' priority)
+            if (!fl_choice("Completely remove %s?", "Yes", "No", NULL, thisname.c_str()))
             {
                 int clearit = true;
                 int count = bank->getBankSize(slot);
 //                synth->getRuntime().Log("Bank size " + asString(count));
                 if (count > 1)
-                    clearit = !fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted", "Continue", "STOP !", NULL, count);
+                    clearit = !fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
+                                         "Continue", "STOP !", NULL, count);
                 if (clearit)
                 {
 //                    synth->getRuntime().Log("We're going");
-                    if (bank->removebank(slot));
+                    if (bank->removebank(slot))
+                    {
+                        if (slot == bank->getCurrentBankID())
+                            bank->setCurrentBankID(0,false);
                         rescan_for_banks(false);
+                        set_bank_slot();
                         rs[slot]->refresh();
+                    }
+                    else
+                        fl_alert("Deleting %s failed. Some files may still exist", thisname.c_str());
                 }
             }
             setread();
@@ -855,7 +863,7 @@ fnr = &RootProcess_::rootprocess;
         }
 
         if (mode == 4)
-        {   // swap
+        {   // Swap banks
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
@@ -869,7 +877,7 @@ fnr = &RootProcess_::rootprocess;
                     rs[ns]->refresh();
                 }
                 nselected = -1;
-                rescan_for_banks(false);
+                rescan_for_banks(true);
                 setread();
                 done = true;
             }

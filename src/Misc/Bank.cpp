@@ -313,7 +313,7 @@ bool Bank::newbank(string newbankdir)
 }
 
 
-// Makes a new bank with known ID and makes it current
+// Makes a new bank with known ID. Does *not* make it current
 bool Bank::newIDbank(string newbankdir, unsigned int bankID)
 {
     if (!newbankfile(newbankdir))
@@ -324,7 +324,7 @@ bool Bank::newIDbank(string newbankdir, unsigned int bankID)
 }
 
 
-// performs the actual file operation for new banks
+// Performs the actual file operation for new banks
 bool Bank::newbankfile(string newbankdir)
 {
      if (getRootPath(currentRootID).empty())
@@ -354,6 +354,7 @@ bool Bank::newbankfile(string newbankdir)
 }
 
 
+// Removes a bank and all its contents
 bool Bank::removebank(unsigned int bankID)
 {
     int chk;
@@ -364,9 +365,10 @@ bool Bank::removebank(unsigned int bankID)
             chk = remove(getFullPath(currentRootID, bankID, inst).c_str());
             if (chk < 0)
             {
-                synth->getRuntime().Log("removebank " + asString(inst) + " failed to remove "
-                     + getFullPath(currentRootID, bankID, inst) + " "
-                     + string(strerror(errno)));
+                synth->getRuntime().Log("removebank: "
+                                        + asString(inst) + " failed to remove "
+                                        + getFullPath(currentRootID, bankID, inst) + " "
+                                        + string(strerror(errno)));
                 return false;
             }
             deletefrombank(currentRootID, bankID, inst);
@@ -374,19 +376,20 @@ bool Bank::removebank(unsigned int bankID)
         string tmp = getBankPath(currentRootID, bankID)+"/.bankdir";
         chk = remove(tmp.c_str());
         if (chk < 0)
-            synth->getRuntime().Log("removebank  failed to remove bank ID "
-                                                  + string(strerror(errno)));
+        {
+            synth->getRuntime().Log("removebank: failed to remove bank ID file"
+                                    + string(strerror(errno)));
+            return false;
+        }
         chk = remove(getBankPath(currentRootID, bankID).c_str());
         if (chk < 0)
-            return false;
-        chk = roots [currentRootID].banks.erase(bankID);
-        if (chk < 0)
         {
-            synth->getRuntime().Log("removebank  failed to remove bank "
+            synth->getRuntime().Log("removebank: failed to remove bank"
                                     + asString(bankID) + " - "
                                     + string(strerror(errno)));
             return false;
         }
+        roots [currentRootID].banks.erase(bankID);
    return true;
 }
 
@@ -432,7 +435,8 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
     }
 }
 
-// intelligently moves or swaps banks preserving instrument details
+
+// Intelligently moves or swaps banks preserving instrument details
 void Bank::swapbanks(unsigned int firstID, unsigned int secondID)
 {
     if (firstID == secondID)
