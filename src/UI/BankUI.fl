@@ -78,8 +78,10 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
             *whatslot = nslot;
             if (event == FL_RELEASE && Fl::event_button() == 1)
                 *what = 1;
-            if (event == FL_RELEASE && Fl::event_button() == 3)
+            if (event == FL_RELEASE && Fl::event_button() == 2)
                 *what = 2;
+            if (event == FL_RELEASE && Fl::event_button() == 3)
+                *what = 3;
             if (event == FL_PUSH)
                 highlight = 1;
         }
@@ -170,8 +172,10 @@ class RootSlot {open : {public Fl_Button, RootProcess_}
             *whatslot = nslot;
             if (event == FL_RELEASE && Fl::event_button() == 1)
                 *what = 1;
-            if (event == FL_RELEASE && Fl::event_button() == 3)
+            if (event == FL_RELEASE && Fl::event_button() == 2)
                 *what = 2;
+            if (event == FL_RELEASE && Fl::event_button() == 3)
+                *what = 3;
             if (event == FL_PUSH)
                 highlight = 1;
         }
@@ -396,7 +400,7 @@ set_bank_slot();}
       Fl_Button {} {
         label Banks
         callback {rootuiwindow->show();
-if (synth->getRuntime().BankUIAutoClose != 0)
+if ((Fl::event_button() == 2) || synth->getRuntime().BankUIAutoClose != 0)
     bankuiwindow->hide();}
         tooltip {Show banks in current root} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -516,7 +520,7 @@ removeselection();}
       Fl_Button {} {
         label Instruments
         callback {bankuiwindow->show();
-if (synth->getRuntime().RootUIAutoClose != 0)
+if ((Fl::event_button() == 2) || synth->getRuntime().RootUIAutoClose != 0)
     rootuiwindow->hide();}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -686,15 +690,14 @@ fnr = &RootProcess_::rootprocess;
   } {
     code {//
 	int slot = this->slot;
-        if (what == 1 && mode == 1 && !bank->emptyslot(slot))
+        if ((what == 1 || what == 2) && mode == 1 && !bank->emptyslot(slot))
         {
             // Reads from slot
             bank->loadfromslot(slot, synth->part[*npart]);
             synth->part[*npart]->Pname = bank->getname(slot);
-            cbwig->do_callback();
-
-            if (synth->getRuntime().BankUIAutoClose != 0)
+            if (what == 2 || synth->getRuntime().BankUIAutoClose != 0)
                 bankuiwindow->hide();
+            cbwig->do_callback();
             refreshmainwindow();
             return;
         }
@@ -710,7 +713,7 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
 
-        if (what == 2 && !bank->emptyslot(slot) && mode != 4)
+        if (what == 3 && !bank->emptyslot(slot) && mode != 4)
         {   // Rename slot
             const char *tmp = fl_input("Slot (instrument) name:", bank->getname(slot).c_str());
             if (tmp != NULL)
@@ -779,17 +782,21 @@ fnr = &RootProcess_::rootprocess;
     string thisname = bank->getBankName(slot);
 
     
-        if (what == 1 && mode == 1 && !bank->getBankName(slot).empty())
+        if ((what == 1 || what == 2) && mode == 1 && !thisname.empty())
         {
             // Selects from slot
             const BankEntry &bankEntry = bank->getBank(slot);
             if (!bank->setCurrentBankID(slot))
+            {
                 fl_alert("Error: Could not load the bank from the directory\\n%s.",
-                    bankEntry.dirname.c_str());
+                          bankEntry.dirname.c_str());
+                 setread();
+                 return;
+             }
+            if (what == 2 || synth->getRuntime().RootUIAutoClose != 0)
+                rootuiwindow->hide();
             cbwig->do_callback();
             bankuiwindow->show();
-            if (synth->getRuntime().RootUIAutoClose != 0)
-                rootuiwindow->hide();
             set_bank_slot(); // needed by 'old' menu selector
             refreshmainwindow();
             return;
@@ -802,6 +809,12 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
         
+
+        if (what == 3 && mode == 1 && !thisname.empty())
+        {   // Rename bank
+        // to do
+        }
+
 
         if (what == 1 && mode == 2)
         {   // Create new bank and save to file

@@ -195,7 +195,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 295} labelsize 12
+          xywh {5 25 457 295} labelsize 12 hide
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
@@ -251,7 +251,7 @@ oldrootID = changeIDbutton->value();}
           Fl_Button showdefaultrootdirbutton {
             label {Open current}
             callback {//
-    synth->getGuiMaster()->bankui->rootuiwindow->show();} selected
+    synth->getGuiMaster()->bankui->rootuiwindow->show();}
             xywh {265 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Return_Button changeIDok {
@@ -487,7 +487,7 @@ oldrootID = changeIDbutton->value();}
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -501,7 +501,7 @@ oldrootID = changeIDbutton->value();}
         if (!name.empty())
         {
             name = "In use for " + name;
-            fl_alert("%s", name.c_str());
+            fl_alert("%s",name.c_str());
             BankRoot->value(BankRootvalue);
             BankRoot->redraw();
         }
@@ -566,10 +566,10 @@ oldrootID = changeIDbutton->value();}
     	o->value(oldBank);
     	o->redraw();
         name = "In use for " + name;
-        fl_alert("%s", name.c_str());
+        fl_alert("%s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
-        configChanged = true;} open
+        configChanged = true;} open selected
             tooltip {CC0 = msb, CC32 = lsb} xywh {275 122 60 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
@@ -617,7 +617,7 @@ oldrootID = changeIDbutton->value();}
         if (!name.empty())
         {
             name = "In use for " + name;
-            fl_alert("%s", name.c_str());
+            fl_alert("%s",name.c_str());
             EPCspinner->value(EPCvalue);
             EPCspinner->redraw();
         }
