@@ -432,7 +432,7 @@ void SynthEngine::SetBank(int banknum)
     128 banks is enough for anybody :-)
     this is configurable to suit different hardware synths
     */
-
+    
     //new implementation uses only 1 call :)
     if(bank.setCurrentBankID(banknum, true))
     {

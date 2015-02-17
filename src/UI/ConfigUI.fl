@@ -53,7 +53,7 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open selected
-      xywh {336 158 465 335} type Double visible
+      xywh {273 160 465 335} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 457 325}
@@ -195,7 +195,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 295} labelsize 12 hide
+          xywh {5 25 457 305} labelsize 12
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
@@ -219,7 +219,7 @@ oldrootID = changeIDbutton->value();}
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
     configChanged = true;}
-            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
+            xywh {10 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removerootdirbutton {
             label {Remove root dir...}
@@ -231,7 +231,7 @@ oldrootID = changeIDbutton->value();}
         configChanged = true;
     }
     activatebutton_rootdir(false);}
-            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+            xywh {95 244 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
           }
           Fl_Button makedefaultrootdirbutton {
@@ -245,8 +245,16 @@ oldrootID = changeIDbutton->value();}
         configChanged = true;
     }
     activatebutton_rootdir(false);}
-            xywh {195 244 80 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
+            xywh {180 244 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
             code0 {o->deactivate();}
+          }
+          Fl_Button showdefaultrootdirbutton {
+            label {Open current}
+            callback {//
+    synth->getGuiMaster()->bankui->rootuiwindow->show();
+    if (Fl::event_button() == 2)
+        configwindow->hide();}
+            xywh {265 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Return_Button changeIDok {
             label Set
@@ -270,11 +278,11 @@ oldrootID = changeIDbutton->value();}
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
     }}
-            xywh {305 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
+            xywh {350 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
             label {Change ID}
-            xywh {305 256 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
+            xywh {350 256 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
             code0 {oldrootID = o->value();}
           }
         }
@@ -481,7 +489,7 @@ oldrootID = changeIDbutton->value();}
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12
+          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {

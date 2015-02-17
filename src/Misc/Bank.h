@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, last modified Jamuary 2015
+    This file is a derivative of a ZynAddSubFX original, last modified February 2015
 */
 
 #ifndef BANK_H
@@ -35,9 +35,10 @@ using namespace std;
 #include <map>
 #include <vector>
 
+#define ROOT_SIZE 128
 #define BANK_SIZE 160
 
-#define MAX_NUM_BANKS 2000
+// not needed anymore? #define MAX_NUM_BANKS 2000
 /*
 typedef struct {
     string name;
@@ -117,8 +118,16 @@ class Bank : private MiscFuncs
         void savetoslot(unsigned int ninstrument, Part *part);
         bool loadfromslot(unsigned int ninstrument, Part *part);
         void swapslot(unsigned int n1, unsigned int n2);
+        void swapbanks(unsigned int firstID, unsigned int secondID);
+        bool readOnlyBank(int bankID);
+        string getBankName(int bankID);
+        string getBankIDname(int bankID);
+        int getBankSize(int bankID);
         bool loadbank(size_t rootID, size_t banknum);
         bool newbank(string newbankdirname);
+        bool newIDbank(string newbankdir, unsigned int bankID);
+        bool newbankfile(string newbankdir);
+        bool removebank(unsigned int bankID);
         void rescanforbanks(void);
         //bool locked(void) { return (dirname.size() == 0); }
              // Check if the bank is locked (i.e. the file opened was readonly)
@@ -148,6 +157,10 @@ class Bank : private MiscFuncs
         string getBankFileTitle()
         {
             return string("Root #") + asString(currentRootID) + ", Bank #" + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
+        }
+        string getRootFileTitle()
+        {
+            return string("Root #") + asString(currentRootID) + " - " + getRootPath(currentRootID);
         }
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
