@@ -52,7 +52,7 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open selected
+      callback {o->hide();} open
       xywh {273 160 465 335} type Double hide
     } {
       Fl_Tabs {} {open
@@ -252,8 +252,8 @@ oldrootID = changeIDbutton->value();}
             label {Open current}
             callback {//
     synth->getGuiMaster()->bankui->rootuiwindow->show();
-    if (Fl::event_button() == 2)
-        configwindow->hide();}
+    if (Fl::event_button() == 3)
+        configwindow->hide();} selected
             xywh {265 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Return_Button changeIDok {

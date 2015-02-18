@@ -232,6 +232,28 @@ int Bank::getBankSize(int bankID)
     return found;
 }
 
+// Changes a bank name 'in place' and updates the filename
+bool Bank::setbankname(unsigned int bankID, string newname)
+{
+    string filename = newname;
+    legit_filename(filename);
+    string newfilepath = getRootPath(currentRootID) + "/" + filename;
+    int chk = rename(getBankPath(currentRootID,bankID).c_str(),
+                     newfilepath.c_str());
+    if (chk < 0)
+    {
+        synth->getRuntime().Log("Bank: failed to rename " + getBankName(bankID)
+                               + " to " + newname);
+        return false;
+    }
+    synth->getRuntime().Log("Renaming " + getBankName(bankID)
+                               + " to " + newname);
+    
+    roots [currentRootID].banks [bankID].dirname = newname;
+    return true;
+}
+
+
 // Makes current a bank directory
 bool Bank::loadbank(size_t rootID, size_t banknum)
 {
