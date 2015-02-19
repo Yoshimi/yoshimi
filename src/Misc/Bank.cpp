@@ -96,10 +96,10 @@ string Bank::getnamenumbered(unsigned int ninstrument)
 
 
 // Changes the name of an instrument (and the filename)
-void Bank::setname(unsigned int ninstrument, string newname, int newslot)
+bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
 {
     if (emptyslot(ninstrument))
-        return;
+        return false;
 
     int slot = (newslot >= 0) ? newslot + 1 : ninstrument + 1;
     string filename = "0000" + asString(slot);
@@ -116,9 +116,11 @@ void Bank::setname(unsigned int ninstrument, string newname, int newslot)
         synth->getRuntime().Log("Error, bank setName failed renaming "
                     + getFullPath(currentRootID, currentBankID, ninstrument) + " -> "
                     + newfilepath + " : " + string(strerror(errno)));
+        return false;
     }    
     instrRef.name = newname;
     instrRef.filename = filename;
+    return true;
 }
 
 
@@ -421,11 +423,7 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
 {
     if (n1 == n2)
         return;
-    if (locked())
-    {
-        synth->getRuntime().Log("swapslot requested, but is locked");
-        return;
-    }
+
     if (emptyslot(n1) && emptyslot(n2))
         return;
     if (emptyslot(n1)) // make the empty slot the destination

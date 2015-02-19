@@ -253,7 +253,7 @@ oldrootID = changeIDbutton->value();}
             callback {//
     synth->getGuiMaster()->bankui->rootuiwindow->show();
     if (Fl::event_button() == 3)
-        configwindow->hide();} selected
+        configwindow->hide();}
             xywh {265 244 75 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Return_Button changeIDok {
@@ -277,7 +277,7 @@ oldrootID = changeIDbutton->value();}
         }
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
-    }}
+    }} selected
             xywh {350 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
@@ -502,8 +502,7 @@ oldrootID = changeIDbutton->value();}
         string name = synth->getRuntime().testCCvalue(candidate);
         if (!name.empty())
         {
-            name = "In use for " + name;
-            fl_alert("%s",name.c_str());
+            fl_alert("In use for %s",name.c_str());
             BankRoot->value(BankRootvalue);
             BankRoot->redraw();
         }
@@ -567,8 +566,7 @@ oldrootID = changeIDbutton->value();}
     {
     	o->value(oldBank);
     	o->redraw();
-        name = "In use for " + name;
-        fl_alert("%s",name.c_str());
+        fl_alert("In use for %s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         configChanged = true;} open
@@ -618,8 +616,7 @@ oldrootID = changeIDbutton->value();}
         string name = synth->getRuntime().testCCvalue(candidate);
         if (!name.empty())
         {
-            name = "In use for " + name;
-            fl_alert("%s",name.c_str());
+            fl_alert("In use for %s",name.c_str());
             EPCspinner->value(EPCvalue);
             EPCspinner->redraw();
         }

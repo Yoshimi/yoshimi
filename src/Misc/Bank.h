@@ -108,7 +108,7 @@ class Bank : private MiscFuncs
         bool readOnlyInstrument(int ninstrument);
         string getname(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
-        void setname(unsigned int ninstrument, string newname, int newslot);
+        bool setname(unsigned int ninstrument, string newname, int newslot);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
         bool isPADsynth_used(unsigned int ninstrument);
@@ -130,8 +130,6 @@ class Bank : private MiscFuncs
         bool newbankfile(string newbankdir);
         bool removebank(unsigned int bankID);
         void rescanforbanks(void);
-        //bool locked(void) { return (dirname.size() == 0); }
-             // Check if the bank is locked (i.e. the file opened was readonly)
         //bankstruct_t banks[MAX_NUM_BANKS];
         void clearBankrootDirlist(void);        
         void removeRoot(size_t rootID);
@@ -153,8 +151,6 @@ class Bank : private MiscFuncs
         const RootEntryMap &getRoots();
         const BankEntry &getBank(size_t bankID);
 
-
-        bool locked() {return false;}
         string getBankFileTitle()
         {
             return string("Root #") + asString(currentRootID) + ", Bank #" + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
