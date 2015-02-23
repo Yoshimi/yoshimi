@@ -102,6 +102,9 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
+        case 6: // data MSB
+            ctl = C_dataH;
+            break;
 	    case 7: // Volume
             ctl = C_volume;
     		break;
@@ -113,6 +116,9 @@ int MusicIO::getMidiController(unsigned char b)
             break;        
 	    case 11: // Expression
             ctl = C_expression;
+            break;
+        case 38: // data LSB
+            ctl = C_dataL;
             break;
 	    case 64: // Sustain pedal
             ctl = C_sustain;
@@ -138,6 +144,12 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 78: // Resonance Bandwith
             ctl = C_resonance_bandwidth;
 	        break;
+        case 98: // NRPN LSB
+            ctl = C_nrpnL;
+            break;
+        case 99: // NRPN MSB
+            ctl = C_nrpnH;
+            break;
 	    case 120: // All Sounds OFF
             ctl = C_allsoundsoff;
 	        break;
@@ -163,6 +175,32 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         setMidiBankOrRootDir(param, in_place);
     else if (ctrl == synth->getRuntime().midi_upper_voice_C)
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place); // it's really an upper set program change
+    else if(ctrl == C_nrpnL)
+    {
+        synth->getRuntime().nrpnL = param;
+        synth->getRuntime().dataL = 128; // we've changed the NRPN
+        synth->getRuntime().dataH = 128; //  so these are now invalid
+        synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
+        synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+//        synth->getRuntime().Log("Status " + asString(synth->getRuntime().nrpnActive));
+    }
+    else if(ctrl == C_nrpnH)
+    {
+        synth->getRuntime().nrpnH = param;
+        synth->getRuntime().dataL = 128; // we've changed the NRPN
+        synth->getRuntime().dataH = 128; //  so these are now invalid
+        synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnL < 127);
+        synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
+//        synth->getRuntime().Log("Status " + asString(synth->getRuntime().nrpnActive));
+    }
+    else if (synth->getRuntime().nrpnActive && (ctrl == C_dataL || ctrl == C_dataH))
+    {
+        if (ctrl == C_dataL)
+            synth->getRuntime().dataL = param;
+        else
+            synth->getRuntime().dataH = param;
+        synth->ProcessNrpn(ch, ctrl, param);
+    }
     else
         synth->SetController(ch, ctrl, param);
 }

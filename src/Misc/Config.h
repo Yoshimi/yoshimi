@@ -136,7 +136,12 @@ class Config : public MiscFuncs
         int           midi_upper_voice_C;
         int           enable_part_on_voice_load;
         int           single_row_panel;
-
+        unsigned char nrpnL;
+        unsigned char nrpnH;
+        unsigned char dataL;
+        unsigned char dataH;
+        bool          nrpnActive;
+        
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
         static const unsigned short MaxParamsHistory;

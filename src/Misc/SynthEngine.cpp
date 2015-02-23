@@ -389,20 +389,71 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     { // bank change doesn't directly affect parts.
-        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        {   // Send the controller to all part assigned to the channel
-            if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-                part[npart]->SetController(type, par);
+        if(nrpnVectors.Enabled[chan] && (nrpnVectors.Xaxis[chan] == type || nrpnVectors.Yaxis[chan] == type))
+        {
+            for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+            {   // Send the controller to all part assigned to the channel
+                    if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                    {
+                        if(nrpnVectors.Xaxis[chan] == type)
+                        {
+                            part[npart]->SetController(7, par);
+                            part[npart + 16]->SetController(7, 127 - par);
+                        }
+                        else
+                        {
+                            part[npart + 32]->SetController(7, par);
+                            part[npart + 48]->SetController(7, 127 - par);
+                        }
+                    }
+            }
         }
+        else
+        {
+                
+            for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+            {   // Send the controller to all part assigned to the channel
+                if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                    part[npart]->SetController(type, par);
+            }
 
-        if (type == C_allsoundsoff)
-        {   // cleanup insertion/system FX
-            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-                sysefx[nefx]->cleanup();
-            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-                insefx[nefx]->cleanup();
+            if (type == C_allsoundsoff)
+            {   // cleanup insertion/system FX
+                for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+                    sysefx[nefx]->cleanup();
+                for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+                    insefx[nefx]->cleanup();
+            }
         }
     }
+}
+
+
+void SynthEngine::ProcessNrpn(int chan, int type, short int par)
+{
+    Runtime.Log("Data type " + asString(type) + "    value " + asString(par));
+//    Runtime.Log("N H " + asString(Runtime.nrpnH) + "   N L " + asString(Runtime.nrpnL));
+//    Runtime.Log("D H " + asString(Runtime.dataH) + "   D L " + asString(Runtime.dataL));
+   
+    if (Runtime.nrpnH == 64 && Runtime.nrpnL == 1) // it's vector control
+        if (Runtime.dataH < 128 && Runtime.dataL < 128)
+        {
+            Runtime.Log("Vector control active for Ch " + asString(chan));
+            nrpnVectors.Xaxis[chan] = Runtime.dataH;
+            nrpnVectors.Yaxis[chan] = Runtime.dataL;
+            nrpnVectors.Enabled[chan] = true;
+            if (Runtime.enable_part_on_voice_load != 0)
+            {
+                for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+                    if (chan == part[npart]->Prcvchn)
+                    {
+                        partonoff(npart, 1);
+                        partonoff(npart + 16, 1);
+                        partonoff(npart + 32, 1);
+                        partonoff(npart + 48, 1);
+                    }
+            }
+        }
 }
 
 

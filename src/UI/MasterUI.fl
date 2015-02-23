@@ -326,7 +326,7 @@ mainCreateNewInstance(forceId);}
           }
           MenuItem {} {
             label {Show Root &Paths...}
-            callback {bankui->pathwindow->show();} selected
+            callback {bankui->pathwindow->show();}
             xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
@@ -865,10 +865,10 @@ ZynAddSubFX}
       code0 {if (synth->getRuntime().single_row_panel)
        Panelbox1->hide();}
     } {
-      Fl_Pack Panelpack1 {
+      Fl_Pack Panelpack1 {open
         xywh {8 10 533 286} type HORIZONTAL
         code0 {//
-          for (int i = 0; i < NUM_MIDI_PARTS / 2; i++)
+          for (int i = 0; i < 8; i++)
           {
               panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
               panellistitem[i]->init(i, bankui, synth);
@@ -878,10 +878,10 @@ ZynAddSubFX}
       Fl_Box Panelbox1 {
         xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
       }
-      Fl_Pack Panelpack2 {
+      Fl_Pack Panelpack2 {open selected
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
-            for (int i = NUM_MIDI_PARTS / 2; i < NUM_MIDI_PARTS; i++)
+            for (int i = 8; i < 16; i++)
             {
                  panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
                  panellistitem[i]->init(i, bankui, synth);
@@ -917,6 +917,29 @@ ZynAddSubFX}
             Panelbox1->show();}
         xywh {821 314 116 25} box THIN_UP_BOX labelsize 13
       }
+      Fl_Choice Panelgroups {
+        label {Parts:}
+        callback {paneloffset = o->value() * 16;
+updatepanel();} open
+        xywh {187 645 86 25} down_box BORDER_BOX
+      } {
+        MenuItem {} {
+          label {1 to 16}
+          xywh {0 0 34 20}
+        }
+        MenuItem {} {
+          label {17 to 32}
+          xywh {0 0 34 20}
+        }
+        MenuItem {} {
+          label {33 to 48}
+          xywh {0 0 34 20}
+        }
+        MenuItem {} {
+          label {49 to 64}
+          xywh {0 0 34 20}
+        }
+      }
     }
   }
   Function {updatesendwindow()} {open
@@ -929,7 +952,7 @@ ZynAddSubFX}
   Function {updatepanel()} {open
   } {
     code {//
-        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
             panellistitem[npart]->refresh();
         if (synth->getRuntime().single_row_panel)
         {
@@ -937,6 +960,7 @@ ZynAddSubFX}
 	        Panelpack2->position(544,10);
 	        Panelclose->position(1018,314);
 	        Panelrefresh->position(950,314);
+	        Panelgroups->position(723,314);
 	        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16 ");
         }
         else
@@ -945,6 +969,7 @@ ZynAddSubFX}
 	        Panelpack2->position(8,325);
 	        Panelclose->position(482,645);
 	        Panelrefresh->position(414,645);
+	        Panelgroups->position(187,645);
 	       	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8 ");
 
         }
@@ -1098,7 +1123,7 @@ ZynAddSubFX}
   Function {resetPartsClip()} {open
   } {
     code {//
-        for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+        for (int i = paneloffset; i < (paneloffset + NUM_MIDI_CHANNELS); i++)
         {
             if(panellistitem[i] && panellistitem[i]->partVUMeter)
             {
@@ -1188,5 +1213,7 @@ ZynAddSubFX}
   decl {SynthEngine *synth;} {private local
   }
   decl {string panelwindowlabel} {private local
+  }
+  decl {int paneloffset;} {private local
   }
 } 

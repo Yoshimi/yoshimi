@@ -43,8 +43,10 @@ typedef enum {
     C_portamento =           65,
     C_resonance_center =     77,
     C_resonance_bandwidth =  78,
-    C_dataentryhi =        0x06,
-    C_dataentrylo =        0x26,
+    C_nrpnL =                98,
+    C_nrpnH =                99,
+    C_dataH =                 6,
+    C_dataL =                38,
 } MidiControllers;
 
 #endif
