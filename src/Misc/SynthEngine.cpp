@@ -391,22 +391,22 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     { // bank change doesn't directly affect parts.
         if(nrpnVectors.Enabled[chan] && (nrpnVectors.Xaxis[chan] == type || nrpnVectors.Yaxis[chan] == type))
         {
-            for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-            {   // Send the controller to all part assigned to the channel
-                    if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-                    {
+//            for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+  //          {   // Send the controller to all part assigned to the channel
+    //                if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+      //              {
                         if(nrpnVectors.Xaxis[chan] == type)
                         {
-                            part[npart]->SetController(7, par);
-                            part[npart + 16]->SetController(7, 127 - par);
+                            part[chan]->SetController(7, par);
+                            part[chan + 16]->SetController(7, 127 - par);
                         }
                         else
                         {
-                            part[npart + 32]->SetController(7, par);
-                            part[npart + 48]->SetController(7, 127 - par);
+                            part[chan + 32]->SetController(7, par);
+                            part[chan + 48]->SetController(7, 127 - par);
                         }
-                    }
-            }
+        //            }
+          //  }
         }
         else
         {
@@ -444,14 +444,14 @@ void SynthEngine::ProcessNrpn(int chan, int type, short int par)
             nrpnVectors.Enabled[chan] = true;
             if (Runtime.enable_part_on_voice_load != 0)
             {
-                for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-                    if (chan == part[npart]->Prcvchn)
-                    {
-                        partonoff(npart, 1);
-                        partonoff(npart + 16, 1);
-                        partonoff(npart + 32, 1);
-                        partonoff(npart + 48, 1);
-                    }
+ //               for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+//                    if (chan == part[npart]->Prcvchn)
+//                    {
+                        partonoff(chan, 1);
+                        partonoff(chan + 16, 1);
+                        partonoff(chan + 32, 1);
+                        partonoff(chan + 48, 1);
+//                    }
             }
         }
 }
