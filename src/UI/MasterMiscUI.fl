@@ -85,7 +85,7 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 } 
 
-class VUMeter {: {public Fl_Box, private MiscFuncs}
+class VUMeter {open : {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
   } {
@@ -108,7 +108,7 @@ synth = _synth;
     synth->VUdata.values.vuOutPeakR = 0.0;
     synth->VUdata.values.vuRmsPeakL = 0.0;
     synth->VUdata.values.vuRmsPeakR = 0.0;
-    for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+    for (int i = 0; i < NUM_MIDI_PARTS; i++)
     {
         panelpart.oldpeak[i] = 0;
         panelpart.clip[i] = false;
@@ -346,12 +346,12 @@ synth = _synth;
   }
   decl {struct{
   int oldpeak[NUM_MIDI_PARTS];
-  bool clip[NUM_MIDI_CHANNELS];
-  } panelpart;} {private local
+  bool clip[NUM_MIDI_PARTS];
+  } panelpart;} {selected private local
   }
   Function {resetPart(bool clipOnly = false)} {open
   } {
-    code {for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
+    code {for (int i = 0; i < NUM_MIDI_PARTS; i++)
       {
           panelpart.clip[i] = false;
       	  if(!clipOnly)
@@ -382,8 +382,7 @@ class SysEffSend {open : {public WidgetPDial, private MiscFuncs}
         labelsize(11);
         align(FL_ALIGN_TOP);
         value(synth->Psysefxsend[neff1][neff2]);
-        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());} {selected
-    }
+        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());} {}
   }
   Function {~SysEffSend()} {} {
     code {hide();} {}
@@ -463,8 +462,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
               if (Fl::event() == FL_RELEASE and Fl::event_button() == FL_RIGHT_MOUSE)
                   synth->getGuiMaster()->showInstrumentEditWindow(npart);}
           tooltip {Left mouse button: Part select
-Right mouse button: Instrument edit}
-          xywh {12 247 40 20} box PLASTIC_UP_BOX labelsize 10
+Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Choice partrcv {
           callback {//
@@ -557,7 +555,8 @@ npart=npart_;
             panellistitemgroup->color(fl_rgb_color(50,190,240));
         panellistitemgroup->redraw();} {}
   }
-  Function {~Panellistitem()} {} {
+  Function {~Panellistitem()} {open
+  } {
     code {panellistitem->hide();} {}
   }
   decl {int npart;} {private local

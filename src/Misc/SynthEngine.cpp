@@ -390,23 +390,17 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     else
     { // bank change doesn't directly affect parts.
         if(nrpnVectors.Enabled[chan] && (nrpnVectors.Xaxis[chan] == type || nrpnVectors.Yaxis[chan] == type))
-        {
-//            for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-  //          {   // Send the controller to all part assigned to the channel
-    //                if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
-      //              {
-                        if(nrpnVectors.Xaxis[chan] == type)
-                        {
-                            part[chan]->SetController(7, par);
-                            part[chan + 16]->SetController(7, 127 - par);
-                        }
-                        else
-                        {
-                            part[chan + 32]->SetController(7, par);
-                            part[chan + 48]->SetController(7, 127 - par);
-                        }
-        //            }
-          //  }
+        { // vector control is direct to parts
+            if(nrpnVectors.Xaxis[chan] == type)
+            {
+                part[chan]->SetController(7, par/2 + 64); // needs improving
+                part[chan + 16]->SetController(7, 127 - par/2);
+            }
+            else
+            {
+                part[chan + 32]->SetController(7, par/2 +64);
+                part[chan + 48]->SetController(7, 127 - par/2);
+            }
         }
         else
         {

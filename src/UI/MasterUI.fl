@@ -205,10 +205,10 @@ class MasterUI {open : {private MiscFuncs}
           {
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
-          }} open
+          }}
       xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
-      Fl_Menu_Bar mastermenu {open
+      Fl_Menu_Bar mastermenu {
         xywh {-4 0 400 25} labelsize 13
       } {
         Submenu {} {
@@ -459,7 +459,7 @@ mainCreateNewInstance(forceId);}
         }
       }
       Fl_Group MasterControls {
-        label {Master  } open
+        label {Master  }
         xywh {3 24 380 64} box PLASTIC_DOWN_FRAME labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Spinner masterkeyshift {
@@ -491,7 +491,7 @@ mainCreateNewInstance(forceId);}
           callback {//
               virkeyboard->relaseallkeys();
               vumeter->init(-1, synth);
-              for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
+              for(int i = 0; i < NUM_MIDI_PARTS; i++)
               {
               	if(panelwindow)              
               	{
@@ -532,7 +532,7 @@ mainCreateNewInstance(forceId);}
             if (o->value() == SystemEffectsGrp)
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
-               showInsEfxUI();} open
+               showInsEfxUI();}
         xywh {3 88 380 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
@@ -794,7 +794,7 @@ mainCreateNewInstance(forceId);}
       }
     }
     Fl_Window aboutwindow {
-      label {About Yoshimi} open
+      label {About Yoshimi}
       xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
@@ -834,7 +834,7 @@ ZynAddSubFX}
       }
     }
     Fl_Window syseffsendwindow {
-      label {System Effects Send} open
+      label {System Effects Send}
       xywh {4 20 120 250} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {open
@@ -875,13 +875,73 @@ ZynAddSubFX}
           }}
         code1 {o->spacing(-3);}
       } {}
+      Fl_Pack Panelpack3 {open
+        xywh {8 10 533 286} type HORIZONTAL hide
+        code0 {//
+          for (int i = 16; i < 24; i++)
+          {
+              panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+              panellistitem[i]->init(i, bankui, synth);
+          }}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Pack Panelpack5 {open
+        xywh {8 10 533 286} type HORIZONTAL hide
+        code0 {//
+          for (int i = 32; i < 40; i++)
+          {
+              panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+              panellistitem[i]->init(i, bankui, synth);
+          }}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Pack Panelpack7 {open
+        xywh {8 10 533 286} type HORIZONTAL hide
+        code0 {//
+          for (int i = 48; i < 56; i++)
+          {
+              panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+              panellistitem[i]->init(i, bankui, synth);
+          }}
+        code1 {o->spacing(-3);}
+      } {}
       Fl_Box Panelbox1 {
         xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
       }
-      Fl_Pack Panelpack2 {open selected
+      Fl_Pack Panelpack2 {open
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
             for (int i = 8; i < 16; i++)
+            {
+                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+                 panellistitem[i]->init(i, bankui, synth);
+            }}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Pack Panelpack4 {open
+        xywh {8 325 533 286} type HORIZONTAL hide
+        code0 {//
+            for (int i = 24; i < 32; i++)
+            {
+                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+                 panellistitem[i]->init(i, bankui, synth);
+            }}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Pack Panelpack6 {open
+        xywh {8 325 533 286} type HORIZONTAL hide
+        code0 {//
+            for (int i = 40; i < 48; i++)
+            {
+                 panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
+                 panellistitem[i]->init(i, bankui, synth);
+            }}
+        code1 {o->spacing(-3);}
+      } {}
+      Fl_Pack Panelpack8 {open
+        xywh {8 325 533 286} type HORIZONTAL hide
+        code0 {//
+            for (int i = 56; i < 64; i++)
             {
                  panellistitem[i] = new Panellistitem(0, 0, 70, 260, "");
                  panellistitem[i]->init(i, bankui, synth);
@@ -918,10 +978,10 @@ ZynAddSubFX}
         xywh {821 314 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Choice Panelgroups {
-        label {Parts:}
-        callback {paneloffset = o->value() * 16;
+        label Parts
+        callback {panelgroup = o->value();
 updatepanel();} open
-        xywh {187 645 86 25} down_box BORDER_BOX
+        xywh {48 645 86 25} down_box BORDER_BOX
       } {
         MenuItem {} {
           label {1 to 16}
@@ -952,29 +1012,87 @@ updatepanel();} open
   Function {updatepanel()} {open
   } {
     code {//
-        for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+        for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             panellistitem[npart]->refresh();
+        switch (panelgroup)
+        {
+            case 0:
+            {
+                Panelpack1->show();
+                Panelpack2->show();
+                Panelpack3->hide();
+                Panelpack4->hide();
+                Panelpack5->hide();
+                Panelpack6->hide();
+                Panelpack7->hide();
+                Panelpack8->hide();
+                break;
+            }
+            case 1:
+            {
+                Panelpack1->hide();
+                Panelpack2->hide();
+                Panelpack3->show();
+                Panelpack4->show();
+                Panelpack5->hide();
+                Panelpack6->hide();
+                Panelpack7->hide();
+                Panelpack8->hide();
+                break;
+            }
+            case 2:
+            {
+                Panelpack1->hide();
+                Panelpack2->hide();
+                Panelpack3->hide();
+                Panelpack4->hide();
+                Panelpack5->show();
+                Panelpack6->show();
+                Panelpack7->hide();
+                Panelpack8->hide();
+                break;
+            }
+            case 3:
+            {
+                Panelpack1->hide();
+                Panelpack2->hide();
+                Panelpack3->hide();
+                Panelpack4->hide();
+                Panelpack5->hide();
+                Panelpack6->hide();
+                Panelpack7->show();
+                Panelpack8->show();
+                break;
+            }
+        }
         if (synth->getRuntime().single_row_panel)
         {
         	panelwindow->size(1085,345);
 	        Panelpack2->position(544,10);
+	        Panelpack4->position(544,10);
+	        Panelpack6->position(544,10);
+	        Panelpack8->position(544,10);
 	        Panelclose->position(1018,314);
 	        Panelrefresh->position(950,314);
-	        Panelgroups->position(723,314);
+	        Panelgroups->position(48,314);
 	        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16 ");
         }
         else
         {
 	        panelwindow->size(550,675);
 	        Panelpack2->position(8,325);
+	        Panelpack4->position(8,325);
+	        Panelpack6->position(8,325);
+	        Panelpack8->position(8,325);
 	        Panelclose->position(482,645);
 	        Panelrefresh->position(414,645);
-	        Panelgroups->position(187,645);
+	        Panelgroups->position(48,645);
 	       	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8 ");
 
         }
         panelwindow->label(panelwindowlabel.c_str());
-        panelwindow->changed();} {}
+        panelwindow->changed();} {selected
+    }
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -985,7 +1103,8 @@ updatepanel();} open
         masterwindow->label(masterwindowlabel.c_str());
         masterwindow->changed();} {}
   }
-  Function {do_new_master()} {} {
+  Function {do_new_master()} {open
+  } {
     code {//
         if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
@@ -1123,7 +1242,7 @@ updatepanel();} open
   Function {resetPartsClip()} {open
   } {
     code {//
-        for (int i = paneloffset; i < (paneloffset + NUM_MIDI_CHANNELS); i++)
+        for (int i = 0; i < NUM_MIDI_PARTS; i++)
         {
             if(panellistitem[i] && panellistitem[i]->partVUMeter)
             {
@@ -1214,6 +1333,6 @@ updatepanel();} open
   }
   decl {string panelwindowlabel} {private local
   }
-  decl {int paneloffset;} {private local
+  decl {int panelgroup;} {private local
   }
 } 
