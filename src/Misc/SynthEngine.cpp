@@ -389,17 +389,40 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     { // bank change doesn't directly affect parts.
-        if(nrpnVectors.Enabled[chan] && (nrpnVectors.Xaxis[chan] == type || nrpnVectors.Yaxis[chan] == type))
+        int Xopps = nrpnVectors.Xaxis[chan];
+        int Xtype = Xopps & 127;
+        int Yopps = nrpnVectors.Yaxis[chan];
+        int Ytype = Yopps & 127;
+        Xopps = Xopps >> 8;
+        Yopps = Yopps >> 8;
+        if(nrpnVectors.Enabled[chan] && (Xtype == type || Ytype == type))
         { // vector control is direct to parts
-            if(nrpnVectors.Xaxis[chan] == type)
+//            Runtime.Log("D H " + asString(Xopps) + "   D L " + asString(Xtype));
+            if(Xtype == type)
             {
-                part[chan]->SetController(7, par/2 + 64); // needs improving
-                part[chan + 16]->SetController(7, 127 - par/2);
+                if (Xopps & 1) // volume
+                {
+                    part[chan]->SetController(7, par/2 + 64); // needs improving
+                    part[chan + 16]->SetController(7, 127 - par/2);
+                }
+                if (Xopps & 2) // pan
+                {
+                    part[chan]->SetController(10, par);
+                    part[chan + 16]->SetController(10, 127 - par);
+                }
             }
             else
             {
-                part[chan + 32]->SetController(7, par/2 +64);
-                part[chan + 48]->SetController(7, 127 - par/2);
+                if (Yopps & 1) // volume
+                {
+                    part[chan + 32]->SetController(7, par/2 +64);
+                    part[chan + 48]->SetController(7, 127 - par/2);
+                }
+                if (Yopps & 2) // pan
+                {
+                    part[chan + 32]->SetController(10, par);
+                    part[chan + 48]->SetController(10, 127 - par);
+                }
             }
         }
         else
@@ -425,28 +448,36 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 
 void SynthEngine::ProcessNrpn(int chan, int type, short int par)
 {
-    Runtime.Log("Data type " + asString(type) + "    value " + asString(par));
+    string sb = "L";
+    if (type == 6)
+        sb = "M";
+    Runtime.Log("Data " + string(sb) + "SB    value " + asString(par));
 //    Runtime.Log("N H " + asString(Runtime.nrpnH) + "   N L " + asString(Runtime.nrpnL));
 //    Runtime.Log("D H " + asString(Runtime.dataH) + "   D L " + asString(Runtime.dataL));
    
-    if (Runtime.nrpnH == 64 && Runtime.nrpnL == 1) // it's vector control
+    if (Runtime.nrpnH == 64 && (Runtime.nrpnL == 1 || Runtime.nrpnL == 2)) // it's vector control
         if (Runtime.dataH < 128 && Runtime.dataL < 128)
         {
             Runtime.Log("Vector control active for Ch " + asString(chan));
-            nrpnVectors.Xaxis[chan] = Runtime.dataH;
-            nrpnVectors.Yaxis[chan] = Runtime.dataL;
-            nrpnVectors.Enabled[chan] = true;
-            if (Runtime.enable_part_on_voice_load != 0)
+            if (Runtime.nrpnL == 1)
             {
- //               for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-//                    if (chan == part[npart]->Prcvchn)
-//                    {
-                        partonoff(chan, 1);
-                        partonoff(chan + 16, 1);
-                        partonoff(chan + 32, 1);
-                        partonoff(chan + 48, 1);
-//                    }
+                nrpnVectors.Xaxis[chan] = (Runtime.dataH << 8) | Runtime.dataL;
+                if (Runtime.enable_part_on_voice_load != 0)
+                {
+                    partonoff(chan, 1);
+                    partonoff(chan + 16, 1);
+                }
             }
+            else
+            {
+                nrpnVectors.Yaxis[chan] = (Runtime.dataH << 8) | Runtime.dataL;
+                if (Runtime.enable_part_on_voice_load != 0)
+                {
+                    partonoff(chan + 32, 1);
+                    partonoff(chan + 48, 1);
+                }
+            }
+            nrpnVectors.Enabled[chan] = true;
         }
 }
 

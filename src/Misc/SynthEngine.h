@@ -158,8 +158,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool fetchMeterData(VUtransfer *VUdata);
 
         struct Vectors{
-            unsigned char Xaxis[NUM_MIDI_CHANNELS];
-            unsigned char Yaxis[NUM_MIDI_CHANNELS];
+            unsigned short Xaxis[NUM_MIDI_CHANNELS];
+            unsigned short Yaxis[NUM_MIDI_CHANNELS];
             bool Enabled[NUM_MIDI_CHANNELS];
         };
         
