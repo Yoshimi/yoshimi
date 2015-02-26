@@ -3,17 +3,21 @@ Yoshimi responds to the following messages.
 
   0 or 32: Bank Change (user selectable and does *not* force a program change)
   1: Modulation Wheel
+  6: Data MSB
   7: Volume
  10: Panning
  11: Expression
+ 38: Data LSB
  64: Sustain pedal
  65: Portamento
  71: Filter Q (Sound Timbre)
  74: Filter Cutoff (Brightness)
- 75: BandWidth
- 76: FM amplitude
- 77: Resonance Center Frequency
- 78: Resonance Bandwith
+ 75: BandWidth *
+ 76: FM amplitude *
+ 77: Resonance Center Frequency *
+ 78: Resonance Bandwith *
+ 98: NRPN LSB
+ 99: NRPN MSB
 120: All Sounds OFF
 121: Reset All Controllers
 123: All Notes OFF
@@ -23,6 +27,7 @@ Yoshimi responds to the following messages.
 
 224: Pitch Bend
 
+* different to the official GM spec.
 
 For more details of bank changes see Banks.txt
 

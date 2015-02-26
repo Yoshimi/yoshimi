@@ -389,6 +389,8 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     { // bank change doesn't directly affect parts.
+        
+#warning all the NRPN & vector stuff should probably move out of the MIDI thread
         int Xopps = nrpnVectors.Xaxis[chan];
         int Xtype = Xopps & 127;
         int Yopps = nrpnVectors.Yaxis[chan];
@@ -478,6 +480,13 @@ void SynthEngine::ProcessNrpn(int chan, int type, short int par)
                 }
             }
             nrpnVectors.Enabled[chan] = true;
+            if (Runtime.showGui && guiMaster)
+            {
+                guiMaster->partui->partgroupui->activate();
+                guiMaster->partui->partGroupEnable->value(1);
+                guiMaster->updatepanel();
+            }
+
         }
 }
 
@@ -567,7 +576,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
     }
     else
     {
-        for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        for(int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+            // we don't want upper parts (16 - 63) activiated!
             if(chan == part[npart]->Prcvchn)
             {
                 partOK = bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0

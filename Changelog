@@ -1,5 +1,33 @@
 yoshimi 1.3.*
 
+2015-2-26 Will
+- Some fine tuning
+- Updated documentation
+
+2015-2-25 Will
+- Separated X & Y to independent NRPNs
+  NRPN msb = 64, lsb = 1 for X
+  NRPN msb = 64, lsb = 2 for Y
+  DATA lsb = CC, msb = operation(s)
+                1 = volume
+                2 = pan
+
+2015-2-24 Will
+- Seems stable now - crashes were due to mixture of
+  channel and part limits.
+- Mixer panel now shows groups of 16 parts.
+- Volume sweeps implemented but need balancing better.
+
+2015-2-23 Will
+- First attempt at vector control
+  Setting NRPNs and vector CCs seems fine.
+  Only implimented volume control.
+  Getting a lot of crashes in use though when changing settings via the gui.
+  Panel window only shows 1st 16 parts.
+  Part control (rather than channel) works much better.
+  GUI problems probably due to some use of NUM_MIDI_CHANNELS
+  where NUM_MIDI_PARTS should be in the original code.
+
 2015-2-19 Will
 - Small gui code optimisations
 - Removed some confusing, duplicate, redundant & disabled code
@@ -59,7 +87,6 @@ yoshimi-1.3.2-rc2
 - Allow instrument name of just 3 chars
 - Bumped version number to rc2
 - Clarified text of error messages
-
 
 2015-1-27 Andrew
 - Added splash window showing current loading status
