@@ -29,6 +29,8 @@ Yoshimi responds to the following messages.
 
 * different to the official GM spec.
 
+User selectable CC for Bank Root Path change.
+
 For more details of bank changes see Banks.txt
 
 Instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.

@@ -794,7 +794,6 @@ mainCreateNewInstance(forceId);}
       }
     }
     Fl_Window aboutwindow {
-      label {About Yoshimi}
       xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
@@ -805,16 +804,17 @@ ZynAddSubFX}
       }
       Fl_Box {} {
         label {copyright notice}
-        xywh {25 100 315 70} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
+        xywh {25 93 315 91} color 51 selection_color 30 labelfont 13 labelsize 11 align 208 when 0
         code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
                                "\\nCopyright 2009-2011, Alan Calvert"
                                "\\nCopyright 2012-2013, Jeremy Jongepier and others"
                                "\\nCopyright 2014, Will Godfrey and others"
-                               "\\nLV2 plugin Copyright 2014, Andrew Deryabin").c_str());}
+                               "\\nLV2 plugin Copyright 2014, Andrew Deryabin"
+                               "\\nSplash Image Copyright 2015, James Fraser").c_str());}
       }
       Fl_Box {} {
-        label {copy terms}
-        xywh {10 182 340 53} labelsize 11 align 144 when 0
+        label {copy terms} selected
+        xywh {10 198 340 53} labelsize 11 align 144 when 0
         code0 {//
             o->copy_label(string("This is free software, and comes with ABSOLUTELY NO WARRANTY; "
                                  "you may redistribute it and/or modify it under the terms of "
