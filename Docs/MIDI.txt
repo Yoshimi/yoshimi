@@ -10,10 +10,10 @@ Yoshimi responds to the following messages.
  65: Portamento
  71: Filter Q (Sound Timbre)
  74: Filter Cutoff (Brightness)
- 75: BandWidth
- 76: FM amplitude
- 77: Resonance Center Frequency
- 78: Resonance Bandwith
+ 75: BandWidth *
+ 76: FM amplitude *
+ 77: Resonance Center Frequency *
+ 78: Resonance Bandwith *
 120: All Sounds OFF
 121: Reset All Controllers
 123: All Notes OFF
@@ -23,6 +23,9 @@ Yoshimi responds to the following messages.
 
 224: Pitch Bend
 
+* different to the official GM spec.
+
+User selectable CC for Bank Root Path change.
 
 For more details of bank changes see Banks.txt
 
