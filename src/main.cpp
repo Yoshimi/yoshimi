@@ -116,15 +116,21 @@ static void *mainGuiThread(void *arg)
 #else
     Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
 #endif
-    Fl_Window winSplash(400, 300, "yoshimi splash screen");
-    Fl_Box box(0, 0, 400,300);
+    
+    const int splashWidth = 411;
+    const int splashHeight = 311;
+    const int textHeight = 20;
+    const int textBorder = 15;
+    
+    Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
+    Fl_Box box(0, 0, splashWidth,splashHeight);
     //Fl_Pixmap pix(yoshimi_logo);
 
     box.image(pix);
-    Fl_Box boxLb(10, 300-30, 400-20, 30);
+    Fl_Box boxLb(textBorder, splashHeight - textHeight * 2, splashWidth - textBorder * 2, textHeight);
     boxLb.box(FL_NO_BOX);
     boxLb.align(FL_ALIGN_CENTER);
-    boxLb.labelsize(20);
+    boxLb.labelsize(textHeight);
     boxLb.labeltype(FL_NORMAL_LABEL);
     boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
     boxLb.label("Yoshimi is starting up");

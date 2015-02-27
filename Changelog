@@ -1,4 +1,11 @@
-yoshimi 1.3.*
+yoshimi 1.3.3-rc
+
+2015-2-27 Will
+- Added and updated Docs & Images
+- Prepared for full release
+
+2015-2-27 Andrew
+- Updated splash screen
 
 2015-2-19 Will
 - Small gui code optimisations

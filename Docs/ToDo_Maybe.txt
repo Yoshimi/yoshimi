@@ -1,4 +1,4 @@
 
-Don't load banks/programs if they are already current.
-
 Improve Copy & Paste functionality.
+
+Complete NRPNs

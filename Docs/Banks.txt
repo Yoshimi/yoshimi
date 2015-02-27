@@ -1,6 +1,4 @@
-The main feature of this release is the revision of root directories and banks.
-
-In the first place, you no longer have the concept of a default root directory, but a current one. This can by changed at any time without requiring a re-start, so there is now no longer a need to display the (confusing) contents of all roots. Also, roots now have ID numbers associated with them, but no changes have been made to the actual directores to achieve this. Instead the IDs are stored in the config file. The same ID system is used for banks, again without making any file system changes.
+You no longer have the concept of a default root directory, but a current one. This can by changed at any time without requiring a re-start, so there is now no longer a need to display the (confusing) contents of all roots. Also, roots now have ID numbers associated with them, but no changes have been made to the actual directores to achieve this. Instead the IDs are stored in the config file. The same ID system is used for banks, again without making any file system changes.
 
 At first run (and whenever new root directories are set) unknown roots and banks are given these IDs. Once set they will not change no matter how many more roots and banks are later added. You can however, manually change root directory IDs in 'settings'. Bank IDs can be changed via the config file, and in the near future the GUI will be updated to manage this. With these IDs, roots and banks can be grouped/ordered by function instead of alphabetically. When using the GUI you will always know exactly which root and bank you fetch an instrument from.
 
@@ -11,19 +9,3 @@ In Yoshimi->Settings->CC you can enable or disable all these MIDI features, and 
 Also, different instances have their own config files so that you can have (say) the main instance with current root(9), bank(23) while instance 4 has current root(2), bank(6). You can call up instances by number and thus access saved settings for that instance. As each instance has its own MIDI and audio ports, they can behave more-or-less independently.
 
 In doing all of this we have completely changed the way we manage the structure internally, resulting in much greater efficiency, at the cost of only a slightly slower startup. Swapping roots performs *no* file operations. Swapping banks only fetches the directory list of the newly selected bank. Changing an instrument doesn't have to search for a file, only load from its already known location.
-
-
-Following on from that, we now have a startup splash image that appears instantly so you always know Yoshimi has started even if some later error causes it to abort. The actual image may change - we have requests out for artwork.
-
-
-So much for the high visability stuff!
-
-More work has been done on LV2, including integrating the new root and bank controls.
-
-The main window and the mixer panel are now fully in sync.
-
-Ambiguities in instrument names have been resolved and Yoshimi will no longer save unnamed or default instruments. If you load a Zyn (or older Yoshimi) file that has unnamed instruments they will be given the name 'No Title'.
-
-You are now prevented (with an explanation) from attempting to change a bank entry in a non-writable area. Previously it would seem you had done so, but the changes would not (of course) have been saved to file - this goes back very many years!
-
-And... a few bug fixes - where do they come from?
