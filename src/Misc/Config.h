@@ -123,6 +123,7 @@ class Config : public MiscFuncs
         string        nameTag;
 
         int           BankUIAutoClose;
+        int           RootUIAutoClose;
         unsigned int  GzipCompression;
         int           Interpolation;        
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];

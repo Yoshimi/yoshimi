@@ -67,6 +67,10 @@ Bank::~Bank()
 
 bool Bank::readOnlyInstrument(int ninstrument)
 {
+    if (readOnlyBank(currentBankID))
+        return true; // root and bank not writable
+    if (emptyslot(ninstrument)) // nothing there so must be OK to write
+        return false;
     const char * file = getFullPath(currentRootID, currentBankID, ninstrument).c_str();
     return access(file, W_OK);
 }
@@ -92,10 +96,10 @@ string Bank::getnamenumbered(unsigned int ninstrument)
 
 
 // Changes the name of an instrument (and the filename)
-void Bank::setname(unsigned int ninstrument, string newname, int newslot)
+bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
 {
     if (emptyslot(ninstrument))
-        return;
+        return false;
 
     int slot = (newslot >= 0) ? newslot + 1 : ninstrument + 1;
     string filename = "0000" + asString(slot);
@@ -112,9 +116,11 @@ void Bank::setname(unsigned int ninstrument, string newname, int newslot)
         synth->getRuntime().Log("Error, bank setName failed renaming "
                     + getFullPath(currentRootID, currentBankID, ninstrument) + " -> "
                     + newfilepath + " : " + string(strerror(errno)));
+        return false;
     }    
     instrRef.name = newname;
     instrRef.filename = filename;
+    return true;
 }
 
 
@@ -184,6 +190,69 @@ bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
     if (!emptyslot(ninstrument))
         flag = part->loadXMLinstrument(getFullPath(currentRootID, currentBankID, ninstrument));
     return flag;
+}
+
+
+bool Bank::readOnlyBank(int bankID)
+{
+    const char * root = getRootPath(currentRootID).c_str();
+    if (access(root, W_OK)) // root not writable
+        return true;
+    if (getBankName(bankID).empty())
+        return false; // not there so must be OK to write
+    const char * file = getBankPath(currentRootID, bankID).c_str();
+    return access(file, W_OK);
+}
+
+
+//Gets a bank name
+string Bank::getBankName(int bankID)
+{
+    if (roots [currentRootID].banks.count(bankID) == 0)
+        return "";
+    return string(roots [currentRootID].banks [bankID].dirname);
+}
+
+
+//Gets a bank name with ID
+string Bank::getBankIDname(int bankID)
+{
+    string retname = getBankName(bankID);
+    if (!retname.empty())
+        retname = asString(bankID) + ". " + retname;
+    return retname;
+}
+
+
+// finds the number of instruments in a bank
+int Bank::getBankSize(int bankID)
+{
+    int found = 0;
+    for (int i = 0; i < BANK_SIZE; ++ i)
+        if (!roots [currentRootID].banks [bankID].instruments [i].name.empty())
+            found += 1;
+    return found;
+}
+
+// Changes a bank name 'in place' and updates the filename
+bool Bank::setbankname(unsigned int bankID, string newname)
+{
+    string filename = newname;
+    legit_filename(filename);
+    string newfilepath = getRootPath(currentRootID) + "/" + filename;
+    int chk = rename(getBankPath(currentRootID,bankID).c_str(),
+                     newfilepath.c_str());
+    if (chk < 0)
+    {
+        synth->getRuntime().Log("Bank: failed to rename " + getBankName(bankID)
+                               + " to " + newname);
+        return false;
+    }
+    synth->getRuntime().Log("Renaming " + getBankName(bankID)
+                               + " to " + newname);
+    
+    roots [currentRootID].banks [bankID].dirname = newname;
+    return true;
 }
 
 
@@ -261,7 +330,28 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 // Makes a new bank, put it on a file and makes it current bank
 bool Bank::newbank(string newbankdir)
 {
-    if (getRootPath(currentRootID).empty())
+    if (!newbankfile(newbankdir))
+        return false;
+    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
+    return true;
+}
+
+
+// Makes a new bank with known ID. Does *not* make it current
+bool Bank::newIDbank(string newbankdir, unsigned int bankID)
+{
+    if (!newbankfile(newbankdir))
+        return false;
+    roots [currentRootID].banks [bankID].dirname = newbankdir;
+    hints [currentRootID] [newbankdir] = bankID; // why do we need this?
+    return true;
+}
+
+
+// Performs the actual file operation for new banks
+bool Bank::newbankfile(string newbankdir)
+{
+     if (getRootPath(currentRootID).empty())
     {
         synth->getRuntime().Log("Current bank root directory not set");
         return false;
@@ -284,8 +374,47 @@ bool Bank::newbank(string newbankdir)
     forcefile += force_bank_dir_file;
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
     fclose(tmpfile);
-    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
     return true;
+}
+
+
+// Removes a bank and all its contents
+bool Bank::removebank(unsigned int bankID)
+{
+    int chk;
+
+    for (int inst = 0; inst < BANK_SIZE; ++ inst)
+        if (!roots [currentRootID].banks [bankID].instruments [inst].name.empty())
+        {
+            chk = remove(getFullPath(currentRootID, bankID, inst).c_str());
+            if (chk < 0)
+            {
+                synth->getRuntime().Log("removebank: "
+                                        + asString(inst) + " failed to remove "
+                                        + getFullPath(currentRootID, bankID, inst) + " "
+                                        + string(strerror(errno)));
+                return false;
+            }
+            deletefrombank(currentRootID, bankID, inst);
+        }
+        string tmp = getBankPath(currentRootID, bankID)+"/.bankdir";
+        chk = remove(tmp.c_str());
+        if (chk < 0)
+        {
+            synth->getRuntime().Log("removebank: failed to remove bank ID file"
+                                    + string(strerror(errno)));
+            return false;
+        }
+        chk = remove(getBankPath(currentRootID, bankID).c_str());
+        if (chk < 0)
+        {
+            synth->getRuntime().Log("removebank: failed to remove bank"
+                                    + asString(bankID) + " - "
+                                    + string(strerror(errno)));
+            return false;
+        }
+        roots [currentRootID].banks.erase(bankID);
+   return true;
 }
 
 
@@ -294,11 +423,7 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
 {
     if (n1 == n2)
         return;
-    if (locked())
-    {
-        synth->getRuntime().Log("swapslot requested, but is locked");
-        return;
-    }
+
     if (emptyslot(n1) && emptyslot(n2))
         return;
     if (emptyslot(n1)) // make the empty slot the destination
@@ -328,6 +453,68 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
         instrRef1 = instrRef2;
         instrRef2 = instrTmp;
     }
+}
+
+
+// Intelligently moves or swaps banks preserving instrument details
+void Bank::swapbanks(unsigned int firstID, unsigned int secondID)
+{
+    if (firstID == secondID)
+    {
+        synth->getRuntime().Log("Nothing to move!");
+        return;
+    }
+        
+    string firstname = getBankName(firstID); // this needs improving
+    string secondname = getBankName(secondID);
+    if (firstname.empty() and secondname.empty())
+    {
+        synth->getRuntime().Log("Nothing to move!");
+        return;
+    }
+    if (secondname.empty())
+    {
+        synth->getRuntime().Log("Moving " + firstname);
+        roots [currentRootID].banks [secondID] = roots [currentRootID].banks [firstID];
+        roots [currentRootID].banks.erase(firstID);
+    }
+    else if (firstname.empty())
+    {
+        synth->getRuntime().Log("Moving " + secondname);
+        roots [currentRootID].banks [firstID] = roots [currentRootID].banks [secondID];
+        roots [currentRootID].banks.erase(secondID);
+    }
+    else
+    {
+        synth->getRuntime().Log("Swapping " + firstname + " with " + secondname );
+        roots [currentRootID].banks [firstID].dirname = secondname;
+        roots [currentRootID].banks [secondID].dirname = firstname;
+        hints [currentRootID] [secondname] = firstID; // why do we need these?
+        hints [currentRootID] [firstname] = secondID;
+
+        for(int pos = 0; pos < BANK_SIZE; ++ pos)
+        {
+            InstrumentEntry &instrRef_1 = getInstrumentReference(currentRootID, firstID, pos);
+            InstrumentEntry &instrRef_2 = getInstrumentReference(currentRootID, secondID, pos);
+
+            InstrumentEntry tmp = instrRef_2;
+            
+            if (instrRef_1.name == "")
+                roots [currentRootID].banks [secondID].instruments.erase(pos);
+            else
+                instrRef_2 = instrRef_1;
+            
+            if (tmp.name == "")
+                roots [currentRootID].banks [firstID].instruments.erase(pos);
+            else
+                instrRef_1 = tmp;
+        }
+    }
+    
+    if (firstID == currentBankID)
+        currentBankID = secondID;
+    else if(secondID == currentBankID)
+        currentBankID = firstID;
 }
 
 
@@ -530,6 +717,7 @@ size_t Bank::add_bank(string name, string , size_t rootID)
     loadbank(rootID, newIndex);
     return newIndex;
 }
+
 
 InstrumentEntry &Bank::getInstrumentReference(size_t ninstrument)
 {
