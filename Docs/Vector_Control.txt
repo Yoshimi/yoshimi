@@ -3,7 +3,7 @@ Yoshi now had 64 parts in blocks of 16, all the upper ones are mapped to the sam
 In vector mode parts will still play together but the vector controls can change ther volume, pan, {others} in pairs. using user defined CCs set up with NRPNs
 
 e.g.
-Parts 1 and 17 can be set as X1 & X2 (volume only) while parts 33 and 49 can be Y1 & Y2 (pan only)
+Parts 1 and 17 can be set as x1 & x2 (volume only) while parts 33 and 49 can be y1 & y2 (pan only)
 
 Independently of this Parts 2 & 18 could use volume and pan from another CC
 
@@ -11,9 +11,23 @@ Setting up is currently done as follows.
 
 In the required channel send:
 RPN MSB (99)  set to 64
-RPN LSB (98)  1 to set X CC or 2 for Y
-Data LSB (38) actual CC number to use for X or Y (as above)
-Data MSB ( 6) set for control feature(s)
+RPN LSB (98)  1
+Data MSB ( 6) set mode
+              0 = X CC
+              1 = Y CC
+              2 = X features
+              3 = Y features
+              4 = x1 instrument (optional)
+              5 = x2 instrument (optional)
+              6 = y1 instrument (optional)
+              7 = y2 instrument (optional)
+These enable vector control any other value disables it
+
+Data LSB (38) value to set
+
+features:
     1 = Volume
     2 = Pan
     4 = {more?}
+
+Instrument setting is not RT safe, and needs work.

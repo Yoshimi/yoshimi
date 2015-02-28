@@ -390,7 +390,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     else
     { // bank change doesn't directly affect parts.
         
-#warning all the NRPN & vector stuff should probably move out of the MIDI thread
+#warning should some NRPN & vector stuff move out of the MIDI thread?
         int Xopps = nrpnVectors.Xaxis[chan];
         int Xtype = Xopps & 127;
         int Yopps = nrpnVectors.Yaxis[chan];
@@ -454,32 +454,77 @@ void SynthEngine::ProcessNrpn(int chan, int type, short int par)
     if (type == 6)
         sb = "M";
     Runtime.Log("Data " + string(sb) + "SB    value " + asString(par));
-//    Runtime.Log("N H " + asString(Runtime.nrpnH) + "   N L " + asString(Runtime.nrpnL));
-//    Runtime.Log("D H " + asString(Runtime.dataH) + "   D L " + asString(Runtime.dataL));
    
-    if (Runtime.nrpnH == 64 && (Runtime.nrpnL == 1 || Runtime.nrpnL == 2)) // it's vector control
-        if (Runtime.dataH < 128 && Runtime.dataL < 128)
+    if (Runtime.nrpnH == 64 && Runtime.nrpnL == 1) // it's vector control
+        if (type == 38)//Runtime.dataH < 128)
         {
-            Runtime.Log("Vector control active for Ch " + asString(chan));
-            if (Runtime.nrpnL == 1)
-            {
-                nrpnVectors.Xaxis[chan] = (Runtime.dataH << 8) | Runtime.dataL;
-                if (Runtime.enable_part_on_voice_load != 0)
-                {
-                    partonoff(chan, 1);
-                    partonoff(chan + 16, 1);
-                }
-            }
-            else
-            {
-                nrpnVectors.Yaxis[chan] = (Runtime.dataH << 8) | Runtime.dataL;
-                if (Runtime.enable_part_on_voice_load != 0)
-                {
-                    partonoff(chan + 32, 1);
-                    partonoff(chan + 48, 1);
-                }
-            }
             nrpnVectors.Enabled[chan] = true;
+            switch (Runtime.dataH)
+            {
+                case 0:
+                    {
+                        nrpnVectors.Xaxis[chan] = par;
+                        if (Runtime.enable_part_on_voice_load != 0)
+                        {
+                            partonoff(chan, 1);
+                            partonoff(chan + 16, 1);
+                        }
+                        break;
+                    }
+                case 1:
+                    {
+                        nrpnVectors.Yaxis[chan] = par;
+                        if (Runtime.enable_part_on_voice_load != 0)
+                        {
+                            partonoff(chan + 32, 1);
+                            partonoff(chan + 48, 1);
+                        }
+                        break;
+                    }
+                case 2:
+                    {
+                        nrpnVectors.Xaxis[chan] |= (par << 8);
+                        break;
+                    }
+                case 3:
+                    {
+                        nrpnVectors.Yaxis[chan] |= (par << 8);
+                        break;
+                    }
+                 case 4:
+                    {
+                        bank.loadfromslot(par, part[chan]); // very temporary!!
+                        break;
+                    }
+                 case 5:
+                    {
+                        bank.loadfromslot(par, part[chan + 16]);
+                        break;
+                    }
+                  case 6:
+                    {
+                        bank.loadfromslot(par, part[chan + 32]);
+                        break;
+                    }
+                 case 7:
+                    {
+                        bank.loadfromslot(par, part[chan + 48]);
+                        break;
+                    }
+              default:
+                    {
+                        nrpnVectors.Enabled[chan] = false;
+                        partonoff(chan, 0);
+                        partonoff(chan + 16, 0);
+                        partonoff(chan, 0);
+                        partonoff(chan + 16, 0);
+
+                    }
+            }
+            if (Runtime.enable_part_on_voice_load && nrpnVectors.Enabled[chan])
+                Runtime.Log("Vector control enabled");
+            else
+                Runtime.Log("Vector control disabled");
             if (Runtime.showGui && guiMaster)
             {
                 guiMaster->partui->partgroupui->activate();
