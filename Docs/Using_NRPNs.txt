@@ -5,7 +5,7 @@ The data CCs associated with these are, 6 for MSB and 38 for LSB
 
 Only when an NRPN has been set can the data values be entered (they will be ignored otherwise).
 
-If a supported control is identified these data values will be stored locally so ther NRPNs can be set.
+If a supported control is identified these data values will be stored locally (if needed) so that other NRPNs can be set.
 
 Whenever either byte of the NRPN is changed, the data values will be cleared (but stored ones will not be affected).
 

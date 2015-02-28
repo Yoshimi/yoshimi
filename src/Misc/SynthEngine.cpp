@@ -448,94 +448,6 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 }
 
 
-void SynthEngine::ProcessNrpn(int chan, int type, short int par)
-{
-    string sb = "L";
-    if (type == 6)
-        sb = "M";
-    Runtime.Log("Data " + string(sb) + "SB    value " + asString(par));
-   
-    if (Runtime.nrpnH == 64 && Runtime.nrpnL == 1) // it's vector control
-        if (type == 38)//Runtime.dataH < 128)
-        {
-            nrpnVectors.Enabled[chan] = true;
-            switch (Runtime.dataH)
-            {
-                case 0:
-                    {
-                        nrpnVectors.Xaxis[chan] = par;
-                        if (Runtime.enable_part_on_voice_load != 0)
-                        {
-                            partonoff(chan, 1);
-                            partonoff(chan + 16, 1);
-                        }
-                        break;
-                    }
-                case 1:
-                    {
-                        nrpnVectors.Yaxis[chan] = par;
-                        if (Runtime.enable_part_on_voice_load != 0)
-                        {
-                            partonoff(chan + 32, 1);
-                            partonoff(chan + 48, 1);
-                        }
-                        break;
-                    }
-                case 2:
-                    {
-                        nrpnVectors.Xaxis[chan] |= (par << 8);
-                        break;
-                    }
-                case 3:
-                    {
-                        nrpnVectors.Yaxis[chan] |= (par << 8);
-                        break;
-                    }
-                 case 4:
-                    {
-                        bank.loadfromslot(par, part[chan]); // very temporary!!
-                        break;
-                    }
-                 case 5:
-                    {
-                        bank.loadfromslot(par, part[chan + 16]);
-                        break;
-                    }
-                  case 6:
-                    {
-                        bank.loadfromslot(par, part[chan + 32]);
-                        break;
-                    }
-                 case 7:
-                    {
-                        bank.loadfromslot(par, part[chan + 48]);
-                        break;
-                    }
-              default:
-                    {
-                        nrpnVectors.Enabled[chan] = false;
-                        partonoff(chan, 0);
-                        partonoff(chan + 16, 0);
-                        partonoff(chan, 0);
-                        partonoff(chan + 16, 0);
-
-                    }
-            }
-            if (Runtime.enable_part_on_voice_load && nrpnVectors.Enabled[chan])
-                Runtime.Log("Vector control enabled");
-            else
-                Runtime.Log("Vector control disabled");
-            if (Runtime.showGui && guiMaster)
-            {
-                guiMaster->partui->partgroupui->activate();
-                guiMaster->partui->partGroupEnable->value(1);
-                guiMaster->updatepanel();
-            }
-
-        }
-}
-
-
 void SynthEngine::SetBankRoot(int rootnum)
 {
     if(bank.setCurrentRootID(rootnum))
@@ -578,66 +490,56 @@ void SynthEngine::SetBank(int banknum)
     {
         Runtime.Log("SynthEngine setBank: No bank " + asString(banknum)+ " in this root");
     }
-
-
-    /*
-    int offset = 0;
-#warning this needs improving.
-    for (int idx = 0; idx < MAX_NUM_BANKS; ++ idx)
-    {
-        if (bank.banks[idx].ID == Runtime.currentRootID and offset == banknum)
-        {
-            banknum = idx; // Set absolute bank location
-            break;
-        }
-        else if (bank.banks[idx].ID == Runtime.currentRootID)
-            offset += 1;
-    }
-
-    if(banknum <= MAX_NUM_BANKS) {
-        if (bank.loadbank(bank.banks[banknum].dir))
-            Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
-        if (Runtime.showGui)
-        {
-            guiMaster->bankui->set_bank_slot();
-            guiMaster->bankui->refreshmainwindow();
-        }
-        else
-            Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
-    }
-    else
-        Runtime.Log("SynthEngine setBank: Value is out of range!");
-    return;
-    */
 }
 
 
-void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
+void SynthEngine::SetProgram(short int chan, unsigned char pgm)
 {
     bool partOK = false;
+    int npart;
     if (bank.getname(pgm) < "!") // can't get a program name less than this
     {
         Runtime.Log("SynthEngine setProgram: No Program " + asString(pgm) + " in this bank");
     }
     else
     {
-        for(int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-            // we don't want upper parts (16 - 63) activiated!
-            if(chan == part[npart]->Prcvchn)
+        if (chan <  NUM_MIDI_CHANNELS) // a normal program change
+        {
+            for(npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+                // we don't want upper parts (16 - 63) activiated!
+                if(chan == part[npart]->Prcvchn)
+                {
+                    partOK = bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
+                    if (partOK and part[npart]->Penabled == 0 and   Runtime.enable_part_on_voice_load != 0)
+                    {
+                        partonoff(npart, 1);
+                        if (Runtime.showGui && guiMaster)
+                        {
+                            guiMaster->partui->partgroupui->activate();
+                            guiMaster->partui->partGroupEnable->value(1);
+                        }
+                    }
+            }
+        }
+        else
+        {
+            npart = chan & 255;
+            if (npart < NUM_MIDI_PARTS)
             {
-                partOK = bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
-                if (partOK and part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
+                partOK = bank.loadfromslot(pgm, part[npart]);
+                if (partOK and part[npart]->Penabled == 0 and   Runtime.enable_part_on_voice_load != 0)
                 {
                     partonoff(npart, 1);
                     if (Runtime.showGui && guiMaster)
-                    {
-                        guiMaster->partui->partgroupui->activate();
-                        guiMaster->partui->partGroupEnable->value(1);
-                    }
+                        {
+                            guiMaster->partui->partgroupui->activate();
+                            guiMaster->partui->partGroupEnable->value(1);
+                        }
                 }
-           }
+            }
+        }
         if (partOK){
-            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm));
+            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 255));
             // update UI
             if (Runtime.showGui && guiMaster)
             {

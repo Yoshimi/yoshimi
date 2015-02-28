@@ -183,8 +183,6 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         synth->getRuntime().dataH = 128; //  so these are now invalid
         synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
         synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
-//        synth->getRuntime().Log("Status "
-//                                + asString(synth->getRuntime().nrpnActive));
     }
     else if(ctrl == C_nrpnH)
     {
@@ -193,8 +191,6 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         synth->getRuntime().dataH = 128; //  so these are now invalid
         synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnL < 127);
         synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
-//        synth->getRuntime().Log("Status "
-//                                + asString(synth->getRuntime().nrpnActive));
     }
     else if (synth->getRuntime().nrpnActive && (ctrl == C_dataL || ctrl == C_dataH))
     {
@@ -202,11 +198,79 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             synth->getRuntime().dataL = param;
         else
             synth->getRuntime().dataH = param;
-        synth->ProcessNrpn(ch, ctrl, param);
+        ProcessNrpn(ch, ctrl, param);
     }
     else
         synth->SetController(ch, ctrl, param);
 }
+
+
+void MusicIO::ProcessNrpn(int chan, int type, short int par)
+{
+    string sb = "L";
+    if (type == 6)
+        sb = "M";
+    synth->getRuntime().Log("Data " + string(sb) + "SB    value " + asString(par));
+   
+    if (synth->getRuntime().nrpnH == 64 && synth->getRuntime().nrpnL == 1) // it's vector control
+        if (type == 38)
+        {
+            if (!synth->nrpnVectors.Enabled[chan])
+            {
+                synth->nrpnVectors.Enabled[chan] = true;
+                synth->getRuntime().Log("Vector control enabled");
+            }
+            switch (synth->getRuntime().dataH)
+            {
+                case 0:
+                    {
+                        synth->nrpnVectors.Xaxis[chan] = par;
+                        break;
+                    }
+                case 1:
+                    {
+                        synth->nrpnVectors.Yaxis[chan] = par;
+                        break;
+                    }
+                case 2:
+                    {
+                        synth->nrpnVectors.Xaxis[chan] |= (par << 8);
+                        break;
+                    }
+                case 3:
+                    {
+                        synth->nrpnVectors.Yaxis[chan] |= (par << 8);
+                        break;
+                    }
+                 case 4:
+                    {
+                        synth->SetProgram(chan | 0x100, par);
+                        break;
+                    }
+                 case 5:
+                    {
+                        synth->SetProgram(chan | 0x110, par);
+                        break;
+                    }
+                  case 6:
+                    {
+                        synth->SetProgram(chan | 0x120, par);
+                        break;
+                    }
+                 case 7:
+                    {
+                        synth->SetProgram(chan | 0x130, par);
+                        break;
+                    }
+              default:
+                    {
+                        synth->nrpnVectors.Enabled[chan] = false;
+                        synth->getRuntime().Log("Vector control disabled");
+                    }
+            }
+        }
+}
+
 
 //bank change and root dir change change share the same thread
 //to make changes consistent
@@ -235,9 +299,14 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
 }
 
 
-void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
+void MusicIO::setMidiProgram(short int ch, int prg, bool in_place)
 {
-    if(ch >= NUM_MIDI_PARTS)
+    int partnum;
+    if (ch < 0x100)
+        partnum = ch;
+    else
+        partnum = ch & 0xff; // this is for direct part access instead of channel
+    if(partnum >= NUM_MIDI_PARTS)
         return;
     if (synth->getRuntime().EnableProgChange)
     {
@@ -246,13 +315,13 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         else
         {
             pthread_t tmpPrgThread = 0;
-            tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [ch].pPrgThread , 0);
+            tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [partnum].pPrgThread , 0);
             if(tmpPrgThread == 0) // don't allow more than one program change process at a time
             {
-                prgChangeCmd [ch].ch = ch;
-                prgChangeCmd [ch].prg = prg;
-                prgChangeCmd [ch]._this_ = this;
-                if(!synth->getRuntime().startThread(&prgChangeCmd [ch].pPrgThread, MusicIO::static_PrgChangeThread, &prgChangeCmd [ch], false, 0, false))
+                prgChangeCmd [partnum].ch = ch;
+                prgChangeCmd [partnum].prg = prg;
+                prgChangeCmd [partnum]._this_ = this;
+                if(!synth->getRuntime().startThread(&prgChangeCmd [partnum].pPrgThread, MusicIO::static_PrgChangeThread, &prgChangeCmd [partnum], false, 0, false))
                 {
                     synth->getRuntime().Log("MusicIO::setMidiProgram: failed to start midi program change thread!");
                 }
@@ -344,7 +413,7 @@ void *MusicIO::prgChange_Thread(_prgChangeCmd *pCmd)
     }
 
     //std::cerr << "MusicIO::prgChange_Thread(). ch = " << pCmd->ch << ", prg = " << pCmd->prg << std::endl;
-
+    synth->getRuntime().Log("here? " + asString(pCmd->ch));
     synth->SetProgram(pCmd->ch, pCmd->prg);
     pCmd->pPrgThread = 0; //done
     return NULL;

@@ -1,6 +1,6 @@
-Yoshi now had 64 parts in blocks of 16, all the upper ones are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages.
+Yoshi now has 64 parts in blocks of 16, all the upper ones are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages.
 
-In vector mode parts will still play together but the vector controls can change ther volume, pan, {others} in pairs. using user defined CCs set up with NRPNs
+In vector mode parts will still play together but the vector controls can change their volume, pan, {others} in pairs. using user defined CCs set up with NRPNs
 
 e.g.
 Parts 1 and 17 can be set as x1 & x2 (volume only) while parts 33 and 49 can be y1 & y2 (pan only)
@@ -30,4 +30,4 @@ features:
     2 = Pan
     4 = {more?}
 
-Instrument setting is not RT safe, and needs work.
+If the panel is open when setting instruments by this method the gui will freeze :(
