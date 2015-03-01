@@ -79,7 +79,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
-        void SetController(unsigned char chan, int type, short int par);
+        void SetController(short int chan, int type, short int par);
         void SetBankRoot(int rootnum);
         void SetBank(int banknum);
         void SetProgram(short int chan, unsigned char pgm);
@@ -156,14 +156,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         
         bool fetchMeterData(VUtransfer *VUdata);
 
-        struct Vectors{
-            unsigned short Xaxis[NUM_MIDI_CHANNELS];
-            unsigned short Yaxis[NUM_MIDI_CHANNELS];
-            bool Enabled[NUM_MIDI_CHANNELS];
-        };
-        
-        Vectors nrpnVectors;
-        
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
         inline Config &getRuntime() {return Runtime;}
         inline PresetsStore &getPresetsStore() {return presetsstore;}

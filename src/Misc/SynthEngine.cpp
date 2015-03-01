@@ -382,67 +382,32 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, int type, short int par)
+void SynthEngine::SetController(short int chan, int type, short int par)
 {
     if (type == Runtime.midi_bank_C) {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
     }
     else
     { // bank change doesn't directly affect parts.
-        
-#warning should some NRPN & vector stuff move out of the MIDI thread?
-        int Xopps = nrpnVectors.Xaxis[chan];
-        int Xtype = Xopps & 127;
-        int Yopps = nrpnVectors.Yaxis[chan];
-        int Ytype = Yopps & 127;
-        Xopps = Xopps >> 8;
-        Yopps = Yopps >> 8;
-        if(nrpnVectors.Enabled[chan] && (Xtype == type || Ytype == type))
-        { // vector control is direct to parts
-//            Runtime.Log("D H " + asString(Xopps) + "   D L " + asString(Xtype));
-            if(Xtype == type)
-            {
-                if (Xopps & 1) // volume
-                {
-                    part[chan]->SetController(7, par/2 + 64); // needs improving
-                    part[chan + 16]->SetController(7, 127 - par/2);
-                }
-                if (Xopps & 2) // pan
-                {
-                    part[chan]->SetController(10, par);
-                    part[chan + 16]->SetController(10, 127 - par);
-                }
-            }
-            else
-            {
-                if (Yopps & 1) // volume
-                {
-                    part[chan + 32]->SetController(7, par/2 +64);
-                    part[chan + 48]->SetController(7, 127 - par/2);
-                }
-                if (Yopps & 2) // pan
-                {
-                    part[chan + 32]->SetController(10, par);
-                    part[chan + 48]->SetController(10, 127 - par);
-                }
-            }
-        }
-        else
+        if (chan < 0x100)
         {
-                
             for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             {   // Send the controller to all part assigned to the channel
                 if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
                     part[npart]->SetController(type, par);
             }
-
-            if (type == C_allsoundsoff)
-            {   // cleanup insertion/system FX
-                for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-                    sysefx[nefx]->cleanup();
-                for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-                    insefx[nefx]->cleanup();
-            }
+        }
+        else
+        {
+            chan &= 0xff;
+            part[chan]->SetController(type, par);
+        }
+        if (type == C_allsoundsoff)
+        {   // cleanup insertion/system FX
+            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+                sysefx[nefx]->cleanup();
+            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+                insefx[nefx]->cleanup();
         }
     }
 }
@@ -523,7 +488,7 @@ void SynthEngine::SetProgram(short int chan, unsigned char pgm)
         }
         else
         {
-            npart = chan & 255;
+            npart = chan & 0xff;
             if (npart < NUM_MIDI_PARTS)
             {
                 partOK = bank.loadfromslot(pgm, part[npart]);
@@ -539,7 +504,7 @@ void SynthEngine::SetProgram(short int chan, unsigned char pgm)
             }
         }
         if (partOK){
-            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 255));
+            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0xff));
             // update UI
             if (Runtime.showGui && guiMaster)
             {

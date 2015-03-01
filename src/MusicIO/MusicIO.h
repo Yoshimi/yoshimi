@@ -71,6 +71,14 @@ class MusicIO : virtual protected MiscFuncs
         void *prgChange_Thread(_prgChangeCmd *pCmd);
         static void *static_BankOrRootDirChangeThread(void *arg);
         static void *static_PrgChangeThread(void *arg);
+        
+        struct Vectors{
+            unsigned short Xaxis[NUM_MIDI_CHANNELS];
+            unsigned short Yaxis[NUM_MIDI_CHANNELS];
+            bool Enabled[NUM_MIDI_CHANNELS];
+        };
+        
+        Vectors nrpnVectors;
 };
 
 #endif
