@@ -32,8 +32,8 @@ class MiscFuncs
         ~MiscFuncs() { }
         string asString(int n);
         string asString(long long n);
-#ifdef __x86_64__
-        //remove ambiguity while compiling for x64 arch
+#if !defined( __i386__ ) && !defined( __arm__ )
+        //remove ambiguity while compiling for most 64-bit/32-bit arches
         string asString(size_t n);
 #endif
         string asString(long n);
