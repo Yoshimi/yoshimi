@@ -491,29 +491,25 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
     }
     else
     {
-        for(int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        for(int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+            // we don't want upper parts (16 - 63) activiated!
             if(chan == part[npart]->Prcvchn)
             {
-                partOK = bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
-                if (partOK and part[npart]->Penabled == 0 and Runtime.enable_part_on_voice_load != 0)
+                if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
                 {
-                    partonoff(npart, 1);
-                    if (Runtime.showGui && guiMaster)
+                    partOK = true; 
+                    if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
+                        partonoff(npart, 1);
+                    if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
-                        guiMaster->partui->partgroupui->activate();
-                        guiMaster->partui->partGroupEnable->value(1);
+                        guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+                        guiMaster->panellistitem[npart]->refresh();
                     }
                 }
-           }
-        if (partOK){
-            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm));
-            // update UI
-            if (Runtime.showGui && guiMaster)
-            {
-                guiMaster->updatepanel();
-                if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
-                    guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
             }
+        if (partOK)
+        {
+            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
         }
         else // I think XML traps this. Should it?
             Runtime.Log("SynthEngine setProgram: Invalid program data");
