@@ -347,7 +347,7 @@ synth = _synth;
   decl {struct{
   int oldpeak[NUM_MIDI_PARTS];
   bool clip[NUM_MIDI_PARTS];
-  } panelpart;} {selected private local
+  } panelpart;} {private local
   }
   Function {resetPart(bool clipOnly = false)} {open
   } {
@@ -411,7 +411,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
       private xywh {1195 47 60 275} type Double hide
       class Fl_Group
     } {
-      Fl_Group panellistitemgroup {open
+      Fl_Group panellistitemgroup {open selected
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
         code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}

@@ -813,7 +813,7 @@ ZynAddSubFX}
                                "\\nSplash Image Copyright 2015, James Fraser").c_str());}
       }
       Fl_Box {} {
-        label {copy terms} selected
+        label {copy terms}
         xywh {10 198 340 53} labelsize 11 align 144 when 0
         code0 {//
             o->copy_label(string("This is free software, and comes with ABSOLUTELY NO WARRANTY; "
@@ -1091,8 +1091,7 @@ updatepanel();} open
 
         }
         panelwindow->label(panelwindowlabel.c_str());
-        panelwindow->changed();} {selected
-    }
+        panelwindow->changed();} {}
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -1319,9 +1318,9 @@ updatepanel();} open
   }
   decl {string masterwindowlabel;} {private local
   }
-  decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {private local
+  decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }
-  decl {Panellistitem *widepanellistitem[NUM_MIDI_PARTS];} {private local
+  decl {Panellistitem *widepanellistitem[NUM_MIDI_PARTS];} {selected public local
   }
   decl {ConsoleUI *yoshiLog;} {private local
   }

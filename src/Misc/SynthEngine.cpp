@@ -382,14 +382,14 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 
 // Controllers
-void SynthEngine::SetController(short int chan, int type, short int par)
+void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
     if (type == Runtime.midi_bank_C) {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
     }
     else
     { // bank change doesn't directly affect parts.
-        if (chan < 0x100)
+        if (chan < NUM_MIDI_CHANNELS)
         {
             for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             {   // Send the controller to all part assigned to the channel
@@ -399,7 +399,7 @@ void SynthEngine::SetController(short int chan, int type, short int par)
         }
         else
         {
-            chan &= 0xff;
+            chan &= 0x7f;
             part[chan]->SetController(type, par);
         }
         if (type == C_allsoundsoff)
@@ -458,7 +458,7 @@ void SynthEngine::SetBank(int banknum)
 }
 
 
-void SynthEngine::SetProgram(short int chan, unsigned char pgm)
+void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
 {
     bool partOK = false;
     int npart;
@@ -474,44 +474,40 @@ void SynthEngine::SetProgram(short int chan, unsigned char pgm)
                 // we don't want upper parts (16 - 63) activiated!
                 if(chan == part[npart]->Prcvchn)
                 {
-                    partOK = bank.loadfromslot(pgm, part[npart]); // Programs indexes start from 0
-                    if (partOK and part[npart]->Penabled == 0 and   Runtime.enable_part_on_voice_load != 0)
+                    if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
                     {
-                        partonoff(npart, 1);
-                        if (Runtime.showGui && guiMaster)
+                        partOK = true; 
+                        if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
+                            partonoff(npart, 1);
+                        if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                         {
-                            guiMaster->partui->partgroupui->activate();
-                            guiMaster->partui->partGroupEnable->value(1);
+                            guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+                            guiMaster->panellistitem[npart]->refresh();
                         }
                     }
-            }
+                }
         }
         else
         {
-            npart = chan & 0xff;
+            npart = chan & 0x7f;
             if (npart < NUM_MIDI_PARTS)
             {
                 partOK = bank.loadfromslot(pgm, part[npart]);
-                if (partOK and part[npart]->Penabled == 0 and   Runtime.enable_part_on_voice_load != 0)
+                if (partOK)
                 {
-                    partonoff(npart, 1);
-                    if (Runtime.showGui && guiMaster)
-                        {
-                            guiMaster->partui->partgroupui->activate();
-                            guiMaster->partui->partGroupEnable->value(1);
-                        }
+                    if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
+                        partonoff(npart, 1);
+                    if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
+                    {
+                        guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+                        guiMaster->panellistitem[npart]->refresh();
+                    }
                 }
             }
         }
-        if (partOK){
-            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0xff));
-            // update UI
-            if (Runtime.showGui && guiMaster)
-            {
-                guiMaster->updatepanel();
-                if (guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
-                    guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
-            }
+        if (partOK)
+        {
+            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
         }
         else // I think XML traps this. Should it?
             Runtime.Log("SynthEngine setProgram: Invalid program data");

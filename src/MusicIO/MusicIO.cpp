@@ -221,18 +221,18 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 //                        synth->getRuntime().Log("X D H " + asString(Xopps)  + "   D L " + asString(Xtype) + "  V " + asString(param));
                         if (Xopps & 1) // volume
                         {
-                            synth->SetController(ch | 0x100, C_volume, param); // needs improving
-                            synth->SetController(ch | 0x110, C_volume, 127 - param);
+                            synth->SetController(ch | 0x80, C_volume, param); // needs improving
+                            synth->SetController(ch | 0x90, C_volume, 127 - param);
                         }
                         if (Xopps & 2) // pan
                         {
-                            synth->SetController(ch | 0x100, C_panning, param);
-                            synth->SetController(ch | 0x110, C_panning, 127 - param);
+                            synth->SetController(ch | 0x80, C_panning, param);
+                            synth->SetController(ch | 0x90, C_panning, 127 - param);
                         }
                         if (Xopps & 4) // 'brightness'
                         {
-                            synth->SetController(ch | 0x100, C_filtercutoff, param);
-                            synth->SetController(ch | 0x110, C_filtercutoff, 127 - param);
+                            synth->SetController(ch | 0x80, C_filtercutoff, param);
+                            synth->SetController(ch | 0x90, C_filtercutoff, 127 - param);
                         }
                     }
                     else
@@ -240,18 +240,18 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 //                       synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
                         if (Yopps & 1) // volume
                         {
-                            synth->SetController(ch | 0x120, C_volume, param);
-                            synth->SetController(ch | 0x130, C_volume, 127 - param);
+                            synth->SetController(ch | 0xa0, C_volume, param);
+                            synth->SetController(ch | 0xb0, C_volume, 127 - param);
                         }
                         if (Yopps & 2) // pan
                         {
-                            synth->SetController(ch | 0x120, C_panning, param);
-                            synth->SetController(ch | 0x130, C_panning, 127 - param);
+                            synth->SetController(ch | 0xa0, C_panning, param);
+                            synth->SetController(ch | 0xb0, C_panning, 127 - param);
                         }
                         if (Yopps & 4) // 'brightness'
                         {
-                            synth->SetController(ch | 0x120, C_filtercutoff, param);
-                            synth->SetController(ch | 0x130, C_filtercutoff, 127 - param);
+                            synth->SetController(ch | 0xa0, C_filtercutoff, param);
+                            synth->SetController(ch | 0xb0, C_filtercutoff, 127 - param);
                         }
                     }
                     return;
@@ -263,7 +263,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 }
 
 
-void MusicIO::ProcessNrpn(int chan, int type, short int par)
+void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
 {
     string sb = "L";
     if (type == 6)
@@ -306,22 +306,22 @@ void MusicIO::ProcessNrpn(int chan, int type, short int par)
                     }
                  case 4:
                     {
-                        setMidiProgram(chan | 0x100, par);
+                        setMidiProgram(chan | 0x80, par);
                         break;
                     }
                  case 5:
                     {
-                        setMidiProgram(chan | 0x110, par);
+                        setMidiProgram(chan | 0x90, par);
                         break;
                     }
                   case 6:
                     {
-                        setMidiProgram(chan | 0x120, par);
+                        setMidiProgram(chan | 0xa0, par);
                         break;
                     }
                  case 7:
                     {
-                        setMidiProgram(chan | 0x130, par);
+                        setMidiProgram(chan | 0xb0, par);
                         break;
                     }
               default:
@@ -361,13 +361,13 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
 }
 
 
-void MusicIO::setMidiProgram(short int ch, int prg, bool in_place)
+void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
 {
     int partnum;
-    if (ch < 0x100)
+    if (ch < NUM_MIDI_CHANNELS)
         partnum = ch;
     else
-        partnum = ch & 0xff; // this is for direct part access instead of channel
+        partnum = ch & 0x7f; // this is for direct part access instead of channel
     if(partnum >= NUM_MIDI_PARTS)
         return;
     if (synth->getRuntime().EnableProgChange)
