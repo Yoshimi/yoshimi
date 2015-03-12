@@ -794,6 +794,7 @@ mainCreateNewInstance(forceId);}
       }
     }
     Fl_Window aboutwindow {
+      label {About Yoshimi} open
       xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
@@ -829,7 +830,7 @@ ZynAddSubFX}
       }
       Fl_Button {} {
         label Close
-        callback {aboutwindow->hide();}
+        callback {aboutwindow->hide();} selected
         xywh {305 253 43 22} box THIN_UP_BOX labelsize 11
       }
     }
@@ -1320,7 +1321,7 @@ updatepanel();} open
   }
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }
-  decl {Panellistitem *widepanellistitem[NUM_MIDI_PARTS];} {selected public local
+  decl {Panellistitem *widepanellistitem[NUM_MIDI_PARTS];} {public local
   }
   decl {ConsoleUI *yoshiLog;} {private local
   }
