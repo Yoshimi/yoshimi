@@ -57,7 +57,7 @@
         lv2:index 3 ;
         lv2:symbol "outr" ;
         lv2:name "Main right" ;
-    ]
+    ];
 
     lv2:port [
         a lv2:OutputPort, lv2:AudioPort ;

@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-3-12 Will
+- inserted missing ";" at line 60 of yoshimi.ttl
+  found by Holger Marzen
+
 2015-3-10 Will
 - Panel window bugfix
 
