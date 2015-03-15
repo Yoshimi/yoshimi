@@ -830,7 +830,7 @@ ZynAddSubFX}
       }
       Fl_Button {} {
         label Close
-        callback {aboutwindow->hide();} selected
+        callback {aboutwindow->hide();}
         xywh {305 253 43 22} box THIN_UP_BOX labelsize 11
       }
     }
@@ -952,6 +952,13 @@ ZynAddSubFX}
         panelwindow->label(panelwindowlabel.c_str());
         panelwindow->changed();} {}
   }
+  Function {updatepart()} {open
+  } {
+    code {//
+    partui->partpan->value(synth->part[npart]->Ppanning);
+    partui->partvol->value(synth->part[npart]->Pvolume);} {selected
+    }
+  }
   Function {setMasterLabel(string name)} {open
   } {
     code {//
@@ -961,7 +968,8 @@ ZynAddSubFX}
         masterwindow->label(masterwindowlabel.c_str());
         masterwindow->changed();} {}
   }
-  Function {do_new_master()} {} {
+  Function {do_new_master()} {open
+  } {
     code {//
         if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
@@ -1043,8 +1051,7 @@ ZynAddSubFX}
         }
         updatepanel();} {}
   }
-  Function {refresh_master_ui()} {open
-  } {
+  Function {refresh_master_ui()} {} {
     code {//
         ninseff = 0;
         nsyseff = 0;

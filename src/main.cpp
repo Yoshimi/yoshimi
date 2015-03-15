@@ -253,6 +253,7 @@ static void *mainGuiThread(void *arg)
                         if(guiMaster)
                         {
                             guiMaster->panellistitem[msg->index]->refresh();
+                            guiMaster->updatepart();
                         }
                     }
                     break;

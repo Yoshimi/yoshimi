@@ -392,7 +392,20 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {   // Send the controller to all part assigned to the channel
             if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+            {
                 part[npart]->SetController(type, par);
+                if (type == 7 || type == 10) // currently only volume and pan
+                {
+                    if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->part)
+                    {
+                        GuiThreadMsg *msg = new GuiThreadMsg;
+                        msg->data = this;
+                        msg->type = GuiThreadMsg::UpdatePanelItem;
+                        msg->index = npart;
+                        Fl::awake((void *)msg);
+                    }
+                }
+            } 
         }
 
         if (type == C_allsoundsoff)
@@ -503,6 +516,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
                         guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
+                        guiMaster->partui->partgroupui->activate();
+                        guiMaster->partui->partGroupEnable->value(1);
                         //guiMaster->panellistitem[npart]->refresh();
                         GuiThreadMsg *msg = new GuiThreadMsg;
                         msg->data = this;
