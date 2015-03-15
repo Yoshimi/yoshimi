@@ -218,18 +218,50 @@ static void *mainGuiThread(void *arg)
                 boxLb.copy_label(splashMessages.front().c_str());
                 splashMessages.pop_front();
             }
-            void *msg = Fl::thread_message();
+            GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
             if(msg)
             {
-                SynthEngine *synth = ((SynthEngine *)msg);
-                MasterUI *guiMaster = synth->getGuiMaster();
-                if(!guiMaster)
+                switch(msg->type)
                 {
-                    cerr << "Error starting Main UI!" << endl;
-                    return (void *)1;
+                case GuiThreadMsg::NewSynthEngine:
+                {
+                    SynthEngine *synth = ((SynthEngine *)msg->data);
+                    MasterUI *guiMaster = synth->getGuiMaster();
+                    if(!guiMaster)
+                    {
+                        cerr << "Error starting Main UI!" << endl;
+                        return (void *)1;
+                    }
+                    guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
                 }
-                guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+                    break;
+                case GuiThreadMsg::UpdatePanel:
+                {
+                    SynthEngine *synth = ((SynthEngine *)msg->data);
+                    MasterUI *guiMaster = synth->getGuiMaster(false);
+                    if(guiMaster)
+                    {
+                        guiMaster->updatepanel();
+                    }
+                }
+                    break;
+                case GuiThreadMsg::UpdatePanelItem:
+                    if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+                    {
+                        SynthEngine *synth = ((SynthEngine *)msg->data);
+                        MasterUI *guiMaster = synth->getGuiMaster(false);
+                        if(guiMaster)
+                        {
+                            guiMaster->panellistitem[msg->index]->refresh();
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+
             }
+            delete msg;
         }
         else
             usleep(33333);
@@ -277,7 +309,10 @@ bool mainCreateNewInstance(unsigned int forceId)
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
-        Fl::awake((void *)synth);
+        GuiThreadMsg *msg = new GuiThreadMsg;
+        msg->type = GuiThreadMsg::NewSynthEngine;
+        msg->data = synth;
+        Fl::awake((void *)msg);
     }
 
     synth->getRuntime().StartupReport(musicClient);

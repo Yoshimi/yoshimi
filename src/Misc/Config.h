@@ -170,4 +170,27 @@ class Config : public MiscFuncs
         friend class YoshimiLV2Plugin;
 };
 
+//struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
+struct GuiThreadMsg
+{
+    GuiThreadMsg()
+    {
+        data = NULL;
+        length = 0;
+        type = GuiThreadMsg::UNDEFINED;
+    }
+
+    enum
+    {
+        NewSynthEngine = 0,
+        UpdatePanel,
+        UpdatePanelItem,
+        UNDEFINED = 9999
+    };
+    void *data; //custom data, must be static or handled by called, does nod freed by receiver
+    unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
+    unsigned int index; // if there is integer data, it can be passed through index (to remove aditional receiver logic)
+    unsigned int type; // type of gui message (see enum above)
+};
+
 #endif

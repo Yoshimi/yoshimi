@@ -503,7 +503,12 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
                         guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
-                        guiMaster->panellistitem[npart]->refresh();
+                        //guiMaster->panellistitem[npart]->refresh();
+                        GuiThreadMsg *msg = new GuiThreadMsg;
+                        msg->data = this;
+                        msg->type = GuiThreadMsg::UpdatePanelItem;
+                        msg->index = npart;
+                        Fl::awake((void *)msg);
                     }
                 }
             }
