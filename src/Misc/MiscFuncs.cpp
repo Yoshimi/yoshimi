@@ -116,7 +116,7 @@ string MiscFuncs::asString(long long n)
    oss << n;
    return string(oss.str());
 }
-#ifdef __x86_64__
+#if !defined( __arm__ ) && !defined( __i386__ )
 string MiscFuncs::asString(size_t n)
 {
     ostringstream oss;

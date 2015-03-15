@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="Robot_Head.svg">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       id="perspective3650"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2"
+     inkscape:cx="126.09297"
+     inkscape:cy="97.755343"
+     inkscape:document-units="px"
+     inkscape:current-layer="g3295"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="741"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-988.36218)">
+    <g
+       id="g3295"
+       transform="matrix(0.31047818,0,0,0.31047818,-120.08633,904.35554)">
+      <rect
+         style="fill:#ffaaaa;fill-opacity:1;stroke:#484848;stroke-width:2.80684113999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="rect4181"
+         width="18.075279"
+         height="39.694729"
+         x="573.43359"
+         y="298.45013" />
+      <rect
+         style="fill:#e3e3e3;fill-opacity:1;stroke:none"
+         id="rect4274"
+         width="21.928448"
+         height="9.1222343"
+         x="568.24957"
+         y="299.8634"
+         ry="0" />
+      <rect
+         ry="0"
+         y="327.62482"
+         x="568.18378"
+         height="9.1222343"
+         width="21.928448"
+         id="rect4276"
+         style="opacity:0.35;fill:#000000;fill-opacity:1;stroke:none" />
+      <rect
+         y="298.45013"
+         x="573.43359"
+         height="39.694729"
+         width="18.075279"
+         id="rect4129"
+         style="fill:none;fill-opacity:1;stroke:#484848;stroke-width:2.80684113999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       id="g3300"
+       transform="matrix(0.31047818,0,0,0.31047818,-120.08633,906.31982)">
+      <rect
+         y="298.45013"
+         x="388.18207"
+         height="39.694729"
+         width="18.075279"
+         id="rect4179"
+         style="fill:#ffaaaa;fill-opacity:1;stroke:#484848;stroke-width:2.80684113999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <rect
+         ry="0"
+         y="299.73184"
+         x="389.2915"
+         height="9.1222343"
+         width="21.928448"
+         id="rect4270"
+         style="fill:#e3e3e3;fill-opacity:1;stroke:none" />
+      <rect
+         style="opacity:0.35;fill:#000000;fill-opacity:1;stroke:none"
+         id="rect4272"
+         width="21.928448"
+         height="9.1222343"
+         x="389.64236"
+         y="327.80026"
+         ry="0" />
+      <rect
+         style="fill:none;fill-opacity:1;stroke:#484848;stroke-width:2.80684113999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="rect3359"
+         width="18.075279"
+         height="39.694729"
+         x="388.18207"
+         y="298.45013" />
+    </g>
+    <g
+       id="g3290"
+       transform="matrix(0.31047818,0,0,0.55807584,-120.08633,836.20533)">
+      <rect
+         y="273.69226"
+         x="404.89108"
+         height="87.083885"
+         width="169.30867"
+         id="rect4166"
+         style="fill:#ff8080;fill-opacity:1;stroke:#484848;stroke-width:2.80684113999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         id="rect4187"
+         d="m 549.65255,274.74182 22.6827,0 0,92.50289 -22.6827,0 c 6.55323,-30.8343 10.45347,-61.66858 0,-92.50289 z"
+         style="opacity:0.32846153;fill:#000000;fill-opacity:1;stroke:none"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         id="path4185"
+         d="m 407.67499,320.77841 1.41767,-42.8845 74.0732,-1.06324 -67.6937,6.37951 -7.79717,37.56823 z"
+         style="fill:#e5e5e5;fill-opacity:1;stroke:none"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="g3305"
+       transform="matrix(0.39708033,0,0,0.39708033,-161.6649,883.41196)">
+      <path
+         transform="matrix(1.8179094,0,0,1.6993499,-163.49669,-131.52364)"
+         d="m 353.55338,256.10944 c 0,6.41575 -4.8618,11.61675 -10.85914,11.61675 -5.99733,0 -10.85914,-5.201 -10.85914,-11.61675 0,-6.41576 4.86181,-11.61676 10.85914,-11.61676 5.99734,0 10.85914,5.201 10.85914,11.61676 z"
+         sodipodi:ry="11.616755"
+         sodipodi:rx="10.859139"
+         sodipodi:cy="256.10944"
+         sodipodi:cx="342.69424"
+         id="path4171"
+         style="fill:#ffffff;fill-opacity:1;stroke:#484848;stroke-opacity:1;stroke-width:2.86565629;stroke-miterlimit:4;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         transform="matrix(1.5005045,0,0,1.8381181,-55.292269,-159.63639)"
+         d="m 349.26024,252.06883 a 6.1871843,5.0507627 0 1 1 -12.37437,0 6.1871843,5.0507627 0 1 1 12.37437,0 z"
+         sodipodi:ry="5.0507627"
+         sodipodi:rx="6.1871843"
+         sodipodi:cy="252.06883"
+         sodipodi:cx="343.07306"
+         id="path4175"
+         style="fill:#292929;fill-opacity:1;stroke:none"
+         sodipodi:type="arc" />
+    </g>
+    <g
+       id="g3309"
+       transform="matrix(0.49234268,0,0,0.49234268,-214.41546,854.67454)">
+      <path
+         sodipodi:type="arc"
+         style="fill:#ffffff;fill-opacity:1;stroke:#484848;stroke-opacity:1;stroke-width:2.31118648;stroke-miterlimit:4;stroke-dasharray:none"
+         id="path4173"
+         sodipodi:cx="342.69424"
+         sodipodi:cy="256.10944"
+         sodipodi:rx="10.859139"
+         sodipodi:ry="11.616755"
+         d="m 353.55338,256.10944 c 0,6.41575 -4.8618,11.61675 -10.85914,11.61675 -5.99733,0 -10.85914,-5.201 -10.85914,-11.61675 0,-6.41576 4.86181,-11.61676 10.85914,-11.61676 5.99734,0 10.85914,5.201 10.85914,11.61676 z"
+         transform="matrix(1.8179094,0,0,1.6993499,-104.30901,-132.58688)" />
+      <path
+         sodipodi:type="arc"
+         style="fill:#292929;fill-opacity:1;stroke:none"
+         id="path4177"
+         sodipodi:cx="343.07306"
+         sodipodi:cy="252.06883"
+         sodipodi:rx="6.1871843"
+         sodipodi:ry="5.0507627"
+         d="m 349.26024,252.06883 a 6.1871843,5.0507627 0 1 1 -12.37437,0 6.1871843,5.0507627 0 1 1 12.37437,0 z"
+         transform="matrix(0.90136219,0,0,1.1041688,209.44499,24.306134)" />
+    </g>
+    <g
+       id="g3285"
+       transform="matrix(0.31047818,0,0,0.72239473,-120.08633,783.38654)">
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         id="rect4168"
+         d="m 397.43811,324.00938 23.15972,0 21.6834,22.99712 92.63888,0 24.63602,-22.99712 23.15973,0 0,47.40944 -185.27775,0 0,-47.40944 z"
+         style="fill:#ff8080;fill-opacity:1;stroke:#484848;stroke-width:2.80684113999999996;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         inkscape:connector-curvature="0" />
+      <path
+         sodipodi:nodetypes="cccccc"
+         id="rect4189"
+         d="m 580.59225,324.94555 -0.008,45.55989 -34.02419,0 0.57924,-32.8053 13.71755,-12.77306 z"
+         style="opacity:0.32846153;fill:#000000;fill-opacity:1;stroke:none"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#e5e5e5;fill-opacity:1;stroke:none"
+         d="m 400.25692,334.90971 0.13445,33.99307 61.93616,0.0556 -56.33125,-5.33301 -5.7394,-28.7156 4e-5,-3e-5 z"
+         id="path4192"
+         sodipodi:nodetypes="cccccc"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+  <metadata
+     id="metadata31">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Open Clip Art Library</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>Cute Robot Head</dc:title>
+        <dc:date>2012-12-26T16:33:03</dc:date>
+        <dc:description>Cute Robot Head. Made for https://github.com/janamcr/laserflect based on http://openclipart.org/detail/170101</dc:description>
+        <dc:source>http://openclipart.org/detail/173913/cute-robot-head-by-qubodup-173913</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>qubodup</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>android</rdf:li>
+            <rdf:li>artificial</rdf:li>
+            <rdf:li>cartoon</rdf:li>
+            <rdf:li>clip art</rdf:li>
+            <rdf:li>clipart</rdf:li>
+            <rdf:li>comic</rdf:li>
+            <rdf:li>doodle</rdf:li>
+            <rdf:li>icon</rdf:li>
+            <rdf:li>robot</rdf:li>
+            <rdf:li>sci-fi</rdf:li>
+            <rdf:li>science</rdf:li>
+            <rdf:li>technology</rdf:li>
+            <rdf:li>toy</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

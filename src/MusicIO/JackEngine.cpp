@@ -380,7 +380,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     getAudio();
     int framesize = sizeof(float) * nframes;
     // Part outputs
-    for (int port, idx = 0; port < NUM_MIDI_PARTS; port++ , idx += 2)
+    for (int port = 0, idx = 0; port < NUM_MIDI_PARTS; port++ , idx += 2)
     {
         if (synth->part[port]->Paudiodest & 2)
         {

@@ -1,4 +1,4 @@
-Packages known to be needed to build in debian wheezy.
+Packages known to be needed to build in debian jessie.
 Some of these will pull in other ones.
 
     automake
@@ -12,7 +12,8 @@ Some of these will pull in other ones.
     libfltk1.3-dev
     libglu1-mesa-dev
     libjack-jackd2-dev
-    libjpeg8-dev
+    libjpeg-dev
+    libmxml-dev
     libxft-dev
     libxinerama-dev
     libxml2-dev
