@@ -206,10 +206,9 @@ void JackEngine::Close(void)
         synth->getRuntime().runSynth = false;
     }
 
-    if (sem_post(&midiSem) == 0)
+    if(midi.pThread != 0) //wait for midi thread to finish
     {
-
-        if(midi.pThread != 0) //wait for midi thread to finish
+        if (sem_post(&midiSem) == 0)
         {
             void *ret = NULL;
             pthread_join(midi.pThread, &ret);
