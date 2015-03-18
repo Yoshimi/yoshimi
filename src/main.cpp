@@ -257,6 +257,17 @@ static void *mainGuiThread(void *arg)
                         }
                     }
                     break;
+                case GuiThreadMsg::UpdatePartProgram:
+                    if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+                    {
+                        SynthEngine *synth = ((SynthEngine *)msg->data);
+                        MasterUI *guiMaster = synth->getGuiMaster(false);
+                        if(guiMaster)
+                        {
+                            guiMaster->updatepartprogram(msg->index);
+                        }
+                    }
+                    break;
                 default:
                     break;
                 }

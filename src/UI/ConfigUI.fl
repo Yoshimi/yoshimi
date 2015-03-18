@@ -195,7 +195,7 @@ class ConfigUI {open : {private MiscFuncs}
         }
         Fl_Group {} {
           label {Bank root dirs} open
-          xywh {5 25 457 305} labelsize 12
+          xywh {5 25 457 305} labelsize 12 hide
         } {
           Fl_Browser rootsbrowse {
             callback {int tmp = o->value();
@@ -277,7 +277,7 @@ oldrootID = changeIDbutton->value();}
         }
         oldrootID = changeIDbutton->value();
         activatebutton_rootdir(false);
-    }} selected
+    }}
             xywh {350 255 74 20} box NO_BOX labelsize 12 align 8 deactivate
           }
           Fl_Spinner changeIDbutton {
@@ -489,7 +489,7 @@ oldrootID = changeIDbutton->value();}
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 455 280} labelsize 12
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -569,7 +569,7 @@ oldrootID = changeIDbutton->value();}
         fl_alert("In use for %s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
-        configChanged = true;} open
+        configChanged = true;} open selected
             tooltip {CC0 = msb, CC32 = lsb} xywh {275 122 60 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
@@ -661,12 +661,14 @@ oldrootID = changeIDbutton->value();}
       }
       Fl_Button {} {
         label {Close Unsaved}
-        callback {configwindow->do_callback();}
+        callback {synth->getGuiMaster()->bankui->readbankcfg();
+configwindow->do_callback();}
         xywh {345 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save and Close}
         callback {savesettings();
+synth->getGuiMaster()->bankui->readbankcfg();
 configChanged = false;
 configwindow->do_callback();}
         xywh {225 305 105 20} box THIN_UP_BOX labelsize 12

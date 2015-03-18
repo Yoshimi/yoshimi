@@ -49,6 +49,9 @@ decl {\#include "Misc/Config.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
+decl {\#include "MasterUI.h"} {private local
+} 
+
 class BankProcess_ {open
 } {
   Function {process(void)} {open return_type {virtual void}
@@ -539,7 +542,7 @@ if ((Fl::event_button() == 3) || synth->getRuntime().RootUIAutoClose != 0)
     }
     Fl_Window pathwindow {
       label {Bank Root Paths}
-      callback {o->hide();} open
+      callback {o->hide();} open selected
       xywh {366 188 465 295} type Double hide
       code0 {readbankcfg();}
     } {
@@ -562,6 +565,7 @@ oldrootID = changeIDbutton->value();}
     dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
     if (!dirname)
       return;
+    synth->getGuiMaster()->configui->configChanged = true;
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();}
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
@@ -573,6 +577,7 @@ oldrootID = changeIDbutton->value();}
     {
         synth->getBankRef().removeRoot(selectedRootID);
         readbankcfg();
+        synth->getGuiMaster()->configui->configChanged = true;
     }
     activatebutton_rootdir(false);}
         xywh {95 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
@@ -586,6 +591,7 @@ oldrootID = changeIDbutton->value();}
         synth->getBankRef().setCurrentRootID(selectedRootID);
         readbankcfg();
         rescan_for_banks(false);
+        synth->getGuiMaster()->configui->configChanged = true;
     }
     activatebutton_rootdir(false);}
         xywh {180 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
@@ -610,6 +616,7 @@ oldrootID = changeIDbutton->value();}
             {
                 readbankcfg();
                 rescan_for_banks(true);
+                synth->getGuiMaster()->configui->configChanged = true;
             }
             else
             {
@@ -629,18 +636,17 @@ oldrootID = changeIDbutton->value();}
       }
       Fl_Button {} {
         label {Close Unsaved}
-        callback {pathwindow->do_callback();}
+        callback {synth->getGuiMaster()->configui->readbankcfg();
+pathwindow->do_callback();}
         xywh {345 268 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save and Close}
-        callback {//synth->getRuntime().saveConfig();
+        callback {synth->getRuntime().saveConfig();
+synth->getGuiMaster()->configui->readbankcfg();
+synth->getGuiMaster()->configui->configChanged = false;
 pathwindow->do_callback();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
-      }
-      Fl_Text_Display {} {
-        label {Currently always saves}
-        xywh {5 265 50 25} box NO_BOX align 8
       }
     }
   }
@@ -957,8 +963,7 @@ fnr = &RootProcess_::rootprocess;
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh();
     for (int i = 0; i < ROOT_SIZE; ++i)
-        rs[i]->refresh();} {selected
-    }
+        rs[i]->refresh();} {}
   }
   Function {removeselection()} {open
   } {

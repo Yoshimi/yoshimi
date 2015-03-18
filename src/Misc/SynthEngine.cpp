@@ -505,7 +505,6 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
     else
     {
         for(int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-            // we don't want upper parts (16 - 63) activiated!
             if(chan == part[npart]->Prcvchn)
             {
                 if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
@@ -515,13 +514,9 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                         partonoff(npart, 1);
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
-                        guiMaster->partui->instrumentlabel->copy_label(guiMaster->partui->part->Pname.c_str());
-                        guiMaster->partui->partgroupui->activate();
-                        guiMaster->partui->partGroupEnable->value(1);
-                        //guiMaster->panellistitem[npart]->refresh();
                         GuiThreadMsg *msg = new GuiThreadMsg;
                         msg->data = this;
-                        msg->type = GuiThreadMsg::UpdatePanelItem;
+                        msg->type = GuiThreadMsg::UpdatePartProgram;
                         msg->index = npart;
                         Fl::awake((void *)msg);
                     }

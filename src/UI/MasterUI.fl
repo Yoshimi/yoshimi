@@ -523,7 +523,7 @@ mainCreateNewInstance(forceId);}
           callback {//
                 updatepanel();
                 panelwindow->show();}
-          tooltip {Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
       Fl_Tabs {} {
@@ -956,8 +956,15 @@ ZynAddSubFX}
   } {
     code {//
     partui->partpan->value(synth->part[npart]->Ppanning);
-    partui->partvol->value(synth->part[npart]->Pvolume);} {selected
-    }
+    partui->partvol->value(synth->part[npart]->Pvolume);} {}
+  }
+  Function {updatepartprogram(int npart)} {open
+  } {
+    code {//
+partui->instrumentlabel->copy_label(partui->part->Pname.c_str());
+partui->partgroupui->activate();
+partui->partGroupEnable->value(1);
+panellistitem[npart]->refresh();} {}
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -1161,7 +1168,7 @@ ZynAddSubFX}
   } {
     code {return synth;} {}
   }
-  decl {ConfigUI *configui;} {private local
+  decl {ConfigUI *configui;} {selected public local
   }
   decl {ParametersUI *paramsui;} {private local
   }
