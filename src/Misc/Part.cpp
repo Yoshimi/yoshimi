@@ -685,7 +685,10 @@ void Part::SetController(unsigned int type, int par)
         case C_volume:
             ctl->setvolume(par);
             if (ctl->volume.receive)
+            {
                 volume = ctl->volume.volume;
+                Pvolume = par / 1.3; // an approximate guess!
+            }
             else
                 setVolume(Pvolume);
             break;

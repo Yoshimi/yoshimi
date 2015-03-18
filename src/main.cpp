@@ -246,13 +246,25 @@ static void *mainGuiThread(void *arg)
                 }
                     break;
                 case GuiThreadMsg::UpdatePanelItem:
-                    if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+                    if(msg->index < NUM_MIDI_PARTS && msg->data)
                     {
                         SynthEngine *synth = ((SynthEngine *)msg->data);
                         MasterUI *guiMaster = synth->getGuiMaster(false);
                         if(guiMaster)
                         {
                             guiMaster->panellistitem[msg->index]->refresh();
+                            guiMaster->updatepart();
+                        }
+                    }
+                    break;
+                case GuiThreadMsg::UpdatePartProgram:
+                    if(msg->index < NUM_MIDI_PARTS && msg->data)
+                    {
+                        SynthEngine *synth = ((SynthEngine *)msg->data);
+                        MasterUI *guiMaster = synth->getGuiMaster(false);
+                        if(guiMaster)
+                        {
+                            guiMaster->updatepartprogram(msg->index);
                         }
                     }
                     break;

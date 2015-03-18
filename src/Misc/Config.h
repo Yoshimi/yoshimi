@@ -190,6 +190,7 @@ struct GuiThreadMsg
         NewSynthEngine = 0,
         UpdatePanel,
         UpdatePanelItem,
+        UpdatePartProgram,
         UNDEFINED = 9999
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver
