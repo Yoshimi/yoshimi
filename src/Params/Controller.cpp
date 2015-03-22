@@ -52,8 +52,52 @@ void Controller::defaults(void)
     modwheel.exponential = 0;
     fmamp.receive = 1;
     volume.receive = 1;
+    volume.volume = 96;
     sustain.receive = 1;
+    portamentosetup();
+    resonancecenter.depth = 64;
+    resonancebandwidth.depth = 64;
 
+    initportamento(440.0f, 440.0f, false);
+    setportamento(0);
+}
+
+
+void Controller::resetall()
+{
+    setpitchwheelbendrange(200); // 2 halftones
+    setpitchwheel(0); // center
+    expression.receive = 1;
+    setexpression(127);
+    setPanDepth(64);
+    filtercutoff.depth = 64;
+    setfiltercutoff(64);
+    setfilterq(64);
+    bandwidth.depth = 64;
+    bandwidth.exponential = 0;
+    setbandwidth(64);
+    modwheel.depth = 80;
+    modwheel.exponential = 0;
+    setmodwheel(64);
+    fmamp.receive = 1;
+    setfmamp(127);
+    volume.receive = 1;
+    setvolume(96);
+    sustain.receive = 1;
+    setsustain(0);
+    setlegato(0);
+    portamentosetup();
+    initportamento(440.0f, 440.0f, false);
+    setportamento(0);
+    resonancecenter.depth = 64;
+    setresonancecenter(64);
+    resonancebandwidth.depth = 64;
+    setresonancebw(64);
+}
+
+
+void  Controller::portamentosetup()
+{
     portamento.portamento = 0;
     portamento.used = 0;
     portamento.proportional = 0;
@@ -65,29 +109,6 @@ void Controller::defaults(void)
     portamento.pitchthresh = 3;
     portamento.pitchthreshtype = 1;
     portamento.noteusing = -1;
-    resonancecenter.depth = 64;
-    resonancebandwidth.depth = 64;
-
-    initportamento(440.0f, 440.0f, false);
-    setportamento(0);
-}
-
-
-void Controller::resetall()
-{
-    setpitchwheel(0); // center
-    setexpression(127);
-    setPanDepth(64);
-    setfiltercutoff(64);
-    setfilterq(64);
-    setbandwidth(64);
-    setmodwheel(64);
-    setfmamp(127);
-    setvolume(127);
-    setsustain(0);
-    setlegato(0);
-    setresonancecenter(64);
-    setresonancebw(64);
 }
 
 
@@ -180,13 +201,10 @@ void Controller::setfmamp(int value)
 }
 
 
-void Controller::setvolume(int value)
+void Controller::setvolume(int value) // range is 64 to 127
 {
     volume.data = value;
-    if (volume.receive)
-        volume.volume = powf(0.1f, (127 - value) / 127.0f * 2.0f);
-    else
-        volume.volume = 0.9f;
+    volume.volume = value / 127.0f;
 }
 
 

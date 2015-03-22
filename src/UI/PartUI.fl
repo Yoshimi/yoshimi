@@ -264,7 +264,8 @@ class PartKitItem {open : {public Fl_Group}
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;part=NULL;} {}
   }
-  Function {refresh()} {} {
+  Function {refresh()} {open
+  } {
     code {//
         enabledcheck->value(part->kit[n].Penabled);
         if (!part->kit[n].Penabled)
@@ -403,7 +404,7 @@ Offset}
           callback {//
               part->SetController(C_panning, 64);
               partpan->value(64);
-              synth->getGuiMaster()->setPanelPartPanWidget(npart, 64);} selected
+              synth->getGuiMaster()->setPanelPartPanWidget(npart, 64);}
           tooltip {Centre panning} xywh {300 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial partvol {
@@ -561,12 +562,12 @@ Offset}
     }
     Fl_Window ctlwindow {
       label Controllers open
-      private xywh {574 513 505 130} type Double hide
+      private xywh {86 540 505 130} type Double hide
     } {
       Fl_Check_Button {} {
         label Expr
         callback {part->ctl->expression.receive = o->value();}
-        tooltip {Expression enable} xywh {155 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {Expression enable} xywh {175 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->expression.receive);}
       }
       Fl_Dial {} {
@@ -614,13 +615,13 @@ Offset}
       Fl_Check_Button {} {
         label FMamp
         callback {part->ctl->fmamp.receive = o->value();}
-        tooltip {FM amplitude enable} xywh {205 55 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {FM amplitude enable} xywh {225 55 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
       }
       Fl_Check_Button {} {
         label Vol
         callback {part->ctl->volume.receive = o->value();}
-        tooltip {Volume enable} xywh {155 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {Volume enable} xywh {175 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->volume.receive);}
       }
       Fl_Check_Button {} {
@@ -632,13 +633,13 @@ Offset}
                 part->RelaseSustainedKeys();
                 part->ctl->setsustain(0);
             }}
-        tooltip {Sustain pedal enable} xywh {205 80 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        tooltip {Sustain pedal enable} xywh {225 80 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
       }
       Fl_Button {} {
         label Close
         callback {ctlwindow->hide();}
-        xywh {330 105 95 20} box THIN_UP_BOX
+        xywh {405 105 95 20} box THIN_UP_BOX
       }
       Fl_Button {} {
         label {Reset all controllers}
@@ -647,57 +648,57 @@ Offset}
       }
       Fl_Group {} {
         label Portamento open
-        xywh {280 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10
+        xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10
       } {
         Fl_Check_Button {} {
           label Rcv
           callback {part->ctl->portamento.receive = o->value();}
-          tooltip {Receive Portamento Controllers} xywh {285 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+          tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
           code0 {o->value(part->ctl->portamento.receive);}
         }
         Fl_Dial {} {
           label time
           callback {part->ctl->portamento.time = o->value();}
-          tooltip {Portamento time} xywh {285 60 25 25} labelsize 10 maximum 127 step 1
+          tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
           class WidgetPDial
         }
         Fl_Counter {} {
           label thresh
           callback {part->ctl->portamento.pitchthresh = o->value();}
-          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {340 20 50 20} type Simple labelsize 10 minimum 0 maximum 127 step 1
+          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple labelsize 10 minimum 0 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button {} {
           label {th.type}
           callback {part->ctl->portamento.pitchthreshtype = o->value();}
-          tooltip {Threshold type (min/max)} xywh {365 68 15 15} down_box DOWN_BOX labelsize 10 align 2
+          tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
           code0 {o->value(part->ctl->portamento.pitchthreshtype);}
         }
         Fl_Box {} {
           label {x100 cnt.}
-          xywh {340 50 55 15} labelsize 10 align 16
+          xywh {400 50 55 15} labelsize 10 align 16
         }
         Fl_Dial {} {
           label {t.dn/up}
           callback {//
               int x = o->value();
               part->ctl->portamento.updowntimestretch = x;}
-          tooltip {Portamento time stretch (up/down)} xywh {315 60 25 25} labelsize 10 maximum 127 step 1
+          tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.updowntimestretch);}
           class WidgetPDial
         }
         Fl_Dial propta {
           label {Prp.Rate}
           callback {part->ctl->portamento.propRate=(int) o->value();}
-          tooltip {Distance required to double change from nonpropotinal portamento time} xywh {403 20 25 25} labelsize 9 maximum 127 step 1
+          tooltip {Distance required to double change from nonpropotinal portamento time} xywh {463 20 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propRate);}
           class WidgetPDial
         }
         Fl_Dial proptb {
           label {Prp.Dpth}
           callback {part->ctl->portamento.propDepth=(int) o->value();}
-          tooltip {The difference from nonproportinal portamento} xywh {403 60 25 25} labelsize 9 maximum 127 step 1
+          tooltip {The difference from nonproportinal portamento} xywh {463 60 25 25} labelsize 9 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.propDepth);}
           class WidgetPDial
         }
@@ -706,7 +707,7 @@ Offset}
           callback {part->ctl->portamento.proportional=(int) o->value();
 if(o->value()){propta->activate();proptb->activate();}
 else {propta->deactivate();proptb->deactivate();}}
-          tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {285 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
+          tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if(o->value()){propta->activate();proptb->activate();}}
           code2 {else {propta->deactivate();proptb->deactivate();}}
@@ -714,19 +715,19 @@ else {propta->deactivate();proptb->deactivate();}}
       }
       Fl_Group {} {
         label Resonance open
-        xywh {445 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10
+        xywh {290 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10
       } {
         Fl_Dial {} {
           label BWdpth
           callback {part->ctl->resonancebandwidth.depth = o->value();}
-          tooltip {BandWidth controller depth} xywh {455 60 25 25} labelsize 10 maximum 127 step 1
+          tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
           class WidgetPDial
         }
         Fl_Dial {} {
           label CFdpth
           callback {part->ctl->resonancecenter.depth = o->value();}
-          tooltip {Center Frequency controller Depth} xywh {455 20 25 25} labelsize 10 maximum 127 step 1
+          tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancecenter.depth);}
           class WidgetPDial
         }
@@ -742,6 +743,13 @@ else {propta->deactivate();proptb->deactivate();}}
         callback {part->ctl->bandwidth.exponential = o->value();}
         tooltip {Exponential BandWidth Controller} xywh {85 15 35 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->bandwidth.exponential);}
+      }
+      Fl_Dial {} {
+        label {Vol Rng}
+        callback {part->ctl->setvolume((char)o->value());} selected
+        tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
+        code0 {o->value(part->ctl->volume.data);}
+        class WidgetPDial
       }
     }
     Fl_Window partfx {

@@ -98,7 +98,7 @@ class Part : private MiscFuncs, SynthHelper
         // Part parameters
         void setkeylimit(unsigned char Pkeylimit_);
         void setkititemstatus(int kititem, int Penabled_);
-        void setVolume(char value);
+        void setVolume(float value);
         void setDestination(int value);
 
         SynthEngine *getSynthEngine() {return synth;}
