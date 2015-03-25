@@ -52,7 +52,8 @@ void Controller::defaults(void)
     modwheel.exponential = 0;
     fmamp.receive = 1;
     volume.receive = 1;
-    volume.volume = 96;
+    volume.data = 96;
+    volume.volume = 96.0f/127.0f;
     sustain.receive = 1;
     portamentosetup();
     resonancecenter.depth = 64;
@@ -203,6 +204,8 @@ void Controller::setfmamp(int value)
 
 void Controller::setvolume(int value) // range is 64 to 127
 {
+    if (value < 64)
+        value = 96; // set invalid to default
     volume.data = value;
     volume.volume = value / 127.0f;
 }
@@ -339,6 +342,7 @@ void Controller::add2XML(XMLwrapper *xml)
     xml->addparbool("mod_wheel_exponential",modwheel.exponential);
     xml->addparbool("fm_amp_receive",fmamp.receive);
     xml->addparbool("volume_receive",volume.receive);
+    xml->addpar("volume_range",volume.data);
     xml->addparbool("sustain_receive",sustain.receive);
 
     xml->addparbool("portamento_receive",portamento.receive);
@@ -369,6 +373,8 @@ void Controller::getfromXML(XMLwrapper *xml)
     modwheel.exponential=xml->getparbool("mod_wheel_exponential",modwheel.exponential);
     fmamp.receive=xml->getparbool("fm_amp_receive",fmamp.receive);
     volume.receive=xml->getparbool("volume_receive",volume.receive);
+    setvolume(xml->getpar127("volume_range",volume.data));
+
     sustain.receive=xml->getparbool("sustain_receive",sustain.receive);
 
     portamento.receive=xml->getparbool("portamento_receive",portamento.receive);

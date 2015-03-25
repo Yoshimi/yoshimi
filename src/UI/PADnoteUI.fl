@@ -48,7 +48,7 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "OscilGenUI.h"} {public global
 } 
 
-decl {\#include "MasterUI.h"} {selected private global
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
@@ -249,7 +249,7 @@ synth = parameters->getSynthEngine();
   } {
     Fl_Window padnotewindow {
       label {PAD synth Parameters} open
-      xywh {776 290 535 450} type Double visible
+      xywh {776 290 535 450} type Double hide
     } {
       Fl_Tabs {} {
         callback {//
@@ -941,8 +941,8 @@ synth = parameters->getSynthEngine();
               callback {//
                   pan->value(64);
                   pars->setPan(64);
-                  randompan->value(pars->randomPan());}
-              tooltip {Centre panning} xywh {213 56 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
+                  randompan->value(pars->randomPan());} selected
+              tooltip {Centre panning} xywh {213 56 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
             }
             Fl_Light_Button randompan {
               label Rand

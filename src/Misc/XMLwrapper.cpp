@@ -62,7 +62,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
 
     mxmlElementSetAttr(root, "version-major", "1");
     mxmlElementSetAttr(root, "version-minor", "1");
-//    mxmlElementSetAttr(root, "ZynAddSubFX-author", "Alan Calvert");
+    mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
+
+    mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
+    string tmp = YOSHIMI_VERSION;
+    string::size_type pos1 = tmp.find('.'); // != string::npos
+    string::size_type pos2 = tmp.find('.',pos1+1);
+    mxmlElementSetAttr(root, "Yoshimi-major", tmp.substr(0, pos1).c_str());
+    mxmlElementSetAttr(root, "Yoshimi-minor", tmp.substr(pos1+1, pos2-pos1-1).c_str());
 
     info = addparams0("INFORMATION"); // specifications
     beginbranch("BASE_PARAMETERS");
@@ -283,6 +290,16 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     push(root);
     xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
     xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
+    if (mxmlElementGetAttr(root, "Yoshimi-major"))
+    {
+        xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
+        synth->getRuntime().Log("Yoshimi " + asString(xml_version.y_major));
+    }
+    if (mxmlElementGetAttr(root, "Yoshimi-minor"))
+    {
+        xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
+        synth->getRuntime().Log("Yoshimi " + asString(xml_version.y_minor));
+    }
     return true;
 }
 

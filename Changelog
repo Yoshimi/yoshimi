@@ -1,5 +1,12 @@
 yoshimi 1.3.x
 
+2015-3-25 Will
+- MIDI volume control range now saved to parameters
+  per part as "volume_range"
+- Updated XML headers to include author and
+  yoshimi-major and yoshimi-minor version numbers
+- All pan centre buttons now red, not just main one
+
 2015-3-22 Will
 - Rationalised MIDI volume control
 - Implemented MIDI volume control range setting
