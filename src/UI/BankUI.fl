@@ -234,7 +234,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
       Fl_Button {} {
         label Close
         callback {bankuiwindow->hide();}
-        xywh {703 546 70 24} box THIN_UP_BOX labelsize 12
+        xywh {669 527 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {open
         xywh {5 34 772 491} box ENGRAVED_FRAME
@@ -358,12 +358,6 @@ removeselection();}
             refreshmainwindow();}
         xywh {650 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
-      Fl_Check_Button {} {
-        label {auto close}
-        callback {synth->getRuntime().BankUIAutoClose = (int) o->value();}
-        tooltip {automatically close the bank window if the instrument is loaded} xywh {703 529 60 15} down_box DOWN_BOX labelsize 10
-        code0 {o->value(synth->getRuntime().BankUIAutoClose);}
-      }
       Fl_Choice banklist {
         callback {//
     int n = o->value();
@@ -389,17 +383,17 @@ set_bank_slot();}
         label {Show PADsynth status}
         callback {synth->getRuntime().CheckPADsynth = (int) o->value();
             refreshmainwindow();}
-        xywh {485 530 150 15} down_box DOWN_BOX labelsize 11
+        xywh {485 533 150 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(synth->getRuntime().CheckPADsynth);}
       }
       Fl_Text_Display {} {
-        label {Column 5 extended Program Change}
-        xywh {485 566 219 3} box NO_BOX labelsize 11 align 5
+        label {Column 5 uses Extended Program Change}
+        xywh {485 567 219 3} box NO_BOX labelsize 11 align 5
       }
       Fl_Button {} {
         label Banks
         callback {rootuiwindow->show();
-if ((Fl::event_button() == 3) || synth->getRuntime().BankUIAutoClose != 0)
+if ((Fl::event_button() == 3))
     bankuiwindow->hide();}
         tooltip {Show banks in current root} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -407,7 +401,7 @@ if ((Fl::event_button() == 3) || synth->getRuntime().BankUIAutoClose != 0)
         label Roots
         callback {//
     pathwindow->show();
-    if ((Fl::event_button() == 3) || synth->getRuntime().BankUIAutoClose != 0)
+    if ((Fl::event_button() == 3))
         bankuiwindow->hide();}
         tooltip {Show root paths} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -420,7 +414,7 @@ if ((Fl::event_button() == 3) || synth->getRuntime().BankUIAutoClose != 0)
       Fl_Button {} {
         label Close
         callback {rootuiwindow->hide();}
-        xywh {647 546 70 24} box THIN_UP_BOX labelsize 12
+        xywh {647 538 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group {} {open
         xywh {5 34 766 491} box ENGRAVED_FRAME
@@ -514,16 +508,10 @@ removeselection();}
           xywh {105 534 85 30} type Radio box PLASTIC_UP_BOX down_box THIN_DOWN_BOX selection_color 5 labeltype ENGRAVED_LABEL labelfont 1 labelsize 12
         }
       }
-      Fl_Check_Button {} {
-        label {auto close}
-        callback {synth->getRuntime().RootUIAutoClose = (int) o->value();}
-        tooltip {automatically close the root window if the bank is selected} xywh {647 529 68 15} down_box DOWN_BOX labelsize 10
-        code0 {o->value(synth->getRuntime().RootUIAutoClose);}
-      }
       Fl_Button {} {
         label Instruments
         callback {bankuiwindow->show();
-if ((Fl::event_button() == 3) || synth->getRuntime().RootUIAutoClose != 0)
+if ((Fl::event_button() == 3))
     rootuiwindow->hide();}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -531,7 +519,7 @@ if ((Fl::event_button() == 3) || synth->getRuntime().RootUIAutoClose != 0)
         label Roots
         callback {// 
     pathwindow->show();
-    if ((Fl::event_button() == 3) || synth->getRuntime().BankUIAutoClose != 0)
+    if ((Fl::event_button() == 3))
        rootuiwindow->hide();}
         tooltip {Show root paths} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
@@ -542,7 +530,7 @@ if ((Fl::event_button() == 3) || synth->getRuntime().RootUIAutoClose != 0)
     }
     Fl_Window pathwindow {
       label {Bank Root Paths}
-      callback {o->hide();} open selected
+      callback {o->hide();} open
       xywh {366 188 465 295} type Double hide
       code0 {readbankcfg();}
     } {
@@ -608,29 +596,33 @@ oldrootID = changeIDbutton->value();}
       Fl_Return_Button changeIDok {
         label Set
         callback {//
-    if (changeIDbutton->value() != oldrootID)
+    if (changeIDbutton->value() == oldrootID)
     {
-        if (selectedRootID >= 0)
+        o->deactivate();
+        return;
+    }
+    if (selectedRootID >= 0)
+    {
+        if (synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value()))
         {
-            if (synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value()))
-            {
-                readbankcfg();
-                rescan_for_banks(true);
-                synth->getGuiMaster()->configui->configChanged = true;
-            }
-            else
-            {
-                changeIDbutton->value(oldrootID);
-                fl_alert("ID already in use!");
-            }
+            readbankcfg();
+            rescan_for_banks(true);
+            synth->getGuiMaster()->configui->configChanged = true;
+            o->deactivate();
         }
-        oldrootID = changeIDbutton->value();
-        activatebutton_rootdir(false);
-    }}
+        else
+        {
+            changeIDbutton->value(oldrootID);
+            fl_alert("ID already in use!");
+        }
+    }
+    oldrootID = changeIDbutton->value();
+    activatebutton_rootdir(false);}
         xywh {350 236 74 20} box NO_BOX labelsize 12 align 8 deactivate
       }
       Fl_Spinner changeIDbutton {
         label {Change ID}
+        callback {changeIDok->activate();}
         xywh {350 237 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
         code0 {oldrootID = o->value();}
       }
@@ -704,7 +696,7 @@ fnr = &RootProcess_::rootprocess;
             // Reads from slot
             bank->loadfromslot(slot, synth->part[*npart]);
             synth->part[*npart]->Pname = thisname;
-            if (what == 3 || synth->getRuntime().BankUIAutoClose != 0)
+            if (what == 3)
                 bankuiwindow->hide();
             cbwig->do_callback();
             refreshmainwindow();
@@ -808,7 +800,7 @@ fnr = &RootProcess_::rootprocess;
                  setrootread();
                  return;
              }
-            if (what == 3 || synth->getRuntime().RootUIAutoClose != 0)
+            if (what == 3)
                 rootuiwindow->hide();
             cbwig->do_callback();
             bankuiwindow->show();
@@ -933,7 +925,8 @@ fnr = &RootProcess_::rootprocess;
                     rs[ns]->refresh();
                 rs[slot]->refresh();
             }
-        }} {}
+        }} {selected
+    }
   }
   Function {setread()} {open
   } {
@@ -1029,7 +1022,6 @@ if(reload)
             removerootdirbutton->activate();
             makedefaultrootdirbutton->activate();
             changeIDbutton->activate();
-            changeIDok->activate();
         }
         else
         {

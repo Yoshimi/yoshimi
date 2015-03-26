@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2015-2-26 Will
+- Bugfixes in setup CC selections
+- Removed auto close checkbox from Banks and instruments
+- Reports menu item greyed out if not enabled.
+
 2015-3-25 Will
 - MIDI volume control range now saved to parameters
   per part as "volume_range"

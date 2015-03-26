@@ -122,14 +122,13 @@ class Config : public MiscFuncs
         string        alsaMidiDevice;
         string        nameTag;
 
-        int           BankUIAutoClose;
-        int           RootUIAutoClose;
         unsigned int  GzipCompression;
         int           Interpolation;        
         string        presetsDirlist[MAX_BANK_ROOT_DIRS];
         int           CheckPADsynth;
         bool          SimpleCheck;
         int           EnableProgChange;
+        bool          consoleMenuItem;
         int           rtprio;
         int           midi_bank_root;
         int           midi_bank_C;
