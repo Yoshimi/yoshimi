@@ -1,5 +1,22 @@
 yoshimi 1.3.x
 
+2015-2-26 Will
+- Bugfixes in setup CC selections
+- Removed auto close checkbox from Banks and instruments
+- Reports menu item greyed out if not enabled.
+
+2015-3-25 Will
+- MIDI volume control range now saved to parameters
+  per part as "volume_range"
+- Updated XML headers to include author and
+  yoshimi-major and yoshimi-minor version numbers
+- All pan centre buttons now red, not just main one
+
+2015-3-22 Will
+- Rationalised MIDI volume control
+- Implemented MIDI volume control range setting
+- Implemented missing resets in 'Reset All Controllers'
+
 2015-3-18 Will
 - Pulled remaining program change gui calls into gui thread
 - Root path window now correctly tracks 'save' changes

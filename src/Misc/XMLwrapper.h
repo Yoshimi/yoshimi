@@ -147,6 +147,8 @@ class XMLwrapper : private MiscFuncs
         struct {
             int major; // settings format version
             int minor;
+            int y_major;
+            int y_minor;
         } xml_version;
 
         SynthEngine *synth;

@@ -101,15 +101,18 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     connectJackaudio(false),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
-    BankUIAutoClose(0),
-    RootUIAutoClose(0),
     GzipCompression(3),
     Interpolation(0),
     CheckPADsynth(1),
-    EnableProgChange(0), // default will be inverted
+    EnableProgChange(1), // default will be inverted
+#if defined(CONSOLE_ERRORS)
+    consoleMenuItem(1),
+ #else
+    consoleMenuItem(0),
+ #endif
     rtprio(50),
-    midi_bank_root(128),
-    midi_bank_C(0),
+    midi_bank_root(128), // 128 is used as 'disabled'
+    midi_bank_C(128),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(0),
     single_row_panel(0),
@@ -428,10 +431,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
     Buffersize = xml->getpar("sound_buffer_size", Buffersize, 64, 4096);
     Oscilsize = xml->getpar("oscil_size", Oscilsize,
                                         MAX_AD_HARMONICS * 2, 131072);
-    BankUIAutoClose = xml->getpar("bank_window_auto_close",
-                                               BankUIAutoClose, 0, 1);
-    RootUIAutoClose = xml->getpar("root_window_auto_close",
-                                               RootUIAutoClose, 0, 1);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
     CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
@@ -541,8 +540,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("sample_rate", Samplerate);
     xmltree->addpar("sound_buffer_size", Buffersize);
     xmltree->addpar("oscil_size", Oscilsize);
-    xmltree->addpar("bank_window_auto_close", BankUIAutoClose);
-    xmltree->addpar("root_window_auto_close", RootUIAutoClose);
 
     xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("check_pad_synth", CheckPADsynth);

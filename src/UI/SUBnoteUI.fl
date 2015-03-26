@@ -188,8 +188,8 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
           callback {//
               pan->value(64);
               pars->setPan(64);
-              randompan->value(pars->randomPan());}
-          tooltip {Centre panning} xywh {192 32 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
+              randompan->value(pars->randomPan());} selected
+          tooltip {Centre panning} xywh {192 32 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Group ampenv {
           label {SUBsynth - Amplitude Envelope}
@@ -581,8 +581,7 @@ pars->updateFrequencyMultipliers();}
   } {
     code {pars = parameters; 
 synth = pars->getSynthEngine();
-make_window();} {selected
-    }
+make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
   } {

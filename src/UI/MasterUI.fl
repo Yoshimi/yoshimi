@@ -210,6 +210,7 @@ class MasterUI {open : {private MiscFuncs}
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-4 0 400 25} labelsize 13
+        code0 {if (synth->getRuntime().consoleMenuItem == false)reports->deactivate();}
       } {
         Submenu {} {
           label {&Yoshimi} open
@@ -243,14 +244,14 @@ mainCreateNewInstance(forceId);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
-            label {&Reports}
-            callback {yoshiLog->Show();}
-            tooltip {Show message log} xywh {15 15 100 20} labelsize 12
-          }
-          MenuItem {} {
             label {&Settings...}
             callback {configui->Show();}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
+          }
+          MenuItem reports {
+            label {&Reports}
+            callback {yoshiLog->Show();} selected
+            tooltip {Show message log} xywh {15 15 100 20} labelsize 12
           }
           MenuItem {} {
             label {E&xit}
@@ -1310,7 +1311,7 @@ panellistitem[npart]->refresh();} {}
   } {
     code {return synth;} {}
   }
-  decl {ConfigUI *configui;} {selected public local
+  decl {ConfigUI *configui;} {public local
   }
   decl {ParametersUI *paramsui;} {private local
   }

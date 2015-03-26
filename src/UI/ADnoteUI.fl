@@ -48,7 +48,7 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "OscilGenUI.h"} {public global
 } 
 
-decl {\#include "MasterUI.h"} {selected private global
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class ADvoicelistitem {: {public Fl_Group, SynthHelper}
@@ -786,7 +786,7 @@ unisongroup->redraw();}
               voicepan->value(64);
               pars->setVoicePan(nvoice, 64);
               voicerandompan->value(pars->randomVoicePan(nvoice));}
-            tooltip {Centre panning} xywh {213 69 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
+            tooltip {Centre panning} xywh {213 69 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
           }
           Fl_Light_Button voicerandompan {
             label Rand
@@ -1010,7 +1010,7 @@ unisongroup->redraw();}
 
 class ADnoteUI {open : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument} open
@@ -1141,8 +1141,8 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
           callback {//
               globalpan->value(64);
               pars->setGlobalPan(64);
-              globalrandompan->value(pars->randomGlobalPan());}
-          tooltip {Centre panning} xywh {213 36 10 10} box PLASTIC_ROUND_UP_BOX color 48 selection_color 4 labeltype NO_LABEL labelsize 10
+              globalrandompan->value(pars->randomGlobalPan());} selected
+          tooltip {Centre panning} xywh {213 36 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial pstr {
           label {P.Str.}

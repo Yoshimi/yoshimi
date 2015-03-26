@@ -54,6 +54,7 @@ class Controller
         void setsustain(int value);
         void setlegato(int value);
         void setportamento(int value);
+        void portamentosetup();
         void setresonancecenter(int value);
         void setresonancebw(int value);
         void setPanDepth(char par) { panning.depth = par;}

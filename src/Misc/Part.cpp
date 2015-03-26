@@ -683,14 +683,8 @@ void Part::SetController(unsigned int type, int par)
             ctl->setfmamp(par);
             break;
         case C_volume:
-            ctl->setvolume(par);
             if (ctl->volume.receive)
-            {
-                volume = ctl->volume.volume;
-                Pvolume = par / 1.3; // an approximate guess!
-            }
-            else
-                setVolume(Pvolume);
+                setVolume(par * ctl->volume.volume);
             break;
         case C_sustain:
             ctl->setsustain(par);
@@ -706,8 +700,6 @@ void Part::SetController(unsigned int type, int par)
         case C_resetallcontrollers:
             ctl->resetall();
             RelaseSustainedKeys();
-            if (ctl->volume.receive)
-                volume = ctl->volume.volume;
             setVolume(Pvolume);
             setPan(Ppanning);
 
@@ -1031,10 +1023,10 @@ void Part::ComputePartSmps(void)
 
 
 // Parameter control
-void Part::setVolume(char value)
+void Part::setVolume(float value)
 {
-    Pvolume = value;
-    volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
+    Pvolume = (int)value;
+    volume  = dB2rap((value - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
 }
 
 void Part::setDestination(int value)
