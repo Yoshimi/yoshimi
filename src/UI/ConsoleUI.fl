@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
@@ -41,11 +41,11 @@ class ConsoleUI {open
     Fl_Window logConsole {
       label {yoshimi console}
       callback {o->hide()} open
-      xywh {1077 699 320 180} type Double color 54 selection_color 36 labeltype NORMAL_LABEL labelfont 13 labelsize 13 align 0 when 1 hide resizable
+      xywh {5 20 385 185} type Double color 54 selection_color 36 labelfont 13 labelsize 13 align 0 when 1 hide resizable
     } {
       Fl_Text_Display logText {
-        label {log text}
-        xywh {0 0 320 180} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
+        label {log text} selected
+        xywh {0 0 385 185} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
       }
     }
   }
@@ -77,8 +77,7 @@ class ConsoleUI {open
   Function {setLabel(const char *_label)} {open return_type void
   } {
     code {logConsole->copy_label((string(_label)
-                              + string(" reports")).c_str());} {selected
-    }
+                              + string(" reports")).c_str());} {}
   }
   decl {Fl_Text_Buffer *txtbuf;} {private local
   }

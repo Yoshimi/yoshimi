@@ -49,3 +49,16 @@ MIDI only sees banks in the *current* root dir, but all banks are accessible to 
 More details in Banks.txt
 
 ###
+
+Sensitivity to MIDI volume change (CC7) is now variable in 'Controllers' in the same way as pan width etc. Numeric range is 64 to 127, the default at 96 gives the same sensitivity as before at -12dB relative to the GUI controls. 127 gives 0dB and 64 gives -26dB
+
+###
+
+Yoshimi now stamps instrument and parameter XML files with its own major and minor version numbers so it is possible to tell which version created the files, or whether they were created by ZynAddSubFX.
+
+###
+
+It is now possible to direct messages to either stderr or the report window on the fly. If you chose stderr the Reports menu item is greyed out.
+
+###
+

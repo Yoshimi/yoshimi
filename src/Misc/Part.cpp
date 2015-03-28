@@ -362,7 +362,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         else
             notebasefreq = microtonal->getNoteFreq(note);
 
-        if (Pfrand > 0.005)  // effective range 0.01 to 0.1
+        if (Pfrand > 0.002)  // effective range 0.005 to 0.1
         {
           notebasefreq *= (1 + ((synth->numRandom() - 0.5f) * Pfrand));
         }
@@ -1202,7 +1202,7 @@ bool Part::saveXML(string filename)
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
-        synth->getRuntime().Log("Error, Part::saveXML failed to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Part: saveXML failed to instantiate new XMLwrapper");
         return false;
     }
     if (Pname < "!") // this shouldn't be possible
@@ -1222,13 +1222,13 @@ int Part::loadXMLinstrument(string filename)
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
-        synth->getRuntime().Log("Error, Part failed to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Part: loadXML failed to instantiate new XMLwrapper");
         return 0;
     }
 
     if (!xml->loadXMLfile(filename))
     {
-        synth->getRuntime().Log("Error, Part failed to load instrument file " + filename);
+        synth->getRuntime().Log("Part: loadXML failed to load instrument file " + filename);
         delete xml;
         return 0;
     }

@@ -1000,7 +1000,7 @@ void SynthEngine::putalldata(const char *data, int size)
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml->putXMLdata(data))
     {
-        Runtime.Log("SynthEngine putXMLdata failed");
+        Runtime.Log("SynthEngine: putXMLdata failed");
         delete xml;
         return;
     }
@@ -1033,7 +1033,7 @@ bool SynthEngine::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper(this);
     if (NULL == xml)
     {
-        Runtime.Log("failed to init xml tree");
+        Runtime.Log("Failed to init xml tree");
         return false;
     }
     if (!xml->loadXMLfile(filename))
