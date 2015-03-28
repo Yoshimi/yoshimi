@@ -54,11 +54,7 @@ class Config : public MiscFuncs
         void StartupReport(MusicClient *musicClient);
         void Announce(void);
         void Usage(void);
-    #if defined(CONSOLE_ERRORS)
         void Log(string msg, bool tostderr = false);
-    #else
-        void Log(string msg, bool tostderr = true);
-    #endif
         void flushLog(void);
 
         void clearPresetsDirlist(void);

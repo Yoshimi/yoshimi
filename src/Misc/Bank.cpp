@@ -113,9 +113,9 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
     int chk = rename(getFullPath(currentRootID, currentBankID, ninstrument).c_str(), newfilepath.c_str());
     if (chk < 0)
     {
-        synth->getRuntime().Log("Error, bank setName failed renaming "
+        synth->getRuntime().Log("Bank: setName failed renaming "
                     + getFullPath(currentRootID, currentBankID, ninstrument) + " -> "
-                    + newfilepath + " : " + string(strerror(errno)));
+                    + newfilepath + ": " + string(strerror(errno)));
         return false;
     }    
     instrRef.name = newname;
@@ -146,7 +146,7 @@ void Bank::clearslot(unsigned int ninstrument)
     int chk = remove(getFullPath(currentRootID, currentBankID, ninstrument).c_str());
     if (chk < 0)
     {
-        synth->getRuntime().Log("clearSlot " + asString(ninstrument) + " failed to remove "
+        synth->getRuntime().Log("clearSlot: " + asString(ninstrument) + " Failed to remove "
                      + getFullPath(currentRootID, currentBankID, ninstrument) + " "
                      + string(strerror(errno)));
     }
@@ -159,7 +159,7 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
 {
     if (ninstrument >= BANK_SIZE)
     {
-        synth->getRuntime().Log("savetoslot " + asString(ninstrument) + ", slot > BANK_SIZE");
+        synth->getRuntime().Log("savetoslot: Saved " + asString(ninstrument) + ", slot > BANK_SIZE");
         return;
     }
     clearslot(ninstrument);
@@ -244,7 +244,7 @@ bool Bank::setbankname(unsigned int bankID, string newname)
                      newfilepath.c_str());
     if (chk < 0)
     {
-        synth->getRuntime().Log("Bank: failed to rename " + getBankName(bankID)
+        synth->getRuntime().Log("Bank: Failed to rename " + getBankName(bankID)
                                + " to " + newname);
         return false;
     }
@@ -363,7 +363,7 @@ bool Bank::newbankfile(string newbankdir)
     int result = mkdir(newbankpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (result < 0)
     {
-        synth->getRuntime().Log("Error, failed to mkdir " + newbankpath);
+        synth->getRuntime().Log("Bank: Failed to mkdir " + newbankpath);
         return false;
     }
     else
@@ -390,7 +390,7 @@ bool Bank::removebank(unsigned int bankID)
             if (chk < 0)
             {
                 synth->getRuntime().Log("removebank: "
-                                        + asString(inst) + " failed to remove "
+                                        + asString(inst) + " Failed to remove "
                                         + getFullPath(currentRootID, bankID, inst) + " "
                                         + string(strerror(errno)));
                 return false;
@@ -401,15 +401,15 @@ bool Bank::removebank(unsigned int bankID)
         chk = remove(tmp.c_str());
         if (chk < 0)
         {
-            synth->getRuntime().Log("removebank: failed to remove bank ID file"
+            synth->getRuntime().Log("removebank: Failed to remove bank ID file"
                                     + string(strerror(errno)));
             return false;
         }
         chk = remove(getBankPath(currentRootID, bankID).c_str());
         if (chk < 0)
         {
-            synth->getRuntime().Log("removebank: failed to remove bank"
-                                    + asString(bankID) + " - "
+            synth->getRuntime().Log("removebank: Failed to remove bank"
+                                    + asString(bankID) + ": "
                                     + string(strerror(errno)));
             return false;
         }
@@ -541,7 +541,7 @@ void Bank::scanrootdir(int root_idx)
     DIR *dir = opendir(rootdir.c_str());
     if (dir == NULL)
     {
-        synth->getRuntime().Log("No such directory, root bank entry: " + rootdir);
+        synth->getRuntime().Log("No such directory, root bank entry " + rootdir);
         return;
     }
     struct dirent *fn;
@@ -564,7 +564,7 @@ void Bank::scanrootdir(int root_idx)
         DIR *d = opendir(chkdir.c_str());
         if (d == NULL)
         {
-            synth->getRuntime().Log("Failed to open bank directory candidate: " + chkdir);
+            synth->getRuntime().Log("scanrootdir: Failed to open bank directory candidate " + chkdir);
             continue;
         }
         struct dirent *fname;
@@ -580,33 +580,17 @@ void Bank::scanrootdir(int root_idx)
                 bankDirsMap [candidate] = chkdir;
                 break;
             }
-
-// we don't need these checks as non-prefixed instruments are valid.
-//# warning this needs tidying up
-/*            if (possible.size() <= (xizext.size() + 5))
-                continue;
-            // check for an instrument starting with "NNNN-" prefix
-            for (idx = 0; idx < 4; ++idx)
+            string chkpath = chkdir + "/" + possible;
+            lstat(chkpath.c_str(), &st);
+            if (st.st_mode & (S_IFREG | S_IRGRP))
             {
-                x = possible.at(idx);
-                if (x < '0' || x > '9')
-                    break;
-            }
-            if (idx < 4 || possible.at(idx) != '-')
-                continue;*/
-            {
-                string chkpath = chkdir + "/" + possible;
-                lstat(chkpath.c_str(), &st);
-                if (st.st_mode & (S_IFREG | S_IRGRP))
+                // check for .xiz extension
+                if ((xizpos = possible.rfind(xizext)) != string::npos)
                 {
-                    // check for .xiz extension
-                    if ((xizpos = possible.rfind(xizext)) != string::npos)
-                    {
-                        if (xizext.size() == (possible.size() - xizpos))
-                        {   // is an instrument, so add the bank
-                            bankDirsMap [candidate] = chkdir;
-                            break;
-                        }
+                    if (xizext.size() == (possible.size() - xizpos))
+                    {   // is an instrument, so add the bank
+                        bankDirsMap [candidate] = chkdir;
+                        break;
                     }
                 }
             }
@@ -737,8 +721,7 @@ void Bank::addDefaultRootDirs()
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
         string(getenv("HOME")) + "/banks",
-        "../banks",
-        "banks"
+        "../banks"
     };
     for (unsigned int i = 0; i < (sizeof(bankdirs) / sizeof(bankdirs [0])); ++i)
     {

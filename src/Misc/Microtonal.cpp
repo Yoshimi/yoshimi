@@ -616,7 +616,7 @@ bool Microtonal::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper(synth);
     if (NULL == xml)
     {
-        synth->getRuntime().Log("Microtonal loadXML fails to instantiate new XMLwrapper");
+        synth->getRuntime().Log("Microtonal: loadXML failed to instantiate new XMLwrapper");
         return false;
     }
     if (!xml->loadXMLfile(filename))
@@ -626,7 +626,7 @@ bool Microtonal::loadXML(string filename)
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
-        synth->getRuntime().Log("Error, " + filename + " is not a scale file");
+        synth->getRuntime().Log("Microtonal: " + filename + " is not a scale file");
         return false;
     }
     getfromXML(xml);

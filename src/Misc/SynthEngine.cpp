@@ -461,37 +461,6 @@ void SynthEngine::SetBank(int banknum)
     {
         Runtime.Log("SynthEngine setBank: No bank " + asString(banknum)+ " in this root");
     }
-
-
-    /*
-    int offset = 0;
-#warning this needs improving.
-    for (int idx = 0; idx < MAX_NUM_BANKS; ++ idx)
-    {
-        if (bank.banks[idx].ID == Runtime.currentRootID and offset == banknum)
-        {
-            banknum = idx; // Set absolute bank location
-            break;
-        }
-        else if (bank.banks[idx].ID == Runtime.currentRootID)
-            offset += 1;
-    }
-
-    if(banknum <= MAX_NUM_BANKS) {
-        if (bank.loadbank(bank.banks[banknum].dir))
-            Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
-        if (Runtime.showGui)
-        {
-            guiMaster->bankui->set_bank_slot();
-            guiMaster->bankui->refreshmainwindow();
-        }
-        else
-            Runtime.Log("SynthEngine setBank: No bank " + asString(banknum));
-    }
-    else
-        Runtime.Log("SynthEngine setBank: Value is out of range!");
-    return;
-    */
 }
 
 
@@ -986,7 +955,7 @@ void SynthEngine::putalldata(const char *data, int size)
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml->putXMLdata(data))
     {
-        Runtime.Log("SynthEngine putXMLdata failed");
+        Runtime.Log("SynthEngine: putXMLdata failed");
         delete xml;
         return;
     }
@@ -1019,7 +988,7 @@ bool SynthEngine::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper(this);
     if (NULL == xml)
     {
-        Runtime.Log("failed to init xml tree");
+        Runtime.Log("Failed to init xml tree");
         return false;
     }
     if (!xml->loadXMLfile(filename))

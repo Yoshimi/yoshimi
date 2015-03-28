@@ -338,7 +338,7 @@ bool mainCreateNewInstance(unsigned int forceId)
 
 bail_out:
     synth->getRuntime().runSynth = false;
-    synth->getRuntime().Log("Yoshimi stages a strategic retreat :-(");
+    synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
     if (musicClient)
     {
         musicClient->Close();
@@ -427,7 +427,7 @@ bail_out:
         _synth->getRuntime().runSynth = false;
         if(!bExitSuccess)
         {
-            _synth->getRuntime().Log("Yoshimi stages a strategic retreat :-(");
+            _synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
         }
 
         if (_client)

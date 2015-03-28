@@ -746,7 +746,7 @@ else {propta->deactivate();proptb->deactivate();}}
       }
       Fl_Dial {} {
         label {Vol Rng}
-        callback {part->ctl->setvolume((char)o->value());} selected
+        callback {part->ctl->setvolume((char)o->value());}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
         class WidgetPDial
@@ -962,8 +962,8 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {305 125 395 360} type Double hide
-      code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
+      xywh {305 125 395 360} type Double
+      code0 {rnddet->value((int)(0.5+part->Pfrand*100));} visible
     } {
       Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1143,9 +1143,9 @@ else {propta->deactivate();proptb->deactivate();}}
       }
       Fl_Spinner rnddet {
         label {Rnd. Det.}
-        callback {part->Pfrand = o->value() / 100.0f;}
-        tooltip {Small random detune - experimental!} xywh {113 335 44 19} labelsize 12 minimum 0 maximum 10 value 0 textsize 12
-        code0 {o->value((int)part->Pfrand*100);}
+        callback {part->Pfrand = o->value() / 200.0f;} selected
+        tooltip {Small random detune - experimental!} xywh {113 335 44 19} labelsize 12 minimum 0 maximum 20 value 0 textsize 12
+        code0 {o->value((int)part->Pfrand*200);}
       }
       Fl_Button {} {
         label Close
