@@ -555,19 +555,21 @@ oldrootID = changeIDbutton->value();}
       return;
     synth->getGuiMaster()->configui->configChanged = true;
     synth->getBankRef().addRootDir(dirname);
-    readbankcfg();}
+    readbankcfg();
+    rescan_for_banks(true);}
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button removerootdirbutton {
         label {Remove root dir...}
         callback {//
     if (selectedRootID >= 0)
-    {
+    {;
         synth->getBankRef().removeRoot(selectedRootID);
         readbankcfg();
         synth->getGuiMaster()->configui->configChanged = true;
     }
-    activatebutton_rootdir(false);}
+    activatebutton_rootdir(false);
+    rescan_for_banks(false);}
         xywh {95 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
         code0 {o->deactivate();}
       }
@@ -628,16 +630,14 @@ oldrootID = changeIDbutton->value();}
       }
       Fl_Button {} {
         label {Close Unsaved}
-        callback {synth->getGuiMaster()->configui->readbankcfg();
-pathwindow->do_callback();}
+        callback {pathwindow->do_callback();}
         xywh {345 268 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
-synth->getGuiMaster()->configui->readbankcfg();
 synth->getGuiMaster()->configui->configChanged = false;
-pathwindow->do_callback();}
+pathwindow->do_callback();} selected
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -925,8 +925,7 @@ fnr = &RootProcess_::rootprocess;
                     rs[ns]->refresh();
                 rs[slot]->refresh();
             }
-        }} {selected
-    }
+        }} {}
   }
   Function {setread()} {open
   } {

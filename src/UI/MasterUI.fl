@@ -208,7 +208,7 @@ class MasterUI {open : {private MiscFuncs}
           }} open
       xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
-      Fl_Menu_Bar mastermenu {open selected
+      Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
         code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
       } {
@@ -1163,7 +1163,8 @@ panellistitem[npart]->refresh();} {}
   }
   Function {updateBankRootDirs()} {open
   } {
-    code {configui->readbankcfg();} {}
+    code {bankui->readbankcfg();} {selected
+    }
   }
   Function {getSynth()} {open return_type {SynthEngine *}
   } {

@@ -869,7 +869,7 @@ void Bank::removeRoot(size_t rootID)
         currentRootID = 0;
     }
     roots.erase(rootID);
-
+    setCurrentRootID(currentRootID);
 }
 
 
@@ -932,8 +932,8 @@ bool Bank::setCurrentBankID(size_t newBankID, bool ignoreMissing)
 
 size_t Bank::addRootDir(string newRootDir)
 {
-
-    if(newRootDir.empty() || !isDirectory(newRootDir))
+   // we need the size check to prevent weird behaviour if the name is just ./
+    if(!isDirectory(newRootDir) || newRootDir.length() < 4)
     {
         return 0;
     }
