@@ -1,5 +1,7 @@
 yoshimi 1.3.x
 
+2015-3-30 Andrew
+- Share async gui process function between main and lv2 mode
 
 2015-3-29 Will
 - Fixed root dir length bug

@@ -61,6 +61,8 @@ typedef struct _Yoshimi_LV2_Options_Option {
 
 using namespace std;
 
+extern void mainProcessGuiMessages();
+
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
     uint real_sample_count = min(sample_count, _bufferSize);
@@ -781,6 +783,8 @@ void YoshimiLV2PluginUI::run()
             _plugin->_synth->getRuntime().LogList.pop_front();
         }
         Fl::check();
+
+        mainProcessGuiMessages();
     }
     else
     {
