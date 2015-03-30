@@ -556,7 +556,7 @@ oldrootID = changeIDbutton->value();}
     synth->getGuiMaster()->configui->configChanged = true;
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
-    rescan_for_banks(true);}
+    rescan_for_banks(true);} selected
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button removerootdirbutton {
@@ -637,7 +637,7 @@ oldrootID = changeIDbutton->value();}
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
 synth->getGuiMaster()->configui->configChanged = false;
-pathwindow->do_callback();} selected
+pathwindow->do_callback();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }
     }

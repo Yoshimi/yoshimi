@@ -24,6 +24,8 @@
 
 #include <cmath>
 
+using namespace std;
+
 #include "Misc/XMLwrapper.h"
 #include "DSP/FFTwrapper.h"
 #include "Synth/OscilGen.h"
@@ -33,6 +35,7 @@
 #include "Params/FilterParams.h"
 #include "Misc/SynthEngine.h"
 #include "Params/PADnoteParameters.h"
+#include "Misc/WavFile.h"
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Presets(_synth)
 {
@@ -650,6 +653,32 @@ void PADnoteParameters::setPan(char pan)
     }
     else
         pangainL = pangainR = 0.7f;
+}
+
+
+// Ported from ZynAddSubFX V 2.4.4
+void PADnoteParameters::export2wav(std::string basefilename)
+{
+    synth->getRuntime().Log("PADnote: Saving samples for " + basefilename);
+    applyparameters(true);
+    basefilename += "_PADsynth_";
+    for(int k = 0; k < PAD_MAX_SAMPLES; ++k)
+    {
+        if(sample[k].smp == NULL)
+            continue;
+        char tmpstr[20];
+        snprintf(tmpstr, 20, "_%02d", k + 1);
+        std::string filename = basefilename + std::string(tmpstr) + ".wav";
+        WavFile     wav(filename, synth->samplerate, 1);
+        if(wav.good())
+        {
+            int nsmps = sample[k].size;
+            short int *smps = new short int[nsmps];
+            for(int i = 0; i < nsmps; ++i)
+                smps[i] = (short int)(sample[k].smp[i] * 32767.0f);
+            wav.writeMonoSamples(nsmps, smps);
+        }
+    }
 }
 
 
