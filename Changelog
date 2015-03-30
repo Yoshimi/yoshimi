@@ -1,5 +1,8 @@
-yoshimi 1.3.x
+yoshimi 1.3.4-rc
 
+
+2015-3-30 Will
+- Ported padsynth wavetable saving from ZynAddSubFX
 
 2015-3-29 Will
 - Fixed root dir length bug
