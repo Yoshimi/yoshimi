@@ -398,11 +398,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 {
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->part)
                     {
-                        GuiThreadMsg *msg = new GuiThreadMsg;
-                        msg->data = this;
-                        msg->type = GuiThreadMsg::UpdatePanelItem;
-                        msg->index = npart;
-                        Fl::awake((void *)msg);
+                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
                     }
                 }
             } 
@@ -483,12 +479,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                         partonoff(npart, 1);
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
-                        // guiMaster->updatepartprogram(npart); // This works with LV2
-                        GuiThreadMsg *msg = new GuiThreadMsg;        //
-                        msg->data = this;                            // This
-                        msg->type = GuiThreadMsg::UpdatePartProgram; // does
-                        msg->index = npart;                          // not :(
-                        Fl::awake((void *)msg);                      //
+                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                     }
                 }
             }

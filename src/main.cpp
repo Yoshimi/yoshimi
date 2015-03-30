@@ -74,69 +74,6 @@ void yoshimiSigHandler(int sig)
     }
 }
 
-void mainProcessGuiMessages()
-{
-    GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
-    if(msg)
-    {
-        switch(msg->type)
-        {
-        case GuiThreadMsg::NewSynthEngine:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster();
-            if(!guiMaster)
-            {
-                cerr << "Error starting Main UI!" << endl;
-            }
-            else
-            {
-                guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
-            }
-        }
-            break;
-        case GuiThreadMsg::UpdatePanel:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-            {
-                guiMaster->updatepanel();
-            }
-        }
-            break;
-        case GuiThreadMsg::UpdatePanelItem:
-            if(msg->index < NUM_MIDI_CHANNELS && msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->panellistitem[msg->index]->refresh();
-                    guiMaster->updatepart();
-                }
-            }
-            break;
-        case GuiThreadMsg::UpdatePartProgram:
-            if(msg->index < NUM_MIDI_CHANNELS && msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->updatepartprogram(msg->index);
-                }
-            }
-            break;
-        default:
-            break;
-        }
-        delete msg;
-    }
-
-
-}
-
 void splashTimeout(void *splashWin)
 {
     (static_cast<Fl_Window *>(splashWin))->hide();
@@ -281,7 +218,7 @@ static void *mainGuiThread(void *arg)
                 boxLb.copy_label(splashMessages.front().c_str());
                 splashMessages.pop_front();
             }
-            mainProcessGuiMessages();
+            GuiThreadMsg::processGuiMessages();
         }
         else
             usleep(33333);
@@ -329,10 +266,7 @@ bool mainCreateNewInstance(unsigned int forceId)
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
-        GuiThreadMsg *msg = new GuiThreadMsg;
-        msg->type = GuiThreadMsg::NewSynthEngine;
-        msg->data = synth;
-        Fl::awake((void *)msg);
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
     }
 
     synth->getRuntime().StartupReport(musicClient);

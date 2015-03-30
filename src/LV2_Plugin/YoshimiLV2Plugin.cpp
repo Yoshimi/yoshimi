@@ -61,8 +61,6 @@ typedef struct _Yoshimi_LV2_Options_Option {
 
 using namespace std;
 
-extern void mainProcessGuiMessages();
-
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
     uint real_sample_count = min(sample_count, _bufferSize);
@@ -784,7 +782,7 @@ void YoshimiLV2PluginUI::run()
         }
         Fl::check();
 
-        mainProcessGuiMessages();
+        GuiThreadMsg::processGuiMessages();
     }
     else
     {
@@ -806,7 +804,11 @@ void YoshimiLV2PluginUI::show()
         return;
     }
     if(bInit)
+    {
+        Fl::lock();
+        Fl::unlock();
         _masterUI->Init(uiHost.plugin_human_id);
+    }
 
 }
 
