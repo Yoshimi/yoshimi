@@ -483,11 +483,12 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                         partonoff(npart, 1);
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
-                        GuiThreadMsg *msg = new GuiThreadMsg;
-                        msg->data = this;
-                        msg->type = GuiThreadMsg::UpdatePartProgram;
-                        msg->index = npart;
-                        Fl::awake((void *)msg);
+                        // guiMaster->updatepartprogram(npart); // This works with LV2
+                        GuiThreadMsg *msg = new GuiThreadMsg;        //
+                        msg->data = this;                            // This
+                        msg->type = GuiThreadMsg::UpdatePartProgram; // does
+                        msg->index = npart;                          // not :(
+                        Fl::awake((void *)msg);                      //
                     }
                 }
             }
