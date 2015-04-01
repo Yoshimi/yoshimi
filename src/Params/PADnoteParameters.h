@@ -25,7 +25,10 @@
 #ifndef PAD_NOTE_PARAMETERS_H
 #define PAD_NOTE_PARAMETERS_H
 
+using namespace std;
+
 #include "Params/Presets.h"
+#include "Misc/MiscFuncs.h"
 
 class XMLwrapper;
 class FFTwrapper;
@@ -141,6 +144,8 @@ class PADnoteParameters : public Presets
         float getNhr(int n); // gets the n-th overtone position relatively to N harmonic
 
         void applyparameters(bool islocked);
+        void export2wav(std::string basefilename);
+        
         OscilGen *oscilgen;
         Resonance *resonance;
 

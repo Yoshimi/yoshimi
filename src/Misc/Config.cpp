@@ -47,6 +47,7 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
+#include "MasterUI.h"
 
 
 const unsigned short Config::MaxParamsHistory = 25;
@@ -1053,4 +1054,67 @@ void Config::loadCmdArgs(int argc, char **argv)
     argp_parse(&cmd_argp, argc, argv, 0, 0, this);
     if (jackSessionUuid.size() && jackSessionFile.size())
         restoreJackSession = true;
+}
+
+void GuiThreadMsg::processGuiMessages()
+{
+    GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
+    if(msg)
+    {
+        switch(msg->type)
+        {
+        case GuiThreadMsg::NewSynthEngine:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster();
+            if(!guiMaster)
+            {
+                cerr << "Error starting Main UI!" << endl;
+            }
+            else
+            {
+                guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdatePanel:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster(false);
+            if(guiMaster)
+            {
+                guiMaster->updatepanel();
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdatePanelItem:
+            if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster)
+                {
+                    guiMaster->panellistitem[msg->index]->refresh();
+                    guiMaster->updatepart();
+                }
+            }
+            break;
+        case GuiThreadMsg::UpdatePartProgram:
+            if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster)
+                {
+                    guiMaster->updatepartprogram(msg->index);
+                }
+            }
+            break;
+        default:
+            break;
+        }
+        delete msg;
+    }
+
+
 }

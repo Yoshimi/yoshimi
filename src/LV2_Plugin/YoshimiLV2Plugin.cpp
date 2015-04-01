@@ -781,6 +781,8 @@ void YoshimiLV2PluginUI::run()
             _plugin->_synth->getRuntime().LogList.pop_front();
         }
         Fl::check();
+
+        GuiThreadMsg::processGuiMessages();
     }
     else
     {
@@ -802,7 +804,11 @@ void YoshimiLV2PluginUI::show()
         return;
     }
     if(bInit)
+    {
+        Fl::lock();
+        Fl::unlock();
         _masterUI->Init(uiHost.plugin_human_id);
+    }
 
 }
 

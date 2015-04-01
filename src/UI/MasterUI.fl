@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -205,12 +205,11 @@ class MasterUI {open : {private MiscFuncs}
           {
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
-          }}
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+          }} open
+      xywh {4 29 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
-      Fl_Menu_Bar mastermenu {
+      Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
-        code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
       } {
         Submenu {} {
           label {&Yoshimi} open
@@ -247,11 +246,6 @@ mainCreateNewInstance(forceId);}
             label {&Settings...}
             callback {configui->Show();}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
-          }
-          MenuItem Reports {
-            label {&Reports}
-            callback {yoshiLog->Show();}
-            tooltip {Show message log} xywh {15 15 100 20} labelsize 12
           }
           MenuItem {} {
             label {E&xit}
@@ -334,37 +328,6 @@ mainCreateNewInstance(forceId);}
             label {&Virtual Keyboard...}
             callback {virkeyboard->Show();}
             xywh {15 15 100 20} labelsize 12
-          }
-        }
-        Submenu {} {
-          label State open
-          xywh {0 0 70 21} labelsize 12
-        } {
-          MenuItem saveState {
-            label Save
-            callback {// for Alessandro
-
-                char *fle = fl_file_chooser("Save:", "({*.state})",
-                                            laststatefile.c_str(), 0);
-                if (fle)
-                {
-                    laststatefile = string(fle);
-                    synth->getRuntime().saveState(laststatefile);
-                }}
-            tooltip {Save session state} xywh {10 10 34 21} labelsize 12
-          }
-          MenuItem loadState {
-            label Load
-            callback {// for Alessandro
-                char *fle = fl_file_chooser("Load:", "({*.state})",
-                                            laststatefile.c_str(), 0);
-                if (fle)
-                {
-                    laststatefile = string(fle);
-                    synth->getRuntime().loadState(laststatefile);
-                }
-                partui->instrumentlabel->copy_label(partui->part->Pname.c_str());}
-            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
         }
         Submenu Parameters {
@@ -456,6 +419,37 @@ mainCreateNewInstance(forceId);}
             label {Show Scale Settings...}
             callback {microtonalui->Show();}
             xywh {0 0 100 20} labelsize 12
+          }
+        }
+        Submenu {} {
+          label State open
+          xywh {0 0 70 21} labelsize 12
+        } {
+          MenuItem saveState {
+            label Save
+            callback {// for Alessandro
+
+                char *fle = fl_file_chooser("Save:", "({*.state})",
+                                            laststatefile.c_str(), 0);
+                if (fle)
+                {
+                    laststatefile = string(fle);
+                    synth->getRuntime().saveState(laststatefile);
+                }}
+            tooltip {Save session state} xywh {10 10 34 21} labelsize 12
+          }
+          MenuItem loadState {
+            label Load
+            callback {// for Alessandro
+                char *fle = fl_file_chooser("Load:", "({*.state})",
+                                            laststatefile.c_str(), 0);
+                if (fle)
+                {
+                    laststatefile = string(fle);
+                    synth->getRuntime().loadState(laststatefile);
+                }
+                partui->instrumentlabel->copy_label(partui->part->Pname.c_str());}
+            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
         }
       }
@@ -735,6 +729,12 @@ mainCreateNewInstance(forceId);}
           }
         }
       }
+      Fl_Button Reports {
+        label Reports
+        callback {yoshiLog->Show();} selected
+        xywh {289 90 60 24} box PLASTIC_UP_BOX labelsize 11
+        code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
+      }
       Fl_Group syseffectuigroup {open
         xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
@@ -767,7 +767,7 @@ mainCreateNewInstance(forceId);}
         } {}
       }
       Fl_Group {} {open
-        xywh {3 427 380 34} box DOWN_BOX labelsize 12
+        xywh {3 427 380 36} box DOWN_BOX labelsize 12
       } {
         Fl_Box vumeter {
           label {VU-Meter}
@@ -1305,7 +1305,7 @@ panellistitem[npart]->refresh();} {}
   }
   Function {updateBankRootDirs()} {open
   } {
-    code {configui->readbankcfg();} {}
+    code {bankui->readbankcfg();} {}
   }
   Function {getSynth()} {open return_type {SynthEngine *}
   } {

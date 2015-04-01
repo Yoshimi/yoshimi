@@ -1,5 +1,22 @@
-yoshimi 1.3.x
+yoshimi 1.3.4
 
+2015-4-1 Will
+- Tidied up for release on such an auspicious date!
+
+2015-3-30 Andrew
+- Share async gui process function between main and lv2 mode
+
+2015-3-30 Will
+- Ported padsynth wavetable saving from ZynAddSubFX
+
+2015-3-29 Will
+- Fixed root dir length bug
+- Fixed add root no-show bug
+- Fixed remove root still showing bug
+- Removed root path tab from Setup window as it
+  was getting too complicated syncing 2 copies
+- Changed 'Reports' menu item into a separate button
+  fltk problem :(
 
 2015-3-28 Will
 - Reports can be sent to the console window or stderr under

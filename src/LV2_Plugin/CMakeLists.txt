@@ -20,9 +20,9 @@ file (GLOB yoshimi_effects_files
 file (GLOB yoshimi_misc_files
     ../Misc/Config.cpp ../Misc/Config.h
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
-    ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/MiscFuncs.cpp
+    ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/MiscFuncs.cpp ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
-    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h)
+    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h)
 file (GLOB yoshimi_params_files
     ../Params/ADnoteParameters.cpp  ../Params/EnvelopeParams.cpp
     ../Params/FilterParams.cpp  ../Params/LFOParams.cpp

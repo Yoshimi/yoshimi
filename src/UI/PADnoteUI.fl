@@ -248,7 +248,7 @@ synth = parameters->getSynthEngine();
   Function {make_window()} {open
   } {
     Fl_Window padnotewindow {
-      label {PAD synth Parameters} open
+      label {PAD synth Parameters} open selected
       xywh {776 290 535 450} type Double hide
     } {
       Fl_Tabs {} {
@@ -261,7 +261,7 @@ synth = parameters->getSynthEngine();
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12 hide
+          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12
         } {
           Fl_Group bwprofilegroup {
             xywh {5 30 90 260} box ENGRAVED_BOX
@@ -822,7 +822,7 @@ synth = parameters->getSynthEngine();
         }
         Fl_Group {} {
           label {Envelopes&LFOs} open
-          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12
+          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Group {} {
             label FREQUENCY open
@@ -941,7 +941,7 @@ synth = parameters->getSynthEngine();
               callback {//
                   pan->value(64);
                   pars->setPan(64);
-                  randompan->value(pars->randomPan());} selected
+                  randompan->value(pars->randomPan());}
               tooltip {Centre panning} xywh {213 56 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
             }
             Fl_Light_Button randompan {
@@ -1054,12 +1054,24 @@ synth = parameters->getSynthEngine();
       Fl_Button {} {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
-        xywh {240 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {205 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
-        xywh {270 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {235 430 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+      }
+      Fl_Button {} {
+        label Export
+        callback {char *filename;
+filename=fl_file_chooser("Export samples:","(*.wav)",NULL,0);
+if (filename==NULL) return;
+fl_filename_setext(filename,"");
+
+
+
+pars->export2wav(filename);}
+        tooltip {Export samples as wav file} xywh {15 410 123 24} box THIN_UP_BOX color 51 labelfont 1 labelsize 12 align 128
       }
     }
   }

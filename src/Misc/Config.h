@@ -36,6 +36,7 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 #include "Misc/HistoryListItem.h"
 #include "Misc/MiscFuncs.h"
+#include "FL/Fl.H"
 
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
@@ -171,15 +172,16 @@ class Config : public MiscFuncs
 };
 
 //struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
-struct GuiThreadMsg
+class GuiThreadMsg
 {
+private:
     GuiThreadMsg()
     {
         data = NULL;
         length = 0;
         type = GuiThreadMsg::UNDEFINED;
     }
-
+public:
     enum
     {
         NewSynthEngine = 0,
@@ -192,6 +194,15 @@ struct GuiThreadMsg
     unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
     unsigned int index; // if there is integer data, it can be passed through index (to remove aditional receiver logic)
     unsigned int type; // type of gui message (see enum above)
+    static void sendMessage(void *_data, unsigned int _type, unsigned int _index)
+    {
+        GuiThreadMsg *msg = new GuiThreadMsg;
+        msg->data = _data;
+        msg->type = _type;
+        msg->index = _index;
+        Fl::awake((void *)msg);
+    }
+    static void processGuiMessages();
 };
 
 #endif

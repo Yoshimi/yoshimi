@@ -389,40 +389,30 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     }
     else
     { // bank change doesn't directly affect parts.
+        int npart;
         if (chan < NUM_MIDI_CHANNELS)
         {
-            for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+            for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             {   // Send the controller to all part assigned to the channel
                 if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
                 {
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
                     {
-                        if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->part)
-                        {
-                            GuiThreadMsg *msg = new GuiThreadMsg;
-                            msg->data = this;
-                            msg->type = GuiThreadMsg::UpdatePanelItem;
-                            msg->index = npart;
-                            Fl::awake((void *)msg);
-                        }
+                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
                     }
                 }
             }
         }
         else
         {
-            chan &= 0x7f;
-            part[chan]->SetController(type, par);
+            npart = chan & 0x7f;
+            part[npart]->SetController(type, par);
             if (type == 7 || type == 10) // currently only volume and pan
             {
                 if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->part)
                 {
-                    GuiThreadMsg *msg = new GuiThreadMsg;
-                    msg->data = this;
-                    msg->type = GuiThreadMsg::UpdatePanelItem;
-                    msg->index = chan;
-                    Fl::awake((void *)msg);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
                 }
             }
             
@@ -506,11 +496,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                             partonoff(npart, 1);
                         if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                         {
-                            GuiThreadMsg *msg = new GuiThreadMsg;
-                            msg->data = this;
-                            msg->type = GuiThreadMsg::UpdatePartProgram;
-                            msg->index = npart;
-                            Fl::awake((void *)msg);
+                            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                         }
                     }
                 }
@@ -527,11 +513,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                         partonoff(npart, 1);
                     if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
                     {
-                        GuiThreadMsg *msg = new GuiThreadMsg;
-                        msg->data = this;
-                        msg->type = GuiThreadMsg::UpdatePartProgram;
-                        msg->index = npart;
-                        Fl::awake((void *)msg);
+                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                     }
                 }
             }
