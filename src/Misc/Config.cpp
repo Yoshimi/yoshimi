@@ -1088,7 +1088,7 @@ void GuiThreadMsg::processGuiMessages()
         }
             break;
         case GuiThreadMsg::UpdatePanelItem:
-            if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+            if(msg->index < NUM_MIDI_PARTS && msg->data)
             {
                 SynthEngine *synth = ((SynthEngine *)msg->data);
                 MasterUI *guiMaster = synth->getGuiMaster(false);
@@ -1100,7 +1100,7 @@ void GuiThreadMsg::processGuiMessages()
             }
             break;
         case GuiThreadMsg::UpdatePartProgram:
-            if(msg->index < NUM_MIDI_CHANNELS && msg->data)
+            if(msg->index < NUM_MIDI_PARTS && msg->data)
             {
                 SynthEngine *synth = ((SynthEngine *)msg->data);
                 MasterUI *guiMaster = synth->getGuiMaster(false);

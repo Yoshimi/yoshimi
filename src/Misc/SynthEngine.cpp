@@ -407,15 +407,14 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         else
         {
             npart = chan & 0x7f;
-            part[npart]->SetController(type, par);
-            if (type == 7 || type == 10) // currently only volume and pan
+            if (npart < NUM_MIDI_PARTS)
             {
-                if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->part)
+                part[npart]->SetController(type, par);
+                if (type == 7 || type == 10) // currently only volume and pan
                 {
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
                 }
             }
-            
         }
         if (type == C_allsoundsoff)
         {   // cleanup insertion/system FX
