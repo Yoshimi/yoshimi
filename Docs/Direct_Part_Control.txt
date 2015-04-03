@@ -1,0 +1,18 @@
+Yoshi can now directly set some part values regardless of what channel that part is set to
+
+Using NRPNs
+
+set NRPN
+ MSB = 64 {same as for vectors}
+ LSB = 0
+ 
+then
+
+DATA MSB (6)
+    0 : LSB = Part number
+    1 : LSB = program number
+    2 { LSB will be controller number }
+    3 { LSB will be controller value }
+    
+    more!
+    

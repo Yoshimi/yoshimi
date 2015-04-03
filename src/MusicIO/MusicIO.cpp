@@ -40,6 +40,8 @@ MusicIO::MusicIO(SynthEngine *_synth) :
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
+    for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
+        nrpnVectors.Enabled[chan] = false;
 }
 
 MusicIO::~MusicIO()
@@ -198,16 +200,13 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         {
             if(ctrl == C_dataL || ctrl == C_dataH)
             {
-                if (ctrl == C_dataL)
-                    synth->getRuntime().dataL = param;
-                else
-                    synth->getRuntime().dataH = param;
                 ProcessNrpn(ch, ctrl, param);
                 return;
             }
+#warning should some NRPN & vector stuff move out of the MIDI thread?
+# if NUM_MIDI_PARTS == 64
             if (nrpnVectors.Enabled[ch])
             {
-#warning should some NRPN & vector stuff move out of the MIDI thread?
                 int Xopps = nrpnVectors.Xaxis[ch];
                 int Xtype = Xopps & 0xff;
                 int Yopps = nrpnVectors.Yaxis[ch];
@@ -257,6 +256,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                     return;
                 }
             }
+#endif
         }
         synth->SetController(ch, ctrl, param);
     }
@@ -265,20 +265,73 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 
 void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
 {
+    int nHigh = synth->getRuntime().nrpnH;
+    if (nHigh != 64)
+    {   
+        synth->getRuntime().Log("Go away " + asString(nHigh) + ". We don't know you");
+        return;
+    }
+    int nLow = synth->getRuntime().nrpnL;
+    
     string sb = "L";
-    if (type == 6)
-        sb = "M";
-    synth->getRuntime().Log("Data " + string(sb) + "SB    value " + asString(par));
-   
-    if (synth->getRuntime().nrpnH == 64 && synth->getRuntime().nrpnL == 1) // it's vector control
-        if (type == 38)
+    if (type == C_dataH)
+    { // we don't set LSB here, we might want a previous value.
+        synth->getRuntime().dataH = par;
+         sb = "M";
+    }
+    synth->getRuntime().Log("Data " + sb + "SB    value " + asString(par));
+    int dHigh = synth->getRuntime().dataH;
+    int dLow = synth->getRuntime().dataL;
+    
+    if (type == C_dataL && nLow == 0) // direct part change
+    {
+        switch (dHigh)
+        {
+            case 0:
+                {
+                    if (par < NUM_MIDI_PARTS)
+                        synth->getRuntime().dataL = par; // set part number
+                    else
+                        synth->getRuntime().dataH = 128; // It's bad. Kill it
+                    break;
+                }
+                case 1:
+                {
+                    if (dLow < 128)
+                        setMidiProgram( dLow | 0x80, par);
+                    break;
+                }
+                case 2:
+                {
+                    // will set controller number
+                }
+
+                case 3:
+                {
+                    // will set controller value
+                }
+                case 4:
+                {
+                    // will set parts channel number
+                }
+        }
+    }
+
+#if NUM_MIDI_PARTS == 64
+    else if (nLow == 1) // it's vector control
+        if (type == C_dataL)
         {
             if (!nrpnVectors.Enabled[chan])
             {
                 nrpnVectors.Enabled[chan] = true;
                 synth->getRuntime().Log("Vector control enabled");
+                /*
+                 * enabling and disabling is only done when the LSB is being set
+                 * but actually tests MSB
+                 * this is to allow for future expansion
+                */
             }
-            switch (synth->getRuntime().dataH)
+            switch (dHigh)
             {
                 case 0:
                     {
@@ -324,13 +377,14 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
                         setMidiProgram(chan | 0xb0, par);
                         break;
                     }
-              default:
+                 default:
                     {
                         nrpnVectors.Enabled[chan] = false;
                         synth->getRuntime().Log("Vector control disabled");
                     }
             }
         }
+#endif
 }
 
 

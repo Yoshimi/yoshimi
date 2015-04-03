@@ -1,4 +1,6 @@
-Yoshi now has 64 parts in blocks of 16, all the upper ones are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages.
+Yoshi can now have 64 parts in blocks of 16. This is set at compile time
+
+All the upper ones are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages.
 
 In vector mode parts will still play together but the vector controls can change their volume, pan, filter cutoff in pairs. using user defined CCs set up with NRPNs
 
