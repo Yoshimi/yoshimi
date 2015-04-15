@@ -1,6 +1,10 @@
 yoshimi 1.3.x
 
-2015-4-3 Will  (vector)
+2015-4-15 Will (vector)
+- Implemented direct part CC change
+- Corrected and updated Docs
+
+2015-4-3 Will (vector)
 - Implemented direct part program change
 - Vector controls only enabled if NUM_MIDI_PARTS set to 64
 

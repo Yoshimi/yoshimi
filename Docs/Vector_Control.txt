@@ -12,8 +12,8 @@ Independently of this Parts 2 & 18 could use filter and pan from another CC
 Setting up is currently done as follows.
 
 In the required channel send:
-RPN MSB (99)  set to 64
-RPN LSB (98)  1
+NRPN MSB (99)  set to 64
+NRPN LSB (98)  1
 Data MSB ( 6) set mode
               0 = X CC
               1 = Y CC
@@ -32,4 +32,25 @@ features:
     2 = Pan
     4 = Filter Cutoff (Brightness)
 
-If the panel is open when setting instruments by this method the gui will freeze :(
+ 
+An Example:
+
+From channel 1, send the following CCs
+
+CC      Value
+99       64
+98        1
+ 6        0
+38       14
+ 6        1
+38       15
+ 6        2
+38        1
+ 6        3
+38        2
+
+This will set up CC14 as the X axis control and CC15 as Y, with X set to volume control and Y set to pan control.
+
+You can either go on with the NRPNs to set the voices (this will load and
+enable voices from the current bank) or enable and load them by hand.
+For channel 1 this would be part 1 and 17 for X and part 33 and 49 for Y

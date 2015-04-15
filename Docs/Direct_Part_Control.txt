@@ -11,8 +11,9 @@ then
 DATA MSB (6)
     0 : LSB = Part number
     1 : LSB = program number
-    2 { LSB will be controller number }
-    3 { LSB will be controller value }
+    2 : LSB = controller number
+    3 : LSB = controller value
+    4 {LSB will be part's channel number}
     
     more!
     

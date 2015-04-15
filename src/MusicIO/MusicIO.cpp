@@ -41,7 +41,7 @@ MusicIO::MusicIO(SynthEngine *_synth) :
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
     for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
-        nrpnVectors.Enabled[chan] = false;
+        nrpndata.Enabled[chan] = false;
 }
 
 MusicIO::~MusicIO()
@@ -205,11 +205,11 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             }
 #warning should some NRPN & vector stuff move out of the MIDI thread?
 # if NUM_MIDI_PARTS == 64
-            if (nrpnVectors.Enabled[ch])
+            if (nrpndata.Enabled[ch])
             {
-                int Xopps = nrpnVectors.Xaxis[ch];
+                int Xopps = nrpndata.Xaxis[ch];
                 int Xtype = Xopps & 0xff;
-                int Yopps = nrpnVectors.Yaxis[ch];
+                int Yopps = nrpndata.Yaxis[ch];
                 int Ytype = Yopps & 0xff;
                 Xopps = Xopps >> 8;
                 Yopps = Yopps >> 8;
@@ -290,7 +290,10 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
             case 0:
                 {
                     if (par < NUM_MIDI_PARTS)
+                    {
                         synth->getRuntime().dataL = par; // set part number
+                        nrpndata.Part = par;
+                    }
                     else
                         synth->getRuntime().dataH = 128; // It's bad. Kill it
                     break;
@@ -298,21 +301,25 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
                 case 1:
                 {
                     if (dLow < 128)
-                        setMidiProgram( dLow | 0x80, par);
+                        setMidiProgram(dLow | 0x80, par);
                     break;
                 }
                 case 2:
                 {
-                    // will set controller number
+                    if (dLow < 128)
+                        synth->getRuntime().dataL = par; // set controller number
+                    break;
                 }
 
                 case 3:
                 {
-                    // will set controller value
+                    if (dLow < 128)
+                        synth->SetController(nrpndata.Part | 0x80, dLow, par);// set controller value
+                    break;
                 }
                 case 4:
                 {
-                    // will set parts channel number
+                     // will set part's channel number
                 }
         }
     }
@@ -321,9 +328,9 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
     else if (nLow == 1) // it's vector control
         if (type == C_dataL)
         {
-            if (!nrpnVectors.Enabled[chan])
+            if (!nrpndata.Enabled[chan])
             {
-                nrpnVectors.Enabled[chan] = true;
+                nrpndata.Enabled[chan] = true;
                 synth->getRuntime().Log("Vector control enabled");
                 /*
                  * enabling and disabling is only done when the LSB is being set
@@ -335,26 +342,26 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
             {
                 case 0:
                     {
-                        nrpnVectors.Xaxis[chan]
-                        = (nrpnVectors.Xaxis[chan] & 0xff00) | par;
+                        nrpndata.Xaxis[chan]
+                        = (nrpndata.Xaxis[chan] & 0xff00) | par;
                         break;
                     }
                 case 1:
                     {
-                        nrpnVectors.Yaxis[chan]
-                        = (nrpnVectors.Yaxis[chan] & 0xff00) | par;
+                        nrpndata.Yaxis[chan]
+                        = (nrpndata.Yaxis[chan] & 0xff00) | par;
                         break;
                     }
                 case 2:
                     {
-                        nrpnVectors.Xaxis[chan]
-                        = (nrpnVectors.Xaxis[chan] & 0xff) | (par << 8);
+                        nrpndata.Xaxis[chan]
+                        = (nrpndata.Xaxis[chan] & 0xff) | (par << 8);
                         break;
                     }
                 case 3:
                     {
-                        nrpnVectors.Yaxis[chan]
-                        = (nrpnVectors.Yaxis[chan] & 0xff) | (par << 8);
+                        nrpndata.Yaxis[chan]
+                        = (nrpndata.Yaxis[chan] & 0xff) | (par << 8);
                         break;
                     }
                  case 4:
@@ -379,7 +386,7 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
                     }
                  default:
                     {
-                        nrpnVectors.Enabled[chan] = false;
+                        nrpndata.Enabled[chan] = false;
                         synth->getRuntime().Log("Vector control disabled");
                     }
             }

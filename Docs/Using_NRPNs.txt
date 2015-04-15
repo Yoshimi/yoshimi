@@ -10,3 +10,5 @@ If a supported control is identified these data values will be stored locally (i
 Whenever either byte of the NRPN is changed, the data values will be cleared (but stored ones will not be affected).
 
 If either NRPN byte is set to 127 data values are ignored again.
+
+NRPNs are not themselves channel sensitive but the final results will be sent to whatever is the current channel.
