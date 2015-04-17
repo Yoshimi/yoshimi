@@ -493,7 +493,9 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                         partOK = true; 
                         if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
                             partonoff(npart, 1);
-                        if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
+                        if (Runtime.showGui && guiMaster && guiMaster->partui
+                                            && guiMaster->partui->instrumentlabel
+                                            && guiMaster->partui->part)
                         {
                             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                         }
@@ -510,7 +512,9 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
                 {
                     if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
                         partonoff(npart, 1);
-                    if (Runtime.showGui && guiMaster && guiMaster->partui && guiMaster->partui->instrumentlabel && guiMaster->partui->part)
+                    if (Runtime.showGui && guiMaster && guiMaster->partui
+                                        && guiMaster->partui->instrumentlabel
+                                        && guiMaster->partui->part)
                     {
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                     }
@@ -523,6 +527,23 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
         }
         else // I think XML traps this. Should it?
             Runtime.Log("SynthEngine setProgram: Invalid program data");
+    }
+}
+
+
+// Set part's channel number
+void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
+{
+    if (npart < NUM_MIDI_PARTS && nchan < NUM_MIDI_CHANNELS)
+    {
+        part[npart]->Prcvchn =  nchan;
+        if (Runtime.showGui && guiMaster && guiMaster->partui
+                            && guiMaster->partui->instrumentlabel
+                            && guiMaster->partui->part)
+        {
+            GuiThreadMsg::sendMessage(this,
+            GuiThreadMsg::UpdatePartProgram, npart);
+        }
     }
 }
 

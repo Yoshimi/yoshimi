@@ -13,7 +13,6 @@ DATA MSB (6)
     1 : LSB = program number
     2 : LSB = controller number
     3 : LSB = controller value
-    4 {LSB will be part's channel number}
+    4 : LSB = part's channel number
     
-    more!
-    
+Other values currently ignored, but more error checking needed.

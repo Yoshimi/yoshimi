@@ -62,3 +62,8 @@ It is now possible to direct messages to either stderr or the report window on t
 
 ###
 
+Some NRPNs are now supported.
+See:
+Using_NRPNs.txt
+Direct_Part_Control.txt
+Vector_Control.txt

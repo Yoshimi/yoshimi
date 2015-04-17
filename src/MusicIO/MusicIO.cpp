@@ -6,7 +6,7 @@
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
     Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    version 2 of the License, or (at your option) any later version.
 
     yoshimi is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -287,39 +287,41 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
     {
         switch (dHigh)
         {
-            case 0:
+            case 0: // set part number
                 {
                     if (par < NUM_MIDI_PARTS)
                     {
-                        synth->getRuntime().dataL = par; // set part number
+                        synth->getRuntime().dataL = par;
                         nrpndata.Part = par;
                     }
-                    else
-                        synth->getRuntime().dataH = 128; // It's bad. Kill it
+                    else // It's bad. Kill it
+                        synth->getRuntime().dataH = 128;
                     break;
                 }
-                case 1:
+                case 1: // Program Change
                 {
                     if (dLow < 128)
                         setMidiProgram(dLow | 0x80, par);
                     break;
                 }
-                case 2:
+                case 2: // Set controller number
                 {
                     if (dLow < 128)
-                        synth->getRuntime().dataL = par; // set controller number
+                        synth->getRuntime().dataL = par;
                     break;
                 }
 
-                case 3:
+                case 3: // Set controller value
                 {
                     if (dLow < 128)
-                        synth->SetController(nrpndata.Part | 0x80, dLow, par);// set controller value
+                        synth->SetController(nrpndata.Part | 0x80, dLow, par);
                     break;
                 }
-                case 4:
+                case 4: // Set part's channel number
                 {
-                     // will set part's channel number
+                     if (dLow < 128)
+                        synth->SetPartChan(nrpndata.Part, par);
+                     break;
                 }
         }
     }
