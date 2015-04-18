@@ -1,6 +1,9 @@
 
 NRPN MSB is CC 99, and LSB is CC 98
 
+You must *always* set NRPN MSB before LSB
+However, once MSB has been set you can set a chain of LSBs if they share the same MSB
+
 The data CCs associated with these are, 6 for MSB and 38 for LSB
 
 Only when an NRPN has been set can the data values be entered (they will be ignored otherwise).

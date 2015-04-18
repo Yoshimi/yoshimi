@@ -3,6 +3,7 @@
 
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
+    Copyright 2014-2015, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -73,10 +74,10 @@ class MusicIO : virtual protected MiscFuncs
         static void *static_PrgChangeThread(void *arg);
         
         struct IOdata{
-            unsigned short Xaxis[NUM_MIDI_CHANNELS];
-            unsigned short Yaxis[NUM_MIDI_CHANNELS];
+            unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
+            unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
             unsigned char Part;
-            bool Enabled[NUM_MIDI_CHANNELS];
+            bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
         
         IOdata nrpndata;

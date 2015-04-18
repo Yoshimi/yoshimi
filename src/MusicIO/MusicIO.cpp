@@ -2,6 +2,7 @@
     MusicIO.cpp
 
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014-2015, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -41,7 +42,11 @@ MusicIO::MusicIO(SynthEngine *_synth) :
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
     for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
-        nrpndata.Enabled[chan] = false;
+    {
+        nrpndata.vectorEnabled[chan] = false;
+        nrpndata.vectorXaxis[chan] = 0xff;
+        nrpndata.vectorYaxis[chan] = 0xff;
+    }
 }
 
 MusicIO::~MusicIO()
@@ -180,11 +185,23 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
     else if(ctrl == C_nrpnL)
     {
-        synth->getRuntime().nrpnL = param;
-        synth->getRuntime().dataL = 128; //  we've changed the NRPN
-        synth->getRuntime().dataH = 128; //  so these are now invalid
-        synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
-        synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+        if ( synth->getRuntime().nrpnH == 127)
+            synth->getRuntime().Log("Must set nrpn MSB first");
+        else
+        {
+            synth->getRuntime().nrpnL = param;
+            synth->getRuntime().dataL = 128; //  we've changed the NRPN
+            synth->getRuntime().dataH = 128; //  so these are now invalid
+            if (param == 1) // clear out previous vector settings
+            {
+                nrpndata.vectorEnabled[ch] = false;
+                nrpndata.vectorXaxis[ch] = 0xff;
+                nrpndata.vectorYaxis[ch] = 0xff;
+
+            }
+            synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
+            synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+        }
     }
     else if(ctrl == C_nrpnH)
     {
@@ -205,11 +222,11 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             }
 #warning should some NRPN & vector stuff move out of the MIDI thread?
 # if NUM_MIDI_PARTS == 64
-            if (nrpndata.Enabled[ch])
+            if (nrpndata.vectorEnabled[ch])
             {
-                int Xopps = nrpndata.Xaxis[ch];
+                int Xopps = nrpndata.vectorXaxis[ch];
                 int Xtype = Xopps & 0xff;
-                int Yopps = nrpndata.Yaxis[ch];
+                int Yopps = nrpndata.vectorYaxis[ch];
                 int Ytype = Yopps & 0xff;
                 Xopps = Xopps >> 8;
                 Yopps = Yopps >> 8;
@@ -234,7 +251,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                             synth->SetController(ch | 0x90, C_filtercutoff, 127 - param);
                         }
                     }
-                    else
+                    else // if Y hasn't been set these commands will be ignored
                     {
 //                       synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
                         if (Yopps & 1) // volume
@@ -330,40 +347,40 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
     else if (nLow == 1) // it's vector control
         if (type == C_dataL)
         {
-            if (!nrpndata.Enabled[chan])
-            {
-                nrpndata.Enabled[chan] = true;
-                synth->getRuntime().Log("Vector control enabled");
-                /*
-                 * enabling and disabling is only done when the LSB is being set
-                 * but actually tests MSB
-                 * this is to allow for future expansion
-                */
-            }
             switch (dHigh)
             {
                 case 0:
                     {
-                        nrpndata.Xaxis[chan]
-                        = (nrpndata.Xaxis[chan] & 0xff00) | par;
+                        nrpndata.vectorXaxis[chan]
+                        = (nrpndata.vectorXaxis[chan] & 0xff00) | par;
+                        if (!nrpndata.vectorEnabled[chan])
+                        {
+                            nrpndata.vectorEnabled[chan] = true;
+                            synth->getRuntime().Log("Vector control enabled");
+                            // enabling is only done with a valid X CC
+                        }
                         break;
                     }
                 case 1:
                     {
-                        nrpndata.Yaxis[chan]
-                        = (nrpndata.Yaxis[chan] & 0xff00) | par;
+                        if ((nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
+                            synth->getRuntime().Log("Vector X axis must be set before Y");
+                        else
+                            nrpndata.vectorYaxis[chan]
+                            = (nrpndata.vectorYaxis[chan] & 0xff00) | par;
                         break;
                     }
                 case 2:
                     {
-                        nrpndata.Xaxis[chan]
-                        = (nrpndata.Xaxis[chan] & 0xff) | (par << 8);
+                        nrpndata.vectorXaxis[chan]
+                        = (nrpndata.vectorXaxis[chan] & 0xff) | (par << 8);
                         break;
                     }
                 case 3:
                     {
-                        nrpndata.Yaxis[chan]
-                        = (nrpndata.Yaxis[chan] & 0xff) | (par << 8);
+                        
+                        nrpndata.vectorYaxis[chan]
+                        = (nrpndata.vectorYaxis[chan] & 0xff) | (par << 8);
                         break;
                     }
                  case 4:
@@ -388,7 +405,9 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
                     }
                  default:
                     {
-                        nrpndata.Enabled[chan] = false;
+                        nrpndata.vectorEnabled[chan] = false;
+                        nrpndata.vectorXaxis[chan] = 0xff;
+                        nrpndata.vectorYaxis[chan] = 0xff;
                         synth->getRuntime().Log("Vector control disabled");
                     }
             }
