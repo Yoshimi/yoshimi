@@ -339,7 +339,7 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {43 582 375 165} type Double
+      private xywh {4 826 375 165} type Double
       class Fl_Group visible
     } {
       Fl_Group partgroupui {open
@@ -393,8 +393,9 @@ Offset}
         Fl_Dial partpan {
           label Pan
           callback {//
-              part->SetController(C_panning, (char)o->value());
-              synth->getGuiMaster()->setPanelPartPanWidget(npart, o->value());}
+    part->SetController(C_panning, (char)o->value());
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());}
           xywh {290 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Ppanning);}
           class WidgetPDial
@@ -402,16 +403,18 @@ Offset}
         Fl_Button {} {
           label Centre
           callback {//
-              part->SetController(C_panning, 64);
-              partpan->value(64);
-              synth->getGuiMaster()->setPanelPartPanWidget(npart, 64);}
+    part->SetController(C_panning, 64);
+    partpan->value(64);
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, 64);}
           tooltip {Centre panning} xywh {300 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial partvol {
           label Volume
           callback {//
-              part->setVolume(o->value());
-              synth->getGuiMaster()->setPanelPartVolWidget(npart, o->value());} selected
+    part->setVolume(o->value());
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());}
           tooltip {Part Volume} xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
@@ -437,8 +440,9 @@ Offset}
       Fl_Spinner midich {
         label Midi
         callback {//
-            part->Prcvchn = lrint(o->value()) - 1;
-            synth->getGuiMaster()->setPanelPartMidiWidget(npart, o->value() - 1);}
+    part->Prcvchn = lrint(o->value()) - 1;
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);} selected
         tooltip {Midi channel for this part} xywh {35 36 40 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
       }
@@ -962,8 +966,8 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {305 125 395 360} type Double
-      code0 {rnddet->value((int)(0.5+part->Pfrand*100));} visible
+      xywh {305 125 395 360} type Double hide
+      code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
     } {
       Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1143,7 +1147,7 @@ else {propta->deactivate();proptb->deactivate();}}
       }
       Fl_Spinner rnddet {
         label {Rnd. Det.}
-        callback {part->Pfrand = o->value() / 200.0f;} selected
+        callback {part->Pfrand = o->value() / 200.0f;}
         tooltip {Small random detune - experimental!} xywh {113 335 44 19} labelsize 12 minimum 0 maximum 20 value 0 textsize 12
         code0 {o->value((int)part->Pfrand*200);}
       }
@@ -1170,6 +1174,7 @@ else {propta->deactivate();proptb->deactivate();}}
         bankui = bankui_;
         part = part_;
         npart = npart_;
+        plgroup = &synth->getGuiMaster()->panelgroup;
         ninseff = 0;
         make_window();
         partgroup->position(this->parent()->x() + 2, this->parent()->y() + 2);
@@ -1266,5 +1271,7 @@ else {propta->deactivate();proptb->deactivate();}}
   decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int *plgroup;} {private local
   }
 } 

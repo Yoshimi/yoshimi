@@ -4,8 +4,9 @@ yoshimi 1.3.x
 - Added NRPN and vector error checks and warnings
 - Updated docs
 - Very specific segfault with Rosegarden V12.4 and 'RootBankChange'
-  test file has cleared! Confirmed it is still there on pre
-  yoshimi 1.3.4 - puzzling :(
+  test file has cleared! Confirmed it is still there on   yoshimi 1.3.3
+  puzzling :(
+- Rationalised mixer panel gui, removing duplicates
 
 2015-4-17 Will (vector)
 - Implemented direct part channel change

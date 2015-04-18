@@ -104,6 +104,7 @@ synth = _synth;
     maxdbl = NO_DB;
     maxdbr = NO_DB;
     clipped = 0;
+    plgroup = &synth->getGuiMaster()->panelgroup;
     synth->VUdata.values.vuOutPeakL = 0.0;
     synth->VUdata.values.vuOutPeakR = 0.0;
     synth->VUdata.values.vuRmsPeakL = 0.0;
@@ -244,7 +245,7 @@ synth = _synth;
     int oy = y()+2;
     int lx = w()-4;
     int ly = h()-4;
-    float Vpeak = synth->VUdata.values.parts[npart];
+    float Vpeak = synth->VUdata.values.parts[npart + *plgroup];
     if (Vpeak < 0) // its a fake one
     {
         fl_rectf(ox, oy, lx, ly, 140, 140, 140);
@@ -254,22 +255,22 @@ synth = _synth;
     }
         
     if (Vpeak > 1.0)
-        panelpart.clip[npart] = true;
+        panelpart.clip[npart + *plgroup] = true;
  
     // draw the vu lines
     float db = rap2dB(Vpeak);
     db = (MIN_DB - db) / MIN_DB;
     db = (db > 1.0) ? 1.0 : db;
     db = db * ly - 2;
-    if (db >= panelpart.oldpeak[npart])
-        panelpart.oldpeak[npart] = (int) db;
-    else if (panelpart.oldpeak[npart] >= 4)
-        panelpart.oldpeak[npart] -= 4;
+    if (db >= panelpart.oldpeak[npart + *plgroup])
+        panelpart.oldpeak[npart + *plgroup] = (int) db;
+    else if (panelpart.oldpeak[npart + *plgroup] >= 4)
+        panelpart.oldpeak[npart + *plgroup] -= 4;
     else
-        panelpart.oldpeak[npart] = 0;
+        panelpart.oldpeak[npart + *plgroup] = 0;
         
     fl_rectf(ox, oy, lx, ly, 0, 0, 0);
-    fl_rectf(ox, oy + ly - panelpart.oldpeak[npart], lx, panelpart.oldpeak[npart], 0, 200, 255);
+    fl_rectf(ox, oy + ly - panelpart.oldpeak[npart + *plgroup], lx, panelpart.oldpeak[npart + *plgroup], 0, 200, 255);
 
     // draw the scales
     float tmp = ly * 1.0 / MIN_DB;
@@ -281,7 +282,7 @@ synth = _synth;
         if (i % 10 == 0)
             fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
     }
-    if (panelpart.clip[npart])
+    if (panelpart.clip[npart + *plgroup])
         fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {}
   }
   Function {draw()} {open
@@ -341,6 +342,8 @@ synth = _synth;
   decl {int oldpeakr;} {private local
   }
   decl {int clipped;} {private local
+  }
+  decl {int *plgroup;} {public local
   }
   decl {SynthEngine *synth;} {private local
   }
@@ -408,10 +411,10 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {1195 47 60 275} type Double hide
-      class Fl_Group
+      private xywh {1195 47 60 275} type Double
+      class Fl_Group visible
     } {
-      Fl_Group panellistitemgroup {open selected
+      Fl_Group panellistitemgroup {open
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
         code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
@@ -428,9 +431,9 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
         }
         Fl_Button partname {
           label {  }
-          callback {if ((int)bankui->cbwig->value() != (npart + 1))
+          callback {if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
               {
-                  bankui->cbwig->value(npart+1);
+                  bankui->cbwig->value(npart + 1 + *plgroup);
                   bankui->cbwig->do_callback();
               }
               bankui->Show();}
@@ -438,36 +441,36 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
         }
         Fl_Slider partvolume {
           callback {//
-              synth->part[npart]->setVolume(o->value());
-              synth->getGuiMaster()->setPartVolWidget(npart, o->value());}
+              synth->part[npart + *plgroup]->setVolume(o->value());
+              synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, o->value());}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
-          code0 {o->value(synth->part[npart]->Pvolume);}
+          code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
         }
         Fl_Dial partpanning {
           callback {//
-              synth->part[npart]->SetController(C_panning, (char)o->value());
-              synth->getGuiMaster()->setPartPanWidget(npart, o->value());}
+              synth->part[npart + *plgroup]->SetController(C_panning, (char)o->value());
+              synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());}
           xywh {17 180 30 30} maximum 127 step 1
-          code0 {o->value(synth->part[npart]->Ppanning);}
+          code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           class WidgetPDial
         }
         Fl_Button {} {
           label Edit
           callback {//
-              if ((int)bankui->cbwig->value() != (npart + 1))
+              if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
               {
-                  bankui->cbwig->value(npart+1);
+                  bankui->cbwig->value(npart + 1 + *plgroup);
                   bankui->cbwig->do_callback();
               }
               if (Fl::event() == FL_RELEASE and Fl::event_button() == FL_RIGHT_MOUSE)
-                  synth->getGuiMaster()->showInstrumentEditWindow(npart);}
+                  synth->getGuiMaster()->showInstrumentEditWindow(npart + *plgroup);}
           tooltip {Left mouse button: Part select
 Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labelsize 10
         }
         Fl_Choice partrcv {
           callback {//
-              synth->part[npart]->Prcvchn=o->value();
-              synth->getGuiMaster()->setPartMidiWidget(npart, o->value() + 1);}
+              synth->part[npart + *plgroup]->Prcvchn=o->value();
+              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, o->value() + 1);}
           tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -476,12 +479,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
                 else
                     o->add("Dr10");
             }}
-          code1 {o->value(synth->part[npart]->Prcvchn);}
+          code1 {o->value(synth->part[npart + *plgroup]->Prcvchn);}
         } {}
         Fl_Choice audiosend {
-          callback {synth->part[npart]->Paudiodest = o->value() + 1;}
+          callback {synth->part[npart + *plgroup]->Paudiodest = o->value() + 1;}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textsize 9
-          code0 {if (synth->part[npart]->Paudiodest == 2) o->value(1); else if (synth->part[npart]->Paudiodest == 3) o->value(2); else o->value(0);}
+          code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
           MenuItem main {
             label Main
@@ -500,23 +503,21 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {synth->actionLock(lockmute);
-            synth->partonoff(npart, o->value());
+            synth->partonoff(npart + *plgroup, o->value());
             synth->actionLock(unlock);
             if (o->value() == 0)
                 panellistitemgroup->deactivate();
             else
             {
                 panellistitemgroup->activate();
-                if ((int)bankui->cbwig->value() != (npart + 1))
-                    bankui->cbwig->value(npart + 1);
+                if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
+                    bankui->cbwig->value(npart + 1 + *plgroup);
             }
-            if ((int)bankui->cbwig->value() == (npart + 1))
+            if ((int)bankui->cbwig->value() == (npart + 1 + *plgroup))
                 bankui->cbwig->do_callback();
             o->redraw();}
-        private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 24
-        code0 {string tmp = asString(npart + 1);
-            o->copy_label(tmp.c_str());}
-        code1 {o->value(synth->part[npart]->Penabled);}
+        private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
+        code0 {o->value(synth->part[npart + *plgroup]->Penabled);}
       }
     }
   }
@@ -528,32 +529,37 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   Function {init(int npart_, BankUI *bankui_, SynthEngine *_synth)} {open
   } {
     code {synth = _synth;
-npart=npart_;
+	npart=npart_;
         bankui = bankui_;
+        plgroup = &synth->getGuiMaster()->panelgroup;
         make_window();
         panellistitem->show();
         end();} {}
   }
   Function {refresh()} {open
   } {
-    code {partenabled->value(synth->part[npart]->Penabled);
-        if (synth->part[npart]->Penabled != 0)
+    code {//
+	partenabled->value(synth->part[npart + *plgroup]->Penabled);
+        if (synth->part[npart + *plgroup]->Penabled != 0)
             panellistitemgroup->activate();
         else
             panellistitemgroup->deactivate();
-        partvolume->value(synth->part[npart]->Pvolume);
-        partpanning->value(synth->part[npart]->Ppanning);
-        partrcv->value(synth->part[npart]->Prcvchn);
-        partname->label(synth->part[npart]->Pname.c_str());
-        int tmp = synth->part[npart]->Paudiodest - 1;
+        partvolume->value(synth->part[npart + *plgroup]->Pvolume);
+        partpanning->value(synth->part[npart + *plgroup]->Ppanning);
+        partrcv->value(synth->part[npart + *plgroup]->Prcvchn);
+        partname->label(synth->part[npart + *plgroup]->Pname.c_str());
+        int tmp = synth->part[npart + *plgroup]->Paudiodest - 1;
         if (tmp < 0 or tmp > 3)
             tmp = 0;
         audiosend->value(tmp);
-        if ((int)bankui->cbwig->value() != (npart + 1))
+        if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));
         else
             panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();} {}
+        panellistitemgroup->redraw();
+        string num = asString(npart + 1 + *plgroup);
+        partenabled->copy_label(num.c_str());} {selected
+    }
   }
   Function {~Panellistitem()} {open
   } {
@@ -564,5 +570,7 @@ npart=npart_;
   decl {BankUI *bankui;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int *plgroup;} {public local
   }
 } 
