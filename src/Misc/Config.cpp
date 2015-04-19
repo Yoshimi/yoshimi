@@ -1094,7 +1094,7 @@ void GuiThreadMsg::processGuiMessages()
                 MasterUI *guiMaster = synth->getGuiMaster(false);
                 if(guiMaster)
                 {
-                    guiMaster->panellistitem[msg->index]->refresh();
+                    guiMaster->panellistitem[(msg->index) % NUM_MIDI_CHANNELS]->refresh();
                     guiMaster->updatepart();
                 }
             }
@@ -1115,6 +1115,4 @@ void GuiThreadMsg::processGuiMessages()
         }
         delete msg;
     }
-
-
 }

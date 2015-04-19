@@ -315,8 +315,6 @@ synth = _synth;
                 maxdbl = NO_DB;
                 maxdbr = NO_DB;
                 clipped = 0;
-                //for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
-                    //panelpart.clip[i] = false;
                	MasterUI *masterUI = synth->getGuiMaster(false);
                	if(masterUI)               
                	{
@@ -325,7 +323,8 @@ synth = _synth;
             }
             break;
         }
-        return 1;} {}
+        return 1;} {selected
+    }
   }
   decl {int npart;} {private local
   }
@@ -411,8 +410,8 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {1195 47 60 275} type Double
-      class Fl_Group visible
+      private xywh {1195 47 60 275} type Double hide
+      class Fl_Group
     } {
       Fl_Group panellistitemgroup {open
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
@@ -539,27 +538,28 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   Function {refresh()} {open
   } {
     code {//
-	partenabled->value(synth->part[npart + *plgroup]->Penabled);
-        if (synth->part[npart + *plgroup]->Penabled != 0)
+	int setpart = npart | *plgroup; // assumes *plgroup always power of 2
+	
+	partenabled->value(synth->part [setpart]->Penabled);
+        if (synth->part[setpart]->Penabled != 0)
             panellistitemgroup->activate();
         else
             panellistitemgroup->deactivate();
-        partvolume->value(synth->part[npart + *plgroup]->Pvolume);
-        partpanning->value(synth->part[npart + *plgroup]->Ppanning);
-        partrcv->value(synth->part[npart + *plgroup]->Prcvchn);
-        partname->label(synth->part[npart + *plgroup]->Pname.c_str());
-        int tmp = synth->part[npart + *plgroup]->Paudiodest - 1;
+        partvolume->value(synth->part[setpart]->Pvolume);
+        partpanning->value(synth->part[setpart]->Ppanning);
+        partrcv->value(synth->part[setpart]->Prcvchn);
+        partname->label(synth->part[setpart]->Pname.c_str());
+        int tmp = synth->part[setpart]->Paudiodest - 1;
         if (tmp < 0 or tmp > 3)
             tmp = 0;
         audiosend->value(tmp);
-        if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
+        if ((int)bankui->cbwig->value() != (setpart + 1))
             panellistitemgroup->color(fl_rgb_color(160, 160, 160));
         else
             panellistitemgroup->color(fl_rgb_color(50,190,240));
         panellistitemgroup->redraw();
-        string num = asString(npart + 1 + *plgroup);
-        partenabled->copy_label(num.c_str());} {selected
-    }
+        string num = asString(setpart + 1);
+        partenabled->copy_label(num.c_str());} {}
   }
   Function {~Panellistitem()} {open
   } {
