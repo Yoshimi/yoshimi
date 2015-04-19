@@ -1,7 +1,7 @@
 
 NRPN MSB is CC 99, and LSB is CC 98
 
-You must *always* set NRPN MSB before LSB
+it's geberally advisable to set NRPN MSB before LSB
 However, once MSB has been set you can set a chain of LSBs if they share the same MSB
 
 The data CCs associated with these are, 6 for MSB and 38 for LSB
@@ -10,8 +10,8 @@ Only when an NRPN has been set can the data values be entered (they will be igno
 
 If a supported control is identified these data values will be stored locally (if needed) so that other NRPNs can be set.
 
-Whenever either byte of the NRPN is changed, the data values will be cleared (but stored ones will not be affected).
+Whenever either byte of the NRPN is changed, the data values will be cleared (but stored settings will not be affected).
 
 If either NRPN byte is set to 127 data values are ignored again.
 
-NRPNs are not themselves channel sensitive but the final results will usually be sent to whichever is the current channel.
+In Yoshimi NRPNs are not themselves channel sensitive but the final results will usually be sent to whichever is the current channel.

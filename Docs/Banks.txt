@@ -9,3 +9,5 @@ In Yoshimi->Settings->CC you can enable or disable all these MIDI features, and 
 Also, different instances have their own config files so that you can have (say) the main instance with current root(9), bank(23) while instance 4 has current root(2), bank(6). You can call up instances by number and thus access saved settings for that instance. As each instance has its own MIDI and audio ports, they can behave more-or-less independently.
 
 In doing all of this we have completely changed the way we manage the structure internally, resulting in much greater efficiency, at the cost of only a slightly slower startup. Swapping roots performs *no* file operations. Swapping banks only fetches the directory list of the newly selected bank. Changing an instrument doesn't have to search for a file, only load from its already known location.
+
+Finally, it is generally advisable to make root and bank changes on channel 1. However they are not channel sensitive as they don't directly affect the sound, so you can set them in any convenient channel then perform individual program changes on the desired channels.

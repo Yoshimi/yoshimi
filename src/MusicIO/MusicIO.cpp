@@ -185,29 +185,33 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
     else if(ctrl == C_nrpnL)
     {
-        if ( synth->getRuntime().nrpnH == 127)
-            synth->getRuntime().Log("Must set nrpn MSB first");
-        else
+        if(synth->getRuntime().nrpnL == param)
+            return;
+        synth->getRuntime().nrpnL = param;
+        synth->getRuntime().dataL = 128; //  we've changed the NRPN
+        synth->getRuntime().dataH = 128; //  so these are now invalid
+        if (param == 1 && synth->getRuntime().nrpnH == 64) // clear out previous vector settings
         {
-            synth->getRuntime().nrpnL = param;
-            synth->getRuntime().dataL = 128; //  we've changed the NRPN
-            synth->getRuntime().dataH = 128; //  so these are now invalid
-            if (param == 1) // clear out previous vector settings
-            {
-                nrpndata.vectorEnabled[ch] = false;
-                nrpndata.vectorXaxis[ch] = 0xff;
-                nrpndata.vectorYaxis[ch] = 0xff;
-
-            }
-            synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
-            synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+            nrpndata.vectorEnabled[ch] = false;
+            nrpndata.vectorXaxis[ch] = 0xff;
+            nrpndata.vectorYaxis[ch] = 0xff;
         }
+        synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
+        synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
     }
     else if(ctrl == C_nrpnH)
     {
+        if(synth->getRuntime().nrpnH == param)
+            return;
         synth->getRuntime().nrpnH = param;
         synth->getRuntime().dataL = 128; //  we've changed the NRPN
         synth->getRuntime().dataH = 128; //  so these are now invalid
+        if (param == 64 && synth->getRuntime().nrpnL == 1) // clear out previous vector settings
+        {
+            nrpndata.vectorEnabled[ch] = false;
+            nrpndata.vectorXaxis[ch] = 0xff;
+            nrpndata.vectorYaxis[ch] = 0xff;
+        }
         synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnL < 127);
         synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
     }
