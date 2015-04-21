@@ -382,15 +382,18 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     // Part outputs
     for (int port = 0, idx = 0; port < NUM_MIDI_PARTS; port++ , idx += 2)
     {
-        if (synth->part[port]->Paudiodest & 2)
+        if (jack_port_connected(audio.ports[port])) // just a few % improvement.
         {
-            memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
-            memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
-        }
-        else
-        {
-            memset(audio.portBuffs[idx], 0, framesize);
-            memset(audio.portBuffs[idx + 1], 0, framesize);
+            if (synth->part[port]->Paudiodest & 2)
+            {
+                memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
+                memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
+            }
+            else
+            {
+                memset(audio.portBuffs[idx], 0, framesize);
+                memset(audio.portBuffs[idx + 1], 0, framesize);
+            }
         }
     }
     // And mixed outputs

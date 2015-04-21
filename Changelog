@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-4-21 Will (vector)
+- Some more small optimisations
+
 2015-4-19 Will (vector)
 - Fixed regressions caused by mixer gui changes!
 - More adjustments giving greater flexibility to NRPNs

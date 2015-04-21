@@ -105,7 +105,6 @@ void Reverb::cleanup(void)
     memset(lpcomb, 0, sizeof(float) * REV_COMBS * 2);
     for (i = 0; i < REV_COMBS * 2; ++i)
     {
-//        lpcomb[i] = 0.0f;
         for (j = 0; j < comblen[i]; ++j)
             comb[i][j] = 0.0f; // not sure how to memset this!
     }
@@ -115,8 +114,6 @@ void Reverb::cleanup(void)
 
     if (idelay)
         memset(idelay, 0, sizeof(float) * idelaylen);
-//        for (i = 0; i < idelaylen; ++i)
-//            idelay[i] = 0.0f;
     if (hpf)
         hpf->cleanup();
     if (lpf)

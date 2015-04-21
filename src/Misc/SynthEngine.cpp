@@ -571,9 +571,12 @@ void SynthEngine::partonoff(int npart, int what)
 
 
 // Master audio out (the final sound)
-void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS], int to_process)
+void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {    
 
+    float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
+    float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
+   
     p_buffersize = buffersize;
     p_bufferbytes = bufferbytes;
     p_buffersize_f = buffersize_f;
@@ -593,11 +596,16 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     }
 
     int npart;
-    for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
+    for (npart = 0; npart < (NUM_MIDI_PARTS); ++npart)
     {
-        memset(outl[npart], 0, p_bufferbytes);
-        memset(outr[npart], 0, p_bufferbytes);
+        if (part[npart]->Penabled)
+        {
+            memset(outl[npart], 0, p_bufferbytes);
+            memset(outr[npart], 0, p_bufferbytes);
+        }
     }
+    memset(mainL, 0, p_bufferbytes);
+    memset(mainR, 0, p_bufferbytes);
 
     if (!isMuted())
     {
@@ -697,8 +705,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
             float outvol = sysefx[nefx]->sysefxgetvolume();
             for (int i = 0; i < p_buffersize; ++i)
             {
-                outl[NUM_MIDI_PARTS][i] += tmpmixl[i] * outvol;
-                outr[NUM_MIDI_PARTS][i] += tmpmixr[i] * outvol;
+                mainL[i] += tmpmixl[i] * outvol;
+                mainR[i] += tmpmixr[i] * outvol;
             }
         }
 
@@ -716,8 +724,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
             {
                 for (int i = 0; i < p_buffersize; ++i)
                 {   // the volume did not change
-                    outl[NUM_MIDI_PARTS][i] += part[npart]->partoutl[i];
-                    outr[NUM_MIDI_PARTS][i] += part[npart]->partoutr[i];
+                    mainL[i] += part[npart]->partoutl[i];
+                    mainR[i] += part[npart]->partoutr[i];
                 }
             }
         }
@@ -726,7 +734,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         {
             if (Pinsparts[nefx] == -2)
-                insefx[nefx]->out(outl[NUM_MIDI_PARTS], outr[NUM_MIDI_PARTS]);
+                insefx[nefx]->out(mainL, mainR);
         }
 
         LFOtime++; // update the LFO's time
@@ -735,16 +743,21 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         float fade;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
-            outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
-            outr[NUM_MIDI_PARTS][idx] *= volume;
+            mainL[idx] *= volume; // apply Master Volume
+            mainR[idx] *= volume;
             if (shutup) // fade-out
             {
                 fade = (float) (p_buffersize - idx) / (float) p_buffersize;
-                for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart) // include mains
+                for (npart = 0; npart < (NUM_MIDI_PARTS); ++npart)
                 {
-                    outl[npart][idx] *= fade;
-                    outr[npart][idx] *= fade;
+                    if (part[npart]->Paudiodest & 2)
+                    {
+                        outl[npart][idx] *= fade;
+                        outr[npart][idx] *= fade;
+                    }
                 }
+                mainL[idx] *= fade;
+                mainR[idx] *= fade;
             }
         }
 
@@ -756,14 +769,14 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         float absval;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
-            if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakL)
+            if ((absval = fabsf(mainL[idx])) > VUpeak.values.vuOutPeakL)
                 VUpeak.values.vuOutPeakL = absval;
-            if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > VUpeak.values.vuOutPeakR)
+            if ((absval = fabsf(mainR[idx])) > VUpeak.values.vuOutPeakR)
                 VUpeak.values.vuOutPeakR = absval;
 
             // RMS Peak
-            VUpeak.values.vuRmsPeakL += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx];
-            VUpeak.values.vuRmsPeakR += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
+            VUpeak.values.vuRmsPeakL += mainL[idx] * mainL[idx];
+            VUpeak.values.vuRmsPeakR += mainR[idx] * mainR[idx];
         }
 
         if (shutup)

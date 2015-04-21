@@ -179,8 +179,6 @@ class ADnoteParameters : public Presets
         void getfromXML(XMLwrapper *xml);
         float getBandwidthDetuneMultiplier(void);
         float getUnisonFrequencySpreadCents(int nvoice);
-        int getUnisonSizeIndex(int nvoice);
-        void setUnisonSizeIndex(int nvoice, int index);
         void setGlobalPan(char pan);
         void setVoicePan(int voice, char pan);
         bool randomGlobalPan(void) { return !GlobalPar.PPanning; }

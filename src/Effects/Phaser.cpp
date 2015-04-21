@@ -269,16 +269,10 @@ void Phaser::cleanup(void)
     fbl = fbr = oldlgain = oldrgain = 0.0f;
     memset(oldl, 0, sizeof(float)*Pstages * 2);
     memset(oldr, 0, sizeof(float)*Pstages * 2);
-//    for (int i = 0; i < Pstages * 2; ++i)
-//        oldl[i] = oldr[i] = 0.0f;
     memset(xn1l, 0, sizeof(float)*Pstages);
     memset(xn1r, 0, sizeof(float)*Pstages);
     memset(yn1l, 0, sizeof(float)*Pstages);
     memset(yn1r, 0, sizeof(float)*Pstages);
-//    for(int i = 0; i < Pstages; ++i) {
-//        xn1l[i] = xn1r[i] =0.0f;
-//        yn1l[i] = yn1r[i] = 0.0f;
-//    }
 }
 
 

@@ -247,40 +247,6 @@ ADnoteParameters::~ADnoteParameters()
 }
 
 
-/*int ADnoteParameters::getUnisonSizeIndex(int nvoice)
-{
-    unsigned int idx = 0;
-    if (nvoice < NUM_VOICES)
-        for (; idx < sizeof(ADnote_unison_sizes) / sizeof(int); ++idx)
-        {
-            if (ADnote_unison_sizes[idx] >= VoicePar[nvoice].Unison_size)
-                break;
-            if (!ADnote_unison_sizes[idx])
-            {
-                --idx;
-                break;
-            }
-        }
-    return idx;
-}
-
-
-void ADnoteParameters::setUnisonSizeIndex(int nvoice, int index)
-{
-    int unison = 1;
-    for (int i = 0; i <= index; ++i)
-    {
-        unison = ADnote_unison_sizes[i];
-        if (unison == 0)
-        {
-            unison = ADnote_unison_sizes[i - 1];
-            break;
-        }
-    }
-    VoicePar[nvoice].Unison_size = unison;
-}*/
-
-
 void ADnoteParameters::setGlobalPan(char pan)
 {
     GlobalPar.PPanning = pan;
