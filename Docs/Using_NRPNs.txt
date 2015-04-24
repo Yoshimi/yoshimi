@@ -15,3 +15,6 @@ Whenever either byte of the NRPN is changed, the data values will be cleared (bu
 If either NRPN byte is set to 127 data values are ignored again.
 
 In Yoshimi NRPNs are not themselves channel sensitive but the final results will usually be sent to whichever is the current channel.
+
+Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user.
+

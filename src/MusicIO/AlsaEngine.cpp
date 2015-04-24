@@ -81,6 +81,7 @@ bool AlsaEngine::openMidi(void)
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PGMCHANGE);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PITCHBEND);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_CONTROL14);
+    snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_NONREGPARAM);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_REGPARAM);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_RESET);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_SUBSCRIBED);
@@ -458,8 +459,8 @@ void *AlsaEngine::MidiThread(void)
     unsigned char channel;
     unsigned char note;
     unsigned char velocity;
-    int ctrltype;
-    int par;
+    unsigned int ctrltype;    
+    unsigned int par;
     int chk;
     while (synth->getRuntime().runSynth)
     {
@@ -506,7 +507,15 @@ void *AlsaEngine::MidiThread(void)
                     par = event->data.control.value;
                     setMidiController(channel, ctrltype, par);
                     break;
-
+                case SND_SEQ_EVENT_NONREGPARAM:
+                    channel = event->data.control.channel;
+                    ctrltype = event->data.control.param;
+                    par = event->data.control.value;
+                    setMidiController(channel, 99, ctrltype >> 7);
+                    setMidiController(channel, 98, ctrltype & 0x7f);
+                    setMidiController(channel, 6, par >> 7);
+                    setMidiController(channel, 38, par & 0x7f);
+                    break;
                 case SND_SEQ_EVENT_RESET: // reset to power-on state
                     channel = event->data.control.channel;
                     ctrltype = C_resetallcontrollers;

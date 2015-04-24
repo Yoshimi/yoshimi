@@ -40,11 +40,11 @@ class ConsoleUI {open
   } {
     Fl_Window logConsole {
       label {yoshimi console}
-      callback {o->hide()} open
+      callback {o->hide()} open selected
       xywh {5 20 385 185} type Double color 54 selection_color 36 labelfont 13 labelsize 13 align 0 when 1 hide resizable
     } {
       Fl_Text_Display logText {
-        label {log text} selected
+        label {log text}
         xywh {0 0 385 185} color 54 labeltype NO_LABEL labelfont 13 labelsize 13 when 1 textfont 13 textsize 12 textcolor 35
       }
     }

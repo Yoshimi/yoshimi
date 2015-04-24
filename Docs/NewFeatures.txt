@@ -58,7 +58,7 @@ Yoshimi now stamps instrument and parameter XML files with its own major and min
 
 ###
 
-It is now possible to direct messages to either stderr or the report window on the fly. If you chose stderr the Reports menu item is greyed out.
+It is now possible to direct messages to either stderr or the report window on the fly. If you chose stderr the Reports button is greyed out.
 
 ###
 
@@ -67,3 +67,10 @@ See:
 Using_NRPNs.txt
 Direct_Part_Control.txt
 Vector_Control.txt
+
+###
+
+You can now use the mouse scroll wheel to adjust rotary controls. Holding down 'ctrl' gives to finer adjustment.
+Also, horizontal as well as vertical mouse movement will adjust the knob.
+
+###

@@ -248,8 +248,8 @@ synth = parameters->getSynthEngine();
   Function {make_window()} {open
   } {
     Fl_Window padnotewindow {
-      label {PAD synth Parameters} open selected
-      xywh {776 290 535 450} type Double hide
+      label {PAD synth Parameters} open
+      xywh {776 507 535 450} type Double hide
     } {
       Fl_Tabs {} {
         callback {//
@@ -260,11 +260,11 @@ synth = parameters->getSynthEngine();
         xywh {0 0 535 395}
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12
+          label {Harmonic Structure} selected
+          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
         } {
           Fl_Group bwprofilegroup {
-            xywh {5 30 90 260} box ENGRAVED_BOX
+            xywh {5 30 90 260} box ENGRAVED_FRAME
             code0 {if (pars->Pmode!=0) o->deactivate();}
           } {
             Fl_Dial hpbasepar1 {
@@ -492,7 +492,7 @@ synth = parameters->getSynthEngine();
             code2 {if (pars->Pmode!=0) o->deactivate();}
           }
           Fl_Group {} {
-            xywh {315 295 215 45} box ENGRAVED_BOX
+            xywh {315 295 215 45} box ENGRAVED_FRAME
           } {
             Fl_Choice hrpostype {
               label OvertonesPosition
