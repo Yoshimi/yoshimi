@@ -339,8 +339,8 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {4 826 375 165} type Double
-      class Fl_Group visible
+      private xywh {4 826 375 165} type Double hide
+      class Fl_Group
     } {
       Fl_Group partgroupui {open
         xywh {0 0 375 166}
@@ -393,7 +393,7 @@ Offset}
         Fl_Dial partpan {
           label Pan
           callback {//
-    part->SetController(C_panning, (char)o->value());
+    part->SetController(C_panning, o->value());
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
         synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());}
           xywh {290 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -441,10 +441,12 @@ Offset}
         label Midi
         callback {//
     part->Prcvchn = lrint(o->value()) - 1;
+    o->textcolor(FL_BLACK);
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);} selected
+        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);}
         tooltip {Midi channel for this part} xywh {35 36 40 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
+        code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
       }
       Fl_Choice {} {
         label Mode
@@ -565,8 +567,10 @@ Offset}
       }
     }
     Fl_Window ctlwindow {
-      label Controllers open
+      label Controllers open selected
       private xywh {86 540 505 130} type Double hide
+      code0 {string tname = synth->getGuiMaster()->set_part_window_title("Controllers");}
+      code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Check_Button {} {
         label Expr
@@ -758,7 +762,9 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window partfx {
       label {Part's Insert Effects} open
-      private xywh {127 580 390 145} type Double hide
+      private xywh {127 580 390 145} type Double
+      code0 {string tname = synth->getGuiMaster()->set_part_window_title("Insert Effects");}
+      code1 {o->copy_label(tname.c_str());} visible
     } {
       Fl_Counter inseffnocounter {
         label {FX No.}
@@ -886,6 +892,8 @@ else {propta->deactivate();proptb->deactivate();}}
     Fl_Window instrumentkitlist {
       label {Instrument Kit} open
       xywh {115 376 670 370} type Double hide
+      code0 {string tname = synth->getGuiMaster()->set_part_window_title("Kit List");}
+      code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Button {} {
         label {Close Window}
@@ -966,8 +974,10 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {305 125 395 360} type Double hide
+      xywh {67 190 395 360} type Double hide
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
+      code1 {string tname = synth->getGuiMaster()->set_part_window_title("Edit");}
+      code2 {o->copy_label(tname.c_str());}
     } {
       Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1262,7 +1272,7 @@ else {propta->deactivate();proptb->deactivate();}}
   }
   decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {private local
   }
-  decl {int npart;} {private local
+  decl {int npart;} {public local
   }
   decl {int ninseff;} {private local
   }

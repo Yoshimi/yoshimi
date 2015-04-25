@@ -534,8 +534,14 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
 // Set part's channel number
 void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 {
-    if (npart < NUM_MIDI_PARTS && nchan < NUM_MIDI_CHANNELS)
+    if (npart < NUM_MIDI_PARTS)
     {
+        if (nchan > NUM_MIDI_CHANNELS)
+            npart = NUM_MIDI_CHANNELS;
+        /* This gives us a way to disable all channel messages to a part.
+         * Sending a valid channel number will restore normal operation
+         * as will using the GUI controls.
+         */
         part[npart]->Prcvchn =  nchan;
         if (Runtime.showGui && guiMaster && guiMaster->partui
                             && guiMaster->partui->instrumentlabel

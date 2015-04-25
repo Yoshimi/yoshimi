@@ -52,8 +52,8 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open selected
-      xywh {273 160 465 330} type Double visible
+      callback {o->hide();} open
+      xywh {273 160 465 330} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 455 297}
@@ -464,12 +464,15 @@ else
     {
          synth->getRuntime().midi_bank_root = 128;
          BankRoot->value(0);
+         BankRootok->deactivate();
          BankRoot->deactivate();
     }
     else
     {
          BankRoot->activate();
+         BankRootok->activate();
          BankRoot->value(0);
+         BankRootvalue = 128;
     }
     BankRoot->redraw();
     configChanged = true;}
@@ -588,14 +591,17 @@ else
          synth->getRuntime().midi_upper_voice_C = 128;
          EPCspinner->value(110);
          EPCspinner->deactivate();
+         EPCok->deactivate();
     }
     else
     {
          EPCspinner->activate();
+         EPCok->activate();
          EPCspinner->value(110);
+         EPCvalue = 128;
     }
     EPCspinner->redraw();
-    configChanged = true;}
+    configChanged = true;} selected
             xywh {275 220 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) { EPCspinner->deactivate(); EPCok->deactivate(); }}

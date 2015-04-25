@@ -70,7 +70,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
-decl {\#include "MasterUI.h"} {selected private global
+decl {\#include "MasterUI.h"} {private global
 } 
 
 class OscilSpectrum {open : {public Fl_Box, MiscFuncs}
@@ -433,9 +433,12 @@ class OscilEditor {open : {public PresetsUI_}
   Function {make_window()} {open
   } {
     Fl_Window osceditUI {
-      label {ADsynth Oscillator Editor} open
-      xywh {132 116 735 595} type Double hide
-      code0 {if (oscil->ADvsPAD) o->label("PADsynth Harmonic Content Editor");}
+      label {ADsynth Oscillator Editor} open selected
+      xywh {132 116 735 595} type Double
+      code0 {string tname;}
+      code1 {if (oscil->ADvsPAD) tname = "PadSynth Harmonic Content"; else tname = "AddSynth Oscillator";}
+      code2 {tname = synth->getGuiMaster()->set_part_window_title(tname);}
+      code3 {o->copy_label(tname.c_str());} visible
     } {
       Fl_Button applybutton {
         label Apply

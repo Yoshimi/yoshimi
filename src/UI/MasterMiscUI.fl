@@ -323,8 +323,7 @@ synth = _synth;
             }
             break;
         }
-        return 1;} {selected
-    }
+        return 1;} {}
   }
   decl {int npart;} {private local
   }
@@ -410,8 +409,8 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window panellistitem {open
-      private xywh {1195 47 60 275} type Double hide
-      class Fl_Group
+      private xywh {1195 47 60 275} type Double
+      class Fl_Group visible
     } {
       Fl_Group panellistitemgroup {open
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
@@ -447,7 +446,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
         }
         Fl_Dial partpanning {
           callback {//
-              synth->part[npart + *plgroup]->SetController(C_panning, (char)o->value());
+              synth->part[npart + *plgroup]->SetController(C_panning, o->value());
               synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
@@ -469,14 +468,15 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         Fl_Choice partrcv {
           callback {//
               synth->part[npart + *plgroup]->Prcvchn=o->value();
-              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, o->value() + 1);}
+              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, o->value() + 1);
+              o->textcolor(FL_BLACK);} selected
           tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
-                if (i != 9)
-                    o->add(string("Ch" + asString(i + 1)).c_str());
-                else
+                if (i == 9)
                     o->add("Dr10");
+                else
+                    o->add(string("Ch" + asString(i + 1)).c_str());
             }}
           code1 {o->value(synth->part[npart + *plgroup]->Prcvchn);}
         } {}
@@ -547,7 +547,14 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
             panellistitemgroup->deactivate();
         partvolume->value(synth->part[setpart]->Pvolume);
         partpanning->value(synth->part[setpart]->Ppanning);
-        partrcv->value(synth->part[setpart]->Prcvchn);
+        int tmpch = synth->part[setpart]->Prcvchn;
+        if (tmpch < NUM_MIDI_CHANNELS)
+        {
+            partrcv->value(tmpch);
+            partrcv->textcolor(FL_BLACK);
+        }
+        else
+             partrcv->textcolor(FL_WHITE);
         partname->label(synth->part[setpart]->Pname.c_str());
         int tmp = synth->part[setpart]->Paudiodest - 1;
         if (tmp < 0 or tmp > 3)

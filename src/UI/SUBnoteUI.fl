@@ -128,8 +128,10 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
   Function {make_window()} {open
   } {
     Fl_Window SUBparameters {
-      label {SUBsynth Parameters} open
-      xywh {638 343 735 475} type Double hide
+      label {SUBsynth Parameters} open selected
+      xywh {638 343 735 475} type Double
+      code0 {string tname = synth->getGuiMaster()->set_part_window_title("SubSynth");}
+      code1 {o->copy_label(tname.c_str());} visible
     } {
       Fl_Scroll {} {open
         xywh {5 140 434 325} type HORIZONTAL box THIN_UP_BOX
@@ -188,7 +190,7 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
           callback {//
               pan->value(64);
               pars->setPan(64);
-              randompan->value(pars->randomPan());} selected
+              randompan->value(pars->randomPan());}
           tooltip {Centre panning} xywh {192 32 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Group ampenv {

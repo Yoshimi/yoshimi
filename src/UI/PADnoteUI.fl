@@ -248,8 +248,10 @@ synth = parameters->getSynthEngine();
   Function {make_window()} {open
   } {
     Fl_Window padnotewindow {
-      label {PAD synth Parameters} open
-      xywh {776 507 535 450} type Double hide
+      label {PAD synth Parameters} open selected
+      xywh {136 254 535 450} type Double hide
+      code0 {string tname = synth->getGuiMaster()->set_part_window_title("PadSynth");}
+      code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Tabs {} {
         callback {//
@@ -260,7 +262,7 @@ synth = parameters->getSynthEngine();
         xywh {0 0 535 395}
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure} selected
+          label {Harmonic Structure} open
           xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
         } {
           Fl_Group bwprofilegroup {
@@ -491,7 +493,7 @@ synth = parameters->getSynthEngine();
             code1 {o->value(pars->setPbandwidth(pars->Pbandwidth));}
             code2 {if (pars->Pmode!=0) o->deactivate();}
           }
-          Fl_Group {} {
+          Fl_Group {} {open
             xywh {315 295 215 45} box ENGRAVED_FRAME
           } {
             Fl_Choice hrpostype {

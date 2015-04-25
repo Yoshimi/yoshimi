@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2015-4-25 Will
+- Added part number and name to editing window title bars.
+- Made it possible to silently disconnect/reconnect a part from all MIDI input.
+- Improved config settings for Bank Root & Extended Program Change.
+
 2015-4-24 Will
 - Implemented 14bit NRPNs
 - Implemented scroll wheel control of knobs
