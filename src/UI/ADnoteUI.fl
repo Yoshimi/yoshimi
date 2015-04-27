@@ -202,8 +202,8 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {open
   } {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open selected
-      xywh {300 188 790 575} type Double hide
+      label Voice open
+      xywh {459 299 770 580} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice Oscillator");}
       code1 {o->copy_label(tname.c_str());}
       class Fl_Group
@@ -1016,7 +1016,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument} open
-      xywh {822 549 540 425} type Double hide
+      xywh {822 549 535 405} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Global");}
       code1 {o->copy_label(tname.c_str());}
     } {
@@ -1230,7 +1230,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
             for (int i = 0; i < NUM_VOICES; ++i)
                 voicelistitem[i]->refreshlist();
             ADnoteVoiceList->show();}
-        xywh {180 375 125 25} labelsize 12
+        xywh {190 375 115 25} labelsize 12
       }
       Fl_Button {} {
         label {Show Voice Parameters}
@@ -1238,7 +1238,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
             voicelistitem[nvoice]->refreshlist();
             ADnoteVoice->show();
             ADnoteVoice->redraw();}
-        xywh {5 375 170 25} labelfont 1 labelsize 12
+        xywh {5 375 180 25} labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Close
@@ -1250,7 +1250,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
         callback {//
             resui->resonancewindow->redraw();
             resui->resonancewindow->show();}
-        tooltip Resonance xywh {309 375 86 25} box THIN_UP_BOX labelsize 12
+        tooltip Resonance xywh {309 375 86 25} labelsize 12
       }
       Fl_Button {} {
         label C
@@ -1265,9 +1265,9 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
     }
     Fl_Window ADnoteVoice {
       label {ADsynth Voice Parameters} open
-      xywh {634 299 765 620} type Double hide
+      xywh {531 31 765 615} type Double
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice");}
-      code1 {o->copy_label(tname.c_str());}
+      code1 {o->copy_label(tname.c_str());} visible
     } {
       Fl_Group advoice {
         xywh {0 0 760 575} box BORDER_BOX
@@ -1275,12 +1275,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
         code1 {o->show();}
         class ADvoiceUI
       } {}
-      Fl_Button {} {
-        label {Close Window}
-        callback {ADnoteVoice->hide();}
-        xywh {300 585 195 25} box THIN_UP_BOX labelfont 1 labelsize 12
-      }
-      Fl_Counter currentvoicecounter {
+      Fl_Spinner currentvoicecounter {
         label {Current Voice}
         callback {//
             nvoice = lrint(o->value()) - 1;
@@ -1292,18 +1287,22 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
             advoice->init(pars, nvoice);
             advoice->show();
             ADnoteVoice->redraw();}
-        xywh {5 585 130 25} type Simple labelfont 1 labelsize 12 align 8 minimum 0 maximum 2 step 1 value 1 textfont 1 textsize 13
-        code0 {o->bounds(1,NUM_VOICES);}
+        xywh {35 584 40 24} labelfont 1 labelsize 12 align 8 maximum 8 textfont 1
+      }
+      Fl_Button {} {
+        label Close
+        callback {ADnoteVoice->hide();}
+        xywh {655 584 90 25} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars,nvoice);}
-        xywh {700 590 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {575 589 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this,nvoice);}
-        xywh {730 590 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {605 589 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
     Fl_Window ADnoteVoiceList {
@@ -1337,9 +1336,9 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
         xywh {245 15 25 10} box NO_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
-        label {Hide Voice List}
-        callback {ADnoteVoiceList->hide();}
-        xywh {255 237 125 20} labelsize 12
+        label Close
+        callback {ADnoteVoiceList->hide();} selected
+        xywh {554 237 62 20} labelsize 12
       }
       Fl_Scroll {} {open
         xywh {0 15 640 220} type VERTICAL box THIN_UP_BOX

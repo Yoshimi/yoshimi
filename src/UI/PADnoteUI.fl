@@ -248,7 +248,7 @@ synth = parameters->getSynthEngine();
   Function {make_window()} {open
   } {
     Fl_Window padnotewindow {
-      label {PAD synth Parameters} open selected
+      label {PAD synth Parameters} open
       xywh {136 254 535 450} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("PadSynth");}
       code1 {o->copy_label(tname.c_str());}
@@ -265,7 +265,7 @@ synth = parameters->getSynthEngine();
           label {Harmonic Structure} open
           xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
         } {
-          Fl_Group bwprofilegroup {
+          Fl_Group bwprofilegroup {open
             xywh {5 30 90 260} box ENGRAVED_FRAME
             code0 {if (pars->Pmode!=0) o->deactivate();}
           } {
@@ -306,7 +306,7 @@ synth = parameters->getSynthEngine();
               callback {//
                   pars->Php.freqmult=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();}
+                  cbwidget->do_callback();} selected
               xywh {55 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.freqmult);}
               class WidgetPDial

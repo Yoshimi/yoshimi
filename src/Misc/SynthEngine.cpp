@@ -746,25 +746,25 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
         LFOtime++; // update the LFO's time
 
         // Master volume, and all output fade
-        float fade;
+        float fade = 10.0f/samplerate; // 100mS fade;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
             if (shutup) // fade-out
             {
-                fade = (float) (p_buffersize - idx) / (float) p_buffersize;
                 for (npart = 0; npart < (NUM_MIDI_PARTS); ++npart)
                 {
                     if (part[npart]->Paudiodest & 2)
                     {
-                        outl[npart][idx] *= fade;
-                        outr[npart][idx] *= fade;
+                        outl[npart][idx] *= fadeLevel;
+                        outr[npart][idx] *= fadeLevel;
                     }
                 }
-                mainL[idx] *= fade;
-                mainR[idx] *= fade;
+                mainL[idx] *= fadeLevel;
+                mainR[idx] *= fadeLevel;
             }
+            fadeLevel -= fade;
         }
 
         actionLock(unlock);
@@ -785,7 +785,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
             VUpeak.values.vuRmsPeakR += mainR[idx] * mainR[idx];
         }
 
-        if (shutup)
+       if (shutup && fadeLevel <= 0.001f)
             ShutUp();
 
         // Peak computation for part vu meters
@@ -888,6 +888,7 @@ void SynthEngine::ShutUp(void)
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
     shutup = false;
+    fadeLevel = 0.0f;
 }
 
 

@@ -376,9 +376,9 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
         }
         Fl_Dial {} {
           label {Velocity
-Sens}
+Sense}
           callback {part->Pvelsns = o->value();}
-          tooltip {Velocity Sensing Function} xywh {198 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {198 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvelsns);}
           class WidgetPDial
         }
@@ -386,7 +386,7 @@ Sens}
           label {Velocity
 Offset}
           callback {part->Pveloffs = o->value();}
-          tooltip {Velocity Offset} xywh {244 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {244 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pveloffs);}
           class WidgetPDial
         }
@@ -415,11 +415,11 @@ Offset}
     part->setVolume(o->value());
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
         synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());}
-          tooltip {Part Volume} xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
         }
-        Fl_Box {} {
+        Fl_Box {} {selected
           xywh {245 97 132 69} box ENGRAVED_FRAME
         }
       }
@@ -567,7 +567,7 @@ Offset}
       }
     }
     Fl_Window ctlwindow {
-      label Controllers open selected
+      label Controllers open
       private xywh {86 540 505 130} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("Controllers");}
       code1 {o->copy_label(tname.c_str());}
@@ -762,12 +762,11 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window partfx {
       label {Part's Insert Effects} open
-      private xywh {127 580 390 145} type Double
+      private xywh {127 442 390 160} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("Insert Effects");}
-      code1 {o->copy_label(tname.c_str());} visible
+      code1 {o->copy_label(tname.c_str());}
     } {
-      Fl_Counter inseffnocounter {
-        label {FX No.}
+      Fl_Spinner inseffnocounter {
         callback {//
             ninseff = o->value() - 1;
             insefftype->value(part->partefx[ninseff]->geteffect());
@@ -778,18 +777,16 @@ else {propta->deactivate();proptb->deactivate();}}
                 x = 1;
             bypasseff->value(part->Pefxbypass[ninseff]);
             sendtochoice->value(x);}
-        xywh {5 110 80 20} type Simple labelfont 1 align 6 minimum 1 maximum 127 step 1 textfont 1
-        code0 {o->bounds(1,NUM_PART_EFX);}
+        tooltip {Effect No.} xywh {35 8 35 19} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
       }
       Fl_Choice insefftype {
-        label EffType
         callback {//
             synth->actionLock(lockmute);
             part->partefx[ninseff]->changeeffect(o->value());
             synth->actionLock(unlock);
             inseffectui->refresh(part->partefx[ninseff]);}
-        xywh {155 110 70 15} down_box BORDER_BOX labelsize 10 align 6
+        tooltip {Effect Type} xywh {104 7 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
         MenuItem {} {
@@ -830,10 +827,10 @@ else {propta->deactivate();proptb->deactivate();}}
         }
       }
       Fl_Group inseffectuigroup {open
-        xywh {5 5 380 100} box FLAT_BOX color 48
+        xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
-          xywh {5 5 380 95}
+          xywh {5 37 380 95}
           code0 {o->init(part->partefx[ninseff]);}
           class EffUI
         } {}
@@ -841,10 +838,10 @@ else {propta->deactivate();proptb->deactivate();}}
       Fl_Button {} {
         label Close
         callback {partfx->hide();}
-        xywh {325 115 60 20} box THIN_UP_BOX
+        xywh {314 136 60 20} box THIN_UP_BOX
       }
       Fl_Choice sendtochoice {
-        label {Send To.}
+        label To
         callback {//
             int x = o->value();
             part->Pefxroute[ninseff] = x;
@@ -852,7 +849,7 @@ else {propta->deactivate();proptb->deactivate();}}
                 part->partefx[ninseff]->setdryonly(true);
             else
                 part->partefx[ninseff]->setdryonly(false);}
-        xywh {235 110 80 15} down_box BORDER_BOX labelsize 10 align 6
+        xywh {244 7 90 22} down_box BORDER_BOX labelfont 1 labelsize 11
         code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
         code1 {o->value(x);}
       } {
@@ -870,15 +867,15 @@ else {propta->deactivate();proptb->deactivate();}}
         }
       }
       Fl_Check_Button bypasseff {
-        label bypass
+        label Bypass
         callback {part->Pefxbypass[ninseff]=((o->value())!=0);}
-        tooltip {if the effect is not used (is bypassed)} xywh {90 110 60 15} down_box DOWN_BOX labelsize 11
+        tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 22} down_box DOWN_BOX labelsize 12 align 4
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
       }
       Fl_Button {} {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(part->partefx[ninseff]);}
-        xywh {90 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {357 3 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
@@ -886,7 +883,7 @@ else {propta->deactivate();proptb->deactivate();}}
             synth->actionLock(lockmute);
             synth->getGuiMaster()->getPresetsUi()->paste(part->partefx[ninseff], inseffectui);
             synth->actionLock(unlock);}
-        xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {357 19 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
     }
     Fl_Window instrumentkitlist {

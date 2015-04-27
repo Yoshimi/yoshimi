@@ -95,6 +95,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Part *part[NUM_MIDI_PARTS];
         bool shutup;
+        float fadeLevel;
 
         // parameters
         unsigned int samplerate;

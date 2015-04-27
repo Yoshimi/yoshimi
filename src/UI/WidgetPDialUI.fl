@@ -176,15 +176,22 @@ class WidgetPDial {open : {public Fl_Dial}
                 return 1;
                 break;
             case FL_ENTER:
-                 if(textset)
+                 //if(textset)
+                 /*
+                 Above was moved because it stopped scroll wheel
+                 working when there was no tooltip.
+                 */
                  {
                      if(!pos)
                      {
                          tipwin->position(Fl::event_x_root(), Fl::event_y_root() + 20);
                          pos = true;
                      }
-                     tipwin->setTextmode();
-                     tipwin->show();
+                     if(textset)
+                     {
+                         tipwin->setTextmode();
+                         tipwin->show();
+                     }
                      return 1;
                  }
                  break;
