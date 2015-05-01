@@ -721,11 +721,14 @@ void Bank::addDefaultRootDirs()
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
         string(getenv("HOME")) + "/banks",
-        "../banks"
+        "../banks",
+        "end"
     };
-    for (unsigned int i = 0; i < (sizeof(bankdirs) / sizeof(bankdirs [0])); ++i)
+    int i = 0;
+    while (bankdirs [i] != "end")
     {
         addRootDir(bankdirs [i]);
+        ++ i;
     }
 }
 
