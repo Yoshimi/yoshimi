@@ -419,7 +419,7 @@ Offset}
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
         }
-        Fl_Box {} {selected
+        Fl_Box {} {
           xywh {245 97 132 69} box ENGRAVED_FRAME
         }
       }
@@ -1261,7 +1261,7 @@ else {propta->deactivate();proptb->deactivate();}}
   }
   decl {BankUI *bankui;} {private local
   }
-  decl {ADnoteUI *adnoteui;} {private local
+  decl {ADnoteUI *adnoteui;} {selected public local
   }
   decl {SUBnoteUI *subnoteui;} {private local
   }

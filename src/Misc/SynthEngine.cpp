@@ -155,6 +155,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
+    fadeStep = 10.0f/samplerate; // 100mS fade;
 
     if (!pthread_mutex_init(&processMutex, NULL))
         processLock = &processMutex;
@@ -746,12 +747,11 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
         LFOtime++; // update the LFO's time
 
         // Master volume, and all output fade
-        float fade = 10.0f/samplerate; // 100mS fade;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (shutup) // fade-out
+            if (shutup) // fade-out - fadeLevel must also have been set
             {
                 for (npart = 0; npart < (NUM_MIDI_PARTS); ++npart)
                 {
@@ -763,8 +763,8 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
                 }
                 mainL[idx] *= fadeLevel;
                 mainR[idx] *= fadeLevel;
+                fadeLevel -= fadeStep;
             }
-            fadeLevel -= fade;
         }
 
         actionLock(unlock);

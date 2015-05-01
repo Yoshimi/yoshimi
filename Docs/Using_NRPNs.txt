@@ -1,10 +1,11 @@
 
 NRPN MSB is CC 99, and LSB is CC 98
 
-it's geberally advisable to set NRPN MSB before LSB
-However, once MSB has been set you can set a chain of LSBs if they share the same MSB
+It's generally advisable to set NRPN MSB before LSB
+However, once MSB has been set you can set a chain of LSBs if they share the same MSB.
 
-The data CCs associated with these are, 6 for MSB and 38 for LSB
+The data CCs associated with these are, 6 for MSB and 38 for LSB.
+Also there is 96 for data increment and 97 for decrement.
 
 Only when an NRPN has been set can the data values be entered (they will be ignored otherwise).
 
@@ -12,9 +13,19 @@ If a supported control is identified these data values will be stored locally (i
 
 Whenever either byte of the NRPN is changed, the data values will be cleared (but stored settings will not be affected).
 
-If either NRPN byte is set to 127 data values are ignored again.
+If either NRPN byte is set to 127, all data values are ignored again.
+
+Data increment and decrement operation enables you to directly change the LSB by between 0 and 63. To change the MSB add 64 to cover the same range. Setting zero might seem pointless, but it gives an alternative way to make an initial setting if your sequencer doesn't play nice.
+
+e.g.
+
+start value     command value   result
+LSB     5           inc 20      25
+MSB     7           inc 68      11
+LSB     128(off)    inc 1       1
+MSB     126         dec 74      116
+MSB     128(off)    dec 65      127
 
 In Yoshimi NRPNs are not themselves channel sensitive but the final results will usually be sent to whichever is the current channel.
 
 Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user.
-

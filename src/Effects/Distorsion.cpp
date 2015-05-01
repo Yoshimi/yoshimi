@@ -87,13 +87,13 @@ void Distorsion::out(float *smpsl, float *smpsr)
     {
         for (int i = 0; i < synth->p_buffersize; ++i)
         {
-            efxoutl[i] = smpsl[i] * inputdrive;
-            efxoutr[i] = smpsr[i] * inputdrive;
+            efxoutl[i] = smpsl[i] * inputdrive * pangainL;
+            efxoutr[i] = smpsr[i] * inputdrive* pangainR;
         }
     }
     else // Mono
         for (int i = 0; i < synth->p_buffersize; ++i)
-            efxoutl[i] = inputdrive * (smpsl[i] + smpsr[i]) * 0.7f;
+            efxoutl[i] = inputdrive * (smpsl[i]* pangainL + smpsr[i]* pangainR) * 0.7f;
 
     if (Pprefiltering)
         applyfilters(efxoutl, efxoutr);
@@ -107,12 +107,6 @@ void Distorsion::out(float *smpsl, float *smpsr)
     if (!Pstereo)
         memcpy(efxoutr, efxoutl, synth->p_bufferbytes);
 
-    for (int i = 0; i < synth->p_buffersize; ++i)
-    {
-        efxoutl[i] *= pangainL;
-        efxoutr[i] *= pangainR;
-    }
-
     float level = dB2rap(60.0f * Plevel / 127.0f - 40.0f);
     for (int i = 0; i < synth->p_buffersize; ++i)
     {
@@ -122,8 +116,8 @@ void Distorsion::out(float *smpsl, float *smpsr)
         float r = rout * (1.0f - lrcross) + lout * lrcross;
         lout = l;
         rout = r;
-        efxoutl[i] = lout * level;
-        efxoutr[i] = rout * level;
+        efxoutl[i] = lout * 2.0f * level;
+        efxoutr[i] = rout * 2.0f * level;
     }
 }
 

@@ -74,3 +74,8 @@ You can now use the mouse scroll wheel to adjust rotary controls. Holding down '
 Also, horizontal as well as vertical mouse movement will adjust the knob.
 
 ###
+
+Part editing windows carry the part number and voice name in the title bar. For the AddSynth oscillator window this also includes the voice number.
+
+###
+

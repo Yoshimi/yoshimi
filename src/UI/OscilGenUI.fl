@@ -67,6 +67,9 @@ decl {\#include "Synth/OscilGen.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
+decl {\#include "Misc/Config.h"} {public local
+} 
+
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
@@ -434,9 +437,9 @@ class OscilEditor {open : {public PresetsUI_}
   } {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor} open selected
-      xywh {132 116 735 595} type Double
+      xywh {63 44 735 595} type Double
       code0 {string tname;}
-      code1 {if (oscil->ADvsPAD) tname = "PadSynth Harmonic Content"; else tname = "AddSynth Oscillator";}
+      code1 {if (oscil->ADvsPAD) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Oscillator "; tname += char(nvoice + 49);}}
       code2 {tname = synth->getGuiMaster()->set_part_window_title(tname);}
       code3 {o->copy_label(tname.c_str());} visible
     } {
@@ -1141,15 +1144,15 @@ refresh();}
       }
     }
   }
-  Function {OscilEditor(OscilGen *oscil_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *cbapplywidget_, SynthEngine *_synth)} {open
+  Function {OscilEditor(OscilGen *oscil_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *cbapplywidget_, int nvoice_, SynthEngine *_synth)} {open
   } {
     code {synth = _synth;
 oscil=oscil_;
 oldosc=oldosc_;
 cbwidget=cbwidget_;
 cbapplywidget=cbapplywidget_;
+nvoice = nvoice_;
 make_window();
-
 refresh();
 osceditUI->show();} {}
   }
@@ -1159,7 +1162,8 @@ osceditUI->show();} {}
 //for (int i=0;i<MAX_AD_HARMONICS;i++) delete (h[i]);
 delete (osceditUI);} {}
   }
-  Function {refresh()} {} {
+  Function {refresh()} {open
+  } {
     code {magtype->value(oscil->Phmagtype);
 rndslider->value(oscil->Prand-64);
 
@@ -1223,6 +1227,8 @@ if (cbwidget!=NULL) {
   decl {Fl_Widget *oldosc,*cbwidget,*cbapplywidget;} {private local
   }
   decl {Oscilharmonic *h[MAX_AD_HARMONICS];} {private local
+  }
+  decl {int nvoice;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

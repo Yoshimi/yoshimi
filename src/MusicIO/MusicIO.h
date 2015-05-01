@@ -77,6 +77,7 @@ class MusicIO : virtual protected MiscFuncs
             unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
             unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
             unsigned char Part;
+            unsigned char Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
         

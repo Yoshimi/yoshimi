@@ -51,7 +51,7 @@ decl {\#include "Misc/SynthHelper.h"
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class ADvoicelistitem {: {public Fl_Group, SynthHelper}
+class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
 } {
   Function {make_window()} {open private
   } {
@@ -189,7 +189,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
   decl {ADnoteParameters *pars;} {private local
   }
-  decl {int nvoice;} {private local
+  decl {int nvoice;} {public local
   }
   decl {Oscilloscope *osc;} {private local
   }
@@ -203,10 +203,10 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
   } {
     Fl_Window ADnoteVoiceParameters {
       label Voice open
-      xywh {459 299 770 580} type Double hide
+      xywh {467 263 770 580} type Double
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice Oscillator");}
       code1 {o->copy_label(tname.c_str());}
-      class Fl_Group
+      class Fl_Group visible
     } {
       Fl_Group voiceparametersgroup {open
         xywh {0 0 765 580} box THIN_UP_BOX color 48
@@ -341,7 +341,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
               }
             }
             Fl_Group modoscil {
-              label {Mod Oscilator}
+              label {Mod Oscilator} open
               xywh {535 365 220 200} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
             } {
               Fl_Group fmoscil {open
@@ -362,7 +362,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                     int nv = nvoice;
                     if (pars->VoicePar[nvoice].PextFMoscil >= 0)
                         nv = pars->VoicePar[nvoice].PextFMoscil;
-                    oscedit = new OscilEditor(pars->VoicePar[nv].FMSmp, fmoscil, NULL, NULL, synth);}
+                    oscedit = new OscilEditor(pars->VoicePar[nv].FMSmp, fmoscil, NULL, NULL, nvoice, synth);}
                 xywh {704 368 43 12} box THIN_UP_BOX labelfont 1 labelsize 9
                 code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
               }
@@ -583,7 +583,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
                 int nv = nvoice;
                 if (pars->VoicePar[nvoice].Pextoscil >= 0)
                     nv=pars->VoicePar[nvoice].Pextoscil;
-                oscedit = new OscilEditor(pars->VoicePar[nv].OscilSmp, voiceoscil, NULL, NULL, synth);}
+                oscedit = new OscilEditor(pars->VoicePar[nv].OscilSmp, voiceoscil, NULL, NULL, nvoice, synth);}
             xywh {5 475 65 20} box THIN_UP_BOX labelfont 1 labelsize 11
             code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
           }
@@ -891,12 +891,10 @@ unisongroup->redraw();}
           }
         }
         Fl_Group {} {
-          label 01
+          label 1 selected
           xywh {5 5 55 35} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 22 align 16
           code0 {//
-              char tmp[10];
-              snprintf(tmp, 10, "%d", nvoice + 1);
-              o->label(strdup(tmp));}
+              char tmp[2]; tmp[0] = nvoice + 49; tmp[1] = 0; o->copy_label(tmp);}
         } {}
         Fl_Choice {} {
           callback {int x = lrint(o->value());
@@ -1265,9 +1263,9 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
     }
     Fl_Window ADnoteVoice {
       label {ADsynth Voice Parameters} open
-      xywh {531 31 765 615} type Double
+      xywh {531 31 765 615} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice");}
-      code1 {o->copy_label(tname.c_str());} visible
+      code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Group advoice {
         xywh {0 0 760 575} box BORDER_BOX
@@ -1337,7 +1335,7 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
       }
       Fl_Button {} {
         label Close
-        callback {ADnoteVoiceList->hide();} selected
+        callback {ADnoteVoiceList->hide();}
         xywh {554 237 62 20} labelsize 12
       }
       Fl_Scroll {} {open

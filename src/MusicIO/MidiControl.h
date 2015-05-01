@@ -47,6 +47,8 @@ typedef enum {
     C_nrpnH =                99,
     C_dataH =                 6,
     C_dataL =                38,
+    C_dataI =                96,
+    C_dataD =                97,
 } MidiControllers;
 
 #endif

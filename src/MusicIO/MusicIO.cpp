@@ -151,6 +151,12 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 78: // Resonance Bandwith
             ctl = C_resonance_bandwidth;
 	        break;
+        case 96: // data increment
+            ctl = C_dataI;
+            break;
+        case 97: // data decrement
+            ctl = C_dataD;
+            break;
         case 98: // NRPN LSB
             ctl = C_nrpnL;
             break;
@@ -219,6 +225,46 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     {
         if (synth->getRuntime().nrpnActive)
         {
+            if(ctrl == C_dataI || ctrl == C_dataD)
+            {
+                int dHigh = synth->getRuntime().dataH;
+                int dLow = synth->getRuntime().dataL;
+
+                bool msbPar = (param >= 0x40);
+                param &= 0x3f;
+                if (ctrl == C_dataI)
+                {
+                    if (msbPar)
+                    {
+                        dHigh &= 0x7f; // clear disabled state
+                        param += dHigh;
+                        ctrl = C_dataH; // change controller type
+                    }
+                    else
+                    {
+                        dLow &= 0x7f; // clear disabled state
+                        param += dLow;
+                        ctrl = C_dataL; // change controller type
+                    }
+                    if (param > 0x7f)
+                        param = 0x7f;
+                }
+                else{
+                    if (msbPar)
+                    {
+                        param = dHigh - param;
+                        ctrl = C_dataH; // change controller type
+                    }
+                    else
+                    {
+                        param = dLow - param;
+                        ctrl = C_dataL; // change controller type
+                    }
+                    if (param < 0)
+                        param = 0;
+                }
+            }
+            
             if(ctrl == C_dataL || ctrl == C_dataH)
             {
                 ProcessNrpn(ch, ctrl, param);
@@ -294,15 +340,15 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
     }
     int nLow = synth->getRuntime().nrpnL;
     
-    string sb = "L";
     if (type == C_dataH)
-    { // we don't set LSB here, we might want a previous value.
+    {
         synth->getRuntime().dataH = par;
-         sb = "M";
+        synth->getRuntime().Log("Data MSB    value " + asString(par));
+        return; // we're not currently using MSB as a value
     }
-    synth->getRuntime().Log("Data " + sb + "SB    value " + asString(par));
+    synth->getRuntime().dataL = par;
+    synth->getRuntime().Log("Data LSB    value " + asString(par));
     int dHigh = synth->getRuntime().dataH;
-    int dLow = synth->getRuntime().dataL;
     
     if (type == C_dataL && nLow == 0) // direct part change
     {
@@ -316,32 +362,30 @@ void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
                         nrpndata.Part = par;
                     }
                     else // It's bad. Kill it
+                        synth->getRuntime().dataL = 128;
                         synth->getRuntime().dataH = 128;
                     break;
                 }
                 case 1: // Program Change
                 {
-                    if (dLow < 128)
-                        setMidiProgram(dLow | 0x80, par);
+                    setMidiProgram(nrpndata.Part | 0x80, par);
                     break;
                 }
                 case 2: // Set controller number
                 {
-                    if (dLow < 128)
-                        synth->getRuntime().dataL = par;
+                    nrpndata.Controller = par;
+                    synth->getRuntime().dataL = par;
                     break;
                 }
 
                 case 3: // Set controller value
                 {
-                    if (dLow < 128)
-                        synth->SetController(nrpndata.Part | 0x80, dLow, par);
+                    synth->SetController(nrpndata.Part | 0x80, nrpndata.Controller, par);
                     break;
                 }
                 case 4: // Set part's channel number
                 {
-                     if (dLow < 128)
-                        synth->SetPartChan(nrpndata.Part, par);
+                     synth->SetPartChan(nrpndata.Part, par);
                      break;
                 }
         }

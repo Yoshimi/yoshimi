@@ -306,7 +306,7 @@ synth = parameters->getSynthEngine();
               callback {//
                   pars->Php.freqmult=(int) o->value();
                   hprofile->redraw();
-                  cbwidget->do_callback();} selected
+                  cbwidget->do_callback();}
               xywh {55 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.freqmult);}
               class WidgetPDial
@@ -457,7 +457,7 @@ synth = parameters->getSynthEngine();
             label Change
             callback {//
                 if (oscui!=NULL) delete (oscui);
-                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton, synth);}
+                oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton, 0, synth);} selected
             xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
           }
           Fl_Box cbwidget {

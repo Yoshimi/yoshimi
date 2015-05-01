@@ -1,6 +1,4 @@
 
 Improve Copy & Paste functionality.
 
-Make vector ignore Y controls if it's CC has not been set or only 32 paerts are enabled.
-
 Complete NRPNs
