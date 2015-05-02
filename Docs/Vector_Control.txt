@@ -25,7 +25,7 @@ Data MSB ( 6) set mode
               5 = x2 instrument (optional)
               6 = y1 instrument (optional)
               7 = y2 instrument (optional)
-These enable vector control any other value disables it
+Setting CC for X enables vector control any value oustide the above list disables it.
 
 Data LSB (38) value to set
 
@@ -53,6 +53,6 @@ CC      Value
 
 This will set up CC14 as the X axis control and CC15 as Y, with X set to volume control and Y set to pan control.
 
-You can either go on with the NRPNs to set the voices (this will load and
-enable voices from the current bank) or enable and load them by hand.
+You can either go on with the NRPNs to set the instruments (this will load and
+enable instruments from the current bank) or enable and load them by hand.
 For channel 1 this would be part 1 and 17 for X and part 33 and 49 for Y

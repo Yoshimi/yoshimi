@@ -2,3 +2,15 @@
 Improve Copy & Paste functionality.
 
 Complete NRPNs
+
+Review mapping of SubSynth harmonic faders
+
+Review tooltips
+
+Consider enabling and disabling tooltips
+
+Change numeric menus to spin boxes
+
+Consider scroll wheel control of sliders
+
+Documentation!

@@ -339,8 +339,8 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      private xywh {4 826 375 165} type Double hide
-      class Fl_Group
+      private xywh {4 826 375 165} type Double
+      class Fl_Group visible
     } {
       Fl_Group partgroupui {open
         xywh {0 0 375 166}
@@ -443,7 +443,7 @@ Offset}
     part->Prcvchn = lrint(o->value()) - 1;
     o->textcolor(FL_BLACK);
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);}
+        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);} selected
         tooltip {Midi channel for this part} xywh {35 36 40 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
         code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
@@ -1261,7 +1261,7 @@ else {propta->deactivate();proptb->deactivate();}}
   }
   decl {BankUI *bankui;} {private local
   }
-  decl {ADnoteUI *adnoteui;} {selected public local
+  decl {ADnoteUI *adnoteui;} {public local
   }
   decl {SUBnoteUI *subnoteui;} {private local
   }

@@ -42,7 +42,10 @@ class MusicIO : virtual protected MiscFuncs
         void InterleaveShorts(void);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
-        void ProcessNrpn(unsigned char chan, int type, short int par);
+        bool nrpnRunVector(unsigned char ch, int ctrl, int param);
+        void nrpnProcessData(unsigned char chan, int type, int par);
+        void nrpnDirectPart(int dHigh, int par);
+        void nrpnSetVector(int dHigh, unsigned char chan,  int par);
         //if setBank is false then set RootDir number else current bank number
         void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
@@ -76,8 +79,8 @@ class MusicIO : virtual protected MiscFuncs
         struct IOdata{
             unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
             unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
-            unsigned char Part;
-            unsigned char Controller;
+            int Part;
+            int Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
         

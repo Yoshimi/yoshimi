@@ -501,7 +501,7 @@ mainCreateNewInstance(forceId);}
               synth->actionLock(lockmute);
               synth->shutup = 1;
               synth->fadeLevel = 1.0f;
-              synth->actionLock(unlock);} selected
+              synth->actionLock(unlock);}
           tooltip {Cease all sound immediately!} xywh {11 46 50 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
@@ -1004,7 +1004,8 @@ updatepanel();} open
          partui->midich->redraw();
     }
     if(npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-         panellistitem[npart % NUM_MIDI_CHANNELS]->refresh();} {}
+         panellistitem[npart % NUM_MIDI_CHANNELS]->refresh();} {selected
+    }
   }
   Function {setMasterLabel(string name)} {open
   } {

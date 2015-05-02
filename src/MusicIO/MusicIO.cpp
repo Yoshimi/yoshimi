@@ -182,6 +182,8 @@ int MusicIO::getMidiController(unsigned char b)
 
 void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
+    int nLow;
+    int nHigh;
     if (ctrl == synth->getRuntime().midi_bank_root)
         setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)
@@ -189,44 +191,34 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     else if (ctrl == synth->getRuntime().midi_upper_voice_C)
         // it's really an upper set program change
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
-    else if(ctrl == C_nrpnL)
+    else if(ctrl == C_nrpnL || ctrl == C_nrpnH)
     {
-        if(synth->getRuntime().nrpnL == param)
-            return;
-        synth->getRuntime().nrpnL = param;
-        synth->getRuntime().dataL = 128; //  we've changed the NRPN
-        synth->getRuntime().dataH = 128; //  so these are now invalid
-        if (param == 1 && synth->getRuntime().nrpnH == 64) // clear out previous vector settings
+        if (ctrl == C_nrpnL)
         {
-            nrpndata.vectorEnabled[ch] = false;
-            nrpndata.vectorXaxis[ch] = 0xff;
-            nrpndata.vectorYaxis[ch] = 0xff;
+            synth->getRuntime().nrpnL = param;
+            nLow = param;
+            nHigh = synth->getRuntime().nrpnH;
+            synth->getRuntime().Log("Set nrpn LSB to " + asString(nLow));
         }
-        synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnH < 127);
-        synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
-    }
-    else if(ctrl == C_nrpnH)
-    {
-        if(synth->getRuntime().nrpnH == param)
-            return;
-        synth->getRuntime().nrpnH = param;
-        synth->getRuntime().dataL = 128; //  we've changed the NRPN
-        synth->getRuntime().dataH = 128; //  so these are now invalid
-        if (param == 64 && synth->getRuntime().nrpnL == 1) // clear out previous vector settings
+        else
         {
-            nrpndata.vectorEnabled[ch] = false;
-            nrpndata.vectorXaxis[ch] = 0xff;
-            nrpndata.vectorYaxis[ch] = 0xff;
+            synth->getRuntime().nrpnH = param;
+            nHigh = param;
+            nLow = synth->getRuntime().nrpnL;
+            synth->getRuntime().Log("Set nrpn MSB to " + asString(nHigh));
         }
-        synth->getRuntime().nrpnActive = (param < 127 && synth->getRuntime().nrpnL < 127);
-        synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
+
+        synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
+        synth->getRuntime().dataH = 0x80; //  so these are now invalid
+        synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
+//        synth->getRuntime().Log("Status nrpn " + asString(synth->getRuntime().nrpnActive));
     }
     else
     {
         if (synth->getRuntime().nrpnActive)
         {
-            if(ctrl == C_dataI || ctrl == C_dataD)
-            {
+            if (ctrl == C_dataI || ctrl == C_dataD)
+            { // translate these to C_dataL and C_dataH
                 int dHigh = synth->getRuntime().dataH;
                 int dLow = synth->getRuntime().dataL;
 
@@ -249,7 +241,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                     if (param > 0x7f)
                         param = 0x7f;
                 }
-                else{
+                else{ // data decrement
                     if (msbPar)
                     {
                         param = dHigh - param;
@@ -265,202 +257,234 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                 }
             }
             
-            if(ctrl == C_dataL || ctrl == C_dataH)
+            if (ctrl == C_dataL || ctrl == C_dataH)
             {
-                ProcessNrpn(ch, ctrl, param);
+                nrpnProcessData(ch, ctrl, param);
                 return;
             }
-#warning should some NRPN & vector stuff move out of the MIDI thread?
 # if NUM_MIDI_PARTS == 64
             if (nrpndata.vectorEnabled[ch])
-            {
-                int Xopps = nrpndata.vectorXaxis[ch];
-                int Xtype = Xopps & 0xff;
-                int Yopps = nrpndata.vectorYaxis[ch];
-                int Ytype = Yopps & 0xff;
-                Xopps = Xopps >> 8;
-                Yopps = Yopps >> 8;
-                if(Xtype == ctrl || Ytype == ctrl)
-                { // vector control is direct to parts
-                    if(Xtype == ctrl)
-                    {
-//                        synth->getRuntime().Log("X D H " + asString(Xopps)  + "   D L " + asString(Xtype) + "  V " + asString(param));
-                        if (Xopps & 1) // volume
-                        {
-                            synth->SetController(ch | 0x80, C_volume, param); // needs improving
-                            synth->SetController(ch | 0x90, C_volume, 127 - param);
-                        }
-                        if (Xopps & 2) // pan
-                        {
-                            synth->SetController(ch | 0x80, C_panning, param);
-                            synth->SetController(ch | 0x90, C_panning, 127 - param);
-                        }
-                        if (Xopps & 4) // 'brightness'
-                        {
-                            synth->SetController(ch | 0x80, C_filtercutoff, param);
-                            synth->SetController(ch | 0x90, C_filtercutoff, 127 - param);
-                        }
-                    }
-                    else // if Y hasn't been set these commands will be ignored
-                    {
-//                       synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
-                        if (Yopps & 1) // volume
-                        {
-                            synth->SetController(ch | 0xa0, C_volume, param);
-                            synth->SetController(ch | 0xb0, C_volume, 127 - param);
-                        }
-                        if (Yopps & 2) // pan
-                        {
-                            synth->SetController(ch | 0xa0, C_panning, param);
-                            synth->SetController(ch | 0xb0, C_panning, 127 - param);
-                        }
-                        if (Yopps & 4) // 'brightness'
-                        {
-                            synth->SetController(ch | 0xa0, C_filtercutoff, param);
-                            synth->SetController(ch | 0xb0, C_filtercutoff, 127 - param);
-                        }
-                    }
-                    return;
-                }
+            { // vector control is direct to parts
+               if (nrpnRunVector(ch, ctrl, param));
+                return;
             }
 #endif
         }
+        // pick up a drop-through if CC doesn't match the above
         synth->SetController(ch, ctrl, param);
     }
 }
 
 
-void MusicIO::ProcessNrpn(unsigned char chan, int type, short int par)
+bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
+{
+    int Xopps = nrpndata.vectorXaxis[ch];
+    int Xtype = Xopps & 0xff;
+    int Yopps = nrpndata.vectorYaxis[ch];
+    int Ytype = Yopps & 0xff;
+    if(ctrl != Xtype && ctrl != Ytype)
+        return false;
+
+    Xopps = Xopps >> 8;
+    Yopps = Yopps >> 8;
+    if(Xtype == ctrl)
+    {
+//        synth->getRuntime().Log("X D H " + asString(Xopps)  + "   D L " + asString(Xtype) + "  V " + asString(param));
+        if (Xopps & 1) // volume
+        {
+            synth->SetController(ch | 0x80, C_volume, param); // needs improving
+            synth->SetController(ch | 0x90, C_volume, 127 - param);
+        }
+        if (Xopps & 2) // pan
+        {
+            synth->SetController(ch | 0x80, C_panning, param);
+            synth->SetController(ch | 0x90, C_panning, 127 - param);
+        }
+        if (Xopps & 4) // 'brightness'
+        {
+            synth->SetController(ch | 0x80, C_filtercutoff, param);
+            synth->SetController(ch | 0x90, C_filtercutoff, 127 - param);
+        }
+    }
+    else // if Y hasn't been set these commands will be ignored
+    {
+//        synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
+        if (Yopps & 1) // volume
+        {
+            synth->SetController(ch | 0xa0, C_volume, param);
+            synth->SetController(ch | 0xb0, C_volume, 127 - param);
+        }
+        if (Yopps & 2) // pan
+        {
+            synth->SetController(ch | 0xa0, C_panning, param);
+            synth->SetController(ch | 0xb0, C_panning, 127 - param);
+        }
+        if (Yopps & 4) // 'brightness'
+        {
+            synth->SetController(ch | 0xa0, C_filtercutoff, param);
+            synth->SetController(ch | 0xb0, C_filtercutoff, 127 - param);
+        }
+    }
+    return true;
+}
+
+
+void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
 {
     int nHigh = synth->getRuntime().nrpnH;
-    if (nHigh != 64)
-    {   
-        synth->getRuntime().Log("Go away " + asString(nHigh) + ". We don't know you");
+    int nLow = synth->getRuntime().nrpnL;
+    if (nHigh != 64 && nLow < 0x7f)
+    {
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + "-xx. We don't know you!");
         return;
     }
-    int nLow = synth->getRuntime().nrpnL;
+    
+    bool noHigh = (synth->getRuntime().dataH > 0x7f);
+    
+    if (type == C_dataL)
+    {
+        synth->getRuntime().dataL = par;
+        synth->getRuntime().Log("Data LSB    value " + asString(par));
+        if (noHigh)
+            return;
+    }
     
     if (type == C_dataH)
     {
         synth->getRuntime().dataH = par;
         synth->getRuntime().Log("Data MSB    value " + asString(par));
-        return; // we're not currently using MSB as a value
+        if (noHigh && synth->getRuntime().dataL <= 0x7f)
+            par = synth->getRuntime().dataL;
+        else
+            return; // we're currently using MSB as parameter not a value
     }
-    synth->getRuntime().dataL = par;
-    synth->getRuntime().Log("Data LSB    value " + asString(par));
+
+    /*
+     * All the above runaround performance is to deal with a data LSB
+     * arriving either before or after the MSB and immediately after
+     * a new NRPN has been set. After this, running data values expect
+     * MSB sub parameter before LSB value until the next full NRPN.
+     */
+
     int dHigh = synth->getRuntime().dataH;
     
-    if (type == C_dataL && nLow == 0) // direct part change
-    {
-        switch (dHigh)
-        {
-            case 0: // set part number
-                {
-                    if (par < NUM_MIDI_PARTS)
-                    {
-                        synth->getRuntime().dataL = par;
-                        nrpndata.Part = par;
-                    }
-                    else // It's bad. Kill it
-                        synth->getRuntime().dataL = 128;
-                        synth->getRuntime().dataH = 128;
-                    break;
-                }
-                case 1: // Program Change
-                {
-                    setMidiProgram(nrpndata.Part | 0x80, par);
-                    break;
-                }
-                case 2: // Set controller number
-                {
-                    nrpndata.Controller = par;
-                    synth->getRuntime().dataL = par;
-                    break;
-                }
-
-                case 3: // Set controller value
-                {
-                    synth->SetController(nrpndata.Part | 0x80, nrpndata.Controller, par);
-                    break;
-                }
-                case 4: // Set part's channel number
-                {
-                     synth->SetPartChan(nrpndata.Part, par);
-                     break;
-                }
-        }
-    }
+    if (nLow == 0) // direct part change
+        nrpnDirectPart(dHigh, par);
 
 #if NUM_MIDI_PARTS == 64
     else if (nLow == 1) // it's vector control
-        if (type == C_dataL)
-        {
-            switch (dHigh)
-            {
-                case 0:
-                    {
-                        nrpndata.vectorXaxis[chan]
-                        = (nrpndata.vectorXaxis[chan] & 0xff00) | par;
-                        if (!nrpndata.vectorEnabled[chan])
-                        {
-                            nrpndata.vectorEnabled[chan] = true;
-                            synth->getRuntime().Log("Vector control enabled");
-                            // enabling is only done with a valid X CC
-                        }
-                        break;
-                    }
-                case 1:
-                    {
-                        if ((nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
-                            synth->getRuntime().Log("Vector X axis must be set before Y");
-                        else
-                            nrpndata.vectorYaxis[chan]
-                            = (nrpndata.vectorYaxis[chan] & 0xff00) | par;
-                        break;
-                    }
-                case 2:
-                    {
-                        nrpndata.vectorXaxis[chan]
-                        = (nrpndata.vectorXaxis[chan] & 0xff) | (par << 8);
-                        break;
-                    }
-                case 3:
-                    {
-                        
-                        nrpndata.vectorYaxis[chan]
-                        = (nrpndata.vectorYaxis[chan] & 0xff) | (par << 8);
-                        break;
-                    }
-                 case 4:
-                    {
-                        setMidiProgram(chan | 0x80, par);
-                        break;
-                    }
-                 case 5:
-                    {
-                        setMidiProgram(chan | 0x90, par);
-                        break;
-                    }
-                  case 6:
-                    {
-                        setMidiProgram(chan | 0xa0, par);
-                        break;
-                    }
-                 case 7:
-                    {
-                        setMidiProgram(chan | 0xb0, par);
-                        break;
-                    }
-                 default:
-                    {
-                        nrpndata.vectorEnabled[chan] = false;
-                        nrpndata.vectorXaxis[chan] = 0xff;
-                        nrpndata.vectorYaxis[chan] = 0xff;
-                        synth->getRuntime().Log("Vector control disabled");
-                    }
-            }
-        }
+        nrpnSetVector(dHigh, chan, par);
+
 #endif
+}
+
+
+void MusicIO::nrpnDirectPart(int dHigh, int par)
+{
+    switch (dHigh)
+    {
+        case 0: // set part number
+        {
+            if (par < NUM_MIDI_PARTS)
+            {
+                synth->getRuntime().dataL = par;
+                nrpndata.Part = par;
+            }
+            else // It's bad. Kill it
+                synth->getRuntime().dataL = 128;
+                synth->getRuntime().dataH = 128;
+            break;
+        }
+        case 1: // Program Change
+        {
+            setMidiProgram(nrpndata.Part | 0x80, par);
+            break;
+        }
+        case 2: // Set controller number
+        {
+            nrpndata.Controller = par;
+            synth->getRuntime().dataL = par;
+            break;
+        }
+        case 3: // Set controller value
+        {
+            synth->SetController(nrpndata.Part | 0x80, nrpndata.Controller, par);
+            break;
+        }
+        case 4: // Set part's channel number
+        {
+             synth->SetPartChan(nrpndata.Part, par);
+             break;
+        }
+    }
+}
+
+
+void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
+{
+    switch (dHigh)
+    {
+        case 0:
+        {
+            nrpndata.vectorXaxis[chan]
+            = (nrpndata.vectorXaxis[chan] & 0xff00) | par;
+            if (!nrpndata.vectorEnabled[chan])
+            {
+                nrpndata.vectorEnabled[chan] = true;
+                synth->getRuntime().Log("Vector control enabled");
+                // enabling is only done with a valid X CC
+            }
+            break;
+        }
+        case 1:
+        {
+            if ((nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
+                synth->getRuntime().Log("Vector X axis must be set before Y");
+            else
+                nrpndata.vectorYaxis[chan]
+                = (nrpndata.vectorYaxis[chan] & 0xff00) | par;
+            break;
+        }
+        case 2:
+        {
+            nrpndata.vectorXaxis[chan]
+            = (nrpndata.vectorXaxis[chan] & 0xff) | (par << 8);
+            break;
+        }
+        case 3:
+        {
+            nrpndata.vectorYaxis[chan]
+            = (nrpndata.vectorYaxis[chan] & 0xff) | (par << 8);
+            break;
+        }
+        case 4:
+        {
+            setMidiProgram(chan | 0x80, par);
+            break;
+        }
+        case 5:
+        {
+            setMidiProgram(chan | 0x90, par);
+            break;
+        }
+        case 6:
+        {
+            setMidiProgram(chan | 0xa0, par);
+            break;
+        }
+        case 7:
+        {
+            setMidiProgram(chan | 0xb0, par);
+            break;
+        }
+        default:
+        {
+            nrpndata.vectorEnabled[chan] = false;
+            nrpndata.vectorXaxis[chan] = 0xff;
+            nrpndata.vectorYaxis[chan] = 0xff;
+            synth->getRuntime().Log("Vector control disabled");
+        }
+    }
 }
 
 

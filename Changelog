@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-5-2 Will
+- Improved NRPN handling of 14bit NRPNs and 'full' NRPNs with reversed data byte order.
+
 2015-4-30 Will
 - Fixed regression in distortion level.
 - Added voice number to AddSynth oscillator editor.

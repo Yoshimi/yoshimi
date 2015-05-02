@@ -15,7 +15,7 @@ Whenever either byte of the NRPN is changed, the data values will be cleared (bu
 
 If either NRPN byte is set to 127, all data values are ignored again.
 
-Data increment and decrement operation enables you to directly change the LSB by between 0 and 63. To change the MSB add 64 to cover the same range. Setting zero might seem pointless, but it gives an alternative way to make an initial setting if your sequencer doesn't play nice.
+Data increment and decrement operation enables you to directly change the data LSB by between 0 and 63. To change the MSB add 64 to cover the same range. Setting zero might seem pointless, but it gives an alternative way to make an initial setting if your sequencer doesn't play nice.
 
 e.g.
 
@@ -28,4 +28,6 @@ MSB     128(off)    dec 65      127
 
 In Yoshimi NRPNs are not themselves channel sensitive but the final results will usually be sent to whichever is the current channel.
 
-Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user.
+Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user. In order to deal with this, and also some variations in the way sequencers present NRPNs generally, if a complete NRPN is set i.e. Nhigh, Nlow, Dhigh, Dlow then the data bytes can be in either order, but must follow Nhigh and Nlow.
+
+Aftert this, for other running single values, Yoshimi expects Dhigh first as it is a parameter number rather than a data byte.
