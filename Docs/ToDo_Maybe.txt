@@ -9,6 +9,8 @@ Review tooltips
 
 Consider enabling and disabling tooltips
 
+Visually identify AddSynth & SubSynth in Instruments window 
+
 Change numeric menus to spin boxes
 
 Consider scroll wheel control of sliders

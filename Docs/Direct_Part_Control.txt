@@ -12,7 +12,13 @@ Data MSB (6)
     2 : data LSB = controller number
     3 : data LSB = controller value
     4 : data LSB = part's channel number { 15 to 127 disconnects the part from any channel}
+    
+    7 : data LSB = main volume {not yet implemented}
 
-   19 (0x13) : data LSB = controller LSB value {not yet implemented}
+
+
+   35 (0x23) : data LSB = controller LSB value {not yet implemented}
+   
+   39 (0x27) : data LSB = main volume LSB {not yet implemented}
 
 Other values currently ignored.

@@ -59,8 +59,8 @@ class SUBnoteharmonic {open : {public Fl_Group}
   Function {make_window()} {open private
   } {
     Fl_Window harmonic {open
-      xywh {558 534 90 310} type Double hide
-      class Fl_Group
+      xywh {558 534 90 310} type Double
+      class Fl_Group visible
     } {
       Fl_Slider mag {
         callback {int x=0;
@@ -77,9 +77,12 @@ if (pars->Phmag[n]==0) o->selection_color(0);
         callback {int x=64;
 if (Fl::event_button1()) x=127-(int)o->value();
    else o->value(x);
-pars->Phrelbw[n]=x;}
+pars->Phrelbw[n]=x;
+if (pars->Phrelbw[n]==64) o->selection_color(0);
+    else o->selection_color(222);}
         tooltip {harmonic's bandwidth} xywh {0 156 10 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-pars->Phrelbw[n]);}
+        code1 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
       }
       Fl_Box {} {
         xywh {10 216 5 5} box FLAT_BOX color 39
@@ -128,10 +131,10 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
   Function {make_window()} {open
   } {
     Fl_Window SUBparameters {
-      label {SUBsynth Parameters} open selected
-      xywh {638 343 735 475} type Double
+      label {SUBsynth Parameters} open
+      xywh {6 183 735 475} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("SubSynth");}
-      code1 {o->copy_label(tname.c_str());} visible
+      code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Scroll {} {open
         xywh {5 140 434 325} type HORIZONTAL box THIN_UP_BOX
@@ -358,13 +361,16 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
             for (int i = 0; i < MAX_SUB_HARMONICS; i++)
             {
                 h[i]->mag->value(127);
+                h[i]->mag->selection_color(0);
                 pars->Phmag[i] = 0;
                 h[i]->bw->value(64);
+                h[i]->bw->selection_color(0);
                 pars->Phrelbw[i] = 64;
             }
             pars->Phmag[0] = 127;
+            h[0]->mag->selection_color(222);
             h[0]->mag->value(0);
-            SUBparameters->redraw();}
+            SUBparameters->redraw();} selected
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group bandwidthsettingsui {
@@ -447,7 +453,7 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
       }
       Fl_Group {} {
         label OVERTONES open
-        xywh {442 145 288 70} box UP_FRAME labelfont 1 labelsize 12 align 17
+        xywh {440 140 290 81} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Choice spreadtype {
           label {Overtones  Position}

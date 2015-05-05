@@ -1110,6 +1110,17 @@ void GuiThreadMsg::processGuiMessages()
                 }
             }
             break;
+        case GuiThreadMsg::UpdateEffects:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster)
+                {
+                    guiMaster->updateeffects(msg->index);
+                }
+            }
+            break;
         default:
             break;
         }

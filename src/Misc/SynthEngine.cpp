@@ -428,6 +428,40 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 }
 
 
+void SynthEngine::SetZynControls()
+{
+    if (Runtime.dataH <= 0x7f && Runtime.dataL <= 0x7f)
+    {
+        int data = Runtime.dataL;
+        char effnum = Runtime.dataH;
+        bool efftype = (effnum >= 0x40);
+        effnum &= 0x3f;
+        data |= (effnum << 8);
+        data |= (Runtime.nrpnL << 16);
+        if (Runtime.nrpnH == 8)
+        {
+            data |= 0x10000000;
+            if (efftype)
+            {
+                insefx[Runtime.nrpnL]->changeeffect(Runtime.dataL);
+            }
+            else
+                insefx[Runtime.nrpnL]->seteffectpar(effnum, Runtime.dataL);
+        }
+        else
+        {
+            if (efftype)
+            {
+                sysefx[Runtime.nrpnL]->changeeffect(Runtime.dataL);
+            }
+            else
+                sysefx[Runtime.nrpnL]->seteffectpar(effnum, Runtime.dataL);
+        }
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
+    }
+}
+
+
 void SynthEngine::SetBankRoot(int rootnum)
 {
     if(bank.setCurrentRootID(rootnum))

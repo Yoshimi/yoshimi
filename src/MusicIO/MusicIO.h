@@ -46,6 +46,7 @@ class MusicIO : virtual protected MiscFuncs
         void nrpnProcessData(unsigned char chan, int type, int par);
         void nrpnDirectPart(int dHigh, int par);
         void nrpnSetVector(int dHigh, unsigned char chan,  int par);
+
         //if setBank is false then set RootDir number else current bank number
         void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);

@@ -262,14 +262,14 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                 nrpnProcessData(ch, ctrl, param);
                 return;
             }
-# if NUM_MIDI_PARTS == 64
-            if (nrpndata.vectorEnabled[ch])
-            { // vector control is direct to parts
-               if (nrpnRunVector(ch, ctrl, param));
-                return;
-            }
-#endif
         }
+# if NUM_MIDI_PARTS == 64
+        if (nrpndata.vectorEnabled[ch])
+        { // vector control is direct to parts
+           if (nrpnRunVector(ch, ctrl, param));
+            return;
+        }
+#endif
         // pick up a drop-through if CC doesn't match the above
         synth->SetController(ch, ctrl, param);
     }
@@ -333,9 +333,19 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
 {
     int nHigh = synth->getRuntime().nrpnH;
     int nLow = synth->getRuntime().nrpnL;
+    if (nLow <7 && (nHigh == 4 || nHigh == 8 ))
+    {
+        if (type == C_dataL)
+            synth->getRuntime().dataL = par;
+        else
+             synth->getRuntime().dataH = par;
+        synth->SetZynControls();
+        return;
+    }
     if (nHigh != 64 && nLow < 0x7f)
     {
-        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + "-xx. We don't know you!");
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + "-" + asHexString(nLow) +" We don't know you!");
+        synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;
     }
     

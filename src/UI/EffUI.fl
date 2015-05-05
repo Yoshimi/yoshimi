@@ -202,8 +202,9 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
-    code {eff = NULL;
-        filterwindow = NULL;} {}
+    code {//
+    eff = NULL;
+    filterwindow = NULL;} {}
   }
   Function {~EffUI()} {} {
     code {effnullwindow->hide();        // delete (effnullwindow);
@@ -629,14 +630,14 @@ refresh(eff);}
   }
   Function {make_phaser_window()} {open
   } {
-    Fl_Window effphaserwindow {
+    Fl_Window effphaserwindow {open
       xywh {866 341 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11
       class Fl_Group visible
     } {
       Fl_Choice phaserp {
         label Preset
         callback {eff->changepreset((int)o->value());
-refresh(eff);} selected
+refresh(eff);}
         xywh {80 21 82 15} box UP_BOX down_box BORDER_BOX color 31 selection_color 7 labelsize 11 align 1 textsize 11
       } {
         MenuItem {} {
@@ -694,7 +695,7 @@ refresh(eff);} selected
       }
       Fl_Dial phaserp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->seteffectpar(0,(int) o->value());} selected
         tooltip {Effect Volume} xywh {10 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }

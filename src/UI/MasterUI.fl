@@ -207,8 +207,8 @@ class MasterUI {open : {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12
-      code0 {partmax = NUM_MIDI_PARTS;} xclass Yoshimi visible
+      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide
+      code0 {partmax = NUM_MIDI_PARTS;} xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
@@ -524,13 +524,13 @@ mainCreateNewInstance(forceId);}
           tooltip {Mixer Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
-      Fl_Tabs {} {
+      Fl_Tabs sysinsgroup {
         label {System/Insert}
         callback {//
             if (o->value() == SystemEffectsGrp)
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
-               showInsEfxUI();}
+               showInsEfxUI();} open
         xywh {3 88 380 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
@@ -648,7 +648,6 @@ mainCreateNewInstance(forceId);}
               synth->insefx[ninseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff]);
-              //inseffectui->show();
               showInsEfxUI();}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
@@ -707,7 +706,7 @@ mainCreateNewInstance(forceId);}
                 insefftype->activate();
                 inseffectui->activate();
               }
-              synth->insefx[ninseff]->cleanup();}
+              synth->insefx[ninseff]->cleanup();} open
             xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textsize 11
             code0 {o->add("Master Out");o->add("Off");}
             code1 {for (int i = 0; i < NUM_MIDI_PARTS; ++i)
@@ -1004,7 +1003,29 @@ updatepanel();} open
          partui->midich->redraw();
     }
     if(npart >= panelgroup && npart < (panelgroup + NUM_MIDI_CHANNELS))
-         panellistitem[npart % NUM_MIDI_CHANNELS]->refresh();} {selected
+         panellistitem[npart % NUM_MIDI_CHANNELS]->refresh();} {}
+  }
+  Function {updateeffects(int data)} {open
+  } {
+    code {//
+    int effect = (data >> 16) & 0x7f;
+    int parameter =  (data >> 8) & 0x7f;
+    int value = data & 0x7f;
+
+    if (data & 0x10000000)
+    {
+        synth->getRuntime().Log("Insert  Effect Number " + asString(effect) + "  Parameter " + asString(parameter) + "  Value " + asString(value));
+        inseffnocounter->value(effect + 1);
+        inseffectui->refresh(synth->insefx[effect]);
+        showInsEfxUI();
+    }
+    else
+    {
+        synth->getRuntime().Log("System  Effect Number " + asString(effect) + "  Parameter " + asString(parameter) + "  Value " + asString(value));
+        syseffnocounter->value(effect + 1);
+        syseffectui->refresh(synth->sysefx[effect]);
+        showSysEfxUI();
+    }} {selected
     }
   }
   Function {setMasterLabel(string name)} {open
@@ -1121,7 +1142,7 @@ updatepanel();} open
   Function {Log(string msg)} {} {
     code {yoshiLog->log(msg);} {}
   }
-  Function {showSysEfxUI(void)} {private
+  Function {showSysEfxUI(void)} {open private
   } {
     code {//
       inseffectui->hide();
@@ -1134,7 +1155,7 @@ updatepanel();} open
       syseffectuigroup->activate();
       syseffectuigroup->show();} {}
   }
-  Function {showInsEfxUI(void)} {private
+  Function {showInsEfxUI(void)} {open private
   } {
     code {//
       syseffectui->hide();
