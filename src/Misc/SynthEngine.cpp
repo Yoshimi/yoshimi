@@ -430,32 +430,41 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
 
 void SynthEngine::SetZynControls()
 {
-    if (Runtime.dataH <= 0x7f && Runtime.dataL <= 0x7f)
+    unsigned char parnum = Runtime.dataH;
+    unsigned char value = Runtime.dataL;
+    if (parnum <= 0x7f && value <= 0x7f)
     {
-        int data = Runtime.dataL;
-        char effnum = Runtime.dataH;
-        bool efftype = (effnum >= 0x40);
-        effnum &= 0x3f;
-        data |= (effnum << 8);
-        data |= (Runtime.nrpnL << 16);
+        Runtime.dataL = 0xff; // use once then clear it out
+        unsigned char effnum = Runtime.nrpnL;
+        unsigned char efftype = (parnum & 0x60);
+        int data = value;
+        data |= (parnum << 8);
+        data |= (effnum << 16);
         if (Runtime.nrpnH == 8)
         {
             data |= 0x10000000;
-            if (efftype)
+            if (efftype == 0x20) // select part
             {
-                insefx[Runtime.nrpnL]->changeeffect(Runtime.dataL);
+                if (value >= 0x7e)
+                    Pinsparts[effnum] = value - 0x80; // set for 'Off' and 'Master out'
+                else if (value < NUM_MIDI_PARTS)
+                    Pinsparts[effnum] = value;
+            }
+            else if (efftype == 0x40) // select effect
+            {
+                insefx[effnum]->changeeffect(value);
             }
             else
-                insefx[Runtime.nrpnL]->seteffectpar(effnum, Runtime.dataL);
+                insefx[effnum]->seteffectpar(parnum, value);
         }
         else
         {
-            if (efftype)
+            if (efftype == 0x40) // select effect
             {
-                sysefx[Runtime.nrpnL]->changeeffect(Runtime.dataL);
+                sysefx[effnum]->changeeffect(value);
             }
             else
-                sysefx[Runtime.nrpnL]->seteffectpar(effnum, Runtime.dataL);
+                sysefx[effnum]->seteffectpar(parnum, value);
         }
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
     }

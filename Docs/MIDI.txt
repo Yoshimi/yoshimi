@@ -16,6 +16,8 @@ Yoshimi responds to the following messages.
  76: FM amplitude *
  77: Resonance Center Frequency *
  78: Resonance Bandwith *
+ 96: Data Increment
+ 97: Data Decrement
  98: NRPN LSB
  99: NRPN MSB
 120: All Sounds OFF
@@ -34,3 +36,5 @@ User selectable CC for Bank Root Path change.
 For more details of bank changes see Banks.txt
 
 Instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
+
+Further details on NRPNs in Using_NRPNs.txt

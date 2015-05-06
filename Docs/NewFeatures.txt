@@ -67,6 +67,7 @@ See:
 Using_NRPNs.txt
 Direct_Part_Control.txt
 Vector_Control.txt
+Zyn_NRPNs.txt
 
 ###
 
