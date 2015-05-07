@@ -52,8 +52,8 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open
-      xywh {273 160 465 330} type Double hide
+      callback {o->hide();} open selected
+      xywh {273 160 465 330} type Double visible
     } {
       Fl_Tabs {} {open
         xywh {5 5 455 297}
@@ -422,13 +422,20 @@ else
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
-          Fl_Return_Button BankRootok {
-            label Set
+          Fl_Spinner BankRoot {
+            label {Bank Root Change}
+            callback {Rpend->show();}
+            xywh {275 81 53 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+            code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
+            code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
+          }
+          Fl_Button Rpend {
+            label Pending
             callback {//
     int candidate = BankRoot->value();
     if (candidate == BankRootvalue)
     {
-        o->deactivate();
+        o->hide();
         return;
     }
     string name = synth->getRuntime().testCCvalue(candidate);
@@ -445,17 +452,10 @@ else
     {
         synth->getRuntime().midi_bank_root = candidate;
         BankRootvalue = candidate;
-        o->deactivate();
+        o->hide();
         configChanged = true;
     }}
-            xywh {275 78 85 22} box NO_BOX labelsize 12 align 8 deactivate
-          }
-          Fl_Spinner BankRoot {
-            label {Bank Root Change}
-            callback {BankRootok->activate();}
-            xywh {275 81 53 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
-            code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
-            code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
+            tooltip {Click to set} xywh {340 81 70 20} box PLASTIC_UP_BOX labelsize 12 hide
           }
           Fl_Check_Button {} {
             label {Enable Bank Root Change}
@@ -464,21 +464,21 @@ else
     {
          synth->getRuntime().midi_bank_root = 128;
          BankRoot->value(0);
-         BankRootok->deactivate();
          BankRoot->deactivate();
+         Rpend->hide();
     }
     else
     {
          BankRoot->activate();
-         BankRootok->activate();
          BankRoot->value(0);
          BankRootvalue = 128;
+         Rpend->show();
     }
     BankRoot->redraw();
     configChanged = true;}
             xywh {275 60 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
-            code1 {if (o->value() == 0) { BankRoot->deactivate(); BankRootok->deactivate(); }}
+            code1 {if (o->value() == 0) BankRoot->deactivate();}
           }
           Fl_Choice bankchange {
             label {Bank Change}
@@ -546,13 +546,20 @@ else
             tooltip {Part enabled if MIDI program changed} xywh {275 182 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
-          Fl_Return_Button EPCok {
-            label Set
+          Fl_Spinner EPCspinner {
+            label {Extended Program Change}
+            callback {Epend->show();}
+            xywh {275 241 53 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
+            code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
+            code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
+          }
+          Fl_Button Epend {
+            label Pending
             callback {//
     int candidate = EPCspinner->value();
     if (candidate == EPCvalue)
     {
-        o->deactivate();
+        o->hide();
         return;
     }
 
@@ -571,40 +578,33 @@ else
     {
         synth->getRuntime().midi_upper_voice_C = candidate;
         EPCvalue = candidate;
-        o->deactivate();
+        o->hide();
         configChanged = true;
     }}
-            xywh {275 238 85 22} box NO_BOX labelsize 12 align 8 deactivate
-          }
-          Fl_Spinner EPCspinner {
-            label {Extended Program Change}
-            callback {EPCok->activate();}
-            xywh {275 241 53 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
-            code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
-            code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
+            tooltip {Click to set} xywh {340 241 70 20} box PLASTIC_UP_BOX labelsize 12 hide
           }
           Fl_Check_Button {} {
             label {Enable Extended Program Change}
-            callback {//
+            callback {// for some weird reason this *must* be the last item in the group
     if (o->value() == 0)
     {
          synth->getRuntime().midi_upper_voice_C = 128;
          EPCspinner->value(110);
          EPCspinner->deactivate();
-         EPCok->deactivate();
+         Epend->hide();
     }
     else
     {
          EPCspinner->activate();
-         EPCok->activate();
+         Epend->show();;
          EPCspinner->value(110);
          EPCvalue = 128;
     }
     EPCspinner->redraw();
-    configChanged = true;} selected
+    configChanged = true;}
             xywh {275 220 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
-            code1 {if (o->value() == 0) { EPCspinner->deactivate(); EPCok->deactivate(); }}
+            code1 {if (o->value() == 0) EPCspinner->deactivate();}
           }
         }
       }

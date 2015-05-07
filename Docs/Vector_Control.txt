@@ -51,7 +51,7 @@ CC      Value
  6        3
 38        2
 
-This will set up CC14 as the X axis control and CC15 as Y, with X set to volume control and Y set to pan control.
+This will set up CC14 as the X axis incoming controller and CC15 as Y, with X set to volume control and Y set to pan control.
 
 You can either go on with the NRPNs to set the instruments (this will load and
 enable instruments from the current bank) or enable and load them by hand.

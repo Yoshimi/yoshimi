@@ -333,7 +333,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
 {
     int nHigh = synth->getRuntime().nrpnH;
     int nLow = synth->getRuntime().nrpnL;
-    if (nLow <7 && (nHigh == 4 || nHigh == 8 ))
+    if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
     {
         if (type == C_dataL)
             synth->getRuntime().dataL = par;

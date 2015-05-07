@@ -1,6 +1,4 @@
-Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX
-
-The controls can be sent on any midi channel (the midi channels numbers are ignored).
+Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX. As with all Yoshimi's NRPNs, the controls can be sent on any midi channel.
 
 The parameters are:
 
@@ -16,12 +14,9 @@ The parameters are:
 If the effect/parameter doesn't exists or is set to none, then the NRPN is
 ignored.
 
-Example(all values in this example are hex):
+A full example is at the end of this file.
 
-    B0 63 08 // Select the insertion effects
-    B0 62 01 // Select the second effect (remember: the first is 00 and not 01)
-    B0 06 00 // Select the effect parameter 00
-    B0 26 7F // Change the parameter of effect to the value 7F (127)
+
 
 WARNING: Changing of some of the effect parameters produces clicks when sounds
 passes thru these effects. Some parameters produce clicks when they are changed very fast.
@@ -159,3 +154,27 @@ This must be set before making a parameter change.
 
 For Insert effects, if the Data MSB bit 5 is set (32) then Data LSB sets the destination part number. 127 is off and 126 is the Master Output.
 
+A complete example:
+
+99 -   8 ~ insert effects
+98 -   3 ~ number 4 (as displayed)
+ 6 -  32 ~ set destination
+38 - 126 ~ Master Out
+99 -   8  *
+98 -   3  *
+ 6 -  64 ~ change effect
+38 -   4 ~ Alienwah
+99 -   8  *
+98 -   3  *
+ 6 -   0 ~ Dry/Wet
+38 -  30 ~ value
+
+* these repeats are not needed as far as Yoshimi is concerned, but some sequencers get unhappy without them.
+
+
+Change just a parameter on an exisiting system effect:
+
+99 -   4 ~ system effects
+98 -   0 ~ the first effect
+ 6 -   1 ~ Pan
+38 -  75 ~ value

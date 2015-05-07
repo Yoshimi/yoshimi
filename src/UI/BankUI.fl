@@ -110,7 +110,11 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
   }
   Function {refresh()} {open
   } {
-    code {if (bank->emptyslot(nslot))
+    code {/* future engine type IDs
+   Bank.h PADsynth_used
+   Bank.cpp see if PADsynth is used
+   Part.cpp */
+if (bank->emptyslot(nslot))
     {
         if (nslot < 128)
             color(46);
@@ -127,12 +131,19 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
                 color(51);
             else
                 color(17);
-        }
+         }
+/* test for addsynth and subsynth here
+   addsynth text colour
+       labelcolor(72);
+   subsynth font type and size
+       labelsize(11);
+       labelfont(2);*/
     }
     if (*nselected == nslot)
         color(6);
     string instrName = bank->getnamenumbered(nslot);
-    copy_label(instrName.c_str());} {}
+    copy_label(instrName.c_str());} {selected
+    }
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
@@ -556,7 +567,7 @@ oldrootID = changeIDbutton->value();}
     synth->getGuiMaster()->configui->configChanged = true;
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
-    rescan_for_banks(true);} selected
+    rescan_for_banks(true);}
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button removerootdirbutton {

@@ -1,18 +1,17 @@
 
-Improve Copy & Paste functionality.
-
-Complete NRPNs
-
 Review mapping of SubSynth harmonic faders
 
 Review tooltips
 
 Consider enabling and disabling tooltips
 
-Visually identify AddSynth & SubSynth in Instruments window 
+Visually identify AddSynth & SubSynth in Instruments window
+    IDs defined in bankUI but not implemented.
 
 Change numeric menus to spin boxes
 
 Consider scroll wheel control of sliders
+
+Improve Copy & Paste functionality.
 
 Documentation!

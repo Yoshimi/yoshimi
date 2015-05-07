@@ -5,7 +5,6 @@ It's generally advisable to set NRPN MSB before LSB
 However, once MSB has been set you can set a chain of LSBs if they share the same MSB.
 
 The data CCs associated with these are, 6 for MSB and 38 for LSB.
-Also there is 96 for data increment and 97 for decrement.
 
 Only when an NRPN has been set can the data values be entered (they will be ignored otherwise).
 
@@ -15,7 +14,18 @@ Whenever either byte of the NRPN is changed, the data values will be cleared (bu
 
 If either NRPN byte is set to 127, all data values are ignored again.
 
+In Yoshimi NRPNs are not themselves channel sensitive but the final results will often be sent to whichever is the current channel.
+
+Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user. In order to deal with this, and also some variations in the way sequencers present NRPNs generally, if a complete NRPN is set i.e. Nhigh, Nlow, Dhigh, Dlow then the data bytes can be in either order, but must follow Nhigh and Nlow.
+
+After this, for other running single values, Yoshimi expects Dhigh first as it is used as a parameter number rather than a data byte.
+
+
+Additionally there is 96 for data increment and 97 for decrement.
+
 Data increment and decrement operation enables you to directly change the data LSB by between 0 and 63. To change the MSB add 64 to cover the same range. Setting zero might seem pointless, but it gives an alternative way to make an initial setting if your sequencer doesn't play nice.
+
+Although data increment and decrement are only active if a valid NRPN has been set, they are otherwise quite independent single CCs.
 
 e.g.
 
@@ -25,9 +35,3 @@ MSB     7           inc 68      11
 LSB     128(off)    inc 1       1
 MSB     126         dec 74      116
 MSB     128(off)    dec 65      127
-
-In Yoshimi NRPNs are not themselves channel sensitive but the final results will usually be sent to whichever is the current channel.
-
-Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user. In order to deal with this, and also some variations in the way sequencers present NRPNs generally, if a complete NRPN is set i.e. Nhigh, Nlow, Dhigh, Dlow then the data bytes can be in either order, but must follow Nhigh and Nlow.
-
-Aftert this, for other running single values, Yoshimi expects Dhigh first as it is a parameter number rather than a data byte.
