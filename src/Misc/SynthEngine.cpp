@@ -440,9 +440,10 @@ void SynthEngine::SetZynControls()
         int data = value;
         data |= (parnum << 8);
         data |= (effnum << 16);
+        parnum &= 0x1f;
         if (Runtime.nrpnH == 8)
         {
-            data |= 0x10000000;
+            data |= 0x400000;
             if (efftype == 0x20) // select part
             {
                 if (value >= 0x7e)
@@ -456,10 +457,16 @@ void SynthEngine::SetZynControls()
             }
             else
                 insefx[effnum]->seteffectpar(parnum, value);
+            data |= (Pinsparts[effnum] + 2) << 24; // needed for both operations
         }
         else
         {
-            if (efftype == 0x40) // select effect
+            if (efftype == 0x20) // select output level
+            {
+                setPsysefxvol(effnum, parnum, value);
+                
+            }
+            else if (efftype == 0x40) // select effect
             {
                 sysefx[effnum]->changeeffect(value);
             }

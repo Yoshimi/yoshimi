@@ -542,7 +542,7 @@ mainCreateNewInstance(forceId);}
               nsyseff = o->value() - 1;
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
               syseffectui->refresh(synth->sysefx[nsyseff]);}
-            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textsize 11
+            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
           }
@@ -636,7 +636,7 @@ mainCreateNewInstance(forceId);}
                 inseffectui->deactivate();
                 inseffectuigroup->deactivate();
               }}
-            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textsize 11
+            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
           }
@@ -706,7 +706,7 @@ mainCreateNewInstance(forceId);}
                 inseffectui->activate();
               }
               synth->insefx[ninseff]->cleanup();} open
-            xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textsize 11
+            xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {o->add("Master Out");o->add("Off");}
             code1 {for (int i = 0; i < NUM_MIDI_PARTS; ++i)
               {
@@ -1007,15 +1007,24 @@ updatepanel();} open
   Function {updateeffects(int data)} {open
   } {
     code {//
-    int effect = (data >> 16) & 0x7f;
+    int effect = (data >> 16) & 0xff;
     int type =  (data >> 12) & 3;
+    int parameter = (data >> 8) & 0x7f;
+    int value = data & 0x7f;
 
-    if (data & 0x10000000)
-    {;
+    if (effect > 0x3f)
+    {
+        effect &= 0x3f;
+        synth->getRuntime().Log("Insert  Effect Number "
+        			+ asString(effect)
+        			+ "  Type " + asString(type)
+        			+ "  Parameter "
+        			+ asString(parameter)
+        			+ "  Value " + asString(value));
         sysinsgroup->value(InsertionEffectsGrp);
         showInsEfxUI();
         inseffnocounter->value(effect + 1);
-        int partnum = synth->Pinsparts[effect] + 2;
+        int partnum = data >> 24;
         inseffpart->value(partnum);
         if (partnum != 1)
         {
@@ -1029,10 +1038,15 @@ updatepanel();} open
         }
         insefftype->value(synth->insefx[effect]->geteffect());
         inseffectui->refresh(synth->insefx[effect]);
-
     }
     else
     {
+        synth->getRuntime().Log("Insert  Effect Number "
+        			+ asString(effect)
+        			+ "  Type " + asString(type)
+        			+ "  Parameter "
+        			+ asString(parameter)
+        			+ "  Value " + asString(value));
         sysinsgroup->value(SystemEffectsGrp);
         syseffnocounter->value(effect + 1);
         if (type == 1)

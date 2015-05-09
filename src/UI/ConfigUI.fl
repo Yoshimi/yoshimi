@@ -52,7 +52,7 @@ class ConfigUI {open : {private MiscFuncs}
   } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open selected
+      callback {o->hide();} open
       xywh {273 160 465 330} type Double visible
     } {
       Fl_Tabs {} {open
@@ -455,7 +455,7 @@ else
         o->hide();
         configChanged = true;
     }}
-            tooltip {Click to set} xywh {340 81 70 20} box PLASTIC_UP_BOX labelsize 12 hide
+            tooltip {Click to set} xywh {340 81 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button {} {
             label {Enable Bank Root Change}
@@ -580,8 +580,8 @@ else
         EPCvalue = candidate;
         o->hide();
         configChanged = true;
-    }}
-            tooltip {Click to set} xywh {340 241 70 20} box PLASTIC_UP_BOX labelsize 12 hide
+    }} selected
+            tooltip {Click to set} xywh {340 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button {} {
             label {Enable Extended Program Change}
