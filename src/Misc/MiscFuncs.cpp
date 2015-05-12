@@ -116,14 +116,16 @@ string MiscFuncs::asString(long long n)
    oss << n;
    return string(oss.str());
 }
-#if !defined( __arm__ ) && !defined( __i386__ )
-string MiscFuncs::asString(size_t n)
+
+//#if !defined( __arm__ ) && !defined( __i386__ )
+//string MiscFuncs::asString(size_t n)
+string MiscFuncs::asString(unsigned long n)
 {
     ostringstream oss;
     oss << n;
     return string(oss.str());
 }
-#endif
+//#endif
 
 string MiscFuncs::asString(long n)
 {
@@ -146,6 +148,14 @@ string MiscFuncs::asString(unsigned int n, unsigned int width)
     return val;
 }
 
+
+string MiscFuncs::asString(unsigned char c)
+{
+    ostringstream oss;
+    oss.width(1);
+    oss << c;
+    return oss.str();
+}
 
 string MiscFuncs::asString(float n)
 {
