@@ -269,7 +269,7 @@ void JackEngine::registerJackPort(int portnum)
             }
             else
             {
-                synth->getRuntime().Log("Error registered jack port " + asString(portnum));
+                synth->getRuntime().Log("Error registering jack port " + asString(portnum));
             }
         }
     }
@@ -344,7 +344,7 @@ bool JackEngine::connectJackPorts(void)
         return false;
 	}
     int ret;
-    for (int port = 0; port < 2 && (NULL != audio.ports[port]); ++port)
+    for (int port = 0; port < 2 && (NULL != audio.ports[port + NUM_MIDI_PARTS*2]); ++port)
     {
         const char *port_name = jack_port_name(audio.ports[port + NUM_MIDI_PARTS * 2]);
         if ((ret = jack_connect(jackClient, port_name, playback_ports[port])))
