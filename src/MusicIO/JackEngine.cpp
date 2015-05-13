@@ -258,10 +258,11 @@ void JackEngine::registerJackPort(int portnum)
 
         if(synth->part [portnum] && synth->part [portnum]->Penabled)
         {
-            string portName = "track_" + asString(portnum + 1) + "_l";
-            audio.ports[portnum * 2] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-            portName = "track_" + asString(portnum + 1) + "_r";
+            string portName = "track_" + asString(portnum + 1) + "_r";
             audio.ports[portnum * 2 + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+            portName = "track_" + asString(portnum + 1) + "_l";
+            audio.ports[portnum * 2] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+
             if(audio.ports [portnum * 2])
             {
                 synth->getRuntime().Log("Registered jack port " + asString(portnum));
@@ -415,9 +416,9 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     // Part outputs
     for (int port = 0, idx = 0; port < NUM_MIDI_PARTS; port++ , idx += 2)
     {
-        if(audio.ports [port])
+        if(audio.ports [idx])
         {
-            if (jack_port_connected(audio.ports[port])) // just a few % improvement.
+            if (jack_port_connected(audio.ports[idx])) // just a few % improvement.
             {
                 if (synth->part[port]->Paudiodest & 2)
                 {
