@@ -39,6 +39,7 @@ using namespace std;
 #include <FL/Fl_PNG_Image.H>
 #include "yoshimi-logo.h"
 
+void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
 map<SynthEngine *, MusicClient *> synthInstances;
 list<string> splashMessages;
@@ -276,6 +277,14 @@ bool mainCreateNewInstance(unsigned int forceId)
     else
         cout << "\nStarted "<< synth->getUniqueId() << "\n";
     synthInstances.insert(std::make_pair<SynthEngine *, MusicClient *>(synth, musicClient));
+    //register jack ports for enabled parts
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {
+        if(synth->part [npart]->Penabled)
+        {
+            mainRegisterAudioPort(synth, npart);
+        }
+    }
     return true;
 
 bail_out:
@@ -389,4 +398,16 @@ bail_out:
         exit(EXIT_SUCCESS);
     else
         exit(EXIT_FAILURE);
+}
+
+void mainRegisterAudioPort(SynthEngine *s, int portnum)
+{
+    if(s && (portnum < NUM_MIDI_PARTS) && (portnum >= 0))
+    {
+        map<SynthEngine *, MusicClient *>::iterator it = synthInstances.find(s);
+        if(it != synthInstances.end())
+        {
+            it->second->registerAudioPort(portnum);
+        }
+    }
 }

@@ -189,6 +189,7 @@ public:
         UpdatePanelItem,
         UpdatePartProgram,
         UpdateEffects,
+        RegisterAudioPort,
         UNDEFINED = 9999
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver

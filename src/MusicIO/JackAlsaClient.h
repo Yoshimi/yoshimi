@@ -51,6 +51,7 @@ class JackAlsaClient : public MusicClient
         string midiClientName(void) { return alsaEngine.midiClientName(); }
         int audioClientId(void) { return jackEngine.clientId(); }
         int midiClientId(void) { return alsaEngine.midiClientId(); }
+        virtual void registerAudioPort(int portnum) { jackEngine.registerJackPort(portnum);}
 
     private:
         JackEngine jackEngine;

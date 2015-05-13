@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-5-13 Andrew
+- On-demand jack ports registering (only if part is enabled)
+
 2015-5-12 Will
 - fixed asString bug that still appeared on some architectures.
   Thanks to Stephen Parry for identifying the cause.

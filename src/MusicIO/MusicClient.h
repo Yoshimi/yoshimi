@@ -43,6 +43,7 @@ class MusicClient
         virtual string midiClientName(void) = 0;
         virtual int audioClientId(void) = 0;
         virtual int midiClientId(void) = 0;
+        virtual void registerAudioPort(int /*portnum*/) {}
         static MusicClient *newMusicClient(SynthEngine *_synth);
         string audiodevice;
         string mididevice;

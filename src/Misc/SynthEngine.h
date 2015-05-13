@@ -57,7 +57,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isLV2Plugin;
         Bank bank;
         Config Runtime;
-        PresetsStore presetsstore;
+        PresetsStore presetsstore;        
     public:
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
@@ -206,6 +206,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         int LFOtime; // used by Pcontinous
         string windowTitle;
+        MusicClient *musicClient;
 };
 
 inline float SynthEngine::numRandom(void)

@@ -36,7 +36,6 @@ using namespace std;
 
 #include <iostream>
 
-
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
     static set<unsigned int> idMap;
@@ -614,6 +613,8 @@ void SynthEngine::partonoff(int npart, int what)
     {
         VUpeak.values.parts[npart] = 1e-9f;
         part[npart]->Penabled = 1;
+        //send message to register jack port (if jack client is active)
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
     }
     else
     {   // disabled part

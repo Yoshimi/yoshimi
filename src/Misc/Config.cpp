@@ -49,6 +49,7 @@ using namespace std;
 #include "Misc/Config.h"
 #include "MasterUI.h"
 
+extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
 const unsigned short Config::MaxParamsHistory = 25;
 
@@ -1119,6 +1120,13 @@ void GuiThreadMsg::processGuiMessages()
                 {
                     guiMaster->updateeffects(msg->index);
                 }
+            }
+            break;
+        case GuiThreadMsg::RegisterAudioPort:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                mainRegisterAudioPort(synth, msg->index);
             }
             break;
         default:

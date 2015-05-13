@@ -902,3 +902,8 @@ bool mainCreateNewInstance(unsigned int) //stub
 {
     return true;
 }
+
+void mainRegisterAudioPort(SynthEngine *, int ) //stub
+{
+
+}

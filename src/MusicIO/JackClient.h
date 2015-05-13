@@ -45,6 +45,7 @@ class JackClient : public MusicClient
         string midiClientName(void) { return jackEngine.clientName(); }
         int audioClientId(void) { return jackEngine.clientId(); }
         int midiClientId(void) { return jackEngine.clientId(); }
+        virtual void registerAudioPort(int portnum) { jackEngine.registerJackPort(portnum);}
 
     private:
         JackEngine jackEngine;
