@@ -53,14 +53,14 @@ class ConfigUI {open : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();} open
-      xywh {273 160 465 330} type Double visible
+      xywh {273 160 465 330} type Double hide
     } {
       Fl_Tabs {} {open
         xywh {5 5 455 297}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 455 277} labelsize 12 hide
+          xywh {5 25 455 277} labelsize 12
         } {
           Fl_Choice {} {
             label OscilSize
@@ -68,8 +68,8 @@ class ConfigUI {open : {private MiscFuncs}
 		unsigned int tmp = synth->getRuntime().Oscilsize;
                 synth->getRuntime().Oscilsize = 128 << o->value();
                 if (synth->getRuntime().Oscilsize != tmp)
-                	configChanged = true;} open
-            tooltip {ADSynth Oscillator Size (samples)} xywh {250 50 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+                	configChanged = true;}
+            tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
@@ -106,32 +106,13 @@ class ConfigUI {open : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {PADsynth Interpolation}
-            callback {//
-                int tmp = synth->getRuntime().Interpolation;
-                synth->getRuntime().Interpolation = (int) o->value();
-                if (synth->getRuntime().Interpolation != tmp)
-                	configChanged = true;} open
-            xywh {250 130 100 20} down_box BORDER_BOX labelsize 12 textsize 12
-            code0 {o->value(synth->getRuntime().Interpolation);}
-          } {
-            MenuItem {} {
-              label {Linear(fast)}
-              xywh {0 0 100 20} labelfont 1 labelsize 10
-            }
-            MenuItem {} {
-              label {Cubic(slow)}
-              xywh {10 10 100 20} labelfont 1 labelsize 10
-            }
-          }
-          Fl_Choice {} {
             label {Virtual Keyboard Layout}
             callback {//
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
                 if (synth->getRuntime().VirKeybLayout != tmp)
                 	configChanged = true;}
-            xywh {250 90 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            xywh {250 80 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
             MenuItem {} {
@@ -155,12 +136,87 @@ class ConfigUI {open : {private MiscFuncs}
               xywh {45 45 100 20} labelfont 1 labelsize 11
             }
           }
+          Fl_Choice {} {
+            label {PADsynth Interpolation}
+            callback {//
+                int tmp = synth->getRuntime().Interpolation;
+                synth->getRuntime().Interpolation = (int) o->value();
+                if (synth->getRuntime().Interpolation != tmp)
+                	configChanged = true;}
+            xywh {250 115 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            code0 {o->value(synth->getRuntime().Interpolation);}
+          } {
+            MenuItem {} {
+              label {Linear(fast)}
+              xywh {0 0 100 20} labelfont 1 labelsize 10
+            }
+            MenuItem {} {
+              label {Cubic(slow)}
+              xywh {10 10 100 20} labelfont 1 labelsize 10
+            }
+          }
+          Fl_Counter compression {
+            label {XML compression level}
+            callback {//
+		unsigned int tmp = synth->getRuntime().GzipCompression;
+		synth->getRuntime().GzipCompression = (unsigned int) o->value();
+		if(synth->getRuntime().GzipCompression != tmp)
+			configChanged = true;}
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 150 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
+            code0 {o->value(synth->getRuntime().GzipCompression);}
+          }
+          Fl_Choice {} {
+            label {Max Parts}
+            callback {int tmp = o->value() *16 +16;
+if (tmp == 48)
+    tmp = 64;
+synth->getRuntime().NumAvailableParts = tmp;} selected
+            tooltip {Number of parts availalbe} xywh {295 185 55 20} down_box BORDER_BOX labelsize 12 textsize 13
+            code0 {int tmp = synth->getRuntime().NumAvailableParts / 16 - 16;}
+            code1 {if (tmp == 3) tmp = 2;}
+            code2 {o->value(tmp);}
+          } {
+            MenuItem {} {
+              label 16
+              xywh {10 10 34 20} labelsize 12
+            }
+            MenuItem {} {
+              label 32
+              xywh {10 10 34 20} labelsize 12
+            }
+            MenuItem {} {
+              label 64
+              xywh {20 20 34 20} labelsize 12
+            }
+          }
+          Fl_Choice {} {
+            label {Send reports to:}
+            callback {synth->getRuntime().consoleMenuItem = o->value();
+if (o->value())
+    synth->getGuiMaster()->Reports->activate();
+else
+{
+    synth->getGuiMaster()->Reports->deactivate();
+    synth->getGuiMaster()->yoshiLog->Hide();
+}}
+            xywh {200 220 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            code0 {o->value(synth->getRuntime().consoleMenuItem);}
+          } {
+            MenuItem {} {
+              label stderr
+              xywh {0 0 34 20} labelsize 12
+            }
+            MenuItem {} {
+              label {Console Window}
+              xywh {0 0 34 20} labelsize 12
+            }
+          }
           Fl_Input SessionStateFile {
             label {Session state save file}
             callback {//
               synth->getRuntime().StateFile = string(o->value());
               SessionStateFile->changed();}
-            xywh {160 247 220 20} labelsize 12 when 1 textsize 12
+            xywh {160 250 220 20} labelsize 12 when 1 textsize 12
             code0 {o->value(synth->getRuntime().StateFile.c_str());}
           }
           Fl_Button StateFileButton {
@@ -175,44 +231,12 @@ class ConfigUI {open : {private MiscFuncs}
                     SessionStateFile->changed();
                     configChanged = true;
                 }}
-            xywh {401 247 49 20} box THIN_UP_BOX labelsize 12
+            xywh {401 250 49 20} box THIN_UP_BOX labelsize 12
             code0 {/* code */}
-          }
-          Fl_Counter compression {
-            label {XML compression level}
-            callback {//
-		unsigned int tmp = synth->getRuntime().GzipCompression;
-		synth->getRuntime().GzipCompression = (unsigned int) o->value();
-		if(synth->getRuntime().GzipCompression != tmp)
-			configChanged = true;}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 170 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
-            code0 {o->value(synth->getRuntime().GzipCompression);}
-          }
-          Fl_Choice {} {
-            label {Send reports to:}
-            callback {synth->getRuntime().consoleMenuItem = o->value();
-if (o->value())
-    synth->getGuiMaster()->Reports->activate();
-else
-{
-    synth->getGuiMaster()->Reports->deactivate();
-    synth->getGuiMaster()->yoshiLog->Hide();
-}} open
-            xywh {203 208 150 20} down_box BORDER_BOX labelsize 12 textsize 13
-            code0 {o->value(synth->getRuntime().consoleMenuItem);}
-          } {
-            MenuItem {} {
-              label stderr
-              xywh {0 0 34 20} labelsize 12
-            }
-            MenuItem {} {
-              label {Console Window}
-              xywh {0 0 34 20} labelsize 12
-            }
           }
           Fl_Box {} {
             label {Most settings changes require a restart}
-            xywh {100 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {100 282 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group {} {
@@ -418,7 +442,7 @@ else
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 275} labelsize 12
+          tooltip {MIDI CC preferences} xywh {5 25 455 275} labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
@@ -580,7 +604,7 @@ else
         EPCvalue = candidate;
         o->hide();
         configChanged = true;
-    }} selected
+    }}
             tooltip {Click to set} xywh {340 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button {} {

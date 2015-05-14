@@ -263,13 +263,11 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                 return;
             }
         }
-# if NUM_MIDI_PARTS == 64
-        if (nrpndata.vectorEnabled[ch])
+        if (nrpndata.vectorEnabled[ch] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
         { // vector control is direct to parts
            if (nrpnRunVector(ch, ctrl, param));
             return;
         }
-#endif
         // pick up a drop-through if CC doesn't match the above
         synth->SetController(ch, ctrl, param);
     }
@@ -354,7 +352,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
     if (type == C_dataL)
     {
         synth->getRuntime().dataL = par;
-        synth->getRuntime().Log("Data LSB    value " + asString(par));
+//        synth->getRuntime().Log("Data LSB    value " + asString(par));
         if (noHigh)
             return;
     }
@@ -362,7 +360,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
     if (type == C_dataH)
     {
         synth->getRuntime().dataH = par;
-        synth->getRuntime().Log("Data MSB    value " + asString(par));
+//        synth->getRuntime().Log("Data MSB    value " + asString(par));
         if (noHigh && synth->getRuntime().dataL <= 0x7f)
             par = synth->getRuntime().dataL;
         else
@@ -381,11 +379,9 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
     if (nLow == 0) // direct part change
         nrpnDirectPart(dHigh, par);
 
-#if NUM_MIDI_PARTS == 64
-    else if (nLow == 1) // it's vector control
+    else if (nLow == 1 && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+        // it's vector control
         nrpnSetVector(dHigh, chan, par);
-
-#endif
 }
 
 
@@ -395,7 +391,7 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
     {
         case 0: // set part number
         {
-            if (par < NUM_MIDI_PARTS)
+            if (par < synth->getRuntime().NumAvailableParts)
             {
                 synth->getRuntime().dataL = par;
                 nrpndata.Part = par;
@@ -463,8 +459,11 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
         }
         case 3:
         {
-            nrpndata.vectorYaxis[chan]
-            = (nrpndata.vectorYaxis[chan] & 0xff) | (par << 8);
+            if (synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS * 2)
+            {
+                nrpndata.vectorYaxis[chan]
+                = (nrpndata.vectorYaxis[chan] & 0xff) | (par << 8);
+            }
             break;
         }
         case 4:
@@ -532,7 +531,7 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         partnum = ch;
     else
         partnum = ch & 0x7f; // this is for direct part access instead of channel
-    if(partnum >= NUM_MIDI_PARTS)
+    if(partnum >= synth->getRuntime().NumAvailableParts)
         return;
     if (synth->getRuntime().EnableProgChange)
     {

@@ -398,7 +398,9 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
 bool JackEngine::processAudio(jack_nframes_t nframes)
 {
-    for (int port = 0; port < (2*NUM_MIDI_PARTS+2); ++port)
+    int currentParts = synth->getRuntime().NumAvailableParts * 2;
+    
+    for (int port = 0; port < (currentParts); ++port)
     {
         if(audio.ports [port])
         {
@@ -411,10 +413,24 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
             }
         }
     }
+    // And mixed parts
+    audio.portBuffs[2*NUM_MIDI_PARTS] = (float*)jack_port_get_buffer(audio.ports[2 * NUM_MIDI_PARTS], nframes);
+    if (!audio.portBuffs[2*NUM_MIDI_PARTS])
+    {
+        synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS));
+        return false;
+    }
+    audio.portBuffs[2 * NUM_MIDI_PARTS + 1] = (float*)jack_port_get_buffer(audio.ports[2 * NUM_MIDI_PARTS + 1], nframes);
+    if (!audio.portBuffs[2 * NUM_MIDI_PARTS + 1])
+    {
+        synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS + 1));
+        return false;
+    }
+
     getAudio();
     int framesize = sizeof(float) * nframes;
     // Part outputs
-    for (int port = 0, idx = 0; port < NUM_MIDI_PARTS; port++ , idx += 2)
+    for (int port = 0, idx = 0; idx < currentParts; port++ , idx += 2)
     {
         if(audio.ports [idx])
         {

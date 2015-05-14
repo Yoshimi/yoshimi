@@ -1,16 +1,20 @@
 
-Review mapping of SubSynth harmonic faders
+Direct part control should be able to change audio routing.
 
-Review tooltips
+Maybe make jack port only register if part O/P is actually set.
 
-Consider enabling and disabling tooltips
-
-Visually identify AddSynth & SubSynth in Instruments window
+Visually identify AddSynth & SubSynth in Instruments window.
     IDs defined in bankUI but not implemented.
 
-Change numeric menus to spin boxes
+Review mapping of SubSynth harmonic faders.
 
-Consider scroll wheel control of sliders
+Review tooltips.
+
+Consider enabling and disabling tooltips.
+
+Change numeric menus to spin boxes.
+
+Consider scroll wheel control of sliders.
 
 Improve Copy & Paste functionality.
 

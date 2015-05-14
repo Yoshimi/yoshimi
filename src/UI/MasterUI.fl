@@ -206,8 +206,7 @@ class MasterUI {open : {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }} open
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide
-      code0 {partmax = NUM_MIDI_PARTS;} xclass Yoshimi
+      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
@@ -372,6 +371,30 @@ mainCreateNewInstance(forceId);}
             label {&Clear}
             callback {do_new_master();}
             xywh {20 20 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {16 parts}
+            callback {synth->getRuntime().NumAvailableParts = 16;
+panelgroup = 0;
+updatepanel();
+npartcounter->range(1.0, synth->getRuntime().NumAvailableParts);}
+            xywh {0 0 34 20}
+          }
+          MenuItem {} {
+            label {32 parts}
+            callback {synth->getRuntime().NumAvailableParts = 32;
+panelgroup = 0;
+updatepanel();
+npartcounter->range(1.0, synth->getRuntime().NumAvailableParts);} selected
+            xywh {0 0 34 20}
+          }
+          MenuItem {} {
+            label {64 parts}
+            callback {synth->getRuntime().NumAvailableParts = 64;
+panelgroup = 0;
+updatepanel();
+npartcounter->range(1.0, synth->getRuntime().NumAvailableParts);}
+            xywh {0 0 34 20}
           }
         }
         Submenu Scales {
@@ -791,7 +814,7 @@ mainCreateNewInstance(forceId);}
           npart = nval;
           updatepanel();}
         xywh {38 265 40 20} labelsize 11 minimum 0 maximum 127 textsize 11
-        code0 {o->type(FL_INT_INPUT); o->range(1.0, NUM_MIDI_PARTS);}
+        code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
         code1 {bankui->init(o);}
       }
     }
@@ -943,6 +966,21 @@ updatepanel();} open
           xywh {0 0 34 20}
         }
       }
+      Fl_Choice Panelsmallgroups {
+        label Parts
+        callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
+updatepanel();} open
+        xywh {48 645 86 25} down_box BORDER_BOX
+      } {
+        MenuItem {} {
+          label {1 to 16}
+          xywh {10 10 34 20}
+        }
+        MenuItem {} {
+          label {17 to 32}
+          xywh {10 10 34 20}
+        }
+      }
     }
   }
   Function {updatesendwindow()} {open
@@ -963,7 +1001,8 @@ updatepanel();} open
 	        Panelpack2->position(544,10);
 	        Panelclose->position(1018,314);
 	        Panelrefresh->position(950,314);
-	        Panelgroups->position(48,314 - partmax + 64);
+	        Panelgroups->position(48,314);
+	        Panelsmallgroups->position(48,314);
 	        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16 ");
         }
         else
@@ -972,10 +1011,21 @@ updatepanel();} open
 	        Panelpack2->position(8,325);
 	        Panelclose->position(482,645);
 	        Panelrefresh->position(414,645);
-	        Panelgroups->position(48,645 - partmax + 64);
+	        Panelgroups->position(48,645);
+	        Panelsmallgroups->position(48,645);
 	       	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8 ");
 
         }
+        int partmax = synth->getRuntime().NumAvailableParts;
+        synth->getRuntime().Log("Parts " + asString(partmax));
+        if (partmax == 64)
+            Panelgroups->show();
+        else
+            Panelgroups->hide();
+        if (partmax == 32)
+            Panelsmallgroups->show();
+        else
+            Panelsmallgroups->hide();
         panelwindow->label(panelwindowlabel.c_str());
         panelwindow->changed();} {}
   }
@@ -1056,8 +1106,7 @@ updatepanel();} open
         sysefftype->value(synth->sysefx[effect]->geteffect());
         syseffectui->refresh(synth->sysefx[effect]);      
         showSysEfxUI();
-    }} {selected
-    }
+    }} {}
   }
   Function {setMasterLabel(string name)} {open
   } {
@@ -1304,7 +1353,5 @@ updatepanel();} open
   decl {string panelwindowlabel} {private local
   }
   decl {int panelgroup;} {public local
-  }
-  decl {int partmax;} {private local
   }
 } 
