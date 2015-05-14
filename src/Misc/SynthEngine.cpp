@@ -1138,6 +1138,10 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
             continue;
         part[npart]->getfromXML(xml);
         xml->exitbranch();
+        if(part[npart]->Penabled)
+        {
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
+        }
     }
 
     if (xml->enterbranch("MICROTONAL"))
