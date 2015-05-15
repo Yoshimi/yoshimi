@@ -382,7 +382,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, int type, short int par)
+void SynthEngine::SetController(unsigned char chan, int type, unsigned short par)
 {
     if (type == Runtime.midi_bank_C) {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
@@ -462,7 +462,7 @@ void SynthEngine::SetZynControls()
         {
             if (efftype == 0x20) // select output level
             {
-                setPsysefxvol(effnum, parnum, value);
+                // setPsysefxvol(effnum, parnum, value); // this isn't correct!
                 
             }
             else if (efftype == 0x40) // select effect
@@ -522,7 +522,7 @@ void SynthEngine::SetBank(int banknum)
 }
 
 
-void SynthEngine::SetProgram(unsigned char chan, unsigned char pgm)
+void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
     bool partOK = false;
     int npart;

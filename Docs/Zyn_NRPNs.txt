@@ -161,7 +161,7 @@ This must be set before making a parameter change.
 4 - AlienWah
 5 - Distortion
 6 - EQ
-7 - DynFilter ?
+7 - DynFilter
 
 
 For Insert effects, if the Data MSB bit 5 is set (32) then Data LSB sets the destination part number. 127 is off and 126 is the Master Output.

@@ -59,7 +59,7 @@ class ConfigUI {open : {private MiscFuncs}
         xywh {5 5 455 297}
       } {
         Fl_Group {} {
-          label {Main settings} open
+          label {Main settings} open selected
           xywh {5 25 455 277} labelsize 12
         } {
           Fl_Choice {} {
@@ -164,30 +164,6 @@ class ConfigUI {open : {private MiscFuncs}
 			configChanged = true;}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 150 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
-          }
-          Fl_Choice {} {
-            label {Max Parts}
-            callback {int tmp = o->value() *16 +16;
-if (tmp == 48)
-    tmp = 64;
-synth->getRuntime().NumAvailableParts = tmp;} selected
-            tooltip {Number of parts availalbe} xywh {295 185 55 20} down_box BORDER_BOX labelsize 12 textsize 13
-            code0 {int tmp = synth->getRuntime().NumAvailableParts / 16 - 16;}
-            code1 {if (tmp == 3) tmp = 2;}
-            code2 {o->value(tmp);}
-          } {
-            MenuItem {} {
-              label 16
-              xywh {10 10 34 20} labelsize 12
-            }
-            MenuItem {} {
-              label 32
-              xywh {10 10 34 20} labelsize 12
-            }
-            MenuItem {} {
-              label 64
-              xywh {20 20 34 20} labelsize 12
-            }
           }
           Fl_Choice {} {
             label {Send reports to:}

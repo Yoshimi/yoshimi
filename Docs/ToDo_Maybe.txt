@@ -1,4 +1,6 @@
 
+Fix parts edit window bug MIDI load not updating.
+
 Direct part control should be able to change audio routing.
 
 Maybe make jack port only register if part O/P is actually set.

@@ -80,3 +80,8 @@ Part editing windows carry the part number and voice name in the title bar. For 
 
 ###
 
+Yoshimi now has up to 64 parts in blocks of 16. You can now decide how many you want to have available using the 'Parameters' menu. You can have 16, 32 or 64.
+
+By default, all the upper parts are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages. However, vector control will intelligently work with however many you have set, as will all the direct part controls.
+
+###

@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-5-15 Will
+- Implemented max part & part group control.
+
 2015-5-13 Andrew
 - On-demand jack ports registering (only if part is enabled)
 
