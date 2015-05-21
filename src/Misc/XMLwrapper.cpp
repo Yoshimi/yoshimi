@@ -53,6 +53,8 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     synth(_synth)
 {
     information.PADsynth_used = 0;
+    information.ADDsynth_used = 0;
+    information.SUBsynth_used = 0;
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
@@ -107,49 +109,64 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     char *end = strstr(xmldata, "</INFORMATION>");
     if (!start || !end || start > end)
     {
+        slowinfosearch(xmldata);
         delete [] xmldata;
         return false;
     }
     //Andrew: just make it simple
     bool bRet = false;
+    unsigned short names = 0;
+    if(strstr(start, "name=\"PADsynth_used\""))
+        names = 1;
     if(strstr(start, "name=\"PADsynth_used\" value=\"yes\""))
     {
         information.PADsynth_used = 1;
         bRet = true;
     }
+    
+    if(strstr(start, "name=\"ADDsynth_used\""))
+        names |= 2;
+    if(strstr(start, "name=\"ADDsynth_used\" value=\"yes\""))
+    {
+        information.ADDsynth_used = 1;
+        bRet = true;
+    }
+    
+    if(strstr(start, "name=\"SUBsynth_used\""))
+        names |= 4;
+
+    if(strstr(start, "name=\"SUBsynth_used\" value=\"yes\""))
+    {
+        information.SUBsynth_used = 1;
+        bRet = true;
+    }
+    if (names != 7)
+        slowinfosearch(xmldata);
+    
     delete [] xmldata;
     return bRet;
+}
 
 
-    /*
-    end += strlen("</INFORMATION>");
-    //end[0] = '\0';
-    //tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
-    tree = node = root = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
-    if (!root)
-    {
-        delete [] xmldata;
-        mxmlDelete(tree);
-        node = root = tree = NULL;
+bool XMLwrapper::slowinfosearch(char *xmldata)
+{
+    char *start = strstr(xmldata, "<INSTRUMENT_KIT>");
+    char *end = strstr(xmldata, "</INSTRUMENT_KIT>");
+    if (!start || !end || start > end)
         return false;
-    }
-    root = mxmlFindElement(tree, tree, "INFORMATION", NULL, NULL, MXML_DESCEND);
-    push(root);
-    if (!root)
-    {
-        delete [] xmldata;
-        mxmlDelete(tree);
-        node = root = tree = NULL;
-        return false;
-    }
-    information.PADsynth_used = getparbool("PADsynth_used",0);
-    exitbranch();
-    if (tree)
-        mxmlDelete(tree);
-    delete [] xmldata;
-    node = root = tree = NULL;
-    return true;
-    */
+    
+    if (!information.PADsynth_used)
+        if(strstr(start, "name=\"pad_enabled\" value=\"yes\""))
+            information.PADsynth_used = 1;
+    
+    if (!information.ADDsynth_used)
+        if(strstr(start, "name=\"add_enabled\" value=\"yes\""))
+            information.ADDsynth_used = 1;
+    
+    if (!information.SUBsynth_used)
+        if(strstr(start, "name=\"sub_enabled\" value=\"yes\""))
+            information.SUBsynth_used = 1;
+  return true;
 }
 
 
@@ -204,6 +221,8 @@ char *XMLwrapper::getXMLdata()
     mxml_node_t *oldnode=node;
     node = info;
     addparbool("PADsynth_used", information.PADsynth_used);
+    addparbool("ADDsynth_used", information.ADDsynth_used);
+    addparbool("SUBsynth_used", information.SUBsynth_used);
     node = oldnode;
     char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
     return xmldata;

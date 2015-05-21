@@ -110,12 +110,15 @@ class XMLwrapper : private MiscFuncs
 
         struct {
             unsigned char PADsynth_used;
+            unsigned char ADDsynth_used;
+            unsigned char SUBsynth_used;
         } information;
 
         // opens a file and parse only the "information" data on it
         // returns "true" if all went ok or "false" on errors
         bool checkfileinformation(const string& filename);
-
+        bool slowinfosearch(char *xmldata);
+        
     private:
         char *doloadfile(const string& filename);
 

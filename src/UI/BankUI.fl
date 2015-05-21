@@ -110,10 +110,7 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
   }
   Function {refresh()} {open
   } {
-    code {/* future engine type IDs
-   Bank.h PADsynth_used
-   Bank.cpp see if PADsynth is used
-   Part.cpp */
+    code {//
 if (bank->emptyslot(nslot))
     {
         if (nslot < 128)
@@ -123,7 +120,11 @@ if (bank->emptyslot(nslot))
     }
     else
     {
-        if (bank->isPADsynth_used(nslot))
+        
+        int engine = 0;
+        // if (synth->getRuntime().CheckPADsynth) //why does this segfault?
+            engine = bank->engines_used(nslot);
+        if (engine & 1) // PadSynth
             color(126);
 	else
 	{
@@ -132,12 +133,20 @@ if (bank->emptyslot(nslot))
             else
                 color(17);
          }
-/* test for addsynth and subsynth here
-   addsynth text colour
-       labelcolor(72);
-   subsynth font type and size
-       labelsize(11);
-       labelfont(2);*/
+       if (engine & 2) // AddSynth
+           labelcolor(72);
+       else
+           labelcolor(0);
+       if (engine & 4) // SubSynth
+       {
+           labelsize(11);
+           labelfont(2);
+       }
+       else
+       {
+           labelsize(12);
+           labelfont(0);
+       }
     }
     if (*nselected == nslot)
         color(6);
@@ -146,6 +155,8 @@ if (bank->emptyslot(nslot))
     }
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
   }
   decl {void (BankProcess_:: *fnc)(void);} {private local
   }
@@ -391,9 +402,10 @@ set_bank_slot();}
         tooltip {Refresh the bank list (rescan)} xywh {212 5 102 25} box PLASTIC_UP_BOX color 50 labelfont 1 labelsize 11
       }
       Fl_Check_Button {} {
-        label {Show PADsynth status}
-        callback {synth->getRuntime().CheckPADsynth = (int) o->value();
-            refreshmainwindow();}
+        label {Show synth engines}
+        callback {//
+    synth->getRuntime().CheckPADsynth = (int) o->value();
+    refreshmainwindow();}
         xywh {485 533 150 15} down_box DOWN_BOX labelsize 11
         code0 {o->value(synth->getRuntime().CheckPADsynth);}
       }

@@ -373,8 +373,8 @@ mainCreateNewInstance(forceId);}
             xywh {20 20 100 20} labelsize 12
           }
           Submenu {} {
-            label {Max Parts} open selected
-            xywh {0 0 70 20}
+            label {Max Parts} open
+            xywh {0 0 70 20} labelsize 12
           } {
             MenuItem {} {
               label 16
@@ -384,7 +384,7 @@ npart = 0;
 npartcounter->value(1);
 updatepanel();
 updatepart();}
-              xywh {10 10 34 20}
+              xywh {10 10 34 20} labelfont 1 labelsize 10
             }
             MenuItem {} {
               label 32
@@ -396,7 +396,7 @@ Panelsmallgroups->value(0);
 npartcounter->value(1);
 updatepanel();
 updatepart();}
-              xywh {10 10 34 20}
+              xywh {10 10 34 20} labelfont 1 labelsize 10
             }
             MenuItem {} {
               label 64
@@ -407,8 +407,8 @@ Panelgroups->value(0);
 Panelsmallgroups->value(0);
 npartcounter->value(1);
 updatepanel();
-updatepart();}
-              xywh {10 10 34 20}
+updatepart();} selected
+              xywh {10 10 34 20} labelfont 1 labelsize 10
             }
           }
         }

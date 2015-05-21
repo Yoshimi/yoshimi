@@ -433,6 +433,8 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
 
 void ADnoteParameters::add2XML(XMLwrapper *xml)
 {
+    xml->information.ADDsynth_used = 1;
+    
     xml->addparbool("stereo", GlobalPar.PStereo);
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");

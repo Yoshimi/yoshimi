@@ -85,3 +85,9 @@ Yoshimi now has up to 64 parts in blocks of 16. You can now decide how many you 
 By default, all the upper parts are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages. However, vector control will intelligently work with however many you have set, as will all the direct part controls.
 
 ###
+
+When opening an instrument bank you can now tell exactly which synth engines are used. As before, the backround colour is changed if there is a PadSynth element. If AddSynth is used, then the text colour is changed to a dark red instead of black, and if SubSynth is used, the text is slightly smaller and italicised.
+
+###
+
+

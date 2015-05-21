@@ -112,6 +112,8 @@ void SUBnoteParameters::setPan(char pan)
 
 void SUBnoteParameters::add2XML(XMLwrapper *xml)
 {
+    xml->information.SUBsynth_used = 1;
+    
     xml->addpar("num_stages",Pnumstages);
     xml->addpar("harmonic_mag_type",Phmagtype);
     xml->addpar("start",Pstart);

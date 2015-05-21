@@ -654,13 +654,17 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     instrRef.name = name;
     instrRef.filename = filename;
     instrRef.PADsynth_used = false;
+    instrRef.ADDsynth_used = false;
+    instrRef.SUBsynth_used = false;
 
-    // see if PADsynth is used
+    // see which engines are used
     if (synth->getRuntime().CheckPADsynth)
     {
         XMLwrapper *xml = new XMLwrapper(synth);
         xml->checkfileinformation(getFullPath(rootID, bankID, pos));
         instrRef.PADsynth_used = xml->information.PADsynth_used;
+        instrRef.ADDsynth_used = xml->information.ADDsynth_used;
+        instrRef.SUBsynth_used = xml->information.SUBsynth_used;
         delete xml;
     }
     return 0;
@@ -853,9 +857,12 @@ const BankEntry &Bank::getBank(size_t bankID)
 }
 
 
-bool Bank::isPADsynth_used(unsigned int ninstrument)
+int Bank::engines_used(unsigned int ninstrument)
 {
-    return getInstrumentReference(ninstrument).PADsynth_used;
+    int tmp = getInstrumentReference(ninstrument).PADsynth_used
+            | (getInstrumentReference(ninstrument).ADDsynth_used << 1)
+            | (getInstrumentReference(ninstrument).SUBsynth_used << 2);
+    return tmp;
 }
 
 

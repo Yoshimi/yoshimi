@@ -53,11 +53,15 @@ typedef struct _InstrumentEntry
     string filename;
     bool used;
     bool PADsynth_used;
+    bool ADDsynth_used;
+    bool SUBsynth_used;
     _InstrumentEntry()
         :name(""),
          filename(""),
          used(false),
-         PADsynth_used(false)
+         PADsynth_used(false),
+         ADDsynth_used(false),
+         SUBsynth_used(false)
     {
 
     }
@@ -67,6 +71,8 @@ typedef struct _InstrumentEntry
         name.clear();
         filename.clear();
         PADsynth_used = false;
+        ADDsynth_used = false;
+        SUBsynth_used = false;
     }
 } InstrumentEntry; // Contains the leafname of the instrument.
 
@@ -111,7 +117,7 @@ class Bank : private MiscFuncs
         bool setname(unsigned int ninstrument, string newname, int newslot);
              // if newslot==-1 then this is ignored, else it will be put on that slot
 
-        bool isPADsynth_used(unsigned int ninstrument);
+        int engines_used(unsigned int ninstrument);
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         void clearslot(unsigned int ninstrument);
