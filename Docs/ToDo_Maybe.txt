@@ -1,4 +1,7 @@
 
+restoreJsession() -> restoreSessionData() -> extractConfigData()
+should NOT refetch entire bank structure.
+
 Fix parts edit window bug MIDI load not updating.
 
 Direct part control should be able to change audio routing.

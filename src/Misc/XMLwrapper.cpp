@@ -105,67 +105,103 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     char *xmldata = doloadfile(filename);
     if (!xmldata)
         return -1;
+    
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");
-    if (!start || !end || start > end)
+    if (!start || !end || start >= end)
     {
         slowinfosearch(xmldata);
         delete [] xmldata;
         return false;
     }
-    //Andrew: just make it simple
-    bool bRet = false;
+    
+    // Andrew: just make it simple
+    // Will: but not too simple :)
+    char *idx = start;
+    *end = 0; // fiddle to limit search
+    bool bRet = false; // we're not actually using this!
     unsigned short names = 0;
-    if(strstr(start, "name=\"PADsynth_used\""))
-        names = 1;
-    if(strstr(start, "name=\"PADsynth_used\" value=\"yes\""))
-    {
-        information.PADsynth_used = 1;
-        bRet = true;
-    }
     
-    if(strstr(start, "name=\"ADDsynth_used\""))
+    // the following could be in any order
+    idx = strstr(start, "name=\"ADDsynth_used\"");
+    if (idx != NULL)
+    {
         names |= 2;
-    if(strstr(start, "name=\"ADDsynth_used\" value=\"yes\""))
-    {
-        information.ADDsynth_used = 1;
-        bRet = true;
+        if(strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
+            information.ADDsynth_used = 1;
     }
     
-    if(strstr(start, "name=\"SUBsynth_used\""))
+    idx = strstr(start, "name=\"SUBsynth_used\"");
+    if (idx != NULL)
+    {
         names |= 4;
-
-    if(strstr(start, "name=\"SUBsynth_used\" value=\"yes\""))
-    {
-        information.SUBsynth_used = 1;
-        bRet = true;
+        if(strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
+            information.SUBsynth_used = 1;
     }
-    if (names != 7)
-        slowinfosearch(xmldata);
     
+    idx = strstr(start, "name=\"PADsynth_used\"");
+    if (idx != NULL)
+    {
+        names |= 1;
+        if(strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
+            information.PADsynth_used = 1;
+    }
+    
+    if (names == 7)
+        bRet = true;
+    else
+        *end = 0x3c; // restore full length
+        bRet = slowinfosearch(xmldata);
     delete [] xmldata;
     return bRet;
 }
 
 
-bool XMLwrapper::slowinfosearch(char *xmldata)
+bool XMLwrapper::slowinfosearch(char *idx)
 {
-    char *start = strstr(xmldata, "<INSTRUMENT_KIT>");
-    char *end = strstr(xmldata, "</INSTRUMENT_KIT>");
-    if (!start || !end || start > end)
+    idx = strstr(idx, "<INSTRUMENT_KIT>");
+    if (idx == NULL)
         return false;
     
-    if (!information.PADsynth_used)
-        if(strstr(start, "name=\"pad_enabled\" value=\"yes\""))
-            information.PADsynth_used = 1;
-    
-    if (!information.ADDsynth_used)
-        if(strstr(start, "name=\"add_enabled\" value=\"yes\""))
-            information.ADDsynth_used = 1;
-    
-    if (!information.SUBsynth_used)
-        if(strstr(start, "name=\"sub_enabled\" value=\"yes\""))
-            information.SUBsynth_used = 1;
+    string mark;
+    for (int kitnum = 0; kitnum < NUM_KIT_ITEMS; ++kitnum)
+    {
+        mark = "<INSTRUMENT_KIT_ITEM id=\"" + asString(kitnum) + "\">";
+        idx = strstr(idx, mark.c_str());
+        if (idx == NULL)
+            return false;
+        
+        idx = strstr(idx, "name=\"enabled\"");
+        if (idx == NULL)
+            return false;
+        if (!strstr(idx, "name=\"enabled\" value=\"yes\""))
+            continue;
+        
+        if (!information.ADDsynth_used)
+        {
+            idx = strstr(idx, "name=\"add_enabled\"");
+            if (idx == NULL)
+                return false;
+            if (strncmp(idx + 26 , "yes", 3) == 0)
+                information.ADDsynth_used = 1;
+        }
+        if (!information.SUBsynth_used)
+        {
+            idx = strstr(idx, "name=\"sub_enabled\"");
+            if (idx == NULL)
+                return false;
+            if (strncmp(idx + 26 , "yes", 3) == 0)
+                information.SUBsynth_used = 1;
+        }
+        if (!information.PADsynth_used)
+        {
+            idx = strstr(idx, "name=\"pad_enabled\"");
+            if (idx == NULL)
+                return false;
+            if (strncmp(idx + 26 , "yes", 3) == 0)
+                information.PADsynth_used = 1;
+        } 
+    }
   return true;
 }
 

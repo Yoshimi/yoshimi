@@ -131,7 +131,7 @@ class Bank : private MiscFuncs
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
-        bool newbank(string newbankdirname);
+//        bool newbank(string newbankdirname);
         bool newIDbank(string newbankdir, unsigned int bankID);
         bool newbankfile(string newbankdir);
         bool removebank(unsigned int bankID);
