@@ -22,7 +22,7 @@ WARNING: Changing of some of the effect parameters produces clicks when sounds
 passes thru these effects. Some parameters produce clicks when they are changed very fast.
 
 Here are the effects parameter number (for Data entry coarse).
-The parameters that produces clicks have (AC) after their entry (always clicks).
+The parameters that produces clicks have (AC) after their entry (Always Clicks).
 The parameter that produces clicks only when they are changed fast have a (FC) after the entry (Fast Clicks).
 Most parameters have the range from 0 to 127.
 When parameters have another range, it is written as [low...high] .

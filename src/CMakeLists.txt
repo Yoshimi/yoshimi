@@ -408,6 +408,17 @@ install (DIRECTORY ../presets DESTINATION share/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
+install (DIRECTORY ../doc/ DESTINATION share/doc/yoshimi
+    FILE_PERMISSIONS
+        OWNER_READ OWNER_WRITE
+        GROUP_READ GROUP_WRITE
+        WORLD_READ
+    DIRECTORY_PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_WRITE GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+)
+
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
     DESTINATION share/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png

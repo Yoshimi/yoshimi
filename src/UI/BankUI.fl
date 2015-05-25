@@ -139,11 +139,13 @@ if (bank->emptyslot(nslot))
        {
            labelsize(11);
            labelfont(2);
+           //box(FL_ENGRAVED_BOX);
        }
        else
        {
            labelsize(12);
            labelfont(0);
+           //box(FL_THIN_UP_BOX);
        }
     }
     if (*nselected == nslot)
@@ -215,9 +217,9 @@ class RootSlot {open : {public Fl_Button, RootProcess_}
         labelsize(13);
         align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
         highlight = 0;
-        refresh();} {}
+        rootrefresh();} {}
   }
-  Function {refresh()} {open
+  Function {rootrefresh()} {open
   } {
     code {//
     string bankName = root->getBankIDname(nslot);
@@ -842,7 +844,7 @@ fnr = &RootProcess_::rootprocess;
                 }
                 else
                 {
-                    rs[slot]->refresh();
+                    rs[slot]->rootrefresh();
                     rescan_for_banks(false);
                     set_bank_slot();
                 }
@@ -874,7 +876,7 @@ fnr = &RootProcess_::rootprocess;
             	return;
             }
             bank->setCurrentBankID(slot);
-            rs[slot]->refresh();
+            rs[slot]->rootrefresh();
             rescan_for_banks(false);
             set_bank_slot();
             setrootread();
@@ -900,7 +902,7 @@ fnr = &RootProcess_::rootprocess;
                             bank->setCurrentBankID(0,false);
                         rescan_for_banks(false);
                         set_bank_slot();
-                        rs[slot]->refresh();
+                        rs[slot]->rootrefresh();
                     }
                     else
                         fl_alert("Deleting %s failed. Some files may still exist", thisname.c_str());
@@ -921,8 +923,8 @@ fnr = &RootProcess_::rootprocess;
                 else
                 {
                     int ns = nselected;
-                    rs[slot]->refresh();
-                    rs[ns]->refresh();
+                    rs[slot]->rootrefresh();
+                    rs[ns]->rootrefresh();
                 }
                 nselected = -1;
                 rescan_for_banks(false);
@@ -934,8 +936,8 @@ fnr = &RootProcess_::rootprocess;
                 int ns = nselected;
                 nselected = slot;
                 if (rs > 0)
-                    rs[ns]->refresh();
-                rs[slot]->refresh();
+                    rs[ns]->rootrefresh();
+                rs[slot]->rootrefresh();
             }
         }} {}
   }
@@ -967,7 +969,7 @@ fnr = &RootProcess_::rootprocess;
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh();
     for (int i = 0; i < ROOT_SIZE; ++i)
-        rs[i]->refresh();} {}
+        rs[i]->rootrefresh();} {}
   }
   Function {removeselection()} {open
   } {

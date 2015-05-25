@@ -106,23 +106,25 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     if (!xmldata)
         return -1;
     
+    bool bRet = false; // we're not actually using this!
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");
     if (!start || !end || start >= end)
     {
-        slowinfosearch(xmldata);
+        bRet = slowinfosearch(xmldata);
         delete [] xmldata;
-        return false;
+        return bRet;
     }
-    
+
     // Andrew: just make it simple
     // Will: but not too simple :)
     char *idx = start;
     *end = 0; // fiddle to limit search
-    bool bRet = false; // we're not actually using this!
     unsigned short names = 0;
     
-    // the following could be in any order
+    /* the following could be in any order. We are checking for
+     * the actual exisitence of the fields as well as their value.
+     */
     idx = strstr(start, "name=\"ADDsynth_used\"");
     if (idx != NULL)
     {
@@ -148,10 +150,18 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     }
     
     if (names == 7)
+    {
         bRet = true;
+//        if (information.SUBsynth_used)
+//                synth->getRuntime().Log("Sub found");
+    }
     else
+    {
+//        if (strstr(idx, "<INSTRUMENT_KIT>"))
+//            synth->getRuntime().Log("Oops! Shouldn't find it.");
         *end = 0x3c; // restore full length
         bRet = slowinfosearch(xmldata);
+    }
     delete [] xmldata;
     return bRet;
 }
@@ -164,7 +174,21 @@ bool XMLwrapper::slowinfosearch(char *idx)
         return false;
     
     string mark;
-    for (int kitnum = 0; kitnum < NUM_KIT_ITEMS; ++kitnum)
+    int max = NUM_KIT_ITEMS;
+    
+    /*
+     * The following will always be in this order
+     * and *must* exist, otherwise the file is corrupted.
+     * This means we only need to scan once through the file as far
+     * as necessary to know if any kit item has ADD, SUB or PAD.
+     */
+    idx = strstr(idx, "name=\"kit_mode\"");
+    if (idx == NULL)
+        return false;
+    if (strncmp(idx + 16 , "value=\"0\"", 9) == 0)
+        max = 1;
+
+    for (int kitnum = 0; kitnum < max; ++kitnum)
     {
         mark = "<INSTRUMENT_KIT_ITEM id=\"" + asString(kitnum) + "\">";
         idx = strstr(idx, mark.c_str());
@@ -200,7 +224,14 @@ bool XMLwrapper::slowinfosearch(char *idx)
                 return false;
             if (strncmp(idx + 26 , "yes", 3) == 0)
                 information.PADsynth_used = 1;
-        } 
+        }
+        if (information.ADDsynth_used
+          & information.SUBsynth_used
+          & information.PADsynth_used)
+        {
+//            synth->getRuntime().Log("Kit " + asString(kitnum));
+            break;
+        }
     }
   return true;
 }
