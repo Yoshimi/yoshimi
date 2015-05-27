@@ -119,7 +119,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     // Andrew: just make it simple
     // Will: but not too simple :)
     char *idx = start;
-    *end = 0; // fiddle to limit search
+    *end = 0; // fiddle to limit search - I can't find a better way :(
     unsigned short names = 0;
     
     /* the following could be in any order. We are checking for
@@ -177,10 +177,11 @@ bool XMLwrapper::slowinfosearch(char *idx)
     int max = NUM_KIT_ITEMS;
     
     /*
-     * The following will always be in this order
-     * and *must* exist, otherwise the file is corrupted.
-     * This means we only need to scan once through the file as far
-     * as necessary to know if any kit item has ADD, SUB or PAD.
+     * The following *must* exist, otherwise the file is corrupted.
+     * They will always be in this order, which means we only need
+     * to scan once through the file.
+     * We can stop if we get to a point where ADD, SUB and PAD
+     * have all been enabled.
      */
     idx = strstr(idx, "name=\"kit_mode\"");
     if (idx == NULL)
@@ -229,7 +230,7 @@ bool XMLwrapper::slowinfosearch(char *idx)
           & information.SUBsynth_used
           & information.PADsynth_used)
         {
-//            synth->getRuntime().Log("Kit " + asString(kitnum));
+//            synth->getRuntime().Log("Kit count " + asString(kitnum));
             break;
         }
     }
@@ -287,9 +288,9 @@ char *XMLwrapper::getXMLdata()
     memset(tabs, 0, STACKSIZE + 2);
     mxml_node_t *oldnode=node;
     node = info;
-    addparbool("PADsynth_used", information.PADsynth_used);
     addparbool("ADDsynth_used", information.ADDsynth_used);
     addparbool("SUBsynth_used", information.SUBsynth_used);
+    addparbool("PADsynth_used", information.PADsynth_used);
     node = oldnode;
     char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
     return xmldata;

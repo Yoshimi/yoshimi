@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2015-5-27 Will
+- Trial for colour based engine IDs in main window.
+- Fixed bug that caused banks to be initialied twice on startup.
+- Hid (redundant) refesh button from instrument banks window.
+  Will remove it completely if no problems show up.
+
 2015-5-23 Will
 - Small improvement to synth ID discovery.
 - Prompts at foot of window.

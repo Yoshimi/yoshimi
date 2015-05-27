@@ -859,9 +859,9 @@ const BankEntry &Bank::getBank(size_t bankID)
 
 int Bank::engines_used(unsigned int ninstrument)
 {
-    int tmp = getInstrumentReference(ninstrument).PADsynth_used
-            | (getInstrumentReference(ninstrument).ADDsynth_used << 1)
-            | (getInstrumentReference(ninstrument).SUBsynth_used << 2);
+    int tmp = getInstrumentReference(ninstrument).ADDsynth_used
+            | (getInstrumentReference(ninstrument).SUBsynth_used << 1)
+            | (getInstrumentReference(ninstrument).PADsynth_used << 2);
     return tmp;
 }
 

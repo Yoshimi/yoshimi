@@ -119,10 +119,25 @@ if (bank->emptyslot(nslot))
             color(16);
     }
     else
-    {
-        
+    {       
         int engine = bank->engines_used(nslot);
-        if (engine & 1) // PadSynth
+        if (engine & 1) // AddSynth
+            labelcolor(72);
+        else
+            labelcolor(0);
+        if (engine & 2) // SubSynth
+        {
+            labelsize(11);
+            labelfont(2);
+            //box(FL_ENGRAVED_BOX);
+        }
+        else
+        {
+            labelsize(12);
+            labelfont(0);
+            //box(FL_THIN_UP_BOX);
+        }
+        if (engine & 4) // PadSynth
             color(126);
 	else
 	{
@@ -131,27 +146,13 @@ if (bank->emptyslot(nslot))
             else
                 color(17);
          }
-       if (engine & 2) // AddSynth
-           labelcolor(72);
-       else
-           labelcolor(0);
-       if (engine & 4) // SubSynth
-       {
-           labelsize(11);
-           labelfont(2);
-           //box(FL_ENGRAVED_BOX);
-       }
-       else
-       {
-           labelsize(12);
-           labelfont(0);
-           //box(FL_THIN_UP_BOX);
-       }
     }
     if (*nselected == nslot)
         color(6);
+
     string instrName = bank->getnamenumbered(nslot);
-    copy_label(instrName.c_str());} {}
+    copy_label(instrName.c_str());} {selected
+    }
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }
@@ -247,10 +248,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {46 240 780 575} type Double
-      code0 {o->copy_label(bank->getBankFileTitle().c_str());}
-      code1 {if (!bank->getBankFileTitle().size())
-            o->label ("Choose a bank from the bank list on the left (or go to settings if to configure the bank location) or choose 'New Bank...' to make a new bank.");} visible
+      xywh {46 240 780 575} type Double visible
     } {
       Fl_Choice banklist {
         callback {//
@@ -271,7 +269,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
         label {Refresh banks}
         callback {rescan_for_banks(true);
 set_bank_slot();}
-        tooltip {Refresh the bank list (rescan)} xywh {212 5 102 25} box PLASTIC_UP_BOX color 50 labelfont 1 labelsize 11
+        tooltip {Refresh the bank list (rescan)} xywh {212 5 102 25} box PLASTIC_UP_BOX color 50 labelfont 1 labelsize 11 hide deactivate
       }
       Fl_Button {} {
         label Roots
@@ -392,7 +390,7 @@ removeselection();}
       }
       Fl_Button {} {
         label Close
-        callback {bankuiwindow->hide();} selected
+        callback {bankuiwindow->hide();}
         xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group engines {open
@@ -698,7 +696,7 @@ fnr = &RootProcess_::rootprocess;
   }
   Function {init(Fl_Spinner *cbwig_)} {open
   } {
-    code {cbwig = cbwig_;rescan_for_banks(true);} {}
+    code {cbwig = cbwig_;rescan_for_banks(false);} {}
   }
   Function {process()} {open return_type void
   } {

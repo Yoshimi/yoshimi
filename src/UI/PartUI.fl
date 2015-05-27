@@ -345,9 +345,21 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
       class Fl_Group visible
     } {
       Fl_Group partgroupui {open
-        xywh {0 0 375 166}
+        xywh {0 0 377 166}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
+        Fl_Box addBox {
+          xywh {84 9 79 16} box FLAT_BOX hide
+          code0 {o->color(0xdfafaf00);}
+        }
+        Fl_Box subBox {
+          xywh {163 9 79 16} box FLAT_BOX hide
+          code0 {o->color(0xafafdf00);}
+        }
+        Fl_Box padBox {
+          xywh {242 9 79 16} box FLAT_BOX hide
+          code0 {o->color(0xafdfaf00);}
+        }
         Fl_Button instrumentlabel {
           callback {//
               int event = Fl::event_button();
@@ -368,8 +380,11 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                   default:
                       break;
               }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 240 20} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 16
-          code0 {o->copy_label(part->Pname.c_str());}
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 240 20} box THIN_DOWN_FRAME labelfont 1 labelsize 11 align 16
+          code0 {o->copy_label(part->Pname.c_str()); find_engines();}
+          code1 {if (engine & 1)  addBox->show();}
+          code2 {if (engine & 2) subBox->show();}
+          code3 {if (engine & 4) padBox->show();}
         }
         Fl_Button {} {
           label Edit
@@ -890,13 +905,13 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit} open
-      xywh {115 376 670 370} type Double
+      xywh {115 376 670 370} type Double hide
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("Kit List");}
-      code1 {o->copy_label(tname.c_str());} visible
+      code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Button {} {
         label Close
-        callback {instrumentkitlist->hide();} selected
+        callback {instrumentkitlist->hide();}
         xywh {569 348 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
@@ -1241,6 +1256,23 @@ else {propta->deactivate();proptb->deactivate();}}
     if (engine == 2 && adnoteui != NULL)
         padnoteui->padnotewindow->show();} {}
   }
+  Function {find_engines()} {open
+  } {
+    code {//
+    engine = 0;
+    if (!synth->getRuntime().CheckPADsynth)
+    return;
+    for(int i = 0; i < NUM_KIT_ITEMS; ++i)
+    {
+        if (part->kit[i].Padenabled)
+            engine |= 1;
+        if (part->kit[i].Psubenabled)
+            engine |= 2;
+        if (part->kit[i].Ppadenabled)
+            engine |= 4;
+    }} {selected
+    }
+  }
   Function {~PartUI()} {} {
     code {if (adnoteui)
             delete adnoteui;
@@ -1272,6 +1304,8 @@ else {propta->deactivate();proptb->deactivate();}}
   decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {private local
   }
   decl {int npart;} {public local
+  }
+  decl {unsigned int engine;} {private local
   }
   decl {int ninseff;} {private local
   }

@@ -109,9 +109,9 @@ class XMLwrapper : private MiscFuncs
         bool minimal; // false if all parameters will be stored (used only for clipboard)
 
         struct {
-            unsigned char PADsynth_used;
             unsigned char ADDsynth_used;
             unsigned char SUBsynth_used;
+            unsigned char PADsynth_used;
         } information;
 
         // opens a file and parse only the "information" data on it
