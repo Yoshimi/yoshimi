@@ -348,6 +348,9 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
         xywh {0 0 377 166}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
+        Fl_Box instrumentbacking {
+          xywh {82 7 240 20} box FLAT_BOX deactivate
+        }
         Fl_Box addBox {
           xywh {84 9 79 16} box FLAT_BOX hide
           code0 {o->color(0xdfafaf00);}
@@ -381,8 +384,8 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       break;
               }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 240 20} box THIN_DOWN_FRAME labelfont 1 labelsize 11 align 16
-          code0 {o->copy_label(part->Pname.c_str()); find_engines();}
-          code1 {if (engine & 1)  addBox->show();}
+          code0 {o->copy_label(part->Pname.c_str()); unsigned int engine = find_engines();}
+          code1 {if (engine & 1) addBox->show();}
           code2 {if (engine & 2) subBox->show();}
           code3 {if (engine & 4) padBox->show();}
         }
@@ -1256,21 +1259,23 @@ else {propta->deactivate();proptb->deactivate();}}
     if (engine == 2 && adnoteui != NULL)
         padnoteui->padnotewindow->show();} {}
   }
-  Function {find_engines()} {open
+  Function {find_engines()} {open return_type {unsigned int}
   } {
     code {//
-    engine = 0;
-    if (!synth->getRuntime().CheckPADsynth)
-    return;
-    for(int i = 0; i < NUM_KIT_ITEMS; ++i)
+    unsigned int engine = 0;
+    if (synth->getRuntime().CheckPADsynth)
     {
-        if (part->kit[i].Padenabled)
-            engine |= 1;
-        if (part->kit[i].Psubenabled)
-            engine |= 2;
-        if (part->kit[i].Ppadenabled)
-            engine |= 4;
-    }} {selected
+        for(int i = 0; i < NUM_KIT_ITEMS; ++i)
+        {
+            if (part->kit[i].Padenabled)
+                engine |= 1;
+            if (part->kit[i].Psubenabled)
+                engine |= 2;
+            if (part->kit[i].Ppadenabled)
+                engine |= 4;
+        }
+    }
+    return engine;} {selected
     }
   }
   Function {~PartUI()} {} {
@@ -1304,8 +1309,6 @@ else {propta->deactivate();proptb->deactivate();}}
   decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {private local
   }
   decl {int npart;} {public local
-  }
-  decl {unsigned int engine;} {private local
   }
   decl {int ninseff;} {private local
   }

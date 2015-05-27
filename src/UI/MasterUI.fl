@@ -381,6 +381,7 @@ mainCreateNewInstance(forceId);}
               callback {synth->getRuntime().NumAvailableParts = 16;
 panelgroup = 0;
 npart = 0;
+partui->npart = 0;
 npartcounter->value(1);
 updatepanel();
 updatepart();}
@@ -391,6 +392,7 @@ updatepart();}
               callback {synth->getRuntime().NumAvailableParts = 32;
 panelgroup = 0;
 npart = 0;
+partui->npart = 0;
 Panelgroups->value(0);
 Panelsmallgroups->value(0);
 npartcounter->value(1);
@@ -403,11 +405,12 @@ updatepart();}
               callback {synth->getRuntime().NumAvailableParts = 64;
 panelgroup = 0;
 npart = 0;
+partui->npart = 0;
 Panelgroups->value(0);
 Panelsmallgroups->value(0);
 npartcounter->value(1);
 updatepanel();
-updatepart();} selected
+updatepart();}
               xywh {10 10 34 20} labelfont 1 labelsize 10
             }
           }
@@ -934,7 +937,7 @@ ZynAddSubFX}
       }
       Fl_Button Panelclose {
         label Close
-        callback {panelwindow->hide(); updatepanel();}
+        callback {panelwindow->hide();// updatepanel();}
         xywh {482 645 55 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button Panelrefresh {
@@ -1050,6 +1053,30 @@ updatepanel();} open
     partui->partpan->value(synth->part[npart]->Ppanning);
     partui->partvol->value(synth->part[npart]->Pvolume);
     partui->midich->value(synth->part[npart]->Prcvchn + 1);
+    partui->instrumentbacking->redraw();
+    unsigned int engine = partui->find_engines();
+    if (engine & 1)
+    {
+        partui->addBox->show();
+        partui->addBox->redraw();
+    }
+    else
+        partui->addBox->hide();
+
+    if (engine & 2)
+    {
+        partui->subBox->show();
+        partui->subBox->redraw();
+    }
+    else
+        partui->subBox->hide();
+    if (engine & 4)
+    {
+        partui->padBox->show();
+        partui->padBox->redraw();
+    }
+    else
+        partui->padBox->hide();
     partui->instrumentlabel->copy_label(synth->part[npart]->Pname.c_str());
     npartcounter->range(1.0, synth->getRuntime().NumAvailableParts);
 
@@ -1073,14 +1100,15 @@ updatepanel();} open
     if (x)
         partui->padeditbutton->activate();
     else
-        partui->padeditbutton->deactivate();} {}
+        partui->padeditbutton->deactivate();} {selected
+    }
   }
-  Function {updatepartprogram(int npart)} {open
+  Function {updatepartprogram(int _npart)} {open
   } {
     code {//
-    partui->instrumentlabel->copy_label(partui->part->Pname.c_str());
-    partui->partgroupui->activate();
-    partui->partGroupEnable->value(1);
+    if (_npart != npart)
+        return;
+    updatepart();
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
         partui->midich->value(partui->part->Prcvchn + 1);
