@@ -1,15 +1,15 @@
 
+Sync panel item label on instrument edits.
+
 restoreJsession() -> restoreSessionData() -> extractConfigData()
 should NOT refetch entire bank structure.
-
-Fix parts edit window bug MIDI load not updating.
 
 Direct part control should be able to change audio routing.
 
 Maybe make jack port only register if part O/P is actually set.
 
 Visually identify AddSynth & SubSynth in Instruments window.
-    IDs defined in bankUI but not implemented.
+    Partly done
 
 Review mapping of SubSynth harmonic faders.
 

@@ -139,6 +139,16 @@ class Config : public MiscFuncs
         unsigned char dataH;
         bool          nrpnActive;
         
+        struct IOdata{
+            unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
+            unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
+            int Part;
+            int Controller;
+            bool vectorEnabled[NUM_MIDI_CHANNELS];
+        };
+        
+        IOdata nrpndata;
+        
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
         static const unsigned short MaxParamsHistory;

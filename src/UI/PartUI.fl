@@ -341,27 +341,27 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      xywh {4 826 375 165} type Double
+      xywh {28 634 375 165} type Double
       class Fl_Group visible
     } {
       Fl_Group partgroupui {open
         xywh {0 0 377 166}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
-        Fl_Box instrumentbacking {
-          xywh {82 7 240 20} box FLAT_BOX deactivate
+        Fl_Button instrumentback {
+          xywh {134 7 192 20} box FLAT_BOX labelfont 1 labelsize 11 align 16 deactivate
         }
-        Fl_Box addBox {
-          xywh {84 9 79 16} box FLAT_BOX hide
-          code0 {o->color(0xdfafaf00);}
+        Fl_Box instrumentaddbox {
+          xywh {136 9 63 16} box FLAT_BOX hide
+          code0 {o->color(0xdfafbf00);}
         }
-        Fl_Box subBox {
-          xywh {163 9 79 16} box FLAT_BOX hide
-          code0 {o->color(0xafafdf00);}
+        Fl_Box instrumentsubbox {
+          xywh {199 9 63 16} box FLAT_BOX hide
+          code0 {o->color(0xafcfdf00);}
         }
-        Fl_Box padBox {
-          xywh {242 9 79 16} box FLAT_BOX hide
-          code0 {o->color(0xafdfaf00);}
+        Fl_Box instrumentpadbox {
+          xywh {262 9 63 16} box FLAT_BOX hide
+          code0 {o->color(0xcfdfaf00);}
         }
         Fl_Button instrumentlabel {
           callback {//
@@ -377,22 +377,19 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       if (tmp != NULL and not string(tmp).empty())
                       {
                           part->Pname = string(tmp);
-                          o->copy_label(part->Pname.c_str());
+                          setinstrumentlabel();
                       }
                       break;
                   default:
                       break;
               }}
-          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {82 7 240 20} box THIN_DOWN_FRAME labelfont 1 labelsize 11 align 16
-          code0 {o->copy_label(part->Pname.c_str()); unsigned int engine = find_engines();}
-          code1 {if (engine & 1) addBox->show();}
-          code2 {if (engine & 2) subBox->show();}
-          code3 {if (engine & 4) padBox->show();}
+          tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 11 align 16
+          code0 {setinstrumentlabel();}
         }
         Fl_Button {} {
           label Edit
           callback {instrumenteditwindow->show();}
-          xywh {332 8 36 19} box PLASTIC_UP_BOX color 22 labelsize 11
+          xywh {330 7 40 21} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
         Fl_Dial {} {
           label {Velocity
@@ -991,37 +988,14 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {67 190 395 360} type Double hide
+      xywh {67 190 395 360} type Double
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
       code1 {string tname = synth->getGuiMaster()->set_part_window_title("Edit");}
-      code2 {o->copy_label(tname.c_str());}
+      code2 {o->copy_label(tname.c_str());} visible
     } {
       Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
       } {
-        Fl_Group {} {
-          label PADsynth open
-          xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
-        } {
-          Fl_Button padeditbutton {
-            label Edit
-            callback {showparameters(0,2);}
-            xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
-            code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
-          }
-          Fl_Check_Button padsynenabledcheck {
-            label Enabled
-            callback {//
-                int x = o->value();
-                part->kit[0].Ppadenabled = x;
-                if (x == 0)
-                    padeditbutton->deactivate();
-                else
-                    padeditbutton->activate();}
-            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
-            code1 {o->value(part->kit[0].Ppadenabled);}
-          }
-        }
         Fl_Group {} {
           label ADDsynth open
           xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
@@ -1029,12 +1003,13 @@ else {propta->deactivate();proptb->deactivate();}}
           Fl_Check_Button adsynenabledcheck {
             label Enabled
             callback {//
-                int x = o->value();
-                part->kit[0].Padenabled = x;
-                if (x == 0)
-                    adeditbutton->deactivate();
-                else
-                    adeditbutton->activate();}
+    int x = o->value();
+    part->kit[0].Padenabled = x;
+    if (x == 0)
+        adeditbutton->deactivate();
+    else
+        adeditbutton->activate();
+    setinstrumentlabel();}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
@@ -1052,12 +1027,13 @@ else {propta->deactivate();proptb->deactivate();}}
           Fl_Check_Button subsynenabledcheck {
             label Enabled
             callback {//
-                int x = o->value();
-                part->kit[0].Psubenabled = x;
-                if (x == 0)
-                    subeditbutton->deactivate();
-                else
-                    subeditbutton->activate();}
+    int x = o->value();
+    part->kit[0].Psubenabled = x;
+    if (x == 0)
+        subeditbutton->deactivate();
+    else
+        subeditbutton->activate();
+    setinstrumentlabel();}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
@@ -1066,6 +1042,30 @@ else {propta->deactivate();proptb->deactivate();}}
             callback {showparameters(0,1);}
             xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
+          }
+        }
+        Fl_Group {} {
+          label PADsynth open
+          xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
+        } {
+          Fl_Button padeditbutton {
+            label Edit
+            callback {showparameters(0,2);}
+            xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
+            code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
+          }
+          Fl_Check_Button padsynenabledcheck {
+            label Enabled
+            callback {//
+    int x = o->value();
+    part->kit[0].Ppadenabled = x;
+    if (x == 0)
+        padeditbutton->deactivate();
+    else
+        padeditbutton->activate();
+    setinstrumentlabel();}
+            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
+            code1 {o->value(part->kit[0].Ppadenabled);}
           }
         }
         Fl_Button {} {
@@ -1275,7 +1275,29 @@ else {propta->deactivate();proptb->deactivate();}}
                 engine |= 4;
         }
     }
-    return engine;} {selected
+    return engine;} {}
+  }
+  Function {setinstrumentlabel()} {open
+  } {
+    code {//
+    unsigned int engine = find_engines();
+    instrumentback->redraw();
+    if (engine & 1)
+    {
+        instrumentaddbox->redraw();
+        instrumentaddbox->show();
+    }
+    if (engine & 2)
+    {
+        instrumentsubbox->redraw();
+        instrumentsubbox->show();
+    }
+    if (engine & 4)
+    {
+        instrumentpadbox->redraw();
+        instrumentpadbox->show();
+    }
+    instrumentlabel->copy_label(part->Pname.c_str());} {selected
     }
   }
   Function {~PartUI()} {} {

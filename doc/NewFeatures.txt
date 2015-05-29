@@ -67,7 +67,7 @@ See:
 Using_NRPNs.txt
 Direct_Part_Control.txt
 Vector_Control.txt
-Zyn_NRPNs.txt
+Yoshi_Zyn_NRPNs.txt
 
 ###
 
@@ -82,11 +82,18 @@ Part editing windows carry the part number and voice name in the title bar. For 
 
 Yoshimi now has up to 64 parts in blocks of 16. You can now decide how many you want to have available using the 'Parameters' menu. You can have 16, 32 or 64.
 
-By default, all the upper parts are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages. However, vector control will intelligently work with however many you have set, as will all the direct part controls.
+By default, all the upper parts are mapped to the same MIDI channel numbers as the lowest ones but have independent voice and parameter settings. They can not normally receive independent note or control messages. However, vector control will intelligently work with however many you have set, as will all the NRPN direct part controls.
 
 ###
 
 When opening an instrument bank you can now tell exactly which synth engines are used. As before, the backround colour is changed if there is a PadSynth element. If AddSynth is used, then the text colour is changed to a dark red instead of black, and if SubSynth is used, the text is slightly smaller and italicised.
+
+For the main part window, and the mixer panel, this is instead represented by three pale background colours:
+Red -> AddSynth
+Blue -> SubSynth
+Green -> PadSynth
+
+Eventually the plan is to show the instrument bank in the same way.
 
 ###
 

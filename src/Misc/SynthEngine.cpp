@@ -231,6 +231,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         }
     }
     defaults();
+    ClearNRPNs();
     if (Runtime.restoreJackSession)
     {
         if (!Runtime.restoreJsession())
@@ -600,6 +601,20 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
             GuiThreadMsg::sendMessage(this,
             GuiThreadMsg::UpdatePartProgram, npart);
         }
+    }
+}
+
+
+void SynthEngine::ClearNRPNs(void)
+{
+    Runtime.nrpnL = 127;
+    Runtime.nrpnH = 127;
+    Runtime.nrpnActive = false;
+    for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
+    {
+        Runtime.nrpndata.vectorEnabled[chan] = false;
+        Runtime.nrpndata.vectorXaxis[chan] = 0xff;
+        Runtime.nrpndata.vectorYaxis[chan] = 0xff;
     }
 }
 

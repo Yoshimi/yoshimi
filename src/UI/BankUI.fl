@@ -106,7 +106,8 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         labelsize(13);
         align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
         highlight = 0;
-        refresh();} {}
+        refresh();} {selected
+    }
   }
   Function {refresh()} {open
   } {
@@ -151,8 +152,7 @@ if (bank->emptyslot(nslot))
         color(6);
 
     string instrName = bank->getnamenumbered(nslot);
-    copy_label(instrName.c_str());} {selected
-    }
+    copy_label(instrName.c_str());} {}
   }
   decl {int *what, *whatslot, nslot, highlight, *nselected;} {private local
   }

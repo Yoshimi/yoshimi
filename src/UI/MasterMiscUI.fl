@@ -427,6 +427,21 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
             class VUMeter
           }
         }
+        Fl_Box partback {
+          xywh {4 27 55 30} box FLAT_BOX deactivate
+        }
+        Fl_Box partadd {
+          xywh {5 28 17 27} box FLAT_BOX hide deactivate
+          code0 {o->color(0xdfafbf00);}
+        }
+        Fl_Box partsub {
+          xywh {23 28 17 27} box FLAT_BOX hide deactivate
+          code0 {o->color(0xafcfdf00);}
+        }
+        Fl_Box partpad {
+          xywh {40 28 17 27} box FLAT_BOX hide deactivate
+          code0 {o->color(0xcfdfaf00);}
+        }
         Fl_Button partname {
           label {  }
           callback {if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
@@ -435,7 +450,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
                   bankui->cbwig->do_callback();
               }
               bankui->Show();}
-          xywh {4 27 55 30} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 208
+          xywh {4 27 55 30} box THIN_DOWN_FRAME down_box FLAT_BOX labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
           callback {//
@@ -469,7 +484,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
           callback {//
               synth->part[npart + *plgroup]->Prcvchn=o->value();
               synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, o->value() + 1);
-              o->textcolor(FL_BLACK);} selected
+              o->textcolor(FL_BLACK);}
           tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -527,46 +542,92 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   }
   Function {init(int npart_, BankUI *bankui_, SynthEngine *_synth)} {open
   } {
-    code {synth = _synth;
-	npart=npart_;
-        bankui = bankui_;
-        plgroup = &synth->getGuiMaster()->panelgroup;
-        make_window();
-        panellistitem->show();
-        end();} {}
+    code {//
+    synth = _synth;
+    npart=npart_;
+    bankui = bankui_;
+    plgroup = &synth->getGuiMaster()->panelgroup;
+    make_window();
+    panellistitem->show();
+    end();} {}
   }
   Function {refresh()} {open
   } {
     code {//
-	int setpart = npart | *plgroup; // assumes *plgroup always power of 2
+
+    int setpart = npart | *plgroup; // assumes *plgroup always power of 2
 	
-	partenabled->value(synth->part [setpart]->Penabled);
-        if (synth->part[setpart]->Penabled != 0)
-            panellistitemgroup->activate();
-        else
-            panellistitemgroup->deactivate();
-        partvolume->value(synth->part[setpart]->Pvolume);
-        partpanning->value(synth->part[setpart]->Ppanning);
-        int tmpch = synth->part[setpart]->Prcvchn;
-        if (tmpch < NUM_MIDI_CHANNELS)
+    partenabled->value(synth->part [setpart]->Penabled);
+    if (synth->part[setpart]->Penabled != 0)
+        panellistitemgroup->activate();
+    else
+        panellistitemgroup->deactivate();
+    
+    partback->redraw();
+    int engine = findengines(setpart);
+    if (engine & 1)
+    {
+        partadd->redraw();
+        partadd->show();
+    }
+    else
+        partadd->hide();
+    if (engine & 2)
+    {
+        partsub->redraw();
+        partsub->show();
+    }
+    else
+        partsub->hide();
+    if (engine & 4)
+    {
+        partpad->redraw();
+        partpad->show();
+    }
+    else
+        partpad->hide();
+        
+    
+    partvolume->value(synth->part[setpart]->Pvolume);
+    partpanning->value(synth->part[setpart]->Ppanning);
+    int tmpch = synth->part[setpart]->Prcvchn;
+    if (tmpch < NUM_MIDI_CHANNELS)
+    {
+        partrcv->value(tmpch);
+        partrcv->textcolor(FL_BLACK);
+    }
+    else
+        partrcv->textcolor(FL_WHITE);
+    partname->label(synth->part[setpart]->Pname.c_str());
+    int tmp = synth->part[setpart]->Paudiodest - 1;
+    if (tmp < 0 or tmp > 3)
+        tmp = 0;
+    audiosend->value(tmp);
+    if ((int)bankui->cbwig->value() != (setpart + 1))
+        panellistitemgroup->color(fl_rgb_color(160, 160, 160));
+    else
+        panellistitemgroup->color(fl_rgb_color(50,190,240));
+    panellistitemgroup->redraw();
+    string num = asString(setpart + 1);
+    partenabled->copy_label(num.c_str());} {}
+  }
+  Function {findengines(int npart)} {open selected return_type {unsigned int}
+  } {
+    code {//
+    unsigned int engine = 0;
+    if (synth->getRuntime().CheckPADsynth)
+    {
+        for(int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
-            partrcv->value(tmpch);
-            partrcv->textcolor(FL_BLACK);
+            if (synth->part[npart]->kit[i].Padenabled)
+                engine |= 1;
+            if (synth->part[npart]->kit[i].Psubenabled)
+                engine |= 2;
+            if (synth->part[npart]->kit[i].Ppadenabled)
+                engine |= 4;
         }
-        else
-             partrcv->textcolor(FL_WHITE);
-        partname->label(synth->part[setpart]->Pname.c_str());
-        int tmp = synth->part[setpart]->Paudiodest - 1;
-        if (tmp < 0 or tmp > 3)
-            tmp = 0;
-        audiosend->value(tmp);
-        if ((int)bankui->cbwig->value() != (setpart + 1))
-            panellistitemgroup->color(fl_rgb_color(160, 160, 160));
-        else
-            panellistitemgroup->color(fl_rgb_color(50,190,240));
-        panellistitemgroup->redraw();
-        string num = asString(setpart + 1);
-        partenabled->copy_label(num.c_str());} {}
+    }
+    return engine;} {}
   }
   Function {~Panellistitem()} {open
   } {
