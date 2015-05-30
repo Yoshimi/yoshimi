@@ -284,8 +284,9 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
 //        synth->getRuntime().Log("X D H " + asString(Xopps)  + "   D L " + asString(Xtype) + "  V " + asString(param));
         if (Xopps & 1) // volume
         {
-            synth->SetController(ch | 0x80, C_volume, param); // needs improving
-            synth->SetController(ch | 0x90, C_volume, 127 - param);
+            int rev = 127 - param;
+            synth->SetController(ch | 0x80, C_volume,127 - (rev * rev / 127));
+            synth->SetController(ch | 0x90, C_volume, 127 - (param * param / 127));
         }
         if (Xopps & 2) // pan
         {

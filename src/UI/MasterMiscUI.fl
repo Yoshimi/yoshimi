@@ -438,19 +438,22 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           xywh {23 28 17 27} box FLAT_BOX hide deactivate
           code0 {o->color(0xafcfdf00);}
         }
-        Fl_Box partpad {
+        Fl_Box partpad {selected
           xywh {40 28 17 27} box FLAT_BOX hide deactivate
           code0 {o->color(0xcfdfaf00);}
         }
         Fl_Button partname {
           label {  }
-          callback {if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
-              {
-                  bankui->cbwig->value(npart + 1 + *plgroup);
-                  bankui->cbwig->do_callback();
-              }
-              bankui->Show();}
-          xywh {4 27 55 30} box THIN_DOWN_FRAME down_box FLAT_BOX labelfont 1 labelsize 10 align 208
+          callback {//
+    if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
+    {
+        bankui->cbwig->value(npart + 1 + *plgroup);
+        bankui->cbwig->do_callback();
+    }
+    bankui->Show();
+    setPartLabel(findengines(npart | *plgroup));}
+          xywh {4 27 55 30} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
+          code0 {setPartLabel(findengines(npart | *plgroup));}
         }
         Fl_Slider partvolume {
           callback {//
@@ -613,8 +616,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     }
     else
         partpad->hide();
-    partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {selected
-    }
+    partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {open return_type {unsigned int}
   } {

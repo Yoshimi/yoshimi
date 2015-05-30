@@ -93,6 +93,8 @@ Red -> AddSynth
 Blue -> SubSynth
 Green -> PadSynth
 
+In the Instrument Edit window the same colours highlight the engine names when they are enabled with the check boxes. 
+
 Eventually the plan is to show the instrument bank in the same way.
 
 ###
