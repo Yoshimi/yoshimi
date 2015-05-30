@@ -282,7 +282,7 @@ class PartKitItem {open : {public Fl_Group}
         adcheck->do_callback();
         subcheck->value(part->kit[n].Psubenabled);
         subcheck->do_callback();
-
+        
         sendtoeffect->value(part->kit[n].Psendtoparteffect + 1);
         if (part->kit[n].Psendtoparteffect == 127)
             sendtoeffect->value(0);
@@ -341,7 +341,7 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
   Function {make_window()} {open private
   } {
     Fl_Window partgroup {open
-      xywh {28 634 375 165} type Double
+      xywh {25 620 375 165} type Double
       class Fl_Group visible
     } {
       Fl_Group partgroupui {open
@@ -370,8 +370,11 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
               switch (event)
               {
                   case FL_LEFT_MOUSE:
+                  {
                       bankui->Show();
+                      setinstrumentlabel();
                       break;
+                   }
                   case FL_RIGHT_MOUSE:
                       tmp = fl_input("Instrument name:", part->Pname.c_str());
                       if (tmp != NULL and not string(tmp).empty())
@@ -382,9 +385,12 @@ class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
                       break;
                   default:
                       break;
-              }}
+              }} selected
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 11 align 16
-          code0 {setinstrumentlabel();}
+          code0 {instrumentlabel->copy_label(part->Pname.c_str()); unsigned int engine = find_engines();}
+          code1 {if (engine & 1) instrumentaddbox->show();}
+          code2 {if (engine & 2) instrumentsubbox->show();}
+          code3 {if (engine & 4) instrumentpadbox->show();}
         }
         Fl_Button {} {
           label Edit
@@ -914,11 +920,11 @@ else {propta->deactivate();proptb->deactivate();}}
         callback {instrumentkitlist->hide();}
         xywh {569 348 63 20} box THIN_UP_BOX
       }
-      Fl_Scroll kitlist {
+      Fl_Scroll kitlist {open
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
         code0 {if (part->Pkitmode==0) o->deactivate();}
       } {
-        Fl_Pack {} {
+        Fl_Pack {} {open
           xywh {0 20 670 320}
           code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){partkititem[i]=new PartKitItem(0,0,670,20,"");partkititem[i]->init(part,i,this);}}
         } {}
@@ -988,10 +994,10 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit} open
-      xywh {67 190 395 360} type Double
+      xywh {149 502 395 360} type Double hide
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
       code1 {string tname = synth->getGuiMaster()->set_part_window_title("Edit");}
-      code2 {o->copy_label(tname.c_str());} visible
+      code2 {o->copy_label(tname.c_str());}
     } {
       Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1297,8 +1303,9 @@ else {propta->deactivate();proptb->deactivate();}}
         instrumentpadbox->redraw();
         instrumentpadbox->show();
     }
-    instrumentlabel->copy_label(part->Pname.c_str());} {selected
-    }
+    instrumentlabel->copy_label(part->Pname.c_str());
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        synth->getGuiMaster()->setPanelPartLabel(npart, engine);} {}
   }
   Function {~PartUI()} {} {
     code {if (adnoteui)

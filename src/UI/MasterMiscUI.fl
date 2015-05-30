@@ -563,30 +563,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     else
         panellistitemgroup->deactivate();
     
-    partback->redraw();
-    int engine = findengines(setpart);
-    if (engine & 1)
-    {
-        partadd->redraw();
-        partadd->show();
-    }
-    else
-        partadd->hide();
-    if (engine & 2)
-    {
-        partsub->redraw();
-        partsub->show();
-    }
-    else
-        partsub->hide();
-    if (engine & 4)
-    {
-        partpad->redraw();
-        partpad->show();
-    }
-    else
-        partpad->hide();
-        
+    setPartLabel(findengines(setpart));        
     
     partvolume->value(synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
@@ -611,7 +588,35 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());} {}
   }
-  Function {findengines(int npart)} {open selected return_type {unsigned int}
+  Function {setPartLabel(int engine)} {open
+  } {
+    code {//
+    partback->redraw();
+    if (engine & 1)
+    {
+        partadd->redraw();
+        partadd->show();
+    }
+    else
+        partadd->hide();
+    if (engine & 2)
+    {
+        partsub->redraw();
+        partsub->show();
+    }
+    else
+        partsub->hide();
+    if (engine & 4)
+    {
+        partpad->redraw();
+        partpad->show();
+    }
+    else
+        partpad->hide();
+    partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {selected
+    }
+  }
+  Function {findengines(int npart)} {open return_type {unsigned int}
   } {
     code {//
     unsigned int engine = 0;
