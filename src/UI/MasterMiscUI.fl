@@ -432,15 +432,15 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
         }
         Fl_Box partadd {
           xywh {5 28 17 27} box FLAT_BOX hide deactivate
-          code0 {o->color(0xdfafbf00);}
+          code0 {o->color(ADD_COLOUR);}
         }
         Fl_Box partsub {
           xywh {23 28 17 27} box FLAT_BOX hide deactivate
-          code0 {o->color(0xafcfdf00);}
+          code0 {o->color(SUB_COLOUR);}
         }
         Fl_Box partpad {selected
           xywh {40 28 17 27} box FLAT_BOX hide deactivate
-          code0 {o->color(0xcfdfaf00);}
+          code0 {o->color(PAD_COLOUR);}
         }
         Fl_Button partname {
           label {  }

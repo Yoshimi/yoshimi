@@ -52,7 +52,7 @@ decl {\#include "Misc/Part.h"
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class PartSysEffSend {selected : {public Fl_Group, private MiscFuncs}
+class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {open private
   } {
@@ -334,11 +334,11 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
-    Fl_Window partgroup {
+    Fl_Window partgroup {open
       xywh {25 620 375 165} type Double hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 377 166}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
@@ -347,15 +347,15 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         }
         Fl_Box instrumentaddbox {
           xywh {136 9 63 16} box FLAT_BOX hide
-          code0 {o->color(0xdfafbf00);}
+          code0 {o->color(ADD_COLOUR);}
         }
         Fl_Box instrumentsubbox {
           xywh {199 9 63 16} box FLAT_BOX hide
-          code0 {o->color(0xafcfdf00);}
+          code0 {o->color(SUB_COLOUR);}
         }
         Fl_Box instrumentpadbox {
           xywh {262 9 63 16} box FLAT_BOX hide
-          code0 {o->color(0xcfdfaf00);}
+          code0 {o->color(PAD_COLOUR);}
         }
         Fl_Button instrumentlabel {
           callback {//
@@ -980,7 +980,7 @@ else {propta->deactivate();proptb->deactivate();}}
       code1 {string tname = synth->getGuiMaster()->set_part_window_title("Edit");}
       code2 {o->copy_label(tname.c_str());}
     } {
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
@@ -1008,7 +1008,7 @@ else {propta->deactivate();proptb->deactivate();}}
           }
           Fl_Box addbox {
             xywh {10 226 89 18} box FLAT_BOX deactivate
-            code0 {o->color(0xdfafbf00);}
+            code0 {o->color(ADD_COLOUR);}
             code1 {if (adsynenabledcheck->value() == 0) o->hide();}
           }
           Fl_Button adeditbutton {
@@ -1043,7 +1043,7 @@ else {propta->deactivate();proptb->deactivate();}}
           }
           Fl_Box subbox {
             xywh {110 226 89 18} box FLAT_BOX deactivate
-            code0 {o->color(0xafcfdf00);}
+            code0 {o->color(SUB_COLOUR);}
             code1 {if (subsynenabledcheck->value() == 0) o->hide();}
           }
           Fl_Button subeditbutton {
@@ -1076,9 +1076,9 @@ else {propta->deactivate();proptb->deactivate();}}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
-          Fl_Box padbox {
+          Fl_Box padbox {selected
             xywh {210 226 89 18} box FLAT_BOX deactivate
-            code0 {o->color(0xcfdfaf00);}
+            code0 {o->color(PAD_COLOUR);}
             code1 {if (padsynenabledcheck->value() == 0) o->hide();}
           }
           Fl_Button padeditbutton {
