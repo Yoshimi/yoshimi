@@ -33,12 +33,18 @@ decl {
     \#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
     \#include "Misc/MiscFuncs.h"
+    \#include "Params/ParamChangeFunc.h"
 } {public global}
 
 decl {
     \#include <FL/fl_draw.H>
     \#include <FL/Fl_Tooltip.H>
     \#include <FL/Fl_Group.H>
+    \#include <Misc/SynthEngine.h>
+    \#include <stdio.h>
+    \#include <FL/Fl_Menu.H>
+    \#include "Params/midiController.h"
+    \#include "MidiControllerUI.h"
     \#include <FL/x.H>
     \#include <cairo/cairo.h>
     \#include <cairo/cairo-xlib.h>
@@ -116,7 +122,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
 
 class WidgetPDial {: {public Fl_Dial}
 } {
-  Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
+  Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {open} {
     code {
         callback(value_cb, (void*)this);
         Fl_Group *save = Fl_Group::current();
@@ -126,12 +132,22 @@ class WidgetPDial {: {public Fl_Dial}
         oldvalue = 0.0;
         pos = false;
         textset = false;
+        midiControlled = false;
+        Controllable = false;
+        justCreated = true;
     } {}
   }
   Function {~WidgetPDial()} {} {
-    code {delete tipwin;} {}
+    code {list<midiController>::iterator i;
+        for(i=synth->assignedMidiControls.begin();i!=synth->assignedMidiControls.end();i++) {
+            if (i->knob==this) i->removeDialPointer();
+        }
+         delete tipwin;} {}
   }
-  Function {handle(int event)} {return_type int
+  Function {callback(Fl_Callback* cb)} {} {
+    code {Fl_Widget::callback(cb);} {}
+  }
+  Function {handle(int event)} {open return_type int
   } {
     code {
         double dragsize, v, min = minimum(), max = maximum();
@@ -140,6 +156,30 @@ class WidgetPDial {: {public Fl_Dial}
         {
             case FL_PUSH:
                  oldvalue = value();
+                 //right click menu:
+                  if ( Fl::event_button() == FL_RIGHT_MOUSE ) {
+                        if (Controllable) {
+                            Fl_Menu_Item rclick_menu[] = {
+                                { "Reset", 0, reset},
+                                { "Midi Learn",  0, stampa, (void*)1 },
+                                { 0 }
+                            };
+                            if (midiControlled) {
+                                Fl_Menu_Item item = {"Remove midi control", 0, stampa, (void*)1};
+                                rclick_menu[1] = item;
+                            }
+                            const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                            if ( m ) m->do_callback(this, m->user_data());
+                         } else {
+                            Fl_Menu_Item rclick_menu[] = {
+                                { "Reset", 0, reset},
+                                { 0 }
+                            };
+                            const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                            if ( m ) m->do_callback(this, m->user_data());
+                         }
+                    }
+                return 1;
             case FL_DRAG:
                  if(!pos)
                  {
@@ -209,21 +249,29 @@ class WidgetPDial {: {public Fl_Dial}
   }
   Function {draw()} {} {
     code {
+        checkSetParameter();
         int cx = x(), cy = y(), sx = w(), sy = h();
+
         double d = (sx>sy)?sy:sx; // d = the smallest side -2
         double dh = d/2;
+
         fl_color(170,170,170);
         fl_pie(cx - 2, cy - 2, d + 4, d + 4, 0, 360);
+
         double val = (value() - minimum()) / (maximum() - minimum());
+
         cairo_t *cr;
         cairo_surface_t* Xsurface = cairo_xlib_surface_create(fl_display, fl_window, fl_visual->visual,Fl_Window::current()->w(), Fl_Window::current()->h());
         cr = cairo_create (Xsurface);
         cairo_translate(cr,cx+dh,cy+dh);
+
         //relative lenghts of the various parts:
         double rCint = 10.5/35;
         double rCout = 13.0/35;
         double rHand = 8.0/35;
         double rGear = 15.0/35;
+
+
         //drawing base dark circle
         if (active_r()) {
             cairo_pattern_create_rgb(51.0/255,51.0/255,51.0/255);
@@ -232,6 +280,7 @@ class WidgetPDial {: {public Fl_Dial}
         }
         cairo_arc(cr,0,0,dh,0,2*M_PI);
         cairo_fill(cr);
+
         cairo_pattern_t* pat;
         //drawing the inner circle:
         pat = cairo_pattern_create_linear(0.5*dh,0.5*dh,0,-0.5*dh);
@@ -249,7 +298,15 @@ class WidgetPDial {: {public Fl_Dial}
         cairo_fill(cr);
         //drawing the "light" circle:
         if (active_r()) {
-            cairo_set_source_rgb(cr,0,197.0/255,245.0/255); //light blue
+            if(midiControlled) {
+                cairo_set_source_rgb(cr,1,1,0); //yellow
+            } else {
+                if (Controllable) {
+                    cairo_set_source_rgb(cr,0,197.0/255,245.0/255); //light blue
+                } else {
+                    cairo_set_source_rgb(cr,245.0,197.0/255,0/255); //red
+                }
+            }
         } else {
             cairo_set_source_rgb(cr,0.6,0.7,0.8);
         }
@@ -271,8 +328,9 @@ class WidgetPDial {: {public Fl_Dial}
         cairo_stroke (cr);
         //freeing the resources
         cairo_pattern_destroy(pat);
-        cairo_surface_destroy(Xsurface);  cairo_destroy(cr);
-    } {}
+        cairo_surface_destroy(Xsurface);
+        cairo_destroy(cr);
+      } {}
   }
   Function {pdialcolor(int r,int g,int b)} {} {
     code {
@@ -298,8 +356,73 @@ class WidgetPDial {: {public Fl_Dial}
         textset = true;
     } {}
   }
+
+  Function {reset(Fl_Widget* w, void* v)} {open return_type {static void}
+  } {
+    code {Fl_Valuator* dial = (Fl_Valuator*)w;
+        dial->value((dial->maximum()-dial->minimum())/2);
+        dial->do_callback();} {}
+  }
+  Function {setMidiControlled(bool b)} {open return_type void
+  } {
+    code {midiControlled = b;
+        this->redraw();} {}
+  }
+  Function {checkSetParameter()} {open private return_type void
+  } {
+    code {if (!justCreated) return;
+          if (param.duplicated) return;
+            
+            param = midiController::whichParameterDoesThisDialControl(this);
+            if (param.paramName!=parID::PNullParam) {Controllable=true;}
+            list<midiController>::iterator i;
+            for(i=synth->assignedMidiControls.begin();i!=synth->assignedMidiControls.end();i++) {
+               i->dialCreated(this);
+            }
+            if(this->active_r()==true) justCreated=false;} {}
+  }
+  decl {using Fl_Widget::callback;} {public
+  }
+
   decl {bool textset;} {}
   decl {bool pos;} {}
   decl {double oldvalue;} {}
   decl {TipWin *tipwin;} {}
+
+  decl {bool midiControlled; bool Controllable;} {public
+  }
+  decl {parameterStruct param;} {public
+  }
+  Function {stampa(Fl_Widget *w, void *v)} {open return_type {static void}
+  } {
+    code {WidgetPDial *p = (WidgetPDial*)w;
+   if (!p->midiControlled) {
+        synth->addController(1,p);
+        p->setMidiControlled(true);
+        midiccwindow->Show();
+   } else {
+        list<midiController>::iterator i;
+        for(i=synth->assignedMidiControls.begin();i!=synth->assignedMidiControls.end();i++) {
+            if (i->knob==p) {synth->removeController(&(*i));break;}
+        }
+        p->setMidiControlled(false);
+        midiccwindow->updateRack();
+   }} {}
+  }
+  decl {bool justCreated;} {}
+  Function {refreshParameter()} {open selected return_type void
+  } {
+    code {//this function is used by some stuff (eg. the eq. band-specific knobs)
+          //that does not recreate the knobs but just changes what they do
+          justCreated = true;
+          if (midiControlled) {
+              midiControlled = false;
+              list<midiController>::iterator i;
+              for(i=synth->assignedMidiControls.begin();i!=synth->assignedMidiControls.end();i++) {
+                if (i->knob==this) i->removeDialPointer();
+              }
+          }
+          checkSetParameter();} {}
+  }
+
 } 

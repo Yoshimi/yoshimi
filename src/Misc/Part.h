@@ -31,6 +31,7 @@ using namespace std;
 
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
+#include "Params/ParamChangeFunc.h"
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -96,6 +97,7 @@ class Part : private MiscFuncs, SynthHelper
         void setkeylimit(unsigned char Pkeylimit_);
         void setkititemstatus(int kititem, int Penabled_);
         void setVolume(char value);
+        void setPan(char panning);
 
         unsigned char Penabled;
         unsigned char Pvolume;
@@ -139,12 +141,13 @@ class Part : private MiscFuncs, SynthHelper
         float randompan;
         int lastnote;
 
+	void realtimeUpdatePar(parameterStruct *par);
+
 
     private:
         void KillNotePos(int pos);
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
-        void setPan(char panning);
         void Mute(void) { __sync_or_and_fetch(&partMuted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&partMuted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&partMuted, 0) != 0); }

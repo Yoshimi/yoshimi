@@ -319,8 +319,35 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 
 // Controllers
+void SynthEngine::addController(int ccNumber, WidgetPDial* dial) {
+	//midiCCpair temp = {ccNumber, dial};
+        //midiController* temp = new midiController(dial);
+        midiController temp(dial);
+	assignedMidiControls.push_back(temp);
+}
+
+//when the dial widget is destroyed (eg. when the user switches to another part)
+//we have to remove it from the list, to prevent segmentation fault
+void SynthEngine::removeController(midiController* toRemove) {
+        list<midiController>::iterator i;
+	for(i=assignedMidiControls.begin();i!=assignedMidiControls.end();i++) {
+            if (&(*i)==toRemove) {assignedMidiControls.erase(i);break;}
+	}
+}
+
 void SynthEngine::SetController(unsigned char chan, unsigned int type, short int par)
 {
+    list<midiController>::iterator i;
+    for(i=assignedMidiControls.begin();i!=assignedMidiControls.end();i++) {
+        if (i->recording) {
+            i->record(chan,type);
+            printf("RECORDED\n");
+        }
+        if (i->ccNumber==type&&i->midiChannel==chan) {
+            i->execute(par);
+        }
+    }
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {   // Send the controller to all part assigned to the channel
         if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
@@ -357,26 +384,22 @@ void SynthEngine::partonoff(int npart, int what)
 
 
 // Master audio out (the final sound)
-void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS])
+void SynthEngine::MasterAudio(float *outl, float *outr)
 {
-    int npart;
-    for (npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
-    {
-        memset(outl[npart], 0, bufferbytes);
-        memset(outr[npart], 0, bufferbytes);
-    }
+    memset(outl, 0, bufferbytes);
+    memset(outr, 0, bufferbytes);
     if (isMuted())
         return;
 
     actionLock(lock);
 
-    // Compute part samples and store them ->partoutl,partoutr
+    // Compute part samples and store them npart]->partoutl,partoutr
+    int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
         {
             part[npart]->ComputePartSmps();
         }
-
     // Insertion effects
     int nefx;
     for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -401,12 +424,15 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         float oldvol_r = part[npart]->oldvolumer;
         float newvol_l = part[npart]->pannedVolLeft();
         float newvol_r = part[npart]->pannedVolRight();
-        if (aboveAmplitudeThreshold(oldvol_l, newvol_l) || aboveAmplitudeThreshold(oldvol_r, newvol_r))
+        if (aboveAmplitudeThreshold(oldvol_l, newvol_l)
+            || aboveAmplitudeThreshold(oldvol_r, newvol_r))
         {   // the volume or the panning has changed and needs interpolation
             for (int i = 0; i < buffersize; ++i)
             {
-                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i, buffersize);
-                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i, buffersize);
+                float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i,
+                                                   buffersize);
+                float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i,
+                                                   buffersize);
                 part[npart]->partoutl[i] *= vol_l;
                 part[npart]->partoutr[i] *= vol_r;
             }
@@ -467,28 +493,18 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         float outvol = sysefx[nefx]->sysefxgetvolume();
         for (int i = 0; i < buffersize; ++i)
         {
-            outl[NUM_MIDI_PARTS][i] += tmpmixl[i] * outvol;
-            outr[NUM_MIDI_PARTS][i] += tmpmixr[i] * outvol;
+            outl[i] += tmpmixl[i] * outvol;
+            outr[i] += tmpmixr[i] * outvol;
         }
     }
 
-    // Copy all parts
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        for (int i = 0; i < buffersize; ++i)
-        {
-            outl[npart][i] = part[npart]->partoutl[i];
-            outr[npart][i] = part[npart]->partoutr[i];
-        }
-    }
-
-    // Mix all parts to mixed outputs
+    // Mix all parts
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         for (int i = 0; i < buffersize; ++i)
         {   // the volume did not change
-            outl[NUM_MIDI_PARTS][i] += outl[npart][i];
-            outr[NUM_MIDI_PARTS][i] += outr[npart][i];
+            outl[i] += part[npart]->partoutl[i];
+            outr[i] += part[npart]->partoutr[i];
         }
     }
 
@@ -497,7 +513,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     {
         if (Pinsparts[nefx] == -2)
         {
-            insefx[nefx]->out(outl[NUM_MIDI_PARTS], outr[NUM_MIDI_PARTS]);
+            insefx[nefx]->out(outl, outr);
         }
     }
 
@@ -513,61 +529,41 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
     vupeakLock(unlock);
 
     float absval;
-    //Per output master volume and fade
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        for (int idx = 0; idx < buffersize; ++idx)
-        {
-            outl[npart][idx] *= volume; // apply Master Volume
-            outr[npart][idx] *= volume;
-
-            if (shutup) // fade-out
-            {
-                float fade = (float) (buffersize - idx) / (float) buffersize;
-                outl[npart][idx] *= fade;
-                outr[npart][idx] *= fade;
-            }
-        }
-    }
-
-    //Master volume and clip calculation for mixed outputs
     for (int idx = 0; idx < buffersize; ++idx)
     {
-        outl[NUM_MIDI_PARTS][idx] *= volume; // apply Master Volume
-        outr[NUM_MIDI_PARTS][idx] *= volume;
+        outl[idx] *= volume; // apply Master Volume
+        outr[idx] *= volume;
 
-        if ((absval = fabsf(outl[NUM_MIDI_PARTS][idx])) > vuoutpeakl) // Peak computation (for vumeters)
+        if ((absval = fabsf(outl[idx])) > vuoutpeakl) // Peak computation (for vumeters)
             vuoutpeakl = absval;
-        if ((absval = fabsf(outr[NUM_MIDI_PARTS][idx])) > vuoutpeakr)
+        if ((absval = fabsf(outr[idx])) > vuoutpeakr)
             vuoutpeakr = absval;
-        vurmspeakl += outl[NUM_MIDI_PARTS][idx] * outl[NUM_MIDI_PARTS][idx]; // RMS Peak
-        vurmspeakr += outr[NUM_MIDI_PARTS][idx] * outr[NUM_MIDI_PARTS][idx];
+        vurmspeakl += outl[idx] * outl[idx];  // RMS Peak
+        vurmspeakr += outr[idx] * outr[idx];
 
         // check for clips
-        if (outl[NUM_MIDI_PARTS][idx] > 1.0f)
+        if (outl[idx] > 1.0f)
             clippedL = true;
-        else if (outl[NUM_MIDI_PARTS][idx] < -1.0f)
+        else if (outl[idx] < -1.0f)
             clippedL = true;
-        if (outr[NUM_MIDI_PARTS][idx] > 1.0f)
+        if (outr[idx] > 1.0f)
             clippedR = true;
-        else if (outr[NUM_MIDI_PARTS][idx] < -1.0f)
+        else if (outr[idx] < -1.0f)
             clippedR = true;
 
         if (shutup) // fade-out
         {
-            float fade = (float) (buffersize - idx) / (float) buffersize;
-            outl[NUM_MIDI_PARTS][idx] *= fade;
-            outr[NUM_MIDI_PARTS][idx] *= fade;
+            float fade = (float)(buffersize - idx) / (float)buffersize;
+            outl[idx] *= fade;
+            outr[idx] *= fade;
         }
     }
     if (shutup)
         ShutUp();
 
     vupeakLock(lock);
-    if (vumaxoutpeakl < vuoutpeakl)
-        vumaxoutpeakl = vuoutpeakl;
-    if (vumaxoutpeakr < vuoutpeakr)
-        vumaxoutpeakr = vuoutpeakr;
+    if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;
+    if (vumaxoutpeakr < vuoutpeakr)  vumaxoutpeakr = vuoutpeakr;
 
     vurmspeakl = sqrtf(vurmspeakl / buffersize);
     vurmspeakr = sqrtf(vurmspeakr / buffersize);
@@ -591,14 +587,14 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MID
         else if (fakepeakpart[npart] > 1)
             fakepeakpart[npart]--;
     }
-    vuOutPeakL = vuoutpeakl;
-    vuOutPeakR = vuoutpeakr;
+    vuOutPeakL =    vuoutpeakl;
+    vuOutPeakR =    vuoutpeakr;
     vuMaxOutPeakL = vumaxoutpeakl;
     vuMaxOutPeakR = vumaxoutpeakr;
-    vuRmsPeakL = vurmspeakl;
-    vuRmsPeakR = vurmspeakr;
-    vuClippedL = clippedL;
-    vuClippedR = clippedR;
+    vuRmsPeakL =    vurmspeakl;
+    vuRmsPeakR =    vurmspeakr;
+    vuClippedL =    clippedL;
+    vuClippedR =    clippedR;
     vupeakLock(unlock);
 }
 
@@ -736,6 +732,17 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     microtonal.add2XML(xml);
     xml->endbranch();
 
+    //assigned midi controllers:
+    xml->beginbranch("MIDI_CONTROLLERS");
+    int nMidiController = 0;
+    for(list<midiController>::iterator i=assignedMidiControls.begin();i!=assignedMidiControls.end();i++) {
+        xml->beginbranch("MIDI_CONTROLLER",nMidiController);
+        i->add2XML(xml);
+        xml->endbranch();
+        nMidiController++;
+    }
+    xml->endbranch();
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         xml->beginbranch("PART",npart);
@@ -869,6 +876,18 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     if (xml->enterbranch("MICROTONAL"))
     {
         microtonal.getfromXML(xml);
+        xml->exitbranch();
+    }
+
+    //assigned midi controllers:
+    if (xml->enterbranch("MIDI_CONTROLLERS") ) {
+        int nMidiController = 0;
+        while (xml->enterbranch("MIDI_CONTROLLER",nMidiController)) {
+            midiController temp(xml);
+            assignedMidiControls.push_back(temp);
+            xml->exitbranch();
+            nMidiController++;
+        }
         xml->exitbranch();
     }
 

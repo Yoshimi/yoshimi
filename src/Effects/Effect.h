@@ -48,15 +48,17 @@ class Effect
         float volume;
         FilterParams *filterpars;
 
-    protected:
+        //TODO FIXME OMGZ: fix things and move this back to protected
+        char  Ppanning;
+        char  Plrcross; // L/R mix
+
+protected:
         void setpanning(char Ppanning_);
         void setlrcross(char Plrcross_);
 
         bool  insertion;
-        char  Ppanning;
         float pangainL;
         float pangainR;
-        char  Plrcross; // L/R mix
         float lrcross;
 };
 

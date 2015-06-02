@@ -29,6 +29,7 @@
 #include "Synth/Carcass.h"
 #include "Synth/LegatoTypes.h"
 #include "Misc/Float2Int.h"
+#include "Params/ParamChangeFunc.h"
 
 class ADnoteParameters;
 class Controller;
@@ -55,6 +56,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         void ADlegatonote(float freq_, float velocity_, int portamento_,
                           int midinote_, bool externcall);
         char ready;
+        void realtimeUpdatePar(parameterStruct *par);
 
     private:
 

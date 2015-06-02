@@ -28,8 +28,10 @@
 #include "Synth/LFO.h"
 
 
-LFO::LFO(LFOParams *lfopars, float basefreq)
+LFO::LFO(LFOParams *lfopars, float basefreq_)
 {
+    pars = lfopars;
+    basefreq = basefreq_;
     if (lfopars->Pstretch == 0)
         lfopars->Pstretch = 1;
     float lfostretch =
@@ -171,4 +173,33 @@ void LFO::computenextincrnd(void)
         return;
     incrnd = nextincrnd;
     nextincrnd = powf(0.5f, lfofreqrnd) + synth->numRandom() * (powf(2.0f, lfofreqrnd) - 1.0f);
+}
+
+void LFO::updatePars() {
+    //update depth:
+    switch (pars->fel)
+    {
+        case 1:
+            lfointensity = pars->Pintensity / 127.0f;
+            break;
+        case 2:
+            lfointensity = pars->Pintensity / 127.0f * 4.0f;
+            break; // in octave
+        default:
+            lfointensity = powf(2.0f, pars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
+            x -= 0.25f; // chance the starting phase
+            break;
+    }
+    //update freq
+     float lfostretch =
+        powf(basefreq / 440.0f, (pars->Pstretch - 64.0f) / 63.0f); // max 2x/octave
+
+    float lfofreq =
+        (powf(2.0f, pars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
+    incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
+
+    // Limit the Frequency(or else...)
+    if (incx > 0.49999999f)
+        incx = 0.499999999f;
+
 }

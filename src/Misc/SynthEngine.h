@@ -35,6 +35,10 @@ using namespace std;
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
+#include "Params/midiController.h"
+#include "WidgetPDialUI.h"
+#include <FL/Fl_Valuator.H>
+#include <list>
 
 typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
@@ -70,7 +74,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);
-        void MasterAudio(float *outl [NUM_MIDI_PARTS], float *outr [NUM_MIDI_PARTS]);
+        void MasterAudio(float *outl, float *outr);
         void partonoff(int npart, int what);
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
@@ -78,6 +82,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         Part *part[NUM_MIDI_PARTS];
         bool shutup;
+
+        //midi learn:
+        void addController(int ccNumber, WidgetPDial* dial);
+        void removeController(midiController* toRemove);
 
         // parameters
         unsigned int samplerate;
@@ -130,7 +138,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool vuClippedL;
         bool vuClippedR;
 
-
+        list<midiController> assignedMidiControls; //contains all the pairs 'recived midi cc'->'action to execute'
+        
     private:
         int muted;
         float volume;

@@ -29,30 +29,20 @@ using namespace std;
 #include "MusicIO/MusicIO.h"
 
 MusicIO::MusicIO() :
+    zynLeft(NULL),
+    zynRight(NULL),
     interleavedShorts(NULL),
     rtprio(25)
-{
-    memset(zynLeft, 0, sizeof(float) * (NUM_MIDI_PARTS + 1));
-    memset(zynRight, 0, sizeof(float) * (NUM_MIDI_PARTS + 1));
-}
+{ }
 
 MusicIO::~MusicIO()
 {
-    for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
-    {
-        if (zynLeft[npart])
-        {
-            fftwf_free(zynLeft[npart]);
-            zynLeft[npart] = NULL;
-        }
-        if (zynRight[npart])
-        {
-            fftwf_free(zynRight[npart]);
-            zynRight[npart] = NULL;
-        }
-    }
+    if (zynLeft)
+        fftwf_free(zynLeft);
+    if (zynRight)
+        fftwf_free(zynRight);
     if (interleavedShorts)
-        delete[] interleavedShorts;
+        delete [] interleavedShorts;
 }
 
 
@@ -63,10 +53,10 @@ void MusicIO::InterleaveShorts(void)
     double scaled;
     for (int frame = 0; frame < buffersize; ++frame)
     {   // with a grateful nod to libsamplerate ...
-        scaled = zynLeft[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
-        scaled = zynRight[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
+        scaled = zynLeft[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
+        scaled = zynRight[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
     }
 }
 
@@ -153,44 +143,37 @@ bool MusicIO::prepBuffers(bool with_interleaved)
     int buffersize = getBuffersize();
     if (buffersize > 0)
     {
-        for (int part = 0; part < (NUM_MIDI_PARTS + 1); part++)
-        {
-            if (!(zynLeft[part] = (float*) fftwf_malloc(buffersize * sizeof(float))))
-                goto bail_out;
-            if (!(zynRight[part] = (float*) fftwf_malloc(buffersize * sizeof(float))))
-                goto bail_out;
-            memset(zynLeft[part], 0, buffersize * sizeof(float));
-            memset(zynRight[part], 0, buffersize * sizeof(float));
-
-        }
+        if (!(zynLeft = (float*)fftwf_malloc(buffersize * sizeof(float))))
+            goto bail_out;
+        if (!(zynRight = (float*)fftwf_malloc(buffersize * sizeof(float))))
+            goto bail_out;
+        memset(zynLeft, 0, buffersize * sizeof(float));
+        memset(zynRight, 0, buffersize * sizeof(float));
         if (with_interleaved)
         {
             interleavedShorts = new short int[buffersize * 2];
             if (NULL == interleavedShorts)
                 goto bail_out;
-            memset(interleavedShorts, 0, sizeof(short int) * buffersize * 2);
+            memset(interleavedShorts, 0,  sizeof(short int) * buffersize * 2);
         }
         return true;
     }
 
 bail_out:
     Runtime.Log("Failed to allocate audio buffers, size " + asString(buffersize));
-    for (int part = 0; part < (NUM_MIDI_PARTS + 1); part++)
+    if (zynLeft)
     {
-        if (zynLeft[part])
-        {
-            fftwf_free(zynLeft[part]);
-            zynLeft[part] = NULL;
-        }
-        if (zynRight[part])
-        {
-            fftwf_free(zynRight[part]);
-            zynRight[part] = NULL;
-        }
+        fftwf_free(zynLeft);
+        zynLeft = NULL;
+    }
+    if (zynRight)
+    {
+        fftwf_free(zynRight);
+        zynRight = NULL;
     }
     if (interleavedShorts)
     {
-        delete[] interleavedShorts;
+        delete [] interleavedShorts;
         interleavedShorts = NULL;
     }
     return false;

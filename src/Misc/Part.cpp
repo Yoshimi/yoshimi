@@ -1347,3 +1347,13 @@ void Part::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 }
+
+void Part::realtimeUpdatePar(parameterStruct *par) {
+    for (int i = 0; i < POLIPHONY; ++i) {
+        if (partnote[i].status != KEY_OFF)  {
+            if (partnote[i].kititem[par->kitItemN].adnote!=NULL) {
+                partnote[i].kititem[par->kitItemN].adnote->realtimeUpdatePar(par);
+            }
+        }
+    }
+}

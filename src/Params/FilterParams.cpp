@@ -389,3 +389,11 @@ void FilterParams::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 }
+
+void FilterParams::realtimeUpdateF(unsigned char f) {
+    Pfreq = f;
+}
+
+void FilterParams::realtimeUpdateQ(unsigned char q) {
+    Pq = q;
+}

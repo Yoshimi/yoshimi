@@ -40,7 +40,6 @@ class Chorus : public Effect
         unsigned char getpar(int npar);
         void cleanup();
 
-    private:
         // Chorus Parameters
         unsigned char Pvolume;
         unsigned char Pdepth;      // the depth of the Chorus(ms)
@@ -50,6 +49,7 @@ class Chorus : public Effect
         unsigned char Poutsub;     // if I wish to substract the output instead of the adding it
         EffectLFO lfo;             // lfo-ul chorus
 
+    private:
 
         // Parameter Controls
         void setvolume(unsigned char Pvolume_);

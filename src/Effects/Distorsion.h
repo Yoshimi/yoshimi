@@ -42,7 +42,6 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         void cleanup(void);
         void applyfilters(float *efxoutl, float *efxoutr);
 
-    private:
         // Parametrii
         unsigned char Pvolume;       // Volumul or E/R
         unsigned char Pdrive;        // the input amplification
@@ -54,6 +53,7 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         unsigned char Pstereo;       // 0 = mono, 1 = stereo
         unsigned char Pprefiltering; // if you want to do the filtering before the distorsion
 
+    private:
         void setvolume(unsigned char Pvolume_);
         void setlpf(unsigned char Plpf_);
         void sethpf(unsigned char Phpf_);

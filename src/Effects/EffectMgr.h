@@ -72,10 +72,10 @@ class EffectMgr : public Presets
         float getEQfreqresponse(float freq);
 
         FilterParams *filterpars;
+        Effect *efx;
 
     private:
         int nefx;
-        Effect *efx;
         bool dryonly;
 };
 

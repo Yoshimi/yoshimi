@@ -41,14 +41,14 @@ class EQ : public Effect, private MiscFuncs
         void cleanup(void);
         float getfreqresponse(float freq);
 
-    private:
         // Parameters
         unsigned char Pvolume;
-        void setvolume(unsigned char Pvolume_);
         struct {
             unsigned char Ptype, Pfreq, Pgain, Pq, Pstages; // parameters
             AnalogFilter *l, *r; // internal values
         } filter[MAX_EQ_BANDS];
+    private:
+        void setvolume(unsigned char Pvolume_);
 };
 
 #endif

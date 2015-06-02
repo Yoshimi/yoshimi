@@ -58,6 +58,9 @@ class XMLwrapper : private MiscFuncs
         // add string parameter (name and string)
         void addparstr(const string& name, const string& val);
 
+        //add a string parameter passed in the form of a char*
+        void addparcharpointer(const string name, char* str);
+
         // add a branch
         void beginbranch(const string& name);
         void beginbranch(const string& name, int id);

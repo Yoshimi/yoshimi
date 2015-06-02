@@ -155,7 +155,6 @@ else(FONTCONFIG_FOUND)
     message (FATAL_ERROR "fontconfig>=0.22 required but not found")
 endif(FONTCONFIG_FOUND)
 
-
 # libcairo
 pkg_check_modules (LIBCAIRO REQUIRED cairo)
 if (LIBCAIRO_FOUND)
@@ -163,7 +162,6 @@ if (LIBCAIRO_FOUND)
 else (LIBCAIRO_FOUND)
     message (FATAL_ERROR "libcairo required but not found")
 endif (LIBCAIRO_FOUND)
-
 
 # fltk
 find_package (FLTK REQUIRED)
@@ -183,6 +181,7 @@ set (GuiFluids
     UI/EffUI.fl  UI/BankUI.fl  UI/PartUI.fl
     UI/MicrotonalUI.fl  UI/MasterUI.fl    UI/MasterMiscUI.fl
     UI/ParametersUI.fl UI/ConsoleUI.fl
+    UI/MidiControllerUI.fl 
 )
 
 fltk_wrap_ui (yoshimi ${GuiFluids})
@@ -234,12 +233,13 @@ set (Params_sources
     Params/FilterParams.cpp  Params/LFOParams.cpp
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
     Params/Controller.cpp  Params/Presets.cpp Params/PresetsStore.cpp
+    Params/midiController.cpp Params/ParamChangeFunc.cpp
 )
 
 set (Synth_sources
     Synth/ADnote.cpp  Synth/Envelope.cpp  Synth/LFO.cpp  Synth/OscilGen.cpp
     Synth/SUBnote.cpp  Synth/Resonance.cpp  Synth/PADnote.cpp
-    Synth/BodyDisposal.cpp
+    Synth/BodyDisposal.cpp 
 )
 
 set (MusicIO_sources
@@ -259,7 +259,7 @@ add_definitions (
 add_definitions (-DMAX_BANK_ROOT_DIRS=128)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
-add_definitions (-DPAD_MAX_SAMPLES=96)
+add_definitions (-DPAD_MAX_SAMPLES=64)
 add_definitions (-DNUM_MIDI_PARTS=16)
 add_definitions (-DNUM_MIDI_CHANNELS=16)
 add_definitions (-DMAX_ENVELOPE_POINTS=40)
@@ -355,6 +355,7 @@ set(ExternLibraries
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
     z
+    dl
 )
 
 add_executable (yoshimi ${ProgSources} main.cpp)

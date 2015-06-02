@@ -72,6 +72,9 @@ decl {\#include "ConsoleUI.h"} {public
 decl {\#include "MasterMiscUI.h"} {public
 } 
 
+decl {\#include "MidiControllerUI.h"} {public
+} 
+
 decl {\#include "Misc/SynthEngine.h"} {public
 } 
 
@@ -96,6 +99,7 @@ class MasterUI {open : {private MiscFuncs}
           syseffsend[i][j] = NULL;
       swapefftype = 0;
       microtonalui = NULL;
+      midiccwindow = NULL;
       bankui = NULL;
       virkeyboard = NULL;
       configui = NULL;
@@ -118,6 +122,11 @@ class MasterUI {open : {private MiscFuncs}
       {
         microtonalui->Hide();
         delete microtonalui;
+      }
+      if (midiccwindow)
+      {
+        //midiccwindow->hide();
+        delete midiccwindow;
       }
       if (bankui)
       {
@@ -157,6 +166,7 @@ class MasterUI {open : {private MiscFuncs}
       bankui = new BankUI(&npart);
       virkeyboard = new VirKeyboard();
       configui = new ConfigUI();
+      midiccwindow = new MidiCCWindow(0,0,316,400,"Midi Controllers");
       presetsui = new PresetsUI();
       paramsui = new ParametersUI();
       yoshiLog = new ConsoleUI();
@@ -192,6 +202,11 @@ class MasterUI {open : {private MiscFuncs}
             label {&Console}
             callback {yoshiLog->Show();}
             tooltip {Show message log} xywh {15 15 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&MIDI controllers}
+            callback {midiccwindow->Show();}
+            tooltip {mapping of midi cc signals} xywh {15 15 100 20} labelsize 12
           }
           MenuItem {} {
             label {&Settings...}
@@ -770,7 +785,7 @@ ZynAddSubFX}
     }
     Fl_Window panelwindow {
       label {Yoshimi Panel}
-      xywh {402 107 635 635} type Double labelfont 13 labelsize 13 hide
+      xywh {402 107 630 635} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {
         xywh {0 5 570 310} type HORIZONTAL box THIN_UP_BOX
@@ -803,7 +818,7 @@ ZynAddSubFX}
       Fl_Button {} {
         label Close
         callback {panelwindow->hide(); updatepanel();}
-        xywh {575 604 55 25} box THIN_UP_BOX labelsize 13
+        xywh {575 605 50 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label Refresh
@@ -862,6 +877,7 @@ ZynAddSubFX}
         }
         synth->actionLock(lockmute);
         synth->defaults(); // clear all parameters
+        synth->assignedMidiControls.clear(); //clear the midiControllers
         int result = synth->loadXML(fname); // load the data
         synth->applyparameters();
         synth->actionLock(unlock);
@@ -927,7 +943,9 @@ ZynAddSubFX}
         inseffnocounter->do_callback();
         masterkeyshift->value(synth->Pkeyshift - 64);
         mastervolumedial->value(synth->Pvolume);
+        mastervolumedial->refreshParameter();
         globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
+        globalfinedetune->refreshParameter();
         microtonalui = new MicrotonalUI(&synth->microtonal);
         updatesendwindow();
         updatepanel();

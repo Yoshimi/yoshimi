@@ -41,7 +41,6 @@ class Echo : public Effect
         void cleanup(void);
         void setdryonly(void);
 
-    private:
         // Parameters
         unsigned char Pvolume;  // 1 Volume or Dry/Wetness
         unsigned char Pdelay;   // 3 Delay of the Echo
@@ -49,6 +48,7 @@ class Echo : public Effect
         unsigned char Pfb;      // 6 Feedback
         unsigned char Phidamp;  // 7 Dampening of the Echo
 
+    private:
         void setvolume(unsigned char Pvolume_);
         void setdelay(unsigned char Pdelay_);
         void setlrdelay(unsigned char Plrdelay_);

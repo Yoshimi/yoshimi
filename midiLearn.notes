@@ -1,0 +1,23 @@
+============Realtime parameter change==================
+
+[[DONE]]:-----------------
+_______________ADsynth Global Parameters:______________
+* LFOs (amplitude, frequency, filter)
+* Filter: Freq, Q
+_______________________________________________________
+
+* all part/system effects
+
+[[TODO]]:-----------------
+
+_______________ADsynth Global Parameters:______________
+* panning
+_______________________________________________________
+
+_______________ADsynth Voice Parameters:_______________
+* Amplitude LFO
+* Frequency LFO
+* Filter LFO
+* Filter: Freq, Q
+_______________________________________________________
+

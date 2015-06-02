@@ -1920,3 +1920,26 @@ void ADnote::relasekey(void)
 }
 
 // for future reference ... re replacing pow(x, y) by exp(y * log(x))
+
+
+void ADnote::realtimeUpdatePar(parameterStruct *par) {
+    switch (par->paramName) {
+        case parID::PAddSynthAmpLfoIntensity: case parID::PAddSynthAmpLfoFreq:
+            NoteGlobalPar.AmpLfo->updatePars();
+            break;
+        case parID::PAddSynthFreqLfoIntensity: case parID::PAddSynthFreqLfoFreq:
+            NoteGlobalPar.FreqLfo->updatePars();
+            break;
+        case parID::PAddSynthFilterLfoIntensity: case parID::PAddSynthFilterLfoFreq:
+            NoteGlobalPar.FilterLfo->updatePars();
+            break;
+        case parID::PAddFilter1: //f
+            adpars->GlobalPar.GlobalFilter->realtimeUpdateF(*((unsigned char*)par->paramPointer));
+            NoteGlobalPar.FilterCenterPitch = adpars->GlobalPar.GlobalFilter->getfreq() + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f * (velF(velocity, adpars->GlobalPar.PFilterVelocityScaleFunction) - 1);
+            break;
+        case parID::PAddFilter2: //Q
+            adpars->GlobalPar.GlobalFilter->realtimeUpdateQ(*((unsigned char*)par->paramPointer));
+            NoteGlobalPar.FilterQ = adpars->GlobalPar.GlobalFilter->getq();
+            break;
+    }
+}

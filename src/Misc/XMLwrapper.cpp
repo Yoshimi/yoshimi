@@ -195,6 +195,12 @@ void XMLwrapper::addparstr(const string& name, const string& val)
     mxmlNewText(element, 0, val.c_str());
 }
 
+void XMLwrapper::addparcharpointer(const string name, char* str)
+{
+    mxml_node_t *element = mxmlNewElement(node, "string");
+    mxmlElementSetAttr(element, "name", name.c_str() );
+    mxmlNewText(element, 0, str);
+}
 
 void XMLwrapper::beginbranch(const string& name)
 {

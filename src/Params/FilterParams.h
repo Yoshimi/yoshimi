@@ -64,6 +64,9 @@ class FilterParams : public Presets, private MiscFuncs
         float getformantq(unsigned char q)
             { return powf(25.0f, (q - 32.0f) / 64.0f); }
 
+        void realtimeUpdateF(unsigned char f);
+        void realtimeUpdateQ(unsigned char q);
+
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)
         unsigned char Pfreq;      // Frequency (64-central frequency)

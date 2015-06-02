@@ -30,12 +30,15 @@
 class LFO
 {
     public:
-        LFO(LFOParams *lfopars, float basefreq);
+        LFO(LFOParams *lfopars, float basefreq_);
         ~LFO() { };
         float lfoout(void);
         float amplfoout(void);
+        void updatePars();
+        LFOParams *pars;
     private:
         void computenextincrnd(void);
+        float basefreq;
         float x;
         float incx, incrnd, nextincrnd;
         float amp1, amp2; // used for randomness

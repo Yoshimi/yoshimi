@@ -42,8 +42,8 @@ class MusicIO : virtual protected MiscFuncs
         void setMidiNote(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 
-        float *zynLeft [NUM_MIDI_PARTS + 1];
-        float *zynRight [NUM_MIDI_PARTS + 1];
+        float *zynLeft;
+        float *zynRight;
         short int *interleavedShorts;
         int rtprio;
 };

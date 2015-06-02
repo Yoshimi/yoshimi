@@ -1051,7 +1051,11 @@ int q=eff->geteffectpar(npb+3);
 qdial->value(q);
 
 int dbl=eff->geteffectpar(npb+4);
-stagescounter->value(dbl);}
+stagescounter->value(dbl);
+            gaindial->refreshParameter();
+            freqdial->refreshParameter();
+            qdial->refreshParameter();
+}
         tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 textsize 11
         code0 {o->bounds(0,MAX_EQ_BANDS-1);}
       }

@@ -1,0 +1,247 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cpp}
+comment {Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009-2010, Alan Calvert
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is a derivative of the ZynAddSubFX original, modified January 2010
+} {in_source in_header
+} 
+
+decl {\#include "WidgetPDialUI.h"
+\#include "WidgetPDialUI.h"
+\#include <FL/Fl_Button.H>
+\#include <FL/Fl_Spinner.H>
+\#include <FL/Fl_Input.H>
+\#include <FL/Fl_Double_Window.H>
+\#include <FL/Fl_Scroll.H>
+\#include <FL/Fl_Value_Input.H>} {public global
+} 
+
+decl {\#include <stdio.h>
+\#include "Misc/MiscFuncs.h"
+\#include "Misc/SynthEngine.h"} {public
+} 
+
+decl {MidiCCWindow* midiccwindow = NULL;} {global
+} 
+
+class MidiCCRack {open : {public Fl_Group}
+} {
+  decl {Fl_Group* embossedGroup;WidgetPDial* dial;Fl_Input* title;Fl_Spinner* spinner;Fl_Spinner* Channelspinner;midiController* controller;
+    Fl_Value_Input* maxInput; Fl_Value_Input* minInput;} {}
+  Function {MidiCCRack(int x, int y, int w, int h) : Fl_Group(x,y,w,h)} {open
+  } {
+    code {embossedGroup = new Fl_Group(x, y, 300, 80);
+        embossedGroup->box(FL_EMBOSSED_BOX);
+        embossedGroup->align(FL_ALIGN_TOP|FL_ALIGN_INSIDE);
+        title = new Fl_Input(x+2, y+2, 280-4, 20);
+          title->color((Fl_Color)91);
+          title->labelsize(10);
+          title->textsize(10);
+          title->callback(titleCallback);
+          title->when(FL_WHEN_CHANGED);
+        dial = new WidgetPDial(x+15, y+28, 35, 35, "");
+          dial->maximum(127);
+          dial->step(1);
+          dial->labelsize(10);
+          dial->param.duplicated=1;
+          dial->setMidiControlled(true);
+          dial->callback(dialCallback);
+         spinner = new Fl_Spinner(x+115, y+25, 40, 17, "CC signal:");
+         spinner->maximum(127);
+         spinner->labelsize(10);
+         spinner->textsize(10);
+         spinner->callback(spinnerChanged,this);
+          Fl_Button* rec = new Fl_Button(x+155, y+25, 15, 15, "R");
+          rec->tooltip("Record (click, then move the controller you want to associate with this value)");
+          rec->box(FL_PLASTIC_UP_BOX);
+          rec->color((Fl_Color)90);
+          rec->selection_color((Fl_Color)93);
+          rec->labelsize(10);
+          rec->callback(startRecording,this);
+         Channelspinner = new Fl_Spinner(x+115, y+45, 40, 17, "Channel:");
+         Channelspinner->maximum(127);
+         Channelspinner->labelsize(10);
+         Channelspinner->textsize(10);
+         Channelspinner->callback(channelChanged,this);
+          Fl_Button* removeBtn = new Fl_Button(x+280-1, y+3, 18, 18, "X");
+          removeBtn->color((Fl_Color)9);
+          removeBtn->selection_color((Fl_Color)9);
+          removeBtn->callback(removeController,this);
+          minInput = new Fl_Value_Input(x+230, y+25,35,15,"min val");
+          minInput->tooltip("map 0 on the midi cc to another arbitrary minimum");
+          minInput->maximum(127);
+          minInput->labelsize(10);
+          minInput->textsize(10);
+          minInput->callback(updateMin,this);
+          maxInput = new Fl_Value_Input(x+230, y+50,35,15,"max val");
+          maxInput->tooltip("map 127 on the midi cc to another arbitrary maximum");
+          maxInput->maximum(127);
+          maxInput->value(127);
+          maxInput->labelsize(10);
+          maxInput->textsize(10);
+          maxInput->callback(updateMax,this);
+          Fl_Button* setMinBtn = new Fl_Button(x+265, y+25,24,15,"cur");
+          setMinBtn->tooltip("set current value as minimum");
+          setMinBtn->box(FL_PLASTIC_UP_BOX);
+          setMinBtn->labelsize(10);
+          setMinBtn->callback(setMin, this);
+	  Fl_Button* setMaxBtn = new Fl_Button(x+265, y+50,24,15,"cur");
+          setMaxBtn->tooltip("set current value as maximum");
+          setMaxBtn->box(FL_PLASTIC_UP_BOX);
+          setMaxBtn->labelsize(10);
+          setMaxBtn->callback(setMax, this);
+        embossedGroup->end();
+      end();} {}
+  }
+  Function {setMidiController(midiController* contr)} {open return_type void
+  } {
+    code {controller = contr;
+      title->value(contr->getLabel());
+      spinner->value(contr->ccNumber);
+      Channelspinner->value(contr->midiChannel+1);
+      contr->duplicatedKnobCreated(dial);
+      contr->MidiRackUI = this;
+      dial->maximum(contr->param.max);
+      dial->minimum(contr->param.min);
+      minInput->value(contr->customMin);
+      minInput->minimum(contr->param.min);
+      maxInput->value(contr->customMax);
+      maxInput->minimum(contr->param.max);
+      if(controller->knob!=NULL) {dial->value(controller->knob->value());}} {}
+  }
+  Function {Record(int channel, int ccNumber)} {open return_type void
+  } {
+    code {this->controller->recording=1;
+     this->spinner->value(ccNumber);
+     this->Channelspinner->value(channel+1);} {}
+  }
+  Function {startRecording(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->controller->recording=1;
+     caller->controller->SpinnerInMidiCCPanel=(Fl_Spinner*)(caller->spinner);} {}
+  }
+  Function {removeController(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     synth->removeController(caller->controller);
+     ((MidiCCWindow*)caller->parent()->parent())->updateRack();} {}
+  }
+  Function {spinnerChanged(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+        int value = caller->spinner->value();
+        caller->controller->setMidiCCNumber(value);} {}
+  }
+  Function {channelChanged(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+        int value = caller->Channelspinner->value() -1;
+        caller->controller->setChannel(value);} {}
+  }
+  Function {setMin(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->controller->setMin(caller->dial->value());
+     caller->minInput->value(caller->dial->value());
+    } {}
+  }
+  Function {setMax(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->controller->setMax(caller->dial->value());
+     caller->maxInput->value(caller->dial->value());
+    } {}
+  }
+  Function {updateMin(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+    Fl_Valuator* v = (Fl_Valuator*)w;
+     if (v->value()<caller->controller->param.min) v->value(caller->controller->param.min);
+     caller->controller->setMin(v->value());
+    } {}
+  }
+  Function {updateMax(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+    Fl_Valuator* v = (Fl_Valuator*)w;
+     if (v->value()>caller->controller->param.max) v->value(caller->controller->param.max);
+     caller->controller->setMax(v->value());
+    } {}
+  }
+  Function {dialCallback(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)w->parent()->parent();
+  char val;
+  WidgetPDial* dial = (WidgetPDial*)w;
+  //bring the value back from 0 to 127, as if it was a midi cc signal
+  val = 127*dial->value()/dial->maximum();
+  caller->controller->execute(val,false);} {selected
+    }
+  }
+  Function {titleCallback(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {
+       MidiCCRack* caller = (MidiCCRack*)w->parent()->parent();
+       caller->controller->setLabel(((Fl_Input*)w)->value());
+     } {selected
+    }
+  }
+} 
+
+class MidiCCWindow {open : Fl_Double_Window
+} {
+  Function {MidiCCWindow(int x, int y, int w, int h, const char *title=0):Fl_Double_Window(300,300,w,h,title)} {open return_type void
+  } {
+    code {scrollArea = new Fl_Scroll(0,0,this->w(),this->h(),"");
+      scrollArea->type(Fl_Scroll::VERTICAL_ALWAYS);
+end();
+updateRack();} {}
+  }
+  Function {Show()} {open return_type void
+  } {
+    code {updateRack();
+show();} {}
+  }
+  Function {updateRack()} {open return_type void
+  } {
+    code {printf("updating rack\\n");
+//        scrollArea->hide();
+//        delete scrollArea;
+  //      scrollArea = new Fl_Scroll(0,0,this->w(),this->h(),"");
+//        add(scrollArea);
+	scrollArea->clear();
+
+        list<midiController>::iterator i;
+        int j = 0;
+	for(i=synth->assignedMidiControls.begin();i!=synth->assignedMidiControls.end();i++) {
+            MidiCCRack* temp=new MidiCCRack(0,82*j,300,80);
+            scrollArea->add(temp);
+            //add(temp);
+            temp->setMidiController(&(*i));
+            j++;
+	}
+        redraw();} {}
+  }
+  decl {Fl_Scroll *scrollArea;} {}
+} 
+
+decl {extern MidiCCWindow* midiccwindow;} {public global
+} 
