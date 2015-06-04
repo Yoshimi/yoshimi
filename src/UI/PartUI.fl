@@ -105,9 +105,9 @@ class PartUI_ {} {
 
 class PartKitItem {: {public Fl_Group}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
-    Fl_Window partkititem {open
+    Fl_Window partkititem {
       private xywh {121 479 670 30} type Double hide
       class Fl_Group
     } {
@@ -330,11 +330,11 @@ class PartKitItem {: {public Fl_Group}
   }
 } 
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
-    Fl_Window partgroup {open
+    Fl_Window partgroup {
       xywh {25 620 375 165} type Double hide
       class Fl_Group
     } {
@@ -499,7 +499,7 @@ Offset}
       }
       Fl_Scroll toSysEfx {
         label {System Effect Sends
-} open
+}
         xywh {248 114 127 52} labelsize 11
       } {
         Fl_Pack {} {
@@ -901,7 +901,7 @@ else {propta->deactivate();proptb->deactivate();}}
         callback {instrumentkitlist->hide();}
         xywh {569 348 63 20} box THIN_UP_BOX
       }
-      Fl_Scroll kitlist {open
+      Fl_Scroll kitlist {
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
         code0 {if (part->Pkitmode==0) o->deactivate();}
       } {
@@ -941,7 +941,7 @@ else {propta->deactivate();proptb->deactivate();}}
             if (part->Pkitmode == 0)
                 kitlist->deactivate();
             else
-                kitlist->activate();} open
+                kitlist->activate();}
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 70 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {o->value(part->Pkitmode);}
       } {
@@ -1076,7 +1076,7 @@ else {propta->deactivate();proptb->deactivate();}}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
-          Fl_Box padbox {selected
+          Fl_Box padbox {
             xywh {210 226 89 18} box FLAT_BOX deactivate
             code0 {o->color(PAD_COLOUR);}
             code1 {if (padsynenabledcheck->value() == 0) o->hide();}
@@ -1299,6 +1299,7 @@ else {propta->deactivate();proptb->deactivate();}}
     code {//
     unsigned int engine = find_engines();
     instrumentback->redraw();
+    instrumentback->show();
     if (engine & 1)
     {
         instrumentaddbox->redraw();

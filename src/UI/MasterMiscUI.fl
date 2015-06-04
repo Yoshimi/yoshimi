@@ -85,14 +85,12 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 } 
 
-class VUMeter {open : {public Fl_Box, private MiscFuncs}
+class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
-  Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
-  } {
+  Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
   }
-  Function {init(int part_, SynthEngine *_synth)} {open
-  } {
+  Function {init(int part_, SynthEngine *_synth)} {} {
     code {// the "part_" parameters sets the part (if it is >=0), else it sets the master
 synth = _synth;
     label(NULL);
@@ -116,8 +114,7 @@ synth = _synth;
         synth->VUdata.values.parts[i] = 0.0;
     }} {}
   }
-  Function {draw_master()} {open
-  } {
+  Function {draw_master()} {} {
     code {//
     int ox = x();
     int oy = y();
@@ -239,8 +236,7 @@ synth = _synth;
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
         }} {}
   }
-  Function {draw_part()} {open
-  } {
+  Function {draw_part()} {} {
     code {int ox = x()+2;
     int oy = y()+2;
     int lx = w()-4;
@@ -285,22 +281,21 @@ synth = _synth;
     if (panelpart.clip[npart + *plgroup])
         fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {}
   }
-  Function {draw()} {open
-  } {
+  Function {draw()} {} {
     code {if (npart>=0) draw_part();
     else draw_master();} {}
   }
-  Function {tickdraw(VUMeter *o)} {open return_type {static void}
+  Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
     code {o->redraw();} {}
   }
-  Function {tick(void *v)} {open return_type {static void}
+  Function {tick(void *v)} {return_type {static void}
   } {
     code {tickdraw((VUMeter *) v);
     ((VUMeter *)v)->synth->fetchMeterData(&((VUMeter *) v)->synth->VUdata);
     Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {switch(event){
         case FL_SHOW:
@@ -350,8 +345,7 @@ synth = _synth;
   bool clip[NUM_MIDI_PARTS];
   } panelpart;} {private local
   }
-  Function {resetPart(bool clipOnly = false)} {open
-  } {
+  Function {resetPart(bool clipOnly = false)} {} {
     code {for (int i = 0; i < NUM_MIDI_PARTS; i++)
       {
           panelpart.clip[i] = false;
@@ -364,14 +358,12 @@ synth = _synth;
   }
 } 
 
-class SysEffSend {open : {public WidgetPDial, private MiscFuncs}
+class SysEffSend {: {public WidgetPDial, private MiscFuncs}
 } {
-  Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {open
-  } {
+  Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {} {
     code {neff1=0; neff2=0;} {}
   }
-  Function {init(int neff1_, int neff2_, SynthEngine *_synth)} {open
-  } {
+  Function {init(int neff1_, int neff2_, SynthEngine *_synth)} {} {
     code {//
         synth = _synth;
         neff1 = neff1_;
@@ -404,20 +396,20 @@ class SysEffSend {open : {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {open : {public Fl_Group, private MiscFuncs}
+class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
-    Fl_Window panellistitem {open
-      private xywh {1195 47 60 275} type Double
-      class Fl_Group visible
+    Fl_Window panellistitem {
+      private xywh {1195 47 60 275} type Double hide
+      class Fl_Group
     } {
-      Fl_Group panellistitemgroup {open
+      Fl_Group panellistitemgroup {
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
         code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
-        Fl_Group {} {open
+        Fl_Group {} {
           xywh {42 64 16 112} box ENGRAVED_FRAME
         } {
           Fl_Box partVUMeter {
@@ -438,7 +430,7 @@ class Panellistitem {open : {public Fl_Group, private MiscFuncs}
           xywh {23 28 17 27} box FLAT_BOX hide deactivate
           code0 {o->color(SUB_COLOUR);}
         }
-        Fl_Box partpad {selected
+        Fl_Box partpad {
           xywh {40 28 17 27} box FLAT_BOX hide deactivate
           code0 {o->color(PAD_COLOUR);}
         }
@@ -538,13 +530,11 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
       }
     }
   }
-  Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {npart = 0;
         bankui = NULL;} {}
   }
-  Function {init(int npart_, BankUI *bankui_, SynthEngine *_synth)} {open
-  } {
+  Function {init(int npart_, BankUI *bankui_, SynthEngine *_synth)} {} {
     code {//
     synth = _synth;
     npart=npart_;
@@ -554,8 +544,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     panellistitem->show();
     end();} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {//
 
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
@@ -591,10 +580,10 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());} {}
   }
-  Function {setPartLabel(int engine)} {open
-  } {
+  Function {setPartLabel(int engine)} {} {
     code {//
     partback->redraw();
+    partback->show();
     if (engine & 1)
     {
         partadd->redraw();
@@ -618,7 +607,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         partpad->hide();
     partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
-  Function {findengines(int npart)} {open return_type {unsigned int}
+  Function {findengines(int npart)} {return_type {unsigned int}
   } {
     code {//
     unsigned int engine = 0;
@@ -636,8 +625,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     }
     return engine;} {}
   }
-  Function {~Panellistitem()} {open
-  } {
+  Function {~Panellistitem()} {} {
     code {panellistitem->hide();} {}
   }
   decl {int npart;} {private local
