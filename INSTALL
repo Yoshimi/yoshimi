@@ -1,0 +1,14 @@
+Installing yoshimi
+
+It's a CMake build. Simply cd to the src directory, then
+    ccmake .
+    cmake .
+    make
+    sudo make install
+which builds an executable called yoshimi, installed by default in
+/usr/local/bin.
+
+Unlike ZynAddSubFX, Yoshimi builds with both Jack and Alsa audio and midi
+options. The default audio and midi options to be used are nominated in the
+ccmake configuration stage. Other options can be nominated at runtime via
+command line parameters.

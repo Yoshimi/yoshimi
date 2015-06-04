@@ -1,0 +1,65 @@
+/*
+    SVFilter.h - Several state-variable filters
+
+    Original ZynAddSubFX author Nasca Octavian Paul
+    Copyright (C) 2002-2005 Nasca Octavian Paul
+
+    This file is part of yoshimi, which is free software: you can
+    redistribute it and/or modify it under the terms of the GNU General
+    Public License as published by the Free Software Foundation, either
+    version 3 of the License, or (at your option) any later version.
+
+    yoshimi is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef SV_FILTER_H
+#define SV_FILTER_H
+
+#include "globals.h"
+#include "DSP/Filter_.h"
+
+class SVFilter : public Filter_
+{
+    public:
+        SVFilter(unsigned char Ftype, float Ffreq, float Fq,
+                 unsigned char Fstages);
+        ~SVFilter() { };
+        void filterout(float *smp);
+        void setfreq(float frequency);
+        void setfreq_and_q(float frequency, float q_);
+        void setq(float q_);
+
+        void settype(int type_);
+        void setgain(float dBgain);
+        void setstages(int stages_);
+        void cleanup();
+
+    private:
+        struct fstage {
+            float low, high, band, notch;
+        } st[MAX_FILTER_STAGES + 1];
+
+        struct parameters {
+            float f, q, q_sqrt;
+        }par, ipar;
+
+        void singlefilterout(float *smp, fstage &x, parameters &par);
+        void computefiltercoefs();
+        int type;      // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
+        int stages;    // how many times the filter is applied (0->1,1->2,etc.)
+        float freq; // Frequency given in Hz
+        float q;    // Q factor (resonance or Q factor)
+        float gain; // the gain of the filter (if are shelf/peak) filters
+
+        int abovenq;   // this is 1 if the frequency is above the nyquist
+        int oldabovenq;
+        int needsinterpolation, firsttime;
+};
+
+#endif
