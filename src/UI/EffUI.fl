@@ -32,7 +32,7 @@ decl {\#include <string>} {public
 decl {\#include "globals.h"} {public
 } 
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include "EnvelopeUI.h"} {public

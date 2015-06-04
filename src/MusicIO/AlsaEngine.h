@@ -66,7 +66,6 @@ class AlsaEngine : public MusicIO
 
         snd_pcm_sframes_t (*pcmWrite)(snd_pcm_t *handle, const void *data,
                                       snd_pcm_uframes_t nframes);
-        //MusicClient *musicClient;
 
         struct {
             string             device;
@@ -76,6 +75,7 @@ class AlsaEngine : public MusicIO
             snd_pcm_uframes_t  period_size;
             snd_pcm_uframes_t  buffer_size;
             int                alsaId;
+            snd_pcm_state_t    pcm_state;
             pthread_t          pThread;
         } audio;
 

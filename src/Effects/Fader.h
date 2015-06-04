@@ -20,6 +20,10 @@
 #ifndef FADER_H
 #define FADER_H
 
+#include <cmath>
+
+#include "globals.h"
+
 // Pseudo logarithmic volume control,
 //  ack http://www.maazl.de/project/pm123/index.html#logvolum_1.0
 class Fader
@@ -29,6 +33,9 @@ class Fader
         ~Fader() { };
         float Level(unsigned char controlvalue)
             { return (controlvalue <= 127 ) ? scaler[controlvalue] : 1.0f; };
+        float dbLevel(unsigned char controlvalue)
+            { return rap2dB((controlvalue <= 127 )
+                             ? scaler[controlvalue] : 1.0f); };
     private:
         const double scalefactor; // default internal scaling factor 3.16227766,
                                   // should not exceed sqrt(10) (+10dB)

@@ -35,13 +35,12 @@ Fader::Fader(double maxmultiplier) :
 {
     double xval = 0.0;
     double step = 1.0 / 127.0; // control range is 0..127
-    for (int i = 0; i < 128; ++i)
+    for (int x = 0; x < 128; ++x)
     {
-        scaler[i] = (maxmultiplier * xval / (1.0 + scalefactor * (1.0 - xval)));
+        scaler[x] = (maxmultiplier * xval / (1.0 + scalefactor * (1.0 - xval)));
         xval += step;
-        //cerr << "Step : " << i << " scaled: " << scaler[i] << endl;
     }
-    // assert top & bottom values
+    // assert top & bottom
     scaler[0] = 0.0;
     scaler[127] = maxmultiplier;
 }

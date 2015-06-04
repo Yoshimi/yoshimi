@@ -67,8 +67,10 @@ void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
 
     for (int i = 1; i < n; ++i)
     {
-        float x = (logf(freq * i) - l1) / l2;
         // compute where the n-th hamonics fits to the graph
+        float x = (logf(freq * i) - l1) / l2;
+        if (x < 0.0)
+            x = 0.0;
 
         x *= N_RES_POINTS;
         float dx = x - floorf(x);
@@ -99,8 +101,10 @@ float Resonance::getfreqresponse(float freq)
             sum = Prespoints[i];
     if (sum < 1.0)
         sum = 1.0;
-    float x = (logf(freq) - l1) / l2;
     // compute where the n-th hamonics fits to the graph
+    float x = (logf(freq) - l1) / l2;
+    if (x < 0.0)
+        x = 0.0;
 
     x *= N_RES_POINTS;
     float dx = x - floorf(x);

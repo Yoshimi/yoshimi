@@ -99,7 +99,7 @@ class Reverb : public Effect
         void processmono(int ch, float *output);
 
         int buffersize;
-        Fader *volControl;
+        Fader *fader6db;
 };
 
 #endif

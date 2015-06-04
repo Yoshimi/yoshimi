@@ -27,6 +27,6 @@ add_custom_target(tarball
     COMMAND  rsync --recursive --times --perms
              COPYING INSTALL README.txt examples banks src CMakeLists.txt
              yoshimi-${YOSHIMI_VERSION}/
-    COMMAND tar -cvjf "yoshimi-${YOSHIMI_VERSION}.tar.bz2" yoshimi-${YOSHIMI_VERSION}
+    COMMAND tar --exclude=*/*gdb* -cvjf "yoshimi-${YOSHIMI_VERSION}.tar.bz2" yoshimi-${YOSHIMI_VERSION}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} VERBATIM
 )

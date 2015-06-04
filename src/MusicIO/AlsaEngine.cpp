@@ -62,12 +62,6 @@ bool AlsaEngine::openAudio(void)
             goto bail_out;
         if (!prepSwparams())
             goto bail_out;
-        if (!prepAudiobuffers(Runtime.settings.Buffersize, true))
-                              // need the interleaved buffer
-        {
-            cerr << "No buffers, no alsa audio :-(" << endl;
-            goto bail_out;
-        }
         Runtime.settings.Samplerate = getSamplerate();
         Runtime.settings.Buffersize = getBuffersize();
         return true;
@@ -260,29 +254,25 @@ void *AlsaEngine::_AudioThread(void *arg)
 
 
 void *AlsaEngine::AudioThread(void)
-{
+{  
     if (NULL == audio.handle)
     {
-        cerr << "NULL audio.handle into AlsaEngine::threadALSAaudio" << endl;
+        cerr << "Error, null pcm handle into AlsaEngine::AudioThread" << endl;
         return NULL;
     }
-    snd_pcm_state_t entry_state;
-    snd_pcm_state_t state;
     set_realtime();
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
-    state = entry_state = snd_pcm_state(audio.handle);
     while (!threadStop)
     {
-        snd_pcm_state(audio.handle);
         if (!getAudioInterleaved(true))
         {
             threadStop = true;
             break;
         }
-        state = entry_state = snd_pcm_state(audio.handle);
-        if (entry_state != SND_PCM_STATE_RUNNING)
+        audio.pcm_state = snd_pcm_state(audio.handle);
+        if (audio.pcm_state != SND_PCM_STATE_RUNNING)
         {
-            switch (entry_state)
+            switch (audio.pcm_state)
             {
                 case SND_PCM_STATE_XRUN:
                 case SND_PCM_STATE_SUSPENDED:
@@ -297,17 +287,17 @@ void *AlsaEngine::AudioThread(void)
                     alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
                     break;
                 default:
-                    cout << "weird SND_PCM_STATE: " << state << endl;
+                    cout << "AlsaEngine::AudioThread, weird SND_PCM_STATE: "
+                         << audio.pcm_state << endl;
                     break;
             }
-            state = snd_pcm_state(audio.handle);
-            //if (entry_state != state)
-            //   cout << "pcm state changed, " << entry_state << " -> " << state << endl;
+            audio.pcm_state = snd_pcm_state(audio.handle);
         }
-        if (state == SND_PCM_STATE_RUNNING)
+        if (audio.pcm_state == SND_PCM_STATE_RUNNING)
             Write();
-        //else
-        //    Runtime.settings.verbose && cout << "pcm still not RUNNING" << endl;
+        else
+            Runtime.settings.verbose
+                && cerr << "Error, audio pcm still not RUNNING" << endl;
     }
     return NULL;
 }
@@ -315,7 +305,7 @@ void *AlsaEngine::AudioThread(void)
 
 void AlsaEngine::Write(void)
 {
-    snd_pcm_uframes_t towrite = zynMaster->getBuffersize();
+    snd_pcm_uframes_t towrite = getBuffersize();
     snd_pcm_sframes_t wrote = 0;
     short int *data = shortInterleaved;
     while (towrite > 0)
@@ -366,12 +356,12 @@ bool AlsaEngine::Recover(int err)
             break;
         case -ESTRPIPE:
             if (!alsaBad(snd_pcm_prepare(audio.handle),
-                         "failed to recover from suspend"))
+                         "Error, AlsaEngine failed to recover from suspend"))
                 isgood = true;
             break;
         case -EPIPE:
             if (!alsaBad(snd_pcm_prepare(audio.handle),
-                         "failed to recover from underrun"))
+                         "Error, AlsaEngine failed to recover from underrun"))
                 isgood = true;
             break;
         default:
@@ -389,7 +379,9 @@ bool AlsaEngine::xrunRecover(void)
         if (!alsaBad(snd_pcm_drop(audio.handle), "pcm drop failed"))
             if (!alsaBad(snd_pcm_prepare(audio.handle), "pcm prepare failed"))
                 isgood = true;
-        cerr << "xrun recovery " << ((isgood) ? "good" : "not good") << endl;
+        Runtime.settings.verbose
+            && cout << "Info, xrun recovery " << ((isgood) ? "good" : "not good")
+                    << endl;
     }
     return isgood;
 }
@@ -400,52 +392,58 @@ bool AlsaEngine::Start(void)
     int chk;
     pthread_attr_t attr;
     threadStop = false;
-
     if (NULL != audio.handle)
     {
-        if ((chk = pthread_attr_init(&attr)))
+        chk = pthread_attr_init(&attr);
+        if (chk)
         {
             cerr << "Error, failed to initialise Alsa audio thread attributes: "
                  << chk << endl;
             goto bail_out;
         }
-        if ((chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)))
+        chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        if (chk)
         {
             cerr << "Error, failed to set Alsa audio thread detach state: " << chk
                  << endl;
             goto bail_out;
         }
-        if ((chk = pthread_create(&audio.pThread, &attr, _AudioThread, this)))
+        chk = pthread_create(&audio.pThread, &attr, _AudioThread, this);
+        if (chk)
         {
-            cerr << "Error, failed to start Alsa audio thread: " << strerror(chk)
-                 << endl;
+            cerr << "Error, failed to start Alsa audio thread: "
+                 << strerror(errno) << endl;
             goto bail_out;
         }
     }
 
     if (NULL != midi.handle)
     {
-        if ((chk = pthread_attr_init(&attr)))
+        chk = pthread_attr_init(&attr);
+        if (chk)
         {
             cerr << "Error, failed to initialise Alsa midi thread attributes: "
                  << chk << endl;
             goto bail_out;
         }
-        if ((chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED)))
+        chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        if (chk)
         {
             cerr << "Error, failed to set Alsa midi thread detach state: " << chk
                  << endl;
             goto bail_out;
         }
-        if ((chk = pthread_create(&midi.pThread, &attr, _MidiThread, this)))
+        chk = pthread_create(&midi.pThread, &attr, _MidiThread, this);
+        if (chk)
         {
-            cerr << "failed to start Alsa midi thread: " << chk << endl;
+            cerr << "Error, failed to start Alsa midi thread: " << chk << endl;
             goto bail_out;
         }
     }
     return true;
 
 bail_out:
+    cerr << "Error - bail out of AlsaEngine::Start()" << endl;
     Close();
     threadStop = true;
     return false;
@@ -528,12 +526,12 @@ void *AlsaEngine::MidiThread(void)
 
                 case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
                     if (Runtime.settings.verbose)
-                        cerr << "alsa midi port connected" << endl;
+                        cout << "Info, alsa midi port connected" << endl;
                     break;
 
                 case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
                     if (Runtime.settings.verbose)
-                        cerr << "Info, alsa midi port disconnected" << endl;
+                        cout << "Info, alsa midi port disconnected" << endl;
                     break;
 
                 case SND_SEQ_EVENT_SYSEX:   // system exclusive
@@ -542,7 +540,7 @@ void *AlsaEngine::MidiThread(void)
 
                 default:
                     if (Runtime.settings.verbose)
-                        cerr << "Info, other non-handled midi event, type: "
+                        cout << "Info, other non-handled midi event, type: "
                              << (int)event->type << endl;
                     break;
             }

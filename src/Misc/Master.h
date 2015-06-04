@@ -34,7 +34,6 @@
 typedef enum { init, trylock, lock, unlock } lockset;
 
 extern bool Pexitprogram;  // if the UI sets this true, the program will exit
-extern bool swaplr;        // left-right swapping
 extern float *denormalkillbuf;
 
 class Master;
@@ -73,7 +72,6 @@ class Master {
 
         Part *part[NUM_MIDI_PARTS];
 
-        int swaplr; // swap L/R, true or false
         int shutup;
 
         // parameters

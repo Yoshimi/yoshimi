@@ -60,21 +60,8 @@ class MusicClient
         virtual int audioClientId(void) { return -1; };
         virtual int midiClientId(void) { return -1; };
 
-//        bool prepAudiobuffers(unsigned int buffersize, bool with_interleaved);
-//        bool getZynAudio(bool lockrequired);
-//        bool getZynAudioInterleaved(bool lockrequired);
-//        void silenceBuffers(void);
-        
-//        int getMidiController(unsigned char b);
-//        void setMidiController(unsigned char ch, unsigned int ctrl, int param);
-//        void setMidiNote(unsigned char chan, unsigned char note);
-//        void setMidiNote(unsigned char chan, unsigned char note,
-//                         unsigned char velocity);
         string      audiodevice;
         string      mididevice;
-//        float      *zynLeft;
-//        float      *zynRight;
-//        short int  *shortInterleaved;
 };
 
 #endif

@@ -44,8 +44,7 @@ class XMLwrapper
         /********************************/
 
         // returns 0 if ok or -1 if the file cannot be saved
-        //int saveXMLfile(const string &filename);
-        int saveXMLfile(const string filename);
+        int saveXMLfile(string filename);
 
         // returns the new allocated string that contains the XML data (used for clipboard)
         // the string is NULL terminated
@@ -100,7 +99,7 @@ class XMLwrapper
         // it returns the parameter and limits it between min and max
         // if min==max==0, it will not limit it
         // if no parameter will be here, the defaultpar will be returned
-        int getpar(const string &name, int defaultpar, int min, int max);
+        int getpar(string name, int defaultpar, int min, int max);
 
         // the same as getpar, but the limits are 0 and 127
         int getpar127(const string &name, int defaultpar);

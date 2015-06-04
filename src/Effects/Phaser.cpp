@@ -18,9 +18,9 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../Misc/Util.h"
-#include "../Misc/Master.h"
-#include "Phaser.h"
+#include "Misc/Util.h"
+#include "Misc/Master.h"
+#include "Effects/Phaser.h"
 
 #define PHASER_LFO_SHAPE 2
 

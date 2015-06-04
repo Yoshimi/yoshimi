@@ -40,7 +40,7 @@ decl {\#include <FL/Fl_Slider.H>} {public
 
 decl {\#include <cmath>} {}
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include "EnvelopeUI.h"} {public

@@ -39,7 +39,7 @@ class SUBnoteParameters : public Presets
 
         // Parameters
         // AMPLITUDE PARAMETRERS
-        unsigned char Pstereo;//0 for mono,1 for stereo
+        unsigned char Pstereo;// 0 for mono,1 for stereo
         unsigned char PVolume;
         unsigned char PPanning;
         unsigned char PAmpVelocityScaleFunction;

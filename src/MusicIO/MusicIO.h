@@ -24,7 +24,8 @@
 class MusicIO
 {
     public:
-        MusicIO() { };
+        MusicIO();
+        MusicIO(int bufsize);
         virtual ~MusicIO() { };
 
         bool prepAudiobuffers(unsigned int buffersize, bool with_interleaved);
@@ -41,6 +42,7 @@ class MusicIO
         float      *zynLeft;
         float      *zynRight;
         short int  *shortInterleaved;
+        int buffersize;
 };
 
 #endif

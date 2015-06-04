@@ -19,7 +19,7 @@
 */
 
 #include "XMLwrapper.h"
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>
 #include <iostream>
@@ -168,11 +168,14 @@ bool XMLwrapper::checkfileinformation(const char *filename)
 
 // SAVE XML members
 
-// int XMLwrapper::saveXMLfile(const string &filename)
-int XMLwrapper::saveXMLfile(const string filename)
+int XMLwrapper::saveXMLfile(string filename)
 {
     char *xmldata = getXMLdata();
-    if (xmldata == NULL) return -2;
+    if (xmldata == NULL)
+    {
+        cerr << "Error, getXMLdata() == NULL" << endl;
+        return -2;
+    }
     int compression = Runtime.settings.GzipCompression;
     int result = dosavefile(filename.c_str(), compression, xmldata);
     free(xmldata);
@@ -194,7 +197,8 @@ char *XMLwrapper::getXMLdata()
 }
 
 
-int XMLwrapper::dosavefile(const char *filename,int compression,const char *xmldata)
+int XMLwrapper::dosavefile(const char *filename, int compression,
+                           const char *xmldata)
 {
     if (compression == 0)
     {
@@ -217,7 +221,10 @@ int XMLwrapper::dosavefile(const char *filename,int compression,const char *xmld
         gzFile gzfile;
         gzfile = gzopen(filename, options);
         if (gzfile == NULL)
+        {
+            cerr << "Error, gzopen() == NULL" << endl;
             return -1;
+        }
         gzputs(gzfile, xmldata);
         gzclose(gzfile);
     }
@@ -381,7 +388,7 @@ int XMLwrapper::getbranchid(int min, int max)
 }
 
 
-int XMLwrapper::getpar(const string &name, int defaultpar, int min, int max)
+int XMLwrapper::getpar(string name, int defaultpar, int min, int max)
 {
     node = mxmlFindElement(peek(), peek(), "par", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (node == NULL)
@@ -565,7 +572,7 @@ mxml_node_t *XMLwrapper::peek()
 {
     if (stackpos <= 0)
     {
-        printf("BUG!: XMLwrapper::peek() - empty parentstack\n");
+        cerr << "BUG!: XMLwrapper::peek() - empty parentstack" << endl;
         return root;
     }
     return parentstack[stackpos];

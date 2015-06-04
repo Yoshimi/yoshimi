@@ -34,9 +34,9 @@ class AlsaJackClient : public MusicClient
         AlsaJackClient() { };
         ~AlsaJackClient() { Stop(); Close(); };
 
-        bool openAudio(void) { return alsaEngine.openAudio(); };
+        bool openAudio(void);
         bool openMidi(void);
-        bool Start(void) { return alsaEngine.Start() && jackEngine.Start(); };
+        bool Start(void);
         void Stop(void) { alsaEngine.Stop(); jackEngine.Stop(); };
         void Close(void) { alsaEngine.Close(); jackEngine.Close(); };
 

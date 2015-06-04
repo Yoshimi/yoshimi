@@ -26,7 +26,7 @@ comment {//
 //} {in_source in_header
 }
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include <FL/Fl_Group.H>} {public

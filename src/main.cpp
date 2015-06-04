@@ -31,21 +31,18 @@ using namespace std;
 #include "MusicIO/MusicClient.h"
 
 #if !defined(DISABLE_GUI)
-#   include "GuiThread.h"
+#   include "GuiThreadUI.h"
 #endif
 
 static int set_DAZ_and_FTZ(int on /*bool*/);
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[])   
 {
     struct option opts[] = { // Command line options
         // no argument: 0, required: 1:, optional: 2::
         {"load",            1, NULL, 'l'},
         {"load-instrument", 1, NULL, 'L'},
-        {"samplerate",      1, NULL, 'r'}, // now redundant!
-        {"buffersize",      1, NULL, 'b'}, // now redundant!
         {"oscilsize",       1, NULL, 'o'},
-        {"swap",            0, NULL, 'S'},
         {"no-gui",          0, NULL, 'U'},
         {"alsa-midi",       2, NULL, 'a'},
         {"jack-midi",       2, NULL, 'j'},
@@ -70,10 +67,9 @@ int main(int argc, char *argv[])
     opterr = 0;
     int tmp = 0;
     unsigned int utmp = 0;
-    string unavail = ", but not available with this build";
     while (true)
     {
-        opt = getopt_long(argc, argv, "a::A::j::J::l:L:r:b:o:hkqSU", opts,
+        opt = getopt_long(argc, argv, "a::A::j::J::l:L:o:hkqU", opts,
                           &option_index);
         char *optarguments = optarg;
         if (opt == -1)
@@ -138,7 +134,7 @@ int main(int argc, char *argv[])
 
             case 'k':
                 if (getenv("JACK_NO_START_SERVER"))
-                    cerr << "jack autostart specified, but JACK_NO_START_SERVER is set"
+                    cerr << "Note, jack autostart specified, but JACK_NO_START_SERVER is set"
                          << endl;
                 else
                     autostart_jack = true;
@@ -199,10 +195,6 @@ int main(int argc, char *argv[])
                 }
                 break;
 
-            case 'S':
-                Runtime.settings.SwapStereo = true;
-                break;
-
             case 'U':
                 Runtime.settings.showGui = false;
                 break;
@@ -229,7 +221,6 @@ int main(int argc, char *argv[])
         exit(0);
     }
     srand(time(NULL));
-    Runtime.StartupReport();
 
     if (NULL == (zynMaster = new Master()))
     {
@@ -292,7 +283,7 @@ int main(int argc, char *argv[])
     OscilGen::tmpsmps = new float[Runtime.settings.Oscilsize];
     if (NULL == OscilGen::tmpsmps)
     {
-        cerr << "Failed top allocate OscilGen::tmpsmps" << endl;
+        cerr << "Error, failed to allocate OscilGen::tmpsmps" << endl;
         exit_status = 1;
         goto bail_out;
     }
@@ -327,21 +318,37 @@ int main(int argc, char *argv[])
 
     if (musicClient->Start())
     {
+        Runtime.StartupReport(musicClient->getSamplerate(), musicClient->getBuffersize());
         while (!Pexitprogram)
             usleep(33000); // where all the action is ...
         musicClient->Close();
+#       if !defined(DISABLE_GUI)
+            if (NULL != guiMaster)
+            {
+                stopGuiThread();
+                delete guiMaster;
+                guiMaster = NULL;
+            }
+#       endif
     }
     else
     {
-        cerr << "So sad, failed to start MusicIO :-(" << endl;
+        cerr << "So sad, failed to start MusicIO" << endl;
         exit_status = 1;
+        goto bail_out;
     }
+    set_DAZ_and_FTZ(0);
+    return exit_status;
 
 bail_out:
+    cerr << "Yoshimi stages a strategic retreat :-(" << endl;
 
 #   if !defined(DISABLE_GUI)
         if (NULL != guiMaster)
+        {
+            guiMaster->strategicRetreat();
             delete guiMaster;
+        }
 #   endif
 
     if (NULL != denormalkillbuf)
@@ -349,12 +356,14 @@ bail_out:
     if (NULL != OscilGen::tmpsmps)
         delete [] OscilGen::tmpsmps;
     deleteFFTFREQS(&OscilGen::outoscilFFTfreqs);
+    set_DAZ_and_FTZ(0);
     exit(exit_status);
 }
 
 
-// Denormal protection, see
-// <http://lists.linuxaudio.org/pipermail/linux-audio-dev/2009-August/024707.html>
+// Denormal protection
+// Reference <http://lists.linuxaudio.org/pipermail/linux-audio-dev/2009-August/024707.html>
+
 #include <xmmintrin.h>
 
 #define CPUID(f,ax,bx,cx,dx) __asm__ __volatile__ \

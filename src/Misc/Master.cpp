@@ -27,14 +27,12 @@ using namespace std;
 #include "Misc/Master.h"
 
 bool Pexitprogram = false;  // if the UI sets this true, the program will exit
-bool swaplr = false;        // left-right swapping
 
 Master *zynMaster;
 
 float *denormalkillbuf;
 
 Master::Master() :
-    swaplr(0),
     shutup(0),
     fft(NULL),
     samplerate(0),
@@ -82,7 +80,6 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size)
     buffersize = Runtime.settings.Buffersize = buffer_size;
     oscilsize = oscil_size;
 
-    swaplr = (Runtime.settings.SwapStereo) ? 1 : 0;
     shutup = 0;
 
     if (!actionLock(init))
@@ -149,6 +146,7 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size)
         goto bail_out;
     }
     defaults();
+
     return true;
 
 bail_out:
@@ -355,25 +353,18 @@ bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
     if (!actionLock((lockrequired) ? lock : trylock))
         return false;
 
-    int npart, nefx;
-    // Swap left/right channels as desired
-    if (swaplr)
-    {
-        float *tmp = outl;
-        outl = outr;
-        outr = tmp;
-    }
-
     // Clean up the output samples
     memset(outl, 0, buffersize * sizeof(float));
     memset(outr, 0, buffersize * sizeof(float));
 
     // Compute part samples and store them npart]->partoutl,partoutr
+    int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
             part[npart]->ComputePartSmps();
 
     // Insertion effects
+    int nefx;
     for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         if (Pinsparts[nefx] >= 0)
@@ -424,7 +415,6 @@ bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
             }
         }
     }
-
     // System effects
     for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {

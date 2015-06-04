@@ -50,7 +50,6 @@ class Config
             unsigned int  Buffersize;
             unsigned int  Oscilsize;
             bool          showGui;
-            bool          SwapStereo;
             bool          verbose;
             int           UserInterfaceMode;
             int           VirKeybLayout;
@@ -74,13 +73,13 @@ class Config
         void clearbankrootdirlist(void);
         void clearpresetsdirlist(void);
         void Save(void) { saveConfig(); };
-        void StartupReport(void);
+        void StartupReport(unsigned int samplerate, int buffersize);
         void Usage(void);
 
     private:
         void readConfig(void);
         void saveConfig(void);
-        string getConfigFileName(void);
+        string getConfigFilename(bool for_save);
 };
 
 #endif

@@ -49,7 +49,7 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
     lpf         (NULL),
     hpf         (NULL), // no filter
     buffersize(zynMaster->getBuffersize()),
-    volControl(new Fader(2.0)) // 0 .. +6db
+    fader6db(new Fader(2.0)) // 0 .. +6db
 {
     inputbuf = new float[buffersize];
     for (int i = 0; i < REV_COMBS * 2; ++i)
@@ -210,8 +210,8 @@ void Reverb::setvolume(unsigned char &Pvolume)
     this->Pvolume = Pvolume;
     if (insertion == 0)
     {
-        if (NULL != volControl)
-            outvolume = volControl->Level(Pvolume);
+        if (NULL != fader6db)
+            outvolume = fader6db->Level(Pvolume);
         else
             outvolume = 1.0;
         volume = 1.0;
@@ -223,24 +223,6 @@ void Reverb::setvolume(unsigned char &Pvolume)
             cleanup();
     }
 }
-
-/**
-void Reverb::setvolume(unsigned char &Pvolume)
-{
-    this->Pvolume = Pvolume;
-    if (insertion == 0)
-    {
-        outvolume = pow(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
-        volume = 1.0;
-    }
-    else
-    {
-        volume = outvolume = Pvolume / 127.0;
-        if (Pvolume == 0)
-            cleanup();
-    }
-}
-**/
 
 
 void Reverb::setpan(unsigned char &Ppan)
@@ -263,7 +245,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp)
 {
     this->Plohidamp = (Plohidamp < 64) ? 64 : Plohidamp;
                        // remove this when the high part from lohidamp is added
-    if (Plohidamp == 64)
+    if (Plohidamp == 64)             
     {
         lohidamptype = 0;
         lohifb = 0.0;

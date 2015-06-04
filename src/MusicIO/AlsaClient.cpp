@@ -28,7 +28,7 @@ bool AlsaClient::openAudio(void)
 {
     if (alsaEngine.openAudio())
     {
-        if (alsaEngine.prepAudiobuffers(getBuffersize(), false))
+        if (alsaEngine.prepAudiobuffers(getBuffersize(), true))
         {
             Runtime.settings.Samplerate = getSamplerate();
             Runtime.settings.Buffersize = getBuffersize();
@@ -37,7 +37,7 @@ bool AlsaClient::openAudio(void)
         else
             cerr << "Error, failed to prep audio buffers" << endl;
     }
-    cerr << "AlsaClient audio open failed" << endl;
+    cerr << "Error, AlsaClient audio open failed" << endl;
     return false;
 }
 
@@ -45,6 +45,6 @@ bool AlsaClient::openMidi(void)
 {
     if (alsaEngine.openMidi())
         return true;
-    cerr << "AlsaClient midi open failed" << endl;
+    cerr << "Error, AlsaClient midi open failed" << endl;
     return false;
 }

@@ -37,15 +37,14 @@ Config Runtime;
 Config::Config()
 {
     // defaults
-    settings.Samplerate = 48000;
-    settings.Buffersize = 256;
-    settings.Oscilsize = 1024;
+    settings.Oscilsize = 2048;
+    settings.Samplerate = 48000; // for Alsa audio, just a hint
+    settings.Buffersize = 256;   // for Alsa audio, just a hint
 #   if defined(DISABLE_GUI)
         settings.showGui = false;
 #   else
         settings.showGui = true;
 #   endif
-    settings.SwapStereo = false;
     settings.verbose = true;
     settings.LinuxALSAaudioDev = "default";
     settings.LinuxALSAmidiDev = "default";
@@ -167,16 +166,12 @@ void Config::clearpresetsdirlist(void)
 void Config::readConfig(void)
 {
     XMLwrapper *xmlcfg = new XMLwrapper();
-    if (xmlcfg->loadXMLfile(getConfigFileName()) < 0)
+    if (xmlcfg->loadXMLfile(getConfigFilename(false)) < 0)
         return;
     if (xmlcfg->enterbranch("CONFIGURATION"))
     {
-        settings.Samplerate = xmlcfg->getpar("sample_rate", settings.Samplerate, 32000, 128000);
-        settings.Buffersize = xmlcfg->getpar("sound_buffer_size",
-                                             settings.Buffersize, 32, 8192);
         settings.Oscilsize = xmlcfg->getpar("oscil_size", settings.Oscilsize,
                                        MAX_AD_HARMONICS * 2, 131072);
-        settings.SwapStereo = xmlcfg->getpar("swap_stereo", settings.SwapStereo, 0, 1);
         settings.BankUIAutoClose = xmlcfg->getpar("bank_window_auto_close",
                                              settings.BankUIAutoClose, 0, 1);
 
@@ -224,7 +219,6 @@ void Config::readConfig(void)
         xmlcfg->exitbranch();
     }
     delete(xmlcfg);
-
     settings.Oscilsize = (int) powf(2, ceil(log (settings.Oscilsize - 1.0) / logf(2.0)));
 }
 
@@ -237,7 +231,7 @@ void Config::saveConfig(void)
     xmlcfg->addpar("sample_rate", settings.Samplerate);
     xmlcfg->addpar("sound_buffer_size", settings.Buffersize);
     xmlcfg->addpar("oscil_size", settings.Oscilsize);
-    xmlcfg->addpar("swap_stereo", settings.SwapStereo);
+    xmlcfg->addpar("swap_stereo", 0);
     xmlcfg->addpar("bank_window_auto_close", settings.BankUIAutoClose);
     xmlcfg->addpar("gzip_compression", settings.GzipCompression);
     xmlcfg->addpar("check_pad_synth", settings.CheckPADsynth);
@@ -270,31 +264,36 @@ void Config::saveConfig(void)
 
     int tmp = settings.GzipCompression;
     settings.GzipCompression = 0;
-    xmlcfg->saveXMLfile(getConfigFileName());
+    xmlcfg->saveXMLfile(getConfigFilename(true));
     settings.GzipCompression = tmp;
     delete(xmlcfg);
 }
 
 
-string Config::getConfigFileName(void)
+string Config::getConfigFilename(bool for_save)
 {
-    return string(getenv("HOME")) + "/.zynaddsubfxXML.cfg";
+    // Try to prevent any perversion of ~/.zynaddsubfxXML.cfg.  For read,
+    // use ~/.yoshimiXML.cfg if it exists, otherwise ~/.zynaddsubfxXML.cfg
+    // For save, use ~/.yoshimiXML.cfg
+    string yoshiCfg = string(getenv("HOME")) + "/.yoshimiXML.cfg";
+    if (for_save)
+        return yoshiCfg;
+    else if (fileexists(yoshiCfg.c_str()))
+        return yoshiCfg;
+    else
+        return string(getenv("HOME")) + "/.zynaddsubfxXML.cfg";
 }
 
 
-void Config::StartupReport(void)
+void Config::StartupReport(unsigned int samplerate, int buffersize)
 {
     if (settings.verbose)
     {
         cerr << "Yoshimi " << YOSHIMI_VERSION << endl;
-        cerr << "Sample Rate = " << Runtime.settings.Samplerate << endl;
-        cerr << "Sound Buffer Size = " << Runtime.settings.Buffersize
-             << " samples" << endl;
-        cerr << "Internal latency = " << Runtime.settings.Buffersize * 1000.0
-                                         / Runtime.settings.Samplerate
-                                      << " ms" << endl;
-        cerr << "ADsynth Oscil.Size = " << Runtime.settings.Oscilsize
-             << " samples\n" << endl;
+        cerr << "ADsynth Oscilsize: " << Runtime.settings.Oscilsize << endl;
+        cerr << "Sample Rate: " << samplerate << endl;
+        cerr << "Sound Buffer Size: " << buffersize << endl;
+        cerr << "Internal latency: " << buffersize * 1000.0 / samplerate << " ms" << endl;
     }
 }
 
@@ -314,10 +313,7 @@ void Config::Usage(void)
     cout << "  -h, --help                         display command-line help and exit" << endl;
     cout << "  -l<file>, --load=<file>            load an .xmz file" << endl;
     cout << "  -L<file>, --load-instrument=<file> load an .xiz file" << endl;
-    cout << "  -r<SR>, --sample-rate=<SR>         set the sample rate SR" << endl;
-    cout << "  -b<BS>, --buffer-size=<BS>         set the buffer size (granularity)" << endl;
     cout << "  -o<OS>, --oscil-size=<OS>          set the ADsynth oscil. size" << endl;
-    cout << "  -S , --swap                        swap Left <--> Right" << endl;
     cout << "  -U , --no-gui                      run without user interface" << endl;
     cout << "  -a[dev], --alsa-midi[=dev]         use ALSA midi on optional device dev" << endl;
     cout << "  -A[dev], --alsa-audio[=dev]        use ALSA audio on optional device dev" << endl;

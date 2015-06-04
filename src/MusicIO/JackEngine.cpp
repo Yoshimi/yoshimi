@@ -86,9 +86,11 @@ bool JackEngine::Start(void)
 {
     if (NULL != jackClient)
     {
+        int chk;
         jack_set_error_function(_errorCallback);
         jack_set_info_function(_infoCallback);
-
+        if ((chk = jack_set_xrun_callback(jackClient, _xrunCallback, this)))
+            cerr << "Error setting jack xrun callback" << endl;
         if (jack_set_process_callback(jackClient, _processCallback, this))
         {
             cerr << "Error, JackEngine failed to set process callback" << endl;
@@ -96,13 +98,12 @@ bool JackEngine::Start(void)
         }
         if (jack_activate(jackClient))
         {
-            cerr << "Error, jack audio failed to activate client" << endl;;
+            cerr << "Error, failed to activate jack client" << endl;;
             goto bail_out;
         }
 
         if (NULL != midi.port)
         {
-            int chk;
             pthread_attr_t attr;
             if ((chk = pthread_attr_init(&attr)))
             {
@@ -163,8 +164,13 @@ void JackEngine::Close(void)
         int chk = jack_client_close(jackClient);
         if (chk && Runtime.settings.verbose)
             cerr << "Error, failed to close jack client, status: " << chk << endl;
+        if (NULL != midi.ringBuf)
+        {
+            jack_ringbuffer_free(midi.ringBuf);
+            midi.ringBuf = NULL;
+        }
+        jackClient = NULL;
     }
-    jackClient = NULL;
 }
 
 
@@ -257,10 +263,8 @@ int JackEngine::processCallback(jack_nframes_t nframes)
 
     if (NULL != audio.ports[0] && NULL != audio.ports[1])
         okaudio = processAudio(nframes);
-
     if (NULL != midi.port)
         okmidi = processMidi(nframes);
-
     return (okaudio && okmidi) ? 0 : -1;
 }
 
@@ -326,14 +330,16 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                 if(!jack_midi_event_get(&jEvent, portBuf, idx))
                 {
                     if (jEvent.size > 0 && jEvent.size <= midi.maxdata)
-                    { // no interest in 0 size or long events
+                    {   // no interest in 0 size or long events
                         for (byt = 0; byt < jEvent.size; ++byt)
                             midi.data[byt] = jEvent.buffer[byt];
                         while (byt < midi.maxdata)
                             midi.data[byt++] = 0;
-                        //if (Runtime.settings.verbose
-                        //    && jack_ringbuffer_write_space(midi.ringBuf) < midi.maxdata)
-                        //    cerr << "Warn, ringbuffer full!!" << endl;
+                        /**
+                        if (Runtime.settings.verbose
+                            && jack_ringbuffer_write_space(midi.ringBuf) < midi.maxdata)
+                            cerr << "Warn, ringbuffer full!!" << endl;
+                        */
                         wrote = 0;
                         tries = 0;
                         data = midi.data;
@@ -359,16 +365,20 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                             return false;
                         }
                     }
-                    //else
-                    //    if (Runtime.settings.verbose)
-                    //        cerr << "Warn, jack midi data length oversize: "
-                    //             << jEvent.size << endl;
+                    /**
+                    else
+                        if (Runtime.settings.verbose)
+                            cerr << "Warn, jack midi data length oversize: "
+                                 << jEvent.size << endl;
+                    **/
                 }
                 else
                     cerr << "Warn, jack midi read failed" << endl;
             }
-            //if (eventCount > 0)
-            //    cerr << eventCount << " events processed" << endl;
+            /**
+            if (eventCount > 0)
+                cerr << eventCount << " events processed" << endl;
+            **/
             return true;
         }
         else
@@ -485,16 +495,16 @@ void *JackEngine::midiThread(void)
 
 int JackEngine::_xrunCallback(void *arg)
 {
-    Runtime.settings.verbose && cerr << "jack client reports xrun" << endl;
+    Runtime.settings.verbose && cerr << "Jack reports xrun" << endl;
     return 0;
 }
 
 void JackEngine::_errorCallback(const char *msg)
 {
-    Runtime.settings.verbose && cerr << "jack client reports error: " << msg << endl;
+    Runtime.settings.verbose && cerr << "Jack reports error: " << msg << endl;
 }
 
 void JackEngine::_infoCallback(const char *msg)
 {
-    Runtime.settings.verbose && cerr << "jack client reports info: " << msg << endl;
+    Runtime.settings.verbose && cerr << "Jack info message: " << msg << endl;
 }

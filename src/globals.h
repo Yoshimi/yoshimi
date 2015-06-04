@@ -100,8 +100,8 @@ extern void deleteFFTFREQS(FFTFREQS *f);
 
 
 // dB
-#define dB2rap(dB) ((expf((dB)*LOG_10/20.0)))
-#define rap2dB(rap) ((20*logf(rap)/LOG_10))
+#define dB2rap(dB) ((exp10f((dB) / 20.0)))
+#define rap2dB(rap) ((20 * log10f(rap)))
 
 // The random generator (0.0..1.0)
 #define RND (rand()/(RAND_MAX+1.0))

@@ -7,9 +7,10 @@
 #  MYFLTK_LIBRARIES  a list of libs required for linking
 #
 
+set(MYFLTK_FOUND FALSE)
 if (MYFLTK_LIBRARIES)
-  # in cache already
-  set(MYFLTK_FOUND TRUE)
+    # in cache already
+    set(MYFLTK_FOUND TRUE)
 else (MYFLTK_LIBRARIES)
     find_program (MYFLTK_CONFIG fltk-config)
     if (MYFLTK_CONFIG)
@@ -25,18 +26,6 @@ else (MYFLTK_LIBRARIES)
             mark_as_advanced(MYFLTK_LIBRARIES)
             set(MYFLTK_FOUND TRUE)
             set(FLTK_WRAP_UI 1)
-            
         endif(FLTK_FLUID_EXECUTABLE)
     endif (MYFLTK_CONFIG)
 endif (MYFLTK_LIBRARIES)
-
-if (MYFLTK_FOUND)
-    if (NOT MYFLTK_FIND_QUIETLY)
-        message(STATUS "found ${MYFLTK_CONFIG}")
-        message(STATUS "found ${FLTK_FLUID_EXECUTABLE}")
-    endif (NOT MYFLTK_FIND_QUIETLY)
-else (MYFLTK_FOUND)
-    if (MYFLTK_FIND_REQUIRED)
-      message(FATAL_ERROR "could not find FLTK, aborting.")
-    endif (MYFLTK_FIND_REQUIRED)
-endif (MYFLTK_FOUND)

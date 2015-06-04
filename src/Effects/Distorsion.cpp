@@ -171,7 +171,8 @@ void waveshapesmps(int n, float *smps, unsigned char type, unsigned char drive)
 
 
 Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
-    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0)
+    Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
+    fader6db(new Fader(2.0))
 {
     lpfl = new AnalogFilter(2, 22000, 1, 0);
     lpfr = new AnalogFilter(2, 22000, 1, 0);
@@ -287,13 +288,14 @@ void Distorsion::setvolume(unsigned char _volume)
     Pvolume = _volume;
     if (insertion == 0)
     {
-        outvolume = powf(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
+        if (NULL != fader6db)
+            outvolume = fader6db->Level(Pvolume);
+        else
+            outvolume = powf(0.01, (1.0 - Pvolume / 127.0)) * 4.0;
         volume = 1.0;
     }
     else
-    {
         volume = outvolume = Pvolume / 127.0;
-    }
     if (Pvolume == 0.0)
         cleanup();
 }

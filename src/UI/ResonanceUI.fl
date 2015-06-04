@@ -37,7 +37,7 @@ decl {\#include <FL/Fl_Value_Output.H>} {public
 
 decl {\#include <cmath>} {}
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include "PresetsUI.h"} {public

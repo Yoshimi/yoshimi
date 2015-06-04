@@ -1,5 +1,5 @@
 #
-#   CMakeLists.txt
+#   CMakeLists.txt    
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,8 @@
 project(Yoshimi)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
-set(YOSHIMI_VERSION "0.010")
+cmake_policy(SET CMP0004 OLD)
+set(YOSHIMI_VERSION "0.016")
 FILE(WRITE version.txt "${YOSHIMI_VERSION}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -27,7 +28,7 @@ set(CMAKE_SKIP_RULE_DEPENDENCY OFF)
     # Rebuild objects if rules have changed, even if source hasn't.
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake.checks")
     # modules for 3rd party library checks reside here
-
+    
 # User options
 set(DEFAULT_AUDIO jack CACHE STRING "Default audio driver - alsa or jack")
 set(DEFAULT_MIDI jack CACHE STRING "Default midi driver - alsa or jack")
@@ -78,6 +79,25 @@ else(PKG_CONFIG_FOUND)
     message(FATAL_ERROR "pkg-config required but not found")
 endif(PKG_CONFIG_FOUND)
 
+# libz
+include(CheckCSourceCompiles)
+set(CMAKE_REQUIRED_LIBRARIES z)
+check_c_source_compiles(
+    "#include <zlib.h>
+     int main(int argc, char **argv) {
+         gzFile zzz  = gzopen(\"/dev/null\", \"rb\");
+         if (NULL != zzz)
+            gzclose(zzz);
+         return 0;
+     }" HAS_LIBZ
+)
+if(HAS_LIBZ)
+    message(STATUS "Found libz")
+    set(YOSHI_LIBRARIES ${YOSHI_LIBRARIES} z)
+else(HAS_LIBZ)
+    message(FATAL_ERROR "libz required but not found: ${HAS_LIBZ}")
+endif(HAS_LIBZ)
+
 if(WANT_GUI)
     message(STATUS "Will build gui")
     # fontconfig
@@ -87,6 +107,12 @@ if(WANT_GUI)
 
     # fltk
     find_package(MYFLTK REQUIRED)
+    if(MYFLTK_FOUND)
+        message(STATUS "Found ${MYFLTK_CONFIG}")
+        message(STATUS "Found ${FLTK_FLUID_EXECUTABLE}")
+    else(MYFLTK_FOUND)
+        message(FATAL_ERROR "Gui requested, but FLTK not found")
+    endif(MYFLTK_FOUND)
     mark_as_advanced(FORCE FLTK_BASE_LIBRARY)
     mark_as_advanced(FORCE FLTK_CONFIG_SCRIPT)
     mark_as_advanced(FORCE FLTK_DIR)
@@ -97,33 +123,39 @@ if(WANT_GUI)
     mark_as_advanced(FORCE FLTK_INCLUDE_DIR)
     mark_as_advanced(FORCE FLTK_MATH_LIBRARY)
     set (FLTK_sources
-       UI/WidgetPDial.fl  UI/PresetsUI.fl  UI/EnvelopeUI.fl
-       UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboard.fl
+       UI/WidgetPDialUI.fl  UI/PresetsUI.fl  UI/EnvelopeUI.fl
+       UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboardUI.fl
        UI/ConfigUI.fl  UI/SUBnoteUI.fl  UI/ResonanceUI.fl
        UI/OscilGenUI.fl  UI/ADnoteUI.fl  UI/PADnoteUI.fl
        UI/EffUI.fl  UI/BankUI.fl  UI/PartUI.fl
-       UI/MicrotonalUI.fl  UI/MasterUI.fl  UI/GuiThread.fl
+       UI/MicrotonalUI.fl  UI/MasterUI.fl  UI/GuiThreadUI.fl
     )
+
     fltk_wrap_ui(yoshimi ${FLTK_sources})
     set_source_files_properties(UI/MasterUI.h PROPERTIES GENERATED 1)
     set(YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
     set(YOSHI_SOURCES ${yoshimi_FLTK_UI_SRCS})
-    set(YOSHI_LIBRARIES ${MYFLTK_LIBRARIES})
-    add_definitions(${MYFLTK_LDFLAGS})
+    set(YOSHI_LIBRARIES ${YOSHI_LIBRARIES} ${MYFLTK_LIBRARIES})
 else(WANT_GUI)
     message(STATUS "Will not build gui")
     add_definitions(-DDISABLE_GUI)
 endif(WANT_GUI)
 
-# FFTW3
+# fftw3
 pkg_check_modules(FFTW3 REQUIRED fftw3>=0.22)
-message(STATUS "Found fftw3 ${FFTW3_VERSION}")
+if(FFTW3_FOUND)
+    message(STATUS "Found fftw3 ${FFTW3_VERSION}")
+else(FFTW3_FOUND)
+    message(FATAL_ERROR "fftw3 >=0.22 required but not found")
+endif(FFTW3_FOUND)
 
 # mxml
-set(MXML_LIBRARIES "" CACHE STRING "mxml libaries")
 pkg_check_modules(MXML REQUIRED mxml>=2.5)
-mark_as_advanced(FORCE MXML_LIBRARIES)
-message(STATUS "Found mxml ${MXML_VERSION}")
+if(MXML_FOUND)
+    message(STATUS "Found mxml ${MXML_VERSION}")
+else(MXML_FOUND)
+    message(FATAL_ERROR "mxml >=2.5 required but not found")
+endif(MXML_FOUND)
 
 # Alsa
 pkg_check_modules(ALSA REQUIRED alsa)
@@ -134,11 +166,11 @@ else(ALSA_FOUND)
 endif(ALSA_FOUND)
 
 # Jack
-pkg_check_modules(JACK REQUIRED jack)
+pkg_check_modules(JACK REQUIRED jack>=0.115.6)
 if(JACK_FOUND)
     message(STATUS "Found jack ${JACK_VERSION}")
 else(JACK_FOUND)
-    message(FATAL_ERROR "Jack required but not found")
+    message(FATAL_ERROR "Jack >=0.115.6 required but not found")
 endif(JACK_FOUND)
 
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -ggdb -Wall -Wpointer-arith")
@@ -211,7 +243,7 @@ if(WANT_ASM_F21)
     add_definitions(-DASM_F2I)
 endif(WANT_ASM_F21)
 
-set(YOSHI_INCLUDES 
+set(YOSHI_INCLUDES
     ${YOSHI_INCLUDES}
     ${FONTCONFIG_INCLUDE_DIRS}
     ${FFTW3F_INC_DIR}
@@ -246,8 +278,12 @@ target_link_libraries(yoshimi ${YOSHI_LIBRARIES})
 
 install(TARGETS yoshimi RUNTIME DESTINATION bin)
 
-# Custom target to clean CMake generated files
-add_custom_target( distclean
+set_directory_properties(PROPERTIES
+    ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
+)
+
+# clean sweep
+add_custom_target(distclean
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/*.log ${CMAKE_SOURCE_DIR}/src/*.log
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/Makefile
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/install_manifest.txt

@@ -21,7 +21,6 @@
 #ifndef PHASER_H
 #define PHASER_H
 
-#include "globals.h"
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 

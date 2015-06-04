@@ -22,12 +22,51 @@
 #include "Misc/Config.h"
 #include "MusicIO/AlsaJackClient.h"
 
+bool AlsaJackClient::openAudio(void)
+{
+    if (alsaEngine.openAudio())
+    {
+        if (alsaEngine.prepAudiobuffers(getBuffersize(), true))
+        {
+            Runtime.settings.Samplerate = getSamplerate();
+            Runtime.settings.Buffersize = getBuffersize();
+            return true;
+        }
+        else
+            cerr << "Error, failed to prep audio buffers" << endl;
+    }
+    else
+        cerr << "Error, failed to register audio" << endl;
+    return false;
+}
+
+
 bool AlsaJackClient::openMidi(void)
 {
-    if (jackEngine.connectServer(Runtime.settings.midiDevice)
-        && jackEngine.openMidi())
+    if (jackEngine.connectServer(Runtime.settings.midiDevice))
+    {
+        if (jackEngine.openMidi())
+        {
             return true;
+        }
+        else
+            cerr << "Error, AlsaJackClient failed to open midi" << endl;
+    }
+    return false;
+}
+
+bool AlsaJackClient::Start(void)
+{
+    if (alsaEngine.Start())
+    {
+        if (jackEngine.Start())
+        {
+            return true;
+        }
+        else
+            cerr << "jackEngine.Start() failed" << endl;
+    }
     else
-        cerr << "Error, AlsaJackClient failed to open midi" << endl;
+        cerr << "alsaEngine.Start() failed" << endl;
     return false;
 }

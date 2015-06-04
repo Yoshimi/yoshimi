@@ -45,8 +45,8 @@ EffectMgr::~EffectMgr()
 {
     if (efx != NULL)
         delete efx;
-    delete []efxoutl;
-    delete []efxoutr;
+    delete [] efxoutl;
+    delete [] efxoutr;
 }
 
 void EffectMgr::defaults(void)

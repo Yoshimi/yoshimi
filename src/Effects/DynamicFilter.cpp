@@ -31,7 +31,8 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) 
     Pampsnsinv(0),
     Pampsmooth(60),
     filterl(NULL),
-    filterr(NULL)
+    filterr(NULL),
+    fader0db(new Fader(1.0))
 {
     setpreset(Ppreset);
     cleanup();
@@ -116,7 +117,10 @@ void DynamicFilter::setdepth(unsigned char _depth)
 void DynamicFilter::setvolume(unsigned char _volume)
 {
     Pvolume = _volume;
-    outvolume = Pvolume / 127.0;
+    if (NULL != fader0db)
+        outvolume = fader0db->Level(Pvolume);
+    else
+        outvolume = Pvolume / 127.0;
     if (insertion == 0)
         volume = 1.0;
     else

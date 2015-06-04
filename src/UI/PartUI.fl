@@ -4,6 +4,7 @@ header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
 }
+
 comment {PartUI.cc} {in_source not_in_header
 } 
 
@@ -26,7 +27,7 @@ comment {//
 //} {in_source in_header
 } 
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include "EffUI.h"} {public
@@ -53,12 +54,12 @@ decl {\#include "Misc/Master.h"} {public
 decl {\#include "Misc/Part.h"} {public
 } 
 
-class PartSysEffSend { : {public Fl_Group}
+class PartSysEffSend {: {public Fl_Group}
 } {
-  Function {make_window()} { private
+  Function {make_window()} {private
   } {
     Fl_Window syseffsend {
-      private xywh {989 1014 90 35} type Double labeltype NO_LABEL
+      private xywh {990 1040 90 35} type Double
       class Fl_Group visible
     } {
       Fl_Dial {} {
@@ -72,13 +73,11 @@ class PartSysEffSend { : {public Fl_Group}
       }
     }
   }
-  Function {PartSysEffSend(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {
-  } {
+  Function {PartSysEffSend(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {neff = 0;
         npart = 0;} {}
   }
-  Function {init(int npart_,int neff_)} {
-  } {
+  Function {init(int npart_,int neff_)} {} {
     code {npart = npart_;
         neff = neff_;
         make_window();
@@ -91,21 +90,20 @@ class PartSysEffSend { : {public Fl_Group}
   }
   decl {int neff;} {}
   decl {int npart;} {}
-  decl {char label[10];} {selected}
+  decl {char label[10];} {}
 } 
 
-class PartUI_ {
-} {
-  Function {showparameters(int kititem,int engine)} { return_type virtual
+class PartUI_ {} {
+  Function {showparameters(int kititem,int engine)} {return_type virtual
   } {}
 } 
 
-class PartKitItem { : {public Fl_Group}
+class PartKitItem {: {public Fl_Group}
 } {
-  Function {make_window()} { private
+  Function {make_window()} {private
   } {
     Fl_Window partkititem {
-       private xywh {118 401 670 30} type Double labeltype NO_LABEL hide
+      private xywh {118 401 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -165,16 +163,13 @@ maxkcounter->do_callback();}
         }
         Fl_Button labelbutton {
           label {Bass Drum}
-          callback {
-              //const char *tmp=fl_input("Kit item name:",(const char *)part->kit[n].Pname);
+          callback {//const char *tmp=fl_input("Kit item name:",(const char *)part->kit[n].Pname);
               const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
               if (tmp != NULL)
-                part->kit[n].Pname = string(tmp);
-          }
+                part->kit[n].Pname = string(tmp);}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 20
-          code0 {o->label((char *)part->kit[n].Pname.c_str());}
+          code0 {o->label(part->kit[n].Pname.c_str());}
         }
- #             //if (tmp != NULL) snprintf((char *)part->kit[n].Pname,PART_MAX_NAME_LEN,"%s",tmp);}
         Fl_Check_Button adcheck {
           callback {part->kit[n].Padenabled=(int)o->value();
 if (part->kit[n].Padenabled!=0) adeditbutton->activate();
@@ -241,19 +236,17 @@ if (part->kit[n].Ppadenabled!=0) padeditbutton->activate();
       }
     }
   }
-  Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {
-  } {
+  Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;
 part=NULL;} {}
   }
-  Function {refresh()} {
-  } {
+  Function {refresh()} {} {
     code {enabledcheck->value(part->kit[n].Penabled);
 if (part->kit[n].Penabled==0) partkititemgroup->deactivate();
 else partkititemgroup->activate();
 
 mutedcheck->value(part->kit[n].Pmuted);
-labelbutton->label((char *)part->kit[n].Pname.c_str());
+labelbutton->label(part->kit[n].Pname.c_str());
 minkcounter->value(part->kit[n].Pminkey);
 maxkcounter->value(part->kit[n].Pmaxkey);
 adcheck->value(part->kit[n].Padenabled);
@@ -279,8 +272,7 @@ partui->showparameters(n,-1);//use to delete the ui, if it is not to item 0
 } else o->value(1);}
     }
   }
-  Function {init(Part *part_,int n_,PartUI_ *partui_)} {
-  } {
+  Function {init(Part *part_,int n_,PartUI_ *partui_)} {} {
     code {part=part_;
 n=n_;
 partui=partui_;
@@ -298,15 +290,15 @@ end();} {}
   decl {PartUI_ *partui;} {}
 } 
 
-class PartUI { : {public Fl_Group,PartUI_}
+class PartUI {open : {public Fl_Group,PartUI_}
 } {
-  Function {make_window()} { private
+  Function {make_window()} {open private
   } {
-    Fl_Window partgroup {
-      private xywh {890 761 430 240} type Double labeltype NO_LABEL hide
-      class Fl_Group visible
+    Fl_Window partgroup {open
+      private xywh {891 787 430 240} type Double hide
+      class Fl_Group
     } {
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 425 235}
         code0 {if (part->Penabled==0) o->deactivate();}
       } {
@@ -335,8 +327,7 @@ class PartUI { : {public Fl_Group,PartUI_}
         }
         Fl_Button {} {
           label Instrument
-          callback {
-              int event = Fl::event_button();
+          callback {int event = Fl::event_button();
               if (event == FL_RIGHT_MOUSE)
               {
                   const char *tmp = fl_input("Instrument name:",part->Pname.c_str());
@@ -349,9 +340,8 @@ class PartUI { : {public Fl_Group,PartUI_}
                       bankui->show();
                   else
                       instrumenteditwindow->show();
-              }
-          }
-          tooltip {Left mousebutton: choose/save/.. from/to bank, Right mousebutton: change the name, Middle button: change the instrument information} xywh {195 14 185 19} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 1
+              }} selected
+          tooltip {Left mousebutton: choose/save/.. from/to bank, Right mousebutton: change the name, Middle button: change the instrument information} xywh {195 14 185 19} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 17
           code0 {o->label(part->Pname.c_str());}
         }
         Fl_Box {} {
@@ -1035,16 +1025,14 @@ part->setkeylimit(val);}
       }
     }
   }
-  Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {
-  } {
+  Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {part = NULL;
         adnoteui = NULL;
         subnoteui = NULL;
         padnoteui = NULL;
         lastkititem = -1;} {}
   }
-  Function {init(Part *part_,int npart_,BankUI *bankui_)} {
-  } {
+  Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {bankui = bankui_;
         part = part_;
         npart = npart_;
@@ -1075,8 +1063,7 @@ part->setkeylimit(val);}
             val = k;
         keylimitlist->value(val);} {}
   }
-  Function {showparameters(int kititem,int engine)} {
-  } {
+  Function {showparameters(int kititem,int engine)} {} {
     code {if (engine == -1)
         {   // this is used if I want to clear the engine from the part
             if (kititem == lastkititem)
@@ -1120,10 +1107,8 @@ part->setkeylimit(val);}
         if (engine == 2 && adnoteui != NULL)
             padnoteui->padnotewindow->show();} {}
   }
-  Function {~PartUI()} {
-  } {
-    code {
-        if (adnoteui != NULL)
+  Function {~PartUI()} {} {
+    code {if (adnoteui != NULL)
             delete (adnoteui);
         if (subnoteui != NULL)
             delete (subnoteui);
@@ -1138,8 +1123,7 @@ part->setkeylimit(val);}
         instrumentkitlist->hide();
         delete(instrumentkitlist);
         instrumenteditwindow->hide();
-        delete(instrumenteditwindow);
-    } {}
+        delete(instrumenteditwindow);} {}
   }
   decl {Part *part;} {}
   decl {BankUI *bankui;} {}
@@ -1148,8 +1132,7 @@ part->setkeylimit(val);}
   decl {PADnoteUI *padnoteui;} {}
   decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {}
   decl {int npart;} {}
-  decl {int ninseff;} {selected
-  }
+  decl {int ninseff;} {}
   decl {int lastkititem;} {}
   decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {}
 } 

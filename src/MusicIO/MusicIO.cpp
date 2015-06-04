@@ -25,37 +25,43 @@ using namespace std;
 #include "Misc/Master.h"
 #include "MusicIO/MusicIO.h"
 
+MusicIO::MusicIO() : buffersize(0) { }
+
 bool MusicIO::prepAudiobuffers(unsigned int nframes, bool with_interleaved)
 {
     if (nframes > 0)
     {
-        zynLeft = new float[nframes];
-        zynRight = new float[nframes];
+        buffersize = nframes;
+        zynLeft = new float[buffersize];
+        zynRight = new float[buffersize];
         if (zynLeft == NULL || zynRight == NULL)
             goto bail_out;
-        memset(zynLeft, 0, nframes * sizeof(float));
-        memset(zynRight, 0, nframes * sizeof(float));
+        memset(zynLeft, 0, buffersize * sizeof(float));
+        memset(zynRight, 0, buffersize * sizeof(float));
         if (with_interleaved)
         {
-            shortInterleaved = new short int[nframes * 2];
+            shortInterleaved = new short int[buffersize * 2];
             if (shortInterleaved == NULL)
                 goto bail_out;
-            memset(shortInterleaved, 0, nframes * 2 * sizeof(short int));
+            memset(shortInterleaved, 0, buffersize * 2 * sizeof(short int));
         }
         return true;
     }
 
 bail_out:
-    cerr << "Error, failed to allocate audio buffers, size " << nframes << endl;
+    cerr << "Error, failed to allocate audio buffers, size " << buffersize << endl;
     if (zynLeft != NULL)
         delete [] zynLeft;
     zynLeft = NULL;
     if (zynRight != NULL)
         delete [] zynRight;
     zynRight = NULL;
-    if (shortInterleaved != NULL)
-        delete [] shortInterleaved;
-    shortInterleaved = NULL;
+    if (with_interleaved)
+    {
+        if (shortInterleaved != NULL)
+            delete [] shortInterleaved;
+        shortInterleaved = NULL;
+    }
     return false;
 }
 
@@ -71,25 +77,29 @@ bool MusicIO::getAudio(bool lockrequired)
 bool MusicIO::getAudioInterleaved(bool lockrequired)
 {
     if (shortInterleaved != NULL)
+    {
         if (getAudio(lockrequired))
         {
             int idx = 0;
-            int buffersize = zynMaster->getBuffersize();
+            double scaled;
             for (int frame = 0; frame < buffersize; ++frame)
-            {
-                shortInterleaved[idx++] = (short int)(zynLeft[frame] * 32767.0);
-                shortInterleaved[idx++] = (short int)(zynRight[frame] * 32767.0);
+            {   // with a nod to libsamplerate ...
+                scaled = zynLeft[frame] * (8.0 * 0x10000000);
+                shortInterleaved[idx++] = (short int)(lrint(scaled) >> 16);
+                scaled = zynRight[frame] * (8.0 * 0x10000000);
+                shortInterleaved[idx++] = (short int)(lrint(scaled) >> 16);
             }
             return true;
         }
+    }
     return false;
 }
 
 
 void MusicIO::silenceBuffers(void)
 {
-        memset(zynLeft, 0, sizeof(zynLeft) * sizeof(float));
-        memset(zynRight, 0, sizeof(zynRight) * sizeof(float));
+        memset(zynLeft, 0, buffersize * sizeof(float));
+        memset(zynRight, 0, buffersize * sizeof(float));
 }
 
 

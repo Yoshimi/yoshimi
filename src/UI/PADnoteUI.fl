@@ -26,9 +26,6 @@ comment {//
 //} {in_source in_header
 }
 
-decl {\#include "ResonanceUI.h"} {public
-} 
-
 decl {\#include <FL/Fl_Box.H>} {public
 } 
 
@@ -40,7 +37,10 @@ decl {\#include <FL/Fl_File_Chooser.H>} {public
 
 decl {\#include <cmath>} {}
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "ResonanceUI.h"} {public
+} 
+
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include "EnvelopeUI.h"} {public

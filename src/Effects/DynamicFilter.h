@@ -25,6 +25,7 @@
 #include "DSP/Filter.h"
 #include "Effects/EffectLFO.h"
 #include "Effects/Effect.h"
+#include "Effects/Fader.h"
 
 class DynamicFilter : public Effect
 {
@@ -62,6 +63,7 @@ class DynamicFilter : public Effect
 
         Filter *filterl, *filterr;
         float ms1, ms2, ms3, ms4; // mean squares
+        Fader *fader0db;
 };
 
 #endif

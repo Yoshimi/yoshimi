@@ -48,7 +48,7 @@ decl {\#include <cmath>} {}
 
 decl {\#include <string>} {}
 
-decl {\#include "WidgetPDial.h"} {public
+decl {\#include "WidgetPDialUI.h"} {public
 } 
 
 decl {\#include "EnvelopeUI.h"} {public
