@@ -419,20 +419,14 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
             class VUMeter
           }
         }
-        Fl_Box partback {
-          xywh {4 27 55 30} box FLAT_BOX deactivate
-        }
         Fl_Box partadd {
-          xywh {5 28 17 27} box FLAT_BOX hide deactivate
-          code0 {o->color(ADD_COLOUR);}
+          xywh {5 28 17 27} box FLAT_BOX deactivate
         }
         Fl_Box partsub {
-          xywh {23 28 17 27} box FLAT_BOX hide deactivate
-          code0 {o->color(SUB_COLOUR);}
+          xywh {23 28 17 27} box FLAT_BOX deactivate
         }
         Fl_Box partpad {
-          xywh {40 28 17 27} box FLAT_BOX hide deactivate
-          code0 {o->color(PAD_COLOUR);}
+          xywh {40 28 17 27} box FLAT_BOX deactivate
         }
         Fl_Button partname {
           label {  }
@@ -582,29 +576,21 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   }
   Function {setPartLabel(int engine)} {} {
     code {//
-    partback->redraw();
-    partback->show();
     if (engine & 1)
-    {
-        partadd->redraw();
-        partadd->show();
-    }
+        partadd->color(ADD_COLOUR);
     else
-        partadd->hide();
+        partadd->color(BASE_COLOUR);
+    partadd->redraw();
     if (engine & 2)
-    {
-        partsub->redraw();
-        partsub->show();
-    }
+        partsub->color(SUB_COLOUR);
     else
-        partsub->hide();
+        partsub->color(BASE_COLOUR);
+    partsub->redraw();
     if (engine & 4)
-    {
-        partpad->redraw();
-        partpad->show();
-    }
+        partpad->color(PAD_COLOUR);
     else
-        partpad->hide();
+        partpad->color(BASE_COLOUR);
+    partpad->redraw();
     partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}

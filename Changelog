@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-6-5 Will
+- Improved engine colour sync, and also responds to kit part edits.
+
 2015-6-1 Will
 - Common Add,Sub,Pad colours now defines in CMakeLists.txt
 
