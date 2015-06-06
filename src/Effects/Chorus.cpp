@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <iostream>
@@ -35,24 +38,24 @@ Chorus::Chorus(bool insertion_, float *const efxoutl_, float *efxoutr_) :
     delayl = new float[maxdelay];
     delayr = new float[maxdelay];
 
-    setpreset(Ppreset);
+    setPreset(Ppreset);
 
-    lfo.effectlfoout(&lfol, &lfor);
-    dl2 = getdelay(lfol);
-    dr2 = getdelay(lfor);
-    cleanup();
+    lfo.effectLfoOut(&lfol, &lfor);
+    dl2 = getDelay(lfol);
+    dr2 = getDelay(lfor);
+    Cleanup();
 }
 
 
 // get the delay value in samples; xlfo is the current lfo value
-float Chorus::getdelay(float xlfo)
+float Chorus::getDelay(float xlfo)
 {
     float result = (Pflangemode) ? 0 : (delay + xlfo * depth) * zynMaster->getSamplerate();
 
-    //check if it is too big delay (caused bu erroneous setdelay() and setdepth()
+    //check if it is too big delay (caused bu erroneous setDelay() and setDepth()
     if ((result + 0.5) >= maxdelay)
     {
-        cerr << "WARNING: Chorus.C::getdelay(..) too big delay (see setdelay and setdepth funcs.)\n";
+        cerr << "WARNING: Chorus.C::getDelay(..) too big delay (see setdelay and setdepth funcs.)\n";
         result = maxdelay - 1.0;
     }
     return result;
@@ -65,10 +68,10 @@ void Chorus::out(float *smpsl, float *smpsr)
     const float one = 1.0;
     dl1 = dl2;
     dr1 = dr2;
-    lfo.effectlfoout(&lfol, &lfor);
+    lfo.effectLfoOut(&lfol, &lfor);
 
-    dl2 = getdelay(lfol);
-    dr2 = getdelay(lfor);
+    dl2 = getDelay(lfol);
+    dr2 = getDelay(lfor);
 
     float inL, inR, tmpL, tmpR, tmp;
     int buffersize = zynMaster->getBuffersize();
@@ -128,7 +131,7 @@ void Chorus::out(float *smpsl, float *smpsr)
 }
 
 // Cleanup the effect
-void Chorus::cleanup(void)
+void Chorus::Cleanup(void)
 {
     for (int i = 0; i < maxdelay; ++i)
         delayl[i] = delayr[i] = 0.0;
@@ -136,28 +139,28 @@ void Chorus::cleanup(void)
 
 
 // Parameter control
-void Chorus::setdepth(unsigned char Pdepth)
+void Chorus::setDepth(unsigned char Pdepth)
 {
     this->Pdepth = Pdepth;
     depth = (powf(8.0, (Pdepth / 127.0) * 2.0) - 1.0) / 1000.0; // seconds
 }
 
 
-void Chorus::setdelay(unsigned char Pdelay)
+void Chorus::setDelay(unsigned char Pdelay)
 {
     this->Pdelay=Pdelay;
     delay = (powf(10.0, (Pdelay / 127.0) * 2.0) - 1.0) / 1000.0; // seconds
 }
 
 
-void Chorus::setfb(unsigned char Pfb)
+void Chorus::setFb(unsigned char Pfb)
 {
     this->Pfb = Pfb;
     fb = (Pfb - 64.0) / 64.1;
 }
 
 
-void Chorus::setvolume(unsigned char Pvolume)
+void Chorus::setVolume(unsigned char Pvolume)
 {
     this->Pvolume = Pvolume;
     if (NULL != fader0db)
@@ -168,21 +171,21 @@ void Chorus::setvolume(unsigned char Pvolume)
 }
 
 
-void Chorus::setpanning(unsigned char Ppanning)
+void Chorus::setPanning(unsigned char Ppanning)
 {
     this->Ppanning = Ppanning;
     panning = Ppanning / 127.0;
 }
 
 
-void Chorus::setlrcross(unsigned char Plrcross)
+void Chorus::setLrCross(unsigned char Plrcross)
 {
     this->Plrcross = Plrcross;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Chorus::setpreset(unsigned char npreset)
+void Chorus::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 12;
     const int NUM_PRESETS = 10;
@@ -212,48 +215,48 @@ void Chorus::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
 
 
-void Chorus::changepar(int npar, unsigned char value)
+void Chorus::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpanning(value);
+            setPanning(value);
             break;
         case 2:
             lfo.Pfreq = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 3:
             lfo.Prandomness = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 4:
             lfo.PLFOtype = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 5:
             lfo.Pstereo = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 6:
-            setdepth(value);
+            setDepth(value);
             break;
         case 7:
-            setdelay(value);
+            setDelay(value);
             break;
         case 8:
-            setfb(value);
+            setFb(value);
             break;
         case 9:
-            setlrcross(value);
+            setLrCross(value);
             break;
         case 10:
             Pflangemode = (value > 1) ? 1 : value;
@@ -265,7 +268,7 @@ void Chorus::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Chorus::getpar(int npar) const
+unsigned char Chorus::getPar(int npar) const
 {
     switch (npar)
     {

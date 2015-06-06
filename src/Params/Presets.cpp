@@ -3,21 +3,24 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
-#include <string.h>
+#include <cstring>
 
 #include "Misc/Master.h"
 #include "Params/Presets.h"
@@ -34,12 +37,12 @@ Presets::Presets() :
 
 Presets::~Presets() { }
 
-void Presets::setpresettype(const char *type)
+void Presets::setPresetType(const char *type)
 {
     strcpy(this->type, type);
 }
 
-void Presets::copy(const char *name)
+void Presets::Copy(const char *name)
 {
     XMLwrapper *xml = new XMLwrapper();
 
@@ -65,15 +68,15 @@ void Presets::copy(const char *name)
     xml->endbranch();
 
     if (name == NULL)
-        presetsstore.copyclipboard(xml, type);
+        presetsstore.copyClipboard(xml, type);
     else
-        presetsstore.copypreset(xml, type,name);
+        presetsstore.copyPreset(xml, type,name);
 
     delete(xml);
     nelement = -1;
 }
 
-void Presets::paste(int npreset)
+void Presets::Paste(int npreset)
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
@@ -88,20 +91,20 @@ void Presets::paste(int npreset)
     XMLwrapper *xml = new XMLwrapper();
     if (npreset == 0)
     {
-        if (!checkclipboardtype())
+        if (!checkClipboardType())
         {
             nelement = -1;
             delete(xml);
             return;
         }
-        if (!presetsstore.pasteclipboard(xml))
+        if (!presetsstore.pasteClipboard(xml))
         {
             delete(xml);
             nelement = -1;
             return;
         }
     } else {
-        if (!presetsstore.pastepreset(xml, npreset))
+        if (!presetsstore.pastePreset(xml, npreset))
         {
             delete(xml);
             nelement = -1;
@@ -116,7 +119,7 @@ void Presets::paste(int npreset)
     }
     if (nelement == -1)
     {
-        defaults();
+        setDefaults();
         getfromXML(xml);
     } else {
         defaults(nelement);
@@ -128,28 +131,28 @@ void Presets::paste(int npreset)
     nelement = -1;
 }
 
-bool Presets::checkclipboardtype()
+bool Presets::checkClipboardType()
 {
     char type[MAX_PRESETTYPE_SIZE];
     strcpy(type, this->type);
     if (nelement != -1)
         strcat(type, "n");
 
-    return presetsstore.checkclipboardtype(type);
+    return presetsstore.checkClipboardType(type);
 }
 
-void Presets::setelement(int n)
+void Presets::setElement(int n)
 {
     nelement = n;
 }
 
-void Presets::rescanforpresets()
+void Presets::rescanPresets()
 {
-    presetsstore.rescanforpresets(type);
+    presetsstore.rescanPresets(type);
 }
 
 
-void Presets::deletepreset(int npreset)
+void Presets::deletePreset(int npreset)
 {
-    presetsstore.deletepreset(npreset);
+    presetsstore.deletePreset(npreset);
 }

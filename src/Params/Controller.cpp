@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
@@ -30,13 +33,13 @@ using namespace std;
 Controller::Controller()
 {
     volume.volControl = new Fader(1.0); // 0 .. 1.0
-    defaults();
-    resetall();
+    setDefaults();
+    resetAll();
 }
 
-void Controller::defaults()
+void Controller::setDefaults()
 {
-    setpitchwheelbendrange(200); // 2 halftones
+    setPitchwheelBendrange(200); // 2 halftones
     expression.receive = 1;
     panning.depth = 64;
     filtercutoff.depth = 64;
@@ -61,24 +64,24 @@ void Controller::defaults()
     resonancecenter.depth = 64;
     resonancebandwidth.depth = 64;
 
-    initportamento(440.0, 440.0, false); // Now has a third argument
-    setportamento(0);
+    initPortamento(440.0, 440.0, false); // Now has a third argument
+    setPortamento(0);
 }
 
-void Controller::resetall()
+void Controller::resetAll()
 {
-    setpitchwheel(0); // center
-    setexpression(127);
-    setpanning(64);
-    setfiltercutoff(64);
-    setfilterq(64);
-    setbandwidth(64);
-    setmodwheel(64);
-    setfmamp(127);
-    setvolume(127);
-    setsustain(0);
-    setresonancecenter(64);
-    setresonancebw(64);
+    setPitchwheel(0); // center
+    setExpression(127);
+    setPanning(64);
+    setFilterCutoff(64);
+    setFilterQ(64);
+    setBandwidth(64);
+    setModwheel(64);
+    setFmAmp(127);
+    setVolume(127);
+    setSustain(0);
+    setResonanceCenter(64);
+    setResonanceBw(64);
 
     //reset the NRPN
     NRPN.parhi = -1;
@@ -87,7 +90,7 @@ void Controller::resetall()
     NRPN.vallo = -1;
 }
 
-void Controller::setpitchwheel(int value)
+void Controller::setPitchwheel(int value)
 {
     pitchwheel.data = value;
     float cents = value / 8192.0;
@@ -97,12 +100,12 @@ void Controller::setpitchwheel(int value)
     //fprintf(stderr,"%ld %ld -> %.3f\n",pitchwheel.bendrange,pitchwheel.data,pitchwheel.relfreq);fflush(stderr);
 }
 
-void Controller::setpitchwheelbendrange(unsigned short int value)
+void Controller::setPitchwheelBendrange(unsigned short int value)
 {
     pitchwheel.bendrange = value;
 }
 
-void Controller::setexpression(int value)
+void Controller::setExpression(int value)
 {
     expression.data = value;
     if (expression.receive != 0 && value >= 0 && value < 128)
@@ -111,26 +114,26 @@ void Controller::setexpression(int value)
         expression.relvolume = 1.0;
 }
 
-void Controller::setpanning(int value)
+void Controller::setPanning(int value)
 {
     panning.data = value;
     panning.pan = (value / 128.0 - 0.5) * (panning.depth / 64.0);
 }
 
-void Controller::setfiltercutoff(int value)
+void Controller::setFilterCutoff(int value)
 {
     filtercutoff.data = value;
     filtercutoff.relfreq = (value - 64.0) * filtercutoff.depth / 4096.0
                            * 3.321928; // 3.3219.. = ln2(10)
 }
 
-void Controller::setfilterq(int value)
+void Controller::setFilterQ(int value)
 {
     filterq.data = value;
     filterq.relq = powf(30.0, (value - 64.0) / 64.0 * (filterq.depth / 64.0));
 }
 
-void Controller::setbandwidth(int value)
+void Controller::setBandwidth(int value)
 {
     bandwidth.data = value;
     if (bandwidth.exponential == 0)
@@ -148,7 +151,7 @@ void Controller::setbandwidth(int value)
     }
 }
 
-void Controller::setmodwheel(int value)
+void Controller::setModwheel(int value)
 {
     modwheel.data = value;
     if (modwheel.exponential == 0)
@@ -164,7 +167,7 @@ void Controller::setmodwheel(int value)
         modwheel.relmod = powf(25.0, (value - 64.0) / 64.0 * (modwheel.depth / 80.0));
 }
 
-void Controller::setfmamp(int value)
+void Controller::setFmAmp(int value)
 {
     fmamp.data = value;
     fmamp.relamp = value / 127.0;
@@ -174,7 +177,7 @@ void Controller::setfmamp(int value)
         fmamp.relamp = 1.0;
 }
 
-void Controller::setvolume(int value)
+void Controller::setVolume(int value)
 {
     volume.data = value;
     if (NULL != volume.volControl)
@@ -188,7 +191,7 @@ void Controller::setvolume(int value)
         cerr << "Error, null Controller Fader" << endl;
 }
 
-void Controller::setsustain(int value)
+void Controller::setSustain(int value)
 {
     sustain.data = value;
     if (sustain.receive != 0)
@@ -197,7 +200,7 @@ void Controller::setsustain(int value)
         sustain.sustain = 0;
 }
 
-void Controller::setportamento(int value)
+void Controller::setPortamento(int value)
 {
     portamento.data = value;
     if (portamento.receive != 0)
@@ -206,7 +209,7 @@ void Controller::setportamento(int value)
 
 // I added a third argument to pass legato status,
 // when legatoflag is true it means "there's a legato in progress".
-int Controller::initportamento(float oldfreq, float newfreq, bool legatoflag)
+int Controller::initPortamento(float oldfreq, float newfreq, bool legatoflag)
 {
     portamento.x = 0.0;
 
@@ -254,7 +257,7 @@ int Controller::initportamento(float oldfreq, float newfreq, bool legatoflag)
     return 1;
 }
 
-void Controller::updateportamento()
+void Controller::updatePortamento()
 {
     if (portamento.used == 0)
         return;
@@ -268,19 +271,19 @@ void Controller::updateportamento()
     portamento.freqrap = (1.0 - portamento.x) * portamento.origfreqrap + portamento.x;
 }
 
-void Controller::setresonancecenter(int value)
+void Controller::setResonanceCenter(int value)
 {
     resonancecenter.data = value;
     resonancecenter.relcenter = powf(3.0, (value - 64.0) / 64.0 * (resonancecenter.depth / 64.0));
 }
-void Controller::setresonancebw(int value)
+void Controller::setResonanceBw(int value)
 {
     resonancebandwidth.data = value;
     resonancebandwidth.relbw = powf(1.5, (value - 64.0) / 64.0 * (resonancebandwidth.depth / 127.0));
 }
 
 // Returns 0 if there is NRPN or 1 if there is not
-int Controller::getnrpn(int *parhi, int *parlo, int *valhi, int *vallo)
+int Controller::getNrpn(int *parhi, int *parlo, int *valhi, int *vallo)
 {
     if (NRPN.receive == 0)
         return 1;
@@ -294,7 +297,7 @@ int Controller::getnrpn(int *parhi, int *parlo, int *valhi, int *vallo)
     return 0;
 }
 
-void Controller::setparameternumber(unsigned int type,int value)
+void Controller::setParameterNumber(unsigned int type,int value)
 {
     switch (type)
     {

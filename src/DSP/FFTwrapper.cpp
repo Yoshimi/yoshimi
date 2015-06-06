@@ -2,70 +2,133 @@
     FFTwrapper.cpp  -  A wrapper for Fast Fourier Transforms
 
     Original ZynAddSubFX author Nasca Octavian Paul
-    Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright (C) 2002-2009 Nasca Octavian Paul
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
+#include <cstring>
+#include <iostream>
+#include <unistd.h>
+#include <errno.h>
 
+using namespace std;
+
+#include "Misc/Config.h"
 #include "DSP/FFTwrapper.h"
+
+int FFTwrapper::fftw_threads = 0;
 
 FFTwrapper::FFTwrapper(int fftsize_)
 {
     fftsize = fftsize_;
-    tmpfftdata1 = new fftw_real[fftsize];
-    tmpfftdata2 = new fftw_real[fftsize];
-    planfftw = fftw_plan_r2r_1d(fftsize, tmpfftdata1, tmpfftdata1, FFTW_R2HC, FFTW_ESTIMATE);
-    planfftw_inv = fftw_plan_r2r_1d(fftsize, tmpfftdata2, tmpfftdata2, FFTW_HC2R, FFTW_ESTIMATE);
+    data1 = (double*)fftw_malloc(sizeof(double) * fftsize);
+    data2 = (double*)fftw_malloc(sizeof(double) * fftsize);
+    if (!fftw_threads)
+    {
+        long nprocs = -1;
+#ifdef _SC_NPROCESSORS_ONLN
+        nprocs = sysconf(_SC_NPROCESSORS_ONLN);
+#elif defined _SC_NPROC_ONLN
+        nprocs = sysconf(_SC_NPROC_ONLN);
+#endif
+        fftw_threads = 1;
+        if (nprocs < 1)
+        {
+            if (Runtime.settings.verbose)
+                cerr << "Failed to determine number of CPUs online: "
+                     << strerror (errno) << endl;
+        }
+        if (nprocs > 0)
+            fftw_threads = nprocs;
+        if (Runtime.settings.verbose)
+            cerr << nprocs << " processors online, fftw3 to use "
+                 << fftw_threads << " threads" << endl;
+        int chk = fftw_init_threads();
+        if (!chk)
+            cerr << "Error from fftw_init_threads()" << endl;
+    }
+    fftw_plan_with_nthreads(fftw_threads);
+    planBasic = fftw_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC,
+                                 FFTW_MEASURE | FFTW_PRESERVE_INPUT);
+    planInv = fftw_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R,
+                               FFTW_MEASURE | FFTW_PRESERVE_INPUT);
 }
+
 
 FFTwrapper::~FFTwrapper()
 {
-    fftw_destroy_plan(planfftw);
-    fftw_destroy_plan(planfftw_inv);
-    delete [] tmpfftdata1;
-    delete [] tmpfftdata2;
+    fftw_destroy_plan(planBasic);
+    fftw_destroy_plan(planInv);
+    fftw_free(data1);
+    fftw_free(data2);
 }
+
 
 // do the Fast Fourier Transform
 void FFTwrapper::smps2freqs(float *smps, FFTFREQS freqs)
 {
     for (int i = 0; i < fftsize; ++i)
-        tmpfftdata1[i] = smps[i];
-    fftw_execute(planfftw);
-    for (int i = 0; i < fftsize / 2; ++i)
+        data1[i] = smps[i];
+    fftw_execute(planBasic);
+    int half_fftsize = fftsize / 2;
+    for (int i = 0; i < half_fftsize; ++i)
     {
-        freqs.c[i] = tmpfftdata1[i];
+        freqs.c[i] = data1[i];
         if (i != 0)
-            freqs.s[i] = tmpfftdata1[fftsize - i];
+            freqs.s[i] = data1[fftsize - i];
     }
-    tmpfftdata2[fftsize / 2] = 0.0;
+    data2[half_fftsize] = 0.0;
 }
+
 
 // do the Inverse Fast Fourier Transform
 void FFTwrapper::freqs2smps(FFTFREQS freqs, float *smps)
 {
-    tmpfftdata2[fftsize / 2] = 0.0;
-    for (int i = 0; i < fftsize / 2; ++i)
+    int half_fftsize = fftsize / 2;
+    data2[half_fftsize] = 0.0;
+    for (int i = 0; i < half_fftsize; ++i)
     {
-        tmpfftdata2[i] = freqs.c[i];
+        data2[i] = freqs.c[i];
         if (i != 0)
-            tmpfftdata2[fftsize - i] = freqs.s[i];
+            data2[fftsize - i] = freqs.s[i];
     }
-    fftw_execute(planfftw_inv);
+    fftw_execute(planInv);
     for (int i = 0; i < fftsize; ++i)
-        smps[i] = tmpfftdata2[i];
+        smps[i] = data2[i];
 }
 
+
+void FFTwrapper::newFFTFREQS(FFTFREQS &f, int size)
+{
+    f.c = new float[size];
+    if (NULL != f.c)
+        memset(f.c, 0, sizeof(float) * size);
+    f.s = new float[size];
+    if (NULL != f.s)
+        memset(f.s, 0, sizeof(float) * size);
+}
+
+
+void FFTwrapper::deleteFFTFREQS(FFTFREQS &f)
+{
+    if (NULL != f.c)
+        delete [] f.c;
+    if (NULL != f.s)
+        delete [] f.s;
+    f.c = f.s = NULL;
+}

@@ -4,18 +4,20 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
@@ -51,11 +53,10 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
     Pforcedrelease = Pforcedrelease_;
     Pfreemode = 1;
     Plinearenvelope = 0;
-
     store2defaults();
 }
 
-float EnvelopeParams::getdt(char i)
+float EnvelopeParams::getDt(char i)
 {
     float result = (powf(2.0, Penvdt[(int)i] / 127.0 * 12.0) - 1.0) * 10.0; // miliseconds
     return result;
@@ -64,50 +65,47 @@ float EnvelopeParams::getdt(char i)
 // ADSR/ASR... initialisations
 void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
 {
-    setpresettype("Penvamplitude");
+    setPresetType("Penvamplitude");
     Envmode = 1;
     PA_dt = A_dt;
     PD_dt = D_dt;
     PS_val = S_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    converttofree();
-
+    convertToFree();
     store2defaults();
 }
 
 void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 {
-    setpresettype("Penvamplitude");
+    setPresetType("Penvamplitude");
     Envmode = 2;
     PA_dt = A_dt;
     PD_dt = D_dt;
     PS_val = S_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    converttofree();
-
+    convertToFree();
     store2defaults();
 }
 
 void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 {
-    setpresettype("Penvfrequency");
+    setPresetType("Penvfrequency");
     Envmode = 3;
     PA_val = A_val;
     PA_dt = A_dt;
     PR_val = R_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    converttofree();
-
+    convertToFree();
     store2defaults();
 }
 
 void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val,
                                      char D_dt, char R_dt, char R_val)
 {
-    setpresettype("Penvfilter");
+    setPresetType("Penvfilter");
     Envmode = 4;
     PA_val = A_val;
     PA_dt = A_dt;
@@ -116,25 +114,25 @@ void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val,
     PR_dt = R_dt;
     PR_val = R_val;
     Pfreemode = 0;
-    converttofree();
+    convertToFree();
     store2defaults();
 }
 
 void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
 {
-    setpresettype("Penvbandwidth");
+    setPresetType("Penvbandwidth");
     Envmode = 5;
     PA_val = A_val;
     PA_dt = A_dt;
     PR_val = R_val;
     PR_dt = R_dt;
     Pfreemode = 0;
-    converttofree();
+    convertToFree();
     store2defaults();
 }
 
 // Convert the Envelope to freemode
-void EnvelopeParams::converttofree()
+void EnvelopeParams::convertToFree(void)
 {
     switch (Envmode) {
     case 1:
@@ -241,10 +239,10 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (!Pfreemode) converttofree();
+    if (!Pfreemode) convertToFree();
 }
 
-void EnvelopeParams::defaults()
+void EnvelopeParams::defaults(void)
 {
     Penvstretch = Denvstretch;
     Pforcedrelease = Dforcedrelease;
@@ -257,10 +255,10 @@ void EnvelopeParams::defaults()
     PS_val = DS_val;
     PR_val = DR_val;
     Pfreemode = 0;
-    converttofree();
+    convertToFree();
 }
 
-void EnvelopeParams::store2defaults()
+void EnvelopeParams::store2defaults(void)
 {
     Denvstretch = Penvstretch;
     Dforcedrelease = Pforcedrelease;

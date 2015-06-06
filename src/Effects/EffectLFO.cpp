@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cstdlib>
@@ -31,7 +34,7 @@ EffectLFO::EffectLFO()
     PLFOtype = 0;
     Pstereo = 96;
 
-    updateparams();
+    updateParams();
 
     ampl1 = (1 - lfornd) + lfornd * RND;
     ampl2 = (1 - lfornd) + lfornd * RND;
@@ -42,7 +45,7 @@ EffectLFO::EffectLFO()
 EffectLFO::~EffectLFO() { }
 
 // Update the changed parameters
-void EffectLFO::updateparams(void)
+void EffectLFO::updateParams(void)
 {
     float lfofreq = (powf(2, Pfreq / 127.0 * 10.0) - 1.0) * 0.03;
     incx = fabsf(lfofreq) * (float)zynMaster->getBuffersize()
@@ -61,7 +64,7 @@ void EffectLFO::updateparams(void)
 }
 
 // Compute the shape of the LFO
-float EffectLFO::getlfoshape(float x)
+float EffectLFO::getLfoShape(float x)
 {
     float out;
     switch (lfotype)
@@ -74,7 +77,7 @@ float EffectLFO::getlfoshape(float x)
             else
                 out = 4.0 * x - 4.0;
             break;
-            // \todo more to be added here; also ::updateparams() need to be
+            // \todo more to be added here; also ::updateParams() need to be
             // updated (to allow more lfotypes)
         default:
             out = cosf(x * 2 * PI); // EffectLFO_SINE
@@ -83,11 +86,11 @@ float EffectLFO::getlfoshape(float x)
 }
 
 // LFO output
-void EffectLFO::effectlfoout(float *outl, float *outr)
+void EffectLFO::effectLfoOut(float *outl, float *outr)
 {
     float out;
 
-    out = getlfoshape(xl);
+    out = getLfoShape(xl);
     if (lfotype == 0 || lfotype == 1)
         out *= (ampl1 + xl * (ampl2 - ampl1));
     xl += incx;
@@ -99,7 +102,7 @@ void EffectLFO::effectlfoout(float *outl, float *outr)
     }
     *outl = (out + 1.0) * 0.5;
 
-    out = getlfoshape(xr);
+    out = getLfoShape(xr);
     if (lfotype == 0 || lfotype == 1)
         out *= (ampr1 + xr * (ampr2 - ampr1));
     xr += incx;

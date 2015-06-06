@@ -27,6 +27,8 @@ using namespace std;
 #include "MusicIO/JackAlsaClient.h"
 #include "MusicIO/AlsaJackClient.h"
 
+MusicClient *musicClient = NULL;
+
 MusicClient *MusicClient::newMusicClient(void)
 {
     MusicClient *musicObj = NULL;

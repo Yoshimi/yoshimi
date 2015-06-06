@@ -4,24 +4,25 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef ENVELOPE_PARAMS_H
 #define ENVELOPE_PARAMS_H
 
-#include "globals.h"
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
 
@@ -39,13 +40,13 @@ class EnvelopeParams : public Presets
         void ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt,
                              char R_dt, char R_val);
         void ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt);
-        void converttofree();
+        void convertToFree();
 
         void add2XML(XMLwrapper *xml);
-        void defaults();
+        void setDefaults(void) { defaults(); };
         void getfromXML(XMLwrapper *xml);
 
-        float getdt(char i);
+        float getDt(char i);
 
         // MIDI Parameters
         unsigned char Pfreemode; // 1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...
@@ -67,6 +68,7 @@ class EnvelopeParams : public Presets
                      // 5 for ASR_bw parameters (bandwidth parameters)
 
     private:
+        void defaults(void);
         void store2defaults();
 
         // Default parameters

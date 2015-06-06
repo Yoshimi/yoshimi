@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
@@ -26,7 +29,7 @@
 
 ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
 {
-    setpresettype("Padsyth");
+    setPresetType("Padsyth");
     fft = fft_;
 
     GlobalPar.FreqEnvelope = new EnvelopeParams(0, 0);
@@ -45,10 +48,10 @@ ADnoteParameters::ADnoteParameters(FFTwrapper *fft_) : Presets()
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         EnableVoice(nvoice);
-    defaults();
+    setDefaults();
 }
 
-void ADnoteParameters::defaults()
+void ADnoteParameters::defaults(void)
 {
     // Default Parameters
     // Frequency Global Parameters
@@ -56,16 +59,16 @@ void ADnoteParameters::defaults()
     GlobalPar.PDetune = 8192; // zero
     GlobalPar.PCoarseDetune = 0;
     GlobalPar.PDetuneType = 1;
-    GlobalPar.FreqEnvelope->defaults();
-    GlobalPar.FreqLfo->defaults();
+    GlobalPar.FreqEnvelope->setDefaults();
+    GlobalPar.FreqLfo->setDefaults();
     GlobalPar.PBandwidth = 64;
 
     // Amplitude Global Parameters
     GlobalPar.PVolume = 90;
     GlobalPar.PPanning = 64; // center
     GlobalPar.PAmpVelocityScaleFunction = 64;
-    GlobalPar.AmpEnvelope->defaults();
-    GlobalPar.AmpLfo->defaults();
+    GlobalPar.AmpEnvelope->setDefaults();
+    GlobalPar.AmpLfo->setDefaults();
     GlobalPar.PPunchStrength = 0;
     GlobalPar.PPunchTime = 60;
     GlobalPar.PPunchStretch = 64;
@@ -75,10 +78,10 @@ void ADnoteParameters::defaults()
     // Filter Global Parameters
     GlobalPar.PFilterVelocityScale = 64;
     GlobalPar.PFilterVelocityScaleFunction = 64;
-    GlobalPar.GlobalFilter->defaults();
-    GlobalPar.FilterEnvelope->defaults();
-    GlobalPar.FilterLfo->defaults();
-    GlobalPar.Reson->defaults();
+    GlobalPar.GlobalFilter->setDefaults();
+    GlobalPar.FilterEnvelope->setDefaults();
+    GlobalPar.FilterLfo->setDefaults();
+    GlobalPar.Reson->setDefaults();
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
         defaults(nvoice);
@@ -128,21 +131,21 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFMAmpEnvelopeEnabled = 0;
     VoicePar[nvoice].PFMVelocityScaleFunction = 64;
 
-    VoicePar[nvoice].OscilSmp->defaults();
-    VoicePar[nvoice].FMSmp->defaults();
+    VoicePar[nvoice].OscilSmp->setDefaults();
+    VoicePar[nvoice].FMSmp->setDefaults();
 
-    VoicePar[nvoice].AmpEnvelope->defaults();
-    VoicePar[nvoice].AmpLfo->defaults();
+    VoicePar[nvoice].AmpEnvelope->setDefaults();
+    VoicePar[nvoice].AmpLfo->setDefaults();
 
-    VoicePar[nvoice].FreqEnvelope->defaults();
-    VoicePar[nvoice].FreqLfo->defaults();
+    VoicePar[nvoice].FreqEnvelope->setDefaults();
+    VoicePar[nvoice].FreqLfo->setDefaults();
 
-    VoicePar[nvoice].VoiceFilter->defaults();
-    VoicePar[nvoice].FilterEnvelope->defaults();
-    VoicePar[nvoice].FilterLfo->defaults();
+    VoicePar[nvoice].VoiceFilter->setDefaults();
+    VoicePar[nvoice].FilterEnvelope->setDefaults();
+    VoicePar[nvoice].FilterLfo->setDefaults();
 
-    VoicePar[nvoice].FMFreqEnvelope->defaults();
-    VoicePar[nvoice].FMAmpEnvelope->defaults();
+    VoicePar[nvoice].FMFreqEnvelope->setDefaults();
+    VoicePar[nvoice].FMAmpEnvelope->setDefaults();
 }
 
 // Init the voice parameters

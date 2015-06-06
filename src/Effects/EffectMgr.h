@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef EFFECTMGR_H
@@ -43,28 +46,28 @@ class EffectMgr : public Presets
         ~EffectMgr();
 
         void add2XML(XMLwrapper *xml);
-        void defaults();
+        void setDefaults(void);
         void getfromXML(XMLwrapper *xml);
 
         void out(float *smpsl, float *smpsr);
 
-        void setdryonly(bool value);
+        void setDryOnly(bool value);
 
-        float sysefxgetvolume(void);
+        float sysefxGetVolume(void);
 
-        void cleanup();
+        void Cleanup(void);
 
-        void changeeffect(int nefx_);
-        int geteffect(void);
-        void changepreset(unsigned char npreset);
-        void changepreset_nolock(unsigned char npreset);
-        unsigned char getpreset(void);
-        void seteffectpar(int npar, unsigned char value);
-        void seteffectpar_nolock(int npar, unsigned char value);
-        unsigned char geteffectpar(int npar);
+        void changeEffect(int nefx_);
+        int getEffect(void);
+        void changePreset(unsigned char npreset);
+        void changePreset_nolock(unsigned char npreset);
+        unsigned char getPreset(void);
+        void setEffectPar(int npar, unsigned char value);
+        void setEffectPar_nolock(int npar, unsigned char value);
+        unsigned char getEffectPar(int npar);
 
         float *efxoutl, *efxoutr;
-        bool insertion; // <1 if the effect is connected as insertion effect
+        bool insertion; // the effect is connected as insertion effect (or not)
 
         // used by UI
         float getEQfreqresponse(float freq);
@@ -72,6 +75,7 @@ class EffectMgr : public Presets
         FilterParams *filterpars;
 
     private:
+        void defaults(void) { setDefaults(); };
         int nefx;
         Effect *efx;
         bool dryonly;

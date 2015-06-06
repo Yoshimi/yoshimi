@@ -5,18 +5,20 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
@@ -79,7 +81,7 @@ ADnote::ADnote(ADnoteParameters *pars, Controller *ctl_, float freq,
         NoteGlobalPar.Panning = pars->GlobalPar.PPanning / 128.0;
 
     NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalPar.GlobalFilter->getfreq() // center freq
+        pars->GlobalPar.GlobalFilter->getFreq() // center freq
         + pars->GlobalPar.PFilterVelocityScale / 127.0 * 6.0 // velocity sensing
         * (VelF(velocity, pars->GlobalPar.PFilterVelocityScaleFunction) - 1);
 
@@ -187,7 +189,7 @@ ADnote::ADnote(ADnoteParameters *pars, Controller *ctl_, float freq,
         NoteVoicePar[nvoice].FilterLfo = NULL;
 
         NoteVoicePar[nvoice].FilterCenterPitch =
-            pars->VoicePar[nvoice].VoiceFilter->getfreq();
+            pars->VoicePar[nvoice].VoiceFilter->getFreq();
         NoteVoicePar[nvoice].filterbypass =
             pars->VoicePar[nvoice].Pfilterbypass;
 
@@ -316,7 +318,7 @@ void ADnote::ADlegatonote(float freq, float velocity,
         NoteGlobalPar.Panning = pars->GlobalPar.PPanning / 128.0;
 
     NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalPar.GlobalFilter->getfreq() // center freq
+        pars->GlobalPar.GlobalFilter->getFreq() // center freq
         + pars->GlobalPar.PFilterVelocityScale / 127.0 * 6.0 // velocity sensing
         * (VelF(velocity, pars->GlobalPar.PFilterVelocityScaleFunction) - 1);
 
@@ -376,7 +378,7 @@ void ADnote::ADlegatonote(float freq, float velocity,
                 NoteVoicePar[nvoice].OscilSmp[i];
 
         NoteVoicePar[nvoice].FilterCenterPitch =
-            pars->VoicePar[nvoice].VoiceFilter->getfreq();
+            pars->VoicePar[nvoice].VoiceFilter->getFreq();
         NoteVoicePar[nvoice].filterbypass =
             pars->VoicePar[nvoice].Pfilterbypass;
 
@@ -435,9 +437,9 @@ void ADnote::ADlegatonote(float freq, float velocity,
         NoteGlobalPar.Volume * NoteGlobalPar.AmpEnvelope->envout_dB()
         * NoteGlobalPar.AmpLfo->amplfoout();
 
-    NoteGlobalPar.FilterQ = partparams->GlobalPar.GlobalFilter->getq();
+    NoteGlobalPar.FilterQ = partparams->GlobalPar.GlobalFilter->getQ();
     NoteGlobalPar.FilterFreqTracking =
-        partparams->GlobalPar.GlobalFilter->getfreqtracking(basefreq);
+        partparams->GlobalPar.GlobalFilter->getFreqTracking(basefreq);
 
     // Forbids the Modulation Voice to be greater or equal than voice
     for (i = 0; i < NUM_VOICES; ++i)
@@ -476,7 +478,7 @@ void ADnote::ADlegatonote(float freq, float velocity,
         }
 
         NoteVoicePar[nvoice].FilterFreqTracking =
-            partparams->VoicePar[nvoice].VoiceFilter->getfreqtracking(basefreq);
+            partparams->VoicePar[nvoice].VoiceFilter->getFreqTracking(basefreq);
 
         /* Voice Modulation Parameters Init */
         if (NoteVoicePar[nvoice].FMEnabled != NONE
@@ -654,9 +656,9 @@ void ADnote::initparameters()
     NoteGlobalPar.FilterEnvelope =
         new Envelope(partparams->GlobalPar.FilterEnvelope, basefreq);
     NoteGlobalPar.FilterLfo = new LFO(partparams->GlobalPar.FilterLfo, basefreq);
-    NoteGlobalPar.FilterQ = partparams->GlobalPar.GlobalFilter->getq();
+    NoteGlobalPar.FilterQ = partparams->GlobalPar.GlobalFilter->getQ();
     NoteGlobalPar.FilterFreqTracking =
-        partparams->GlobalPar.GlobalFilter->getfreqtracking(basefreq);
+        partparams->GlobalPar.GlobalFilter->getFreqTracking(basefreq);
 
     // Forbids the Modulation Voice to be greater or equal than voice
     for (i = 0; i < NUM_VOICES; ++i)
@@ -726,7 +728,7 @@ void ADnote::initparameters()
                 new LFO(partparams->VoicePar[nvoice].FilterLfo, basefreq);
 
         NoteVoicePar[nvoice].FilterFreqTracking =
-            partparams->VoicePar[nvoice].VoiceFilter->getfreqtracking(basefreq);
+            partparams->VoicePar[nvoice].VoiceFilter->getFreqTracking(basefreq);
 
         // Voice Modulation Parameters Init
         if (NoteVoicePar[nvoice].FMEnabled != NONE
@@ -874,12 +876,12 @@ void ADnote::computecurrentparameters()
                                 + ctl->filtercutoff.relfreq
                                 + NoteGlobalPar.FilterFreqTracking;
 
-    tmpfilterfreq = NoteGlobalPar.GlobalFilterL->getrealfreq(tmpfilterfreq);
+    tmpfilterfreq = NoteGlobalPar.GlobalFilterL->getRealFreq(tmpfilterfreq);
 
     float globalfilterq = NoteGlobalPar.FilterQ * ctl->filterq.relq;
-    NoteGlobalPar.GlobalFilterL->setfreq_and_q(tmpfilterfreq,globalfilterq);
+    NoteGlobalPar.GlobalFilterL->setFreq_and_Q(tmpfilterfreq,globalfilterq);
     if (stereo != 0)
-        NoteGlobalPar.GlobalFilterR->setfreq_and_q(tmpfilterfreq, globalfilterq);
+        NoteGlobalPar.GlobalFilterR->setFreq_and_Q(tmpfilterfreq, globalfilterq);
 
     // compute the portamento, if it is used by this note
     float portamentofreqrap = 1.0;
@@ -927,9 +929,9 @@ void ADnote::computecurrentparameters()
                 filterpitch += NoteVoicePar[nvoice].FilterLfo->lfoout();
 
             filterfreq = filterpitch + NoteVoicePar[nvoice].FilterFreqTracking;
-            filterfreq = NoteVoicePar[nvoice].VoiceFilter->getrealfreq(filterfreq);
+            filterfreq = NoteVoicePar[nvoice].VoiceFilter->getRealFreq(filterfreq);
 
-            NoteVoicePar[nvoice].VoiceFilter->setfreq(filterfreq);
+            NoteVoicePar[nvoice].VoiceFilter->setFreq(filterfreq);
         }
 
         if (NoteVoicePar[nvoice].noisetype == 0)
@@ -1279,8 +1281,8 @@ int ADnote::noteout(float *outl, float *outr)
         return 0;
 
     int nvoice;
-    memcpy(outl, denormalkillbuf, buffersize * sizeof(float));
-    memcpy(outr, denormalkillbuf, buffersize * sizeof(float));
+    memset(outl, 0, buffersize * sizeof(float));
+    memset(outr, 0, buffersize * sizeof(float));
     memset(bypassl, 0, buffersize * sizeof(float));
     memset(bypassr, 0, buffersize * sizeof(float));
     computecurrentparameters();
@@ -1348,7 +1350,7 @@ int ADnote::noteout(float *outl, float *outr)
 
         // Filter
         if (NoteVoicePar[nvoice].VoiceFilter != NULL)
-            NoteVoicePar[nvoice].VoiceFilter->filterout(&tmpwave[0]);
+            NoteVoicePar[nvoice].VoiceFilter->filterOut(&tmpwave[0]);
 
         // check if the amplitude envelope is finished, if yes, the voice will be fadeout
         if (NoteVoicePar[nvoice].AmpEnvelope != NULL)
@@ -1400,7 +1402,7 @@ int ADnote::noteout(float *outl, float *outr)
 
 
     // Processing Global parameters
-    NoteGlobalPar.GlobalFilterL->filterout(&outl[0]);
+    NoteGlobalPar.GlobalFilterL->filterOut(&outl[0]);
 
     if (stereo == 0)
     {
@@ -1410,7 +1412,7 @@ int ADnote::noteout(float *outl, float *outr)
             bypassr[i] = bypassl[i];
         }
     } else
-        NoteGlobalPar.GlobalFilterR->filterout(&outr[0]);
+        NoteGlobalPar.GlobalFilterR->filterOut(&outr[0]);
 
     for (int i = 0; i < buffersize; ++i)
     {

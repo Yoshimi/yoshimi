@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef XML_WRAPPER_H
@@ -27,8 +30,6 @@
 using namespace std;
 
 #include "globals.h"
-
-#define TMPSTR_SIZE 50
 
 // the maxim tree depth
 #define STACKSIZE 100
@@ -43,8 +44,8 @@ class XMLwrapper
         /*         SAVE to XML          */
         /********************************/
 
-        // returns 0 if ok or -1 if the file cannot be saved
-        int saveXMLfile(string filename);
+        // returns true if ok, false if the file cannot be saved
+        bool saveXMLfile(string filename);
 
         // returns the new allocated string that contains the XML data (used for clipboard)
         // the string is NULL terminated
@@ -72,23 +73,22 @@ class XMLwrapper
         /*        LOAD from XML         */
         /********************************/
 
-        // returns 0 if ok or -1 if the file cannot be loaded
-        int loadXMLfile(const string &filename);
+        bool loadXMLfile(string filename); // true if loaded ok
 
         // used by the clipboard
         bool putXMLdata(const char *xmldata);
 
         // enter into the branch
         // returns 1 if is ok, or 0 otherwise
-        int enterbranch(const string &name);
+        bool enterbranch(string name);
 
 
         // enter into the branch with id
         // returns 1 if is ok, or 0 otherwise
-        int enterbranch(const string &name, int id);
+        bool enterbranch(string name, int id);
 
         // exits from a branch
-        void exitbranch();
+        void exitbranch(void);
 
         // get the the branch_id and limits it between the min and max
         // if min==max==0, it will not limit it
@@ -102,16 +102,15 @@ class XMLwrapper
         int getpar(string name, int defaultpar, int min, int max);
 
         // the same as getpar, but the limits are 0 and 127
-        int getpar127(const string &name, int defaultpar);
+        int getpar127(string name, int defaultpar);
 
-        int getparbool(const string &name, int defaultpar);
+        int getparbool(string name, int defaultpar);
 
-        void getparstr(const string &name, char *par, int maxstrlen);
-        void getparstr(const string &name, string& par, int maxstrlen);
+         string getparstr(string name);
 
-        float getparreal(const char *name, float defaultpar);
-        float getparreal(const char *name, float defaultpar,
-                            float min, float max);
+        float getparreal(string name, float defaultpar);
+        float getparreal(string name, float defaultpar,
+                         float min, float max);
 
         bool minimal; // false if all parameters will be stored (used only for clipboard)
 
@@ -121,11 +120,11 @@ class XMLwrapper
 
         // opens a file and parse only the "information" data on it
         // returns "true" if all went ok or "false" on errors
-        bool checkfileinformation(const char *filename);
+        bool checkfileinformation(string filename);
 
     private:
-        int dosavefile(const char *filename, int compression, const char *xmldata);
-        char *doloadfile(const string &filename);
+        bool dosavefile(string filename, int compression, const char *xmldata);
+        char *doloadfile(string filename);
 
         mxml_node_t *tree; // all xml data
         mxml_node_t *root; // xml data used by zynaddsubfx
@@ -135,27 +134,23 @@ class XMLwrapper
         // adds params like this:
         // <name>
         // returns the node
-        mxml_node_t *addparams0(const char *name);
+        //mxml_node_t *addparams0(const char *name);
+        mxml_node_t *addparams0(string  name);
 
         // adds params like this:
         // <name par1="val1">
         // returns the node
-        mxml_node_t *addparams1(const char *name, const char *par1, const char *val1);
+        //mxml_node_t *addparams1(const char *name, const char *par1, const char *val1);
+        mxml_node_t *addparams1(string name, string par1, string val1);
 
         // adds params like this:
         // <name par1="val1" par2="val2">
         // returns the node
-        mxml_node_t *addparams2(const char *name, const char *par1,
-                                const char *val1, const char *par2,
-                                const char *val2);
-
-        char *int2str(int x);
-        char *real2str(float x);
-
-        int str2int(const char *str);
-        float str2real(const char *str);
-
-        char tmpstr[TMPSTR_SIZE];
+        //mxml_node_t *addparams2(const char *name, const char *par1,
+        //                        const char *val1, const char *par2,
+        //                        const char *val2);
+        mxml_node_t *addparams2(string name, string par1, string val1,
+                                string par2, string val2);
 
         // this is used to store the parents
         mxml_node_t *parentstack[STACKSIZE];
@@ -168,9 +163,9 @@ class XMLwrapper
         // these are used to store the values
         struct {
             struct {
-                int major,minor;
+                int major, minor;
             } xml_version;
-        }values;
+        } values;
 };
 
 #endif

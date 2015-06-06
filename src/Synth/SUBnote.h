@@ -3,29 +3,31 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef SUB_NOTE_H
 #define SUB_NOTE_H
 
-#include "../globals.h"
-#include "../Params/SUBnoteParameters.h"
-#include "../Params/Controller.h"
-#include "Envelope.h"
-#include "../DSP/Filter.h"
+#include "Params/SUBnoteParameters.h"
+#include "Params/Controller.h"
+#include "Synth/Envelope.h"
+#include "DSP/Filter.h"
 
 class SUBnote
 {
@@ -132,10 +134,10 @@ class SUBnote
             } param;
         } Legato;
 
-        const float log_0_01;// = logf(0.01);
-        const float log_0_001;// = logf(0.001);
-        const float log_0_0001;// = logf(0.0001);
-        const float log_0_00001;// = logf(0.00001);
+        const float log_0_01;    // = logf(0.01);
+        const float log_0_001;   // = logf(0.001);
+        const float log_0_0001;  // = logf(0.0001);
+        const float log_0_00001; // = logf(0.00001);
 
         unsigned int samplerate;
         int buffersize;

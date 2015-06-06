@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
@@ -67,8 +70,8 @@ Reverb::Reverb(bool insertion_, float *efxoutl_, float *efxoutr_) :
         apk[i] = 0;
         ap[i] = NULL;
     }
-    setpreset(Ppreset);
-    cleanup(); // do not call this before the comb initialisation
+    setPreset(Ppreset);
+    Cleanup(); // do not call this before the comb initialisation
 }
 
 
@@ -91,7 +94,7 @@ Reverb::~Reverb()
 }
 
 // Cleanup the effect
-void Reverb::cleanup(void)
+void Reverb::Cleanup(void)
 {
     int i, j;
     for (i = 0; i < REV_COMBS * 2; ++i)
@@ -108,13 +111,13 @@ void Reverb::cleanup(void)
         for (i = 0; i < idelaylen; ++i)
             idelay[i] = 0.0;
     if (hpf != NULL)
-        hpf->cleanup();
+        hpf->Cleanup();
     if (lpf != NULL)
-        lpf->cleanup();
+        lpf->Cleanup();
 }
 
 // Process one channel; 0 = left, 1 = right
-void Reverb::processmono(int ch, float *output)
+void Reverb::processMono(int ch, float *output)
 {
     int i, j;
     float fbout, tmp;
@@ -151,7 +154,9 @@ void Reverb::processmono(int ch, float *output)
         {
             tmp = ap[j][ak];
             ap[j][ak] = 0.7 * tmp + output[i];
-            output[i] = tmp - 0.7 * ap[j][ak];
+            output[i] = tmp - 0.7 * ap[j][ak] - 1e-20f; // anti-denormal -
+                                                        // a very, very, very
+                                                        // small dc bias
             if ((++ak) >= aplength)
                 ak = 0;
         }
@@ -181,12 +186,12 @@ void Reverb::out(float *smps_l, float *smps_r)
     }
 
     if (lpf != NULL)
-        lpf->filterout(inputbuf);
+        lpf->filterOut(inputbuf);
     if (hpf != NULL)
-        hpf->filterout(inputbuf);
+        hpf->filterOut(inputbuf);
 
-    processmono(0, efxoutl); // left
-    processmono(1, efxoutr); // right
+    processMono(0, efxoutl); // left
+    processMono(1, efxoutr); // right
 
     float lvol = rs / REV_COMBS * pan;
     float rvol = rs / REV_COMBS * (1.0 - pan);
@@ -205,7 +210,7 @@ void Reverb::out(float *smps_l, float *smps_r)
 
 // Parameter control
 
-void Reverb::setvolume(unsigned char &Pvolume)
+void Reverb::setVolume(unsigned char &Pvolume)
 {
     this->Pvolume = Pvolume;
     if (insertion == 0)
@@ -220,18 +225,18 @@ void Reverb::setvolume(unsigned char &Pvolume)
     {
         volume = outvolume = Pvolume / 127.0;
         if (Pvolume == 0.0)
-            cleanup();
+            Cleanup();
     }
 }
 
 
-void Reverb::setpan(unsigned char &Ppan)
+void Reverb::setPan(unsigned char &Ppan)
 {
     this->Ppan = Ppan;
     pan = (float)Ppan / 127.0f;
 }
 
-void Reverb::settime(unsigned char &Ptime)
+void Reverb::setTime(unsigned char &Ptime)
 {
     this->Ptime = Ptime;
     float t = powf(60.0, Ptime / 127.0) - 0.97;
@@ -241,7 +246,7 @@ void Reverb::settime(unsigned char &Ptime)
         // the feedback is negative because it removes the DC
 }
 
-void Reverb::setlohidamp(unsigned char Plohidamp)
+void Reverb::setLoHiDamp(unsigned char Plohidamp)
 {
     this->Plohidamp = (Plohidamp < 64) ? 64 : Plohidamp;
                        // remove this when the high part from lohidamp is added
@@ -261,7 +266,7 @@ void Reverb::setlohidamp(unsigned char Plohidamp)
     }
 }
 
-void Reverb::setidelay(unsigned char &Pidelay)
+void Reverb::setIdelay(unsigned char &Pidelay)
 {
     this->Pidelay = Pidelay;
     float delay = powf(50 * Pidelay / 127.0, 2) - 1.0;
@@ -279,13 +284,13 @@ void Reverb::setidelay(unsigned char &Pidelay)
     }
 }
 
-void Reverb::setidelayfb(unsigned char &Pidelayfb)
+void Reverb::setIdelayFb(unsigned char &Pidelayfb)
 {
     this->Pidelayfb = Pidelayfb;
     idelayfb = Pidelayfb / 128.0;
 }
 
-void Reverb::sethpf(unsigned char &Phpf)
+void Reverb::setHpf(unsigned char &Phpf)
 {
     this->Phpf = Phpf;
     if (Phpf == 0)
@@ -298,11 +303,11 @@ void Reverb::sethpf(unsigned char &Phpf)
         if (hpf == NULL)
             hpf = new AnalogFilter(3, fr, 1, 0);
         else
-            hpf->setfreq(fr);
+            hpf->setFreq(fr);
     }
 }
 
-void Reverb::setlpf(unsigned char &Plpf)
+void Reverb::setLpf(unsigned char &Plpf)
 {
     this->Plpf = Plpf;
     if (Plpf == 127)
@@ -315,11 +320,11 @@ void Reverb::setlpf(unsigned char &Plpf)
         if (lpf == NULL)
             lpf = new AnalogFilter(2, fr, 1, 0);
         else
-            lpf->setfreq(fr);
+            lpf->setFreq(fr);
     }
 }
 
-void Reverb::settype(unsigned char Ptype)
+void Reverb::setType(unsigned char Ptype)
 {
     const int NUM_TYPES = 2;
     int combtunings[NUM_TYPES][REV_COMBS] = {
@@ -377,11 +382,11 @@ void Reverb::settype(unsigned char Ptype)
         ap[i] = new float[aplen[i]];
         memset(ap[i], 0, aplen[i] * sizeof(float));
     }
-    settime(Ptime);
-    cleanup();
+    setTime(Ptime);
+    Cleanup();
 }
 
-void Reverb::setroomsize(unsigned char &Proomsize)
+void Reverb::setRoomsize(unsigned char &Proomsize)
 {
     this->Proomsize = Proomsize;
     if (Proomsize == 0)
@@ -391,10 +396,10 @@ void Reverb::setroomsize(unsigned char &Proomsize)
         roomsize *= 2.0;
     roomsize = powf(10.0, roomsize);
     rs = sqrtf(roomsize);
-    settype(Ptype);
+    setType(Ptype);
 }
 
-void Reverb::setpreset(unsigned char npreset)
+void Reverb::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 12;
     const int NUM_PRESETS = 13;
@@ -430,55 +435,55 @@ void Reverb::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
     if (insertion != 0)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if reverb is insertion effect
+        changePar(0, presets[npreset][0] / 2); // lower the volume if reverb is insertion effect
     Ppreset = npreset;
 }
 
 
-void Reverb::changepar(int npar, unsigned char value)
+void Reverb::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpan(value);
+            setPan(value);
             break;
         case 2:
-            settime(value);
+            setTime(value);
             break;
         case 3:
-            setidelay(value);
+            setIdelay(value);
             break;
         case 4:
-            setidelayfb(value);
+            setIdelayFb(value);
             break;
     //  case 5: setrdelay(value);
     //      break;
     //  case 6: seterbalance(value);
     //      break;
         case 7:
-            setlpf(value);
+            setLpf(value);
             break;
         case 8:
-            sethpf(value);
+            setHpf(value);
             break;
         case 9:
-            setlohidamp(value);
+            setLoHiDamp(value);
             break;
         case 10:
-            settype(value);
+            setType(value);
             break;
         case 11:
-            setroomsize(value);
+            setRoomsize(value);
             break;
     }
 }
 
-unsigned char Reverb::getpar(int npar) const
+unsigned char Reverb::getPar(int npar) const
 {
     switch (npar)
     {

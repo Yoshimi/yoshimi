@@ -3,29 +3,31 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef PART_H
 #define PART_H
 
-#include <list> // For the monomemnotes list.
+#include <list>
 
 using namespace std;
 
-#include "globals.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/PADnoteParameters.h"
@@ -51,35 +53,36 @@ class Part
         void NoteOn(unsigned char note, unsigned char velocity,
                         int masterkeyshift);
         void NoteOff(unsigned char note);
-        void AllNotesOff() { killallnotes = true; }; // panic, prepare all notes
-                                                     // to be turned off
+        void AllNotesOff(void) { killallnotes = true; };
+             // panic, prepare all notes to be turned off
         void SetController(unsigned int type, int par);
-        void RelaseSustainedKeys(); // this is called when the sustain pedal is relased
-        void RelaseAllKeys();       // this is called on AllNotesOff controller
+        void RelaseSustainedKeys(void);
+             // this is called when the sustain pedal is relased
+        void RelaseAllKeys(void);
+             // this is called on AllNotesOff controller
 
         /* The synthesizer part output */
-        void ComputePartSmps(); // Part output
+        void ComputePartSmps(void); // Part output
 
         // instrumentonly: 0 - save all, 1 - save only instrumnet,
         //                 2 - save only instrument without the name(used in bank)
 
-        //saves the instrument settings to a XML file
-        //returns 0 for ok or <0 if there is an error
-        int saveXML(char *filename);
-        int loadXMLinstrument(const char *filename);
+        // saves the instrument settings to a XML file
+        bool saveXML(string filename); // true for load ok, otherwise false
+        bool loadXMLinstrument(string filename);
 
         void add2XML(XMLwrapper *xml);
         void add2XMLinstrument(XMLwrapper *xml);
 
-        void defaults();
-        void defaultsinstrument();
+        void setDefaults(void);
+        void defaultsInstrument(void);
 
-        void applyparameters();
+        void applyParameters(void);
 
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
 
-        void cleanup();
+        void Cleanup(void);
 
     //      ADnoteParameters *ADPartParameters;
     //      SUBnoteParameters *SUBPartParameters;
@@ -96,8 +99,8 @@ class Part
         } kit[NUM_KIT_ITEMS];
 
         // Part parameters
-        void setkeylimit(unsigned char Pkeylimit);
-        void setkititemstatus(int kititem,int Penabled_);
+        void setKeyLimit(unsigned char Pkeylimit);
+        void setKitItemStatus(int kititem,int Penabled_);
 
         unsigned char Penabled;
         unsigned char Pvolume;
@@ -155,7 +158,7 @@ class Part
     private:
         void KillNotePos(int pos);
         void RelaseNotePos(int pos);
-        void MonoMemRenote(); // MonoMem stuff.
+        void MonoMemRenote(void); // MonoMem stuff.
 
         bool killallnotes; // true if I want to kill all notes (ie, panic)
 

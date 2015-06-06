@@ -41,7 +41,7 @@ class AlsaEngine : public MusicIO
         void Close(void);
         
         unsigned int getSamplerate(void) { return audio.samplerate; };
-        unsigned int getBuffersize(void) { return audio.period_size; };
+        int getBuffersize(void) { return audio.period_size; };
         
         string audioClientName(void);
         string midiClientName(void);

@@ -23,13 +23,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-struct FFTFREQS {
-    float *s, *c; // sine and cosine components
-};
-
-extern void newFFTFREQS(FFTFREQS *f, int size);
-extern void deleteFFTFREQS(FFTFREQS *f);
-
 #define MAX_AD_HARMONICS 128
 
 #define MAX_SUB_HARMONICS 64

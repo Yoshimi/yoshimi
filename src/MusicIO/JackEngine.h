@@ -30,8 +30,6 @@ using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
-typedef jack_default_audio_sample_t jsample_t;
-
 class JackEngine : public MusicIO
 {
     public:
@@ -46,7 +44,7 @@ class JackEngine : public MusicIO
         void Close(void);
         
         unsigned int getSamplerate(void) { return audio.jackSamplerate; };
-        unsigned int getBuffersize(void) { return audio.jackNframes; };
+        int getBuffersize(void) { return audio.jackNframes; };
 
         string clientName(void);
         int clientId(void);

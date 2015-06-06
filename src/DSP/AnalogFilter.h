@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef ANALOG_FILTER_H
@@ -30,15 +33,15 @@ class AnalogFilter : public Filter_
         AnalogFilter(unsigned char Ftype, float Ffreq, float Fq,
                      unsigned char Fstages);
         ~AnalogFilter();
-        void filterout(float *smp);
-        void setfreq(float frequency);
-        void setfreq_and_q(float frequency, float q_);
-        void setq(float q_);
+        void filterOut(float *smp);
+        void setFreq(float frequency);
+        void setFreq_and_Q(float frequency, float q_);
+        void setQ(float q_);
 
-        void settype(int type_);
-        void setgain(float dBgain);
-        void setstages(int stages_);
-        void cleanup();
+        void setType(int type_);
+        void setGain(float dBgain);
+        void setStages(int stages_);
+        void Cleanup();
 
         float H(float freq); // Obtains the response for a given frequency
 
@@ -50,9 +53,9 @@ class AnalogFilter : public Filter_
           oldx[MAX_FILTER_STAGES + 1],
           oldy[MAX_FILTER_STAGES + 1];
 
-        void singlefilterout(float *smp, fstage &x, fstage &y, float *c,
+        void singleFilterOut(float *smp, fstage &x, fstage &y, float *c,
                              float *d);
-        void computefiltercoefs();
+        void computeFilterCoefs();
         int type;   // The type of the filter (LPF1,HPF1,LPF2,HPF2...)
         int stages; // how many times the filter is applied (0->1,1->2,etc.)
         float freq; // Frequency given in Hz

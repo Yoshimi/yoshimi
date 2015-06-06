@@ -3,40 +3,44 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include <stdlib.h>
-#include <string.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "Misc/Util.h"
 #include "Params/PresetsStore.h"
 
 PresetsStore presetsstore;
 
-PresetsStore::PresetsStore()
+PresetsStore::PresetsStore() :
+    preset_extension(".xpz")
 {
     clipboard.data = NULL;
-    clipboard.type[0] = 0;
+    clipboard.type.clear();
 
     for (int i = 0; i < MAX_PRESETS; ++i)
     {
-        presets[i].file = NULL;
-        presets[i].name = NULL;
+        presets[i].file.clear();
+        presets[i].name.clear();
     }
 }
 
@@ -44,171 +48,139 @@ PresetsStore::~PresetsStore()
 {
     if (clipboard.data != NULL)
         free(clipboard.data);
-    clearpresets();
 }
 
 // Clipboard management
 
-void PresetsStore::copyclipboard(XMLwrapper *xml, char *type)
+void PresetsStore::copyClipboard(XMLwrapper *xml, string type)
 {
-    strcpy(clipboard.type, type);
+    clipboard.type = type;
     if (clipboard.data != NULL)
         free(clipboard.data);
     clipboard.data = xml->getXMLdata();
 }
 
-bool PresetsStore::pasteclipboard(XMLwrapper *xml)
+bool PresetsStore::pasteClipboard(XMLwrapper *xml)
 {
-    if (clipboard.data!=NULL) xml->putXMLdata(clipboard.data);
-    else return(false);
-    return(true);
+    if (clipboard.data != NULL)
+    {
+        xml->putXMLdata(clipboard.data);
+        return true;
+    }
+    return false;
 }
 
-bool PresetsStore::checkclipboardtype(char *type)
+bool PresetsStore::checkClipboardType(string type)
 {
     //makes LFO's compatible
-    if ((strstr(type,"Plfo")!=NULL)&&(strstr(clipboard.type,"Plfo")!=NULL)) return(true);
-    return(strcmp(type,clipboard.type)==0);
+    if (type.find("Plfo") != string::npos
+        && clipboard.type.find("Plfo") != string::npos)
+        return true;
+    return (!type.compare(clipboard.type));
 }
 
-// Presets management
-void PresetsStore::clearpresets()
-{
-    for (int i=0;i<MAX_PRESETS;i++) {
-        if (presets[i].file!=NULL) {
-            delete(presets[i].file);
-            presets[i].file=NULL;
-        }
-        if (presets[i].name!=NULL) {
-            delete(presets[i].name);
-            presets[i].name=NULL;
-        }
-    }
-}
 
+/**
 // a helper function that compares 2 presets[]
 int Presets_compar(const void *a, const void *b)
 {
     struct PresetsStore::presetstruct *p1 = (PresetsStore::presetstruct *)a;
     struct PresetsStore::presetstruct *p2 = (PresetsStore::presetstruct *)b;
-    if (p1->name == NULL || p2->name == NULL)
+    if (p1->name.empty() || p2->name.empty())
         return 0;
-
-    return (strcasecmp(p1->name, p2->name) < 0);
+    return (strcasecmp(p1->name.c_str(), p2->name.c_str()) < 0);
 }
+**/
 
-
-void PresetsStore::rescanforpresets(char *type)
+void PresetsStore::rescanPresets(string type)
 {
-    clearpresets();
+    for (int i = 0; i < MAX_PRESETS; ++i)
+    {
+        presets[i].file.clear();
+        presets[i].name.clear();
+    }
     int presetk = 0;
-    char ftype[MAX_STRING_SIZE];
-    snprintf(ftype, MAX_STRING_SIZE, ".%s.xpz", type);
+    string ftype = "." + type + preset_extension;
 
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
-        if (Runtime.settings.presetsDirList[i] == NULL)
+        if (Runtime.settings.presetsDirlist[i].empty())
             continue;
-        char *dirname = Runtime.settings.presetsDirList[i];
-        DIR *dir = opendir(dirname);
+        string dirname = Runtime.settings.presetsDirlist[i];
+        DIR *dir = opendir(dirname.c_str());
         if (dir == NULL)
             continue;
         struct dirent *fn;
         while ((fn = readdir(dir)))
         {
-            const char *filename = fn->d_name;
-            if (strstr(filename, ftype) == NULL)
+            string filename = string(fn->d_name);
+            if (filename.find(ftype) == string::npos)
                 continue;
-
-            presets[presetk].file = new char [MAX_STRING_SIZE];
-            presets[presetk].name = new char [MAX_STRING_SIZE];
-            char tmpc = dirname[strlen(dirname) - 1];
-            const char *tmps;
-            if (tmpc == '/' || tmpc == '\\')
-                tmps = "";
+            if (dirname.at(dirname.size() - 1) != '/')
+                dirname += "/";
+            presets[presetk].file = dirname + filename;
+            if (filename.find_last_of(ftype) != string::npos)
+                presets[presetk].name = filename;
             else
-                tmps = "/";
-            snprintf(presets[presetk].file, MAX_STRING_SIZE, "%s%s%s", dirname,
-                     tmps, filename);
-            snprintf(presets[presetk].name, MAX_STRING_SIZE, "%s", filename);
-
-            char *tmp = strstr(presets[presetk].name, ftype);
-            if (tmp != NULL)
-                tmp[0] = '\0';
+                presets[presetk].name =
+                    filename.substr(0, filename.find_last_of(ftype));
             presetk++;
             if (presetk >= MAX_PRESETS)
                 return;
         }
         closedir(dir);
     }
-
     // sort the presets
-    for (int j = 0; j < MAX_PRESETS - 1; ++j)
+    bool check = true;
+    while (check)
     {
-        for (int i = j + 1; i < MAX_PRESETS; ++i)
+        check = false;
+        for (int j = 0; j < MAX_PRESETS - 1; ++j)
         {
-            if (Presets_compar(&presets[i], &presets[j]))
+            for (int i = j + 1; i < MAX_PRESETS; ++i)
             {
-                presetstruct tmp = presets[i];
-                presets[i] = presets[j];
-                presets[j] = tmp;
+                if (presets[i].name.empty() || presets[j].name.empty())
+                    continue;
+                if (strcasecmp(presets[i].name.c_str(), presets[j].name.c_str()) < 0)
+                {
+                    presets[i].file.swap(presets[j].file);
+                    presets[i].name.swap(presets[j].name);
+                    check = true;
+                }
             }
         }
     }
 }
 
-void PresetsStore::copypreset(XMLwrapper *xml, char *type, const char *name)
+void PresetsStore::copyPreset(XMLwrapper *xml, string type, string name)
 {
-    char filename[MAX_STRING_SIZE], tmpfilename[MAX_STRING_SIZE];
-
-    if (Runtime.settings.presetsDirList[0] == NULL)
+    if (Runtime.settings.presetsDirlist[0].empty())
         return;
-
-    snprintf(tmpfilename, MAX_STRING_SIZE, "%s",name);
-
-    // make the filenames legal
-    for (int i = 0; i < (int) strlen(tmpfilename); ++i)
-    {
-        char c = tmpfilename[i];
-        if (c >= '0' && c <= '9')
-            continue;
-        if (c >= 'A' && c <= 'Z')
-            continue;
-        if (c >= 'a' && c <= 'z')
-            continue;
-        if (c == '-' || c == ' ')
-            continue;
-        tmpfilename[i] = '_';
-    }
-
-    const char *dirname = Runtime.settings.presetsDirList[0];
-    char tmpc = dirname[strlen(dirname) - 1];
-    const char *tmps;
-    if (tmpc == '/' || tmpc == '\\')
-        tmps = "";
-    else
-        tmps = "/";
-
-    snprintf(filename, MAX_STRING_SIZE, "%s%s%s.%s.xpz", dirname, tmps, name, type);
-
+    string filename;
+    string tmpfilename = name;
+    legit_filename(tmpfilename);
+    string dirname = Runtime.settings.presetsDirlist[0];
+    if (dirname.find_last_of("/") != (dirname.size() - 1))
+        dirname += "/";
+    filename = dirname + "." + type + preset_extension;
     xml->saveXMLfile(filename);
 }
 
-bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
+bool PresetsStore::pastePreset(XMLwrapper *xml, int npreset)
 {
+    if (npreset >= MAX_PRESETS || npreset < 1)
+        return false;
     npreset--;
-    if (npreset>=MAX_PRESETS) return(false);
-    char *filename=presets[npreset].file;
-    if (filename==NULL) return(false);
-    bool result=(xml->loadXMLfile(filename)>=0);
-    return(result);
+    if (presets[npreset].file.empty())
+        return false;
+    return xml->loadXMLfile(presets[npreset].file);
 }
 
-void PresetsStore::deletepreset(int npreset)
+void PresetsStore::deletePreset(int npreset)
 {
+    if (npreset >= MAX_PRESETS || npreset < 1)
+        return;
     npreset--;
-    if (npreset>=MAX_PRESETS) return;
-    char *filename=presets[npreset].file;
-    if (filename==NULL) return;
-    remove(filename);
+    if (!presets[npreset].file.empty())
+        remove(presets[npreset].file.c_str());
 }

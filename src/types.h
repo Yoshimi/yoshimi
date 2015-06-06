@@ -1,5 +1,5 @@
 /*
-    AntiDenormals.h
+    types.h
 
     Copyright 2009, Alan Calvert
 
@@ -17,11 +17,11 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// For de-denormalling volume controls, ie, greater than/equal to zero -
-inline float dedenormVol(float x) { return (x < 1e-10f) ? 0.0f : x; }
+#ifndef TYPES_H
+#define TYPES_H
 
-inline float FlushToZero( volatile float f )
-{
-    f += 9.8607615E-32f;
-    return f - 9.8607615E-32f;
-}
+
+
+
+
+#endif

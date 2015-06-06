@@ -16,18 +16,20 @@ comment {//
 // Copyright (C) 2002-2005 Nasca Octavian Paul
 // Copyright 2009, Alan Calvert
 //
-// This file is part of yoshimi, which is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-
-// yoshimi is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of yoshimi, which is free software: you can redistribute
+// it and/or modify it under the terms of version 2 of the GNU General Public
+// License as published by the Free Software Foundation.
+//
+// yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+// later) for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+// Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// This file is a derivative of the ZynAddSubFX original, modified October 2009
 //} {in_source in_header
 } 
 
@@ -70,7 +72,7 @@ decl {\#include "PresetsUI.h"} {public
 decl {\#include "Misc/Master.h"} {public
 } 
 
-class VUMeter {: {public Fl_Box}
+class VUMeter {open : {public Fl_Box}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -82,7 +84,8 @@ class VUMeter {: {public Fl_Box}
         olddbl = 0.0;
         olddbr = 0.0;
         oldrmsdbl = 0.0;
-        oldrmsdbr = 0.0;} {}
+        oldrmsdbr = 0.0;
+    } {}
   }
   Function {draw_master()} {} {
     code {\#define MIN_DB (-48)
@@ -90,15 +93,13 @@ class VUMeter {: {public Fl_Box}
         int oy = y();
         int lx = w();
         int ly = h();
-        zynMaster->actionLock(lock);
-        float dbl = zynMaster->vuoutpeakl;
-        float dbr = zynMaster->vuoutpeakr;
-        float rmsdbl = zynMaster->vurmspeakl;
-        float rmsdbr = zynMaster->vurmspeakr;
-        float maxdbl = zynMaster->vumaxoutpeakl;
-        float maxdbr = zynMaster->vumaxoutpeakr;
-        int clipped = zynMaster->vuclipped;
-        zynMaster->actionLock(unlock);
+        float dbl = zynMaster->vuOutPeakL;
+        float dbr = zynMaster->vuOutPeakR;
+        float rmsdbl = zynMaster->vuRmsPeakL;
+        float rmsdbr = zynMaster->vuRmsPeakR;
+        float maxdbl = zynMaster->vuMaxOutPeakL;
+        float maxdbr = zynMaster->vuMaxOutPeakR;
+        bool clipped = zynMaster->vuClipped;
         dbl = rap2dB(dbl);
         dbr = rap2dB(dbr);
         rmsdbl = rap2dB(rmsdbl);
@@ -107,9 +108,15 @@ class VUMeter {: {public Fl_Box}
         maxdbr = rap2dB(maxdbr);
         
         dbl = (MIN_DB - dbl) / MIN_DB;
-        dbl = (dbl > 1.0) ? 1.0 : dbl;
+        if (dbl < 0.0)
+            dbl = 0.0;
+        else if (dbl > 1.0)
+            dbl = 1.0;
         dbr = (MIN_DB - dbr) / MIN_DB;
-        dbr = (dbr > 1.0) ? 1.0 : dbr;
+        if (dbr < 0.0)
+            dbr = 0.0;
+        else if (dbr > 1.0)
+            dbr = 1.0;
         dbl = dbl * 0.4 + olddbl * 0.6;
         dbr = dbr * 0.4 + olddbr * 0.6;
         olddbl = dbl;
@@ -119,14 +126,20 @@ class VUMeter {: {public Fl_Box}
         dbl *= VULENX;
         dbr *= VULENX;
 
-        int idbl = (int) dbl;
-        int idbr = (int) dbr;
+        int idbl = dbl;
+        int idbr = dbr;
 
         // compute RMS - start
         rmsdbl = (MIN_DB - rmsdbl) / MIN_DB;
-        rmsdbl = (rmsdbl > 1.0) ? 1.0 : rmsdbl;
-        rmsdbr = (MIN_DB-rmsdbr) / MIN_DB;
-        rmsdbr = (rmsdbr > 1.0) ? 1.0 : rmsdbr;
+        if (rmsdbl < 0.0)
+            rmsdbl = 0.0;
+        else if (rmsdbl > 1.0)
+            rmsdbl = 1.0;
+        rmsdbr = (MIN_DB - rmsdbr) / MIN_DB;
+        if (rmsdbr < 0.0)
+            rmsdbr = 0.0;
+        else if (rmsdbr > 1.0)
+            rmsdbr = 1.0;
         rmsdbl = rmsdbl * 0.4 + oldrmsdbl * 0.6;
         rmsdbr = rmsdbr * 0.4 + oldrmsdbr * 0.6;
         oldrmsdbl = rmsdbl;
@@ -134,8 +147,8 @@ class VUMeter {: {public Fl_Box}
         rmsdbl *= VULENX;
         rmsdbr *= VULENX;
 
-        int irmsdbl = (int) rmsdbl;
-        int irmsdbr = (int) rmsdbr;
+        int irmsdbl = rmsdbl;
+        int irmsdbr = rmsdbr;
         // compute RMS - end
 
         // draw the vu-meter lines
@@ -150,7 +163,7 @@ class VUMeter {: {public Fl_Box}
         float tmp = VULENX * 1.0 / MIN_DB;
         for (int i = 1; i < 1 - MIN_DB; ++i)
         {
-           int tx = VULENX + (int) (tmp * i);
+           int tx = VULENX + (int)(tmp * i);
            fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 160, 200);
            if (i % 5 == 0)
                fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 230, 240);
@@ -163,27 +176,31 @@ class VUMeter {: {public Fl_Box}
             fl_rectf(ox + irmsdbr - 1, oy, 3, VULENY, 255, 255, 0);
         if (irmsdbl > 2)
             fl_rectf(ox + irmsdbl - 1, oy + ly / 2, 3, VULENY, 255, 255, 0);
+
         // draw the red box if clipping has occured
-        if (clipped == 0)
-            fl_rectf(ox + VULENX + 2, oy + 1, lx - VULENX - 3, ly - 4, 0, 0, 10);
-        else
+        if (clipped)
             fl_rectf(ox + VULENX + 2, oy + 1, lx - VULENX - 3, ly - 4, 250, 10, 10);
+        else
+            fl_rectf(ox + VULENX + 2, oy + 1, lx - VULENX - 3, ly - 4, 0, 0, 10);
+
         // draw the maxdB
-        fl_font(FL_HELVETICA | FL_BOLD, 10);
-        fl_color(255, 255, 255);
-        char tmpstr[10];
         if ((maxdbl > MIN_DB - 20))
         {
-            snprintf((char *)&tmpstr, 10, "%ddB", (int)maxdbr);
-            fl_draw(tmpstr, ox + VULENX + 1, oy+ 1, lx - VULENX - 1, VULENY,
-                    FL_ALIGN_RIGHT, NULL, 0);
+            fl_font(FL_HELVETICA | FL_BOLD, 10);
+            fl_color(255, 255, 255);
+            string tmpstr = asString((int)maxdbl) + "dB";
+            fl_draw(tmpstr.c_str(), ox + VULENX + 1, oy + 1, lx - VULENX - 1,
+                    VULENY, FL_ALIGN_RIGHT, NULL, 0);
         }
         if ((maxdbr > MIN_DB - 20))
         {
-            snprintf((char *)&tmpstr, 10, "%ddB", (int)maxdbl);
-            fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1, lx - VULENX - 1,
-                    VULENY, FL_ALIGN_RIGHT, NULL, 0);
-        }} {}
+            fl_font(FL_HELVETICA | FL_BOLD, 10);
+            fl_color(255, 255, 255);
+            string tmpstr = asString((int)maxdbr) + "dB";
+            fl_draw(tmpstr.c_str(), ox + VULENX + 1, oy + ly / 2 + 1,
+                    lx - VULENX - 1, VULENY, FL_ALIGN_RIGHT, NULL, 0);
+        }
+    } {}
   }
   Function {draw_part()} {} {
     code {\#define MIN_DB (-48)
@@ -193,9 +210,18 @@ class VUMeter {: {public Fl_Box}
         int ly = h();
         if (!active_r())
         {
-            zynMaster->actionLock(lock);
+            fl_rectf(ox, oy, lx, ly, 140, 140, 140);
+            if (zynMaster->fakepeakpart[npart] > 0)
+            {
+                int fakedb = zynMaster->fakepeakpart[npart] / 255.0 * ly + 4;
+                fl_rectf(ox + 2, oy + ly - fakedb, lx - 4, fakedb, 0, 0, 0);
+            }
+            return;
+        }
+/**
+        if (!active_r())
+        {
             int fakedb = zynMaster->fakepeakpart[npart];
-            zynMaster->actionLock(unlock);
             fl_rectf(ox, oy, lx, ly, 140, 140, 140);
             if (fakedb > 0)
             {
@@ -204,10 +230,12 @@ class VUMeter {: {public Fl_Box}
             }
             return;
         }
+
+
+**/
         // draw the vu lines
-        zynMaster->actionLock(lock);
-        float db = rap2dB(zynMaster->vuoutpeakpart[npart]);
-        zynMaster->actionLock(unlock);
+        float db = zynMaster->vuoutpeakpart[npart];
+        db = rap2dB(db);
 
         db = (MIN_DB - db) / MIN_DB;
         db = (db > 1.0) ? 1.0 : db;
@@ -226,9 +254,11 @@ class VUMeter {: {public Fl_Box}
                 fl_rectf(ox, oy + ly - ty, lx, 1, 0, 160, 200);
             if (i % 10 == 0)
                 fl_rectf(ox, oy + ly - ty, lx, 1, 0, 230, 240);
-        }} {}
+        }
+    } {}
   }
-  Function {draw()} {} {
+  Function {draw()} {open
+  } {
     code {if (npart>=0) draw_part();
    else draw_master();} {}
   }
@@ -239,36 +269,37 @@ class VUMeter {: {public Fl_Box}
   Function {tick(void *v)} {return_type {static void}
   } {
     code {tickdraw((VUMeter *) v);
-        Fl::add_timeout(1.0 / 60.0, tick, v);// 60 fps} {}
+        Fl::add_timeout(0.04, tick, v); // 1.0 / 25.0 => 25 fps} {}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {switch(event){
-   case FL_SHOW:
-             tick(this);
-             break;
-   case FL_HIDE:
-             Fl::remove_timeout(tick,this);
-             break;
-   case FL_PUSH:
-             if (npart>=0) break;
-             zynMaster->actionLock(lock);
-             zynMaster->vuresetpeaks();
-             zynMaster->actionLock(unlock);
-             break;
-};
-return 1;} {}
+    code {
+        switch(event){
+            case FL_SHOW:
+                tick(this);
+                break;
+            case FL_HIDE:
+                Fl::remove_timeout(tick, this);
+                break;
+            case FL_PUSH:
+                if (npart < 0) //if (npart >= 0) break;
+                    zynMaster->vuResetpeaks();
+                break;
+        }
+        return 1;
+    } {}
   }
   decl {int npart;} {}
-  decl {float olddbl,olddbr;} {}
-  decl {float oldrmsdbl,oldrmsdbr;} {}
+  decl {float olddbl;} {}
+  decl {float olddbr;} {}
+  decl {float oldrmsdbl;} {}
+  decl {float oldrmsdbr;} {}
 } 
 
-class SysEffSend {: {public WidgetPDial}
+class SysEffSend {open : {public WidgetPDial}
 } {
   Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {} {
-    code {neff1=0;
-neff2=0;} {}
+    code {neff1=0; neff2=0;} {}
   }
   Function {init(int neff1_,int neff2_)} {} {
     code {neff1 = neff1_;
@@ -279,28 +310,28 @@ neff2=0;} {}
         labelfont(1);
         labelsize(10);
         align(FL_ALIGN_TOP);
-
         value(zynMaster->Psysefxsend[neff1][neff2]);
-        char tmp[20];
-        snprintf(tmp, 20, "%d->%d", neff1 + 1, neff2 + 1);
-        copy_label(tmp);} {}
+        copy_label((asString(neff1 + 1) + "->" + asString(neff2 + 1)).c_str());
+    } {}
   }
   Function {~SysEffSend()} {} {
     code {hide();} {}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {if ((event==FL_PUSH) || (event==FL_DRAG)){
-   zynMaster->setPsysefxsend(neff1,neff2,(int) value());
-};
-
-return(WidgetPDial::handle(event));} {}
+    code {
+        if (event == FL_PUSH || event == FL_DRAG)
+        {
+            zynMaster->setPsysefxsend(neff1,neff2,(int) value());
+        }
+        return WidgetPDial::handle(event);
+    } {}
   }
   decl {int neff1;} {}
   decl {int neff2;} {}
 } 
 
-class Panellistitem {: {public Fl_Group}
+class Panellistitem {open : {public Fl_Group}
 } {
   Function {make_window()} {private
   } {
@@ -324,12 +355,14 @@ class Panellistitem {: {public Fl_Group}
         }
         Fl_Button partname {
           label {  }
-          callback {if ((int)bankui->cbwig->value() != (npart + 1))
+          callback {
+              if ((int)bankui->cbwig->value() != (npart + 1))
               {
                   bankui->cbwig->value(npart+1);
                   bankui->cbwig->do_callback();
               }
-              bankui->show();}
+              bankui->show();
+          }
           xywh {5 27 60 30} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
@@ -355,12 +388,11 @@ class Panellistitem {: {public Fl_Group}
         Fl_Choice partrcv {
           callback {zynMaster->part[npart]->Prcvchn=(int) o->value();}
           tooltip {receive from Midi channel} xywh {10 213 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
-          code0 {char nrstr[10];
+          code0 {
             for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
-                sprintf(nrstr, "Ch%d", i + 1 );
                 if (i != 9)
-                    o->add(nrstr);
+                    o->add(string("Ch" + asString(i + 1)).c_str());
                 else
                     o->add("Dr10");
             }}
@@ -369,7 +401,8 @@ class Panellistitem {: {public Fl_Group}
       }
       Fl_Check_Button partenabled {
         label 01
-        callback {zynMaster->actionLock(lock);
+        callback {
+            zynMaster->actionLock(lock);
             zynMaster->partOnOff(npart, (int) o->value());
             zynMaster->actionLock(unlock);
 
@@ -386,26 +419,31 @@ class Panellistitem {: {public Fl_Group}
             }
             o->redraw();}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 24
-        code0 {char tmp[10];
-            snprintf(tmp, 10, "%d", npart + 1);
-            o->copy_label(tmp);}
+        code0 {
+            string tmp = asString(npart + 1);
+            o->copy_label(tmp.c_str());
+        }
         code1 {o->value(zynMaster->part[npart]->Penabled);}
       }
     }
   }
-  Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+  Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
+  } {
     code {npart = 0;
         bankui = NULL;} {}
   }
-  Function {init(int npart_,BankUI *bankui_)} {} {
+  Function {init(int npart_, BankUI *bankui_)} {open
+  } {
     code {npart=npart_;
         bankui = bankui_;
         make_window();
         panellistitem->show();
         end();} {}
   }
-  Function {refresh()} {} {
-    code {partenabled->value(zynMaster->part[npart]->Penabled);
+  Function {refresh()} {open
+  } {
+    code {
+        partenabled->value(zynMaster->part[npart]->Penabled);
         if (zynMaster->part[npart]->Penabled != 0)
             panellistitemgroup->activate();
         else
@@ -430,17 +468,18 @@ class Panellistitem {: {public Fl_Group}
 
 class MasterUI {open
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window masterwindow {
       label zynaddsubfx
       callback {if (fl_choice("Exit and leave the unsaved data?", "No", "Yes", NULL))
           {
               Runtime.Save();
               Pexitprogram = true;
-          }}
-      xywh {1169 484 390 465} type Double xclass zynaddsubfx visible
+          }} open
+      xywh {81 594 390 460} type Double xclass zynaddsubfx visible
     } {
-      Fl_Menu_Bar mastermenu {
+      Fl_Menu_Bar mastermenu {open
         xywh {-5 0 690 25}
       } {
         Submenu {} {
@@ -468,40 +507,33 @@ class MasterUI {open
                 filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
                 if (filename == NULL)
                     return;
+                string fname = string(filename);
                 zynMaster->actionLock(lock);
-                // clear all parameters
-                zynMaster->microtonal.defaults();
-                // load the data
-                int result = zynMaster->microtonal.loadXML(filename);
+                zynMaster->microtonal.setDefaults(); // clear all parameters
+                bool result = zynMaster->microtonal.loadXML(fname);
                 zynMaster->actionLock(unlock);
-                delete microtonalui;
+                if (NULL != microtonalui)
+                    delete microtonalui;
                 microtonalui = new MicrotonalUI(&zynMaster->microtonal);
-                if (result == -10)
-                    fl_alert("Error: Could not load the file\\nbecause it is not a scale file.");
-                else if (result < 0)
-                    fl_alert("Error: Could not load the file.");}
+                if (!result)
+                    fl_alert("Error, failed to load scale settings file");}
             xywh {35 35 100 20}
           }
           MenuItem {} {
             label {Save Sc&ale Settings ..}
             callback {char *filename;
-                int result = 0;
                 filename = fl_file_chooser("Save:", "({*.xsz})", NULL, 0);
                 if (filename == NULL)
                     return;
                 filename = fl_filename_setext(filename, ".xsz");
-                result = fileexists(filename);
-                if (result)
-                {
-                    result = 0;
+                if (fileexists(string(filename)))
                     if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
                         return;
-                }
                 zynMaster->actionLock(lock);
-                result = zynMaster->microtonal.saveXML(filename);
+                bool result = zynMaster->microtonal.saveXML(string(filename));
                 zynMaster->actionLock(unlock);
-                if (result < 0)
-                    fl_alert("Error: Could not save the file.");
+                if (!result)
+                    fl_alert("Error, failed to save scale settings");
                 updatepanel();}
             xywh {25 25 100 20}
           }
@@ -516,9 +548,9 @@ class MasterUI {open
             xywh {25 25 100 20} divider
           }
           MenuItem {} {
-            label {&Copyright...}
+            label {&About...}
             callback {aboutwindow->show();}
-            xywh {15 15 100 20} divider
+            tooltip {Copyright and version info} xywh {15 15 100 20} divider
           }
           MenuItem {} {
             label {E&xit}
@@ -532,16 +564,15 @@ class MasterUI {open
         } {
           MenuItem {} {
             label {&Clear Instrument...}
-            callback {if (fl_choice("Clear instrument's parameters ?","No","Yes",NULL)){
-//       int npart=(int)npartcounter->value()-1;
-       zynMaster->actionLock(lock);
-       zynMaster->part[npart]->defaultsinstrument();
-       zynMaster->actionLock(unlock);
-
-       npartcounter->do_callback();
-};
-
-updatepanel();}
+            callback {if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
+                {
+                    // int npart = (int)npartcounter->value() - 1;
+                    zynMaster->actionLock(lock);
+                    zynMaster->part[npart]->defaultsInstrument();
+                    zynMaster->actionLock(unlock);
+                    npartcounter->do_callback();
+                }
+                updatepanel();}
             xywh {35 35 100 20}
           }
           MenuItem {} {
@@ -553,38 +584,32 @@ updatepanel();}
                 zynMaster->actionLock(lock);
                 // int npart=(int)npartcounter->value()-1;
                 // clear all instrument parameters, first
-                zynMaster->part[npart]->defaultsinstrument();
+                zynMaster->part[npart]->defaultsInstrument();
                 // load the instr. parameters
-                int result = zynMaster->part[npart]->loadXMLinstrument(filename);
+                bool result =
+                    zynMaster->part[npart]->loadXMLinstrument(string(filename));
                 zynMaster->actionLock(unlock);
-                zynMaster->part[npart]->applyparameters();
+                zynMaster->part[npart]->applyParameters();
                 npartcounter->do_callback();
                 updatepanel();
-                if (result == -10)
-                    fl_alert("Error: Could not load the file\\nbecause it is not an instrument file.");
-                else if (result < 0)
-                    fl_alert("Error: Could not load the file.");}
+                if (!result)
+                    fl_alert("Error, failed to load instrument file");}
             xywh {30 30 100 20}
           }
           MenuItem {} {
             label {&Save Instrument ...}
-            callback {char *filename;
-                filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
+            callback {char *filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
                 filename = fl_filename_setext(filename, ".xiz");
-                int result = fileexists(filename);
-                if (result)
-                {
-                    result = 0;
+                if (fileexists(string(filename)))
                     if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
                         return;
-                }
                 zynMaster->actionLock(lock);
-                result = zynMaster->part[npart]->saveXML(filename);
+                bool result = zynMaster->part[npart]->saveXML(string(filename));
                 zynMaster->actionLock(unlock);
-                if (result < 0)
-                    fl_alert("Error: Could not save the file.");
+                if (!result)
+                    fl_alert("Error, failed to save instrument file");
                 updatepanel();}
             xywh {20 20 100 20} divider
           }
@@ -605,14 +630,16 @@ updatepanel();}
         } {
           MenuItem {} {
             label {Switch User Interface Mode}
-            callback {if (fl_choice("Switch the User Interface to Beginner mode ?",
+            callback {
+                if (fl_choice("Switch the User Interface to Beginner mode ?",
                               "No", "Yes", NULL))
                 {
                     masterwindow->hide();
                     refresh_master_ui();
                     simplemasterwindow->show();
                     Runtime.settings.UserInterfaceMode=2;
-                }}
+                }
+            }
             xywh {10 10 100 20}
           }
         }
@@ -639,7 +666,7 @@ updatepanel();}
             zynMaster->actionLock(unlock);}
         xywh {293 29 92 31} box PLASTIC_UP_BOX color 231 labelfont 1
       }
-      Fl_Group partuigroup {
+      Fl_Group partuigroup {open
         xywh {0 242 390 183} box ENGRAVED_FRAME
       } {
         Fl_Group partui {
@@ -649,7 +676,7 @@ updatepanel();}
           class PartUI
         } {}
       }
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {0 80 390 160}
       } {
         Fl_Group {} {
@@ -659,7 +686,7 @@ updatepanel();}
           Fl_Counter syseffnocounter {
             label {Sys.Effect No.}
             callback {nsyseff = (int) o->value() - 1;
-                sysefftype->value(zynMaster->sysefx[nsyseff]->geteffect());
+                sysefftype->value(zynMaster->sysefx[nsyseff]->getEffect());
                 syseffectui->refresh(zynMaster->sysefx[nsyseff]);}
             xywh {5 120 80 20} type Simple labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 step 1 value 1 textfont 1
             code0 {o->bounds(1,NUM_SYS_EFX);}
@@ -668,11 +695,11 @@ updatepanel();}
           Fl_Choice sysefftype {
             label EffType
             callback {zynMaster->actionLock(lock);
-                zynMaster->sysefx[nsyseff]->changeeffect((int) o->value());
+                zynMaster->sysefx[nsyseff]->changeEffect((int) o->value());
                 zynMaster->actionLock(unlock);
                 syseffectui->refresh(zynMaster->sysefx[nsyseff]);}
             xywh {315 125 70 15} down_box BORDER_BOX labelsize 10
-            code0 {o->value(zynMaster->sysefx[nsyseff]->geteffect());}
+            code0 {o->value(zynMaster->sysefx[nsyseff]->getEffect());}
           } {
             MenuItem {} {
               label {No Effect}
@@ -727,13 +754,13 @@ updatepanel();}
           }
           Fl_Button {} {
             label C
-            callback {presetsui->copy(zynMaster->sysefx[nsyseff]);}
+            callback {presetsui->Copy(zynMaster->sysefx[nsyseff]);}
             xywh {215 124 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
           Fl_Button {} {
             label P
             callback {zynMaster->actionLock(lock);
-                presetsui->paste(zynMaster->sysefx[nsyseff], syseffectui);
+                presetsui->Paste(zynMaster->sysefx[nsyseff], syseffectui);
                 zynMaster->actionLock(unlock);}
             xywh {245 124 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
@@ -745,7 +772,7 @@ updatepanel();}
           Fl_Counter inseffnocounter {
             label {Ins.Effect No.}
             callback {ninseff = (int) o->value() - 1;
-                insefftype->value(zynMaster->insefx[ninseff]->geteffect());
+                insefftype->value(zynMaster->insefx[ninseff]->getEffect());
                 inseffpart->value(zynMaster->Pinsparts[ninseff] + 2);
                 inseffectui->refresh(zynMaster->insefx[ninseff]);
                 if (zynMaster->Pinsparts[ninseff] != -1)
@@ -765,12 +792,12 @@ updatepanel();}
           Fl_Choice insefftype {
             label EffType
             callback {zynMaster->actionLock(lock);
-                zynMaster->insefx[ninseff]->changeeffect((int) o->value());
+                zynMaster->insefx[ninseff]->changeEffect((int) o->value());
                 zynMaster->actionLock(unlock);
                 inseffectui->refresh(zynMaster->insefx[ninseff]);
                 inseffectui->show();}
             xywh {315 125 70 15} down_box BORDER_BOX labelsize 10
-            code0 {o->value(zynMaster->insefx[ninseff]->geteffect());}
+            code0 {o->value(zynMaster->insefx[ninseff]->getEffect());}
             code1 {if (zynMaster->Pinsparts[ninseff]== -1) o->deactivate();}
           } {
             MenuItem {} {
@@ -835,26 +862,27 @@ updatepanel();}
                     insefftype->activate();
                     inseffectui->activate();
                 }
-                zynMaster->insefx[ninseff]->cleanup();}
+                zynMaster->insefx[ninseff]->Cleanup();}
             xywh {95 120 80 20} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textsize 10
             code0 {o->add("Master Out");o->add("Off");}
-            code1 {char tmp[50];
+            code1 {
                 for (int i = 0; i < NUM_MIDI_PARTS; ++i)
                 {
-                    sprintf(tmp, "Part %2d", i + 1);
-                    o->add(tmp);
-                }}
+                    string num = string("00") + asString(i + 1);
+                    o->add(string("Part " + num.substr(num.size() - 2, 2)).c_str());
+                }
+            }
             code3 {o->value(zynMaster->Pinsparts[ninseff]+2);}
           } {}
           Fl_Button {} {
             label C
-            callback {presetsui->copy(zynMaster->insefx[ninseff]);}
+            callback {presetsui->Copy(zynMaster->insefx[ninseff]);}
             xywh {215 124 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
           Fl_Button {} {
             label P
             callback {zynMaster->actionLock(lock);
-                presetsui->paste(zynMaster->insefx[ninseff], inseffectui);
+                presetsui->Paste(zynMaster->insefx[ninseff], inseffectui);
                 zynMaster->actionLock(unlock);}
             xywh {245 124 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
@@ -865,7 +893,7 @@ updatepanel();}
         callback {microtonalui->show();}
         xywh {330 80 56 19} box PLASTIC_UP_BOX color 231 labeltype ENGRAVED_LABEL labelfont 1
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {1 427 389 33} box ENGRAVED_FRAME
       } {
         Fl_Box {} {
@@ -923,16 +951,28 @@ updatepanel();}
       }
     }
     Fl_Window aboutwindow {
-      label {Copyright...}
-      xywh {411 344 365 280} type Double hide
+      label {About...} open
+      xywh {412 370 365 280} type Double labelsize 13 hide
     } {
       Fl_Box {} {
-        label {Copyright (c) 2002-2009 Nasca O. PAUL and others, Copyright 2009, Alan Calvert.}
-        xywh {15 35 335 55} labeltype EMBOSSED_LABEL labelsize 15 align 208
+        label {copyright notice}
+        xywh {15 35 335 55} labeltype EMBOSSED_LABEL labelsize 12 align 208
+        code0 {
+            string copyleft =
+               string("Copyright (c) 2002-2009 Nasca O. PAUL and others,\\n")
+                + string("Copyright 2009, Alan Calvert");
+            o->copy_label(copyleft.c_str());}
       }
       Fl_Box {} {
-        label {This is free software; you may redistribute it and/or modify it under the terms of version 3 (or any later version) of the GNU General Public License as published by the Free Software Fundation. This program comes with ABSOLUTELY NO WARRANTY. See the file COPYING for details.}
-        xywh {15 90 335 145} labelfont 1 labelsize 11 align 144
+        label {copy terms }
+        xywh {15 90 335 145} labelsize 11 align 144
+        code0 {
+            string copyterms =
+                string("This is free software, and comes with ABSOLUTELY NO ")
+                + string("WARRANTY; you may redistribute it and/or modify it ")
+                + string("under certain conditions. See file COPYING for details.\\n\\n")
+                + string("yoshimi version ") + string( YOSHIMI_VERSION );
+            o->copy_label(copyterms.c_str());}
       }
       Fl_Button {} {
         label {Close this window}
@@ -964,7 +1004,7 @@ updatepanel();}
       }
     }
     Fl_Window panelwindow {
-      label {ZynAddSubFX Panel}
+      label {ZynAddSubFX Panel} open
       xywh {89 59 630 635} type Double hide
     } {
       Fl_Scroll {} {
@@ -1000,10 +1040,10 @@ updatepanel();}
           {
               Runtime.Save();
               Pexitprogram = true;
-          }}
+          }} open
       xywh {400 405 600 335} type Double hide
     } {
-      Fl_Menu_Bar {} {
+      Fl_Menu_Bar {} {open
         xywh {0 0 690 25}
       } {
         Submenu {} {
@@ -1031,7 +1071,7 @@ updatepanel();}
             xywh {35 35 100 20} divider
           }
           MenuItem {} {
-            label {&Copyright...}
+            label {&About...}
             callback {aboutwindow->show();}
             xywh {25 25 100 20} divider
           }
@@ -1054,16 +1094,15 @@ updatepanel();}
                 zynMaster->actionLock(lock);
                 //  int npart=(int)npartcounter->value()-1;
                 // clear all instrument parameters, first
-                zynMaster->part[npart]->defaultsinstrument();
+                zynMaster->part[npart]->defaultsInstrument();
                 // load the instr. parameters
-                int result = zynMaster->part[npart]->loadXMLinstrument(filename);
+                bool result =
+                    zynMaster->part[npart]->loadXMLinstrument(string(filename));
                 zynMaster->actionLock(unlock);
-                zynMaster->part[npart]->applyparameters();
+                zynMaster->part[npart]->applyParameters();
                 simplenpartcounter->do_callback();
-                if (result == -10)
-                    fl_alert("Error: Could not load the file\\nbecause it is not an instrument file.");
-                else if (result < 0)
-                    fl_alert("Error: Could not load the file.");}
+                if (!result)
+                    fl_alert("Error, failed to load instrument file");}
             xywh {40 40 100 20}
           }
           MenuItem {} {
@@ -1090,17 +1129,20 @@ updatepanel();}
           }
         }
       }
-      Fl_Group simplelistitemgroup {
+      Fl_Group simplelistitemgroup {open
         private xywh {125 65 215 150} box ENGRAVED_BOX
         code0 {if (zynMaster->part[npart]->Penabled==0) o->deactivate();}
       } {
         Fl_Button partname {
-          callback {if ((int)bankui->cbwig->value() != (npart + 1))
+          callback {
+              if ((int)bankui->cbwig->value() != (npart + 1))
               {
                   bankui->cbwig->value(npart + 1);
                   bankui->cbwig->do_callback();
               }
-              bankui->show();}
+              bankui->show();
+              simplerefresh();
+          } selected
           xywh {130 72 205 18} box PLASTIC_THIN_DOWN_BOX down_box FLAT_BOX color 247 labelfont 1 labelsize 11 align 208
         }
         Fl_Slider partpanning {
@@ -1113,17 +1155,17 @@ updatepanel();}
           label {Midi Channel Receive}
           callback {virkeys->relaseallkeys(0);
               zynMaster->part[npart]->Prcvchn=(int) o->value();
-              virkeys->midich=(int) o->value();}
+              virkeys->midich=(int) o->value();} open
           tooltip {receive from Midi channel} xywh {140 157 65 18} down_box BORDER_BOX labelsize 10 align 130 textfont 1
-          code0 {char nrstr[10];
-            for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
-            {
-                sprintf(nrstr, "Ch%d", i + 1 );
-                if (i != 9)
-                    o->add(nrstr);
-                else
-                    o->add("Dr10");
-            }}
+          code0 {
+              for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
+              {
+                  if (i != 9)
+                      o->add(string("Ch" + asString( i + 1)).c_str());
+                  else
+                      o->add("Dr10");
+              }
+          }
           code1 {o->value(zynMaster->part[npart]->Prcvchn);}
         } {}
         Fl_Dial partvolume {
@@ -1230,10 +1272,10 @@ updatepanel();}
         code0 {o->init();}
         class VirKeys
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {340 30 255 185} box ENGRAVED_BOX
       } {
-        Fl_Tabs {} {
+        Fl_Tabs {} {open
           xywh {345 35 245 175} align 18
         } {
           Fl_Group {} {
@@ -1243,7 +1285,7 @@ updatepanel();}
             Fl_Counter simplesyseffnocounter {
               label {Sys.Effect No.}
               callback {nsyseff = (int) o->value() - 1;
-                  simplesysefftype->value(zynMaster->sysefx[nsyseff]->geteffect());
+                  simplesysefftype->value(zynMaster->sysefx[nsyseff]->getEffect());
                   simplesyseffectui->refresh(zynMaster->sysefx[nsyseff]);
                   simplerefresh();}
               xywh {350 75 80 20} type Simple labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 step 1 value 1 textfont 1
@@ -1253,11 +1295,11 @@ updatepanel();}
             Fl_Choice simplesysefftype {
               label EffType
               callback {zynMaster->actionLock(lock);
-                  zynMaster->sysefx[nsyseff]->changeeffect((int) o->value());
+                  zynMaster->sysefx[nsyseff]->changeEffect((int) o->value());
                   zynMaster->actionLock(unlock);
                 simplesyseffectui->refresh(zynMaster->sysefx[nsyseff]);}
               xywh {515 80 70 15} down_box BORDER_BOX labelsize 10 align 5
-              code0 {o->value(zynMaster->sysefx[nsyseff]->geteffect());}
+              code0 {o->value(zynMaster->sysefx[nsyseff]->getEffect());}
             } {
               MenuItem {} {
                 label {No Effect}
@@ -1313,7 +1355,7 @@ updatepanel();}
             Fl_Button {} {
               label P
               callback {zynMaster->actionLock(lock);
-                  presetsui->paste(zynMaster->sysefx[nsyseff], simplesyseffectui);
+                  presetsui->Paste(zynMaster->sysefx[nsyseff], simplesyseffectui);
                   zynMaster->actionLock(unlock);}
               xywh {560 65 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
             }
@@ -1325,7 +1367,7 @@ updatepanel();}
             Fl_Counter simpleinseffnocounter {
               label {Ins.Effect No.}
               callback {ninseff = (int) o->value() - 1;
-                  simpleinsefftype->value(zynMaster->insefx[ninseff]->geteffect());
+                  simpleinsefftype->value(zynMaster->insefx[ninseff]->getEffect());
                   simpleinseffpart->value(zynMaster->Pinsparts[ninseff] + 2);
                   simpleinseffectui->refresh(zynMaster->insefx[ninseff]);
 
@@ -1348,12 +1390,12 @@ updatepanel();}
             Fl_Choice simpleinsefftype {
               label EffType
               callback {zynMaster->actionLock(lock);
-                  zynMaster->insefx[ninseff]->changeeffect((int) o->value());
+                  zynMaster->insefx[ninseff]->changeEffect((int) o->value());
                   zynMaster->actionLock(unlock);
                   simpleinseffectui->refresh(zynMaster->insefx[ninseff]);
                   simpleinseffectui->show();}
               xywh {515 80 70 15} down_box BORDER_BOX labelsize 10 align 5
-              code0 {o->value(zynMaster->insefx[ninseff]->geteffect());}
+              code0 {o->value(zynMaster->insefx[ninseff]->getEffect());}
               code1 {if (zynMaster->Pinsparts[ninseff]== -1) o->deactivate();}
             } {
               MenuItem {} {
@@ -1418,28 +1460,32 @@ updatepanel();}
                       simpleinsefftype->activate();
                       simpleinseffectui->activate();
                   }
-                  zynMaster->insefx[ninseff]->cleanup();}
+                  zynMaster->insefx[ninseff]->Cleanup();}
               xywh {435 75 80 20} down_box BORDER_BOX labelfont 1 labelsize 10 align 5 textsize 10
               code0 {o->add("Master Out");o->add("Off");}
-              code1 {char tmp[50];
-                for (int i = 0; i < NUM_MIDI_PARTS; ++i)
-                {
-                    sprintf(tmp, "Part %2d", i + 1);
-                    o->add(tmp);
-                }}
+              code1 {
+                  //char tmp[50];
+                  for (int i = 0; i < NUM_MIDI_PARTS; ++i)
+                  {
+                      //sprintf(tmp, "Part %2d", i + 1);
+                      //o->add(tmp);
+                      string num = "0" + asString(i + 1);
+                      o->add(string("Part " + num.substr(num.size() - 2, 2)).c_str());
+                  }
+              }
               code3 {o->value(zynMaster->Pinsparts[ninseff]+2);}
             } {}
             Fl_Button {} {
               label P
               callback {zynMaster->actionLock(lock);
-                  presetsui->paste(zynMaster->insefx[ninseff], simpleinseffectui);
+                  presetsui->Paste(zynMaster->insefx[ninseff], simpleinseffectui);
                   zynMaster->actionLock(unlock);}
               xywh {560 65 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
             }
           }
         }
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {5 300 590 30} box ENGRAVED_FRAME
       } {
         Fl_Box {} {
@@ -1565,8 +1611,7 @@ updatepanel();}
         simplemasterwindow->label(masterwindowlabel.c_str());} {}
   }
   Function {MasterUI(void)} {} {
-    code {
-        ninseff = 0;
+    code {ninseff = 0;
         nsyseff = 0;
         npart = 0;
 
@@ -1581,8 +1626,7 @@ updatepanel();}
         presetsui = new PresetsUI();
         setfilelabel(NULL);
         swapefftype = 0;
-        simplerefresh();
-    } {}
+        simplerefresh();} {}
   }
   Function {~MasterUI()} {} {
     code {masterwindow->hide();
@@ -1600,8 +1644,7 @@ updatepanel();}
         delete (selectuiwindow);} {}
   }
   Function {showUI()} {} {
-    code {
-        switch (Runtime.settings.UserInterfaceMode)
+    code {switch (Runtime.settings.UserInterfaceMode)
         {
             case 0:
                 selectuiwindow->show();
@@ -1612,8 +1655,7 @@ updatepanel();}
             case 2:
                 simplemasterwindow->show();
                 break;
-        }
-    } {}
+        }} {}
   }
   Function {simplerefresh()} {} {
     code {partenabled->value(zynMaster->part[npart]->Penabled);
@@ -1645,7 +1687,7 @@ updatepanel();}
             delete microtonalui;
 
             zynMaster->actionLock(lock);
-            zynMaster->defaults();
+            zynMaster->setDefaults();
             zynMaster->actionLock(unlock);
 
             npartcounter->value(1);
@@ -1666,12 +1708,12 @@ updatepanel();}
 
         zynMaster->actionLock(lock);
         // clear all parameters
-        zynMaster->defaults();
+        zynMaster->setDefaults();
 
         // load the data
         int result = zynMaster->loadXML(filename);
         zynMaster->actionLock(unlock);
-        zynMaster->applyparameters();
+        zynMaster->applyParameters();
 
         npartcounter->value(1);
         refresh_master_ui();
@@ -1687,7 +1729,7 @@ updatepanel();}
   Function {do_save_master(const char* file = NULL)} {} {
     code {const char *filename;
         char *tmp;
-        int result = 0;
+        bool result = false;
         if (file == NULL)
         {
             tmp = fl_file_chooser("Save:", "({*.xmz})", NULL, 0);
@@ -1698,7 +1740,7 @@ updatepanel();}
             result = fileexists(tmp);
             if (result)
             {
-                result = 0;
+                result = false;
                 if (!fl_choice("The file exists. Overwrite it?", "No", "Yes", NULL))
                     return;
             }
@@ -1710,8 +1752,8 @@ updatepanel();}
         result = zynMaster->saveXML(filename);
         zynMaster->actionLock(unlock);
 
-        if (result < 0)
-            fl_alert("Error: Could not save the file.");
+        if (!result)
+            fl_alert("Error, could not save the file.");
         else
             setfilelabel(filename);
 
@@ -1749,14 +1791,13 @@ updatepanel();}
         simplerefresh();
         bankui->hide();} {}
   }
-
   Function {strategicRetreat(void)} {} {
     code {fl_alert("Bad things happened,\\nYoshimi strategically retreats.");} {}
   }
-
   decl {MicrotonalUI *microtonalui;} {}
   decl {BankUI *bankui;} {}
-  decl {int ninseff, npart;} {}
+  decl {int ninseff;} {}
+  decl {int npart;} {}
   decl {int nsyseff;} {}
   decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {}
   decl {VirKeyboard *virkeyboard;} {}

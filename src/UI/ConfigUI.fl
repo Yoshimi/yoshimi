@@ -7,18 +7,20 @@ comment {//
 // Copyright (C) 2002-2005 Nasca Octavian Paul
 // Copyright 2009, Alan Calvert
 //
-// This file is part of yoshimi, which is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-
-// yoshimi is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of yoshimi, which is free software: you can redistribute
+// it and/or modify it under the terms of version 2 of the GNU General Public
+// License as published by the Free Software Foundation.
+//
+// yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+// later) for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+// Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// This file is a derivative of the ZynAddSubFX original, modified October 2009
 //} {in_source in_header
 } 
 
@@ -294,33 +296,29 @@ class ConfigUI {open
     code {rootsbrowse->clear();
         for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         {
-            if (Runtime.settings.bankRootDirList[i] != NULL)
-                rootsbrowse->add(Runtime.settings.bankRootDirList[i]);
+            if (Runtime.settings.bankRootDirlist[i].size())
+                rootsbrowse->add(Runtime.settings.bankRootDirlist[i].c_str());
         }} {}
   }
   Function {writebankcfg()} {} {
-    code {Runtime.clearbankrootdirlist();
+    code {Runtime.clearBankrootDirlist();
         for (int n = 0; n < rootsbrowse->size(); ++n)
-        {
-            Runtime.settings.bankRootDirList[n] = new char [MAX_STRING_SIZE];
-            strncpy(Runtime.settings.bankRootDirList[n], rootsbrowse->text(n + 1), MAX_STRING_SIZE);
-        }} {}
+            Runtime.settings.bankRootDirlist[n] = string(rootsbrowse->text(n + 1));
+    } {}
   }
   Function {readpresetcfg()} {} {
     code {presetbrowse->clear();
         for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
-        {
-            if (Runtime.settings.presetsDirList[i] != NULL)
-                presetbrowse->add(Runtime.settings.presetsDirList[i]);
-        }} {}
+            if (Runtime.settings.presetsDirlist[i].size())
+                presetbrowse->add(Runtime.settings.presetsDirlist[i].c_str());
+    } {}
   }
   Function {writepresetcfg()} {} {
-    code {Runtime.clearpresetsdirlist();
+    code {
+        Runtime.clearPresetsDirlist();
         for (int n = 0; n < presetbrowse->size(); ++n)
-        {
-            Runtime.settings.presetsDirList[n] = new char [MAX_STRING_SIZE];
-            strncpy(Runtime.settings.presetsDirList[n], presetbrowse->text(n + 1), MAX_STRING_SIZE);
-        }} {}
+            Runtime.settings.presetsDirlist[n] = string(presetbrowse->text(n + 1));
+    } {}
   }
   Function {show()} {} {
     code {configwindow->show();} {}

@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef ECHO_H
@@ -31,12 +34,12 @@ class Echo : public Effect
         ~Echo();
 
         void out(float *smpsl, float *smpr);
-        void setpreset(unsigned char npreset);
-        void changepar(int npar, unsigned char value);
-        unsigned char getpar(int npar) const;
-        int getnumparams(void);
-        void cleanup(void);
-        void setdryonly(void);
+        void setPreset(unsigned char npreset);
+        void changePar(int npar, unsigned char value);
+        unsigned char getPar(int npar) const;
+        int getNumParams(void);
+        void Cleanup(void);
+        void setDryonly(void);
 
     private:
         // Parameters
@@ -48,19 +51,19 @@ class Echo : public Effect
         unsigned char Pfb;      // <#6 Feedback
         unsigned char Phidamp;  // <#7 Dampening of the Echo
 
-        void setvolume(unsigned char value);
-        void setpanning(unsigned char _panning);
-        void setdelay(unsigned char _delay);
-        void setlrdelay(unsigned char _lrdelay);
-        void setlrcross(unsigned char _lrcross);
-        void setfb(unsigned char _fb);
-        void sethidamp(unsigned char _hidamp);
+        void setVolume(unsigned char value);
+        void setPanning(unsigned char _panning);
+        void setDelay(unsigned char _delay);
+        void setLrDelay(unsigned char _lrdelay);
+        void setLrCross(unsigned char _lrcross);
+        void setFb(unsigned char _fb);
+        void setHiDamp(unsigned char _hidamp);
 
         // Real Parameters
         float panning, lrcross, fb, hidamp;
         int dl, dr, delay, lrdelay;
 
-        void initdelays(void);
+        void initDelays(void);
         float *ldelay;
         float *rdelay;
         float  oldl, oldr; // pt. lpf

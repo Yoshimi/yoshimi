@@ -3,26 +3,29 @@
     SUBnote.cpp - The "subtractive" synthesizer
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Author: Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
 
-#include "../Misc/Util.h"
-#include "../Misc/Master.h"
-#include "SUBnote.h"
+#include "Misc/Util.h"
+#include "Misc/Master.h"
+#include "Synth/SUBnote.h"
 
 SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
                  float velocity, int portamento_, int midinote, bool besilent) :
@@ -92,7 +95,7 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
 
     // global filter
     GlobalFilterCenterPitch =
-        pars->GlobalFilter->getfreq()
+        pars->GlobalFilter->getFreq()
         + // center freq
           (pars->PGlobalFilterVelocityScale / 127.0 * 6.0)
         * // velocity sensing
@@ -263,7 +266,7 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
     basefreq *= powf(2.0, detune / 1200.0); // detune
 
     // global filter
-    GlobalFilterCenterPitch = pars->GlobalFilter->getfreq() + // center freq
+    GlobalFilterCenterPitch = pars->GlobalFilter->getFreq() + // center freq
                               (pars->PGlobalFilterVelocityScale / 127.0 * 6.0)
                               // velocity sensing
                               * (VelF(velocity, pars->PGlobalFilterVelocityScaleFunction) - 1);
@@ -361,8 +364,8 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
 
     if (pars->PGlobalFilterEnabled != 0)
     {
-        globalfiltercenterq = pars->GlobalFilter->getq();
-        GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+        globalfiltercenterq = pars->GlobalFilter->getQ();
+        GlobalFilterFreqTracking = pars->GlobalFilter->getFreqTracking(basefreq);
     }
 
     // end of the altered initparameters function content.
@@ -490,12 +493,12 @@ void SUBnote::initparameters(float freq)
         BandWidthEnvelope = NULL;
     if (pars->PGlobalFilterEnabled != 0)
     {
-        globalfiltercenterq = pars->GlobalFilter->getq();
+        globalfiltercenterq = pars->GlobalFilter->getQ();
         GlobalFilterL = new Filter(pars->GlobalFilter);
         if (stereo != 0)
             GlobalFilterR = new Filter(pars->GlobalFilter);
         GlobalFilterEnvelope = new Envelope(pars->GlobalFilterEnvelope, freq);
-        GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+        GlobalFilterFreqTracking = pars->GlobalFilter->getFreqTracking(basefreq);
     }
     computecurrentparameters();
 }
@@ -574,25 +577,19 @@ void SUBnote::computecurrentparameters(void)
     {
         float globalfilterpitch = GlobalFilterCenterPitch + GlobalFilterEnvelope->envout();
         float filterfreq = globalfilterpitch + ctl->filtercutoff.relfreq + GlobalFilterFreqTracking;
-        filterfreq = GlobalFilterL->getrealfreq(filterfreq);
+        filterfreq = GlobalFilterL->getRealFreq(filterfreq);
 
-        GlobalFilterL->setfreq_and_q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
+        GlobalFilterL->setFreq_and_Q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
         if (GlobalFilterR != NULL)
-            GlobalFilterR->setfreq_and_q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
+            GlobalFilterR->setFreq_and_Q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
     }
 }
 
 // Note Output
 int SUBnote::noteout(float *outl, float *outr)
 {
-    memcpy(outl, denormalkillbuf, buffersize * sizeof(float));
-    memcpy(outr, denormalkillbuf, buffersize * sizeof(float));
-                //for (i = 0; i < buffersize; ++i)
-                //{
-                //    outl[i] = denormalkillbuf[i];
-                //    outr[i] = denormalkillbuf[i];
-                //}
-
+    memset(outl, 0, buffersize * sizeof(float));
+    memset(outr, 0, buffersize * sizeof(float));
     if (NoteEnabled == OFF)
         return 0;
 
@@ -611,7 +608,7 @@ int SUBnote::noteout(float *outl, float *outr)
     }
 
     if (GlobalFilterL != NULL)
-        GlobalFilterL->filterout(&outl[0]);
+        GlobalFilterL->filterOut(&outl[0]);
 
     // right channel
     if (stereo != 0)
@@ -628,7 +625,7 @@ int SUBnote::noteout(float *outl, float *outr)
                 outr[i] += tmpsmp[i];
         }
         if (GlobalFilterR != NULL)
-            GlobalFilterR->filterout(&outr[0]);
+            GlobalFilterR->filterOut(&outr[0]);
     }
     else
         for (i = 0; i < buffersize; ++i)

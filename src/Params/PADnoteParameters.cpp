@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
@@ -26,9 +29,8 @@
 
 PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
 {
-    setpresettype("Ppadsyth");
-
-    fft=fft_;
+    setPresetType("Ppadsyth");
+    fft = fft_;
 
     resonance = new Resonance();
     oscilgen = new OscilGen(fft_, resonance);
@@ -50,12 +52,12 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_) : Presets()
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
         sample[i].smp = NULL;
     newsample.smp = NULL;
-    defaults();
+    setDefaults();
 }
 
 PADnoteParameters::~PADnoteParameters()
 {
-    deletesamples();
+    deleteSamples();
     delete(oscilgen);
     delete(resonance);
     delete(FreqEnvelope);
@@ -87,8 +89,8 @@ void PADnoteParameters::defaults()
     setPbandwidth(500);
     Pbwscale = 0;
 
-    resonance->defaults();
-    oscilgen->defaults();
+    resonance->setDefaults();
+    oscilgen->setDefaults();
 
     Phrpos.type = 0;
     Phrpos.par1 = 64;
@@ -107,15 +109,15 @@ void PADnoteParameters::defaults()
     PDetune = 8192; // zero
     PCoarseDetune = 0;
     PDetuneType = 1;
-    FreqEnvelope->defaults();
-    FreqLfo->defaults();
+    FreqEnvelope->setDefaults();
+    FreqLfo->setDefaults();
 
     // Amplitude Global Parameters
     PVolume = 90;
     PPanning = 64; // center
     PAmpVelocityScaleFunction = 64;
-    AmpEnvelope->defaults();
-    AmpLfo->defaults();
+    AmpEnvelope->setDefaults();
+    AmpLfo->setDefaults();
     PPunchStrength = 0;
     PPunchTime = 60;
     PPunchStretch = 64;
@@ -124,13 +126,13 @@ void PADnoteParameters::defaults()
     // Filter Global Parameters
     PFilterVelocityScale = 64;
     PFilterVelocityScaleFunction = 64;
-    GlobalFilter->defaults();
-    FilterEnvelope->defaults();
-    FilterLfo->defaults();
-    deletesamples();
+    GlobalFilter->setDefaults();
+    FilterEnvelope->setDefaults();
+    FilterLfo->setDefaults();
+    deleteSamples();
 }
 
-void PADnoteParameters::deletesample(int n)
+void PADnoteParameters::deleteSample(int n)
 {
     if (n < 0 || n >= PAD_MAX_SAMPLES)
         return;
@@ -143,14 +145,14 @@ void PADnoteParameters::deletesample(int n)
     sample[n].basefreq = 440.0;
 }
 
-void PADnoteParameters::deletesamples()
+void PADnoteParameters::deleteSamples(void)
 {
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
-        deletesample(i);
+        deleteSample(i);
 }
 
 // Get the harmonic profile (i.e. the frequency distributio of a single harmonic)
-float PADnoteParameters::getprofile(float *smp, int size)
+float PADnoteParameters::getProfile(float *smp, int size)
 {
     for (int i = 0; i < size; ++i)
         smp[i] = 0.0;
@@ -350,20 +352,21 @@ float PADnoteParameters::getNhr(int n)
 
 // Generates the long spectrum for Bandwidth mode (only amplitudes are generated;
 // phases will be random)
-void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
-                                                       int size,
-                                                       float basefreq,
-                                                       float *profile,
-                                                       int profilesize,
-                                                       float bwadjust)
+void PADnoteParameters::generateSpectrumBandwidthMode(float *spectrum,
+                                                      int size,
+                                                      float basefreq,
+                                                      float *profile,
+                                                      int profilesize,
+                                                      float bwadjust)
 {
-    for (int i = 0; i < size; ++i)
-        spectrum[i] = 0.0;
+    //for (int i = 0; i < size; ++i)
+    //    spectrum[i] = 0.0;
+    memset(spectrum, 0, sizeof(float) * size);
 
-    float harmonics[zynMaster->getOscilsize() / 2];
+    //float harmonics[zynMaster->getOscilsize() / 2];
+    float harmonics[half_oscilsize];
     memset(harmonics, 0, half_oscilsize * sizeof(float));
-    //for (unsigned int u = 0; u < zynMaster->getOscilsize() / 2; ++u)
-    //    harmonics[u] = 0.0;
+
     // get the harmonic structure from the oscillator (I am using the frequency amplitudes, only)
     oscilgen->get(harmonics, basefreq, false);
 
@@ -420,7 +423,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         int ibw = (int)((bw / (samplerate * 0.5) * size)) + 1;
         float amp = harmonics[nh - 1];
         if (resonance->Penabled)
-            amp *= resonance->getfreqresponse(realfreq);
+            amp *= resonance->getFreqResponse(realfreq);
         if (ibw > profilesize)
         {   // if the bandwidth is larger than the profilesize
             float rap = sqrtf((float)profilesize / (float)ibw);
@@ -458,15 +461,16 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
 }
 
 // Generates the long spectrum for non-Bandwidth modes (only amplitudes are generated; phases will be random)
-void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
-                                                    int size,
-                                                    float basefreq,
-                                                    float *profile,
-                                                    int profilesize,
-                                                    float bwadjust)
+void PADnoteParameters::generateSpectrumOtherModes(float *spectrum,
+                                                   int size,
+                                                   float basefreq,
+                                                   float *profile,
+                                                   int profilesize,
+                                                   float bwadjust)
 {
-    for (int i = 0; i < size; ++i)
-        spectrum[i] = 0.0;
+    //for (int i = 0; i < size; ++i)
+    //    spectrum[i] = 0.0;
+    memset(spectrum, 0, sizeof(float) * size);
 
     float harmonics[half_oscilsize];
     memset(harmonics, 0, half_oscilsize * sizeof(float));
@@ -499,7 +503,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 
         float amp = harmonics[nh - 1];
         if (resonance->Penabled)
-            amp *= resonance->getfreqresponse(realfreq);
+            amp *= resonance->getFreqResponse(realfreq);
         int cfreq = (int)(realfreq / (samplerate * 0.5) * size);
         spectrum[cfreq] = amp + 1e-9;
     }
@@ -527,7 +531,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
 }
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
-void PADnoteParameters::applyparameters(bool lockmutex)
+void PADnoteParameters::applyParameters(bool lockmutex)
 {
     const int samplesize = (((int)1) << (Pquality.samplesize + 14));
     int spectrumsize = samplesize / 2;
@@ -535,7 +539,7 @@ void PADnoteParameters::applyparameters(bool lockmutex)
     int profilesize = 512;
     float profile[profilesize];
 
-    float bwadjust = getprofile(profile, profilesize);
+    float bwadjust = getProfile(profile, profilesize);
 //    for (int i=0;i<profilesize;i++) profile[i]*=profile[i];
     float basefreq = 65.406 * powf(2.0, Pquality.basenote / 2);
     if (Pquality.basenote %2 == 1)
@@ -557,7 +561,7 @@ void PADnoteParameters::applyparameters(bool lockmutex)
     // prepare a BIG FFT stuff
     FFTwrapper *fft = new FFTwrapper(samplesize);
     FFTFREQS fftfreqs;
-    newFFTFREQS(&fftfreqs, samplesize / 2);
+    FFTwrapper::newFFTFREQS(fftfreqs, samplesize / 2);
 
     float adj[samplemax]; // this is used to compute frequency relation to the base frequency
     for (int nsample = 0; nsample < samplemax; ++nsample)
@@ -568,13 +572,13 @@ void PADnoteParameters::applyparameters(bool lockmutex)
         float basefreqadjust = powf(2.0, tmp);
 
         if (Pmode == 0)
-            generatespectrum_bandwidthMode(spectrum, spectrumsize,
-                                           basefreq * basefreqadjust, profile,
-                                           profilesize, bwadjust);
+            generateSpectrumBandwidthMode(spectrum, spectrumsize,
+                                          basefreq * basefreqadjust, profile,
+                                          profilesize, bwadjust);
         else
-            generatespectrum_otherModes(spectrum, spectrumsize,
-                                        basefreq * basefreqadjust, profile,
-                                        profilesize, bwadjust);
+            generateSpectrumOtherModes(spectrum, spectrumsize,
+                                       basefreq * basefreqadjust, profile,
+                                       profilesize, bwadjust);
 
         const int extra_samples = 5; // the last samples contains the first
                                      // samples (used for linear/cubic interpolation)
@@ -608,7 +612,7 @@ void PADnoteParameters::applyparameters(bool lockmutex)
         // replace the current sample with the new computed sample
         if (lockmutex)
             zynMaster->actionLock(lock);
-        deletesample(nsample);
+        deleteSample(nsample);
         sample[nsample].smp = newsample.smp;
         sample[nsample].size = samplesize;
         sample[nsample].basefreq = basefreq * basefreqadjust;
@@ -616,43 +620,18 @@ void PADnoteParameters::applyparameters(bool lockmutex)
             zynMaster->actionLock(unlock);
         newsample.smp = NULL;
     }
-    delete(fft);
-    deleteFFTFREQS(&fftfreqs);
+    delete fft;
+    FFTwrapper::deleteFFTFREQS(fftfreqs);
 
     // delete the additional samples that might exists and are not useful
     if (lockmutex)
         zynMaster->actionLock(lock);
     for (int i = samplemax; i < PAD_MAX_SAMPLES; ++i)
-        deletesample(i);
+        deleteSample(i);
     if (lockmutex)
         zynMaster->actionLock(unlock);
 }
 
-/**
-void PADnoteParameters::export2wav(string basefilename)
-{
-    applyparameters(true);
-    basefilename += "_PADsynth_";
-    for (int k = 0; k < PAD_MAX_SAMPLES; ++k)
-    {
-        if (sample[k].smp == NULL)
-            continue;
-        char tmpstr[20];
-        snprintf(tmpstr,20, "_%02d", k + 1);
-        string filename = basefilename + string(tmpstr) + ".wav";
-        WAVaudiooutput wav;
-        if (wav.newfile(filename, zynMaster->getSamplerate(), 1))
-        {
-            int nsmps = sample[k].size;
-            short int *smps = new short int[nsmps];
-            for (int i = 0; i < nsmps; ++i)
-                smps[i] = (short int)(sample[k].smp[i] * 32767.0);
-            wav.write_mono_samples(nsmps, smps);
-            wav.close();
-        }
-    }
-}
-**/
 
 void PADnoteParameters::add2XML(XMLwrapper *xml)
 {

@@ -46,8 +46,7 @@ class MusicClient
         virtual ~MusicClient() { };
 
         static MusicClient *newMusicClient(void);
-        virtual bool openAudio(void) { return true; };
-        virtual bool openMidi(void) { return true; };
+        bool Open(void) { return openAudio() && openMidi(); };
         virtual bool Start(void) { return true; };
         virtual void Stop(void) { };
         virtual void Close(void) { };
@@ -62,6 +61,13 @@ class MusicClient
 
         string      audiodevice;
         string      mididevice;
+
+    protected:
+        virtual bool openAudio(void) { return true; };
+        virtual bool openMidi(void) { return true; };
+
 };
+
+extern MusicClient *musicClient;
 
 #endif

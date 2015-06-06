@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 #include <cmath>
 #include <iostream>
@@ -115,7 +118,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         NoteGlobalPar.Panning = pars->PPanning / 128.0;
 
     NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalFilter->getfreq() + // center freq
+        pars->GlobalFilter->getFreq() + // center freq
             pars->PFilterVelocityScale / 127.0 * 6.0
             * (VelF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
 
@@ -155,8 +158,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
 
     NoteGlobalPar.FilterEnvelope = new Envelope(pars->FilterEnvelope, basefreq);
     NoteGlobalPar.FilterLfo = new LFO(pars->FilterLfo, basefreq);
-    NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getfreqtracking(basefreq);
+    NoteGlobalPar.FilterQ = pars->GlobalFilter->getQ();
+    NoteGlobalPar.FilterFreqTracking=pars->GlobalFilter->getFreqTracking(basefreq);
 
     ready = true; ///sa il pun pe asta doar cand e chiar gata
 
@@ -256,7 +259,7 @@ void PADnote::PADlegatonote(float freq, float velocity,
         NoteGlobalPar.Panning = pars->PPanning / 128.0;
 
     NoteGlobalPar.FilterCenterPitch =
-        pars->GlobalFilter->getfreq() // center freq
+        pars->GlobalFilter->getFreq() // center freq
         + pars->PFilterVelocityScale / 127.0 * 6.0 // velocity sensing
         * (VelF(velocity, pars->PFilterVelocityScaleFunction) - 1);
 
@@ -270,8 +273,8 @@ void PADnote::PADlegatonote(float freq, float velocity,
             NoteGlobalPar.Volume * NoteGlobalPar.AmpEnvelope->envout_dB()
                 * NoteGlobalPar.AmpLfo->amplfoout();
 
-    NoteGlobalPar.FilterQ = pars->GlobalFilter->getq();
-    NoteGlobalPar.FilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
+    NoteGlobalPar.FilterQ = pars->GlobalFilter->getQ();
+    NoteGlobalPar.FilterFreqTracking = pars->GlobalFilter->getFreqTracking(basefreq);
 
     if (parameters->sample[nsample].smp == NULL)
     {
@@ -340,11 +343,11 @@ void PADnote::computecurrentparameters()
         globalfilterpitch+ctl->filtercutoff.relfreq + NoteGlobalPar.FilterFreqTracking;
 
     tmpfilterfreq =
-        NoteGlobalPar.GlobalFilterL->getrealfreq(tmpfilterfreq);
+        NoteGlobalPar.GlobalFilterL->getRealFreq(tmpfilterfreq);
 
     float globalfilterq = NoteGlobalPar.FilterQ * ctl->filterq.relq;
-    NoteGlobalPar.GlobalFilterL->setfreq_and_q(tmpfilterfreq,globalfilterq);
-    NoteGlobalPar.GlobalFilterR->setfreq_and_q(tmpfilterfreq,globalfilterq);
+    NoteGlobalPar.GlobalFilterL->setFreq_and_Q(tmpfilterfreq,globalfilterq);
+    NoteGlobalPar.GlobalFilterR->setFreq_and_Q(tmpfilterfreq,globalfilterq);
 
     // compute the portamento, if it is used by this note
     float portamentofreqrap = 1.0;
@@ -473,8 +476,8 @@ int PADnote::noteout(float *outl,float *outr)
         firsttime = false;
     }
 
-    NoteGlobalPar.GlobalFilterL->filterout(outl);
-    NoteGlobalPar.GlobalFilterR->filterout(outr);
+    NoteGlobalPar.GlobalFilterL->filterOut(outl);
+    NoteGlobalPar.GlobalFilterR->filterOut(outr);
 
     // Apply the punch
     if (NoteGlobalPar.Punch.Enabled != 0)

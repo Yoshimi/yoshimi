@@ -3,22 +3,25 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include <string>
+#include <iostream>
 
 #include "Misc/Util.h"
 #include "Misc/Master.h"
@@ -26,14 +29,7 @@
 
 #define MAX_LINE_SIZE 80
 
-Microtonal::Microtonal()
-{
-    Pname = new unsigned char[MICROTONAL_MAX_NAME_LEN];
-    Pcomment = new unsigned char[MICROTONAL_MAX_NAME_LEN];
-    defaults();
-}
-
-void Microtonal::defaults()
+void Microtonal::setDefaults()
 {
     Pinvertupdown = 0;
     Pinvertupdowncenter = 60;
@@ -62,30 +58,19 @@ void Microtonal::defaults()
     octave[11].type = 2;
     octave[11].x1 = 2;
     octave[11].x2 = 1;
-    for (int i = 0; i < MICROTONAL_MAX_NAME_LEN; ++i)
-    {
-        Pname[i] = '\0';
-        Pcomment[i] = '\0';
-    }
-    snprintf((char *) Pname, MICROTONAL_MAX_NAME_LEN, "12tET");
-    snprintf((char *) Pcomment, MICROTONAL_MAX_NAME_LEN, "Equal Temperament 12 notes per octave");
+    Pname = string("12tET");
+    Pcomment = string("Equal Temperament 12 notes per octave");
     Pglobalfinedetune = 64;
 }
 
-Microtonal::~Microtonal()
-{
-    delete [] Pname;
-    delete [] Pcomment;
-}
-
 // Get the size of the octave
-unsigned char Microtonal::getoctavesize()
+unsigned char Microtonal::getOctaveSize()
 {
     return ((Penabled) ? octavesize : 12);
 }
 
 // Get the frequency according the note number
-float Microtonal::getnotefreq(int note, int keyshift)
+float Microtonal::getNoteFreq(int note, int keyshift)
 {
     // in this function will appears many times things like this:
     // var=(a+b*100)%b
@@ -93,7 +78,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
     // This is the same with divisions.
 
     if (Pinvertupdown && (!Pmappingenabled || !Penabled))
-    note = (int) Pinvertupdowncenter * 2 - note;
+        note = (int) Pinvertupdowncenter * 2 - note;
 
     // compute global fine detune
     float globalfinedetunerap =
@@ -185,7 +170,7 @@ float Microtonal::getnotefreq(int note, int keyshift)
 
 
 // Convert a line to tunings; returns -1 if it ok
-int Microtonal::linetotunings(unsigned int nline, const char *line)
+int Microtonal::lineToTunings(unsigned int nline, const char *line)
 {
     int x1 = -1, x2 = -1, type = -1;
     float x = -1.0, tmp, tuning = 1.0;
@@ -247,7 +232,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
 }
 
 // Convert the text to tunnings
-int Microtonal::texttotunings(const char *text)
+int Microtonal::textToTunings(const char *text)
 {
     unsigned int i, k = 0, nl = 0;
     char *lin;
@@ -263,7 +248,7 @@ int Microtonal::texttotunings(const char *text)
         lin[i] = '\0';
         if (!strlen(lin))
             continue;
-        int err = linetotunings(nl, lin);
+        int err = lineToTunings(nl, lin);
         if (err != -1)
         {
             delete [] lin;
@@ -288,7 +273,7 @@ int Microtonal::texttotunings(const char *text)
 }
 
 // Convert the text to mapping
-void Microtonal::texttomapping(const char *text)
+void Microtonal::textToMapping(const char *text)
 {
     unsigned int i, k = 0;
     char *lin;
@@ -326,7 +311,7 @@ void Microtonal::texttomapping(const char *text)
 }
 
 // Convert tunning to text line
-void Microtonal::tuningtoline(int n, char *line, int maxn)
+void Microtonal::tuningToLine(int n, char *line, int maxn)
 {
     if (n > octavesize || n > MAX_OCTAVE_SIZE)
     {
@@ -340,7 +325,7 @@ void Microtonal::tuningtoline(int n, char *line, int maxn)
 }
 
 
-int Microtonal::loadline(FILE *file, char *line)
+int Microtonal::loadLine(FILE *file, char *line)
 {
     do {
         if (!fgets(line, 500, file))
@@ -351,21 +336,21 @@ int Microtonal::loadline(FILE *file, char *line)
 
 
 // Loads the tunnings from a scl file
-int Microtonal::loadscl(const char *filename)
+int Microtonal::loadScl(string filename)
 {
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(filename.c_str(), "r");
     char tmp[500];
     fseek(file, 0, SEEK_SET);
     // loads the short description
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     for (int i = 0; i < 500; ++i)
         if (tmp[i] < 32)
             tmp[i] = 0;
-    snprintf((char *) Pname, MICROTONAL_MAX_NAME_LEN, "%s", tmp);
-    snprintf((char *) Pcomment, MICROTONAL_MAX_NAME_LEN, "%s", tmp);
+    Pname = string(tmp);
+    Pcomment = string(tmp);
     // loads the number of the notes
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     int nnotes = MAX_OCTAVE_SIZE;
     sscanf(&tmp[0], "%d", &nnotes);
@@ -374,9 +359,9 @@ int Microtonal::loadscl(const char *filename)
     // load the tunnings
     for (int nline = 0; nline < nnotes; ++nline)
     {
-        if (loadline(file, &tmp[0]))
+        if (loadLine(file, &tmp[0]))
             return 2;
-        linetotunings(nline, &tmp[0]);
+        lineToTunings(nline, &tmp[0]);
     }
     fclose(file);
 
@@ -393,15 +378,15 @@ int Microtonal::loadscl(const char *filename)
 }
 
 // Loads the mapping from a kbm file
-int Microtonal::loadkbm(const char *filename)
+int Microtonal::loadKbm(string filename)
 {
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(filename.c_str(), "r");
     int x;
     char tmp[500];
 
     fseek(file, 0, SEEK_SET);
     // loads the mapsize
-    if (loadline(file,&tmp[0]))
+    if (loadLine(file,&tmp[0]))
         return 2;
     if (!sscanf(&tmp[0], "%d",&x))
         return 2;
@@ -411,7 +396,7 @@ int Microtonal::loadkbm(const char *filename)
         x = 127; // just in case...
     Pmapsize = x;
     // loads first MIDI note to retune
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
@@ -421,7 +406,7 @@ int Microtonal::loadkbm(const char *filename)
         x = 127; // just in case...
     Pfirstkey = x;
     // loads last MIDI note to retune
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
@@ -431,7 +416,7 @@ int Microtonal::loadkbm(const char *filename)
         x = 127; // just in case...
     Plastkey = x;
     // loads last the middle note where scale fro scale degree=0
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
@@ -441,7 +426,7 @@ int Microtonal::loadkbm(const char *filename)
         x = 127; // just in case...
     Pmiddlenote = x;
     // loads the reference note
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
@@ -451,7 +436,7 @@ int Microtonal::loadkbm(const char *filename)
         x = 127; // just in case...
     PAnote = x;
     // loads the reference freq.
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
     float tmpPAfreq = 440.0;
     if (!sscanf(&tmp[0], "%f", &tmpPAfreq))
@@ -459,7 +444,7 @@ int Microtonal::loadkbm(const char *filename)
     PAfreq = tmpPAfreq;
 
     // the scale degree(which is the octave) is not loaded, it is obtained by the tunnings with getoctavesize() method
-    if (loadline(file, &tmp[0]))
+    if (loadLine(file, &tmp[0]))
         return 2;
 
     // load the mappings
@@ -467,7 +452,7 @@ int Microtonal::loadkbm(const char *filename)
     {
         for (int nline = 0; nline < Pmapsize; ++nline)
         {
-            if (loadline(file, &tmp[0]))
+            if (loadLine(file, &tmp[0]))
                 return 2;
             if (!sscanf(&tmp[0], "%d", &x))
                 x = -1;
@@ -489,8 +474,8 @@ int Microtonal::loadkbm(const char *filename)
 
 void Microtonal::add2XML(XMLwrapper *xml)
 {
-    xml->addparstr("name", (char *) Pname);
-    xml->addparstr("comment", (char *) Pcomment);
+    xml->addparstr("name", Pname.c_str());
+    xml->addparstr("comment", Pcomment.c_str());
 
     xml->addparbool("invert_up_down", Pinvertupdown);
     xml->addparbool("invert_up_down_center", Pinvertupdowncenter);
@@ -543,8 +528,8 @@ void Microtonal::add2XML(XMLwrapper *xml)
 
 void Microtonal::getfromXML(XMLwrapper *xml)
 {
-    xml->getparstr("name", (char *) Pname, MICROTONAL_MAX_NAME_LEN);
-    xml->getparstr("comment",(char *) Pcomment, MICROTONAL_MAX_NAME_LEN);
+    Pname = xml->getparstr("name");  //MICROTONAL_MAX_NAME_LEN);
+    Pcomment = xml->getparstr("comment");
 
     Pinvertupdown=xml->getparbool("invert_up_down", Pinvertupdown);
     Pinvertupdowncenter=xml->getparbool("invert_up_down_center", Pinvertupdowncenter);
@@ -602,7 +587,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 }
 
 
-int Microtonal::saveXML(char *filename)
+bool Microtonal::saveXML(string filename)
 {
     XMLwrapper *xml = new XMLwrapper();
 
@@ -610,25 +595,31 @@ int Microtonal::saveXML(char *filename)
     add2XML(xml);
     xml->endbranch();
 
-    int result = xml->saveXMLfile(filename);
-    delete (xml);
-    return(result);
+    bool result = xml->saveXMLfile(filename);
+    delete xml;
+    return result;
 }
 
-int Microtonal::loadXML(char *filename)
+bool Microtonal::loadXML(string filename)
 {
     XMLwrapper *xml = new XMLwrapper();
-    if (xml->loadXMLfile(filename) < 0)
+    if (NULL == xml)
     {
-        delete(xml);
-        return -1;
+        Runtime.settings.verbose && cerr << "Microtonal::loadXML fails to instantiate new XMLwrapper" << endl;
+        return false;
     }
-
+    if (!xml->loadXMLfile(filename))
+    {
+        delete xml;
+        return false;
+    }
     if (!xml->enterbranch("MICROTONAL"))
-        return -10;
+    {
+        Runtime.settings.verbose && cerr << "Error, " << filename << " is not a scale file" << endl;
+        return false;
+    }
     getfromXML(xml);
     xml->exitbranch();
-
-    delete(xml);
-    return 0;
+    delete xml;
+    return true;
 }

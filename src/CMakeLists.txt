@@ -1,5 +1,7 @@
 #
-#   CMakeLists.txt    
+#   CMakeLists.txt
+#
+#   Copyright 2009, Alan Calvert
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -18,7 +20,7 @@ project(Yoshimi)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 cmake_policy(SET CMP0004 OLD)
-set(YOSHIMI_VERSION "0.016")
+set(YOSHIMI_VERSION "0.036")
 FILE(WRITE version.txt "${YOSHIMI_VERSION}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -26,9 +28,7 @@ set(CMAKE_USE_RELATIVE_PATHS OFF)
     # relative paths break some scripts(?)
 set(CMAKE_SKIP_RULE_DEPENDENCY OFF)
     # Rebuild objects if rules have changed, even if source hasn't.
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake.checks")
-    # modules for 3rd party library checks reside here
-    
+
 # User options
 set(DEFAULT_AUDIO jack CACHE STRING "Default audio driver - alsa or jack")
 set(DEFAULT_MIDI jack CACHE STRING "Default midi driver - alsa or jack")
@@ -103,25 +103,20 @@ if(WANT_GUI)
     # fontconfig
     pkg_check_modules(FONTCONFIG REQUIRED fontconfig>=0.22)
     mark_as_advanced(FONTCONFIG_LIBRARIES)
-    message(STATUS "Found fontconfig ${FONTCONFIG_VERSION}")
+    if(FONTCONFIG_FOUND)
+        message(STATUS "Found fontconfig ${FONTCONFIG_VERSION}")
+    else(FONTCONFIG_FOUND)
+        message(FATAL_ERROR "fontconfig>=0.22 required but not found")
+    endif(FONTCONFIG_FOUND)
 
     # fltk
-    find_package(MYFLTK REQUIRED)
-    if(MYFLTK_FOUND)
-        message(STATUS "Found ${MYFLTK_CONFIG}")
+    find_package(FLTK REQUIRED)
+    if(FLTK_FOUND)
+        message(STATUS "Found ${FLTK_CONFIG}")
         message(STATUS "Found ${FLTK_FLUID_EXECUTABLE}")
-    else(MYFLTK_FOUND)
+    else(FLTK_FOUND)
         message(FATAL_ERROR "Gui requested, but FLTK not found")
-    endif(MYFLTK_FOUND)
-    mark_as_advanced(FORCE FLTK_BASE_LIBRARY)
-    mark_as_advanced(FORCE FLTK_CONFIG_SCRIPT)
-    mark_as_advanced(FORCE FLTK_DIR)
-    mark_as_advanced(FORCE FLTK_FLUID_EXECUTABLE)
-    mark_as_advanced(FORCE FLTK_FORMS_LIBRARY)
-    mark_as_advanced(FORCE FLTK_GL_LIBRARY)
-    mark_as_advanced(FORCE FLTK_IMAGES_LIBRARY)
-    mark_as_advanced(FORCE FLTK_INCLUDE_DIR)
-    mark_as_advanced(FORCE FLTK_MATH_LIBRARY)
+    endif(FLTK_FOUND)
     set (FLTK_sources
        UI/WidgetPDialUI.fl  UI/PresetsUI.fl  UI/EnvelopeUI.fl
        UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboardUI.fl
@@ -135,7 +130,7 @@ if(WANT_GUI)
     set_source_files_properties(UI/MasterUI.h PROPERTIES GENERATED 1)
     set(YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
     set(YOSHI_SOURCES ${yoshimi_FLTK_UI_SRCS})
-    set(YOSHI_LIBRARIES ${YOSHI_LIBRARIES} ${MYFLTK_LIBRARIES})
+    set(YOSHI_LIBRARIES ${YOSHI_LIBRARIES} ${FLTK_LIBRARIES})
 else(WANT_GUI)
     message(STATUS "Will not build gui")
     add_definitions(-DDISABLE_GUI)
@@ -144,6 +139,7 @@ endif(WANT_GUI)
 # fftw3
 pkg_check_modules(FFTW3 REQUIRED fftw3>=0.22)
 if(FFTW3_FOUND)
+    set(FFTW3_LIBRARIES "${FFTW3_LIBRARIES};fftw3_threads;pthread")
     message(STATUS "Found fftw3 ${FFTW3_VERSION}")
 else(FFTW3_FOUND)
     message(FATAL_ERROR "fftw3 >=0.22 required but not found")
@@ -246,7 +242,7 @@ endif(WANT_ASM_F21)
 set(YOSHI_INCLUDES
     ${YOSHI_INCLUDES}
     ${FONTCONFIG_INCLUDE_DIRS}
-    ${FFTW3F_INC_DIR}
+    ${FFTW3_INC_DIR}
     ${JACK_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
 )
@@ -284,12 +280,13 @@ set_directory_properties(PROPERTIES
 
 # clean sweep
 add_custom_target(distclean
-    COMMAND rm -f ${CMAKE_SOURCE_DIR}/*.log ${CMAKE_SOURCE_DIR}/src/*.log
+    COMMAND rm -f ${CMAKE_SOURCE_DIR}/*.log
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/Makefile
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/install_manifest.txt
     COMMAND rm -f ${CMAKE_SOURCE_DIR}/cmake_install.cmake
     COMMAND find ${CMAKE_SOURCE_DIR} -type f -name CMakeCache.txt | xargs -r rm -f
     COMMAND find ${CMAKE_SOURCE_DIR} -type d -name CMakeFiles | xargs -r rm -rf
+    COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "*.marks" | xargs -r rm -f
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 add_dependencies(distclean clean)

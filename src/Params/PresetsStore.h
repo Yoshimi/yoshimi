@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "Misc/XMLwrapper.h"
@@ -24,6 +27,9 @@
 #define MAX_PRESETTYPE_SIZE 30
 #define MAX_PRESETS 1000
 
+class PresetsStore;
+extern PresetsStore presetsstore;
+
 class PresetsStore
 {
 public:
@@ -31,32 +37,28 @@ public:
     ~PresetsStore();
 
     // Clipboard stuff
-    void copyclipboard(XMLwrapper *xml,char *type);
-    bool pasteclipboard(XMLwrapper *xml);
-    bool checkclipboardtype(char *type);
+    void copyClipboard(XMLwrapper *xml, string type);
+    bool pasteClipboard(XMLwrapper *xml);
+    bool checkClipboardType(string type);
 
     // presets stuff
-    void copypreset(XMLwrapper *xml,char *type, const char *name);
-    bool pastepreset(XMLwrapper *xml, int npreset);
-    void deletepreset(int npreset);
+    void copyPreset(XMLwrapper *xml, string type, string name);
+    bool pastePreset(XMLwrapper *xml, int npreset);
+    void deletePreset(int npreset);
 
     struct presetstruct {
-        char *file;
-        char *name;
+        string file;
+        string name;
     };
     presetstruct presets[MAX_PRESETS];
 
-    void rescanforpresets(char *type);
+    void rescanPresets(string type);
 
 private:
     struct {
         char *data;
-        char type[MAX_PRESETTYPE_SIZE];
+        string type;
     } clipboard;
 
-    void clearpresets();
-
+    const string preset_extension;
 };
-
-extern PresetsStore presetsstore;
-

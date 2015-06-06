@@ -1,6 +1,8 @@
 /*
-    AlsaClient.cpp - Alsa audio / Alsa midi
+    SynthTypes.h
 
+    Original ZynAddfSubFX author Nasca Octavian Paul
+    Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
 
     This file is part of yoshimi, which is free software: you can
@@ -17,29 +19,21 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 
-using namespace std;
+#ifndef SYNTHTYPES_H
+#define SYNTHTYPES_H
 
-#include "Misc/Config.h"
-#include "MusicIO/AlsaClient.h"
+enum ONOFFTYPE {
+    OFF = 0,
+    ON = 1
+};
 
-bool AlsaClient::openAudio(void)
-{
-    if (alsaEngine.openAudio())
-    {
-        Runtime.settings.Samplerate = getSamplerate();
-        Runtime.settings.Buffersize = getBuffersize();
-        return true;
-    }
-    cerr << "Error, AlsaClient audio open failed" << endl;
-    return false;
-}
+enum LegatoMsg {
+    LM_Norm,
+    LM_FadeIn,
+    LM_FadeOut,
+    LM_CatchUp,
+    LM_ToNorm
+};
 
-bool AlsaClient::openMidi(void)
-{
-    if (alsaEngine.openMidi())
-        return true;
-    cerr << "Error, AlsaClient midi open failed" << endl;
-    return false;
-}
+#endif

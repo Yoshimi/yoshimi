@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "Misc/Util.h"
@@ -29,8 +32,8 @@ Phaser::Phaser(bool insertion_, float *efxoutl_, float *efxoutr_) :
     oldl(NULL),
     oldr(NULL)
 {
-    setpreset(Ppreset);
-    cleanup();
+    setPreset(Ppreset);
+    Cleanup();
 };
 
 
@@ -49,7 +52,7 @@ void Phaser::out(float *smpsl, float *smpsr)
     //int j;
     float lfol, lfor, lgain, rgain, tmp;
 
-    lfo.effectlfoout(&lfol, &lfor);
+    lfo.effectLfoOut(&lfol, &lfor);
     lgain = lfol;
     rgain = lfor;
     lgain = (expf(lgain * PHASER_LFO_SHAPE) - 1)
@@ -108,7 +111,7 @@ void Phaser::out(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void Phaser::cleanup(void)
+void Phaser::Cleanup(void)
 {
     fbl = fbr = oldlgain = oldrgain = 0.0;
     for (int i = 0; i < Pstages * 2; ++i)
@@ -117,21 +120,21 @@ void Phaser::cleanup(void)
 
 
 // Parameter control
-void Phaser::setdepth(unsigned char _depth)
+void Phaser::setDepth(unsigned char _depth)
 {
     Pdepth = _depth;
     depth = Pdepth / 127.0;
 }
 
 
-void Phaser::setfb(unsigned char _fb)
+void Phaser::setFb(unsigned char _fb)
 {
     Pfb = _fb;
     fb = (Pfb - 64.0) / 64.1;
 }
 
 
-void Phaser::setvolume(unsigned char _volume)
+void Phaser::setVolume(unsigned char _volume)
 {
     Pvolume = _volume;
     outvolume = Pvolume / 127.0;
@@ -139,20 +142,20 @@ void Phaser::setvolume(unsigned char _volume)
 }
 
 
-void Phaser::setpanning(unsigned char _panning)
+void Phaser::setPanning(unsigned char _panning)
 {
     Ppanning = _panning;
     panning = Ppanning / 127.0;
 }
 
-void Phaser::setlrcross(unsigned char _lrcross)
+void Phaser::setLrCross(unsigned char _lrcross)
 {
     Plrcross = _lrcross;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Phaser::setstages(unsigned char _stages)
+void Phaser::setStages(unsigned char _stages)
 {
     if (oldl != NULL)
         delete [] oldl;
@@ -161,18 +164,18 @@ void Phaser::setstages(unsigned char _stages)
     Pstages = (_stages >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : _stages;
     oldl = new float[Pstages * 2];
     oldr = new float[Pstages * 2];
-    cleanup();
+    Cleanup();
 }
 
 
-void Phaser::setphase(unsigned char _phase)
+void Phaser::setPhase(unsigned char _phase)
 {
     Pphase = _phase;
     phase = Pphase / 127.0;
 }
 
 
-void Phaser::setpreset(unsigned char npreset)
+void Phaser::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 12;
     const int NUM_PRESETS = 6;
@@ -193,60 +196,60 @@ void Phaser::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
     Ppreset = npreset;
 }
 
 
-void Phaser::changepar(int npar, unsigned char value)
+void Phaser::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpanning(value);
+            setPanning(value);
             break;
         case 2:
             lfo.Pfreq = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 3:
             lfo.Prandomness = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 4:
             lfo.PLFOtype = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 5:
             lfo.Pstereo = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 6:
-            setdepth(value);
+            setDepth(value);
             break;
         case 7:
-            setfb(value);
+            setFb(value);
             break;
         case 8:
-            setstages(value);
+            setStages(value);
             break;
         case 9:
-            setlrcross(value);
+            setLrCross(value);
             break;
         case 10:
             Poutsub = (value > 1) ? 1 : value;
             break;
         case 11:
-            setphase(value);
+            setPhase(value);
             break;
     }
 }
 
 
-unsigned char Phaser::getpar(int npar) const
+unsigned char Phaser::getPar(int npar) const
 {
     switch (npar)
     {

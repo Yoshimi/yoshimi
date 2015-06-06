@@ -3,20 +3,24 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
+
 #ifndef RESONANCE_H
 #define RESONANCE_H
 
@@ -32,22 +36,22 @@ class Resonance : public Presets
     public:
         Resonance();
         ~Resonance() { };
-        void setpoint(int n, unsigned char p);
-        void applyres(int n, FFTFREQS fftdata, float freq);
-        void smooth();
-        void interpolatepeaks(int type);
+        void setPoint(int n, unsigned char p);
+        void applyRes(int n, FFTFREQS fftdata, float freq);
+        void smooth(void);
+        void interpolatePeaks(int type);
         void randomize(int type);
 
         void add2XML(XMLwrapper *xml);
-        void defaults();
+        void setDefaults(void) { defaults(); };
         void getfromXML(XMLwrapper *xml);
 
-        float getfreqpos(float freq);
-        float getfreqx(float x);
-        float getfreqresponse(float freq);
-        float getcenterfreq();
-        float getoctavesfreq();
-        void sendcontroller(MidiControllers ctl, float par);
+        float getFreqPos(float freq);
+        float getFreqX(float x);
+        float getFreqResponse(float freq);
+        float getCenterFreq(void);
+        float getOctavesFreq(void);
+        void sendController(MidiControllers ctl, float par);
 
         // parameters
         unsigned char Penabled;                 //if the ressonance is enabled
@@ -59,6 +63,9 @@ class Resonance : public Presets
         // controllers
         float ctlcenter; // center frequency(relative)
         float ctlbw;     // bandwidth(relative)
+
+    private:
+        void defaults(void);
 };
 
 #endif

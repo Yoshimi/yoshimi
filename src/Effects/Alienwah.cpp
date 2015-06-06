@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 using namespace std;
@@ -30,8 +33,8 @@ Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_) :
     oldr(NULL),
     fader0db(new Fader(1.0)) // 0 .. +0db
 {
-    setpreset(Ppreset);
-    cleanup();
+    setPreset(Ppreset);
+    Cleanup();
     oldclfol = complex<float>(fb, 0.0);
     oldclfor = complex<float>(fb, 0.0);
 }
@@ -52,7 +55,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
     float lfol;
     float lfor; // Left/Right LFOs
     complex<float> clfol, clfor, out, tmp;
-    lfo.effectlfoout(&lfol, &lfor);
+    lfo.effectLfoOut(&lfol, &lfor);
     lfol *= depth * PI * 2.0;
     lfor *= depth * PI * 2.0;
     clfol = complex<float>(cosf(lfol + phase) * fb, sinf(lfol + phase) * fb); //rework
@@ -93,7 +96,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
 
 
 // Cleanup the effect
-void Alienwah::cleanup(void)
+void Alienwah::Cleanup(void)
 {
     for (int i = 0; i < Pdelay; ++i)
     {
@@ -105,13 +108,13 @@ void Alienwah::cleanup(void)
 
 
 // Parameter control
-void Alienwah::setdepth(unsigned char _depth)
+void Alienwah::setDepth(unsigned char _depth)
 {
     Pdepth = _depth;
     depth = Pdepth / 127.0;
 }
 
-void Alienwah::setfb(unsigned char _fb)
+void Alienwah::setFb(unsigned char _fb)
 {
     Pfb = _fb;
     fb = fabs((Pfb - 64.0) / 64.1);
@@ -123,7 +126,7 @@ void Alienwah::setfb(unsigned char _fb)
 }
 
 
-void Alienwah::setvolume(unsigned char _volume)
+void Alienwah::setVolume(unsigned char _volume)
 {
     Pvolume = _volume;
     if (NULL != fader0db)
@@ -137,41 +140,28 @@ void Alienwah::setvolume(unsigned char _volume)
 }
 
 
-/**
-void Alienwah::setvolume(unsigned char _volume)
-{
-    Pvolume = _volume;
-    outvolume = Pvolume / 127.0;
-    if (insertion == 0)
-        volume = 1.0;
-    else
-        volume = outvolume;
-}
-**/
-
-
-void Alienwah::setpanning(unsigned char _panning)
+void Alienwah::setPanning(unsigned char _panning)
 {
     Ppanning = _panning;
     panning = Ppanning / 127.0;
 }
 
 
-void Alienwah::setlrcross(unsigned char _lrcross)
+void Alienwah::setLrCross(unsigned char _lrcross)
 {
     Plrcross = _lrcross;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Alienwah::setphase(unsigned char _phase)
+void Alienwah::setPhase(unsigned char _phase)
 {
     Pphase = _phase;
     phase = (Pphase - 64.0) / 64.0 * PI;
 }
 
 
-void Alienwah::setdelay(unsigned char _delay)
+void Alienwah::setDelay(unsigned char _delay)
 {
     if (oldl != NULL)
         delete [] oldl;
@@ -180,11 +170,11 @@ void Alienwah::setdelay(unsigned char _delay)
     Pdelay = (_delay >= MAX_ALIENWAH_DELAY) ? MAX_ALIENWAH_DELAY : _delay;
     oldl = new complex<float>[Pdelay];
     oldr = new complex<float>[Pdelay];
-    cleanup();
+    Cleanup();
 }
 
 
-void Alienwah::setpreset(unsigned char npreset)
+void Alienwah::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 11;
     const int NUM_PRESETS = 4;
@@ -202,59 +192,59 @@ void Alienwah::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
     if (insertion == 0)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
+        changePar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
     Ppreset = npreset;
 }
 
 
-void Alienwah::changepar(int npar, unsigned char value)
+void Alienwah::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpanning(value);
+            setPanning(value);
             break;
         case 2:
             lfo.Pfreq = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 3:
             lfo.Prandomness = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 4:
             lfo.PLFOtype = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 5:
             lfo.Pstereo = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 6:
-            setdepth(value);
+            setDepth(value);
             break;
         case 7:
-            setfb(value);
+            setFb(value);
             break;
         case 8:
-            setdelay(value);
+            setDelay(value);
             break;
         case 9:
-            setlrcross(value);
+            setLrCross(value);
             break;
         case 10:
-            setphase(value);
+            setPhase(value);
             break;
     }
 }
 
 
-unsigned char Alienwah::getpar(int npar) const
+unsigned char Alienwah::getPar(int npar) const
 {
     switch (npar)
     {

@@ -4,18 +4,20 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "Misc/Util.h"
@@ -35,11 +37,11 @@ SVFilter::SVFilter(unsigned char Ftype, float Ffreq, float Fq,
     if (stages >= MAX_FILTER_STAGES)
         stages = MAX_FILTER_STAGES;
     outgain = 1.0;
-    cleanup();
-    setfreq_and_q(Ffreq, Fq);
+    Cleanup();
+    setFreq_and_Q(Ffreq, Fq);
 }
 
-void SVFilter::cleanup()
+void SVFilter::Cleanup()
 {
     for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
         st[i].low = st[i].high = st[i].band = st[i].notch = 0.0;
@@ -47,7 +49,7 @@ void SVFilter::cleanup()
     abovenq = 0;
 }
 
-void SVFilter::computefiltercoefs()
+void SVFilter::computeFilterCoefs()
 {
     par.f = freq / zynMaster->getSamplerate() * 4.0;
     if (par.f > 0.99999)
@@ -58,7 +60,7 @@ void SVFilter::computefiltercoefs()
 }
 
 
-void SVFilter::setfreq(float frequency)
+void SVFilter::setFreq(float frequency)
 {
     if (frequency < 0.1)
         frequency = 0.1;
@@ -79,44 +81,44 @@ void SVFilter::setfreq(float frequency)
         ipar = par;
     }
     freq = frequency;
-    computefiltercoefs();
+    computeFilterCoefs();
     firsttime = 0;
 }
 
-void SVFilter::setfreq_and_q(float frequency, float q_)
+void SVFilter::setFreq_and_Q(float frequency, float q_)
 {
     q = q_;
-    setfreq(frequency);
+    setFreq(frequency);
 }
 
-void SVFilter::setq(float q_)
+void SVFilter::setQ(float q_)
 {
     q = q_;
-    computefiltercoefs();
+    computeFilterCoefs();
 }
 
-void SVFilter::settype(int type_)
+void SVFilter::setType(int type_)
 {
     type = type_;
-    computefiltercoefs();
+    computeFilterCoefs();
 }
 
-void SVFilter::setgain(float dBgain)
+void SVFilter::setGain(float dBgain)
 {
     gain = dB2rap(dBgain);
-    computefiltercoefs();
+    computeFilterCoefs();
 }
 
-void SVFilter::setstages(int stages_)
+void SVFilter::setStages(int stages_)
 {
     if (stages_ >= MAX_FILTER_STAGES)
         stages_ = MAX_FILTER_STAGES - 1;
     stages = stages_;
-    cleanup();
-    computefiltercoefs();
+    Cleanup();
+    computeFilterCoefs();
 }
 
-void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
+void SVFilter::singleFilterOut(float *smp, fstage &x, parameters &par)
 {
     float *out = NULL;
     switch (type)
@@ -146,7 +148,7 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
     }
 }
 
-void SVFilter::filterout(float *smp)
+void SVFilter::filterOut(float *smp)
 {
     float *ismp = NULL;
     int buffersize = zynMaster->getBuffersize();
@@ -160,11 +162,11 @@ void SVFilter::filterout(float *smp)
         memcpy(ismp, smp, buffersize * sizeof(float));
 
         for (int i = 0; i < stages + 1; ++i)
-            singlefilterout(ismp, st[i],ipar);
+            singleFilterOut(ismp, st[i],ipar);
     }
 
     for (int i = 0; i < stages + 1; ++i)
-        singlefilterout(smp, st[i],par);
+        singleFilterOut(smp, st[i],par);
 
     if (needsinterpolation != 0)
     {

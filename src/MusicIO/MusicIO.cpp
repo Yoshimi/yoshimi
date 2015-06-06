@@ -18,32 +18,36 @@
 */
 
 #include <iostream>
-#include <string.h>
+#include <cstring>
 
-using namespace std;
+using namespace std;   
 
-#include "Misc/Master.h"
 #include "MusicIO/MusicIO.h"
 
-MusicIO::MusicIO() : buffersize(0) { }
+MusicIO::MusicIO() :
+    zynLeft(NULL),
+    zynRight(NULL),
+    interleavedShorts(NULL)
+{ }
 
-bool MusicIO::prepAudiobuffers(unsigned int nframes, bool with_interleaved)
+
+bool MusicIO::prepAudiobuffers(bool with_interleaved)
 {
-    if (nframes > 0)
+    int buffersize = getBuffersize();
+    if (buffersize > 0)
     {
-        buffersize = nframes;
-        zynLeft = new float[buffersize];
-        zynRight = new float[buffersize];
+        zynLeft = new jsample_t[buffersize];
+        zynRight = new jsample_t[buffersize];
         if (zynLeft == NULL || zynRight == NULL)
             goto bail_out;
-        memset(zynLeft, 0, buffersize * sizeof(float));
-        memset(zynRight, 0, buffersize * sizeof(float));
+        memset(zynLeft, 0, sizeof(jsample_t) * buffersize);
+        memset(zynRight, 0, sizeof(jsample_t) * buffersize);
         if (with_interleaved)
         {
-            shortInterleaved = new short int[buffersize * 2];
-            if (shortInterleaved == NULL)
+            interleavedShorts = new short int[buffersize * 2];
+            if (interleavedShorts == NULL)
                 goto bail_out;
-            memset(shortInterleaved, 0, buffersize * 2 * sizeof(short int));
+            memset(interleavedShorts, 0,  sizeof(short int) * buffersize * 2);
         }
         return true;
     }
@@ -56,50 +60,41 @@ bail_out:
     if (zynRight != NULL)
         delete [] zynRight;
     zynRight = NULL;
-    if (with_interleaved)
-    {
-        if (shortInterleaved != NULL)
-            delete [] shortInterleaved;
-        shortInterleaved = NULL;
-    }
+    if (interleavedShorts != NULL)
+        delete [] interleavedShorts;
+    interleavedShorts = NULL;
     return false;
 }
 
 
-bool MusicIO::getAudio(bool lockrequired)
+void MusicIO::getAudio(void)
 {
     if (NULL != zynMaster && zynRight != NULL && zynLeft != NULL)
-        return zynMaster->MasterAudio(zynLeft, zynRight, lockrequired);
-    return false;
+        zynMaster->MasterAudio(zynLeft, zynRight);
 }
 
 
-bool MusicIO::getAudioInterleaved(bool lockrequired)
+void MusicIO::getAudioInterleaved(void)
 {
-    if (shortInterleaved != NULL)
-    {
-        if (getAudio(lockrequired))
-        {
-            int idx = 0;
-            double scaled;
-            for (int frame = 0; frame < buffersize; ++frame)
-            {   // with a nod to libsamplerate ...
-                scaled = zynLeft[frame] * (8.0 * 0x10000000);
-                shortInterleaved[idx++] = (short int)(lrint(scaled) >> 16);
-                scaled = zynRight[frame] * (8.0 * 0x10000000);
-                shortInterleaved[idx++] = (short int)(lrint(scaled) >> 16);
-            }
-            return true;
-        }
+    getAudio();
+    int buffersize = getBuffersize();
+    int idx = 0;
+    double scaled;
+    for (int frame = 0; frame < buffersize; ++frame)
+    {   // with a nod to libsamplerate ...
+        scaled = zynLeft[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
+        scaled = zynRight[frame] * (8.0 * 0x10000000);
+        interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
     }
-    return false;
 }
 
 
 void MusicIO::silenceBuffers(void)
 {
-        memset(zynLeft, 0, buffersize * sizeof(float));
-        memset(zynRight, 0, buffersize * sizeof(float));
+    int buffersize = getBuffersize();
+    memset(zynLeft, 0, buffersize * sizeof(jsample_t));
+    memset(zynRight, 0, buffersize * sizeof(jsample_t));
 }
 
 
@@ -108,66 +103,66 @@ int MusicIO::getMidiController(unsigned char b)
     int ctl = C_NULL;
     switch (b)
     {
-	    case 1:
-            ctl = C_modwheel;            // Modulation Wheel
+	    case 1: // Modulation Wheel
+            ctl = C_modwheel;
             break;
-	    case 7:
-            ctl=C_volume;                // Volume
+	    case 7: // Volume
+            ctl=C_volume;
     		break;
-	    case 10:
-            ctl = C_panning;             // Panning
+	    case 10: // Panning
+            ctl = C_panning;
             break;
-	    case 11:
-            ctl = C_expression;          // Expression
+	    case 11: // Expression
+            ctl = C_expression;
             break;
-	    case 64:
-            ctl = C_sustain;             // Sustain pedal
+	    case 64: // Sustain pedal
+            ctl = C_sustain;
 	        break;
-	    case 65:
-            ctl = C_portamento;          // Portamento
+	    case 65: // Portamento
+            ctl = C_portamento;
 	        break;
-	    case 71:
-            ctl = C_filterq;             // Filter Q (Sound Timbre)
+	    case 71: // Filter Q (Sound Timbre)
+            ctl = C_filterq;
             break;
-	    case 74:
-            ctl = C_filtercutoff;        // Filter Cutoff (Brightness)
+	    case 74: // Filter Cutoff (Brightness)
+            ctl = C_filtercutoff;
 	        break;
-	    case 75:
-            ctl = C_bandwidth;           // BandWidth
+	    case 75: // BandWidth
+            ctl = C_bandwidth;
 	        break;
-	    case 76:
-            ctl = C_fmamp;               // FM amplitude
+	    case 76: // FM amplitude
+            ctl = C_fmamp;
 	        break;
-	    case 77:
-            ctl = C_resonance_center;    // Resonance Center Frequency
+	    case 77: // Resonance Center Frequency
+            ctl = C_resonance_center;
 	        break;
-	    case 78:
-            ctl = C_resonance_bandwidth; // Resonance Bandwith
+	    case 78: // Resonance Bandwith
+            ctl = C_resonance_bandwidth;
 	        break;
-	    case 120:
-            ctl = C_allsoundsoff;        // All Sounds OFF
+	    case 120: // All Sounds OFF
+            ctl = C_allsoundsoff;
 	        break;
-	    case 121:
-            ctl = C_resetallcontrollers; // Reset All Controllers
+	    case 121: // Reset All Controllers
+            ctl = C_resetallcontrollers;
 	        break;
-	    case 123:
-            ctl = C_allnotesoff;         // All Notes OFF
+	    case 123: // All Notes OFF
+            ctl = C_allnotesoff;
 	        break;
 	    // RPN and NRPN
-	    case 0x06:
-            ctl = C_dataentryhi;         // Data Entry (Coarse)
+	    case 0x06: // Data Entry (Coarse)
+            ctl = C_dataentryhi;
 	         break;
-	    case 0x26:
-            ctl = C_dataentrylo;         // Data Entry (Fine)
+	    case 0x26: // Data Entry (Fine)
+            ctl = C_dataentrylo;
 	         break;
-	    case 99:
-            ctl = C_nrpnhi;              // NRPN (Coarse)
+	    case 99:  // NRPN (Coarse)
+            ctl = C_nrpnhi;
 	         break;
-	    case 98:
-            ctl = C_nrpnlo;              // NRPN (Fine)
+	    case 98: // NRPN (Fine)
+            ctl = C_nrpnlo;
 	        break;
-	    default:
-            ctl = C_NULL;                // an unrecognised controller!
+	    default: // an unrecognised controller!
+            ctl = C_NULL;
             break;
 	}
     return ctl;
@@ -177,24 +172,18 @@ int MusicIO::getMidiController(unsigned char b)
 void MusicIO::setMidiController(unsigned char ch, unsigned int ctrl,
                                     int param)
 {
-    zynMaster->actionLock(lock);
     zynMaster->SetController(ch, ctrl, param);
-    zynMaster->actionLock(unlock);
 }
 
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
                            unsigned char velocity)
 {
-    zynMaster->actionLock(lock);
     zynMaster->NoteOn(channel, note, velocity);
-    zynMaster->actionLock(unlock);
 }
 
 
 void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 {
-    zynMaster->actionLock(lock);
     zynMaster->NoteOff(channel, note);
-    zynMaster->actionLock(unlock);
 }

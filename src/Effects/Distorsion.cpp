@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "Misc/Util.h"
@@ -191,8 +194,8 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_) :
     Pstereo = 0;
     Pprefiltering = 0;
 
-    setpreset(Ppreset);
-    cleanup();
+    setPreset(Ppreset);
+    Cleanup();
 }
 
 Distorsion::~Distorsion()
@@ -205,24 +208,24 @@ Distorsion::~Distorsion()
 }
 
 // Cleanup the effect
-void Distorsion::cleanup()
+void Distorsion::Cleanup()
 {
-    lpfl->cleanup();
-    hpfl->cleanup();
-    lpfr->cleanup();
-    hpfr->cleanup();
+    lpfl->Cleanup();
+    hpfl->Cleanup();
+    lpfr->Cleanup();
+    hpfr->Cleanup();
 }
 
 
 // Apply the filters
-void Distorsion::applyfilters(float *efxoutl, float *efxoutr)
+void Distorsion::applyFilters(float *efxoutl, float *efxoutr)
 {
-    lpfl->filterout(efxoutl);
-    hpfl->filterout(efxoutl);
+    lpfl->filterOut(efxoutl);
+    hpfl->filterOut(efxoutl);
     if (Pstereo != 0)
     {   // stereo
-        lpfr->filterout(efxoutr);
-        hpfr->filterout(efxoutr);
+        lpfr->filterOut(efxoutr);
+        hpfr->filterOut(efxoutr);
     }
 }
 
@@ -252,7 +255,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
     }
 
     if (Pprefiltering != 0)
-        applyfilters(efxoutl, efxoutr);
+        applyFilters(efxoutl, efxoutr);
 
     // no optimised, yet (no look table)
     waveshapesmps(buffersize, efxoutl, Ptype + 1, Pdrive);
@@ -260,7 +263,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
         waveshapesmps(buffersize, efxoutr, Ptype + 1, Pdrive);
 
     if (Pprefiltering == 0)
-        applyfilters(efxoutl, efxoutr);
+        applyFilters(efxoutl, efxoutr);
 
     if (Pstereo == 0)
         memcpy(efxoutr, efxoutl, buffersize * sizeof(float));
@@ -283,7 +286,7 @@ void Distorsion::out(float *smpsl, float *smpsr)
 
 
 // Parameter control
-void Distorsion::setvolume(unsigned char _volume)
+void Distorsion::setVolume(unsigned char _volume)
 {
     Pvolume = _volume;
     if (insertion == 0)
@@ -297,43 +300,43 @@ void Distorsion::setvolume(unsigned char _volume)
     else
         volume = outvolume = Pvolume / 127.0;
     if (Pvolume == 0.0)
-        cleanup();
+        Cleanup();
 }
 
 
-void Distorsion::setpanning(unsigned char _panning)
+void Distorsion::setPanning(unsigned char _panning)
 {
     Ppanning = _panning;
     panning = (Ppanning + 0.5) / 127.0;
 }
 
 
-void Distorsion::setlrcross(unsigned char _lrcross)
+void Distorsion::setLrCross(unsigned char _lrcross)
 {
     Plrcross = _lrcross;
     lrcross = Plrcross / 127.0;
 }
 
 
-void Distorsion::setlpf(unsigned char _lpf)
+void Distorsion::setLpf(unsigned char _lpf)
 {
     Plpf = _lpf;
     float fr = expf(powf(Plpf / 127.0, 0.5) * logf(25000.0)) + 40;
-    lpfl->setfreq(fr);
-    lpfr->setfreq(fr);
+    lpfl->setFreq(fr);
+    lpfr->setFreq(fr);
 }
 
 
-void Distorsion::sethpf(unsigned char _hpf)
+void Distorsion::setHpf(unsigned char _hpf)
 {
     Phpf = _hpf;
     float fr = expf(powf(Phpf / 127.0, 0.5) * logf(25000.0)) + 20.0;
-    hpfl->setfreq(fr);
-    hpfr->setfreq(fr);
+    hpfl->setFreq(fr);
+    hpfr->setFreq(fr);
 }
 
 
-void Distorsion::setpreset(unsigned char npreset)
+void Distorsion::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 11;
     const int NUM_PRESETS = 6;
@@ -355,26 +358,26 @@ void Distorsion::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
     if (insertion == 0)
-        changepar(0, (int)(presets[npreset][0] / 1.5)); // lower the volume if this is system effect
+        changePar(0, (int)(presets[npreset][0] / 1.5)); // lower the volume if this is system effect
     Ppreset = npreset;
-    cleanup();
+    Cleanup();
 }
 
 
-void Distorsion::changepar(int npar, unsigned char value)
+void Distorsion::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpanning(value);
+            setPanning(value);
             break;
         case 2:
-            setlrcross(value);
+            setLrCross(value);
             break;
         case 3:
             Pdrive = value;
@@ -395,10 +398,10 @@ void Distorsion::changepar(int npar, unsigned char value)
                 Pnegate = value;
             break;
         case 7:
-            setlpf(value);
+            setLpf(value);
             break;
         case 8:
-            sethpf(value);
+            setHpf(value);
             break;
         case 9:
             if (value > 1)
@@ -413,7 +416,7 @@ void Distorsion::changepar(int npar, unsigned char value)
 }
 
 
-unsigned char Distorsion::getpar(int npar) const
+unsigned char Distorsion::getPar(int npar) const
 {
     switch (npar)
     {

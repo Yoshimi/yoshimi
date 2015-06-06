@@ -3,37 +3,42 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #ifndef MICROTONAL_H
 #define MICROTONAL_H
 
-#include "globals.h"
+#include <cstring>
+
+using namespace std;
+
 #include "Misc/XMLwrapper.h"
 
 #define MAX_OCTAVE_SIZE 128
-#define MICROTONAL_MAX_NAME_LEN 120
 
 class Microtonal
 {
     public:
-        Microtonal();
-        ~Microtonal();
-        void defaults();
-        float getnotefreq(int note,int keyshift);
+        Microtonal() { };
+        ~Microtonal() { };
+        void setDefaults();
+        float getNoteFreq(int note, int keyshift);
 
         // Parameters
         unsigned char Pinvertupdown;
@@ -61,23 +66,23 @@ class Microtonal
         unsigned char Pglobalfinedetune;
 
         // Functions
-        unsigned char getoctavesize();
-        void tuningtoline(int n, char *line, int maxn);
-        int loadscl(const char *filename); // load the tunnings from a .scl file
-        int loadkbm(const char *filename); // load the mapping from .kbm file
-        int texttotunings(const char *text);
-        void texttomapping(const char *text);
-        unsigned char *Pname;
-        unsigned char *Pcomment;
+        unsigned char getOctaveSize();
+        void tuningToLine(int n, char *line, int maxn);
+        int loadScl(string filename); // load the tunnings from a .scl file
+        int loadKbm(string filename); // load the mapping from .kbm file
+        int textToTunings(const char *text);
+        void textToMapping(const char *text);
+        string Pname;
+        string Pcomment;
 
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
-        int saveXML(char *filename);
-        int loadXML(char *filename);
+        bool saveXML(string filename);
+        bool loadXML(string filename);
 
     private:
-        int linetotunings(unsigned int nline, const char *line);
-        int loadline(FILE *file, char *line);
+        int lineToTunings(unsigned int nline, const char *line);
+        int loadLine(FILE *file, char *line);
             // loads a line from the text file,
             // ignoring the lines beggining with "!"
         unsigned char octavesize;

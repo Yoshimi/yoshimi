@@ -6,50 +6,86 @@
     Copyright 2009, Alan Calvert
     Copyright 2009, James Morris
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <cmath>
+#include <iostream>
+
+using namespace std;
 
 #include "Effects/Distorsion.h"
 #include "Misc/Util.h"
+#include "Misc/Config.h"
 #include "Misc/Master.h"
 #include "Synth/OscilGen.h"
 
-// this array stores some termporary data and it has SOUND_BUFFER_SIZE elements
-float *OscilGen::tmpsmps;
-
 FFTFREQS OscilGen::outoscilFFTfreqs;
+
+float *OscilGen::tmpsmps = NULL; // SOUND_BUFFER_SIZE array for temporary data
+
+int OscilGen::active_count = 0;
+
 
 OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) : Presets()
 {
-    setpresettype("Poscilgen");
+    if (NULL == tmpsmps)
+    {
+        FFTwrapper::newFFTFREQS(OscilGen::outoscilFFTfreqs, half_oscilsize);
+        if (NULL == (tmpsmps = new float[oscilsize]))
+        {
+            cerr << "Very bad error, failed to allocate OscilGen::tmpsmps" << endl;
+        }
+        else
+        {
+            memset(tmpsmps, 0, sizeof(float) * oscilsize);
+            ++active_count;
+            if (Runtime.settings.verbose)
+                cerr << "OscilGen::active_count now " << active_count << endl;
+        }
+    }
+
+    setPresetType("Poscilgen");
     fft = fft_;
     res = res_;
-    newFFTFREQS(&oscilFFTfreqs, half_oscilsize);
-    newFFTFREQS(&basefuncFFTfreqs, half_oscilsize);
+    FFTwrapper::newFFTFREQS(oscilFFTfreqs, half_oscilsize);
+    FFTwrapper::newFFTFREQS(basefuncFFTfreqs, half_oscilsize);
 
     randseed = 1;
     ADvsPAD = false;
 
-    defaults();
+    setDefaults();
 }
 
 OscilGen::~OscilGen()
 {
-    deleteFFTFREQS(&basefuncFFTfreqs);
-    deleteFFTFREQS(&oscilFFTfreqs);
+    FFTwrapper::deleteFFTFREQS(basefuncFFTfreqs);
+    FFTwrapper::deleteFFTFREQS(oscilFFTfreqs);
+    if (active_count > 0)
+    {
+        if (--active_count == 0 && NULL != tmpsmps)
+        {
+            delete [] tmpsmps;
+            tmpsmps = NULL;
+            FFTwrapper::deleteFFTFREQS(outoscilFFTfreqs);
+            if (Runtime.settings.verbose)
+                cerr << "Delete OscilGen::tmpsmps, active_count now "
+                     << active_count << endl;
+        }
+    }
 }
 
 
@@ -135,7 +171,7 @@ void OscilGen::convert2sine(int magtype)
     float mag[MAX_AD_HARMONICS], phase[MAX_AD_HARMONICS];
     float oscil[oscilsize];
     FFTFREQS freqs;
-    newFFTFREQS(&freqs, half_oscilsize);
+    FFTwrapper::newFFTFREQS(freqs, half_oscilsize);
 
     get(oscil, -1.0);
     FFTwrapper *fft = new FFTwrapper(oscilsize);
@@ -172,7 +208,7 @@ void OscilGen::convert2sine(int magtype)
         if (Phmag[i] == 64)
             Phphase[i] = 64;
     }
-    deleteFFTFREQS(&freqs);
+    FFTwrapper::deleteFFTFREQS(freqs);
     prepare();
 }
 
@@ -669,8 +705,11 @@ void OscilGen::modulation(void)
     // Normalize
     float max = 0.0;
     for (int i = 0; i < oscilsize; ++i)
-        if (max < fabsf(tmpsmps[i]))
-            max = fabsf(tmpsmps[i]);
+    {
+        float absx = fabsf(tmpsmps[i]);
+        if (max < absx)
+            max = absx;
+    }
     if (max < 0.00001)
         max = 1.0;
     max = 1.0 / max;
@@ -934,7 +973,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
         freq = 440.0;
 
     FFTFREQS inf;
-    newFFTFREQS(&inf, oscilsize / 2);
+    FFTwrapper::newFFTFREQS(inf, oscilsize / 2);
     for (int i = 0; i < half_oscilsize; ++i)
     {
         inf.s[i] = f.s[i];
@@ -1000,7 +1039,7 @@ void OscilGen::adaptiveharmonic(FFTFREQS f, float freq)
     f.c[1] += f.c[0];
     f.s[1] += f.s[0];
     f.c[0] = f.s[0] = 0.0;
-    deleteFFTFREQS(&inf);
+    FFTwrapper::deleteFFTFREQS(inf);
 }
 
 
@@ -1050,13 +1089,13 @@ void OscilGen::adaptiveharmonicpostprocess(float *f, int size)
 // Get the oscillator function
 short int OscilGen::get(float *smps, float freqHz)
 {
-    return(this->get(smps, freqHz, 0));
+    return this->get(smps, freqHz, 0);
 }
 
 
 void OscilGen::newrandseed(unsigned int randseed)
 {
-    this->randseed=randseed;
+    this->randseed = randseed;
 }
 
 
@@ -1106,8 +1145,10 @@ short int OscilGen::get(float *smps, float freqHz, int resonance)
     outpos = (int)((RND * 2.0 - 1.0) * (float) oscilsize * (Prand - 64.0) / 64.0);
     outpos = (outpos + 2 * oscilsize) % oscilsize;
 
-    for (int i = 0; i < half_oscilsize; ++i)
-        outoscilFFTfreqs.c[i] = outoscilFFTfreqs.s[i] = 0.0;
+    //for (int i = 0; i < half_oscilsize; ++i)
+    //    outoscilFFTfreqs.c[i] = outoscilFFTfreqs.s[i] = 0.0;
+    memset(outoscilFFTfreqs.c, 0, sizeof(float) * half_oscilsize);
+    memset(outoscilFFTfreqs.s, 0, sizeof(float) * half_oscilsize);
 
     nyquist = (int)(0.5 * zynMaster->getSamplerate() / fabsf(freqHz)) + 2;
     if (ADvsPAD)
@@ -1143,7 +1184,7 @@ short int OscilGen::get(float *smps, float freqHz, int resonance)
         float rnd, angle, a, b, c, d;
         rnd = PI * powf((Prand - 64.0) / 64.0, 2.0);
         for (int i = 1; i < nyquist - 1; ++i)
-        {   //to Nyquist only for AntiAliasing
+        {   // to Nyquist only for AntiAliasing
             angle = rnd * i * RND;
             a = outoscilFFTfreqs.c[i];
             b = outoscilFFTfreqs.s[i];
@@ -1189,7 +1230,7 @@ short int OscilGen::get(float *smps, float freqHz, int resonance)
     }
 
     if (freqHz > 0.1 && resonance != 0)
-        res->applyres(nyquist - 1, outoscilFFTfreqs, freqHz);
+        res->applyRes(nyquist - 1, outoscilFFTfreqs, freqHz);
 
     // Full RMS normalize
     float sum = 0;

@@ -10,19 +10,22 @@ comment {OscilgenUI.cc} {in_source not_in_header
 comment {//
 // Original ZynAddSubFX author Nasca Octavian Paul
 // Copyright (C) 2002-2005 Nasca Octavian Paul
+// Copyright 2009, Alan Calvert
 //
-// This file is part of yoshimi, which is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-
-// yoshimi is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of yoshimi, which is free software: you can redistribute
+// it and/or modify it under the terms of version 2 of the GNU General Public
+// License as published by the Free Software Foundation.
+//
+// yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+// later) for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+// Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// This file is a derivative of the ZynAddSubFX original, modified October 2009
 //} {in_source in_header
 }
 
@@ -1081,12 +1084,12 @@ refresh();}
       }
       Fl_Button {} {
         label C
-        callback {presetsui->copy(oscil);}
+        callback {presetsui->Copy(oscil);}
         xywh {670 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
-        callback {presetsui->paste(oscil,this);}
+        callback {presetsui->Paste(oscil,this);}
         xywh {700 545 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Scroll _this_has_to_be_the_last {

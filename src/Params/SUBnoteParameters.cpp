@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "globals.h"
@@ -23,7 +26,7 @@
 
 SUBnoteParameters::SUBnoteParameters() : Presets()
 {
-    setpresettype("Psubsyth");
+    setPresetType("Psubsyth");
     AmpEnvelope = new EnvelopeParams(64, 1);
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     FreqEnvelope = new EnvelopeParams(64, 0);
@@ -34,7 +37,7 @@ SUBnoteParameters::SUBnoteParameters() : Presets()
     GlobalFilter = new FilterParams(2, 80, 40);
     GlobalFilterEnvelope = new EnvelopeParams(0, 1);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
-    defaults();
+    setDefaults();
 }
 
 void SUBnoteParameters::defaults(void)
@@ -69,11 +72,11 @@ void SUBnoteParameters::defaults(void)
     PGlobalFilterVelocityScale = 64;
     PGlobalFilterVelocityScaleFunction = 64;
 
-    AmpEnvelope->defaults();
-    FreqEnvelope->defaults();
-    BandWidthEnvelope->defaults();
-    GlobalFilter->defaults();
-    GlobalFilterEnvelope->defaults();
+    AmpEnvelope->setDefaults();
+    FreqEnvelope->setDefaults();
+    BandWidthEnvelope->setDefaults();
+    GlobalFilter->setDefaults();
+    GlobalFilterEnvelope->setDefaults();
 }
 
 SUBnoteParameters::~SUBnoteParameters()

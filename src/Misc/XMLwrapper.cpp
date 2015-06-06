@@ -3,44 +3,42 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include "XMLwrapper.h"
-//#include <stdio.h>
-#include <stdlib.h>
 #include <zlib.h>
 #include <iostream>
-#include <sstream>
-#include <cstring>
-
-#include "globals.h"
-#include "Misc/Util.h"
 
 using namespace std;
 
-int xml_k=0;
-char tabs[STACKSIZE+2];
+#include "Misc/XMLwrapper.h"
+#include "Misc/Util.h"
 
-const char *XMLwrapper_whitespace_callback(mxml_node_t *node,int where)
+int xml_k = 0;
+char tabs[STACKSIZE + 2];
+
+const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 {
     const char *name = node->value.element.name;
 
-    if (where == MXML_WS_BEFORE_OPEN && !strcmp(name,"?xml"))
+    if (where == MXML_WS_BEFORE_OPEN && !strcmp(name, "?xml"))
         return NULL;
-    if (where == MXML_WS_BEFORE_CLOSE && !strcmp(name,"string"))
+    if (where == MXML_WS_BEFORE_CLOSE && !strcmp(name, "string"))
         return NULL;
 
     if (where == MXML_WS_BEFORE_OPEN || where == MXML_WS_BEFORE_CLOSE)
@@ -81,12 +79,6 @@ XMLwrapper::XMLwrapper()
     information.PADsynth_used = false;
 
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
-    /*  for mxml 2.1 (and older)
-        tree=mxmlNewElement(MXML_NO_PARENT,"?xml");
-        mxmlElementSetAttr(tree,"version","1.0");
-        mxmlElementSetAttr(tree,"encoding","UTF-8");
-    */
-
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
     mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
 
@@ -118,7 +110,7 @@ XMLwrapper::~XMLwrapper()
         mxmlDelete(tree);
 }
 
-bool XMLwrapper::checkfileinformation(const char *filename)
+bool XMLwrapper::checkfileinformation(string filename)
 {
     stackpos = 0;
     ZERO(&parentstack, (int)sizeof(parentstack));
@@ -168,7 +160,7 @@ bool XMLwrapper::checkfileinformation(const char *filename)
 
 // SAVE XML members
 
-int XMLwrapper::saveXMLfile(string filename)
+bool XMLwrapper::saveXMLfile(string filename)
 {
     char *xmldata = getXMLdata();
     if (xmldata == NULL)
@@ -177,7 +169,7 @@ int XMLwrapper::saveXMLfile(string filename)
         return -2;
     }
     int compression = Runtime.settings.GzipCompression;
-    int result = dosavefile(filename.c_str(), compression, xmldata);
+    bool result = dosavefile(filename, compression, xmldata);
     free(xmldata);
     return result;
 }
@@ -193,19 +185,21 @@ char *XMLwrapper::getXMLdata()
     addparbool("PADsynth_used",information.PADsynth_used);
     node = oldnode;
     char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
-    return(xmldata);
+    return xmldata;
 }
 
 
-int XMLwrapper::dosavefile(const char *filename, int compression,
-                           const char *xmldata)
+bool XMLwrapper::dosavefile(string filename, int compression, const char *xmldata)
 {
     if (compression == 0)
     {
         FILE *file;
-        file = fopen(filename, "w");
+        file = fopen(filename.c_str(), "w");
         if (file == NULL)
-            return -1;
+        {
+            cerr << "Error, failed to open xml file " << filename << endl;
+            return false;
+        }
         fputs(xmldata, file);
         fclose(file);
     }
@@ -219,28 +213,29 @@ int XMLwrapper::dosavefile(const char *filename, int compression,
         snprintf(options, 10, "wb%d", compression);
 
         gzFile gzfile;
-        gzfile = gzopen(filename, options);
+        gzfile = gzopen(filename.c_str(), options);
         if (gzfile == NULL)
         {
             cerr << "Error, gzopen() == NULL" << endl;
-            return -1;
+            return false;
         }
         gzputs(gzfile, xmldata);
         gzclose(gzfile);
     }
-    return 0;
+    return true;
 }
 
 
 void XMLwrapper::addpar(const string &name, int val)
 {
-    addparams2("par", "name", name.c_str(), "value", int2str(val));
+    addparams2("par", "name", name.c_str(), "value", asString(val));
 }
 
 
 void XMLwrapper::addparreal(const string &name, float val)
 {
-    addparams2("par_real","name",name.c_str(),"value",real2str(val));
+    //addparams2("par_real","name",name.c_str(),"value", real2str(val));
+    addparams2("par_real","name", name.c_str(), "value", asString(val));
 }
 
 void XMLwrapper::addparbool(const string &name, int val)
@@ -268,7 +263,8 @@ void XMLwrapper::beginbranch(const string &name)
 void XMLwrapper::beginbranch(const string &name,int id)
 {
     push(node);
-    node = addparams1(name.c_str(), "id", int2str(id));
+    //node = addparams1(name.c_str(), "id", int2str(id));
+    node = addparams1(name.c_str(), "id", asString(id));
 }
 
 void XMLwrapper::endbranch()
@@ -279,7 +275,7 @@ void XMLwrapper::endbranch()
 
 // LOAD XML members
 
-int XMLwrapper::loadXMLfile(const string &filename)
+bool XMLwrapper::loadXMLfile(string filename)
 {
     if (tree != NULL)
         mxmlDelete(tree);
@@ -287,43 +283,59 @@ int XMLwrapper::loadXMLfile(const string &filename)
     ZERO(&parentstack, (int)sizeof(parentstack));
     ZERO(&values, (int)sizeof(values));
     stackpos = 0;
-    const char *xmldata = doloadfile(filename.c_str());
+    const char *xmldata = doloadfile(filename);
     if (xmldata == NULL)
-        return -1; // the file could not be loaded or uncompressed
+    {
+        Runtime.settings.verbose && cerr << "Error, xml file " << filename << " could not be loaded or uncompressed" << endl;
+         return false;
+    }
     root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (tree == NULL)
-        return -2; // this is not XML
+    {
+        Runtime.settings.verbose && cerr << "Error, xml file " << filename << " is not XML" << endl;
+        return false;
+    }
     node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
     if (root == NULL)
-        return -3; // the XML doesnt embbed zynaddsubfx data
+    {
+        Runtime.settings.verbose && cerr << "Error, xml file " << filename << " doesnt embbed zynaddsubfx data" << endl;
+        return false;
+    }
     push(root);
-    values.xml_version.major = str2int(mxmlElementGetAttr(root, "version-major"));
-    values.xml_version.minor = str2int(mxmlElementGetAttr(root, "version-minor"));
-    return 0;
+    values.xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
+    values.xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
+    return true;
 }
 
 
-char *XMLwrapper::doloadfile(const string &filename)
+char *XMLwrapper::doloadfile(string filename)
 {
     char * xmldata = NULL;
     gzFile gzfile  = gzopen(filename.c_str(), "rb");
     if (gzfile != NULL)
     {
-        stringstream strBuf;
-        const int bufSize = 500;
-        char fetchBuf[bufSize + 1];
-        int read = 0;
-        fetchBuf[bufSize] = 0; // pointless?
-        while(bufSize == (read = gzread(gzfile, fetchBuf, bufSize)))
-            strBuf << fetchBuf;
-        fetchBuf[read] = 0;
-        strBuf << fetchBuf;
+        const int bufSize = 512;
+        char fetchBuf[bufSize + 2];
+        int bytes_read;
+        int read_size = 0;
+        string strbuf = string();
+        while(!gzeof(gzfile))
+        {
+            memset(fetchBuf, 0, sizeof(char) * (bufSize + 2));
+            if ((bytes_read = gzread(gzfile, fetchBuf, bufSize)) > 0)
+            {
+                read_size += bytes_read;
+                strbuf += string(fetchBuf);
+            }
+        }
         gzclose(gzfile);
-        string tmp = strBuf.str();
-        xmldata = new char[tmp.size() + 1];
-        strncpy(xmldata, tmp.c_str(), tmp.size() + 1);
+        xmldata = new char[strbuf.size() + 1];
+        strcpy(xmldata, strbuf.c_str());
     }
+    else
+        cerr << "gzopen failed, errno " << errno << ", " << strerror(errno) << endl;
+
     return xmldata;
 }
 
@@ -348,36 +360,34 @@ bool XMLwrapper::putXMLdata(const char *xmldata)
 }
 
 
-int XMLwrapper::enterbranch(const string &name)
+bool XMLwrapper::enterbranch(string name)
 {
-    node = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL, MXML_DESCEND_FIRST);
+    node = mxmlFindElement(peek(), peek(), name.c_str(), NULL, NULL,
+                           MXML_DESCEND_FIRST);
     if (node == NULL)
-        return 0;
+        return false;
     push(node);
-    return 1;
+    return true;
 }
 
 
-int XMLwrapper::enterbranch(const string &name, int id)
+bool XMLwrapper::enterbranch(string name, int id)
 {
-    snprintf(tmpstr, TMPSTR_SIZE, "%d", id);
-    node = mxmlFindElement(peek(), peek(), name.c_str(), "id", tmpstr, MXML_DESCEND_FIRST);
+    node = mxmlFindElement(peek(), peek(), name.c_str(), "id",
+                           asString(id).c_str(), MXML_DESCEND_FIRST);
     if (node == NULL)
-        return 0;
+        return false;
     push(node);
-    return 1;
+    return true;
 }
 
 
-void XMLwrapper::exitbranch()
-{
-    pop();
-}
+void XMLwrapper::exitbranch(void) { pop(); }
 
 
 int XMLwrapper::getbranchid(int min, int max)
 {
-    int id = str2int(mxmlElementGetAttr(node, "id"));
+    int id = string2int(mxmlElementGetAttr(node, "id"));
     if (min == 0 && max == 0)
         return id;
     if (id < min)
@@ -396,7 +406,7 @@ int XMLwrapper::getpar(string name, int defaultpar, int min, int max)
     const char *strval = mxmlElementGetAttr(node, "value");
     if (strval == NULL)
         return defaultpar;
-    int val = str2int(strval);
+    int val = string2int(strval);
     if (val < min)
         val = min;
     else if (val > max)
@@ -405,13 +415,13 @@ int XMLwrapper::getpar(string name, int defaultpar, int min, int max)
 }
 
 
-int XMLwrapper::getpar127(const string &name, int defaultpar)
+int XMLwrapper::getpar127(string name, int defaultpar)
 {
     return(getpar(name, defaultpar, 0, 127));
 }
 
 
-int XMLwrapper::getparbool(const string &name, int defaultpar)
+int XMLwrapper::getparbool(string name, int defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (node == NULL)
@@ -419,54 +429,37 @@ int XMLwrapper::getparbool(const string &name, int defaultpar)
     const char *strval = mxmlElementGetAttr(node, "value");
     if (strval == NULL)
         return defaultpar;
-    if (strval[0] == 'Y' || strval[0] == 'y')
-        return 1;
-    else
-        return 0;
+    return (strval[0] == 'Y' || strval[0] == 'y') ? 1 : 0;
 }
 
 
-void XMLwrapper::getparstr(const string &name, char *par, int maxstrlen)
+string XMLwrapper::getparstr(string name)
 {
-    ZERO(par, maxstrlen);
     node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(), MXML_DESCEND_FIRST);
     if (node == NULL)
-        return;
+        return string();
     if (node->child == NULL)
-        return;
+        return string();
     if (node->child->type != MXML_OPAQUE)
-        return;
-    snprintf(par, maxstrlen, "%s", node->child->value.element.name);
+        return string();
+    return string(node->child->value.element.name);
 }
 
 
-void XMLwrapper::getparstr(const string &name, string& par, int maxstrlen)
+float XMLwrapper::getparreal(string name, float defaultpar)
 {
-    node = mxmlFindElement(peek(), peek(), "string", "name", name.c_str(),
+    node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
                            MXML_DESCEND_FIRST);
-    if (node == NULL)
-        return;
-    if (node->child == NULL)
-        return;
-    if (node->child->type != MXML_OPAQUE)
-        return;
-    par = string(node->child->value.element.name);
-}
-
-
-float XMLwrapper::getparreal(const char *name,float defaultpar)
-{
-    node = mxmlFindElement(peek(), peek(), "par_real", "name", name, MXML_DESCEND_FIRST);
     if (node == NULL)
         return defaultpar;
     const char *strval = mxmlElementGetAttr(node, "value");
     if (strval == NULL)
         return defaultpar;
-    return str2real(strval);
+    return string2float(string(strval));
 }
 
 
-float XMLwrapper::getparreal(const char *name, float defaultpar, float min, float max)
+float XMLwrapper::getparreal(string name, float defaultpar, float min, float max)
 {
     float result = getparreal(name, defaultpar);
     if (result < min)
@@ -477,61 +470,29 @@ float XMLwrapper::getparreal(const char *name, float defaultpar, float min, floa
 }
 
 
-/** Private members **/
+// Private parts
 
-char *XMLwrapper::int2str(int x)
+mxml_node_t *XMLwrapper::addparams0(string name)
 {
-    snprintf(tmpstr, TMPSTR_SIZE, "%d", x);
-    return tmpstr;
-}
-
-char *XMLwrapper::real2str(float x)
-{
-    snprintf(tmpstr, TMPSTR_SIZE, "%g", x);
-    return tmpstr;
-}
-
-
-int XMLwrapper::str2int(const char *str)
-{
-    if (str == NULL)
-        return 0;
-    int result = strtol(str, NULL, 10);
-    return result;
-}
-
-
-float XMLwrapper::str2real(const char *str)
-{
-    if (str == NULL)
-        return 0.0;
-    float result = strtod(str, NULL);
-    return result;
-}
-
-
-mxml_node_t *XMLwrapper::addparams0(const char *name)
-{
-    mxml_node_t *element = mxmlNewElement(node, name);
+    mxml_node_t *element = mxmlNewElement(node, name.c_str());
     return element;
 }
 
 
-mxml_node_t *XMLwrapper::addparams1(const char *name, const char *par1, const char *val1)
+mxml_node_t *XMLwrapper::addparams1(string name, string par1, string val1)
 {
-    mxml_node_t *element = mxmlNewElement(node, name);
-    mxmlElementSetAttr(element, par1, val1);
+    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
     return element;
 }
 
 
-mxml_node_t *XMLwrapper::addparams2(const char *name, const char *par1,
-                                    const char *val1, const char *par2,
-                                    const char *val2)
+mxml_node_t *XMLwrapper::addparams2(string name, string par1, string val1,
+                                    string par2, string val2)
 {
-    mxml_node_t *element = mxmlNewElement(node, name);
-    mxmlElementSetAttr(element, par1, val1);
-    mxmlElementSetAttr(element, par2, val2);
+    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
+    mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
     return element;
 }
 
@@ -545,9 +506,6 @@ void XMLwrapper::push(mxml_node_t *node)
     }
     stackpos++;
     parentstack[stackpos] = node;
-
-//    printf("push %d - %s\n",stackpos,node->value.element.name);
-
 }
 
 
@@ -560,9 +518,6 @@ mxml_node_t *XMLwrapper::pop()
     }
     mxml_node_t *node = parentstack[stackpos];
     parentstack[stackpos] = NULL;
-
-//    printf("pop %d - %s\n",stackpos,node->value.element.name);
-
     stackpos--;
     return node;
 }

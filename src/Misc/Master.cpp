@@ -6,18 +6,20 @@
     Copyright 2009, Alan Calvert
     Copyright 2009, James Morris
 
-    This file is part of zynminus, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    zynminus is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with zynminus.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <iostream>
@@ -28,12 +30,10 @@ using namespace std;
 
 bool Pexitprogram = false;  // if the UI sets this true, the program will exit
 
-Master *zynMaster;
-
-float *denormalkillbuf;
+Master *zynMaster = NULL;
 
 Master::Master() :
-    shutup(0),
+    shutup(false),
     fft(NULL),
     samplerate(0),
     buffersize(0),
@@ -70,21 +70,34 @@ Master::~Master()
         delete [] tmpmixr;
     if (NULL != fft)
         delete fft;
-    pthread_mutex_destroy(&mutex);
+    actionLock(destroy);
 }
 
 
-bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size)
+bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size,
+                  string params_file, string instrument_file)
 {
     samplerate = Runtime.settings.Samplerate = sample_rate;
     buffersize = Runtime.settings.Buffersize = buffer_size;
-    oscilsize = oscil_size;
+    if (oscil_size < (buffersize / 2))
+    {
+        cerr << "Enforcing oscilsize adjustment to half buffersize, "
+             << oscilsize << " -> " << buffersize / 2 << endl;
+        oscilsize = buffersize / 2;
+    }
+    else
+        oscilsize = oscil_size;
 
-    shutup = 0;
+    shutup = false;
 
     if (!actionLock(init))
     {
         cerr << "Error, actionLock init failed" << endl;
+        goto bail_out;
+    }
+    if (Runtime.settings.showGui && !vupeakLock(init))
+    {
+        cerr << "Error, meterLock init failed" << endl;
         goto bail_out;
     }
 
@@ -93,6 +106,7 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size)
         cerr << "Error, Master failed to allocate fft" << endl;
         goto bail_out;
     }
+
     tmpmixl = new float[buffersize];
     tmpmixr = new float[buffersize];
     if (tmpmixl == NULL || tmpmixr == NULL)
@@ -100,14 +114,6 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size)
         cerr << "Error, Master tmpmix allocations failed" << endl;
         goto bail_out;
     }
-
-    if (NULL == (denormalkillbuf = new float[buffersize]))
-    {
-        cerr << "Failed to allocate denormalkillbuf" << endl;
-        goto bail_out;
-    }
-    for (int i = 0; i < buffersize; ++i)
-        denormalkillbuf[i] = (RND - 0.5) * 1e-16;
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -145,8 +151,37 @@ bool Master::Init(unsigned int sample_rate, int buffer_size, int oscil_size)
         cerr << "Failed to allocate new VolumeControl" << endl;
         goto bail_out;
     }
-    defaults();
+    setDefaults();
 
+    if (!params_file.empty())
+    {
+        if (!zynMaster->loadXML(params_file))
+        {
+            cerr << "Error, failed to load master file: " << params_file << endl;
+            goto bail_out;
+        }
+        else
+        {
+            zynMaster->applyParameters();
+            if (Runtime.settings.verbose)
+                cerr << "Master file " << params_file << " loaded" << endl;
+        }
+    }
+    if (!instrument_file.empty())
+    {
+        int loadtopart = 0;
+        if (!zynMaster->part[loadtopart]->loadXMLinstrument(instrument_file))
+        {
+            cerr << "Error, failed to load instrument file: " << instrument_file << endl;
+            goto bail_out;
+        }
+        else
+        {
+            zynMaster->part[loadtopart]->applyParameters();
+            if (Runtime.settings.verbose)
+                cerr << "Instrument file " << instrument_file << " loaded" << endl;
+        }
+    }
     return true;
 
 bail_out:
@@ -161,17 +196,20 @@ bail_out:
     tmpmixr = NULL;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        delete part[npart];
+        if (NULL != part[npart])
+            delete part[npart];
         part[npart] = NULL;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        delete insefx[nefx];
+        if (NULL != insefx[nefx])
+            delete insefx[nefx];
         insefx[nefx] = NULL;
     }
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        delete sysefx[nefx];
+        if (NULL != sysefx[nefx])
+            delete sysefx[nefx];
         sysefx[nefx] = NULL;
     }
     return false;
@@ -182,8 +220,8 @@ bool Master::actionLock(lockset request)
     int chk  = -1;
     if (request == init)
     {
-        if (!(chk = pthread_mutex_init(&mutex, NULL)))
-            processLock = &mutex;
+        if (!(chk = pthread_mutex_init(&processMutex, NULL)))
+            processLock = &processMutex;
         else
         {
             cerr << "Error, Master actionLock init fails :-(" << endl;
@@ -195,7 +233,7 @@ bool Master::actionLock(lockset request)
         switch (request)
         {
             case trylock:
-                chk = pthread_mutex_lock(processLock);
+                chk = pthread_mutex_trylock(processLock);
                 break;
 
             case lock:
@@ -205,6 +243,12 @@ bool Master::actionLock(lockset request)
             case unlock:
                 chk = pthread_mutex_unlock(processLock);
                 break;
+
+            case destroy:
+                pthread_mutex_destroy(&processMutex);
+                chk = 0;
+                break;
+
             default:
                 break;
         }
@@ -213,14 +257,56 @@ bool Master::actionLock(lockset request)
 }
 
 
-void Master::defaults(void)
+bool Master::vupeakLock(lockset request)
+{
+    int chk  = -1;
+    if (request == init)
+    {
+        if (!(chk = pthread_mutex_init(&meterMutex, NULL)))
+            meterLock = &meterMutex;
+        else
+        {
+            cerr << "Error, Master meterLock init fails :-(" << endl;
+            meterLock = NULL;
+        }
+    }
+    else if (NULL != meterLock)
+    {
+        switch (request)
+        {
+            case trylock:
+                chk = pthread_mutex_trylock(meterLock);
+                break;
+
+            case lock:
+                chk = pthread_mutex_lock(meterLock);
+                break;
+
+            case unlock:
+                chk = pthread_mutex_unlock(meterLock);
+                break;
+
+            case destroy:
+                pthread_mutex_destroy(&meterMutex);
+                chk = 0;
+                break;
+
+            default:
+                break;
+        }
+    }
+    return (chk == 0) ? true : false;
+}
+
+
+void Master::setDefaults(void)
 {
     setPvolume(90);
     setPkeyshift(64);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        part[npart]->defaults();
+        part[npart]->setDefaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
 
@@ -228,14 +314,14 @@ void Master::defaults(void)
 
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
-        insefx[nefx]->defaults();
+        insefx[nefx]->setDefaults();
         Pinsparts[nefx] = -1;
     }
 
     // System Effects init
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        sysefx[nefx]->defaults();
+        sysefx[nefx]->setDefaults();
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         {
             //if (nefx==0) setPsysefxvol(npart,nefx,64);
@@ -247,7 +333,7 @@ void Master::defaults(void)
     }
 
 //	sysefx[0]->changeeffect(1);
-    microtonal.defaults();
+    microtonal.setDefaults();
     ShutUp();
 }
 
@@ -258,51 +344,58 @@ void Master::NoteOn(unsigned char chan, unsigned char note, unsigned char veloci
     if (!velocity)
         this->NoteOff(chan, note);
     else
+    {
+        zynMaster->actionLock(lock);
         for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
             if (chan == part[npart]->Prcvchn)
             {
                 fakepeakpart[npart] = velocity * 2;
-                if (part[npart]->Penabled != 0)
+                if (part[npart]->Penabled)
                     part[npart]->NoteOn(note, velocity, keyshift);
             }
+        zynMaster->actionLock(unlock);
+    }
 }
 
 
 // Note Off Messages
 void Master::NoteOff(unsigned char chan, unsigned char note)
 {
+    zynMaster->actionLock(lock);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if (chan == part[npart]->Prcvchn && part[npart]->Penabled != 0)
+        if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
             part[npart]->NoteOff(note);
     }
+    zynMaster->actionLock(unlock);
 }
 
 
 // Controllers
 void Master::SetController(unsigned char chan, unsigned int type, short int par)
 {
+    zynMaster->actionLock(lock);
     if (type == C_dataentryhi
         || type == C_dataentrylo
         || type == C_nrpnhi
         || type == C_nrpnlo)
     {
         // Process RPN and NRPN by the Master (ignore the chan)
-        ctl.setparameternumber(type, par);
+        ctl.setParameterNumber(type, par);
 
         int parhi = -1, parlo = -1, valhi = -1, vallo = -1;
-        if (!ctl.getnrpn(&parhi, &parlo, &valhi, &vallo))
+        if (!ctl.getNrpn(&parhi, &parlo, &valhi, &vallo))
         {   // this is NRPN
             // fprintf(stderr,"rcv. NRPN: %d %d %d %d\n",parhi,parlo,valhi,vallo);
             switch (parhi)
             {
                 case 0x04: // System Effects
                     if (parlo < NUM_SYS_EFX)
-                        sysefx[parlo]->seteffectpar_nolock(valhi, vallo);
+                        sysefx[parlo]->setEffectPar_nolock(valhi, vallo);
                     break;
             case 0x08: // Insertion Effects
                 if (parlo < NUM_INS_EFX)
-                    insefx[parlo]->seteffectpar_nolock(valhi, vallo);
+                    insefx[parlo]->setEffectPar_nolock(valhi, vallo);
                 break;
 
             }
@@ -319,11 +412,12 @@ void Master::SetController(unsigned char chan, unsigned int type, short int par)
         if (type == C_allsoundsoff)
         {   // cleanup insertion/system FX
             for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-                sysefx[nefx]->cleanup();
+                sysefx[nefx]->Cleanup();
             for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-                insefx[nefx]->cleanup();
+                insefx[nefx]->Cleanup();
         }
     }
+    zynMaster->actionLock(unlock);
 }
 
 
@@ -332,37 +426,33 @@ void Master::partOnOff(int npart, int what)
 {
     if (npart >= NUM_MIDI_PARTS)
         return;
-    if (what == 0) // disable part
-    {
-        fakepeakpart[npart] = 0;
+    fakepeakpart[npart] = 0;
+    if (what)
+        part[npart]->Penabled = 1; // part enabled
+    else
+    {   // disabled part
         part[npart]->Penabled = 0;
-        part[npart]->cleanup();
+        part[npart]->Cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
-                insefx[nefx]->cleanup();
-    } else { // part enabled
-        part[npart]->Penabled = 1;
-        fakepeakpart[npart] = 0;
+                insefx[nefx]->Cleanup();
     }
 }
 
 
 // Master audio out (the final sound)
-bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
+void Master::MasterAudio(jsample_t *outl, jsample_t *outr)
 {
-    if (!actionLock((lockrequired) ? lock : trylock))
-        return false;
-
     // Clean up the output samples
-    memset(outl, 0, buffersize * sizeof(float));
-    memset(outr, 0, buffersize * sizeof(float));
+    memset(outl, 0, buffersize * sizeof(jsample_t));
+    memset(outr, 0, buffersize * sizeof(jsample_t));
+    actionLock(lock);
 
     // Compute part samples and store them npart]->partoutl,partoutr
     int npart;
     for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart]->Penabled)
             part[npart]->ComputePartSmps();
-
     // Insertion effects
     int nefx;
     for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -418,7 +508,7 @@ bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
     // System effects
     for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
-        if (!sysefx[nefx]->geteffect())
+        if (!sysefx[nefx]->getEffect())
             continue; // the effect is disabled
 
         // Clean up the samples used by the system effects
@@ -457,7 +547,7 @@ bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
         sysefx[nefx]->out(tmpmixl, tmpmixr);
 
         // Add the System Effect to sound output
-        float outvol = sysefx[nefx]->sysefxgetvolume();
+        float outvol = sysefx[nefx]->sysefxGetVolume();
         for (int i = 0; i < buffersize; ++i)
         {
             outl[i] += tmpmixl[i] * outvol;
@@ -482,72 +572,103 @@ bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
             insefx[nefx]->out(outl, outr);
     }
 
-    vuoutpeakl = 1e-12;
-    vuoutpeakr = 1e-12;
-    vurmspeakl = 1e-12;
-    vurmspeakr = 1e-12;
-    float sample;
-    for (int i = 0; i < buffersize; ++i)
-    {
-        sample = outl[i] * volume; // Master Volume
-        sample = (sample > 1.0f) ? 1.0f : sample;
-        outl[i] = (sample < -1.0f) ? -1.0f : sample;
-        sample = outr[i] * volume;
-        sample = (sample > 1.0f) ? 1.0f : sample;
-        outr[i] = (sample < -1.0f) ? -1.0f : sample;
-        if (fabsf(outl[i]) > vuoutpeakl) // Peak computation (for vumeters)
-            vuoutpeakl = fabsf(outl[i]);
-        if (fabsf(outr[i]) > vuoutpeakr)
-            vuoutpeakr = fabsf(outr[i]);
-        vurmspeakl += outl[i] * outl[i]; // RMS Peak computation (for vumeters)
-        vurmspeakr += outr[i] * outr[i];
-    }
-
-    if (vuoutpeakl > 1.0 || vuoutpeakr > 1.0)
-        vuclipped = 1;
-    if (vumaxoutpeakl < vuoutpeakl)
-        vumaxoutpeakl = vuoutpeakl;
-    if (vumaxoutpeakr < vuoutpeakr)
-        vumaxoutpeakr = vuoutpeakr;
-
-    vurmspeakl = sqrtf(vurmspeakl / buffersize);
-    vurmspeakr = sqrtf(vurmspeakr / buffersize);
-
-    // Part Peak computation (for Part vumeters or fake part vumeters)
-    for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-    {
-        vuoutpeakpart[npart] = 1.0e-12;
-        if (part[npart]->Penabled)
-        {
-            float *outl = part[npart]->partoutl;
-            float *outr = part[npart]->partoutr;
-            for (int i = 0; i < buffersize; ++i)
-            {
-                float tmp = fabsf(outl[i] + outr[i]);
-                if (tmp > vuoutpeakpart[npart])
-                    vuoutpeakpart[npart] = tmp;
-            }
-            vuoutpeakpart[npart] *= volume;
-        }
-        else if (fakepeakpart[npart] > 1)
-            fakepeakpart[npart]--;
-    }
-    // Shutup if it is asked (with fade-out)
-    if (shutup)
-    {
-        for (int i = 0; i < buffersize; ++i)
-        {
-            float tmp = (float)(buffersize - i)
-                               / (float)buffersize;
-            outl[i] *= tmp;
-            outr[i] *= tmp;
-        }
-        ShutUp();
-    }
+    LFOParams::time++; // update the LFO's time
     actionLock(unlock);
-    // update the LFO's time
-    LFOParams::time++;
-    return true;
+
+    if (Runtime.settings.showGui)
+    {
+        zynMaster->vupeakLock(lock);
+        vuoutpeakl = 1e-9;
+        vuoutpeakr = 1e-9;
+        vurmspeakl = 1e-9;
+        vurmspeakr = 1e-9;
+        zynMaster->vupeakLock(unlock);
+    }
+    float sample;
+    float absval;
+    for (int idx = 0; idx < buffersize; ++idx)
+    {
+        // left
+        sample = outl[idx] * volume; // Master Volume
+        if (Runtime.settings.showGui)
+        {
+            absval = fabsf(sample);
+            if (absval > vuoutpeakl) // Peak computation (for vumeters)
+                if ((vuoutpeakl = absval) > 1.0f)
+                    vuclipped = true;
+            vurmspeakl += sample * sample;  // RMS Peak computation (for vumeters)
+        }
+        if (sample > 1.0f)
+            sample = 1.0f;
+        else if (sample > 1.0f)
+            sample = -1.0f;
+        outl[idx] = sample;
+
+        // right
+        sample = outr[idx] * volume;
+        if (Runtime.settings.showGui)
+        {
+            absval = fabsf(sample);
+            if (absval > vuoutpeakr)  // Peak computation (for vumeters)
+                if ((vuoutpeakr = absval) > 1.0f)
+                    vuclipped = true;
+            vurmspeakr += sample * sample;   // RMS Peak computation (for vumeters)
+        }
+        if (sample > 1.0f)
+            sample = 1.0f;
+        else if (sample < -1.0f)
+            sample = -1.0f;
+        outr[idx] = sample;
+        if (shutup) // Shutup fade-out
+        {
+            float fade = (float)(buffersize - idx) / (float)buffersize;
+            outl[idx] *= fade;
+            outr[idx] *= fade;
+        }
+
+    }
+    // Shutup if it is asked
+    if (shutup)
+        ShutUp();
+
+    if (Runtime.settings.showGui)
+    {
+        zynMaster->vupeakLock(lock);
+        if (vumaxoutpeakl < vuoutpeakl)  vumaxoutpeakl = vuoutpeakl;
+        if (vumaxoutpeakr < vuoutpeakr)  vumaxoutpeakr = vuoutpeakr;
+
+        vurmspeakl = sqrtf(vurmspeakl / buffersize);
+        vurmspeakr = sqrtf(vurmspeakr / buffersize);
+
+        // Part Peak computation (for Part vumeters or fake part vumeters)
+        for (npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+        {
+            vuoutpeakpart[npart] = 1.0e-12;
+            if (part[npart]->Penabled)
+            {
+                float *outl = part[npart]->partoutl;
+                float *outr = part[npart]->partoutr;
+                for (int i = 0; i < buffersize; ++i)
+                {
+                    float tmp = fabsf(outl[i] + outr[i]);
+                    if (tmp > vuoutpeakpart[npart])
+                        vuoutpeakpart[npart] = tmp;
+                }
+                vuoutpeakpart[npart] *= volume;
+                // how is part peak related to master volume??
+            }
+            else if (fakepeakpart[npart] > 1)
+                fakepeakpart[npart]--;
+        }
+        vuOutPeakL =    vuoutpeakl;
+        vuOutPeakR =    vuoutpeakr;
+        vuMaxOutPeakL = vumaxoutpeakl;
+        vuMaxOutPeakR = vumaxoutpeakr;
+        vuRmsPeakL =    vurmspeakl;
+        vuRmsPeakR =    vurmspeakr;
+        vuClipped =     vuclipped;
+        zynMaster->vupeakLock(unlock);
+    }
 }
 
 
@@ -555,7 +676,7 @@ bool Master::MasterAudio(float *outl, float *outr, bool lockrequired)
 void Master::setPvolume(char control_value)
 {
     Pvolume = control_value;
-    volume = volControl->Level(control_value);
+    volume = volControl->Level(Pvolume);
 }
 
 
@@ -587,30 +708,37 @@ void Master::ShutUp(void)
 {
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        part[npart]->cleanup();
+        part[npart]->Cleanup();
         fakepeakpart[npart] = 0;
     }
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-        insefx[nefx]->cleanup();
+        insefx[nefx]->Cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-        sysefx[nefx]->cleanup();
-    vuresetpeaks();
-    shutup = 0;
+        sysefx[nefx]->Cleanup();
+    vuResetpeaks();
+    shutup = false;
 }
 
 
 // Reset peaks and clear the "clipped" flag (for VU-meter)
-void Master::vuresetpeaks(void)
+void Master::vuResetpeaks(void)
 {
-    vuoutpeakl = vuoutpeakr = vumaxoutpeakl = vumaxoutpeakr = 1e-9;
-    vuclipped = 0;
+    zynMaster->vupeakLock(lock);
+    vuOutPeakL = vuoutpeakl = 1e-12;
+    vuOutPeakR = vuoutpeakr =  1e-12;
+    vuMaxOutPeakL = vumaxoutpeakl = 1e-12;
+    vuMaxOutPeakR = vumaxoutpeakr = 1e-12;
+    vuRmsPeakL = vurmspeakl = 1e-12;
+    vuRmsPeakR = vurmspeakr = 1e-12;
+    vuClipped = vuclipped = false;
+    zynMaster->vupeakLock(unlock);
 }
 
 
-void Master::applyparameters(void)
+void Master::applyParameters(void)
 {
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
-        part[npart]->applyparameters();
+        part[npart]->applyParameters();
 }
 
 
@@ -666,7 +794,7 @@ void Master::add2XML(XMLwrapper *xml)
 }
 
 
-int Master::getalldata(char **data)
+int Master::getAllData(char **data)
 {
     XMLwrapper *xml=new XMLwrapper();
 
@@ -683,48 +811,57 @@ int Master::getalldata(char **data)
 }
 
 
-void Master::putalldata(char *data, int size)
+void Master::putAllData(char *data, int size)
 {
     XMLwrapper *xml=new XMLwrapper();
-    if (!xml->putXMLdata(data)) {
-        delete(xml);
+    if (!xml->putXMLdata(data))
+    {
+        cerr << "Error, Master putXMLdata failed" << endl;
+        delete xml;
         return;
     }
-
-    if (xml->enterbranch("MASTER")==0) return;
-
-    actionLock(lock);
-    getfromXML(xml);
-    actionLock(unlock);
-    xml->exitbranch();
-    delete(xml);
+    if (xml->enterbranch("MASTER"))
+    {
+        actionLock(lock);
+        getfromXML(xml);
+        actionLock(unlock);
+        xml->exitbranch();
+    }
+    else
+        cerr << "Error, putAllData failed to enter MASTER branch" << endl;
+    delete xml;
 }
 
 
-int Master::saveXML(const char *filename)
+bool Master::saveXML(string filename)
 {
-    XMLwrapper *xml=new XMLwrapper();
+    XMLwrapper *xml = new XMLwrapper();
     xml->beginbranch("MASTER");
     add2XML(xml);
     xml->endbranch();
-    int result=xml->saveXMLfile(filename);
-    delete (xml);
-    return(result);
+    bool result = xml->saveXMLfile(filename);
+    delete xml;
+    return result;
 }
 
 
-int Master::loadXML(const char *filename)
+bool Master::loadXML(string filename)
 {
-    XMLwrapper *xml=new XMLwrapper();
-    if (xml->loadXMLfile(filename)<0) {
-        delete(xml);
-        return(-1);
+    XMLwrapper *xml = new XMLwrapper();
+    if (!xml->loadXMLfile(filename))
+    {
+        delete xml;
+        return false;
     }
-    if (xml->enterbranch("MASTER")==0) return(-10);
+    if (xml->enterbranch("MASTER") == 0)
+    {
+        cerr << "Error, no MASTER branch found" << endl;
+        return false;
+    }
     getfromXML(xml);
     xml->exitbranch();
-    delete(xml);
-    return 0;
+    delete xml;
+    return true;
 }
 
 
@@ -734,9 +871,11 @@ void Master::getfromXML(XMLwrapper *xml)
     setPkeyshift(xml->getpar127("key_shift",Pkeyshift));
     ctl.NRPN.receive=xml->getparbool("nrpn_receive",ctl.NRPN.receive);
 
-    part[0]->Penabled=0;
-    for (int npart=0;npart<NUM_MIDI_PARTS;npart++) {
-        if (xml->enterbranch("PART",npart)==0) continue;
+    part[0]->Penabled = 0;
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {
+        if (xml->enterbranch("PART",npart) == 0)
+            continue;
         part[npart]->getfromXML(xml);
         xml->exitbranch();
     }
@@ -746,24 +885,31 @@ void Master::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    sysefx[0]->changeeffect(0);
-    if (xml->enterbranch("SYSTEM_EFFECTS")) {
-        for (int nefx=0;nefx<NUM_SYS_EFX;nefx++) {
-            if (xml->enterbranch("SYSTEM_EFFECT",nefx)==0) continue;
+    sysefx[0]->changeEffect(0);
+    if (xml->enterbranch("SYSTEM_EFFECTS"))
+    {
+        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+        {
+            if (xml->enterbranch("SYSTEM_EFFECT",nefx) == 0)
+                continue;
             if (xml->enterbranch("EFFECT")) {
                 sysefx[nefx]->getfromXML(xml);
                 xml->exitbranch();
             }
 
-            for (int partefx=0;partefx<NUM_MIDI_PARTS;partefx++) {
-                if (xml->enterbranch("VOLUME",partefx)==0) continue;
-                setPsysefxvol(partefx,nefx,xml->getpar127("vol",Psysefxvol[partefx][nefx]));
+            for (int partefx = 0; partefx < NUM_MIDI_PARTS; ++partefx)
+            {
+                if (xml->enterbranch("VOLUME", partefx) == 0)
+                    continue;
+                setPsysefxvol(partefx, nefx,xml->getpar127("vol", Psysefxvol[partefx][nefx]));
                 xml->exitbranch();
             }
 
-            for (int tonefx=nefx+1;tonefx<NUM_SYS_EFX;tonefx++) {
-                if (xml->enterbranch("SENDTO",tonefx)==0) continue;
-                setPsysefxsend(nefx,tonefx,xml->getpar127("send_vol",Psysefxsend[nefx][tonefx]));
+            for (int tonefx = nefx + 1; tonefx < NUM_SYS_EFX; ++tonefx)
+            {
+                if (xml->enterbranch("SENDTO", tonefx) == 0)
+                    continue;
+                setPsysefxsend(nefx, tonefx, xml->getpar127("send_vol", Psysefxsend[nefx][tonefx]));
                 xml->exitbranch();
             }
             xml->exitbranch();
@@ -771,12 +917,15 @@ void Master::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("INSERTION_EFFECTS")) {
-        for (int nefx=0;nefx<NUM_INS_EFX;nefx++) {
-
-            if (xml->enterbranch("INSERTION_EFFECT",nefx)==0) continue;
-            Pinsparts[nefx]=xml->getpar("part",Pinsparts[nefx],-2,NUM_MIDI_PARTS);
-            if (xml->enterbranch("EFFECT")) {
+    if (xml->enterbranch("INSERTION_EFFECTS"))
+    {
+        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+        {
+            if (xml->enterbranch("INSERTION_EFFECT", nefx) == 0)
+                continue;
+            Pinsparts[nefx] = xml->getpar("part", Pinsparts[nefx], -2, NUM_MIDI_PARTS);
+            if (xml->enterbranch("EFFECT"))
+            {
                 insefx[nefx]->getfromXML(xml);
                 xml->exitbranch();
             }
@@ -785,5 +934,3 @@ void Master::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 }
-
-

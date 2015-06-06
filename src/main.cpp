@@ -5,27 +5,29 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include <string>
 #include <iostream>
 #include <getopt.h>
+#include <fftw3.h>
 
 using namespace std;
 
-#include "Misc/AntiDenormals.h"
 #include "Misc/Util.h"
 #include "Misc/Master.h"
 #include "MusicIO/MusicClient.h"
@@ -40,6 +42,7 @@ int main(int argc, char *argv[])
 {
     struct option opts[] = { // Command line options
         // no argument: 0, required: 1:, optional: 2::
+        {"name-tag",        1, NULL, 'N'},
         {"load",            1, NULL, 'l'},
         {"load-instrument", 1, NULL, 'L'},
         {"oscilsize",       1, NULL, 'o'},
@@ -56,11 +59,11 @@ int main(int argc, char *argv[])
     };
 
     set_DAZ_and_FTZ(1);
-    MusicClient *musicClient = NULL;
     int exit_status = 0;
+    std::ios::sync_with_stdio(false);
     cerr.precision(3);
-    string loadfile = string();
-    string loadinstrument = string();
+    string load_params = string();
+    string load_instrument = string();
     int option_index = 0;
     int opt;
     bool exitwithhelp = false;
@@ -69,7 +72,7 @@ int main(int argc, char *argv[])
     unsigned int utmp = 0;
     while (true)
     {
-        opt = getopt_long(argc, argv, "a::A::j::J::l:L:o:hkqU", opts,
+        opt = getopt_long(argc, argv, "a::A::j::J::N:l:L:o:hkqU", opts,
                           &option_index);
         char *optarguments = optarg;
         if (opt == -1)
@@ -107,6 +110,11 @@ int main(int argc, char *argv[])
                 }
                 break;
 
+            case 'N':
+                if (optarguments != NULL)
+                    Runtime.settings.nameTag = string(optarguments);
+                break;
+
             case 'h':
                 exitwithhelp = true;
                 break;
@@ -142,12 +150,12 @@ int main(int argc, char *argv[])
 
             case 'l':
                 if (optarguments != NULL)
-                    loadfile = string(optarguments);
+                    load_params = string(optarguments);
                 break;
 
             case 'L':
                 if (optarguments != NULL)
-                    loadinstrument = string(optarguments);
+                    load_instrument = string(optarguments);
                 break;
 
             case 'o':
@@ -229,36 +237,6 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
 
-    if (loadfile.size())
-    {
-        if (zynMaster->loadXML(loadfile.c_str()) < 0)
-        {
-            cerr << "Error, failed to load master file: " << loadfile << endl;
-            exit(1);
-        }
-        else
-        {
-            zynMaster->applyparameters();
-            if (Runtime.settings.verbose)
-                cerr << "Master file " << loadfile << " loaded" << endl;
-        }
-    }
-    if (loadinstrument.size())
-    {
-        int loadtopart = 0;
-        if (zynMaster->part[loadtopart]->loadXMLinstrument(loadinstrument.c_str()) < 0)
-        {
-            cerr << "Error, failed to load instrument file: " << loadinstrument << endl;
-            exit(1);
-        }
-        else
-        {
-            zynMaster->part[loadtopart]->applyparameters();
-            if (Runtime.settings.verbose)
-                cerr << "Instrument file " << loadinstrument << "loaded" << endl;
-        }
-    }
-
     if (NULL == (musicClient = MusicClient::newMusicClient()))
     {
         cerr << "Error, failed to instantiate MusicClient" << endl;
@@ -266,33 +244,17 @@ int main(int argc, char *argv[])
         goto bail_out;
     }
 
-    if (!(musicClient->openAudio()))
+    if (!(musicClient->Open()))
     {
-        cerr << "Error, failed to open MusicClient audio" << endl;
+        cerr << "Error, failed to open MusicClient" << endl;
         exit_status = 1;
         goto bail_out;
     }
-
-    if (!(musicClient->openMidi()))
-    {
-        cerr << "Error, failed to open MusicClient midi" << endl;
-        exit_status = 1;
-        goto bail_out;
-    }
-
-    OscilGen::tmpsmps = new float[Runtime.settings.Oscilsize];
-    if (NULL == OscilGen::tmpsmps)
-    {
-        cerr << "Error, failed to allocate OscilGen::tmpsmps" << endl;
-        exit_status = 1;
-        goto bail_out;
-    }
-    memset(OscilGen::tmpsmps, 0, Runtime.settings.Oscilsize * sizeof(float));
-    newFFTFREQS(&OscilGen::outoscilFFTfreqs, Runtime.settings.Oscilsize / 2);
 
     if (!zynMaster->Init(musicClient->getSamplerate(),
                          musicClient->getBuffersize(),
-                         Runtime.settings.Oscilsize))
+                         Runtime.settings.Oscilsize,
+                         load_params, load_instrument))
     {
         cerr << "Error, Master init failed" << endl;
         exit_status = 1;
@@ -337,6 +299,7 @@ int main(int argc, char *argv[])
         exit_status = 1;
         goto bail_out;
     }
+    fftw_cleanup_threads();
     set_DAZ_and_FTZ(0);
     return exit_status;
 
@@ -351,11 +314,7 @@ bail_out:
         }
 #   endif
 
-    if (NULL != denormalkillbuf)
-        delete [] denormalkillbuf;
-    if (NULL != OscilGen::tmpsmps)
-        delete [] OscilGen::tmpsmps;
-    deleteFFTFREQS(&OscilGen::outoscilFFTfreqs);
+    fftw_cleanup_threads();
     set_DAZ_and_FTZ(0);
     exit(exit_status);
 }

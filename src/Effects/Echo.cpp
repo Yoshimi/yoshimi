@@ -3,25 +3,27 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
-#include "Misc/AntiDenormals.h"
 #include "Misc/Util.h"
 #include "Misc/Master.h"
-#include "Echo.h"
+#include "Effects/Echo.h"
 
 Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -37,8 +39,8 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_) :
     rdelay(NULL),
     fader6db(new Fader(2.0))
 {
-    setpreset(Ppreset);
-    cleanup();
+    setPreset(Ppreset);
+    Cleanup();
 }
 
 Echo::~Echo()
@@ -49,7 +51,7 @@ Echo::~Echo()
 
 
 // Cleanup the effect
-void Echo::cleanup(void)
+void Echo::Cleanup(void)
 {
     memset(ldelay, 0, dl * sizeof(float));
     memset(rdelay, 0, dr * sizeof(float));
@@ -58,7 +60,7 @@ void Echo::cleanup(void)
 
 
 // Initialize the delays
-void Echo::initdelays(void)
+void Echo::initDelays(void)
 {
     // todo: make this adjust insted of destroy old delays
     kl = kr = 0;
@@ -75,7 +77,7 @@ void Echo::initdelays(void)
         delete [] rdelay;
     ldelay = new float[dl];
     rdelay = new float[dr];
-    cleanup();
+    Cleanup();
 }
 
 // Effect output
@@ -94,8 +96,8 @@ void Echo::out(float* smpsl, float* smpsr)
         ldl = l;
         rdl = r;
 
-        efxoutl[i] = ldl * 2.0;
-        efxoutr[i] = rdl * 2.0;
+        efxoutl[i] = ldl * 2.0 - 1e-20f; // anti-denormal - a very, very, very
+        efxoutr[i] = rdl * 2.0 - 1e-20f; // small dc bias
 
         ldl = smpsl[i] * panning - ldl * fb;
         rdl = smpsr[i] * (1.0 - panning) - rdl * fb;
@@ -114,7 +116,7 @@ void Echo::out(float* smpsl, float* smpsr)
 }
 
 // Parameter control
-void Echo::setvolume(unsigned char value)
+void Echo::setVolume(unsigned char value)
 {
     Pvolume = value;
     if (insertion == 0)
@@ -128,23 +130,23 @@ void Echo::setvolume(unsigned char value)
     else
         volume = outvolume = Pvolume / 127.0;
     if (Pvolume == 0)
-        cleanup();
+        Cleanup();
 }
 
-void Echo::setpanning(unsigned char _panning)
+void Echo::setPanning(unsigned char _panning)
 {
     Ppanning = _panning;
     panning = (Ppanning + 0.5) / 127.0;
 }
 
-void Echo::setdelay(const unsigned char _delay)
+void Echo::setDelay(const unsigned char _delay)
 {
     Pdelay = _delay;
     delay = 1 + (int)(Pdelay / 127.0 * zynMaster->getSamplerate() * 1.5); // 0 .. 1.5 sec
-    initdelays();
+    initDelays();
 }
 
-void Echo::setlrdelay(unsigned char _lrdelay)
+void Echo::setLrDelay(unsigned char _lrdelay)
 {
     float tmp;
     Plrdelay = _lrdelay;
@@ -152,28 +154,28 @@ void Echo::setlrdelay(unsigned char _lrdelay)
     if (Plrdelay < 64.0)
         tmp = -tmp;
     lrdelay = (int)tmp;
-    initdelays();
+    initDelays();
 }
 
-void Echo::setlrcross(unsigned char _lrcross)
+void Echo::setLrCross(unsigned char _lrcross)
 {
     Plrcross = _lrcross;
     lrcross = Plrcross / 127.0 * 1.0;
 }
 
-void Echo::setfb(unsigned char _fb)
+void Echo::setFb(unsigned char _fb)
 {
     Pfb = _fb;
     fb = Pfb / 128.0;
 }
 
-void Echo::sethidamp(unsigned char _hidamp)
+void Echo::setHiDamp(unsigned char _hidamp)
 {
     Phidamp = _hidamp;
     hidamp = 1.0 - Phidamp / 127.0;
 }
 
-void Echo::setpreset(unsigned char npreset)
+void Echo::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 7;
     const int NUM_PRESETS = 9;
@@ -193,43 +195,43 @@ void Echo::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
     if (insertion != 0)
-        setvolume(presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        setVolume(presets[npreset][0] / 2); // lower the volume if this is insertion effect
     Ppreset = npreset;
 }
 
 
-void Echo::changepar(int npar, unsigned char value)
+void Echo::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpanning(value);
+            setPanning(value);
             break;
         case 2:
-            setdelay(value);
+            setDelay(value);
             break;
         case 3:
-            setlrdelay(value);
+            setLrDelay(value);
             break;
         case 4:
-            setlrcross(value);
+            setLrCross(value);
             break;
         case 5:
-            setfb(value);
+            setFb(value);
             break;
         case 6:
-            sethidamp(value);
+            setHiDamp(value);
             break;
     }
 }
 
 
-unsigned char Echo::getpar(int npar) const
+unsigned char Echo::getPar(int npar) const
 {
     switch (npar)
     {

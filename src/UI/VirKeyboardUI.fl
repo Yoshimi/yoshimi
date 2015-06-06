@@ -1,28 +1,32 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109
+version 1.0110
 header_name {.h} 
 code_name {.cc}
 comment {VirKeyboard.h} {not_in_source in_header
 }
+
 comment {VirKeyboard.cc} {in_source not_in_header
 }
 
 comment {//
 // Original ZynAddSubFX author Nasca Octavian Paul
 // Copyright (C) 2002-2005 Nasca Octavian Paul
+// Copyright 2009, Alan Calvert
 //
-// This file is part of yoshimi, which is free software: you can
-// redistribute it and/or modify it under the terms of the GNU General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-
-// yoshimi is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of yoshimi, which is free software: you can redistribute
+// it and/or modify it under the terms of version 2 of the GNU General Public
+// License as published by the Free Software Foundation.
+//
+// yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+// later) for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+// Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// This file is a derivative of the ZynAddSubFX original, modified October 2009
 //} {in_source in_header
 }
 
@@ -70,8 +74,7 @@ class VirKeys {: {public Fl_Box}
     code {} {}
   }
   Function {init(void)} {} {
-    code {
-        for (int i = 0; i < N_OCT * 12 + 1; ++i)
+    code {for (int i = 0; i < N_OCT * 12 + 1; ++i)
             pressed[i] = 0;
         midich = 0;
         midivel = 100;
@@ -220,8 +223,7 @@ class VirKeys {: {public Fl_Box}
         return 1;} {}
   }
   Function {presskey(int nk,int exclusive,int type)} {} {
-    code {
-        // Exclusive means that multiple keys can be pressed at once
+    code {// Exclusive means that multiple keys can be pressed at once
         // when the user uses the shift key
         if (nk >= N_OCT * 12)
             return;
@@ -245,10 +247,7 @@ class VirKeys {: {public Fl_Box}
         {
             vel = midivel * (127.0 - rndvelocity) / 127.0 + RND * rndvelocity;
         }
-
-        zynMaster->actionLock(lock);
-        zynMaster->NoteOn(midich, nk + midioct * 12, (int)vel);
-        zynMaster->actionLock(unlock);} {}
+        zynMaster->NoteOn(midich, nk + midioct * 12, (int)vel);} {}
   }
   Function {relasekey(int nk,int type)} {} {
     code {if (nk < 0 || nk >= N_OCT * 12)
@@ -259,10 +258,7 @@ class VirKeys {: {public Fl_Box}
             return;
         pressed[nk] = 0;
         damage(1);
-
-        zynMaster->actionLock(lock);
-        zynMaster->NoteOff(midich, nk + 12 * midioct);
-        zynMaster->actionLock(unlock);} {}
+        zynMaster->NoteOff(midich, nk + 12 * midioct);} {}
   }
   Function {relaseallkeys(int type)} {} {
     code {for (int i = 0; i < N_OCT * 12; ++i)
@@ -279,14 +275,15 @@ class VirKeys {: {public Fl_Box}
   }
 } 
 
-class VirKeyboard {
+class VirKeyboard {open
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window virkeyboardwindow {
       label {Virtual Keyboard - ZynAddSubFX}
       callback {relaseallkeys();
-virkeyboardwindow->hide();}
-      xywh {95 563 650 130} type Double hide
+virkeyboardwindow->hide();} open
+      xywh {75 679 650 130} type Double visible
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -311,32 +308,30 @@ virkeys->take_focus();}
         code0 {o->value(virkeys->keyoct2);}
       }
       Fl_Value_Slider {} {
-        label Vel
+        label Velocity
         callback {virkeys->midivel=(int) o->value();
 virkeys->take_focus();}
-        tooltip Velocity xywh {95 105 100 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum 1 maximum 127 step 1
+        tooltip Velocity xywh {83 108 109 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
       }
       Fl_Counter {} {
-        label {Oct.}
+        label Octave
         callback {relaseallkeys();
 virkeys->midioct=(int) o->value();
 virkeys->take_focus();}
-        tooltip {Midi Octave} xywh {255 100 55 20} type Simple labelsize 11 align 4 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 11
+        tooltip {Midi Octave} xywh {245 106 56 18} type Simple labelsize 10 align 1 when 6 minimum 0 maximum 5 step 1 textfont 1 textsize 10
         code0 {o->value(virkeys->midioct);}
       }
       Fl_Button {} {
         label Close
         callback {relaseallkeys();
 virkeyboardwindow->hide();}
-        xywh {545 105 55 20} box THIN_UP_BOX
+        xywh {545 105 55 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Value_Slider {} {
         label Cval
         callback {int ctl = midictl;
-            zynMaster->actionLock(lock);
             zynMaster->SetController(virkeys->midich, ctl, (int) o->value());
-            zynMaster->actionLock(unlock);
             virkeys->take_focus();}
         tooltip {Controller value} xywh {605 10 15 115} type {Vert Fill} box ENGRAVED_BOX selection_color 229 labelsize 8 align 5 minimum 127 maximum 0 step 1 value 64 textsize 7
       }
@@ -359,7 +354,7 @@ virkeyboardwindow->hide();}
                 default: midictl = C_NULL; break;
             }
             virkeys->take_focus();}
-        xywh {435 105 100 15} down_box BORDER_BOX labelsize 10 align 5 when 6 textfont 1 textsize 10
+        xywh {435 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
         code0 {midictl=C_filtercutoff;o->value(7);}
       } {
         MenuItem {} {
@@ -413,9 +408,8 @@ virkeyboardwindow->hide();}
       }
       Fl_Roller pitchwheelroller {
         label Pwh
-        callback {zynMaster->actionLock(lock);
+        callback {
             zynMaster->SetController(virkeys->midich, C_pitchwheel, -(int) o->value());
-            zynMaster->actionLock(unlock);
             virkeys->take_focus();}
         tooltip {Pitch Wheel} xywh {625 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
       }
@@ -428,16 +422,16 @@ virkeyboardwindow->hide();}
       Fl_Dial {} {
         label Vrnd
         callback {virkeys->rndvelocity=(int) o->value();}
-        tooltip {Velocity Randomness} xywh {205 105 20 20} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
+        tooltip {Velocity Randomness} xywh {205 106 20 21} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
         code0 {o->value(virkeys->rndvelocity);}
         class WidgetPDial
       }
       Fl_Choice partrcv {
-        label {MIDI Ch.}
+        label {Midi Channel}
         callback {relaseallkeys();
             virkeys->midich = (int) o->value();
-            virkeys->take_focus();}
-        tooltip {Send to Midi Channel} xywh {20 105 65 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+            virkeys->take_focus();} selected
+        tooltip {Send to Midi Channel} xywh {11 108 66 16} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
         code0 {char nrstr[10];
             for(int i = 0; i < NUM_MIDI_CHANNELS; ++i)
             {
@@ -455,9 +449,8 @@ virkeyboardwindow->hide();}
     code {midictl = 75;
         make_window();} {}
   }
-  Function {~VirKeyboard()} {
-  } {
-    code {delete virkeyboardwindow;} {selected}
+  Function {~VirKeyboard()} {} {
+    code {delete virkeyboardwindow;} {}
   }
   Function {show()} {} {
     code {virkeyboardwindow->show();} {}

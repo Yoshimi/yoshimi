@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "Misc/Util.h"
@@ -34,8 +37,8 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_) 
     filterr(NULL),
     fader0db(new Fader(1.0))
 {
-    setpreset(Ppreset);
-    cleanup();
+    setPreset(Ppreset);
+    Cleanup();
 }
 
 DynamicFilter::~DynamicFilter()
@@ -52,15 +55,15 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     if (filterpars->changed)
     {
         filterpars->changed = false;
-        cleanup();
+        Cleanup();
     }
 
     float lfol, lfor;
-    lfo.effectlfoout(&lfol, &lfor);
+    lfo.effectLfoOut(&lfol, &lfor);
     lfol *= depth * 5.0;
     lfor *= depth * 5.0;
-    float freq = filterpars->getfreq();
-    float q = filterpars->getq();
+    float freq = filterpars->getFreq();
+    float q = filterpars->getQ();
 
     int buffersize = zynMaster->getBuffersize();
     for (int i = 0; i < buffersize; ++i)
@@ -78,14 +81,14 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     ms4=ms4 * (1.0 - ampsmooth2) + ms3 * ampsmooth2;
     float rms = (sqrtf(ms4)) * ampsns;
 
-    float frl = filterl->getrealfreq(freq + lfol + rms);
-    float frr = filterr->getrealfreq(freq + lfor + rms);
+    float frl = filterl->getRealFreq(freq + lfol + rms);
+    float frr = filterr->getRealFreq(freq + lfor + rms);
 
-    filterl->setfreq_and_q(frl, q);
-    filterr->setfreq_and_q(frr, q);
+    filterl->setFreq_and_Q(frl, q);
+    filterr->setFreq_and_Q(frr, q);
 
-    filterl->filterout(efxoutl);
-    filterr->filterout(efxoutr);
+    filterl->filterOut(efxoutl);
+    filterr->filterOut(efxoutr);
 
     // panning
     for (int i = 0; i < buffersize; ++i)
@@ -96,9 +99,9 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
 }
 
 // Cleanup the effect
-void DynamicFilter::cleanup(void)
+void DynamicFilter::Cleanup(void)
 {
-    reinitfilter();
+    reinitFilter();
     ms1 = 0.0;
     ms2 = 0.0;
     ms3 = 0.0;
@@ -107,14 +110,14 @@ void DynamicFilter::cleanup(void)
 
 
 // Parameter control
-void DynamicFilter::setdepth(unsigned char _depth)
+void DynamicFilter::setDepth(unsigned char _depth)
 {
     Pdepth = _depth;
     depth = powf(Pdepth / 127.0, 2.0);
 }
 
 
-void DynamicFilter::setvolume(unsigned char _volume)
+void DynamicFilter::setVolume(unsigned char _volume)
 {
     Pvolume = _volume;
     if (NULL != fader0db)
@@ -127,23 +130,23 @@ void DynamicFilter::setvolume(unsigned char _volume)
         volume = outvolume;
 }
 
-void DynamicFilter::setpanning(unsigned char _panning)
+void DynamicFilter::setPanning(unsigned char _panning)
 {
     Ppanning = _panning;
     panning = Ppanning / 127.0;
 }
 
 
-void DynamicFilter::setampsns(unsigned char _ampsns)
+void DynamicFilter::setAmpsns(unsigned char _ampsns)
 {
     Pampsns = _ampsns;
     ampsns = powf(Pampsns / 127.0, 2.5) * 10.0;
     if (Pampsnsinv != 0)
         ampsns = -ampsns;
-    ampsmooth = exp(-Pampsmooth / 127.0 * 10.0) * 0.99;
+    ampsmooth = expf(-Pampsmooth / 127.0 * 10.0) * 0.99;
 }
 
-void DynamicFilter::reinitfilter(void)
+void DynamicFilter::reinitFilter(void)
 {
     if (filterl != NULL)
         delete(filterl);
@@ -153,7 +156,7 @@ void DynamicFilter::reinitfilter(void)
     filterr = new Filter(filterpars);
 }
 
-void DynamicFilter::setpreset(unsigned char npreset)
+void DynamicFilter::setPreset(unsigned char npreset)
 {
     const int PRESET_SIZE = 10;
     const int NUM_PRESETS = 5;
@@ -173,9 +176,10 @@ void DynamicFilter::setpreset(unsigned char npreset)
     if (npreset >= NUM_PRESETS)
         npreset = NUM_PRESETS - 1;
     for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
+        changePar(n, presets[npreset][n]);
 
-    filterpars->defaults();
+    filterpars->setDefaults();
+
     switch (npreset)
     {
         case 0:
@@ -264,56 +268,56 @@ void DynamicFilter::setpreset(unsigned char npreset)
 //		printf("freq=%d  amp=%d  q=%d\n",filterpars->Pvowels[0].formants[i].freq,filterpars->Pvowels[0].formants[i].amp,filterpars->Pvowels[0].formants[i].q);
 //	    };
     if (insertion == 0)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
+        changePar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
     Ppreset = npreset;
-    reinitfilter();
+    reinitFilter();
 }
 
 
-void DynamicFilter::changepar(int npar, unsigned char value)
+void DynamicFilter::changePar(int npar, unsigned char value)
 {
     switch (npar)
     {
         case 0:
-            setvolume(value);
+            setVolume(value);
             break;
         case 1:
-            setpanning(value);
+            setPanning(value);
             break;
         case 2:
             lfo.Pfreq = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 3:
             lfo.Prandomness = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 4:
             lfo.PLFOtype = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 5:
             lfo.Pstereo = value;
-            lfo.updateparams();
+            lfo.updateParams();
             break;
         case 6:
-            setdepth(value);
+            setDepth(value);
             break;
         case 7:
-            setampsns(value);
+            setAmpsns(value);
             break;
         case 8:
             Pampsnsinv = value;
-            setampsns(Pampsns);
+            setAmpsns(Pampsns);
             break;
         case 9:
             Pampsmooth = value;
-            setampsns(Pampsns);
+            setAmpsns(Pampsns);
             break;
     }
 }
 
-unsigned char DynamicFilter::getpar(int npar) const
+unsigned char DynamicFilter::getPar(int npar) const
 {
     switch (npar)
     {

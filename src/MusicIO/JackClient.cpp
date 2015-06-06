@@ -30,14 +30,9 @@ bool JackClient::openAudio(void)
     {
         if (jackEngine.openAudio())
         {
-            if (jackEngine.prepAudiobuffers(getBuffersize(), false))
-            {
-                Runtime.settings.Samplerate = getSamplerate();
-                Runtime.settings.Buffersize = getBuffersize();
-                return true;
-            }
-            else
-                cerr << "Error, failed to prep audio buffers" << endl;
+            Runtime.settings.Samplerate = getSamplerate();
+            Runtime.settings.Buffersize = getBuffersize();
+            return true;
         }
         else
             cerr << "Error, failed to register audio" << endl;

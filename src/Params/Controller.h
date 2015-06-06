@@ -3,26 +3,28 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "globals.h"
 #include "Misc/XMLwrapper.h"
 #include "Effects/Fader.h"
 
@@ -31,36 +33,36 @@ class Controller
     public:
         Controller();
         ~Controller() { };
-        void resetall();
+        void resetAll();
 
         void add2XML(XMLwrapper *xml);
-        void defaults();
+        void setDefaults();
         void getfromXML(XMLwrapper *xml);
 
         // Controllers functions
-        void setpitchwheel(int value);
-        void setpitchwheelbendrange(unsigned short int value);
-        void setexpression(int value);
-        void setpanning(int value);
-        void setfiltercutoff(int value);
-        void setfilterq(int value);
-        void setbandwidth(int value);
-        void setmodwheel(int value);
-        void setfmamp(int value);
-        void setvolume(int value);
-        void setsustain(int value);
-        void setportamento(int value);
-        void setresonancecenter(int value);
-        void setresonancebw(int value);
+        void setPitchwheel(int value);
+        void setPitchwheelBendrange(unsigned short int value);
+        void setExpression(int value);
+        void setPanning(int value);
+        void setFilterCutoff(int value);
+        void setFilterQ(int value);
+        void setBandwidth(int value);
+        void setModwheel(int value);
+        void setFmAmp(int value);
+        void setVolume(int value);
+        void setSustain(int value);
+        void setPortamento(int value);
+        void setResonanceCenter(int value);
+        void setResonanceBw(int value);
 
 
-        void setparameternumber(unsigned int type, int value); // used for RPN and NRPN's
-        int getnrpn(int *parhi, int *parlo, int *valhi, int *vallo);
+        void setParameterNumber(unsigned int type, int value); // used for RPN and NRPN's
+        int getNrpn(int *parhi, int *parlo, int *valhi, int *vallo);
 
-        int initportamento(float oldfreq, float newfreq, bool legatoflag);
+        int initPortamento(float oldfreq, float newfreq, bool legatoflag);
         // returns 1 if the portamento's conditions are true, else return 0
 
-        void updateportamento(); //update portamento values
+        void updatePortamento(); //update portamento values
 
         // Controllers values
         struct { // Pitch Wheel

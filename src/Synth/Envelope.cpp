@@ -3,19 +3,22 @@
 
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
+    Copyright 2009, Alan Calvert
 
-    This file is part of yoshimi, which is free software: you can
-    redistribute it and/or modify it under the terms of the GNU General
-    Public License as published by the Free Software Foundation, either
-    version 3 of the License, or (at your option) any later version.
+    This file is part of yoshimi, which is free software: you can redistribute
+    it and/or modify it under the terms of version 2 of the GNU General Public
+    License as published by the Free Software Foundation.
 
-    yoshimi is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+    later) for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with
+    yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+    Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+    This file is a derivative of the ZynAddSubFX original, modified October 2009
 */
 
 #include "Misc/Util.h"
@@ -34,7 +37,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
     linearenvelope = envpars->Plinearenvelope;
 
     if (envpars->Pfreemode == 0)
-        envpars->converttofree();
+        envpars->convertToFree();
 
     float bufferdt = (float)zynMaster->getBuffersize()
                       / (float)zynMaster->getSamplerate();
@@ -49,7 +52,7 @@ Envelope::Envelope(EnvelopeParams *envpars, float basefreq)
 
     for (i = 0; i < MAX_ENVELOPE_POINTS; ++i)
     {
-        float tmp = envpars->getdt(i) / 1000.0 * envstretch;
+        float tmp = envpars->getDt(i) / 1000.0 * envstretch;
         if (tmp > bufferdt)
             envdt[i] = bufferdt / tmp;
         else

@@ -26,7 +26,8 @@ using namespace std;
 #include "Misc/Master.h"
 #include "MusicIO/AlsaEngine.h"
 
-AlsaEngine::AlsaEngine()
+AlsaEngine::AlsaEngine() :
+    MusicIO()
 {
     audio.handle = NULL;
     audio.period_time = 0;
@@ -62,9 +63,8 @@ bool AlsaEngine::openAudio(void)
             goto bail_out;
         if (!prepSwparams())
             goto bail_out;
-        Runtime.settings.Samplerate = getSamplerate();
-        Runtime.settings.Buffersize = getBuffersize();
-        return true;
+        if (prepAudiobuffers(true))
+            return true;
 bail_out:
     Close();
     return false;
@@ -118,14 +118,18 @@ void AlsaEngine::Close(void)
 
 string AlsaEngine::audioClientName(void)
 {
-    string name = "yoshimi" + asString(audioClientId());
+    string name = "yoshimi";
+    if (!Runtime.settings.nameTag.empty())
+        name += ("-" + Runtime.settings.nameTag);
     return name;
 }
 
 string AlsaEngine::midiClientName(void)
 {
-    string name = "yoshimi" + asString(midiClientId());
-    return name.c_str();
+    string name = "yoshimi";
+    if (!Runtime.settings.nameTag.empty())
+        name += ("-" + Runtime.settings.nameTag);
+    return name;
 }
 
 
@@ -264,11 +268,7 @@ void *AlsaEngine::AudioThread(void)
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
     while (!threadStop)
     {
-        if (!getAudioInterleaved(true))
-        {
-            threadStop = true;
-            break;
-        }
+        getAudioInterleaved();
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
         {
@@ -307,7 +307,7 @@ void AlsaEngine::Write(void)
 {
     snd_pcm_uframes_t towrite = getBuffersize();
     snd_pcm_sframes_t wrote = 0;
-    short int *data = shortInterleaved;
+    short int *data = interleavedShorts;
     while (towrite > 0)
     {
         wrote = pcmWrite(audio.handle, data, towrite);

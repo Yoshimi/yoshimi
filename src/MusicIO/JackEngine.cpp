@@ -30,6 +30,7 @@ using namespace std;
 #include "MusicIO/JackEngine.h"
 
 JackEngine::JackEngine() :
+    MusicIO(),
     jackClient(NULL)
 {
     audio.jackSamplerate = 0;
@@ -53,7 +54,9 @@ bool JackEngine::connectServer(string server)
 {
     if (NULL == jackClient) // ie, not already connected
     {
-        const char *clientname = "yoshimi";
+        string clientname = "yoshimi";
+        if (!Runtime.settings.nameTag.empty())
+            clientname += ("-" + Runtime.settings.nameTag);
         jack_status_t jackstatus;
         bool use_server_name = server.size() && server.compare("default") != 0;
         jack_options_t jopts = (jack_options_t)
@@ -62,10 +65,10 @@ bool JackEngine::connectServer(string server)
         for (int tries = 0; tries < 3 && NULL == jackClient; ++tries)
         {
             if (use_server_name)
-                jackClient = jack_client_open(clientname, jopts, &jackstatus,
+                jackClient = jack_client_open(clientname.c_str(), jopts, &jackstatus,
                                               server.c_str());
             else
-                jackClient = jack_client_open(clientname, jopts, &jackstatus);
+                jackClient = jack_client_open(clientname.c_str(), jopts, &jackstatus);
             if (NULL != jackClient)
                 break;
             else
@@ -148,6 +151,7 @@ void JackEngine::Stop(void)
 
 void JackEngine::Close(void)
 {
+    int chk;
     if (NULL != jackClient)
     {
         for (int i = 0; i < 2; ++i)
@@ -161,7 +165,7 @@ void JackEngine::Close(void)
             jack_port_unregister(jackClient, midi.port);
             midi.port = NULL;
         }
-        int chk = jack_client_close(jackClient);
+        chk = jack_client_close(jackClient);
         if (chk && Runtime.settings.verbose)
             cerr << "Error, failed to close jack client, status: " << chk << endl;
         if (NULL != midi.ringBuf)
@@ -171,6 +175,12 @@ void JackEngine::Close(void)
         }
         jackClient = NULL;
     }
+    if (NULL != midi.eventsUp && (chk = sem_close(midi.eventsUp)))
+        cerr << "Error, failed to close jack midi semaphore "
+             << midi.semName << strerror(errno) << endl;
+    if (!midi.semName.empty() && (chk = sem_unlink(midi.semName.c_str())))
+        cerr << "Error, failed to unlink jack midi semaphore "
+             << midi.semName << strerror(errno) << endl;
 }
 
 
@@ -187,7 +197,8 @@ bool JackEngine::openAudio(void)
     {
         audio.jackSamplerate = jack_get_sample_rate(jackClient);
         audio.jackNframes = jack_get_buffer_size(jackClient);
-        return true;
+        if (prepAudiobuffers(false))
+            return true;
     }
     else
         cerr << "Error, failed to register jack audio ports" << endl;
@@ -286,21 +297,14 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
                     return false;
                 }
             }
-            int locktries = 0;
-            int maxretries = 3;
-            for (locktries = 0; locktries < maxretries; ++locktries)
-                if (getAudio(false))
-                    break;
-            if (locktries >= maxretries && Runtime.settings.verbose)
-                cerr << "Info, jack processAudio missed the lock :-(" << endl;
+            memcpy(audio.portBuffs[0], zynLeft, sizeof(jsample_t) * nframes);
+            memcpy(audio.portBuffs[1], zynRight, sizeof(jsample_t) * nframes);
+            getAudio();
         }
         else
             silenceBuffers();
-        for (unsigned int frame = 0; frame < nframes; ++frame)
-        {
-            audio.portBuffs[0][frame] = zynLeft[frame];
-            audio.portBuffs[1][frame] = zynRight[frame];
-        }
+        memcpy(audio.portBuffs[0], zynLeft, sizeof(jsample_t) * nframes);
+        memcpy(audio.portBuffs[1], zynRight, sizeof(jsample_t) * nframes);
         return true;
     }
     else
@@ -335,11 +339,6 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                             midi.data[byt] = jEvent.buffer[byt];
                         while (byt < midi.maxdata)
                             midi.data[byt++] = 0;
-                        /**
-                        if (Runtime.settings.verbose
-                            && jack_ringbuffer_write_space(midi.ringBuf) < midi.maxdata)
-                            cerr << "Warn, ringbuffer full!!" << endl;
-                        */
                         wrote = 0;
                         tries = 0;
                         data = midi.data;
@@ -365,20 +364,10 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                             return false;
                         }
                     }
-                    /**
-                    else
-                        if (Runtime.settings.verbose)
-                            cerr << "Warn, jack midi data length oversize: "
-                                 << jEvent.size << endl;
-                    **/
                 }
                 else
                     cerr << "Warn, jack midi read failed" << endl;
             }
-            /**
-            if (eventCount > 0)
-                cerr << eventCount << " events processed" << endl;
-            **/
             return true;
         }
         else
@@ -457,6 +446,7 @@ void *JackEngine::midiThread(void)
 
             case 0x80: // note-off
                 note = midi.data[1];
+                //velocity = midi.data[2];
                 setMidiNote(channel, note);
                 break;
 
@@ -476,7 +466,7 @@ void *JackEngine::midiThread(void)
 
             case 0xE0: // pitch bend
                 ctrltype = C_pitchwheel;
-                par = ((midi.data[2] << 8) | midi.data[1]) - 8192;
+                par = ((midi.data[2] << 7) | midi.data[1]) - 8192;
                 setMidiController(channel, ctrltype, par);
                 break;
 
