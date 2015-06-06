@@ -32,10 +32,6 @@ using namespace std;
 
 #define MAX_BANK_ROOT_DIRS 100
 
-
-
-extern int thread_priority; // default 50;
-
 extern bool autostart_jack; // default false
 
 class Config; extern Config Runtime;
@@ -54,15 +50,21 @@ class Config
             bool          verbose;
             int           UserInterfaceMode;
             int           VirKeybLayout;
+
+            string        LinuxALSAaudioDev;
+            string        LinuxALSAmidiDev;
+            string        LinuxJACKserver;
+
             audio_drivers audioEngine;
             midi_drivers  midiEngine;
             string        audioDevice;
             string        midiDevice;
             string        nameTag;
 
-            string        LinuxALSAaudioDev;
-            string        LinuxALSAmidiDev;
-            string        LinuxJACKserver;
+            int           Float32bitWavs;
+            string        DefaultRecordDirectory;
+            string        CurrentRecordDirectory;
+
             int           BankUIAutoClose;
             int           GzipCompression;
             int           Interpolation;

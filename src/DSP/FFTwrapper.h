@@ -50,6 +50,5 @@ class FFTwrapper
         double *data2;
         fftw_plan planBasic;
         fftw_plan planInv;
-        static int fftw_threads;
 };
 #endif

@@ -27,61 +27,47 @@ using namespace std;
 MusicIO::MusicIO() :
     zynLeft(NULL),
     zynRight(NULL),
-    interleavedShorts(NULL)
+    interleavedShorts(NULL),
+    muted(false)
 { }
 
 
-bool MusicIO::prepAudiobuffers(bool with_interleaved)
+void MusicIO::Close(void)
 {
-    int buffersize = getBuffersize();
-    if (buffersize > 0)
-    {
-        zynLeft = new jsample_t[buffersize];
-        zynRight = new jsample_t[buffersize];
-        if (zynLeft == NULL || zynRight == NULL)
-            goto bail_out;
-        memset(zynLeft, 0, sizeof(jsample_t) * buffersize);
-        memset(zynRight, 0, sizeof(jsample_t) * buffersize);
-        if (with_interleaved)
-        {
-            interleavedShorts = new short int[buffersize * 2];
-            if (interleavedShorts == NULL)
-                goto bail_out;
-            memset(interleavedShorts, 0,  sizeof(short int) * buffersize * 2);
-        }
-        return true;
-    }
-
-bail_out:
-    cerr << "Error, failed to allocate audio buffers, size " << buffersize << endl;
-    if (zynLeft != NULL)
+    RecordClose();
+    if (NULL != zynLeft)
         delete [] zynLeft;
-    zynLeft = NULL;
-    if (zynRight != NULL)
+    if (NULL != zynRight)
         delete [] zynRight;
-    zynRight = NULL;
-    if (interleavedShorts != NULL)
+    if (NULL != interleavedShorts)
         delete [] interleavedShorts;
+    zynLeft = NULL;
+    zynRight = NULL;
     interleavedShorts = NULL;
-    return false;
+}
+
+
+bool MusicIO::prepMusicIO(bool with_interleaved)
+{
+        return prepBuffers(with_interleaved) && PrepWav();
 }
 
 
 void MusicIO::getAudio(void)
 {
-    if (NULL != zynMaster && zynRight != NULL && zynLeft != NULL)
-        zynMaster->MasterAudio(zynLeft, zynRight);
+    zynMaster->MasterAudio(zynLeft, zynRight);
+    if (recordRunning)
+    feedRecord(zynLeft, zynRight);
 }
 
 
-void MusicIO::getAudioInterleaved(void)
+void MusicIO::InterleaveShorts(void)
 {
-    getAudio();
     int buffersize = getBuffersize();
     int idx = 0;
     double scaled;
     for (int frame = 0; frame < buffersize; ++frame)
-    {   // with a nod to libsamplerate ...
+    {   // with a grateful nod to libsamplerate ...
         scaled = zynLeft[frame] * (8.0 * 0x10000000);
         interleavedShorts[idx++] = (short int)(lrint(scaled) >> 16);
         scaled = zynRight[frame] * (8.0 * 0x10000000);
@@ -107,7 +93,7 @@ int MusicIO::getMidiController(unsigned char b)
             ctl = C_modwheel;
             break;
 	    case 7: // Volume
-            ctl=C_volume;
+            ctl = C_volume;
     		break;
 	    case 10: // Panning
             ctl = C_panning;
@@ -187,3 +173,41 @@ void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 {
     zynMaster->NoteOff(channel, note);
 }
+
+
+bool MusicIO::prepBuffers(bool with_interleaved)
+{
+    int buffersize = getBuffersize();
+    if (buffersize > 0)
+    {
+        zynLeft = new jsample_t[buffersize];
+        zynRight = new jsample_t[buffersize];
+        if (NULL == zynLeft || NULL == zynRight)
+            goto bail_out;
+        memset(zynLeft, 0, sizeof(jsample_t) * buffersize);
+        memset(zynRight, 0, sizeof(jsample_t) * buffersize);
+        if (with_interleaved)
+        {
+            interleavedShorts = new short int[buffersize * 2];
+            if (NULL == interleavedShorts)
+                goto bail_out;
+            memset(interleavedShorts, 0,  sizeof(short int) * buffersize * 2);
+        }
+        return true;
+    }
+
+bail_out:
+    cerr << "Error, failed to allocate audio buffers, size " << buffersize << endl;
+    if (NULL != zynLeft)
+        delete [] zynLeft;
+    if (NULL != zynRight)
+        delete [] zynRight;
+    if (NULL != interleavedShorts)
+        delete [] interleavedShorts;
+    zynLeft = NULL;
+    zynRight = NULL;
+    interleavedShorts = NULL;
+    return false;
+}
+
+

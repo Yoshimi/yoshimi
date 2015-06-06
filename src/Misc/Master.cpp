@@ -242,6 +242,12 @@ bool Master::actionLock(lockset request)
 
             case unlock:
                 chk = pthread_mutex_unlock(processLock);
+                musicClient->unMute();
+                break;
+
+            case lockmute:
+                musicClient->Mute();
+                chk = pthread_mutex_lock(processLock);
                 break;
 
             case destroy:
@@ -374,7 +380,6 @@ void Master::NoteOff(unsigned char chan, unsigned char note)
 // Controllers
 void Master::SetController(unsigned char chan, unsigned int type, short int par)
 {
-    zynMaster->actionLock(lock);
     if (type == C_dataentryhi
         || type == C_dataentrylo
         || type == C_nrpnhi
@@ -417,7 +422,6 @@ void Master::SetController(unsigned char chan, unsigned int type, short int par)
                 insefx[nefx]->Cleanup();
         }
     }
-    zynMaster->actionLock(unlock);
 }
 
 

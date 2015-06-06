@@ -21,6 +21,7 @@
 
 using namespace std;
 
+#include "Misc/Util.h"
 #include "MusicIO/MusicClient.h"
 #include "MusicIO/JackClient.h"
 #include "MusicIO/AlsaClient.h"
@@ -28,6 +29,12 @@ using namespace std;
 #include "MusicIO/AlsaJackClient.h"
 
 MusicClient *musicClient = NULL;
+
+MusicClient::MusicClient() :
+    audiodevice(string()),
+    mididevice(string())
+{ }
+
 
 MusicClient *MusicClient::newMusicClient(void)
 {

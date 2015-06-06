@@ -305,7 +305,7 @@ rescan_for_banks();} {}
                 bank->setName(slot, string(tmp), -1);
             bs[slot]->refresh();
             // Re-read from slot
-            zynMaster->actionLock(lock);
+            zynMaster->actionLock(lockmute);
             bank->loadFromSlot(slot, zynMaster->part[*npart]);
             zynMaster->actionLock(unlock);
             zynMaster->part[*npart]->applyParameters();
@@ -315,7 +315,7 @@ rescan_for_banks();} {}
 
         if (what == 1 && mode == 1 && !bank->emptySlot(slot))
         {   // Reads from slot
-            zynMaster->actionLock(lock);
+            zynMaster->actionLock(lockmute);
             bank->loadFromSlot(slot, zynMaster->part[*npart]);
             zynMaster->actionLock(unlock);
             zynMaster->part[*npart]->applyParameters();
@@ -336,7 +336,7 @@ rescan_for_banks();} {}
                     doit = false;
             if (doit)
             {
-                zynMaster->actionLock(lock);
+                zynMaster->actionLock(lockmute);
                 bank->saveToSlot(slot,zynMaster->part[*npart]);
                 zynMaster->actionLock(unlock);
                 bs[slot]->refresh();

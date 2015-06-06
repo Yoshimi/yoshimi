@@ -48,23 +48,20 @@ AlsaEngine::AlsaEngine() :
 
 bool AlsaEngine::openAudio(void)
 {
-        audio.device = Runtime.settings.audioDevice;
-        audio.samplerate = Runtime.settings.Samplerate;
-        audio.period_size = Runtime.settings.Buffersize;
-        audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
-        alsaBad(snd_config_update_free_global(), "failed to update snd config");
-        if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
-                                 SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
-                "failed to open alsa audio device:" + audio.device))
-            goto bail_out;
-        if (alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
-            goto bail_out;
-        if (!prepHwparams())
-            goto bail_out;
-        if (!prepSwparams())
-            goto bail_out;
-        if (prepAudiobuffers(true))
-            return true;
+    audio.device = Runtime.settings.audioDevice;
+    audio.samplerate = Runtime.settings.Samplerate;
+    audio.period_size = Runtime.settings.Buffersize;
+    audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
+    alsaBad(snd_config_update_free_global(), "failed to update snd config");
+    if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
+                             SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
+            "failed to open alsa audio device:" + audio.device))
+        goto bail_out;
+        if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
+            if (prepHwparams())
+                if (prepSwparams())
+                    if (prepMusicIO(true))
+                        return true;
 bail_out:
     Close();
     return false;
@@ -106,6 +103,7 @@ bail_out:
 void AlsaEngine::Close(void)
 {
     Stop();
+    MusicIO::Close();
     if (audio.handle != NULL)
         alsaBad(snd_pcm_close(audio.handle), "close pcm failed");
     audio.handle = NULL;
@@ -241,16 +239,6 @@ bail_out:
 }
 
 
-bool AlsaEngine::alsaBad(int op_result, string err_msg)
-{
-    bool isbad = (op_result < 0); // (op_result < 0) -> is bad -> return true
-    if (isbad)
-        cerr << "Error, alsa audio: " << err_msg << ": "
-             << string(snd_strerror(op_result)) << endl;
-    return isbad;
-}
-
-
 void *AlsaEngine::_AudioThread(void *arg)
 {
     return static_cast<AlsaEngine*>(arg)->AudioThread();
@@ -268,7 +256,6 @@ void *AlsaEngine::AudioThread(void)
     alsaBad(snd_pcm_start(audio.handle), "alsa audio pcm start failed");
     while (!threadStop)
     {
-        getAudioInterleaved();
         audio.pcm_state = snd_pcm_state(audio.handle);
         if (audio.pcm_state != SND_PCM_STATE_RUNNING)
         {
@@ -294,7 +281,11 @@ void *AlsaEngine::AudioThread(void)
             audio.pcm_state = snd_pcm_state(audio.handle);
         }
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
+        {
+            getAudio();
+            InterleaveShorts();
             Write();
+        }
         else
             Runtime.settings.verbose
                 && cerr << "Error, audio pcm still not RUNNING" << endl;
@@ -314,7 +305,7 @@ void AlsaEngine::Write(void)
         if (wrote >= 0)
         {
             if ((snd_pcm_uframes_t)wrote < towrite || wrote == -EAGAIN)
-                snd_pcm_wait(audio.handle, 707);
+                snd_pcm_wait(audio.handle, 666);
             if (wrote > 0)
             {
                 towrite -= wrote;
@@ -554,4 +545,14 @@ void *AlsaEngine::MidiThread(void)
         }
     }
     return NULL;
+}
+
+
+bool AlsaEngine::alsaBad(int op_result, string err_msg)
+{
+    bool isbad = (op_result < 0); // (op_result < 0) -> is bad -> return true
+    if (isbad)
+        cerr << "Error, alsa audio: " << err_msg << ": "
+             << string(snd_strerror(op_result)) << endl;
+    return isbad;
 }

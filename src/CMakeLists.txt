@@ -20,7 +20,7 @@ project(Yoshimi)
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(VERSION 2.6)
 cmake_policy(SET CMP0004 OLD)
-set(YOSHIMI_VERSION "0.036")
+set(YOSHIMI_VERSION "0.038")
 FILE(WRITE version.txt "${YOSHIMI_VERSION}")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -36,6 +36,7 @@ option(WANT_GUI "Build with GUI" ON)
 option(X86_64_BUILD "Build for x86_64 system" OFF)
 option(WANT_ASM_F21 "Assembler FLOAT to INT conversions" ON)
 option(WANT_DEBUG "Include gdb debug support" OFF)
+set(YOSHI_FIFO_DIR /dev/shm CACHE STRING "Directory for fifos")
 
 set(X86_64_OPTS
     # "-march=native
@@ -112,8 +113,7 @@ if(WANT_GUI)
     # fltk
     find_package(FLTK REQUIRED)
     if(FLTK_FOUND)
-        message(STATUS "Found ${FLTK_CONFIG}")
-        message(STATUS "Found ${FLTK_FLUID_EXECUTABLE}")
+        message(STATUS "Found fltk")
     else(FLTK_FOUND)
         message(FATAL_ERROR "Gui requested, but FLTK not found")
     endif(FLTK_FOUND)
@@ -169,6 +169,14 @@ else(JACK_FOUND)
     message(FATAL_ERROR "Jack >=0.115.6 required but not found")
 endif(JACK_FOUND)
 
+# libsndfile
+pkg_check_modules(LIBSNDFILE REQUIRED sndfile)
+if(LIBSNDFILE_FOUND)
+    message(STATUS "Found libsndfile ${LIBSNDFILE_VERSION}")
+else(LIBSNDFILE_FOUND)
+    message(FATAL_ERROR "libsndfile required but not found")
+endif(LIBSNDFILE_FOUND)
+
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -ggdb -Wall -Wpointer-arith")
 if(X86_64_BUILD)
     set(CMAKE_CXX_FLAGS_RELEASE ${X86_64_OPTS})
@@ -209,11 +217,15 @@ set(Synth_sources
 set(MusicIO_sources
     MusicIO/MusicClient.cpp  MusicIO/MusicIO.cpp  MusicIO/JackEngine.cpp 
     MusicIO/AlsaEngine.cpp  MusicIO/JackClient.cpp  MusicIO/AlsaClient.cpp
-    MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp
+    MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp MusicIO/WavRecord.cpp
 )
 
-add_definitions(-D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"')
-add_definitions(${ALSA_LDFLAGS} ${JACK_LDFLAGS})
+add_definitions(
+    -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
+    ${ALSA_LDFLAGS}
+    ${JACK_LDFLAGS}
+    -DYOSHI_FIFO_DIR="${YOSHI_FIFO_DIR}"
+)
 
 if(${DEFAULT_AUDIO} STREQUAL "jack")
     message(STATUS "Default audio driver is Jack")
@@ -243,8 +255,10 @@ set(YOSHI_INCLUDES
     ${YOSHI_INCLUDES}
     ${FONTCONFIG_INCLUDE_DIRS}
     ${FFTW3_INC_DIR}
-    ${JACK_INCLUDE_DIRS}
+    ${MXML_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
+    ${JACK_INCLUDE_DIRS}
+    ${LIBSNDFILE_INCLUDE_DIRS}
 )
 
 set(YOSHI_SOURCES
@@ -264,6 +278,7 @@ set(YOSHI_LIBRARIES
     ${MXML_LIBRARIES}
     ${ALSA_LIBRARIES}
     ${JACK_LIBRARIES}
+    ${LIBSNDFILE_LIBRARIES}
 )
 
 include_directories(AFTER ${YOSHI_INCLUDES})

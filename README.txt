@@ -6,8 +6,10 @@ See INSTALL for instructions.
 Bon apetite.
 ------------
 Changes
+0.038 re-fix load parameters, flush record buffer at appropriate times, and
+      attempt to reduce xrun impact of private moments (patch changes etc) 2009-11-12
+0.037 Yoshimi records 2009-011-11
 0.036 Will J Godfrey's load parameter file fix
-0.035 Adjust cmake fltk detection, re ubuntu 9.04 build failure
 0.034 Somewhat experimental in nature, adult supervision recommended: use fftw
       threaded routines. 2009-10-24
 0.031 restore some sanity to the metering (perhaps). 2009-10-23

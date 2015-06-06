@@ -23,50 +23,22 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
-#include <unistd.h>
-#include <errno.h>
+#include <sys/sysinfo.h>
 
 using namespace std;
 
 #include "Misc/Config.h"
 #include "DSP/FFTwrapper.h"
 
-int FFTwrapper::fftw_threads = 0;
-
 FFTwrapper::FFTwrapper(int fftsize_)
 {
     fftsize = fftsize_;
-    data1 = (double*)fftw_malloc(sizeof(double) * fftsize);
-    data2 = (double*)fftw_malloc(sizeof(double) * fftsize);
-    if (!fftw_threads)
-    {
-        long nprocs = -1;
-#ifdef _SC_NPROCESSORS_ONLN
-        nprocs = sysconf(_SC_NPROCESSORS_ONLN);
-#elif defined _SC_NPROC_ONLN
-        nprocs = sysconf(_SC_NPROC_ONLN);
-#endif
-        fftw_threads = 1;
-        if (nprocs < 1)
-        {
-            if (Runtime.settings.verbose)
-                cerr << "Failed to determine number of CPUs online: "
-                     << strerror (errno) << endl;
-        }
-        if (nprocs > 0)
-            fftw_threads = nprocs;
-        if (Runtime.settings.verbose)
-            cerr << nprocs << " processors online, fftw3 to use "
-                 << fftw_threads << " threads" << endl;
-        int chk = fftw_init_threads();
-        if (!chk)
-            cerr << "Error from fftw_init_threads()" << endl;
-    }
-    fftw_plan_with_nthreads(fftw_threads);
+    data1 = new double[fftsize];
+    data2 = new double[fftsize];
     planBasic = fftw_plan_r2r_1d(fftsize, data1, data1, FFTW_R2HC,
-                                 FFTW_MEASURE | FFTW_PRESERVE_INPUT);
+                                 FFTW_ESTIMATE);
     planInv = fftw_plan_r2r_1d(fftsize, data2, data2, FFTW_HC2R,
-                               FFTW_MEASURE | FFTW_PRESERVE_INPUT);
+                               FFTW_ESTIMATE);
 }
 
 
@@ -74,8 +46,8 @@ FFTwrapper::~FFTwrapper()
 {
     fftw_destroy_plan(planBasic);
     fftw_destroy_plan(planInv);
-    fftw_free(data1);
-    fftw_free(data2);
+    delete [] data1;
+    delete [] data2;
 }
 
 

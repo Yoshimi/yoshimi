@@ -38,7 +38,9 @@ using namespace std;
 // Velocity Sensing function
 extern float VelF(float velocity, unsigned char scaling);
 
-bool fileexists(string filename);
+bool isRegFile(string chkpath);
+bool isDirectory(string chkpath);
+bool isFifo(string chkpath);
 
 #define N_DETUNE_TYPES 4 // the number of detune types
 extern float getdetune(unsigned char type, unsigned short int coarsedetune,

@@ -26,8 +26,8 @@
 class AlsaClient : public MusicClient
 {
     public:
-        AlsaClient() { };
-        ~AlsaClient(){ };
+        AlsaClient() : MusicClient() { };
+        ~AlsaClient() { };
 
         bool openAudio(void);
         bool openMidi(void);
@@ -36,12 +36,22 @@ class AlsaClient : public MusicClient
         void Close(void) { alsaEngine.Close(); };
 
         unsigned int getSamplerate(void) { return alsaEngine.getSamplerate(); };
-        unsigned int getBuffersize(void) { return alsaEngine.getBuffersize(); };
+        int getBuffersize(void) { return alsaEngine.getBuffersize(); };
 
         string audioClientName(void) { return alsaEngine.audioClientName(); };
         string midiClientName(void) { return alsaEngine.midiClientName(); };
         int audioClientId(void) { return alsaEngine.audioClientId(); };
         int midiClientId(void) { return alsaEngine.midiClientId(); };
+
+        void startRecord(void) { alsaEngine.RecordStart(); };
+        void stopRecord(void) { alsaEngine.RecordStop(); };
+        bool setRecordFile(const char* fpath, string& errmsg)
+            { return alsaEngine.SetWavFile(fpath, errmsg); };
+        bool setRecordOverwrite(string& errmsg)
+            { return alsaEngine.SetWavOverwrite(errmsg); };
+        string wavFilename(void) { return alsaEngine.WavFilename(); };
+        void Mute(void) { alsaEngine.Mute(); };
+        void unMute(void) { alsaEngine.unMute(); };
 
     protected:
         AlsaEngine alsaEngine;

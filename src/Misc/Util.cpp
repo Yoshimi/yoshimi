@@ -47,6 +47,7 @@ float VelF(float velocity, unsigned char scaling)
 //      return (scaling != 127 && velocity <= 0.99) ? powf(velocity, x) : 1.0;
 }
 
+
 // Get the detune in cents
 float getdetune(unsigned char type, unsigned short int coarsedetune,
                       unsigned short int finedetune)
@@ -98,41 +99,45 @@ float getdetune(unsigned char type, unsigned short int coarsedetune,
     return det;
 }
 
-bool fileexists(string filename)
-{
-    struct stat tmp;
-    int result = stat(filename.c_str(), &tmp);
-    if (result >= 0)
-        return true;
 
+bool isRegFile(string chkpath)
+{
+    struct stat st;
+    if (!lstat(chkpath.c_str(), &st))
+        if (S_ISREG(st.st_mode))
+            return true;
     return false;
 }
 
-/**
-void newFFTFREQS(FFTFREQS *f, int size)
+
+bool isDirectory(string chkpath)
 {
-    f->c = new float[size];
-    f->s = new float[size];
-    memset(f->c, 0, size * sizeof(float));
-    memset(f->s, 0, size * sizeof(float));
+    struct stat st;
+    if (!lstat(chkpath.c_str(), &st))
+        if (S_ISDIR(st.st_mode))
+            return true;
+    return false;
 }
 
-void deleteFFTFREQS(FFTFREQS *f)
+
+bool isFifo(string chkpath)
 {
-    delete[] f->c;
-    delete[] f->s;
-    f->c = f->s = NULL;
+    struct stat st;
+    if (!lstat(chkpath.c_str(), &st))
+        if (S_ISFIFO(st.st_mode))
+            return true;
+    return false;
 }
-**/
+
 
 // try to get dreamtime priority
 void set_realtime(void)
 {
     sched_param sc;
-    sc.sched_priority =
-        (thread_priority >= 0 && thread_priority <= 75) ? thread_priority : 60;
+    sc.sched_priority = 50;
     sched_setscheduler(0, SCHED_FIFO, &sc);
 }
+
 
 string asString(const float& number)
 {
@@ -143,6 +148,7 @@ string asString(const float& number)
    return string(oss.str());
 }
 
+
 string asString(const int& number)
 {
    ostringstream oss;
@@ -150,12 +156,14 @@ string asString(const int& number)
    return string(oss.str());
 }
 
+
 string asString(const unsigned int& number)
 {
    ostringstream oss;
    oss << number;
    return string(oss.str());
 }
+
 
 float string2float(const string& str)
 {
@@ -165,6 +173,7 @@ float string2float(const string& str)
     return fval;
 }
 
+
 int string2int(const string& str)
 {
     istringstream machine(str);
@@ -172,6 +181,7 @@ int string2int(const string& str)
     machine >> intval;
     return intval;
 }
+
 
 // make a filename legal
 void legit_filename(string& fname)
@@ -188,4 +198,3 @@ void legit_filename(string& fname)
             fname.at(i) = '_';
     }
 }
-

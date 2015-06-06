@@ -31,8 +31,6 @@ using namespace std;
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 
-int thread_priority = 50;
-
 bool autostart_jack = false;
 
 Config Runtime;
@@ -61,6 +59,10 @@ Config::Config()
     settings.VirKeybLayout = 1;
     settings.audioEngine = DEFAULT_AUDIO;
     settings.midiEngine  = DEFAULT_MIDI;
+
+    settings.DefaultRecordDirectory = "/tmp";
+    settings.Float32bitWavs  = 1;
+
     for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         settings.bankRootDirlist[i] = string();
     settings.currentBankDir = string("./testbnk");
@@ -194,21 +196,28 @@ void Config::readConfig(void)
             }
         }
 
-        // linux stuff
-
         xmlcfg->getparstr("linux_oss_wave_out_dev"); // deprecated in yoshi
         xmlcfg->getparstr("linux_oss_seq_in_dev");   // deprecated in yoshi
 
-        // windows stuff
-        xmlcfg->getpar("windows_wave_out_id", 0, 0, 0); // deprecated in yoshi
-        xmlcfg->getpar("windows_midi_in_id", 0, 0, 0); // deprecated in yoshi
+        // windows stuff, deprecated in yoshi
+        xmlcfg->getpar("windows_wave_out_id", 0, 0, 0);
+        xmlcfg->getpar("windows_midi_in_id", 0, 0, 0);
 
         // yoshi only settings
         settings.LinuxALSAaudioDev = xmlcfg->getparstr("linux_alsa_audio_dev");
         settings.LinuxALSAmidiDev = xmlcfg->getparstr("linux_alsa_midi_dev");
         settings.LinuxJACKserver = xmlcfg->getparstr("linux_jack_server");
 
-        xmlcfg->exitbranch();
+        settings.DefaultRecordDirectory = xmlcfg->getparstr("DefaultRecordDirectory");
+        if (settings.DefaultRecordDirectory.empty())
+            settings.DefaultRecordDirectory = string("/tmp/");
+        if (settings.DefaultRecordDirectory.at(settings.DefaultRecordDirectory.size() - 1) != '/')
+                settings.DefaultRecordDirectory += "/";
+        if (settings.CurrentRecordDirectory.empty())
+            settings.CurrentRecordDirectory = settings.DefaultRecordDirectory;
+        settings.Float32bitWavs = xmlcfg->getpar("Float32bitWavs", 0, 0, 1);
+
+        xmlcfg->exitbranch(); // CONFIGURATION
     }
     delete(xmlcfg);
     settings.Oscilsize = (int) powf(2, ceil(log (settings.Oscilsize - 1.0) / logf(2.0)));
@@ -265,8 +274,10 @@ void Config::saveConfig(void)
     xmlcfg->addparstr("linux_alsa_audio_dev", settings.LinuxALSAaudioDev);
     xmlcfg->addparstr("linux_alsa_midi_dev", settings.LinuxALSAmidiDev);
     xmlcfg->addparstr("linux_jack_server", settings.LinuxJACKserver);
+    xmlcfg->addparstr("DefaultRecordDirectory", settings.DefaultRecordDirectory);
+    xmlcfg->addpar("Float32bitWavs", settings.Float32bitWavs);
 
-    xmlcfg->endbranch();
+    xmlcfg->endbranch(); // CONFIGURATION
 
     int tmp = settings.GzipCompression;
     settings.GzipCompression = 0;
@@ -282,9 +293,9 @@ string Config::getConfigFilename(bool for_save)
     // use ~/.yoshimiXML.cfg if it exists, otherwise ~/.zynaddsubfxXML.cfg
     // For save, use ~/.yoshimiXML.cfg
     string yoshiCfg = string(getenv("HOME")) + "/.yoshimiXML.cfg";
-    if (for_save || fileexists(yoshiCfg))
+    if (for_save || isRegFile(yoshiCfg))
         return yoshiCfg;
-    else if (fileexists(yoshiCfg))
+    else if (isRegFile(yoshiCfg))
         return yoshiCfg;
     else
         return string(getenv("HOME")) + "/.zynaddsubfxXML.cfg";

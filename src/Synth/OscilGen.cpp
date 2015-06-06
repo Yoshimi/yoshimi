@@ -53,8 +53,8 @@ OscilGen::OscilGen(FFTwrapper *fft_, Resonance *res_) : Presets()
         {
             memset(tmpsmps, 0, sizeof(float) * oscilsize);
             ++active_count;
-            if (Runtime.settings.verbose)
-                cerr << "OscilGen::active_count now " << active_count << endl;
+            //if (Runtime.settings.verbose)
+            //    cerr << "OscilGens active: " << active_count << endl;
         }
     }
 
@@ -81,9 +81,9 @@ OscilGen::~OscilGen()
             delete [] tmpsmps;
             tmpsmps = NULL;
             FFTwrapper::deleteFFTFREQS(outoscilFFTfreqs);
-            if (Runtime.settings.verbose)
-                cerr << "Delete OscilGen::tmpsmps, active_count now "
-                     << active_count << endl;
+            //if (Runtime.settings.verbose)
+            //    cerr << "delete OscilGen tmpsmps, active_count: "
+            //         << active_count << endl;
         }
     }
 }

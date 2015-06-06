@@ -178,17 +178,6 @@ int main(int argc, char *argv[])
                 }
                 break;
 
-            case 'p':
-                tmp = (optarguments != NULL) ? atoi(optarguments) : -1;
-                if (!(tmp < 0 || tmp > 75))
-                    thread_priority = tmp;
-                else
-                {
-                    cerr << "Error, invalid thread priority specified: " << tmp << endl;
-                    exit(1);
-                }
-                break;
-
             case 'r':
                 tmp = 0;
                 if (optarguments != NULL)

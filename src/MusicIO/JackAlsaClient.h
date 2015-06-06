@@ -36,7 +36,7 @@ using namespace std;
 class JackAlsaClient : public MusicClient
 {
     public:
-        JackAlsaClient() { };
+        JackAlsaClient() : MusicClient() { };
         ~JackAlsaClient() { Stop(); Close(); };
 
         bool openAudio(void);
@@ -46,12 +46,22 @@ class JackAlsaClient : public MusicClient
         void Close(void) { jackEngine.Close(); alsaEngine.Close(); };
 
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
-        unsigned int getBuffersize(void) { return jackEngine.getBuffersize(); };
+        int getBuffersize(void) { return jackEngine.getBuffersize(); };
 
         string audioClientName(void) { return jackEngine.clientName(); };
         string midiClientName(void) { return alsaEngine.midiClientName(); };
         int audioClientId(void) { return jackEngine.clientId(); };
         int midiClientId(void) { return alsaEngine.midiClientId(); };
+
+        void startRecord(void) { jackEngine.RecordStart(); };
+        void stopRecord(void) { jackEngine.RecordStop(); };
+        bool setRecordFile(const char* fpath, string& errmsg)
+            { return jackEngine.SetWavFile(fpath, errmsg); };
+        bool setRecordOverwrite(string& errmsg)
+            { return jackEngine.SetWavOverwrite(errmsg); };
+        string wavFilename(void) { return jackEngine.WavFilename(); };
+        void Mute(void) { jackEngine.Mute(); alsaEngine.Mute(); };
+        void unMute(void) { jackEngine.unMute(); alsaEngine.Mute(); };
 
     private:
         JackEngine jackEngine;

@@ -151,6 +151,8 @@ void JackEngine::Stop(void)
 
 void JackEngine::Close(void)
 {
+    Stop();
+    MusicIO::Close();
     int chk;
     if (NULL != jackClient)
     {
@@ -181,6 +183,7 @@ void JackEngine::Close(void)
     if (!midi.semName.empty() && (chk = sem_unlink(midi.semName.c_str())))
         cerr << "Error, failed to unlink jack midi semaphore "
              << midi.semName << strerror(errno) << endl;
+
 }
 
 
@@ -197,11 +200,12 @@ bool JackEngine::openAudio(void)
     {
         audio.jackSamplerate = jack_get_sample_rate(jackClient);
         audio.jackNframes = jack_get_buffer_size(jackClient);
-        if (prepAudiobuffers(false))
+        if (prepMusicIO(false))
             return true;
     }
     else
         cerr << "Error, failed to register jack audio ports" << endl;
+
     Close();
     return false;
 }
@@ -284,7 +288,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
 {
     if (NULL != audio.ports[0] && NULL != audio.ports[1])
     {
-        if (NULL != zynMaster)
+        if (NULL != zynMaster && !muted)
         {
             for (int port = 0; port < 2; ++port)
             {
@@ -333,7 +337,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
             {
                 if(!jack_midi_event_get(&jEvent, portBuf, idx))
                 {
-                    if (jEvent.size > 0 && jEvent.size <= midi.maxdata)
+                    if (jEvent.size > 0 && jEvent.size <= midi.maxdata && !muted)
                     {   // no interest in 0 size or long events
                         for (byt = 0; byt < jEvent.size; ++byt)
                             midi.data[byt] = jEvent.buffer[byt];
@@ -389,7 +393,7 @@ void *JackEngine::midiThread(void)
     unsigned char channel, note, velocity;
     int chk;
     int ctrltype;
-    int par;
+    int par = 0;
     unsigned int fetch;
     unsigned int ev;
     set_realtime();
@@ -427,6 +431,15 @@ void *JackEngine::midiThread(void)
                 ctrltype = C_expression;
                 par = midi.data[2];
                 setMidiController(channel, ctrltype, par);
+                break;
+
+            case 0x0C: // program change ... but how?
+                if (Runtime.settings.verbose)
+                {
+                    cerr << "How to change to program " << par << " on channel "
+                         << channel << "?" << endl;
+                    par = midi.data[2];
+                }
                 break;
 
             case 0x78: // all sound off

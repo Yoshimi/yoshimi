@@ -36,6 +36,7 @@
 using namespace std;
 
 #include "Misc/Config.h"
+#include "Misc/Master.h"
 #include "Misc/Bank.h"
 
 // compare function for sorting banks
@@ -164,7 +165,7 @@ void Bank::saveToSlot(unsigned int ninstrument, Part *part)
     if (filepath.at(filepath.size() - 1) != '/')
         filepath += "/";
     filepath += filename;
-    if (fileexists(filepath))
+    if (isRegFile(filepath))
     {
         int chk = remove(filepath.c_str());
         if (chk < 0)

@@ -30,7 +30,7 @@ using namespace std;
 class JackClient : public MusicClient
 {
     public:
-        JackClient() { };
+        JackClient() : MusicClient() { };
         ~JackClient() { Stop(); Close(); };
 
         bool openAudio(void);
@@ -40,12 +40,23 @@ class JackClient : public MusicClient
         void Close(void) { jackEngine.Close(); };
 
         unsigned int getSamplerate(void) { return jackEngine.getSamplerate(); };
-        unsigned int getBuffersize(void) { return jackEngine.getBuffersize(); };
+        int getBuffersize(void) { return jackEngine.getBuffersize(); };
 
         string audioClientName(void) { return jackEngine.clientName(); };
         string midiClientName(void) { return jackEngine.clientName(); };
         int audioClientId(void) { return jackEngine.clientId(); };
         int midiClientId(void) { return jackEngine.clientId(); };
+
+        void startRecord(void) { jackEngine.RecordStart(); };
+        void stopRecord(void) { jackEngine.RecordStop(); };
+
+        bool setRecordFile(const char* fpath, string& errmsg)
+            { return jackEngine.SetWavFile(fpath, errmsg); };
+        bool setRecordOverwrite(string& errmsg)
+            { return jackEngine.SetWavOverwrite(errmsg); };
+        string wavFilename(void) { return jackEngine.WavFilename(); };
+        void Mute(void) { jackEngine.Mute(); };
+        void unMute(void) { jackEngine.unMute(); };
 
     private:
         JackEngine jackEngine;

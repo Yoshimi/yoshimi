@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0109
+version 1.0110
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -62,8 +62,8 @@ class PartSysEffSend {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window syseffsend {
-      private xywh {990 1040 90 35} type Double
-      class Fl_Group visible
+      private xywh {991 1066 90 35} type Double hide
+      class Fl_Group
     } {
       Fl_Dial {} {
         label 01
@@ -71,7 +71,6 @@ class PartSysEffSend {: {public Fl_Group}
         xywh {0 0 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 130 maximum 127 step 1
         code0 {o->size(25,25);}
         code1 {o->value(zynMaster->Psysefxvol[neff][npart]);}
-        #code2 {snprintf(label,10,"%d",neff+1);o->label(label);}
         code2 {o->copy_label(asString(neff+1).c_str());}
         class WidgetPDial
       }
@@ -120,32 +119,26 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Button {} {
           label m
-          callback {
-              if (part->lastnote >= 0)
+          callback {if (part->lastnote >= 0)
                   minkcounter->value(part->lastnote);
               minkcounter->do_callback();
-              maxkcounter->do_callback();
-          }
+              maxkcounter->do_callback();}
           tooltip {set the minimum key to the last pressed key} xywh {285 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
           label M
-          callback {
-              if (part->lastnote >= 0)
+          callback {if (part->lastnote >= 0)
                   maxkcounter->value(part->lastnote);
               maxkcounter->do_callback();
-              minkcounter->do_callback();
-          }
+              minkcounter->do_callback();}
           tooltip {set the maximum key to the last pressed key} xywh {315 3 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
           label R
-          callback {
-              minkcounter->value(0);
+          callback {minkcounter->value(0);
               minkcounter->do_callback();
               maxkcounter->value(127);
-              maxkcounter->do_callback();
-          }
+              maxkcounter->do_callback();}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button adeditbutton {
@@ -179,7 +172,6 @@ class PartKitItem {: {public Fl_Group}
               if (tmp != NULL)
                 part->kit[n].Pname = string(tmp);}
           xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 20
-          #code0 {o->label(part->kit[n].Pname.c_str());}
           code0 {o->copy_label(part->kit[n].Pname.c_str());}
         }
         Fl_Check_Button adcheck {
@@ -228,7 +220,7 @@ if (part->kit[n].Ppadenabled!=0) padeditbutton->activate();
                 answer = fl_choice("Delete the item?","No","Yes",NULL);
             if (answer != 0)
             {
-                zynMaster->actionLock(lock);
+                zynMaster->actionLock(lockmute);
                 part->setKitItemStatus(n,(int) o->value());
                 zynMaster->actionLock(unlock);
 
@@ -273,7 +265,7 @@ this->redraw();} {
       callback {int answer=1;
 if (o->value()==0) answer=fl_choice("Delete the item?","No","Yes",NULL);
 if (answer!=0){
-zynMaster->actionLock(lock);
+zynMaster->actionLock(lockmute);
  part->setKitItemStatus(n,(int) o->value());
 zynMaster->actionLock(unlock);
 
@@ -339,8 +331,7 @@ class PartUI {open : {public Fl_Group,PartUI_}
         }
         Fl_Button {} {
           label Instrument
-          callback {
-              int event = Fl::event_button();
+          callback {int event = Fl::event_button();
               switch (event)
               {
                   case FL_LEFT_MOUSE:
@@ -351,8 +342,7 @@ class PartUI {open : {public Fl_Group,PartUI_}
                       break;
                   default:
                       break;
-              }
-          } selected
+              }}
           tooltip {Left mousebutton: choose/save/.. from/to bank, Middle button: change the instrument information} xywh {195 14 185 19} box THIN_DOWN_BOX labelfont 1 labelsize 11 align 17
           code0 {o->copy_label(part->Pname.c_str());}
         }
@@ -376,13 +366,11 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
         }
         Fl_Counter maxkcounter {
           label {Max.k}
-          callback {
-              part->Pmaxkey=(int) o->value();
+          callback {part->Pmaxkey=(int) o->value();
               if (part->Pminkey > part->Pmaxkey)
                   o->textcolor(FL_RED);
               else
-                  o->textcolor(FL_BLACK);
-          }
+                  o->textcolor(FL_BLACK);}
           tooltip {Maximum key (that the part receives NoteOn messages)} xywh {340 125 40 15} type Simple labelfont 1 labelsize 10 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->value(part->Pmaxkey);}
         }
@@ -425,31 +413,25 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
         }
         Fl_Button {} {
           label m
-          callback {
-              if (part->lastnote >= 0)
+          callback {if (part->lastnote >= 0)
                   minkcounter->value(part->lastnote);
               minkcounter->do_callback();
-              maxkcounter->do_callback();
-          }
+              maxkcounter->do_callback();}
           tooltip {set the minimum key to the last pressed key} xywh {315 155 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
           label M
-          callback {
-              if (part->lastnote>=0) maxkcounter->value(part->lastnote);
+          callback {if (part->lastnote>=0) maxkcounter->value(part->lastnote);
               maxkcounter->do_callback();
-              minkcounter->do_callback();
-          }
+              minkcounter->do_callback();}
           tooltip {set the maximum key to the last pressed key} xywh {345 155 15 12} box THIN_UP_BOX labelsize 10
         }
         Fl_Button {} {
           label R
-          callback {
-              minkcounter->value(0);
+          callback {minkcounter->value(0);
               minkcounter->do_callback();
               maxkcounter->value(127);
-              maxkcounter->do_callback();
-          }
+              maxkcounter->do_callback();}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {330 155 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Choice {} {
@@ -461,17 +443,14 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
         } {}
         Fl_Choice keylimitlist {
           label KLmt
-          callback {
-              int val = 0;
+          callback {int val = 0;
               val = atoi(o->text());
-              part->setKeyLimit(val);
-          }
+              part->setKeyLimit(val);}
           tooltip {Key Limit} xywh {215 155 50 20} down_box BORDER_BOX labelsize 10 align 8 textfont 1 textsize 10
         } {}
         Fl_Choice {} {
           label {Mode :}
-          callback {
-              switch ((int)o->value())
+          callback {switch ((int)o->value())
               {
                   case 0: // Poly (implies no legato)
                       part->Ppolymode = 1;
@@ -487,8 +466,7 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
                       break;
                   default:
                       break;
-              }
-          }
+              }}
           tooltip {Poly, Mono or Legato mode} xywh {80 130 64 18} down_box BORDER_BOX labelfont 1 labelsize 11 textfont 1 textsize 10
           code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
           code1 {if (part->Ppolymode!=0) o->value(0); else o->value(1);}
@@ -497,7 +475,7 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Check_Button {} {
         label Enabled
-        callback {zynMaster->actionLock(lock);
+        callback {zynMaster->actionLock(lockmute);
             zynMaster->partOnOff(npart, (int)o->value());
             zynMaster->actionLock(unlock);
             if (part->Penabled == 0)
@@ -688,7 +666,7 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Choice insefftype {
         label EffType
-        callback {zynMaster->actionLock(lock);
+        callback {zynMaster->actionLock(lockmute);
             part->partefx[ninseff]->changeEffect((int) o->value());
             zynMaster->actionLock(unlock);
             inseffectui->refresh(part->partefx[ninseff]);}
@@ -784,7 +762,7 @@ if (part->Pminkey>part->Pmaxkey) o->textcolor(FL_RED);
       }
       Fl_Button {} {
         label P
-        callback {zynMaster->actionLock(lock);
+        callback {zynMaster->actionLock(lockmute);
             presetsui->Paste(part->partefx[ninseff], inseffectui);
             zynMaster->actionLock(unlock);}
         xywh {120 127 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7

@@ -26,46 +26,45 @@
 using namespace std;
 
 #include "MusicIO/MidiControl.h"
+#include "MusicIO/WavRecord.h"
 
-typedef enum {
-    no_audio = 0,
-    jack_audio,
-    alsa_audio,
-} audio_drivers;
-
-typedef enum {
-    no_midi = 0,
-    jack_midi,
-    alsa_midi,
-} midi_drivers;
+typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
+typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
 
 class MusicClient
 {
     public:
-        MusicClient() { };
-        virtual ~MusicClient() { };
+        MusicClient();
+        ~MusicClient() { };
 
+        bool Open(void) { return (openAudio() && openMidi()); };
+        virtual bool Start(void) = 0;
+        virtual void Stop(void) = 0;
+        virtual void Close(void) = 0;
         static MusicClient *newMusicClient(void);
-        bool Open(void) { return openAudio() && openMidi(); };
-        virtual bool Start(void) { return true; };
-        virtual void Stop(void) { };
-        virtual void Close(void) { };
 
-        virtual unsigned int getSamplerate(void) { return 0; };
-        virtual unsigned int getBuffersize(void) { return 0; };
+        virtual unsigned int getSamplerate(void) = 0;
+        virtual int getBuffersize(void) = 0;
 
-        virtual string audioClientName(void) { return string("Nada"); };
-        virtual string midiClientName(void) { return string("Nada"); };
-        virtual int audioClientId(void) { return -1; };
-        virtual int midiClientId(void) { return -1; };
+        virtual string audioClientName(void) = 0;
+        virtual string midiClientName(void) = 0;
+        virtual int audioClientId(void) = 0;
+        virtual int midiClientId(void) = 0;
+
+        virtual void startRecord(void) = 0;
+        virtual void stopRecord(void) = 0;
+        virtual bool setRecordFile(const char* fpath, string& errmsg) = 0;
+        virtual bool setRecordOverwrite(string& errmsg) = 0;
+        virtual string wavFilename(void) = 0;
+        virtual void Mute(void) = 0;
+        virtual void unMute(void) = 0;
 
         string      audiodevice;
         string      mididevice;
 
     protected:
-        virtual bool openAudio(void) { return true; };
-        virtual bool openMidi(void) { return true; };
-
+        virtual bool openAudio(void) = 0;
+        virtual bool openMidi(void) = 0;
 };
 
 extern MusicClient *musicClient;

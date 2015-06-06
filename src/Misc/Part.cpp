@@ -691,8 +691,6 @@ void Part::SetController(unsigned int type, int par)
             RelaseSustainedKeys();
             if (ctl.volume.receive != 0)
                 volume = ctl.volume.volume;
-            // superfluous //else
-            // superfluous //    setPvolume(Pvolume);
             setPvolume(Pvolume);   // update the volume
             setPpanning(Ppanning); // update the panning
 

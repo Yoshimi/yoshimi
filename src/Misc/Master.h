@@ -25,6 +25,10 @@
 #ifndef MASTER_H
 #define MASTER_H
 
+#include <jack/jack.h>
+
+typedef jack_default_audio_sample_t jsample_t;
+
 #include "Effects/EffectMgr.h"
 #include "Effects/Fader.h"
 #include "Misc/Part.h"
@@ -32,9 +36,9 @@
 #include "Misc/Bank.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Util.h"
-#include "MusicIO/MusicIO.h"
+//#include "MusicIO/MusicIO.h"
 
-typedef enum { init, trylock, lock, unlock, destroy } lockset;
+typedef enum { init, trylock, lock, unlock, lockmute, destroy } lockset;
 
 extern bool Pexitprogram;  // if the UI sets this true, the program will exit
 

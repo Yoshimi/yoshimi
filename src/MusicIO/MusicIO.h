@@ -21,39 +21,39 @@
 #ifndef MUSIC_IO_H
 #define MUSIC_IO_H
 
-#include <jack/jack.h>
-
-typedef jack_default_audio_sample_t jsample_t;
-
 #include "Misc/Master.h"
+#include "MusicIO/WavRecord.h"
 
-class MusicIO
+class MusicIO : public WavRecord
 {
     public:
         MusicIO();
-        virtual ~MusicIO() { };
+        ~MusicIO() { };
 
-        void getAudio(void);
-        void getAudioInterleaved(void);
-        void silenceBuffers(void);
-
-        virtual unsigned int getSamplerate(void) { return 0; };
-        virtual int getBuffersize(void) { return 0; };
-
-        void setMidiController(unsigned char ch, unsigned int ctrl, int param);
-        void setMidiNote(unsigned char chan, unsigned char note);
-        void setMidiNote(unsigned char chan, unsigned char note,
-                         unsigned char velocity);
-        int getMidiController(unsigned char b);
+        virtual unsigned int getSamplerate(void) = 0;
+        virtual int getBuffersize(void) = 0;
+        virtual bool Start(void) = 0;
+        virtual void Stop(void) = 0;
+        virtual void Close(void);
+        void Mute(void) { muted = true; };
+        void unMute(void) { muted = false; };
 
     protected:
-        bool prepAudiobuffers(bool with_interleaved);
+        bool prepMusicIO(bool with_interleaved);
+        void getAudio(void);
+        void InterleaveShorts(void);
+        void silenceBuffers(void);
+        int getMidiController(unsigned char b);
+        void setMidiController(unsigned char ch, unsigned int ctrl, int param);
+        void setMidiNote(unsigned char chan, unsigned char note);
+        void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
+        jsample_t *zynLeft;
+        jsample_t *zynRight;
+        short int *interleavedShorts;
+        bool muted;
 
-        jsample_t   *zynLeft;
-        jsample_t   *zynRight;
-        short int   *interleavedShorts;
+    private:
+        bool prepBuffers(bool with_interleaved);
 };
-
-
 
 #endif
