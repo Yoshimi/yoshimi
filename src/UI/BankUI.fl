@@ -247,7 +247,7 @@ class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
   } {
     Fl_Window bankuiwindow {
       label Bank open
-      xywh {46 240 780 575} type Double hide
+      xywh {46 240 780 575} type Double visible
     } {
       Fl_Choice banklist {
         callback {//
@@ -389,7 +389,7 @@ removeselection();}
       }
       Fl_Button {} {
         label Close
-        callback {bankuiwindow->hide();} selected
+        callback {bankuiwindow->hide();}
         xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group engines {open
@@ -399,7 +399,9 @@ removeselection();}
           label {Show synth engines}
           callback {//
     synth->getRuntime().CheckPADsynth = (int) o->value();
-    rescan_for_banks(true);}
+    rescan_for_banks(true);
+    synth->getGuiMaster()->partui->resetlabels();
+    synth->getGuiMaster()->updatepanel();} selected
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
           code0 {o->value(synth->getRuntime().CheckPADsynth);}
         }

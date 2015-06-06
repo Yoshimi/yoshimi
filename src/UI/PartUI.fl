@@ -990,23 +990,20 @@ else {propta->deactivate();proptb->deactivate();}}
     int x = o->value();
     part->kit[0].Padenabled = x;
     if (x == 0)
-    {
         adeditbutton->deactivate();
-        addbox->hide();
-    }
     else
-    {
         adeditbutton->activate();
-        addbox->show();
-    }
-    copylabeltopanel();}
+    copylabeltopanel();
+    if(engine == 0 || x == 0)
+        addbox->color(BASE_COLOUR);
+    else
+        addbox->color(ADD_COLOUR);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
           Fl_Box addbox {
             xywh {10 226 89 18} box FLAT_BOX deactivate
-            code0 {o->color(ADD_COLOUR);}
-            code1 {if (adsynenabledcheck->value() == 0) o->hide();}
+            code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(ADD_COLOUR); else o->color(BASE_COLOUR);}
           }
           Fl_Button adeditbutton {
             label Edit
@@ -1016,7 +1013,7 @@ else {propta->deactivate();proptb->deactivate();}}
           }
         }
         Fl_Group {} {
-          label SUBsynth
+          label SUBsynth open
           xywh {105 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
@@ -1025,23 +1022,20 @@ else {propta->deactivate();proptb->deactivate();}}
     int x = o->value();
     part->kit[0].Psubenabled = x;
     if (x == 0)
-    {
         subeditbutton->deactivate();
-        subbox->hide();
-    }
     else
-    {
         subeditbutton->activate();
-        subbox->show();
-    }
-    copylabeltopanel();}
+    copylabeltopanel();
+    if(engine == 0 || x == 0)
+        subbox->color(BASE_COLOUR);
+    else
+        subbox->color(SUB_COLOUR);}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
           Fl_Box subbox {
             xywh {110 226 89 18} box FLAT_BOX deactivate
-            code0 {o->color(SUB_COLOUR);}
-            code1 {if (subsynenabledcheck->value() == 0) o->hide();}
+            code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(SUB_COLOUR); else o->color(BASE_COLOUR);}
           }
           Fl_Button subeditbutton {
             label Edit
@@ -1051,7 +1045,7 @@ else {propta->deactivate();proptb->deactivate();}}
           }
         }
         Fl_Group {} {
-          label PADsynth
+          label PADsynth open
           xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
@@ -1060,23 +1054,20 @@ else {propta->deactivate();proptb->deactivate();}}
     int x = o->value();
     part->kit[0].Ppadenabled = x;
     if (x == 0)
-    {
         padeditbutton->deactivate();
-        padbox->hide();
-    }
     else
-    {
         padeditbutton->activate();
-        padbox->show();
-    }
-    copylabeltopanel();}
+    copylabeltopanel();
+    if(engine == 0 || x == 0)
+        padbox->color(BASE_COLOUR);
+    else
+        padbox->color(PAD_COLOUR);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
           Fl_Box padbox {
             xywh {210 226 89 18} box FLAT_BOX deactivate
-            code0 {o->color(PAD_COLOUR);}
-            code1 {if (padsynenabledcheck->value() == 0) o->hide();}
+            code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(PAD_COLOUR); else o->color(BASE_COLOUR);}
           }
           Fl_Button padeditbutton {
             label Edit
@@ -1273,10 +1264,9 @@ else {propta->deactivate();proptb->deactivate();}}
     if (engine == 2 && adnoteui != NULL)
         padnoteui->padnotewindow->show();} {}
   }
-  Function {find_engines()} {return_type {unsigned int}
-  } {
+  Function {find_engines()} {} {
     code {//
-    unsigned int engine = 0;
+    engine = 0;
     if (synth->getRuntime().CheckPADsynth)
     {
         for(int i = 0; i < NUM_KIT_ITEMS; ++i)
@@ -1288,13 +1278,11 @@ else {propta->deactivate();proptb->deactivate();}}
             if (part->kit[i].Ppadenabled)
                 engine |= 4;
         }
-    }
-    return engine;} {}
+    }} {}
   }
-  Function {setinstrumentlabel()} {return_type int
-  } {
+  Function {setinstrumentlabel()} {} {
     code {//
-    unsigned int engine = find_engines();
+    find_engines();
     if (engine & 1)
         instrumentaddbox->color(ADD_COLOUR);
     else
@@ -1310,16 +1298,32 @@ else {propta->deactivate();proptb->deactivate();}}
     else
         instrumentpadbox->color(BASE_COLOUR);
     instrumentpadbox->redraw();
-    instrumentlabel->copy_label(part->Pname.c_str());
-    return engine;} {}
+    instrumentlabel->copy_label(part->Pname.c_str());} {}
   }
-  Function {copylabeltopanel()} {return_type int
-  } {
+  Function {copylabeltopanel()} {} {
     code {//
-    int engine = setinstrumentlabel();
+    setinstrumentlabel();
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartLabel(npart, engine);
-    return engine;} {}
+        synth->getGuiMaster()->setPanelPartLabel(npart, engine);} {}
+  }
+  Function {resetlabels()} {} {
+    code {//
+    setinstrumentlabel();
+    if (adsynenabledcheck->value() == 0 || engine == 0)
+        addbox->color(BASE_COLOUR);
+    else
+        addbox->color(ADD_COLOUR);
+    addbox->redraw();
+    if (subsynenabledcheck->value() == 0 || engine == 0)
+        subbox->color(BASE_COLOUR);
+    else
+        subbox->color(SUB_COLOUR);
+    subbox->redraw();
+    if (padsynenabledcheck->value() == 0 || engine == 0)
+        padbox->color(BASE_COLOUR);
+    else
+        padbox->color(PAD_COLOUR);
+    padbox->redraw();} {}
   }
   Function {~PartUI()} {} {
     code {if (adnoteui)
@@ -1362,5 +1366,7 @@ else {propta->deactivate();proptb->deactivate();}}
   decl {SynthEngine *synth;} {private local
   }
   decl {int *plgroup;} {private local
+  }
+  decl {int engine;} {private local
   }
 } 
