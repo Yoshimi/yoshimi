@@ -398,12 +398,12 @@ removeselection();}
         Fl_Check_Button {} {
           label {Show synth engines}
           callback {//
-    synth->getRuntime().CheckPADsynth = (int) o->value();
+    synth->getRuntime().checksynthengines = (int) o->value();
     rescan_for_banks(true);
     synth->getGuiMaster()->partui->resetlabels();
     synth->getGuiMaster()->updatepanel();} selected
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
-          code0 {o->value(synth->getRuntime().CheckPADsynth);}
+          code0 {o->value(synth->getRuntime().checksynthengines);}
         }
         Fl_Button {} {
           label Add

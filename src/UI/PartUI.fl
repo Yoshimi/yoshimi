@@ -1267,7 +1267,7 @@ else {propta->deactivate();proptb->deactivate();}}
   Function {find_engines()} {} {
     code {//
     engine = 0;
-    if (synth->getRuntime().CheckPADsynth)
+    if (synth->getRuntime().checksynthengines)
     {
         for(int i = 0; i < NUM_KIT_ITEMS; ++i)
         {

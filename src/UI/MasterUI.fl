@@ -85,10 +85,9 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
-  Function {MasterUI(SynthEngine *_synth)} {open
-  } {
+  Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
       synth = _synth;
       presetsui = NULL;
@@ -108,8 +107,7 @@ class MasterUI {open : {private MiscFuncs}
       yoshiLog = NULL;
       laststatefile = synth->getRuntime().StateFile;} {}
   }
-  Function {~MasterUI()} {open
-  } {
+  Function {~MasterUI()} {} {
     code {//
       masterwindow->hide();
       aboutwindow->hide();
@@ -155,8 +153,7 @@ class MasterUI {open : {private MiscFuncs}
       }
       delete masterwindow;} {}
   }
-  Function {Init(const char *_label)} {open
-  } {
+  Function {Init(const char *_label)} {} {
     code {//
       microtonalui = new MicrotonalUI(&synth->microtonal);
       bankui = new BankUI(&npart, synth);
@@ -181,8 +178,7 @@ class MasterUI {open : {private MiscFuncs}
       else
           yoshiLog->Hide();} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {if (configui->configChanged)
@@ -205,14 +201,14 @@ class MasterUI {open : {private MiscFuncs}
           {
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
-          }} open selected
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+          }}
+      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
-      Fl_Menu_Bar mastermenu {open
+      Fl_Menu_Bar mastermenu {
         xywh {-4 0 400 25} labelsize 13
       } {
         Submenu {} {
-          label {&Yoshimi} open
+          label {&Yoshimi}
           xywh {0 0 100 20} labelsize 12
         } {
           MenuItem {} {
@@ -254,7 +250,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label {&Instrument} open
+          label {&Instrument}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
@@ -331,7 +327,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu Parameters {
-          label {&Parameters} open
+          label {&Parameters}
           xywh {0 0 70 21} labelsize 12
           code0 {o = o; // suppress warning
               if (synth->getRuntime().ParamsHistory.empty())
@@ -422,7 +418,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label State open
+          label State
           xywh {0 0 70 21} labelsize 12
         } {
           MenuItem saveState {
@@ -454,7 +450,7 @@ mainCreateNewInstance(forceId);}
         }
       }
       Fl_Group MasterControls {
-        label {Master  } open
+        label {Master  }
         xywh {3 24 380 64} box PLASTIC_DOWN_FRAME labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Spinner masterkeyshift {
@@ -528,11 +524,11 @@ mainCreateNewInstance(forceId);}
             if (o->value() == SystemEffectsGrp)
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
-               showInsEfxUI();} open
+               showInsEfxUI();}
         xywh {3 88 380 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
-          label {System Effects} open
+          label {System Effects}
           xywh {3 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
@@ -552,7 +548,7 @@ mainCreateNewInstance(forceId);}
               synth->sysefx[nsyseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               syseffectui->refresh(synth->sysefx[nsyseff]);
-              showSysEfxUI();} open
+              showSysEfxUI();}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
@@ -613,7 +609,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Fl_Group InsertionEffectsGrp {
-          label {Insertion Effects} open
+          label {Insertion Effects}
           xywh {3 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
@@ -646,7 +642,7 @@ mainCreateNewInstance(forceId);}
               synth->insefx[ninseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff]);
-              showInsEfxUI();} open
+              showInsEfxUI();}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -704,7 +700,7 @@ mainCreateNewInstance(forceId);}
                 insefftype->activate();
                 inseffectui->activate();
               }
-              synth->insefx[ninseff]->cleanup();} open
+              synth->insefx[ninseff]->cleanup();}
             xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {o->add("Master Out");o->add("Off");}
             code1 {for (int i = 0; i < NUM_MIDI_PARTS; ++i)
@@ -735,7 +731,7 @@ mainCreateNewInstance(forceId);}
         xywh {289 90 60 24} box PLASTIC_UP_BOX labelsize 11
         code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
       }
-      Fl_Group syseffectuigroup {open
+      Fl_Group syseffectuigroup {
         xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
         code0 {o->show();}
       } {
@@ -745,7 +741,7 @@ mainCreateNewInstance(forceId);}
           class EffUI
         } {}
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {3 158 384 95} box FLAT_BOX color 48
         code0 {o->hide();}
       } {
@@ -756,7 +752,7 @@ mainCreateNewInstance(forceId);}
           class EffUI
         } {}
       }
-      Fl_Group partuigroup {open
+      Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
         Fl_Group partui {open
@@ -766,7 +762,7 @@ mainCreateNewInstance(forceId);}
           class PartUI
         } {}
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {3 427 380 36} box DOWN_BOX labelsize 12
       } {
         Fl_Box vumeter {
@@ -812,7 +808,7 @@ updatepart();}
       }
     }
     Fl_Window aboutwindow {
-      label {About Yoshimi} open
+      label {About Yoshimi}
       xywh {4 20 365 290} type Double color 54 labelfont 13 labelsize 13 when 0 hide
     } {
       Fl_Box {} {
@@ -879,7 +875,7 @@ ZynAddSubFX}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Panel 2 x 8} open
+      label {Yoshimi Panel 2 x 8}
       xywh {4 20 550 675} type Double labelfont 13 labelsize 13 hide
       code0 {if (synth->getRuntime().single_row_panel)
        Panelbox1->hide();}
@@ -918,7 +914,7 @@ ZynAddSubFX}
       Fl_Button Panelrefresh {
         label Refresh
         callback {updatepanel();}
-        xywh {414 645 55 25} box THIN_UP_BOX labelsize 13
+        xywh {414 645 55 25} box THIN_UP_BOX labelsize 13 hide deactivate
       }
       Fl_Button {} {
         label {Change to 1 x 16}
@@ -940,7 +936,7 @@ ZynAddSubFX}
         label Parts
         callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
 Panelsmallgroups->value(o->value());
-updatepanel();} open
+updatepanel();}
         xywh {48 645 86 25} down_box BORDER_BOX
       } {
         MenuItem {} {
@@ -964,7 +960,7 @@ updatepanel();} open
         label Parts
         callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
 Panelgroups->value(o->value());
-updatepanel();} open
+updatepanel();}
         xywh {48 645 86 25} down_box BORDER_BOX
       } {
         MenuItem {} {
@@ -978,15 +974,13 @@ updatepanel();} open
       }
     }
   }
-  Function {updatesendwindow()} {open
-  } {
+  Function {updatesendwindow()} {} {
     code {//
         for (int neff1 = 0; neff1 < NUM_SYS_EFX; ++neff1)
             for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
                 syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);} {}
   }
-  Function {updatepanel()} {open
-  } {
+  Function {updatepanel()} {} {
     code {//
         for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
             panellistitem[npart]->refresh();
@@ -1024,14 +1018,12 @@ updatepanel();} open
         panelwindow->label(panelwindowlabel.c_str());
         panelwindow->changed();} {}
   }
-  Function {updatepart()} {open
-  } {
+  Function {updatepart()} {} {
     code {//
     checkmaxparts();
     npartcounter->do_callback();} {}
   }
-  Function {updatepartprogram(int npart)} {open
-  } {
+  Function {updatepartprogram(int npart)} {} {
     code {//
     updatepart();
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
@@ -1045,8 +1037,7 @@ updatepanel();} open
          partui->midich->redraw();
     }} {}
   }
-  Function {updateeffects(int data)} {open
-  } {
+  Function {updateeffects(int data)} {} {
     code {//
     int effect = (data >> 16) & 0xff;
     int type =  (data >> 12) & 3;
@@ -1099,8 +1090,7 @@ updatepanel();} open
         showSysEfxUI();
     }} {}
   }
-  Function {setMasterLabel(string name)} {open
-  } {
+  Function {setMasterLabel(string name)} {} {
     code {//
         masterwindowlabel = synth->makeUniqueName("Yoshimi");
         if (name.size())
@@ -1108,8 +1098,7 @@ updatepanel();} open
         masterwindow->label(masterwindowlabel.c_str());
         masterwindow->changed();} {}
   }
-  Function {do_new_master()} {open
-  } {
+  Function {do_new_master()} {} {
     code {//
         if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
         {
@@ -1125,8 +1114,7 @@ updatepanel();} open
             updatepanel();
         }} {}
   }
-  Function {do_load_master(bool updatehistory, const char* file)} {open
-  } {
+  Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//
         const char *fname;
         if (NULL != file)
@@ -1192,8 +1180,7 @@ updatepanel();} open
         }
         updatepanel();} {}
   }
-  Function {refresh_master_ui()} {open
-  } {
+  Function {refresh_master_ui()} {} {
     code {//
         ninseff = 0;
         nsyseff = 0;
@@ -1209,7 +1196,7 @@ updatepanel();} open
         updatepanel();
         bankui->Hide();} {}
   }
-  Function {checkmaxparts()} {open private
+  Function {checkmaxparts()} {private
   } {
     code {//
     int max = synth->getRuntime().NumAvailableParts;
@@ -1229,7 +1216,7 @@ updatepanel();} open
   Function {Log(string msg)} {} {
     code {yoshiLog->log(msg);} {}
   }
-  Function {showSysEfxUI(void)} {open private
+  Function {showSysEfxUI(void)} {private
   } {
     code {//
       inseffectui->hide();
@@ -1242,7 +1229,7 @@ updatepanel();} open
       syseffectuigroup->activate();
       syseffectuigroup->show();} {}
   }
-  Function {showInsEfxUI(void)} {open private
+  Function {showInsEfxUI(void)} {private
   } {
     code {//
       syseffectui->hide();
@@ -1255,12 +1242,11 @@ updatepanel();} open
       inseffectuigroup->activate();
       inseffectuigroup->show();} {}
   }
-  Function {getPresetsUi()} {open return_type {PresetsUI *}
+  Function {getPresetsUi()} {return_type {PresetsUI *}
   } {
     code {return presetsui;} {}
   }
-  Function {resetPartsClip()} {open
-  } {
+  Function {resetPartsClip()} {} {
     code {//
         for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
         {
@@ -1270,64 +1256,55 @@ updatepanel();} open
             }
         }} {}
   }
-  Function {set_part_window_title(string prefix)} {open return_type string
+  Function {set_part_window_title(string prefix)} {return_type string
   } {
     code {//
     string name = prefix + " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
     return name;} {}
   }
-  Function {setPartVolWidget(int _npart, float _value)} {open
-  } {
+  Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
         if (_npart == npart)
             partui->partvol->value(_value);} {}
   }
-  Function {setPartPanWidget(int _npart, float _value)} {open
-  } {
+  Function {setPartPanWidget(int _npart, float _value)} {} {
     code {//
         if (_npart == npart)
             partui->partpan->value(_value);} {}
   }
-  Function {setPanelPartVolWidget(int _npart, float _value)} {open
-  } {
+  Function {setPanelPartVolWidget(int _npart, float _value)} {} {
     code {//
         panellistitem[_npart]->partvolume->value(_value);} {}
   }
-  Function {setPanelPartPanWidget(int _npart, float _value)} {open
-  } {
+  Function {setPanelPartPanWidget(int _npart, float _value)} {} {
     code {//
         panellistitem[_npart]->partpanning->value(_value);} {}
   }
-  Function {setPartMidiWidget(int _npart, unsigned char _value)} {open
-  } {
+  Function {setPartMidiWidget(int _npart, unsigned char _value)} {} {
     code {//
         if (_npart == npart)
             partui->midich->value(_value);
             partui->midich->textcolor(FL_BLACK);} {}
   }
-  Function {setPanelPartMidiWidget(int _npart, unsigned char _value)} {open
-  } {
+  Function {setPanelPartMidiWidget(int _npart, unsigned char _value)} {} {
     code {//
         panellistitem[_npart]->partrcv->value(_value);
         panellistitem[_npart]->partrcv->textcolor(FL_BLACK);
         panellistitem[_npart]->partrcv->redraw();} {}
   }
-  Function {setPanelPartLabel(int _npart, int _engine)} {open
-  } {
+  Function {setPanelPartLabel(int _npart, int _engine)} {} {
     code {//
     panellistitem[_npart % NUM_MIDI_CHANNELS]->setPartLabel(_engine);} {}
   }
-  Function {showInstrumentEditWindow(int _npart)} {open
-  } {
+  Function {showInstrumentEditWindow(int _npart)} {} {
     code {//
         if (_npart == npart)
             partui->instrumenteditwindow->show();} {}
   }
-  Function {updateBankRootDirs()} {open
-  } {
+  Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
   }
-  Function {getSynth()} {open return_type {SynthEngine *}
+  Function {getSynth()} {return_type {SynthEngine *}
   } {
     code {return synth;} {}
   }

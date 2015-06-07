@@ -658,7 +658,7 @@ bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filenam
     instrRef.SUBsynth_used = false;
 
     // see which engines are used
-    if (synth->getRuntime().CheckPADsynth)
+    if (synth->getRuntime().checksynthengines)
     {
         XMLwrapper *xml = new XMLwrapper(synth);
         xml->checkfileinformation(getFullPath(rootID, bankID, pos));

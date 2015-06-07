@@ -605,6 +605,18 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 }
 
 
+/*
+ * Send message to register jack port if jack client is active,
+ * but only if the part individual destination is set.
+ */
+void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
+{
+    part[npart]->Paudiodest = dest;
+    if (part[npart]->Paudiodest & 2)
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
+}
+
+
 void SynthEngine::ClearNRPNs(void)
 {
     Runtime.nrpnL = 127;
@@ -628,8 +640,6 @@ void SynthEngine::partonoff(int npart, int what)
     {
         VUpeak.values.parts[npart] = 1e-9f;
         part[npart]->Penabled = 1;
-        //send message to register jack port (if jack client is active)
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
     }
     else
     {   // disabled part
@@ -1162,7 +1172,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
             continue;
         part[npart]->getfromXML(xml);
         xml->exitbranch();
-        if(part[npart]->Penabled)
+        if(part[npart]->Penabled && (part[npart]->Paudiodest & 2))
         {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
         }

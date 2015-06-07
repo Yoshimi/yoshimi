@@ -1,5 +1,12 @@
 yoshimi 1.3.x
 
+
+2015-6-7 Will
+- Jack port only registered if direct part output is set as well as 
+  the part being enabled.
+- Mixer panel refresh button hidden (redundant).
+  Will eventually be removed if no problems seen.
+
 2015-6-5 Will
 - Improved engine colour sync, and also responds to kit part edits.
 

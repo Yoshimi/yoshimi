@@ -105,7 +105,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     alsaMidiDevice("default"),
     GzipCompression(3),
     Interpolation(0),
-    CheckPADsynth(1),
+    checksynthengines(1),
     EnableProgChange(1), // default will be inverted
     consoleMenuItem(1),
     rtprio(50),
@@ -439,7 +439,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
                                         MAX_AD_HARMONICS * 2, 131072);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
-    CheckPADsynth = xml->getpar("check_pad_synth", CheckPADsynth, 0, 1);
+    checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     consoleMenuItem = xml->getpar("reports_destination", consoleMenuItem, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
@@ -550,7 +550,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("oscil_size", Oscilsize);
 
     xmltree->addpar("gzip_compression", GzipCompression);
-    xmltree->addpar("check_pad_synth", CheckPADsynth);
+    xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("reports_destination", consoleMenuItem);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);

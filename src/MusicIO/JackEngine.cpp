@@ -245,31 +245,31 @@ void JackEngine::Close(void)
     }
 }
 
-void JackEngine::registerJackPort(int portnum)
+void JackEngine::registerJackPort(int partnum)
 {
-    if(portnum >=0 && portnum < NUM_MIDI_PARTS)
+    int portnum = partnum * 2;
+    if(partnum >=0 && partnum < NUM_MIDI_PARTS)
     {
-        if(audio.ports [portnum * 2] != NULL)
+        if(audio.ports [portnum] != NULL)
         {
             //port already registered
-            //synth->getRuntime().Log("Jack port " + asString(portnum) + " already registered!");
+            //synth->getRuntime().Log("Jack port " + asString(partnum) + " already registered!");
             return;
         }
-
-        if(synth->part [portnum] && synth->part [portnum]->Penabled)
+        if(synth->part [partnum] && synth->part [partnum]->Penabled)
         {
-            string portName = "track_" + asString(portnum + 1) + "_r";
-            audio.ports[portnum * 2 + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-            portName = "track_" + asString(portnum + 1) + "_l";
-            audio.ports[portnum * 2] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+            string portName = "track_" + asString(partnum + 1) + "_r";
+            audio.ports[portnum + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+            portName = "track_" + asString(partnum + 1) + "_l";
+            audio.ports[portnum] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
-            if(audio.ports [portnum * 2])
+            if(audio.ports [portnum])
             {
-                synth->getRuntime().Log("Registered jack port " + asString(portnum));
+                synth->getRuntime().Log("Registered jack port " + asString(partnum));
             }
             else
             {
-                synth->getRuntime().Log("Error registering jack port " + asString(portnum));
+                synth->getRuntime().Log("Error registering jack port " + asString(partnum));
             }
         }
     }
@@ -280,7 +280,9 @@ bool JackEngine::openAudio(void)
     // Register mixed outputs
     audio.ports[2 * NUM_MIDI_PARTS] = jack_port_register(jackClient, "left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     audio.ports[2 * NUM_MIDI_PARTS + 1] = jack_port_register(jackClient, "right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+
     // And individual parts
+/* this section is now reduntant!
     for (int port = 0; port < NUM_MIDI_PARTS; ++port)
     {
         //stringstream portName;
@@ -288,7 +290,7 @@ bool JackEngine::openAudio(void)
         //audio.ports[port] = jack_port_register(jackClient, portName.str().c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
         registerJackPort(port);
     }
-
+*/
     bool jackPortsRegistered = true;
     /*for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port)
     {        

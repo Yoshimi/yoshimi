@@ -85,6 +85,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetBank(int banknum);
         void SetProgram(unsigned char chan, unsigned short pgm);
         void SetPartChan(unsigned char npart, unsigned char nchan);
+        void SetPartDestination(unsigned char npart, unsigned char dest);
         void ClearNRPNs(void);
         float numRandom(void);
         unsigned int random(void);
