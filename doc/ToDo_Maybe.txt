@@ -1,15 +1,8 @@
 
-Sync panel item label on instrument edits.
-
 restoreJsession() -> restoreSessionData() -> extractConfigData()
 should NOT refetch entire bank structure.
 
 Direct part control should be able to change audio routing.
-
-Maybe make jack port only register if part O/P is actually set.
-
-Visually identify AddSynth & SubSynth in Instruments window.
-    Partly done
 
 Review mapping of SubSynth harmonic faders.
 

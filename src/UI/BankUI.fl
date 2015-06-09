@@ -52,9 +52,8 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class BankProcess_ {open
-} {
-  Function {process(void)} {open return_type {virtual void}
+class BankProcess_ {} {
+  Function {process(void)} {return_type {virtual void}
   } {
     code {;} {}
   }
@@ -62,16 +61,15 @@ class BankProcess_ {open
   }
 } 
 
-class BankSlot {open : {public Fl_Button, BankProcess_}
+class BankSlot {: {public Fl_Button, BankProcess_}
 } {
-  Function {BankSlot(int x,int y, int w, int h, const char *label=0):Fl_Button(x,y,w,h,label)} {open
-  } {
+  Function {BankSlot(int x,int y, int w, int h, const char *label=0):Fl_Button(x,y,w,h,label)} {} {
     code {what = NULL;
         whatslot = NULL;
         nslot = 0;
         nselected = NULL;} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {//
     if (what == NULL)
@@ -92,8 +90,7 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         (bp->*fnc)();
     return tmp;} {}
   }
-  Function {init(int nslot_, int *what_, int *whatslot_, void (BankProcess_:: *fnc_)(void), BankProcess_ *bp_, Bank *bank_, int *nselected_)} {open
-  } {
+  Function {init(int nslot_, int *what_, int *whatslot_, void (BankProcess_:: *fnc_)(void), BankProcess_ *bp_, Bank *bank_, int *nselected_)} {} {
     code {nslot = nslot_;
         what = what_;
         whatslot = whatslot_;
@@ -101,17 +98,16 @@ class BankSlot {open : {public Fl_Button, BankProcess_}
         bp = bp_;
         bank = bank_;
         nselected = nselected_;
-        box(FL_THIN_UP_BOX);
+        box(FL_THIN_UP_FRAME);
         labelfont(0);
         labelsize(13);
         align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_CLIP);
         highlight = 0;
         refresh();} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {//
-if (bank->emptyslot(nslot))
+/*    if (bank->emptyslot(nslot))
     {
         if (nslot < 128)
             color(46);
@@ -129,13 +125,11 @@ if (bank->emptyslot(nslot))
         {
             labelsize(11);
             labelfont(2);
-            //box(FL_ENGRAVED_BOX);
         }
         else
         {
             labelsize(12);
             labelfont(0);
-            //box(FL_THIN_UP_BOX);
         }
         if (engine & 4) // PadSynth
             color(126);
@@ -149,7 +143,7 @@ if (bank->emptyslot(nslot))
     }
     if (*nselected == nslot)
         color(6);
-
+*/
     string instrName = bank->getnamenumbered(nslot);
     copy_label(instrName.c_str());} {}
   }
@@ -161,11 +155,80 @@ if (bank->emptyslot(nslot))
   }
   decl {BankProcess_ *bp;} {private local
   }
+  Function {draw()} {
+    comment {overrides button's draw()} protected
+  } {
+    code {//
+    if (type() == FL_HIDDEN_BUTTON) return;
+    int acol, scol, pcol, bcol;
+    int wid = w() * 0.334;
+    int engine = bank->engines_used(nslot);
+    if (*nselected == nslot)
+    {
+            acol = 6;
+            scol = 6;
+            pcol = 6;
+    }
+    else if(bank->emptyslot(nslot))
+    {
+        if (nslot < 128)
+        {
+            acol = 46;
+            scol = 46;
+            pcol = 46;
+        }
+        else
+        {
+            acol = 16;
+            scol = 16;
+            pcol = 16;
+        }
+    }
+    else
+    {
+        if (nslot < 128)
+            bcol = 51;
+        else
+            bcol = 17;
+        if(engine & 1)
+            acol = ADD_COLOUR;
+        else
+            acol = bcol;
+        if(engine & 2)
+            scol = SUB_COLOUR;
+        else
+            scol = bcol;
+        if(engine & 4)
+            pcol = PAD_COLOUR;
+        else
+            pcol = bcol;
+    }
+    draw_box(FL_FLAT_BOX, x(), y(), wid, h(), acol);
+    draw_box(FL_FLAT_BOX, x() + wid, y(), wid, h(), scol);
+    draw_box(FL_FLAT_BOX, x() + wid * 2, y(), wid, h(), pcol);
+
+    //frame for label
+    draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), BASE_COLOUR);
+
+    draw_backdrop();
+    
+    Fl_Color col = value() ? selection_color() : color();
+    if (labeltype() == FL_NORMAL_LABEL && value())
+    {
+        Fl_Color c = labelcolor();
+        labelcolor(fl_contrast(c, col));
+        draw_label();
+        labelcolor(c);
+    }
+    else
+        draw_label();
+ 
+    if (Fl::focus() == this) draw_focus();} {}
+  }
 } 
 
-class RootProcess_ {open
-} {
-  Function {rootprocess(void)} {open return_type {virtual void}
+class RootProcess_ {} {
+  Function {rootprocess(void)} {return_type {virtual void}
   } {
     code {;} {}
   }
@@ -173,16 +236,15 @@ class RootProcess_ {open
   }
 } 
 
-class RootSlot {open : {public Fl_Button, RootProcess_}
+class RootSlot {: {public Fl_Button, RootProcess_}
 } {
-  Function {RootSlot(int x,int y, int w, int h, const char *label=0):Fl_Button(x,y,w,h,label)} {open
-  } {
+  Function {RootSlot(int x,int y, int w, int h, const char *label=0):Fl_Button(x,y,w,h,label)} {} {
     code {what = NULL;
         whatslot = NULL;
         nslot = 0;
         nselected = NULL;} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {if (what == NULL)
             return 0;
@@ -203,8 +265,7 @@ class RootSlot {open : {public Fl_Button, RootProcess_}
             (rp->*fnr)();
         return tmp;} {}
   }
-  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *nselected_)} {open
-  } {
+  Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *nselected_)} {} {
     code {nslot = nslot_;
         what = what_;
         whatslot = whatslot_;
@@ -219,8 +280,7 @@ class RootSlot {open : {public Fl_Button, RootProcess_}
         highlight = 0;
         rootrefresh();} {}
   }
-  Function {rootrefresh()} {open
-  } {
+  Function {rootrefresh()} {} {
     code {//
     string bankName = root->getBankIDname(nslot);
     if (bankName.empty())
@@ -241,13 +301,12 @@ class RootSlot {open : {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window bankuiwindow {
-      label Bank open
-      xywh {46 240 780 575} type Double visible
+      label Bank
+      xywh {46 240 780 575} type Double hide
     } {
       Fl_Choice banklist {
         callback {//
@@ -293,7 +352,7 @@ if ((Fl::event_button() == 3))
         label {Extended Program Change}
         xywh {615 30 162 3} box NO_BOX labelsize 11 align 33
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {5 34 772 491} box ENGRAVED_FRAME
       } {
         Fl_Pack {} {
@@ -347,7 +406,7 @@ if ((Fl::event_button() == 3))
             }}
         } {}
       }
-      Fl_Group modeselect {open
+      Fl_Group modeselect {
         xywh {5 528 458 42} box ENGRAVED_BOX
       } {
         Fl_Light_Button writebutton {
@@ -392,7 +451,7 @@ removeselection();}
         callback {bankuiwindow->hide();}
         xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
-      Fl_Group engines {open
+      Fl_Group engines {
         xywh {468 528 151 42} box ENGRAVED_FRAME
       } {
         Fl_Check_Button {} {
@@ -401,26 +460,32 @@ removeselection();}
     synth->getRuntime().checksynthengines = (int) o->value();
     rescan_for_banks(true);
     synth->getGuiMaster()->partui->resetlabels();
-    synth->getGuiMaster()->updatepanel();} selected
+    synth->getGuiMaster()->updatepanel();}
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
           code0 {o->value(synth->getRuntime().checksynthengines);}
         }
-        Fl_Button {} {
+        Fl_Button addpatch {
           label Add
-          xywh {472 550 45 16} box THIN_UP_BOX labelsize 12 labelcolor 72 align 32
+          xywh {473 550 47 16} box FLAT_BOX labelsize 12 align 32
+          code0 {o->color(ADD_COLOUR);}
         }
-        Fl_Button {} {
+        Fl_Button subpatch {
           label Sub
-          xywh {521 550 45 16} box THIN_UP_BOX labelfont 2 labelsize 11 align 32
+          xywh {520 550 47 16} box FLAT_BOX labelsize 11 align 32
+          code0 {o->color(SUB_COLOUR);}
+        }
+        Fl_Button padpatch {
+          label Pad
+          xywh {567 550 47 16} box FLAT_BOX color 29 labelsize 12 align 32
+          code0 {o->color(PAD_COLOUR);}
         }
         Fl_Button {} {
-          label Pad
-          xywh {570 550 45 16} box THIN_UP_BOX color 126 labelsize 12 align 32
+          xywh {474 549 139 17} box THIN_UP_FRAME
         }
       }
     }
     Fl_Window rootuiwindow {
-      label Root open
+      label Root
       xywh {14 352 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
@@ -443,7 +508,7 @@ if ((Fl::event_button() == 3))
     rootuiwindow->hide();}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {5 34 766 491} box ENGRAVED_FRAME
       } {
         Fl_Pack {} {
@@ -495,7 +560,7 @@ if ((Fl::event_button() == 3))
           }}
         } {}
       }
-      Fl_Group rootmodeselect {open
+      Fl_Group rootmodeselect {
         xywh {5 528 475 42} box ENGRAVED_BOX
       } {
         Fl_Light_Button rootwritebutton {
@@ -543,7 +608,7 @@ removeselection();}
     }
     Fl_Window pathwindow {
       label {Bank Root Paths}
-      callback {o->hide();} open
+      callback {o->hide();}
       xywh {366 188 465 295} type Double hide
       code0 {readbankcfg();}
     } {
@@ -655,8 +720,7 @@ pathwindow->do_callback();}
       }
     }
   }
-  Function {BankUI(int *npart_, SynthEngine *_synth)} {open
-  } {
+  Function {BankUI(int *npart_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 fnc = &BankProcess_::process;
         npart = npart_;
@@ -668,7 +732,7 @@ fnc = &BankProcess_::process;
 fnr = &RootProcess_::rootprocess;
 	root = synth->getBankPtr();} {}
   }
-  Function {~BankUI()} {open return_type virtual
+  Function {~BankUI()} {return_type virtual
   } {
     code {//
         bankuiwindow->hide();
@@ -678,8 +742,7 @@ fnr = &RootProcess_::rootprocess;
         pathwindow->hide();
         delete pathwindow;} {}
   }
-  Function {Show()} {open
-  } {
+  Function {Show()} {} {
     code {// called from part UI
     rescan_for_banks(false);
     set_bank_slot();
@@ -690,16 +753,14 @@ fnr = &RootProcess_::rootprocess;
     modeselect->show();
     refreshmainwindow();} {}
   }
-  Function {Hide()} {open
-  } {
+  Function {Hide()} {} {
     code {// called from master UI
     bankuiwindow->hide();} {}
   }
-  Function {init(Fl_Spinner *cbwig_)} {open
-  } {
+  Function {init(Fl_Spinner *cbwig_)} {} {
     code {cbwig = cbwig_;rescan_for_banks(false);} {}
   }
-  Function {process()} {open return_type void
+  Function {process()} {return_type void
   } {
     code {//
 	int slot = this->slot;
@@ -795,7 +856,7 @@ fnr = &RootProcess_::rootprocess;
         if (mode != 4)
             refreshmainwindow();} {}
   }
-  Function {rootprocess()} {open return_type void
+  Function {rootprocess()} {return_type void
   } {
     code {//
     unsigned int slot = this->slot;
@@ -940,8 +1001,7 @@ fnr = &RootProcess_::rootprocess;
             }
         }} {}
   }
-  Function {setread()} {open
-  } {
+  Function {setread()} {} {
     code {//
     mode = 1;
     readbutton->value(1);
@@ -950,8 +1010,7 @@ fnr = &RootProcess_::rootprocess;
     swapbutton->value(0);
     renamebutton->value(0);} {}
   }
-  Function {setrootread()} {open
-  } {
+  Function {setrootread()} {} {
     code {//
     mode = 1;
     rootreadbutton->value(1);
@@ -960,8 +1019,7 @@ fnr = &RootProcess_::rootprocess;
     rootswapbutton->value(0);
     rootrenamebutton->value(0);} {}
   }
-  Function {refreshmainwindow()} {open
-  } {
+  Function {refreshmainwindow()} {} {
     code {//
     bankuiwindow->copy_label(bank->getBankFileTitle().c_str());
     rootuiwindow->copy_label(bank->getRootFileTitle().c_str());
@@ -970,8 +1028,7 @@ fnr = &RootProcess_::rootprocess;
     for (int i = 0; i < ROOT_SIZE; ++i)
         rs[i]->rootrefresh();} {}
   }
-  Function {removeselection()} {open
-  } {
+  Function {removeselection()} {} {
     code {if (nselected >= 0)
         {
             int ns = nselected;
@@ -979,8 +1036,7 @@ fnr = &RootProcess_::rootprocess;
             bs[ns]->refresh();
         }} {}
   }
-  Function {rescan_for_banks(bool reload)} {open
-  } {
+  Function {rescan_for_banks(bool reload)} {} {
     code {banklist->clear();
 if(reload)
 {
@@ -1001,8 +1057,7 @@ if(reload)
           }
           refreshmainwindow();} {}
   }
-  Function {set_bank_slot()} {open
-  } {
+  Function {set_bank_slot()} {} {
     code {// 
   size_t curID = bank->getCurrentBankID();
  const Fl_Menu_Item *curItem = 0;
@@ -1026,8 +1081,7 @@ if(reload)
         banklist->value(0);
     }} {}
   }
-  Function {activatebutton_rootdir(bool active)} {open
-  } {
+  Function {activatebutton_rootdir(bool active)} {} {
     code {//
         if (active)
         {
@@ -1043,8 +1097,7 @@ if(reload)
             changeIDok->deactivate();
         }} {}
   }
-  Function {readbankcfg()} {open
-  } {
+  Function {readbankcfg()} {} {
     code {//
     string tmp;
     rootsbrowse->clear();
@@ -1060,7 +1113,7 @@ if(reload)
         rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
       }} {}
   }
-  Function {recoverID()} {open return_type int
+  Function {recoverID()} {return_type int
   } {
     code {//
     if (selectedRootID >= 0)

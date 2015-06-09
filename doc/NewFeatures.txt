@@ -86,16 +86,15 @@ By default, all the upper parts are mapped to the same MIDI channel numbers as t
 
 ###
 
-When opening an instrument bank you can now tell exactly which synth engines are used. As before, the backround colour is changed if there is a PadSynth element. If AddSynth is used, then the text colour is changed to a dark red instead of black, and if SubSynth is used, the text is slightly smaller and italicised.
+When opening an instrument bank you can now tell exactly which synth engines are used by each instrument. This is represented by three pale background colours:
 
-For the main part window, and the mixer panel, this is instead represented by three pale background colours:
 Red -> AddSynth
 Blue -> SubSynth
 Green -> PadSynth
 
-In the Instrument Edit window the same colours highlight the engine names when they are enabled with the check boxes. 
+If the instruments are kits they scanned to find out if *any* member of the kit containes each engine.
 
-Eventually the plan is to show the instrument bank in the same way.
+This is duplicated in the current part, the mixer panel for the currently loaded instruments, and in the Instrument Edit window the same colours highlight the engine names when they are enabled with the check boxes. 
 
 ###
 
