@@ -434,6 +434,8 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
                 synth->getRuntime().nrpndata.vectorEnabled[chan] = true;
                 synth->getRuntime().Log("Vector control enabled");
                 // enabling is only done with a valid X CC
+                synth->SetPartChan(chan, chan);
+                synth->SetPartChan(chan | 16, chan);
             }
             break;
         }
@@ -442,8 +444,12 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             if ((synth->getRuntime().nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
                 synth->getRuntime().Log("Vector X axis must be set before Y");
             else
+            {
                 synth->getRuntime().nrpndata.vectorYaxis[chan]
                 = (synth->getRuntime().nrpndata.vectorYaxis[chan] & 0xff00) | par;
+                synth->SetPartChan(chan | 32, chan);
+                synth->SetPartChan(chan | 48, chan);
+            }
             break;
         }
         case 2:

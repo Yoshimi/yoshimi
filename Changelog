@@ -1,5 +1,12 @@
-yoshimi 1.3.x
+yoshimi 1.3.5-rc2
 
+2015-6-11 Will
+- Fixed gui bug, disappearing 'Bypass Global F.' when Addsynth Voice
+  Filter checkbutton clicked.
+- Vector checks and sets related part channel numbers instead of
+  assuming default values.
+
+yoshimi 1.3.5-rc
 
 2015-6-7 Will
 - Jack port only registered if direct part output is set as well as 
