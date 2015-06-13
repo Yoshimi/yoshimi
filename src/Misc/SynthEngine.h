@@ -79,7 +79,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         void NoteOn(unsigned char chan, unsigned char note, unsigned char velocity);
         void NoteOff(unsigned char chan, unsigned char note);
-        void SetController(unsigned char chan, int type, unsigned short par);
+        void SetController(unsigned char chan, int type, short int par);
         void SetZynControls();
         void SetBankRoot(int rootnum);
         void SetBank(int banknum);

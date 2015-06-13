@@ -383,7 +383,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 
 
 // Controllers
-void SynthEngine::SetController(unsigned char chan, int type, unsigned short par)
+void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
     if (type == Runtime.midi_bank_C) {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
