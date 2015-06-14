@@ -12,7 +12,6 @@ Add reverse vector control features Data MSB.
 
 Gui to set up vector control!
 
-
 Review mapping of SubSynth harmonic faders.
 
 Review tooltips.

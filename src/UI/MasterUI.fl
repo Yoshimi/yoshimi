@@ -702,12 +702,7 @@ mainCreateNewInstance(forceId);}
               }
               synth->insefx[ninseff]->cleanup();}
             xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
-            code0 {o->add("Master Out");o->add("Off");}
-            code1 {for (int i = 0; i < NUM_MIDI_PARTS; ++i)
-              {
-                string num = string("00") + asString(i + 1);
-                o->add((string("Part ") + asString(i + 1)).c_str());
-              }}
+            code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
           } {}
           Fl_Button {} {
@@ -802,7 +797,8 @@ if (tmp == 48)
     o->value(tmp);
 }
 synth->getRuntime().NumAvailableParts = tmp;
-updatepart();}
+updatepart();
+setinspartlist();}
         xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(synth->getRuntime().NumAvailableParts);}
       }
@@ -1127,6 +1123,7 @@ updatepanel();}
         }
         int result = synth->loadParameters(fname);
         checkmaxparts();
+        setinspartlist();
         npartcounter->value(1);
         refresh_master_ui();
         if (result >= 0) // shouldn't this be just > ?
@@ -1241,6 +1238,26 @@ updatepanel();}
       inseffectui->show();
       inseffectuigroup->activate();
       inseffectuigroup->show();} {}
+  }
+  Function {setinspartlist()} {open
+  } {
+    code {//
+    inseffpart->clear();
+    inseffpart->add("Master Out");
+    inseffpart->add("Off");
+    int size = synth->getRuntime().NumAvailableParts;
+    for (int i = 0; i < size; ++i)
+    {
+        string num = string("00") + asString(i + 1);
+        inseffpart->add((string("Part ") + asString(i + 1)).c_str());
+    }
+    int current = synth->Pinsparts[ninseff];
+    if (current >= size)
+    {
+        current = -1; // off is safe
+        synth->Pinsparts[ninseff] = current;
+    }
+    inseffpart->value(current + 2);} {}
   }
   Function {getPresetsUi()} {return_type {PresetsUI *}
   } {
