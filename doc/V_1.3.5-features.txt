@@ -1,19 +1,31 @@
 In response to suggestions at LAC 2015 we have made the title bars of all editing windows display both the part number and the current name of the instrument you are working on. In the addsynth oscillator editor you also see the number of the oscillator you are editing.
 
 
-Also, in respose to suggestions, horizontal as well as vertical mouse dragging can be used to set rotary controls. Additionally, the mouse scroll wheel can be used, and if you hold down the 'ctrl' key you can get very precise setting.
+Also, in response to suggestions, horizontal as well as vertical mouse dragging can be used to set rotary controls. Additionally, the mouse scroll wheel can be used, and if you hold down the 'ctrl' key you can get very precise setting.
 
 
 Another request we had was for the part effects window to have the same layout as System and Insertion effects. This has been done and it is now almost identical to Insertion effects.
 
 
 The most noticeable GUI enhancement is colour coded identification of an instrument's use of Add Sub and Pad synth engines, no matter where in the instrument's kit they may be. This can be enabled/disabled in the mixer panel. It does slow down yoshimi's startup, but due to the banks reorganisation (done some time ago) it causes no delay in changing banks/instruments once you are up and running.
-Some saved instruments seem to have had their Info section corrupted. Yoshimi can detect this and step over it. Also, if you resave the instrument, not only will the PadSynth status be restored, but Add and Sub will be included, allowing a faster scan next time.
+Some saved instruments seem to have had their Info section corrupted. Yoshimi can detect this and step over it to find the true status. Also, if you resave the instrument, not only will the PadSynth status be restored, but Add and Sub will be included, allowing a faster scan next time.
 
 
-In Yoshimi V1.3.5 a number of features have come together to give much greater flexibility (especially for automation) using standard MIDI messages. These are:
+Requests that don't look so likely:
+
+Oscillator sync: Not possible on SubSynth - no oscillators! - or PadSynth (Reset the wavetables every cycle?) and debatable on AddSynth due in part to the variable nature of what oscillators you might set up and the complexity of providing an interface for all of this.
+
+Subsynth filter levels: Changing apparent sensitivity would be potentially visually confusing as well as possibly changing the resolution. Further confusion would be caused by the fact that these are not absolute levels but normalised ones, so changing the one with the greatest amplitude would change the relative level of all the others.
+
+Instrument kit note range: A cross fade overlap looks interesting until you consider 5 or 6 kit items all crossing over at different points, and different ranges. This is assuming you only want to control and maintain a reasonably consistent volume.
+
+
+
+
+In Yoshimi V1.3.5 a number of existing, as well as new features have come together to give much greater flexibility (especially for automation) using standard MIDI messages. These are:
 
 NRPNs.
+ZynAddSubFX controls.
 Independent part control.
 16, 32 or 64 parts.
 Vector Control.
@@ -23,20 +35,23 @@ Direct part stereo audio output.
 NRPNs can handle individual bytes appearing in either order, and usually the same with the data bytes. Increment and decrement is also supported as graduated values for both data LSB and MSB. Additionally, ALSA sequencer's 14bit NRPN blocks are supported.
 
 
-Independent part control enables you to change instrument, volume, pan, or indeed any other available control of just that part, without affecting any others that are receiving the same MIDI channel. This can be particulalry interesting with multiply layered sounds.
+Zyn. System & Insertion Effect controls are fully supported with extensions to allow you to set the effect type and (for insertion effects) the destination part number.
+
+
+Independent part control enables you to change instrument, volume, pan, or indeed any other available control of just that part, without affecting any others that are receiving the same MIDI channel. This can be particularly interesting with multiply layered sounds. There are more extensions planned.
 
 
 With 32 and 64 parts it helps to think of 2/4 rows of 16. When you save a parameter block the number of parts is also saved, and will be restored when you reload.
 By default each *column* has the same MIDI channel number, but these can be independently switched around, and by setting (say) number 17 taken right out of normal access.
 
-In tests, *compiling* for 64 parts compared with 16 parts increases processor load by a very small amount when Yoshimi is idling, but this becomes virtually undetectable once you have 8+ instruments actually generating output. In normal use, selecting the different formats makes no detectable difference but using the default 16 reduces clutter when you don't need the extra.
+In tests, *compiling* for 64 parts compared with 16 parts increased processor load by a very small amount when Yoshimi was idling, but this becomes virtually undetectable once you have 8+ instruments actually generating output. In normal use, selecting the different formats makes no detectable difference but using the default 16 reduces clutter when you don't need the extra.
 
 
-Vector control is based on these columns giving you either 2 (X only) or 4 (X + Y) instruments in this channel. Currently the vector CCs you set up can (in pairs) vary any combination of volume, pan and filter cut-off. More will be added.
-To keep the processor load reasonable it pays to use fairly simple instruments, but if you have sufficient processing power it would be theoretically possible to set up all 16 channels with quite with independent vector behaviour!
+Vector control is based on these columns giving you either 2 (X only) or 4 (X + Y) instruments in this channel. Currently the vector CCs you set up can (as inverse pairs) vary any combination of volume, pan and filter cut-off. More will be added.
+To keep the processor load reasonable it pays to use fairly simple instruments, but if you have sufficient processing power it would be theoretically possible to set up all 16 channels with quite independent vector behaviour!
 
 
-Direct part audio is Jack-specific and allows you to apply further processing to just the defined parts, which can still output to the main L+R if you want to. This setting is saved with parameter blocks. Currently it is only set in the mixer panel window, but it will also eventually come under MIDI direct part control.
-Again, to reduce unnecssary clutter, part ports are only registered with Jack if they are both enabled, and set for direct output. However, once set they will remain in place for the session to avoid disrupting other applications that may have seen them.
+Direct part audio is Jack-specific and allows you to apply further processing to just the defined part's audio output (which can still output to the main L+R if you want). This setting is saved with parameter blocks. Currently it is only set in the mixer panel window, but it will also eventually come under MIDI direct part control.
+Again, to reduce unnecessary clutter, part ports are only registered with Jack if they are both enabled, and set for direct output. However, once set they will remain in place for the session to avoid disrupting other applications that may have seen them.
 
 

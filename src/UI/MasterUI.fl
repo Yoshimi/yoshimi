@@ -444,7 +444,7 @@ mainCreateNewInstance(forceId);}
                     laststatefile = string(fle);
                     synth->getRuntime().loadState(laststatefile);
                 }
-                partui->instrumentlabel->copy_label(partui->part->Pname.c_str());}
+                refresh_master_ui();}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
         }
@@ -1203,9 +1203,10 @@ updatepanel();}
         npart = 0;
         Panelgroups->value(0);
         Panelsmallgroups->value(0);
-        npartcounter->value(1);
     }
-    npartcounter->range(1.0,max);} {}
+    npartcounter->range(1.0,max);
+    if ( npartcounter->value() >= (max + 1))
+        npartcounter->value(1);} {}
   }
   Function {strategicRetreat(void)} {} {
     code {fl_alert("Bad things happened,\\nYoshimi strategically retreats.");} {}
@@ -1239,8 +1240,7 @@ updatepanel();}
       inseffectuigroup->activate();
       inseffectuigroup->show();} {}
   }
-  Function {setinspartlist()} {open
-  } {
+  Function {setinspartlist()} {} {
     code {//
     inseffpart->clear();
     inseffpart->add("Master Out");

@@ -203,14 +203,14 @@ class BankSlot {: {public Fl_Button, BankProcess_}
         else
             pcol = bcol;
     }
-    draw_box(FL_FLAT_BOX, x(), y(), wid, h(), acol);
-    draw_box(FL_FLAT_BOX, x() + wid, y(), wid, h(), scol);
-    draw_box(FL_FLAT_BOX, x() + wid * 2, y(), wid, h(), pcol);
+    draw_box(FL_FLAT_BOX, x(), y(), wid, h(), (Fl_Color) acol);
+    draw_box(FL_FLAT_BOX, x() + wid, y(), wid, h(), (Fl_Color) scol);
+    draw_box(FL_FLAT_BOX, x() + wid * 2, y(), wid, h(), (Fl_Color) pcol);
 
     //frame for label
-    draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), BASE_COLOUR);
+    draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), (Fl_Color) BASE_COLOUR);
 
-    draw_backdrop();
+    //draw_backdrop();
     
     Fl_Color col = value() ? selection_color() : color();
     if (labeltype() == FL_NORMAL_LABEL && value())
