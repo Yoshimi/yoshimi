@@ -30,7 +30,7 @@ bool JackClient::openAudio(void)
     if (jackEngine.openAudio())
     {
         synth->getRuntime().Samplerate = getSamplerate();
-        synth->getRuntime().Buffersize = getBuffersize();
+//        synth->getRuntime().Buffersize = getBuffersize();
         return true;
     }
     else

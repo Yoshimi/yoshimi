@@ -427,9 +427,28 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS + 1));
         return false;
     }
-
-    getAudio();
+    unsigned int internalbuff = synth->getRuntime().Buffersize;
+    //synth->getRuntime().Log("Jack " + asString(nframes) + "  Internal " + asString(internalbuff));
     int framesize = sizeof(float) * nframes;
+    if (nframes < internalbuff)
+    {
+        synth->MasterAudio(zynLeft, zynRight, nframes);
+        sendAudio(framesize, 0);
+    }
+    else
+    {
+        for (unsigned int pos = 0; pos < nframes; pos += internalbuff)
+        {
+        synth->MasterAudio(zynLeft, zynRight, 0);
+        sendAudio(framesize, pos);
+        }
+    }
+    return true;
+}
+
+
+void JackEngine::sendAudio(int framesize, unsigned int offset)
+{
     // Part outputs
     int currentmax = synth->getRuntime().NumAvailableParts;
     for (int port = 0, idx = 0; idx < 2 * NUM_MIDI_PARTS; port++ , idx += 2)
@@ -438,23 +457,33 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         {
             if (jack_port_connected(audio.ports[idx])) // just a few % improvement.
             {
+                float *lpoint = audio.portBuffs[idx] + offset;
+                float *rpoint = audio.portBuffs[idx + 1] + offset;
                 if ((synth->part[port]->Paudiodest & 2) && port < currentmax)
                 {
-                    memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
-                    memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
+                    
+//                    memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
+//                    memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
+                    memcpy(lpoint, zynLeft[port], framesize);
+                    memcpy(rpoint, zynRight[port], framesize);
                 }
                 else
                 {
-                    memset(audio.portBuffs[idx], 0, framesize);
-                    memset(audio.portBuffs[idx + 1], 0, framesize);
+//                    memset(audio.portBuffs[idx], 0, framesize);
+//                    memset(audio.portBuffs[idx + 1], 0, framesize);
+                    memset(lpoint, 0, framesize);
+                    memset(rpoint, 0, framesize);
                 }
             }
         }
     }
     // And mixed outputs
-    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
-    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
-    return true;
+    float *Lpoint = audio.portBuffs[2 * NUM_MIDI_PARTS] + offset;
+    float *Rpoint = audio.portBuffs[2 * NUM_MIDI_PARTS + 1] + offset;
+    memcpy(Lpoint, zynLeft[NUM_MIDI_PARTS], framesize);
+    memcpy(Rpoint, zynRight[NUM_MIDI_PARTS], framesize);
+//    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
+//    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
 }
 
 

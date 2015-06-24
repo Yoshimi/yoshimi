@@ -25,7 +25,7 @@ bool AlsaClient::openAudio(void)
     if (alsaEngine.openAudio())
     {
         synth->getRuntime().Samplerate = getSamplerate();
-        synth->getRuntime().Buffersize = getBuffersize();
+        //synth->getRuntime().Buffersize = getBuffersize();
         return true;
     }
     synth->getRuntime().Log("AlsaClient audio open failed");
