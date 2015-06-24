@@ -151,6 +151,10 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate / 2;
     buffersize_f = buffersize = Runtime.Buffersize;
+
+    if (buffersize > audiobufsize)
+        buffersize_f = audiobufsize;
+    
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
@@ -659,7 +663,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
 
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
-   
+
     p_buffersize = buffersize;
     p_bufferbytes = bufferbytes;
     p_buffersize_f = buffersize_f;
