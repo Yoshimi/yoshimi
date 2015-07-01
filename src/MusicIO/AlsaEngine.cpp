@@ -26,7 +26,7 @@
 AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 {
     audio.handle = NULL;
-    audio.period_time = 0;
+    audio.period_time = 0; // re-used as number of periods
     audio.samplerate = 0;
     audio.buffer_size = 0;
     audio.period_size = 0;
@@ -45,7 +45,9 @@ bool AlsaEngine::openAudio(void)
     audio.device = synth->getRuntime().audioDevice;
     audio.samplerate = synth->getRuntime().Samplerate;
     audio.period_size = synth->getRuntime().Buffersize;
-    audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
+    audio.period_time = 2;
+    audio.buffer_size = audio.period_size * audio.period_time;
+//    audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
     if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
                              SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
             "failed to open alsa audio device:" + audio.device))
@@ -182,7 +184,7 @@ string AlsaEngine::midiClientName(void)
 
 bool AlsaEngine::prepHwparams(void)
 {
-    unsigned int buffer_time = audio.period_time * 4;
+//    unsigned int buffer_time = audio.period_time * 4;
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
     snd_pcm_format_t format = SND_PCM_FORMAT_S16; // Alsa appends _LE/_BE? hmmm
@@ -219,7 +221,7 @@ bool AlsaEngine::prepHwparams(void)
     if (alsaBad(snd_pcm_hw_params_set_channels(audio.handle, hwparams, 2),
                 "alsa audio failed to set channels to 2"))
         goto bail_out;
-    if (!alsaBad(snd_pcm_hw_params_set_buffer_time_near(audio.handle, hwparams,
+/*    if (!alsaBad(snd_pcm_hw_params_set_buffer_time_near(audio.handle, hwparams,
                  &buffer_time, NULL), "initial buffer time setting failed"))
     {
         if (alsaBad(snd_pcm_hw_params_get_buffer_size(hwparams, &audio.buffer_size),
@@ -241,7 +243,16 @@ bool AlsaEngine::prepHwparams(void)
         if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams,
                     &audio.buffer_size), "failed to set buffer size"))
             goto bail_out;
-    }
+    }*/
+    if (alsaBad(snd_pcm_hw_params_set_period_size_near(audio.handle, hwparams, &audio.period_size, 0), "failed to set period size"))
+        goto bail_out;
+    if (alsaBad(snd_pcm_hw_params_set_periods(audio.handle, hwparams, audio.period_time, 0), "failed to set number of periods"))
+        goto bail_out;
+    if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams, &audio.buffer_size), "failed to set buffer size"))
+        goto bail_out;
+
+
+    
     if (alsaBad(snd_pcm_hw_params (audio.handle, hwparams),
                 "alsa audio failed to set hardware parameters"))
 		goto bail_out;
@@ -252,8 +263,11 @@ bool AlsaEngine::prepHwparams(void)
                 NULL), "failed to get period size"))
         goto bail_out;
     if (ask_buffersize != audio.period_size)
+    {
         synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size));
+        synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
+    }
     return true;
 
 bail_out:
