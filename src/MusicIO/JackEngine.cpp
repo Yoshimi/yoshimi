@@ -508,7 +508,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            if (jEvent.size < 1 || jEvent.size > sizeof(event.data))
+            if (jEvent.size < 1 || (jEvent.size > sizeof(event.data)))
                 continue; // no interest in zero sized or long events
             event.time = jEvent.time;
             memset(event.data, 0, sizeof(event.data));
