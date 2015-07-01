@@ -62,7 +62,7 @@ class MusicIO : virtual protected MiscFuncs
     private:
         pthread_t pBankOrRootDirThread;
         int bankOrRootDirToChange;
-        bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank
+        bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank        
         struct _prgChangeCmd
         {            
             int ch;

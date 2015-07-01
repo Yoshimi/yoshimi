@@ -99,6 +99,7 @@ class JackEngine : public MusicIO
             jack_nframes_t time;
             char data[4]; // all events of interest are <= 4bytes
         };
+        unsigned int internalbuff;
 };
 
 #endif

@@ -134,6 +134,7 @@ bool JackEngine::openJackClient(string server)
 bool JackEngine::Start(void)
 {
     bool jackPortsRegistered = true;
+    internalbuff = synth->getRuntime().Buffersize;
     //Andrew Deryabin: use default error callback function provided by jack
     //jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
@@ -426,8 +427,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     {
         synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS + 1));
         return false;
-    }
-    unsigned int internalbuff = synth->getRuntime().Buffersize;
+    }    
     //synth->getRuntime().Log("Jack " + asString(nframes) + "  Internal " + asString(internalbuff));
     int framesize = sizeof(float) * nframes;
     if (nframes < internalbuff)
