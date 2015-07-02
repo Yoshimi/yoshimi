@@ -187,6 +187,7 @@ bool AlsaEngine::prepHwparams(void)
 //    unsigned int buffer_time = audio.period_time * 4;
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
+    unsigned int chans = 2;
     snd_pcm_format_t format = SND_PCM_FORMAT_S16; // Alsa appends _LE/_BE? hmmm
     snd_pcm_access_t axs = SND_PCM_ACCESS_MMAP_INTERLEAVED;
     snd_pcm_hw_params_t  *hwparams;
@@ -218,8 +219,9 @@ bool AlsaEngine::prepHwparams(void)
                 "alsa audio failed to set sample rate (asked for "
                 + asString(ask_samplerate) + ")"))
         goto bail_out;
-    if (alsaBad(snd_pcm_hw_params_set_channels(audio.handle, hwparams, 2),
-                "alsa audio failed to set channels to 2"))
+
+    if (alsaBad(snd_pcm_hw_params_set_channels_near(audio.handle, hwparams, &chans),
+                "alsa audio failed to set channels to" + asString(chans)))
         goto bail_out;
 /*    if (!alsaBad(snd_pcm_hw_params_set_buffer_time_near(audio.handle, hwparams,
                  &buffer_time, NULL), "initial buffer time setting failed"))

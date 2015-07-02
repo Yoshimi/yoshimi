@@ -77,17 +77,19 @@ MusicIO::~MusicIO()
 }
 
 
-void MusicIO::InterleaveShorts(void)
+void MusicIO::InterleaveShorts()
 {
     int buffersize = getBuffersize();
     int idx = 0;
-    double scaled;
+//    double scaled;
     for (int frame = 0; frame < buffersize; ++frame)
     {   // with a grateful nod to libsamplerate ...
-        scaled = zynLeft[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
-        scaled = zynRight[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
-        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
+//        scaled = zynLeft[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
+//        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
+        interleavedShorts[idx++] = (int) ((lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800)) >> 0);
+//        scaled = zynRight[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
+//        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
+        interleavedShorts[idx++] = (int) ((lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800)) >> 0);
     }
 }
 
