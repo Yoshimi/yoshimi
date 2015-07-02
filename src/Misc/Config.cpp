@@ -154,8 +154,10 @@ bool Config::Setup(int argc, char **argv)
     switch (audioEngine)
     {
         case alsa_audio:
+        {
             audioDevice = string(alsaAudioDevice);
             break;
+        }
         case jack_audio:
             audioDevice = string(jackServer);
             break;
@@ -1002,6 +1004,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->audioEngine = alsa_audio;
             if (arg)
                 settings->audioDevice = string(arg);
+            else
+                settings->audioDevice = settings->alsaAudioDevice;
             break;
         case 'a':
             settings->midiEngine = alsa_midi;
