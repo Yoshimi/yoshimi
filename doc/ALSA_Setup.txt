@@ -1,0 +1,19 @@
+To be able to reliably use ALSA audio you need to set a card name, not just "Default"
+
+In a terminal window enter:
+cat /proc/asound/card*/id
+
+You should get something like:
+
+PCH
+K6
+
+Go into Yoshimi->Settings->Alsa and in Alsa Audio Device enter (say) hw:PCH
+
+This ensures you will always connect to this card regardless of the order this and other ones.
+
+Another benefit of doing this is that ALSA will now use Yoshimi's internal buffer size, otherwise it will force Yoshimi to accept its default size.
+
+You can now set the sample rate as well - bear in mind that not all cards can use all of these but 44100 and 48000 are almost always available.
+
+If you also set a Midi Device (such as a keyboard) Yoshimi will try to find and connect to this.
