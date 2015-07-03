@@ -89,7 +89,7 @@ void MusicIO::InterleaveShorts()
         interleavedShorts[idx++] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
 //        scaled = zynRight[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
 //        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
-        interleavedShorts[idx++] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+        interleavedShorts[idx++] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
     }
 }
 
