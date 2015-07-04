@@ -23,6 +23,7 @@ Data MSB ( 6) set mode
               5 = x2 instrument (optional)
               6 = y1 instrument (optional)
               7 = y2 instrument (optional)
+
 Setting CC for X enables vector control any value oustide the above list disables it.
 
 Data LSB (38) value to set
@@ -31,6 +32,10 @@ features:
     1 = Volume
     2 = Pan
     4 = Filter Cutoff (Brightness)
+    
+0x11 = 17 = Reversed Volume
+0x22 = 34 = Reversed Pan
+0x44 = 68 = Reversed Filter Cutoff
 
  
 An Example:

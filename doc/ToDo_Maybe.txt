@@ -6,10 +6,6 @@ Direct part control should be able to change audio routing.
 
 Add 'Ignore MIDI Reset All' to deal with brain dead sequencers :(
 
-Add reverse vector control features Data MSB.
-10 = X
-11 = y
-
 Gui to set up vector control!
 
 Review mapping of SubSynth harmonic faders.

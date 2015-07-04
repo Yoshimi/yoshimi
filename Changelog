@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2015-7-5 Will
+- Minor gui bugfix 'Simple Sound' correctly set to 'No Title' in
+  all windows when actually edited.
+- Vector control individual features can be reversed.
+
 2015-7-3 Will
 - Merged in corrected buffers - still some work to do on alsa
   audio which has been incorrect for a long time but should be OK

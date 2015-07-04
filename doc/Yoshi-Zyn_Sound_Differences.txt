@@ -10,7 +10,7 @@ About two years ago someone sent in a patch with spelling corrections. Unfortuna
 Recently we discovered that the jack and internal buffers had somehow become fused together. This would make a difference to some sounds if you wanted a very large internal buffer but a small jack one, although it's a situation I never came across myself. However, this in now corrected in the current master and will be pushed out with the next release.
 
 
-Whenever in doubt my reference is to check sounds against Zyn 2.2.1. This is getting harder as I can no longer compile it on modern distros, and the executable will save but not load instrument files. Also, some features like 'unison' don't exist. There is another complication for 'unison' in that current versions of Zyn have different numbers in the list to the original implimentation. This breaks compatibility with patches created with the first version. In Yoshimi we got round this by changing from a list of values to the direct values themselves. This also would seem to break compatibility but plans are afoot to detect file versions and make appropriate translations.
+Whenever in doubt my reference is to check sounds against Zyn 2.2.1. This is getting harder as I can no longer compile it on modern distros, and the executable will save but not load instrument files. Also, some features like 'unison' don't exist.
 
 All-in-all, my experience is that provided you set up *exactly* the same configuration in all respects an instrument created with old Zyn will sound virtually the same on both new Zyn and all versions of Yoshi.
 
