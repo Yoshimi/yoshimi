@@ -47,10 +47,13 @@ CC      Value
 98        1
  6        0
 38       14
+98        1 *
  6        1
 38       15
+98        1 *
  6        2
 38        1
+98        1 *
  6        3
 38        2
 
@@ -59,3 +62,6 @@ This will set up CC14 as the X axis incoming controller and CC15 as Y, with X se
 You can either go on with the NRPNs to set the instruments (this will load and
 enable instruments from the current bank) or enable and load them by hand.
 For channel 1 this would be part 1 and 17 for X and part 33 and 49 for Y
+
+The (*) CCs ensure that the data bytes are reset each time. This is not really necessary for the earlier commands, but should be done if you set the instruments with NRPNs as well, otherwise you will try to set them twice! 
+

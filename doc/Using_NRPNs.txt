@@ -22,12 +22,11 @@ After this, for running values, once Dhigh and Dlow have been set if you change 
 
 e.g. Starting with Dhigh = 6 and Dlow = 20
 
-Change Dlow to 15 and Yoshimi will regard this as a command Dhigh 6 + Dlow 16
+Change Dlow to 15 and Yoshimi will regard this as a command Dhigh 6 + Dlow 15
 Alternatively change Dhigh to 2 and Yoshimi will regard this as a command Dhigh 2 + Dlow 20
 This can be useful but may have unintended consequeces!
 
-If in doubt change either of the NRPN bytes and both data bytes will be cleared.
-
+If in doubt, change/resend either of the NRPN bytes and both data bytes will be cleared.
 
 Additionally there is 96 for data increment and 97 for decrement.
 

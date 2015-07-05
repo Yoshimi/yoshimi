@@ -31,6 +31,9 @@ Yoshimi responds to the following messages.
 
 * different to the official GM spec.
 
+
+The modulation wheel only affects AddSynth and PadSynth, and then only the frequency LFO depth. Just to make it more confusing, it changes the level from 0 up to it's current (gui) setting only. Therefore if the LFO depth is set to zero the Mod Wheel will have no effect.
+
 User selectable CC for Bank Root Path change.
 
 For more details of bank changes see Banks.txt
