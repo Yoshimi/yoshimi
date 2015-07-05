@@ -618,6 +618,8 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
     part[npart]->Paudiodest = dest;
     if (part[npart]->Paudiodest & 2)
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
+    // next line only really needed for direct part control.
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
 }
 
 

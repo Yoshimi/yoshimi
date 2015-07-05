@@ -431,8 +431,14 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
         }
         case 4: // Set part's channel number
         {
-             synth->SetPartChan(synth->getRuntime().nrpndata.Part, par);
-             break;
+            synth->SetPartChan(synth->getRuntime().nrpndata.Part, par);
+            break;
+        }
+        case 5: // Set part's audio destination
+        {
+            if (par > 0 and par < 4)
+                synth->SetPartDestination(synth->getRuntime().nrpndata.Part, par);
+            break;
         }
     }
 }
