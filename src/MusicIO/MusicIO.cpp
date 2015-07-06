@@ -318,8 +318,8 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
 //        synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
         if (Yopps & 1) // fixed as volume
         {
-            synth->SetController(ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
-            synth->SetController(ch | 0x90, C_volume, 127 - (param * param / 127));
+            synth->SetController(ch | 0xa0, C_volume,127 - (p_rev * p_rev / 127));
+            synth->SetController(ch | 0xb0, C_volume, 127 - (param * param / 127));
         }
         if (Yopps & 2) // default is pan
         {
@@ -337,7 +337,7 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Yopps & 5) // curently undefined
         {
-            swap1 = ((Yopps >> 2) & 0x10) | 0x80;
+            swap1 = ((Yopps >> 2) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
         }
     }
