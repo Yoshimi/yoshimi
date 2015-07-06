@@ -15,29 +15,44 @@ In the required channel send:
 NRPN MSB (99)  set to 64
 NRPN LSB (98)  1
 Data MSB ( 6) set mode
-              0 = X CC
-              1 = Y CC
-              2 = X features
-              3 = Y features
-              4 = x1 instrument (optional)
-              5 = x2 instrument (optional)
-              6 = y1 instrument (optional)
-              7 = y2 instrument (optional)
+              0 = X sweep CC
+              1 = Y sweep CC
+              2 = enable X features
+              3 = enable Y features
 
-Setting CC for X enables vector control any value oustide the above list disables it.
+Optional settings
+              4 = x1 instrument
+              5 = x2 instrument
+              6 = y1 instrument
+              7 = y2 instrument
+              
+              8 = set CC for X feature 2 \
+              9 = set CC for X feature 4 |
+             10 = set CC for X feature 8 |
+                                          > not yet implemented!
+             11 = set CC for Y feature 2 |
+             12 = set CC for Y feature 4 |
+             13 = set CC for Y feature 8 /
+              
+Setting CC for X enables vector control. It also sets, but doesn't enable the default X features. Any value outside the above list disables it.
 
-Data LSB (38) value to set
+Setting CC for Y sets, but doesn't enable the default Y features.
+
+Data LSB (38) feature to set
 
 features:
-    1 = Volume
-    2 = Pan
-    4 = Filter Cutoff (Brightness)
+    1 = fixed as Volume
+    2 = default is Pan
+    4 = default is Filter Cutoff (Brightness)
+    8 = {undefined}
     
-0x11 = 17 = Reversed Volume
-0x22 = 34 = Reversed Pan
-0x44 = 68 = Reversed Filter Cutoff
+0x12 = 18 = Reversed Pan
+0x24 = 36 = Reversed Filter Cutoff
+0x48 = 72 = Reversed 8 {undefined}
 
+If you don't enable any features not a lot will happen!
  
+
 An Example:
 
 From channel 1, send the following CCs

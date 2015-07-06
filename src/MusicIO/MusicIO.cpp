@@ -288,51 +288,57 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
     {
 //        synth->getRuntime().Log("X D H " + asString(Xopps)  + "   D L " + asString(Xtype) + "  V " + asString(param));
 
-        if (Xopps & 1) // volume
+        if (Xopps & 1) // fixed as volume
+        {
+            synth->SetController(ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
+            synth->SetController(ch | 0x90, C_volume, 127 - (param * param / 127));
+        }
+        if (Xopps & 2) // default is pan
         {
             swap1 = (Xopps & 0x10) | 0x80;
-            swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, C_volume,127 - (p_rev * p_rev / 127));
-            synth->SetController(ch | swap2, C_volume, 127 - (param * param / 127));
-        }
-        if (Xopps & 2) // pan
-        {
-            swap1 = ((Xopps >> 1) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, C_panning, param);
             synth->SetController(ch | swap2, C_panning, p_rev);
         }
-        if (Xopps & 4) // 'brightness'
+        if (Xopps & 4) // default is 'brightness'
         {
-            swap1 = ((Xopps >> 2) & 0x10) | 0x80;
+            swap1 = ((Xopps >> 1) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, C_filtercutoff, param);
             synth->SetController(ch | swap2, C_filtercutoff, p_rev);
+        }
+        if (Xopps & 5) // curently undefined
+        {
+            swap1 = ((Xopps >> 2) & 0x10) | 0x80;
+            swap2 = swap1 ^ 0x10;
         }
     }
     else // if Y hasn't been set these commands will be ignored
     {
 //        synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
-        if (Yopps & 1) // volume
+        if (Yopps & 1) // fixed as volume
+        {
+            synth->SetController(ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
+            synth->SetController(ch | 0x90, C_volume, 127 - (param * param / 127));
+        }
+        if (Yopps & 2) // default is pan
         {
             swap1 = (Yopps & 0x10) | 0xa0;
-            swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, C_volume,127 - (p_rev * p_rev / 127));
-            synth->SetController(ch | swap2, C_volume, 127 - (param * param / 127));
-        }
-        if (Yopps & 2) // pan
-        {
-            swap1 = ((Yopps >> 1) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, C_panning, param);
             synth->SetController(ch | swap2, C_panning, p_rev);
         }
-        if (Yopps & 4) // 'brightness'
+        if (Yopps & 4) // default is 'brightness'
         {
-            swap1 = ((Yopps >> 2) & 0x10) | 0xa0;
+            swap1 = ((Yopps >> 1) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
             synth->SetController(ch | swap1, C_filtercutoff, param);
             synth->SetController(ch | swap2, C_filtercutoff, p_rev);
+        }
+        if (Yopps & 5) // curently undefined
+        {
+            swap1 = ((Yopps >> 2) & 0x10) | 0x80;
+            swap2 = swap1 ^ 0x10;
         }
     }
     return true;
