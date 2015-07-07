@@ -60,7 +60,7 @@ class ConfigUI {open : {private MiscFuncs}
       } {
         Fl_Group {} {
           label {Main settings} open
-          xywh {5 25 455 277} labelsize 12
+          xywh {5 25 455 277} labelsize 12 hide
         } {
           Fl_Choice {} {
             label {AddSynth Oscillator Size}
@@ -71,7 +71,7 @@ class ConfigUI {open : {private MiscFuncs}
     {
         synth->getRuntime().Oscilsize = changed;
         configChanged = true;
-    }} selected
+    }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
@@ -388,7 +388,7 @@ else
           }
         }
         Fl_Group {} {
-          label CCs
+          label MIDI
           callback {//
     EPCvalue = synth->getRuntime().midi_upper_voice_C;
     if (EPCvalue >= 128)
@@ -413,14 +413,14 @@ else
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }} open
-          tooltip {MIDI CC preferences} xywh {5 25 455 275} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 455 275} labelsize 12
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
           Fl_Spinner BankRoot {
             label {Bank Root Change}
             callback {Rpend->show();}
-            xywh {275 81 53 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+            xywh {275 81 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
           }
@@ -504,7 +504,7 @@ else
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         configChanged = true;} open
-            tooltip {CC0 = msb, CC32 = lsb} xywh {275 122 60 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
+            tooltip {CC0 = msb, CC32 = lsb} xywh {275 122 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
           } {
@@ -544,7 +544,7 @@ else
           Fl_Spinner EPCspinner {
             label {Extended Program Change}
             callback {Epend->show();}
-            xywh {275 241 53 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
+            xywh {275 241 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
           }
@@ -600,6 +600,27 @@ else
             xywh {275 220 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
+          }
+          Fl_Spinner Control {
+            label {Set immediate -- Control}
+            callback {CCpend->show();}
+            xywh {181 272 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+          }
+          Fl_Spinner Value {
+            label Value
+            callback {CCpend->show();}
+            xywh {275 272 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+          }
+          Fl_Button CCpend {
+            label Pending
+            callback {//
+    o->hide();
+    int cc = (int) Control->value();
+    int val = (int) Value->value();
+    int part = synth->getGuiMaster()->partui->npart;
+    synth->SetController(part, cc, val);
+    synth->getRuntime().Log(" Part " + asString(part) + "  Midi CC " + asString(cc) + " set to " + asString(val));} selected
+            tooltip {Click to set} xywh {340 272 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
         }
       }
