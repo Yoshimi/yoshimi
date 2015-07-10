@@ -290,7 +290,7 @@ string Config::testCCvalue(int cc)
             result = "expression";
             break;
         case 38:
-            result = "data lab";
+            result = "data lsb";
             break;
         case 64:
             result = "sustain pedal";

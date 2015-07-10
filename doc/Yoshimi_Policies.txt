@@ -9,4 +9,5 @@ yoshimi-1.3.5.2 {second bugfix} surely not!
 
 
 
-We won't accept fixes for spelling errors in the *code* For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.
+We won't accept fixes for spelling errors in the *code*
+For a start, from bitter experience it is fatally easy to change two variables to the same name! Also, there's no point, after all they are only a mnemonic for memory addresses etc. 'volume' and 'LFO' could just as well be 'turnyfing' and 'derfingwotwiggles'.

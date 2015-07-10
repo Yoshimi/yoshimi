@@ -7,7 +7,7 @@ Set NRPN
 then (all value ranges start from zero, not 1)
 
 Data MSB (6)
-    0 : data LSB = part number
+    0 : data LSB = part number          {this obviously has to be set first}
     1 : data LSB = program number
     2 : data LSB = controller number
     3 : data LSB = controller value
@@ -18,7 +18,7 @@ Data MSB (6)
                     3 = both
                     all other values ignored
     
-    7 : data LSB = main volume {not yet implemented - might go elsewhere}
+    7 : data LSB = main volume          {not yet implemented - might go elsewhere}
 
 
 

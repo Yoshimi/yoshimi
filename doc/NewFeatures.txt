@@ -92,10 +92,13 @@ Red -> AddSynth
 Blue -> SubSynth
 Green -> PadSynth
 
-If the instruments are kits they scanned to find out if *any* member of the kit containes each engine.
+If the instruments are kits they scanned to find out if *any* member of the kit contains each engine.
 
 This is duplicated in the current part, the mixer panel for the currently loaded instruments, and in the Instrument Edit window the same colours highlight the engine names when they are enabled with the check boxes. 
 
 ###
 
+CCs can now be entered from the gui as if they'd been sent by MIDI, although currently this doesn't include NRPNs. The entry is made at the bottom of the 'MIDI' tab in the 'Settings' window.
+
+###
 

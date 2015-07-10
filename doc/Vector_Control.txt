@@ -38,6 +38,8 @@ Setting the sweep CC for Y sets, but doesn't enable the default Y features.
 
 If you don't enable any features not a lot will happen!
 
+The feature numbers are chosen so they can be combined. So, 5 would be Voume + Brightness.
+
 
 Optional settings
               4 = x1 instrument
@@ -82,4 +84,3 @@ enable instruments from the current bank) or enable and load them by hand.
 For channel 1 this would be part 1 and 17 for X and part 33 and 49 for Y
 
 The (*) CCs ensure that the data bytes are reset each time. This is not really necessary for the earlier commands, but should be done if you set the instruments with NRPNs as well, otherwise you will try to set them twice! 
-
