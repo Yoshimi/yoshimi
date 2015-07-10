@@ -191,17 +191,23 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     {
         if (ctrl == C_nrpnL)
         {
-            synth->getRuntime().nrpnL = param;
+            if (synth->getRuntime().nrpnL != param)
+            {
+                synth->getRuntime().nrpnL = param;
+                synth->getRuntime().Log("MusicIO setMidiController: Set nrpn LSB to " + asString(param));
+            }
             nLow = param;
             nHigh = synth->getRuntime().nrpnH;
-            synth->getRuntime().Log("Set nrpn LSB to " + asString(nLow));
         }
         else
         {
-            synth->getRuntime().nrpnH = param;
+            if(synth->getRuntime().nrpnH != param)
+            {
+                synth->getRuntime().nrpnH = param;
+                synth->getRuntime().Log("MusicIO setMidiController: Set nrpn MSB to " + asString(param));
+            }
             nHigh = param;
             nLow = synth->getRuntime().nrpnL;
-            synth->getRuntime().Log("Set nrpn MSB to " + asString(nHigh));
         }
 
         synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
@@ -397,8 +403,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
     if (nLow == 0) // direct part change
         nrpnDirectPart(dHigh, par);
 
-    else if (nLow == 1 && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
-        // it's vector control
+    else if (nLow == 1) // it's vector control
         nrpnSetVector(dHigh, chan, par);
 }
 
@@ -452,6 +457,26 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
 
 void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 {
+    if (dHigh < 2)
+    {
+        int parts = synth->getRuntime().NumAvailableParts;
+        if ((dHigh == 0) && (parts < NUM_MIDI_CHANNELS * 2))
+        {
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control needs at least " + asString(NUM_MIDI_CHANNELS * 2) + " parts");
+            return;
+        }
+        else if ((dHigh == 1) && (parts < NUM_MIDI_CHANNELS * 4))
+        {
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control Y axis needs " + asString(NUM_MIDI_CHANNELS * 4) + " parts");
+            return;
+        }
+        string name = synth->getRuntime().testCCvalue(par);
+        if (name > "")
+        {
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: CC " + asString(par) + "in use for " + name);
+            return;
+        }
+    }
     switch (dHigh)
     {
         case 0:
@@ -461,21 +486,23 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             if (!synth->getRuntime().nrpndata.vectorEnabled[chan])
             {
                 synth->getRuntime().nrpndata.vectorEnabled[chan] = true;
-                synth->getRuntime().Log("Vector control enabled");
+                synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control enabled");
                 // enabling is only done with a valid X CC
                 synth->SetPartChan(chan, chan);
                 synth->SetPartChan(chan | 16, chan);
             }
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector X CC to " + asString(par));
             break;
         }
         case 1:
         {
-            if ((synth->getRuntime().nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
-                synth->getRuntime().Log("Vector X axis must be set before Y");
+            if (!synth->getRuntime().nrpndata.vectorEnabled[chan])//(synth->getRuntime().nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
+                synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector X axis must be set before Y");
             else
             {
                 synth->getRuntime().nrpndata.vectorYaxis[chan]
                 = (synth->getRuntime().nrpndata.vectorYaxis[chan] & 0xff00) | par;
+                synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector Y CC to " + asString(par));
                 synth->SetPartChan(chan | 32, chan);
                 synth->SetPartChan(chan | 48, chan);
             }

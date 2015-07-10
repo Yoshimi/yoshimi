@@ -277,6 +277,9 @@ string Config::testCCvalue(int cc)
         case 1:
             result = "mod wheel";
             break;
+         case 6:
+            result = "data msb";
+            break;
         case 7:
             result = "volume";
             break;
@@ -285,6 +288,9 @@ string Config::testCCvalue(int cc)
             break;
         case 11:
             result = "expression";
+            break;
+        case 38:
+            result = "data lab";
             break;
         case 64:
             result = "sustain pedal";
@@ -309,6 +315,18 @@ string Config::testCCvalue(int cc)
             break;
         case 78:
             result = "resonance bandwidth";
+            break;
+        case 96:
+            result = "data increment";
+            break;
+        case 97:
+            result = "data decrement";
+            break;
+        case 98:
+            result = "NRPN lsb";
+            break;
+        case 99:
+            result = "NRPN msb";
             break;
         case 120:
             result = "all sounds off";

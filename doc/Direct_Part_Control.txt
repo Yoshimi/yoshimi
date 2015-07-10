@@ -13,7 +13,7 @@ Data MSB (6)
     3 : data LSB = controller value
     4 : data LSB = part's channel number {15 to 127 disconnects the part from any channel}
     5 : data LSB = part's audio destination
-                    1 = mail L&R
+                    1 = main L&R
                     2 = direct L&R
                     3 = both
                     all other values ignored

@@ -2,7 +2,7 @@ Vector control is only possible if you have 32 or 64 parts active.
 
 In vector mode parts will still play together but the vector controls can change their volume, pan, filter cutoff in pairs, controlled by user defined CCs set up with NRPNs
 
-You must set the X axis CC before Y, but if you don't set Y at all you can run just a single axis. If yuo only have 32 parts active Y settings are ignored.
+You must set the X axis CC before Y, but if you don't set Y at all you can run just a single axis. If you only have 32 parts active Y settings are ignored.
 
 e.g.
 Parts 1 and 17 can be set as x1 & x2 (volume only) while parts 33 and 49 can be y1 & y2 (pan only)
@@ -13,12 +13,31 @@ Setting up is currently done as follows.
 
 In the required channel send:
 NRPN MSB (99)  set to 64
-NRPN LSB (98)  1
-Data MSB ( 6) set mode
+NRPN LSB (98)  set to 1
+Data MSB ( 6)  set mode
               0 = X sweep CC
               1 = Y sweep CC
               2 = enable X features
               3 = enable Y features
+
+Data LSB (38) features to set
+
+features:
+    1 = fixed as Volume
+    2 = default is Pan
+    4 = default is Filter Cutoff (Brightness)
+    8 = {undefined}
+    
+0x12 = 18 = Reversed Pan
+0x24 = 36 = Reversed Filter Cutoff
+0x48 = 72 = Reversed 8 {undefined}
+
+Setting the sweep CC for X enables vector control. It also sets, but doesn't enable the default X features.
+
+Setting the sweep CC for Y sets, but doesn't enable the default Y features.
+
+If you don't enable any features not a lot will happen!
+
 
 Optional settings
               4 = x1 instrument
@@ -34,24 +53,8 @@ Optional settings
              12 = set CC for Y feature 4 |
              13 = set CC for Y feature 8 /
               
-Setting CC for X enables vector control. It also sets, but doesn't enable the default X features. Any value outside the above list disables it.
+Any data MSB value outside the above list disables vector control.
 
-Setting CC for Y sets, but doesn't enable the default Y features.
-
-Data LSB (38) feature to set
-
-features:
-    1 = fixed as Volume
-    2 = default is Pan
-    4 = default is Filter Cutoff (Brightness)
-    8 = {undefined}
-    
-0x12 = 18 = Reversed Pan
-0x24 = 36 = Reversed Filter Cutoff
-0x48 = 72 = Reversed 8 {undefined}
-
-If you don't enable any features not a lot will happen!
- 
 
 An Example:
 
