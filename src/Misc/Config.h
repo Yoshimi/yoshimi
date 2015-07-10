@@ -140,8 +140,16 @@ class Config : public MiscFuncs
         bool          nrpnActive;
         
         struct IOdata{
-            unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
-            unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
+            unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
+            unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
+            unsigned char vectorXfeatures[NUM_MIDI_CHANNELS];
+            unsigned char vectorYfeatures[NUM_MIDI_CHANNELS];
+            unsigned char vectorXcc2[NUM_MIDI_CHANNELS];
+            unsigned char vectorYcc2[NUM_MIDI_CHANNELS];
+            unsigned char vectorXcc4[NUM_MIDI_CHANNELS];
+            unsigned char vectorYcc4[NUM_MIDI_CHANNELS];
+            unsigned char vectorXcc8[NUM_MIDI_CHANNELS];
+            unsigned char vectorYcc8[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];

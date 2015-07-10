@@ -5,6 +5,7 @@ yoshimi 1.3.x
 - Added exclusions to CC designations.
 - Improved vector control error checks.
 - More doc updates.
+- Implemented redefinable vector features
 
 2015-7-5 Will
 - Minor gui bugfix 'Simple Sound' correctly set to 'No Title' in

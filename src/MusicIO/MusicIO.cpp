@@ -278,22 +278,15 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 
 bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
 {
-    int Xopps = synth->getRuntime().nrpndata.vectorXaxis[ch];
-    int Xtype = Xopps & 0xff;
-    int Yopps = synth->getRuntime().nrpndata.vectorYaxis[ch];
-    int Ytype = Yopps & 0xff;
+    int Xopps = synth->getRuntime().nrpndata.vectorXfeatures[ch];
+    int Yopps = synth->getRuntime().nrpndata.vectorYfeatures[ch];
     int p_rev = 127 - param;
     int swap1;
     int swap2;
-    if(ctrl != Xtype && ctrl != Ytype)
-        return false;
+    unsigned char type;
 
-    Xopps = Xopps >> 8;
-    Yopps = Yopps >> 8;
-    if(Xtype == ctrl)
+    if(ctrl == synth->getRuntime().nrpndata.vectorXaxis[ch])
     {
-//        synth->getRuntime().Log("X D H " + asString(Xopps)  + "   D L " + asString(Xtype) + "  V " + asString(param));
-
         if (Xopps & 1) // fixed as volume
         {
             synth->SetController(ch | 0x80, C_volume,127 - (p_rev * p_rev / 127));
@@ -301,27 +294,32 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Xopps & 2) // default is pan
         {
+            type = synth->getRuntime().nrpndata.vectorXcc2[ch];
             swap1 = (Xopps & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, C_panning, param);
-            synth->SetController(ch | swap2, C_panning, p_rev);
+            synth->SetController(ch | swap1, type, param);
+            synth->SetController(ch | swap2, type, p_rev);
         }
         if (Xopps & 4) // default is 'brightness'
         {
+            type = synth->getRuntime().nrpndata.vectorXcc4[ch];
             swap1 = ((Xopps >> 1) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, C_filtercutoff, param);
-            synth->SetController(ch | swap2, C_filtercutoff, p_rev);
+            synth->SetController(ch | swap1, type, param);
+            synth->SetController(ch | swap2, type, p_rev);
         }
-        if (Xopps & 5) // curently undefined
+        if (Xopps & 8) // default is mod wheel
         {
+            type = synth->getRuntime().nrpndata.vectorXcc8[ch];
             swap1 = ((Xopps >> 2) & 0x10) | 0x80;
             swap2 = swap1 ^ 0x10;
+            synth->SetController(ch | swap1, type, param);
+            synth->SetController(ch | swap2, type, p_rev);
         }
+        return true;
     }
-    else // if Y hasn't been set these commands will be ignored
-    {
-//        synth->getRuntime().Log("Y D H " + asString(Yopps)  + "   D L " + asString(Ytype) + "  V " + asString(param));
+    else if(ctrl == synth->getRuntime().nrpndata.vectorYaxis[ch])
+    { // if Y hasn't been set these commands will be ignored
         if (Yopps & 1) // fixed as volume
         {
             synth->SetController(ch | 0xa0, C_volume,127 - (p_rev * p_rev / 127));
@@ -329,25 +327,31 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
         }
         if (Yopps & 2) // default is pan
         {
+            type = synth->getRuntime().nrpndata.vectorYcc2[ch];
             swap1 = (Yopps & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, C_panning, param);
-            synth->SetController(ch | swap2, C_panning, p_rev);
+            synth->SetController(ch | swap1, type, param);
+            synth->SetController(ch | swap2, type, p_rev);
         }
         if (Yopps & 4) // default is 'brightness'
         {
+            type = synth->getRuntime().nrpndata.vectorYcc4[ch];
             swap1 = ((Yopps >> 1) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
-            synth->SetController(ch | swap1, C_filtercutoff, param);
-            synth->SetController(ch | swap2, C_filtercutoff, p_rev);
+            synth->SetController(ch | swap1, type, param);
+            synth->SetController(ch | swap2, type, p_rev);
         }
-        if (Yopps & 5) // curently undefined
+        if (Yopps & 8) // default is mod wheel
         {
+            type = synth->getRuntime().nrpndata.vectorYcc8[ch];
             swap1 = ((Yopps >> 2) & 0x10) | 0xa0;
             swap2 = swap1 ^ 0x10;
+            synth->SetController(ch | swap1, type, param);
+            synth->SetController(ch | swap2, type, p_rev);
         }
+        return true;
     }
-    return true;
+    return false;
 }
 
 
@@ -473,7 +477,7 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
         string name = synth->getRuntime().testCCvalue(par);
         if (name > "")
         {
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: CC " + asString(par) + "in use for " + name);
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: CC " + asString(par) + " in use for " + name);
             return;
         }
     }
@@ -481,48 +485,53 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
     {
         case 0:
         {
-            synth->getRuntime().nrpndata.vectorXaxis[chan]
-            = (synth->getRuntime().nrpndata.vectorXaxis[chan] & 0xff00) | par;
+            synth->getRuntime().nrpndata.vectorXaxis[chan] = par;
             if (!synth->getRuntime().nrpndata.vectorEnabled[chan])
             {
                 synth->getRuntime().nrpndata.vectorEnabled[chan] = true;
                 synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control enabled");
                 // enabling is only done with a valid X CC
-                synth->SetPartChan(chan, chan);
-                synth->SetPartChan(chan | 16, chan);
             }
+            synth->SetPartChan(chan, chan);
+            synth->SetPartChan(chan | 16, chan);
+            synth->getRuntime().nrpndata.vectorXcc2[chan] = C_panning;
+            synth->getRuntime().nrpndata.vectorXcc4[chan] = C_filtercutoff;
+            synth->getRuntime().nrpndata.vectorXcc8[chan] = C_modwheel;
             synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector X CC to " + asString(par));
             break;
         }
         case 1:
         {
-            if (!synth->getRuntime().nrpndata.vectorEnabled[chan])//(synth->getRuntime().nrpndata.vectorXaxis[chan] & 0xff) == 0xff)
+            if (!synth->getRuntime().nrpndata.vectorEnabled[chan])
                 synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector X axis must be set before Y");
             else
             {
-                synth->getRuntime().nrpndata.vectorYaxis[chan]
-                = (synth->getRuntime().nrpndata.vectorYaxis[chan] & 0xff00) | par;
-                synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector Y CC to " + asString(par));
                 synth->SetPartChan(chan | 32, chan);
                 synth->SetPartChan(chan | 48, chan);
+                synth->getRuntime().nrpndata.vectorYaxis[chan] = par;
+                synth->getRuntime().nrpndata.vectorYcc2[chan] = C_panning;
+                synth->getRuntime().nrpndata.vectorYcc4[chan] = C_filtercutoff;
+                synth->getRuntime().nrpndata.vectorYcc8[chan] = C_modwheel;
+                synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector Y CC to " + asString(par));
             }
             break;
         }
         case 2:
         {
-            synth->getRuntime().nrpndata.vectorXaxis[chan]
-            = (synth->getRuntime().nrpndata.vectorXaxis[chan] & 0xff) | (par << 8);
+            synth->getRuntime().nrpndata.vectorXfeatures[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Enabled X features " + asString(par));
             break;
         }
         case 3:
         {
             if (synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
-                synth->getRuntime().nrpndata.vectorYaxis[chan]
-                = (synth->getRuntime().nrpndata.vectorYaxis[chan] & 0xff) | (par << 8);
+                synth->getRuntime().nrpndata.vectorYfeatures[chan] = par;
+                synth->getRuntime().Log("SynthEngine nrpnSetVector: Enabled Y features " + asString(par));
             }
             break;
         }
+        
         case 4:
         {
             setMidiProgram(chan | 0x80, par);
@@ -543,11 +552,51 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             setMidiProgram(chan | 0xb0, par);
             break;
         }
+        
+        case 8:
+        {
+            synth->getRuntime().nrpndata.vectorXcc2[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set X feature 2 to " + asString(par));
+            break;
+        }
+        case 9:
+        {
+            synth->getRuntime().nrpndata.vectorXcc4[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set X feature 4 to " + asString(par));
+            break;
+        }
+        case 10:
+        {
+            synth->getRuntime().nrpndata.vectorXcc8[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set X feature 8 to " + asString(par));
+            break;
+        }
+        case 11:
+        {
+            synth->getRuntime().nrpndata.vectorYcc2[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set Y feature 2 to " + asString(par));
+            break;
+        }
+        case 12:
+        {
+            synth->getRuntime().nrpndata.vectorYcc4[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set Y feature 4 to " + asString(par));
+            break;
+        }
+        case 13:
+        {
+            synth->getRuntime().nrpndata.vectorYcc8[chan] = par;
+            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set Y feature 8 to " + asString(par));
+            break;
+        }
+        
         default:
         {
             synth->getRuntime().nrpndata.vectorEnabled[chan] = false;
             synth->getRuntime().nrpndata.vectorXaxis[chan] = 0xff;
             synth->getRuntime().nrpndata.vectorYaxis[chan] = 0xff;
+            synth->getRuntime().nrpndata.vectorXfeatures[chan] = 0;
+            synth->getRuntime().nrpndata.vectorYfeatures[chan] = 0;
             synth->getRuntime().Log("Vector control disabled");
         }
     }

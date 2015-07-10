@@ -46,16 +46,18 @@ Optional settings
               5 = x2 instrument
               6 = y1 instrument
               7 = y2 instrument
-              
-              8 = set CC for X feature 2 \
-              9 = set CC for X feature 4 |
-             10 = set CC for X feature 8 |
-                                          > not yet implemented!
-             11 = set CC for Y feature 2 |
-             12 = set CC for Y feature 4 |
-             13 = set CC for Y feature 8 /
+
+              8 = set CC for X feature 2
+              9 = set CC for X feature 4
+             10 = set CC for X feature 8
+
+             11 = set CC for Y feature 2
+             12 = set CC for Y feature 4
+             13 = set CC for Y feature 8
               
 Any data MSB value outside the above list disables vector control.
+
+Currently 8 - 13 values aren't sanity checked, so you can set the feature CC do daft things like turning all sound off. 
 
 
 An Example:
