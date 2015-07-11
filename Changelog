@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-7-11 Will
+- Fixed bug that would crash if a bank or instrument rename
+  was cancelled.
 
 2015-7-10 Will
 - Added exclusions to CC designations.

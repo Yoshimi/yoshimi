@@ -320,7 +320,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         fl_alert("Error: Could not load the bank from the directory\\n%s.", bankEntry.dirname.c_str());
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh();
-    refreshmainwindow();} open
+    refreshmainwindow();}
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
@@ -787,20 +787,21 @@ fnr = &RootProcess_::rootprocess;
         if (mode == 5 && !bank->emptyslot(slot))
         {   // Rename slot
             const char *newname = fl_input("Instrument name:", thisname.c_str());
-            if (strlen(newname) > 3)
-            {
-                if (!bank->setname(slot, string(newname), -1))
+            if (newname)
+                if (strlen(newname) > 3)
                 {
-                    setread();
-                    fl_alert("Could not rename instrument %d to %s", slot, newname);
-                    return;
+                    if (!bank->setname(slot, string(newname), -1))
+                    {
+                        setread();
+                        fl_alert("Could not rename instrument %d to %s", slot, newname);
+                        return;
+                    }
+                    else
+                    {
+                        bs[slot]->refresh();
+                        synth->part[*npart]->Pname = newname;
+                    }
                 }
-                else
-                {
-                    bs[slot]->refresh();
-                    synth->part[*npart]->Pname = newname;
-                }
-            }
             setread();
             cbwig->do_callback();
         }
@@ -894,21 +895,22 @@ fnr = &RootProcess_::rootprocess;
         if (mode == 5 && !thisname.empty())
         {   // Rename bank
             const char *tmp = fl_input("Bank name:",thisname.c_str());
-           if (strlen(tmp) > 2) // insist on a readable name
-            {
-                if (!bank->setbankname(slot, string(tmp)))
+            if (tmp)
+                if (strlen(tmp) > 2) // insist on a readable name
                 {
-                    setrootread();
-                    fl_alert("Cound not rename bank %d to %s", slot, thisname.c_str());
-                    return;
+                    if (!bank->setbankname(slot, string(tmp)))
+                    {
+                        setrootread();
+                        fl_alert("Cound not rename bank %d to %s", slot, thisname.c_str());
+                        return;
+                    }
+                    else
+                    {
+                        rs[slot]->rootrefresh();
+                        rescan_for_banks(false);
+                        set_bank_slot();
+                    }
                 }
-                else
-                {
-                    rs[slot]->rootrefresh();
-                    rescan_for_banks(false);
-                    set_bank_slot();
-                }
-            }
             setrootread();
         }
 

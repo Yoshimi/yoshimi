@@ -63,7 +63,7 @@ const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 static struct argp_option cmd_options[] = {
     {"alsa-audio",        'A',  "<device>", 0x1,  "use alsa audio output" },
     {"alsa-midi",         'a',  "<device>", 0x1,  "use alsa midi input" },
-    {"buffersize",        'b',  "<size>",     0,  "set alsa audio buffer size" },
+    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
     {"show-console",      'c',  NULL,         0,  "show console on startup" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
     {"jack-audio",        'J',  "<server>", 0x1,  "use jack audio output" },
@@ -74,7 +74,7 @@ static struct argp_option cmd_options[] = {
     {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
-    {"oscilsize",         'o',  "<size>",     0,  "set oscilsize" },
+    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size" },
     {"state",             'S',  "<file>",   0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
     #if defined(JACK_SESSION)
         {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
