@@ -144,7 +144,7 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     oldlgain = modl;
     oldrgain = modr;
 
-   for(int i = 0; i < synth->buffersize; ++i) {
+   for(int i = 0; i < synth->p_buffersize; ++i) {
         gl += diffl; // Linear interpolation between LFO samples
         gr += diffr;
 
