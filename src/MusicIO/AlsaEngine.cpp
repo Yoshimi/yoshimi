@@ -248,7 +248,7 @@ bool AlsaEngine::prepHwparams(void)
     }*/
     if (alsaBad(snd_pcm_hw_params_set_period_size_near(audio.handle, hwparams, &audio.period_size, 0), "failed to set period size"))
         goto bail_out;
-    if (alsaBad(snd_pcm_hw_params_set_periods(audio.handle, hwparams, audio.period_time, 0), "failed to set number of periods"))
+    if (alsaBad(snd_pcm_hw_params_set_periods_near(audio.handle, hwparams, &audio.period_time, 0), "failed to set number of periods"))
         goto bail_out;
     if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams, &audio.buffer_size), "failed to set buffer size"))
         goto bail_out;

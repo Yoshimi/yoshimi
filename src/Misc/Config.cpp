@@ -277,12 +277,6 @@ string Config::testCCvalue(int cc)
         case 1:
             result = "mod wheel";
             break;
-         case 6:
-            result = "data msb";
-            break;
-        case 7:
-            result = "volume";
-            break;
         case 10:
             result = "panning";
             break;
@@ -291,12 +285,6 @@ string Config::testCCvalue(int cc)
             break;
         case 38:
             result = "data lsb";
-            break;
-        case 64:
-            result = "sustain pedal";
-            break;
-        case 65:
-            result = "partamento";
             break;
         case 71:
             result = "filter Q";
@@ -315,6 +303,33 @@ string Config::testCCvalue(int cc)
             break;
         case 78:
             result = "resonance bandwidth";
+            break;
+        default:
+            result = masterCCtest(cc);
+    }
+    return result;
+}
+
+
+string Config::masterCCtest(int cc)
+{
+    string result = "";
+    switch (cc)
+    {
+         case 6:
+            result = "data msb";
+            break;
+        case 7:
+            result = "volume";
+            break;
+        case 38:
+            result = "data lsb";
+            break;
+        case 64:
+            result = "sustain pedal";
+            break;
+        case 65:
+            result = "portamento";
             break;
         case 96:
             result = "data increment";

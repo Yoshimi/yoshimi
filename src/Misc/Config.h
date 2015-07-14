@@ -61,6 +61,7 @@ class Config : public MiscFuncs
         void clearPresetsDirlist(void);
 
         string testCCvalue(int cc);
+        string masterCCtest(int cc);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }

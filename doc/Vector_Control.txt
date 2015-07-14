@@ -1,6 +1,6 @@
 Vector control is only possible if you have 32 or 64 parts active.
 
-In vector mode parts will still play together but the vector controls can change their volume, pan, filter cutoff in pairs, controlled by user defined CCs set up with NRPNs
+In vector mode parts will still play together but the vector controls can change their volume, pan, etc. in pairs, controlled by user defined CCs set up with NRPNs
 
 You must set the X axis CC before Y, but if you don't set Y at all you can run just a single axis. If you only have 32 parts active Y settings are ignored.
 
@@ -20,17 +20,17 @@ Data MSB ( 6)  set mode
               2 = enable X features
               3 = enable Y features
 
-Data LSB (38) features to set
+Data LSB (38) features to enable
 
-features:
+Features:
     1 = fixed as Volume
     2 = default is Pan
     4 = default is Filter Cutoff (Brightness)
-    8 = {undefined}
+    8 = default is Mod Wheel
     
 0x12 = 18 = Reversed Pan
 0x24 = 36 = Reversed Filter Cutoff
-0x48 = 72 = Reversed 8 {undefined}
+0x48 = 72 = Reversed Mod Wheel
 
 Setting the sweep CC for X enables vector control. It also sets, but doesn't enable the default X features.
 
@@ -38,7 +38,7 @@ Setting the sweep CC for Y sets, but doesn't enable the default Y features.
 
 If you don't enable any features not a lot will happen!
 
-The feature numbers are chosen so they can be combined. So, 5 would be Voume + Brightness.
+The feature numbers are chosen so they can be combined. So, 5 would be Volume + Brightness and 19 would be Volume + Reversed Pan
 
 
 Optional settings
@@ -57,7 +57,7 @@ Optional settings
               
 Any data MSB value outside the above list disables vector control.
 
-Currently 8 - 13 values aren't sanity checked, so you can set the feature CC do daft things like turning all sound off. 
+Sweep CCs and feature CCs are sanity checked.
 
 
 An Example:

@@ -461,26 +461,31 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
 
 void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 {
+    string name = "";
     if (dHigh < 2)
     {
         int parts = synth->getRuntime().NumAvailableParts;
         if ((dHigh == 0) && (parts < NUM_MIDI_CHANNELS * 2))
         {
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control needs at least " + asString(NUM_MIDI_CHANNELS * 2) + " parts");
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Vector control needs at least " + asString(NUM_MIDI_CHANNELS * 2) + " parts");
             return;
         }
         else if ((dHigh == 1) && (parts < NUM_MIDI_CHANNELS * 4))
         {
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control Y axis needs " + asString(NUM_MIDI_CHANNELS * 4) + " parts");
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Vector control Y axis needs " + asString(NUM_MIDI_CHANNELS * 4) + " parts");
             return;
         }
-        string name = synth->getRuntime().testCCvalue(par);
-        if (name > "")
-        {
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: CC " + asString(par) + " in use for " + name);
-            return;
-        }
+        name = synth->getRuntime().testCCvalue(par);
     }
+    else if (dHigh > 7)
+        name = synth->getRuntime().masterCCtest(par);
+
+    if (name > "")
+    {
+        synth->getRuntime().Log("MusicIO nrpnSetVector: CC " + asString(par) + " in use for " + name);
+        return;
+    }
+
     switch (dHigh)
     {
         case 0:
@@ -489,7 +494,7 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             if (!synth->getRuntime().nrpndata.vectorEnabled[chan])
             {
                 synth->getRuntime().nrpndata.vectorEnabled[chan] = true;
-                synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector control enabled");
+                synth->getRuntime().Log("MusicIO nrpnSetVector: Vector control enabled");
                 // enabling is only done with a valid X CC
             }
             synth->SetPartChan(chan, chan);
@@ -497,13 +502,13 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             synth->getRuntime().nrpndata.vectorXcc2[chan] = C_panning;
             synth->getRuntime().nrpndata.vectorXcc4[chan] = C_filtercutoff;
             synth->getRuntime().nrpndata.vectorXcc8[chan] = C_modwheel;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector X CC to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set vector X CC to " + asString(par));
             break;
         }
         case 1:
         {
             if (!synth->getRuntime().nrpndata.vectorEnabled[chan])
-                synth->getRuntime().Log("SynthEngine nrpnSetVector: Vector X axis must be set before Y");
+                synth->getRuntime().Log("MusicIO nrpnSetVector: Vector X axis must be set before Y");
             else
             {
                 synth->SetPartChan(chan | 32, chan);
@@ -512,14 +517,14 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
                 synth->getRuntime().nrpndata.vectorYcc2[chan] = C_panning;
                 synth->getRuntime().nrpndata.vectorYcc4[chan] = C_filtercutoff;
                 synth->getRuntime().nrpndata.vectorYcc8[chan] = C_modwheel;
-                synth->getRuntime().Log("SynthEngine nrpnSetVector: Set vector Y CC to " + asString(par));
+                synth->getRuntime().Log("MusicIO nrpnSetVector: Set vector Y CC to " + asString(par));
             }
             break;
         }
         case 2:
         {
             synth->getRuntime().nrpndata.vectorXfeatures[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Enabled X features " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Enabled X features " + asString(par));
             break;
         }
         case 3:
@@ -527,7 +532,7 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             if (synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
                 synth->getRuntime().nrpndata.vectorYfeatures[chan] = par;
-                synth->getRuntime().Log("SynthEngine nrpnSetVector: Enabled Y features " + asString(par));
+                synth->getRuntime().Log("MusicIO nrpnSetVector: Enabled Y features " + asString(par));
             }
             break;
         }
@@ -556,37 +561,37 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
         case 8:
         {
             synth->getRuntime().nrpndata.vectorXcc2[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set X feature 2 to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set X feature 2 to " + asString(par));
             break;
         }
         case 9:
         {
             synth->getRuntime().nrpndata.vectorXcc4[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set X feature 4 to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set X feature 4 to " + asString(par));
             break;
         }
         case 10:
         {
             synth->getRuntime().nrpndata.vectorXcc8[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set X feature 8 to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set X feature 8 to " + asString(par));
             break;
         }
         case 11:
         {
             synth->getRuntime().nrpndata.vectorYcc2[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set Y feature 2 to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set Y feature 2 to " + asString(par));
             break;
         }
         case 12:
         {
             synth->getRuntime().nrpndata.vectorYcc4[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set Y feature 4 to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set Y feature 4 to " + asString(par));
             break;
         }
         case 13:
         {
             synth->getRuntime().nrpndata.vectorYcc8[chan] = par;
-            synth->getRuntime().Log("SynthEngine nrpnSetVector: Set Y feature 8 to " + asString(par));
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Set Y feature 8 to " + asString(par));
             break;
         }
         
@@ -597,7 +602,7 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
             synth->getRuntime().nrpndata.vectorYaxis[chan] = 0xff;
             synth->getRuntime().nrpndata.vectorXfeatures[chan] = 0;
             synth->getRuntime().nrpndata.vectorYfeatures[chan] = 0;
-            synth->getRuntime().Log("Vector control disabled");
+            synth->getRuntime().Log("MusicIO nrpnSetVector: Vector control disabled");
         }
     }
 }
