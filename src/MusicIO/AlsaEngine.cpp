@@ -184,11 +184,12 @@ string AlsaEngine::midiClientName(void)
 
 bool AlsaEngine::prepHwparams(void)
 {
+    string formattxt = "";
 //    unsigned int buffer_time = audio.period_time * 4;
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
     unsigned int chans = 2;
-    snd_pcm_format_t format = SND_PCM_FORMAT_S16; // Alsa appends _LE/_BE? hmmm
+    snd_pcm_format_t format = SND_PCM_FORMAT_UNKNOWN;//SND_PCM_FORMAT_S16_LE;
     snd_pcm_access_t axs = SND_PCM_ACCESS_MMAP_INTERLEAVED;
     snd_pcm_hw_params_t  *hwparams;
     snd_pcm_hw_params_alloca(&hwparams);
@@ -209,9 +210,170 @@ bool AlsaEngine::prepHwparams(void)
             goto bail_out;
         pcmWrite = &snd_pcm_writei;
     }
-    if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
-                "alsa audio failed to set sample format"))
-        goto bail_out;
+    snd_pcm_hw_params_get_format(hwparams, &format);
+
+    switch(format)
+    {
+        case SND_PCM_FORMAT_UNKNOWN: // -1
+            formattxt = "not known";
+            break;
+        case SND_PCM_FORMAT_S8: // 0
+            formattxt = "8 bit LE";
+            break;
+        case SND_PCM_FORMAT_U8:
+            formattxt = "unsigned 8 bit LE";
+            break;
+        case SND_PCM_FORMAT_S16_LE:
+            formattxt = "16 bit LE";
+            break;
+        case SND_PCM_FORMAT_S16_BE:
+            formattxt = "16 bit BE";
+            break;
+        case SND_PCM_FORMAT_U16_LE:
+            formattxt = "unsigned 16 bit LE";
+            break;
+        case SND_PCM_FORMAT_U16_BE:
+            formattxt = "unsigned 16 bit BE";
+            break;
+        case SND_PCM_FORMAT_S24_LE:
+            formattxt = "24 bit LE";
+            break;
+        case SND_PCM_FORMAT_S24_BE:
+            formattxt = "24 bit BE";
+            break;
+        case SND_PCM_FORMAT_U24_LE:
+            formattxt = "unsigned 24 bit LE";
+            break;
+         case SND_PCM_FORMAT_U24_BE:
+            formattxt = "unsigned 24 bit BE";
+            break;
+        case SND_PCM_FORMAT_S32_LE:
+            formattxt = "32 bit LE";
+            break;
+        case SND_PCM_FORMAT_S32_BE:
+            formattxt = "32 bit BE";
+            break;
+        case SND_PCM_FORMAT_U32_LE:
+            formattxt = "unsigned 32 bit LE";
+            break;
+        case SND_PCM_FORMAT_U32_BE:
+            formattxt = "unsigned 32 bit BE";
+            break;
+       case SND_PCM_FORMAT_FLOAT_LE:
+            formattxt = "float LE";
+            break;
+        case SND_PCM_FORMAT_FLOAT_BE:
+            formattxt = "float BE";
+            break;
+       case SND_PCM_FORMAT_FLOAT64_LE:
+            formattxt = "double LE";
+            break;
+        case SND_PCM_FORMAT_FLOAT64_BE:
+            formattxt = "double BE";
+            break;
+       case SND_PCM_FORMAT_IEC958_SUBFRAME_LE:
+            formattxt = "iec958 LE";
+            break;
+        case SND_PCM_FORMAT_IEC958_SUBFRAME_BE:
+            formattxt = "iec958 BE";
+            break;
+        case SND_PCM_FORMAT_MU_LAW:
+            formattxt = "Mu-Law";
+            break;
+        case SND_PCM_FORMAT_A_LAW:
+            formattxt = "A_Law";
+            break;
+        case SND_PCM_FORMAT_IMA_ADPCM:
+            formattxt = "Ima-ADPCM";
+            break;
+        case SND_PCM_FORMAT_MPEG:
+            formattxt = "MPEG";
+            break;
+        case SND_PCM_FORMAT_GSM:
+            formattxt = "GSM";
+            break;
+         case SND_PCM_FORMAT_SPECIAL: // 31
+            formattxt = "Special";
+            break;
+        case SND_PCM_FORMAT_S24_3LE:
+            formattxt = "3 byte 24 bit LE";
+            break;
+        case SND_PCM_FORMAT_S24_3BE:
+            formattxt = "3 byte 24 bit BE";
+            break;
+        case SND_PCM_FORMAT_U24_3LE:
+            formattxt = "unsigned 3 byte 24 bit LE";
+            break;
+        case SND_PCM_FORMAT_U24_3BE:
+            formattxt = "unsigned 3 byte 24 bit BE";
+            break;
+        case SND_PCM_FORMAT_S20_3LE:
+            formattxt = "3 byte 20 bit LE";
+            break;
+        case SND_PCM_FORMAT_S20_3BE:
+            formattxt = "3 byte 20 bit BE";
+            break;
+        case SND_PCM_FORMAT_U20_3LE:
+            formattxt = "unsigned 3 byte 20 bit LE";
+            break;
+        case SND_PCM_FORMAT_U20_3BE:
+            formattxt = "unsigned 3 byte 20 bit BE";
+            break;
+        case SND_PCM_FORMAT_S18_3LE:
+            formattxt = "3 byte 18 bit LE";
+            break;
+        case SND_PCM_FORMAT_S18_3BE:
+            formattxt = "3 byte 24 bit BE";
+            break;
+        case SND_PCM_FORMAT_U18_3LE:
+            formattxt = "unsigned 3 byte 24 bit LE";
+            break;
+        case SND_PCM_FORMAT_U18_3BE:
+            formattxt = "unsigned 3 byte 24 bit BE";
+            break;
+        case SND_PCM_FORMAT_G723_24:
+            formattxt = "G723";
+            break;
+        case SND_PCM_FORMAT_G723_24_1B:
+            formattxt = "G723 1 byte";
+            break;
+        case SND_PCM_FORMAT_DSD_U8:
+            formattxt = "Direct stream 1 byte";
+            break;
+        case SND_PCM_FORMAT_DSD_U16_LE:
+            formattxt = "Direct stream 2 byte LE";
+            break;
+        case SND_PCM_FORMAT_DSD_U32_LE:
+            formattxt = "Direct stream 4 byte LE";
+            break;
+        case SND_PCM_FORMAT_DSD_U16_BE:
+            formattxt = "Direct stream 2 byte BE";
+            break;
+        case SND_PCM_FORMAT_DSD_U32_BE:
+            formattxt = "Direct stream 4 byte BE";
+            break;
+       default:
+            snd_pcm_hw_params_set_format(audio.handle, hwparams, format);
+            //formattxt = "Undefined";
+    }
+    synth->getRuntime().Log("Format = " + formattxt);
+ 
+/*    if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
+                "alsa audio failed to set sample format 32"))
+    {
+        format = SND_PCM_FORMAT_S24;
+        if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
+                "alsa audio failed to set sample format 24"))
+        {
+            format = SND_PCM_FORMAT_S16_LE;
+            if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
+                "alsa audio failed to set sample format 16"))
+                goto bail_out;
+        }
+    }*/
+    
+    
+    
     alsaBad(snd_pcm_hw_params_set_rate_resample(audio.handle, hwparams, 1),
             "alsa audio failed to set allow resample");
     if (alsaBad(snd_pcm_hw_params_set_rate_near(audio.handle, hwparams,
