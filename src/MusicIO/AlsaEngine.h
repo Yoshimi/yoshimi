@@ -48,7 +48,11 @@ class AlsaEngine : public MusicIO
         string midiClientName(void);
         int audioClientId(void) { return audio.alsaId; }
         int midiClientId(void) { return midi.alsaId; }
-
+        bool little_endian;
+        bool card_endian;
+        int card_bits;
+        unsigned int card_chans;
+        
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);

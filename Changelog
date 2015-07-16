@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-7-16 Will (buffers)
+- Alsa now recognises 32, 24 & 16 bit formats LE only.
+
 2015-7-15 Will
 - Addied sanity checks to vector feature CC settings.
 - Small correction to alsa audio.

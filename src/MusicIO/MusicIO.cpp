@@ -34,6 +34,7 @@ using namespace std;
 
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleavedShorts(NULL),
+    interleaved(NULL),
     rtprio(25),
     synth(_synth),
     pBankOrRootDirThread(0)
@@ -74,23 +75,30 @@ MusicIO::~MusicIO()
     }
     if (interleavedShorts)
         delete[] interleavedShorts;
+    if (interleaved)
+        delete[] interleaved;
 }
 
 
-void MusicIO::InterleaveShorts()
+void MusicIO::InterleaveShorts(int bits, int chans)
 {
     int buffersize = getBuffersize();
     int idx = 0;
-//    double scaled;
-    for (int frame = 0; frame < buffersize; ++frame)
-    {   // with a grateful nod to libsamplerate ...
-//        scaled = zynLeft[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
-//        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
-        interleavedShorts[idx++] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-//        scaled = zynRight[NUM_MIDI_PARTS][frame] * (8.0 * 0x10000000);
-//        interleavedShorts[idx++] = (short int) (lrint(scaled) >> 16);
-        interleavedShorts[idx++] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
-    }
+    if (bits == 16)
+        for (int frame = 0; frame < buffersize; ++frame)
+        {   // with a grateful nod to libsamplerate ...
+            interleavedShorts[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            interleavedShorts[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+            idx += chans;
+        }
+    else
+        for (int frame = 0; frame < buffersize; ++frame)
+        {   // with a grateful nod to libsamplerate ...
+            interleaved[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
+            interleaved[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
+            idx += chans;
+        }
+            
 }
 
 
@@ -697,10 +705,14 @@ bool MusicIO::prepBuffers(bool with_interleaved)
         }
         if (with_interleaved)
         {
-            interleavedShorts = new short int[buffersize * 2];
+            interleavedShorts = new short int[buffersize * 6];
             if (NULL == interleavedShorts)
                 goto bail_out;
-            memset(interleavedShorts, 0, sizeof(short int) * buffersize * 2);
+            memset(interleavedShorts, 0, sizeof(short int) * buffersize * 6);
+            interleaved = new int[buffersize * 6];
+            if (NULL == interleaved)
+                goto bail_out;
+            memset(interleaved, 0, sizeof(int) * buffersize * 6);
         }
         return true;
     }
@@ -724,6 +736,11 @@ bail_out:
     {
         delete[] interleavedShorts;
         interleavedShorts = NULL;
+    }
+    if (interleaved)
+    {
+        delete[] interleaved;
+        interleaved = NULL;
     }
     return false;
 }

@@ -39,7 +39,7 @@ class MusicIO : virtual protected MiscFuncs
     protected:
         bool prepBuffers(bool with_interleaved);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
-        void InterleaveShorts(void);
+        void InterleaveShorts(int bits, int chans);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
         bool nrpnRunVector(unsigned char ch, int ctrl, int param);
@@ -56,6 +56,7 @@ class MusicIO : virtual protected MiscFuncs
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
         short int *interleavedShorts;
+        int *interleaved;
         int rtprio;
 
         SynthEngine *synth;
