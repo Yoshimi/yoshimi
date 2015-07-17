@@ -51,6 +51,7 @@ class AlsaEngine : public MusicIO
         bool little_endian;
         bool card_endian;
         int card_bits;
+        bool card_signed;
         unsigned int card_chans;
         
     private:
@@ -74,7 +75,7 @@ class AlsaEngine : public MusicIO
         struct {
             string             device;
             snd_pcm_t         *handle;
-            unsigned int       period_time;
+            unsigned int       period_count;
             unsigned int       samplerate;
             snd_pcm_uframes_t  period_size;
             snd_pcm_uframes_t  buffer_size;

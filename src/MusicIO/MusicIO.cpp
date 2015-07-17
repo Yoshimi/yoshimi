@@ -33,7 +33,6 @@ using namespace std;
 #include <iostream>
 
 MusicIO::MusicIO(SynthEngine *_synth) :
-    interleavedShorts(NULL),
     interleaved(NULL),
     rtprio(25),
     synth(_synth),
@@ -73,32 +72,34 @@ MusicIO::~MusicIO()
             zynRight[npart] = NULL;
         }
     }
-    if (interleavedShorts)
-        delete[] interleavedShorts;
-    if (interleaved)
-        delete[] interleaved;
 }
 
 
-void MusicIO::InterleaveShorts(int bits, int chans)
+void MusicIO::Interleave(int bits, int chans)
 {
     int buffersize = getBuffersize();
     int idx = 0;
+    short int tmp; // 16 bit stuff might not be quite right!
     if (bits == 16)
+    {
+        chans /= 2; // because we're pairing them on a single integer
         for (int frame = 0; frame < buffersize; ++frame)
-        {   // with a grateful nod to libsamplerate ...
-            interleavedShorts[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-            interleavedShorts[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+        {
+            interleaved[idx] = 0;
+            tmp = (short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            interleaved[idx] = tmp & 0xffff;
+             tmp = (short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+             interleaved[idx] |= (tmp << 16);
             idx += chans;
         }
+    }
     else
         for (int frame = 0; frame < buffersize; ++frame)
-        {   // with a grateful nod to libsamplerate ...
+        {
             interleaved[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
             interleaved[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
             idx += chans;
-        }
-            
+        }    
 }
 
 
@@ -688,7 +689,7 @@ void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 }
 
 
-bool MusicIO::prepBuffers(bool with_interleaved)
+bool MusicIO::prepBuffers(int with_interleaved)
 {
     int buffersize = getBuffersize();
     if (buffersize > 0)
@@ -705,14 +706,10 @@ bool MusicIO::prepBuffers(bool with_interleaved)
         }
         if (with_interleaved)
         {
-            interleavedShorts = new short int[buffersize * 6];
-            if (NULL == interleavedShorts)
-                goto bail_out;
-            memset(interleavedShorts, 0, sizeof(short int) * buffersize * 6);
-            interleaved = new int[buffersize * 6];
+            interleaved = new int[buffersize * with_interleaved];
             if (NULL == interleaved)
                 goto bail_out;
-            memset(interleaved, 0, sizeof(int) * buffersize * 6);
+            memset(interleaved, 0, sizeof(int) * buffersize * with_interleaved);
         }
         return true;
     }
@@ -731,11 +728,6 @@ bail_out:
             fftwf_free(zynRight[part]);
             zynRight[part] = NULL;
         }
-    }
-    if (interleavedShorts)
-    {
-        delete[] interleavedShorts;
-        interleavedShorts = NULL;
     }
     if (interleaved)
     {
