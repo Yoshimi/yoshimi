@@ -75,34 +75,6 @@ MusicIO::~MusicIO()
 }
 
 
-void MusicIO::Interleave(int bits, int chans)
-{
-    int buffersize = getBuffersize();
-    int idx = 0;
-    short int tmp; // 16 bit stuff might not be quite right!
-    if (bits == 16)
-    {
-        chans /= 2; // because we're pairing them on a single integer
-        for (int frame = 0; frame < buffersize; ++frame)
-        {
-            interleaved[idx] = 0;
-            tmp = (short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-            interleaved[idx] = tmp & 0xffff;
-             tmp = (short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
-             interleaved[idx] |= (tmp << 16);
-            idx += chans;
-        }
-    }
-    else
-        for (int frame = 0; frame < buffersize; ++frame)
-        {
-            interleaved[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
-            interleaved[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
-            idx += chans;
-        }    
-}
-
-
 int MusicIO::getMidiController(unsigned char b)
 {
     int ctl = C_NULL;
@@ -689,7 +661,7 @@ void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
 }
 
 
-bool MusicIO::prepBuffers(int with_interleaved)
+bool MusicIO::prepBuffers(void)
 {
     int buffersize = getBuffersize();
     if (buffersize > 0)
@@ -703,13 +675,6 @@ bool MusicIO::prepBuffers(int with_interleaved)
             memset(zynLeft[part], 0, buffersize * sizeof(float));
             memset(zynRight[part], 0, buffersize * sizeof(float));
 
-        }
-        if (with_interleaved)
-        {
-            interleaved = new int[buffersize * with_interleaved];
-            if (NULL == interleaved)
-                goto bail_out;
-            memset(interleaved, 0, sizeof(int) * buffersize * with_interleaved);
         }
         return true;
     }

@@ -303,7 +303,7 @@ bool JackEngine::openAudio(void)
     }*/
 
     if (jackPortsRegistered)
-        return prepBuffers(false) && latencyPrep();
+        return prepBuffers() && latencyPrep();
     else
         synth->getRuntime().Log("Failed to register jack audio ports");
     Close();

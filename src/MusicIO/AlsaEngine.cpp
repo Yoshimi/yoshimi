@@ -63,7 +63,14 @@ bool AlsaEngine::openAudio(void)
         if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
             if (prepHwparams())
                 if (prepSwparams())
-                    if (prepBuffers(card_chans))
+                    if (prepBuffers())
+                    {
+                        int buffersize = getBuffersize();
+                        interleaved = new int[buffersize * card_chans];
+                        if (NULL == interleaved)
+                            goto bail_out;
+                        memset(interleaved, 0, sizeof(int) * buffersize * card_chans);
+                    }
                         return true;
 bail_out:
     Close();
@@ -221,16 +228,14 @@ bool AlsaEngine::prepHwparams(void)
     
     // the whole format section needs improving
     format = SND_PCM_FORMAT_S32_LE;
-    if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
-                "alsa audio failed to set sample format 32"))
+    if (snd_pcm_hw_params_set_format(audio.handle, hwparams, format) < 0)
     {
         format = SND_PCM_FORMAT_S24;
-        if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
-                "alsa audio failed to set sample format 24"))
+        if (snd_pcm_hw_params_set_format(audio.handle, hwparams, format) < 0)
         {
             format = SND_PCM_FORMAT_S16_LE;
             if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
-                "alsa audio failed to set sample format 16"))
+                "alsa audio failed to find matching format"))
                 goto bail_out;
         }
     }
@@ -389,6 +394,38 @@ bail_out:
 }
 
 
+void AlsaEngine::Interleave(void)
+{
+    int buffersize = getBuffersize();
+    int idx = 0;
+    short int tmp; // 16 bit stuff might not be quite right!
+    int chans;
+    if (card_bits == 16)
+    {
+        chans = card_chans / 2; // because we're pairing them on a single integer
+        for (int frame = 0; frame < buffersize; ++frame)
+        {
+            interleaved[idx] = 0;
+            tmp = (short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            interleaved[idx] = tmp & 0xffff;
+             tmp = (short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+             interleaved[idx] |= (tmp << 16);
+            idx += chans;
+        }
+    }
+    else
+    {
+        chans = card_chans;
+        for (int frame = 0; frame < buffersize; ++frame)
+        {
+            interleaved[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
+            interleaved[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
+            idx += chans;
+        }
+    }
+}
+
+
 void *AlsaEngine::_AudioThread(void *arg)
 {
     return static_cast<AlsaEngine*>(arg)->AudioThread();
@@ -427,7 +464,7 @@ void *AlsaEngine::AudioThread(void)
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
             getAudio();
-            Interleave(card_bits, card_chans);
+            Interleave();
             Write();
         }
         else

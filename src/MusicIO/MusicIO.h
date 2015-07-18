@@ -37,9 +37,8 @@ class MusicIO : virtual protected MiscFuncs
         virtual void Close(void) = 0;
 
     protected:
-        bool prepBuffers(int with_interleaved);
+        bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
-        void Interleave(int bits, int chans);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
         bool nrpnRunVector(unsigned char ch, int ctrl, int param);
