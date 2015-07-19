@@ -199,9 +199,27 @@ string AlsaEngine::midiClientName(void)
 
 bool AlsaEngine::prepHwparams(void)
 {
+    static struct
+    {
+        snd_pcm_format_t card_format;
+        int card_bits;
+        bool card_endian;
+        bool card_signed;
+    }
+    card_formats[] = 
+    {
+        {SND_PCM_FORMAT_S32_LE, 32, true, true},
+        {SND_PCM_FORMAT_S32_BE, 32, false, true},
+        {SND_PCM_FORMAT_S24_3LE, 24, true, true},
+        {SND_PCM_FORMAT_S24_3BE, 24, false, true},
+        {SND_PCM_FORMAT_S16_LE, 16, true, true},
+        {SND_PCM_FORMAT_S16_BE, 16, false, true},
+        {SND_PCM_FORMAT_UNKNOWN, 0, false, true}
+    };
+    int formidx;
     string formattxt = "";
-    snd_pcm_format_t format;
     card_chans = 2; // got to start somewhwere
+    
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
 
@@ -225,94 +243,22 @@ bool AlsaEngine::prepHwparams(void)
             goto bail_out;
         pcmWrite = &snd_pcm_writei;
     }
-    
-    // the whole format section needs improving
-    format = SND_PCM_FORMAT_S32_LE;
-    if (snd_pcm_hw_params_set_format(audio.handle, hwparams, format) < 0)
+
+    formidx = 0;
+    while (snd_pcm_hw_params_set_format(audio.handle, hwparams, card_formats[formidx].card_format) < 0)
     {
-        format = SND_PCM_FORMAT_S24;
-        if (snd_pcm_hw_params_set_format(audio.handle, hwparams, format) < 0)
+        ++formidx;
+        if (card_formats[formidx].card_bits == 0)
         {
-            format = SND_PCM_FORMAT_S16_LE;
-            if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
-                "alsa audio failed to find matching format"))
-                goto bail_out;
-        }
+            synth->getRuntime().Log("alsa audio failed to find matching format");
+            goto bail_out;
+        }    
     }
+    card_bits = card_formats[formidx].card_bits;
+    card_endian = card_formats[formidx].card_endian;
     
     synth->getRuntime().Log("march little endian = " + asString(little_endian)); // we may need this eventually
 
-    card_endian = 1;
-    card_signed = 1;
-    switch(format)
-    {
-        case SND_PCM_FORMAT_S16_LE:
-            card_bits = 16;
-            break;
-        case SND_PCM_FORMAT_S16_BE:
-            card_bits = 16;
-            card_endian = 0;
-            break;
-        case SND_PCM_FORMAT_U16_LE:
-            card_bits = 16;
-            card_signed = 0;
-            break;
-        case SND_PCM_FORMAT_U16_BE:
-            card_bits = 16;
-            card_endian = 0;
-            card_signed = 0;
-            break;
-        case SND_PCM_FORMAT_S24_LE:
-            card_bits = 24;
-            break;
-        case SND_PCM_FORMAT_S24_BE:
-            card_bits = 24;
-            card_endian = 0;
-            break;
-        case SND_PCM_FORMAT_U24_LE:
-            card_bits = 24;
-            card_signed = 0;
-            break;
-         case SND_PCM_FORMAT_U24_BE:
-            card_bits = 24;
-            card_endian = 0;
-            card_signed = 0;
-            break;
-        case SND_PCM_FORMAT_S24_3LE:
-            card_bits = 24;
-            break;
-        case SND_PCM_FORMAT_S24_3BE:
-            card_bits = 24;
-            card_endian = 0;
-            break;
-        case SND_PCM_FORMAT_U24_3LE:
-            card_bits = 24;
-            card_signed = 0;
-           break;
-        case SND_PCM_FORMAT_U24_3BE:
-            card_bits = 24;
-            card_endian = 0;
-            card_signed = 0;
-            break;
-        case SND_PCM_FORMAT_S32_LE:
-            card_bits = 32;
-            break;
-        case SND_PCM_FORMAT_S32_BE:;
-            card_bits = 32;
-            card_endian = 0;
-            break;
-        case SND_PCM_FORMAT_U32_LE:
-            card_bits = 32;
-            card_signed = 0;
-            break;
-        case SND_PCM_FORMAT_U32_BE:
-            card_bits = 32;
-            card_endian = 0;
-            card_signed = 0;
-            break;
-       default:
-            formattxt = "Undefined";
-    }
     if (card_signed)
         formattxt = "Signed";
     else
@@ -323,6 +269,7 @@ bool AlsaEngine::prepHwparams(void)
     else
         formattxt += " Big";
  
+
     alsaBad(snd_pcm_hw_params_set_rate_resample(audio.handle, hwparams, 1),
             "alsa audio failed to set allow resample");
     if (alsaBad(snd_pcm_hw_params_set_rate_near(audio.handle, hwparams,
@@ -394,9 +341,8 @@ bail_out:
 }
 
 
-void AlsaEngine::Interleave(void)
+void AlsaEngine::Interleave(int buffersize)
 {
-    int buffersize = getBuffersize();
     int idx = 0;
     short int tmp; // 16 bit stuff might not be quite right!
     int chans;
@@ -464,8 +410,9 @@ void *AlsaEngine::AudioThread(void)
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
             getAudio();
-            Interleave();
-            Write();
+            int alsa_buff = getBuffersize();
+            Interleave(alsa_buff);
+            Write(alsa_buff);
         }
         else
             synth->getRuntime().Log("Audio pcm still not running");
@@ -474,9 +421,8 @@ void *AlsaEngine::AudioThread(void)
 }
 
 
-void AlsaEngine::Write(void)
+void AlsaEngine::Write(snd_pcm_uframes_t towrite)
 {
-    snd_pcm_uframes_t towrite = getBuffersize();
     snd_pcm_sframes_t wrote = 0;
     int *data = interleaved;
 
