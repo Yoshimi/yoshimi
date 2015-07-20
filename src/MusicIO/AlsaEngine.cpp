@@ -199,6 +199,10 @@ string AlsaEngine::midiClientName(void)
 
 bool AlsaEngine::prepHwparams(void)
 {
+    /*
+     * thanks to the jack project for which formats to support and
+     * the basis of a simplified structure
+     */
     static struct
     {
         snd_pcm_format_t card_format;
@@ -218,7 +222,7 @@ bool AlsaEngine::prepHwparams(void)
     };
     int formidx;
     string formattxt = "";
-    card_chans = 2; // got to start somewhwere
+    card_chans = 2; // got to start somewhere
     
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
@@ -256,8 +260,9 @@ bool AlsaEngine::prepHwparams(void)
     }
     card_bits = card_formats[formidx].card_bits;
     card_endian = card_formats[formidx].card_endian;
+    card_signed = card_formats[formidx].card_signed;
     
-    synth->getRuntime().Log("march little endian = " + asString(little_endian)); // we may need this eventually
+    synth->getRuntime().Log("March little endian = " + asString(little_endian));
 
     if (card_signed)
         formattxt = "Signed";
@@ -278,7 +283,7 @@ bool AlsaEngine::prepHwparams(void)
                 + asString(ask_samplerate) + ")"))
         goto bail_out;
     if (alsaBad(snd_pcm_hw_params_set_channels_near(audio.handle, hwparams, &card_chans),
-                "alsa audio failed to set channels to" + asString(card_chans)))
+                "alsa audio failed to set requested channels"))
         goto bail_out;
     if (alsaBad(snd_pcm_hw_params_set_period_size_near(audio.handle, hwparams, &audio.period_size, 0), "failed to set period size"))
         goto bail_out;
@@ -344,18 +349,23 @@ bail_out:
 void AlsaEngine::Interleave(int buffersize)
 {
     int idx = 0;
-    short int tmp; // 16 bit stuff might not be quite right!
+    bool byte_swap = (little_endian != card_endian);
+    unsigned short int tmp16a, tmp16b; // 16 bit stuff might not be quite right!
     int chans;
+    unsigned int tmp32a, tmp32b;
     if (card_bits == 16)
     {
         chans = card_chans / 2; // because we're pairing them on a single integer
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            interleaved[idx] = 0;
-            tmp = (short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
-            interleaved[idx] = tmp & 0xffff;
-             tmp = (short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
-             interleaved[idx] |= (tmp << 16);
+            tmp16a = (unsigned short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            tmp16b = (unsigned short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+            if (byte_swap)
+            {
+                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));
+                tmp16b = ((tmp16b >> 8) | (tmp16b << 8));
+            }
+            interleaved[idx] = tmp16a | (int) (tmp16b << 16);
             idx += chans;
         }
     }
@@ -364,8 +374,15 @@ void AlsaEngine::Interleave(int buffersize)
         chans = card_chans;
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            interleaved[idx] = (int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
-            interleaved[idx + 1] = (int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
+            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
+            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
+            if (byte_swap)
+            {
+                tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
+                tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
+            }
+            interleaved[idx] = (int) tmp32a;
+            interleaved[idx + 1] = (int) tmp32b;
             idx += chans;
         }
     }
