@@ -264,7 +264,7 @@ bool AlsaEngine::prepHwparams(void)
     
     synth->getRuntime().Log("March little endian = " + asString(little_endian));
 
-    if (card_signed)
+    if (card_signed) // not currently used, may be later
         formattxt = "Signed";
     else
         formattxt = "Unsigned";
@@ -350,9 +350,13 @@ void AlsaEngine::Interleave(int buffersize)
 {
     int idx = 0;
     bool byte_swap = (little_endian != card_endian);
-    unsigned short int tmp16a, tmp16b; // 16 bit stuff might not be quite right!
+    unsigned short int tmp16a, tmp16b;
     int chans;
     unsigned int tmp32a, tmp32b;
+    unsigned int shift = 0x78000000;
+    if (card_bits == 24)
+        shift = 0x780000;
+    
     if (card_bits == 16)
     {
         chans = card_chans / 2; // because we're pairing them on a single integer
@@ -374,8 +378,10 @@ void AlsaEngine::Interleave(int buffersize)
         chans = card_chans;
         for (int frame = 0; frame < buffersize; ++frame)
         {
-            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x78000000));
-            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x78000000));
+            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * shift));
+            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
+            // how should we do an endian swap for 24 bit, 3 byte?
+            // is it really the same, just swapping the 'unused' byte?
             if (byte_swap)
             {
                 tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
