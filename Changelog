@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-7-20 Will
+- Merger in ALSA updates from 'buffers'.
+- master version now displays an 'M' suffix.
+
 2015-7-20 Will (buffers)
 - Hopefully completed Alsa updates.
 
