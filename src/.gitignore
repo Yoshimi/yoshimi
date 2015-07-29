@@ -1,6 +1,7 @@
 *.cbp
 *.layout
 *.sublime-project
+*.sublime-workspace
 *.desktop
 CMakeCache.txt
 Makefile
