@@ -48,11 +48,17 @@ class AlsaEngine : public MusicIO
         string midiClientName(void);
         int audioClientId(void) { return audio.alsaId; }
         int midiClientId(void) { return midi.alsaId; }
+        bool little_endian;
+        bool card_endian;
+        int card_bits;
+        bool card_signed;
+        unsigned int card_chans;
 
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);
-        void Write(void);
+        void Interleave(int buffersize);
+        void Write(snd_pcm_uframes_t towrite);
         bool Recover(int err);
         bool xrunRecover(void);
         bool alsaBad(int op_result, string err_msg);
@@ -70,7 +76,7 @@ class AlsaEngine : public MusicIO
         struct {
             string             device;
             snd_pcm_t         *handle;
-            unsigned int       period_time;
+            unsigned int       period_count;
             unsigned int       samplerate;
             snd_pcm_uframes_t  period_size;
             snd_pcm_uframes_t  buffer_size;

@@ -35,8 +35,9 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "Params/ControllableByMIDI.h"
-#include "ControllableByMIDIUI.h"
+#include "Misc/ControllableByMIDIUI.h"
 #include <iostream>
+#include <list>
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -76,7 +77,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
-    buffersize(256),
+    buffersize(512),
     buffersize_f(buffersize),
     oscilsize(1024),
     oscilsize_f(oscilsize),
@@ -152,7 +153,11 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate / 2;
-    buffersize_f = buffersize = audiobufsize;
+    buffersize_f = buffersize = Runtime.Buffersize;
+
+    if (buffersize > audiobufsize)
+        buffersize_f = audiobufsize;
+    
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
@@ -419,9 +424,9 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         if((*i)->ccNbr == type) {
             std::cout << "Found Control" << endl;
             (*i)->changepar(par);
-            // Here update interface -- have to know how to do it first.
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateUIWindow, 0, (*i)->ui);
+            if((*i)->ui)
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateUIWindow, 0, (*i)->ui);
             return;
         }
     }
@@ -655,6 +660,8 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
     part[npart]->Paudiodest = dest;
     if (part[npart]->Paudiodest & 2)
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
+    // next line only really needed for direct part control.
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
 }
 
 

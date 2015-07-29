@@ -37,7 +37,7 @@ using namespace std;
 #include "Misc/HistoryListItem.h"
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
-#include "ControllableByMIDIUI.h"
+#include "Misc/ControllableByMIDIUI.h"
 
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
@@ -64,6 +64,7 @@ class Config : public MiscFuncs
         void clearPresetsDirlist(void);
 
         string testCCvalue(int cc);
+        string masterCCtest(int cc);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
@@ -143,8 +144,16 @@ class Config : public MiscFuncs
         bool          nrpnActive;
         
         struct IOdata{
-            unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
-            unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
+            unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
+            unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
+            unsigned char vectorXfeatures[NUM_MIDI_CHANNELS];
+            unsigned char vectorYfeatures[NUM_MIDI_CHANNELS];
+            unsigned char vectorXcc2[NUM_MIDI_CHANNELS];
+            unsigned char vectorYcc2[NUM_MIDI_CHANNELS];
+            unsigned char vectorXcc4[NUM_MIDI_CHANNELS];
+            unsigned char vectorYcc4[NUM_MIDI_CHANNELS];
+            unsigned char vectorXcc8[NUM_MIDI_CHANNELS];
+            unsigned char vectorYcc8[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];
@@ -219,12 +228,7 @@ public:
         msg->data = _data;
         msg->type = _type;
         msg->index = _index;
-        if(ui != NULL){
-            msg->ui = ui;
-        }
-        else {
-            msg->ui = NULL;
-        }
+        msg->ui = ui; // UI can be null
         Fl::awake((void *)msg);
     }
     static void processGuiMessages();

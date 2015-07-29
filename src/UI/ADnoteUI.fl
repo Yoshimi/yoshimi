@@ -46,7 +46,7 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"
-    \#include "ControllableByMIDIUI.h"} {public global
+    \#include "Misc/ControllableByMIDIUI.h"} {public global
 } 
 
 decl {\#include "MasterUI.h"} {private global

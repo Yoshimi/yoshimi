@@ -35,7 +35,7 @@ decl {    \#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
     \#include "Misc/MiscFuncs.h"
     \#include "Params/ControllableByMIDI.h"
-    \#include "ControllableByMIDIUI.h"
+    \#include "Misc/ControllableByMIDIUI.h"
     \#include "Misc/SynthEngine.h"
     \#include <iostream>} {public global
 } 
@@ -131,9 +131,6 @@ class WidgetPDial {open : {public Fl_Dial}
         oldvalue = 0.0;
         pos = false;
         textset = false;
-        //midiControlled = false;
-        //controllable = false;
-        //justCreated = true;
         synth = NULL;
         controllable = false;} {}
   }
@@ -153,7 +150,6 @@ class WidgetPDial {open : {public Fl_Dial}
         {
             case FL_PUSH:
                 oldvalue = value();
-                std::cout << "hey i'm moving" << endl;
                 // right click menu:
                 if(Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_shift() != 0) {
                     std::cout << "hey yeah" << endl;

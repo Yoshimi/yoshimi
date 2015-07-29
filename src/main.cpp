@@ -44,7 +44,7 @@ void mainRegisterAudioPort(SynthEngine *s, int portnum);
 map<SynthEngine *, MusicClient *> synthInstances;
 list<string> splashMessages;
 
-SynthEngine *firstSynth = NULL;
+static SynthEngine *firstSynth = NULL;
 static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;

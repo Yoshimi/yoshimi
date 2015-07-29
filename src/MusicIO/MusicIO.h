@@ -37,9 +37,8 @@ class MusicIO : virtual protected MiscFuncs
         virtual void Close(void) = 0;
 
     protected:
-        bool prepBuffers(bool with_interleaved);
+        bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
-        void InterleaveShorts(void);
         int getMidiController(unsigned char b);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
         bool nrpnRunVector(unsigned char ch, int ctrl, int param);
@@ -55,14 +54,14 @@ class MusicIO : virtual protected MiscFuncs
 
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
-        short int *interleavedShorts;
+        int *interleaved;
         int rtprio;
 
         SynthEngine *synth;
     private:
         pthread_t pBankOrRootDirThread;
         int bankOrRootDirToChange;
-        bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank
+        bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank        
         struct _prgChangeCmd
         {            
             int ch;

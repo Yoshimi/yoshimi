@@ -24,7 +24,7 @@
 #ifndef CONTROLLABLEBYMYDI_H
 #define CONTROLLABLEBYMYDI_H
 
-#include "ControllableByMIDIUI.h"
+#include "Misc/ControllableByMIDIUI.h"
 #include <iostream>
 #include <list>
 

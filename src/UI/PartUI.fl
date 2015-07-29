@@ -42,7 +42,7 @@ decl {\#include "EffUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "Params/Controller.h"
-    \#include "ControllableByMIDIUI.h"
+    \#include "Misc/ControllableByMIDIUI.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
@@ -973,7 +973,7 @@ else {propta->deactivate();proptb->deactivate();}}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {149 502 395 360} type Double hide
+      xywh {147 542 395 360} type Double hide
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
       code1 {string tname = synth->getGuiMaster()->set_part_window_title("Edit");}
       code2 {o->copy_label(tname.c_str());}
@@ -999,7 +999,7 @@ else {propta->deactivate();proptb->deactivate();}}
                   addbox->color(BASE_COLOUR);
               else
                   addbox->color(ADD_COLOUR);}
-            tooltip {enable/disable ADDsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
+            tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
           Fl_Box addbox {
@@ -1008,13 +1008,15 @@ else {propta->deactivate();proptb->deactivate();}}
           }
           Fl_Button adeditbutton {
             label Edit
-            callback {showparameters(0,0);}
+            callback {showparameters(0,0);
+              copylabeltopanel();
+              seteditname();}
             xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
         Fl_Group {} {
-          label SUBsynth open
+          label SUBsynth
           xywh {105 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button subsynenabledcheck {
@@ -1026,7 +1028,6 @@ else {propta->deactivate();proptb->deactivate();}}
         subeditbutton->deactivate();
     else
         subeditbutton->activate();
-    copylabeltopanel();
     if(engine == 0 || x == 0)
         subbox->color(BASE_COLOUR);
     else
@@ -1040,13 +1041,15 @@ else {propta->deactivate();proptb->deactivate();}}
           }
           Fl_Button subeditbutton {
             label Edit
-            callback {showparameters(0,1);}
+            callback {showparameters(0,1);
+              copylabeltopanel();
+              seteditname();}
             xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
         Fl_Group {} {
-          label PADsynth open
+          label PADsynth
           xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button padsynenabledcheck {
@@ -1058,7 +1061,7 @@ else {propta->deactivate();proptb->deactivate();}}
         padeditbutton->deactivate();
     else
         padeditbutton->activate();
-    copylabeltopanel();
+
     if(engine == 0 || x == 0)
         padbox->color(BASE_COLOUR);
     else
@@ -1072,7 +1075,9 @@ else {propta->deactivate();proptb->deactivate();}}
           }
           Fl_Button padeditbutton {
             label Edit
-            callback {showparameters(0,2);}
+            callback {showparameters(0,2);
+                copylabeltopanel();
+                seteditname();}
             xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
@@ -1325,6 +1330,11 @@ else {propta->deactivate();proptb->deactivate();}}
     else
         padbox->color(PAD_COLOUR);
     padbox->redraw();} {}
+  }
+  Function {seteditname()} {} {
+    code {//
+    string tname = synth->getGuiMaster()->set_part_window_title("Edit");
+    instrumenteditwindow->copy_label(tname.c_str());} {}
   }
   Function {~PartUI()} {} {
     code {if (adnoteui)

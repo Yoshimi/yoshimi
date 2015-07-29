@@ -19,6 +19,10 @@
     Last modified August 2014
 */
 
+#include <endian.h>
+
+using namespace std;
+
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
@@ -26,7 +30,7 @@
 AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
 {
     audio.handle = NULL;
-    audio.period_time = 0;
+    audio.period_count = 0; // re-used as number of periods
     audio.samplerate = 0;
     audio.buffer_size = 0;
     audio.period_size = 0;
@@ -37,6 +41,11 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     midi.handle = NULL;
     midi.alsaId = -1;
     midi.pThread = 0;
+#if __BYTE_ORDER  == __LITTLE_ENDIAN
+    little_endian = true;
+#else
+    little_endian = false;
+#endif
 }
 
 
@@ -45,7 +54,8 @@ bool AlsaEngine::openAudio(void)
     audio.device = synth->getRuntime().audioDevice;
     audio.samplerate = synth->getRuntime().Samplerate;
     audio.period_size = synth->getRuntime().Buffersize;
-    audio.period_time =  audio.period_size * 1000000.0f / audio.samplerate;
+    audio.period_count = 2;
+    audio.buffer_size = audio.period_size * audio.period_count;
     if (alsaBad(snd_pcm_open(&audio.handle, audio.device.c_str(),
                              SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
             "failed to open alsa audio device:" + audio.device))
@@ -53,7 +63,14 @@ bool AlsaEngine::openAudio(void)
         if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
             if (prepHwparams())
                 if (prepSwparams())
-                    if (prepBuffers(true))
+                    if (prepBuffers())
+                    {
+                        int buffersize = getBuffersize();
+                        interleaved = new int[buffersize * card_chans];
+                        if (NULL == interleaved)
+                            goto bail_out;
+                        memset(interleaved, 0, sizeof(int) * buffersize * card_chans);
+                    }
                         return true;
 bail_out:
     Close();
@@ -182,10 +199,34 @@ string AlsaEngine::midiClientName(void)
 
 bool AlsaEngine::prepHwparams(void)
 {
-    unsigned int buffer_time = audio.period_time * 4;
+    /*
+-     * thanks to the jack project for which formats to support and
+-     * the basis of a simplified structure
+-     */
+    static struct
+    {
+        snd_pcm_format_t card_format;
+        int card_bits;
+        bool card_endian;
+        bool card_signed;
+    }
+    card_formats[] = 
+    {
+        {SND_PCM_FORMAT_S32_LE, 32, true, true},
+        {SND_PCM_FORMAT_S32_BE, 32, false, true},
+        {SND_PCM_FORMAT_S24_3LE, 24, true, true},
+        {SND_PCM_FORMAT_S24_3BE, 24, false, true},
+        {SND_PCM_FORMAT_S16_LE, 16, true, true},
+        {SND_PCM_FORMAT_S16_BE, 16, false, true},
+        {SND_PCM_FORMAT_UNKNOWN, 0, false, true}
+    };
+    int formidx;
+    string formattxt = "";
+    card_chans = 2; // got to start somewhere
+    
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
-    snd_pcm_format_t format = SND_PCM_FORMAT_S16; // Alsa appends _LE/_BE? hmmm
+
     snd_pcm_access_t axs = SND_PCM_ACCESS_MMAP_INTERLEAVED;
     snd_pcm_hw_params_t  *hwparams;
     snd_pcm_hw_params_alloca(&hwparams);
@@ -206,9 +247,34 @@ bool AlsaEngine::prepHwparams(void)
             goto bail_out;
         pcmWrite = &snd_pcm_writei;
     }
-    if (alsaBad(snd_pcm_hw_params_set_format(audio.handle, hwparams, format),
-                "alsa audio failed to set sample format"))
-        goto bail_out;
+
+    formidx = 0;
+    while (snd_pcm_hw_params_set_format(audio.handle, hwparams, card_formats[formidx].card_format) < 0)
+    {
+        ++formidx;
+        if (card_formats[formidx].card_bits == 0)
+        {
+            synth->getRuntime().Log("alsa audio failed to find matching format");
+            goto bail_out;
+        }    
+    }
+    card_bits = card_formats[formidx].card_bits;
+    card_endian = card_formats[formidx].card_endian;
+    card_signed = card_formats[formidx].card_signed;
+    
+    synth->getRuntime().Log("March little endian = " + asString(little_endian));
+
+    if (card_signed) // not currently used, may be later
+        formattxt = "Signed";
+    else
+        formattxt = "Unsigned";
+    
+    if (card_endian)
+        formattxt += " Little";
+    else
+        formattxt += " Big";
+ 
+
     alsaBad(snd_pcm_hw_params_set_rate_resample(audio.handle, hwparams, 1),
             "alsa audio failed to set allow resample");
     if (alsaBad(snd_pcm_hw_params_set_rate_near(audio.handle, hwparams,
@@ -216,32 +282,15 @@ bool AlsaEngine::prepHwparams(void)
                 "alsa audio failed to set sample rate (asked for "
                 + asString(ask_samplerate) + ")"))
         goto bail_out;
-    if (alsaBad(snd_pcm_hw_params_set_channels(audio.handle, hwparams, 2),
-                "alsa audio failed to set channels to 2"))
+    if (alsaBad(snd_pcm_hw_params_set_channels_near(audio.handle, hwparams, &card_chans),
+                "alsa audio failed to set requested channels"))
         goto bail_out;
-    if (!alsaBad(snd_pcm_hw_params_set_buffer_time_near(audio.handle, hwparams,
-                 &buffer_time, NULL), "initial buffer time setting failed"))
-    {
-        if (alsaBad(snd_pcm_hw_params_get_buffer_size(hwparams, &audio.buffer_size),
-                    "alsa audio failed to get buffer size"))
-            goto bail_out;
-        if (alsaBad(snd_pcm_hw_params_set_period_time_near(audio.handle, hwparams,
-                    &audio.period_time, NULL), "failed to set period time"))
-            goto bail_out;
-        if (alsaBad(snd_pcm_hw_params_get_period_size(hwparams, &audio.period_size,
-                    NULL), "alsa audio failed to get period size"))
-            goto bail_out;
-    }
-    else
-    {
-        if (alsaBad(snd_pcm_hw_params_set_period_time_near(audio.handle, hwparams,
-                    &audio.period_time, NULL), "failed to set period time"))
-            goto bail_out;
-        audio.buffer_size = audio.period_size * 4;
-        if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams,
-                    &audio.buffer_size), "failed to set buffer size"))
-            goto bail_out;
-    }
+    if (alsaBad(snd_pcm_hw_params_set_period_size_near(audio.handle, hwparams, &audio.period_size, 0), "failed to set period size"))
+        goto bail_out;
+    if (alsaBad(snd_pcm_hw_params_set_periods_near(audio.handle, hwparams, &audio.period_count, 0), "failed to set number of periods"))
+        goto bail_out;
+    if (alsaBad(snd_pcm_hw_params_set_buffer_size_near(audio.handle, hwparams, &audio.buffer_size), "failed to set buffer size"))
+        goto bail_out;
     if (alsaBad(snd_pcm_hw_params (audio.handle, hwparams),
                 "alsa audio failed to set hardware parameters"))
 		goto bail_out;
@@ -251,9 +300,14 @@ bool AlsaEngine::prepHwparams(void)
     if (alsaBad(snd_pcm_hw_params_get_period_size(hwparams, &audio.period_size,
                 NULL), "failed to get period size"))
         goto bail_out;
+
+    synth->getRuntime().Log("Format = " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" );
     if (ask_buffersize != audio.period_size)
+    {
         synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize)
                     + ", Alsa dictates " + asString((unsigned int)audio.period_size));
+        synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
+    }
     return true;
 
 bail_out:
@@ -291,12 +345,58 @@ bail_out:
     return false;
 }
 
+void AlsaEngine::Interleave(int buffersize)
+{
+    int idx = 0;
+    bool byte_swap = (little_endian != card_endian);
+    unsigned short int tmp16a, tmp16b;
+    int chans;
+    unsigned int tmp32a, tmp32b;
+    unsigned int shift = 0x78000000;
+    if (card_bits == 24)
+        shift = 0x780000;
+    
+    if (card_bits == 16)
+    {
+        chans = card_chans / 2; // because we're pairing them on a single integer
+        for (int frame = 0; frame < buffersize; ++frame)
+        {
+            tmp16a = (unsigned short int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * 0x7800));
+            tmp16b = (unsigned short int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * 0x7800));
+            if (byte_swap)
+            {
+                tmp16a = (short int) ((tmp16a >> 8) | (tmp16a << 8));
+                tmp16b = ((tmp16b >> 8) | (tmp16b << 8));
+            }
+            interleaved[idx] = tmp16a | (int) (tmp16b << 16);
+            idx += chans;
+        }
+    }
+    else
+    {
+        chans = card_chans;
+        for (int frame = 0; frame < buffersize; ++frame)
+        {
+            tmp32a = (unsigned int) (lrint(zynLeft[NUM_MIDI_PARTS][frame] * shift));
+            tmp32b = (unsigned int) (lrint(zynRight[NUM_MIDI_PARTS][frame] * shift));
+            // how should we do an endian swap for 24 bit, 3 byte?
+            // is it really the same, just swapping the 'unused' byte?
+            if (byte_swap)
+            {
+                tmp32a = (tmp32a >> 24) | ((tmp32a << 8) & 0x00FF0000) | ((tmp32a >> 8) & 0x0000FF00) | (tmp32a << 24);
+                tmp32b = (tmp32b >> 24) | ((tmp32b << 8) & 0x00FF0000) | ((tmp32b >> 8) & 0x0000FF00) | (tmp32b << 24);
+            }
+            interleaved[idx] = (int) tmp32a;
+            interleaved[idx + 1] = (int) tmp32b;
+            idx += chans;
+        }
+    }
+}
 
 void *AlsaEngine::_AudioThread(void *arg)
 {
     return static_cast<AlsaEngine*>(arg)->AudioThread();
 }
-
 
 void *AlsaEngine::AudioThread(void)
 {
@@ -330,8 +430,9 @@ void *AlsaEngine::AudioThread(void)
         if (audio.pcm_state == SND_PCM_STATE_RUNNING)
         {
             getAudio();
-            InterleaveShorts();
-            Write();
+            int alsa_buff = getBuffersize();
+            Interleave(alsa_buff);
+            Write(alsa_buff);
         }
         else
             synth->getRuntime().Log("Audio pcm still not running");
@@ -340,11 +441,11 @@ void *AlsaEngine::AudioThread(void)
 }
 
 
-void AlsaEngine::Write(void)
+void AlsaEngine::Write(snd_pcm_uframes_t towrite)
 {
-    snd_pcm_uframes_t towrite = getBuffersize();
     snd_pcm_sframes_t wrote = 0;
-    short int *data = interleavedShorts;
+    int *data = interleaved;
+
     while (towrite > 0)
     {
         wrote = pcmWrite(audio.handle, data, towrite);
@@ -355,7 +456,7 @@ void AlsaEngine::Write(void)
             if (wrote > 0)
             {
                 towrite -= wrote;
-                data += wrote * 2;
+                data += wrote * card_chans;
             }
         }
         else // (wrote < 0)
@@ -550,7 +651,7 @@ void *AlsaEngine::MidiThread(void)
 
 bool AlsaEngine::alsaBad(int op_result, string err_msg)
 {
-    bool isbad = (op_result < 0); // (op_result < 0) -> is bad -> return true
+    bool isbad = (op_result < 0);
     if (isbad)
         synth->getRuntime().Log("Error, alsa audio: " +err_msg + ": "
                      + string(snd_strerror(op_result)));

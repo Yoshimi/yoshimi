@@ -2,7 +2,7 @@
 
 using namespace std;
 #include "Params/ControllableByMIDI.h"
-#include "ControllableByMIDIUI.h"
+#include "Misc/ControllableByMIDIUI.h"
 #include <iostream>
 #include <list>
 

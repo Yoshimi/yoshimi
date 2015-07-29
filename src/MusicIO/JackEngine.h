@@ -57,6 +57,7 @@ class JackEngine : public MusicIO
         bool openJackClient(string server);
         bool connectJackPorts(void);
         bool processAudio(jack_nframes_t nframes);
+        void sendAudio(int framesize, unsigned int offset);
         bool processMidi(jack_nframes_t nframes);
         bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);
@@ -98,6 +99,7 @@ class JackEngine : public MusicIO
             jack_nframes_t time;
             char data[4]; // all events of interest are <= 4bytes
         };
+        unsigned int internalbuff;
 };
 
 #endif

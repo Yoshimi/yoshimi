@@ -106,7 +106,6 @@ void LFO::changepar(int npar, double value){
             lfofreq = (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
             incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
             // Limit the Frequency (or else...)
-            std::cout << "incx: " << incx << ", lfofreq: " << lfofreq << endl;
             if (incx > 0.49999999f)
                 incx = 0.499999999f;
             break;

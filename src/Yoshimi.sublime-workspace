@@ -1,0 +1,485 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"card_",
+				"card_chans"
+			],
+			[
+				"Contro",
+				"ControllableByMIDI"
+			],
+			[
+				"Pst",
+				"Pstretch"
+			],
+			[
+				"Pf",
+				"Pfreqrand"
+			],
+			[
+				"resonance",
+				"resonancebandwidth"
+			],
+			[
+				"C_all",
+				"C_allnotesoff"
+			],
+			[
+				"C_fil",
+				"C_filterq"
+			],
+			[
+				"C",
+				"ControllableByMIDI"
+			],
+			[
+				"Pde",
+				"Pdepth_"
+			],
+			[
+				"asigne",
+				"assignedMidiControls"
+			],
+			[
+				"assigne",
+				"assignedMidiControls"
+			],
+			[
+				"Ps",
+				"Pstereo_"
+			],
+			[
+				"Pr",
+				"Prandomness_"
+			],
+			[
+				"Prandom",
+				"Prandomness"
+			],
+			[
+				"do",
+				"do_callback"
+			],
+			[
+				"setMidiC",
+				"setMidiControlled"
+			],
+			[
+				"midi",
+				"midiController"
+			],
+			[
+				"Spinner",
+				"SpinnerInMidiCCPanel"
+			],
+			[
+				"spinner",
+				"SpinnerInMidiCCPanel"
+			],
+			[
+				"Duplicated",
+				"DuplicatedKnobInMidiCCPanel"
+			],
+			[
+				"custom",
+				"customMin"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Misc/ControllableByMIDIUI.h",
+			"settings":
+			{
+				"buffer_size": 1460,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Misc/ControllableByMIDIUI.cpp",
+			"settings":
+			{
+				"buffer_size": 1529,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Yoshimi - all",
+	"command_palette":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 146.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/CMakeLists.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/LV2_Plugin/CMakeLists.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Params/ControllableByMIDI.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Params/ControllableByMIDI.h",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Misc/SynthEngine.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Misc/Config.h",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Misc/Config.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/WidgetPDialUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/PartUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/MasterUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Synth/LFO.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/LFOUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/ADnoteUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/ControllableByMIDIUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/JackEngine.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/MusicIO.h",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/BankUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/UI/ConfigUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/main.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/CMakeCache.txt",
+		"/louis/.config/sublime-text-2/Packages/User/make yoshimi (not LV2).sublime-build",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/AlsaJackClient.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/JackAlsaClient.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/JackClient.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/JackEngine.h",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/LV2_Plugin/YoshimiLV2Plugin.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Effects/Phaser.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/Effects/Alienwah.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/AlsaEngine.h",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/AlsaClient.h",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/AlsaClient.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/src/MusicIO/AlsaEngine.cpp",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/ToDo_Maybe.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/Using_NRPNs.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/Vector_Control.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/Direct_Part_Control.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/MIDI.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/NewFeatures.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/doc/Banks.txt",
+		"/home/louis/Documents/prog/Yoshimi/github/yoshimi/Changelog",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Synth/ADnote.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/ADnoteParameters.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/ParamChangeFunc.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/ParamChangeFunc.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/UI/MidiControllerUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/LFOParams.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Synth/LFO.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/UI/WidgetPDialUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/WidgetPDialUI.cxx",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Misc/SynthEngine.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Synth/LFO.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Synth/ADnote.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Misc/Config.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Misc/Part.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/WidgetPDialUI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/ADnoteParameters.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/Alienwah.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/MidiControllerUI.cxx",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/MidiController.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/MidiController.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/CMakeLists.txt",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Misc/SynthEngine.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/LFOUI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/MidiControllerUI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/MasterUI.cxx",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/MasterUI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Misc/Config.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/main.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/MusicIO/MidiControl.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/Using_NRPNs.txt",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/AddSynthModulation.txt",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/MIDI.txt",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/MIDI_Controllers.html",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/Direct_Part_Control.txt",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/Dependencies",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/doc/1stReadMe.txt",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/UI/MasterUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/Alienwah.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/Distorsion.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/ControllableByMIDI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/midiController.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/midiController.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/ControllableByMIDI.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/Effect.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Yoshimi.sublime-project",
+		"/louis/.config/sublime-text-2/Packages/User/yoshimimake.sublime-build",
+		"/louis/.config/sublime-text-2/Packages/User/yoshimiclean.sublime-build",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/EffectMgr.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/EffectMgr.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/Effect.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/EffUI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/PartUI.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Misc/Part.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/FilterUI.cxx",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Params/PADnoteParameters.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/EffectLFO.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/UI/PartUI.fl",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/Distorsion.h",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/Effects/EffectLFO.cpp",
+		"/home/louis/Documents/prog/Yoshimi/yoshimi-1.3.5.1/src/PartUI.cxx"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"",
+			"<open files>",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"Misc",
+			"ControllableByMIDIUI.h",
+			"_AudioThread",
+			"WidgetPDIal",
+			"midiControlled",
+			"Controllable",
+			"Controlled",
+			"if(Controllable",
+			"LFOParams::Params::",
+			"LFOParams::Params",
+			"unsigned char ",
+			"LFOParams::Params::",
+			"LFO::Params::",
+			" midiControl",
+			"midiControl ",
+			"midiControl",
+			"MidiController",
+			"GuiThreadMsg",
+			"MidiController",
+			"MidiControllerUI",
+			"MidiController",
+			"->data",
+			"class Controller",
+			"Controller",
+			"ctl->",
+			"ctrl",
+			"FFTwrapper",
+			"pars",
+			"VoicePar",
+			"stampa",
+			"unsigned char P[a-zA-Z]",
+			" P[a-zA-Z]",
+			"ADnote(",
+			"initParameters",
+			"computenext",
+			"SetController",
+			"getMidiController",
+			"getMidiControlle",
+			"getMidiController",
+			"processCallback",
+			"processMIdi",
+			"WidgetPDial(",
+			"WidgetPDial",
+			"first",
+			"MidiCCRack",
+			"awake",
+			"sendMessage",
+			"firstSynth",
+			"do_callback",
+			"GuiThreadMsg",
+			"Penabled",
+			"setVolume",
+			"prefiltering",
+			"LFOtype",
+			"checkSetParameter",
+			"whichParameterDoesThisDialControl",
+			"We're up and running",
+			"ControllableByMIDI",
+			"ControllableByMidi::",
+			"WidgetPDial* ",
+			"WidgetPDial ",
+			"WidgetPDial",
+			"synth",
+			"SynthEngine",
+			"synth->",
+			"ControllableByMIDI",
+			"synth->",
+			"void changepar",
+			"doComplex",
+			"doComplexC",
+			"synth->",
+			"getSynthEngine",
+			"gets",
+			"synth->",
+			"firstSynth",
+			" synth",
+			"paramPointer",
+			"class MasterUi",
+			"SynthEngine ",
+			"SynthEngine synth",
+			"synth",
+			"WidgetPDial",
+			"synth"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"LFOParams::c_",
+			"",
+			"LFOParams::",
+			"",
+			".data",
+			"ctl",
+			"midiController::",
+			"ControllableByMIDI::"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Misc/ControllableByMIDIUI.h",
+					"settings":
+					{
+						"buffer_size": 1460,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1460,
+								1460
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Misc/ControllableByMIDIUI.cpp",
+					"settings":
+					{
+						"buffer_size": 1529,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1035,
+								1035
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 54.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 34.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 227.0
+	},
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 396.0,
+	"status_bar_visible": true
+}

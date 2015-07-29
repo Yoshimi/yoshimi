@@ -34,7 +34,7 @@ This file is a derivative of the ZynAddSubFX original, modified October 2009
 decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
-decl {\#include "ControllableByMIDIUI.h"} {public local
+decl {\#include "Misc/ControllableByMIDIUI.h"} {public local
 } 
 
 decl {\#include <FL/Fl_Group.H>} {public local
