@@ -185,6 +185,20 @@ void Distorsion::setpreset(unsigned char npreset)
     cleanup();
 }
 
+// Parameters Control
+void Distorsion::settype(unsigned char Ptype_){
+    if(Ptype_ > 13)
+        Ptype = 13;
+    else
+        Ptype = Ptype_;
+}
+
+void Distorsion::setdrive(unsigned char Pdrive_){ 
+    Pdrive = Pdrive_;
+}
+void Distorsion::setlevel(unsigned char Plevel_){ 
+    Plevel = Plevel_;
+}
 
 void Distorsion::changepar(int npar, unsigned char value)
 {
@@ -206,10 +220,7 @@ void Distorsion::changepar(int npar, unsigned char value)
             Plevel = value;
             break;
         case 5:
-            if (value > 13)
-                Ptype = 13; // this must be increased if more distorsion types are added
-            else
-                Ptype = value;
+            settype(value);
             break;
         case 6:
             if (value > 1)

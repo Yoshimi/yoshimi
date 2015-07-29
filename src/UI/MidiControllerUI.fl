@@ -1,0 +1,176 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cpp}
+comment {Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009-2010, Alan Calvert
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is a derivative of the ZynAddSubFX original, modified January 2010
+} {in_source in_header
+} 
+
+decl {\#include "WidgetPDialUI.h"
+\#include <FL/Fl_Button.H>
+\#include <FL/Fl_Spinner.H>
+\#include <FL/Fl_Input.H>
+\#include <FL/Fl_Double_Window.H>
+\#include <FL/Fl_Scroll.H>} {public global
+} 
+
+decl {\#include <stdio.h>
+\#include "Misc/MiscFuncs.h"
+\#include "Misc/SynthEngine.h"} {public
+} 
+
+decl {MidiCCWindow* midiccwindow = NULL;} {global
+} 
+
+decl {class WidgetPDial;} {public global
+}
+
+class MidiCCRack {open : {public Fl_Group}
+} {
+  decl {Fl_Group* embossedGroup;WidgetPDial* dial;Fl_Input* title;Fl_Spinner* spinner;midiControl* controller;} {}
+  Function {MidiCCRack(int x, int y, int w, int h) : Fl_Group(x,y,w,h)} {open
+  } {
+    code {embossedGroup = new Fl_Group(x, y, 300, 80);
+        embossedGroup->box(FL_EMBOSSED_BOX);
+        embossedGroup->align(FL_ALIGN_TOP|FL_ALIGN_INSIDE);
+        title = new Fl_Input(x+2, y+2, 280-4, 20);
+          title->color((Fl_Color)91);
+          title->labelsize(10);
+          title->textsize(10);
+        dial = new WidgetPDial(x+15, y+28, 35, 35, "");
+          dial->maximum(127);
+          dial->step(1);
+          dial->labelsize(10);
+          //dial->param.duplicated=1;
+          dial->controllable = true;
+          //dial->setMidiControlled(true);
+          //dial->callback(dialCallback);
+          this->synth = dial->getSynth();
+         spinner = new Fl_Spinner(x+115, y+35, 40, 20, "CC signal:");
+         spinner->labelsize(10);
+         spinner->callback(spinnerChanged,this);
+          Fl_Button* rec = new Fl_Button(x+160, y+35, 47, 20, "REC");
+          rec->tooltip("click, then move the controller you want to associate with this value");
+          rec->box(FL_PLASTIC_UP_BOX);
+          rec->color((Fl_Color)90);
+          rec->selection_color((Fl_Color)93);
+          rec->labelsize(10);
+          rec->callback(startRecording,this);
+          Fl_Button* removeBtn = new Fl_Button(x+280-1, y+3, 18, 18, "X");
+          removeBtn->color((Fl_Color)9);
+          removeBtn->selection_color((Fl_Color)9);
+          removeBtn->callback(removeController,this);
+          Fl_Button* setMinBtn = new Fl_Button(x+220, y+25,12,12,"Cur > Min");
+          setMinBtn->tooltip("set current value as minimum");
+          setMinBtn->box(FL_PLASTIC_ROUND_UP_BOX);
+          setMinBtn->color((Fl_Color)1);
+          setMinBtn->selection_color((Fl_Color)1);
+          setMinBtn->labelsize(10);
+          setMinBtn->callback(setMin, this);
+          setMinBtn->align(FL_ALIGN_RIGHT);
+	  Fl_Button* setMaxBtn = new Fl_Button(x+220, y+50,12,12,"Cur > Max");
+          setMaxBtn->tooltip("set current value as maximum");
+          setMaxBtn->box(FL_PLASTIC_ROUND_UP_BOX);
+          setMaxBtn->color((Fl_Color)1);
+          setMaxBtn->selection_color((Fl_Color)1);
+          setMaxBtn->labelsize(10);
+          setMaxBtn->callback(setMax, this);
+          setMaxBtn->align(FL_ALIGN_RIGHT);
+        embossedGroup->end();
+      end();} {}
+  }
+  Function {setMidiController(midiControl* contr)} {open return_type void
+  } {
+    code {controller = contr;
+      //title->value(controller->getLabel());
+      spinner->value(controller->ccNbr);
+      dial->value(controller->getpar());
+      } {}
+  }
+  Function {startRecording(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->controller->recording=1;
+     //caller->controller->SpinnerInMidiCCPanel=(Fl_Spinner*)(caller->spinner);
+     } {}
+  }
+  Function {removeController(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->synth->removeMidiControl(caller->controller);
+     ((MidiCCWindow*)caller->parent()->parent())->updateRack();} {}
+  }
+  Function {spinnerChanged(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+        int value = caller->spinner->value();
+        caller->controller->ccNbr = value;} {}
+  }
+  Function {setMin(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->controller->min = caller->dial->value();} {}
+  }
+  Function {setMax(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+     caller->controller->max = caller->dial->value();} {}
+  }
+  decl {SynthEngine *synth;} {public
+  }
+} 
+
+class MidiCCWindow {open : {public Fl_Double_Window}
+} {
+  Function {MidiCCWindow(int x, int y, int w, int h, SynthEngine* _synth, const char *title=0):Fl_Double_Window(300,300,w,h,title), synth(_synth)} {open return_type void
+  } {
+    code {scrollArea = new Fl_Scroll(0,0,this->w(),this->h(),"");
+end();
+updateRack();} {}
+  }
+  Function {Show()} {open return_type void
+  } {
+    code {updateRack();
+show();} {}
+  }
+  Function {updateRack()} {open return_type void
+  } {
+    code {
+	scrollArea->clear();
+
+        list<midiControl*>::iterator i;
+        int j = 0;
+	      for(i=synth->midiControls.begin();i!=synth->midiControls.end();i++) {
+            MidiCCRack* temp=new MidiCCRack(0,82*j,300,80);
+            temp->synth = synth;
+            scrollArea->add(temp);
+            //add(temp);
+            temp->setMidiController(*i);
+            j++;
+	       }
+        redraw();} {}
+  }
+  decl {Fl_Scroll *scrollArea;} {}
+  decl {SynthEngine *synth;} {public
+  }
+} 
+
+decl {extern MidiCCWindow* midiccwindow;} {public global
+} 

@@ -28,6 +28,7 @@
 #include "Params/EnvelopeParams.h"
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
+#include "Params/ControllableByMIDI.h"
 #include "Synth/OscilGen.h"
 #include "Synth/Resonance.h"
 #include "Misc/XMLwrapper.h"
@@ -44,8 +45,12 @@ class SynthEngine;
 /*                    GLOBAL PARAMETERS                          */
 /*****************************************************************/
 
-struct ADnoteGlobalParam {
+struct ADnoteGlobalParam : public ControllableByMIDI {
     bool PStereo;
+
+    void changepar(int npar, double value){}
+    unsigned char getparChar(int npar){ return 1;}
+    float getparFloat(int npar){ return 1;}
 
     // Frequency global parameters
     unsigned short int PDetune;       // fine detune
@@ -79,6 +84,8 @@ struct ADnoteGlobalParam {
     Resonance *Reson;
     unsigned char Hrandgrouping; // how the randomness is applied to the harmonics
                                  // on more voices using the same oscillator
+
+    
 };
 
 
@@ -169,7 +176,7 @@ struct ADnoteVoiceParam { // Voice parameters
 };
 
 
-class ADnoteParameters : public Presets
+class ADnoteParameters : public Presets, public ControllableByMIDI
 {
     public:
         ADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth);
@@ -187,6 +194,9 @@ class ADnoteParameters : public Presets
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         static int ADnote_unison_sizes[15];
 
+        void changepar(int npar, double value){}
+        unsigned char getparChar(int npar){ return 1;}
+        float getparFloat(int npar){ return 1;}
     private:
         void defaults(int n); // n is the nvoice
         void enableVoice(int nvoice);

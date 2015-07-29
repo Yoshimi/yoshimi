@@ -31,9 +31,13 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
-decl {\#include <FL/Fl_Dial.H>
+decl {    \#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
-    \#include "Misc/MiscFuncs.h"} {public global
+    \#include "Misc/MiscFuncs.h"
+    \#include "Params/ControllableByMIDI.h"
+    \#include "ControllableByMIDIUI.h"
+    \#include "Misc/SynthEngine.h"
+    \#include <iostream>} {public global
 } 
 
 decl {\#include <FL/fl_draw.H>
@@ -41,8 +45,15 @@ decl {\#include <FL/fl_draw.H>
     \#include <FL/Fl_Group.H>
     \#include <FL/x.H>
     \#include <cairo/cairo.h>
-    \#include <cairo/cairo-xlib.h>} {private global
-} 
+    \#include <cairo/cairo-xlib.h>
+    \#include <stdio.h>
+    \#include <Misc/SynthEngine.h>} {private global
+}
+
+decl {\#include <stdio.h>
+      \#include <FL/Fl_Menu.H>
+      \#include "MidiControllerUI.h"} {global
+}
 
 class TipWin {open : {public Fl_Menu_Window, MiscFuncs}
 } {
@@ -110,7 +121,8 @@ class TipWin {open : {public Fl_Menu_Window, MiscFuncs}
 
 class WidgetPDial {open : {public Fl_Dial}
 } {
-  Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
+  Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {open
+  } {
     code {callback(value_cb, (void*)this);
         Fl_Group *save = Fl_Group::current();
         tipwin = new TipWin();
@@ -118,20 +130,55 @@ class WidgetPDial {open : {public Fl_Dial}
         Fl_Group::current(save);
         oldvalue = 0.0;
         pos = false;
-        textset = false;} {}
+        textset = false;
+        //midiControlled = false;
+        //controllable = false;
+        //justCreated = true;
+        synth = NULL;
+        controllable = false;} {}
   }
   Function {~WidgetPDial()} {} {
     code {delete tipwin;} {}
+  }
+  Function {callback(Fl_Callback* cb)} {} {
+    code {Fl_Widget::callback(cb);} {}
   }
   Function {handle(int event)} {open return_type int
   } {
     code {double dragsize, v, min = minimum(), max = maximum();
         int my;
         int mx;
+
         switch (event)
         {
             case FL_PUSH:
-                 oldvalue = value();
+                oldvalue = value();
+                std::cout << "hey i'm moving" << endl;
+                // right click menu:
+                if(Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_shift() != 0) {
+                    std::cout << "hey yeah" << endl;
+                    if(controllable) {
+                        Fl_Menu_Item rclick_menu[] = {
+                            { "Reset", 0, reset},
+                            { "Midi Learn", 0, stampa, (void*)1 },
+                            { 0}
+                        };
+                        const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                        if(m){
+                            m->do_callback(this, m->user_data());
+                        }
+                    } else {
+                        Fl_Menu_Item rclick_menu[] = {
+                            { "Reset", 0, reset},
+                            { 0 }
+                        };
+                        const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                        if(m){
+                            m->do_callback(this, m->user_data());
+                        }
+                    }
+                 }
+                 return 1;
             case FL_DRAG:
                  if(!pos)
                  {
@@ -221,7 +268,8 @@ class WidgetPDial {open : {public Fl_Dial}
         }} {}
   }
   Function {draw()} {} {
-    code {int cx = x(), cy = y(), sx = w(), sy = h();
+    code {
+        int cx = x(), cy = y(), sx = w(), sy = h();
         double d = (sx>sy)?sy:sx; // d = the smallest side -2
         double dh = d/2;
         fl_color(170,170,170);
@@ -305,6 +353,22 @@ class WidgetPDial {open : {public Fl_Dial}
     code {tipwin->setText(c);
         textset = true;} {}
   }
+  Function {reset(Fl_Widget* w, void* v)} {open return_type {static void}
+  } {
+    code {Fl_Valuator* dial = (Fl_Valuator*)w;
+        dial->value((dial->maximum()-dial->minimum())/2);
+        dial->do_callback();} {}
+  }
+  Function {getSynth()} {open public return_type {SynthEngine *}
+  } {
+    code {return synth;} {}
+  }
+  Function {setSynth(SynthEngine *_synth)} {open public return_type {void}
+  } {
+    code {synth = _synth;} {}
+  }
+  decl {using Fl_Widget::callback;} {public
+  }
   decl {bool textset;} {private local
   }
   decl {bool pos;} {private local
@@ -312,5 +376,22 @@ class WidgetPDial {open : {public Fl_Dial}
   decl {double oldvalue;} {private local
   }
   decl {TipWin *tipwin;} {private local
+  }
+  decl {ControllableByMIDI *midiCtrl;} {public
+  }
+  decl {ControllableByMIDIUI *ui;} {public
+  }
+  decl {int par;} {public
+  }
+  decl {SynthEngine *synth;} {public
+  }
+  decl {bool controllable;} {public
+  }
+
+  Function {stampa(Fl_Widget *w, void *v)} {open return_type {static void}
+  } {
+    code {WidgetPDial *p = (WidgetPDial*)w;
+    p->synth->addMidiControl(p->midiCtrl, p->par, p->ui);
+    midiccwindow->Show();} {}
   }
 } 

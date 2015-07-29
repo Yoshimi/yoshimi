@@ -32,6 +32,7 @@ using namespace std;
 
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthHelper.h"
+#include "Params/ControllableByMIDI.h"
 
 class ADnoteParameters;
 class SUBnoteParameters;
@@ -47,7 +48,7 @@ class FFTwrapper;
 
 class SynthEngine;
 
-class Part : private MiscFuncs, SynthHelper
+class Part : private MiscFuncs, SynthHelper, public ControllableByMIDI
 {
     public:
         enum NoteStatus { KEY_OFF, KEY_PLAYING, KEY_RELASED_AND_SUSTAINED, KEY_RELASED };
@@ -94,6 +95,12 @@ class Part : private MiscFuncs, SynthHelper
             SUBnoteParameters *subpars;
             PADnoteParameters *padpars;
         } kit[NUM_KIT_ITEMS];
+
+        // Midi Controls
+        unsigned char getpar(int npar);
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar){ return getpar(npar);}
+        float getparFloat(int npar){ return (float)getpar(npar);}
 
         // Part parameters
         void setkeylimit(unsigned char Pkeylimit_);

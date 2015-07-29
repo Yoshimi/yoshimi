@@ -24,6 +24,7 @@
 
 #include <cmath>
 
+#include "Synth/LFO.h"
 #include "Params/LFOParams.h"
 
 //int LFOParams::time = 0;
@@ -57,6 +58,90 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
     defaults();
 }
 
+void LFOParams::addLFO(LFO *lfo){
+    lfos.push_back(lfo);
+}
+
+void LFOParams::removeLFO(LFO *lfo){
+    list<LFO*>::iterator i;
+    for(i=lfos.begin(); i != lfos.end(); i++){
+        if((*i) == lfo){
+            lfos.erase(i);
+            return;
+        }
+    }
+}
+
+void LFOParams::changepar(int npar, double value){
+    std::cout << "NPAR: " << npar << ", value: " << value << ", value(float):" << (float)value << endl;
+    switch(npar){
+        case c_Pfreq:
+            Pfreq = (float)(value/127.0f);
+            break;
+        case c_Pintensity:
+            Pintensity = (unsigned char)value;
+            break;
+        case c_Pstartphase:
+            Pstartphase = (unsigned char)value;
+            break;
+        case c_PLFOtype:
+            PLFOtype = (unsigned char)value;
+            break;
+        case c_Prandomness:
+            Prandomness = (unsigned char)value;
+            break;
+        case c_Pfreqrand:
+            Pfreqrand = (unsigned char)value;
+            break;
+        case c_Pdelay:
+            Pdelay = (unsigned char)value;
+            break;
+        case c_Pcontinous:
+            Pcontinous = (unsigned char)value;
+            break;
+        case c_Pstretch:
+            if(value == 0)
+                Pstretch = 1;
+            else
+                Pstretch = (unsigned char)value;
+            break;
+        default:
+            return;
+    }
+    list<LFO*>::iterator i;
+    std::cout << "check lfos: " << lfos.size() << endl;
+    for(i=lfos.begin(); i != lfos.end(); i++){
+        (*i)->changepar(npar, value);
+    }
+
+    return;
+}
+
+float LFOParams::getparFloat(int npar){
+    std::cout << "getparFloat: npar " << npar << endl;
+    switch(npar){
+        case c_Pfreq:
+            return Pfreq*127;
+        case c_Pintensity:
+            return Pintensity;
+        case c_Pstartphase:
+            return Pstartphase;
+        case c_PLFOtype:
+            return PLFOtype;
+        case c_Prandomness:
+            return Prandomness;
+        case c_Pfreqrand:
+            return Pfreqrand;
+        case c_Pdelay:
+            return Pdelay;
+        case c_Pcontinous:
+            return Pcontinous;
+        case c_Pstretch:
+            return Pstretch;
+        default:
+            return -1;
+    }
+}
 
 void LFOParams::defaults(void)
 {

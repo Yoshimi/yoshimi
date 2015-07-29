@@ -325,7 +325,7 @@ freeedit->redraw();}
         label {Str.}
         callback {env->Penvstretch=(int)o->value();}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 155 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
-        code0 {o->value(env->Penvstretch);}
+        code0 {o->value(env->Penvstretch);o->setSynth(synth);o->controllable=false;}
         code1 {if (env->Pfreemode==0) o->hide();}
         class WidgetPDial
       }

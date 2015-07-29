@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2015, Louis Cherel
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -29,6 +30,7 @@
 
 using namespace std;
 
+#include "Params/ControllableByMIDI.h"
 #include "Effects/Effect.h"
 #include "Effects/EffectLFO.h"
 
@@ -48,7 +50,20 @@ class Alienwah : public Effect
         unsigned char getpar(int npar);
         void cleanup(void);
 
+        // Control Parameters
+        /*void changepar(int npar, double value){ changepar(npar, (unsigned char)value);}
+        unsigned char getparChar(int npar){ return getpar(npar);}
+        float getparFloat(int npar){ return (float)getpar(npar);}*/
+
+        
+
     private:
+        void setvolume(unsigned char Pvolume_);
+        void setdepth(unsigned char Pdepth_);
+        void setfb(unsigned char Pfb_);
+        void setdelay(unsigned char Pdelay_);
+        void setphase(unsigned char Pphase_);
+
         // Alienwah Parameters
         EffectLFO lfo; // lfo-ul Alienwah
         unsigned char Pvolume;
@@ -56,14 +71,6 @@ class Alienwah : public Effect
         unsigned char Pfb;      // feedback
         unsigned char Pdelay;
         unsigned char Pphase;
-
-
-        // Control Parameters
-        void setvolume(unsigned char Pvolume_);
-        void setdepth(unsigned char Pdepth_);
-        void setfb(unsigned char Pfb_);
-        void setdelay(unsigned char Pdelay_);
-        void setphase(unsigned char Pphase_);
 
         // Internal Values
         float fb, depth, phase;

@@ -395,7 +395,7 @@ bool YoshimiLV2Plugin::init()
 {
     if(_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yosmihi_state_id == 0 || _atom_string_id == 0)
         return false;
-    if(!prepBuffers())
+    if(!prepBuffers(false))
         return false;
     if(sem_init(&_midiSem, 0, 0) != 0)
     {

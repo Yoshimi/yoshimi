@@ -26,6 +26,9 @@ using namespace std;
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Alienwah.h"
+#include "Params/ControllableByMIDI.h"
+
+class ControllableByMIDI;
 
 Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -177,7 +180,7 @@ void Alienwah::setpreset(unsigned char npreset)
     for (int n = 0; n < PRESET_SIZE; ++n)
         changepar(n, presets[npreset][n]);
     if (insertion == 0)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
+        changepar(0, (unsigned char)(presets[npreset][0] / 2)); // lower the volume if this is system effect
     Ppreset = npreset;
 }
 

@@ -1229,7 +1229,7 @@ void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
  */
 
 /* As the code here is a bit odd due to optimization, here is what happens
- * First the current possition and frequency are retrieved from the running
+ * First the current position and frequency are retrieved from the running
  * state. These are broken up into high and low portions to indicate how many
  * samples are skipped in one step and how many fractional samples are skipped.
  * Outside of this method the fractional samples are just handled with floating

@@ -134,7 +134,6 @@ bool JackEngine::openJackClient(string server)
 bool JackEngine::Start(void)
 {
     bool jackPortsRegistered = true;
-    internalbuff = synth->getRuntime().Buffersize;
     //Andrew Deryabin: use default error callback function provided by jack
     //jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
@@ -303,7 +302,7 @@ bool JackEngine::openAudio(void)
     }*/
 
     if (jackPortsRegistered)
-        return prepBuffers() && latencyPrep();
+        return prepBuffers(false) && latencyPrep();
     else
         synth->getRuntime().Log("Failed to register jack audio ports");
     Close();
@@ -427,28 +426,10 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     {
         synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS + 1));
         return false;
-    }    
-    //synth->getRuntime().Log("Jack " + asString(nframes) + "  Internal " + asString(internalbuff));
+    }
+
+    getAudio();
     int framesize = sizeof(float) * nframes;
-    if (nframes < internalbuff)
-    {
-        synth->MasterAudio(zynLeft, zynRight, nframes);
-        sendAudio(framesize, 0);
-    }
-    else
-    {
-        for (unsigned int pos = 0; pos < nframes; pos += internalbuff)
-        {
-        synth->MasterAudio(zynLeft, zynRight, 0);
-        sendAudio(framesize, pos);
-        }
-    }
-    return true;
-}
-
-
-void JackEngine::sendAudio(int framesize, unsigned int offset)
-{
     // Part outputs
     int currentmax = synth->getRuntime().NumAvailableParts;
     for (int port = 0, idx = 0; idx < 2 * NUM_MIDI_PARTS; port++ , idx += 2)
@@ -457,33 +438,23 @@ void JackEngine::sendAudio(int framesize, unsigned int offset)
         {
             if (jack_port_connected(audio.ports[idx])) // just a few % improvement.
             {
-                float *lpoint = audio.portBuffs[idx] + offset;
-                float *rpoint = audio.portBuffs[idx + 1] + offset;
                 if ((synth->part[port]->Paudiodest & 2) && port < currentmax)
                 {
-                    
-//                    memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
-//                    memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
-                    memcpy(lpoint, zynLeft[port], framesize);
-                    memcpy(rpoint, zynRight[port], framesize);
+                    memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
+                    memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
                 }
                 else
                 {
-//                    memset(audio.portBuffs[idx], 0, framesize);
-//                    memset(audio.portBuffs[idx + 1], 0, framesize);
-                    memset(lpoint, 0, framesize);
-                    memset(rpoint, 0, framesize);
+                    memset(audio.portBuffs[idx], 0, framesize);
+                    memset(audio.portBuffs[idx + 1], 0, framesize);
                 }
             }
         }
     }
     // And mixed outputs
-    float *Lpoint = audio.portBuffs[2 * NUM_MIDI_PARTS] + offset;
-    float *Rpoint = audio.portBuffs[2 * NUM_MIDI_PARTS + 1] + offset;
-    memcpy(Lpoint, zynLeft[NUM_MIDI_PARTS], framesize);
-    memcpy(Rpoint, zynRight[NUM_MIDI_PARTS], framesize);
-//    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
-//    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
+    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
+    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
+    return true;
 }
 
 
@@ -508,7 +479,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            if (jEvent.size < 1 || (jEvent.size > sizeof(event.data)))
+            if (jEvent.size < 1 || jEvent.size > sizeof(event.data))
                 continue; // no interest in zero sized or long events
             event.time = jEvent.time;
             memset(event.data, 0, sizeof(event.data));

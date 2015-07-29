@@ -37,9 +37,12 @@ using namespace std;
 #include "Misc/HistoryListItem.h"
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
+#include "ControllableByMIDIUI.h"
 
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
+
+class ControllableByMIDIUI;
 
 class XMLwrapper;
 class BodyDisposal;
@@ -61,7 +64,6 @@ class Config : public MiscFuncs
         void clearPresetsDirlist(void);
 
         string testCCvalue(int cc);
-        string masterCCtest(int cc);
         void saveConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
@@ -141,16 +143,8 @@ class Config : public MiscFuncs
         bool          nrpnActive;
         
         struct IOdata{
-            unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
-            unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
-            unsigned char vectorXfeatures[NUM_MIDI_CHANNELS];
-            unsigned char vectorYfeatures[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc2[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc2[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc4[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc4[NUM_MIDI_CHANNELS];
-            unsigned char vectorXcc8[NUM_MIDI_CHANNELS];
-            unsigned char vectorYcc8[NUM_MIDI_CHANNELS];
+            unsigned short vectorXaxis[NUM_MIDI_CHANNELS];
+            unsigned short vectorYaxis[NUM_MIDI_CHANNELS];
             int Part;
             int Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];
@@ -205,7 +199,9 @@ public:
     enum
     {
         NewSynthEngine = 0,
+        UpdateMidiControllers,
         UpdatePanel,
+        UpdateUIWindow,
         UpdatePanelItem,
         UpdatePartProgram,
         UpdateEffects,
@@ -216,12 +212,19 @@ public:
     unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
     unsigned int index; // if there is integer data, it can be passed through index (to remove aditional receiver logic)
     unsigned int type; // type of gui message (see enum above)
-    static void sendMessage(void *_data, unsigned int _type, unsigned int _index)
+    ControllableByMIDIUI *ui;
+    static void sendMessage(void *_data, unsigned int _type, unsigned int _index, ControllableByMIDIUI *ui = NULL)
     {
         GuiThreadMsg *msg = new GuiThreadMsg;
         msg->data = _data;
         msg->type = _type;
         msg->index = _index;
+        if(ui != NULL){
+            msg->ui = ui;
+        }
+        else {
+            msg->ui = NULL;
+        }
         Fl::awake((void *)msg);
     }
     static void processGuiMessages();

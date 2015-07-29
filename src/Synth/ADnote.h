@@ -30,6 +30,7 @@
 #include "Synth/Carcass.h"
 #include "Synth/LegatoTypes.h"
 #include "Misc/Float2Int.h"
+#include "Params/ControllableByMIDI.h"
 
 class ADnoteParameters;
 class Controller;
@@ -45,7 +46,7 @@ class Filter;
 
 class SynthEngine;
 
-class ADnote : public Carcass, private SynthHelper, private Float2Int
+class ADnote : public Carcass, private SynthHelper, private Float2Int, public ControllableByMIDI
 {
     public:
         ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_, float velocity_,
@@ -58,6 +59,10 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         void ADlegatonote(float freq_, float velocity_, int portamento_,
                           int midinote_, bool externcall);
         char ready;
+
+        void changepar(int npar, double value){}
+        unsigned char getparChar(int npar){ return 0;}
+        float getparFloat(int npar){ return 0.0;}
 
     private:
 

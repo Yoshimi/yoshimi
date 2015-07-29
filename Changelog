@@ -1,51 +1,7 @@
 yoshimi 1.3.x
 
-2015-7-20 Will
-- Merger in ALSA updates from 'buffers'.
-- master version now displays an 'M' suffix.
-
-2015-7-20 Will (buffers)
-- Hopefully completed Alsa updates.
-
-2015-7-20 Will (buffers)
-- Implemented Alsa endian changes.
-
-2015-7-16 Will (buffers)
-- Alsa now recognises 32, 24 & 16 bit formats LE only.
-
-2015-7-15 Will
-- Added sanity checks to vector feature CC settings.
-- Small correction to alsa audio.
-- More doc updates.
-
-2015-7-11 Will
-- Fixed bug that would crash if a bank or instrument rename
-  was cancelled.
-
-2015-7-10 Will
-- Added exclusions to CC designations.
-- Improved vector control error checks.
-- More doc updates.
-- Implemented redefinable vector features
-
-2015-7-5 Will
-- Minor gui bugfix 'Simple Sound' correctly set to 'No Title' in
-  all windows when actually edited.
-- Vector control individual features can be reversed.
-- Enabled NRPN part destination setting.
-
-2015-7-3 Will
-- Merged in corrected buffers - still some work to do on alsa
-  audio which has been incorrect for a long time but should be OK
-  on motherboard chipsets.
-- More documentation!
-
-2015-6-24 Will (buffers)
-- Set up and tested separate buffers for JACK only, very untidy.
-- currently breaks ALSA and LV2.
-
 2015-6-19 Will
-- bugfix set typecast in BankUI to enable build with fltk 1.1
+- bugfix set typecast in BankUI to enable build witj fltk 1.1
 - bugfix changed MasterUI so that main window is refreshed when
   'State' is loaded.
 

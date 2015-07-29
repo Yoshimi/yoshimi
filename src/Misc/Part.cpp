@@ -647,6 +647,101 @@ void Part::NoteOff(int note) //relase the key
     }
 }
 
+unsigned char Part::getpar(int npar){
+    switch(npar){
+        case 0:
+            return (unsigned char)ctl->pitchwheel.data;
+        case 1:
+            return (unsigned char)ctl->expression.data;
+        case 2:
+            return (unsigned char)ctl->portamento.data;
+        case 3:
+            return (unsigned char)ctl->panning.data;
+        case 4:
+            return (unsigned char)ctl->filtercutoff.data;
+        case 5:
+            return (unsigned char)ctl->filterq.data;
+        case 6:
+            return (unsigned char)ctl->bandwidth.data;
+        case 7:
+            return (unsigned char)ctl->modwheel.data;
+        case 8:
+            return (unsigned char)ctl->fmamp.data;
+        case 9:
+            return (unsigned char)ctl->volume.data;
+        case 10:
+            return (unsigned char)ctl->sustain.data;
+        case 11:
+            return (unsigned char)ctl->legato.data;
+        case 12:
+            return 0;
+        case 13:
+            return 0;
+        case 14:
+            return 0;
+        case 15:
+            return (unsigned char)ctl->resonancecenter.data;
+        case 16:
+            return (unsigned char)ctl->resonancebandwidth.data;
+    }
+}
+
+void Part::changepar(int npar, double value){
+    switch (npar){
+        case 0:
+            SetController(C_pitchwheel, (int)value);
+            break;
+        case 1:
+            SetController(C_expression, (int)value);
+            break;
+        case 2:
+            SetController(C_portamento, (int)value);
+            break;
+        case 3:
+            SetController(C_panning, (int)value);
+            break;
+        case 4:
+            SetController(C_filtercutoff, (int)value);
+            break;
+        case 5:
+            SetController(C_filterq, (int)value);
+            break;
+        case 6:
+            SetController(C_bandwidth, (int)value);
+            break;
+        case 7:
+            SetController(C_modwheel, (int)value);
+            break;
+        case 8:
+            SetController(C_fmamp, (int)value);
+            break;
+        case 9:
+            SetController(C_volume, (int)value);
+            break;
+        case 10:
+            SetController(C_sustain, (int)value);
+            break;
+        case 11:
+            SetController(C_legatofootswitch, (int)value);
+            break;
+        case 12:
+            SetController(C_allsoundsoff, (int)value);
+            break;
+        case 13:
+            SetController(C_resetallcontrollers, (int)value);
+            break;
+        case 14:
+            SetController(C_allnotesoff, (int)value);
+            break;
+        case 15:
+            SetController(C_resonance_center, (int)value);
+            break;
+        case 16:
+            SetController(C_resonance_bandwidth, (int)value);
+            break;
+
+    }
+}
 
 // Controllers
 void Part::SetController(unsigned int type, int par)

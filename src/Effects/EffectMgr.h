@@ -66,6 +66,7 @@ class EffectMgr : public Presets
         void seteffectpar(int npar, unsigned char value);
         void seteffectpar_nolock(int npar, unsigned char value);
         unsigned char geteffectpar(int npar);
+        Effect* getefx(){return efx;}
 
         SynthEngine *getSynthEngine() {return synth;}
 

@@ -48,6 +48,8 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "MasterUI.h"
+#include "MidiControllerUI.h"
+#include "ControllableByMIDIUI.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
@@ -63,7 +65,7 @@ const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 static struct argp_option cmd_options[] = {
     {"alsa-audio",        'A',  "<device>", 0x1,  "use alsa audio output" },
     {"alsa-midi",         'a',  "<device>", 0x1,  "use alsa midi input" },
-    {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
+    {"buffersize",        'b',  "<size>",     0,  "set alsa audio buffer size" },
     {"show-console",      'c',  NULL,         0,  "show console on startup" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
     {"jack-audio",        'J',  "<server>", 0x1,  "use jack audio output" },
@@ -74,7 +76,7 @@ static struct argp_option cmd_options[] = {
     {"load-instrument",   'L',  "<file>",     0,  "load .xiz file" },
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
-    {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size" },
+    {"oscilsize",         'o',  "<size>",     0,  "set oscilsize" },
     {"state",             'S',  "<file>",   0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
     #if defined(JACK_SESSION)
         {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
@@ -154,10 +156,8 @@ bool Config::Setup(int argc, char **argv)
     switch (audioEngine)
     {
         case alsa_audio:
-        {
             audioDevice = string(alsaAudioDevice);
             break;
-        }
         case jack_audio:
             audioDevice = string(jackServer);
             break;
@@ -277,14 +277,20 @@ string Config::testCCvalue(int cc)
         case 1:
             result = "mod wheel";
             break;
+        case 7:
+            result = "volume";
+            break;
         case 10:
             result = "panning";
             break;
         case 11:
             result = "expression";
             break;
-        case 38:
-            result = "data lsb";
+        case 64:
+            result = "sustain pedal";
+            break;
+        case 65:
+            result = "partamento";
             break;
         case 71:
             result = "filter Q";
@@ -303,45 +309,6 @@ string Config::testCCvalue(int cc)
             break;
         case 78:
             result = "resonance bandwidth";
-            break;
-        default:
-            result = masterCCtest(cc);
-    }
-    return result;
-}
-
-
-string Config::masterCCtest(int cc)
-{
-    string result = "";
-    switch (cc)
-    {
-         case 6:
-            result = "data msb";
-            break;
-        case 7:
-            result = "volume";
-            break;
-        case 38:
-            result = "data lsb";
-            break;
-        case 64:
-            result = "sustain pedal";
-            break;
-        case 65:
-            result = "portamento";
-            break;
-        case 96:
-            result = "data increment";
-            break;
-        case 97:
-            result = "data decrement";
-            break;
-        case 98:
-            result = "NRPN lsb";
-            break;
-        case 99:
-            result = "NRPN msb";
             break;
         case 120:
             result = "all sounds off";
@@ -1037,8 +1004,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->audioEngine = alsa_audio;
             if (arg)
                 settings->audioDevice = string(arg);
-            else
-                settings->audioDevice = settings->alsaAudioDevice;
             break;
         case 'a':
             settings->midiEngine = alsa_midi;
@@ -1113,6 +1078,25 @@ void GuiThreadMsg::processGuiMessages()
             else
             {
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdateMidiControllers:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MidiCCWindow *win = synth->getMidiCCWindow();
+            if(win)
+            {
+                win->updateRack();
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdateUIWindow:
+        {
+            if(msg->ui != NULL){
+                std::cout << "Refreshing some ui..." << endl;
+                if(msg->ui != NULL)
+                    msg->ui->refresh();
             }
         }
             break;

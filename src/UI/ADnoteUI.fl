@@ -45,7 +45,8 @@ decl {\#include "Misc/SynthHelper.h"
     \#include <string>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
-    \#include "OscilGenUI.h"} {public global
+    \#include "OscilGenUI.h"
+    \#include "ControllableByMIDIUI.h"} {public global
 } 
 
 decl {\#include "MasterUI.h"} {private global
@@ -1001,7 +1002,7 @@ unisongroup->redraw();}
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper, ControllableByMIDIUI}
 } {
   Function {make_window()} {private
   } {

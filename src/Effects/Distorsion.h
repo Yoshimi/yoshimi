@@ -44,6 +44,20 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         void cleanup(void);
         void applyfilters(float *efxoutl, float *efxoutr);
 
+        unsigned char getvolume(){return Pvolume;}
+        unsigned char getdrive(){return Pdrive;}
+        unsigned char getlevel(){return Plevel;}
+        unsigned char gettype(){return Ptype;}
+        unsigned char getlpf(){return Plpf;}
+        unsigned char gethpf(){return Phpf;}
+
+        void setvolume(unsigned char Pvolume_);
+        void setlpf(unsigned char Plpf_);
+        void sethpf(unsigned char Phpf_);
+        void setdrive(unsigned char Pdrive_);
+        void setlevel(unsigned char Plevel_);
+        void settype(unsigned char Ptype_);
+
     private:
         // Parametrii
         unsigned char Pvolume;       // Volumul or E/R
@@ -55,10 +69,6 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         unsigned char Phpf;          // highpass filter
         unsigned char Pstereo;       // 0 = mono, 1 = stereo
         unsigned char Pprefiltering; // if you want to do the filtering before the distorsion
-
-        void setvolume(unsigned char Pvolume_);
-        void setlpf(unsigned char Plpf_);
-        void sethpf(unsigned char Phpf_);
 
         // Real Parameters
         AnalogFilter *lpfl;
