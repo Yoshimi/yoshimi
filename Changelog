@@ -1,6 +1,9 @@
 yoshimi 1.3.x
 
 2015-7-30 Musinux
+- added system, insert, and part effects (chorus, phaser, echo, disto, alienwah, reverb) midi controlling (knobs only)
+
+2015-7-30 Musinux
 - some bugfixes
 - added midi learn midi channel managing
 - added save/restore functionnality for midi learning (backwards compatible with previous files, but newly created files are probably not compatible with previous yoshimi versions)
