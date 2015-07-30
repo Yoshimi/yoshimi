@@ -24,7 +24,6 @@
 #ifndef CONTROLLABLEBYMYDI_H
 #define CONTROLLABLEBYMYDI_H
 
-#include "Misc/ControllableByMIDIUI.h"
 #include <iostream>
 #include <list>
 
@@ -32,6 +31,8 @@ using namespace std;
 
 class ControllableByMIDIUI;
 class ControllableByMIDI;
+class XMLwrapper;
+class SynthEngine;
 
 // Midi Learn
 struct midiControl {
@@ -45,8 +46,9 @@ struct midiControl {
     bool recording; // useful ?
     bool isFloat;
 
-    midiControl(): controller(NULL) {}
-
+    midiControl(): controller(NULL), ui(NULL) {}
+    midiControl(int ccNbr, int channel, int min, int max, ControllableByMIDI *controller, ControllableByMIDIUI *ui, int par, int isFloat): ccNbr(ccNbr), channel(channel), min(min), max(max), controller(controller), ui(ui), par(par), isFloat(isFloat), recording(false) {}
+    ~midiControl();
     void changepar(int value);
     float getpar();
 };
@@ -70,8 +72,11 @@ public:
     void removeMidiController(midiControl *ctrl);
     midiControl *hasMidiController(int par);
 
-    ControllableByMIDI(): isControlled(false) {}
+    void add2XMLMidi(XMLwrapper *xml);
+    void getfromXMLMidi(XMLwrapper *xml, SynthEngine *synth);
 
+    ControllableByMIDI(): isControlled(false) {}
+    ~ControllableByMIDI();
 private:
     list<midiControl*> controllers;
     bool isControlled;

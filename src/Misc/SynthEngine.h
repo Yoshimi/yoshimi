@@ -141,7 +141,9 @@ class SynthEngine : private SynthHelper, MiscFuncs, public ControllableByMIDI
         list<midiControl*> midiControls;
 
         void addMidiControl(ControllableByMIDI *ctrl, int par, ControllableByMIDIUI *ui);
-        void removeMidiControl(midiControl *ctrl);
+        void addMidiControl(midiControl *midiCtrl);
+        void removeMidiControl(midiControl *midiCtrl);
+        void removeAllMidiControls();
 
         unsigned char getpar(int npar);
         void changepar(int npar, double value);

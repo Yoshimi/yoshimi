@@ -1,10 +1,17 @@
 
 
 using namespace std;
+#include "Misc/SynthEngine.h"
 #include "Params/ControllableByMIDI.h"
 #include "Misc/ControllableByMIDIUI.h"
+#include "Misc/XMLwrapper.h"
 #include <iostream>
 #include <list>
+
+midiControl::~midiControl(){
+    if(controller)
+        controller->removeMidiController(this);
+}
 
 void midiControl::changepar(int value){
     std::cout << "Par changed, par: " << par << ", value: " << value << endl;
@@ -20,9 +27,18 @@ float midiControl::getpar(){
     else {
         value = (float)controller->getparChar(par);
     }
-
-    std::cout << "valeur renvoyée: " << value << " isFloat: " << isFloat << endl;
     return value;
+}
+
+ControllableByMIDI::~ControllableByMIDI(){
+    if(isControlled){
+        list<midiControl*>::iterator i;
+        for(i=controllers.begin(); i != controllers.end();i++){
+            delete (*i);
+        }
+        controllers.clear();
+    }
+    
 }
 
 void ControllableByMIDI::reassignUIControls(ControllableByMIDIUI *ctrl){
@@ -58,6 +74,7 @@ void ControllableByMIDI::removeMidiController(midiControl *ctrl){
     list<midiControl*>::iterator i;
     for(i=controllers.begin(); i != controllers.end();i++){
         if((*i) == ctrl){
+            //delete (*i);
             controllers.erase(i);
             if(controllers.size() == 0){
                 isControlled = false;
@@ -76,3 +93,46 @@ midiControl *ControllableByMIDI::hasMidiController(int par){
     }
     return NULL;
 }
+
+void ControllableByMIDI::add2XMLMidi(XMLwrapper *xml){
+    if(controllers.size() == 0)
+        return;
+    xml->beginbranch("MIDI_CONTROLLERS");
+    list<midiControl*>::iterator i;
+    int cpt = 0;
+    for(i = controllers.begin(); i != controllers.end(); i++){
+        cout << "Controller écrit " << (*i)->channel << " " << (*i)->ccNbr << endl;
+        xml->beginbranch("CONTROLLER", cpt);
+        xml->addpar("ccNbr", (*i)->ccNbr);
+        xml->addpar("channel", (*i)->channel);
+        xml->addpar("min", (*i)->min);
+        xml->addpar("max", (*i)->max);
+        xml->addpar("par", (*i)->par);
+        xml->addparbool("isFloat", (*i)->isFloat);
+        xml->endbranch();
+        cpt++;
+    }
+    xml->endbranch();
+};
+void ControllableByMIDI::getfromXMLMidi(XMLwrapper *xml, SynthEngine *synth){
+    if(!xml->enterbranch("MIDI_CONTROLLERS"))
+        return;
+    int cpt = 0;
+    while(xml->enterbranch("CONTROLLER", cpt) != false){
+        midiControl *mc = new midiControl(
+                xml->getpar127("ccNbr", -1),
+                xml->getpar127("channel", -1),
+                xml->getpar127("min", 0),
+                xml->getpar127("max", 127),
+                this,
+                NULL,
+                xml->getpar("par", -1, 0, 30),
+                xml->getparbool("isFloat", 1)
+            );
+        xml->exitbranch();
+        synth->addMidiControl(mc);
+        cout << "Controller lu (" << cpt << ") " << mc->channel << " " << mc->ccNbr << endl;
+        cpt++;
+    }
+    xml->exitbranch();
+};

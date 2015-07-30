@@ -109,7 +109,6 @@ void LFOParams::changepar(int npar, double value){
             return;
     }
     list<LFO*>::iterator i;
-    std::cout << "check lfos: " << lfos.size() << endl;
     for(i=lfos.begin(); i != lfos.end(); i++){
         (*i)->changepar(npar, value);
     }
@@ -118,7 +117,6 @@ void LFOParams::changepar(int npar, double value){
 }
 
 float LFOParams::getparFloat(int npar){
-    std::cout << "getparFloat: npar " << npar << endl;
     switch(npar){
         case c_Pfreq:
             return Pfreq*127;
@@ -168,6 +166,7 @@ void LFOParams::add2XML(XMLwrapper *xml)
     xml->addpar("delay", Pdelay);
     xml->addpar("stretch", Pstretch);
     xml->addparbool("continous",    Pcontinous);
+    add2XMLMidi(xml);
 }
 
 
@@ -182,4 +181,5 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pdelay = xml->getpar127("delay", Pdelay);
     Pstretch = xml->getpar127("stretch", Pstretch);
     Pcontinous = xml->getparbool("continous", Pcontinous);
+    getfromXMLMidi(xml, synth);
 }

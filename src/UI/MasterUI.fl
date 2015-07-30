@@ -225,7 +225,7 @@ class MasterUI {selected : {private MiscFuncs, public ControllableByMIDIUI}
           }
           MenuItem {} {
             label MidiControllers
-            callback {midiccwindow->show();}
+            callback {midiccwindow->Show();}
             tooltip {Mapping of midi cc signals} xywh {15 15 100 20} labelsize 12
           }
           MenuItem {} {

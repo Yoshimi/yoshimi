@@ -146,6 +146,9 @@ SynthEngine::~SynthEngine()
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
+    if(midiControls.size() > 0){
+        removeAllMidiControls();
+    }
 }
 
 
@@ -347,6 +350,7 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    removeAllMidiControls();
     ShutUp();
 }
 
@@ -389,6 +393,11 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 }
 
 // Midi Control
+void SynthEngine::addMidiControl(midiControl *midiCtrl) {
+    midiCtrl->controller->addMidiController(midiCtrl);
+    midiControls.push_back(midiCtrl);
+}
+
 void SynthEngine::addMidiControl(ControllableByMIDI *ctrl, int par, ControllableByMIDIUI *ui) {
     midiControl *mc = new midiControl;
     mc->par = par;
@@ -404,10 +413,20 @@ void SynthEngine::removeMidiControl(midiControl *midiCtrl) {
     list<midiControl*>::iterator i;
     for(i=midiControls.begin(); i != midiControls.end();i++){
         if((*i) == midiCtrl){
+            delete (*i);
             midiControls.erase(i);
             return;
         }
     }
+}
+
+void SynthEngine::removeAllMidiControls() {
+    list<midiControl*>::iterator i;
+    for(i=midiControls.begin(); i != midiControls.end();i++){
+        cout << "deleting control "<< (*i)->ccNbr << endl;
+        delete (*i);
+    }
+    midiControls.clear();
 }
 
 // Controllers

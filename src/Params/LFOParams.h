@@ -44,7 +44,7 @@ class LFOParams : public Presets, public ControllableByMIDI
         void getfromXML(XMLwrapper *xml);
 
         void changepar(int npar, double value);
-        unsigned char getparChar(int npar){ return 0;};
+        unsigned char getparChar(int npar){ return -1;};
         float getparFloat(int npar);
 
         enum {
