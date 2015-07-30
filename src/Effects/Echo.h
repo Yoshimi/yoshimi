@@ -43,6 +43,16 @@ class Echo : public Effect
         void cleanup(void);
         void setdryonly(void);
 
+        enum {
+            c_Pvolume,
+            c_Ppanning,
+            c_Pdelay,
+            c_Plrdelay,
+            c_Plrcross,
+            c_Pfeedback,
+            c_Phidamp
+        };
+
     private:
         // Parameters
         unsigned char Pvolume;  // 1 Volume or Dry/Wetness

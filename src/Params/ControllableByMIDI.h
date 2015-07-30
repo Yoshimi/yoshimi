@@ -70,13 +70,15 @@ public:
     void unassignUIControls();
     void addMidiController(midiControl *ctrl);
     void removeMidiController(midiControl *ctrl);
+    void removeAllMidiControllers(SynthEngine *synth);
+
     midiControl *hasMidiController(int par);
 
     void add2XMLMidi(XMLwrapper *xml);
     void getfromXMLMidi(XMLwrapper *xml, SynthEngine *synth);
 
     ControllableByMIDI(): isControlled(false) {}
-    ~ControllableByMIDI();
+    ~ControllableByMIDI(){}
 private:
     list<midiControl*> controllers;
     bool isControlled;

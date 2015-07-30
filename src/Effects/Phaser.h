@@ -44,6 +44,24 @@ class Phaser : public Effect
         unsigned char getpar(int npar);
         void cleanup(void);
         void setdryonly(void);
+
+        enum {
+            c_Pvolume,
+            c_Ppanning,
+            c_Pfreq,
+            c_Prandomness,
+            c_PLFOtype,
+            c_Pstereo,
+            c_Pdepth,
+            c_Pfeedback,
+            c_Pstages,
+            c_Plrcross,
+            c_Poutsub,
+            c_Pphase,
+            c_Phyper,
+            c_Pdistorsion,
+            c_Panalog
+        };
     
     private:
         // Parametrii Phaser

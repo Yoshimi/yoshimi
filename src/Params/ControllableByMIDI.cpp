@@ -30,15 +30,20 @@ float midiControl::getpar(){
     return value;
 }
 
-ControllableByMIDI::~ControllableByMIDI(){
+/*ControllableByMIDI::~ControllableByMIDI(){
+    removeAllMidiControllers();
+}*/
+
+void ControllableByMIDI::removeAllMidiControllers(SynthEngine *synth){
     if(isControlled){
         list<midiControl*>::iterator i;
-        for(i=controllers.begin(); i != controllers.end();i++){
-            delete (*i);
+        std::cout << "controllers to delete: " << controllers.size() << endl;
+        for(i=controllers.begin(); controllers.size() > 0 && i != controllers.end();i++){
+            synth->removeMidiControl(*i);
+            i--;
         }
-        controllers.clear();
+        isControlled = false;
     }
-    
 }
 
 void ControllableByMIDI::reassignUIControls(ControllableByMIDIUI *ctrl){
@@ -74,7 +79,6 @@ void ControllableByMIDI::removeMidiController(midiControl *ctrl){
     list<midiControl*>::iterator i;
     for(i=controllers.begin(); i != controllers.end();i++){
         if((*i) == ctrl){
-            //delete (*i);
             controllers.erase(i);
             if(controllers.size() == 0){
                 isControlled = false;

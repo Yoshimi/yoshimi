@@ -204,40 +204,40 @@ void Distorsion::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
-        case 0:
+        case c_Pvolume:
             setvolume(value);
             break;
-        case 1:
+        case c_Ppanning:
             setpanning(value);
             break;
-        case 2:
+        case c_Plrcross:
             setlrcross(value);
             break;
-        case 3:
+        case c_Pdrive:
             Pdrive = value;
             break;
-        case 4:
+        case c_Plevel:
             Plevel = value;
             break;
-        case 5:
+        case c_Ptype:
             settype(value);
             break;
-        case 6:
+        case c_Pnegate:
             if (value > 1)
                 Pnegate = 1;
             else
                 Pnegate = value;
             break;
-        case 7:
+        case c_Plpf:
             setlpf(value);
             break;
-        case 8:
+        case c_Phpf:
             sethpf(value);
             break;
-        case 9:
+        case c_Pstereo:
             Pstereo = (value > 0) ? 1 : 0; 
             break;
-        case 10:
+        case c_Pprefiltering:
             Pprefiltering = value;
             break;
     }
@@ -248,17 +248,17 @@ unsigned char Distorsion::getpar(int npar)
 {
     switch (npar)
     {
-        case 0:  return Pvolume;
-        case 1:  return Ppanning;
-        case 2:  return Plrcross;
-        case 3:  return Pdrive;
-        case 4:  return Plevel;
-        case 5:  return Ptype;
-        case 6:  return Pnegate;
-        case 7:  return Plpf;
-        case 8:  return Phpf;
-        case 9:  return Pstereo;
-        case 10: return Pprefiltering;
+        case c_Pvolume:  return Pvolume;
+        case c_Ppanning:  return Ppanning;
+        case c_Plrcross:  return Plrcross;
+        case c_Pdrive:  return Pdrive;
+        case c_Plevel:  return Plevel;
+        case c_Ptype:  return Ptype;
+        case c_Pnegate:  return Pnegate;
+        case c_Plpf:  return Plpf;
+        case c_Phpf:  return Phpf;
+        case c_Pstereo:  return Pstereo;
+        case c_Pprefiltering: return Pprefiltering;
         default: break;
     }
     return 0; // in case of bogus parameter number

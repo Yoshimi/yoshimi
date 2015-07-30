@@ -744,7 +744,7 @@ mainCreateNewInstance(forceId);}
       } {
         Fl_Group syseffectui {open
           xywh {3 158 384 95} labeltype NO_LABEL
-          code0 {o->init(synth->sysefx[nsyseff]);o->activate();o->show();}
+          code0 {o->init(synth->sysefx[nsyseff], synth);o->activate();o->show();}
           class EffUI
         } {}
       }
@@ -754,7 +754,7 @@ mainCreateNewInstance(forceId);}
       } {
         Fl_Group inseffectui {open
           xywh {3 158 380 95} color 52
-          code0 {o->init(synth->insefx[ninseff]);o->hide();}
+          code0 {o->init(synth->insefx[ninseff], synth);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}

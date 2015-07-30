@@ -29,8 +29,8 @@
     class ControllableByMIDI;
 
 class ControllableByMIDIUI {
-  ControllableByMIDI *controller; 
 public:
+  ControllableByMIDI *controller; 
   virtual void refresh();
   void reassignMidi(ControllableByMIDI *ctrl);
   ControllableByMIDIUI();

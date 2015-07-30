@@ -4,9 +4,10 @@ yoshimi 1.3.x
 - some bugfixes
 - added midi learn midi channel managing
 - added save/restore functionnality for midi learning (backwards compatible with previous files, but newly created files are probably not compatible with previous yoshimi versions)
+
 2015-7-29 Musinux
 - Added simple support of midi learning, only for LFOs for now, but for ALL LFOs.
-- Saving midi learn configuration isn't possible for now.
+
 2015-7-20 Will
 - Merger in ALSA updates from 'buffers'.
 - master version now displays an 'M' suffix.

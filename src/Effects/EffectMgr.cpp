@@ -71,6 +71,9 @@ void EffectMgr::changeeffect(int _nefx)
     memset(efxoutr, 0, synth->bufferbytes);
     if (efx)
         delete efx;
+
+    removeAllMidiControllers(synth);
+
     switch (nefx)
     {
         case 1:
@@ -157,6 +160,12 @@ void EffectMgr::seteffectpar_nolock(int npar, unsigned char value)
     efx->changepar(npar, value);
 }
 
+void EffectMgr::changepar(int npar, double value){
+    synth->actionLock(lock);
+    seteffectpar_nolock(npar, value);
+    synth->actionLock(unlock);
+}
+
 
 // Change a parameter of the current effect (with thread locking)
 void EffectMgr::seteffectpar(int npar, unsigned char value)
@@ -166,6 +175,11 @@ void EffectMgr::seteffectpar(int npar, unsigned char value)
     synth->actionLock(unlock);
 }
 
+float EffectMgr::getparFloat(int npar){
+    if (!efx)
+        return 0;
+    return efx->getpar(npar);
+}
 
 // Get a parameter of the current effect
 unsigned char EffectMgr::geteffectpar(int npar)
@@ -292,6 +306,7 @@ void EffectMgr::add2XML(XMLwrapper *xml)
         xml->endbranch();
     }
     xml->endbranch();
+    add2XMLMidi(xml);
 }
 
 
@@ -323,5 +338,6 @@ void EffectMgr::getfromXML(XMLwrapper *xml)
         }
         xml->exitbranch();
     }
+    getfromXMLMidi(xml, synth);
     cleanup();
 }

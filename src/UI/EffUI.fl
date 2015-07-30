@@ -42,6 +42,9 @@ decl {\#include "EnvelopeUI.h"} {public local
 decl {\#include "FilterUI.h"} {public local
 } 
 
+decl {\#include "Misc/ControllableByMIDIUI.h"} {public local
+} 
+
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
 
@@ -198,13 +201,16 @@ eff = eff_;
   }
 } 
 
-class EffUI {open : {public Fl_Group,public PresetsUI_}
+class EffUI {open : {public Fl_Group,public PresetsUI_, public ControllableByMIDIUI}
 } {
+  decl {SynthEngine *synth;} {private local
+  }
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
     code {//
     eff = NULL;
-    filterwindow = NULL;} {}
+    filterwindow = NULL;
+    synth = NULL;} {}
   }
   Function {~EffUI()} {} {
     code {effnullwindow->hide();        // delete (effnullwindow);
@@ -305,8 +311,8 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
       }
       Fl_Choice revp10 {
         label Type
-        callback {eff->seteffectpar(10,(int) o->value());
-if (eff->geteffectpar(10)==2) revp12->activate();
+        callback {eff->changepar(Reverb::c_Ptype, o->value());
+if (eff->getparFloat(Reverb::c_Ptype)==2) revp12->activate();
 else revp12->deactivate();} open
         xywh {240 13 75 15} down_box BORDER_BOX color 14 labelsize 11 textsize 11 textcolor 7
       } {
@@ -325,64 +331,114 @@ else revp12->deactivate();} open
       }
       Fl_Dial revp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Pvolume, o->value());}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Pvolume;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Ppanning, o->value());}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Ppanning;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp2 {
         label Time
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Ptime, o->value());}
         tooltip {Duration of Effect} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Ptime;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp3 {
         label {I.del}
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Pidelay, o->value());}
         tooltip {Initial Delay} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Pidelay;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp4 {
         label {I.delfb}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->changepar(Reverb::c_PidelayFb, o->value());}
         tooltip {Initial Delay Feedback} xywh {155 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_PidelayFb;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp12 {
         label BW
-        callback {eff->seteffectpar(12,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Pbandwidth, o->value());}
         xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127 deactivate
         code0 {if (eff->geteffectpar(10)==2) o->activate();}
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Pbandwidth;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp6 {
         label {E/R}
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Perbalance, o->value());}
         xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127 deactivate
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Perbalance;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp7 {
         label LPF
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Plpf, o->value());}
         tooltip {Low Pass Filter} xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Plpf;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp8 {
         label HPF
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Phpf, o->value());}
         tooltip {High Pass Filter} xywh {305 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Phpf;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp9 {
         label Damp
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->changepar(Reverb::c_Plohidamp, o->value());}
         tooltip Dampening xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 minimum 64 maximum 127 step 1
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Plohidamp;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial revp11 {
         label {R.S.}
@@ -391,7 +447,12 @@ if (Fl::event_button1()) x=(int)o->value();
    else o->value(x);
 eff->seteffectpar(11,x);}
         tooltip RoomSize xywh {342 8 25 25} box ROUND_UP_BOX labelsize 10 align 4 minimum 1 maximum 127 step 1
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Reverb::c_Proomsize;
+                 o->ui = this;}
+            class WidgetPDial
       }
     }
   }
@@ -449,45 +510,80 @@ refresh(eff);} open
       }
       Fl_Dial echop0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->changepar(Echo::c_Pvolume, o->value());}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Pvolume;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial echop1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->changepar(Echo::c_Ppanning, o->value());}
         xywh {59 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Ppanning;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial echop2 {
         label Delay
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->changepar(Echo::c_Pdelay, o->value());}
         xywh {111 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Pdelay;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial echop3 {
         label {LRdl.}
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->changepar(Echo::c_Plrdelay, o->value());}
         tooltip {Delay Between L/R} xywh {164 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Plrdelay;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial echop4 {
         label {LRc.}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->changepar(Echo::c_Plrcross, o->value());}
         tooltip {L/R Crossover} xywh {218 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Plrcross;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial echop5 {
         label {Fb.}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->changepar(Echo::c_Pfeedback, o->value());}
         tooltip Feedback xywh {273 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Pfeedback;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial echop6 {
         label Damp
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->changepar(Echo::c_Phidamp, o->value());}
         tooltip Dampening xywh {334 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Echo::c_Phidamp;
+                 o->ui = this;}
+            class WidgetPDial
       }
     }
   }
@@ -549,72 +645,117 @@ refresh(eff);}
       }
       Fl_Dial chorusp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pvolume, o->value());}
         xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Pvolume;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Ppanning, o->value());}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Ppanning;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pfreq, o->value());}
         tooltip {LFO Frequency} xywh {85 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Pfreq;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Prandomness, o->value());}
         tooltip {LFO Randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Prandomness;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pstereo, o->value());}
         tooltip {L/R Phase Shift} xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Pstereo;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp6 {
         label Dpth
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pdepth, o->value());}
         tooltip {LFO Depth} xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Pdepth;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp7 {
         label Delay
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pdelay, o->value());}
         xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Pdelay;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp8 {
         label Fb
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pfeedback, o->value());}
         tooltip Feedback xywh {305 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Pfeedback;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Dial chorusp9 {
         label {L/R}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Plrcross, o->value());}
         tooltip {Channel Routing} xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
-        class WidgetPDial
+        code {o->synth=synth;
+                 o->controllable = true;
+                 o->midiCtrl = eff;
+                 o->par = Chorus::c_Plrcross;
+                 o->ui = this;}
+            class WidgetPDial
       }
       Fl_Check_Button {} {
         label Flange
-        callback {eff->seteffectpar(10,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Pflangemode, o->value());}
         xywh {120 10 55 20} box THIN_UP_BOX down_box DOWN_BOX color 230 labelfont 1 labelsize 10 hide deactivate
         code0 {o->value(eff->geteffectpar(10));}
       }
       Fl_Check_Button chorusp11 {
         label Substract
-        callback {eff->seteffectpar(11,(int) o->value());}
+        callback {eff->changepar(Chorus::c_Poutsub, o->value());}
         tooltip {inverts the output} xywh {232 13 83 16} box THIN_UP_BOX down_box DOWN_BOX color 230 labelsize 11
       }
       Fl_Choice chorusp4 {
         label {LFO type}
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->changepar(Chorus::c_PLFOtype, o->value());}
         tooltip {LFO function} xywh {154 50 43 15} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -695,31 +836,51 @@ refresh(eff);}
       }
       Fl_Dial phaserp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());} selected
+        callback {eff->changepar(Phaser::c_Pvolume, o->value());} selected
         tooltip {Effect Volume} xywh {10 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pvolume;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial phaserp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Ppanning, o->value());}
         xywh {48 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Ppanning;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial phaserp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pfreq, o->value());}
         tooltip {LFO frequency} xywh {86 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pfreq;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial phaserp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Prandomness, o->value());}
         tooltip {LFO randomness} xywh {124 50 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Prandomness;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Choice phaserp4 {
         label LFO
-        callback {eff->seteffectpar(4,(int) o->value());} open
+        callback {eff->changepar(Phaser::c_PLFOtype, o->value());} open
         tooltip {LFO function} xywh {314 60 50 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -733,59 +894,95 @@ refresh(eff);}
       }
       Fl_Dial phaserp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pstereo, o->value());}
         tooltip {Left/Right Channel Phase Shift} xywh {162 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pstereo;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial phaserp6 {
         label Depth
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pdepth, o->value());}
         tooltip {LFO Depth} xywh {181 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pdepth;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial phaserp7 {
         label Fb
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pfeedback, o->value());}
         tooltip Feedback xywh {200 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pfeedback;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Counter phaserp8 {
         label Stages
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pstages, o->value());}
         xywh {265 23 35 15} type Simple labelsize 11 align 1 minimum 0 maximum 127 step 1 textfont 1 textsize 11
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pstages;
+            o->ui = this;}
         code0 {o->range(1,MAX_PHASER_STAGES);}
       }
       Fl_Dial phaserp9 {
         label {L/R}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Plrcross, o->value());}
         tooltip {Channel Routing} xywh {238 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Plrcross;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Check_Button phaserp10 {
         label Subtract
-        callback {eff->seteffectpar(10,(int) o->value());}
-        tooltip {inverts output} xywh {314 9 40 16} down_box DOWN_BOX color 230 labelsize 11
+        callback {eff->changepar(Phaser::c_Poutsub, o->value());}
+        tooltip {inverts output} xywh {314 9 40 16} down_box DOWN_BOX color 230 
+        labelsize 11
       }
       Fl_Dial phaserp11 {
         label Phase
-        callback {eff->seteffectpar(11,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pphase, o->value());}
         xywh {219 15 30 30} box ROUND_UP_BOX labelsize 11 align 1 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pphase;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Check_Button phaserp12 {
         label hyper
-        callback {eff->seteffectpar(12,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Phyper, o->value());}
         tooltip {hyper-sine} xywh {314 25 55 15} down_box DOWN_BOX labelsize 11
       }
       Fl_Dial phaserp13 {
         label dist
-        callback {eff->seteffectpar(13,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Pdistorsion, o->value());}
         tooltip Distortion xywh {276 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Phaser::c_Pdistorsion;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Check_Button phaserp14 {
         label Analog
-        callback {eff->seteffectpar(14,(int) o->value());}
+        callback {eff->changepar(Phaser::c_Panalog, o->value());}
         tooltip {Emulates FET} xywh {314 40 70 15} down_box DOWN_BOX labelsize 11
       }
     }
@@ -825,50 +1022,90 @@ refresh(eff);} open
       }
       Fl_Dial awp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Pvolume,o->value());}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Pvolume;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Ppanning, o->value());}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Ppanning;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp2 {
         label Freq
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Pfreq, o->value());}
         tooltip {LFO Frequency} xywh {85 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Pfreq;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp3 {
         label Rnd
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Prandomness, o->value());}
         tooltip {LFO Randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Prandomness;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp5 {
         label {St.df}
-        callback {eff->seteffectpar(5,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Pstereo, o->value());}
         tooltip {Left/Right Channel Phase Shift} xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Pstereo;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp6 {
         label Dpth
-        callback {eff->seteffectpar(6,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Pdepth, o->value());}
         tooltip Depth xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Pdepth;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp7 {
         label Fb
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->changepar(Alienwah::c_Pfeedback, o->value());}
         tooltip Feedback xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Pfeedback;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial awp9 {
         label {L/R}
-        callback {eff->seteffectpar(9,(int) o->value());}
+        callback {eff->seteffectpar(Alienwah::c_Plrcross, o->value());}
         xywh {345 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Alienwah::c_Plrcross;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Choice awp4 {
@@ -942,44 +1179,79 @@ refresh(eff);}
       }
       Fl_Dial distp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Pvolume,(int) o->value());}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Pvolume;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial distp1 {
         label Pan
-        callback {eff->seteffectpar(1,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Ppanning,(int) o->value());}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Ppanning;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial distp2 {
         label {LRc.}
-        callback {eff->seteffectpar(2,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Plrcross,(int) o->value());}
         tooltip {L/R Mix} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Plrcross;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial distp3 {
         label Drive
-        callback {eff->seteffectpar(3,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Pdrive,(int) o->value());}
         tooltip {Input Amplification} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Pdrive;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial distp4 {
         label Level
-        callback {eff->seteffectpar(4,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Plevel,(int) o->value());}
         tooltip {Output Amplification} xywh {155 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Plevel;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial distp7 {
         label LPF
-        callback {eff->seteffectpar(7,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Plpf,(int) o->value());}
         tooltip {Low Pass Filter} xywh {285 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Plpf;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial distp8 {
         label HPF
-        callback {eff->seteffectpar(8,(int) o->value());}
+        callback {eff->changepar(Distorsion::c_Plpf,(int) o->value());}
         tooltip {High Pass Filter} xywh {320 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
+        code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = eff;
+            o->par = Distorsion::c_Phpf;
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Choice distp5 {
@@ -1047,6 +1319,7 @@ refresh(eff);}
       Fl_Check_Button distp6 {
         label {Neg.}
         callback {eff->seteffectpar(6,(int) o->value());}
+
         xywh {260 55 15 15} down_box DOWN_BOX labelsize 11 align 2
       }
       Fl_Check_Button distp9 {
@@ -1334,10 +1607,11 @@ refresh(eff);}
       }
     }
   }
-  Function {init(EffectMgr *eff_)} {open
+  Function {init(EffectMgr *eff_, SynthEngine *_synth)} {open
   } {
     code {eff=eff_;
-
+    synth = _synth;
+controller = eff->getefx();
 make_null_window();
 make_reverb_window();
 make_echo_window();

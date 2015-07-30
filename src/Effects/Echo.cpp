@@ -196,25 +196,25 @@ void Echo::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
-        case 0:
+        case c_Pvolume:
             setvolume(value);
             break;
-        case 1:
+        case c_Ppanning:
             setpanning(value);
             break;
-        case 2:
+        case c_Pdelay:
             setdelay(value);
             break;
-        case 3:
+        case c_Plrdelay:
             setlrdelay(value);
             break;
-        case 4:
+        case c_Plrcross:
             setlrcross(value);
             break;
-        case 5:
+        case c_Pfeedback:
             setfb(value);
             break;
-        case 6:
+        case c_Phidamp:
             sethidamp(value);
             break;
     }
@@ -225,13 +225,13 @@ unsigned char Echo::getpar(int npar)
 {
     switch (npar)
     {
-        case 0: return Pvolume;
-        case 1: return Ppanning;
-        case 2: return Pdelay;
-        case 3: return Plrdelay;
-        case 4: return Plrcross;
-        case 5: return Pfb;
-        case 6: return Phidamp;
+        case c_Pvolume: return Pvolume;
+        case c_Ppanning: return Ppanning;
+        case c_Pdelay: return Pdelay;
+        case c_Plrdelay: return Plrdelay;
+        case c_Plrcross: return Plrcross;
+        case c_Pfeedback: return Pfb;
+        case c_Phidamp: return Phidamp;
         default: break;
     }
     return 0; // in case of bogus parameter number

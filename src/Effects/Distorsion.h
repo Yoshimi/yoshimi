@@ -58,6 +58,20 @@ class Distorsion : public Effect, private MiscFuncs, WaveShapeSamples
         void setlevel(unsigned char Plevel_);
         void settype(unsigned char Ptype_);
 
+        enum {
+            c_Pvolume,
+            c_Ppanning,
+            c_Plrcross,
+            c_Pdrive,
+            c_Plevel,
+            c_Ptype,
+            c_Pnegate,
+            c_Plpf,
+            c_Phpf,
+            c_Pstereo,
+            c_Pprefiltering
+        };
+
     private:
         // Parametrii
         unsigned char Pvolume;       // Volumul or E/R

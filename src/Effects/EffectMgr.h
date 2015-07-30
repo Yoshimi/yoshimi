@@ -40,7 +40,7 @@
 
 class SynthEngine;
 
-class EffectMgr : public Presets
+class EffectMgr : public Presets, public ControllableByMIDI
 {
     public:
         EffectMgr(const bool insertion_, SynthEngine *_synth);
@@ -69,6 +69,10 @@ class EffectMgr : public Presets
         Effect* getefx(){return efx;}
 
         SynthEngine *getSynthEngine() {return synth;}
+
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar) { return -1;}
+        float getparFloat(int npar);
 
         float *efxoutl, *efxoutr;
         bool insertion; // the effect is connected as insertion effect (or not)

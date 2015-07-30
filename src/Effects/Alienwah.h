@@ -55,7 +55,19 @@ class Alienwah : public Effect
         unsigned char getparChar(int npar){ return getpar(npar);}
         float getparFloat(int npar){ return (float)getpar(npar);}*/
 
-        
+        enum {
+            c_Pvolume,
+            c_Ppanning,
+            c_Pfreq,
+            c_Prandomness,
+            c_PLFOtype,
+            c_Pstereo,
+            c_Pdepth,
+            c_Pfeedback,
+            c_Pdelay,
+            c_Plrcross,
+            c_Pphase
+        };
 
     private:
         void setvolume(unsigned char Pvolume_);

@@ -169,6 +169,9 @@ show();} {}
 
         list<midiControl*>::iterator i;
         int j = 0;
+        if(synth->midiControls.size() < 1){
+          hide();
+        }
 	      for(i=synth->midiControls.begin();i!=synth->midiControls.end();i++) {
             MidiCCRack* temp=new MidiCCRack(0,82*j,300,80);
             temp->synth = synth;

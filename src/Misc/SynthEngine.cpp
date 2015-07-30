@@ -329,6 +329,7 @@ void SynthEngine::defaults(void)
 {
     setPvolume(90);
     setPkeyshift(64);
+    removeAllMidiControls();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->defaults();
@@ -350,7 +351,7 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
-    removeAllMidiControls();
+    
     ShutUp();
 }
 
@@ -396,6 +397,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 void SynthEngine::addMidiControl(midiControl *midiCtrl) {
     midiCtrl->controller->addMidiController(midiCtrl);
     midiControls.push_back(midiCtrl);
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
 }
 
 void SynthEngine::addMidiControl(ControllableByMIDI *ctrl, int par, ControllableByMIDIUI *ui) {
@@ -407,6 +409,7 @@ void SynthEngine::addMidiControl(ControllableByMIDI *ctrl, int par, Controllable
     mc->ui = ui;
     ctrl->addMidiController(mc);
     midiControls.push_back(mc);
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
 }
 
 void SynthEngine::removeMidiControl(midiControl *midiCtrl) {
@@ -415,9 +418,11 @@ void SynthEngine::removeMidiControl(midiControl *midiCtrl) {
         if((*i) == midiCtrl){
             delete (*i);
             midiControls.erase(i);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
             return;
         }
     }
+    
 }
 
 void SynthEngine::removeAllMidiControls() {
@@ -427,6 +432,7 @@ void SynthEngine::removeAllMidiControls() {
         delete (*i);
     }
     midiControls.clear();
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
 }
 
 // Controllers

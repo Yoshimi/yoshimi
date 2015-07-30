@@ -833,7 +833,7 @@ else {propta->deactivate();proptb->deactivate();}}
       } {
         Fl_Group inseffectui {
           xywh {5 37 380 95}
-          code0 {o->init(part->partefx[ninseff]);}
+          code0 {o->init(part->partefx[ninseff], synth);}
           class EffUI
         } {}
       }
