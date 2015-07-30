@@ -36,13 +36,7 @@ class ControllableByMIDI;
 // Midi Learn
 struct midiControl {
     int ccNbr;
-    /*
-    int partN;
-    int kitItemN;
-    int voiceN;
-    int effN;
-    int EQbandN;
-    */
+    int channel;
     int min;
     int max;
     ControllableByMIDI *controller;

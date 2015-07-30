@@ -44,7 +44,7 @@ decl {class WidgetPDial;} {public global
 
 class MidiCCRack {open : {public Fl_Group}
 } {
-  decl {Fl_Group* embossedGroup;WidgetPDial* dial;Fl_Input* title;Fl_Spinner* spinner;midiControl* controller;} {}
+  decl {Fl_Group* embossedGroup;WidgetPDial* dial;Fl_Input* title;Fl_Spinner* spinner;Fl_Spinner* Channelspinner;midiControl* controller;} {}
   Function {MidiCCRack(int x, int y, int w, int h) : Fl_Group(x,y,w,h)} {open
   } {
     code {embossedGroup = new Fl_Group(x, y, 300, 80);
@@ -58,21 +58,26 @@ class MidiCCRack {open : {public Fl_Group}
           dial->maximum(127);
           dial->step(1);
           dial->labelsize(10);
-          //dial->param.duplicated=1;
           dial->controllable = true;
-          //dial->setMidiControlled(true);
-          //dial->callback(dialCallback);
           this->synth = dial->getSynth();
-         spinner = new Fl_Spinner(x+115, y+35, 40, 20, "CC signal:");
-         spinner->labelsize(10);
-         spinner->callback(spinnerChanged,this);
-          Fl_Button* rec = new Fl_Button(x+160, y+35, 47, 20, "REC");
+        spinner = new Fl_Spinner(x+115, y+25, 40, 17, "CC signal:");
+          spinner->maximum(127);
+          spinner->labelsize(10);
+          spinner->textsize(10);
+          spinner->callback(spinnerChanged,this);
+        Fl_Button* rec = new Fl_Button(x+170, y+40, 15, 15, "R");
+          rec->tooltip("Record (click, then move the controller you want to associate with this value)");
           rec->tooltip("click, then move the controller you want to associate with this value");
           rec->box(FL_PLASTIC_UP_BOX);
           rec->color((Fl_Color)90);
           rec->selection_color((Fl_Color)93);
           rec->labelsize(10);
           rec->callback(startRecording,this);
+        Channelspinner = new Fl_Spinner(x+115, y+50, 40, 17, "Channel:");
+          Channelspinner->maximum(127);
+          Channelspinner->labelsize(10);
+          Channelspinner->textsize(10);
+          Channelspinner->callback(channelChanged,this);
           Fl_Button* removeBtn = new Fl_Button(x+280-1, y+3, 18, 18, "X");
           removeBtn->color((Fl_Color)9);
           removeBtn->selection_color((Fl_Color)9);
@@ -102,6 +107,7 @@ class MidiCCRack {open : {public Fl_Group}
       //title->value(controller->getLabel());
       spinner->value(controller->ccNbr);
       dial->value(controller->getpar());
+      Channelspinner->value(contr->channel+1);
       } {}
   }
   Function {startRecording(Fl_Widget* w, void* p)} {open private return_type {static void}
@@ -132,6 +138,12 @@ class MidiCCRack {open : {public Fl_Group}
   } {
     code {MidiCCRack* caller = (MidiCCRack*)p;
      caller->controller->max = caller->dial->value();} {}
+  }
+  Function {channelChanged(Fl_Widget* w, void* p)} {open private return_type {static void}
+  } {
+    code {MidiCCRack* caller = (MidiCCRack*)p;
+        int value = caller->Channelspinner->value() -1;
+        caller->controller->channel = value;} {}
   }
   decl {SynthEngine *synth;} {public
   }

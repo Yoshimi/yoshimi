@@ -419,9 +419,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         if((*i)->recording) {
             std::cout << "Value recorded" << endl;
             (*i)->ccNbr = type;
+            (*i)->channel = chan;
             (*i)->recording = false;
         }
-        if((*i)->ccNbr == type) {
+        if((*i)->ccNbr == type && (*i)->channel == chan) {
             std::cout << "Found Control" << endl;
             (*i)->changepar(par);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
