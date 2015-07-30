@@ -49,7 +49,7 @@ class EQ : public Effect, private MiscFuncs
             c_Pgain,
             c_Pq,
             c_Pstages
-        }
+        };
 
     private:
         // Parameters
