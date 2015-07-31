@@ -1142,9 +1142,12 @@ void GuiThreadMsg::processGuiMessages()
         case GuiThreadMsg::UpdateUIWindow:
         {
             if(msg->ui != NULL){
-                std::cout << "Refreshing some ui..." << endl;
+                std::cout << "Refreshing some ui... ";
+                std::cout << std::flush;
                 if(msg->ui != NULL)
                     msg->ui->refresh();
+                std::cout << "Done." << endl;
+                std::cout << std::flush;
             }
         }
             break;

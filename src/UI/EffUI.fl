@@ -686,9 +686,7 @@ refresh(eff);}
                  o->controllable = true;
                  o->midiCtrl = eff;
                  o->par = Chorus::c_Pfreq;
-                 o->ui = this;
-                 std::cout << "effMgr: " << o->midiCtrl << endl;
-                 std::cout << "ui: " << o->ui << endl;}
+                 o->ui = this;}
             class WidgetPDial
       }
       Fl_Dial chorusp3 {
@@ -888,9 +886,7 @@ refresh(eff);}
             o->controllable = true;
             o->midiCtrl = eff;
             o->par = Phaser::c_Pfreq;
-            o->ui = this;
-            std::cout << "effMgr: " << o->midiCtrl << endl;
-            std::cout << "ui: " << o->ui << endl;}
+            o->ui = this;}
         class WidgetPDial
       }
       Fl_Dial phaserp3 {

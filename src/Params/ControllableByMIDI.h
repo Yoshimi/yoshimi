@@ -43,11 +43,12 @@ struct midiControl {
     ControllableByMIDI *controller;
     ControllableByMIDIUI *ui;
     int par;
-    bool recording; // useful ?
+    bool recording;
     bool isFloat;
 
     midiControl(): controller(NULL), ui(NULL) {}
     midiControl(int ccNbr, int channel, int min, int max, ControllableByMIDI *controller, ControllableByMIDIUI *ui, int par, int isFloat): ccNbr(ccNbr), channel(channel), min(min), max(max), controller(controller), ui(ui), par(par), isFloat(isFloat), recording(false) {}
+    midiControl(ControllableByMIDI *controller, ControllableByMIDIUI *ui, int par, int isFloat): ccNbr(-1), channel(-1), min(0), max(127), controller(controller), ui(ui), par(par), isFloat(isFloat), recording(true) {}
     ~midiControl();
     void changepar(int value);
     float getpar();

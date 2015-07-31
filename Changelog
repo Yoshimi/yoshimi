@@ -1,6 +1,9 @@
 yoshimi 1.3.x
 
 2015-7-31 Musinux
+- added envelope parameters control (amplitude, filter, ...) and saving
+
+2015-7-31 Musinux
 - added midi control possibility for buttons, lists and checkboxes
 - added EQ and DynFilter control
 - big bugfix: only the first effect of the chain could be controlled, before this patch

@@ -26,12 +26,13 @@
 #define ENVELOPE_PARAMS_H
 
 #include "Params/Presets.h"
+#include "Params/ControllableByMIDI.h"
 
 class XMLwrapper;
 
 class SynthEngine;
 
-class EnvelopeParams : public Presets
+class EnvelopeParams : public Presets, public ControllableByMIDI
 {
     public:
         EnvelopeParams(unsigned char Penvstretch_, unsigned char Pforcedrelease_, SynthEngine *_synth);
@@ -49,6 +50,26 @@ class EnvelopeParams : public Presets
         void getfromXML(XMLwrapper *xml);
 
         float getdt(char i);
+
+        enum {
+            c_Pfreemode,
+            c_Penvpoints,
+            c_Penvsustain,
+            c_PA_dt,
+            c_PD_dt,
+            c_PR_dt,
+            c_PA_val,
+            c_PD_val,
+            c_PS_val,
+            c_PR_val,
+            c_Penvstretch,
+            c_Pforcedrelease,
+            c_Plinearenvelope
+        };
+
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar) { return 0;};
+        float getparFloat(int npar);
 
         // MIDI Parameters
         unsigned char Pfreemode; // 1 daca este in modul free sau 0 daca este in mod ADSR,ASR,...

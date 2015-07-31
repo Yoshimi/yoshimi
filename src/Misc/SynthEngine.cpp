@@ -401,12 +401,8 @@ void SynthEngine::addMidiControl(midiControl *midiCtrl) {
 }
 
 void SynthEngine::addMidiControl(ControllableByMIDI *ctrl, int par, ControllableByMIDIUI *ui) {
-    midiControl *mc = new midiControl;
-    mc->par = par;
-    mc->recording = true;
-    mc->controller = ctrl;
-    mc->isFloat = true;
-    mc->ui = ui;
+    //                                              isFloat
+    midiControl *mc = new midiControl(ctrl, ui, par, true);
     ctrl->addMidiController(mc);
     midiControls.push_back(mc);
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
@@ -439,7 +435,7 @@ void SynthEngine::removeAllMidiControls() {
 void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
     list<midiControl*>::iterator i;
-    std::cout << "size of midiControls:" << midiControls.size() << endl;
+    std::cout << "Number of midicontrols " << midiControls.size() << endl;
     for(i=midiControls.begin(); i != midiControls.end();i++){
         if((*i)->recording) {
             std::cout << "Value recorded" << endl;

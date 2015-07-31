@@ -40,7 +40,6 @@ EffectMgr::EffectMgr(const bool insertion_, SynthEngine *_synth) :
     efxoutr = (float*)fftwf_malloc(synth->bufferbytes);
     memset(efxoutl, 0, synth->bufferbytes);
     memset(efxoutr, 0, synth->bufferbytes);
-    std::cout << "New EffMgr" << endl;
     defaults();
 }
 

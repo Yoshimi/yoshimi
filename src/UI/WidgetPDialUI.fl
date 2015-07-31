@@ -152,7 +152,6 @@ class WidgetPDial {open : {public Fl_Dial}
                 oldvalue = value();
                 // right click menu:
                 if(Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_shift() != 0) {
-                    std::cout << "hey yeah" << endl;
                     if(controllable) {
                         Fl_Menu_Item rclick_menu[] = {
                             { "Reset", 0, reset},
@@ -387,7 +386,6 @@ class WidgetPDial {open : {public Fl_Dial}
   Function {stampa(Fl_Widget *w, void *v)} {open return_type {static void}
   } {
     code {WidgetPDial *p = (WidgetPDial*)w;
-    std::cout << "ui: " << p->ui << " effMgr:" << p->midiCtrl << endl;
     p->synth->addMidiControl(p->midiCtrl, p->par, p->ui);
     midiccwindow->Show();} {}
   }

@@ -29,6 +29,7 @@ void ControllableByMIDIUI::refresh() {
 
 void ControllableByMIDIUI::reassignMidi(ControllableByMIDI *ctrl) {
 	controller = ctrl; 
+
 	controller->reassignUIControls(this);
 }
 
@@ -38,7 +39,7 @@ ControllableByMIDIUI::ControllableByMIDIUI() {
 
 ControllableByMIDIUI::~ControllableByMIDIUI() {
   if(controller != NULL){
-  	std::cout << "Deleting ui links" << endl; 
   	controller->unassignUIControls();
   }
+  std::cout << "deleting ControllableByMIDIUI" << endl;
 }

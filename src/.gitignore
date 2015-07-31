@@ -4,6 +4,7 @@
 *.sublime-workspace
 *.desktop
 CMakeCache.txt
+CMakeLists.txt
 Makefile
 nohup.out
 version.txt

@@ -70,8 +70,7 @@ pars=NULL;} {}
   }
   Function {~LFOUI()} {} {
     code {lfoui->hide();
-hide();
-//delete (lfoui);} {}
+hide();} {}
   }
   Function {make_window()} {open
   } {

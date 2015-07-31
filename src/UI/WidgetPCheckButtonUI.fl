@@ -69,7 +69,6 @@ class WidgetPCheckButton {open : {public Fl_Check_Button}
             case FL_PUSH:
                 // right click menu:
                 if(Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_shift() != 0) {
-                    std::cout << "hey yeah" << endl;
                     if(controllable) {
                         Fl_Menu_Item rclick_menu[] = {
                             { "Reset", 0, reset},

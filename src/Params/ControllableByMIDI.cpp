@@ -49,6 +49,7 @@ void ControllableByMIDI::removeAllMidiControllers(SynthEngine *synth){
 void ControllableByMIDI::reassignUIControls(ControllableByMIDIUI *ctrl){
     if(isControlled){
         list<midiControl*>::iterator i;
+        std::cout << "Recreating ui controls (" << controllers.size() << ")" << endl; 
         for(i=controllers.begin(); i != controllers.end();i++){
             (*i)->ui = ctrl;
         }
@@ -57,6 +58,7 @@ void ControllableByMIDI::reassignUIControls(ControllableByMIDIUI *ctrl){
 
 void ControllableByMIDI::unassignUIControls(){
     if(isControlled){
+        std::cout << "Removing ui controls (" << controllers.size() << ")" << endl; 
         list<midiControl*>::iterator i;
         for(i=controllers.begin(); i != controllers.end();i++){
             (*i)->ui = NULL;
