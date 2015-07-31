@@ -37,6 +37,11 @@ using namespace std;
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
+#include "Params/ControllableByMIDI.h"
+#include "WidgetPDialUI.h"
+#include "MidiControllerUI.h"
+#include <FL/Fl_Valuator.H>
+#include <list>
 
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
@@ -47,17 +52,17 @@ class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
-
+class MidiCCWindow;
 class MasterUI;
 
-class SynthEngine : private SynthHelper, MiscFuncs
+class SynthEngine : private SynthHelper, MiscFuncs, public ControllableByMIDI
 {
     private:    
         unsigned int uniqueId;
         bool isLV2Plugin;
         Bank bank;
         Config Runtime;
-        PresetsStore presetsstore;        
+        PresetsStore presetsstore;
     public:
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
@@ -131,6 +136,20 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol);
         void setPaudiodest(int value);
 
+
+
+        list<midiControl*> midiControls;
+
+        void addMidiControl(ControllableByMIDI *ctrl, int par, ControllableByMIDIUI *ui);
+        void addMidiControl(midiControl *midiCtrl);
+        void removeMidiControl(midiControl *midiCtrl);
+        void removeAllMidiControls();
+
+        unsigned char getpar(int npar);
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar){ return getpar(npar);}
+        float getparFloat(int npar){ return (float)getpar(npar);}
+
         // effects
         EffectMgr *sysefx[NUM_SYS_EFX]; // system
         EffectMgr *insefx[NUM_INS_EFX]; // insertion
@@ -167,6 +186,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         inline PresetsStore &getPresetsStore() {return presetsstore;}
         unsigned int getUniqueId() {return uniqueId;}
         MasterUI *getGuiMaster(bool createGui = true);
+        MidiCCWindow *getMidiCCWindow(){ return midiccwindow; };
+        void setMidiCCWindow(MidiCCWindow *win){ midiccwindow = win;}
         void guiClosed(bool stopSynth);
         void setGuiClosedCallback(void( *_guiClosedCallback)(void*), void *arg)
         {
@@ -205,6 +226,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         MasterUI *guiMaster;
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
+
+        MidiCCWindow *midiccwindow;
 
         int LFOtime; // used by Pcontinous
         string windowTitle;

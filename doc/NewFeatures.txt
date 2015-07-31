@@ -100,5 +100,4 @@ This is duplicated in the current part, the mixer panel for the currently loaded
 
 CCs can now be entered from the gui as if they'd been sent by MIDI, although currently this doesn't include NRPNs. The entry is made at the bottom of the 'MIDI' tab in the 'Settings' window.
 
-###
-
+-###

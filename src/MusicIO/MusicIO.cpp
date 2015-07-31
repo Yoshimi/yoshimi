@@ -80,54 +80,54 @@ int MusicIO::getMidiController(unsigned char b)
     int ctl = C_NULL;
     switch (b)
     {
-	    case 0: // Bank Select MSB
+        case 0: // Bank Select MSB
             ctl = C_bankselectmsb;
             break;        
-	    case 1: // Modulation Wheel
+        case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
         case 6: // data MSB
             ctl = C_dataH;
             break;
-	    case 7: // Volume
+        case 7: // Volume
             ctl = C_volume;
-    		break;
-	    case 10: // Panning
+            break;
+        case 10: // Panning
             ctl = C_panning;
             break;
             case 32: // Bank Select LSB
             ctl = C_bankselectlsb;
             break;        
-	    case 11: // Expression
+        case 11: // Expression
             ctl = C_expression;
             break;
         case 38: // data LSB
             ctl = C_dataL;
             break;
-	    case 64: // Sustain pedal
+        case 64: // Sustain pedal
             ctl = C_sustain;
-	        break;
-	    case 65: // Portamento
+            break;
+        case 65: // Portamento
             ctl = C_portamento;
-	        break;
-	    case 71: // Filter Q (Sound Timbre)
+            break;
+        case 71: // Filter Q (Sound Timbre)
             ctl = C_filterq;
             break;
-	    case 74: // Filter Cutoff (Brightness)
+        case 74: // Filter Cutoff (Brightness)
             ctl = C_filtercutoff;
-	        break;
-	    case 75: // BandWidth
+            break;
+        case 75: // BandWidth
             ctl = C_bandwidth;
-	        break;
-	    case 76: // FM amplitude
+            break;
+        case 76: // FM amplitude
             ctl = C_fmamp;
-	        break;
-	    case 77: // Resonance Center Frequency
+            break;
+        case 77: // Resonance Center Frequency
             ctl = C_resonance_center;
-	        break;
-	    case 78: // Resonance Bandwith
+            break;
+        case 78: // Resonance Bandwith
             ctl = C_resonance_bandwidth;
-	        break;
+            break;
         case 96: // data increment
             ctl = C_dataI;
             break;
@@ -140,19 +140,19 @@ int MusicIO::getMidiController(unsigned char b)
         case 99: // NRPN MSB
             ctl = C_nrpnH;
             break;
-	    case 120: // All Sounds OFF
+        case 120: // All Sounds OFF
             ctl = C_allsoundsoff;
-	        break;
-	    case 121: // Reset All Controllers
+            break;
+        case 121: // Reset All Controllers
             ctl = C_resetallcontrollers;
-	        break;
-	    case 123: // All Notes OFF
+            break;
+        case 123: // All Notes OFF
             ctl = C_allnotesoff;
-	        break;
-	    default: // an unrecognised controller!
+            break;
+        default: // an unrecognised controller!
             ctl = C_NULL;
             break;
-	}
+    }
     return ctl;
 }
 

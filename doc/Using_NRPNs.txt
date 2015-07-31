@@ -28,6 +28,7 @@ This can be useful but may have unintended consequeces!
 
 If in doubt, change/resend either of the NRPN bytes and both data bytes will be cleared.
 
+
 Additionally there is 96 for data increment and 97 for decrement.
 
 Data increment and decrement operation enables you to directly change the data LSB by between 0 and 63. To change the MSB add 64 to cover the same range. Setting zero might seem pointless, but it gives an alternative way to make an initial setting if your sequencer doesn't play nice.

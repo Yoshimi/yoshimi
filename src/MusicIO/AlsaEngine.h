@@ -42,7 +42,7 @@ class AlsaEngine : public MusicIO
         void Close(void);
 
         unsigned int getSamplerate(void) { return audio.samplerate; }
-        int getBuffersize(void) { return audio.period_size; };
+        int getBuffersize(void) { return audio.period_size; }
 
         string audioClientName(void);
         string midiClientName(void);
@@ -53,7 +53,7 @@ class AlsaEngine : public MusicIO
         int card_bits;
         bool card_signed;
         unsigned int card_chans;
-        
+
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);

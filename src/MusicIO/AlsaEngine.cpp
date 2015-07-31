@@ -42,9 +42,9 @@ AlsaEngine::AlsaEngine(SynthEngine *_synth) :MusicIO(_synth)
     midi.alsaId = -1;
     midi.pThread = 0;
 #if __BYTE_ORDER  == __LITTLE_ENDIAN
-        little_endian = true;
+    little_endian = true;
 #else
-        little_endian = false;
+    little_endian = false;
 #endif
 }
 
@@ -200,9 +200,9 @@ string AlsaEngine::midiClientName(void)
 bool AlsaEngine::prepHwparams(void)
 {
     /*
-     * thanks to the jack project for which formats to support and
-     * the basis of a simplified structure
-     */
+-     * thanks to the jack project for which formats to support and
+-     * the basis of a simplified structure
+-     */
     static struct
     {
         snd_pcm_format_t card_format;
@@ -345,7 +345,6 @@ bail_out:
     return false;
 }
 
-
 void AlsaEngine::Interleave(int buffersize)
 {
     int idx = 0;
@@ -394,12 +393,10 @@ void AlsaEngine::Interleave(int buffersize)
     }
 }
 
-
 void *AlsaEngine::_AudioThread(void *arg)
 {
     return static_cast<AlsaEngine*>(arg)->AudioThread();
 }
-
 
 void *AlsaEngine::AudioThread(void)
 {

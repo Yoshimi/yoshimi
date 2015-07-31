@@ -48,6 +48,8 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "MasterUI.h"
+#include "MidiControllerUI.h"
+#include "Misc/ControllableByMIDIUI.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
@@ -154,10 +156,8 @@ bool Config::Setup(int argc, char **argv)
     switch (audioEngine)
     {
         case alsa_audio:
-        {
             audioDevice = string(alsaAudioDevice);
             break;
-        }
         case jack_audio:
             audioDevice = string(jackServer);
             break;
@@ -285,6 +285,11 @@ string Config::testCCvalue(int cc)
             break;
         case 38:
             result = "data lsb";
+        case 64:
+            result = "sustain pedal";
+            break;
+        case 65:
+            result = "partamento";
             break;
         case 71:
             result = "filter Q";
@@ -303,6 +308,15 @@ string Config::testCCvalue(int cc)
             break;
         case 78:
             result = "resonance bandwidth";
+            break;
+        case 120:
+            result = "all sounds off";
+            break;
+        case 121:
+            result = "reset all controllers";
+            break;
+        case 123:
+            result = "all notes off";
             break;
         default:
             result = masterCCtest(cc);
@@ -367,7 +381,6 @@ string Config::masterCCtest(int cc)
     }
     return result;
 }
-
 
 void Config::clearPresetsDirlist(void)
 {
@@ -1113,6 +1126,28 @@ void GuiThreadMsg::processGuiMessages()
             else
             {
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdateMidiControllers:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MidiCCWindow *win = synth->getMidiCCWindow();
+            if(win)
+            {
+                win->updateRack();
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdateUIWindow:
+        {
+            if(msg->ui != NULL){
+                //std::cout << "Refreshing some ui... ";
+                //std::cout << std::flush;
+                if(msg->ui != NULL)
+                    msg->ui->refresh();
+                //std::cout << "Done." << endl;
+                //std::cout << std::flush;
             }
         }
             break;

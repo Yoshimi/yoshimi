@@ -43,6 +43,14 @@ class EQ : public Effect, private MiscFuncs
         void cleanup(void);
         float getfreqresponse(float freq);
 
+        enum {
+            c_Ptype,
+            c_Pfreq,
+            c_Pgain,
+            c_Pq,
+            c_Pstages
+        };
+
     private:
         // Parameters
         unsigned char Pvolume;

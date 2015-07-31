@@ -30,11 +30,14 @@
 
 using namespace std;
 
+#include "MidiControllerUI.h"
 #include "MasterUI.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
-
+#include "Params/ControllableByMIDI.h"
+#include "Misc/ControllableByMIDIUI.h"
 #include <iostream>
+#include <list>
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -143,6 +146,9 @@ SynthEngine::~SynthEngine()
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
+    if(midiControls.size() > 0){
+        removeAllMidiControls();
+    }
 }
 
 
@@ -323,6 +329,7 @@ void SynthEngine::defaults(void)
 {
     setPvolume(90);
     setPkeyshift(64);
+    removeAllMidiControls();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->defaults();
@@ -344,6 +351,7 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    
     ShutUp();
 }
 
@@ -385,10 +393,66 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
     }
 }
 
+// Midi Control
+void SynthEngine::addMidiControl(midiControl *midiCtrl) {
+    midiCtrl->controller->addMidiController(midiCtrl);
+    midiControls.push_back(midiCtrl);
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
+}
+
+void SynthEngine::addMidiControl(ControllableByMIDI *ctrl, int par, ControllableByMIDIUI *ui) {
+    //                                              isFloat
+    midiControl *mc = new midiControl(ctrl, ui, par, true);
+    ctrl->addMidiController(mc);
+    midiControls.push_back(mc);
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
+}
+
+void SynthEngine::removeMidiControl(midiControl *midiCtrl) {
+    list<midiControl*>::iterator i;
+    for(i=midiControls.begin(); i != midiControls.end();i++){
+        if((*i) == midiCtrl){
+            delete (*i);
+            midiControls.erase(i);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
+            return;
+        }
+    }
+    
+}
+
+void SynthEngine::removeAllMidiControls() {
+    list<midiControl*>::iterator i;
+    for(i=midiControls.begin(); i != midiControls.end();i++){
+        //cout << "deleting control "<< (*i)->ccNbr << endl;
+        delete (*i);
+    }
+    midiControls.clear();
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
+}
 
 // Controllers
 void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
+    list<midiControl*>::iterator i;
+    //std::cout << "Number of midicontrols " << midiControls.size() << endl;
+    for(i=midiControls.begin(); i != midiControls.end();i++){
+        if((*i)->recording) {
+            std::cout << "Value recorded" << endl;
+            (*i)->ccNbr = type;
+            (*i)->channel = chan;
+            (*i)->recording = false;
+        }
+        if((*i)->ccNbr == type && (*i)->channel == chan) {
+            //std::cout << "Found Control" << endl;
+            (*i)->changepar(par);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
+            if((*i)->ui)
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateUIWindow, 0, (*i)->ui);
+            return;
+        }
+    }
+
     if (type == Runtime.midi_bank_C) {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
     }
@@ -665,7 +729,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
 
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
-
+   
     p_buffersize = buffersize;
     p_bufferbytes = bufferbytes;
     p_buffersize_f = buffersize_f;
@@ -919,6 +983,29 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
         return true;
     }
     return false;
+}
+
+void SynthEngine::changepar(int npar, double value){
+
+    switch(npar){
+        case 0:
+            setPvolume((char)value);
+            break;
+        case 1:
+            microtonal.Pglobalfinedetune = (int)value; // Doesn't change on a single note
+            break;
+    }
+}
+
+unsigned char SynthEngine::getpar(int npar){
+    switch(npar){
+        case 0:
+            return (unsigned char)Pvolume;
+        case 1:
+            return (unsigned char)microtonal.Pglobalfinedetune;
+        default:
+            return 0;
+    }
 }
 
 // Parameter control

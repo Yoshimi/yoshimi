@@ -42,6 +42,7 @@ decl {\#include "EffUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
     \#include "Params/Controller.h"
+    \#include "Misc/ControllableByMIDIUI.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
@@ -333,7 +334,7 @@ class PartKitItem {: {public Fl_Group}
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs, public ControllableByMIDIUI}
 } {
   Function {make_window()} {private
   } {
@@ -832,7 +833,7 @@ else {propta->deactivate();proptb->deactivate();}}
       } {
         Fl_Group inseffectui {
           xywh {5 37 380 95}
-          code0 {o->init(part->partefx[ninseff]);}
+          code0 {o->init(part->partefx[ninseff], synth);}
           class EffUI
         } {}
       }
@@ -974,7 +975,8 @@ else {propta->deactivate();proptb->deactivate();}}
       label {Instrument Edit}
       xywh {147 542 395 360} type Double hide
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
-      code1 {seteditname();}
+      code1 {string tname = synth->getGuiMaster()->set_part_window_title("Edit");}
+      code2 {o->copy_label(tname.c_str());}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -986,17 +988,17 @@ else {propta->deactivate();proptb->deactivate();}}
           Fl_Check_Button adsynenabledcheck {
             label Enabled
             callback {//
-    int x = o->value();
-    part->kit[0].Padenabled = x;
-    if (x == 0)
-        adeditbutton->deactivate();
-    else
-        adeditbutton->activate();
-
-    if(engine == 0 || x == 0)
-        addbox->color(BASE_COLOUR);
-    else
-        addbox->color(ADD_COLOUR);}
+              int x = o->value();
+              part->kit[0].Padenabled = x;
+              if (x == 0)
+                  adeditbutton->deactivate();
+              else
+                  adeditbutton->activate();
+              copylabeltopanel();
+              if(engine == 0 || x == 0)
+                  addbox->color(BASE_COLOUR);
+              else
+                  addbox->color(ADD_COLOUR);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
@@ -1007,8 +1009,8 @@ else {propta->deactivate();proptb->deactivate();}}
           Fl_Button adeditbutton {
             label Edit
             callback {showparameters(0,0);
-copylabeltopanel();
-seteditname();}
+              copylabeltopanel();
+              seteditname();}
             xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
@@ -1026,7 +1028,6 @@ seteditname();}
         subeditbutton->deactivate();
     else
         subeditbutton->activate();
-
     if(engine == 0 || x == 0)
         subbox->color(BASE_COLOUR);
     else
@@ -1041,8 +1042,8 @@ seteditname();}
           Fl_Button subeditbutton {
             label Edit
             callback {showparameters(0,1);
-copylabeltopanel();
-seteditname();}
+              copylabeltopanel();
+              seteditname();}
             xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
@@ -1075,8 +1076,8 @@ seteditname();}
           Fl_Button padeditbutton {
             label Edit
             callback {showparameters(0,2);
-copylabeltopanel();
-seteditname();}
+                copylabeltopanel();
+                seteditname();}
             xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
@@ -1352,6 +1353,13 @@ seteditname();}
         delete instrumentkitlist;
         instrumenteditwindow->hide();
         delete instrumenteditwindow;} {}
+  }
+  Function {refresh()} {} {
+    code {
+      /*if(adnoteui != NULL) adnoteui->refresh();
+      if(subnoteui != NULL) subnoteui->refresh();
+      if(padnoteui != NULL) padnoteui->refresh();*/
+    } {}
   }
   decl {Part *part;} {public local
   }

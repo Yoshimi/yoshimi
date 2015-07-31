@@ -27,10 +27,11 @@
 
 #include "Misc/XMLwrapper.h"
 #include "Params/Presets.h"
-
+#include "Params/ControllableByMIDI.h"
+class LFO;
 class SynthEngine;
 
-class LFOParams : public Presets
+class LFOParams : public Presets, public ControllableByMIDI
 {
     public:
         LFOParams(float Pfreq_, unsigned char Pintensity_, unsigned char Pstartphase_,
@@ -41,6 +42,22 @@ class LFOParams : public Presets
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
+
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar){ return -1;};
+        float getparFloat(int npar);
+
+        enum {
+            c_Pfreq,
+            c_Pintensity,
+            c_Pstartphase,
+            c_PLFOtype,
+            c_Prandomness,
+            c_Pfreqrand,
+            c_Pdelay,
+            c_Pcontinous,
+            c_Pstretch
+        };
 
         // MIDI Parameters
         float Pfreq;
@@ -54,7 +71,10 @@ class LFOParams : public Presets
         unsigned char Pstretch;
 
         int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
-       // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
+        // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
+
+        void addLFO(LFO *lfo);
+        void removeLFO(LFO *lfo);
 
     private:
         // Default parameters
@@ -65,6 +85,8 @@ class LFOParams : public Presets
         unsigned char Drandomness;
         unsigned char Ddelay;
         unsigned char Dcontinous;
+
+        list<LFO*> lfos;
 };
 
 #endif

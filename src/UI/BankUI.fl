@@ -320,7 +320,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
         fl_alert("Error: Could not load the bank from the directory\\n%s.", bankEntry.dirname.c_str());
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh();
-    refreshmainwindow();}
+    refreshmainwindow();} open
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
       Fl_Button {} {
@@ -788,6 +788,7 @@ fnr = &RootProcess_::rootprocess;
         {   // Rename slot
             const char *newname = fl_input("Instrument name:", thisname.c_str());
             if (newname)
+            {
                 if (strlen(newname) > 3)
                 {
                     if (!bank->setname(slot, string(newname), -1))
@@ -802,6 +803,7 @@ fnr = &RootProcess_::rootprocess;
                         synth->part[*npart]->Pname = newname;
                     }
                 }
+            }
             setread();
             cbwig->do_callback();
         }
@@ -895,7 +897,8 @@ fnr = &RootProcess_::rootprocess;
         if (mode == 5 && !thisname.empty())
         {   // Rename bank
             const char *tmp = fl_input("Bank name:",thisname.c_str());
-            if (tmp)
+           if (tmp)
+           {
                 if (strlen(tmp) > 2) // insist on a readable name
                 {
                     if (!bank->setbankname(slot, string(tmp)))
@@ -911,6 +914,7 @@ fnr = &RootProcess_::rootprocess;
                         set_bank_slot();
                     }
                 }
+            }
             setrootread();
         }
 

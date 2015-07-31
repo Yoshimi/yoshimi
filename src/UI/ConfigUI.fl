@@ -148,7 +148,7 @@ class ConfigUI {open : {private MiscFuncs}
                 int tmp = synth->getRuntime().Interpolation;
                 synth->getRuntime().Interpolation = (int) o->value();
                 if (synth->getRuntime().Interpolation != tmp)
-                	configChanged = true;}
+                  configChanged = true;}
             xywh {250 115 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
@@ -167,7 +167,7 @@ class ConfigUI {open : {private MiscFuncs}
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
                 if (synth->getRuntime().VirKeybLayout != tmp)
-                	configChanged = true;}
+                  configChanged = true;}
             xywh {250 150 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
@@ -195,10 +195,10 @@ class ConfigUI {open : {private MiscFuncs}
           Fl_Counter compression {
             label {XML compression level}
             callback {//
-		unsigned int tmp = synth->getRuntime().GzipCompression;
-		synth->getRuntime().GzipCompression = (unsigned int) o->value();
-		if(synth->getRuntime().GzipCompression != tmp)
-			configChanged = true;}
+    unsigned int tmp = synth->getRuntime().GzipCompression;
+    synth->getRuntime().GzipCompression = (unsigned int) o->value();
+    if(synth->getRuntime().GzipCompression != tmp)
+      configChanged = true;}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 185 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
           }
@@ -498,8 +498,8 @@ else
         synth->getRuntime().midi_bank_C = candidate;
     else
     {
-    	o->value(oldBank);
-    	o->redraw();
+      o->value(oldBank);
+      o->redraw();
         fl_alert("In use for %s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
@@ -524,20 +524,20 @@ else
           Fl_Check_Button {} {
             label {Enable Program Change}
             callback {//
-		int tmp = synth->getRuntime().EnableProgChange;
-		synth->getRuntime().EnableProgChange = o->value();
-		if (synth->getRuntime().EnableProgChange != tmp)
-			configChanged = true;}
+    int tmp = synth->getRuntime().EnableProgChange;
+    synth->getRuntime().EnableProgChange = o->value();
+    if (synth->getRuntime().EnableProgChange != tmp)
+      configChanged = true;}
             tooltip {MIDI program change enable/disable} xywh {275 162 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
           Fl_Check_Button {} {
             label {Enable Part On Program Change}
             callback {//
-		int tmp = synth->getRuntime().enable_part_on_voice_load;
-		synth->getRuntime().enable_part_on_voice_load = o->value();
-		if (synth->getRuntime().enable_part_on_voice_load != tmp)
-			configChanged = true;}
+    int tmp = synth->getRuntime().enable_part_on_voice_load;
+    synth->getRuntime().enable_part_on_voice_load = o->value();
+    if (synth->getRuntime().enable_part_on_voice_load != tmp)
+      configChanged = true;}
             tooltip {Part enabled if MIDI program changed} xywh {275 182 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
@@ -643,11 +643,11 @@ configwindow->do_callback();}
   Function {ConfigUI(SynthEngine *_synth)} {open
   } {
     code {//
-	synth = _synth;
+  synth = _synth;
         configChanged = false;
         make_window();
         readpresetcfg();
-	selectedRootID = -1;} {}
+  selectedRootID = -1;} {}
   }
   Function {activatebutton_presetdir(bool active)} {open
   } {

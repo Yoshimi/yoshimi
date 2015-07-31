@@ -26,6 +26,9 @@ using namespace std;
 
 #include "Misc/SynthEngine.h"
 #include "Effects/Alienwah.h"
+#include "Params/ControllableByMIDI.h"
+
+class ControllableByMIDI;
 
 Alienwah::Alienwah(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
     Effect(insertion_, efxoutl_, efxoutr_, NULL, 0),
@@ -186,41 +189,41 @@ void Alienwah::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
-        case 0:
+        case c_Pvolume:
             setvolume(value);
             break;
-        case 1:
+        case c_Ppanning:
             setpanning(value);
             break;
-        case 2:
+        case c_Pfreq:
             lfo.Pfreq = value;
             lfo.updateparams();
             break;
-        case 3:
+        case c_Prandomness:
             lfo.Prandomness = value;
             lfo.updateparams();
             break;
-        case 4:
+        case c_PLFOtype:
             lfo.PLFOtype = value;
             lfo.updateparams();
             break;
-        case 5:
+        case c_Pstereo:
             lfo.Pstereo = value;
             lfo.updateparams();
             break;
-        case 6:
+        case c_Pdepth:
             setdepth(value);
             break;
-        case 7:
+        case c_Pfeedback:
             setfb(value);
             break;
-        case 8:
+        case c_Pdelay:
             setdelay(value);
             break;
-        case 9:
+        case c_Plrcross:
             setlrcross(value);
             break;
-        case 10:
+        case c_Pphase:
             setphase(value);
             break;
     }

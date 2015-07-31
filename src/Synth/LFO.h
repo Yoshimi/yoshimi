@@ -26,16 +26,33 @@
 #define LFO_H
 
 #include "Params/LFOParams.h"
+#include "Params/ControllableByMIDI.h"
 
 class SynthEngine;
 
-class LFO
+class LFO: public ControllableByMIDI
 {
     public:
         LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth);
-        ~LFO() { };
+        ~LFO();
         float lfoout(void);
         float amplfoout(void);
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar){ return 0;};
+        float getparFloat(int npar);
+
+        enum {
+            c_Pfreq,
+            c_Pintensity,
+            c_Pstartphase,
+            c_PLFOtype,
+            c_Prandomness,
+            c_Pfreqrand,
+            c_Pdelay,
+            c_Pcontinous,
+            c_Pstretch
+        };
+
     private:
         void computenextincrnd(void);
         float x;
@@ -47,7 +64,9 @@ class LFO
         float lfodelay;
         char lfotype;
         int freqrndenabled;
+        float basefreq;
 
+        LFOParams *lfopars;
         SynthEngine *synth;
 };
 

@@ -254,6 +254,107 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
     }
 }
 
+void FilterParams::changepar(int npar, double value){
+    switch(npar){
+        case c_Pcategory:
+            Pcategory = value;
+            break;
+        case c_Ptype:
+            Ptype = value;
+            break;
+        case c_Pfreq:
+            Pfreq = value;
+            break;
+        case c_Pq:
+            Pq = value;
+            break;
+        case c_Pstages:
+            Pstages = value;
+            break;
+        case c_Pfreqtrack:
+            Pfreqtrack = value;
+            break;
+        case c_Pgain:
+            Pgain = value;
+            break;
+        case c_Pnumformants:
+            Pnumformants = value;
+            break;
+        case c_Pformantslowness:
+            Pformantslowness = value;
+            break;
+        case c_Pvowelclearness:
+            Pvowelclearness = value;
+            break;
+        case c_Pcenterfreq:
+            Pcenterfreq = value;
+            break;
+        case c_Poctavesfreq:
+            Poctavesfreq = value;
+            break;
+        case c_Psequencesize:
+            Psequencesize = value;
+            break;
+        case c_Psequencestretch:
+            Psequencestretch = value;
+            break;
+        case c_Psequencereversed:
+            Psequencereversed = value;
+            break;
+    }
+}
+
+float FilterParams::getparFloat(int npar){
+    switch(npar){
+        case c_Pcategory:
+            return Pcategory;
+            break;
+        case c_Ptype:
+            return Ptype;
+            break;
+        case c_Pfreq:
+            return Pfreq;
+            break;
+        case c_Pq:
+            return Pq;
+            break;
+        case c_Pstages:
+            return Pstages;
+            break;
+        case c_Pfreqtrack:
+            return Pfreqtrack;
+            break;
+        case c_Pgain:
+            return Pgain;
+            break;
+        case c_Pnumformants:
+            return Pnumformants;
+            break;
+        case c_Pformantslowness:
+            return Pformantslowness;
+            break;
+        case c_Pvowelclearness:
+            return Pvowelclearness;
+            break;
+        case c_Pcenterfreq:
+            return Pcenterfreq;
+            break;
+        case c_Poctavesfreq:
+            return Poctavesfreq;
+            break;
+        case c_Psequencesize:
+            return Psequencesize;
+            break;
+        case c_Psequencestretch:
+            return Psequencestretch;
+            break;
+        case c_Psequencereversed:
+            return Psequencereversed;
+            break;
+    }
+    return -1;
+}
+
 
 // Transforms a parameter to the real value
 //float FilterParams::getformantfreq(unsigned char freq)

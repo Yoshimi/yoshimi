@@ -37,9 +37,12 @@ using namespace std;
 #include "Misc/HistoryListItem.h"
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
+#include "Misc/ControllableByMIDIUI.h"
 
 typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
 typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
+
+class ControllableByMIDIUI;
 
 class XMLwrapper;
 class BodyDisposal;
@@ -205,7 +208,9 @@ public:
     enum
     {
         NewSynthEngine = 0,
+        UpdateMidiControllers,
         UpdatePanel,
+        UpdateUIWindow,
         UpdatePanelItem,
         UpdatePartProgram,
         UpdateEffects,
@@ -216,12 +221,14 @@ public:
     unsigned long length; //length of data member (determined by type member, can be set to 0, if data is known struct/class)
     unsigned int index; // if there is integer data, it can be passed through index (to remove aditional receiver logic)
     unsigned int type; // type of gui message (see enum above)
-    static void sendMessage(void *_data, unsigned int _type, unsigned int _index)
+    ControllableByMIDIUI *ui;
+    static void sendMessage(void *_data, unsigned int _type, unsigned int _index, ControllableByMIDIUI *ui = NULL)
     {
         GuiThreadMsg *msg = new GuiThreadMsg;
         msg->data = _data;
         msg->type = _type;
         msg->index = _index;
+        msg->ui = ui; // UI can be null
         Fl::awake((void *)msg);
     }
     static void processGuiMessages();

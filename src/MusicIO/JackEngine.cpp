@@ -341,11 +341,11 @@ bool JackEngine::connectJackPorts(void)
 {
     const char** playback_ports = jack_get_ports(jackClient, NULL, NULL,
                                                  JackPortIsPhysical|JackPortIsInput);
-	if (!playback_ports)
+    if (!playback_ports)
     {
         synth->getRuntime().Log("No physical jack playback ports found.");
         return false;
-	}
+    }
     int ret;
     for (int port = 0; port < 2 && (NULL != audio.ports[port + NUM_MIDI_PARTS*2]); ++port)
     {

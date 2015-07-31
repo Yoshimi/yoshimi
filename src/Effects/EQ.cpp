@@ -122,7 +122,7 @@ void EQ::changepar(int npar, unsigned char value)
     float tmp;
     switch (bp)
     {
-        case 0:
+        case c_Ptype:
             filter[nb].Ptype = value;
             if (value > 9)
                 filter[nb].Ptype = 0; // has to be changed if more filters will be added
@@ -132,25 +132,25 @@ void EQ::changepar(int npar, unsigned char value)
                 filter[nb].r->settype(value - 1);
             }
             break;
-        case 1:
+        case c_Pfreq:
             filter[nb].Pfreq = value;
             tmp = 600.0f * powf(30.0f, (value - 64.0f) / 64.0f);
             filter[nb].l->setfreq(tmp);
             filter[nb].r->setfreq(tmp);
             break;
-        case 2:
+        case c_Pgain:
             filter[nb].Pgain = value;
             tmp = 30.0f * (value - 64.0f) / 64.0f;
             filter[nb].l->setgain(tmp);
             filter[nb].r->setgain(tmp);
             break;
-        case 3:
+        case c_Pq:
             filter[nb].Pq = value;
             tmp = powf(30.0f, (value - 64.0f) / 64.0f);
             filter[nb].l->setq(tmp);
             filter[nb].r->setq(tmp);
             break;
-        case 4:
+        case c_Pstages:
             filter[nb].Pstages = value;
             if (value >= MAX_FILTER_STAGES)
                 filter[nb].Pstages = MAX_FILTER_STAGES - 1;

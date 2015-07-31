@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.5 M")
+set (YOSHIMI_VERSION "1.3.5 Midilearn")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -190,6 +190,10 @@ set (GuiFluids
     UI/EffUI.fl  UI/BankUI.fl  UI/PartUI.fl
     UI/MicrotonalUI.fl  UI/MasterUI.fl    UI/MasterMiscUI.fl
     UI/ParametersUI.fl UI/ConsoleUI.fl
+    UI/MidiControllerUI.fl
+    UI/WidgetPCheckButtonUI.fl
+    UI/WidgetPChoiceUI.fl
+    UI/WidgetPCounterUI.fl
 )
 
 fltk_wrap_ui (yoshimi ${GuiFluids})
@@ -234,6 +238,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Microtonal.cpp
     Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+    Misc/ControllableByMIDIUI.cpp
 )
 
 set (Params_sources
@@ -242,6 +247,7 @@ set (Params_sources
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
     Params/Controller.cpp  Params/Presets.cpp Params/PresetsStore.cpp
     Params/ControlInterface.cpp
+    Params/ControllableByMIDI.cpp
 )
 
 set (Synth_sources

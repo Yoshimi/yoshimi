@@ -40,6 +40,10 @@ decl {using namespace std;} {public local
 decl {\#include "ADnoteUI.h"} {public local
 } 
 
+decl {\#include "Misc/ControllableByMIDIUI.h"} {public local
+} 
+
+
 decl {\#include "SUBnoteUI.h"} {public local
 } 
 
@@ -82,10 +86,11 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-decl {class MasterUI;} {public local
+decl {class MasterUI;
+      \#include "MidiControllerUI.h"} {public local
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs, public ControllableByMIDIUI}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -159,6 +164,8 @@ class MasterUI {selected : {private MiscFuncs}
       bankui = new BankUI(&npart, synth);
       virkeyboard = new VirKeyboard(synth);
       configui = new ConfigUI(synth);
+      midiccwindow = new MidiCCWindow(masterwindow->x()+100,masterwindow->y()+50,316,400, synth, "Midi Controllers");
+      synth->setMidiCCWindow(midiccwindow);
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
@@ -215,6 +222,11 @@ class MasterUI {selected : {private MiscFuncs}
             label {&About...}
             callback {aboutwindow->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label MidiControllers
+            callback {midiccwindow->Show();}
+            tooltip {Mapping of midi cc signals} xywh {15 15 100 20} labelsize 12
           }
           MenuItem {} {
             label {&New instance}
@@ -732,7 +744,7 @@ mainCreateNewInstance(forceId);}
       } {
         Fl_Group syseffectui {open
           xywh {3 158 384 95} labeltype NO_LABEL
-          code0 {o->init(synth->sysefx[nsyseff]);o->activate();o->show();}
+          code0 {o->init(synth->sysefx[nsyseff], synth);o->activate();o->show();}
           class EffUI
         } {}
       }
@@ -742,7 +754,7 @@ mainCreateNewInstance(forceId);}
       } {
         Fl_Group inseffectui {open
           xywh {3 158 380 95} color 52
-          code0 {o->init(synth->insefx[ninseff]);o->hide();}
+          code0 {o->init(synth->insefx[ninseff], synth);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}
@@ -1324,6 +1336,10 @@ updatepanel();}
   Function {getSynth()} {return_type {SynthEngine *}
   } {
     code {return synth;} {}
+  }
+  Function {refresh()} {} {
+    code {
+      /*if(partui != NULL) partui->refresh();*/} {}
   }
   decl {ConfigUI *configui;} {public local
   }

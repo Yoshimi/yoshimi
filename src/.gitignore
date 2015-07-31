@@ -1,0 +1,11 @@
+*.cbp
+*.layout
+*.sublime-project
+*.sublime-workspace
+*.desktop
+CMakeCache.txt
+Makefile
+nohup.out
+version.txt
+CMakeFiles/
+cmake_install.cmake

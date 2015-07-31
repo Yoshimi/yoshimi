@@ -42,6 +42,21 @@ class Chorus : public Effect
         unsigned char getpar(int npar);
         void cleanup();
 
+        enum {
+            c_Pvolume,
+            c_Ppanning,
+            c_Pfreq,
+            c_Prandomness,
+            c_PLFOtype,
+            c_Pstereo,
+            c_Pdepth,
+            c_Pdelay,
+            c_Pfeedback,
+            c_Plrcross,
+            c_Pflangemode,
+            c_Poutsub
+        };
+
     private:
         // Chorus Parameters
         unsigned char Pvolume;

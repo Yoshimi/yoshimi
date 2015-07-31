@@ -398,56 +398,56 @@ void Phaser::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
-        case 0:
+        case c_Pvolume:
             setvolume(value);
             break;
-        case 1:
+        case c_Ppanning:
             setpanning(value);
             break;
-        case 2:
+        case c_Pfreq:
             lfo.Pfreq = value;
             lfo.updateparams();
             break;
-        case 3:
+        case c_Prandomness:
             lfo.Prandomness = value;
             lfo.updateparams();
             break;
-        case 4:
+        case c_PLFOtype:
             lfo.PLFOtype = value;
             lfo.updateparams();
             barber = (2 == value);
             break;
-        case 5:
+        case c_Pstereo:
             lfo.Pstereo = value;
             lfo.updateparams();
             break;
-        case 6:
+        case c_Pdepth:
             setdepth(value);
             break;
-        case 7:
+        case c_Pfeedback:
             setfb(value);
             break;
-        case 8:
+        case c_Pstages:
             setstages(value);
             break;
-        case 9:
+        case c_Plrcross:
             setlrcross(value);
             setoffset(value);
             break;
-        case 10:
+        case c_Poutsub:
             Poutsub = (value > 1) ? 1 : value;
             break;
-        case 11:
+        case c_Pphase:
             setphase(value);
             setwidth(value);
             break;
-        case 12:
+        case c_Phyper:
             Phyper = min((int)value, 1);
             break;
-        case 13:
+        case c_Pdistorsion:
             setdistortion(value);
             break;
-        case 14:
+        case c_Panalog:
             Panalog = value;
             break;
     }

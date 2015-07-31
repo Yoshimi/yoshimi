@@ -214,6 +214,7 @@ void EnvelopeParams::add2XML(XMLwrapper *xml)
             xml->endbranch();
         }
     }
+    add2XMLMidi(xml);
 }
 
 void EnvelopeParams::getfromXML(XMLwrapper *xml)
@@ -239,9 +240,10 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
         Penvval[i]=xml->getpar127("val",Penvval[i]);
         xml->exitbranch();
     }
-
+    getfromXMLMidi(xml, synth);
     if (!Pfreemode)
         converttofree();
+
 }
 
 void EnvelopeParams::defaults(void)
@@ -272,4 +274,94 @@ void EnvelopeParams::store2defaults(void)
     DD_val = PD_val;
     DS_val = PS_val;
     DR_val = PR_val;
+}
+
+void EnvelopeParams::changepar(int npar, double value){
+    switch(npar){
+        case c_Pfreemode:
+            Pfreemode = value >= 1 ? 1:0;
+            break;
+        case c_Penvpoints:
+            Penvpoints = MAX_ENVELOPE_POINTS < Penvpoints ? MAX_ENVELOPE_POINTS: value;
+            break;
+        case c_Penvsustain:
+            Penvsustain = value;
+            break;
+        case c_PA_dt:
+            PA_dt = value;
+            break;
+        case c_PD_dt:
+            PD_dt = value;
+            break;
+        case c_PR_dt:
+            PR_dt = value;
+            break;
+        case c_PA_val:
+            PA_val = value;
+            break;
+        case c_PD_val:
+            PD_val = value;
+            break;
+        case c_PS_val:
+            PS_val = value;
+            break;
+        case c_PR_val:
+            PR_val = value;
+            break;
+        case c_Penvstretch:
+            Penvstretch = value;
+            break;
+        case c_Pforcedrelease:
+            Pforcedrelease = value;
+            break;
+        case c_Plinearenvelope:
+            Plinearenvelope = value;
+            break;
+    }
+    return;
+}
+
+float EnvelopeParams::getparFloat(int npar){
+    switch(npar){
+        case c_Pfreemode:
+            return Pfreemode;
+            break;
+        case c_Penvpoints:
+            return Penvpoints;
+            break;
+        case c_Penvsustain:
+            return Penvsustain;
+            break;
+        case c_PA_dt:
+            return PA_dt;
+            break;
+        case c_PD_dt:
+            return PD_dt;
+            break;
+        case c_PR_dt:
+            return PR_dt;
+            break;
+        case c_PA_val:
+            return PA_val;
+            break;
+        case c_PD_val:
+            return PD_val;
+            break;
+        case c_PS_val:
+            return PS_val;
+            break;
+        case c_PR_val:
+            return PR_val;
+            break;
+        case c_Penvstretch:
+            return Penvstretch;
+            break;
+        case c_Pforcedrelease:
+            return Pforcedrelease;
+            break;
+        case c_Plinearenvelope:
+            return Plinearenvelope;
+            break;
+    }
+    return -1;
 }

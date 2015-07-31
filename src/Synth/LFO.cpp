@@ -29,8 +29,11 @@
 
 
 LFO::LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth):
+    lfopars(lfopars), 
+    basefreq(basefreq),
     synth(_synth)
 {
+    lfopars->addLFO(this);
     if (lfopars->Pstretch == 0)
         lfopars->Pstretch = 1;
     float lfostretch =
@@ -89,6 +92,82 @@ LFO::LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth):
     computenextincrnd(); // twice because I want incrnd & nextincrnd to be random
 }
 
+LFO::~LFO() {
+    lfopars->removeLFO(this);
+}
+
+void LFO::changepar(int npar, double value){
+    float lfofreq;
+    float lfostretch;
+    switch(npar){
+        case c_Pfreq:
+            lfostretch =
+                powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
+            lfofreq = (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
+            incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
+            // Limit the Frequency (or else...)
+            if (incx > 0.49999999f)
+                incx = 0.499999999f;
+            break;
+        case c_Pintensity:
+            switch (lfopars->fel)
+            {
+                case 1:
+                    lfointensity = lfopars->Pintensity / 127.0f;
+                    break;
+                case 2:
+                    lfointensity = lfopars->Pintensity / 127.0f * 4.0f;
+                    break; // in octave
+                default:
+                    lfointensity = powf(2.0f, lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
+                    break;
+            }
+            break;
+        case c_Pstartphase:
+            break;
+        case c_PLFOtype:
+            lfotype = lfopars->PLFOtype;
+            break;
+        case c_Prandomness:
+            break;
+        case c_Pfreqrand:
+            freqrndenabled = (lfopars->Pfreqrand != 0);
+            break;
+        case c_Pdelay:
+            break;
+        case c_Pcontinous:
+            break;
+        case c_Pstretch:
+            break;
+        default:
+            return;
+    }
+
+    return;
+}
+
+float LFO::getparFloat(int npar){
+    switch(npar){
+        case LFOParams::c_Pintensity:
+            return lfopars->Pintensity;
+        case LFOParams::c_Pstartphase:
+            return lfopars->Pstartphase;
+        case LFOParams::c_PLFOtype:
+            return lfopars->PLFOtype;
+        case LFOParams::c_Prandomness:
+            return lfopars->Prandomness;
+        case LFOParams::c_Pfreqrand:
+            return lfopars->Pfreqrand;
+        case LFOParams::c_Pdelay:
+            return lfopars->Pdelay;
+        case LFOParams::c_Pcontinous:
+            return lfopars->Pcontinous;
+        case LFOParams::c_Pstretch:
+            return lfopars->Pstretch;
+        default:
+            return -1;
+    }
+}
 
 // LFO out
 float LFO::lfoout(void)

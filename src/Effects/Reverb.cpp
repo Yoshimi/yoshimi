@@ -481,41 +481,41 @@ void Reverb::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
-        case 0:
+        case c_Pvolume:
             setvolume(value);
             break;
-        case 1:
+        case c_Ppanning:
             setpanning(value);
             break;
-        case 2:
+        case c_Ptime:
             settime(value);
             break;
-        case 3:
+        case c_Pidelay:
             setidelay(value);
             break;
-        case 4:
+        case c_PidelayFb:
             setidelayfb(value);
             break;
     //  case 5: setrdelay(value);
     //      break;
-    //  case 6: seterbalance(value);
+    //  case c_Perbalance: seterbalance(value);
     //      break;
-        case 7:
+        case c_Plpf:
             setlpf(value);
             break;
-        case 8:
+        case c_Phpf:
             sethpf(value);
             break;
-        case 9:
+        case c_Plohidamp:
             setlohidamp(value);
             break;
-        case 10:
+        case c_Ptype:
             settype(value);
             break;
-        case 11:
+        case c_Proomsize:
             setroomsize(value);
             break;
-        case 12:
+        case c_Pbandwidth:
             setbandwidth(value);
             break;
     }
@@ -526,21 +526,21 @@ unsigned char Reverb::getpar(int npar)
 {
     switch (npar)
     {
-        case 0:  return Pvolume;
-        case 1:  return Ppanning;
-        case 2:  return Ptime;
-        case 3:  return Pidelay;
-        case 4:  return Pidelayfb;
+        case c_Pvolume:  return Pvolume;
+        case c_Ppanning:  return Ppanning;
+        case c_Ptime:  return Ptime;
+        case c_Pidelay:  return Pidelay;
+        case c_PidelayFb:  return Pidelayfb;
     //  case 5: return(Prdelay);
     //      break;
-    //  case 6: return(Perbalance);
+    //  case c_Perbalance: return(Perbalance);
     //      break;
-        case 7:  return Plpf;
-        case 8:  return Phpf;
-        case 9:  return Plohidamp;
-        case 10: return Ptype;
-        case 11: return Proomsize;
-        case 12: return Pbandwidth;
+        case c_Plpf:  return Plpf;
+        case c_Phpf:  return Phpf;
+        case c_Plohidamp:  return Plohidamp;
+        case c_Ptype: return Ptype;
+        case c_Proomsize: return Proomsize;
+        case c_Pbandwidth: return Pbandwidth;
         default: break;
     }
     return 0; // in case of bogus "parameter"

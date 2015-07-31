@@ -40,7 +40,8 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/MiscFuncs.cpp ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
-    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h)
+    ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h
+    ../Misc/ControllableByMIDIUI.cpp)
 file (GLOB yoshimi_params_files
     ../Params/ADnoteParameters.cpp  ../Params/EnvelopeParams.cpp
     ../Params/FilterParams.cpp  ../Params/LFOParams.cpp
@@ -74,6 +75,9 @@ set (GuiFluids
     ../UI/EffUI.fl  ../UI/BankUI.fl  ../UI/PartUI.fl
     ../UI/MicrotonalUI.fl  ../UI/MasterUI.fl    ../UI/MasterMiscUI.fl
     ../UI/ParametersUI.fl ../UI/ConsoleUI.fl
+    ../UI/WidgetPCheckButtonUI.fl
+    ../UI/WidgetPChoiceUI.fl
+    ../UI/WidgetPCounterUI.fl
 )
 
 fltk_wrap_ui (yoshimi_lv2 ${GuiFluids})

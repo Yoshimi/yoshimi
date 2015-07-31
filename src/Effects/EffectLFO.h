@@ -34,6 +34,18 @@ class EffectLFO
         ~EffectLFO();
         void effectlfoout(float *outl, float *outr);
         void updateparams(void);
+
+        // Control parameters
+        unsigned char getfreq(){return Pfreq;}
+        unsigned char getrandomness(){return Prandomness;}
+        unsigned char getLFOtype(){return PLFOtype;}
+        unsigned char getstereo(){return Pstereo;}
+
+        void setfreq(unsigned char Pfreq_){ Pfreq = Pfreq_; };
+        void setrandomness(unsigned char Prandomness_){ Prandomness = Prandomness_; }
+        void setLFOtype(unsigned char PLFOtype_){ PLFOtype = PLFOtype_; }
+        void setstereo(unsigned char Pstereo_){ Pstereo = Pstereo_; }
+
         unsigned char Pfreq;
         unsigned char Prandomness;
         unsigned char PLFOtype;

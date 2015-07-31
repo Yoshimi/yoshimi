@@ -17,7 +17,6 @@ Data MSB (6)
                     2 = direct L&R
                     3 = both
                     all other values ignored
-    
     7 : data LSB = main volume          {not yet implemented - might go elsewhere}
 
 

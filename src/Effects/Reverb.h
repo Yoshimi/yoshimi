@@ -47,6 +47,22 @@ class Reverb : public Effect
         void changepar(int npar, unsigned char value);
         unsigned char getpar(int npar);
 
+        enum {
+            c_Pvolume,
+            c_Ppanning,
+            c_Ptime,
+            c_Pidelay,
+            c_PidelayFb,
+            c_Prdelay,
+            c_Perbalance,
+            c_Plpf,
+            c_Phpf,
+            c_Plohidamp,
+            c_Ptype,
+            c_Proomsize,
+            c_Pbandwidth
+        };
+
     private:
         // Parametrii
         unsigned char Pvolume;

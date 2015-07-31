@@ -59,7 +59,6 @@ Any data MSB value outside the above list disables vector control.
 
 Sweep CCs and feature CCs are sanity checked.
 
-
 An Example:
 
 From channel 1, send the following CCs

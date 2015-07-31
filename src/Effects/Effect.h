@@ -26,8 +26,9 @@
 #define EFFECT_H
 
 #include "Params/FilterParams.h"
+#include "Params/ControllableByMIDI.h"
 
-class Effect
+class Effect: public ControllableByMIDI
 {
     public:
         Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
@@ -40,6 +41,9 @@ class Effect
         virtual void out(float *smpsl, float *smpsr) = 0;
         virtual void cleanup() { };
         virtual float getfreqresponse(float freq) { return (0); };
+        void changepar(int npar, double value){ changepar(npar, (unsigned char)value);}
+        unsigned char getparChar(int npar){ return getpar(npar);}
+        float getparFloat(int npar){ return (float)getpar(npar);}
 
         unsigned char Ppreset; // Currentl preset
         float *const efxoutl;

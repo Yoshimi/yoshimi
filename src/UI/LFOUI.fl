@@ -34,6 +34,9 @@ This file is a derivative of the ZynAddSubFX original, modified October 2009
 decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
+decl {\#include "Misc/ControllableByMIDIUI.h"} {public local
+} 
+
 decl {\#include <FL/Fl_Group.H>} {public local
 } 
 
@@ -58,7 +61,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class LFOUI {open : {public Fl_Group, PresetsUI_}
+class LFOUI {open : {public Fl_Group, PresetsUI_, ControllableByMIDIUI}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
   } {
@@ -67,8 +70,7 @@ pars=NULL;} {}
   }
   Function {~LFOUI()} {} {
     code {lfoui->hide();
-hide();
-//delete (lfoui);} {}
+hide();} {}
   }
   Function {make_window()} {open
   } {
@@ -82,37 +84,63 @@ hide();
       } {
         Fl_Dial freq {
           label {Freq.}
-          callback {pars->Pfreq=o->value();}
+          callback {pars->changepar(LFOParams::c_Pfreq, o->value()*127);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Pfreq;
+            o->ui = this;}
           class WidgetPDial
         }
         Fl_Dial intensity {
           label Depth
-          callback {pars->Pintensity=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Pintensity, o->value());}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Pintensity;
+            o->ui = this;
+            }
           class WidgetPDial
         }
         Fl_Dial delay {
           label Delay
-          callback {pars->Pdelay=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Pdelay, o->value());}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Pdelay;
+            o->ui = this;}
           class WidgetPDial
         }
         Fl_Dial startphase {
           label Start
-          callback {pars->Pstartphase=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Pstartphase, o->value());}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Pstartphase;
+            o->ui = this;}
           class WidgetPDial
         }
         Fl_Dial randomness {
           label {A.R.}
-          callback {pars->Prandomness=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Prandomness, o->value());}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Prandomness;
+            o->ui = this;}
           class WidgetPDial
         }
         Fl_Choice LFOtype {
           label Type
-          callback {pars->PLFOtype=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_PLFOtype, o->value());}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
         } {
           MenuItem {} {
@@ -146,19 +174,29 @@ hide();
         }
         Fl_Check_Button continous {
           label {C.}
-          callback {pars->Pcontinous=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Pcontinous, o->value());}
           tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
-          callback {pars->Pfreqrand=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Pfreqrand, o->value());}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Pfreqrand;
+            o->ui = this;}
           class WidgetPDial
         }
         Fl_Dial stretch {
           label {Str.}
-          callback {pars->Pstretch=(int)o->value();}
+          callback {pars->changepar(LFOParams::c_Pstretch, o->value());}
           tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code {o->synth=synth;
+            o->controllable = true;
+            o->midiCtrl = pars; 
+            o->par = LFOParams::c_Pstretch;
+            o->ui = this;}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -188,15 +226,16 @@ LFOtype->value(pars->PLFOtype);} {}
   Function {init(LFOParams *lfopars_)} {open
   } {
     code {pars=lfopars_;
-synth = pars->getSynthEngine();
-make_window();
-end();
+    synth = pars->getSynthEngine();
+    reassignMidi(lfopars_);
+    make_window();
+    end();
 
-refresh();
+    refresh();
 
-lfoui->resize(this->x(),this->y(),this->w(),this->h());
+    lfoui->resize(this->x(),this->y(),this->w(),this->h());
 
-lfoparamswindow->label(this->label());} {selected
+    lfoparamswindow->label(this->label());} {selected
     }
   }
   decl {LFOParams *pars;} {private local
