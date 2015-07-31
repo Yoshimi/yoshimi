@@ -43,6 +43,19 @@ class DynamicFilter : public Effect
         void cleanup(void);
     //	void setdryonly();
 
+    enum {
+        c_Pvolume,
+        c_Ppanning,
+        c_Pfreq,
+        c_Prandomness,
+        c_PLFOtype,
+        c_Pstereo,
+        c_Pdepth,
+        c_Pampsns,
+        c_Pampsnsinv,
+        c_Pampsmooth
+    };
+
     private:
         // Parametrii DynamicFilter
         EffectLFO lfo; // lfo-ul DynamicFilter

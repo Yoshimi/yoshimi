@@ -264,39 +264,39 @@ void DynamicFilter::changepar(int npar, unsigned char value)
 {
     switch (npar)
     {
-        case 0:
+        case c_Pvolume:
             setvolume(value);
             break;
-        case 1:
+        case c_Ppanning:
             setpanning(value);
             break;
-        case 2:
+        case c_Pfreq:
             lfo.Pfreq = value;
             lfo.updateparams();
             break;
-        case 3:
+        case c_Prandomness:
             lfo.Prandomness = value;
             lfo.updateparams();
             break;
-        case 4:
+        case c_PLFOtype:
             lfo.PLFOtype = value;
             lfo.updateparams();
             break;
-        case 5:
+        case c_Pstereo:
             lfo.Pstereo = value;
             lfo.updateparams();
             break;
-        case 6:
+        case c_Pdepth:
             setdepth(value);
             break;
-        case 7:
+        case c_Pampsns:
             setampsns(value);
             break;
-        case 8:
+        case c_Pampsnsinv:
             Pampsnsinv = value;
             setampsns(Pampsns);
             break;
-        case 9:
+        case c_Pampsmooth:
             Pampsmooth = value;
             setampsns(Pampsns);
             break;

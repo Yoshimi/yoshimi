@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2015-7-31 Musinux
+- added midi control possibility for buttons, lists and checkboxes
+- added EQ and DynFilter control
+- big bugfix: only the first effect of the chain could be controlled, before this patch
+
 2015-7-30 Musinux
 - added system, insert, and part effects (chorus, phaser, echo, disto, alienwah, reverb) midi controlling (knobs only)
 

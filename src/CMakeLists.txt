@@ -191,6 +191,9 @@ set (GuiFluids
     UI/MicrotonalUI.fl  UI/MasterUI.fl    UI/MasterMiscUI.fl
     UI/ParametersUI.fl UI/ConsoleUI.fl
     UI/MidiControllerUI.fl
+    UI/WidgetPCheckButtonUI.fl
+    UI/WidgetPChoiceUI.fl
+    UI/WidgetPCounterUI.fl
 )
 
 fltk_wrap_ui (yoshimi ${GuiFluids})

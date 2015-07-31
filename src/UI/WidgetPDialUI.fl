@@ -387,6 +387,7 @@ class WidgetPDial {open : {public Fl_Dial}
   Function {stampa(Fl_Widget *w, void *v)} {open return_type {static void}
   } {
     code {WidgetPDial *p = (WidgetPDial*)w;
+    std::cout << "ui: " << p->ui << " effMgr:" << p->midiCtrl << endl;
     p->synth->addMidiControl(p->midiCtrl, p->par, p->ui);
     midiccwindow->Show();} {}
   }

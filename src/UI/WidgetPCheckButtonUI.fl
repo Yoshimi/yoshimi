@@ -1,0 +1,136 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+header_name {.h} 
+code_name {.cc}
+comment {WidgetPCheckButton.h} {not_in_source in_header
+} 
+
+comment {WidgetPCheckButton.cc} {in_source not_in_header
+} 
+
+comment {
+Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009-2010, Alan Calvert
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is a derivative of the ZynAddSubFX original, modified October 2010
+} {in_source in_header
+} 
+
+decl {    \#include <FL/Fl_Check_Button.H>
+    \#include <FL/Fl_Menu_Window.H>
+    \#include "Misc/MiscFuncs.h"
+    \#include "Params/ControllableByMIDI.h"
+    \#include "Misc/ControllableByMIDIUI.h"
+    \#include "Misc/SynthEngine.h"
+    \#include <iostream>} {public global
+} 
+
+decl {
+    \#include <stdio.h>
+    \#include <Misc/SynthEngine.h>} {private global
+}
+
+decl {\#include <stdio.h>
+      \#include <FL/Fl_Menu.H>
+      \#include "MidiControllerUI.h"} {global
+}
+
+class WidgetPCheckButton {open : {public Fl_Check_Button}
+} {
+  Function {WidgetPCheckButton(int x,int y, int w, int h, const char *label=0):Fl_Check_Button(x,y,w,h,label)} {open
+  } {
+    code {
+        synth = NULL;
+        controllable = false;} {}
+  }
+  Function {callback(Fl_Callback* cb)} {} {
+    code {Fl_Widget::callback(cb);} {}
+  }
+  Function {handle(int event)} {open return_type int
+  } {
+    code {
+        switch (event)
+        {
+            case FL_PUSH:
+                // right click menu:
+                if(Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_shift() != 0) {
+                    std::cout << "hey yeah" << endl;
+                    if(controllable) {
+                        Fl_Menu_Item rclick_menu[] = {
+                            { "Reset", 0, reset},
+                            { "Midi Learn", 0, stampa, (void*)1 },
+                            { 0}
+                        };
+                        const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                        if(m){
+                            m->do_callback(this, m->user_data());
+                        }
+                    } else {
+                        Fl_Menu_Item rclick_menu[] = {
+                            { "Reset", 0, reset},
+                            { 0 }
+                        };
+                        const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                        if(m){
+                            m->do_callback(this, m->user_data());
+                        }
+                    }
+                    return 1;
+                 }
+                 break;
+            default: 
+              break;
+        }
+        return Fl_Check_Button::handle(event);} {selected
+    }
+  }
+  Function {reset(Fl_Widget* w, void* v)} {open return_type {static void}
+  } {
+    code {Fl_Valuator* dial = (Fl_Valuator*)w;
+        dial->value(false);
+        dial->do_callback();} {}
+  }
+  Function {getSynth()} {open public return_type {SynthEngine *}
+  } {
+    code {return synth;} {}
+  }
+  Function {setSynth(SynthEngine *_synth)} {open public return_type {void}
+  } {
+    code {synth = _synth;} {}
+  }
+  decl {using Fl_Widget::callback;} {public
+  }
+  decl {ControllableByMIDI *midiCtrl;} {public
+  }
+  decl {ControllableByMIDIUI *ui;} {public
+  }
+  decl {int par;} {public
+  }
+  decl {SynthEngine *synth;} {public
+  }
+  decl {bool controllable;} {public
+  }
+
+  Function {stampa(Fl_Widget *w, void *v)} {open return_type {static void}
+  } {
+    code {WidgetPCheckButton *p = (WidgetPCheckButton*)w;
+    std::cout << "ui: " << p->ui << " effMgr:" << p->midiCtrl << endl;
+    p->synth->addMidiControl(p->midiCtrl, p->par, p->ui);
+    midiccwindow->Show();} {}
+  }
+} 
