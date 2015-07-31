@@ -26,13 +26,14 @@
 #define FILTER_PARAMS_H
 
 #include "Misc/MiscFuncs.h"
+#include "Params/ControllableByMIDI.h"
 #include "Params/Presets.h"
 
 class XMLwrapper;
 
 class SynthEngine;
 
-class FilterParams : public Presets, private MiscFuncs
+class FilterParams : public Presets, private MiscFuncs, public ControllableByMIDI
 {
     public:
         FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, SynthEngine *_synth);
@@ -65,6 +66,28 @@ class FilterParams : public Presets, private MiscFuncs
             { return powf(0.1f, (1.0f - amp / 127.0f) * 4.0f); }
         float getformantq(unsigned char q)
             { return powf(25.0f, (q - 32.0f) / 64.0f); }
+
+        enum {
+            c_Pcategory,
+            c_Ptype,
+            c_Pfreq,
+            c_Pq,
+            c_Pstages,
+            c_Pfreqtrack,
+            c_Pgain,
+            c_Pnumformants,
+            c_Pformantslowness,
+            c_Pvowelclearness,
+            c_Pcenterfreq,
+            c_Poctavesfreq,
+            c_Psequencesize,
+            c_Psequencestretch,
+            c_Psequencereversed
+        };
+
+        void changepar(int npar, double value);
+        unsigned char getparChar(int npar){ return -1;}
+        float getparFloat(int npar);
 
         unsigned char Pcategory;  // Filter category (Analog/Formant/StVar)
         unsigned char Ptype;      // Filter type  (for analog lpf,hpf,bpf..)

@@ -1,6 +1,9 @@
 yoshimi 1.3.x
 
 2015-7-31 Musinux
+- added some filter params control
+
+2015-7-31 Musinux
 - added envelope parameters control (amplitude, filter, ...) and saving
 
 2015-7-31 Musinux
