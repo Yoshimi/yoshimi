@@ -128,7 +128,6 @@ class WidgetPCheckButton {open : {public Fl_Check_Button}
   Function {stampa(Fl_Widget *w, void *v)} {open return_type {static void}
   } {
     code {WidgetPCheckButton *p = (WidgetPCheckButton*)w;
-    std::cout << "ui: " << p->ui << " effMgr:" << p->midiCtrl << endl;
     p->synth->addMidiControl(p->midiCtrl, p->par, p->ui);
     midiccwindow->Show();} {}
   }

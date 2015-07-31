@@ -14,7 +14,7 @@ midiControl::~midiControl(){
 }
 
 void midiControl::changepar(int value){
-    std::cout << "Par changed, par: " << par << ", value: " << value << endl;
+    //std::cout << "Par changed, par: " << par << ", value: " << value << endl;
     controller->changepar(par, value);
 }
 
@@ -37,7 +37,7 @@ float midiControl::getpar(){
 void ControllableByMIDI::removeAllMidiControllers(SynthEngine *synth){
     if(isControlled){
         list<midiControl*>::iterator i;
-        std::cout << "controllers to delete: " << controllers.size() << endl;
+        //std::cout << "controllers to delete: " << controllers.size() << endl;
         for(i=controllers.begin(); controllers.size() > 0 && i != controllers.end();i++){
             synth->removeMidiControl(*i);
             i--;
@@ -49,7 +49,7 @@ void ControllableByMIDI::removeAllMidiControllers(SynthEngine *synth){
 void ControllableByMIDI::reassignUIControls(ControllableByMIDIUI *ctrl){
     if(isControlled){
         list<midiControl*>::iterator i;
-        std::cout << "Recreating ui controls (" << controllers.size() << ")" << endl; 
+        //std::cout << "Recreating ui controls (" << controllers.size() << ")" << endl; 
         for(i=controllers.begin(); i != controllers.end();i++){
             (*i)->ui = ctrl;
         }
@@ -58,7 +58,7 @@ void ControllableByMIDI::reassignUIControls(ControllableByMIDIUI *ctrl){
 
 void ControllableByMIDI::unassignUIControls(){
     if(isControlled){
-        std::cout << "Removing ui controls (" << controllers.size() << ")" << endl; 
+        //std::cout << "Removing ui controls (" << controllers.size() << ")" << endl; 
         list<midiControl*>::iterator i;
         for(i=controllers.begin(); i != controllers.end();i++){
             (*i)->ui = NULL;
@@ -107,7 +107,7 @@ void ControllableByMIDI::add2XMLMidi(XMLwrapper *xml){
     list<midiControl*>::iterator i;
     int cpt = 0;
     for(i = controllers.begin(); i != controllers.end(); i++){
-        cout << "Controller écrit " << (*i)->channel << " " << (*i)->ccNbr << endl;
+        //cout << "Controller writen " << (*i)->channel << " " << (*i)->ccNbr << endl;
         xml->beginbranch("CONTROLLER", cpt);
         xml->addpar("ccNbr", (*i)->ccNbr);
         xml->addpar("channel", (*i)->channel);
@@ -137,7 +137,7 @@ void ControllableByMIDI::getfromXMLMidi(XMLwrapper *xml, SynthEngine *synth){
             );
         xml->exitbranch();
         synth->addMidiControl(mc);
-        cout << "Controller lu (" << cpt << ") " << mc->channel << " " << mc->ccNbr << endl;
+        //cout << "Controller read (" << cpt << ") " << mc->channel << " " << mc->ccNbr << endl;
         cpt++;
     }
     xml->exitbranch();

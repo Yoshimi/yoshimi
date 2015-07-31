@@ -73,7 +73,7 @@ void LFOParams::removeLFO(LFO *lfo){
 }
 
 void LFOParams::changepar(int npar, double value){
-    std::cout << "NPAR: " << npar << ", value: " << value << ", value(float):" << (float)value << endl;
+    //std::cout << "NPAR: " << npar << ", value: " << value << ", value(float):" << (float)value << endl;
     switch(npar){
         case c_Pfreq:
             Pfreq = (float)(value/127.0f);

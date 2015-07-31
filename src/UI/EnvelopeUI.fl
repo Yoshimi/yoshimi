@@ -244,8 +244,7 @@ envfree=NULL;} {}
     code {envwindow->hide();
 hide();
 freemodeeditwindow->hide();
-delete (freemodeeditwindow);
-std::cout << "Deleting envelopeUI" << endl;} {}
+delete (freemodeeditwindow);} {}
   }
   Function {make_freemode_edit_window()} {open
   } {

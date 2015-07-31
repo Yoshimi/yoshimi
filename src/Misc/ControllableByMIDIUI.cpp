@@ -41,5 +41,5 @@ ControllableByMIDIUI::~ControllableByMIDIUI() {
   if(controller != NULL){
   	controller->unassignUIControls();
   }
-  std::cout << "deleting ControllableByMIDIUI" << endl;
+  //std::cout << "deleting ControllableByMIDIUI" << endl;
 }

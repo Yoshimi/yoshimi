@@ -424,7 +424,7 @@ void SynthEngine::removeMidiControl(midiControl *midiCtrl) {
 void SynthEngine::removeAllMidiControls() {
     list<midiControl*>::iterator i;
     for(i=midiControls.begin(); i != midiControls.end();i++){
-        cout << "deleting control "<< (*i)->ccNbr << endl;
+        //cout << "deleting control "<< (*i)->ccNbr << endl;
         delete (*i);
     }
     midiControls.clear();
@@ -435,7 +435,7 @@ void SynthEngine::removeAllMidiControls() {
 void SynthEngine::SetController(unsigned char chan, int type, short int par)
 {
     list<midiControl*>::iterator i;
-    std::cout << "Number of midicontrols " << midiControls.size() << endl;
+    //std::cout << "Number of midicontrols " << midiControls.size() << endl;
     for(i=midiControls.begin(); i != midiControls.end();i++){
         if((*i)->recording) {
             std::cout << "Value recorded" << endl;
@@ -444,7 +444,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             (*i)->recording = false;
         }
         if((*i)->ccNbr == type && (*i)->channel == chan) {
-            std::cout << "Found Control" << endl;
+            //std::cout << "Found Control" << endl;
             (*i)->changepar(par);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMidiControllers, 0);
             if((*i)->ui)
