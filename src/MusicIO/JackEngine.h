@@ -34,6 +34,8 @@ using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
+extern list<string> splashMessages;
+
 class SynthEngine;
 
 class JackEngine : public MusicIO

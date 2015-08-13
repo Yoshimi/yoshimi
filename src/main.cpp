@@ -83,9 +83,9 @@ void splashTimeout(void *splashWin)
 static void *mainGuiThread(void *arg)
 {
 
-    for(int i = 0; i < globalArgc; ++i)
+    for (int i = 0; i < globalArgc; ++i)
     {
-        if(!strcmp(globalArgv [i], "-i")
+        if (!strcmp(globalArgv [i], "-i")
            || !strcmp(globalArgv [i], "--no-gui")
            || !strcmp(globalArgv [i], "--help")
            || !strcmp(globalArgv [i], "-?"))
@@ -102,17 +102,17 @@ static void *mainGuiThread(void *arg)
     fl_register_images();
 #if (FL_MAJOR_VERSION == 1 && FL_MINOR_VERSION < 3)
     char *fname = tmpnam(NULL);
-    if(fname)
+    if (fname)
     {
         FILE *f = fopen(fname, "wb");
-        if(f)
+        if (f)
         {
             fwrite(yoshimi_logo_png, sizeof(yoshimi_logo_png), 1, f);
             fclose(f);
         }
     }
     Fl_PNG_Image pix(fname);
-    if(fname)
+    if (fname)
     unlink(fname);
 #else
     Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
@@ -140,7 +140,7 @@ static void *mainGuiThread(void *arg)
     winSplash.clear_border();
     winSplash.border(false);
 
-    if(bShowGui)
+    if (bShowGui)
     {
         //o->Rectangle::set(Fl_Monitor::find(0,0),o->w(),o->h(),fltk::ALIGN_CENTER);
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
@@ -151,10 +151,10 @@ static void *mainGuiThread(void *arg)
 
     do
     {
-        if(bShowGui)
+        if (bShowGui)
         {
             Fl::wait(0.033333);
-            while(!splashMessages.empty())
+            while (!splashMessages.empty())
             {
                 boxLb.copy_label(splashMessages.front().c_str());
                 splashMessages.pop_front();
@@ -167,17 +167,17 @@ static void *mainGuiThread(void *arg)
 
     while (firstSynth->getRuntime().runSynth)
     {        
-        if(firstSynth->getUniqueId() == 0)
+        if (firstSynth->getUniqueId() == 0)
         {
             firstSynth->getRuntime().signalCheck();
         }
 
-        for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+        for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
         {
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
             _synth->getRuntime().deadObjects->disposeBodies();
-            if(!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
+            if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_client)
                 {
@@ -201,7 +201,7 @@ static void *mainGuiThread(void *arg)
                 for (int i = 0; !_synth->getRuntime().LogList.empty() && i < 5; ++i)
                 {
                     MasterUI *guiMaster = _synth->getGuiMaster(false);
-                    if(guiMaster)
+                    if (guiMaster)
                     {
                         guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
@@ -211,10 +211,10 @@ static void *mainGuiThread(void *arg)
         }
 
         // where all the action is ...
-        if(bShowGui)
+        if (bShowGui)
         {
             Fl::wait(0.033333);
-            while(!splashMessages.empty())
+            while (!splashMessages.empty())
             {
                 boxLb.copy_label(splashMessages.front().c_str());
                 splashMessages.pop_front();
@@ -316,9 +316,9 @@ int main(int argc, char *argv[])
     sem_t semGui;
     if(sem_init(&semGui, 0, 0) == 0)
     {
-        if(pthread_attr_init(&attr) == 0)
+        if (pthread_attr_init(&attr) == 0)
         {
-            if(pthread_create(&thr, &attr, mainGuiThread, (void *)&semGui) == 0)
+            if (pthread_create(&thr, &attr, mainGuiThread, (void *)&semGui) == 0)
             {
                 guiStarted = true;
             }
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(!guiStarted)
+    if (!guiStarted)
     {        
         cout << "Yoshimi can't start main gui loop!" << endl;
         goto bail_out;
@@ -370,8 +370,10 @@ int main(int argc, char *argv[])
     cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
 
-bail_out:    
-    for(it = synthInstances.begin(); it != synthInstances.end(); ++it)
+bail_out:
+    if (!bExitSuccess)
+        usleep(4000000);
+    for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;
         MusicClient *_client = it->second;
@@ -394,7 +396,7 @@ bail_out:
             delete _synth;
         }
     }
-    if(bExitSuccess)
+    if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
         exit(EXIT_FAILURE);
@@ -402,10 +404,10 @@ bail_out:
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum)
 {
-    if(s && (portnum < NUM_MIDI_PARTS) && (portnum >= 0))
+    if (s && (portnum < NUM_MIDI_PARTS) && (portnum >= 0))
     {
         map<SynthEngine *, MusicClient *>::iterator it = synthInstances.find(s);
-        if(it != synthInstances.end())
+        if (it != synthInstances.end())
         {
             it->second->registerAudioPort(portnum);
         }

@@ -60,6 +60,7 @@ bool AlsaEngine::openAudio(void)
                              SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
             "failed to open alsa audio device:" + audio.device))
         goto bail_out;
+        
         if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
             if (prepHwparams())
                 if (prepSwparams())
@@ -74,6 +75,7 @@ bool AlsaEngine::openAudio(void)
                         return true;
 bail_out:
     Close();
+    splashMessages.push_back("Can't connect to alsa audio :(");
     return false;
 }
 
