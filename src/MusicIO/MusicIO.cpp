@@ -390,6 +390,9 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
 
     else if (nLow == 1) // it's vector control
         nrpnSetVector(dHigh, chan, par);
+    
+    else if (nLow == 2) // system settings
+        synth->SetSystemValue(dHigh, par);
 }
 
 

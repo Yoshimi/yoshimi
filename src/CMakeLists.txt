@@ -265,6 +265,7 @@ add_definitions (
 )
 
 add_definitions (-DMAX_BANK_ROOT_DIRS=128)
+add_definitions (-DMAX_BANKS_IN_ROOT=128)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
 add_definitions (-DPAD_MAX_SAMPLES=96)

@@ -102,3 +102,7 @@ CCs can now be entered from the gui as if they'd been sent by MIDI, although cur
 
 ###
 
+NRPNs have been extended so that via MIDI you can read some of the dynamic system settings (to the Log file). Some of these can now also be set, and eventually they all will be.
+
+###
+

@@ -205,6 +205,7 @@ public:
     enum
     {
         NewSynthEngine = 0,
+        UpdateMaster,
         UpdatePanel,
         UpdatePanelItem,
         UpdatePartProgram,

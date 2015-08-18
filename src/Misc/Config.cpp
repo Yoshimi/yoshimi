@@ -727,9 +727,6 @@ void Config::Log(string msg, bool tostderr)
 
 void Config::StartupReport(MusicClient *musicClient)
 {
-    if (!showGui)
-        return;
-
     Log(string(argp_program_version));
     Log("Config: Clientname: " + musicClient->midiClientName());
     string report = "Config: Audio: ";
@@ -1113,6 +1110,16 @@ void GuiThreadMsg::processGuiMessages()
             else
             {
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdateMaster:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster(false);
+            if(guiMaster)
+            {
+                guiMaster->refresh_master_ui();
             }
         }
             break;

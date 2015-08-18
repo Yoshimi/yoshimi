@@ -2,6 +2,22 @@
 restoreJsession() -> restoreSessionData() -> extractConfigData()
 Should this refetch entire bank structure?
 
+system NRPNs
+NRPN 64,2,100,n Reports destination ( > 63 = Reports window, otherwise stderr)
+
+NRPN 64,2,109,x report current root and bank etc.
+NRPN 64,2,110,x list all root path names and IDs
+NRPN 64,2,111,n list banks in root path ID,n
+NRPN 64,2,112,n list instruments in bank ID n of current root path
+NRPN 64,2,113,n set root path change value ( > 119 disables)
+NRPN 64,2,114,n set bank change value ( > 119 disables)
+NRPN 64,2,115,n set/clear enable program change ( > 63 = on)
+NRPN 64,2,116,n set/clear enable part on program change ( > 63 = on)
+NRPN 64,2,117,n set extended program change value ( > 119 disables)
+NRPN 64,2,118,n set number of available parts (16, 32, 64)
+
+NRPN 64,2,119 save settings
+
 Add 'Ignore MIDI Reset All' to deal with brain dead sequencers :(
 
 Gui to set up vector control!

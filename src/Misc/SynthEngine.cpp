@@ -622,6 +622,133 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
 }
 
+/* Provides a way of setting dynamic system variables
+ * from sources other than the gui
+ */
+void SynthEngine::SetSystemValue(int type, int value)
+{
+    int idx;
+    string label;
+    label = "";
+    switch (type)
+    {
+        case 100:
+            if(value > 63)
+            {
+                Runtime.consoleMenuItem = true;
+                Runtime.Log("Sending reports to console window");
+                // we need the next line in case is someone is working headless
+                cout << "Sending reports to console window\n";
+            }
+            else
+            {
+                Runtime.consoleMenuItem = false;
+                Runtime.Log("Sending reports to stderr");
+            }
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+            break;
+        case 109 :
+            if (Runtime.consoleMenuItem)
+            {
+                Runtime.Log("Reports sent to console window");
+                // wesame as above
+                cout << "Reports sent to console window\n";
+            }
+            else
+                Runtime.Log("\nReports sent to stderr");
+            
+            idx = bank.currentRootID;
+            if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
+            {
+                label = bank.roots [idx].path;
+                if(label.at(label.size() - 1) == '/')
+                    label = label.substr(0, label.size() - 1);
+                Runtime.Log("Current Root ID " + asString(idx) + "    " + label
+                    + "\nCurrent Bank ID " + asString(bank.currentBankID) + "    "
+                    + bank.roots [idx].banks [bank.currentBankID].dirname);
+            }
+            else
+                Runtime.Log("No Paths set");
+            
+            if (Runtime.midi_bank_root > 119)
+                Runtime.Log("MIDI root change off");
+            else
+                Runtime.Log("MIDI root CC " + asString(Runtime.midi_bank_root));
+            
+            if (Runtime.midi_bank_C > 119)
+                Runtime.Log("MIDI bank change off");
+            else
+                Runtime.Log("MIDI bank CC " + asString(Runtime.midi_bank_C));
+            
+            if (Runtime.EnableProgChange)
+            {
+                Runtime.Log("MIDI program change on");
+                if (Runtime.enable_part_on_voice_load)
+                    Runtime.Log("MIDI program change enables part");
+                else
+                    Runtime.Log("MIDI program change doesn't enable part");
+            }
+            else
+                Runtime.Log("MIDI program change off");
+            
+            if (Runtime.midi_upper_voice_C > 119)
+                Runtime.Log("MIDI extended program change off");
+            else
+                Runtime.Log("MIDI extended program change CC " + asString(Runtime.midi_upper_voice_C));
+            
+            Runtime.Log("Number of active parts " + asString(Runtime.NumAvailableParts));
+            break; 
+            
+        case 110 :
+            Runtime.Log("\nRoot Paths");
+            for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
+            {
+                if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
+                {
+                    label = bank.roots [idx].path;
+                    if(label.at(label.size() - 1) == '/')
+                        label = label.substr(0, label.size() - 1);
+                    Runtime.Log("    ID " + asString(idx) + "     " + label);
+                }
+            }
+            break;
+            
+        case 111 :
+            if (bank.roots.count(value) > 0 && !bank.roots [value].path.empty())
+            {
+                label = bank.roots [value].path;
+                if(label.at(label.size() - 1) == '/')
+                    label = label.substr(0, label.size() - 1);
+                Runtime.Log("\nBanks in Root ID " + asString(value) + "    " + label);
+                for (idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+                {
+                    if (!bank.roots [value].banks [idx].dirname.empty())
+                        Runtime.Log("    ID " + asString(idx) + "    "
+                        + bank.roots [value].banks [idx].dirname);
+                }
+            }
+            else
+                Runtime.Log("No root ID " + asString(value));
+            break;
+            
+        case 118:
+            if (value == 16 or value == 32 or value == 64)
+            {
+                Runtime.NumAvailableParts = value;
+                Runtime.Log("Set active parts to " + asString(value));
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+            }
+            else
+                Runtime.Log("Out of range");
+            break;
+            
+        case 119:
+            Runtime.saveConfig();
+            Runtime.Log("Settings saved");
+            break;
+    }
+}
+
 
 void SynthEngine::ClearNRPNs(void)
 {
