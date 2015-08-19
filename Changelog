@@ -1,8 +1,11 @@
 yoshimi 1.3.x
 
+2015-8-20 Will
+- Completed new NRPN extensions so most system values can be changes.
+
 2015-8-18 Will
 - Extended NRPNs to list dynamic system values (to current report log)
-  Some of which can also be changed.
+  some of which can also be changed.
 
 2015-8-13 Will
 - Added failure messages to splash screen and increased timeout.

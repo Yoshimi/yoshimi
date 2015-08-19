@@ -46,20 +46,19 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class ConfigUI {open : {private MiscFuncs}
+class ConfigUI {selected : {private MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window configwindow {
       label {Yoshimi Settings}
-      callback {o->hide();} open selected
-      xywh {273 160 465 330} type Double hide
+      callback {o->hide();}
+      xywh {449 127 465 330} type Double hide
     } {
-      Fl_Tabs {} {open
+      Fl_Tabs {} {
         xywh {5 5 455 297}
       } {
         Fl_Group {} {
-          label {Main settings} open
+          label {Main settings}
           xywh {5 25 455 277} labelsize 12
         } {
           Fl_Choice {} {
@@ -202,7 +201,7 @@ class ConfigUI {open : {private MiscFuncs}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 185 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
           }
-          Fl_Choice {} {
+          Fl_Choice reports {
             label {Send reports to:}
             callback {synth->getRuntime().consoleMenuItem = o->value();
 if (o->value())
@@ -253,7 +252,7 @@ else
           }
         }
         Fl_Group {} {
-          label {Presets dirs} open
+          label {Presets dirs}
           xywh {5 25 455 272} labelsize 12 hide
         } {
           Fl_Browser presetbrowse {
@@ -304,7 +303,7 @@ else
           }
         }
         Fl_Group {} {
-          label Jack open
+          label Jack
           xywh {5 25 455 277} labelsize 12 hide
         } {
           Fl_Input {} {
@@ -321,7 +320,7 @@ else
           }
         }
         Fl_Group {} {
-          label Alsa open
+          label Alsa
           xywh {5 25 455 277} labelsize 12 hide
         } {
           Fl_Input {} {
@@ -412,7 +411,7 @@ else
     {
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
-    }} open
+    }}
           tooltip {MIDI CC preferences} xywh {5 25 455 275} labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
@@ -452,7 +451,7 @@ else
     }}
             tooltip {Click to set} xywh {340 81 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button rootcheck {
             label {Enable Bank Root Change}
             callback {//
     if (o->value() == 0)
@@ -503,7 +502,7 @@ else
         fl_alert("In use for %s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
-        configChanged = true;} open
+        configChanged = true;}
             tooltip {CC0 = msb, CC32 = lsb} xywh {275 122 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
@@ -521,7 +520,7 @@ else
               xywh {0 0 34 20} labelsize 12
             }
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button progenable {
             label {Enable Program Change}
             callback {//
 		int tmp = synth->getRuntime().EnableProgChange;
@@ -531,7 +530,7 @@ else
             tooltip {MIDI program change enable/disable} xywh {275 162 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button progpartenable {
             label {Enable Part On Program Change}
             callback {//
 		int tmp = synth->getRuntime().enable_part_on_voice_load;
@@ -578,7 +577,7 @@ else
     }}
             tooltip {Click to set} xywh {340 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button Epcheck {
             label {Enable Extended Program Change}
             callback {// for some weird reason this *must* be the last item in the group
     if (o->value() == 0)
@@ -640,8 +639,7 @@ configwindow->do_callback();}
       }
     }
   }
-  Function {ConfigUI(SynthEngine *_synth)} {open
-  } {
+  Function {ConfigUI(SynthEngine *_synth)} {} {
     code {//
 	synth = _synth;
         configChanged = false;
@@ -649,8 +647,7 @@ configwindow->do_callback();}
         readpresetcfg();
 	selectedRootID = -1;} {}
   }
-  Function {activatebutton_presetdir(bool active)} {open
-  } {
+  Function {activatebutton_presetdir(bool active)} {} {
     code {//
         if (active)
         {
@@ -663,7 +660,7 @@ configwindow->do_callback();}
             makedefaultpresetbutton->deactivate();
         }} {}
   }
-  Function {recoverID()} {open return_type int
+  Function {recoverID()} {return_type int
   } {
     code {//
     if (selectedRootID >= 0)
@@ -685,13 +682,74 @@ configwindow->do_callback();}
         for (int n = 0; n < presetbrowse->size(); ++n)
             synth->getRuntime().presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
   }
+  Function {update_config(int tabnumber)} {} {
+    code {//
+    int tmp;
+    switch (tabnumber)
+    {
+        case 1 : //Main
+            reports->value(synth->getRuntime().consoleMenuItem);
+            break;
+        case 2 : // Presets
+            break;
+        case 3 : // Jack
+            break;
+        case 4 : // Alsa
+            break;
+        case 5 : // MIDI
+            tmp = synth->getRuntime().midi_bank_root;
+            if (tmp == 128)
+            {
+                BankRoot->value(0);
+                BankRoot->deactivate();
+                rootcheck->value(0);
+            }
+            else
+            {
+                BankRoot->value(tmp);
+                BankRoot->activate();
+                rootcheck->value(1);
+            }
+            Rpend->hide();
+
+            switch (synth->getRuntime().midi_bank_C)
+            {
+                case 32:
+                    bankchange->value(0);
+                    break;
+                case 0:
+                    bankchange->value(1);
+                    break;
+                default:
+                    bankchange->value(2);
+                    break;
+            }
+	    progenable->value(synth->getRuntime().EnableProgChange);
+	    progpartenable->value(synth->getRuntime().enable_part_on_voice_load);
+	    tmp = synth->getRuntime().midi_upper_voice_C;
+            if (tmp == 128)
+            {
+                EPCspinner->value(110);
+                EPCspinner->deactivate();
+                Epcheck->value(0);
+            }
+            else
+            {
+                EPCspinner->value(tmp);
+                EPCspinner->activate();
+                Epcheck->value(1);
+            }
+            Epend->hide();
+            break;
+    }} {}
+  }
   Function {Show()} {} {
     code {configwindow->show();} {}
   }
   Function {Hide()} {} {
     code {configwindow->hide();} {}
   }
-  Function {savesettings(void)} {open private return_type void
+  Function {savesettings(void)} {private return_type void
   } {
     code {//
         synth->getRuntime().saveConfig();

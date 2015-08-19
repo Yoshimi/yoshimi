@@ -622,12 +622,13 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
 }
 
+
 /* Provides a way of setting dynamic system variables
  * from sources other than the gui
  */
 void SynthEngine::SetSystemValue(int type, int value)
 {
-    int idx;
+    int idx, root;
     string label;
     label = "";
     switch (type)
@@ -646,60 +647,62 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("Sending reports to stderr");
             }
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
             break;
+            
         case 109 :
             if (Runtime.consoleMenuItem)
             {
                 Runtime.Log("Reports sent to console window");
-                // wesame as above
+                // same as above
                 cout << "Reports sent to console window\n";
             }
             else
                 Runtime.Log("\nReports sent to stderr");
             
-            idx = bank.currentRootID;
-            if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
+            root = bank.currentRootID;
+            if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
             {
-                label = bank.roots [idx].path;
+                label = bank.roots [root].path;
                 if(label.at(label.size() - 1) == '/')
                     label = label.substr(0, label.size() - 1);
-                Runtime.Log("Current Root ID " + asString(idx) + "    " + label
+                Runtime.Log("Current Root ID " + asString(root) + "    " + label
                     + "\nCurrent Bank ID " + asString(bank.currentBankID) + "    "
-                    + bank.roots [idx].banks [bank.currentBankID].dirname);
+                    + bank.roots [root].banks [bank.currentBankID].dirname);
             }
             else
-                Runtime.Log("No Paths set");
+                Runtime.Log("No paths set");
             
             if (Runtime.midi_bank_root > 119)
-                Runtime.Log("MIDI root change off");
+                Runtime.Log("MIDI Root Change off");
             else
-                Runtime.Log("MIDI root CC " + asString(Runtime.midi_bank_root));
+                Runtime.Log("MIDI Root CC " + asString(Runtime.midi_bank_root));
             
             if (Runtime.midi_bank_C > 119)
-                Runtime.Log("MIDI bank change off");
+                Runtime.Log("MIDI Bank Change off");
             else
-                Runtime.Log("MIDI bank CC " + asString(Runtime.midi_bank_C));
+                Runtime.Log("MIDI Bank CC " + asString(Runtime.midi_bank_C));
             
             if (Runtime.EnableProgChange)
             {
-                Runtime.Log("MIDI program change on");
+                Runtime.Log("MIDI Program Change on");
                 if (Runtime.enable_part_on_voice_load)
-                    Runtime.Log("MIDI program change enables part");
+                    Runtime.Log("MIDI Program Change enables part");
                 else
-                    Runtime.Log("MIDI program change doesn't enable part");
+                    Runtime.Log("MIDI Program Change doesn't enable part");
             }
             else
                 Runtime.Log("MIDI program change off");
             
             if (Runtime.midi_upper_voice_C > 119)
-                Runtime.Log("MIDI extended program change off");
+                Runtime.Log("MIDI extended Program Change off");
             else
-                Runtime.Log("MIDI extended program change CC " + asString(Runtime.midi_upper_voice_C));
+                Runtime.Log("MIDI extended Program Change CC " + asString(Runtime.midi_upper_voice_C));
             
             Runtime.Log("Number of active parts " + asString(Runtime.NumAvailableParts));
             break; 
             
-        case 110 :
+        case 110 : // list paths
             Runtime.Log("\nRoot Paths");
             for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
             {
@@ -713,13 +716,14 @@ void SynthEngine::SetSystemValue(int type, int value)
             }
             break;
             
-        case 111 :
-            if (bank.roots.count(value) > 0 && !bank.roots [value].path.empty())
+        case 111 : // list banks
+            if (bank.roots.count(value) > 0
+                && !bank.roots [value].path.empty())
             {
                 label = bank.roots [value].path;
                 if(label.at(label.size() - 1) == '/')
                     label = label.substr(0, label.size() - 1);
-                Runtime.Log("\nBanks in Root ID " + asString(value) + "    " + label);
+                Runtime.Log("\nBanks in Root ID " + asString(value) + "\n    " + label);
                 for (idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
                 {
                     if (!bank.roots [value].banks [idx].dirname.empty())
@@ -728,7 +732,132 @@ void SynthEngine::SetSystemValue(int type, int value)
                 }
             }
             else
-                Runtime.Log("No root ID " + asString(value));
+                Runtime.Log("No Root ID " + asString(value));
+            break;
+            
+        case 112: // list instruments
+            root = bank.currentRootID;
+            if (bank.roots.count(root) > 0
+                && !bank.roots [root].path.empty())
+            {
+                if (!bank.roots [root].banks [value].instruments.empty())
+                {
+                    label = bank.roots [root].path;
+                    if(label.at(label.size() - 1) == '/')
+                        label = label.substr(0, label.size() - 1);
+                    Runtime.Log("\nInstruments in Root ID " + asString(root)
+                              + ", Bank ID " + asString(value) + "\n    " + label
+                              + "/" + bank.roots [root].banks [value].dirname);
+                    for (idx = 0; idx < BANK_SIZE; ++ idx)
+                    {
+                        if (!bank.emptyslotWithID(root, value, idx))
+                            Runtime.Log( "    ID " + asString(idx)+ "    "
+                            + bank.roots [root].banks [value].instruments [idx].name);
+                    }
+                }
+                else
+                    Runtime.Log("No Bank ID " + asString(value)
+                              + " in Root " + asString(root));
+            }
+            else
+                Runtime.Log("No Root ID " + asString(root));
+            break;
+            
+        case 113: // root
+            if (value > 119)
+                value = 128;
+            if (value != Runtime.midi_bank_root) // don't mess about if it's the same
+            {
+                label = Runtime.testCCvalue(value);
+                if (label > "")
+                {
+                    Runtime.Log("CC" + asString(value) + " in use by " + label);
+                    value = -1;
+                }
+                else
+                {
+                    Runtime.midi_bank_root = value;
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                }
+            }
+            if (value == 128) // but still report the setting
+                Runtime.Log("MIDI Root Change disabled");
+            else if (value > -1)
+                Runtime.Log("Set Root CC to " + asString(value));
+            break;
+            
+        case 114: // bank
+            if (value != 0 && value != 32)
+                value = 128;
+            if (value != Runtime.midi_bank_C)
+            {
+                label = Runtime.testCCvalue(value);
+                if (label > "")
+                {
+                    Runtime.Log("CC" + asString(value) + " in use by " + label);
+                    value = -1;
+                }
+                else
+                {
+                    Runtime.midi_bank_C = value;
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                }
+            }
+            if (value == 0)
+                Runtime.Log("Set Bank CC to MSB (0)");
+            else if (value == 32)
+                Runtime.Log("Set Bank CC to LSB (32)");
+            else if (value > -1)
+                Runtime.Log("MIDI Bank Change disabled");
+            break;
+            
+        case 115: // prog change
+            value = (value > 63);
+            if (value)
+                Runtime.Log("MIDI Program Change enabled");
+            else
+                Runtime.Log("MIDI Program Change disabled");
+            if(value != Runtime.EnableProgChange)
+            {
+                Runtime.EnableProgChange = value;
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+            }
+            break;
+            
+        case 116: // enable on prog change
+            value = (value > 63);
+            if (value)
+                Runtime.Log("Set MIDI Program Change to enable part");
+            else
+                Runtime.Log("Set MIDI Program Change doesn't enable part");
+            if(value != Runtime.enable_part_on_voice_load)
+            {
+                Runtime.enable_part_on_voice_load = value;
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+            }
+            break;
+            
+        case 117: // extended prog change
+            if (value > 119)
+                value = 128;
+            if (value != Runtime.midi_upper_voice_C) // don't mess about if it's the same
+            {
+                label = Runtime.testCCvalue(value);
+                if (label > "")
+                {
+                    Runtime.Log("CC" + asString(value) + " in use by " + label);
+                    value = -1;
+                }
+                else
+                {
+                    Runtime.midi_upper_voice_C = value;
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                }
+            }
+            if (value == 128) // but still report the setting
+                Runtime.Log("MIDI extended Program Change disabled");
+            else if (value > -1)
+                Runtime.Log("Set extended Program Change CC to " + asString(value));
             break;
             
         case 118:

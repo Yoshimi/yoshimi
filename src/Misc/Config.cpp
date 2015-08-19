@@ -1123,6 +1123,16 @@ void GuiThreadMsg::processGuiMessages()
             }
         }
             break;
+        case GuiThreadMsg::UpdateConfig:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster(false);
+            if(guiMaster)
+            {
+                guiMaster->configui->update_config(msg->index);
+            }
+        }
+            break;
         case GuiThreadMsg::UpdatePanel:
         {
             SynthEngine *synth = ((SynthEngine *)msg->data);

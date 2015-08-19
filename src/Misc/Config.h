@@ -206,6 +206,7 @@ public:
     {
         NewSynthEngine = 0,
         UpdateMaster,
+        UpdateConfig,
         UpdatePanel,
         UpdatePanelItem,
         UpdatePartProgram,
