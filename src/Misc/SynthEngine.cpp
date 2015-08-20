@@ -633,7 +633,23 @@ void SynthEngine::SetSystemValue(int type, int value)
     label = "";
     switch (type)
     {
-        case 100:
+        case 2: // master key shift
+            if (value > 76)
+                value = 76;
+            else if (value < 52) // 2 octaves is enough for anybody :)
+                value = 52;            
+            setPkeyshift(value);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+            Runtime.Log("Set Master key shift " + asString(value)
+                      + "  (" + asString(value - 64) + ")");
+            break;
+        case 7: // master volume
+            setPvolume(value);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+            Runtime.Log("Set Master volume " + asString(value));
+            break;
+            
+        case 100: // reports destination
             if(value > 63)
             {
                 Runtime.consoleMenuItem = true;
@@ -650,16 +666,20 @@ void SynthEngine::SetSystemValue(int type, int value)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
             break;
             
-        case 109 :
+        case 109 : // list dynamics
             if (Runtime.consoleMenuItem)
             {
-                Runtime.Log("Reports sent to console window");
-                // same as above
-                cout << "Reports sent to console window\n";
+                Runtime.Log("\nReports sent to console window");
+                // we need the next line in case is someone is working headless
+                cout << "\nReports sent to console window\n";
             }
             else
                 Runtime.Log("\nReports sent to stderr");
             
+            Runtime.Log("Master volume " + asString((int) Pvolume));
+            Runtime.Log("Master key shift " + asString(Pkeyshift)
+                      + "  (" + asString(Pkeyshift - 64) + ")");
+
             root = bank.currentRootID;
             if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
             {
@@ -811,7 +831,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("MIDI Bank Change disabled");
             break;
             
-        case 115: // prog change
+        case 115: // program change
             value = (value > 63);
             if (value)
                 Runtime.Log("MIDI Program Change enabled");
@@ -824,7 +844,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             }
             break;
             
-        case 116: // enable on prog change
+        case 116: // enable on program change
             value = (value > 63);
             if (value)
                 Runtime.Log("Set MIDI Program Change to enable part");
@@ -837,7 +857,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             }
             break;
             
-        case 117: // extended prog change
+        case 117: // extended program change
             if (value > 119)
                 value = 128;
             if (value != Runtime.midi_upper_voice_C) // don't mess about if it's the same
@@ -860,7 +880,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("Set extended Program Change CC to " + asString(value));
             break;
             
-        case 118:
+        case 118: // active parts
             if (value == 16 or value == 32 or value == 64)
             {
                 Runtime.NumAvailableParts = value;
@@ -871,7 +891,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("Out of range");
             break;
             
-        case 119:
+        case 119: // obvious!
             Runtime.saveConfig();
             Runtime.Log("Settings saved");
             break;

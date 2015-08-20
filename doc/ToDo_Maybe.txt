@@ -3,6 +3,17 @@ restoreJsession() -> restoreSessionData() -> extractConfigData()
 Should this refetch entire bank structure?
 
 
+RPNs (channel based)
+
+101,0 (MSB)
+
+100,0 Pitch bend range
+100,1 Fine detune
+100,2 Coarse detune
+
+Maybe a NRPN variation of this for global tuning.
+
+
 Add 'Ignore MIDI Reset All' to deal with brain dead sequencers :(
 
 Gui to set up vector control!
