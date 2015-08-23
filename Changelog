@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-8-23 Will
+- Improved command line options
+- Updated docs
+
 2015-8-20 Will
 - Completed new NRPN extensions so most system values can be changed.
 

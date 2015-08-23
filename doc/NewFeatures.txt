@@ -20,8 +20,8 @@ From the command line, as well as autoconnecting the main L & R outputs to jack,
 
 e.g.
 
- ./yoshimi -K --alsa-midi="Virtual Keyboard"
- ./yoshimi -K --jack-midi="jack-keyboard:midi_out"
+ ./yoshimi -K --alsa-midi "Virtual Keyboard"
+ ./yoshimi -K --jack-midi "jack-keyboard:midi_out"
  
 Alsa can often manage with just the client name, but jack needs the port as well. These commands are case sensitive, and quite fussy about spaces etc. so it's wise to use quotes for the source name, even if they don't seem to be needed.
 

@@ -14,6 +14,9 @@ RPNs (channel based)
 Maybe a NRPN variation of this for global tuning.
 
 
+-D --root-path[<path>]   define path to bank root
+
+
 Add 'Ignore MIDI Reset All' to deal with brain dead sequencers :(
 
 Gui to set up vector control!

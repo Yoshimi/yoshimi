@@ -56,18 +56,21 @@ const unsigned short Config::MaxParamsHistory = 25;
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
-    "Copyright 2009-2011 Alan Calvert";
+    "Copyright 2009-2011 Alan Calvert, "
+    "Copyright 20012-2013 Jeremy Jongepier and others, "
+    "Copyright 20014-2015 Will Godfrey and others";
 
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
 static struct argp_option cmd_options[] = {
-    {"alsa-audio",        'A',  "<device>", 0x1,  "use alsa audio output" },
-    {"alsa-midi",         'a',  "<device>", 0x1,  "use alsa midi input" },
+    {"alsa-audio",        'A',  "<device>",   0,  "use named alsa audio output" },
+    {"alsa-midi",         'a',  "<device>",   0,  "use named alsa midi input" },
+    {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
     {"show-console",      'c',  NULL,         0,  "show console on startup" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
-    {"jack-audio",        'J',  "<server>", 0x1,  "use jack audio output" },
-    {"jack-midi",         'j',  "<device>", 0x1,  "use jack midi input" },
+    {"jack-audio",        'J',  "<server>",   0,  "use named jack audio output" },
+    {"jack-midi",         'j',  "<device>",   0,  "use named jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
     {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
     {"load",              'l',  "<file>",     0,  "load .xmz file" },
@@ -75,10 +78,10 @@ static struct argp_option cmd_options[] = {
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
     {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size" },
-    {"state",             'S',  "<file>",   0x1,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
+    {"state",             'S',  "<file>",     0,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
     #if defined(JACK_SESSION)
         {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
-        {"jack-session-file", 'u',  "<file>",     0,  "load jack session file" },
+        {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file" },
     #endif
     { 0, }
 };
@@ -1021,6 +1024,8 @@ LinuxSampler src/common/Features.cpp, licensed thus -
 static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 {
     Config *settings = (Config*)state->input;
+    if (arg && arg[0] == 0x3d)
+        ++ arg;
     switch (key)
     {
         case 'c': settings->showConsole = true; break;
@@ -1041,6 +1046,12 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->midiEngine = alsa_midi;
             if (arg)
                 settings->midiDevice = string(arg);
+            break;
+        case 'D':
+            if (arg)
+                cout << arg << endl;
+        // don't know how to implement the next line :(
+                // addRootDir(arg)
             break;
         case 'i':
             settings->showGui = false;
