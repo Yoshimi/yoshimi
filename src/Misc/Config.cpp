@@ -63,14 +63,14 @@ static char prog_doc[] =
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
 static struct argp_option cmd_options[] = {
-    {"alsa-audio",        'A',  "<device>",   0,  "use named alsa audio output" },
-    {"alsa-midi",         'a',  "<device>",   0,  "use named alsa midi input" },
+    {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output" },
+    {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input" },
     {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
     {"show-console",      'c',  NULL,         0,  "show console on startup" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
-    {"jack-audio",        'J',  "<server>",   0,  "use named jack audio output" },
-    {"jack-midi",         'j',  "<device>",   0,  "use named jack midi input" },
+    {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
+    {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
     {"auto-connect",      'K',  NULL,         0,  "auto connect jack audio" },
     {"load",              'l',  "<file>",     0,  "load .xmz file" },
@@ -78,7 +78,7 @@ static struct argp_option cmd_options[] = {
     {"name-tag",          'N',  "<tag>",      0,  "add tag to clientname" },
     {"samplerate",        'R',  "<rate>",     0,  "set alsa audio sample rate" },
     {"oscilsize",         'o',  "<size>",     0,  "set AddSynth oscilator size" },
-    {"state",             'S',  "<file>",     0,  "load state from <file>, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
+    {"state",             'S',  "<file>",     1,  "load saved state, defaults to '$HOME/.config/yoshimi/yoshimi.state'" },
     #if defined(JACK_SESSION)
         {"jack-session-uuid", 'U',  "<uuid>",     0,  "jack session uuid" },
         {"jack-session-file", 'u',  "<file>",     0,  "load named jack session file" },
@@ -110,13 +110,13 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Interpolation(0),
     checksynthengines(1),
     EnableProgChange(1), // default will be inverted
-    consoleMenuItem(1),
+    consoleMenuItem(0),
     rtprio(50),
-    midi_bank_root(128), // 128 is used as 'disabled'
-    midi_bank_C(128),
+    midi_bank_root(0), // 128 is used as 'disabled'
+    midi_bank_C(32),
     midi_upper_voice_C(128),
-    enable_part_on_voice_load(0),
-    single_row_panel(0),
+    enable_part_on_voice_load(1),
+    single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     nrpnL(127),
     nrpnH(127),
@@ -1026,15 +1026,14 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
     Config *settings = (Config*)state->input;
     if (arg && arg[0] == 0x3d)
         ++ arg;
+    int num;
+
     switch (key)
     {
         case 'c': settings->showConsole = true; break;
         case 'N': settings->nameTag = string(arg); break;
         case 'l': settings->paramsLoad = string(arg); break;
         case 'L': settings->instrumentLoad = string(arg); break;
-        case 'R': settings->Samplerate = Config::string2int(string(arg)); break;
-        case 'b': settings->Buffersize = Config::string2int(string(arg)); break;
-        case 'o': settings->Oscilsize = Config::string2int(string(arg)); break;
         case 'A':
             settings->audioEngine = alsa_audio;
             if (arg)
@@ -1047,11 +1046,23 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 settings->midiDevice = string(arg);
             break;
+        case 'b': // messy but I can't think of a better way :(
+            num = Config::string2int(string(arg));
+            if (num >= 1024)
+                num = 1024;
+            else if (num >= 512)
+                num = 512;
+            else if (num >= 256)
+                num = 256;
+            else if (num >= 128)
+                num = 128;
+            else
+                num = 64;
+            settings->Buffersize = num;
+            break;
         case 'D':
             if (arg)
-                cout << arg << endl;
-        // don't know how to implement the next line :(
-                // addRootDir(arg)
+                settings->rootDefine = string(arg);
             break;
         case 'i':
             settings->showGui = false;
@@ -1069,6 +1080,35 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
         case 'k': settings->startJack = true; break;
         case 'K': settings->connectJackaudio = true; break;
+        case 'o':
+            num = Config::string2int(string(arg));
+            if (num >= 16384)
+                num = 16384;
+            else if (num >= 8192)
+                num = 8192;
+            else if (num >= 4096)
+                num = 4096;
+            else if (num >= 2048)
+                num = 2048;
+            else if (num >= 1024)
+                num = 1024;
+            else if (num >= 512)
+                num = 512;
+            else if (num >= 256)
+                num = 256;
+            else num = 128;
+            settings->Oscilsize = num;
+            break;
+        case 'R':
+            num = Config::string2int(string(arg));
+            if (num >= 96000)
+                num = 96000;
+            else if (num >= 48000)
+                num = 48000;
+            else
+                num = 44100;
+            settings->Samplerate = num;
+            break;
         case 'S':
             settings->restoreState = true;
             if (arg)
@@ -1087,7 +1127,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;
-        default: return ARGP_ERR_UNKNOWN;
+        default:
+            return ARGP_ERR_UNKNOWN;
     }
     return 0;
 }

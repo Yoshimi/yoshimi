@@ -159,7 +159,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f/samplerate; // 100mS fade;
-
+    int found = 0;
+    
     if (!pthread_mutex_init(&processMutex, NULL))
         processLock = &processMutex;
     else
@@ -279,6 +280,19 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
                 Runtime.instrumentLoad = "";
             }
         }
+    }
+
+    if (Runtime.rootDefine.size())
+    {
+        found = bank.addRootDir(Runtime.rootDefine);
+        if (found)
+        {
+            cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
+            bank.scanrootdir(found);
+            Runtime.saveConfig();
+        }
+        else
+            cout << "Can't find path " << Runtime.rootDefine << endl;
     }
     return true;
 

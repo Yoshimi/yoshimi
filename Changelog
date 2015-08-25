@@ -1,8 +1,14 @@
 yoshimi 1.3.x
 
+2015-8-25 Will
+- Corrected command line regression :(
+- Added command line entry to define new root path.
+- Improved some default settings.
+- Now correctly scans for banks on first time startup.
+
 2015-8-23 Will
-- Improved command line options
-- Updated docs
+- Improved command line options.
+- Updated docs.
 
 2015-8-20 Will
 - Completed new NRPN extensions so most system values can be changed.

@@ -734,6 +734,7 @@ void Bank::addDefaultRootDirs()
         addRootDir(bankdirs [i]);
         ++ i;
     }
+    rescanforbanks();
 }
 
 

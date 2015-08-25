@@ -276,6 +276,7 @@ add_definitions (-DPAD_COLOUR=0xcfdfaf00)
 add_definitions (-DNUM_MIDI_PARTS=64)
 add_definitions (-DNUM_MIDI_CHANNELS=16)
 add_definitions (-DMAX_ENVELOPE_POINTS=40)
+add_definitions (-DMIN_ENVELOPE_DB=-60)
 
 add_definitions (-DPI=3.1415926536f)
 add_definitions (-DTWOPI=6.28318530718f)

@@ -90,6 +90,7 @@ class Config : public MiscFuncs
         string        ConfigFile;
         string        paramsLoad;
         string        instrumentLoad;
+        string        rootDefine;
         bool          restoreState;
         string        StateFile;
         string        CurrentXMZ;
