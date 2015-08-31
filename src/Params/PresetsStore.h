@@ -29,7 +29,6 @@
 #include "Misc/MiscFuncs.h"
 
 #define MAX_PRESETTYPE_SIZE 30
-#define MAX_PRESETS 1000
 
 class XMLwrapper;
 class PresetsStore;

@@ -16,7 +16,9 @@ If either NRPN byte is set to 127, all data values are ignored again.
 
 In Yoshimi NRPNs are not themselves channel sensitive but the final results will often be sent to whichever is the current channel.
 
-Yoshimi also supports the curious 14bit NRPNs but this shouldn't be noticable to the user. In order to deal with this, and also some variations in the way sequencers present NRPNs generally, if a complete NRPN is set i.e. Nhigh, Nlow, Dhigh, Dlow then the data bytes can be in either order, but must follow Nhigh and Nlow.
+Yoshimi also supports the curious 14 bit NRPNs but this shouldn't be noticable to the user. In order to deal with this, and also some variations in the way sequencers present NRPNs generally, if a complete NRPN is set i.e. Nhigh, Nlow, Dhigh, Dlow then the data bytes can be in either order, but must follow Nhigh and Nlow.
+
+In these notes, where practical we also list the 14 bit values in square brackets.
 
 After this, for running values, once Dhigh and Dlow have been set if you change either of these, the other will be assumed.
 

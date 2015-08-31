@@ -111,7 +111,7 @@ void PresetsStore::rescanforpresets(string type)
     int presetk = 0;
     string ftype = "." + type + preset_extension;
 
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    for (int i = 0; i < MAX_PRESETS; ++i)
     {
         if (synth->getRuntime().presetsDirlist[i].empty())
             continue;

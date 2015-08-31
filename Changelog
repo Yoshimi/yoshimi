@@ -1,4 +1,11 @@
-yoshimi 1.3.x
+yoshimi 1.3.6 rc1
+
+2015-8-31 Will
+- set version as 1.3.6 rc1
+- Untangled preset counters from bank counters.
+- Improved NRPN listing of roots and banks.
+- Small GUI adjustments.
+- Updated docs
 
 2015-8-25 Will
 - Corrected command line regression :(

@@ -145,7 +145,7 @@ static void *mainGuiThread(void *arg)
         //o->Rectangle::set(Fl_Monitor::find(0,0),o->w(),o->h(),fltk::ALIGN_CENTER);
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
         winSplash.show();
-        Fl::add_timeout(2.0, splashTimeout, &winSplash);
+        Fl::add_timeout(2.5, splashTimeout, &winSplash);
 
     }
 
@@ -306,6 +306,7 @@ bail_out:
 
 int main(int argc, char *argv[])
 {
+    cout << "Yoshimi is starting" << endl; // guaranteed start message
     globalArgc = argc;
     globalArgv = argv;
     bool bExitSuccess = false;    
@@ -333,9 +334,6 @@ int main(int argc, char *argv[])
     }
     sem_wait(&semGui);
     sem_destroy(&semGui);
-
-    //cout << "Yoshimi is starting" << endl;
-    splashMessages.push_back("Starting synth engine...");
 
     if (!mainCreateNewInstance(0))
     {
@@ -371,8 +369,8 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    if (!bExitSuccess)
-        usleep(4000000);
+    if (bShowGui && !bExitSuccess) // this could be done better!
+        usleep(2000000);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;

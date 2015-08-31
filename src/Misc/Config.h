@@ -123,7 +123,7 @@ class Config : public MiscFuncs
 
         unsigned int  GzipCompression;
         int           Interpolation;        
-        string        presetsDirlist[MAX_BANK_ROOT_DIRS];
+        string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
         bool          SimpleCheck;
         int           EnableProgChange;

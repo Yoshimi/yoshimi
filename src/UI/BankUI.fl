@@ -266,7 +266,8 @@ class RootSlot {: {public Fl_Button, RootProcess_}
         return tmp;} {}
   }
   Function {init(int nslot_, int *what_, int *whatslot_, void (RootProcess_:: *fnr_)(void), RootProcess_ *rp_, Bank *root_, int *nselected_)} {} {
-    code {nslot = nslot_;
+    code {//
+	nslot = nslot_;
         what = what_;
         whatslot = whatslot_;
         fnr = fnr_;
@@ -282,6 +283,11 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
   Function {rootrefresh()} {} {
     code {//
+    if (nslot == 127)
+    {
+        hide();
+        return;
+    }
     string bankName = root->getBankIDname(nslot);
     if (bankName.empty())
         color(46);
@@ -508,7 +514,7 @@ if ((Fl::event_button() == 3))
     rootuiwindow->hide();}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {5 34 766 491} box ENGRAVED_FRAME
       } {
         Fl_Pack {} {
@@ -609,7 +615,7 @@ removeselection();}
     Fl_Window pathwindow {
       label {Bank Root Paths}
       callback {o->hide();}
-      xywh {366 188 465 295} type Double hide
+      xywh {30 70 465 295} type Double hide
       code0 {readbankcfg();}
     } {
       Fl_Browser rootsbrowse {
@@ -621,7 +627,8 @@ if (tmp)
 }
     
 changeIDbutton->value(recoverID());
-oldrootID = changeIDbutton->value();}
+oldrootID = changeIDbutton->value();
+Pend->hide();}
         xywh {10 10 445 200} type Hold labelsize 12 textsize 13
       }
       Fl_Button {} {
@@ -634,7 +641,8 @@ oldrootID = changeIDbutton->value();}
     synth->getGuiMaster()->configui->configChanged = true;
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
-    rescan_for_banks(true);}
+    rescan_for_banks(true);
+    Pend->hide();}
         xywh {10 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button removerootdirbutton {
@@ -647,7 +655,8 @@ oldrootID = changeIDbutton->value();}
         synth->getGuiMaster()->configui->configChanged = true;
     }
     activatebutton_rootdir(false);
-    rescan_for_banks(false);}
+    rescan_for_banks(false);
+    Pend->hide();}
         xywh {95 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
         code0 {o->deactivate();}
       }
@@ -661,7 +670,8 @@ oldrootID = changeIDbutton->value();}
         rescan_for_banks(false);
         synth->getGuiMaster()->configui->configChanged = true;
     }
-    activatebutton_rootdir(false);}
+    activatebutton_rootdir(false);
+    Pend->hide();}
         xywh {180 225 75 35} box THIN_UP_BOX labelsize 12 align 128 deactivate
         code0 {o->deactivate();}
       }
@@ -673,37 +683,32 @@ oldrootID = changeIDbutton->value();}
         pathwindow->hide();}
         xywh {265 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
-      Fl_Return_Button changeIDok {
-        label Set
+      Fl_Button Pend {
+        label Pending
         callback {//
     if (changeIDbutton->value() == oldrootID)
     {
-        o->deactivate();
+        o->hide();
         return;
     }
     if (selectedRootID >= 0)
     {
-        if (synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value()))
-        {
-            readbankcfg();
-            rescan_for_banks(true);
-            synth->getGuiMaster()->configui->configChanged = true;
-            o->deactivate();
-        }
-        else
-        {
-            changeIDbutton->value(oldrootID);
-            fl_alert("ID already in use!");
-        }
+
+        synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value());
+        readbankcfg();
+        rescan_for_banks(true);
+        synth->getGuiMaster()->configui->configChanged = true;
+
     }
     oldrootID = changeIDbutton->value();
-    activatebutton_rootdir(false);}
-        xywh {350 236 74 20} box NO_BOX labelsize 12 align 8 deactivate
+    activatebutton_rootdir(false);
+    o->hide();}
+        tooltip {Click to set} xywh {400 239 56 18} box PLASTIC_UP_BOX color 90 labelsize 10 hide
       }
       Fl_Spinner changeIDbutton {
         label {Change ID}
-        callback {changeIDok->activate();}
-        xywh {350 237 45 19} labelsize 12 align 5 minimum 0 maximum 127 textsize 12 deactivate
+        callback {Pend->show();}
+        xywh {348 238 45 19} labelsize 12 align 5 minimum 0 maximum 126 textsize 12 deactivate
         code0 {oldrootID = o->value();}
       }
       Fl_Button {} {
@@ -861,6 +866,8 @@ fnr = &RootProcess_::rootprocess;
   } {
     code {//
     unsigned int slot = this->slot;
+    if (slot == 127)
+    return;
     string thisname = bank->getBankName(slot);
 
     
@@ -1096,7 +1103,7 @@ if(reload)
             removerootdirbutton->deactivate();
             makedefaultrootdirbutton->deactivate();
             changeIDbutton->deactivate();
-            changeIDok->deactivate();
+            Pend->hide();
         }} {}
   }
   Function {readbankcfg()} {} {

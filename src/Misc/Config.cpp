@@ -374,7 +374,7 @@ string Config::masterCCtest(int cc)
 
 void Config::clearPresetsDirlist(void)
 {
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    for (int i = 0; i < MAX_PRESETS; ++i)
         presetsDirlist[i].clear();
 }
 
@@ -433,7 +433,10 @@ bool Config::loadConfig(void)
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+    {
         Log("ConfigFile " + resConfigFile + " still not found, will use default settings");
+        saveConfig();
+    }
     else
     {
         XMLwrapper *xml = new XMLwrapper(synth);
@@ -487,7 +490,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     // get preset dirs
     int count = 0;
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    for (int i = 0; i < MAX_PRESETS; ++i)
     {
         if (xml->enterbranch("PRESETSROOT", i))
         {
@@ -595,7 +598,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     synth->getBankRef().saveToConfigFile(xmltree);
 
-    for (int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
+    for (int i = 0; i < MAX_PRESETS; ++i)
         if (presetsDirlist[i].size())
         {
             xmltree->beginbranch("PRESETSROOT",i);

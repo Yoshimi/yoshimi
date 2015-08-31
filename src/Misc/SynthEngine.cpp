@@ -751,6 +751,8 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
             
         case 111 : // list banks
+            if (value >= MAX_BANK_ROOT_DIRS)
+                value = bank.currentRootID;
             if (bank.roots.count(value) > 0
                 && !bank.roots [value].path.empty())
             {
@@ -774,6 +776,8 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (bank.roots.count(root) > 0
                 && !bank.roots [root].path.empty())
             {
+                if (value >= MAX_BANKS_IN_ROOT)
+                    value = bank.currentBankID;
                 if (!bank.roots [root].banks [value].instruments.empty())
                 {
                     label = bank.roots [root].path;

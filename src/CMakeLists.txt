@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.5 M")
+set (YOSHIMI_VERSION "1.3.6 rc1")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -264,8 +264,9 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
-add_definitions (-DMAX_BANK_ROOT_DIRS=128)
-add_definitions (-DMAX_BANKS_IN_ROOT=128)
+add_definitions (-DMAX_PRESETS=1000)
+add_definitions (-DMAX_BANK_ROOT_DIRS=127)
+add_definitions (-DMAX_BANKS_IN_ROOT=127)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
 add_definitions (-DPAD_MAX_SAMPLES=96)

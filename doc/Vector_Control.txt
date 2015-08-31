@@ -12,8 +12,7 @@ Independently of this Parts 2 & 18 could use filter and pan from another CC
 Setting up is currently done as follows.
 
 In the required channel send:
-NRPN MSB (99)  set to 64
-NRPN LSB (98)  set to 1
+NRPN MSB (99)  set to 64, LSB (98)  set to 1  [8129]
 Data MSB ( 6)  set mode
               0 = X sweep CC
               1 = Y sweep CC
