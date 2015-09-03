@@ -7,7 +7,7 @@ Later I had another complaint, but this was much harder to pin down. The person 
 
 About two years ago someone sent in a patch with spelling corrections. Unfortunately this changed the name of an XML parameter. It was quickly found and corrected. Ironically the only patch I found that was affected by this was one of mine!
 
-Recently we discovered that the jack and internal buffers had somehow become fused together. This would make a difference to some sounds if you wanted a very large internal buffer but a small jack one, although it's a situation I never came across myself. However, this in now corrected in the current master and will be pushed out with the next release.
+Recently we discovered that the jack and internal buffers had somehow become fused together. This would make a difference to some sounds if you wanted a very large internal buffer but a small jack one, although it's a situation I never came across myself. However, this in now corrected.
 
 
 Whenever in doubt my reference is to check sounds against Zyn 2.2.1. This is getting harder as I can no longer compile it on modern distros, and the executable will save but not load instrument files. Also, some features like 'unison' don't exist.

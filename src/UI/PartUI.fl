@@ -490,8 +490,8 @@ Offset}
       Fl_Spinner {} {
         label {Key Limit}
         callback {part->setkeylimit(o->value());}
-        tooltip {Maximum keys for this part} xywh {202 140 38 18} labelsize 10 value 15 textsize 11
-        code0 {o->range(1, POLIPHONY - 5);}
+        tooltip {Maximum keys for this part} xywh {202 140 38 18} labelsize 10 value 20 textsize 11
+        code0 {o->range(1, POLIPHONY - 20); // enough for one part!}
         code1 {o->value(part->Pkeylimit);}
       }
       Fl_Scroll toSysEfx {

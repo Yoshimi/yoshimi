@@ -1,11 +1,20 @@
-yoshimi 1.3.6 rc1
+yoshimi 1.3.6 rc2
+
+2015-9-2 Will
+- Set version as 1.3.6 rc2.
+- Overall key limit increased to 80.
+- Part max key limit increased to 60.
+- Part default key limit increased to 20.
+- Added demo midi and parameter set to examples directory.
+- More doc updates and moved some files to Histories directory.
+- License corrections.
 
 2015-8-31 Will
-- set version as 1.3.6 rc1
+- Set version as 1.3.6 rc1.
 - Untangled preset counters from bank counters.
 - Improved NRPN listing of roots and banks.
 - Small GUI adjustments.
-- Updated docs
+- Updated docs.
 
 2015-8-25 Will
 - Corrected command line regression :(

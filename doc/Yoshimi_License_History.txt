@@ -17,3 +17,9 @@ To the best of my knowledge, V3 is not compatible with V2 strict, but V2 or late
 I doubt anyone would actually make an issue of this. However, to safeguard Yoshimi as a whole, I took it upon myself to change Cal's code to V2 or later. I believe it retains the spirit of his wishes, and the only person with standing to object -  his daughter - has been totally supportive of the work currently being done on Yoshimi.
 
 Any source code I add will be GPL V2 or later.
+
+Update.
+
+The original change discussion has now been located and the license for both Zyn and Yoshi is confirmed as GPL V2 or later.
+
+Anyone wanting to confirm this should look at the Zyn user list archives August 2007 and September 2007.

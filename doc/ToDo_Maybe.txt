@@ -3,6 +3,10 @@ restoreJsession() -> restoreSessionData() -> extractConfigData()
 Should this refetch entire bank structure?
 
 
+Allow new root path creation to include the ID value
+
+Provide NRPNs to change root & bank IDs
+
 RPNs (channel based)
 
 101,0 (MSB)

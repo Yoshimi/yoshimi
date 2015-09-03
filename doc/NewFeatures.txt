@@ -20,8 +20,8 @@ From the command line, as well as autoconnecting the main L & R outputs to jack,
 
 e.g.
 
- ./yoshimi -K --alsa-midi "Virtual Keyboard"
- ./yoshimi -K --jack-midi "jack-keyboard:midi_out"
+ ./yoshimi -K --alsa-midi="Virtual Keyboard"
+ ./yoshimi -K --jack-midi="jack-keyboard:midi_out"
  
 Alsa can often manage with just the client name, but jack needs the port as well. These commands are case sensitive, and quite fussy about spaces etc. so it's wise to use quotes for the source name, even if they don't seem to be needed.
 
@@ -110,7 +110,7 @@ It is now possible to set up a new bank root path when starting from the command
 
 yoshimi -D /home/{username}/{directory}/{subdirectory}/bank
 
-Yoshimi with then immediately scan this path for new banks, but won't make the root 9or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
+Yoshimi will then immediately scan this path for new banks, but won't make the root 9or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
 
 ###
 

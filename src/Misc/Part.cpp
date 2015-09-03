@@ -128,7 +128,7 @@ void Part::defaults(void)
     setPan(Ppanning = 64);
     Pvelsns = 64;
     Pveloffs = 64;
-    Pkeylimit = 15;
+    Pkeylimit = 20;
     Pfrand = 0;
     setDestination(1);
     defaultsinstrument();
@@ -837,8 +837,6 @@ void Part::setkeylimit(unsigned char Pkeylimit_)
 {
     Pkeylimit = Pkeylimit_;
     int keylimit = Pkeylimit;
-/*    if (!keylimit) // not needed now
-        keylimit = POLIPHONY - 5;*/
 
     // release old keys if the number of notes>keylimit
     if (Ppolymode && !ctl->legato.legato)
@@ -1360,11 +1358,11 @@ void Part::getfromXML(XMLwrapper *xml)
     Pkeylimit = xml->getpar127("key_limit", Pkeylimit);
     if (Pkeylimit < 1)
     {
-        Pkeylimit = POLIPHONY - 5;
+        Pkeylimit = POLIPHONY - 20;
     }
-    else if(Pkeylimit > (POLIPHONY - 5))
+    else if(Pkeylimit > (POLIPHONY - 20))
     {
-        Pkeylimit = POLIPHONY - 5;
+        Pkeylimit = POLIPHONY - 20;
     }
     setDestination(xml->getpar127("destination", Paudiodest));
     

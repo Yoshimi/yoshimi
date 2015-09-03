@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.6 rc1")
+set (YOSHIMI_VERSION "1.3.6 rc2")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -286,7 +286,7 @@ add_definitions (-DLOG_2=0.693147181f)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
-add_definitions (-DPOLIPHONY=60)
+add_definitions (-DPOLIPHONY=80)
 add_definitions (-DNUM_SYS_EFX=4)
 add_definitions (-DNUM_INS_EFX=8)
 add_definitions (-DNUM_PART_EFX=3)

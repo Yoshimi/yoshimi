@@ -4,4 +4,4 @@ Any additional notes are more than welcome. If you like, you can send them to me
 
 abrolag@users.sourceforge.net
 
-For the sake of completeness there is some info on ZynAddSubFx from its beginning up to the time of the Yoshimi fork.
+For the sake of completeness in the Historiesdirectory there is some info on ZynAddSubFx from its beginning up to the time of the Yoshimi fork. Other information will be placed there from time to time.
