@@ -1,0 +1,24 @@
+When running from the command line all the following can now be entered after the 'up and running' message.
+
+setup - displays the current dynamic system settings.
+
+show paths - display all the currently defined bank root paths and their IDs.
+
+list root (n) - lists all the banks and their IDs in root path 'n' (or the current root).
+
+list bank (n) - lists all the instruments and their IDs in bank 'n' (or the current bank) of the current root.
+
+set rootcc [n] - set the MIDI CC for root path changes (128 disables).
+
+set bankcc [n] - set the MIDI CC for bank changes (anything other than 0 or 32 disables).
+
+set path [n] - set current root path to ID 'n'.
+
+set bank [n] - set current bank to ID 'n'.
+
+set part [n1] program [n2] - load instrument 'n2' into par 'n1'.
+
+
+Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names provided that is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+
+More will be added, and the organisation of them may be changed slightly.

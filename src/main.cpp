@@ -18,6 +18,9 @@
 */
 
 #include <iostream>
+#include <stdio.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -49,6 +52,39 @@ static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
+
+int commandStyle;
+int commandCount;
+char commandChr;
+char commandBuffer[COMMAND_SIZE + 2]; // allow for overcount and terminator
+
+
+bool commandProcess(char chr)
+{
+    if (chr >= 0x20 && chr < 0x7f && commandCount < COMMAND_SIZE)
+    {
+        commandBuffer[commandCount] = chr;
+        printf("%c", chr);
+        ++commandCount;
+    }
+    else if (chr == 0x7f)
+    {
+        if (commandCount > 0)
+        {
+            printf("%c %c", 0x08, 0x08);
+            --commandCount;
+            commandBuffer[commandCount] = 0;
+        }
+    }
+    else
+    {
+        commandBuffer[commandCount] = 0;
+        commandCount = 0;
+        return true;
+    }
+    return false;
+}
+
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
 //It's only suitable for single instance app support
@@ -170,6 +206,9 @@ static void *mainGuiThread(void *arg)
         if (firstSynth->getUniqueId() == 0)
         {
             firstSynth->getRuntime().signalCheck();
+            if (read(0, &commandChr, 1) > 0)
+                if (commandProcess(commandChr))
+                    firstSynth->DecodeCommands( commandBuffer);//getRuntime().Log(commandBuffer);
         }
 
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -288,6 +327,7 @@ bool mainCreateNewInstance(unsigned int forceId)
     return true;
 
 bail_out:
+    fcntl(0, F_SETFL, commandStyle);
     synth->getRuntime().runSynth = false;
     synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
     if (musicClient)
@@ -306,6 +346,11 @@ bail_out:
 
 int main(int argc, char *argv[])
 {
+    commandCount = 0;
+    commandStyle = fcntl(0, F_GETFL, 0);
+    fcntl (0, F_SETFL, (commandStyle | O_NDELAY)); 
+    
+    
     cout << "Yoshimi is starting" << endl; // guaranteed start message
     globalArgc = argc;
     globalArgv = argv;
@@ -369,6 +414,7 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
+    fcntl(0, F_SETFL, commandStyle);
     if (bShowGui && !bExitSuccess) // this could be done better!
         usleep(2000000);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)

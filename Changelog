@@ -1,5 +1,8 @@
 yoshimi 1.3.6 rc2
 
+2015-9-5 Will (command)
+- started new cmmand line access
+
 2015-9-2 Will
 - Set version as 1.3.6 rc2.
 - Overall key limit increased to 80.
@@ -37,7 +40,7 @@ yoshimi 1.3.6 rc2
 - Added failure messages to splash screen and increased timeout.
 
 2015-7-20 Will
-- Merger in ALSA updates from 'buffers'.
+- Merged in ALSA updates from 'buffers'.
 - master version now displays an 'M' suffix.
 
 2015-7-20 Will (buffers)

@@ -817,7 +817,7 @@ synth = parameters->getSynthEngine();
               xywh {125 125 100 20} labelfont 1 labelsize 11
             }
             MenuItem {} {
-              label Continous
+              label Continuous
               xywh {115 115 100 20} labelfont 1 labelsize 11
             }
           }

@@ -112,5 +112,7 @@ yoshimi -D /home/{username}/{directory}/{subdirectory}/bank
 
 Yoshimi will then immediately scan this path for new banks, but won't make the root 9or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
 
+Also, when running from the command line there is now access to many of the system and Root, Bank etc. settings
+
 ###
 

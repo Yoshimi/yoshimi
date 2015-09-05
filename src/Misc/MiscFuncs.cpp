@@ -189,3 +189,23 @@ string MiscFuncs::asHexString(unsigned int x)
    oss << hex << x;
    return string(oss.str());
 }
+
+
+char *MiscFuncs::skipSpace(char *buf)
+{
+    while (buf[0] == 0x20)
+    {
+        ++ buf;
+    }
+    return buf;
+}
+
+char *MiscFuncs::skipChars(char *buf)
+{
+    while (buf[0] > 0x20) // will also stop on line ends
+    {
+        ++ buf;
+    }
+    
+    return buf;
+}

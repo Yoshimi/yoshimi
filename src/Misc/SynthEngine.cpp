@@ -35,6 +35,7 @@ using namespace std;
 #include "Misc/Config.h"
 
 #include <iostream>
+#include <string>
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -914,6 +915,117 @@ void SynthEngine::SetSystemValue(int type, int value)
             Runtime.Log("Settings saved");
             break;
     }
+}
+
+// Provides a command line link to system values
+void SynthEngine::DecodeCommands(char *buffer)
+{
+    char *point = buffer;
+    Runtime.Log(""); // Clear out command repeat. Why?
+    
+    for (unsigned int i = 0; i < strlen(buffer); ++i)
+        if (!(buffer[i] & 0x20))
+            buffer[i] |= 0x20; // quick and dirty lower case
+
+    if (!strcmp(buffer, "setup"))
+        SetSystemValue(109, 255);
+    else if (!strncmp(buffer, "show path", 9))
+        SetSystemValue(110, 255);
+    else if(strncmp(buffer, "list", 4) == 0)
+    {
+        point = skipChars(point);
+        point = skipSpace(point);
+        if(strncmp(point, "root", 4) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if(point[0] == 0)
+                SetSystemValue(111, 255);
+            else
+            {
+                SetSystemValue(111, string2int(point));
+            }
+        }
+        else if (strncmp(point, "bank", 4) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if(point[0] == 0)
+                SetSystemValue(112, 255);
+            else
+            {
+                SetSystemValue(112, string2int(point));
+            }
+        }
+    }
+    else if (strncmp(buffer, "set", 3) == 0)
+    {
+        point = skipChars(point);
+        point = skipSpace(point);
+        if(strncmp(point, "path", 4) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            SetBankRoot(string2int(point));
+        }
+        else if(strncmp(point, "rootcc", 6) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            SetSystemValue(113, string2int(point));
+        }
+        else if(strncmp(point, "bankcc", 6) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            SetSystemValue(114, string2int(point));
+        }
+        else if(strncmp(point, "bank", 4) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            SetBank(string2int(point));
+        }
+        else if (strncmp(point, "part", 4) == 0)
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] == 0)
+                Runtime.Log("Which part?");
+            else{
+                
+                unsigned char partnum = string2int(point);
+                point = skipChars(point);
+                point = skipSpace(point);
+                if (point[0] == 0)
+                    Runtime.Log("Which operation?");
+                
+                else if (strncmp(point, "prog", 4) == 0)
+                {
+                    point = skipChars(point);
+                    point = skipSpace(point);
+                    SetProgram(partnum, string2int(point));
+                }
+            }
+        }
+        else
+            Runtime.Log("Set what?");
+    }
+    else
+    {
+        Runtime.Log("Commands");
+        Runtime.Log("  setup - Show settings");
+        Runtime.Log("  show paths - display bank root paths");
+        Runtime.Log("  list root (n) - list banks in root ID or current");
+        Runtime.Log("  list bank (n) - list instruments in bank ID or current");
+        Runtime.Log("  set rootcc [n]- set CC for root path changes");
+        Runtime.Log("  set bankcc [n]- set CC for bank changes");
+        Runtime.Log("  set path [n]- set path to root ID");
+        Runtime.Log("  set bank [n]- set bank to ID");
+        Runtime.Log("  set part [n1]- set part operations");
+        Runtime.Log("    program to [n2] - loads instrument ID");
+    }
+    memset(buffer, 0, COMMAND_SIZE);
 }
 
 

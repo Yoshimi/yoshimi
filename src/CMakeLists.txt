@@ -264,6 +264,7 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
+add_definitions (-DCOMMAND_SIZE=80)
 add_definitions (-DMAX_PRESETS=1000)
 add_definitions (-DMAX_BANK_ROOT_DIRS=127)
 add_definitions (-DMAX_BANKS_IN_ROOT=127)
