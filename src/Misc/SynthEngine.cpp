@@ -607,7 +607,7 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
     if (npart < Runtime.NumAvailableParts)
     {
         if (nchan > NUM_MIDI_CHANNELS)
-            npart = NUM_MIDI_CHANNELS;
+            nchan = NUM_MIDI_CHANNELS;
         /* This gives us a way to disable all channel messages to a part.
          * Sending a valid channel number will restore normal operation
          * as will using the GUI controls.
@@ -866,7 +866,7 @@ void SynthEngine::SetSystemValue(int type, int value)
         case 116: // enable on program change
             value = (value > 63);
             if (value)
-                Runtime.Log("Set MIDI Program Change to enable part");
+                Runtime.Log("Set MIDI Program Change enables part");
             else
                 Runtime.Log("Set MIDI Program Change doesn't enable part");
             if(value != Runtime.enable_part_on_voice_load)
@@ -923,21 +923,53 @@ void SynthEngine::DecodeCommands(char *buffer)
     char *point = buffer;
     Runtime.Log(""); // Clear out command repeat. Why?
     
-    for (unsigned int i = 0; i < strlen(buffer); ++i)
-        if (!(buffer[i] & 0x20))
-            buffer[i] |= 0x20; // quick and dirty lower case
-
-    if (!strcmp(buffer, "setup"))
+    bool noval = false;
+    if (matchWord(point, "setu"))
         SetSystemValue(109, 255);
-    else if (!strncmp(buffer, "show path", 9))
-        SetSystemValue(110, 255);
-    else if(strncmp(buffer, "list", 4) == 0)
+    else if (matchWord(point, "path"))
     {
         point = skipChars(point);
         point = skipSpace(point);
-        if(strncmp(point, "root", 4) == 0)
+        if (point[0] == 0)
+            Runtime.Log("Which operation?");
+        else if (matchWord(point, "show"))
+            SetSystemValue(110, 255);
+        else if (matchWord(point, "add"))
+        {
+            point = skipSpace(point);
+            int found = bank.addRootDir(point);
+            if (!found)
+            {
+                Runtime.Log("Can't find path " + (string) point);
+            }
+            else
+                Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
+        }
+        else if (matchWord(point, "remo"))
         {
             point = skipChars(point);
+            point = skipSpace(point);
+            if (isdigit(point[0]))
+            {
+                int rootID = string2int(point);
+                string rootname = bank.getRootPath(rootID);
+                if (rootname.empty())
+                    Runtime.Log("Can't find path " + (string) point);
+                else
+                {
+                    bank.removeRoot(rootID);
+                    Runtime.Log("Removed " + rootname);
+                }
+            }
+            else
+                noval = true;
+        }
+    }
+    else if(matchWord(point, "list"))
+    {
+        point = skipSpace(point);
+        if(matchWord(point, "root"))
+        {
             point = skipSpace(point);
             if(point[0] == 0)
                 SetSystemValue(111, 255);
@@ -946,9 +978,8 @@ void SynthEngine::DecodeCommands(char *buffer)
                 SetSystemValue(111, string2int(point));
             }
         }
-        else if (strncmp(point, "bank", 4) == 0)
+        else if (matchWord(point, "bank"))
         {
-            point = skipChars(point);
             point = skipSpace(point);
             if(point[0] == 0)
                 SetSystemValue(112, 255);
@@ -957,74 +988,180 @@ void SynthEngine::DecodeCommands(char *buffer)
                 SetSystemValue(112, string2int(point));
             }
         }
+        else
+            Runtime.Log("List what?");
     }
-    else if (strncmp(buffer, "set", 3) == 0)
+    
+    else if (matchWord(point, "set"))
     {
-        point = skipChars(point);
         point = skipSpace(point);
-        if(strncmp(point, "path", 4) == 0)
+        if(matchWord(point, "rootcc"))
         {
-            point = skipChars(point);
             point = skipSpace(point);
-            SetBankRoot(string2int(point));
+            if (point[0] != 0)
+                SetSystemValue(113, string2int(point));
+            else
+                noval = true;
         }
-        else if(strncmp(point, "rootcc", 6) == 0)
+        else if(matchWord(point, "bankcc"))
         {
-            point = skipChars(point);
+            if (point[0] != 0)
+                SetSystemValue(114, string2int(point));
+            else
+                noval = true;
+        }
+        else if(matchWord(point, "root"))
+        {
             point = skipSpace(point);
-            SetSystemValue(113, string2int(point));
+            if (point[0] != 0)
+                SetBankRoot(string2int(point));
+            else
+                noval = true;
         }
-        else if(strncmp(point, "bankcc", 6) == 0)
+        else if(matchWord(point, "bank"))
         {
-            point = skipChars(point);
             point = skipSpace(point);
-            SetSystemValue(114, string2int(point));
+            if (point[0] != 0)
+                SetBank(string2int(point));
+            else
+                noval = true;
         }
-        else if(strncmp(point, "bank", 4) == 0)
+        
+        else if (matchWord(point, "part"))
         {
-            point = skipChars(point);
-            point = skipSpace(point);
-            SetBank(string2int(point));
-        }
-        else if (strncmp(point, "part", 4) == 0)
-        {
-            point = skipChars(point);
             point = skipSpace(point);
             if (point[0] == 0)
                 Runtime.Log("Which part?");
-            else{
-                
-                unsigned char partnum = string2int(point);
-                point = skipChars(point);
+            else
+            {
                 point = skipSpace(point);
-                if (point[0] == 0)
-                    Runtime.Log("Which operation?");
-                
-                else if (strncmp(point, "prog", 4) == 0)
+                if (isdigit(point[0]))
                 {
+                   unsigned char partnum = string2int(point);
                     point = skipChars(point);
                     point = skipSpace(point);
-                    SetProgram(partnum, string2int(point));
+                    if (point[0] == 0)
+                        Runtime.Log("Which operation?");
+                    else if (matchWord(point, "prog"))
+                    {
+                        point = skipChars(point);
+                        point = skipSpace(point);
+                        if (point[0] != 0)
+                            SetProgram(partnum, string2int(point));
+                        else
+                            noval = true;
+                    }
+                     else if (matchWord(point, "chan"))
+                    {
+                        point = skipChars(point);
+                        point = skipSpace(point);
+                        if (point[0] != 0)
+                            SetPartChan(partnum, string2int(point));
+                        else
+                            noval = true;
+                    }
                 }
+                else
+                    noval = true;
             }
+        }
+        else if (matchWord(point, "prog"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] == '0')
+                SetSystemValue(115, 0);
+            else
+                SetSystemValue(115, 127);
+        }
+        else if (matchWord(point, "acti"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] == '0')
+                SetSystemValue(116, 0);
+            else
+                SetSystemValue(116, 127);
+        }
+        else if (matchWord(point, "exte"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] != 0)
+                SetSystemValue(117, string2int(point));
+            else
+                noval = true;
+        }            
+        else if (matchWord(point, "avai"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] != 0)
+                SetSystemValue(118, string2int(point));
+            else
+                noval = true;
+        }
+        else if (matchWord(point, "repo"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] == '1')
+                SetSystemValue(100, 127);
+            else
+                SetSystemValue(100, 0);
+        }
+        else if (matchWord(point, "volu"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] != 0)
+                SetSystemValue(7, string2int(point));
+            else
+                noval = true;
+        }
+        else if (matchWord(point, "shif"))
+        {
+            point = skipChars(point);
+            point = skipSpace(point);
+            if (point[0] != 0)
+                SetSystemValue(2, string2int(point));
+            else
+                noval = true;
         }
         else
             Runtime.Log("Set what?");
     }
+    
+    else if (matchWord(point, "save"))
+        SetSystemValue(119, 255);
     else
     {
         Runtime.Log("Commands");
-        Runtime.Log("  setup - Show settings");
-        Runtime.Log("  show paths - display bank root paths");
+        Runtime.Log("  setup - show dynamic settings");
+        Runtime.Log("  save - save dynamic settings");
+        Runtime.Log("  paths show - display bank root paths");
+        Runtime.Log("  path add [s] - add bank root path");
+        Runtime.Log("  path remove [n] - remove bank root path ID");
         Runtime.Log("  list root (n) - list banks in root ID or current");
         Runtime.Log("  list bank (n) - list instruments in bank ID or current");
-        Runtime.Log("  set rootcc [n]- set CC for root path changes");
-        Runtime.Log("  set bankcc [n]- set CC for bank changes");
-        Runtime.Log("  set path [n]- set path to root ID");
-        Runtime.Log("  set bank [n]- set bank to ID");
-        Runtime.Log("  set part [n1]- set part operations");
-        Runtime.Log("    program to [n2] - loads instrument ID");
+        Runtime.Log("  set root [n] - set root path to ID");
+        Runtime.Log("  set bank [n] - set bank to ID");
+        Runtime.Log("  set part [n1] - set part ID operations");
+        Runtime.Log("    program [n2] - loads instrument ID");
+        Runtime.Log("    channel [n2] - sets MIDI channel (> 15 disables)");
+        Runtime.Log("  set rootcc [n] - set CC for root path changes (> 119 disables)");
+        Runtime.Log("  set bankcc [n] - set CC for bank changes (0, 32, other disables)");
+        Runtime.Log("  set program [n] - set MIDI program change (0 off, other on)");
+        Runtime.Log("  set activate [n ]- set MIDI part activate (0 off, other on)");
+        Runtime.Log("  set extend [n] - set CC for extended program change (> 119 disables)");
+        Runtime.Log("  set available [n] - set available parts (16, 32, 64)");
+        Runtime.Log("  set reports [n] - set report destination (1 GUI console, other stderr)");
+        Runtime.Log("  set volume [n] - set master volume");        
+        Runtime.Log("  set shift [n] - set master key shift semitones (64 no shift");        
     }
+    if (noval)
+        Runtime.Log("Value?");
+    
     memset(buffer, 0, COMMAND_SIZE);
 }
 

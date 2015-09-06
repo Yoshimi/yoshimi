@@ -19,6 +19,7 @@
 
 #include <sys/stat.h>
 #include <sstream>
+#include <string.h>
 
 using namespace std;
 
@@ -208,4 +209,19 @@ char *MiscFuncs::skipChars(char *buf)
     }
     
     return buf;
+}
+
+
+int MiscFuncs::matchWord(char*& point, const char *word)
+{
+    int newp = 0;
+    int size = strlen(word);
+    while (point[newp] > 0x20 && point[newp] < 0x7f && newp < size && (point[newp] | 0x20) == word[newp])
+            ++ newp;
+    if (newp == size)
+    {
+        point += size;
+        return size;
+    }
+    return 0;
 }

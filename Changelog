@@ -1,7 +1,11 @@
 yoshimi 1.3.6 rc2
 
+
+2015-9-6 Will (command)
+- extended and improved command line access.
+
 2015-9-5 Will (command)
-- started new cmmand line access
+- started new cmmand line access.
 
 2015-9-2 Will
 - Set version as 1.3.6 rc2.

@@ -2,6 +2,7 @@
 restoreJsession() -> restoreSessionData() -> extractConfigData()
 Should this refetch entire bank structure?
 
+make command line adding and removing root paths update gui.
 
 Allow new root path creation to include the ID value
 
