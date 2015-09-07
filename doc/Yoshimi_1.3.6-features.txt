@@ -1,12 +1,18 @@
 One of the main features of this release is improved non-gui accessibility. This has focussed on using just two universally available techniques. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
 
-When starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID. A future upgrade will allow the ID to be set to any valid one when it is created - mirroring the GUI behaviour.
+When starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
 
-Almost all dynamic setup (i.e. doesn't require a restart) can now be done via NRPNs, so a MIDI file can manage yoshimi starting from a pretty random state and set up important features like Bank and Program change behavour and number of available parts.
+Once running, almost all dynamic setup (i.e. doesn't require a restart) can now be done within the terminal window. There is also extensive control of roots, banks, parts and instruments including the ability to list and set all of these. You can now do things like:
 
-In parallel with this there is a command to list all of these settings. You can also list the available bank roots, the banks in any root, and instruments in any bank - along with their numeric IDs. These can then be used with normal MIDI CCs to get exactly the instrument you want at any time.
+Path add /home/music/yoshimi/banks
+Set part 4 program 130
 
-This arrangment looks positively steam-punk, but is actually very easy to use, requiring only a command line interface and any utility that can send MIDI CCs. NRPNs aren't special. They are simply a specific pattern of CCs. Yoshimi's implementation is very forgiving, doesn't mind if you stop halfway through (will just get on with other things while it waits) and will report exactly what it is doing.
+Additional controls that are frequently taken forgranted in the GUI but otherwise get forgotten are master key shift and master volume.
+
+There is extensive error checking and feedback.
+
+
+In parallel with this there are more NRPNs so that you can perform some of these via automation. That arrangment looks positively steam-punk, but is actually very easy to use, requiring only a utility that can send MIDI CCs. NRPNs aren't special. They are simply a specific pattern of CCs. Yoshimi's implementation is very forgiving, doesn't mind if you stop halfway through (will just get on with other things while it waits) and will report exactly what it is doing.
 
 
 Another significant improvement is to the handling of ALSA audio, which is still very important for some people. Up till now we've been insisting on 2 channel 16 bit format. Tests have shown that virtually all motherboard sound chipsets will handle this, but many external ones don't. So now we initially request 32 bit 2 channel and work towards a compromise :) With external sound modules in mind, endian swaps are also implemented.

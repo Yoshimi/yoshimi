@@ -1,5 +1,8 @@
 yoshimi 1.3.6 rc2
 
+2015-9-7 Will (command)
+- more extensions to command line access.
+- improved error checks.
 
 2015-9-6 Will (command)
 - extended and improved command line access.

@@ -633,6 +633,21 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
     part[npart]->Paudiodest = dest;
     if (part[npart]->Paudiodest & 2)
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
+        string name;
+    switch (dest)
+    {
+        case 1:
+            name = "Main";
+            break;   
+        case 2:
+            name = "Part";
+            break;
+        case 3:
+            name = "Both";
+            break;
+    }
+    Runtime.Log("Part " +asString((int) npart) + " sent to " + name);
+
     // next line only really needed for direct part control.
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
 }
@@ -921,10 +936,13 @@ void SynthEngine::SetSystemValue(int type, int value)
 void SynthEngine::DecodeCommands(char *buffer)
 {
     char *point = buffer;
-    Runtime.Log(""); // Clear out command repeat. Why?
+    cout << endl; // Clear out command repeat. Why?
     
+    point = skipSpace(point); // just to be sure
     bool noval = false;
-    if (matchWord(point, "setu"))
+    if (matchWord(point, "stop"))
+        allStop();
+    else if (matchWord(point, "setu"))
         SetSystemValue(109, 255);
     else if (matchWord(point, "path"))
     {
@@ -936,6 +954,7 @@ void SynthEngine::DecodeCommands(char *buffer)
             SetSystemValue(110, 255);
         else if (matchWord(point, "add"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             int found = bank.addRootDir(point);
             if (!found)
@@ -954,7 +973,7 @@ void SynthEngine::DecodeCommands(char *buffer)
                 int rootID = string2int(point);
                 string rootname = bank.getRootPath(rootID);
                 if (rootname.empty())
-                    Runtime.Log("Can't find path " + (string) point);
+                    Runtime.Log("Can't find path " + asString(rootID));
                 else
                 {
                     bank.removeRoot(rootID);
@@ -967,9 +986,11 @@ void SynthEngine::DecodeCommands(char *buffer)
     }
     else if(matchWord(point, "list"))
     {
+        point = skipChars(point);
         point = skipSpace(point);
         if(matchWord(point, "root"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             if(point[0] == 0)
                 SetSystemValue(111, 255);
@@ -980,6 +1001,7 @@ void SynthEngine::DecodeCommands(char *buffer)
         }
         else if (matchWord(point, "bank"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             if(point[0] == 0)
                 SetSystemValue(112, 255);
@@ -994,9 +1016,11 @@ void SynthEngine::DecodeCommands(char *buffer)
     
     else if (matchWord(point, "set"))
     {
+        point = skipChars(point);
         point = skipSpace(point);
         if(matchWord(point, "rootcc"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(113, string2int(point));
@@ -1005,6 +1029,8 @@ void SynthEngine::DecodeCommands(char *buffer)
         }
         else if(matchWord(point, "bankcc"))
         {
+            point = skipChars(point);
+            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(114, string2int(point));
             else
@@ -1012,6 +1038,7 @@ void SynthEngine::DecodeCommands(char *buffer)
         }
         else if(matchWord(point, "root"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             if (point[0] != 0)
                 SetBankRoot(string2int(point));
@@ -1020,6 +1047,7 @@ void SynthEngine::DecodeCommands(char *buffer)
         }
         else if(matchWord(point, "bank"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             if (point[0] != 0)
                 SetBank(string2int(point));
@@ -1029,15 +1057,20 @@ void SynthEngine::DecodeCommands(char *buffer)
         
         else if (matchWord(point, "part"))
         {
+            point = skipChars(point);
             point = skipSpace(point);
             if (point[0] == 0)
                 Runtime.Log("Which part?");
             else
             {
-                point = skipSpace(point);
                 if (isdigit(point[0]))
                 {
-                   unsigned char partnum = string2int(point);
+                    unsigned char partnum = string2int(point);
+                    if (partnum >= Runtime.NumAvailableParts)
+                    {
+                        Runtime.Log("Part number too high");
+                        return;
+                    }
                     point = skipChars(point);
                     point = skipSpace(point);
                     if (point[0] == 0)
@@ -1059,6 +1092,19 @@ void SynthEngine::DecodeCommands(char *buffer)
                             SetPartChan(partnum, string2int(point));
                         else
                             noval = true;
+                    }
+                     else if (matchWord(point, "dest"))
+                    {
+                        point = skipChars(point);
+                        point = skipSpace(point);
+                        int dest = point[0] - 48;
+                        if (dest > 0 and dest < 4)
+                        {
+                            partonoff(partnum, 1);
+                            SetPartDestination(partnum, dest);
+                        }
+                        else
+                            Runtime.Log("Out of range");
                     }
                 }
                 else
@@ -1149,15 +1195,17 @@ void SynthEngine::DecodeCommands(char *buffer)
         Runtime.Log("  set part [n1] - set part ID operations");
         Runtime.Log("    program [n2] - loads instrument ID");
         Runtime.Log("    channel [n2] - sets MIDI channel (> 15 disables)");
+        Runtime.Log("    destination [n2] - (1 main, 2 part, 3 both)");
         Runtime.Log("  set rootcc [n] - set CC for root path changes (> 119 disables)");
         Runtime.Log("  set bankcc [n] - set CC for bank changes (0, 32, other disables)");
         Runtime.Log("  set program [n] - set MIDI program change (0 off, other on)");
-        Runtime.Log("  set activate [n ]- set MIDI part activate (0 off, other on)");
+        Runtime.Log("  set activate [n ]- set part activate (0 off, other on)");
         Runtime.Log("  set extend [n] - set CC for extended program change (> 119 disables)");
         Runtime.Log("  set available [n] - set available parts (16, 32, 64)");
-        Runtime.Log("  set reports [n] - set report destination (1 GUI console, other stderr)");
+        cout << "  set reports [n] - set report destination (1 GUI console, other stderr)\n"; // must always go to stdout
         Runtime.Log("  set volume [n] - set master volume");        
         Runtime.Log("  set shift [n] - set master key shift semitones (64 no shift");        
+        Runtime.Log("  stop - all sound off");
     }
     if (noval)
         Runtime.Log("Value?");
@@ -1514,6 +1562,15 @@ void SynthEngine::ShutUp(void)
         sysefx[nefx]->cleanup();
     shutup = false;
     fadeLevel = 0.0f;
+}
+
+
+void SynthEngine::allStop()
+{
+    actionLock(lockmute);
+    shutup = 1;
+    fadeLevel = 1.0f;
+    actionLock(unlock);
 }
 
 

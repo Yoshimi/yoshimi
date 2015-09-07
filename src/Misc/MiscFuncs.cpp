@@ -212,16 +212,13 @@ char *MiscFuncs::skipChars(char *buf)
 }
 
 
-int MiscFuncs::matchWord(char*& point, const char *word)
+int MiscFuncs::matchWord(char *buf, const char *word)
 {
     int newp = 0;
     int size = strlen(word);
-    while (point[newp] > 0x20 && point[newp] < 0x7f && newp < size && (point[newp] | 0x20) == word[newp])
+    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == word[newp])
             ++ newp;
     if (newp == size)
-    {
-        point += size;
         return size;
-    }
     return 0;
 }

@@ -20,7 +20,9 @@ set bank [n] - set current bank to ID 'n'.
 
 set part [n1] program [n2] - load instrument 'n2' into part 'n1'.
 
-set part [n1] channel [n2] - sett the MIDI channel 'n2' for part 'n1'. if the channel number is greater than 15 no further MIDI messages will be accepted by that part.
+set part [n1] channel [n2] - set the MIDI channel 'n2' for part 'n1'. if the channel number is greater than 15 no further MIDI messages will be accepted by that part.
+
+set part [n1] destination [n2] set the audio destination of part 'n1' to main (1), part (2), both (3). Also enables part if not already enables.
 
 set rootcc [n] - set the MIDI CC for root path changes (anything greater than 119 disables).
 
@@ -28,7 +30,7 @@ set bankcc [n] - set the MIDI CC for bank changes (anything other than 0 or 32 d
 
 set program (n) - set MIDI program change (0 disables, anything else enables).
 
-set activate (n) - set MIDI part activate on program change (0 disables, anything esle enables).
+set activate (n) - set part activate on program change (0 disables, anything else enables). This applies to command line program change as well.
 
 set extend [n] - set CC for extended program change (anything greater than 119 disables).
 
@@ -38,6 +40,8 @@ set reports (n) - set reports destination (1 gui console, anything esle stderr).
 
 set volume [n] - set master volume.
 set shift [n] - set master key shift for following notes in semitones (+- octave, 64 no shift).
+
+stop - cease all sound immediately!
 
 
 Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names provided that is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
