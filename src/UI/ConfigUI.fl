@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014, Will Godfrey   
+Copyright 2014 -2015, Will Godfrey   
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -52,7 +52,7 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {449 127 465 330} type Double hide
+      xywh {230 126 465 330} type Double hide
     } {
       Fl_Tabs {} {
         xywh {5 5 455 297}
@@ -111,15 +111,19 @@ class ConfigUI {selected : {private MiscFuncs}
             label {Internal Buffer Size}
             callback {//
     unsigned int old = synth->getRuntime().Buffersize;
-    unsigned int changed = 64 << o->value();
+    unsigned int changed = 32 << o->value();
     if (old != changed)
     {
         synth->getRuntime().Buffersize = changed;
         configChanged = true;
     }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {249 80 100 20} down_box BORDER_BOX labelsize 12 textsize 11
-            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 64.0f - 1.0f) / logf(2.0f)) + 1);}
+            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 32.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
+            MenuItem {} {
+              label 32
+              xywh {45 45 100 20} labelfont 1
+            }
             MenuItem {} {
               label 64
               xywh {35 35 100 20} labelfont 1
