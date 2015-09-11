@@ -42,6 +42,11 @@ using namespace std;
 #include <FL/Fl_PNG_Image.H>
 #include "yoshimi-logo.h"
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
+extern void cmdIfaceProcessCommand(std::string cmd);
+
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
 map<SynthEngine *, MusicClient *> synthInstances;
@@ -58,7 +63,7 @@ int commandCount;
 char commandChr;
 char commandBuffer[COMMAND_SIZE + 2]; // allow for overcount and terminator
 
-
+/*
 bool commandProcess(char chr)
 {
     if (chr >= 0x20 && chr < 0x7f && commandCount < COMMAND_SIZE)
@@ -84,6 +89,7 @@ bool commandProcess(char chr)
     }
     return false;
 }
+*/
 
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -206,9 +212,10 @@ static void *mainGuiThread(void *arg)
         if (firstSynth->getUniqueId() == 0)
         {
             firstSynth->getRuntime().signalCheck();
-            if (read(0, &commandChr, 1) > 0)
+            /*if (read(0, &commandChr, 1) > 0)
                 if (commandProcess(commandChr))
                     firstSynth->DecodeCommands( commandBuffer);//getRuntime().Log(commandBuffer);
+                    */
         }
 
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -344,6 +351,20 @@ bail_out:
     return false;
 }
 
+void *commandThread(void *arg)
+{
+    while(true)
+    {
+
+        char *cmd = readline("yoshimi> ");
+        cmdIfaceProcessCommand(cmd);
+        if(cmd)
+        {
+            free(cmd);
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     commandCount = 0;
@@ -402,6 +423,18 @@ int main(int argc, char *argv[])
         firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
 
     splashMessages.push_back("Startup complete!");
+
+    //create command line processing thread
+
+    pthread_t cmdThr;
+    if (pthread_attr_init(&attr) == 0)
+    {
+        if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+        {
+
+        }
+        pthread_attr_destroy(&attr);
+    }
 
     void *ret;
     pthread_join(thr, &ret);    
