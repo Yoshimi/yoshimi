@@ -45,7 +45,7 @@ using namespace std;
 #include <readline/readline.h>
 #include <readline/history.h>
 
-extern void cmdIfaceProcessCommand(std::string cmd);
+extern void cmdIfaceCommandLoop();
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
@@ -353,16 +353,8 @@ bail_out:
 
 void *commandThread(void *arg)
 {
-    while(true)
-    {
-
-        char *cmd = readline("yoshimi> ");
-        cmdIfaceProcessCommand(cmd);
-        if(cmd)
-        {
-            free(cmd);
-        }
-    }
+    cmdIfaceCommandLoop();
+    return 0;
 }
 
 int main(int argc, char *argv[])
