@@ -1,4 +1,5 @@
 #include <Misc/SynthEngine.h>
+#include <Misc/MiscFuncs.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <string>
@@ -18,13 +19,15 @@ map<string, string > commands;
 static bool cmdIfaceReady = false;
 static int currentInstance = 0;
 
+MiscFuncs miscFuncs;
+
 void cmdIfaceSetup()
 {
     cmdIfaceReady = true;
     commands.insert(pair<string, string >("instance [n]", "set current instance (default = 0)"));
     commands.insert(pair<string, string >("setup", "show dynamic settings"));
     commands.insert(pair<string, string >("save", "save dynamic settings"));
-    commands.insert(pair<string, string >("paths show", "display bank root paths"));
+    commands.insert(pair<string, string >("path show", "display bank root paths"));
     commands.insert(pair<string, string >("path add [s]", "add bank root path"));
     commands.insert(pair<string, string >("path remove [n]", "remove bank root path ID"));
     commands.insert(pair<string, string >("list root (n)", "list banks in root ID or current"));
@@ -53,6 +56,7 @@ void cmdIfaceProcessCommand(string cmd, vector<string> args)
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
     for(int i = 0; i < currentInstance; i++, ++itSynth);
     SynthEngine *synth = itSynth->first;
+    Config &Runtime = synth->getRuntime();
     if(cmd == "instance")
     {
         if(args.size() == 1)
@@ -69,6 +73,47 @@ void cmdIfaceProcessCommand(string cmd, vector<string> args)
             }
 
         }
+    }
+    else if(cmd == "stop")
+    {
+        synth->allStop();
+    }
+    else if(cmd == "setup")
+    {
+        synth->SetSystemValue(109, 255);
+    }
+    else if(cmd == "path")
+    {
+        if(args.size() >= 1)
+        {
+            if(args [0] == "show")
+            {
+                synth->SetSystemValue(110, 255);
+            }
+            else if((args [0] == "add") && (args.size() == 2))
+            {
+                int found = synth->getBankRef().addRootDir(args [1]);
+                if (!found)
+                {
+                    Runtime.Log("Can't find path " + args [1]);
+                }
+                else
+                    Runtime.Log("Added new root ID " + miscFuncs.asString(found) + " as " + args [1]);
+            }
+            else if((args [0] == "remove") && (args.size() == 2))
+            {
+                int rootID = miscFuncs.string2int(args [1]);
+                string rootname = synth->getBankRef().getRootPath(rootID);
+                if (rootname.empty())
+                    Runtime.Log("Can't find path " + miscFuncs.asString(rootID));
+                else
+                {
+                    synth->getBankRef().removeRoot(rootID);
+                    Runtime.Log("Removed " + rootname);
+                }
+            }
+        }
+
     }
     else if(cmd == "help")
     {
