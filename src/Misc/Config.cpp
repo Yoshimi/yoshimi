@@ -475,7 +475,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         return false;
     }
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 64, 4096);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 32, 1024);
     Oscilsize = xml->getpar("oscil_size", Oscilsize,
                                         MAX_AD_HARMONICS * 2, 131072);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
@@ -1059,8 +1059,10 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 num = 256;
             else if (num >= 128)
                 num = 128;
-            else
+            else if (num >= 64)
                 num = 64;
+            else
+                num = 32;
             settings->Buffersize = num;
             break;
         case 'D':
