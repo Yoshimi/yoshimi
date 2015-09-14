@@ -814,7 +814,12 @@ fnr = &RootProcess_::rootprocess;
         if (mode == 2)
         {   // save(write) to slot (choices reversed for 'No' priority)
             bool doit = true;
-            if (!bank->emptyslot(slot))
+            if (synth->part[*npart]->Pname == "Simple Sound")
+            {
+                fl_alert("Can't store instrument with default name");
+                doit = false;
+            }
+            else if (!bank->emptyslot(slot))
                 if (fl_choice("Overwrite the slot no. %d ?", "Yes", "No", NULL, slot + 1))
                     doit = false;
             if (doit)

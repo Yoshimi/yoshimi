@@ -1,4 +1,4 @@
-One of the main features of this release is improved non-gui accessibility. This has focussed on using just two universally available techniques. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
+One of the main features of this release is improved non-gui accessibility. This has focussed on using only universally available techniques. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
 
 When starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
 

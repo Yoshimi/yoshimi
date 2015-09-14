@@ -4,9 +4,11 @@ Should this refetch entire bank structure?
 
 make command line adding and removing root paths update gui.
 
+change name of any instrument called 'simple sound' before saving, or storing in a bank.
+
 Allow new root path creation to include the ID value
 
-Provide NRPNs to change root & bank IDs
+Provide NRPNs to change root & bank IDs - probably not actually.
 
 RPNs (channel based)
 
