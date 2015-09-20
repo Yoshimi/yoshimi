@@ -151,10 +151,14 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate / 2;
-    buffersize_f = buffersize = Runtime.Buffersize;
+    if(!getIsLV2Plugin()){
+        buffersize_f = buffersize = Runtime.Buffersize;
 
-    if (buffersize > audiobufsize)
-        buffersize_f = audiobufsize;
+        if (buffersize > audiobufsize)
+            buffersize_f = audiobufsize;
+    }else{ //for lv2 mode force buffersizes = audiobufsize
+        buffersize_f = buffersize = audiobufsize;
+    }
     
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
