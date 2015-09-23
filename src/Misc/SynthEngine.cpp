@@ -151,9 +151,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate / 2;
-    buffersize_f = buffersize = Runtime.Buffersize;
-
-    if (buffersize > audiobufsize)
+    if(!getIsLV2Plugin()){
+        buffersize_f = buffersize = Runtime.Buffersize;        
+    }else{ //for lv2 mode force buffersize = audiobufsize
+        buffersize_f = Runtime.Buffersize;
+        buffersize = audiobufsize;
+    }
+    if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
     
     bufferbytes = buffersize * sizeof(float);
@@ -183,7 +187,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     {
         Runtime.Log("Enforcing oscilsize to half buffersize, "
                     + asString(oscilsize) + " -> " + asString(buffersize / 2));
-        oscilsize = buffersize / 2;
+        oscilsize_f = oscilsize = buffersize / 2;
+        halfoscilsize_f = halfoscilsize = oscilsize / 2;
     }
 
     if (!(fft = new FFTwrapper(oscilsize)))

@@ -327,7 +327,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu Parameters {
-          label {&Parameters}
+          label {&Patch Sets}
           xywh {0 0 70 21} labelsize 12
           code0 {o = o; // suppress warning
               if (synth->getRuntime().ParamsHistory.empty())

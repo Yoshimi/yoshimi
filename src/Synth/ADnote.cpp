@@ -383,7 +383,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         firsttick[nvoice] = 1;
         NoteVoicePar[nvoice].DelayTicks =
             (int)truncf((expf(adpars->VoicePar[nvoice].PDelay / 127.0f
-                         * logf(50.0f)) - 1.0f) / synth->buffersize / 10.0f
+                         * logf(50.0f)) - 1.0f) / synth->buffersize_f / 10.0f
                          * synth->samplerate_f);
     }
 
