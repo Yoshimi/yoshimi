@@ -187,7 +187,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     {
         Runtime.Log("Enforcing oscilsize to half buffersize, "
                     + asString(oscilsize) + " -> " + asString(buffersize / 2));
-        oscilsize = buffersize / 2;
+        oscilsize_f = oscilsize = buffersize / 2;
+        halfoscilsize_f = halfoscilsize = oscilsize / 2;
     }
 
     if (!(fft = new FFTwrapper(oscilsize)))
