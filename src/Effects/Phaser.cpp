@@ -167,8 +167,8 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     }
     
     if(Poutsub) {
-        invSignal(efxoutl, synth->buffersize);
-        invSignal(efxoutr, synth->buffersize);
+        invSignal(efxoutl, synth->p_buffersize);
+        invSignal(efxoutr, synth->p_buffersize);
     }
 }
 

@@ -497,7 +497,7 @@ void SUBnote::filter(bpfilter &filter, float *smps)
         return;
     }
 
-    assert(synth->buffersize % 8 == 0);
+    assert(synth->p_buffersize % 8 == 0);
     float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
     float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
 
