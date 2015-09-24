@@ -103,12 +103,18 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                && (processed < real_sample_count)
                && (to_process <= (real_sample_count - processed)))
             {
-                _synth->MasterAudio(tmpLeft, tmpRight, to_process);
+                int mastered = 0;
                 offs = next_frame;
-                for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                while(to_process - mastered > 0)
                 {
-                    tmpLeft [i] += to_process;
-                    tmpRight [i] += to_process;
+                    int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
+                    for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                    {
+                        tmpLeft [i] += mastered_chunk;
+                        tmpRight [i] += mastered_chunk;
+                    }
+
+                    mastered += mastered_chunk;
                 }
                 processed += to_process;
             }
@@ -163,11 +169,20 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             fprintf(stderr, "Processed = %u\n", processed);
         }*/
         uint32_t to_process = real_sample_count - processed;
-        if(to_process > 0)
+        int mastered = 0;
+        offs = next_frame;
+        while(to_process - mastered > 0)
         {
-            _synth->MasterAudio(tmpLeft, tmpRight, to_process);
-            offs = next_frame;
+            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
+            for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+            {
+                tmpLeft [i] += mastered_chunk;
+                tmpRight [i] += mastered_chunk;
+            }
+
+            mastered += mastered_chunk;
         }
+        processed += to_process;
 
     }
 

@@ -151,12 +151,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
     halfsamplerate_f = samplerate / 2;
-    if(!getIsLV2Plugin()){
-        buffersize_f = buffersize = Runtime.Buffersize;        
-    }else{ //for lv2 mode force buffersize = audiobufsize
-        buffersize_f = Runtime.Buffersize;
-        buffersize = audiobufsize;
-    }
+    buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
     
@@ -1256,7 +1251,7 @@ void SynthEngine::partonoff(int npart, int what)
 
 
 // Master audio out (the final sound)
-void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
+int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {    
 
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
@@ -1501,6 +1496,7 @@ void SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM
     processOffset += p_buffersize;
     if(processOffset >= buffersize)
         processOffset = 0;
+    return p_buffersize;
 }
 
 
