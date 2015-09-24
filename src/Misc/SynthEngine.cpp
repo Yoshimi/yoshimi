@@ -150,7 +150,7 @@ SynthEngine::~SynthEngine()
 bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 {
     samplerate_f = samplerate = audiosrate;
-    halfsamplerate_f = samplerate / 2;
+    halfsamplerate_f = samplerate_f / 2;
     buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
@@ -1261,18 +1261,24 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     p_bufferbytes = bufferbytes;
     p_buffersize_f = buffersize_f;
 
-    if(to_process > 0)
+    if((to_process > 0) && (to_process < buffersize))
     {
         p_buffersize = to_process;
         p_bufferbytes = p_buffersize * sizeof(float);
         p_buffersize_f = p_buffersize;
 
-        if(p_buffersize + processOffset > buffersize)
+        /*if(p_buffersize + processOffset > buffersize)
+        {
+            p_buffersize = buffersize - processOffset;
+            p_bufferbytes = p_buffersize * sizeof(float);
+            p_buffersize_f = p_buffersize;
+        }*/
+        /*if(p_buffersize > buffersize)
         {
             p_buffersize = buffersize;
-            p_bufferbytes = bufferbytes;
-            p_buffersize_f = buffersize_f;
-        }
+            p_bufferbytes = p_buffersize * sizeof(float);
+            p_buffersize_f = p_buffersize;
+        }*/
     }
 
     int npart;

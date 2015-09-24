@@ -64,10 +64,10 @@ using namespace std;
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
-    uint real_sample_count = min(sample_count, _bufferSize);
-    uint32_t offs = 0;
-    uint32_t next_frame = 0;
-    uint32_t processed = 0;
+    int real_sample_count = min(sample_count, _bufferSize);
+    int offs = 0;
+    int next_frame = 0;
+    int processed = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
@@ -97,7 +97,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             {
                 next_frame = 0;
             }*/
-            uint32_t to_process = next_frame - offs;
+            int to_process = next_frame - offs;
 
             if((to_process > 0)
                && (processed < real_sample_count)
@@ -179,7 +179,6 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                 tmpLeft [i] += mastered_chunk;
                 tmpRight [i] += mastered_chunk;
             }
-
             mastered += mastered_chunk;
         }
         processed += to_process;
