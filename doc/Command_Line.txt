@@ -41,9 +41,19 @@ set reports (n) - set reports destination (1 gui console, anything esle stderr).
 set volume [n] - set master volume.
 set shift [n] - set master key shift for following notes in semitones (+- octave, 64 no shift).
 
+set alsa midi [s] - * sets the name of the MIDI device ALSA looks for.
+
+set alsa audio [s] - * sets the name of the audio hardware device ALSA looks for.
+
+set jack server [s] - * sets the name of the jack server Yoshimi tries to connect to.
+
 stop - cease all sound immediately!
 
+exit - tidy up and close yoshimi down.
 
-Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names provided that is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+
+Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names - as long as it is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+
+Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
 
 More will be added, and the organisation of them may be changed slightly.

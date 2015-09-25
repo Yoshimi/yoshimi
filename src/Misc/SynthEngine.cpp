@@ -154,6 +154,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
+     // because its now *groups* of audio buffers.
     
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
@@ -939,23 +940,27 @@ void SynthEngine::DecodeCommands(char *buffer)
     cout << endl; // Clear out command repeat. Why?
     
     point = skipSpace(point); // just to be sure
-    bool noval = false;
+    bool noVal = false;
+    bool noOpp = false;
     if (matchWord(point, "stop"))
         allStop();
     else if (matchWord(point, "setu"))
+    {
         SetSystemValue(109, 255);
+        Runtime.Log("ALSA MIDI " + getRuntime().alsaMidiDevice);
+        Runtime.Log("ALSA AUDIO " + getRuntime().alsaAudioDevice);
+        Runtime.Log("Jack server " + getRuntime().jackServer);
+    }
     else if (matchWord(point, "path"))
     {
         point = skipChars(point);
-        point = skipSpace(point);
         if (point[0] == 0)
-            Runtime.Log("Which operation?");
+            noOpp = true;
         else if (matchWord(point, "show"))
             SetSystemValue(110, 255);
         else if (matchWord(point, "add"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             int found = bank.addRootDir(point);
             if (!found)
             {
@@ -967,7 +972,6 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "remo"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (isdigit(point[0]))
             {
                 int rootID = string2int(point);
@@ -981,17 +985,15 @@ void SynthEngine::DecodeCommands(char *buffer)
                 }
             }
             else
-                noval = true;
+                noVal = true;
         }
     }
     else if(matchWord(point, "list"))
     {
         point = skipChars(point);
-        point = skipSpace(point);
         if(matchWord(point, "root"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if(point[0] == 0)
                 SetSystemValue(111, 255);
             else
@@ -1002,7 +1004,6 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "bank"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if(point[0] == 0)
                 SetSystemValue(112, 255);
             else
@@ -1017,48 +1018,42 @@ void SynthEngine::DecodeCommands(char *buffer)
     else if (matchWord(point, "set"))
     {
         point = skipChars(point);
-        point = skipSpace(point);
         if(matchWord(point, "rootcc"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(113, string2int(point));
             else
-                noval = true;
+                noVal = true;
         }
         else if(matchWord(point, "bankcc"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(114, string2int(point));
             else
-                noval = true;
+                noVal = true;
         }
         else if(matchWord(point, "root"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetBankRoot(string2int(point));
             else
-                noval = true;
+                noVal = true;
         }
         else if(matchWord(point, "bank"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetBank(string2int(point));
             else
-                noval = true;
+                noVal = true;
         }
         
         else if (matchWord(point, "part"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] == 0)
                 Runtime.Log("Which part?");
             else
@@ -1072,31 +1067,27 @@ void SynthEngine::DecodeCommands(char *buffer)
                         return;
                     }
                     point = skipChars(point);
-                    point = skipSpace(point);
                     if (point[0] == 0)
-                        Runtime.Log("Which operation?");
+                        noOpp = true;
                     else if (matchWord(point, "prog"))
                     {
                         point = skipChars(point);
-                        point = skipSpace(point);
                         if (point[0] != 0)
                             SetProgram(partnum, string2int(point));
                         else
-                            noval = true;
+                            noVal = true;
                     }
                      else if (matchWord(point, "chan"))
                     {
                         point = skipChars(point);
-                        point = skipSpace(point);
                         if (point[0] != 0)
                             SetPartChan(partnum, string2int(point));
                         else
-                            noval = true;
+                            noVal = true;
                     }
                      else if (matchWord(point, "dest"))
                     {
                         point = skipChars(point);
-                        point = skipSpace(point);
                         int dest = point[0] - 48;
                         if (dest > 0 and dest < 4)
                         {
@@ -1108,13 +1099,12 @@ void SynthEngine::DecodeCommands(char *buffer)
                     }
                 }
                 else
-                    noval = true;
+                    noVal = true;
             }
         }
         else if (matchWord(point, "prog"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] == '0')
                 SetSystemValue(115, 0);
             else
@@ -1123,7 +1113,6 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "acti"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] == '0')
                 SetSystemValue(116, 0);
             else
@@ -1132,25 +1121,22 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "exte"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(117, string2int(point));
             else
-                noval = true;
+                noVal = true;
         }            
         else if (matchWord(point, "avai"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(118, string2int(point));
             else
-                noval = true;
+                noVal = true;
         }
         else if (matchWord(point, "repo"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] == '1')
                 SetSystemValue(100, 127);
             else
@@ -1159,20 +1145,63 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "volu"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(7, string2int(point));
             else
-                noval = true;
+                noVal = true;
         }
         else if (matchWord(point, "shif"))
         {
             point = skipChars(point);
-            point = skipSpace(point);
             if (point[0] != 0)
                 SetSystemValue(2, string2int(point));
             else
-                noval = true;
+                noVal = true;
+        }
+        else if (matchWord(point, "alsa"))
+        {
+            point = skipChars(point);
+            if (matchWord(point, "midi"))
+            {
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    getRuntime().alsaMidiDevice = (string) point;
+                    Runtime.Log("* Set ALSA MIDI to " + getRuntime().alsaMidiDevice);
+                }
+                else
+                    noVal = true;
+            }
+            else if (matchWord(point, "audi"))
+            {
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    getRuntime().alsaAudioDevice = (string) point;
+                    Runtime.Log("* Set ALSA AUDIO to " + getRuntime().alsaAudioDevice);
+                }
+                else
+                    noVal = true;
+            }
+            else
+                noOpp = true;
+        }
+        else if (matchWord(point, "jack"))
+        {
+            point = skipChars(point);
+            if (matchWord(point, "serv"))
+            {
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    getRuntime().jackServer = (string) point;
+                    Runtime.Log("* Set Jack server to " + getRuntime().jackServer);
+                }
+                else
+                    noVal = true;
+            }
+            else
+                noOpp = true;
         }
         else
             Runtime.Log("Set what?");
@@ -1180,6 +1209,8 @@ void SynthEngine::DecodeCommands(char *buffer)
     
     else if (matchWord(point, "save"))
         SetSystemValue(119, 255);
+    else if (matchWord(point, "exit"))
+        getRuntime().runSynth = false;
     else
     {
         Runtime.Log("Commands");
@@ -1199,16 +1230,23 @@ void SynthEngine::DecodeCommands(char *buffer)
         Runtime.Log("  set rootcc [n] - set CC for root path changes (> 119 disables)");
         Runtime.Log("  set bankcc [n] - set CC for bank changes (0, 32, other disables)");
         Runtime.Log("  set program [n] - set MIDI program change (0 off, other on)");
-        Runtime.Log("  set activate [n ]- set part activate (0 off, other on)");
+        Runtime.Log("  set activate [n] - set part activate (0 off, other on)");
         Runtime.Log("  set extend [n] - set CC for extended program change (> 119 disables)");
         Runtime.Log("  set available [n] - set available parts (16, 32, 64)");
         cout << "  set reports [n] - set report destination (1 GUI console, other stderr)\n"; // must always go to stdout
         Runtime.Log("  set volume [n] - set master volume");        
-        Runtime.Log("  set shift [n] - set master key shift semitones (64 no shift");        
+        Runtime.Log("  set shift [n] - set master key shift semitones (64 no shift)");
+        Runtime.Log("  set alsa midi [s] - * set name of source");
+        Runtime.Log("  set alsa audio [s] - * set name of hardware device");
+        Runtime.Log("  set jack server [s] - * set server name");
         Runtime.Log("  stop - all sound off");
+        Runtime.Log("  exit - tidy up and close Yoshimi");
+        Runtime.Log("'*' entries need a save and Yoshimi restart to activate");
     }
-    if (noval)
+    if (noVal)
         Runtime.Log("Value?");
+    if (noOpp)
+        Runtime.Log("Which operation?");
     
     memset(buffer, 0, COMMAND_SIZE);
 }
