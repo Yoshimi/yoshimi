@@ -696,8 +696,30 @@ void SynthEngine::SetSystemValue(int type, int value)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
             break;
+        
             
-        case 109 : // list dynamics
+        case 108: // list vector parameters
+            if(!Runtime.nrpndata.vectorEnabled[value])
+            {
+                Runtime.Log("Disabled");
+                return;
+            }
+            else
+            {
+                Runtime.Log("X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[value]));
+                Runtime.Log("  features = " + asString((int)  Runtime.nrpndata.vectorXfeatures[value]));
+            }
+            if (Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
+                Runtime.Log("Y axis disabled");
+            else
+            {
+                Runtime.Log("Y CC = " + asString((int)  Runtime.nrpndata.vectorYaxis[value]));
+                Runtime.Log("  features = " + asString((int) Runtime.nrpndata.vectorYfeatures[value]));
+            }
+            break;
+                
+            
+        case 109: // list dynamics
             if (Runtime.consoleMenuItem)
             {
                 Runtime.Log("\nReports sent to console window");
@@ -936,29 +958,24 @@ void SynthEngine::SetSystemValue(int type, int value)
 // Provides a command line link to system values
 void SynthEngine::DecodeCommands(char *buffer)
 {
+    int error = 0;
     char *point = buffer;
     cout << endl; // Clear out command repeat. Why?
     
     point = skipSpace(point); // just to be sure
-    bool noVal = false;
-    bool noOpp = false;
     if (matchWord(point, "stop"))
         allStop();
     else if (matchWord(point, "setu"))
     {
         SetSystemValue(109, 255);
-        Runtime.Log("ALSA MIDI " + getRuntime().alsaMidiDevice);
-        Runtime.Log("ALSA AUDIO " + getRuntime().alsaAudioDevice);
-        Runtime.Log("Jack server " + getRuntime().jackServer);
+        Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
+        Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
+        Runtime.Log("Jack server " + Runtime.jackServer);
     }
     else if (matchWord(point, "path"))
     {
         point = skipChars(point);
-        if (point[0] == 0)
-            noOpp = true;
-        else if (matchWord(point, "show"))
-            SetSystemValue(110, 255);
-        else if (matchWord(point, "add"))
+        if (matchWord(point, "add"))
         {
             point = skipChars(point);
             int found = bank.addRootDir(point);
@@ -985,8 +1002,10 @@ void SynthEngine::DecodeCommands(char *buffer)
                 }
             }
             else
-                noVal = true;
+                error = 1;
         }
+        else
+            SetSystemValue(110, 255);
     }
     else if(matchWord(point, "list"))
     {
@@ -1011,216 +1030,48 @@ void SynthEngine::DecodeCommands(char *buffer)
                 SetSystemValue(112, string2int(point));
             }
         }
+        else if (matchWord(point, "vect"))
+        {
+            point = skipChars(point);
+            if(point[0] != 0)
+            {
+                int ch = string2int(point);
+                if (ch < NUM_MIDI_CHANNELS)
+                    SetSystemValue(108, ch);
+                else
+                    error = 4;
+            }
+            else
+                error = 1;
+        }
         else
-            Runtime.Log("List what?");
+            error = 3;
     }
     
     else if (matchWord(point, "set"))
     {
         point = skipChars(point);
-        if(matchWord(point, "rootcc"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetSystemValue(113, string2int(point));
-            else
-                noVal = true;
-        }
-        else if(matchWord(point, "bankcc"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetSystemValue(114, string2int(point));
-            else
-                noVal = true;
-        }
-        else if(matchWord(point, "root"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetBankRoot(string2int(point));
-            else
-                noVal = true;
-        }
-        else if(matchWord(point, "bank"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetBank(string2int(point));
-            else
-                noVal = true;
-        }
-        
-        else if (matchWord(point, "part"))
-        {
-            point = skipChars(point);
-            if (point[0] == 0)
-                Runtime.Log("Which part?");
-            else
-            {
-                if (isdigit(point[0]))
-                {
-                    unsigned char partnum = string2int(point);
-                    if (partnum >= Runtime.NumAvailableParts)
-                    {
-                        Runtime.Log("Part number too high");
-                        return;
-                    }
-                    point = skipChars(point);
-                    if (point[0] == 0)
-                        noOpp = true;
-                    else if (matchWord(point, "prog"))
-                    {
-                        point = skipChars(point);
-                        if (point[0] != 0)
-                            SetProgram(partnum, string2int(point));
-                        else
-                            noVal = true;
-                    }
-                     else if (matchWord(point, "chan"))
-                    {
-                        point = skipChars(point);
-                        if (point[0] != 0)
-                            SetPartChan(partnum, string2int(point));
-                        else
-                            noVal = true;
-                    }
-                     else if (matchWord(point, "dest"))
-                    {
-                        point = skipChars(point);
-                        int dest = point[0] - 48;
-                        if (dest > 0 and dest < 4)
-                        {
-                            partonoff(partnum, 1);
-                            SetPartDestination(partnum, dest);
-                        }
-                        else
-                            Runtime.Log("Out of range");
-                    }
-                }
-                else
-                    noVal = true;
-            }
-        }
-        else if (matchWord(point, "prog"))
-        {
-            point = skipChars(point);
-            if (point[0] == '0')
-                SetSystemValue(115, 0);
-            else
-                SetSystemValue(115, 127);
-        }
-        else if (matchWord(point, "acti"))
-        {
-            point = skipChars(point);
-            if (point[0] == '0')
-                SetSystemValue(116, 0);
-            else
-                SetSystemValue(116, 127);
-        }
-        else if (matchWord(point, "exte"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetSystemValue(117, string2int(point));
-            else
-                noVal = true;
-        }            
-        else if (matchWord(point, "avai"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetSystemValue(118, string2int(point));
-            else
-                noVal = true;
-        }
-        else if (matchWord(point, "repo"))
-        {
-            point = skipChars(point);
-            if (point[0] == '1')
-                SetSystemValue(100, 127);
-            else
-                SetSystemValue(100, 0);
-        }
-        else if (matchWord(point, "volu"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetSystemValue(7, string2int(point));
-            else
-                noVal = true;
-        }
-        else if (matchWord(point, "shif"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-                SetSystemValue(2, string2int(point));
-            else
-                noVal = true;
-        }
-        else if (matchWord(point, "alsa"))
-        {
-            point = skipChars(point);
-            if (matchWord(point, "midi"))
-            {
-                point = skipChars(point);
-                if (point[0] != 0)
-                {
-                    getRuntime().alsaMidiDevice = (string) point;
-                    Runtime.Log("* Set ALSA MIDI to " + getRuntime().alsaMidiDevice);
-                }
-                else
-                    noVal = true;
-            }
-            else if (matchWord(point, "audi"))
-            {
-                point = skipChars(point);
-                if (point[0] != 0)
-                {
-                    getRuntime().alsaAudioDevice = (string) point;
-                    Runtime.Log("* Set ALSA AUDIO to " + getRuntime().alsaAudioDevice);
-                }
-                else
-                    noVal = true;
-            }
-            else
-                noOpp = true;
-        }
-        else if (matchWord(point, "jack"))
-        {
-            point = skipChars(point);
-            if (matchWord(point, "serv"))
-            {
-                point = skipChars(point);
-                if (point[0] != 0)
-                {
-                    getRuntime().jackServer = (string) point;
-                    Runtime.Log("* Set Jack server to " + getRuntime().jackServer);
-                }
-                else
-                    noVal = true;
-            }
-            else
-                noOpp = true;
-        }
+        if (point[0] != 0)
+            error = commandSet(point);
         else
-            Runtime.Log("Set what?");
+            error = 3;
     }
     
     else if (matchWord(point, "save"))
         SetSystemValue(119, 255);
     else if (matchWord(point, "exit"))
-        getRuntime().runSynth = false;
+        Runtime.runSynth = false;
     else
     {
         Runtime.Log("Commands");
         Runtime.Log("  setup - show dynamic settings");
         Runtime.Log("  save - save dynamic settings");
-        Runtime.Log("  paths show - display bank root paths");
+        Runtime.Log("  paths - display bank root paths");
         Runtime.Log("  path add [s] - add bank root path");
         Runtime.Log("  path remove [n] - remove bank root path ID");
         Runtime.Log("  list root (n) - list banks in root ID or current");
         Runtime.Log("  list bank (n) - list instruments in bank ID or current");
+        Runtime.Log("  list vector [n] - list settings for vector CHANNEL");
         Runtime.Log("  set root [n] - set root path to ID");
         Runtime.Log("  set bank [n] - set bank to ID");
         Runtime.Log("  set part [n1] - set part ID operations");
@@ -1239,16 +1090,470 @@ void SynthEngine::DecodeCommands(char *buffer)
         Runtime.Log("  set alsa midi [s] - * set name of source");
         Runtime.Log("  set alsa audio [s] - * set name of hardware device");
         Runtime.Log("  set jack server [s] - * set server name");
+        Runtime.Log("  set vector [n1] - set vector CHANNEL operations");
+        Runtime.Log("    x cc [n2] - CC n2 is used for n1 X axis sweep");
+        Runtime.Log("    y cc [n2] - CC n2 is used for n1 Y axis sweep");
+        Runtime.Log("    x features [n2] - sets n1 X features");
+        Runtime.Log("    y features [n2] - sets n1 Y features");
+        Runtime.Log("    x program [l/r] [n2] - X program change ID for L or R");
+        Runtime.Log("    y program [l/r] [n2] - Y program change ID for L or R");
         Runtime.Log("  stop - all sound off");
         Runtime.Log("  exit - tidy up and close Yoshimi");
         Runtime.Log("'*' entries need a save and Yoshimi restart to activate");
     }
-    if (noVal)
-        Runtime.Log("Value?");
-    if (noOpp)
-        Runtime.Log("Which operation?");
-    
+    switch (error)
+    {
+        case 1:
+            Runtime.Log("Value?");
+            break;
+        case 2:
+            Runtime.Log("Which operation?");
+            break;
+        case 3:
+            point = skipChars(buffer);
+            point[0] = 0; // sneaky :)
+            Runtime.Log((string) buffer + " what?");
+            break;
+        case 4:
+            Runtime.Log("Out of range");
+            break;
+    }
     memset(buffer, 0, COMMAND_SIZE);
+}
+
+
+int SynthEngine::commandSet(char *point)
+{
+    int error = 0;
+
+    if(matchWord(point, "rootcc"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetSystemValue(113, string2int(point));
+        else
+            error = 1;
+    }
+    else if(matchWord(point, "bankcc"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetSystemValue(114, string2int(point));
+        else
+            error = 1;
+    }
+    else if(matchWord(point, "root"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetBankRoot(string2int(point));
+        else
+            error = 1;
+    }
+    else if(matchWord(point, "bank"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetBank(string2int(point));
+        else
+            error = 1;
+    }
+    
+    else if (matchWord(point, "part"))
+    {
+        point = skipChars(point);
+        if (point[0] == 0)
+            Runtime.Log("Which part?");
+        else
+        {
+            if (isdigit(point[0]))
+            {
+                unsigned char partnum = string2int(point);
+                if (partnum >= Runtime.NumAvailableParts)
+                {
+                    Runtime.Log("Part number too high");
+                    return 0;
+                }
+                point = skipChars(point);
+                if (point[0] == 0)
+                    error = 2;
+                else if (matchWord(point, "prog"))
+                {
+                    point = skipChars(point);
+                    if (point[0] != 0) // force part not channel number
+                        SetProgram(partnum | 0x80, string2int(point));
+                    else
+                        error = 1;
+                }
+                 else if (matchWord(point, "chan"))
+                {
+                    point = skipChars(point);
+                    if (point[0] != 0)
+                        SetPartChan(partnum, string2int(point));
+                    else
+                        error = 1;
+                }
+                 else if (matchWord(point, "dest"))
+                {
+                    point = skipChars(point);
+                    int dest = point[0] - 48;
+                    if (dest > 0 and dest < 4)
+                    {
+                        partonoff(partnum, 1);
+                        SetPartDestination(partnum, dest);
+                    }
+                    else
+                        error = 4;
+                }
+            }
+            else
+                error = 1;
+        }
+    }
+    else if (matchWord(point, "prog"))
+    {
+        point = skipChars(point);
+        if (point[0] == '0')
+            SetSystemValue(115, 0);
+        else
+            SetSystemValue(115, 127);
+    }
+    else if (matchWord(point, "acti"))
+    {
+        point = skipChars(point);
+        if (point[0] == '0')
+            SetSystemValue(116, 0);
+        else
+            SetSystemValue(116, 127);
+    }
+    else if (matchWord(point, "exte"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetSystemValue(117, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchWord(point, "avai"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetSystemValue(118, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchWord(point, "repo"))
+    {
+        point = skipChars(point);
+        if (point[0] == '1')
+            SetSystemValue(100, 127);
+        else
+            SetSystemValue(100, 0);
+    }
+    else if (matchWord(point, "volu"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetSystemValue(7, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchWord(point, "shif"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            SetSystemValue(2, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchWord(point, "alsa"))
+    {
+        point = skipChars(point);
+        if (matchWord(point, "midi"))
+        {
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                Runtime.alsaMidiDevice = (string) point;
+                Runtime.Log("* Set ALSA MIDI to " + Runtime.alsaMidiDevice);
+            }
+            else
+                error = 1;
+        }
+        else if (matchWord(point, "audi"))
+        {
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                Runtime.alsaAudioDevice = (string) point;
+                Runtime.Log("* Set ALSA AUDIO to " + Runtime.alsaAudioDevice);
+            }
+            else
+                error = 1;
+        }
+        else
+            error = 2;
+    }
+    else if (matchWord(point, "jack"))
+    {
+        point = skipChars(point);
+        if (matchWord(point, "serv"))
+        {
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                Runtime.jackServer = (string) point;
+                Runtime.Log("* Set Jack server to " + Runtime.jackServer);
+            }
+            else
+                error = 1;
+        }
+        else
+            error = 2;
+    }
+    else if (matchWord(point, "vect"))
+    {
+        point = skipChars(point);
+        if (point[0] != 0)
+            error = commandVector(point);
+        else
+            error = 1;
+    }
+    else
+        error = 2;
+    return error; 
+}
+
+
+int SynthEngine::commandVector(char *point)
+{
+    int error = 0;
+    int tmp;
+    int axis;
+    
+    unsigned char chan = string2int(point);
+    if (chan >= NUM_MIDI_CHANNELS)
+        return 4;
+    point = skipChars(point);
+    tmp = point[0] | 32;
+    if (tmp == 32)
+        return 2;
+    
+    if (tmp == 'x')
+        axis = 0;
+    else if (tmp == 'y')
+        axis = 1;
+    else
+    {
+        Runtime.Log("Axis?");
+        return 0;
+    }
+    ++ point;
+    point = skipSpace(point); // can manage with or without a space
+    if (matchWord(point, "cc"))
+    {
+        point = skipChars(point);
+        if (point[0] == 0)
+            error = 1;
+        else
+        {
+            tmp = string2int(point);
+            if (!vectorInit(axis, chan, tmp))
+        vectorSet(axis, chan, tmp);
+        } 
+    }
+    else if (matchWord(point, "feat"))
+    {
+        point = skipChars(point);
+        if (point[0] == 0)
+            error = 1;
+        else
+        {
+            tmp = string2int(point);
+            if (!vectorInit(axis + 2, chan, tmp))
+                vectorSet(axis + 2, chan, tmp);
+        }
+    }
+    else if (matchWord(point, "prog"))
+    {
+        point = skipChars(point);
+        int hand = point[0] | 32;
+        if (point[0] == 'l')
+            hand = 0;
+        else if (point[0] == 'r')
+            hand = 1;
+        else
+            return 2;
+        point = skipChars(point);
+        tmp = string2int(point);
+        if (!vectorInit(axis * 2 + hand + 4, chan, tmp))
+            vectorSet(axis * 2 + hand + 4, chan, tmp);
+    }
+    return error;
+}
+
+
+bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
+{
+    string name = "";
+    if (dHigh < 2)
+    {
+        int parts = Runtime.NumAvailableParts;
+        if ((dHigh == 0) && (parts < NUM_MIDI_CHANNELS * 2))
+        {
+            Runtime.Log("Vector control needs at least " + asString(NUM_MIDI_CHANNELS * 2) + " parts");
+            return true;
+        }
+        else if ((dHigh == 1) && (parts < NUM_MIDI_CHANNELS * 4))
+        {
+            Runtime.Log("Vector control Y axis needs " + asString(NUM_MIDI_CHANNELS * 4) + " parts");
+            return true;
+        }
+        name = Runtime.testCCvalue(par);
+    }
+    else if (!Runtime.nrpndata.vectorEnabled[chan])
+    {
+        Runtime.Log("Vector control must be enabled first");
+        return true;
+    }
+    else if (dHigh > 7)
+        name = Runtime.masterCCtest(par);
+
+    if (name > "")
+    {
+        Runtime.Log("CC " + asString(par) + " in use for " + name);
+        return true;
+    }
+return false;
+}
+
+        
+void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
+{
+    switch (dHigh)
+    {
+        case 0:
+        {
+            Runtime.nrpndata.vectorXaxis[chan] = par;
+            if (!Runtime.nrpndata.vectorEnabled[chan])
+            {
+                Runtime.nrpndata.vectorEnabled[chan] = true;
+                Runtime.Log("Vector control enabled");
+                // enabling is only done with a valid X CC
+            }
+            SetPartChan(chan, chan);
+            SetPartChan(chan | 16, chan);
+            Runtime.nrpndata.vectorXcc2[chan] = C_panning;
+            Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
+            Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
+            Runtime.Log("Set vector X CC to " + asString(par));
+            break;
+        }
+        case 1:
+        {
+            if (!Runtime.nrpndata.vectorEnabled[chan])
+                Runtime.Log("Vector X axis must be set before Y");
+            else
+            {
+                SetPartChan(chan | 32, chan);
+                SetPartChan(chan | 48, chan);
+                Runtime.nrpndata.vectorYaxis[chan] = par;
+                Runtime.nrpndata.vectorYcc2[chan] = C_panning;
+                Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
+                Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
+                Runtime.Log("Set vector Y CC to " + asString(par));
+            }
+            break;
+        }
+        case 2:
+        {
+            Runtime.nrpndata.vectorXfeatures[chan] = par;
+            Runtime.Log("Enabled X features " + asString(par));
+            break;
+        }
+        case 3:
+        {
+            if (Runtime.NumAvailableParts > NUM_MIDI_CHANNELS * 2)
+            {
+                Runtime.nrpndata.vectorYfeatures[chan] = par;
+                Runtime.Log("Enabled Y features " + asString(par));
+            }
+            break;
+        }
+        
+        /*
+         * we don't need to worry about blocking
+         * with these program changes as it is
+         * only the command line that's blocked
+         */
+        case 4:
+        {
+            SetProgram(chan | 0x80, par);
+            break;
+        }
+        case 5:
+        {
+            SetProgram(chan | 0x90, par);
+            break;
+        }
+        case 6:
+        {
+            SetProgram(chan | 0xa0, par);
+            break;
+        }
+        case 7:
+        {
+            SetProgram(chan | 0xb0, par);
+            break;
+        }
+        
+        case 8:
+        {
+            Runtime.nrpndata.vectorXcc2[chan] = par;
+            Runtime.Log("Set X feature 2 to " + asString(par));
+            break;
+        }
+        case 9:
+        {
+            Runtime.nrpndata.vectorXcc4[chan] = par;
+            Runtime.Log("Set X feature 4 to " + asString(par));
+            break;
+        }
+        case 10:
+        {
+            Runtime.nrpndata.vectorXcc8[chan] = par;
+            Runtime.Log("Set X feature 8 to " + asString(par));
+            break;
+        }
+        case 11:
+        {
+            Runtime.nrpndata.vectorYcc2[chan] = par;
+            Runtime.Log("Set Y feature 2 to " + asString(par));
+            break;
+        }
+        case 12:
+        {
+            Runtime.nrpndata.vectorYcc4[chan] = par;
+            Runtime.Log("Set Y feature 4 to " + asString(par));
+            break;
+        }
+        case 13:
+        {
+            Runtime.nrpndata.vectorYcc8[chan] = par;
+            Runtime.Log("Set Y feature 8 to " + asString(par));
+            break;
+        }
+        
+        default:
+        {
+            Runtime.nrpndata.vectorEnabled[chan] = false;
+            Runtime.nrpndata.vectorXaxis[chan] = 0xff;
+            Runtime.nrpndata.vectorYaxis[chan] = 0xff;
+            Runtime.nrpndata.vectorXfeatures[chan] = 0;
+            Runtime.nrpndata.vectorYfeatures[chan] = 0;
+            Runtime.Log("Vector control disabled");
+        }
+    }
 }
 
 

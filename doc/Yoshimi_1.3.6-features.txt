@@ -1,6 +1,6 @@
-One of the main features of this release is improved non-gui accessibility. This has focussed on using only universally available techniques. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
+One of the main features of this release is improved accessibility. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
 
-When starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
+It has always been possibly to run Yoshimi headless, but now real control is available. For a start, when starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
 
 Once running, almost all dynamic setup (i.e. doesn't require a restart) can now be done within the terminal window. There is also extensive control of roots, banks, parts and instruments including the ability to list and set all of these. You can now do things like:
 
@@ -9,7 +9,9 @@ Set part 4 program 130
 
 Additional controls that are frequently taken forgranted in the GUI but otherwise get forgotten are master key shift and master volume.
 
-There is extensive error checking and feedback.
+Finally, we have the most important parts of vector control exposed to the command line.
+
+For all of this there is extensive error checking and feedback.
 
 
 In parallel with this there are more NRPNs so that you can perform some of these via automation. That arrangment looks positively steam-punk, but is actually very easy to use, requiring only a utility that can send MIDI CCs. NRPNs aren't special. They are simply a specific pattern of CCs. Yoshimi's implementation is very forgiving, doesn't mind if you stop halfway through (will just get on with other things while it waits) and will report exactly what it is doing.
