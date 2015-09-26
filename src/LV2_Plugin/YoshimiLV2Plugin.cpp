@@ -64,7 +64,7 @@ using namespace std;
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
-    int real_sample_count = min(sample_count, _bufferSize);
+    int real_sample_count = sample_count;//min(sample_count, _bufferSize);
     int offs = 0;
     int next_frame = 0;
     int processed = 0;
@@ -379,7 +379,7 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     }
 
     if(_bufferSize == 0)
-        _bufferSize = 1024;
+        _bufferSize = 8192;
 }
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
