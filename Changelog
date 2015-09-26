@@ -1,4 +1,9 @@
-yoshimi 1.3.6 rc3
+yoshimi 1.3.6 rc5
+
+2015-9-26 Will
+- Pulled in additional command line controls.
+- Pulled in Andrew's further LV2 fixes.
+- Set version as 1.3.6 rc5.
 
 2015-9-20 Andrew
 - Fixed LV2 plugin buffersize setting in case of smaller
