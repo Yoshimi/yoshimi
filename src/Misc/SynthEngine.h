@@ -116,7 +116,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int halfoscilsize;
         float halfoscilsize_f;
 
-        int processOffset; //used for variable length runs
         int p_buffersize; //used for variable length runs
         int p_bufferbytes; //used for variable length runs
         float p_buffersize_f; //used for variable length runs

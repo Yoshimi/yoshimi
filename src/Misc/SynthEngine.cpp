@@ -81,7 +81,6 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     oscilsize_f(oscilsize),
     halfoscilsize(oscilsize / 2),
     halfoscilsize_f(halfoscilsize),
-    processOffset(0),
     p_buffersize(0),
     p_bufferbytes(0),
     p_buffersize_f(0),
@@ -1266,19 +1265,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         p_buffersize = to_process;
         p_bufferbytes = p_buffersize * sizeof(float);
         p_buffersize_f = p_buffersize;
-
-        /*if(p_buffersize + processOffset > buffersize)
-        {
-            p_buffersize = buffersize - processOffset;
-            p_bufferbytes = p_buffersize * sizeof(float);
-            p_buffersize_f = p_buffersize;
-        }*/
-        /*if(p_buffersize > buffersize)
-        {
-            p_buffersize = buffersize;
-            p_bufferbytes = p_buffersize * sizeof(float);
-            p_buffersize_f = p_buffersize;
-        }*/
     }
 
     int npart;
@@ -1497,11 +1483,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                     VUpeak.values.parts[npart]+= 2;
             }
         }
-    }
-
-    processOffset += p_buffersize;
-    if(processOffset >= buffersize)
-        processOffset = 0;
+    }    
     return p_buffersize;
 }
 
