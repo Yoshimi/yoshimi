@@ -37,7 +37,7 @@ LFO::LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth):
         powf(basefreq / 440.0f, (float)((int)lfopars->Pstretch - 64) / 63.0f); // max 2x/octave
 
     float lfofreq = (powf(2.0f, lfopars->Pfreq * 10.0f) - 1.0f) / 12.0f * lfostretch;
-    incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
+    incx = fabsf(lfofreq) * synth->p_all_buffersize_f / synth->samplerate_f;
 
     if (lfopars->Pcontinous == 0)
     {
@@ -148,7 +148,7 @@ float LFO::lfoout(void)
             computenextincrnd();
         }
     } else
-        lfodelay -= synth->buffersize_f / synth->samplerate_f;
+        lfodelay -= synth->p_all_buffersize_f / synth->samplerate_f;
     return out;
 }
 

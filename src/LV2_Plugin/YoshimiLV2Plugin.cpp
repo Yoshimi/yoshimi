@@ -64,6 +64,11 @@ using namespace std;
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
+    if(sample_count == 0)
+    {
+        return;
+    }
+    synth->p_all_buffersize_f = sample_count;
     int real_sample_count = sample_count;//min(sample_count, _bufferSize);
     int offs = 0;
     int next_frame = 0;

@@ -153,6 +153,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
+    p_all_buffersize_f = buffersize_f;
      // because its now *groups* of audio buffers.
     
     bufferbytes = buffersize * sizeof(float);

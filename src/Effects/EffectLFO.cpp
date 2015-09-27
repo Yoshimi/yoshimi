@@ -52,7 +52,7 @@ EffectLFO::~EffectLFO() { }
 void EffectLFO::updateparams(void)
 {
     float lfofreq = (powf(2.0f, Pfreq / 127.0f * 10.0f) - 1.0f) * 0.03f;
-    incx = fabsf(lfofreq) * synth->buffersize_f / synth->samplerate_f;
+    incx = fabsf(lfofreq) * synth->p_all_buffersize_f / synth->samplerate_f;
     if (incx > 0.49999999f)
         incx = 0.499999999f; // Limit the Frequency
 

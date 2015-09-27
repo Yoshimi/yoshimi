@@ -113,7 +113,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float samplerate_f;
         float halfsamplerate_f;
         int buffersize;
-        float buffersize_f;
+        float buffersize_f;        
         int bufferbytes;
         int oscilsize;
         float oscilsize_f;
@@ -123,6 +123,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int p_buffersize; //used for variable length runs
         int p_bufferbytes; //used for variable length runs
         float p_buffersize_f; //used for variable length runs
+        float p_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
 
         unsigned char Pvolume;
         int           Paudiodest;
