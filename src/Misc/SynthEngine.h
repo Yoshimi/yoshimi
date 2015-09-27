@@ -88,6 +88,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetPartDestination(unsigned char npart, unsigned char dest);
         void SetSystemValue(int type, int value);
         void DecodeCommands(char *buffer);
+        int commandSet(char *point);
+        int commandVector(char *point);
+        bool vectorInit(int dHigh, unsigned char chan, int par);
+        void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
         float numRandom(void);
         unsigned int random(void);

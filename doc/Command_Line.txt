@@ -4,7 +4,7 @@ setup - displays the current dynamic system settings.
 
 save - saves these sattings.
 
-paths show - display all the currently defined bank root paths and their IDs.
+paths - display all the currently defined bank root paths and their IDs.
 
 path add [s] - defines a new bank root path and returns its ID.
 
@@ -13,6 +13,8 @@ path remove [n] - removes path entry ID from the bank roots (doesn't delete anyt
 list root (n) - lists all the banks and their IDs in root path 'n' (or the current root).
 
 list bank (n) - lists all the instruments and their IDs in bank 'n' (or the current bank) of the current root.
+
+list vector [n] - lists the settings for vector on channel 'n'
 
 set root [n] - set current root path to ID 'n'.
 
@@ -41,9 +43,31 @@ set reports (n) - set reports destination (1 gui console, anything esle stderr).
 set volume [n] - set master volume.
 set shift [n] - set master key shift for following notes in semitones (+- octave, 64 no shift).
 
+set alsa midi [s] - * sets the name of the MIDI device ALSA looks for.
+
+set alsa audio [s] - * sets the name of the audio hardware device ALSA looks for.
+
+set jack server [s] - * sets the name of the jack server Yoshimi tries to connect to.
+
+set vector [n1] x cc [n2] - CC 'n2' is used for channel 'n1' X axis sweep. This also enables vector control for this channel.
+
+set vector [n1] y cc [n2] - CC 'n2' is used for channel 'n1' Y axis sweep.
+
+set vector [n1] x features [n2] - sets channel 'n1' X features to 'n2'.
+
+set vector [n1] y features [n2] - sets channel 'n1' Y features to 'n2'.
+
+set vector [n1] x program [l/r] [n2] - loads program 'n2' to channel 'n1' X 'left' or 'right' part.
+
+set vector [n1] y program [l/r] [n2] - loads program 'n2' to channel 'n1' X 'left' or 'right' part.
+
 stop - cease all sound immediately!
 
+exit - tidy up and close yoshimi down.
 
-Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names provided that is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+
+Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names - as long as it is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+
+Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
 
 More will be added, and the organisation of them may be changed slightly.

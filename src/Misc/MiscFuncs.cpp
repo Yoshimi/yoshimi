@@ -207,7 +207,8 @@ char *MiscFuncs::skipChars(char *buf)
     {
         ++ buf;
     }
-    
+    if (buf[0] == 0x20)
+        buf = skipSpace(buf);
     return buf;
 }
 
