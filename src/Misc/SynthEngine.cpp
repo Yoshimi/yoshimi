@@ -40,17 +40,17 @@ using namespace std;
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
     static set<unsigned int> idMap;
-    if(remove)
+    if (remove)
     {
-        if(idMap.count(idx) > 0)
+        if (idMap.count(idx) > 0)
         {
             idMap.erase(idx);
         }
         return 0;
     }
-    else if(idx > 0)
+    else if (idx > 0)
     {
-        if(idMap.count(idx) == 0)
+        if (idMap.count(idx) == 0)
         {
             idMap.insert(idx);
             return idx;
@@ -59,7 +59,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     set<unsigned int>::const_iterator itEnd = idMap.end();
     set<unsigned int>::const_iterator it;
     unsigned int nextId = 0;
-    for(it = idMap.begin(); it != itEnd && nextId == *it; ++it, ++nextId)
+    for (it = idMap.begin(); it != itEnd && nextId == *it; ++it, ++nextId)
     {}
     idMap.insert(nextId);
     return nextId;
@@ -99,7 +99,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     LFOtime(0),
     windowTitle("Yoshimi" + asString(uniqueId))
 {    
-    if(bank.roots.empty())
+    if (bank.roots.empty())
     {
         bank.addDefaultRootDirs();
     }
@@ -153,13 +153,13 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
-    p_all_buffersize_f = buffersize_f;
      // because its now *groups* of audio buffers.
+    p_all_buffersize_f = buffersize_f;
     
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
-    fadeStep = 10.0f/samplerate; // 100mS fade;
+    fadeStep = 10.0f / samplerate; // 100mS fade;
     int found = 0;
     
     if (!pthread_mutex_init(&processMutex, NULL))
@@ -500,13 +500,13 @@ void SynthEngine::SetZynControls()
 
 void SynthEngine::SetBankRoot(int rootnum)
 {
-    if(bank.setCurrentRootID(rootnum))
+    if (bank.setCurrentRootID(rootnum))
     {
-        Runtime.Log("SynthEngine setBank: Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
+        Runtime.Log("Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
     }
     else
     {
-        Runtime.Log("SynthEngine setBank: No match for root ID " + asString(rootnum));
+        Runtime.Log("No match for root ID " + asString(rootnum));
     }
     if (Runtime.showGui)
     {
@@ -526,19 +526,19 @@ void SynthEngine::SetBank(int banknum)
     */
     
     //new implementation uses only 1 call :)
-    if(bank.setCurrentBankID(banknum, true))
+    if (bank.setCurrentBankID(banknum, true))
     {
-        if(Runtime.showGui && guiMaster && guiMaster->bankui)
+        if (Runtime.showGui && guiMaster && guiMaster->bankui)
         {
             guiMaster->bankui->set_bank_slot();
             guiMaster->bankui->refreshmainwindow();
         }
-        Runtime.Log("SynthEngine setBank: Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
+        Runtime.Log("Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
 
     }
     else
     {
-        Runtime.Log("SynthEngine setBank: No bank " + asString(banknum)+ " in this root");
+        Runtime.Log("No bank " + asString(banknum)+ " in this root");
     }
 }
 
@@ -549,15 +549,15 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
     int npart;
     if (bank.getname(pgm) < "!") // can't get a program name less than this
     {
-        Runtime.Log("SynthEngine setProgram: No Program " + asString(pgm) + " in this bank");
+        Runtime.Log("No Program " + asString(pgm) + " in this bank");
     }
     else
     {
         if (chan <  NUM_MIDI_CHANNELS) // a normal program change
         {
-            for(npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
+            for (npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
                 // we don't want upper parts (16 - 63) activiated!
-                if(chan == part[npart]->Prcvchn)
+                if (chan == part[npart]->Prcvchn)
                 {
                     if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
                     {
@@ -594,9 +594,9 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
         }
         if (partOK)
         {
-            Runtime.Log("SynthEngine setProgram: Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
+            Runtime.Log("Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
         }
-        else // I think XML traps this. Should it?
+        else
             Runtime.Log("SynthEngine setProgram: Invalid program data");
     }
 }
@@ -681,7 +681,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
             
         case 100: // reports destination
-            if(value > 63)
+            if (value > 63)
             {
                 Runtime.consoleMenuItem = true;
                 Runtime.Log("Sending reports to console window");
@@ -699,7 +699,7 @@ void SynthEngine::SetSystemValue(int type, int value)
         
             
         case 108: // list vector parameters
-            if(!Runtime.nrpndata.vectorEnabled[value])
+            if (!Runtime.nrpndata.vectorEnabled[value])
             {
                 Runtime.Log("Disabled");
                 return;
@@ -737,7 +737,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
             {
                 label = bank.roots [root].path;
-                if(label.at(label.size() - 1) == '/')
+                if (label.at(label.size() - 1) == '/')
                     label = label.substr(0, label.size() - 1);
                 Runtime.Log("Current Root ID " + asString(root) + "    " + label
                     + "\nCurrent Bank ID " + asString(bank.currentBankID) + "    "
@@ -782,7 +782,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
                 {
                     label = bank.roots [idx].path;
-                    if(label.at(label.size() - 1) == '/')
+                    if (label.at(label.size() - 1) == '/')
                         label = label.substr(0, label.size() - 1);
                     Runtime.Log("    ID " + asString(idx) + "     " + label);
                 }
@@ -796,7 +796,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 && !bank.roots [value].path.empty())
             {
                 label = bank.roots [value].path;
-                if(label.at(label.size() - 1) == '/')
+                if (label.at(label.size() - 1) == '/')
                     label = label.substr(0, label.size() - 1);
                 Runtime.Log("\nBanks in Root ID " + asString(value) + "\n    " + label);
                 for (idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
@@ -820,7 +820,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 if (!bank.roots [root].banks [value].instruments.empty())
                 {
                     label = bank.roots [root].path;
-                    if(label.at(label.size() - 1) == '/')
+                    if (label.at(label.size() - 1) == '/')
                         label = label.substr(0, label.size() - 1);
                     Runtime.Log("\nInstruments in Root ID " + asString(root)
                               + ", Bank ID " + asString(value) + "\n    " + label
@@ -894,7 +894,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("MIDI Program Change enabled");
             else
                 Runtime.Log("MIDI Program Change disabled");
-            if(value != Runtime.EnableProgChange)
+            if (value != Runtime.EnableProgChange)
             {
                 Runtime.EnableProgChange = value;
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
@@ -907,7 +907,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("Set MIDI Program Change enables part");
             else
                 Runtime.Log("Set MIDI Program Change doesn't enable part");
-            if(value != Runtime.enable_part_on_voice_load)
+            if (value != Runtime.enable_part_on_voice_load)
             {
                 Runtime.enable_part_on_voice_load = value;
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
@@ -1007,13 +1007,13 @@ void SynthEngine::DecodeCommands(char *buffer)
         else
             SetSystemValue(110, 255);
     }
-    else if(matchWord(point, "list"))
+    else if (matchWord(point, "list"))
     {
         point = skipChars(point);
-        if(matchWord(point, "root"))
+        if (matchWord(point, "root"))
         {
             point = skipChars(point);
-            if(point[0] == 0)
+            if (point[0] == 0)
                 SetSystemValue(111, 255);
             else
             {
@@ -1023,7 +1023,7 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "bank"))
         {
             point = skipChars(point);
-            if(point[0] == 0)
+            if (point[0] == 0)
                 SetSystemValue(112, 255);
             else
             {
@@ -1033,7 +1033,7 @@ void SynthEngine::DecodeCommands(char *buffer)
         else if (matchWord(point, "vect"))
         {
             point = skipChars(point);
-            if(point[0] != 0)
+            if (point[0] != 0)
             {
                 int ch = string2int(point);
                 if (ch < NUM_MIDI_CHANNELS)
@@ -1064,41 +1064,42 @@ void SynthEngine::DecodeCommands(char *buffer)
     else
     {
         Runtime.Log("Commands");
-        Runtime.Log("  setup - show dynamic settings");
-        Runtime.Log("  save - save dynamic settings");
-        Runtime.Log("  paths - display bank root paths");
-        Runtime.Log("  path add [s] - add bank root path");
-        Runtime.Log("  path remove [n] - remove bank root path ID");
-        Runtime.Log("  list root (n) - list banks in root ID or current");
-        Runtime.Log("  list bank (n) - list instruments in bank ID or current");
-        Runtime.Log("  list vector [n] - list settings for vector CHANNEL");
-        Runtime.Log("  set root [n] - set root path to ID");
-        Runtime.Log("  set bank [n] - set bank to ID");
-        Runtime.Log("  set part [n1] - set part ID operations");
-        Runtime.Log("    program [n2] - loads instrument ID");
-        Runtime.Log("    channel [n2] - sets MIDI channel (> 15 disables)");
-        Runtime.Log("    destination [n2] - (1 main, 2 part, 3 both)");
-        Runtime.Log("  set rootcc [n] - set CC for root path changes (> 119 disables)");
-        Runtime.Log("  set bankcc [n] - set CC for bank changes (0, 32, other disables)");
-        Runtime.Log("  set program [n] - set MIDI program change (0 off, other on)");
-        Runtime.Log("  set activate [n] - set part activate (0 off, other on)");
-        Runtime.Log("  set extend [n] - set CC for extended program change (> 119 disables)");
-        Runtime.Log("  set available [n] - set available parts (16, 32, 64)");
-        cout << "  set reports [n] - set report destination (1 GUI console, other stderr)\n"; // must always go to stdout
-        Runtime.Log("  set volume [n] - set master volume");        
-        Runtime.Log("  set shift [n] - set master key shift semitones (64 no shift)");
-        Runtime.Log("  set alsa midi [s] - * set name of source");
-        Runtime.Log("  set alsa audio [s] - * set name of hardware device");
-        Runtime.Log("  set jack server [s] - * set server name");
-        Runtime.Log("  set vector [n1] - set vector CHANNEL operations");
-        Runtime.Log("    x cc [n2] - CC n2 is used for n1 X axis sweep");
-        Runtime.Log("    y cc [n2] - CC n2 is used for n1 Y axis sweep");
-        Runtime.Log("    x features [n2] - sets n1 X features");
-        Runtime.Log("    y features [n2] - sets n1 Y features");
-        Runtime.Log("    x program [l/r] [n2] - X program change ID for L or R");
-        Runtime.Log("    y program [l/r] [n2] - Y program change ID for L or R");
-        Runtime.Log("  stop - all sound off");
-        Runtime.Log("  exit - tidy up and close Yoshimi");
+        Runtime.Log("  setup                  - show dynamic settings");
+        Runtime.Log("  save                   - save dynamic settings");
+        Runtime.Log("  paths                  - display bank root paths");
+        Runtime.Log("  path add [s]           - add bank root path");
+        Runtime.Log("  path remove [n]        - remove bank root path ID");
+        Runtime.Log("  list root (n)          - list banks in root ID or current");
+        Runtime.Log("  list bank (n)          - list instruments in bank ID or current");
+        Runtime.Log("  list vector [n]        - list settings for vector CHANNEL");
+        Runtime.Log("  set root [n]           - set root path to ID");
+        Runtime.Log("  set bank [n]           - set bank to ID");
+        Runtime.Log("  set part [n1]          - set part ID operations");
+        Runtime.Log("    program [n2]         - loads instrument ID");
+        Runtime.Log("    channel [n2]         - sets MIDI channel (> 15 disables)");
+        Runtime.Log("    destination [n2]     - (1 main, 2 part, 3 both)");
+        Runtime.Log("  set rootcc [n]         - set CC for root path changes (> 119 disables)");
+        Runtime.Log("  set bankcc [n]         - set CC for bank changes (0, 32, other disables)");
+        Runtime.Log("  set program [n]        - set MIDI program change (0 off, other on)");
+        Runtime.Log("  set activate [n]       - set part activate (0 off, other on)");
+        Runtime.Log("  set extend [n]         - set CC for extended program change (> 119 disables)");
+        Runtime.Log("  set available [n]      - set available parts (16, 32, 64)");
+        // next message must always go to stdout
+        cout <<     "  set reports [n]        - set report destination (1 GUI console, other stderr)\n";
+        Runtime.Log("  set volume [n]         - set master volume");        
+        Runtime.Log("  set shift [n]          - set master key shift semitones (64 no shift)");
+        Runtime.Log("  set alsa midi [s]      - * set name of source");
+        Runtime.Log("  set alsa audio [s]     - * set name of hardware device");
+        Runtime.Log("  set jack server [s]    - * set server name");
+        Runtime.Log("  set vector [n1]        - set vector CHANNEL operations");
+        Runtime.Log("    x cc [n2]            - CC n2 is used for n1 X axis sweep");
+        Runtime.Log("    y cc [n2]            - CC n2 is used for n1 Y axis sweep");
+        Runtime.Log("    x features [n2]      - sets n1 X features");
+        Runtime.Log("    y features [n2]      - sets n1 Y features");
+        Runtime.Log("    x program [l/r] [n2] - X program change ID for n1 L or R part");
+        Runtime.Log("    y program [l/r] [n2] - Y program change ID for n1 L or R part");
+        Runtime.Log("  stop                   - all sound off");
+        Runtime.Log("  exit                   - tidy up and close Yoshimi");
         Runtime.Log("'*' entries need a save and Yoshimi restart to activate");
     }
     switch (error)
@@ -1125,8 +1126,9 @@ void SynthEngine::DecodeCommands(char *buffer)
 int SynthEngine::commandSet(char *point)
 {
     int error = 0;
+    int tmp;
 
-    if(matchWord(point, "rootcc"))
+    if (matchWord(point, "rootcc"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1134,7 +1136,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if(matchWord(point, "bankcc"))
+    else if (matchWord(point, "bankcc"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1142,7 +1144,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if(matchWord(point, "root"))
+    else if (matchWord(point, "root"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1150,7 +1152,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if(matchWord(point, "bank"))
+    else if (matchWord(point, "bank"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1189,7 +1191,16 @@ int SynthEngine::commandSet(char *point)
                 {
                     point = skipChars(point);
                     if (point[0] != 0)
-                        SetPartChan(partnum, string2int(point));
+                    {
+                        tmp = string2int(point);
+                        if (tmp < NUM_MIDI_CHANNELS)
+                        {
+                            SetPartChan(partnum, tmp);
+                            Runtime.Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
+                        }
+                        else
+                            Runtime.Log("Part " + asString((int) partnum) + " set to no MIDI"); 
+                    }
                     else
                         error = 1;
                 }
@@ -1433,7 +1444,6 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
     switch (dHigh)
     {
         case 0:
-        {
             Runtime.nrpndata.vectorXaxis[chan] = par;
             if (!Runtime.nrpndata.vectorEnabled[chan])
             {
@@ -1448,9 +1458,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
             Runtime.Log("Set vector X CC to " + asString(par));
             break;
-        }
         case 1:
-        {
             if (!Runtime.nrpndata.vectorEnabled[chan])
                 Runtime.Log("Vector X axis must be set before Y");
             else
@@ -1464,22 +1472,17 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.Log("Set vector Y CC to " + asString(par));
             }
             break;
-        }
         case 2:
-        {
             Runtime.nrpndata.vectorXfeatures[chan] = par;
             Runtime.Log("Enabled X features " + asString(par));
             break;
-        }
         case 3:
-        {
             if (Runtime.NumAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
                 Runtime.nrpndata.vectorYfeatures[chan] = par;
                 Runtime.Log("Enabled Y features " + asString(par));
             }
             break;
-        }
         
         /*
          * we don't need to worry about blocking
@@ -1487,72 +1490,51 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
          * only the command line that's blocked
          */
         case 4:
-        {
             SetProgram(chan | 0x80, par);
             break;
-        }
         case 5:
-        {
             SetProgram(chan | 0x90, par);
             break;
-        }
         case 6:
-        {
             SetProgram(chan | 0xa0, par);
             break;
-        }
         case 7:
-        {
             SetProgram(chan | 0xb0, par);
             break;
-        }
         
         case 8:
-        {
             Runtime.nrpndata.vectorXcc2[chan] = par;
             Runtime.Log("Set X feature 2 to " + asString(par));
             break;
-        }
         case 9:
-        {
             Runtime.nrpndata.vectorXcc4[chan] = par;
             Runtime.Log("Set X feature 4 to " + asString(par));
             break;
-        }
         case 10:
-        {
             Runtime.nrpndata.vectorXcc8[chan] = par;
             Runtime.Log("Set X feature 8 to " + asString(par));
             break;
-        }
         case 11:
-        {
             Runtime.nrpndata.vectorYcc2[chan] = par;
             Runtime.Log("Set Y feature 2 to " + asString(par));
             break;
-        }
         case 12:
-        {
             Runtime.nrpndata.vectorYcc4[chan] = par;
             Runtime.Log("Set Y feature 4 to " + asString(par));
             break;
-        }
         case 13:
-        {
             Runtime.nrpndata.vectorYcc8[chan] = par;
             Runtime.Log("Set Y feature 8 to " + asString(par));
             break;
-        }
         
         default:
-        {
             Runtime.nrpndata.vectorEnabled[chan] = false;
             Runtime.nrpndata.vectorXaxis[chan] = 0xff;
             Runtime.nrpndata.vectorYaxis[chan] = 0xff;
             Runtime.nrpndata.vectorXfeatures[chan] = 0;
             Runtime.nrpndata.vectorYfeatures[chan] = 0;
             Runtime.Log("Vector control disabled");
-        }
+            break;
     }
 }
 
@@ -1604,7 +1586,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     p_bufferbytes = bufferbytes;
     p_buffersize_f = buffersize_f;
 
-    if((to_process > 0) && (to_process < buffersize))
+    if ((to_process > 0) && (to_process < buffersize))
     {
         p_buffersize = to_process;
         p_bufferbytes = p_buffersize * sizeof(float);
@@ -1951,7 +1933,7 @@ int SynthEngine::loadParameters(string fname)
     Runtime.SimpleCheck = false;
     actionLock(lockmute);
     defaults(); // clear all parameters
-    if(loadXML(fname)) // load the data
+    if (loadXML(fname)) // load the data
     {
         result = 1; // this is messy, but can't trust bool to int conversions
         if (Runtime.SimpleCheck)
@@ -2111,7 +2093,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
             continue;
         part[npart]->getfromXML(xml);
         xml->exitbranch();
-        if(part[npart]->Penabled && (part[npart]->Paudiodest & 2))
+        if (part[npart]->Penabled && (part[npart]->Paudiodest & 2))
         {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
         }
@@ -2226,7 +2208,7 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
 
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {
-    if(guiMaster == NULL && createGui)
+    if (guiMaster == NULL && createGui)
     {
         guiMaster = new MasterUI(this);
     }
@@ -2235,15 +2217,15 @@ MasterUI *SynthEngine::getGuiMaster(bool createGui)
 
 void SynthEngine::guiClosed(bool stopSynth)
 {
-    if(stopSynth && !isLV2Plugin)
+    if (stopSynth && !isLV2Plugin)
         Runtime.runSynth = false;    
-    if(guiClosedCallback != NULL)
+    if (guiClosedCallback != NULL)
         guiClosedCallback(guiCallbackArg);
 }
 
 void SynthEngine::closeGui()
 {
-    if(guiMaster != NULL)
+    if (guiMaster != NULL)
     {
         delete guiMaster;
         guiMaster = NULL;
@@ -2256,7 +2238,7 @@ std::string SynthEngine::makeUniqueName(const char *name)
     char strUniquePostfix [1024];
     std::string newUniqueName = name;
     memset(strUniquePostfix, 0, sizeof(strUniquePostfix));
-    if(uniqueId > 0)
+    if (uniqueId > 0)
     {
         snprintf(strUniquePostfix, sizeof(strUniquePostfix), "-%d", uniqueId);
     }
@@ -2267,7 +2249,7 @@ std::string SynthEngine::makeUniqueName(const char *name)
 
 void SynthEngine::setWindowTitle(string _windowTitle)
 {
-    if(!_windowTitle.empty())
+    if (!_windowTitle.empty())
     {
         windowTitle = _windowTitle;
     }

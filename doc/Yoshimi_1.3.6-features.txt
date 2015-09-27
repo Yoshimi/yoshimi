@@ -1,6 +1,6 @@
 One of the main features of this release is improved accessibility. The effectiveness (and indeed usefulness) of this will help shape future complimentary interfaces. Also, a number of first-time defaults have been changed to make this easier.
 
-It has always been possibly to run Yoshimi headless, but now real control is available. For a start, when starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
+It has always been possible to run Yoshimi headless, but now real control is available. In the first place, when starting from the command line, an argument can be included for a new root path to be defined to point to a set of banks fetched from elsewhere. This will be given the next free ID.
 
 Once running, almost all dynamic setup (i.e. doesn't require a restart) can now be done within the terminal window. There is also extensive control of roots, banks, parts and instruments including the ability to list and set all of these. You can now do things like:
 
@@ -24,6 +24,9 @@ Vector control has been extended so that there are four independent 'features' t
 
 
 When using the GUI, there are additional style improvements and tweaks. Also, Yoshimi is a bit more informative when there are insurmountable problems, especially at start-up.
+
+
+In the 'examples' directory there is now a complete song set, 'OutThere.mid' and 'OutThere.xmz'. Together these produce a fairly complex 12 part tune that makes Yoshimi work quite hard.
 
 
 Finally, as well as document updates and the usual crop of bug-blatting, a couple of obscure regressions have been fixed.

@@ -1,4 +1,11 @@
-yoshimi 1.3.6 rc5
+yoshimi 1.3.6
+
+2015-9-28
+- Some code style corrections.
+- Final LV2 fix.
+- Documentation updates.
+- Snuck in a new instrument patch.
+- Set version as 1.3.6 for release.
 
 2015-9-26 Will
 - Pulled in additional command line controls.
