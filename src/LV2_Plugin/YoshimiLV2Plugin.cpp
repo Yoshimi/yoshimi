@@ -68,7 +68,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
     {
         return;
     }
-    synth->p_all_buffersize_f = sample_count;
+    synth->p_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
     int real_sample_count = sample_count;//min(sample_count, _bufferSize);
     int offs = 0;
     int next_frame = 0;
