@@ -64,66 +64,77 @@ using namespace std;
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
-    uint real_sample_count = min(sample_count, _bufferSize);
-    uint32_t offs = 0;
-    uint32_t next_frame = 0;
-    uint32_t processed = 0;
+    if (sample_count == 0)
+    {
+        return;
+    }
+    synth->p_all_buffersize_f = min(sample_count, (uint32_t)synth->buffersize);
+    int real_sample_count = sample_count;//min(sample_count, _bufferSize);
+    int offs = 0;
+    int next_frame = 0;
+    int processed = 0;
     float *tmpLeft [NUM_MIDI_PARTS + 1];
     float *tmpRight [NUM_MIDI_PARTS + 1];
     struct midi_event intMidiEvent;
-    for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
     {
         tmpLeft [i] = lv2Left [i];
-        if(tmpLeft [i] == NULL)
+        if (tmpLeft [i] == NULL)
             tmpLeft [i] = zynLeft [i];
         tmpRight [i] = lv2Right [i];
-        if(tmpRight [i] == NULL)
+        if (tmpRight [i] == NULL)
             tmpRight [i] = zynRight [i];
     }
     LV2_ATOM_SEQUENCE_FOREACH(_midiDataPort, event)
     {
-        if(event == NULL)
+        if (event == NULL)
             continue;
-        if(event->body.size > sizeof(intMidiEvent.data))
+        if (event->body.size > sizeof(intMidiEvent.data))
             continue;
 
-        if(event->body.type == _midi_event_id)
+        if (event->body.type == _midi_event_id)
         {
             next_frame = event->time.frames;                       
-            if(next_frame >= real_sample_count)
+            if (next_frame >= real_sample_count)
                 continue;
-            /*if(next_frame == _bufferSize - 1
+            /*if (next_frame == _bufferSize - 1
                && processed == 0)
             {
                 next_frame = 0;
             }*/
-            uint32_t to_process = next_frame - offs;
+            int to_process = next_frame - offs;
 
-            if((to_process > 0)
+            if ((to_process > 0)
                && (processed < real_sample_count)
                && (to_process <= (real_sample_count - processed)))
             {
-                _synth->MasterAudio(tmpLeft, tmpRight, to_process);
+                int mastered = 0;
                 offs = next_frame;
-                for(uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                while (to_process - mastered > 0)
                 {
-                    tmpLeft [i] += to_process;
-                    tmpRight [i] += to_process;
+                    int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
+                    for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+                    {
+                        tmpLeft [i] += mastered_chunk;
+                        tmpRight [i] += mastered_chunk;
+                    }
+
+                    mastered += mastered_chunk;
                 }
                 processed += to_process;
             }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
             bool bMidiProcessed = false;
-            if(_bFreeWheel != NULL)
+            if (_bFreeWheel != NULL)
             {
-                if(*_bFreeWheel != 0)
+                if (*_bFreeWheel != 0)
                 {
                     processMidiMessage(msg);
                     bMidiProcessed = true;
                 }
             }
-            if(!bMidiProcessed)
+            if (!bMidiProcessed)
             {
                 intMidiEvent.time = next_frame;
                 memset(intMidiEvent.data, 0, sizeof(intMidiEvent.data));
@@ -156,18 +167,26 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         }
     }
 
-    if(processed < real_sample_count)
+    if (processed < real_sample_count)
     {
-        /*if(processed != 0)
+        /*if (processed != 0)
         {
             fprintf(stderr, "Processed = %u\n", processed);
         }*/
         uint32_t to_process = real_sample_count - processed;
-        if(to_process > 0)
+        int mastered = 0;
+        offs = next_frame;
+        while (to_process - mastered > 0)
         {
-            _synth->MasterAudio(tmpLeft, tmpRight, to_process);
-            offs = next_frame;
+            int mastered_chunk = _synth->MasterAudio(tmpLeft, tmpRight, to_process - mastered);
+            for (uint32_t i = 0; i < NUM_MIDI_PARTS + 1; ++i)
+            {
+                tmpLeft [i] += mastered_chunk;
+                tmpRight [i] += mastered_chunk;
+            }
+            mastered += mastered_chunk;
         }
+        processed += to_process;
 
     }
 
@@ -298,7 +317,7 @@ void *YoshimiLV2Plugin::idleThread()
     {
         _synth->getRuntime().deadObjects->disposeBodies();
 //        // where all the action is ...
-//        if(_synth->getRuntime().showGui)
+//        if (_synth->getRuntime().showGui)
 //            Fl::wait(0.033333);
 //        else
             usleep(33333);
@@ -327,20 +346,20 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _uridMap.map = NULL;
     const LV2_Feature *f = NULL;
     const Yoshimi_LV2_Options_Option *options = NULL;
-    while((f = *features) != NULL)
+    while ((f = *features) != NULL)
     {
-        if(strcmp(f->URI, LV2_URID__map) == 0)
+        if (strcmp(f->URI, LV2_URID__map) == 0)
         {
             _uridMap = *(static_cast<LV2_URID_Map *>(f->data));
         }
-        else if(strcmp(f->URI, YOSHIMI_LV2_OPTIONS__options) == 0)
+        else if (strcmp(f->URI, YOSHIMI_LV2_OPTIONS__options) == 0)
         {
             options = static_cast<Yoshimi_LV2_Options_Option *>(f->data);
         }
         ++features;
     }
 
-    if(_uridMap.map != NULL && options != NULL)
+    if (_uridMap.map != NULL && options != NULL)
     {
         _midi_event_id = _uridMap.map(_uridMap.handle, LV2_MIDI__MidiEvent);
         _yosmihi_state_id = _uridMap.map(_uridMap.handle, YOSHIMI_STATE_URI);
@@ -348,14 +367,14 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
-        while(options->size > 0 && options->value != NULL)
+        while (options->size > 0 && options->value != NULL)
         {
-            if(options->context == LV2_OPTIONS_INSTANCE)
+            if (options->context == LV2_OPTIONS_INSTANCE)
             {
-                if((options->key == minBufSz || options->key == maxBufSz) && options->type == atomInt)
+                if ((options->key == minBufSz || options->key == maxBufSz) && options->type == atomInt)
                 {
                     uint32_t bufSz = *static_cast<const uint32_t *>(options->value);
-                    if(_bufferSize < bufSz)
+                    if (_bufferSize < bufSz)
                         _bufferSize = bufSz;
                 }
             }
@@ -364,15 +383,15 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
 
     }
 
-    if(_bufferSize == 0)
-        _bufferSize = 1024;
+    if (_bufferSize == 0)
+        _bufferSize = 8192;
 }
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
 {
-    if(_synth != NULL)
+    if (_synth != NULL)
     {
-        if(!flatbankprgs.empty())
+        if (!flatbankprgs.empty())
         {
             getProgram(flatbankprgs.size() + 1);
         }
@@ -381,7 +400,7 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
         pthread_join(_pMidiThread, NULL);
         pthread_join(_pIdleThread, NULL);
         sem_destroy(&_midiSem);
-        if(_midiRingBuf != NULL)
+        if (_midiRingBuf != NULL)
         {
             jack_ringbuffer_free(_midiRingBuf);
             _midiRingBuf = NULL;
@@ -393,11 +412,11 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
 
 bool YoshimiLV2Plugin::init()
 {
-    if(_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yosmihi_state_id == 0 || _atom_string_id == 0)
+    if (_uridMap.map == NULL || _sampleRate == 0 || _bufferSize == 0 || _midi_event_id == 0 || _yosmihi_state_id == 0 || _atom_string_id == 0)
         return false;
-    if(!prepBuffers())
+    if (!prepBuffers())
         return false;
-    if(sem_init(&_midiSem, 0, 0) != 0)
+    if (sem_init(&_midiSem, 0, 0) != 0)
     {
         _synth->getRuntime().Log("Failed to create midi semaphore");
         return false;
@@ -424,13 +443,13 @@ bool YoshimiLV2Plugin::init()
 
     _synth->getRuntime().runSynth = true;
 
-    if(!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false))
+    if (!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false))
     {
         synth->getRuntime().Log("Failed to start midi thread");
         return false;
     }
 
-    if(!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false))
+    if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false))
     {
         synth->getRuntime().Log("Failed to start idle thread");
         return false;
@@ -447,10 +466,10 @@ bool YoshimiLV2Plugin::init()
 LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
-    if(synth == NULL)
+    if (synth == NULL)
         return NULL;
     YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features);
-    if(inst->init())
+    if (inst->init())
         return static_cast<LV2_Handle>(inst);
     else
         delete inst;
@@ -459,14 +478,15 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double
 
 void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *data_location)
 {
-    if(port > NUM_MIDI_PARTS + 2)
+    if (port > NUM_MIDI_PARTS + 2)
         return;
      YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
-     if(port == 0)//atom midi event port
+     if (port == 0)//atom midi event port
      {
          inst->_midiDataPort = static_cast<LV2_Atom_Sequence *>(data_location);
          return;
-     }else if(port == 1) //freewheel control port
+     }
+     else if (port == 1) //freewheel control port
      {
          inst->_bFreeWheel = static_cast<float *>(data_location);
          return;
@@ -474,16 +494,16 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
 
      port -=2;
 
-     if(port == 0) //main outl
+     if (port == 0) //main outl
          port = NUM_MIDI_PARTS * 2;
-     else if(port == 1) //main outr
+     else if (port == 1) //main outr
          port = NUM_MIDI_PARTS * 2 + 1;
      else
          port -= 2;
 
 
      int portIndex = static_cast<int>(floorf((float)port/2.0f));
-     if(port % 2 == 0) //left channel
+     if (port % 2 == 0) //left channel
          inst->lv2Left[portIndex] = static_cast<float *>(data_location);
      else
          inst->lv2Right[portIndex] = static_cast<float *>(data_location);
@@ -541,11 +561,11 @@ const void *YoshimiLV2Plugin::extension_data(const char *uri)
         return static_cast<const void *>(&state_iface);
 
     }
-    else if(strcmp(uri, LV2_PROGRAMSNEW__Interface) == 0)
+    else if (strcmp(uri, LV2_PROGRAMSNEW__Interface) == 0)
     {
         return static_cast<const void *>(&yoshimi_prg_iface);
     }
-    else if(strcmp(uri, LV2_PROGRAMS__Interface) == 0)
+    else if (strcmp(uri, LV2_PROGRAMS__Interface) == 0)
     {
         return static_cast<const void *>(&yoshimi_prg_iface);
     }
@@ -577,7 +597,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     //fwrite(data, 1, sz, f);
     //fclose(f);
 
-    if(sz > 0)
+    if (sz > 0)
     {
 
         _synth->putalldata(data, sz);
@@ -587,20 +607,20 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
 
 const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
 {
-    if(flatbankprgs.empty())
+    if (flatbankprgs.empty())
     {
         Bank &bankObj = synth->getBankRef();
         const BankEntryMap &banks = bankObj.getBanks(bankObj.getCurrentRootID());
         BankEntryMap::const_iterator itB;
         InstrumentEntryMap::const_iterator itI;
-        for(itB = banks.begin(); itB != banks.end(); ++itB)
+        for (itB = banks.begin(); itB != banks.end(); ++itB)
         {
             string bankName = itB->second.dirname;
-            if(!bankName.empty())
+            if (!bankName.empty())
             {
-                for(itI = itB->second.instruments.begin(); itI != itB->second.instruments.end(); ++itI)
+                for (itI = itB->second.instruments.begin(); itI != itB->second.instruments.end(); ++itI)
                 {
-                    if(!itI->second.name.empty())
+                    if (!itI->second.name.empty())
                     {
                         LV2_Program_Descriptor desc;
                         desc.bank = itB->first;
@@ -613,11 +633,11 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
         }
     }
 
-    if(index >= flatbankprgs.size())
+    if (index >= flatbankprgs.size())
     {
-        for(size_t i = 0; i < flatbankprgs.size(); ++i)
+        for (size_t i = 0; i < flatbankprgs.size(); ++i)
         {
-            if(flatbankprgs [i].name != NULL)
+            if (flatbankprgs [i].name != NULL)
             {
                 free(const_cast<char *>(flatbankprgs [i].name));
             }
@@ -632,9 +652,9 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
 void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program)
 {
     bool isFreeWheel = false;
-    if(_bFreeWheel && *_bFreeWheel == 1)
+    if (_bFreeWheel && *_bFreeWheel == 1)
         isFreeWheel = true;
-    if(_synth->getRuntime().midi_bank_C != 128)
+    if (_synth->getRuntime().midi_bank_C != 128)
     {
         setMidiBankOrRootDir((short)bank, isFreeWheel);
     }
@@ -703,20 +723,20 @@ YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2U
     externalUI.uiWIdget.show = YoshimiLV2PluginUI::static_Show;
     externalUI.uiWIdget.hide = YoshimiLV2PluginUI::static_Hide;
     externalUI.uiInst = this;
-    while((f = *features) != NULL)
+    while ((f = *features) != NULL)
     {
-        if(strcmp(f->URI, LV2_INSTANCE_ACCESS_URI) == 0)
+        if (strcmp(f->URI, LV2_INSTANCE_ACCESS_URI) == 0)
         {
             _plugin = static_cast<YoshimiLV2Plugin *>(f->data);
         }
-        else if(strcmp(f->URI, LV2_EXTERNAL_UI__Host) == 0)
+        else if (strcmp(f->URI, LV2_EXTERNAL_UI__Host) == 0)
         {
             uiHost.plugin_human_id = strdup(static_cast<LV2_External_UI_Host *>(f->data)->plugin_human_id);
             uiHost.ui_closed = static_cast<LV2_External_UI_Host *>(f->data)->ui_closed;
         }
         ++features;
     }
-    if(uiHost.plugin_human_id == NULL)
+    if (uiHost.plugin_human_id == NULL)
     {
         uiHost.plugin_human_id = strdup("Yoshimi lv2 plugin");
     }
@@ -725,7 +745,7 @@ YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2U
 
 YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
 {
-    if(uiHost.plugin_human_id != NULL)
+    if (uiHost.plugin_human_id != NULL)
     {
         free(const_cast<char *>(uiHost.plugin_human_id));
         uiHost.plugin_human_id = NULL;
@@ -738,7 +758,7 @@ YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
 
 bool YoshimiLV2PluginUI::init()
 {
-    if(_plugin == NULL || uiHost.ui_closed == NULL)
+    if (_plugin == NULL || uiHost.ui_closed == NULL)
         return false;
 
     _plugin->_synth->setGuiClosedCallback(YoshimiLV2PluginUI::static_guiClosed, this);
@@ -750,7 +770,7 @@ bool YoshimiLV2PluginUI::init()
 LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor, const char *plugin_uri, const char *bundle_path, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
 {
     YoshimiLV2PluginUI *uiinst = new YoshimiLV2PluginUI(bundle_path, write_function, controller, widget, features);
-    if(uiinst->init())
+    if (uiinst->init())
     {
         return static_cast<LV2_External_UI_Widget *>(uiinst);
     }
@@ -774,7 +794,7 @@ void YoshimiLV2PluginUI::static_guiClosed(void *arg)
 
 void YoshimiLV2PluginUI::run()
 {
-    if(_masterUI != NULL)
+    if (_masterUI != NULL)
     {
         for (int i = 0; !_plugin->_synth->getRuntime().LogList.empty() && i < 5; ++i)
         {
@@ -787,7 +807,7 @@ void YoshimiLV2PluginUI::run()
     }
     else
     {
-        if(uiHost.ui_closed != NULL)
+        if (uiHost.ui_closed != NULL)
             uiHost.ui_closed(_controller);
     }
 }
@@ -796,7 +816,7 @@ void YoshimiLV2PluginUI::show()
 {
     _plugin->_synth->getRuntime().showGui = true;
     bool bInit = false;
-    if(_masterUI == NULL)
+    if (_masterUI == NULL)
         bInit = true;
     _masterUI = _plugin->_synth->getGuiMaster();
     if (_masterUI == NULL)
@@ -804,7 +824,7 @@ void YoshimiLV2PluginUI::show()
         _plugin->_synth->getRuntime().Log("Failed to instantiate gui");
         return;
     }
-    if(bInit)
+    if (bInit)
     {
         Fl::lock();
         Fl::unlock();
@@ -815,7 +835,7 @@ void YoshimiLV2PluginUI::show()
 
 void YoshimiLV2PluginUI::hide()
 {
-    if(_masterUI)
+    if (_masterUI)
         _masterUI->masterwindow->hide();
 }
 
@@ -864,7 +884,7 @@ LV2_Descriptor yoshimi_lv2_multi_desc =
 
 extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
 {
-    switch(index)
+    switch (index)
     {
     case 0:
         return &yoshimi_lv2_desc;
@@ -887,7 +907,7 @@ LV2UI_Descriptor yoshimi_lv2ui_desc =
 
 extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
-    switch(index)
+    switch (index)
     {
     case 0:
         return &yoshimi_lv2ui_desc;

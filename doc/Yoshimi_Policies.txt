@@ -23,3 +23,7 @@ master is shown as yoshimi-1.3.5 M
 xml files created with this will have:
 Major version 3
 Minor version 5
+
+
+
+If using Fluid to edit GUI files, please close all windows and collapse all menus *before* the last save. I know it's tedious, but it avoids storms of spurious 'changes' that make genuine ones harder to see.
