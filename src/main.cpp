@@ -20,7 +20,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
-#include <fcntl.h>
+//#include <fcntl.h>
 
 using namespace std;
 
@@ -58,10 +58,10 @@ static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
 
-int commandStyle;
-int commandCount;
-char commandChr;
-char commandBuffer[COMMAND_SIZE + 2]; // allow for overcount and terminator
+//int commandStyle;
+//int commandCount;
+//char commandChr;
+//char commandBuffer[COMMAND_SIZE + 2]; // allow for overcount and terminator
 
 /*
 bool commandProcess(char chr)
@@ -334,7 +334,7 @@ bool mainCreateNewInstance(unsigned int forceId)
     return true;
 
 bail_out:
-    fcntl(0, F_SETFL, commandStyle);
+//    fcntl(0, F_SETFL, commandStyle);
     synth->getRuntime().runSynth = false;
     synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
     if (musicClient)
@@ -359,9 +359,9 @@ void *commandThread(void *arg)
 
 int main(int argc, char *argv[])
 {
-    commandCount = 0;
-    commandStyle = fcntl(0, F_GETFL, 0);
-    fcntl (0, F_SETFL, (commandStyle | O_NDELAY)); 
+//    commandCount = 0;
+//    commandStyle = fcntl(0, F_GETFL, 0);
+//    fcntl (0, F_SETFL, (commandStyle | O_NDELAY)); 
     
     
     cout << "Yoshimi is starting" << endl; // guaranteed start message
@@ -439,7 +439,7 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    fcntl(0, F_SETFL, commandStyle);
+//    fcntl(0, F_SETFL, commandStyle);
     if (bShowGui && !bExitSuccess) // this could be done better!
         usleep(2000000);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
