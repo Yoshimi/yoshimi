@@ -1,6 +1,15 @@
+yoshimi 1.3.6 M
+
+2015-9-26 Will
+- First time config search was getting confused if zyn or old style
+  yoshi configs were there, so they are no longer accepted.
+- Added definitive search for bank dirs launch directory parent.
+- Identifed preset bugs.
+- Added definitive search for preset dirs in launch directory parent.
+
 yoshimi 1.3.6
 
-2015-9-28
+2015-9-28 Will
 - Some code style corrections.
 - Final LV2 fix.
 - Documentation updates.

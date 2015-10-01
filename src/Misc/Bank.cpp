@@ -42,6 +42,7 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
+#include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
 
 Bank::Bank(SynthEngine *_synth) :
@@ -725,7 +726,6 @@ void Bank::addDefaultRootDirs()
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
         string(getenv("HOME")) + "/banks",
-        "../banks",
         "end"
     };
     int i = 0;
@@ -734,6 +734,7 @@ void Bank::addDefaultRootDirs()
         addRootDir(bankdirs [i]);
         ++ i;
     }
+    addRootDir(localPath("/banks"));
     rescanforbanks();
 }
 
