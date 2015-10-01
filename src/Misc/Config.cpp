@@ -507,8 +507,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
             "/usr/local/share/yoshimi/presets",
             "/usr/share/zynaddsubfx/presets",
             "/usr/local/share/zynaddsubfx/presets",
-            string(getenv("HOME")) + ".config/yoshimi/presets",
-            string(getenv("HOME")) + "/presets",
+            string(getenv("HOME")) + "/.config/yoshimi/presets",
+            localPath("/presets"),
             "end"
         };
         int i = 0;
@@ -518,7 +518,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
                 presetsDirlist[count++] = presetdirs[i];
             ++ i;
         }
-        presetsDirlist[count] = localPath("/presets");
     }
 
     // alsa settings

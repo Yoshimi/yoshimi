@@ -100,7 +100,7 @@ void MiscFuncs::legit_filename(string& fname)
 }
 
 
-// replace 'src' with a different one in the compilation cirectory
+// replace 'src' with a different one in the compilation directory
 string MiscFuncs::localPath(string leaf)
 {
     char *tmpath;
@@ -110,6 +110,8 @@ string MiscFuncs::localPath(string leaf)
     size_t found = path.rfind("/src");
     if (found != string::npos)
         path.replace (found,4,leaf);
+    else
+        path = "";
     free(tmpath);
     return path;
 }

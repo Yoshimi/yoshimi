@@ -165,14 +165,13 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
     if (synth->getRuntime().presetsDirlist[0].empty())
         return;
-    string filename;
+    synth->getRuntime().Log(name);
     string tmpfilename = name;
     legit_filename(tmpfilename);
     string dirname = synth->getRuntime().presetsDirlist[0];
     if (dirname.find_last_of("/") != (dirname.size() - 1))
         dirname += "/";
-    filename = dirname + "." + type + preset_extension;
-    xml->saveXMLfile(filename);
+    xml->saveXMLfile(dirname + tmpfilename + "." + type + preset_extension);
 }
 
 bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
