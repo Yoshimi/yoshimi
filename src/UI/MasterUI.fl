@@ -202,7 +202,7 @@ class MasterUI {: {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }}
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-4 0 400 25} labelsize 13
@@ -599,9 +599,10 @@ mainCreateNewInstance(forceId);}
           Fl_Button {} {
             label P
             callback {//
-              synth->actionLock(lockmute);
-              presetsui->paste(synth->sysefx[nsyseff], syseffectui);
-              synth->actionLock(unlock);}
+    int tmp;
+    synth->actionLock(lockmute);
+    presetsui->paste(synth->sysefx[nsyseff], syseffectui);
+    synth->actionLock(unlock);}
             xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }

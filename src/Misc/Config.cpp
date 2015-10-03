@@ -403,7 +403,7 @@ bool Config::loadConfig(void)
     {
         resConfigFile += asString(synth->getUniqueId());
     }
-    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+/*    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
     {
         Log("ConfigFile " + resConfigFile + " not found");
         Log("Trying for old config file");
@@ -429,12 +429,12 @@ bool Config::loadConfig(void)
             if (oldfle)
                 fclose(oldfle);
         }
-    }
+    }*/
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
     {
-        Log("ConfigFile " + resConfigFile + " still not found, will use default settings");
+        Log("ConfigFile " + resConfigFile + " not found, will use default settings");
         saveConfig();
     }
     else
@@ -507,14 +507,17 @@ bool Config::extractConfigData(XMLwrapper *xml)
             "/usr/local/share/yoshimi/presets",
             "/usr/share/zynaddsubfx/presets",
             "/usr/local/share/zynaddsubfx/presets",
-            string(getenv("HOME")) + "/presets",
-            "../presets",
-            "presets"
+            string(getenv("HOME")) + "/.config/yoshimi/presets",
+            localPath("/presets"),
+            "end"
         };
-        const int defaultsCount = 7; // as per presetdirs[] above
-        for (int i = 0; i < defaultsCount; ++i)
-            if (presetdirs[i].size() && isDirectory(presetdirs[i]))
+        int i = 0;
+        while (presetdirs[i] != "end")
+        {
+            if (isDirectory(presetdirs[i]))
                 presetsDirlist[count++] = presetdirs[i];
+            ++ i;
+        }
     }
 
     // alsa settings

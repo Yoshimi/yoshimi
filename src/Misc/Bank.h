@@ -38,15 +38,7 @@ using namespace std;
 #define ROOT_SIZE 128
 #define BANK_SIZE 160
 
-// not needed anymore? #define MAX_NUM_BANKS 2000
-/*
-typedef struct {
-    string name;
-    string alias;
-    string dir;
-    int ID;
-} bankstruct_t;
-*/
+
 typedef struct _InstrumentEntry
 {
     string name;
