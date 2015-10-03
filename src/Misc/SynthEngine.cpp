@@ -970,7 +970,49 @@ void SynthEngine::DecodeCommands(char *buffer)
     int error = 0;
     char *point = buffer;
     cout << endl; // Clear out command repeat. Why?
-    
+    string commands[] = {
+        "Commands",
+        "  setup                  - show dynamic settings",
+        "  save                   - save dynamic settings",
+        "  paths                  - display bank root paths",
+        "  path add <s>           - add bank root path",
+        "  path remove <n>        - remove bank root path ID",
+        "  list root [n]         - list banks in root ID or current",
+        "  list bank [n]          - list instruments in bank ID or current",
+        "  list vector <n>        - list settings for vector CHANNEL",
+        "  set reports [n]        - set report destination (1 GUI console, other stderr)",
+        "  set root <n>           - set current root path to ID",
+        "  set bank <n>           - set current bank to ID",
+        "  set part [n1]          - set part ID operations",
+        "    program <n2>         - loads instrument ID",
+        "    channel <n2>         - sets MIDI channel (> 15 disables)",
+        "    destination <n2>     - (1 main, 2 part, 3 both)",
+        "  set rootcc <n>         - set CC for root path changes (> 119 disables)",
+        "  set bankcc <n>         - set CC for bank changes (0, 32, other disables)",
+        "  set program <n>        - set MIDI program change (0 off, other on)",
+        "  set activate <n>       - set part activate (0 off, other on)",
+        "  set extend <n>         - set CC for extended program change (> 119 disables)",
+        "  set available <n>      - set available parts (16, 32, 64)",
+        "  set volume <n>         - set master volume",        
+        "  set shift <n>          - set master key shift semitones (64 no shift)",
+        "  set alsa midi <s>      - * set name of source",
+        "  set alsa audio <s>     - * set name of hardware device",
+        "  set jack server <s>    - * set server name",
+        "  set vector [n1]        - set vector CHANNEL operations",
+        "    x cc <n2>            - CC n2 is used for CHANNEL X axis sweep",
+        "    y cc <n2>            - CC n2 is used for CHANNEL Y axis sweep",
+        "    x features <n2>      - sets CHANNEL X features",
+        "    y features <n2>      - sets CHANNEL Y features",
+        "    x program <l/r> <n2> - X program change ID for CHANNEL L or R part",
+        "    y program <l/r> <n2> - Y program change ID for CHANNEL L or R part",
+        "    x <n2> command <n3>  - sets n3 CC to use for X feature n2 (2, 4, 8)",
+        "    y <n2> command <n3>  - sets n3 CC to use for Y feature n2 (2, 4, 8)",
+        "    off                  - disable vector for CHANNEL",
+        "  stop                   - all sound off",
+        "  exit                   - tidy up and close Yoshimi",
+        "'*' entries need a save and Yoshimi restart to activate",
+        "end"
+    };
     point = skipSpace(point); // just to be sure
     if (matchWord(point, "stop"))
         allStop();
@@ -1072,46 +1114,17 @@ void SynthEngine::DecodeCommands(char *buffer)
         Runtime.runSynth = false;
     else
     {
-        Runtime.Log("Commands");
-        Runtime.Log("  setup                  - show dynamic settings");
-        Runtime.Log("  save                   - save dynamic settings");
-        Runtime.Log("  paths                  - display bank root paths");
-        Runtime.Log("  path add <s>           - add bank root path");
-        Runtime.Log("  path remove <n>        - remove bank root path ID");
-        Runtime.Log("  list root [n]         - list banks in root ID or current");
-        Runtime.Log("  list bank [n]          - list instruments in bank ID or current");
-        Runtime.Log("  list vector <n>        - list settings for vector CHANNEL");
-        Runtime.Log("  set root <n>           - set current root path to ID");
-        Runtime.Log("  set bank <n>           - set current bank to ID");
-        Runtime.Log("  set part [n1]          - set part ID operations");
-        Runtime.Log("    program <n2>         - loads instrument ID");
-        Runtime.Log("    channel <n2>         - sets MIDI channel (> 15 disables)");
-        Runtime.Log("    destination <n2>     - (1 main, 2 part, 3 both)");
-        Runtime.Log("  set rootcc <n>         - set CC for root path changes (> 119 disables)");
-        Runtime.Log("  set bankcc <n>         - set CC for bank changes (0, 32, other disables)");
-        Runtime.Log("  set program <n>        - set MIDI program change (0 off, other on)");
-        Runtime.Log("  set activate <n>       - set part activate (0 off, other on)");
-        Runtime.Log("  set extend <n>         - set CC for extended program change (> 119 disables)");
-        Runtime.Log("  set available <n>      - set available parts (16, 32, 64)");
-        // next message must always go to stdout
-        cout <<     "  set reports [n]        - set report destination (1 GUI console, other stderr)\n";
-        Runtime.Log("  set volume <n>         - set master volume");        
-        Runtime.Log("  set shift <n>          - set master key shift semitones (64 no shift)");
-        Runtime.Log("  set alsa midi <s>      - * set name of source");
-        Runtime.Log("  set alsa audio <s>     - * set name of hardware device");
-        Runtime.Log("  set jack server <s>    - * set server name");
-        Runtime.Log("  set vector [n1]        - set vector CHANNEL operations");
-        Runtime.Log("    x cc <n2>            - CC n2 is used for CHANNEL X axis sweep");
-        Runtime.Log("    y cc <n2>            - CC n2 is used for CHANNEL Y axis sweep");
-        Runtime.Log("    x features <n2>      - sets CHANNEL X features");
-        Runtime.Log("    y features <n2>      - sets CHANNEL Y features");
-        Runtime.Log("    x program <l/r> <n2> - X program change ID for CHANNEL L or R part");
-        Runtime.Log("    y program <l/r> <n2> - Y program change ID for CHANNEL L or R part");
-        Runtime.Log("    off                  - disable vector for CHANNEL");
-        Runtime.Log("  stop                   - all sound off");
-        Runtime.Log("  exit                   - tidy up and close Yoshimi");
-        Runtime.Log("'*' entries need a save and Yoshimi restart to activate");
+        int word = 0;
+        while (commands[word] != "end")
+        {
+            Runtime.Log(commands[word]);
+            ++ word;
+        }
+        if (Runtime.consoleMenuItem)
+            cout << commands[9] << endl;
+            // stdout needs this if reports sent to console
     }
+
     switch (error)
     {
         case 1:
@@ -1423,6 +1436,26 @@ int SynthEngine::commandVector(char *point)
         tmp = string2int(point);
         if (!vectorInit(axis * 2 + hand + 4, chan, tmp))
             vectorSet(axis * 2 + hand + 4, chan, tmp);
+    }
+    else if(isdigit(point[0]))
+    {
+        int cmd = string2int(point) >> 1;
+        if (cmd == 4)
+            cmd = 3; // can't remember how to do this :(
+        if (cmd < 1 || cmd > 3)
+            return 4;
+        point = skipChars(point);
+        if (!matchWord(point, "cont"))
+            error = 2;
+        else
+        {
+            point = skipChars(point);
+            if (point[0] == 0)
+                return 1;
+            tmp = string2int(point);
+            if (!vectorInit(axis * 2 + cmd + 7, chan, tmp))
+            vectorSet(axis * 2 + cmd + 7, chan, tmp);
+        }
     }
     return error;
 }
