@@ -135,6 +135,9 @@ class Config : public MiscFuncs
         int           enable_part_on_voice_load;
         int           single_row_panel;
         int           NumAvailableParts;
+        int           currentPart;
+        int           currentChannel;
+        int           currentMode;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;

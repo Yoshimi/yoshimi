@@ -828,8 +828,17 @@ void SynthEngine::SetSystemValue(int type, int value)
                     for (idx = 0; idx < BANK_SIZE; ++ idx)
                     {
                         if (!bank.emptyslotWithID(root, value, idx))
+                        {
+                            string suffix = "  ";
+                            if (bank.roots [root].banks [value].instruments [idx].ADDsynth_used)
+                                suffix += "A";
+                            if (bank.roots [root].banks [value].instruments [idx].SUBsynth_used)
+                                suffix += "S";
+                            if (bank.roots [root].banks [value].instruments [idx].PADsynth_used)
+                                suffix += "P";
                             Runtime.Log( "    ID " + asString(idx)+ "    "
-                            + bank.roots [root].banks [value].instruments [idx].name);
+                            + bank.roots [root].banks [value].instruments [idx].name + suffix);
+                        }
                     }
                 }
                 else
@@ -1067,37 +1076,38 @@ void SynthEngine::DecodeCommands(char *buffer)
         Runtime.Log("  setup                  - show dynamic settings");
         Runtime.Log("  save                   - save dynamic settings");
         Runtime.Log("  paths                  - display bank root paths");
-        Runtime.Log("  path add [s]           - add bank root path");
-        Runtime.Log("  path remove [n]        - remove bank root path ID");
-        Runtime.Log("  list root (n)          - list banks in root ID or current");
-        Runtime.Log("  list bank (n)          - list instruments in bank ID or current");
-        Runtime.Log("  list vector [n]        - list settings for vector CHANNEL");
-        Runtime.Log("  set root [n]           - set root path to ID");
-        Runtime.Log("  set bank [n]           - set bank to ID");
+        Runtime.Log("  path add <s>           - add bank root path");
+        Runtime.Log("  path remove <n>        - remove bank root path ID");
+        Runtime.Log("  list root [n]         - list banks in root ID or current");
+        Runtime.Log("  list bank [n]          - list instruments in bank ID or current");
+        Runtime.Log("  list vector <n>        - list settings for vector CHANNEL");
+        Runtime.Log("  set root <n>           - set current root path to ID");
+        Runtime.Log("  set bank <n>           - set current bank to ID");
         Runtime.Log("  set part [n1]          - set part ID operations");
-        Runtime.Log("    program [n2]         - loads instrument ID");
-        Runtime.Log("    channel [n2]         - sets MIDI channel (> 15 disables)");
-        Runtime.Log("    destination [n2]     - (1 main, 2 part, 3 both)");
-        Runtime.Log("  set rootcc [n]         - set CC for root path changes (> 119 disables)");
-        Runtime.Log("  set bankcc [n]         - set CC for bank changes (0, 32, other disables)");
-        Runtime.Log("  set program [n]        - set MIDI program change (0 off, other on)");
-        Runtime.Log("  set activate [n]       - set part activate (0 off, other on)");
-        Runtime.Log("  set extend [n]         - set CC for extended program change (> 119 disables)");
-        Runtime.Log("  set available [n]      - set available parts (16, 32, 64)");
+        Runtime.Log("    program <n2>         - loads instrument ID");
+        Runtime.Log("    channel <n2>         - sets MIDI channel (> 15 disables)");
+        Runtime.Log("    destination <n2>     - (1 main, 2 part, 3 both)");
+        Runtime.Log("  set rootcc <n>         - set CC for root path changes (> 119 disables)");
+        Runtime.Log("  set bankcc <n>         - set CC for bank changes (0, 32, other disables)");
+        Runtime.Log("  set program <n>        - set MIDI program change (0 off, other on)");
+        Runtime.Log("  set activate <n>       - set part activate (0 off, other on)");
+        Runtime.Log("  set extend <n>         - set CC for extended program change (> 119 disables)");
+        Runtime.Log("  set available <n>      - set available parts (16, 32, 64)");
         // next message must always go to stdout
         cout <<     "  set reports [n]        - set report destination (1 GUI console, other stderr)\n";
-        Runtime.Log("  set volume [n]         - set master volume");        
-        Runtime.Log("  set shift [n]          - set master key shift semitones (64 no shift)");
-        Runtime.Log("  set alsa midi [s]      - * set name of source");
-        Runtime.Log("  set alsa audio [s]     - * set name of hardware device");
-        Runtime.Log("  set jack server [s]    - * set server name");
+        Runtime.Log("  set volume <n>         - set master volume");        
+        Runtime.Log("  set shift <n>          - set master key shift semitones (64 no shift)");
+        Runtime.Log("  set alsa midi <s>      - * set name of source");
+        Runtime.Log("  set alsa audio <s>     - * set name of hardware device");
+        Runtime.Log("  set jack server <s>    - * set server name");
         Runtime.Log("  set vector [n1]        - set vector CHANNEL operations");
-        Runtime.Log("    x cc [n2]            - CC n2 is used for n1 X axis sweep");
-        Runtime.Log("    y cc [n2]            - CC n2 is used for n1 Y axis sweep");
-        Runtime.Log("    x features [n2]      - sets n1 X features");
-        Runtime.Log("    y features [n2]      - sets n1 Y features");
-        Runtime.Log("    x program [l/r] [n2] - X program change ID for n1 L or R part");
-        Runtime.Log("    y program [l/r] [n2] - Y program change ID for n1 L or R part");
+        Runtime.Log("    x cc <n2>            - CC n2 is used for CHANNEL X axis sweep");
+        Runtime.Log("    y cc <n2>            - CC n2 is used for CHANNEL Y axis sweep");
+        Runtime.Log("    x features <n2>      - sets CHANNEL X features");
+        Runtime.Log("    y features <n2>      - sets CHANNEL Y features");
+        Runtime.Log("    x program <l/r> <n2> - X program change ID for CHANNEL L or R part");
+        Runtime.Log("    y program <l/r> <n2> - Y program change ID for CHANNEL L or R part");
+        Runtime.Log("    off                  - disable vector for CHANNEL");
         Runtime.Log("  stop                   - all sound off");
         Runtime.Log("  exit                   - tidy up and close Yoshimi");
         Runtime.Log("'*' entries need a save and Yoshimi restart to activate");
@@ -1127,6 +1137,7 @@ int SynthEngine::commandSet(char *point)
 {
     int error = 0;
     int tmp;
+    int partnum = Runtime.currentPart;
 
     if (matchWord(point, "rootcc"))
     {
@@ -1160,66 +1171,66 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    
     else if (matchWord(point, "part"))
     {
         point = skipChars(point);
         if (point[0] == 0)
-            Runtime.Log("Which part?");
-        else
+            return 1;
+        if (isdigit(point[0]))
         {
-            if (isdigit(point[0]))
+            partnum = string2int(point);
+            if (partnum >= Runtime.NumAvailableParts)
             {
-                unsigned char partnum = string2int(point);
-                if (partnum >= Runtime.NumAvailableParts)
+                Runtime.Log("Part number too high");
+                return 0;
+            }
+            point = skipChars(point);
+            Runtime.currentPart = partnum;
+        }
+        if (point[0] == 0)
+        {
+            Runtime.Log("Part number set to " + asString(partnum));
+            return 0;
+        }
+        else if (matchWord(point, "prog"))
+        {
+            point = skipChars(point);
+            if (point[0] != 0) // force part not channel number
+                SetProgram(partnum | 0x80, string2int(point));
+            else
+                error = 1;
+        }
+        else if (matchWord(point, "chan"))
+        {
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                tmp = string2int(point);
+                if (tmp < NUM_MIDI_CHANNELS)
                 {
-                    Runtime.Log("Part number too high");
-                    return 0;
+                    SetPartChan(partnum, tmp);
+                    Runtime.Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
                 }
-                point = skipChars(point);
-                if (point[0] == 0)
-                    error = 2;
-                else if (matchWord(point, "prog"))
-                {
-                    point = skipChars(point);
-                    if (point[0] != 0) // force part not channel number
-                        SetProgram(partnum | 0x80, string2int(point));
-                    else
-                        error = 1;
-                }
-                 else if (matchWord(point, "chan"))
-                {
-                    point = skipChars(point);
-                    if (point[0] != 0)
-                    {
-                        tmp = string2int(point);
-                        if (tmp < NUM_MIDI_CHANNELS)
-                        {
-                            SetPartChan(partnum, tmp);
-                            Runtime.Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
-                        }
-                        else
-                            Runtime.Log("Part " + asString((int) partnum) + " set to no MIDI"); 
-                    }
-                    else
-                        error = 1;
-                }
-                 else if (matchWord(point, "dest"))
-                {
-                    point = skipChars(point);
-                    int dest = point[0] - 48;
-                    if (dest > 0 and dest < 4)
-                    {
-                        partonoff(partnum, 1);
-                        SetPartDestination(partnum, dest);
-                    }
-                    else
-                        error = 4;
-                }
+                else
+                    Runtime.Log("Part " + asString((int) partnum) + " set to no MIDI"); 
             }
             else
                 error = 1;
         }
+        else if (matchWord(point, "dest"))
+        {
+            point = skipChars(point);
+            int dest = point[0] - 48;
+            if (dest > 0 and dest < 4)
+            {
+                partonoff(partnum, 1);
+                SetPartDestination(partnum, dest);
+            }
+            else
+                error = 4;
+        }
+        else
+            error = 2;
     }
     else if (matchWord(point, "prog"))
     {
@@ -1341,11 +1352,24 @@ int SynthEngine::commandVector(char *point)
     int error = 0;
     int tmp;
     int axis;
+    int chan = Runtime.currentChannel;
     
-    unsigned char chan = string2int(point);
-    if (chan >= NUM_MIDI_CHANNELS)
-        return 4;
-    point = skipChars(point);
+    if (isdigit(point[0]))
+    {
+        chan = string2int(point);
+        if (chan >= NUM_MIDI_CHANNELS)
+            return 4;
+        point = skipChars(point);
+        Runtime.currentChannel = chan;
+    }
+    else
+        chan = Runtime.currentChannel;
+
+    if (matchWord(point, "off"))
+    {
+        vectorSet(127, chan, 0);
+        return 0;
+    }
     tmp = point[0] | 32;
     if (tmp == 32)
         return 2;
@@ -1370,7 +1394,7 @@ int SynthEngine::commandVector(char *point)
         {
             tmp = string2int(point);
             if (!vectorInit(axis, chan, tmp))
-        vectorSet(axis, chan, tmp);
+                vectorSet(axis, chan, tmp);
         } 
     }
     else if (matchWord(point, "feat"))
@@ -1456,7 +1480,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc2[chan] = C_panning;
             Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
-            Runtime.Log("Set vector X CC to " + asString(par));
+            Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
         case 1:
             if (!Runtime.nrpndata.vectorEnabled[chan])
@@ -1469,7 +1493,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.nrpndata.vectorYcc2[chan] = C_panning;
                 Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
                 Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
-                Runtime.Log("Set vector Y CC to " + asString(par));
+                Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
             }
             break;
         case 2:
@@ -1504,27 +1528,27 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         
         case 8:
             Runtime.nrpndata.vectorXcc2[chan] = par;
-            Runtime.Log("Set X feature 2 to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " X feature 2 set to " + asString(par));
             break;
         case 9:
             Runtime.nrpndata.vectorXcc4[chan] = par;
-            Runtime.Log("Set X feature 4 to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " X feature 4 set to " + asString(par));
             break;
         case 10:
             Runtime.nrpndata.vectorXcc8[chan] = par;
-            Runtime.Log("Set X feature 8 to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " X feature 8 set to " + asString(par));
             break;
         case 11:
             Runtime.nrpndata.vectorYcc2[chan] = par;
-            Runtime.Log("Set Y feature 2 to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " Y feature 2 set to " + asString(par));
             break;
         case 12:
             Runtime.nrpndata.vectorYcc4[chan] = par;
-            Runtime.Log("Set Y feature 4 to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " Y feature 4 set to " + asString(par));
             break;
         case 13:
             Runtime.nrpndata.vectorYcc8[chan] = par;
-            Runtime.Log("Set Y feature 8 to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " Y feature 8 set to " + asString(par));
             break;
         
         default:
@@ -1533,7 +1557,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorYaxis[chan] = 0xff;
             Runtime.nrpndata.vectorXfeatures[chan] = 0;
             Runtime.nrpndata.vectorYfeatures[chan] = 0;
-            Runtime.Log("Vector control disabled");
+            Runtime.Log("Channel " + asString((int) chan) + " vector control disabled");
             break;
     }
 }
