@@ -829,7 +829,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                     {
                         if (!bank.emptyslotWithID(root, value, idx))
                         {
-                            string suffix = "  ";
+                            string suffix = "";
                             if (bank.roots [root].banks [value].instruments [idx].ADDsynth_used)
                                 suffix += "A";
                             if (bank.roots [root].banks [value].instruments [idx].SUBsynth_used)
@@ -837,7 +837,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                             if (bank.roots [root].banks [value].instruments [idx].PADsynth_used)
                                 suffix += "P";
                             Runtime.Log( "    ID " + asString(idx)+ "    "
-                            + bank.roots [root].banks [value].instruments [idx].name + suffix);
+                            + bank.roots [root].banks [value].instruments [idx].name + "  (" + suffix + ")");
                         }
                     }
                 }

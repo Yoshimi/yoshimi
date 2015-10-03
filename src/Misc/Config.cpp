@@ -399,6 +399,13 @@ bool Config::loadConfig(void)
             return false;
         }
     }
+    string presetDir = ConfigDir + "/presets";
+    if (!isDirectory(presetDir))
+    {
+        cmd = string("mkdir -p ") + presetDir;
+        if ((chk = system(cmd.c_str())) < 0)
+            Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
+    }
     ConfigFile = ConfigDir + string("/yoshimi.config");
     StateFile = ConfigDir + string("/yoshimi.state");
     string resConfigFile = ConfigFile;

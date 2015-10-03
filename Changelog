@@ -3,6 +3,7 @@ yoshimi 1.3.6 M
 2015-10-3 Will
 - More improvements to command line control.
 - Extended command line vector control.
+- Auto generate .config/yoshimi/presets directory.
 
 2015-10-1 Will
 - First time config search was getting confused if zyn or old style
