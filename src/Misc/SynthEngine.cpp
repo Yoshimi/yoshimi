@@ -709,11 +709,11 @@ void SynthEngine::SetSystemValue(int type, int value)
                 Runtime.Log("X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[value]));
                 Runtime.Log("  features = " + asString((int)  Runtime.nrpndata.vectorXfeatures[value]));
             }
-            if (Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
+            if (Runtime.nrpndata.vectorYaxis[value] > 0x7f || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
                 Runtime.Log("Y axis disabled");
             else
             {
-                Runtime.Log("Y CC = " + asString((int)  Runtime.nrpndata.vectorYaxis[value]));
+                Runtime.Log("Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[value]));
                 Runtime.Log("  features = " + asString((int) Runtime.nrpndata.vectorYfeatures[value]));
             }
             break;
@@ -967,9 +967,13 @@ void SynthEngine::SetSystemValue(int type, int value)
 // Provides a command line link to system values
 void SynthEngine::DecodeCommands(char *buffer)
 {
+    cout << char(13);
+    for (unsigned int i = 0; i < strlen(buffer); ++ i)
+        cout << " "; // messy way to clear out command repeat. Why?
+    cout << char(13);
+
     int error = 0;
     char *point = buffer;
-    cout << endl; // Clear out command repeat. Why?
     string commands[] = {
         "Commands",
         "  setup                  - show dynamic settings",
@@ -979,7 +983,7 @@ void SynthEngine::DecodeCommands(char *buffer)
         "  path remove <n>        - remove bank root path ID",
         "  list root [n]         - list banks in root ID or current",
         "  list bank [n]          - list instruments in bank ID or current",
-        "  list vector <n>        - list settings for vector CHANNEL",
+        "  list vector [n]        - list settings for vector CHANNEL",
         "  set reports [n]        - set report destination (1 GUI console, other stderr)",
         "  set root <n>           - set current root path to ID",
         "  set bank <n>           - set current bank to ID",
@@ -1005,8 +1009,8 @@ void SynthEngine::DecodeCommands(char *buffer)
         "    y features <n2>      - sets CHANNEL Y features",
         "    x program <l/r> <n2> - X program change ID for CHANNEL L or R part",
         "    y program <l/r> <n2> - Y program change ID for CHANNEL L or R part",
-        "    x <n2> command <n3>  - sets n3 CC to use for X feature n2 (2, 4, 8)",
-        "    y <n2> command <n3>  - sets n3 CC to use for Y feature n2 (2, 4, 8)",
+        "    x <n2> control <n3>  - sets n3 CC to use for X feature n2 (2, 4, 8)",
+        "    y <n2> control <n3>  - sets n3 CC to use for Y feature n2 (2, 4, 8)",
         "    off                  - disable vector for CHANNEL",
         "  stop                   - all sound off",
         "  exit                   - tidy up and close Yoshimi",
@@ -1083,17 +1087,20 @@ void SynthEngine::DecodeCommands(char *buffer)
         }
         else if (matchWord(point, "vect"))
         {
+            int chan;
             point = skipChars(point);
-            if (point[0] != 0)
+            if (point[0] == 0)
+                chan = Runtime.currentChannel;
+            else
             {
-                int ch = string2int(point);
-                if (ch < NUM_MIDI_CHANNELS)
-                    SetSystemValue(108, ch);
+                chan = string2int(point);
+                if (chan < NUM_MIDI_CHANNELS)
+                    Runtime.currentChannel = chan;
                 else
                     error = 4;
             }
-            else
-                error = 1;
+            if (error != 4)
+                SetSystemValue(108, chan);
         }
         else
             error = 3;
