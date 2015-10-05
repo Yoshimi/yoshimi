@@ -1,5 +1,9 @@
 yoshimi 1.3.6 M
 
+2015-10-5 Will
+- Further improvements to command line control.
+- General code tidying.
+
 2015-10-3 Will
 - More improvements to command line control.
 - Extended command line vector control.

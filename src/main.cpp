@@ -64,7 +64,6 @@ bool commandProcess(char chr)
     if (chr >= 0x20 && chr < 0x7f && commandCount < COMMAND_SIZE)
     {
         commandBuffer[commandCount] = chr;
-        printf("%c", chr);
         ++commandCount;
     }
     else if (chr == 0x7f)

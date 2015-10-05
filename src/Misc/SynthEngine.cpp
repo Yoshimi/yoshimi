@@ -967,53 +967,44 @@ void SynthEngine::SetSystemValue(int type, int value)
 // Provides a command line link to system values
 void SynthEngine::DecodeCommands(char *buffer)
 {
-    cout << char(13);
-    for (unsigned int i = 0; i < strlen(buffer); ++ i)
-        cout << " "; // messy way to clear out command repeat. Why?
-    cout << char(13);
-
     int error = 0;
     char *point = buffer;
     string commands[] = {
         "Commands",
-        "  setup                  - show dynamic settings",
-        "  save                   - save dynamic settings",
-        "  paths                  - display bank root paths",
-        "  path add <s>           - add bank root path",
-        "  path remove <n>        - remove bank root path ID",
-        "  list root [n]         - list banks in root ID or current",
-        "  list bank [n]          - list instruments in bank ID or current",
-        "  list vector [n]        - list settings for vector CHANNEL",
-        "  set reports [n]        - set report destination (1 GUI console, other stderr)",
-        "  set root <n>           - set current root path to ID",
-        "  set bank <n>           - set current bank to ID",
-        "  set part [n1]          - set part ID operations",
-        "    program <n2>         - loads instrument ID",
-        "    channel <n2>         - sets MIDI channel (> 15 disables)",
-        "    destination <n2>     - (1 main, 2 part, 3 both)",
-        "  set rootcc <n>         - set CC for root path changes (> 119 disables)",
-        "  set bankcc <n>         - set CC for bank changes (0, 32, other disables)",
-        "  set program <n>        - set MIDI program change (0 off, other on)",
-        "  set activate <n>       - set part activate (0 off, other on)",
-        "  set extend <n>         - set CC for extended program change (> 119 disables)",
-        "  set available <n>      - set available parts (16, 32, 64)",
-        "  set volume <n>         - set master volume",        
-        "  set shift <n>          - set master key shift semitones (64 no shift)",
-        "  set alsa midi <s>      - * set name of source",
-        "  set alsa audio <s>     - * set name of hardware device",
-        "  set jack server <s>    - * set server name",
-        "  set vector [n1]        - set vector CHANNEL operations",
-        "    x cc <n2>            - CC n2 is used for CHANNEL X axis sweep",
-        "    y cc <n2>            - CC n2 is used for CHANNEL Y axis sweep",
-        "    x features <n2>      - sets CHANNEL X features",
-        "    y features <n2>      - sets CHANNEL Y features",
-        "    x program <l/r> <n2> - X program change ID for CHANNEL L or R part",
-        "    y program <l/r> <n2> - Y program change ID for CHANNEL L or R part",
-        "    x <n2> control <n3>  - sets n3 CC to use for X feature n2 (2, 4, 8)",
-        "    y <n2> control <n3>  - sets n3 CC to use for Y feature n2 (2, 4, 8)",
-        "    off                  - disable vector for CHANNEL",
-        "  stop                   - all sound off",
-        "  exit                   - tidy up and close Yoshimi",
+        "  setup                      - show dynamic settings",
+        "  save                       - save dynamic settings",
+        "  paths                      - display bank root paths",
+        "  path add <s>               - add bank root path",
+        "  path remove <n>            - remove bank root path ID",
+        "  list root [n]              - list banks in root ID or current",
+        "  list bank [n]              - list instruments in bank ID or current",
+        "  list vector [n]            - list settings for vector CHANNEL",
+        "  set reports [n]            - set report destination (1 GUI console, other stderr)",
+        "  set root <n>               - set current root path to ID",
+        "  set bank <n>               - set current bank to ID",
+        "  set part [n1]              - set part ID operations",
+        "    program <n2>             - loads instrument ID",
+        "    channel <n2>             - sets MIDI channel (> 15 disables)",
+        "    destination <n2>         - (1 main, 2 part, 3 both)",
+        "  set rootcc <n>             - set CC for root path changes (> 119 disables)",
+        "  set bankcc <n>             - set CC for bank changes (0, 32, other disables)",
+        "  set program <n>            - set MIDI program change (0 off, other on)",
+        "  set activate <n>           - set part activate (0 off, other on)",
+        "  set extend <n>             - set CC for extended program change (> 119 disables)",
+        "  set available <n>          - set available parts (16, 32, 64)",
+        "  set volume <n>             - set master volume",        
+        "  set shift <n>              - set master key shift semitones (64 no shift)",
+        "  set alsa midi <s>          - * set name of source",
+        "  set alsa audio <s>         - * set name of hardware device",
+        "  set jack server <s>        - * set server name",
+        "  set vector [n1]            - set vector CHANNEL, operations",
+        "    [x/y] cc <n2>            - CC n2 is used for CHANNEL X or Y axis sweep",
+        "    [x/y] features <n2>      - sets CHANNEL X or Y features",
+        "    [x/y] program <l/r> <n2> - X or Y program change ID for CHANNEL L or R part",
+        "    [x/y] control <n2> <n3>  - sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
+        "    off                      - disable vector for CHANNEL",
+        "  stop                       - all sound off",
+        "  exit                       - tidy up and close Yoshimi",
         "'*' entries need a save and Yoshimi restart to activate",
         "end"
     };
@@ -1369,9 +1360,9 @@ int SynthEngine::commandSet(char *point)
 
 int SynthEngine::commandVector(char *point)
 {
+    static int axis;
     int error = 0;
     int tmp;
-    int axis;
     int chan = Runtime.currentChannel;
     
     if (isdigit(point[0]))
@@ -1391,20 +1382,15 @@ int SynthEngine::commandVector(char *point)
         return 0;
     }
     tmp = point[0] | 32;
-    if (tmp == 32)
+    if (tmp == 32) // would be line end
         return 2;
     
-    if (tmp == 'x')
-        axis = 0;
-    else if (tmp == 'y')
-        axis = 1;
-    else
+    if (tmp == 'x' || tmp == 'y')
     {
-        Runtime.Log("Axis?");
-        return 0;
+        axis = tmp - 'x';
+        ++ point;
+        point = skipSpace(point); // can manage with or without a space
     }
-    ++ point;
-    point = skipSpace(point); // can manage with or without a space
     if (matchWord(point, "cc"))
     {
         point = skipChars(point);
@@ -1444,18 +1430,18 @@ int SynthEngine::commandVector(char *point)
         if (!vectorInit(axis * 2 + hand + 4, chan, tmp))
             vectorSet(axis * 2 + hand + 4, chan, tmp);
     }
-    else if(isdigit(point[0]))
+    else
     {
-        int cmd = string2int(point) >> 1;
-        if (cmd == 4)
-            cmd = 3; // can't remember how to do this :(
-        if (cmd < 1 || cmd > 3)
-            return 4;
-        point = skipChars(point);
         if (!matchWord(point, "cont"))
-            error = 2;
-        else
+            return 2;
+        point = skipChars(point);
+        if(isdigit(point[0]))
         {
+            int cmd = string2int(point) >> 1;
+            if (cmd == 4)
+                cmd = 3; // can't remember how to do this :(
+            if (cmd < 1 || cmd > 3)
+                return 4;
             point = skipChars(point);
             if (point[0] == 0)
                 return 1;
@@ -1463,6 +1449,8 @@ int SynthEngine::commandVector(char *point)
             if (!vectorInit(axis * 2 + cmd + 7, chan, tmp))
             vectorSet(axis * 2 + cmd + 7, chan, tmp);
         }
+        else
+            error = 1;
     }
     return error;
 }
