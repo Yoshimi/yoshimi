@@ -45,14 +45,16 @@ void cmdIfaceSetup()
     commands.insert(pair<string, string >("set volume [n]", "set master volume"));
     commands.insert(pair<string, string >("set shift [n]", "set master key shift semitones (64 no shift)"));
     commands.insert(pair<string, string >("stop", "all sound off"));
+    commands.insert(pair<string, string >("exit", "clean up and close yoshimi"));
     commands.insert(pair<string, string >("help", "show all commands"));
 
 
 }
 
-void cmdIfaceProcessCommand(string cmd, vector<string> args)
+bool cmdIfaceProcessCommand(string cmd, vector<string> args)
 {
     //cout << "processing command " << cmd << endl;
+    bool exit = false;
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
     for(int i = 0; i < currentInstance; i++, ++itSynth);
     SynthEngine *synth = itSynth->first;
@@ -77,6 +79,11 @@ void cmdIfaceProcessCommand(string cmd, vector<string> args)
     else if(cmd == "stop")
     {
         synth->allStop();
+    }
+    else if(cmd == "exit")
+    {
+        exit = true;
+        synth->getRuntime().runSynth = false;
     }
     else if(cmd == "setup")
     {
@@ -128,6 +135,7 @@ void cmdIfaceProcessCommand(string cmd, vector<string> args)
     {
         cout << "Unknown command: " << cmd << endl;
     }
+    return exit;
 }
 
 void cmdIfaceCommandLoop()
@@ -137,12 +145,17 @@ void cmdIfaceCommandLoop()
         cmdIfaceSetup();
     }
     char welcomeBuffer [512];
-    while(true)
+    char *cCmd = NULL;
+    bool exit = false;
+    while(!exit)
     {
         memset(welcomeBuffer, 0, sizeof(welcomeBuffer));
         sprintf(welcomeBuffer, "yoshimi [%d]> ", currentInstance);
-        char *cCmd = readline(welcomeBuffer);
+        
+        cCmd = readline(welcomeBuffer);
         string sCmd = cCmd;
+        if (sCmd == "exit")
+            exit = true;
         if(!sCmd.empty())
         {
             vector<string> vArgs;
@@ -150,12 +163,11 @@ void cmdIfaceCommandLoop()
             copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(vArgs));
             sCmd = vArgs [0];
             vArgs.erase(vArgs.begin());
-            cmdIfaceProcessCommand(sCmd, vArgs);
+            exit = cmdIfaceProcessCommand(sCmd, vArgs);
         }
         if(cCmd)
         {
             free(cCmd);
         }
     }
-
 }

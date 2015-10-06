@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 //#include <fcntl.h>
+#include <termios.h>
 
 using namespace std;
 
@@ -362,7 +363,8 @@ int main(int argc, char *argv[])
 //    commandCount = 0;
 //    commandStyle = fcntl(0, F_GETFL, 0);
 //    fcntl (0, F_SETFL, (commandStyle | O_NDELAY)); 
-    
+    struct termios  cooked;
+    tcgetattr(0, &cooked);
     
     cout << "Yoshimi is starting" << endl; // guaranteed start message
     globalArgc = argc;
@@ -465,6 +467,7 @@ bail_out:
             delete _synth;
         }
     }
+    tcsetattr(0, TCSANOW, &cooked);
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
