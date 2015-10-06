@@ -118,6 +118,9 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     enable_part_on_voice_load(1),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
+    currentPart(0),
+    currentChannel(0),
+    currentMode(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -395,6 +398,13 @@ bool Config::loadConfig(void)
             Log("Create config directory " + ConfigDir + " failed, status " + asString(chk));
             return false;
         }
+    }
+    string presetDir = ConfigDir + "/presets";
+    if (!isDirectory(presetDir))
+    {
+        cmd = string("mkdir -p ") + presetDir;
+        if ((chk = system(cmd.c_str())) < 0)
+            Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
     ConfigFile = ConfigDir + string("/yoshimi.config");
     StateFile = ConfigDir + string("/yoshimi.state");

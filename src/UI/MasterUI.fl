@@ -599,7 +599,6 @@ mainCreateNewInstance(forceId);}
           Fl_Button {} {
             label P
             callback {//
-    int tmp;
     synth->actionLock(lockmute);
     presetsui->paste(synth->sysefx[nsyseff], syseffectui);
     synth->actionLock(unlock);}

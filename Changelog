@@ -4,6 +4,15 @@ yoshimi 1.3.6.1
 - Set up bugfix branch to track only the current release.
 - Set version to 1.3.6.1
 
+2015-10-5 Will
+- Further improvements to command line control.
+- General code tidying.
+
+2015-10-3 Will
+- More improvements to command line control.
+- Extended command line vector control.
+- Auto generate .config/yoshimi/presets directory.
+
 2015-10-1 Will
 - First time config search was getting confused if zyn or old style
   yoshi configs were there, so they are no longer accepted.

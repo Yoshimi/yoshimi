@@ -327,16 +327,6 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     return true;
 }
 
-// no longer used.
-// Makes a new bank, put it on a file and makes it current bank
-/*bool Bank::newbank(string newbankdir)
-{
-    if (!newbankfile(newbankdir))
-        return false;
-    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
-    return true;
-}*/
-
 
 // Makes a new bank with known ID. Does *not* make it current
 bool Bank::newIDbank(string newbankdir, unsigned int bankID)
