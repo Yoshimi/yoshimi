@@ -124,7 +124,7 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
         else if (matchMove(point, "remo"))
         {
-            if (isdigit(point[0]))
+            if (point[0] >= '0' && point[0] <= '9')//isdigit(point[0]))
             {
                 int rootID = miscFuncs.string2int(point);
                 string rootname = synth->getBankRef().getRootPath(rootID);
