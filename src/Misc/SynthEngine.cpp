@@ -964,185 +964,8 @@ void SynthEngine::SetSystemValue(int type, int value)
     }
 }
 
+
 // Provides a command line link to system values
-void SynthEngine::DecodeCommands(char *buffer)
-{
-    int error = 0;
-    char *point = buffer;
-    string commands[] = {
-        "Commands",
-        "  setup                      - show dynamic settings",
-        "  save                       - save dynamic settings",
-        "  paths                      - display bank root paths",
-        "  path add <s>               - add bank root path",
-        "  path remove <n>            - remove bank root path ID",
-        "  list root [n]              - list banks in root ID or current",
-        "  list bank [n]              - list instruments in bank ID or current",
-        "  list vector [n]            - list settings for vector CHANNEL",
-        "  set reports [n]            - set report destination (1 GUI console, other stderr)",
-        "  set root <n>               - set current root path to ID",
-        "  set bank <n>               - set current bank to ID",
-        "  set part [n1]              - set part ID operations",
-        "    program <n2>             - loads instrument ID",
-        "    channel <n2>             - sets MIDI channel (> 15 disables)",
-        "    destination <n2>         - (1 main, 2 part, 3 both)",
-        "  set rootcc <n>             - set CC for root path changes (> 119 disables)",
-        "  set bankcc <n>             - set CC for bank changes (0, 32, other disables)",
-        "  set program <n>            - set MIDI program change (0 off, other on)",
-        "  set activate <n>           - set part activate (0 off, other on)",
-        "  set extend <n>             - set CC for extended program change (> 119 disables)",
-        "  set available <n>          - set available parts (16, 32, 64)",
-        "  set volume <n>             - set master volume",        
-        "  set shift <n>              - set master key shift semitones (64 no shift)",
-        "  set alsa midi <s>          - * set name of source",
-        "  set alsa audio <s>         - * set name of hardware device",
-        "  set jack server <s>        - * set server name",
-        "  set vector [n1]            - set vector CHANNEL, operations",
-        "    [x/y] cc <n2>            - CC n2 is used for CHANNEL X or Y axis sweep",
-        "    [x/y] features <n2>      - sets CHANNEL X or Y features",
-        "    [x/y] program <l/r> <n2> - X or Y program change ID for CHANNEL L or R part",
-        "    [x/y] control <n2> <n3>  - sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
-        "    off                      - disable vector for CHANNEL",
-        "  stop                       - all sound off",
-        "  exit                       - tidy up and close Yoshimi",
-        "'*' entries need a save and Yoshimi restart to activate",
-        "end"
-    };
-    point = skipSpace(point); // just to be sure
-    if (matchWord(point, "stop"))
-        allStop();
-    else if (matchWord(point, "setu"))
-    {
-        SetSystemValue(109, 255);
-        Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
-        Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
-        Runtime.Log("Jack server " + Runtime.jackServer);
-    }
-    else if (matchWord(point, "path"))
-    {
-        point = skipChars(point);
-        if (matchWord(point, "add"))
-        {
-            point = skipChars(point);
-            int found = bank.addRootDir(point);
-            if (!found)
-            {
-                Runtime.Log("Can't find path " + (string) point);
-            }
-            else
-                Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
-        }
-        else if (matchWord(point, "remo"))
-        {
-            point = skipChars(point);
-            if (isdigit(point[0]))
-            {
-                int rootID = string2int(point);
-                string rootname = bank.getRootPath(rootID);
-                if (rootname.empty())
-                    Runtime.Log("Can't find path " + asString(rootID));
-                else
-                {
-                    bank.removeRoot(rootID);
-                    Runtime.Log("Removed " + rootname);
-                }
-            }
-            else
-                error = 1;
-        }
-        else
-            SetSystemValue(110, 255);
-    }
-    else if (matchWord(point, "list"))
-    {
-        point = skipChars(point);
-        if (matchWord(point, "root"))
-        {
-            point = skipChars(point);
-            if (point[0] == 0)
-                SetSystemValue(111, 255);
-            else
-            {
-                SetSystemValue(111, string2int(point));
-            }
-        }
-        else if (matchWord(point, "bank"))
-        {
-            point = skipChars(point);
-            if (point[0] == 0)
-                SetSystemValue(112, 255);
-            else
-            {
-                SetSystemValue(112, string2int(point));
-            }
-        }
-        else if (matchWord(point, "vect"))
-        {
-            int chan;
-            point = skipChars(point);
-            if (point[0] == 0)
-                chan = Runtime.currentChannel;
-            else
-            {
-                chan = string2int(point);
-                if (chan < NUM_MIDI_CHANNELS)
-                    Runtime.currentChannel = chan;
-                else
-                    error = 4;
-            }
-            if (error != 4)
-                SetSystemValue(108, chan);
-        }
-        else
-            error = 3;
-    }
-    
-    else if (matchWord(point, "set"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            error = commandSet(point);
-        else
-            error = 3;
-    }
-    
-    else if (matchWord(point, "save"))
-        SetSystemValue(119, 255);
-    else if (matchWord(point, "exit"))
-        Runtime.runSynth = false;
-    else
-    {
-        int word = 0;
-        while (commands[word] != "end")
-        {
-            Runtime.Log(commands[word]);
-            ++ word;
-        }
-        if (Runtime.consoleMenuItem)
-            cout << commands[9] << endl;
-            // stdout needs this if reports sent to console
-    }
-
-    switch (error)
-    {
-        case 1:
-            Runtime.Log("Value?");
-            break;
-        case 2:
-            Runtime.Log("Which operation?");
-            break;
-        case 3:
-            point = skipChars(buffer);
-            point[0] = 0; // sneaky :)
-            Runtime.Log((string) buffer + " what?");
-            break;
-        case 4:
-            Runtime.Log("Out of range");
-            break;
-    }
-    memset(buffer, 0, COMMAND_SIZE);
-}
-
 
 int SynthEngine::commandSet(char *point)
 {
@@ -1537,9 +1360,11 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
         
         /*
+         * If this came from the command line thread
          * we don't need to worry about blocking
-         * with these program changes as it is
-         * only the command line that's blocked
+         * with these program changes as it is only
+         * the command line thread that's blocked.
+         * The MIDI NRPN thread deals with them separately.
          */
         case 4:
             SetProgram(chan | 0x80, par);

@@ -20,7 +20,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
-//#include <fcntl.h>
 #include <termios.h>
 
 using namespace std;
@@ -58,38 +57,6 @@ static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
-
-//int commandStyle;
-//int commandCount;
-//char commandChr;
-//char commandBuffer[COMMAND_SIZE + 2]; // allow for overcount and terminator
-
-/*
-bool commandProcess(char chr)
-{
-    if (chr >= 0x20 && chr < 0x7f && commandCount < COMMAND_SIZE)
-    {
-        commandBuffer[commandCount] = chr;
-        ++commandCount;
-    }
-    else if (chr == 0x7f)
-    {
-        if (commandCount > 0)
-        {
-            printf("%c %c", 0x08, 0x08);
-            --commandCount;
-            commandBuffer[commandCount] = 0;
-        }
-    }
-    else
-    {
-        commandBuffer[commandCount] = 0;
-        commandCount = 0;
-        return true;
-    }
-    return false;
-}
-*/
 
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -334,7 +301,6 @@ bool mainCreateNewInstance(unsigned int forceId)
     return true;
 
 bail_out:
-//    fcntl(0, F_SETFL, commandStyle);
     synth->getRuntime().runSynth = false;
     synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
     if (musicClient)
@@ -359,11 +325,8 @@ void *commandThread(void *arg)
 
 int main(int argc, char *argv[])
 {
-//    commandCount = 0;
-//    commandStyle = fcntl(0, F_GETFL, 0);
-//    fcntl (0, F_SETFL, (commandStyle | O_NDELAY)); 
-    struct termios  cooked;
-    tcgetattr(0, &cooked);
+    struct termios  oldTerm;
+    tcgetattr(0, &oldTerm);
     
     cout << "Yoshimi is starting" << endl; // guaranteed start message
     globalArgc = argc;
@@ -440,7 +403,6 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-//    fcntl(0, F_SETFL, commandStyle);
     if (bShowGui && !bExitSuccess) // this could be done better!
         usleep(2000000);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -466,7 +428,7 @@ bail_out:
             delete _synth;
         }
     }
-    tcsetattr(0, TCSANOW, &cooked);
+    tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
