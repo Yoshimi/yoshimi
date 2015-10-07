@@ -5,6 +5,7 @@
 #include <readline/history.h>
 #include <string>
 #include <iostream>
+#include <stdlib.h>
 #include <algorithm>
 #include <iterator>
 #include <map>
