@@ -23,50 +23,49 @@ static int currentInstance = 0;
 char welcomeBuffer [128];
 
 string basics[] = {
-    "  setup                      - show dynamic settings",
-    "  save                       - save dynamic settings",
-    "  paths                      - display bank root paths",
-    "  path add <s>               - add bank root path",
-    "  path remove <n>            - remove bank root path ID",
-    "  list root [n]              - list banks in root ID or current",
-    "  list bank [n]              - list instruments in bank ID or current",
-    "  list vector [n]            - list settings for vector CHANNEL",
-    "  set reports [n]            - set report destination (1 GUI console, other stderr)",
-    "  set root <n>               - set current root path to ID",
-    "  set bank <n>               - set current bank to ID",
-    "  set part [n1]              - set part ID operations",
-    "    program <n2>             - loads instrument ID",
-    "    channel <n2>             - sets MIDI channel (> 15 disables)",
-    "    destination <n2>         - (1 main, 2 part, 3 both)",
-    "  set rootcc <n>             - set CC for root path changes (> 119 disables)",
-    "  set bankcc <n>             - set CC for bank changes (0, 32, other disables)",
-    "  set program <n>            - set MIDI program change (0 off, other on)",
-    "  set activate <n>           - set part activate (0 off, other on)",
-    "  set extend <n>             - set CC for extended program change (> 119 disables)",
-    "  set available <n>          - set available parts (16, 32, 64)",
-    "  set volume <n>             - set master volume",
-    "  set shift <n>              - set master key shift semitones (64 no shift)",
-    "  set alsa midi <s>          - * set name of source",
-    "  set alsa audio <s>         - * set name of hardware device",
-    "  set jack server <s>        - * set server name",
-    "  set vector [n1]            - set vector CHANNEL, operations",
-    "    [x/y] cc <n2>            - CC n2 is used for CHANNEL X or Y axis sweep",
-    "    [x/y] features <n2>      - sets CHANNEL X or Y features",
-    "    [x/y] program <l/r> <n2> - X or Y program change ID for CHANNEL L or R part",
-    "    [x/y] control <n2> <n3>  - sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
-    "    off                      - disable vector for CHANNEL",
-    "  stop                       - all sound off",
-    "  mode <mode name>           - change to different menus, addsynth, subsynth, padsynth",
-    "  exit                       - tidy up and close Yoshimi",
-    "  ? / help                   - list commands",
-    "'*' entries need a save and Yoshimi restart to activate",
+    "setup",                      "show dynamic settings",
+    "save",                       "save dynamic settings",
+    "paths",                      "display bank root paths",
+    "path add <s>",               "add bank root path",
+    "path remove <n>",            "remove bank root path ID",
+    "list root [n]",              "list banks in root ID or current",
+    "list bank [n]",              "list instruments in bank ID or current",
+    "list vector [n]",            "list settings for vector CHANNEL",
+    "set reports [n]",            "set report destination (1 GUI console, other stderr)",
+    "set root <n>",               "set current root path to ID",
+    "set bank <n>",               "set current bank to ID",
+    "set part [n1]",              "set part ID operations",
+    "  program <n2>",             "loads instrument ID",
+    "  channel <n2>",             "sets MIDI channel (> 15 disables)",
+    "  destination <n2>",         "(1 main, 2 part, 3 both)",
+    "set rootcc <n>",             "set CC for root path changes (> 119 disables)",
+    "set bankcc <n>",             "set CC for bank changes (0, 32, other disables)",
+    "set program <n>",            "set MIDI program change (0 off, other on)",
+    "set activate <n>",           "set part activate (0 off, other on)",
+    "set extend <n>",             "set CC for extended program change (> 119 disables)",
+    "set available <n>",          "set available parts (16, 32, 64)",
+    "set volume <n>",             "set master volume",
+    "set shift <n>",              "set master key shift semitones (64 no shift)",
+    "set alsa midi <s>",          "* set name of source",
+    "set alsa audio <s>",         "* set name of hardware device",
+    "set jack server <s>",        "* set server name",
+    "set vector [n1]",            "set vector CHANNEL, operations",
+    "  [x/y] cc <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
+    "  [x/y] features <n2>",      "sets CHANNEL X or Y features",
+    "  [x/y] program <l/r> <n2>", "X or Y program change ID for CHANNEL L or R part",
+    "  [x/y] control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
+    "  off",                      "disable vector for CHANNEL",
+    "stop",                       "all sound off",
+    "mode <s>",                   "change to different menus, addsynth, subsynth, padsynth",
+    "exit",                       "tidy up and close Yoshimi",
+    "? / help",                   "list commands",
     "end"
 };
 
 string subsynth [] = {
-    "  volume",
-    "  pan",
-    "  mode <mode name / ^ >        - change to different menus, ?? , ^ to go back one",
+    "volume",                     "Not yet!",
+    "pan",                        "Not yet!",
+    "mode <s>",                   "change to different menus, ?? , ^ to go back one",
     "end"
 };
 
@@ -204,16 +203,17 @@ bool cmdIfaceProcessCommand(char *buffer)
         {
             if (mode > 0 && (tmp == '^' || matchMove(point, "back")))
             {
-                -- mode;
                 if (mode & 0x1f)
                     mode = 0;
+                else
+                    -- mode;
             }
             else if (matchMove(point, "add"))
                 mode = 1;
             else if (matchMove(point, "sub"))
                 mode = 0x21;
             else if (matchMove(point, "pad"))
-                mode = 0x31;
+                mode = 0x41;
             string extension;
             switch (mode)
             {
@@ -221,13 +221,13 @@ bool cmdIfaceProcessCommand(char *buffer)
                     extension = " ";
                     break;
                 case 1:
-                    extension = "addsynth>";
+                    extension = "addsynth> ";
                     break;
                 case 0x21:
-                    extension = "subsynth>";
+                    extension = "subsynth> ";
                     break;
-                case 0x31:
-                    extension = "padsynth>";
+                case 0x41:
+                    extension = "padsynth> ";
                     break;
             }
             sprintf(welcomeBuffer + 9, extension.c_str());
@@ -240,21 +240,35 @@ bool cmdIfaceProcessCommand(char *buffer)
                     commands = basics;
                     break;
                 case 1:
+                    commands = subsynth;
+                    break;
                 case 0x21:
-                case 0x31:
+                    commands = subsynth;
+                    break;
+                case 0x41:
                     commands = subsynth;
                     break;
                 }
             int word = 0;
+            string left;
+            string blanks;
             Runtime.Log("Commands");
             while (commands[word] != "end")
             {
-                Runtime.Log(commands[word]);
-                ++ word;
+                left = commands[word];
+                if (left != "end")
+                {
+                    ++ word;
+                    Runtime.Log("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word]);
+                    ++ word;
+                }
             }
             if (Runtime.consoleMenuItem)
                 cout << basics[8] << endl;
                 // stdout needs this if reports sent to console
+            if (mode == 0)
+                Runtime.Log("'*' entries need to be saved and Yoshimi restarted to activate");
+
         }
     }
 
