@@ -1,16 +1,16 @@
-#include <Misc/SynthEngine.h>
-#include <Misc/MiscFuncs.h>
-#include <Misc/Bank.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <string>
 #include <iostream>
+#include <string>
 #include <stdlib.h>
 #include <algorithm>
 #include <iterator>
 #include <map>
 #include <list>
 #include <sstream>
+#include <Misc/SynthEngine.h>
+#include <Misc/MiscFuncs.h>
+#include <Misc/Bank.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 using namespace std;
 
@@ -123,7 +123,7 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
         else if (matchMove(point, "remo"))
         {
-            if (point[0] >= '0' && point[0] <= '9')//isdigit(point[0]))
+            if (isdigit(point[0]))
             {
                 int rootID = miscFuncs.string2int(point);
                 string rootname = synth->getBankRef().getRootPath(rootID);
@@ -300,6 +300,7 @@ void cmdIfaceCommandLoop()
         if(cCmd[0] != 0)
         {
             exit = cmdIfaceProcessCommand(buffer);
+            add_history(cCmd);
             memset(buffer, 0, len + 1);
         }
         if(cCmd)

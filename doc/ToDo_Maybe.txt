@@ -5,6 +5,8 @@ Should this refetch entire bank structure?
 Make command line adding and removing root paths update gui.
 Check other command/gui updates.
 
+Make loading effect presets update the 'top' line.
+
 Allow headless compilation.
 
 Allow new root path creation to include the ID value.

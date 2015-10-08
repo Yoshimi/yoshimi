@@ -2,6 +2,7 @@ yoshimi 1.3.6 M
 
 2015-10-8 Will
 - Fixed segfault when changing command line mode.
+- Added command line history.
 
 2015-10-7 Will
 - Brought Andrew's thread and readline into older style command line.
