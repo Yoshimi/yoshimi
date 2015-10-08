@@ -56,7 +56,7 @@ string basics[] = {
     "  [x/y] control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
     "  off",                      "disable vector for CHANNEL",
     "stop",                       "all sound off",
-    "mode <s>",                   "change to different menus, addsynth, subsynth, padsynth",
+    "mode <s>",                   "change to different menus, (addsynth, subsynth, padsynth)",
     "exit",                       "tidy up and close Yoshimi",
     "? / help",                   "list commands",
     "end"
@@ -65,7 +65,7 @@ string basics[] = {
 string subsynth [] = {
     "volume",                     "Not yet!",
     "pan",                        "Not yet!",
-    "mode <s>",                   "change to different menus, ?? , ^ to go back one",
+    "mode <s>",                   "change to different menus, (??, ???, ????) (.. / back) (top)",
     "end"
 };
 
@@ -97,7 +97,6 @@ bool cmdIfaceProcessCommand(char *buffer)
     static int mode;
     string *commands = NULL;
     int error = 0;
-    int tmp;
     char *point = buffer;
     point = miscFuncs.skipSpace(point); // just to be sure
     if (matchMove(point, "stop"))
@@ -198,16 +197,18 @@ bool cmdIfaceProcessCommand(char *buffer)
     }
     else
     {
-        tmp = point[0];
-        if (tmp == '^' || matchMove(point, "mode"))
+        int pushback = miscFuncs.matchWord(point, "..");
+        if (pushback != 0 || matchMove(point, "mode"))
         {
-            if (mode > 0 && (tmp == '^' || matchMove(point, "back")))
+            if (pushback != 0 || (mode > 0 && ( matchMove(point, "back") || matchMove(point, ".."))))
             {
                 if (mode & 0x1f)
                     mode = 0;
                 else
                     -- mode;
             }
+            else if (matchMove(point, "top"))
+                mode = 0;
             else if (matchMove(point, "add"))
                 mode = 1;
             else if (matchMove(point, "sub"))
@@ -288,22 +289,29 @@ bool cmdIfaceProcessCommand(char *buffer)
 void cmdIfaceCommandLoop()
 {
     int len = 512;
+    char *cCmd = NULL;
     char buffer [len];
     memset(buffer, 0, len);
     bool exit = false;
     sprintf(welcomeBuffer, "\nyoshimi> ");
     while(!exit)
     {
-        char *cCmd = readline(welcomeBuffer);
-        memcpy(buffer, cCmd, len);
-        string sCmd = cCmd;
-        if(cCmd[0] != 0)
+        cCmd = readline(welcomeBuffer);
+        if (cCmd)
         {
-            exit = cmdIfaceProcessCommand(buffer);
-            add_history(cCmd);
-            memset(buffer, 0, len + 1);
+            memcpy(buffer, cCmd, len);
+            string sCmd = cCmd;
+            if(cCmd[0] != 0)
+            {
+                exit = cmdIfaceProcessCommand(buffer);
+                add_history(cCmd);
+                memset(buffer, 0, len + 1);
+            }
+            if(cCmd)
+            {
+                free(cCmd);
+                cCmd = NULL;
+            }
         }
-        if(cCmd)
-            free(cCmd);
     }
 }

@@ -1,5 +1,8 @@
 yoshimi 1.3.6 M
 
+2015-10-9 Will
+- Changed mode return behaviour.
+
 2015-10-8 Will
 - Fixed segfault when changing command line mode.
 - Added command line history.
