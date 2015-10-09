@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
+#include <unistd.h>
 #include <algorithm>
 #include <iterator>
 #include <map>
@@ -23,14 +24,14 @@ static int currentInstance = 0;
 char welcomeBuffer [128];
 
 string basics[] = {
-    "setup",                      "show dynamic settings",
-    "save",                       "save dynamic settings",
+    "save setup",                       "save dynamic settings",
     "paths",                      "display bank root paths",
     "path add <s>",               "add bank root path",
     "path remove <n>",            "remove bank root path ID",
     "list root [n]",              "list banks in root ID or current",
     "list bank [n]",              "list instruments in bank ID or current",
     "list vector [n]",            "list settings for vector CHANNEL",
+    "list setup",                      "show dynamic settings",
     "set reports [n]",            "set report destination (1 GUI console, other stderr)",
     "set root <n>",               "set current root path to ID",
     "set bank <n>",               "set current bank to ID",
@@ -38,8 +39,8 @@ string basics[] = {
     "  program <n2>",             "loads instrument ID",
     "  channel <n2>",             "sets MIDI channel (> 15 disables)",
     "  destination <n2>",         "(1 main, 2 part, 3 both)",
-    "set rootcc <n>",             "set CC for root path changes (> 119 disables)",
-    "set bankcc <n>",             "set CC for bank changes (0, 32, other disables)",
+    "set ccroot <n>",             "set CC for root path changes (> 119 disables)",
+    "set ccbank <n>",             "set CC for bank changes (0, 32, other disables)",
     "set program <n>",            "set MIDI program change (0 off, other on)",
     "set activate <n>",           "set part activate (0 off, other on)",
     "set extend <n>",             "set CC for extended program change (> 119 disables)",
@@ -65,7 +66,7 @@ string basics[] = {
 string subsynth [] = {
     "volume",                     "Not yet!",
     "pan",                        "Not yet!",
-    "mode <s>",                   "change to different menus, (??, ???, ????) (.. / back) (top)",
+    "mode <s>",                   "change to different menus, (opt1, opt2, opt3) (.. / back) (top)",
     "end"
 };
 
@@ -99,16 +100,9 @@ bool cmdIfaceProcessCommand(char *buffer)
     int error = 0;
     char *point = buffer;
     point = miscFuncs.skipSpace(point); // just to be sure
-    if (matchMove(point, "stop"))
+    if (matchMove(point, "sto"))
         synth->allStop();
-    else if (matchMove(point, "setu"))
-    {
-        synth->SetSystemValue(109, 255);
-        Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
-        Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
-        Runtime.Log("Jack server " + Runtime.jackServer);
-    }
-    else if (matchMove(point, "path"))
+    else if (matchMove(point, "pat"))
     {
         if (matchMove(point, "add"))
         {
@@ -120,7 +114,7 @@ bool cmdIfaceProcessCommand(char *buffer)
             else
                 Runtime.Log("Added new root ID " + miscFuncs.asString(found) + " as " + (string) point);
         }
-        else if (matchMove(point, "remo"))
+        else if (matchMove(point, "rem"))
         {
             if (isdigit(point[0]))
             {
@@ -140,9 +134,9 @@ bool cmdIfaceProcessCommand(char *buffer)
         else
             synth->SetSystemValue(110, 255);
     }
-    else if (matchMove(point, "list"))
+    else if (matchMove(point, "lis"))
     {
-        if (matchMove(point, "root"))
+        if (matchMove(point, "roo"))
         {
             if (point[0] == 0)
                 synth->SetSystemValue(111, 255);
@@ -151,7 +145,7 @@ bool cmdIfaceProcessCommand(char *buffer)
                 synth->SetSystemValue(111, miscFuncs.string2int(point));
             }
         }
-        else if (matchMove(point, "bank"))
+        else if (matchMove(point, "ban"))
         {
             if (point[0] == 0)
                 synth->SetSystemValue(112, 255);
@@ -160,7 +154,7 @@ bool cmdIfaceProcessCommand(char *buffer)
                 synth->SetSystemValue(112, miscFuncs.string2int(point));
             }
         }
-        else if (matchMove(point, "vect"))
+        else if (matchMove(point, "vec"))
         {
             int chan;
             if (point[0] == 0)
@@ -176,8 +170,18 @@ bool cmdIfaceProcessCommand(char *buffer)
             if (error != 4)
                 synth->SetSystemValue(108, chan);
         }
+        else if (matchMove(point, "set"))
+        {
+            synth->SetSystemValue(109, 255);
+            Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
+            Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
+            Runtime.Log("Jack server " + Runtime.jackServer);
+        }
         else
+        {
+            sprintf(buffer, "list");
             error = 3;
+        }
     }
     
     else if (matchMove(point, "set"))
@@ -185,12 +189,21 @@ bool cmdIfaceProcessCommand(char *buffer)
         if (point[0] != 0)
             error = synth->commandSet(point);
         else
+        {
+            sprintf(buffer, "set");
             error = 3;
+        }
     }
     
-    else if (matchMove(point, "save"))
-        synth->SetSystemValue(119, 255);
-    else if (matchMove(point, "exit"))
+    else if (matchMove(point, "sav"))
+        if(matchMove(point, "set"))
+            synth->SetSystemValue(119, 255);
+        else
+        {
+            sprintf(buffer, "save");
+            error = 3;
+        }
+    else if (matchMove(point, "exi"))
     {
         Runtime.runSynth = false;
         return true;
@@ -198,11 +211,11 @@ bool cmdIfaceProcessCommand(char *buffer)
     else
     {
         int pushback = miscFuncs.matchWord(point, "..");
-        if (pushback != 0 || matchMove(point, "mode"))
+        if (pushback != 0 || matchMove(point, "mod"))
         {
-            if (pushback != 0 || (mode > 0 && ( matchMove(point, "back") || matchMove(point, ".."))))
+            if (pushback != 0 || (mode > 0 && ( matchMove(point, "bac") || matchMove(point, ".."))))
             {
-                if (mode & 0x1f)
+                if (mode & 0x0f)
                     mode = 0;
                 else
                     -- mode;
@@ -210,7 +223,7 @@ bool cmdIfaceProcessCommand(char *buffer)
             else if (matchMove(point, "top"))
                 mode = 0;
             else if (matchMove(point, "add"))
-                mode = 1;
+                mode = 0x11;
             else if (matchMove(point, "sub"))
                 mode = 0x21;
             else if (matchMove(point, "pad"))
@@ -219,9 +232,9 @@ bool cmdIfaceProcessCommand(char *buffer)
             switch (mode)
             {
                 case 0:
-                    extension = " ";
+                    extension = "";
                     break;
-                case 1:
+                case 0x11:
                     extension = "addsynth> ";
                     break;
                 case 0x21:
@@ -240,7 +253,7 @@ bool cmdIfaceProcessCommand(char *buffer)
                 case 0:
                     commands = basics;
                     break;
-                case 1:
+                case 0x11:
                     commands = subsynth;
                     break;
                 case 0x21:
@@ -274,10 +287,7 @@ bool cmdIfaceProcessCommand(char *buffer)
     }
 
     if (error == 3)
-    {
-        point[0] = 0; // sneaky :)
         Runtime.Log((string) buffer + errors[3]);
-    }
     else if (error)
         Runtime.Log(errors[error]);
         
@@ -288,30 +298,24 @@ bool cmdIfaceProcessCommand(char *buffer)
 
 void cmdIfaceCommandLoop()
 {
-    int len = 512;
+
     char *cCmd = NULL;
-    char buffer [len];
-    memset(buffer, 0, len);
     bool exit = false;
-    sprintf(welcomeBuffer, "\nyoshimi> ");
+    sprintf(welcomeBuffer, "yoshimi> ");
     while(!exit)
     {
         cCmd = readline(welcomeBuffer);
         if (cCmd)
         {
-            memcpy(buffer, cCmd, len);
-            string sCmd = cCmd;
             if(cCmd[0] != 0)
             {
-                exit = cmdIfaceProcessCommand(buffer);
+                exit = cmdIfaceProcessCommand(cCmd);
                 add_history(cCmd);
-                memset(buffer, 0, len + 1);
             }
-            if(cCmd)
-            {
-                free(cCmd);
-                cCmd = NULL;
-            }
+            free(cCmd);
+            cCmd = NULL;
         }
+        else
+            usleep(20000);
     }
 }

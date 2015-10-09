@@ -331,7 +331,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     if (pos == -1)
     {
         // test
-        synth->getRuntime().Log("Too may notes - notes > poliphony, PartNoteOn()");
+        synth->getRuntime().Log("Too many notes - notes > poliphony");
     }
     else
     {
@@ -615,7 +615,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         }
     }
 
-    // this only relase the keys if there is maximum number of keys allowed
+    // this only release the keys if there is maximum number of keys allowed
     setkeylimit(Pkeylimit);
 }
 
