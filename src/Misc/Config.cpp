@@ -118,6 +118,9 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     enable_part_on_voice_load(1),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
+    currentPart(0),
+    currentChannel(0),
+    currentMode(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -396,6 +399,13 @@ bool Config::loadConfig(void)
             return false;
         }
     }
+    string presetDir = ConfigDir + "/presets";
+    if (!isDirectory(presetDir))
+    {
+        cmd = string("mkdir -p ") + presetDir;
+        if ((chk = system(cmd.c_str())) < 0)
+            Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
+    }
     ConfigFile = ConfigDir + string("/yoshimi.config");
     StateFile = ConfigDir + string("/yoshimi.state");
     string resConfigFile = ConfigFile;
@@ -403,7 +413,7 @@ bool Config::loadConfig(void)
     {
         resConfigFile += asString(synth->getUniqueId());
     }
-    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
+/*    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
     {
         Log("ConfigFile " + resConfigFile + " not found");
         Log("Trying for old config file");
@@ -429,12 +439,12 @@ bool Config::loadConfig(void)
             if (oldfle)
                 fclose(oldfle);
         }
-    }
+    }*/
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
     {
-        Log("ConfigFile " + resConfigFile + " still not found, will use default settings");
+        Log("ConfigFile " + resConfigFile + " not found, will use default settings");
         saveConfig();
     }
     else
@@ -507,14 +517,17 @@ bool Config::extractConfigData(XMLwrapper *xml)
             "/usr/local/share/yoshimi/presets",
             "/usr/share/zynaddsubfx/presets",
             "/usr/local/share/zynaddsubfx/presets",
-            string(getenv("HOME")) + "/presets",
-            "../presets",
-            "presets"
+            string(getenv("HOME")) + "/.config/yoshimi/presets",
+            localPath("/presets"),
+            "end"
         };
-        const int defaultsCount = 7; // as per presetdirs[] above
-        for (int i = 0; i < defaultsCount; ++i)
-            if (presetdirs[i].size() && isDirectory(presetdirs[i]))
+        int i = 0;
+        while (presetdirs[i] != "end")
+        {
+            if (isDirectory(presetdirs[i]))
                 presetsDirlist[count++] = presetdirs[i];
+            ++ i;
+        }
     }
 
     // alsa settings

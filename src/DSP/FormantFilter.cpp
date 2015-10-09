@@ -183,8 +183,10 @@ void FormantFilter::setq(float q_)
 
 void FormantFilter::setfreq_and_q(float frequency, float q_)
 {
-    Qfactor = q_;
-    setpos(frequency);
+/*     //Convert form real freq[Hz]
+    const float freq = (logf(frequency) / logf(2.0)) - 9.96578428f; //log2(1000)=9.95748f.*/
+   Qfactor = q_;
+    setpos(frequency); // setpos(freq) // zyn code doesn't seem to do anything ???
 }
 
 void FormantFilter::filterout(float *smp)

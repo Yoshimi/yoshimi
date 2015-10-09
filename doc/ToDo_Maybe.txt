@@ -2,11 +2,14 @@
 restoreJsession() -> restoreSessionData() -> extractConfigData()
 Should this refetch entire bank structure?
 
-make command line adding and removing root paths update gui.
+Make command line adding and removing root paths update gui.
+Check other command/gui updates.
 
-change name of any instrument called 'simple sound' before saving, or storing in a bank.
+Make loading effect presets update the 'top' line.
 
-Allow new root path creation to include the ID value
+Allow headless compilation.
+
+Allow new root path creation to include the ID value.
 
 Provide NRPNs to change root & bank IDs - probably not actually.
 
@@ -25,13 +28,9 @@ Add 'Ignore MIDI Reset All' to deal with brain dead sequencers :(
 
 Gui to set up vector control!
 
-Review mapping of SubSynth harmonic faders.
-
 Review tooltips.
 
 Consider enabling and disabling tooltips.
-
-Change numeric menus to spin boxes.
 
 Consider scroll wheel control of sliders.
 

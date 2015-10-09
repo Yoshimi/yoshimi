@@ -18,6 +18,10 @@
 */
 
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <unistd.h>
 #include <sstream>
 #include <string.h>
 
@@ -96,6 +100,23 @@ void MiscFuncs::legit_filename(string& fname)
 }
 
 
+// replace 'src' with a different one in the compilation directory
+string MiscFuncs::localPath(string leaf)
+{
+    char *tmpath;
+    tmpath = (char*) malloc(PATH_MAX);
+    getcwd (tmpath, PATH_MAX);
+    string path = (string) tmpath;
+    size_t found = path.rfind("/src");
+    if (found != string::npos)
+        path.replace (found,4,leaf);
+    else
+        path = "";
+    free(tmpath);
+    return path;
+}
+
+
 void invSignal(float *sig, size_t len)
 {
     for(size_t i = 0; i < len; ++i)
@@ -118,8 +139,7 @@ string MiscFuncs::asString(long long n)
    return string(oss.str());
 }
 
-//#if !defined( __arm__ ) && !defined( __i386__ )
-//string MiscFuncs::asString(size_t n)
+
 string MiscFuncs::asString(unsigned long n)
 {
     ostringstream oss;

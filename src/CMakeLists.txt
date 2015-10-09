@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.6 rc5")
+set (YOSHIMI_VERSION "1.3.6.1")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -234,6 +234,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Microtonal.cpp
     Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+    Misc/CmdInterface.cpp
 )
 
 set (Params_sources
@@ -344,6 +345,60 @@ if (HasJackLatency)
     add_definitions(-DJACK_LATENCY)
 endif (HasJackLatency)
 
+# - Try to find readline include dirs and libraries
+#
+# Usage of this module as follows:
+#
+#     find_package(Readline)
+#
+# Variables used by this module, they can change the default behaviour and need
+# to be set before calling find_package:
+#
+#  Readline_ROOT_DIR         Set this variable to the root installation of
+#                            readline if the module has problems finding the
+#                            proper installation path.
+#
+# Variables defined by this module:
+#
+#  READLINE_FOUND            System has readline, include and lib dirs found
+#  Readline_INCLUDE_DIR      The readline include directories.
+#  Readline_LIBRARY          The readline library.
+
+find_path(Readline_ROOT_DIR
+    NAMES include/readline/readline.h
+)
+
+find_path(Readline_INCLUDE_DIR
+    NAMES readline/readline.h
+    HINTS ${Readline_ROOT_DIR}/include
+)
+
+find_library(Readline_LIBRARY
+    NAMES readline
+    HINTS ${Readline_ROOT_DIR}/lib
+)
+
+if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+  set(READLINE_FOUND TRUE)
+else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+  FIND_LIBRARY(Readline_LIBRARY NAMES readline)
+  include(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
+  MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
+endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+
+mark_as_advanced(
+    Readline_ROOT_DIR
+    Readline_INCLUDE_DIR
+    Readline_LIBRARY
+)
+
+if(READLINE_FOUND)
+    message ( "Readline library found" )
+else(READLINE_FOUND)
+    message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
+endif(READLINE_FOUND)
+
 set (ProgSources
     ${Misc_sources}
     ${Params_sources}
@@ -362,6 +417,7 @@ include_directories (AFTER
     ${FLTK_INCLUDE_DIR}
     ${FFTW3F_INC_DIR}
     ${LIBCAIRO_INCLUDE_DIRS}
+    ${Readline_INCLUDE_DIR}
 )
 
 set(ExternLibraries
@@ -373,6 +429,7 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
+    ${Readline_LIBRARY}
     z
     dl
 )

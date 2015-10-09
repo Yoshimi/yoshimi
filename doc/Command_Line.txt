@@ -2,7 +2,7 @@ When running from the command line all the following can now be entered after th
 
 setup - displays the current dynamic system settings.
 
-save - saves these sattings.
+save - saves these settings.
 
 paths - display all the currently defined bank root paths and their IDs.
 
@@ -66,7 +66,7 @@ stop - cease all sound immediately!
 exit - tidy up and close yoshimi down.
 
 
-Commands are not case sensitive and an invalid one will print a reminder. usually, you only need the first 4 letters of the names - as long as it is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+Commands are not case sensitive and an invalid one will print a reminder. Usually, you only need the first 4 letters of the names - as long as it is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
 
 Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
 

@@ -42,6 +42,7 @@ using namespace std;
 #include "Misc/XMLwrapper.h"
 #include "Misc/Config.h"
 #include "Misc/Bank.h"
+#include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
 
 Bank::Bank(SynthEngine *_synth) :
@@ -325,16 +326,6 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
     closedir(dir);
     return true;
 }
-
-// no longer used.
-// Makes a new bank, put it on a file and makes it current bank
-/*bool Bank::newbank(string newbankdir)
-{
-    if (!newbankfile(newbankdir))
-        return false;
-    currentBankID = add_bank(newbankdir, newbankdir, currentRootID);
-    return true;
-}*/
 
 
 // Makes a new bank with known ID. Does *not* make it current
@@ -725,7 +716,6 @@ void Bank::addDefaultRootDirs()
         "/usr/share/zynaddsubfx/banks",
         "/usr/local/share/zynaddsubfx/banks",
         string(getenv("HOME")) + "/banks",
-        "../banks",
         "end"
     };
     int i = 0;
@@ -734,6 +724,7 @@ void Bank::addDefaultRootDirs()
         addRootDir(bankdirs [i]);
         ++ i;
     }
+    addRootDir(localPath("/banks"));
     rescanforbanks();
 }
 
