@@ -138,6 +138,7 @@ class Config : public MiscFuncs
         int           currentPart;
         int           currentChannel;
         int           currentMode;
+        int           logLineNumber;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;

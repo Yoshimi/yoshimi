@@ -121,6 +121,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     currentPart(0),
     currentChannel(0),
     currentMode(0),
+    logLineNumber(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -741,6 +742,7 @@ void Config::Log(string msg, bool tostderr)
     }
     else
         cerr << msg << endl;
+    ++ logLineNumber;
 }
 
 

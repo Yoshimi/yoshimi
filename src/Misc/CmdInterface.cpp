@@ -23,15 +23,17 @@ static int currentInstance = 0;
 
 char welcomeBuffer [128];
 
+static int listLength = 200;
+
 string basics[] = {
-    "save setup",                       "save dynamic settings",
+    "save setup",                 "save dynamic settings",
     "paths",                      "display bank root paths",
     "path add <s>",               "add bank root path",
     "path remove <n>",            "remove bank root path ID",
-    "list root [n]",              "list banks in root ID or current",
-    "list bank [n]",              "list instruments in bank ID or current",
+    "list banks [n]",             "list banks in root ID or current",
+    "list instruments [n]",       "list instruments in bank ID or current",
     "list vector [n]",            "list settings for vector CHANNEL",
-    "list setup",                      "show dynamic settings",
+    "list setup",                 "show dynamic settings",
     "set reports [n]",            "set report destination (1 GUI console, other stderr)",
     "set root <n>",               "set current root path to ID",
     "set bank <n>",               "set current bank to ID",
@@ -58,8 +60,11 @@ string basics[] = {
     "  off",                      "disable vector for CHANNEL",
     "stop",                       "all sound off",
     "mode <s>",                   "change to different menus, (addsynth, subsynth, padsynth)",
-    "exit",                       "tidy up and close Yoshimi",
+    "page [n]",                   "number of lines per screen page or disable",
+    "previous",                   "previous page",
+    "next",                       "next page",
     "? / help",                   "list commands",
+    "exit",                       "tidy up and close Yoshimi",
     "end"
 };
 
@@ -88,6 +93,83 @@ bool matchMove(char *&pnt, const char *word)
 }
 
 
+bool run_list(int mode, char *point, string *commands, SynthEngine *synth)
+{
+    Config &Runtime = synth->getRuntime();
+    static int logLineOffset;
+    static int listing;
+    static int listStart;
+    static int listEnd;
+        
+    switch (mode)
+    {
+        case 0:
+            commands = basics;
+            break;
+        case 0x11:
+            commands = subsynth;
+            break;
+        case 0x21:
+            commands = subsynth;
+            break;
+        case 0x41:
+            commands = subsynth;
+            break;
+        }
+    listEnd = 0;
+    while(commands[listEnd] != "end")
+        listEnd += 2;
+
+    if (matchMove(point, "hel") || matchMove(point, "?"))
+    {
+        listing = true;
+        listStart = 0;
+    }
+    else if (listing && matchMove(point, "nex"))
+    {
+        listStart += listLength * 2;
+        if (listStart >= listEnd)
+            listStart -= listLength * 2;
+    }
+    else if (listing && matchMove(point, "pre"))
+    {
+        listStart -= listLength * 2;
+        if (listStart < 0)
+            listStart = 0;
+    }
+    else
+    {
+        listing = false;
+        return false;
+    }
+
+    int word = listStart;
+    string left;
+    string blanks;
+    logLineOffset = Runtime.logLineNumber;
+    if (listStart == 0)
+        Runtime.Log("Commands");
+    while (commands[word] != "end" && (Runtime.logLineNumber - logLineOffset) < listLength)
+    {
+        left = commands[word];
+        Runtime.Log("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word + 1]);
+        word += 2;
+    }
+//    Runtime.Log("List = " + miscFuncs.asString(Runtime.logLineNumber - logLineOffset));
+    if (Runtime.consoleMenuItem)
+        cout << basics[8] << endl;
+        // stdout needs this if reports sent to console
+    if (commands[word] == "end")
+    {
+        if (mode == 0)
+            Runtime.Log("'*' entries need to be saved and Yoshimi restarted to activate");
+    }
+    else
+        Runtime.Log(" More?");
+    return true;
+}
+
+
 bool cmdIfaceProcessCommand(char *buffer)
 {
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
@@ -96,12 +178,95 @@ bool cmdIfaceProcessCommand(char *buffer)
     Config &Runtime = synth->getRuntime();
     
     static int mode;
+    static int ID;
+    static int type;
+    static int lineOffset;
     string *commands = NULL;
     int error = 0;
     char *point = buffer;
     point = miscFuncs.skipSpace(point); // just to be sure
-    if (matchMove(point, "sto"))
+
+    if (run_list(mode, point, commands, synth))
+        return false;
+
+    if (miscFuncs.matchWord(point, "lis") || (type == 3 && (miscFuncs.matchWord(point, "nex") ||miscFuncs.matchWord(point, "pre"))))
+    {
+        if (matchMove(point, "lis"))
+            type = 0;
+        if (miscFuncs.matchWord(point, "ins") || (type == 3 && (miscFuncs.matchWord(point, "nex") || miscFuncs.matchWord(point, "pre"))))
+        {
+            int shortLength = listLength - 4;
+            if (matchMove(point, "ins"))
+            {
+                if (point[0] == 0)
+                    ID = 255;
+                else
+                    ID = miscFuncs.string2int(point);
+                type = 3;
+                lineOffset = 0;
+            }
+            else if (matchMove(point, "nex"))
+            {
+                lineOffset += (shortLength);
+                if (lineOffset >= MAX_BANKS_IN_ROOT)
+                    lineOffset -= (shortLength);
+            }
+            else if (matchMove(point, "pre"))
+            {
+                lineOffset -= shortLength;
+                if (lineOffset < 0)
+                    lineOffset = 0;
+            }
+            synth->ListInstruments(lineOffset, listLength, ID);
+            return false;
+        }
+
+        if (matchMove(point, "ban"))
+        {
+            if (point[0] == 0)
+                synth->SetSystemValue(111, 255);
+            else
+            {
+                synth->SetSystemValue(111, miscFuncs.string2int(point));
+            }
+        }
+        
+        else if (matchMove(point, "vec"))
+        {
+            int chan;
+            if (point[0] == 0)
+                chan = Runtime.currentChannel;
+            else
+            {
+                chan = miscFuncs.string2int(point);
+                if (chan < NUM_MIDI_CHANNELS)
+                    Runtime.currentChannel = chan;
+                else
+                    error = 4;
+            }
+            if (error != 4)
+                synth->SetSystemValue(108, chan);
+        }
+        else if (matchMove(point, "set"))
+        {
+            synth->SetSystemValue(109, 255);
+            Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
+            Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
+            Runtime.Log("Jack server " + Runtime.jackServer);
+        }
+        else
+        {
+            sprintf(buffer, "list");
+            error = 3;
+        }
+    }
+    
+    else if (matchMove(point, "sto"))
         synth->allStop();
+    else if (matchMove(point, "pag"))
+        listLength = miscFuncs.string2int(point);
+        if (listLength < 2)
+            listLength = 200;
     else if (matchMove(point, "pat"))
     {
         if (matchMove(point, "add"))
@@ -134,56 +299,7 @@ bool cmdIfaceProcessCommand(char *buffer)
         else
             synth->SetSystemValue(110, 255);
     }
-    else if (matchMove(point, "lis"))
-    {
-        if (matchMove(point, "roo"))
-        {
-            if (point[0] == 0)
-                synth->SetSystemValue(111, 255);
-            else
-            {
-                synth->SetSystemValue(111, miscFuncs.string2int(point));
-            }
-        }
-        else if (matchMove(point, "ban"))
-        {
-            if (point[0] == 0)
-                synth->SetSystemValue(112, 255);
-            else
-            {
-                synth->SetSystemValue(112, miscFuncs.string2int(point));
-            }
-        }
-        else if (matchMove(point, "vec"))
-        {
-            int chan;
-            if (point[0] == 0)
-                chan = Runtime.currentChannel;
-            else
-            {
-                chan = miscFuncs.string2int(point);
-                if (chan < NUM_MIDI_CHANNELS)
-                    Runtime.currentChannel = chan;
-                else
-                    error = 4;
-            }
-            if (error != 4)
-                synth->SetSystemValue(108, chan);
-        }
-        else if (matchMove(point, "set"))
-        {
-            synth->SetSystemValue(109, 255);
-            Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
-            Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
-            Runtime.Log("Jack server " + Runtime.jackServer);
-        }
-        else
-        {
-            sprintf(buffer, "list");
-            error = 3;
-        }
-    }
-    
+
     else if (matchMove(point, "set"))
     {
         if (point[0] != 0)
@@ -210,10 +326,10 @@ bool cmdIfaceProcessCommand(char *buffer)
     }
     else
     {
-        int pushback = miscFuncs.matchWord(point, "..");
-        if (pushback != 0 || matchMove(point, "mod"))
+        int back = miscFuncs.matchWord(point, "..");
+        if (back != 0 || matchMove(point, "mod"))
         {
-            if (pushback != 0 || (mode > 0 && ( matchMove(point, "bac") || matchMove(point, ".."))))
+            if (back != 0 || (mode > 0 && ( matchMove(point, "bac") || matchMove(point, ".."))))
             {
                 if (mode & 0x0f)
                     mode = 0;
@@ -246,44 +362,6 @@ bool cmdIfaceProcessCommand(char *buffer)
             }
             sprintf(welcomeBuffer + 9, extension.c_str());
         }
-        else
-        {
-            switch (mode)
-            {
-                case 0:
-                    commands = basics;
-                    break;
-                case 0x11:
-                    commands = subsynth;
-                    break;
-                case 0x21:
-                    commands = subsynth;
-                    break;
-                case 0x41:
-                    commands = subsynth;
-                    break;
-                }
-            int word = 0;
-            string left;
-            string blanks;
-            Runtime.Log("Commands");
-            while (commands[word] != "end")
-            {
-                left = commands[word];
-                if (left != "end")
-                {
-                    ++ word;
-                    Runtime.Log("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word]);
-                    ++ word;
-                }
-            }
-            if (Runtime.consoleMenuItem)
-                cout << basics[8] << endl;
-                // stdout needs this if reports sent to console
-            if (mode == 0)
-                Runtime.Log("'*' entries need to be saved and Yoshimi restarted to activate");
-
-        }
     }
 
     if (error == 3)
@@ -298,7 +376,6 @@ bool cmdIfaceProcessCommand(char *buffer)
 
 void cmdIfaceCommandLoop()
 {
-
     char *cCmd = NULL;
     bool exit = false;
     sprintf(welcomeBuffer, "yoshimi> ");

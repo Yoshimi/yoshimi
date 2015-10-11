@@ -1,5 +1,8 @@
 yoshimi 1.3.6 M
 
+2015-10-11 Will
+- Implemented paging (not banks yet).
+
 2015-10-9 Will
 - Changed mode return behaviour.
 - Changed some command names.

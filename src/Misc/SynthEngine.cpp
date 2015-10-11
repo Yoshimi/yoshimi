@@ -654,6 +654,60 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
+int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
+{
+    int root = bank.currentRootID;
+    int seen = 0;
+    int counted = 0;
+    int logLineOffset;
+    string label;
+    if (bank.roots.count(root) > 0
+        && !bank.roots [root].path.empty())
+    {
+        if (bankNum >= MAX_BANKS_IN_ROOT)
+            bankNum = bank.currentBankID;
+        if (!bank.roots [root].banks [bankNum].instruments.empty())
+        {
+            label = bank.roots [root].path;
+            if (label.at(label.size() - 1) == '/')
+                label = label.substr(0, label.size() - 1);
+            logLineOffset = Runtime.logLineNumber;
+            Runtime.Log("\nInstruments in Root ID " + asString(root)
+                      + ", Bank ID " + asString(bankNum) + "\n    " + label
+                      + "/" + bank.roots [root].banks [bankNum].dirname);
+            for (int idx = 0; idx < BANK_SIZE; ++ idx)
+            {
+                if (!bank.emptyslotWithID(root, bankNum, idx))
+                {
+                    if (seen >= start && (Runtime.logLineNumber - logLineOffset) < numLines)
+                    {
+                        string suffix = "";
+                        if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
+                            suffix += "A";
+                        if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
+                            suffix += "S";
+                        if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
+                            suffix += "P";
+                        Runtime.Log( "    ID " + asString(idx)+ "    "
+                        + bank.roots [root].banks [bankNum].instruments [idx].name
+                        + "  (" + suffix + ")");
+                        ++ counted;
+                    }
+                    ++ seen;
+                }
+            }
+        }
+        else
+            Runtime.Log("No Bank ID " + asString(bankNum)
+                      + " in Root " + asString(root));
+    }
+    else
+        Runtime.Log("No Root ID " + asString(root));
+    return counted;
+}
+
+
+
 /* Provides a way of setting dynamic system variables
  * from sources other than the gui
  */
