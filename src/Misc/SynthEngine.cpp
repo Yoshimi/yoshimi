@@ -654,6 +654,43 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
+int SynthEngine::ListBanks(int start, int numLines, int rootNum)
+{
+    int seen = 0;
+    int counted = 0;
+    int logLineOffset;
+    string label;
+    if (rootNum >= MAX_BANK_ROOT_DIRS)
+        rootNum = bank.currentRootID;
+    if (bank.roots.count(rootNum) > 0
+        && !bank.roots [rootNum].path.empty())
+    {
+        label = bank.roots [rootNum].path;
+        if (label.at(label.size() - 1) == '/')
+            label = label.substr(0, label.size() - 1);
+        logLineOffset = Runtime.logLineNumber;
+        Runtime.Log("\nBanks in Root ID " + asString(rootNum) + "\n    " + label);
+        for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+        {
+            if (!bank.roots [rootNum].banks [idx].dirname.empty()) 
+            {
+               if (seen >= start && (Runtime.logLineNumber - logLineOffset) < numLines)
+               {
+                    Runtime.Log("    ID " + asString(idx) + "    "
+                    + bank.roots [rootNum].banks [idx].dirname);
+                    ++ counted;
+               }
+               ++ seen;
+            }
+        }
+    }
+    else
+        Runtime.Log("No Root ID " + asString(rootNum));
+    
+    return counted;
+}
+
+
 int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
 {
     int root = bank.currentRootID;
@@ -844,63 +881,11 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
             
         case 111 : // list banks
-            if (value >= MAX_BANK_ROOT_DIRS)
-                value = bank.currentRootID;
-            if (bank.roots.count(value) > 0
-                && !bank.roots [value].path.empty())
-            {
-                label = bank.roots [value].path;
-                if (label.at(label.size() - 1) == '/')
-                    label = label.substr(0, label.size() - 1);
-                Runtime.Log("\nBanks in Root ID " + asString(value) + "\n    " + label);
-                for (idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
-                {
-                    if (!bank.roots [value].banks [idx].dirname.empty())
-                        Runtime.Log("    ID " + asString(idx) + "    "
-                        + bank.roots [value].banks [idx].dirname);
-                }
-            }
-            else
-                Runtime.Log("No Root ID " + asString(value));
+            ListBanks(0, MAX_BANKS_IN_ROOT, value);
             break;
             
         case 112: // list instruments
-            root = bank.currentRootID;
-            if (bank.roots.count(root) > 0
-                && !bank.roots [root].path.empty())
-            {
-                if (value >= MAX_BANKS_IN_ROOT)
-                    value = bank.currentBankID;
-                if (!bank.roots [root].banks [value].instruments.empty())
-                {
-                    label = bank.roots [root].path;
-                    if (label.at(label.size() - 1) == '/')
-                        label = label.substr(0, label.size() - 1);
-                    Runtime.Log("\nInstruments in Root ID " + asString(root)
-                              + ", Bank ID " + asString(value) + "\n    " + label
-                              + "/" + bank.roots [root].banks [value].dirname);
-                    for (idx = 0; idx < BANK_SIZE; ++ idx)
-                    {
-                        if (!bank.emptyslotWithID(root, value, idx))
-                        {
-                            string suffix = "";
-                            if (bank.roots [root].banks [value].instruments [idx].ADDsynth_used)
-                                suffix += "A";
-                            if (bank.roots [root].banks [value].instruments [idx].SUBsynth_used)
-                                suffix += "S";
-                            if (bank.roots [root].banks [value].instruments [idx].PADsynth_used)
-                                suffix += "P";
-                            Runtime.Log( "    ID " + asString(idx)+ "    "
-                            + bank.roots [root].banks [value].instruments [idx].name + "  (" + suffix + ")");
-                        }
-                    }
-                }
-                else
-                    Runtime.Log("No Bank ID " + asString(value)
-                              + " in Root " + asString(root));
-            }
-            else
-                Runtime.Log("No Root ID " + asString(root));
+            ListInstruments(0, 160, value);
             break;
             
         case 113: // root

@@ -55,7 +55,7 @@ string basics[] = {
     "set vector [n1]",            "set vector CHANNEL, operations",
     "  [x/y] cc <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
     "  [x/y] features <n2>",      "sets CHANNEL X or Y features",
-    "  [x/y] program <l/r> <n2>", "X or Y program change ID for CHANNEL L or R part",
+    "  [x/y] program [l/r] <n2>", "X or Y program change ID for CHANNEL L or R part",
     "  [x/y] control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
     "  off",                      "disable vector for CHANNEL",
     "stop",                       "all sound off",
@@ -63,7 +63,7 @@ string basics[] = {
     "page [n]",                   "number of lines per screen page or disable",
     "previous",                   "previous page",
     "next",                       "next page",
-    "? / help",                   "list commands",
+    "? / help",                   "list commands for current mode",
     "exit",                       "tidy up and close Yoshimi",
     "end"
 };
@@ -179,8 +179,9 @@ bool cmdIfaceProcessCommand(char *buffer)
     
     static int mode;
     static int ID;
-    static int type;
+    static int listType;
     static int lineOffset;
+    static int counted;
     string *commands = NULL;
     int error = 0;
     char *point = buffer;
@@ -188,21 +189,24 @@ bool cmdIfaceProcessCommand(char *buffer)
 
     if (run_list(mode, point, commands, synth))
         return false;
-
-    if (miscFuncs.matchWord(point, "lis") || (type == 3 && (miscFuncs.matchWord(point, "nex") ||miscFuncs.matchWord(point, "pre"))))
+    if (!miscFuncs.matchWord(point, "nex") && !miscFuncs.matchWord(point, "pre"))
+        listType = 0;
+    if (matchMove(point, "lis") || listType >= 2)
     {
-        if (matchMove(point, "lis"))
-            type = 0;
-        if (miscFuncs.matchWord(point, "ins") || (type == 3 && (miscFuncs.matchWord(point, "nex") || miscFuncs.matchWord(point, "pre"))))
+        if (miscFuncs.matchWord(point, "ban") || miscFuncs.matchWord(point, "ins") || listType >= 2 )
         {
+            if (miscFuncs.matchWord(point, "ban"))
+                listType = 2;
+            else if(miscFuncs.matchWord(point, "ins"))
+                listType = 3;
+                    
             int shortLength = listLength - 4;
-            if (matchMove(point, "ins"))
+            if (matchMove(point, "ban") || matchMove(point, "ins"))
             {
                 if (point[0] == 0)
                     ID = 255;
                 else
                     ID = miscFuncs.string2int(point);
-                type = 3;
                 lineOffset = 0;
             }
             else if (matchMove(point, "nex"))
@@ -217,21 +221,14 @@ bool cmdIfaceProcessCommand(char *buffer)
                 if (lineOffset < 0)
                     lineOffset = 0;
             }
-            synth->ListInstruments(lineOffset, listLength, ID);
+            if (listType == 2)
+                counted = synth->ListBanks(lineOffset, listLength, ID);
+            else
+                counted = synth->ListInstruments(lineOffset, listLength, ID);
             return false;
         }
 
-        if (matchMove(point, "ban"))
-        {
-            if (point[0] == 0)
-                synth->SetSystemValue(111, 255);
-            else
-            {
-                synth->SetSystemValue(111, miscFuncs.string2int(point));
-            }
-        }
-        
-        else if (matchMove(point, "vec"))
+        if (matchMove(point, "vec"))
         {
             int chan;
             if (point[0] == 0)

@@ -1,5 +1,8 @@
 yoshimi 1.3.6 M
 
+2015-10-12 Will
+- Added paging to banks list.
+
 2015-10-11 Will
 - Implemented paging (not banks yet).
 
