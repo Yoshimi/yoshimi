@@ -26,6 +26,8 @@ char welcomeBuffer [128];
 static int listLength = 200;
 
 string basics[] = {
+    "load patchset <s>",          "load a complete set of instruments from named file",
+    "save patchset <s>",          "save a complete set of instruments to named file",
     "save setup",                 "save dynamic settings",
     "paths",                      "display bank root paths",
     "path add <s>",               "add bank root path",
@@ -308,9 +310,43 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
     }
     
+    else if (matchMove(point, "loa"))
+    {
+        if (matchMove(point, "pat") )
+        {
+            if (point[0] == 0)
+                error = 1;
+            else
+            {
+                int loadResult = synth->loadPatchSetAndUpdate((string) point);
+                if (loadResult == 3)
+                    Runtime.Log("At least one instrument is named 'Simple Sound'. This should be changed before resave");
+                else if  (loadResult == 1)
+                    Runtime.Log((string) point + " loaded");
+            }
+        }
+        else
+        {
+            sprintf(buffer, "load");
+            error = 3;
+        }
+    }
     else if (matchMove(point, "sav"))
         if(matchMove(point, "set"))
             synth->SetSystemValue(119, 255);
+        else if (matchMove(point, "pat"))
+        {
+            if (point[0] == 0)
+                error = 1;
+            else
+            {
+                int saveResult = synth->saveXML((string) point);
+                if (!saveResult)
+                    Runtime.Log("Could not save " + (string) point);
+                else
+                    Runtime.Log((string) point + " saved");
+            }
+        }
         else
         {
             sprintf(buffer, "save");

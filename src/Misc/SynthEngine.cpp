@@ -1860,6 +1860,14 @@ int SynthEngine::loadParameters(string fname)
 }
 
 
+int SynthEngine::loadPatchSetAndUpdate(string fname)
+{
+    int result = loadParameters(fname);
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+    return result;
+}
+
+
 void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");

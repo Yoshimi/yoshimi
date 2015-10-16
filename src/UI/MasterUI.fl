@@ -85,7 +85,7 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -345,7 +345,7 @@ mainCreateNewInstance(forceId);}
             callback {//
                 do_load_master(true, NULL);
                 paramsui->loadRecent();}
-            tooltip {Load a parameters (.xmz) file} xywh {0 0 34 21} labelsize 12
+            tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
             label {&Save}
@@ -1119,11 +1119,10 @@ updatepanel();}
                 return;
         }
         int result = synth->loadParameters(fname);
-        checkmaxparts();
         setinspartlist();
         npartcounter->value(1);
         refresh_master_ui();
-        if (result >= 0) // shouldn't this be just > ?
+        if (result >= 0)
         {
             if (updatehistory)
                 setMasterLabel(synth->getRuntime().addParamHistory(string(fname)));
@@ -1136,7 +1135,7 @@ updatepanel();}
             string msg = "Could not load file " + string(fname);
             if (result == -10)
             {
-                msg += ",\\nit does not appear to be a valid parameter file.";
+                msg += ",\\nit does not appear to be a valid patch set file.";
                 fl_alert("%s",msg.c_str());
             }
             else
@@ -1186,6 +1185,7 @@ updatepanel();}
         mastervolumedial->value(synth->Pvolume);
         globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
         microtonalui = new MicrotonalUI(&synth->microtonal);
+        checkmaxparts();
         updatesendwindow();
         updatepanel();
         bankui->Hide();

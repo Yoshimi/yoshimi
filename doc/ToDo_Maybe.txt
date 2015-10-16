@@ -1,6 +1,6 @@
 
 restoreJsession() -> restoreSessionData() -> extractConfigData()
-Should this refetch entire bank structure?
+Refetches the entire bank structure. Should it?
 
 Make command line adding and removing root paths update gui.
 Check other command/gui updates.
@@ -10,8 +10,6 @@ Make loading effect presets update the 'top' line.
 Allow headless compilation.
 
 Allow new root path creation to include the ID value.
-
-Provide NRPNs to change root & bank IDs - probably not actually.
 
 RPNs (channel based)
 

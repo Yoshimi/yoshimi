@@ -71,6 +71,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadXML(string filename);
         void applyparameters(void);
         int loadParameters(string filename);
+        int loadPatchSetAndUpdate(string filename);
         
         bool getfromXML(XMLwrapper *xml);
 

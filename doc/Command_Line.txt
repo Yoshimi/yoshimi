@@ -1,6 +1,10 @@
 When running from the command line all the following can now be entered after the 'up and running' message.
 
-save setup - saves these settings.
+load patchset <s> - loads a complete patch set from the named file.
+
+save patchset <s> - saves the patch set to the named file.
+
+save setup - saves the current dynamic system settings.
 
 paths - display all the currently defined bank root paths and their IDs.
 
