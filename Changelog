@@ -1,5 +1,9 @@
 yoshimi 1.3.6 M
 
+2015-10-23 Will
+- Implemented unix style paging for command lists
+- Updated some docs
+
 2015-10-16 Will
 - Implemented load and save of patch sets.
 

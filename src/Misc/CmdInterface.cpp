@@ -1,7 +1,13 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <list>
+#include <sys/types.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ncurses.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include <algorithm>
 #include <iterator>
 #include <map>
@@ -10,10 +16,10 @@
 #include <Misc/SynthEngine.h>
 #include <Misc/MiscFuncs.h>
 #include <Misc/Bank.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-
+ 
 using namespace std;
+
+
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 
@@ -95,13 +101,35 @@ bool matchMove(char *&pnt, const char *word)
 }
 
 
+void output(list<string>& msg_buf)
+{
+    list<string>::iterator it;
+    if (msg_buf.size() <= (unsigned int)(LINES -1)) // Output will fit the screen
+    {
+        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
+            cout << *it << endl;
+    }
+
+    else // Output is too long, page it
+    {
+        // JBS: make that a class member variable
+        string page_filename = "yoshimi-pager-" + miscFuncs.asString(getpid()) + ".log";
+        ofstream fout(page_filename.c_str(),(ios_base::out | ios_base::trunc));
+        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
+            fout << *it << endl;
+        fout.close();
+        string cmd = "less -X -i -M -PM\"q=quit /=search PgUp/PgDown=scroll (line %lt of %L)\" " + page_filename;
+        system(cmd.c_str());
+        unlink(page_filename.c_str());
+    }
+    msg_buf.clear();
+}
+
+
 bool run_list(int mode, char *point, string *commands, SynthEngine *synth)
 {
     Config &Runtime = synth->getRuntime();
     static int logLineOffset;
-    static int listing;
-    static int listStart;
-    static int listEnd;
         
     switch (mode)
     {
@@ -118,56 +146,22 @@ bool run_list(int mode, char *point, string *commands, SynthEngine *synth)
             commands = subsynth;
             break;
         }
-    listEnd = 0;
-    while(commands[listEnd] != "end")
-        listEnd += 2;
-
-    if (matchMove(point, "hel") || matchMove(point, "?"))
-    {
-        listing = true;
-        listStart = 0;
-    }
-    else if (listing && matchMove(point, "nex"))
-    {
-        listStart += listLength * 2;
-        if (listStart >= listEnd)
-            listStart -= listLength * 2;
-    }
-    else if (listing && matchMove(point, "pre"))
-    {
-        listStart -= listLength * 2;
-        if (listStart < 0)
-            listStart = 0;
-    }
-    else
-    {
-        listing = false;
+        
+    if (!matchMove(point, "hel") && !matchMove(point, "?"))
         return false;
-    }
 
-    int word = listStart;
+    int word = 0;
     string left;
     string blanks;
     logLineOffset = Runtime.logLineNumber;
-    if (listStart == 0)
-        Runtime.Log("Commands");
+    list<string>msg;
     while (commands[word] != "end" && (Runtime.logLineNumber - logLineOffset) < listLength)
     {
         left = commands[word];
-        Runtime.Log("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word + 1]);
+        msg.push_back("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word + 1]);
         word += 2;
     }
-//    Runtime.Log("List = " + miscFuncs.asString(Runtime.logLineNumber - logLineOffset));
-    if (Runtime.consoleMenuItem)
-        cout << basics[8] << endl;
-        // stdout needs this if reports sent to console
-    if (commands[word] == "end")
-    {
-        if (mode == 0)
-            Runtime.Log("'*' entries need to be saved and Yoshimi restarted to activate");
-    }
-    else
-        Runtime.Log(" More?");
+    output(msg);
     return true;
 }
 

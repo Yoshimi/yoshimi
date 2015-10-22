@@ -12,7 +12,7 @@ If a supported control is identified these data values will be stored locally (i
 
 Whenever either byte of the NRPN is changed, the data values will be cleared (but stored settings will not be affected).
 
-If either NRPN byte is set to 127, all data values are cleared and then ignored again.
+If either NRPN byte is set to 127, both data values are cleared and then ignored again.
 
 In Yoshimi NRPNs are not themselves channel sensitive but the final results will often be sent to whichever is the current channel.
 

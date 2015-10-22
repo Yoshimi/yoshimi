@@ -430,6 +430,7 @@ set(ExternLibraries
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
     ${Readline_LIBRARY}
+    ncurses
     z
     dl
 )

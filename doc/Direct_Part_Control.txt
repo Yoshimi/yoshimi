@@ -8,9 +8,9 @@ then (all value ranges start from zero, not 1)
 Data MSB (6)
     0 : data LSB = part number          {this obviously has to be set first}
     1 : data LSB = program number
-    2 : data LSB = controller number
+    2 : data LSB = controller number    {carried over between calls}
     3 : data LSB = controller value
-    4 : data LSB = part's channel number {15 to 127 disconnects the part from any channel}
+    4 : data LSB = part's channel number { > 15 disconnects the part from any channel}
     5 : data LSB = part's audio destination
                     1 = main L&R
                     2 = direct L&R
