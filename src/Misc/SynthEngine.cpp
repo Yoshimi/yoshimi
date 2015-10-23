@@ -654,11 +654,8 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
-int SynthEngine::ListBanks(int start, int numLines, int rootNum)
+void SynthEngine::ListBanks(int rootNum)
 {
-    int seen = 0;
-    int counted = 0;
-    int logLineOffset;
     string label;
     if (rootNum >= MAX_BANK_ROOT_DIRS)
         rootNum = bank.currentRootID;
@@ -668,30 +665,20 @@ int SynthEngine::ListBanks(int start, int numLines, int rootNum)
         label = bank.roots [rootNum].path;
         if (label.at(label.size() - 1) == '/')
             label = label.substr(0, label.size() - 1);
-        logLineOffset = Runtime.logLineNumber;
         Runtime.Log("\nBanks in Root ID " + asString(rootNum) + "\n    " + label);
         for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
         {
             if (!bank.roots [rootNum].banks [idx].dirname.empty()) 
-            {
-               if (seen >= start && (Runtime.logLineNumber - logLineOffset) < numLines)
-               {
-                    Runtime.Log("    ID " + asString(idx) + "    "
-                    + bank.roots [rootNum].banks [idx].dirname);
-                    ++ counted;
-               }
-               ++ seen;
-            }
+                Runtime.Log("    ID " + asString(idx) + "    "
+                          + bank.roots [rootNum].banks [idx].dirname);
         }
     }
     else
         Runtime.Log("No Root ID " + asString(rootNum));
-    
-    return counted;
 }
 
 
-int SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
+void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
     string label;
     if (rootNum >= MAX_BANK_ROOT_DIRS)
@@ -713,16 +700,12 @@ int SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
     }
     else
         msg_buf.push_back("No Root ID " + asString(rootNum));
-    return 0;
 }
 
 
-int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
+void SynthEngine::ListInstruments(int bankNum)
 {
     int root = bank.currentRootID;
-    int seen = 0;
-    int counted = 0;
-    int logLineOffset;
     string label;
     if (bank.roots.count(root) > 0
         && !bank.roots [root].path.empty())
@@ -734,7 +717,6 @@ int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
             label = bank.roots [root].path;
             if (label.at(label.size() - 1) == '/')
                 label = label.substr(0, label.size() - 1);
-            logLineOffset = Runtime.logLineNumber;
             Runtime.Log("\nInstruments in Root ID " + asString(root)
                       + ", Bank ID " + asString(bankNum) + "\n    " + label
                       + "/" + bank.roots [root].banks [bankNum].dirname);
@@ -742,21 +724,16 @@ int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
             {
                 if (!bank.emptyslotWithID(root, bankNum, idx))
                 {
-                    if (seen >= start && (Runtime.logLineNumber - logLineOffset) < numLines)
-                    {
-                        string suffix = "";
-                        if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
-                            suffix += "A";
-                        if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
-                            suffix += "S";
-                        if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
-                            suffix += "P";
-                        Runtime.Log( "    ID " + asString(idx)+ "    "
-                        + bank.roots [root].banks [bankNum].instruments [idx].name
-                        + "  (" + suffix + ")");
-                        ++ counted;
-                    }
-                    ++ seen;
+                    string suffix = "";
+                    if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
+                        suffix += "A";
+                    if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
+                        suffix += "S";
+                    if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
+                        suffix += "P";
+                    Runtime.Log( "    ID " + asString(idx)+ "    "
+                              + bank.roots [root].banks [bankNum].instruments [idx].name
+                              + "  (" + suffix + ")");
                 }
             }
         }
@@ -766,11 +743,10 @@ int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
     }
     else
         Runtime.Log("No Root ID " + asString(root));
-    return counted;
 }
 
 
-int SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
+void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
 {
     int root = bank.currentRootID;
     string label;
@@ -792,16 +768,16 @@ int SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
             {
                 if (!bank.emptyslotWithID(root, bankNum, idx))
                 {
-                        string suffix = "";
-                        if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
-                            suffix += "A";
-                        if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
-                            suffix += "S";
-                        if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
-                            suffix += "P";
-                        msg_buf.push_back("    ID " + asString(idx) + "    "
-                                        + bank.roots [root].banks [bankNum].instruments [idx].name
-                                        + "  (" + suffix + ")");
+                    string suffix = "";
+                    if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
+                        suffix += "A";
+                    if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
+                        suffix += "S";
+                    if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
+                        suffix += "P";
+                    msg_buf.push_back("    ID " + asString(idx) + "    "
+                                    + bank.roots [root].banks [bankNum].instruments [idx].name
+                                    + "  (" + suffix + ")");
                 }
             }
         }
@@ -811,7 +787,33 @@ int SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
     }
     else
                 msg_buf.push_back("No Root ID " + asString(root));
-    return 0;
+}
+
+
+void SynthEngine::ListCurrentParts(list<string>& msg_buf)
+{
+    int dest;
+    string name;
+    int avail = Runtime.NumAvailableParts;
+    msg_buf.push_back(asString(avail) + " parts available");
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
+    {
+        if ((part[npart]->Pname) != "Simple Sound" || (part[npart]->Penabled))
+        {
+            name = "  " + asString(npart);
+            dest = part[npart]->Paudiodest;
+            if (!part[npart]->Penabled || npart >= avail)
+                name += " -";
+            else if(dest == 1)
+                name += " M";
+            else if(dest == 2)
+                name += " P";
+            else
+                name += " B";
+            name +=  " " + part[npart]->Pname;
+            msg_buf.push_back(name);
+        }
+    }
 }
 
 
@@ -951,11 +953,11 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
             
         case 111 : // list banks
-            ListBanks(0, MAX_BANKS_IN_ROOT, value);
+            ListBanks(value);
             break;
             
         case 112: // list instruments
-            ListInstruments(0, 160, value);
+            ListInstruments(value);
             break;
             
         case 113: // root

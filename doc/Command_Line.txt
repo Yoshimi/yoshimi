@@ -16,6 +16,8 @@ list banks (n) - lists all the banks and their IDs in root path 'n' (or the curr
 
 list instruments (n) - lists all the instruments and their IDs in bank 'n' (or the current bank) of the current root.
 
+list current - lists the numberof parts availalble and parts with instruments currently installed along with any enabled with the default sound. Also shows their audio destination 'M' = main L/R, 'P' = part, 'B' = both, '-' = disabled or unavailable.
+
 list vector [n] - lists the settings for vector on channel 'n'
 
 list setup - displays the current dynamic system settings.

@@ -38,6 +38,7 @@ string basics[] = {
     "path remove <n>",            "remove bank root path ID",
     "list banks [n]",             "list banks in root ID or current",
     "list instruments [n]",       "list instruments in bank ID or current",
+    "list current",               "list parts with instruments installed",
     "list vector [n]",            "list settings for vector CHANNEL",
     "list setup",                 "show dynamic settings",
     "set reports [n]",            "set report destination (1 GUI console, other stderr)",
@@ -217,6 +218,11 @@ bool cmdIfaceProcessCommand(char *buffer)
             }
             if (error != 4)
                 synth->SetSystemValue(108, chan);
+        }
+        else if (matchMove(point, "cur"))
+        {
+            synth->ListCurrentParts(msg);
+            output(msg, LINES);
         }
         else if (matchMove(point, "set"))
         {
