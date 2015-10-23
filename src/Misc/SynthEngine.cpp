@@ -691,6 +691,32 @@ int SynthEngine::ListBanks(int start, int numLines, int rootNum)
 }
 
 
+int SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
+{
+    string label;
+    if (rootNum >= MAX_BANK_ROOT_DIRS)
+        rootNum = bank.currentRootID;
+    if (bank.roots.count(rootNum) > 0
+                && !bank.roots [rootNum].path.empty())
+    {
+        label = bank.roots [rootNum].path;
+        if (label.at(label.size() - 1) == '/')
+            label = label.substr(0, label.size() - 1);
+        msg_buf.push_back("Banks in Root ID " + asString(rootNum));
+        msg_buf.push_back("    " + label);
+        for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+        {
+            if (!bank.roots [rootNum].banks [idx].dirname.empty())
+                msg_buf.push_back("    ID " + asString(idx) + "    "
+                                + bank.roots [rootNum].banks [idx].dirname);
+        }
+    }
+    else
+        msg_buf.push_back("No Root ID " + asString(rootNum));
+    return 0;
+}
+
+
 int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
 {
     int root = bank.currentRootID;
@@ -743,6 +769,50 @@ int SynthEngine::ListInstruments(int start, int numLines, int bankNum)
     return counted;
 }
 
+
+int SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
+{
+    int root = bank.currentRootID;
+    string label;
+    if (bank.roots.count(root) > 0
+        && !bank.roots [root].path.empty())
+    {
+        if (bankNum >= MAX_BANKS_IN_ROOT)
+            bankNum = bank.currentBankID;
+        if (!bank.roots [root].banks [bankNum].instruments.empty())
+        {
+            label = bank.roots [root].path;
+            if (label.at(label.size() - 1) == '/')
+                label = label.substr(0, label.size() - 1);
+            msg_buf.push_back("Instruments in Root ID " + asString(root)
+                            + ", Bank ID " + asString(bankNum));
+            msg_buf.push_back("    " + label
+                            + "/" + bank.roots [root].banks [bankNum].dirname);
+            for (int idx = 0; idx < BANK_SIZE; ++ idx)
+            {
+                if (!bank.emptyslotWithID(root, bankNum, idx))
+                {
+                        string suffix = "";
+                        if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
+                            suffix += "A";
+                        if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
+                            suffix += "S";
+                        if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
+                            suffix += "P";
+                        msg_buf.push_back("    ID " + asString(idx) + "    "
+                                        + bank.roots [root].banks [bankNum].instruments [idx].name
+                                        + "  (" + suffix + ")");
+                }
+            }
+        }
+        else
+            msg_buf.push_back("No Bank ID " + asString(bankNum)
+                      + " in Root " + asString(root));
+    }
+    else
+                msg_buf.push_back("No Root ID " + asString(root));
+    return 0;
+}
 
 
 /* Provides a way of setting dynamic system variables

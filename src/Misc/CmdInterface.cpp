@@ -29,8 +29,6 @@ static int currentInstance = 0;
 
 char welcomeBuffer [128];
 
-static int listLength = 200;
-
 string basics[] = {
     "load patchset <s>",          "load a complete set of instruments from named file",
     "save patchset <s>",          "save a complete set of instruments to named file",
@@ -68,9 +66,6 @@ string basics[] = {
     "  off",                      "disable vector for CHANNEL",
     "stop",                       "all sound off",
     "mode <s>",                   "change to different menus, (addsynth, subsynth, padsynth)",
-    "page [n]",                   "number of lines per screen page or disable",
-    "previous",                   "previous page",
-    "next",                       "next page",
     "? / help",                   "list commands for current mode",
     "exit",                       "tidy up and close Yoshimi",
     "end"
@@ -100,11 +95,11 @@ bool matchMove(char *&pnt, const char *word)
  return found;
 }
 
-
-void output(list<string>& msg_buf)
+// developed from ideas of F. Silvain
+void output(list<string>& msg_buf, unsigned int windowHeight)
 {
     list<string>::iterator it;
-    if (msg_buf.size() <= (unsigned int)(LINES -1)) // Output will fit the screen
+    if (msg_buf.size() < windowHeight) // Output will fit the screen
     {
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             cout << *it << endl;
@@ -118,6 +113,7 @@ void output(list<string>& msg_buf)
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             fout << *it << endl;
         fout.close();
+        //int le = lt + windowHeight;
         string cmd = "less -X -i -M -PM\"q=quit /=search PgUp/PgDown=scroll (line %lt of %L)\" " + page_filename;
         system(cmd.c_str());
         unlink(page_filename.c_str());
@@ -126,10 +122,9 @@ void output(list<string>& msg_buf)
 }
 
 
-bool run_list(int mode, char *point, string *commands, SynthEngine *synth)
+bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
 {
     Config &Runtime = synth->getRuntime();
-    static int logLineOffset;
         
     switch (mode)
     {
@@ -153,15 +148,17 @@ bool run_list(int mode, char *point, string *commands, SynthEngine *synth)
     int word = 0;
     string left;
     string blanks;
-    logLineOffset = Runtime.logLineNumber;
     list<string>msg;
-    while (commands[word] != "end" && (Runtime.logLineNumber - logLineOffset) < listLength)
+    msg.push_back("Commands:");
+    while (commands[word] != "end")
     {
         left = commands[word];
         msg.push_back("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word + 1]);
         word += 2;
     }
-    output(msg);
+    if (mode == 0)
+        msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
+    output(msg, LINES);
     return true;
 }
 
@@ -174,53 +171,34 @@ bool cmdIfaceProcessCommand(char *buffer)
     Config &Runtime = synth->getRuntime();
     
     static int mode;
-    static int ID;
-    static int listType;
-    static int lineOffset;
-    static int counted;
-    string *commands = NULL;
+    int ID;
+    int listType = 0;
     int error = 0;
+    string *commands = NULL;
     char *point = buffer;
     point = miscFuncs.skipSpace(point); // just to be sure
+    list<string> msg;
 
-    if (run_list(mode, point, commands, synth))
+    if (helpList(mode, point, commands, synth))
         return false;
-    if (!miscFuncs.matchWord(point, "nex") && !miscFuncs.matchWord(point, "pre"))
-        listType = 0;
     if (matchMove(point, "lis") || listType >= 2)
     {
         if (miscFuncs.matchWord(point, "ban") || miscFuncs.matchWord(point, "ins") || listType >= 2 )
         {
-            if (miscFuncs.matchWord(point, "ban"))
+            if (matchMove(point, "ban"))
                 listType = 2;
-            else if(miscFuncs.matchWord(point, "ins"))
+            else if(matchMove(point, "ins"))
                 listType = 3;
                     
-            int shortLength = listLength - 4;
-            if (matchMove(point, "ban") || matchMove(point, "ins"))
-            {
-                if (point[0] == 0)
-                    ID = 255;
-                else
-                    ID = miscFuncs.string2int(point);
-                lineOffset = 0;
-            }
-            else if (matchMove(point, "nex"))
-            {
-                lineOffset += (shortLength);
-                if (lineOffset >= MAX_BANKS_IN_ROOT)
-                    lineOffset -= (shortLength);
-            }
-            else if (matchMove(point, "pre"))
-            {
-                lineOffset -= shortLength;
-                if (lineOffset < 0)
-                    lineOffset = 0;
-            }
-            if (listType == 2)
-                counted = synth->ListBanks(lineOffset, listLength, ID);
+            if (point[0] == 0)
+                ID = 255;
             else
-                counted = synth->ListInstruments(lineOffset, listLength, ID);
+                ID = miscFuncs.string2int(point);
+            if (listType == 2)
+                synth->ListBanks(ID, msg);
+            else
+                synth->ListInstruments(ID, msg);
+            output(msg, LINES);
             return false;
         }
 
@@ -256,10 +234,6 @@ bool cmdIfaceProcessCommand(char *buffer)
     
     else if (matchMove(point, "sto"))
         synth->allStop();
-    else if (matchMove(point, "pag"))
-        listLength = miscFuncs.string2int(point);
-        if (listLength < 2)
-            listLength = 200;
     else if (matchMove(point, "pat"))
     {
         if (matchMove(point, "add"))

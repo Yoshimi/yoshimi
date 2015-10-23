@@ -66,12 +66,6 @@ stop - cease all sound immediately!
 
 mode <s> - change to different menus, (addsynth, subsynth, padsynth)
 
-page [n] - define number of lines per screen page (no number disables).
-
-next - show next screen page.
-
-previous - show previous screen page.
-
 ? / help - list commands for current mode.
 
 exit - tidy up and close yoshimi down.
