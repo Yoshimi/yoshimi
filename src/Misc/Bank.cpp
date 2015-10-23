@@ -114,7 +114,7 @@ bool Bank::setname(unsigned int ninstrument, string newname, int newslot)
     int chk = rename(getFullPath(currentRootID, currentBankID, ninstrument).c_str(), newfilepath.c_str());
     if (chk < 0)
     {
-        synth->getRuntime().Log("Bank: setName failed renaming "
+        synth->getRuntime().Log("setName failed renaming "
                     + getFullPath(currentRootID, currentBankID, ninstrument) + " -> "
                     + newfilepath + ": " + string(strerror(errno)));
         return false;
@@ -147,7 +147,7 @@ void Bank::clearslot(unsigned int ninstrument)
     int chk = remove(getFullPath(currentRootID, currentBankID, ninstrument).c_str());
     if (chk < 0)
     {
-        synth->getRuntime().Log("clearSlot: " + asString(ninstrument) + " Failed to remove "
+        synth->getRuntime().Log(asString(ninstrument) + " Failed to remove "
                      + getFullPath(currentRootID, currentBankID, ninstrument) + " "
                      + string(strerror(errno)));
     }
@@ -160,7 +160,7 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
 {
     if (ninstrument >= BANK_SIZE)
     {
-        synth->getRuntime().Log("savetoslot: Saved " + asString(ninstrument) + ", slot > BANK_SIZE");
+        synth->getRuntime().Log("Saved " + asString(ninstrument) + ", slot > BANK_SIZE");
         return;
     }
     clearslot(ninstrument);
@@ -176,7 +176,7 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
     {
         int chk = remove(filepath.c_str());
         if (chk < 0)
-            synth->getRuntime().Log("Bank saveToSlot failed to unlink " + filepath
+            synth->getRuntime().Log("saveToSlot failed to unlink " + filepath
                         + ", " + string(strerror(errno)));
     }
     part->saveXML(filepath);
@@ -245,7 +245,7 @@ bool Bank::setbankname(unsigned int bankID, string newname)
                      newfilepath.c_str());
     if (chk < 0)
     {
-        synth->getRuntime().Log("Bank: Failed to rename " + getBankName(bankID)
+        synth->getRuntime().Log("Failed to rename " + getBankName(bankID)
                                + " to " + newname);
         return false;
     }
@@ -354,7 +354,7 @@ bool Bank::newbankfile(string newbankdir)
     int result = mkdir(newbankpath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (result < 0)
     {
-        synth->getRuntime().Log("Bank: Failed to mkdir " + newbankpath);
+        synth->getRuntime().Log("Failed to mkdir " + newbankpath);
         return false;
     }
     else
@@ -380,8 +380,7 @@ bool Bank::removebank(unsigned int bankID)
             chk = remove(getFullPath(currentRootID, bankID, inst).c_str());
             if (chk < 0)
             {
-                synth->getRuntime().Log("removebank: "
-                                        + asString(inst) + " Failed to remove "
+                synth->getRuntime().Log(asString(inst) + " Failed to remove "
                                         + getFullPath(currentRootID, bankID, inst) + " "
                                         + string(strerror(errno)));
                 return false;
@@ -392,14 +391,14 @@ bool Bank::removebank(unsigned int bankID)
         chk = remove(tmp.c_str());
         if (chk < 0)
         {
-            synth->getRuntime().Log("removebank: Failed to remove bank ID file"
+            synth->getRuntime().Log("Failed to remove bank ID file"
                                     + string(strerror(errno)));
             return false;
         }
         chk = remove(getBankPath(currentRootID, bankID).c_str());
         if (chk < 0)
         {
-            synth->getRuntime().Log("removebank: Failed to remove bank"
+            synth->getRuntime().Log("Failed to remove bank"
                                     + asString(bankID) + ": "
                                     + string(strerror(errno)));
             return false;
@@ -555,7 +554,7 @@ void Bank::scanrootdir(int root_idx)
         DIR *d = opendir(chkdir.c_str());
         if (d == NULL)
         {
-            synth->getRuntime().Log("scanrootdir: Failed to open bank directory candidate " + chkdir);
+            synth->getRuntime().Log("Failed to open bank directory candidate " + chkdir);
             continue;
         }
         struct dirent *fname;

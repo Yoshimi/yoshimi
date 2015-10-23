@@ -12,8 +12,6 @@ save part [n1] program <[n2] [s]>
 if 'n2' is present it saves to a bank slot and 's' optionally changes the name
 otherwise 's' is a complete filename and the leaf sets the stored instrument name
 
-list current {instruments} - only non-default and include number of available parts.
-
 Allow headless compilation.
 
 Allow new root path creation to include the ID value.

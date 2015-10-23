@@ -121,7 +121,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     currentPart(0),
     currentChannel(0),
     currentMode(0),
-    logLineNumber(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -731,25 +730,17 @@ void Config::addRuntimeXML(XMLwrapper *xml)
 
 void Config::Log(string msg, bool tostderr)
 {
-    int pos;
     if (showGui && !tostderr && consoleMenuItem)
-    {
-        pos = msg.find(":");
-        if (pos > 1)
-            LogList.push_back(msg.substr(pos + 2));
-        else
-            LogList.push_back(msg);
-    }
+        LogList.push_back(msg);
     else
         cerr << msg << endl;
-    ++ logLineNumber;
 }
 
 
 void Config::StartupReport(MusicClient *musicClient)
 {
     Log(string(argp_program_version));
-    Log("Config: Clientname: " + musicClient->midiClientName());
+    Log("Clientname: " + musicClient->midiClientName());
     string report = "Config: Audio: ";
     switch (audioEngine)
     {
@@ -764,7 +755,7 @@ void Config::StartupReport(MusicClient *musicClient)
     }
     report += (" -> '" + audioDevice + "'");
     Log(report);
-    report = "Config: Midi: ";
+    report = "Midi: ";
     switch (midiEngine)
     {
         case jack_midi:
@@ -780,9 +771,9 @@ void Config::StartupReport(MusicClient *musicClient)
         midiDevice = "default";
     report += (" -> '" + midiDevice + "'");
     Log(report);
-    Log("Config: Oscilsize: " + asString(synth->oscilsize));
-    Log("Config: Samplerate: " + asString(synth->samplerate));
-    Log("Config: Period size: " + asString(synth->buffersize));
+    Log("Oscilsize: " + asString(synth->oscilsize));
+    Log("Samplerate: " + asString(synth->samplerate));
+    Log("Period size: " + asString(synth->buffersize));
 }
 
 

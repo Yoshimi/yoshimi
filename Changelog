@@ -2,8 +2,9 @@ yoshimi 1.3.6 M
 
 2015-10-23 Will
 - Implemented unix style paging for command lists from ideas of F. Silvain.
-- Implemeted command line listing of parts with instuments installed.
+- Implemented command line listing of parts with instruments installed.
 - Updated some docs.
+- Cleaned up error messages and logs.
 
 2015-10-16 Will
 - Implemented load and save of patch sets.

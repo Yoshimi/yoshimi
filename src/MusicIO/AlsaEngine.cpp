@@ -87,7 +87,7 @@ bool AlsaEngine::openMidi(void)
     int port_num;
     if (snd_seq_open(&midi.handle, "default", SND_SEQ_OPEN_INPUT, SND_SEQ_NONBLOCK) != 0)
     {
-        synth->getRuntime().Log("Error, failed to open alsa midi");
+        synth->getRuntime().Log("Failed to open alsa midi");
         goto bail_out;
     }
     snd_seq_client_info_t *seq_info;
@@ -116,7 +116,7 @@ bool AlsaEngine::openMidi(void)
                                        SND_SEQ_PORT_TYPE_SYNTH);
     if (port_num < 0)
     {
-        synth->getRuntime().Log("Error, failed to acquire alsa midi port");
+        synth->getRuntime().Log("Failed to acquire alsa midi port");
         goto bail_out;
     }
     if (!midi.device.empty())

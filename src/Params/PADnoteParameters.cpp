@@ -659,7 +659,7 @@ void PADnoteParameters::setPan(char pan)
 // Ported from ZynAddSubFX V 2.4.4
 void PADnoteParameters::export2wav(std::string basefilename)
 {
-    synth->getRuntime().Log("PADnote: Saving samples for " + basefilename);
+    synth->getRuntime().Log("Saving samples for " + basefilename);
     applyparameters(true);
     basefilename += "_PADsynth_";
     for(int k = 0; k < PAD_MAX_SAMPLES; ++k)
