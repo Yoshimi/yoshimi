@@ -87,11 +87,13 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetProgram(unsigned char chan, unsigned short pgm);
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
-        void ListBanks(int rootNum);
-            void ListBanks(int rootNum, list<string>& msg_buf);
-        void ListInstruments(int bankNum);
-            void ListInstruments(int bankNum, list<string>& msg_buf);
+        void cliOutput(list<string>& msg_buf, unsigned int lines);
+        void ListPaths(list<string>& msg_buf);
+        void ListBanks(int rootNum, list<string>& msg_buf);
+        void ListInstruments(int bankNum, list<string>& msg_buf);
         void ListCurrentParts(list<string>& msg_buf);
+        void ListVectors(list<string>& msg_buf);
+        void ListSettings(list<string>& msg_buf);
         void SetSystemValue(int type, int value);
         int commandSet(char *point);
         int commandVector(char *point);

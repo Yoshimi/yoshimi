@@ -39,7 +39,7 @@ string basics[] = {
     "list banks [n]",             "list banks in root ID or current",
     "list instruments [n]",       "list instruments in bank ID or current",
     "list current",               "list parts with instruments installed",
-    "list vector [n]",            "list settings for vector CHANNEL",
+    "list vectors",               "list settings for all enabled vectors",
     "list setup",                 "show dynamic settings",
     "set reports [n]",            "set report destination (1 GUI console, other stderr)",
     "set root <n>",               "set current root path to ID",
@@ -96,37 +96,9 @@ bool matchMove(char *&pnt, const char *word)
  return found;
 }
 
-// developed from ideas of F. Silvain
-void output(list<string>& msg_buf, unsigned int windowHeight)
-{
-    list<string>::iterator it;
-    if (msg_buf.size() < windowHeight) // Output will fit the screen
-    {
-        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
-            cout << *it << endl;
-    }
-
-    else // Output is too long, page it
-    {
-        // JBS: make that a class member variable
-        string page_filename = "yoshimi-pager-" + miscFuncs.asString(getpid()) + ".log";
-        ofstream fout(page_filename.c_str(),(ios_base::out | ios_base::trunc));
-        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
-            fout << *it << endl;
-        fout.close();
-        //int le = lt + windowHeight;
-        string cmd = "less -X -i -M -PM\"q=quit /=search PgUp/PgDown=scroll (line %lt of %L)\" " + page_filename;
-        system(cmd.c_str());
-        unlink(page_filename.c_str());
-    }
-    msg_buf.clear();
-}
-
 
 bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
-{
-    Config &Runtime = synth->getRuntime();
-        
+{ 
     switch (mode)
     {
         case 0:
@@ -159,7 +131,11 @@ bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
     }
     if (mode == 0)
         msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
-    output(msg, LINES);
+    if (synth->getRuntime().consoleMenuItem)
+        // we need this in case someone is working headless
+        cout << "\nset reports [n] - set report destination (1 GUI console, other stderr)\n\n";
+ 
+    synth->cliOutput(msg, LINES);
     return true;
 }
 
@@ -198,38 +174,27 @@ bool cmdIfaceProcessCommand(char *buffer)
             if (listType == 2)
                 synth->ListBanks(ID, msg);
             else
+            {
                 synth->ListInstruments(ID, msg);
-            output(msg, LINES);
+                synth->cliOutput(msg, LINES);
+            }
             return false;
         }
 
         if (matchMove(point, "vec"))
         {
-            int chan;
-            if (point[0] == 0)
-                chan = Runtime.currentChannel;
-            else
-            {
-                chan = miscFuncs.string2int(point);
-                if (chan < NUM_MIDI_CHANNELS)
-                    Runtime.currentChannel = chan;
-                else
-                    error = 4;
-            }
-            if (error != 4)
-                synth->SetSystemValue(108, chan);
+            synth->ListVectors(msg);
+            synth->cliOutput(msg, LINES);
         }
         else if (matchMove(point, "cur"))
         {
             synth->ListCurrentParts(msg);
-            output(msg, LINES);
+            synth->cliOutput(msg, LINES);
         }
         else if (matchMove(point, "set"))
         {
-            synth->SetSystemValue(109, 255);
-            Runtime.Log("ALSA MIDI " + Runtime.alsaMidiDevice);
-            Runtime.Log("ALSA AUDIO " + Runtime.alsaAudioDevice);
-            Runtime.Log("Jack server " + Runtime.jackServer);
+            synth->ListSettings(msg);
+            synth->cliOutput(msg, LINES);
         }
         else
         {
@@ -270,7 +235,10 @@ bool cmdIfaceProcessCommand(char *buffer)
                 error = 1;
         }
         else
-            synth->SetSystemValue(110, 255);
+        {
+            synth->ListPaths(msg);
+            synth->cliOutput(msg, LINES);
+        }
     }
 
     else if (matchMove(point, "set"))

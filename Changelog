@@ -1,5 +1,9 @@
 yoshimi 1.3.6 M
 
+2015-10-24 Will
+- Moved cli output call to make it more generic.
+- Removed duplicate report code in synthEngine.
+
 2015-10-23 Will
 - Implemented unix style paging for command lists from ideas of F. Silvain.
 - Implemented command line listing of parts with instruments installed.

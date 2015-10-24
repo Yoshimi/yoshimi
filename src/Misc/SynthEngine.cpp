@@ -35,7 +35,12 @@ using namespace std;
 #include "Misc/Config.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -654,27 +659,56 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
-void SynthEngine::ListBanks(int rootNum)
+/*
+ * This should really be in MiscFuncs but it has two runtime calls
+ * and I can't work out a way to implement that :(
+ * We als have to fake long pages when calling via NRPNs as there
+ * is no readline entry to set the page length.
+ */
+
+void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
+{
+    list<string>::iterator it;
+    if ((msg_buf.size() < lines) || Runtime.consoleMenuItem) // Output will fit the screen (or console)
+    {
+        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
+            Runtime.Log(*it);
+        if (Runtime.consoleMenuItem)
+            // we need this in case someone is working headless
+            cout << "\nReports sent to console window\n\n";
+    }
+
+    else // Output is too long, page it
+    {
+        // JBS: make that a class member variable
+        string page_filename = "yoshimi-pager-" + asString(getpid()) + ".log";
+        ofstream fout(page_filename.c_str(),(ios_base::out | ios_base::trunc));
+        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
+            fout << *it << endl;
+        fout.close();
+        string cmd = "less -X -i -M -PM\"q=quit /=search PgUp/PgDown=scroll (line %lt of %L)\" " + page_filename;
+        system(cmd.c_str());
+        unlink(page_filename.c_str());
+    }
+    msg_buf.clear();
+}
+
+
+void SynthEngine::ListPaths(list<string>& msg_buf)
 {
     string label;
-    if (rootNum >= MAX_BANK_ROOT_DIRS)
-        rootNum = bank.currentRootID;
-    if (bank.roots.count(rootNum) > 0
-        && !bank.roots [rootNum].path.empty())
+    int idx;
+    msg_buf.push_back("Root Paths");
+    for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
     {
-        label = bank.roots [rootNum].path;
-        if (label.at(label.size() - 1) == '/')
-            label = label.substr(0, label.size() - 1);
-        Runtime.Log("\nBanks in Root ID " + asString(rootNum) + "\n    " + label);
-        for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+        if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
         {
-            if (!bank.roots [rootNum].banks [idx].dirname.empty()) 
-                Runtime.Log("    ID " + asString(idx) + "    "
-                          + bank.roots [rootNum].banks [idx].dirname);
+            label = bank.roots [idx].path;
+            if (label.at(label.size() - 1) == '/')
+                label = label.substr(0, label.size() - 1);
+            msg_buf.push_back("    ID " + asString(idx) + "     " + label);
         }
     }
-    else
-        Runtime.Log("No Root ID " + asString(rootNum));
 }
 
 
@@ -700,49 +734,6 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
     }
     else
         msg_buf.push_back("No Root ID " + asString(rootNum));
-}
-
-
-void SynthEngine::ListInstruments(int bankNum)
-{
-    int root = bank.currentRootID;
-    string label;
-    if (bank.roots.count(root) > 0
-        && !bank.roots [root].path.empty())
-    {
-        if (bankNum >= MAX_BANKS_IN_ROOT)
-            bankNum = bank.currentBankID;
-        if (!bank.roots [root].banks [bankNum].instruments.empty())
-        {
-            label = bank.roots [root].path;
-            if (label.at(label.size() - 1) == '/')
-                label = label.substr(0, label.size() - 1);
-            Runtime.Log("\nInstruments in Root ID " + asString(root)
-                      + ", Bank ID " + asString(bankNum) + "\n    " + label
-                      + "/" + bank.roots [root].banks [bankNum].dirname);
-            for (int idx = 0; idx < BANK_SIZE; ++ idx)
-            {
-                if (!bank.emptyslotWithID(root, bankNum, idx))
-                {
-                    string suffix = "";
-                    if (bank.roots [root].banks [bankNum].instruments [idx].ADDsynth_used)
-                        suffix += "A";
-                    if (bank.roots [root].banks [bankNum].instruments [idx].SUBsynth_used)
-                        suffix += "S";
-                    if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
-                        suffix += "P";
-                    Runtime.Log( "    ID " + asString(idx)+ "    "
-                              + bank.roots [root].banks [bankNum].instruments [idx].name
-                              + "  (" + suffix + ")");
-                }
-            }
-        }
-        else
-            Runtime.Log("No Bank ID " + asString(bankNum)
-                      + " in Root " + asString(root));
-    }
-    else
-        Runtime.Log("No Root ID " + asString(root));
 }
 
 
@@ -817,12 +808,108 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
 }
 
 
+void SynthEngine::ListVectors(list<string>& msg_buf)
+{
+    bool found = false;
+    for (int value = 0; value < NUM_MIDI_CHANNELS; ++value)
+    {
+        if (Runtime.nrpndata.vectorEnabled[value])
+        {
+            found = true;
+            msg_buf.push_back("Channel " + asString(value));
+            msg_buf.push_back("  X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[value])
+                            + "    features = " + asString((int)  Runtime.nrpndata.vectorXfeatures[value]));
+
+            if (Runtime.nrpndata.vectorYaxis[value] > 0x7f || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
+            msg_buf.push_back("  Y axis disabled");
+            else
+            {
+                msg_buf.push_back("  Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[value])
+                + "    features = " + asString((int) Runtime.nrpndata.vectorYfeatures[value]));
+            }
+        }
+    }
+    if (!found)
+        msg_buf.push_back("No vectors enabled");
+}
+
+
+void SynthEngine::ListSettings(list<string>& msg_buf)
+{
+    int root;
+    string label;
+    msg_buf.push_back("Settings");
+    msg_buf.push_back("  Master volume " + asString((int) Pvolume));
+    msg_buf.push_back("  Master key shift " + asString(Pkeyshift)
+              + "  (" + asString(Pkeyshift - 64) + ")");
+
+    root = bank.currentRootID;
+    if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
+    {
+        label = bank.roots [root].path;
+        if (label.at(label.size() - 1) == '/')
+            label = label.substr(0, label.size() - 1);
+        msg_buf.push_back("  Current Root ID " + asString(root)
+                        + "    " + label);
+        msg_buf.push_back("  Current Bank ID " + asString(bank.currentBankID)
+                        + "    " + bank.roots [root].banks [bank.currentBankID].dirname);
+    }
+    else
+        msg_buf.push_back("  No paths set");
+    
+    msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
+    
+    msg_buf.push_back("  Number of active parts "
+                    + asString(Runtime.NumAvailableParts));
+    
+    msg_buf.push_back("  Current MIDI channel " + asString(Runtime.currentChannel));
+    
+    if (Runtime.midi_bank_root > 119)
+        msg_buf.push_back("  MIDI Root Change off");
+    else
+        msg_buf.push_back("  MIDI Root CC " + asString(Runtime.midi_bank_root));
+    
+    if (Runtime.midi_bank_C > 119)
+        msg_buf.push_back("  MIDI Bank Change off");
+    else
+        msg_buf.push_back("  MIDI Bank CC " + asString(Runtime.midi_bank_C));
+    
+    if (Runtime.EnableProgChange)
+    {
+        msg_buf.push_back("  MIDI Program Change on");
+        if (Runtime.enable_part_on_voice_load)
+            msg_buf.push_back("  MIDI Program Change enables part");
+        else
+            msg_buf.push_back("  MIDI Program Change doesn't enable part");
+    }
+    else
+        msg_buf.push_back("  MIDI program change off");
+    
+    if (Runtime.midi_upper_voice_C > 119)
+        msg_buf.push_back("  MIDI extended Program Change off");
+    else
+        msg_buf.push_back("  MIDI extended Program Change CC "
+                        + asString(Runtime.midi_upper_voice_C));
+        
+    msg_buf.push_back("  ALSA MIDI " + Runtime.alsaMidiDevice);
+    msg_buf.push_back("  ALSA AUDIO " + Runtime.alsaAudioDevice);
+    msg_buf.push_back("  Jack server " + Runtime.jackServer);
+
+    if (Runtime.consoleMenuItem)
+    {
+        msg_buf.push_back("  Reports sent to console window");
+    }
+    else
+        msg_buf.push_back("  Reports sent to stderr");
+}
+
+
 /* Provides a way of setting dynamic system variables
  * from sources other than the gui
  */
 void SynthEngine::SetSystemValue(int type, int value)
 {
-    int idx, root;
+    list<string> msg;
     string label;
     label = "";
     switch (type)
@@ -848,7 +935,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             {
                 Runtime.consoleMenuItem = true;
                 Runtime.Log("Sending reports to console window");
-                // we need the next line in case is someone is working headless
+                // we need the next line in case someone is working headless
                 cout << "Sending reports to console window\n";
             }
             else
@@ -862,102 +949,29 @@ void SynthEngine::SetSystemValue(int type, int value)
         
             
         case 108: // list vector parameters
-            if (!Runtime.nrpndata.vectorEnabled[value])
-            {
-                Runtime.Log("Disabled");
-                return;
-            }
-            else
-            {
-                Runtime.Log("X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[value]));
-                Runtime.Log("  features = " + asString((int)  Runtime.nrpndata.vectorXfeatures[value]));
-            }
-            if (Runtime.nrpndata.vectorYaxis[value] > 0x7f || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
-                Runtime.Log("Y axis disabled");
-            else
-            {
-                Runtime.Log("Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[value]));
-                Runtime.Log("  features = " + asString((int) Runtime.nrpndata.vectorYfeatures[value]));
-            }
+            ListVectors(msg);
+            cliOutput(msg, 255);
             break;
                 
             
         case 109: // list dynamics
-            if (Runtime.consoleMenuItem)
-            {
-                Runtime.Log("\nReports sent to console window");
-                // we need the next line in case is someone is working headless
-                cout << "\nReports sent to console window\n";
-            }
-            else
-                Runtime.Log("\nReports sent to stderr");
-            
-            Runtime.Log("Master volume " + asString((int) Pvolume));
-            Runtime.Log("Master key shift " + asString(Pkeyshift)
-                      + "  (" + asString(Pkeyshift - 64) + ")");
-
-            root = bank.currentRootID;
-            if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
-            {
-                label = bank.roots [root].path;
-                if (label.at(label.size() - 1) == '/')
-                    label = label.substr(0, label.size() - 1);
-                Runtime.Log("Current Root ID " + asString(root) + "    " + label
-                    + "\nCurrent Bank ID " + asString(bank.currentBankID) + "    "
-                    + bank.roots [root].banks [bank.currentBankID].dirname);
-            }
-            else
-                Runtime.Log("No paths set");
-            
-            if (Runtime.midi_bank_root > 119)
-                Runtime.Log("MIDI Root Change off");
-            else
-                Runtime.Log("MIDI Root CC " + asString(Runtime.midi_bank_root));
-            
-            if (Runtime.midi_bank_C > 119)
-                Runtime.Log("MIDI Bank Change off");
-            else
-                Runtime.Log("MIDI Bank CC " + asString(Runtime.midi_bank_C));
-            
-            if (Runtime.EnableProgChange)
-            {
-                Runtime.Log("MIDI Program Change on");
-                if (Runtime.enable_part_on_voice_load)
-                    Runtime.Log("MIDI Program Change enables part");
-                else
-                    Runtime.Log("MIDI Program Change doesn't enable part");
-            }
-            else
-                Runtime.Log("MIDI program change off");
-            
-            if (Runtime.midi_upper_voice_C > 119)
-                Runtime.Log("MIDI extended Program Change off");
-            else
-                Runtime.Log("MIDI extended Program Change CC " + asString(Runtime.midi_upper_voice_C));
-            
-            Runtime.Log("Number of active parts " + asString(Runtime.NumAvailableParts));
+            ListSettings(msg);
+            cliOutput(msg, 255);
             break; 
             
         case 110 : // list paths
-            Runtime.Log("\nRoot Paths");
-            for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
-            {
-                if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
-                {
-                    label = bank.roots [idx].path;
-                    if (label.at(label.size() - 1) == '/')
-                        label = label.substr(0, label.size() - 1);
-                    Runtime.Log("    ID " + asString(idx) + "     " + label);
-                }
-            }
+            ListPaths(msg);
+            cliOutput(msg, 255);
             break;
             
         case 111 : // list banks
-            ListBanks(value);
+            ListBanks(value, msg);
+            cliOutput(msg, 255);
             break;
             
         case 112: // list instruments
-            ListInstruments(value);
+            ListInstruments(value, msg);
+            cliOutput(msg, 255);
             break;
             
         case 113: // root

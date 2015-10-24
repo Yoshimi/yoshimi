@@ -18,7 +18,7 @@ list instruments (n) - lists all the instruments and their IDs in bank 'n' (or t
 
 list current - lists the number of parts available and parts with instruments currently installed along with any enabled with the default sound. Also shows their audio destination 'M' = main L/R, 'P' = part, 'B' = both, '-' = disabled or unavailable.
 
-list vector [n] - lists the settings for vector on channel 'n'
+list vectors - lists the settings for all enabled vectors.
 
 list setup - displays the current dynamic system settings.
 
