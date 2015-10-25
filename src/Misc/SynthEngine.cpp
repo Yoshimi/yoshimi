@@ -681,7 +681,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
     else // Output is too long, page it
     {
         // JBS: make that a class member variable
-        string page_filename = "yoshimi-pager-" + asString(getpid()) + ".log";
+        string page_filename = "/tmp/yoshimi-pager-" + asString(getpid()) + ".log";
         ofstream fout(page_filename.c_str(),(ios_base::out | ios_base::trunc));
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             fout << *it << endl;
@@ -859,7 +859,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     
     msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
     
-    msg_buf.push_back("  Number of active parts "
+    msg_buf.push_back("  Number of availalbe parts "
                     + asString(Runtime.NumAvailableParts));
     
     msg_buf.push_back("  Current MIDI channel " + asString(Runtime.currentChannel));

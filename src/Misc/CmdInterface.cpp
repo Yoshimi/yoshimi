@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <list>
-#include <sys/types.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
+#include <pwd.h>
+#include <cstdio>
+#include <cerrno>
+#include <sys/types.h>
 #include <ncurses.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -158,13 +160,13 @@ bool cmdIfaceProcessCommand(char *buffer)
 
     if (helpList(mode, point, commands, synth))
         return false;
-    if (matchMove(point, "lis") || listType >= 2)
+    if (matchMove(point, "lis"))
     {
-        if (miscFuncs.matchWord(point, "ban") || miscFuncs.matchWord(point, "ins") || listType >= 2 )
+        if (miscFuncs.matchWord(point, "ban") || miscFuncs.matchWord(point, "ins"))
         {
             if (matchMove(point, "ban"))
                 listType = 2;
-            else if(matchMove(point, "ins"))
+            else if (matchMove(point, "ins")) // yes we do need this second check!
                 listType = 3;
                     
             if (point[0] == 0)
@@ -172,7 +174,10 @@ bool cmdIfaceProcessCommand(char *buffer)
             else
                 ID = miscFuncs.string2int(point);
             if (listType == 2)
+            {
                 synth->ListBanks(ID, msg);
+                synth->cliOutput(msg, LINES);
+            }
             else
             {
                 synth->ListInstruments(ID, msg);
@@ -351,6 +356,19 @@ bool cmdIfaceProcessCommand(char *buffer)
 
 void cmdIfaceCommandLoop()
 {
+    // Initialise the history functionality
+    // Set up the history filename
+    string hist_filename;
+    { // put this in a block to lose the passwd afterwards
+        struct passwd *pw = getpwuid(getuid());
+        hist_filename = string(pw->pw_dir) + string("/.yoshimi_history");
+    }
+    using_history();
+    stifle_history(80); // Never more than 80 commands
+    if (read_history(hist_filename.c_str()) != 0) // reading failed
+    {
+        perror(hist_filename.c_str());
+    }
     char *cCmd = NULL;
     bool exit = false;
     sprintf(welcomeBuffer, "yoshimi> ");
@@ -369,5 +387,9 @@ void cmdIfaceCommandLoop()
         }
         else
             usleep(20000);
+    }
+    if (write_history(hist_filename.c_str()) != 0) // writing of history file failed
+    {
+        perror(hist_filename.c_str());
     }
 }
