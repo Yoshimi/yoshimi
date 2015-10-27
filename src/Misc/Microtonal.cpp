@@ -588,7 +588,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
             {
                 if (!xml->enterbranch("KEYMAP", i))
                     continue;
-                Pmapping[i] = xml->getpar127("degree", Pmapping[i]);
+                Pmapping[i] = xml->getpar("degree", Pmapping[i], -1, 127);
                 xml->exitbranch();
             }
             xml->exitbranch();

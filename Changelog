@@ -1,5 +1,9 @@
 yoshimi 1.3.6 M
 
+2015-10-27 Will
+- Fixes microtonal tuning regression.
+- Moved old README.txt file to histories.
+
 2015-10-25 Will
 - Added command line history patch from of F. Silvain.
 - Corrected bank listing regression.
