@@ -1,5 +1,8 @@
 yoshimi 1.3.6.1
 
+2015-10-27 Will
+- Fixed Microtonal scale regresssion.
+
 2015-10-2 Will
 - Set up bugfix branch to track only the current release.
 - Set version to 1.3.6.1
