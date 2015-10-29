@@ -376,20 +376,22 @@ mainCreateNewInstance(forceId);}
           MenuItem {} {
             label {&Load Scale Settings...}
             callback {//
-                char *filename;
-                filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
-                if (filename == NULL)
-                    return;
-                string fname = string(filename);
-                synth->actionLock(lockmute);
-                synth->microtonal.defaults(); // clear all parameters
-                bool result = synth->microtonal.loadXML(fname);
-                synth->actionLock(unlock);
-                if (NULL != microtonalui)
-                    delete microtonalui;
-                microtonalui = new MicrotonalUI(&synth->microtonal);
-                if (!result)
-                    fl_alert("Failed to load scale settings file");}
+    char *filename;
+    filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
+    if (filename == NULL)
+        return;
+    string fname = string(filename);
+    synth->actionLock(lockmute);
+    synth->microtonal.defaults(); // clear all parameters
+    bool result = synth->microtonal.loadXML(fname);
+    synth->actionLock(unlock);
+    if (NULL != microtonalui)
+        delete microtonalui;
+    microtonalui = new MicrotonalUI(&synth->microtonal);
+    if (!result)
+        fl_alert("Failed to load scale settings file");
+    else
+        microtonalui->apply();}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
@@ -437,14 +439,15 @@ mainCreateNewInstance(forceId);}
           MenuItem loadState {
             label Load
             callback {// for Alessandro
-                char *fle = fl_file_chooser("Load:", "({*.state})",
-                                            laststatefile.c_str(), 0);
-                if (fle)
-                {
-                    laststatefile = string(fle);
-                    synth->getRuntime().loadState(laststatefile);
-                }
-                refresh_master_ui();}
+    char *fle = fl_file_chooser("Load:", "({*.state})",
+                                laststatefile.c_str(), 0);
+    if (fle)
+    {
+        laststatefile = string(fle);
+        synth->getRuntime().loadState(laststatefile);
+    }
+    refresh_master_ui();
+    microtonalui->apply();}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
         }

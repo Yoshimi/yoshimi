@@ -1,5 +1,8 @@
 yoshimi 1.3.6 M
 
+2015-10-29 Will
+- Loading scales or state now performs a retune.
+
 2015-10-27 Will
 - Fixes microtonal tuning regression.
 - Moved old README.txt file to histories.
