@@ -1,5 +1,12 @@
 yoshimi 1.3.6 M
 
+2015-10-31 Will
+- Added 'Show' to top menu bar.
+- Rationalised top menu bar entries.
+- Created 'Reset' button in place of 'Clear all parameters'.
+- Added reset to command line.
+- Added number of available parts to defaults resetting.
+
 2015-10-29 Will
 - Loading scales or state now performs a retune.
 

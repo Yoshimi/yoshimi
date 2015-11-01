@@ -58,6 +58,7 @@ string basics[] = {
     "set available <n>",          "set available parts (16, 32, 64)",
     "set volume <n>",             "set master volume",
     "set shift <n>",              "set master key shift semitones (64 no shift)",
+    "set defaults",               "Restore all dynamic settings to their defaults",
     "set alsa midi <s>",          "* set name of source",
     "set alsa audio <s>",         "* set name of hardware device",
     "set jack server <s>",        "* set server name",

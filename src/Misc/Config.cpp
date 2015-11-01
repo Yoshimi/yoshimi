@@ -92,7 +92,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreJackSession(false),
     Samplerate(48000),
     Buffersize(256),
-    Oscilsize(1024),
+    Oscilsize(512),
     runSynth(true),
     showGui(true),
     showConsole(false),

@@ -254,20 +254,7 @@ mainCreateNewInstance(forceId);}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
-            label {&Clear Instrument...}
-            callback {//
-                if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
-                {
-                    synth->actionLock(lockmute);
-                    synth->part[npart]->defaultsinstrument();
-                    synth->actionLock(unlock);
-                    npartcounter->do_callback();
-                }
-                updatepanel();}
-            xywh {35 35 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Open Instrument...}
+            label {&Load}
             callback {//
                 const char *filename;
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
@@ -283,7 +270,7 @@ mainCreateNewInstance(forceId);}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Save Instrument ...}
+            label {&Save}
             callback {//
     if (synth->part[npart]->Pname == "Simple Sound")
     {
@@ -306,24 +293,17 @@ mainCreateNewInstance(forceId);}
             tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
-            label {Show &Instruments...}
-            callback {bankui->Show();}
-            xywh {0 0 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {Show &Banks...}
-            callback {bankui->rootuiwindow->show();}
-            xywh {10 10 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {Show Root &Paths...}
-            callback {bankui->pathwindow->show();}
-            xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Virtual Keyboard...}
-            callback {virkeyboard->Show();}
-            xywh {15 15 100 20} labelsize 12
+            label {&Clear}
+            callback {//
+                if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
+                {
+                    synth->actionLock(lockmute);
+                    synth->part[npart]->defaultsinstrument();
+                    synth->actionLock(unlock);
+                    npartcounter->do_callback();
+                }
+                updatepanel();}
+            xywh {35 35 100 20} labelsize 12
           }
         }
         Submenu Parameters {
@@ -341,7 +321,7 @@ mainCreateNewInstance(forceId);}
             xywh {0 0 34 21} labelsize 12
           }
           MenuItem {} {
-            label {&Open}
+            label {&Load}
             callback {//
                 do_load_master(true, NULL);
                 paramsui->loadRecent();}
@@ -362,11 +342,6 @@ mainCreateNewInstance(forceId);}
     else
         fl_alert("Nothing to save!");}
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
-          }
-          MenuItem {} {
-            label {&Clear}
-            callback {do_new_master();}
-            xywh {20 20 100 20} labelsize 12
           }
         }
         Submenu Scales {
@@ -420,22 +395,9 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label State
+          label {S&tate}
           xywh {0 0 70 21} labelsize 12
         } {
-          MenuItem saveState {
-            label Save
-            callback {// for Alessandro
-
-                char *fle = fl_file_chooser("Save:", "({*.state})",
-                                            laststatefile.c_str(), 0);
-                if (fle)
-                {
-                    laststatefile = string(fle);
-                    synth->getRuntime().saveState(laststatefile);
-                }}
-            tooltip {Save session state} xywh {10 10 34 21} labelsize 12
-          }
           MenuItem loadState {
             label Load
             callback {// for Alessandro
@@ -449,6 +411,39 @@ mainCreateNewInstance(forceId);}
     refresh_master_ui();
     microtonalui->apply();}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
+          }
+          MenuItem saveState {
+            label Save
+            callback {// for Alessandro
+
+                char *fle = fl_file_chooser("Save:", "({*.state})",
+                                            laststatefile.c_str(), 0);
+                if (fle)
+                {
+                    laststatefile = string(fle);
+                    synth->getRuntime().saveState(laststatefile);
+                }}
+            tooltip {Save session state} xywh {10 10 34 21} labelsize 12
+          }
+        }
+        Submenu {} {
+          label {S&how}
+          xywh {0 0 70 20} labelsize 12
+        } {
+          MenuItem {} {
+            label {&Instruments...}
+            callback {bankui->Show();}
+            xywh {10 10 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Banks...}
+            callback {bankui->rootuiwindow->show();}
+            xywh {20 20 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Root Paths...}
+            callback {bankui->pathwindow->show();}
+            xywh {30 30 100 20} labelsize 12
           }
         }
       }
@@ -478,7 +473,7 @@ mainCreateNewInstance(forceId);}
               globalfinedetune->value(64.0);
               synth->microtonal.Pglobalfinedetune = 64.0f;
               globalfinedetune->changed();}
-          tooltip {Master fine detune reset} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
+          tooltip {Clear all dynamic settings} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
         Fl_Button {} {
           label {Stop!}
@@ -496,7 +491,7 @@ mainCreateNewInstance(forceId);}
               	}              	
               }
               synth->allStop();}
-          tooltip {Cease all sound immediately!} xywh {11 46 50 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {15 32 80 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -506,16 +501,22 @@ mainCreateNewInstance(forceId);}
           class WidgetPDial
         }
         Fl_Button {} {
-          label virKbd
+          label {Virtual Kbd}
           callback {virkeyboard->Show();}
-          tooltip {Virtual Keyboard} xywh {148 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {116 60 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button {} {
-          label Panel
+          label {Mixer Panel}
           callback {//
                 updatepanel();
                 panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {116 32 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+        }
+        Fl_Button {} {
+          label Reset
+          callback {//
+    do_new_master();}
+          tooltip {Restore all dynamic settings to their defaults} xywh {15 60 80 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
       }
       Fl_Tabs sysinsgroup {
@@ -1096,18 +1097,14 @@ updatepanel();}
   }
   Function {do_new_master()} {} {
     code {//
-        if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
-        {
-            delete microtonalui;
+    if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
+    {
+        delete microtonalui;
+        synth->resetAll();
 
-            synth->actionLock(lockmute);
-            synth->defaults();
-            synth->ClearNRPNs();
-            synth->actionLock(unlock);
-
-            npartcounter->value(1);
-            refresh_master_ui();
-            updatepanel();
+        npartcounter->value(1);
+        refresh_master_ui();
+        updatepanel();
         }} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {

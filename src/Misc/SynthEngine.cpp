@@ -365,6 +365,7 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    Runtime.NumAvailableParts = 16;
     ShutUp();
 }
 
@@ -1247,6 +1248,13 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
+    else if (matchWord(point, "def"))
+    {
+        resetAll();
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+
+    }
+    
     else if (matchWord(point, "als"))
     {
         point = skipChars(point);
@@ -1552,6 +1560,16 @@ void SynthEngine::ClearNRPNs(void)
         Runtime.nrpndata.vectorXaxis[chan] = 0xff;
         Runtime.nrpndata.vectorYaxis[chan] = 0xff;
     }
+}
+
+
+void SynthEngine::resetAll(void)
+{
+    actionLock(lockmute);
+    defaults();
+    ClearNRPNs();
+    actionLock(unlock);
+    Runtime.Log("All dynamic values set to defaults.");
 }
 
 

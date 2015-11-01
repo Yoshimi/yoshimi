@@ -152,8 +152,6 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     if (names == 7)
     {
         bRet = true;
-//        if (information.SUBsynth_used)
-//                synth->getRuntime().Log("Sub found");
     }
     else
     {
