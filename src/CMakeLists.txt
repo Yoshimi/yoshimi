@@ -152,6 +152,10 @@ else (Boost_FOUND)
     message (FATAL_ERROR "boost headers required, but not found")
 endif (Boost_FOUND)
 
+# Liblo
+pkg_search_module(LIBLO liblo>=0.0.0)
+mark_as_advanced(LIBLO_LIBRARIES)
+
 # fontconfig
 pkg_check_modules (FONTCONFIG REQUIRED fontconfig>=0.22)
 mark_as_advanced(FONTCONFIG_LIBRARIES)
@@ -234,7 +238,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Microtonal.cpp
     Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
-    Misc/CmdInterface.cpp
+    Misc/CmdInterface.cpp Misc/NSM.C Misc/NSM/Client.C Misc/debug.C
 )
 
 set (Params_sources
@@ -412,6 +416,7 @@ set (ProgSources
 include_directories (AFTER
     ${MXML_INCLUDE_DIRS}
     ${ALSA_INCLUDE_DIRS}
+    ${LIBLO_INCLUDE_DIRS}
     ${JACK_INCLUDE_DIRS}
     ${FONTCONFIG_INCLUDE_DIRS}
     ${FLTK_INCLUDE_DIR}
@@ -425,6 +430,7 @@ set(ExternLibraries
     ${FLTK_LIBRARIES}
     ${MXML_LIBRARIES}
     ${ALSA_LIBRARIES}
+    ${LIBLO_LIBRARIES}
     ${JACK_LIBRARIES}
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}

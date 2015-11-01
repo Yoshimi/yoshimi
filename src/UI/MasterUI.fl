@@ -1107,7 +1107,7 @@ updatepanel();}
         updatepanel();
         }} {}
   }
-  Function {do_load_master(bool updatehistory, const char* file)} {} {
+  Function {do_load_master_unconditional(bool updatehistory, const char* file)} {return_type int} {
     code {//
         const char *fname;
         if (NULL != file)
@@ -1116,7 +1116,7 @@ updatepanel();}
         {
             fname = fl_file_chooser("Open:", "({*.xmz})", NULL, 0);
             if (fname == NULL)
-                return;
+                return -1;
         }
         int result = synth->loadParameters(fname);
         setinspartlist();
@@ -1142,6 +1142,45 @@ updatepanel();}
                 fl_alert("%s",msg.c_str());
         }} {}
   }
+
+ Function {do_load_master(bool updatehistory, const char* file)} {} {
+    code {//
+        const char *fname;
+        if (NULL != file)
+            fname = file;
+        else
+        {
+            fname = fl_file_chooser("Open:", "({*.xmz})", NULL, 0);
+            if (fname == NULL)
+                return;
+        }
+        int result = do_load_master_unconditional( updatehistory, fname );
+
+        if ( result < 0 )
+        {
+             string msg = "Could not load file " + string(fname);
+             if (result == -10)
+             {
+                 fl_alert(msg.c_str());
+             }
+         }} {}
+   }
+
+   Function {do_save_master_unconditional(const char* file = NULL)} {return_type int} {
+    code {//
+        bool result = false;
+        result = synth->saveXML(file);
+        if (result)
+        {
+            // NSM_TODO: i don't know how to fix this :)
+            // synth->getRuntime().setMasterLabel(Runtime.addParamHistory(file));
+            RecentParams->activate();
+        }
+        updatepanel();
+        return result;
+        } {}
+  }
+
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
         const char *fname;
@@ -1163,7 +1202,7 @@ updatepanel();}
         }
         else
             fname = file;
-        result = synth->saveXML(fname);
+        result = do_save_master_unconditional(fname);
         if (!result)
             fl_alert("Could not save the file.");
         else

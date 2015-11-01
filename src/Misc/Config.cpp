@@ -41,6 +41,11 @@
 #include <jack/session.h>
 #endif
 
+#include "nsm.h"
+#include "NSM.H"
+
+extern NSM::Client *nsm;
+
 using namespace std;
 
 #include "Synth/BodyDisposal.h"
@@ -909,6 +914,9 @@ void Config::setInterruptActive(void)
 {
     Log("Interrupt received", true);
     __sync_or_and_fetch(&sigIntActive, 0xFF);
+
+    if( nsm )
+        nsm->check();
 }
 
 

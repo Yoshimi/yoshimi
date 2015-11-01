@@ -45,6 +45,25 @@ using namespace std;
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+//#include "Misc/nsm.h"
+#include "Misc/NSM.H"
+#include "Misc/NSM/Client.H"
+
+// NSM instance
+char *instance_name;
+NSM_Client *nsm;
+
+// cleanup on signaled exit
+void sigterm_exit( int /* sig */ )
+{
+    // NSM_TODO: fix this
+    //Runtime.runSynth = false;
+    exit(0);
+}
+
 extern void cmdIfaceCommandLoop();
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
@@ -284,6 +303,22 @@ bool mainCreateNewInstance(unsigned int forceId)
     }
 
     synth->getRuntime().StartupReport(musicClient);
+
+    if( nsm && nsm->is_active() )
+    {
+        if( nsm->project_filename )
+        {
+           struct stat st;
+           if( stat( nsm->project_filename, &st ) == 0 )
+           {
+                    MasterUI *guiMaster = synth->getGuiMaster(false);
+                    guiMaster->do_load_master_unconditional( true, nsm->project_filename );
+           }
+           // NSM_TODO: disable save here, NSM sessions can only
+           // be saved from the NSM SM app
+        }
+    }
+
     synth->Unmute();
     if (synth->getUniqueId() == 0)
         cout << "\nYay! We're up and running :-)\n";
@@ -325,6 +360,8 @@ void *commandThread(void *arg)
 
 int main(int argc, char *argv[])
 {
+    char *nsm_url;
+
     struct termios  oldTerm;
     tcgetattr(0, &oldTerm);
     
@@ -364,6 +401,35 @@ int main(int argc, char *argv[])
     it = synthInstances.begin();
     firstRuntime = &it->first->getRuntime();
     firstSynth = it->first;
+
+    // NSM_TODO : Is this signal handling OK given the sigaction() below?
+    signal( SIGINT , sigterm_exit);
+    signal( SIGTERM, sigterm_exit);
+
+    nsm_url = getenv( "NSM_URL" );
+
+    if( nsm_url )
+    {
+        nsm = new NSM_Client( firstSynth, firstSynth->getGuiMaster() );
+        if( !nsm->init( nsm_url ) )
+        {
+                nsm->announce( "Yoshimi", "", argv[0] );
+                /* Yoshimi really isn't structure to work without
+                 * being connected to JACK and having synth object
+                 * defined, so sleep for a bit and give up if not done */
+                nsm->check( 500 );
+                if( !nsm->is_active() )
+                {
+                        delete nsm;
+                        nsm = 0;
+                }
+        }
+        else
+        {
+                delete nsm;
+                nsm = 0;
+        }
+    }
 
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
