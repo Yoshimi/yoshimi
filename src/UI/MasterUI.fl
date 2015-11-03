@@ -427,7 +427,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label {S&how}
+          label {&View}
           xywh {0 0 70 20} labelsize 12
         } {
           MenuItem {} {
@@ -473,7 +473,7 @@ mainCreateNewInstance(forceId);}
               globalfinedetune->value(64.0);
               synth->microtonal.Pglobalfinedetune = 64.0f;
               globalfinedetune->changed();}
-          tooltip {Clear all dynamic settings} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
+          tooltip {Master fine detune reset} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
         Fl_Button {} {
           label {Stop!}
@@ -516,7 +516,7 @@ mainCreateNewInstance(forceId);}
           label Reset
           callback {//
     do_new_master();}
-          tooltip {Restore all dynamic settings to their defaults} xywh {15 60 80 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Clear all dynamic settings} xywh {15 60 80 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
       }
       Fl_Tabs sysinsgroup {

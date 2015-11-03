@@ -286,9 +286,35 @@ char *XMLwrapper::getXMLdata()
     memset(tabs, 0, STACKSIZE + 2);
     mxml_node_t *oldnode=node;
     node = info;
-    addparbool("ADDsynth_used", information.ADDsynth_used);
-    addparbool("SUBsynth_used", information.SUBsynth_used);
-    addparbool("PADsynth_used", information.PADsynth_used);
+    switch (synth->getRuntime().xmlType)
+    {
+        case 0:
+            addparstr("XMLtype", "Invalid");
+            break;
+        case XML_INSTRUMENT:
+            addparbool("ADDsynth_used", information.ADDsynth_used);
+            addparbool("SUBsynth_used", information.SUBsynth_used);
+            addparbool("PADsynth_used", information.PADsynth_used);
+            break;
+        case XML_PARAMETERS:
+            addparstr("XMLtype", "Parameters");
+            break;
+        case XML_MICROTONAL:
+            addparstr("XMLtype", "Scales");
+            break;
+        case XML_PRESETS:
+            addparstr("XMLtype", "Presets");
+            break;
+        case XML_STATE:
+            addparstr("XMLtype", "Session");
+            break;
+        case XML_CONFIG:
+            addparstr("XMLtype", "Config");
+            break;
+        default:
+            addparstr("XMLtype", "Unknown");
+            break;
+    }
     node = oldnode;
     char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
     return xmldata;

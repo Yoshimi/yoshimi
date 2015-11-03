@@ -109,6 +109,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     GzipCompression(3),
     Interpolation(0),
     checksynthengines(1),
+    xmlType(0),
     EnableProgChange(1), // default will be inverted
     consoleMenuItem(0),
     rtprio(50),
@@ -569,6 +570,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
 void Config::saveConfig(void)
 {
+    xmlType = XML_CONFIG;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
@@ -652,6 +654,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
 void Config::saveSessionData(string savefile)
 {
+    synth->getRuntime().xmlType = XML_STATE;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {

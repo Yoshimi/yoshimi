@@ -126,6 +126,7 @@ class Config : public MiscFuncs
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
         bool          SimpleCheck;
+        int           xmlType;
         int           EnableProgChange;
         bool          consoleMenuItem;
         int           rtprio;

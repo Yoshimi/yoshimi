@@ -600,6 +600,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 
 bool Microtonal::saveXML(string filename)
 {
+    synth->getRuntime().xmlType = XML_MICROTONAL;
     XMLwrapper *xml = new XMLwrapper(synth);
 
     xml->beginbranch("MICROTONAL");

@@ -1,13 +1,12 @@
 
-restoreJsession() -> restoreSessionData() -> extractConfigData()
-Refetches the entire bank structure. Should it?
-
 Make command line adding and removing root paths update gui.
 Check other command/gui updates.
 
 Make loading effect presets update the 'top' line.
 
 Tidy up 'INFO' in xml files - only voices need engine status,
+
+Sort out default midi message.
 
 startup state load doesn't set buffersize correctly - why?
     size is ignored if loaded when already running which is reasonable.

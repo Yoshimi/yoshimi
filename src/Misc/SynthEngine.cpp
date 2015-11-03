@@ -2067,6 +2067,7 @@ void SynthEngine::putalldata(const char *data, int size)
 
 bool SynthEngine::saveXML(string filename)
 {
+    Runtime.xmlType = XML_PARAMETERS;
     XMLwrapper *xml = new XMLwrapper(this);
     add2XML(xml);
     bool result = xml->saveXMLfile(filename);

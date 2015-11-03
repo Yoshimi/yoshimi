@@ -1197,6 +1197,7 @@ void Part::add2XML(XMLwrapper *xml)
 
 bool Part::saveXML(string filename)
 {
+    synth->getRuntime().xmlType = XML_INSTRUMENT;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
