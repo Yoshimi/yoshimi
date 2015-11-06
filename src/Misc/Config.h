@@ -129,6 +129,7 @@ class Config : public MiscFuncs
         int           xmlType;
         int           EnableProgChange;
         bool          consoleMenuItem;
+        bool          logXMLheaders;
         int           rtprio;
         int           midi_bank_root;
         int           midi_bank_C;

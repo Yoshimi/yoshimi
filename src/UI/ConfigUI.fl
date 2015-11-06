@@ -117,7 +117,7 @@ class ConfigUI {selected : {private MiscFuncs}
         synth->getRuntime().Buffersize = changed;
         configChanged = true;
     }}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {249 80 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            tooltip {ADSynth Oscillator Size (samples)} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 32.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
@@ -152,7 +152,7 @@ class ConfigUI {selected : {private MiscFuncs}
                 synth->getRuntime().Interpolation = (int) o->value();
                 if (synth->getRuntime().Interpolation != tmp)
                 	configChanged = true;}
-            xywh {250 115 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
             MenuItem {} {
@@ -171,7 +171,7 @@ class ConfigUI {selected : {private MiscFuncs}
                 synth->getRuntime().VirKeybLayout = (int) o->value();
                 if (synth->getRuntime().VirKeybLayout != tmp)
                 	configChanged = true;}
-            xywh {250 150 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            xywh {250 135 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
             MenuItem {} {
@@ -202,7 +202,7 @@ class ConfigUI {selected : {private MiscFuncs}
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
 		if(synth->getRuntime().GzipCompression != tmp)
 			configChanged = true;}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 185 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
           }
           Fl_Choice reports {
@@ -215,7 +215,7 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            xywh {200 220 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().consoleMenuItem);}
           } {
             MenuItem {} {
@@ -253,6 +253,16 @@ else
           Fl_Box {} {
             label {Most settings changes require a restart}
             xywh {100 282 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
+          Fl_Check_Button {} {
+            label {Log XML headers}
+            callback {if (synth->getRuntime().logXMLheaders != o->value())
+{
+    synth->getRuntime().logXMLheaders = o->value();
+    configChanged = true;
+}}
+            xywh {320 225 20 20} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
         }
         Fl_Group {} {

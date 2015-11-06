@@ -112,6 +112,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     xmlType(0),
     EnableProgChange(1), // default will be inverted
     consoleMenuItem(0),
+    logXMLheaders(0),
     rtprio(50),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
@@ -208,6 +209,7 @@ bool Config::Setup(int argc, char **argv)
             no_state0: Log("Invalid state file specified for restore " + StateFile);
             return false;
         }
+        Log(StateFile);
     }    
     return true;
 }
@@ -414,33 +416,6 @@ bool Config::loadConfig(void)
     {
         resConfigFile += asString(synth->getUniqueId());
     }
-/*    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
-    {
-        Log("ConfigFile " + resConfigFile + " not found");
-        Log("Trying for old config file");
-        string oldConfigFile = string(getenv("HOME")) + string("/.yoshimiXML.cfg");
-        if (!isRegFile(oldConfigFile))
-        {
-            Log("Old config file " + resConfigFile + " not found");
-            Log("Trying for ZynAddSubFX config file");
-            oldConfigFile = string(getenv("HOME")) + string("/.zynaddsubfxXML.cfg");
-        }
-        if (isRegFile(oldConfigFile))
-        {
-            Log("Copying old config file " + oldConfigFile + " to new location " + resConfigFile);
-            FILE *oldfle = fopen (oldConfigFile.c_str(), "r");
-            FILE *newfle = fopen (resConfigFile.c_str(), "w");
-            if (oldfle != NULL && newfle != NULL)
-                while (!feof(oldfle))
-                    putc(getc(oldfle), newfle);
-            else
-                Log("Failed to copy old config file " + oldConfigFile + " to " + resConfigFile);
-            if (newfle)
-                fclose(newfle);
-            if (oldfle)
-                fclose(oldfle);
-        }
-    }*/
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
@@ -494,6 +469,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     consoleMenuItem = xml->getpar("reports_destination", consoleMenuItem, 0, 1);
+    logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
     // get bank dirs
@@ -543,7 +519,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
-    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
+//    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
 
     if (xml->enterbranch("XMZ_HISTORY"))
@@ -609,6 +585,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("reports_destination", consoleMenuItem);
+    xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
     synth->getBankRef().saveToConfigFile(xmltree);
@@ -630,7 +607,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
-    xmltree->addpar("enable_console_window", consoleMenuItem);
+//    xmltree->addpar("enable_console_window", consoleMenuItem);
     xmltree->addpar("single_row_panel", single_row_panel);
 
     // Parameters history

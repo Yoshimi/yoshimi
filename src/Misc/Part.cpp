@@ -1088,14 +1088,14 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 
 void Part::add2XMLinstrument(XMLwrapper *xml)
 {
-    if (Pname == "Simple Sound")
-        return;
     xml->beginbranch("INFO");
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
     xml->addpar("type",info.Ptype);
     xml->endbranch();
+    if (Pname == "Simple Sound")
+        return;
 
 
     xml->beginbranch("INSTRUMENT_KIT");
@@ -1272,7 +1272,12 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("INSTRUMENT_KIT"))
+    if (!xml->enterbranch("INSTRUMENT_KIT"))
+    {
+        defaultsinstrument();
+        return;
+    }
+    else
     {
         Pkitmode = xml->getpar127("kit_mode", Pkitmode);
         Pdrummode = xml->getparbool("drum_mode", Pdrummode);

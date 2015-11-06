@@ -4,7 +4,7 @@ Check other command/gui updates.
 
 Make loading effect presets update the 'top' line.
 
-Tidy up 'INFO' in xml files - only voices need engine status,
+Sort out default state save/load
 
 Sort out default midi message.
 

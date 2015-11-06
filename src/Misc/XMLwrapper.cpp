@@ -374,6 +374,7 @@ void XMLwrapper::endbranch()
 
 bool XMLwrapper::loadXMLfile(const string& filename)
 {
+    bool yoshitoo = false;
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
@@ -404,12 +405,19 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     if (mxmlElementGetAttr(root, "Yoshimi-major"))
     {
         xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
+        yoshitoo = true;
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major));
     }
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
         xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_minor));
+    }
+    if (synth->getRuntime().logXMLheaders)
+    {
+        synth->getRuntime().Log("ZynAddSubFX version major " + asString(xml_version.major) + "   minor " + asString(xml_version.minor));
+        if (yoshitoo)
+            synth->getRuntime().Log("Yoshimi version major " + asString(xml_version.y_major) + "   minor " + asString(xml_version.y_minor));
     }
     return true;
 }

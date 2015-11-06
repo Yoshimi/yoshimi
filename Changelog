@@ -1,5 +1,10 @@
 yoshimi 1.3.6 M
 
+2015-11-6 Will
+- Bugfix state save and load didn't identify 'empty' instruments.
+- Reorganised top menu bar again and added 'clear' to scales.
+- Enabled logging XML header versions.
+
 2015-11-3 Will
 - Prepared XML wrapper so that meaningful data can be put
   in 'INFORMATION' not just instrument settings.

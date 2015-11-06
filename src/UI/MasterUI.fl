@@ -250,11 +250,36 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
+          label {&View}
+          xywh {0 0 70 20} labelsize 12
+        } {
+          MenuItem {} {
+            label {&Instruments...}
+            callback {bankui->Show();}
+            xywh {10 10 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Banks...}
+            callback {bankui->rootuiwindow->show();}
+            xywh {20 20 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Root Paths...}
+            callback {bankui->pathwindow->show();}
+            xywh {30 30 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Scale Settings...}
+            callback {microtonalui->Show();}
+            xywh {10 10 100 20} labelsize 12
+          }
+        }
+        Submenu {} {
           label {&Instrument}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
-            label {&Load}
+            label {&Load...}
             callback {//
                 const char *filename;
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
@@ -270,7 +295,7 @@ mainCreateNewInstance(forceId);}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Save}
+            label {&Save...}
             callback {//
     if (synth->part[npart]->Pname == "Simple Sound")
     {
@@ -295,14 +320,14 @@ mainCreateNewInstance(forceId);}
           MenuItem {} {
             label {&Clear}
             callback {//
-                if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
-                {
-                    synth->actionLock(lockmute);
-                    synth->part[npart]->defaultsinstrument();
-                    synth->actionLock(unlock);
-                    npartcounter->do_callback();
-                }
-                updatepanel();}
+    if (!fl_choice("Clear instrument's parameters ?", "Yes", "No", NULL))
+    {
+        synth->actionLock(lockmute);
+        synth->part[npart]->defaultsinstrument();
+        synth->actionLock(unlock);
+        npartcounter->do_callback();
+    }
+    updatepanel();}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -315,20 +340,15 @@ mainCreateNewInstance(forceId);}
               else
                   RecentParams->activate();}
         } {
-          MenuItem RecentParams {
-            label {&Recent}
-            callback {paramsui->Show();}
-            xywh {0 0 34 21} labelsize 12
-          }
           MenuItem {} {
-            label {&Load}
+            label {&Load...}
             callback {//
                 do_load_master(true, NULL);
                 paramsui->loadRecent();}
             tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
-            label {&Save}
+            label {&Save...}
             callback {//
     bool valid = false;
     for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
@@ -343,13 +363,18 @@ mainCreateNewInstance(forceId);}
         fl_alert("Nothing to save!");}
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
           }
+          MenuItem RecentParams {
+            label {&Recent...}
+            callback {paramsui->Show();}
+            xywh {0 0 34 21} labelsize 12
+          }
         }
         Submenu Scales {
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 70 21} labelsize 12
         } {
           MenuItem {} {
-            label {&Load Scale Settings...}
+            label {&Load...}
             callback {//
     char *filename;
     filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
@@ -370,7 +395,7 @@ mainCreateNewInstance(forceId);}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
-            label {Save Sc&ale Settings ..}
+            label {&Save...}
             callback {//
                 char *filename;
                 filename = fl_file_chooser("Save:", "({*.xsz})", NULL, 0);
@@ -389,9 +414,19 @@ mainCreateNewInstance(forceId);}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem {} {
-            label {Show Scale Settings...}
-            callback {microtonalui->Show();}
-            xywh {0 0 100 20} labelsize 12
+            label {&Clear}
+            callback {\#
+    if (!fl_choice("Set scales to the defaults?", "Yes", "No", NULL))
+    {
+        synth->actionLock(lockmute);
+        synth->microtonal.defaults();
+        synth->actionLock(unlock);
+        if (NULL != microtonalui)
+            delete microtonalui;
+        microtonalui = new MicrotonalUI(&synth->microtonal);
+
+    }}
+            xywh {0 0 34 20} labelsize 12
           }
         }
         Submenu {} {
@@ -399,7 +434,7 @@ mainCreateNewInstance(forceId);}
           xywh {0 0 70 21} labelsize 12
         } {
           MenuItem loadState {
-            label Load
+            label {Load...}
             callback {// for Alessandro
     char *fle = fl_file_chooser("Load:", "({*.state})",
                                 laststatefile.c_str(), 0);
@@ -413,7 +448,7 @@ mainCreateNewInstance(forceId);}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
-            label Save
+            label {Save...}
             callback {// for Alessandro
 
                 char *fle = fl_file_chooser("Save:", "({*.state})",
@@ -424,26 +459,6 @@ mainCreateNewInstance(forceId);}
                     synth->getRuntime().saveState(laststatefile);
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
-          }
-        }
-        Submenu {} {
-          label {&View}
-          xywh {0 0 70 20} labelsize 12
-        } {
-          MenuItem {} {
-            label {&Instruments...}
-            callback {bankui->Show();}
-            xywh {10 10 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Banks...}
-            callback {bankui->rootuiwindow->show();}
-            xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Root Paths...}
-            callback {bankui->pathwindow->show();}
-            xywh {30 30 100 20} labelsize 12
           }
         }
       }
@@ -1095,7 +1110,8 @@ updatepanel();}
         masterwindow->label(masterwindowlabel.c_str());
         masterwindow->changed();} {}
   }
-  Function {do_new_master()} {} {
+  Function {do_new_master()} {open
+  } {
     code {//
     if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
     {
