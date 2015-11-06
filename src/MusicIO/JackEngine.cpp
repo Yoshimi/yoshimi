@@ -34,6 +34,9 @@ using namespace std;
 #include "Misc/Config.h"
 #include "MusicIO/JackEngine.h"
 
+// NSM instance name
+extern char *instance_name;
+
 JackEngine::JackEngine(SynthEngine *_synth) : MusicIO(_synth), jackClient(NULL)
 {
     audio.jackSamplerate = 0;
@@ -79,7 +82,8 @@ bool JackEngine::openJackClient(string server)
 {
     int jopts = JackNullOption;
     jack_status_t jstatus;
-    string clientname = "yoshimi";
+    // NSM sets the name when running
+    string clientname = instance_name ? instance_name : "yoshimi";
     if (synth->getRuntime().nameTag.size())
         clientname += ("-" + synth->getRuntime().nameTag);
 
