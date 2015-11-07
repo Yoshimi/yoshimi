@@ -1,5 +1,9 @@
 yoshimi 1.3.6 M
 
+2015-11-7 Will
+- Bugfix reset all controllers missed some and didn't update the window.
+- Multiple instances disabled if running with ALSA audio output.
+
 2015-11-6 Will
 - Bugfix state save and load didn't identify 'empty' instruments.
 - Reorganised top menu bar again and added 'clear' to scales.

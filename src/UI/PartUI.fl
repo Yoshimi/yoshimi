@@ -333,12 +333,12 @@ class PartKitItem {: {public Fl_Group}
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
     Fl_Window partgroup {
-      xywh {25 620 375 165} type Double hide
+      xywh {11 608 375 165} type Double hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -362,11 +362,11 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         bankui->Show();
     else if (event == FL_RIGHT_MOUSE)
     {
-            tmp = fl_input("Instrument name:", part->Pname.c_str());
-            if (tmp != NULL and not string(tmp).empty())
-                part->Pname = string(tmp);
-    }
-    copylabeltopanel();}
+        tmp = fl_input("Instrument name:", part->Pname.c_str());
+        if (tmp != NULL and not string(tmp).empty())
+            part->Pname = string(tmp);
+        copylabeltopanel();
+    }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 12 align 16
           code0 {setinstrumentlabel();}
         }
@@ -573,67 +573,67 @@ Offset}
       code0 {string tname = synth->getGuiMaster()->set_part_window_title("Controllers");}
       code1 {o->copy_label(tname.c_str());}
     } {
-      Fl_Check_Button {} {
+      Fl_Check_Button expr {
         label Expr
         callback {part->ctl->expression.receive = o->value();}
         tooltip {Expression enable} xywh {175 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->expression.receive);}
       }
-      Fl_Dial {} {
+      Fl_Dial panwidth {
         label PanWdth
         callback {part->ctl->setPanDepth((char)o->value());}
-        tooltip {Panning Depth} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
+        tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
         class WidgetPDial
       }
-      Fl_Dial {} {
+      Fl_Dial fltcut {
         label FltCut
         callback {part->ctl->filtercutoff.depth = o->value();}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}
         class WidgetPDial
       }
-      Fl_Dial {} {
+      Fl_Dial filtq {
         label FltQ
         callback {part->ctl->filterq.depth = o->value();}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
         class WidgetPDial
       }
-      Fl_Dial {} {
+      Fl_Dial bwdpth {
         label BwDpth
         callback {part->ctl->bandwidth.depth = o->value();}
         tooltip {BandWidth depth} xywh {125 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
         class WidgetPDial
       }
-      Fl_Dial {} {
+      Fl_Dial modwh {
         label ModWh
         callback {part->ctl->modwheel.depth = o->value();}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
         class WidgetPDial
       }
-      Fl_Counter {} {
+      Fl_Counter pwheelbrng {
         label {PWheelB.Rng (cents)}
         callback {part->ctl->pitchwheel.bendrange = o->value();}
         tooltip {Pitch Wheel Bend Range (cents)} xywh {165 15 110 20} labelsize 10 align 1 minimum -6400 maximum 6400 step 1
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
         code1 {o->lstep(100);}
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button fmamp {
         label FMamp
         callback {part->ctl->fmamp.receive = o->value();}
         tooltip {FM amplitude enable} xywh {225 55 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button vol {
         label Vol
         callback {part->ctl->volume.receive = o->value();}
         tooltip {Volume enable} xywh {175 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->volume.receive);}
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button sustain {
         label Sustain
         callback {//
             part->ctl->sustain.receive = o->value();
@@ -652,33 +652,33 @@ Offset}
       }
       Fl_Button {} {
         label {Reset all controllers}
-        callback {part->SetController(C_resetallcontrollers,0);}
+        callback {updatecontrollers();}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Group {} {
-        label Portamento open
+        label Portamento
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10
       } {
-        Fl_Check_Button {} {
+        Fl_Check_Button rcv {
           label Rcv
           callback {part->ctl->portamento.receive = o->value();}
           tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
           code0 {o->value(part->ctl->portamento.receive);}
         }
-        Fl_Dial {} {
+        Fl_Dial prtime {
           label time
           callback {part->ctl->portamento.time = o->value();}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
           class WidgetPDial
         }
-        Fl_Counter {} {
-          label thresh
+        Fl_Counter thresh {
+          label Thresh
           callback {part->ctl->portamento.pitchthresh = o->value();}
           tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple labelsize 10 minimum 0 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
-        Fl_Check_Button {} {
+        Fl_Check_Button thtype {
           label {th.type}
           callback {part->ctl->portamento.pitchthreshtype = o->value();}
           tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
@@ -688,7 +688,7 @@ Offset}
           label {x100 cnt.}
           xywh {400 50 55 15} labelsize 10 align 16
         }
-        Fl_Dial {} {
+        Fl_Dial timedu {
           label {t.dn/up}
           callback {//
               int x = o->value();
@@ -711,11 +711,19 @@ Offset}
           code0 {o->value(part->ctl->portamento.propDepth);}
           class WidgetPDial
         }
-        Fl_Check_Button {} {
+        Fl_Check_Button proprt {
           label {Proprt.}
           callback {part->ctl->portamento.proportional=(int) o->value();
-if(o->value()){propta->activate();proptb->activate();}
-else {propta->deactivate();proptb->deactivate();}}
+if(o->value())
+{
+    propta->activate();
+    proptb->activate();
+}
+else
+{
+    propta->deactivate();
+    proptb->deactivate();
+}}
           tooltip {Enable Proportinal Portamento (over fixed Portamento)} xywh {345 40 50 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 9
           code0 {o->value(part->ctl->portamento.proportional);}
           code1 {if(o->value()){propta->activate();proptb->activate();}}
@@ -723,17 +731,17 @@ else {propta->deactivate();proptb->deactivate();}}
         }
       }
       Fl_Group {} {
-        label Resonance open
+        label Resonance
         xywh {290 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10
       } {
-        Fl_Dial {} {
+        Fl_Dial rbwdpth {
           label BWdpth
           callback {part->ctl->resonancebandwidth.depth = o->value();}
           tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->resonancebandwidth.depth);}
           class WidgetPDial
         }
-        Fl_Dial {} {
+        Fl_Dial cfdpth {
           label CFdpth
           callback {part->ctl->resonancecenter.depth = o->value();}
           tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
@@ -741,19 +749,19 @@ else {propta->deactivate();proptb->deactivate();}}
           class WidgetPDial
         }
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button expmwh {
         label {Exp MWh}
         callback {part->ctl->modwheel.exponential = o->value();}
         tooltip {Exponential modulation wheel} xywh {10 15 40 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->modwheel.exponential);}
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button expbw {
         label {Exp BW}
         callback {part->ctl->bandwidth.exponential = o->value();}
         tooltip {Exponential BandWidth Controller} xywh {85 15 35 25} down_box DOWN_BOX labelsize 10 align 148
         code0 {o->value(part->ctl->bandwidth.exponential);}
       }
-      Fl_Dial {} {
+      Fl_Dial volrng {
         label {Vol Rng}
         callback {part->ctl->setvolume((char)o->value());}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
@@ -1206,6 +1214,47 @@ seteditname();}
         padnoteui = NULL;
         lastkititem = -1;} {}
   }
+  Function {updatecontrollers()} {} {
+    code {//
+    part->SetController(C_resetallcontrollers,0);
+    
+    
+    expmwh->value(part->ctl->modwheel.exponential);
+    modwh->value(part->ctl->modwheel.depth);
+    expbw->value(part->ctl->bandwidth.exponential);
+    bwdpth->value(part->ctl->bandwidth.depth);
+    pwheelbrng->value(part->ctl->pitchwheel.bendrange);
+    panwidth->value(part->ctl->panning.depth);
+    filtq->value(part->ctl->filterq.depth);
+    fltcut->value(part->ctl->filtercutoff.depth);
+    volrng->value(part->ctl->volume.data);
+    expr->value(part->ctl->expression.receive);
+    fmamp->value(part->ctl->fmamp.receive);
+    vol->value(part->ctl->volume.receive);
+    sustain->value(part->ctl->sustain.receive);
+    
+    cfdpth->value(part->ctl->resonancecenter.depth);
+    rbwdpth->value(part->ctl->resonancebandwidth.depth);
+    
+    rcv->value(part->ctl->portamento.receive);
+    thresh->value(part->ctl->portamento.pitchthresh);
+    propta->value(part->ctl->portamento.propRate);
+    proprt->value(part->ctl->portamento.proportional);
+    if(proprt->value())
+    {
+        propta->activate();
+        proptb->activate();
+    }
+    else
+    {
+        propta->deactivate();
+        proptb->deactivate();
+    }
+    prtime->value(part->ctl->portamento.time);
+    timedu->value(part->ctl->portamento.updowntimestretch);
+    thtype->value(part->ctl->portamento.pitchthreshtype);
+    proptb->value(part->ctl->portamento.propDepth);} {}
+  }
   Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {//
 	synth = part_->getSynthEngine();
@@ -1377,6 +1426,6 @@ seteditname();}
   }
   decl {int *plgroup;} {private local
   }
-  decl {int engine;} {private local
+  decl {int engine;} {selected private local
   }
 } 
