@@ -1176,6 +1176,16 @@ void GuiThreadMsg::processGuiMessages()
             }
         }
             break;
+        case GuiThreadMsg::UpdatePaths:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster(false);
+            if(guiMaster)
+            {
+                guiMaster->updatepaths(msg->index);
+            }
+        }
+            break;
         case GuiThreadMsg::UpdatePanel:
         {
             SynthEngine *synth = ((SynthEngine *)msg->data);

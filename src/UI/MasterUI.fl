@@ -85,7 +85,7 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1188,24 +1188,30 @@ updatepanel();}
   }
   Function {refresh_master_ui()} {} {
     code {//
-        ninseff = 0;
-        nsyseff = 0;
-        npart = 0;
-        npartcounter->do_callback();
-        syseffnocounter->do_callback();
-        inseffnocounter->do_callback();
-        masterkeyshift->value(synth->Pkeyshift - 64);
-        mastervolumedial->value(synth->Pvolume);
-        globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
-        microtonalui = new MicrotonalUI(&synth->microtonal);
-        checkmaxparts();
-        updatesendwindow();
-        updatepanel();
-        bankui->Hide();
-        if (synth->getRuntime().consoleMenuItem == false)
-            Reports->deactivate();
-        else
-             Reports->activate();} {}
+    ninseff = 0;
+    nsyseff = 0;
+    npart = 0;
+    npartcounter->do_callback();
+    nsyseff = 0;
+    syseffnocounter->value(nsyseff + 1);
+    syseffnocounter->do_callback();
+    ninseff = 0;
+    inseffnocounter->value(nsyseff + 1);
+    inseffnocounter->do_callback();
+    sysinsgroup->value(SystemEffectsGrp);
+    sysinsgroup->do_callback();
+    masterkeyshift->value(synth->Pkeyshift - 64);
+    mastervolumedial->value(synth->Pvolume);
+    globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
+    microtonalui = new MicrotonalUI(&synth->microtonal);
+    checkmaxparts();
+    updatesendwindow();
+    updatepanel();
+    bankui->Hide();
+    if (synth->getRuntime().consoleMenuItem == false)
+        Reports->deactivate();
+    else
+        Reports->activate();} {}
   }
   Function {checkmaxparts()} {private
   } {
@@ -1334,6 +1340,14 @@ updatepanel();}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
+  }
+  Function {updatepaths(int type)} {} {
+    code {//
+    if (type == 0)
+    {
+        bankui->readbankcfg();
+        bankui-> rescan_for_banks(false);
+    }} {}
   }
   Function {getSynth()} {return_type {SynthEngine *}
   } {

@@ -1,5 +1,11 @@
 yoshimi 1.3.6 M
 
+2015-11-8 Will
+- Minor adjustment to command line - single characters can be used for
+  unambiguous commands. Spaces between them are still needed.
+- Adding or removing root paths via command line now updates the gui.
+- gui master refresh sets system and insert to 1 and selects system.
+
 2015-11-7 Will
 - Bugfix reset all controllers missed some and didn't update the window.
 - Multiple instances disabled if running with ALSA audio output.

@@ -78,7 +78,7 @@ string basics[] = {
 string subsynth [] = {
     "volume",                     "Not yet!",
     "pan",                        "Not yet!",
-    "mode <s>",                   "change to different menus, (opt1, opt2, opt3) (.. / back) (top)",
+    "mode <s>",                   "change to different menus, (opt1, opt2, opt3) .. {top}",
     "end"
 };
 
@@ -87,7 +87,9 @@ string errors [] = {
     "Value?",
     "Which Operation",
     " what?",
-    "Out of range"
+    "Out of range",
+    "Unrecognised",
+    "Not at this level"
 };
 
 
@@ -118,7 +120,7 @@ bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
             break;
         }
         
-    if (!matchMove(point, "hel") && !matchMove(point, "?"))
+    if (!matchMove(point, "help") && !matchMove(point, "?"))
         return false;
 
     int word = 0;
@@ -161,13 +163,13 @@ bool cmdIfaceProcessCommand(char *buffer)
 
     if (helpList(mode, point, commands, synth))
         return false;
-    if (matchMove(point, "lis"))
+    if (matchMove(point, "list"))
     {
-        if (miscFuncs.matchWord(point, "ban") || miscFuncs.matchWord(point, "ins"))
+        if (miscFuncs.matchWord(point, "bank") || miscFuncs.matchWord(point, "instrument"))
         {
-            if (matchMove(point, "ban"))
+            if (matchMove(point, "bank"))
                 listType = 2;
-            else if (matchMove(point, "ins")) // yes we do need this second check!
+            else if (matchMove(point, "instrument")) // yes we do need this second check!
                 listType = 3;
                     
             if (point[0] == 0)
@@ -187,17 +189,17 @@ bool cmdIfaceProcessCommand(char *buffer)
             return false;
         }
 
-        if (matchMove(point, "vec"))
+        if (matchMove(point, "vector"))
         {
             synth->ListVectors(msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchMove(point, "cur"))
+        else if (matchMove(point, "current"))
         {
             synth->ListCurrentParts(msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchMove(point, "set"))
+        else if (matchMove(point, "settings"))
         {
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
@@ -209,9 +211,20 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
     }
     
-    else if (matchMove(point, "sto"))
+    else if (matchMove(point, "set"))
+    {
+        if (point[0] != 0)
+            error = synth->commandSet(point);
+        else
+        {
+            sprintf(buffer, "set");
+            error = 3;
+        }
+    }
+    
+    else if (matchMove(point, "stop"))
         synth->allStop();
-    else if (matchMove(point, "pat"))
+    else if (matchMove(point, "path"))
     {
         if (matchMove(point, "add"))
         {
@@ -221,9 +234,12 @@ bool cmdIfaceProcessCommand(char *buffer)
                 Runtime.Log("Can't find path " + (string) point);
             }
             else
+            {
+                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                 Runtime.Log("Added new root ID " + miscFuncs.asString(found) + " as " + (string) point);
+            }
         }
-        else if (matchMove(point, "rem"))
+        else if (matchMove(point, "remove"))
         {
             if (isdigit(point[0]))
             {
@@ -234,6 +250,7 @@ bool cmdIfaceProcessCommand(char *buffer)
                 else
                 {
                     synth->getBankRef().removeRoot(rootID);
+                    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                     Runtime.Log("Removed " + rootname);
                 }
             }
@@ -247,20 +264,9 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
     }
 
-    else if (matchMove(point, "set"))
+    else if (matchMove(point, "load"))
     {
-        if (point[0] != 0)
-            error = synth->commandSet(point);
-        else
-        {
-            sprintf(buffer, "set");
-            error = 3;
-        }
-    }
-    
-    else if (matchMove(point, "loa"))
-    {
-        if (matchMove(point, "pat") )
+        if (matchMove(point, "patchset") )
         {
             if (point[0] == 0)
                 error = 1;
@@ -279,10 +285,10 @@ bool cmdIfaceProcessCommand(char *buffer)
             error = 3;
         }
     }
-    else if (matchMove(point, "sav"))
-        if(matchMove(point, "set"))
+    else if (matchMove(point, "save"))
+        if(matchMove(point, "setup"))
             synth->SetSystemValue(119, 255);
-        else if (matchMove(point, "pat"))
+        else if (matchMove(point, "patchset"))
         {
             if (point[0] == 0)
                 error = 1;
@@ -300,7 +306,7 @@ bool cmdIfaceProcessCommand(char *buffer)
             sprintf(buffer, "save");
             error = 3;
         }
-    else if (matchMove(point, "exi"))
+    else if (matchMove(point, "exit"))
     {
         Runtime.runSynth = false;
         return true;
@@ -308,9 +314,9 @@ bool cmdIfaceProcessCommand(char *buffer)
     else
     {
         int back = miscFuncs.matchWord(point, "..");
-        if (back != 0 || matchMove(point, "mod"))
+        if (back != 0 || matchMove(point, "mode"))
         {
-            if (back != 0 || (mode > 0 && ( matchMove(point, "bac") || matchMove(point, ".."))))
+            if (back != 0 || (mode > 0 &&  matchMove(point, "..")))
             {
                 if (mode & 0x0f)
                     mode = 0;
@@ -319,11 +325,11 @@ bool cmdIfaceProcessCommand(char *buffer)
             }
             else if (matchMove(point, "top"))
                 mode = 0;
-            else if (matchMove(point, "add"))
+            else if (matchMove(point, "addsynth"))
                 mode = 0x11;
-            else if (matchMove(point, "sub"))
+            else if (matchMove(point, "subsynth"))
                 mode = 0x21;
-            else if (matchMove(point, "pad"))
+            else if (matchMove(point, "padsynth"))
                 mode = 0x41;
             string extension;
             switch (mode)
@@ -343,14 +349,14 @@ bool cmdIfaceProcessCommand(char *buffer)
             }
             sprintf(welcomeBuffer + 9, extension.c_str());
         }
+        else
+            error = 5;
     }
 
     if (error == 3)
         Runtime.Log((string) buffer + errors[3]);
     else if (error)
         Runtime.Log(errors[error]);
-        
-//    Runtime.Log("Mode " + miscFuncs.asString(mode));
     return false;
 }
 

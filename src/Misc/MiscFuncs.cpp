@@ -239,7 +239,7 @@ int MiscFuncs::matchWord(char *buf, const char *word)
     int size = strlen(word);
     while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == word[newp])
             ++ newp;
-    if (newp == size)
-        return size;
+    if (newp > 0 && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
+        return newp;
     return 0;
 }

@@ -1,6 +1,5 @@
 
-Make command line adding and removing root paths update gui.
-Check other command/gui updates.
+Check command/gui updates.
 
 Make loading effect presets update the 'top' line.
 

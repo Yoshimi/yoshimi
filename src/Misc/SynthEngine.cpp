@@ -1099,7 +1099,7 @@ int SynthEngine::commandSet(char *point)
     int tmp;
     int partnum = Runtime.currentPart;
 
-    if (matchWord(point, "ccr"))
+    if (matchWord(point, "ccroot"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1107,7 +1107,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "ccb"))
+    else if (matchWord(point, "ccbank"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1115,7 +1115,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "roo"))
+    else if (matchWord(point, "root"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1123,7 +1123,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "ban"))
+    else if (matchWord(point, "bank"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1131,7 +1131,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "par"))
+    else if (matchWord(point, "part"))
     {
         point = skipChars(point);
         if (point[0] == 0)
@@ -1152,7 +1152,7 @@ int SynthEngine::commandSet(char *point)
             Runtime.Log("Part number set to " + asString(partnum));
             return 0;
         }
-        else if (matchWord(point, "pro"))
+        else if (matchWord(point, "program"))
         {
             point = skipChars(point);
             if (point[0] != 0) // force part not channel number
@@ -1160,7 +1160,7 @@ int SynthEngine::commandSet(char *point)
             else
                 error = 1;
         }
-        else if (matchWord(point, "cha"))
+        else if (matchWord(point, "channel"))
         {
             point = skipChars(point);
             if (point[0] != 0)
@@ -1177,7 +1177,7 @@ int SynthEngine::commandSet(char *point)
             else
                 error = 1;
         }
-        else if (matchWord(point, "des"))
+        else if (matchWord(point, "destination"))
         {
             point = skipChars(point);
             int dest = point[0] - 48;
@@ -1192,7 +1192,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 2;
     }
-    else if (matchWord(point, "pro"))
+    else if (matchWord(point, "program"))
     {
         point = skipChars(point);
         if (point[0] == '0')
@@ -1200,7 +1200,7 @@ int SynthEngine::commandSet(char *point)
         else
             SetSystemValue(115, 127);
     }
-    else if (matchWord(point, "act"))
+    else if (matchWord(point, "activate"))
     {
         point = skipChars(point);
         if (point[0] == '0')
@@ -1208,7 +1208,7 @@ int SynthEngine::commandSet(char *point)
         else
             SetSystemValue(116, 127);
     }
-    else if (matchWord(point, "ext"))
+    else if (matchWord(point, "extend"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1216,7 +1216,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "ava"))
+    else if (matchWord(point, "available"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1224,7 +1224,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "rep"))
+    else if (matchWord(point, "reports"))
     {
         point = skipChars(point);
         if (point[0] == '1')
@@ -1232,7 +1232,7 @@ int SynthEngine::commandSet(char *point)
         else
             SetSystemValue(100, 0);
     }
-    else if (matchWord(point, "vol"))
+    else if (matchWord(point, "volume"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1240,7 +1240,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "shi"))
+    else if (matchWord(point, "shift"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1248,17 +1248,17 @@ int SynthEngine::commandSet(char *point)
         else
             error = 1;
     }
-    else if (matchWord(point, "def"))
+    else if (matchWord(point, "defaults"))
     {
         resetAll();
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
 
     }
     
-    else if (matchWord(point, "als"))
+    else if (matchWord(point, "alsa"))
     {
         point = skipChars(point);
-        if (matchWord(point, "mid"))
+        if (matchWord(point, "midi"))
         {
             point = skipChars(point);
             if (point[0] != 0)
@@ -1269,7 +1269,7 @@ int SynthEngine::commandSet(char *point)
             else
                 error = 1;
         }
-        else if (matchWord(point, "aud"))
+        else if (matchWord(point, "audio"))
         {
             point = skipChars(point);
             if (point[0] != 0)
@@ -1283,10 +1283,10 @@ int SynthEngine::commandSet(char *point)
         else
             error = 2;
     }
-    else if (matchWord(point, "jac"))
+    else if (matchWord(point, "jack"))
     {
         point = skipChars(point);
-        if (matchWord(point, "ser"))
+        if (matchWord(point, "server"))
         {
             point = skipChars(point);
             if (point[0] != 0)
@@ -1300,7 +1300,7 @@ int SynthEngine::commandSet(char *point)
         else
             error = 2;
     }
-    else if (matchWord(point, "vec"))
+    else if (matchWord(point, "vector"))
     {
         point = skipChars(point);
         if (point[0] != 0)
@@ -1359,7 +1359,7 @@ int SynthEngine::commandVector(char *point)
                 vectorSet(axis, chan, tmp);
         } 
     }
-    else if (matchWord(point, "fea"))
+    else if (matchWord(point, "features"))
     {
         point = skipChars(point);
         if (point[0] == 0)
@@ -1371,7 +1371,7 @@ int SynthEngine::commandVector(char *point)
                 vectorSet(axis + 2, chan, tmp);
         }
     }
-    else if (matchWord(point, "pro"))
+    else if (matchWord(point, "program"))
     {
         point = skipChars(point);
         int hand = point[0] | 32;
@@ -1388,7 +1388,7 @@ int SynthEngine::commandVector(char *point)
     }
     else
     {
-        if (!matchWord(point, "con"))
+        if (!matchWord(point, "control"))
             return 2;
         point = skipChars(point);
         if(isdigit(point[0]))
