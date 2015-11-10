@@ -333,7 +333,7 @@ class PartKitItem {: {public Fl_Group}
   }
 } 
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
@@ -483,9 +483,8 @@ Offset}
       Fl_Spinner {} {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
-        xywh {202 116 38 18} labelsize 10 minimum -12 maximum 12 textsize 11
-        code0 {o->range(-12.0, 12.0);}
-        code1 {o->value(part->Pkeyshift - 64);}
+        xywh {202 116 38 18} labelsize 10 minimum -24 maximum 24 textsize 11
+        code0 {o->value(part->Pkeyshift - 64);}
       }
       Fl_Spinner {} {
         label {Key Limit}
@@ -1426,6 +1425,6 @@ seteditname();}
   }
   decl {int *plgroup;} {private local
   }
-  decl {int engine;} {selected private local
+  decl {int engine;} {private local
   }
 } 

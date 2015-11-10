@@ -73,7 +73,7 @@ mode <s> - change to different menus, (addsynth, subsynth, padsynth)
 exit - tidy up and close yoshimi down.
 
 
-Commands are not case sensitive and an invalid one will print a reminder. Usually, you only need the first 3 letters of the names - as long as it is unabiguous.
+Commands are not case sensitive and an invalid one will print a reminder. Often you only need the first letter of a command - as long as it is unabiguous.
 
 Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
 

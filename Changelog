@@ -1,5 +1,17 @@
 yoshimi 1.3.6 M
 
+
+
+2015-11-10 Will
+- Directly setting channel numbers 16 to 31 will now allow a note off
+  while blocking all other MIDI messages to that part.
+- Preset directory changes no longer need a restart.
+- Part key shift extended to +- 24 semitones.
+  4 octaves should be enough for anybody :)
+- Default state file location is now fixed - users can change it
+  as they wish.
+- Removed redundant Pnoteon code.
+
 2015-11-8 Will
 - Minor adjustment to command line - single characters can be used for
   unambiguous commands. Spaces between them are still needed.

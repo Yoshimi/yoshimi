@@ -398,7 +398,8 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
 {
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
-        if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+        // mask values 16 - 31 to still allow a note off
+        if (chan == (part[npart]->Prcvchn & 0xef) && part[npart]->Penabled)
         {
             actionLock(lock);
             part[npart]->NoteOff(note);
@@ -613,9 +614,10 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 {
     if (npart < Runtime.NumAvailableParts)
     {
-        if (nchan > NUM_MIDI_CHANNELS)
-            nchan = NUM_MIDI_CHANNELS;
-        /* This gives us a way to disable all channel messages to a part.
+        /* We allow direct controls to set out of range channel numbers. 
+         * This gives us a way to disable all channel messages to a part.
+         * Values 16 to 31 will still allow a note off but values greater
+         * than that allow a drone to be set.
          * Sending a valid channel number will restore normal operation
          * as will using the GUI controls.
          */
@@ -1166,11 +1168,9 @@ int SynthEngine::commandSet(char *point)
             if (point[0] != 0)
             {
                 tmp = string2int(point);
+                SetPartChan(partnum, tmp);
                 if (tmp < NUM_MIDI_CHANNELS)
-                {
-                    SetPartChan(partnum, tmp);
                     Runtime.Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
-                }
                 else
                     Runtime.Log("Part " + asString((int) partnum) + " set to no MIDI"); 
             }

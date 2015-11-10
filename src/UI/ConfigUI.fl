@@ -52,7 +52,7 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {230 126 465 330} type Double hide
+      xywh {179 103 465 330} type Double hide
     } {
       Fl_Tabs {} {
         xywh {5 5 455 297}
@@ -227,29 +227,6 @@ else
               xywh {0 0 34 20} labelsize 12
             }
           }
-          Fl_Input SessionStateFile {
-            label {Session state save file}
-            callback {//
-              synth->getRuntime().StateFile = string(o->value());
-              SessionStateFile->changed();}
-            xywh {160 250 220 20} labelsize 12 when 1 textsize 12
-            code0 {o->value(synth->getRuntime().StateFile.c_str());}
-          }
-          Fl_Button StateFileButton {
-            label Select
-            callback {//
-                const char *filename = fl_file_chooser("Nominate session save state file",
-                                                       NULL, synth->getRuntime().StateFile.c_str(), 0);
-                if (NULL != filename)
-                {
-                    synth->getRuntime().StateFile = string(filename);
-                    SessionStateFile->value(synth->getRuntime().StateFile.c_str());
-                    SessionStateFile->changed();
-                    configChanged = true;
-                }}
-            xywh {401 250 49 20} box THIN_UP_BOX labelsize 12
-            code0 {/* code */}
-          }
           Fl_Box {} {
             label {Most settings changes require a restart}
             xywh {100 282 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
@@ -261,11 +238,11 @@ else
     synth->getRuntime().logXMLheaders = o->value();
     configChanged = true;
 }}
-            xywh {320 225 20 20} down_box DOWN_BOX labelsize 12 align 4
+            xywh {320 239 20 20} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
         }
-        Fl_Group {} {
+        Fl_Group presets {
           label {Presets dirs}
           xywh {5 25 455 272} labelsize 12 hide
         } {
@@ -276,44 +253,40 @@ else
           Fl_Button {} {
             label {Add preset directory...}
             callback {//
-                const char *dirname;
-                dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
-                if (!dirname)
-                    return;
-                presetbrowse->add(dirname);
-                configChanged = true;}
+    const char *dirname;
+    dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
+    if (!dirname)
+        return;
+    presetbrowse->add(dirname);
+    configChanged = true;
+    writepresetcfg();}
             xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
           }
           Fl_Button removepresetbutton {
             label {Remove preset dir...}
             callback {//
-                if (presetbrowse->value() != 0)
-                {
-                    presetbrowse->remove(presetbrowse->value());
-                }
-                activatebutton_presetdir(false);
-                configChanged = true;}
+    if (presetbrowse->value() != 0)
+        presetbrowse->remove(presetbrowse->value());
+    activatebutton_presetdir(false);
+    configChanged = true;
+    writepresetcfg();}
             xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
           }
           Fl_Button makedefaultpresetbutton {
             label {Make default}
             callback {//
-                int n = presetbrowse->value();
-                if (n != 0)
-                {
-                    presetbrowse->move(1, n);
-                    presetbrowse->value(1);
-                    presetbrowse->redraw();
-                }
-                activatebutton_presetdir(true);
-                configChanged = true;}
+    int n = presetbrowse->value();
+    if (n != 0)
+    {
+        presetbrowse->move(1, n);
+        presetbrowse->value(1);
+        presetbrowse->redraw();
+    }
+    activatebutton_presetdir(true);
+    configChanged = true;}
             xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
             code0 {o->deactivate();}
-          }
-          Fl_Box {} {
-            label {Settings changes require a restart}
-            xywh {110 285 267 12} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group {} {
@@ -685,16 +658,16 @@ configwindow->do_callback();}
   }
   Function {readpresetcfg()} {} {
     code {//
-        presetbrowse->clear();
-        for (int i = 0; i < MAX_PRESETS; ++i)
-            if (synth->getRuntime().presetsDirlist[i].size())
-                presetbrowse->add(synth->getRuntime().presetsDirlist[i].c_str());} {}
+    presetbrowse->clear();
+    for (int i = 0; i < MAX_PRESETS; ++i)
+        if (synth->getRuntime().presetsDirlist[i].size())
+            presetbrowse->add(synth->getRuntime().presetsDirlist[i].c_str());} {}
   }
   Function {writepresetcfg()} {} {
     code {//
-        synth->getRuntime().clearPresetsDirlist();
-        for (int n = 0; n < presetbrowse->size(); ++n)
-            synth->getRuntime().presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
+    synth->getRuntime().clearPresetsDirlist();
+    for (int n = 0; n < presetbrowse->size(); ++n)
+        synth->getRuntime().presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
   }
   Function {update_config(int tabnumber)} {} {
     code {//
@@ -766,8 +739,7 @@ configwindow->do_callback();}
   Function {savesettings(void)} {private return_type void
   } {
     code {//
-        synth->getRuntime().saveConfig();
-        writepresetcfg();} {}
+    synth->getRuntime().saveConfig();} {}
   }
   decl {bool configChanged;} {public local
   }
