@@ -492,7 +492,7 @@ removeselection();}
     }
     Fl_Window rootuiwindow {
       label Root
-      xywh {14 352 775 575} type Double labelsize 12 hide
+      xywh {13 319 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -747,7 +747,8 @@ fnr = &RootProcess_::rootprocess;
         pathwindow->hide();
         delete pathwindow;} {}
   }
-  Function {Show()} {} {
+  Function {Show()} {open
+  } {
     code {// called from part UI
     rescan_for_banks(false);
     set_bank_slot();

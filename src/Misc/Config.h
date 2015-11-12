@@ -145,7 +145,7 @@ class Config : public MiscFuncs
         unsigned char dataL;
         unsigned char dataH;
         bool          nrpnActive;
-        
+
         struct IOdata{
             unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
             unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
@@ -162,7 +162,7 @@ class Config : public MiscFuncs
             bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
         
-        IOdata nrpndata;
+        IOdata nrpndata;        
         
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
