@@ -4,6 +4,7 @@ yoshimi 1.3.6 M
 - Now ensures session files always save with the .state extension.
 - Remembers the last positions of major windows and reopens them
   if shut down while they were still open.
+- Added different file for each instance.
 
 2015-11-10 Will
 - Directly setting channel numbers 16 to 31 will now allow a note off

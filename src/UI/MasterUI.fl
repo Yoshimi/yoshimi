@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014, Will Godfrey    
+Copyright 2014-2015, Will Godfrey    
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -163,7 +163,9 @@ class MasterUI {selected : {private MiscFuncs}
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
-      yoshiLog->setLabel(_label);
+      yoshiLog->setLabel(_label);   
+      instance = synth->getUniqueId();
+      
       make_window();
       loadWindowData();
       if(synth->getIsLV2Plugin())
@@ -1378,7 +1380,10 @@ updatepanel();}
     banksY = 1;
     virkbdX = 1;
     virkbdY = 1;
+    string ID =  asString(instance);
     string tofetch = synth->getRuntime().ConfigDir + "/yoshimi_window.data";
+    if (isRegFile(tofetch + ID))
+    tofetch += ID;
     windows = fopen(tofetch.c_str(), "r");
     if (windows != NULL)
         ok = true;
@@ -1456,7 +1461,10 @@ updatepanel();}
   }
   Function {saveWindowData()} {} {
     code {//
-    string tosend = synth->getRuntime().ConfigDir + "/yoshimi_window.data";
+    string tosend = "";
+    if (instance > 0)
+        tosend = asString(instance);
+    tosend = synth->getRuntime().ConfigDir + "/yoshimi_window.data" + tosend;
     FILE *windows = fopen(tosend.c_str(), "w");
     tosend = "master\\n" + asString(masterwindow->x())
            + "\\n" + asString(masterwindow->y()) + "\\n";
@@ -1536,5 +1544,7 @@ updatepanel();}
   decl {int virkbdY;} {public local
   }
   decl {int virkbdO;} {public local
+  }
+  decl {int instance;} {private local
   }
 } 
