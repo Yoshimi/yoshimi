@@ -149,14 +149,9 @@ class Bank : private MiscFuncs
         const RootEntryMap &getRoots();
         const BankEntry &getBank(size_t bankID);
 
-        string getBankFileTitle()
-        {
-            return string("Root #") + asString(currentRootID) + ", Bank #" + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
-        }
-        string getRootFileTitle()
-        {
-            return string("Root #") + asString(currentRootID) + " - " + getRootPath(currentRootID);
-        }
+        string getBankFileTitle();
+        string getRootFileTitle();
+        
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
              // add an instrument to the bank, if pos is -1 try to find a position

@@ -87,4 +87,4 @@ Also, when running from the command line there is now access to many of the syst
 
 ###
 
-Yoshimi now remembers where major windows were last placed (per instance), and if any were left open at shutdown, the will be reopened at the same location on the next run.
+Yoshimi now remembers where major windows were last placed (per instance), and if any were left open at shutdown, they will be reopened at the same location on the next run.

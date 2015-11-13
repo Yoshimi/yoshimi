@@ -747,8 +747,7 @@ fnr = &RootProcess_::rootprocess;
         pathwindow->hide();
         delete pathwindow;} {}
   }
-  Function {Show()} {open
-  } {
+  Function {Show()} {} {
     code {// called from part UI
     rescan_for_banks(false);
     set_bank_slot();
@@ -764,7 +763,8 @@ fnr = &RootProcess_::rootprocess;
     bankuiwindow->hide();} {}
   }
   Function {init(Fl_Spinner *cbwig_)} {} {
-    code {cbwig = cbwig_;rescan_for_banks(false);} {}
+    code {//
+    cbwig = cbwig_;rescan_for_banks(false);} {}
   }
   Function {process()} {return_type void
   } {
@@ -1162,5 +1162,7 @@ if(reload)
   decl {int oldBank;} {private local
   }
   decl {int oldrootID;} {private local
+  }
+  decl {string pathwindowlabel;} {private local
   }
 } 

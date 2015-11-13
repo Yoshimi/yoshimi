@@ -156,15 +156,23 @@ class MasterUI {selected : {private MiscFuncs}
   }
   Function {Init(const char *_label)} {} {
     code {//
+      instance = synth->getUniqueId();
+      yoshimi = "Yoshimi";
+      if (instance > 0)
+          yoshimi += ("-" + asString(instance));
+      yoshimi += " : ";
       microtonalui = new MicrotonalUI(&synth->microtonal);
+      microtonalui->microtonaluiwindow->copy_label((yoshimi + "Scales").c_str());
       bankui = new BankUI(&npart, synth);
+      bankui->pathwindow->copy_label((yoshimi + "Bank Root Paths").c_str());
       virkeyboard = new VirKeyboard(synth);
+      virkeyboard->virkeyboardwindow->copy_label((yoshimi + "Virtual Keyboard").c_str()); 
       configui = new ConfigUI(synth);
+      configui->configwindow->copy_label((yoshimi + "Settings").c_str());
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
-      yoshiLog->setLabel(_label);   
-      instance = synth->getUniqueId();
+      yoshiLog->logConsole->copy_label((yoshimi + "Console").c_str()); 
       
       make_window();
       loadWindowData();
@@ -188,8 +196,14 @@ class MasterUI {selected : {private MiscFuncs}
           bankui->Show();
       if (banksO)
           bankui->rootuiwindow->show();
+      if (rootsO)
+          bankui->pathwindow->show();
+      if (scalesO)
+          microtonalui->microtonaluiwindow->show();
       if (virkbdO)
-          virkeyboard->Show();} {}
+          virkeyboard->Show();
+      if (settingsO)
+          configui->Show();} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -379,7 +393,8 @@ mainCreateNewInstance(forceId);}
           }
           MenuItem RecentParams {
             label {&Recent...}
-            callback {paramsui->Show();}
+            callback {paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+paramsui->Show();}
             xywh {0 0 34 21} labelsize 12
           }
         }
@@ -1113,12 +1128,12 @@ updatepanel();}
     }} {}
   }
   Function {setMasterLabel(string name)} {} {
-    code {//
-        masterwindowlabel = synth->makeUniqueName("Yoshimi");
-        if (name.size())
-            masterwindowlabel += (" : " + name);
-        masterwindow->label(masterwindowlabel.c_str());
-        masterwindow->changed();} {}
+    code {//        
+    if  (name.size())
+        masterwindow->copy_label((yoshimi + name).c_str());
+    else
+        masterwindow->copy_label(yoshimi.substr(0, yoshimi.length() - 3).c_str());
+    masterwindow->changed();} {}
   }
   Function {do_new_master()} {} {
     code {//
@@ -1126,7 +1141,7 @@ updatepanel();}
     {
         delete microtonalui;
         synth->resetAll();
-
+        setMasterLabel("");
         npartcounter->value(1);
         refresh_master_ui();
         updatepanel();
@@ -1378,8 +1393,14 @@ updatepanel();}
     instrumentsY = 1;
     banksX = 1;
     banksY = 1;
+    rootsX = 1;
+    rootsY = 1;
+    scalesX = 1;
+    scalesY = 1;
     virkbdX = 1;
     virkbdY = 1;
+    settingsX = 1;
+    settingsY = 1;
     string ID =  asString(instance);
     string tofetch = synth->getRuntime().ConfigDir + "/yoshimi_window.data";
     if (isRegFile(tofetch + ID))
@@ -1387,6 +1408,7 @@ updatepanel();}
     windows = fopen(tofetch.c_str(), "r");
     if (windows != NULL)
         ok = true;
+        
     if (ok)
         ok = (fgets(word, 30, windows) != NULL);
         if (ok)
@@ -1398,6 +1420,7 @@ updatepanel();}
         if (fgets(word, 30, windows) != NULL)
     	    masterY = atoi(word);    	
     }
+    
     if (ok)
         ok = (fgets(word, 30, windows) != NULL);
         if (ok)
@@ -1411,6 +1434,7 @@ updatepanel();}
     	if (fgets(word, 30, windows) != NULL)
     	    panelO = atoi(word);    	
     }
+    
     if (ok)
         ok = (fgets(word, 30, windows) != NULL);
         if (ok)
@@ -1424,6 +1448,7 @@ updatepanel();}
     	if (fgets(word, 30, windows) != NULL)
     	    instrumentsO = atoi(word);    	
     }
+    
     if (ok)
         ok = (fgets(word, 30, windows) != NULL);
         if (ok)
@@ -1437,6 +1462,35 @@ updatepanel();}
     	if (fgets(word, 30, windows) != NULL)
     	    banksO = atoi(word);    	
     }
+    
+    if (ok)
+        ok = (fgets(word, 30, windows) != NULL);
+        if (ok)
+    	    ok = ((string) word == "roots\\n");
+    if (ok)
+    {
+        if (fgets(word, 30, windows) != NULL)
+            rootsX = atoi(word);
+        if (fgets(word, 30, windows) != NULL)
+             rootsY = atoi(word);
+    	if (fgets(word, 30, windows) != NULL)
+    	    rootsO = atoi(word);    	
+    }
+    
+    if (ok)
+        ok = (fgets(word, 30, windows) != NULL);
+        if (ok)
+    	    ok = ((string) word == "scales\\n");
+    if (ok)
+    {
+        if (fgets(word, 30, windows) != NULL)
+            scalesX = atoi(word);
+        if (fgets(word, 30, windows) != NULL)
+             scalesY = atoi(word);
+    	if (fgets(word, 30, windows) != NULL)
+    	    scalesO = atoi(word);    	
+    }
+    
     if (ok)
         ok = (fgets(word, 30, windows) != NULL);
         if (ok)
@@ -1451,13 +1505,31 @@ updatepanel();}
     	    virkbdO = atoi(word);    	
     }
      
+    if (ok)
+        ok = (fgets(word, 30, windows) != NULL);
+        if (ok)
+    	    ok = ((string) word == "settings\\n");
+    if (ok)
+    {
+        if (fgets(word, 30, windows) != NULL)
+            settingsX = atoi(word);
+        if (fgets(word, 30, windows) != NULL)
+             settingsY = atoi(word);
+    	if (fgets(word, 30, windows) != NULL)
+    	    settingsO = atoi(word);    	
+    }
+     
     if (windows != NULL)
         fclose(windows);
+        
     masterwindow->position(masterX, masterY);
     panelwindow->position(panelX, panelY);
     bankui->bankuiwindow->position(instrumentsX, instrumentsY);
     bankui->rootuiwindow->position(banksX, banksY);
-    virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);} {}
+    bankui->pathwindow->position(rootsX, rootsY);
+    microtonalui->microtonaluiwindow->position(scalesX, scalesY);
+    virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
+    configui->configwindow->position(settingsX, settingsY);} {}
   }
   Function {saveWindowData()} {} {
     code {//
@@ -1466,25 +1538,46 @@ updatepanel();}
         tosend = asString(instance);
     tosend = synth->getRuntime().ConfigDir + "/yoshimi_window.data" + tosend;
     FILE *windows = fopen(tosend.c_str(), "w");
+    
     tosend = "master\\n" + asString(masterwindow->x())
            + "\\n" + asString(masterwindow->y()) + "\\n";
     fputs(tosend.c_str(), windows);
+    
     tosend = "panel\\n" + asString(panelwindow->x())
            + "\\n" + asString(panelwindow->y())
            + "\\n" + asString(panelwindow->visible()) + "\\n";
     fputs(tosend.c_str(), windows);
+    
     tosend = "instruments\\n" + asString(bankui->bankuiwindow->x())
            + "\\n" + asString(bankui->bankuiwindow->y())
            + "\\n" + asString(bankui->bankuiwindow->visible()) + "\\n";
     fputs(tosend.c_str(), windows);
+    
     tosend = "banks\\n" + asString(bankui->rootuiwindow->x())
            + "\\n" + asString(bankui->rootuiwindow->y())
            + "\\n" + asString(bankui->rootuiwindow->visible()) + "\\n";
     fputs(tosend.c_str(), windows);
+    
+    tosend = "roots\\n" + asString(bankui->pathwindow->x())
+           + "\\n" + asString(bankui->pathwindow->y())
+           + "\\n" + asString(bankui->pathwindow->visible()) + "\\n";
+    fputs(tosend.c_str(), windows);
+    
+    tosend = "scales\\n" + asString(microtonalui->microtonaluiwindow->x())
+           + "\\n" + asString(microtonalui->microtonaluiwindow->y())
+           + "\\n" + asString(microtonalui->microtonaluiwindow->visible()) + "\\n";
+    fputs(tosend.c_str(), windows);
+    
     tosend = "virtkeybd\\n" + asString(virkeyboard->virkeyboardwindow->x())
            + "\\n" + asString(virkeyboard->virkeyboardwindow->y())
            + "\\n" + asString(virkeyboard->virkeyboardwindow->visible()) + "\\n";
     fputs(tosend.c_str(), windows);
+    
+    tosend = "settings\\n" + asString(configui->configwindow->x())
+           + "\\n" + asString(configui->configwindow->y())
+           + "\\n" + asString(configui->configwindow->visible()) + "\\n";
+    fputs(tosend.c_str(), windows);
+    
     fclose(windows);} {}
   }
   decl {ConfigUI *configui;} {public local
@@ -1505,7 +1598,7 @@ updatepanel();}
   }
   decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
   }
-  decl {string masterwindowlabel;} {private local
+  decl {string yoshimi;} {private local
   }
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }
@@ -1519,32 +1612,50 @@ updatepanel();}
   }
   decl {string panelwindowlabel} {private local
   }
+  decl {int instance;} {private local
+  }
   decl {int panelgroup;} {public local
   }
-  decl {int panelX;} {public local
+  decl {int panelX;} {private local
   }
-  decl {int panelY;} {public local
+  decl {int panelY;} {private local
   }
-  decl {int panelO;} {public local
+  decl {int panelO;} {private local
   }
-  decl {int instrumentsX;} {public local
+  decl {int instrumentsX;} {private local
   }
-  decl {int instrumentsY;} {public local
+  decl {int instrumentsY;} {private local
   }
-  decl {int instrumentsO;} {public local
+  decl {int instrumentsO;} {private local
   }
-  decl {int banksX;} {public local
+  decl {int banksX;} {private local
   }
-  decl {int banksY;} {public local
+  decl {int banksY;} {private local
   }
-  decl {int banksO;} {public local
+  decl {int banksO;} {private local
   }
-  decl {int virkbdX;} {public local
+  decl {int rootsX;} {private local
   }
-  decl {int virkbdY;} {public local
+  decl {int rootsY;} {private local
   }
-  decl {int virkbdO;} {public local
+  decl {int rootsO;} {private local
   }
-  decl {int instance;} {private local
+  decl {int scalesX;} {private local
+  }
+  decl {int scalesY;} {private local
+  }
+  decl {int scalesO;} {private local
+  }
+  decl {int virkbdX;} {private local
+  }
+  decl {int virkbdY;} {private local
+  }
+  decl {int virkbdO;} {private local
+  }
+  decl {int settingsX;} {private local
+  }
+  decl {int settingsY;} {private local
+  }
+  decl {int settingsO;} {private local
   }
 } 

@@ -66,6 +66,18 @@ Bank::~Bank()
 }
 
 
+string Bank::getBankFileTitle()
+{
+    return synth->makeUniqueName("Yoshimi") + string(" : Root ") + asString(currentRootID) + ", Bank " + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
+}
+
+
+string Bank::getRootFileTitle()
+{
+    return synth->makeUniqueName("Yoshimi") + string(" : Root ") + asString(currentRootID) + " - " + getRootPath(currentRootID);
+}
+
+
 bool Bank::readOnlyInstrument(int ninstrument)
 {
     if (readOnlyBank(currentBankID))
