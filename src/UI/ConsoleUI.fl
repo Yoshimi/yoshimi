@@ -49,10 +49,10 @@ class ConsoleUI {selected
     }
   }
   Function {ConsoleUI()} {} {
-    code {make_window();
-      txtbuf = new Fl_Text_Buffer(8192);
-      logText->buffer(txtbuf);
-      logConsole->copy_label(string("yoshimi console").c_str());} {}
+    code {//
+    make_window();
+    txtbuf = new Fl_Text_Buffer(8192);
+    logText->buffer(txtbuf);} {}
   }
   Function {Show()} {} {
     code {logConsole->show();} {}

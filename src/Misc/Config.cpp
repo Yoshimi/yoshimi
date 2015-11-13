@@ -66,7 +66,6 @@ static struct argp_option cmd_options[] = {
     {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input" },
     {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
-    {"show-console",      'c',  NULL,         0,  "show console on startup" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
     {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
@@ -94,7 +93,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Oscilsize(512),
     runSynth(true),
     showGui(true),
-    showConsole(false),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -1024,7 +1022,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
     switch (key)
     {
-        case 'c': settings->showConsole = true; break;
         case 'N': settings->nameTag = string(arg); break;
         case 'l': settings->paramsLoad = string(arg); break;
         case 'L': settings->instrumentLoad = string(arg); break;
@@ -1062,7 +1059,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
         case 'i':
             settings->showGui = false;
-            settings->showConsole = false;
             break;
         case 'J':
             settings->audioEngine = jack_audio;

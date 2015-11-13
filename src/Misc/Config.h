@@ -103,7 +103,6 @@ class Config : public MiscFuncs
 
         bool          runSynth;
         bool          showGui;
-        bool          showConsole;
         int           VirKeybLayout;
 
         audio_drivers audioEngine;

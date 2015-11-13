@@ -1,7 +1,9 @@
 yoshimi 1.3.6 M
 
-2015-11-12 Will
+2015-11-13 Will
 - More windows under control.
+- Improved save and load code.
+- More windows show the instance number in their title.
 
 2015-11-12 Will
 - Now ensures session files always save with the .state extension.

@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014, Will Godfrey    
+Copyright 2014-2015, Will Godfrey    
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -54,7 +54,7 @@ decl {\#include "MasterUI.h"} {private global
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window syseffsend {
       private xywh {916 904 150 145} type Double hide
@@ -335,8 +335,7 @@ class PartKitItem {: {public Fl_Group}
 
 class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
-  Function {make_window()} {private
-  } {
+  Function {make_window()} {} {
     Fl_Window partgroup {
       xywh {11 608 375 165} type Double hide
       class Fl_Group
@@ -513,7 +512,7 @@ Offset}
       Fl_Button {} {
         label Controllers
         callback {ctlwindow->show();}
-        tooltip {Controller settings} xywh {25 82 135 25} box PLASTIC_UP_BOX color 22 labelsize 12
+        tooltip {Controller settings} xywh {25 82 135 25} box PLASTIC_UP_BOX color 228 labelsize 12
       }
       Fl_Spinner minkcounter {
         label {Minimum Note}
@@ -568,8 +567,8 @@ Offset}
     }
     Fl_Window ctlwindow {
       label Controllers
-      private xywh {86 540 505 130} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("Controllers");}
+      xywh {86 540 505 130} type Double hide
+      code0 {string tname = synth->getGuiMaster()->yoshimi + synth->getGuiMaster()->set_part_window_title("Controllers");}
       code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Check_Button expr {
@@ -771,7 +770,7 @@ else
     Fl_Window partfx {
       label {Part's Insert Effects}
       private xywh {127 442 390 160} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("Insert Effects");}
+      code0 {string tname = synth->getGuiMaster()->yoshimi + synth->getGuiMaster()->set_part_window_title("Insert Effects");}
       code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Spinner inseffnocounter {
@@ -897,7 +896,7 @@ else
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
       xywh {115 376 670 370} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("Kit List");}
+      code0 {string tname = synth->getGuiMaster()->yoshimi + synth->getGuiMaster()->set_part_window_title("Kit List");}
       code1 {o->copy_label(tname.c_str());}
     } {
       Fl_Button {} {
@@ -982,6 +981,8 @@ else
       xywh {147 542 395 360} type Double hide
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
       code1 {seteditname();}
+      code2 {string tname = synth->getGuiMaster()->yoshimi + "Instrument Edit";}
+      code3 {o->copy_label(tname.c_str());}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
