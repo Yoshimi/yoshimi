@@ -80,7 +80,7 @@ decl {const int keysoct1azerty[]={'a',233,'z','\\"','e','r','(','t','-','y',232,
 decl {const int keysoct2azerty[]={'w','s','x','d','c','v','g','b','h','n','j',',',';','l',':','m','!',0};} {private local
 } 
 
-class VirKeys {open : {public Fl_Box}
+class VirKeys {: {public Fl_Box}
 } {
   decl {static const int N_OCT = 6;} {private local
   }
@@ -303,15 +303,14 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
   }
 } 
 
-class VirKeyboard {open
+class VirKeyboard {selected
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
-virkeyboardwindow->hide();} open
-      xywh {1157 239 650 130} type Double visible
+virkeyboardwindow->hide();}
+      xywh {749 239 650 130} type Double hide
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -464,14 +463,12 @@ virkeyboardwindow->hide();}
       }
     }
   }
-  Function {VirKeyboard(SynthEngine *_synth)} {open
-  } {
+  Function {VirKeyboard(SynthEngine *_synth)} {} {
     code {synth = _synth;
 midictl = 75;
         make_window();
-        keyboardlabel = synth->makeUniqueName("Yoshimi Virtual Keyboard");
-        virkeyboardwindow->label(keyboardlabel.c_str());} {selected
-    }
+        keyboardlabel = synth->makeUniqueName("Virtual Keyboard");
+        virkeyboardwindow->label(keyboardlabel.c_str());} {}
   }
   Function {~VirKeyboard()} {} {
     code {delete virkeyboardwindow;} {}

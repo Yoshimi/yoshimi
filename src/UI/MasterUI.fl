@@ -157,22 +157,20 @@ class MasterUI {selected : {private MiscFuncs}
   Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
-      yoshimi = "Yoshimi";
+      
+      filename = synth->getRuntime().ConfigDir + "/" +synth->getRuntime().programCmd();
       if (instance > 0)
-          yoshimi += ("-" + asString(instance));
-      yoshimi += " : ";
+      {
+          filename += ("-" + asString(instance));
+      }
+      filename += ".windows";
       microtonalui = new MicrotonalUI(&synth->microtonal);
-      microtonalui->microtonaluiwindow->copy_label((yoshimi + "Scales").c_str());
-      bankui = new BankUI(&npart, synth);
-      bankui->pathwindow->copy_label((yoshimi + "Bank Root Paths").c_str());
-      virkeyboard = new VirKeyboard(synth);
-      virkeyboard->virkeyboardwindow->copy_label((yoshimi + "Virtual Keyboard").c_str()); 
+      bankui = new BankUI(&npart, synth);;
+      virkeyboard = new VirKeyboard(synth); 
       configui = new ConfigUI(synth);
-      configui->configwindow->copy_label((yoshimi + "Settings").c_str());
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
-      yoshiLog->logConsole->copy_label((yoshimi + "Console").c_str()); 
       
       make_window();
       loadWindowData();
@@ -185,7 +183,11 @@ class MasterUI {selected : {private MiscFuncs}
 	setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
-      panelwindow->copy_label((yoshimi + "Mixer Panel").c_str()); 
+      
+      // these don't have access to synth ->
+      microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
+      yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str()); 
+      
       if (panelO)
           mixerpanel->do_callback();
       if (instrumentsO)
@@ -919,6 +921,7 @@ ZynAddSubFX}
       label {Yoshimi Mixer Panel}
       xywh {6 48 550 675} type Double labelfont 13 labelsize 13 hide
       code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
+      code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
       Fl_Pack Panelpack1 {open
         xywh {8 10 533 286} type HORIZONTAL
@@ -1128,11 +1131,16 @@ updatepanel();}
     }} {}
   }
   Function {setMasterLabel(string name)} {} {
-    code {//        
+    code {//
+    string prefix;
     if  (name.size())
-        masterwindow->copy_label((yoshimi + name).c_str());
+    	prefix = synth->makeUniqueName(name);
     else
-        masterwindow->copy_label(yoshimi.substr(0, yoshimi.length() - 3).c_str());
+    {
+    	prefix = synth->makeUniqueName("");
+    	prefix = prefix.substr(0, prefix.length() - 3);
+    }
+    masterwindow->copy_label(prefix.c_str());
     masterwindow->changed();} {}
   }
   Function {do_new_master()} {} {
@@ -1320,11 +1328,10 @@ updatepanel();}
             }
         }} {}
   }
-  Function {set_part_window_title(string prefix)} {return_type string
+  Function {setPartWindowTitle(string prefix)} {return_type string
   } {
     code {//
-    string name = prefix + " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
-    return name;} {}
+    return synth->makeUniqueName(prefix + " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname);} {}
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
@@ -1388,10 +1395,7 @@ updatepanel();}
     int masterY;
     int masterO;
 
-    string tofetch = synth->getRuntime().ConfigDir
-                   + "/" + yoshimi.substr(0, yoshimi.length() - 3)
-                   + ".windows";
-    windows = fopen(tofetch.c_str(), "r");
+    windows = fopen(filename.c_str(), "r");
     if (windows != NULL)
         ok = true;
     // we carry on anyway to set defaults
@@ -1462,8 +1466,7 @@ updatepanel();}
   }
   Function {saveWindowData()} {} {
     code {//
-    string tosend = synth->getRuntime().ConfigDir + "/" + yoshimi.substr(0, yoshimi.length() - 3) + ".windows";
-    windows = fopen(tosend.c_str(), "w");
+    windows = fopen(filename.c_str(), "w");
 
     putData("master",
              masterwindow->x(),
@@ -1568,8 +1571,6 @@ updatepanel();}
   }
   decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
   }
-  decl {string yoshimi;} {public local
-  }
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }
   decl {ConsoleUI *yoshiLog;} {public local
@@ -1586,9 +1587,11 @@ updatepanel();}
   }
   decl {int panelgroup;} {public local
   }
-  decl {char word [30];} {private local
+  decl {char word [20];} {private local
   }
   decl {FILE *windows;} {private local
+  }
+  decl {string filename;} {private local
   }
   decl {int panelX;} {private local
   }
@@ -1638,9 +1641,9 @@ updatepanel();}
   }
   decl {int yoshiLogO;} {private local
   }
-  decl {int controllersX;} {private local
+  decl {int controllersX;} {public local
   }
-  decl {int controllersY;} {private local
+  decl {int controllersY;} {public local
   }
   decl {int controllersO;} {private local
   }

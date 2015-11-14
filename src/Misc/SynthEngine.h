@@ -190,7 +190,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         }
         void closeGui();
         int getLFOtime() {return LFOtime;}
-        std::string makeUniqueName(const char *name);
+        string makeUniqueName(string name);
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}

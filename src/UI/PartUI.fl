@@ -567,9 +567,9 @@ Offset}
     }
     Fl_Window ctlwindow {
       label Controllers
-      xywh {86 540 505 130} type Double hide
-      code0 {string tname = synth->getGuiMaster()->yoshimi + synth->getGuiMaster()->set_part_window_title("Controllers");}
-      code1 {o->copy_label(tname.c_str());}
+      xywh {70 409 505 130} type Double hide
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
+      code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
     } {
       Fl_Check_Button expr {
         label Expr
@@ -770,8 +770,7 @@ else
     Fl_Window partfx {
       label {Part's Insert Effects}
       private xywh {127 442 390 160} type Double hide
-      code0 {string tname = synth->getGuiMaster()->yoshimi + synth->getGuiMaster()->set_part_window_title("Insert Effects");}
-      code1 {o->copy_label(tname.c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
       Fl_Spinner inseffnocounter {
         callback {//
@@ -895,9 +894,8 @@ else
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
-      xywh {115 376 670 370} type Double hide
-      code0 {string tname = synth->getGuiMaster()->yoshimi + synth->getGuiMaster()->set_part_window_title("Kit List");}
-      code1 {o->copy_label(tname.c_str());}
+      xywh {30 252 670 370} type Double hide
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
     } {
       Fl_Button {} {
         label Close
@@ -981,8 +979,7 @@ else
       xywh {147 542 395 360} type Double hide
       code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
       code1 {seteditname();}
-      code2 {string tname = synth->getGuiMaster()->yoshimi + "Instrument Edit";}
-      code3 {o->copy_label(tname.c_str());}
+      code2 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1381,8 +1378,7 @@ seteditname();}
   }
   Function {seteditname()} {} {
     code {//
-    string tname = synth->getGuiMaster()->set_part_window_title("Edit");
-    instrumenteditwindow->copy_label(tname.c_str());} {}
+    instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Edit").c_str());} {}
   }
   Function {~PartUI()} {} {
     code {if (adnoteui)

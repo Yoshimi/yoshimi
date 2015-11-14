@@ -390,7 +390,7 @@ bool Config::loadConfig(void)
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
         homedir = string("/tmp");
-    ConfigDir = homedir + string("/.config/yoshimi");
+    ConfigDir = homedir + string("/.config/") + programcommand;
     if (!isDirectory(ConfigDir))
     {
         cmd = string("mkdir -p ") + ConfigDir;
@@ -400,6 +400,9 @@ bool Config::loadConfig(void)
             return false;
         }
     }
+    string yoshimi = "/" + programcommand;
+    if (synth->getUniqueId() > 0)
+        yoshimi += ("-" + asString(synth->getUniqueId()));
     string presetDir = ConfigDir + "/presets";
     if (!isDirectory(presetDir))
     {
@@ -407,13 +410,9 @@ bool Config::loadConfig(void)
         if ((chk = system(cmd.c_str())) < 0)
             Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
-    ConfigFile = ConfigDir + string("/yoshimi.config");
-    StateFile = ConfigDir + string("/yoshimi.state");
+    ConfigFile = ConfigDir + yoshimi + string(".config");
+    StateFile = ConfigDir + yoshimi + string(".state");
     string resConfigFile = ConfigFile;
-    if(synth->getUniqueId() > 0)
-    {
-        resConfigFile += asString(synth->getUniqueId());
-    }
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
@@ -556,10 +555,7 @@ void Config::saveConfig(void)
     GzipCompression = 0;
 
     string resConfigFile = ConfigFile;
-    if(synth->getUniqueId() > 0)
-    {
-        resConfigFile += asString(synth->getUniqueId());
-    }
+
     if (!xmltree->saveXMLfile(resConfigFile))
     {
         Log("Failed to save config to " + resConfigFile);

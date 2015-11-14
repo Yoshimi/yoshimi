@@ -68,13 +68,13 @@ Bank::~Bank()
 
 string Bank::getBankFileTitle()
 {
-    return synth->makeUniqueName("Yoshimi") + string(" : Root ") + asString(currentRootID) + ", Bank " + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID);
+    return synth->makeUniqueName("Root " + asString(currentRootID) + ", Bank " + asString(currentBankID) + " - " + getBankPath(currentRootID, currentBankID));
 }
 
 
 string Bank::getRootFileTitle()
 {
-    return synth->makeUniqueName("Yoshimi") + string(" : Root ") + asString(currentRootID) + " - " + getRootPath(currentRootID);
+    return synth->makeUniqueName("Root " + asString(currentRootID) + " - " + getRootPath(currentRootID));
 }
 
 

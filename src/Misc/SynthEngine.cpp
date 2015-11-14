@@ -2235,6 +2235,7 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     return det;
 }
 
+
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {
     if (guiMaster == NULL && createGui)
@@ -2244,6 +2245,7 @@ MasterUI *SynthEngine::getGuiMaster(bool createGui)
     return guiMaster;
 }
 
+
 void SynthEngine::guiClosed(bool stopSynth)
 {
     if (stopSynth && !isLV2Plugin)
@@ -2251,6 +2253,7 @@ void SynthEngine::guiClosed(bool stopSynth)
     if (guiClosedCallback != NULL)
         guiClosedCallback(guiCallbackArg);
 }
+
 
 void SynthEngine::closeGui()
 {
@@ -2262,19 +2265,16 @@ void SynthEngine::closeGui()
     }
 }
 
-std::string SynthEngine::makeUniqueName(const char *name)
-{
-    char strUniquePostfix [1024];
-    std::string newUniqueName = name;
-    memset(strUniquePostfix, 0, sizeof(strUniquePostfix));
-    if (uniqueId > 0)
-    {
-        snprintf(strUniquePostfix, sizeof(strUniquePostfix), "-%d", uniqueId);
-    }
 
-    newUniqueName += strUniquePostfix;
-    return newUniqueName;
+string SynthEngine::makeUniqueName(string name)
+{
+    string result = "Yoshimi";
+    if (uniqueId > 0)
+        result += ("-" + asString(uniqueId));
+    result += " : " + name;
+    return result;
 }
+
 
 void SynthEngine::setWindowTitle(string _windowTitle)
 {

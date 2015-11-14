@@ -42,7 +42,7 @@ decl {\#include "Misc/Microtonal.h"} {public local
 class MicrotonalUI {} {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
-      label Scales
+      label Scales selected
       xywh {99 164 405 450} type Double hide
     } {
       Fl_Group {} {

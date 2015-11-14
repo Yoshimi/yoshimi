@@ -199,8 +199,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
     Fl_Window ADnoteVoiceParameters {
       label Voice
       xywh {398 90 770 580} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice Oscillator");}
-      code1 {o->copy_label(tname.c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
       Fl_Group voiceparametersgroup {
@@ -1001,15 +1000,14 @@ unisongroup->redraw();}
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
       xywh {822 549 535 405} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Global");}
-      code1 {o->copy_label(tname.c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
     } {
       Fl_Group {} {
         label FREQUENCY
@@ -1240,7 +1238,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         label Resonance
         callback {//
             resui->resonancewindow->redraw();
-            resui->resonancewindow->show();}
+            resui->Show(true);}
         tooltip Resonance xywh {309 375 86 25} labelsize 12
       }
       Fl_Button {} {
@@ -1257,8 +1255,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
     Fl_Window ADnoteVoice {
       label {ADsynth Voice Parameters}
       xywh {531 31 765 615} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice");}
-      code1 {o->copy_label(tname.c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
     } {
       Fl_Group advoice {
         xywh {0 0 760 575} box BORDER_BOX
@@ -1299,8 +1296,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
     Fl_Window ADnoteVoiceList {
       label {ADsynth Voices list}
       xywh {33 292 650 260} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("AddSynth Voice List");}
-      code1 {o->copy_label(tname.c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice List").c_str());}
     } {
       Fl_Text_Display {} {
         label {No.}

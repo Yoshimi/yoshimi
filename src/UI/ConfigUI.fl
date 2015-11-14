@@ -52,7 +52,8 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {179 103 465 330} type Double hide
+      xywh {152 367 465 330} type Double hide
+      code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
     } {
       Fl_Tabs {} {
         xywh {5 5 455 297}
