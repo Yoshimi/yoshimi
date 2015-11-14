@@ -1,8 +1,10 @@
-yoshimi 1.3.6 M
+yoshimi 1.3.7 rc1
 
 2015-11-14 Will
 - Rationalised window titles.
 - Consolidated internal filenames.
+- Bugfix kit item label now updates correctly.
+- Set version as 1.3.7 rc1
 
 2015-11-13 Will
 - More windows under control.

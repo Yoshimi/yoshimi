@@ -69,16 +69,8 @@ string basics[] = {
     "  [x/y] control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
     "  off",                      "disable vector for CHANNEL",
     "stop",                       "all sound off",
-    "mode <s>",                   "change to different menus, (addsynth, subsynth, padsynth)",
-    "? / help",                   "list commands for current mode",
+    "? / help",                   "list commands",
     "exit",                       "tidy up and close Yoshimi",
-    "end"
-};
-
-string subsynth [] = {
-    "volume",                     "Not yet!",
-    "pan",                        "Not yet!",
-    "mode <s>",                   "change to different menus, (opt1, opt2, opt3) .. {top}",
     "end"
 };
 
@@ -102,14 +94,15 @@ bool matchMove(char *&pnt, const char *word)
 }
 
 
-bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
-{ 
-    switch (mode)
+bool helpList(char *point, string *commands, SynthEngine *synth)
+{
+    int level = 0;
+    switch (level)
     {
         case 0:
             commands = basics;
             break;
-        case 0x11:
+ /*       case 0x11:
             commands = subsynth;
             break;
         case 0x21:
@@ -117,7 +110,7 @@ bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
             break;
         case 0x41:
             commands = subsynth;
-            break;
+            break;*/
         }
         
     if (!matchMove(point, "help") && !matchMove(point, "?"))
@@ -134,8 +127,8 @@ bool helpList(int mode, char *point, string *commands, SynthEngine *synth)
         msg.push_back("  " + left + blanks.assign<int>(30 - left.length(), ' ') + "- " + commands[word + 1]);
         word += 2;
     }
-    if (mode == 0)
-        msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
+
+    msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
     if (synth->getRuntime().consoleMenuItem)
         // we need this in case someone is working headless
         cout << "\nset reports [n] - set report destination (1 GUI console, other stderr)\n\n";
@@ -152,7 +145,6 @@ bool cmdIfaceProcessCommand(char *buffer)
     SynthEngine *synth = itSynth->first;
     Config &Runtime = synth->getRuntime();
     
-    static int mode;
     int ID;
     int listType = 0;
     int error = 0;
@@ -161,7 +153,7 @@ bool cmdIfaceProcessCommand(char *buffer)
     point = miscFuncs.skipSpace(point); // just to be sure
     list<string> msg;
 
-    if (helpList(mode, point, commands, synth))
+    if (helpList(point, commands, synth))
         return false;
     if (matchMove(point, "list"))
     {
@@ -312,46 +304,7 @@ bool cmdIfaceProcessCommand(char *buffer)
         return true;
     }
     else
-    {
-        int back = miscFuncs.matchWord(point, "..");
-        if (back != 0 || matchMove(point, "mode"))
-        {
-            if (back != 0 || (mode > 0 &&  matchMove(point, "..")))
-            {
-                if (mode & 0x0f)
-                    mode = 0;
-                else
-                    -- mode;
-            }
-            else if (matchMove(point, "top"))
-                mode = 0;
-            else if (matchMove(point, "addsynth"))
-                mode = 0x11;
-            else if (matchMove(point, "subsynth"))
-                mode = 0x21;
-            else if (matchMove(point, "padsynth"))
-                mode = 0x41;
-            string extension;
-            switch (mode)
-            {
-                case 0:
-                    extension = "";
-                    break;
-                case 0x11:
-                    extension = "addsynth> ";
-                    break;
-                case 0x21:
-                    extension = "subsynth> ";
-                    break;
-                case 0x41:
-                    extension = "padsynth> ";
-                    break;
-            }
-            sprintf(welcomeBuffer + 9, extension.c_str());
-        }
-        else
-            error = 5;
-    }
+      error = 5;
 
     if (error == 3)
         Runtime.Log((string) buffer + errors[3]);

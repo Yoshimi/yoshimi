@@ -590,9 +590,9 @@ make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
   } {
-    code {//for (int i=0;i<MAX_SUB_HARMONICS;i++) delete (h[i]);
-        SUBparameters->hide();
-        delete(SUBparameters);} {}
+    code {//
+    SUBparameters->hide();
+    delete(SUBparameters);} {}
   }
   decl {SUBnoteParameters *pars;} {private local
   }

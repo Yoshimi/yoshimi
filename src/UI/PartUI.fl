@@ -153,14 +153,12 @@ class PartKitItem {: {public Fl_Group}
           callback {partui->showparameters(n,0);}
           xywh {420 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
-          code1 {if (n==0) o->hide();}
         }
         Fl_Button subeditbutton {
           label edit
           callback {partui->showparameters(n,1);}
           xywh {490 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
-          code1 {if (n==0) o->hide();}
         }
         Fl_Check_Button mutedcheck {
           callback {part->kit[n].Pmuted=(int)o->value();}
@@ -177,8 +175,11 @@ class PartKitItem {: {public Fl_Group}
           callback {//
               const char *tmp = fl_input("Kit item name:", part->kit[n].Pname.c_str());
               if (tmp != NULL)
-                part->kit[n].Pname = string(tmp);}
-          xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX labelfont 1 labelsize 10 align 20
+              {
+                part->kit[n].Pname = string(tmp);
+                o->copy_label(tmp);
+              }}
+          xywh {90 0 130 15} box THIN_DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 20
           code0 {o->copy_label(part->kit[n].Pname.c_str());}
         }
         Fl_Check_Button adcheck {
@@ -191,7 +192,6 @@ class PartKitItem {: {public Fl_Group}
     synth->getGuiMaster()->partui->copylabeltopanel();}
           private xywh {400 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
-          code1 {if (n==0) o->hide();}
         }
         Fl_Check_Button subcheck {
           callback {//
@@ -203,7 +203,6 @@ class PartKitItem {: {public Fl_Group}
     synth->getGuiMaster()->partui->copylabeltopanel();}
           private xywh {470 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
-          code1 {if (n==0) o->hide();}
         }
         Fl_Choice sendtoeffect {
           callback {//
@@ -220,7 +219,6 @@ class PartKitItem {: {public Fl_Group}
           callback {partui->showparameters(n,2);}
           xywh {560 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
-          code1 {if (n==0) o->hide();}
         }
         Fl_Check_Button padcheck {
           callback {//
@@ -232,7 +230,6 @@ class PartKitItem {: {public Fl_Group}
     synth->getGuiMaster()->partui->copylabeltopanel();}
           private xywh {540 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
-          code1 {if (n==0) o->hide();}
         }
       }
       Fl_Check_Button enabledcheck {
@@ -248,7 +245,10 @@ class PartKitItem {: {public Fl_Group}
                 synth->actionLock(unlock);
 
                 if (o->value() == 0)
+                {
                     partkititemgroup->deactivate();
+                    labelbutton->copy_label("");
+                }
                 else
                     partkititemgroup->activate();
                 o->redraw();
@@ -259,7 +259,8 @@ class PartKitItem {: {public Fl_Group}
         private xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {snprintf(label,10,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
-        code2 {if (n==0) o->deactivate();}
+        code2 {if (n==0) o->hide();}
+        code3 {if (o->value() == 0) labelbutton->color(FL_WHITE);}
       }
     }
   }
@@ -313,8 +314,7 @@ class PartKitItem {: {public Fl_Group}
       part = part_;
       n = n_;
       partui = partui_;
-      make_window();
-      //partkititem->show();
+      make_window();;
       end();} {}
   }
   Function {~PartKitItem()} {} {
@@ -769,7 +769,7 @@ else
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
-      private xywh {127 442 390 160} type Double hide
+      xywh {127 442 390 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
       Fl_Spinner inseffnocounter {
@@ -894,8 +894,9 @@ else
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
-      xywh {30 252 670 370} type Double hide
+      xywh {4 587 670 370} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
+      code1 {kitMode->do_callback();}
     } {
       Fl_Button {} {
         label Close
@@ -904,7 +905,6 @@ else
       }
       Fl_Scroll kitlist {
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
-        code0 {if (part->Pkitmode==0) o->deactivate();}
       } {
         Fl_Pack {} {open
           xywh {0 20 670 320}
@@ -913,36 +913,36 @@ else
       }
       Fl_Box {} {
         label {No.}
-        xywh {5 0 25 15} labelfont 1 labelsize 11 align 18
+        xywh {10 0 25 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
-        label {M.}
+        label Mute
         xywh {55 0 25 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
-        label {Min.k}
+        label {Min key}
         xywh {235 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
-        label {Max.k}
+        label {Max key}
         xywh {345 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label ADsynth
-        xywh {405 0 50 15} labelfont 1 labelsize 11 align 18
+        xywh {410 0 50 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label SUBsynth
         xywh {470 0 60 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Choice {} {
+      Fl_Choice kitMode {
         label Mode
         callback {//
-            part->Pkitmode = o->value();
-            if (part->Pkitmode == 0)
-                kitlist->deactivate();
-            else
-                kitlist->activate();}
+    part->Pkitmode = o->value();
+    if (part->Pkitmode == 0)
+        kitlist->deactivate();
+    else
+        kitlist->activate();}
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 70 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {o->value(part->Pkitmode);}
       } {
@@ -972,6 +972,10 @@ else
       Fl_Box {} {
         label PADsynth
         xywh {540 0 60 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Name
+        xywh {137 0 40 15} labelfont 1 labelsize 11 align 18
       }
     }
     Fl_Window instrumenteditwindow {

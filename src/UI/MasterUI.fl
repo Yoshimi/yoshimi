@@ -194,6 +194,8 @@ class MasterUI {selected : {private MiscFuncs}
           bankui->Show();
       if (banksO)
           bankui->rootuiwindow->show();
+      if (presetsO)
+          configui->presets->show();
       if (rootsO)
           bankui->pathwindow->show();
       if (scalesO)
@@ -205,7 +207,13 @@ class MasterUI {selected : {private MiscFuncs}
       if (yoshiLogO)
           yoshiLog->Show();
       if (controllersO)
-          partui->ctlwindow->show();} {}
+          partui->ctlwindow->show();
+      if (inseditO)
+          partui->instrumenteditwindow->show();
+      if (kitlistO)
+          partui->instrumentkitlist->show();
+      if (partfxO)
+          partui->partfx->show();} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -233,7 +241,7 @@ class MasterUI {selected : {private MiscFuncs}
           }}
       xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
-      Fl_Menu_Bar mastermenu {
+      Fl_Menu_Bar mastermenu {open
         xywh {-4 0 400 25} labelsize 13
         code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
@@ -280,36 +288,16 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label {&View}
-          xywh {0 0 70 20} labelsize 12
-        } {
-          MenuItem {} {
-            label {&Instruments...}
-            callback {bankui->Show();}
-            xywh {10 10 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Banks...}
-            callback {bankui->rootuiwindow->show();}
-            xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Root Paths...}
-            callback {bankui->pathwindow->show();}
-            xywh {30 30 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Scale Settings...}
-            callback {microtonalui->Show();}
-            xywh {10 10 100 20} labelsize 12
-          }
-        }
-        Submenu {} {
           label {&Instrument}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
-            label {&Load...}
+            label {&Show Stored...}
+            callback {bankui->Show();}
+            xywh {20 20 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Load External...}
             callback {//
                 const char *filename;
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
@@ -325,7 +313,7 @@ mainCreateNewInstance(forceId);}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Save...}
+            label {&Save External...}
             callback {//
     if (synth->part[npart]->Pname == "Simple Sound")
     {
@@ -371,14 +359,19 @@ mainCreateNewInstance(forceId);}
                   RecentParams->activate();}
         } {
           MenuItem {} {
-            label {&Load...}
+            label {&Show Patch Banks...}
+            callback {bankui->rootuiwindow->show();}
+            xywh {30 30 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Load External...}
             callback {//
                 do_load_master(true, NULL);
                 paramsui->loadRecent();}
             tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
-            label {&Save...}
+            label {&Save External...}
             callback {//
     bool valid = false;
     for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
@@ -394,16 +387,36 @@ mainCreateNewInstance(forceId);}
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem RecentParams {
-            label {&Recent...}
+            label {&Recent Sets...}
             callback {paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
 paramsui->Show();}
             xywh {0 0 34 21} labelsize 12
+          }
+        }
+        Submenu {} {
+          label {Pat&hs}
+          xywh {0 0 70 20} labelsize 12
+        } {
+          MenuItem {} {
+            label {&Bank Root Dirs...}
+            callback {bankui->pathwindow->show();}
+            xywh {30 30 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Preset Dirs...}
+            callback {configui->presets->show();}
+            xywh {0 0 34 20} labelsize 12
           }
         }
         Submenu Scales {
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 70 21} labelsize 12
         } {
+          MenuItem {} {
+            label {&Show Settings...}
+            callback {microtonalui->Show();}
+            xywh {20 20 100 20} labelsize 12
+          }
           MenuItem {} {
             label {&Load...}
             callback {//
@@ -1425,6 +1438,11 @@ updatepanel();}
                  rootsY,
                  rootsO);
     ok = getData(ok,
+                "presets",
+                 presetsX,
+                 presetsY,
+                 presetsO);
+    ok = getData(ok,
                 "scales",
                  scalesX,
                  scalesY,
@@ -1448,9 +1466,24 @@ updatepanel();}
                 "controllers",
                  controllersX,
                  controllersY,
-                 controllersO);
-    
-    if (windows != NULL)
+                 controllersO);    
+    ok = getData(ok,
+                "instrumentedit",
+                 inseditX,
+                 inseditY,
+                 inseditO);
+    ok = getData(ok,
+                "kitlist",
+                 kitlistX,
+                 kitlistY,
+                 kitlistO);
+    ok = getData(ok,
+                "partFX",
+                 partfxX,
+                 partfxY,
+                 partfxO);
+
+   if (windows != NULL)
         fclose(windows);
         
     masterwindow->position(masterX, masterY);
@@ -1458,13 +1491,18 @@ updatepanel();}
     bankui->bankuiwindow->position(instrumentsX, instrumentsY);
     bankui->rootuiwindow->position(banksX, banksY);
     bankui->pathwindow->position(rootsX, rootsY);
+    configui->presets->position(presetsX, presetsY);
     microtonalui->microtonaluiwindow->position(scalesX, scalesY);
     virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
     configui->configwindow->position(settingsX, settingsY);
     yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
-    partui->ctlwindow->position(controllersX, controllersY);} {}
+    partui->ctlwindow->position(controllersX, controllersY);
+    partui->instrumenteditwindow->position(inseditX, inseditY);
+    partui->instrumentkitlist->position(kitlistX, kitlistY);
+    partui->partfx->position(partfxX, partfxY);} {}
   }
-  Function {saveWindowData()} {} {
+  Function {saveWindowData()} {open
+  } {
     code {//
     windows = fopen(filename.c_str(), "w");
 
@@ -1488,6 +1526,10 @@ updatepanel();}
              bankui->pathwindow->x(),
              bankui->pathwindow->y(),
              bankui->pathwindow->visible());
+    putData("presets",
+             configui->presets->x(),
+             configui->presets->y(),
+             configui->presets->visible());
     putData("scales",
              microtonalui->microtonaluiwindow->x(),
              microtonalui->microtonaluiwindow->y(),
@@ -1505,7 +1547,7 @@ updatepanel();}
              yoshiLog->logConsole->y(),
              yoshiLog->logConsole->visible());
 
-    if (partui->ctlwindow->x())
+    if (partui->ctlwindow->x()) // this works, visible() doesn't :(
     	putData("controllers",
              	partui->ctlwindow->x(),
              	partui->ctlwindow->y(),
@@ -1515,7 +1557,20 @@ updatepanel();}
                  controllersX,
                  controllersY,
                  controllersO);
-    
+
+    putData("instrumentedit",
+             partui->instrumenteditwindow->x(),
+             partui->instrumenteditwindow->y(),
+             partui->instrumenteditwindow->visible());
+    putData("kitlist",
+             partui->instrumentkitlist->x(),
+             partui->instrumentkitlist->y(),
+             partui->instrumentkitlist->visible());
+    putData("partFX",
+             partui->partfx->x(),
+             partui->partfx->y(),
+             partui->partfx->visible());
+
     fclose(windows);} {}
   }
   Function {getData(bool ok, string name, int& X, int& Y, int& O)} {return_type bool
@@ -1617,6 +1672,12 @@ updatepanel();}
   }
   decl {int rootsO;} {private local
   }
+  decl {int presetsX;} {private local
+  }
+  decl {int presetsY;} {private local
+  }
+  decl {int presetsO;} {private local
+  }
   decl {int scalesX;} {private local
   }
   decl {int scalesY;} {private local
@@ -1646,5 +1707,23 @@ updatepanel();}
   decl {int controllersY;} {public local
   }
   decl {int controllersO;} {private local
+  }
+  decl {int inseditX;} {private local
+  }
+  decl {int inseditY;} {private local
+  }
+  decl {int inseditO;} {private local
+  }
+  decl {int kitlistX;} {private local
+  }
+  decl {int kitlistY;} {private local
+  }
+  decl {int kitlistO;} {private local
+  }
+  decl {int partfxX;} {private local
+  }
+  decl {int partfxY;} {private local
+  }
+  decl {int partfxO;} {private local
   }
 } 
