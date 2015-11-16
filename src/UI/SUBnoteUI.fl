@@ -133,6 +133,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
       label {SUBsynth Parameters}
       xywh {6 183 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
+      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
       Fl_Scroll {} {
         xywh {5 140 434 325} type HORIZONTAL box THIN_UP_BOX
@@ -144,7 +145,9 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
       }
       Fl_Button {} {
         label Close
-        callback {SUBparameters->hide();}
+        callback {synth->getGuiMaster()->subNoteX = SUBparameters->x();
+synth->getGuiMaster()->subNoteY = SUBparameters->y();
+SUBparameters->hide();}
         xywh {625 446 105 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {

@@ -26,6 +26,7 @@ typedef enum {
     C_programchange =      1001,
     C_pitchwheel =         1000,
     C_bankselectmsb =         0,
+    C_breath =                2,
     C_expression =           11,
     C_panning =              10,
     C_bankselectlsb =        32,

@@ -241,7 +241,7 @@ class MasterUI {selected : {private MiscFuncs}
           }}
       xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
-      Fl_Menu_Bar mastermenu {open
+      Fl_Menu_Bar mastermenu {
         xywh {-4 0 400 25} labelsize 13
         code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
@@ -288,7 +288,7 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label {&Instrument}
+          label {&Instruments}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
@@ -1344,7 +1344,10 @@ updatepanel();}
   Function {setPartWindowTitle(string prefix)} {return_type string
   } {
     code {//
-    return synth->makeUniqueName(prefix + " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname);} {}
+    string extension = " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
+    if (partui->part->Pkitmode)
+        extension += ", Kit ";
+    return synth->makeUniqueName(prefix + extension);} {}
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
@@ -1483,6 +1486,22 @@ updatepanel();}
                  partfxY,
                  partfxO);
 
+    ok = getData(ok,
+                "SUBnote",
+                 subNoteX,
+                 subNoteY,
+                 subNoteO);
+    ok = getData(ok,
+                "PADnote",
+                 padNoteX,
+                 padNoteY,
+                 padNoteO);
+    ok = getData(ok,
+                "ADDnote",
+                 addNoteX,
+                 addNoteY,
+                 addNoteO);
+
    if (windows != NULL)
         fclose(windows);
         
@@ -1501,8 +1520,7 @@ updatepanel();}
     partui->instrumentkitlist->position(kitlistX, kitlistY);
     partui->partfx->position(partfxX, partfxY);} {}
   }
-  Function {saveWindowData()} {open
-  } {
+  Function {saveWindowData()} {} {
     code {//
     windows = fopen(filename.c_str(), "w");
 
@@ -1570,6 +1588,19 @@ updatepanel();}
              partui->partfx->x(),
              partui->partfx->y(),
              partui->partfx->visible());
+    putData("SUBnote",
+             subNoteX,
+             subNoteY,
+             subNoteO);
+    putData("PADnote",
+             padNoteX,
+             padNoteY,
+             padNoteO);
+             
+    putData("ADDnote",
+             addNoteX,
+             addNoteY,
+             addNoteO);
 
     fclose(windows);} {}
   }
@@ -1725,5 +1756,23 @@ updatepanel();}
   decl {int partfxY;} {private local
   }
   decl {int partfxO;} {private local
+  }
+  decl {int subNoteX;} {public local
+  }
+  decl {int subNoteY;} {public local
+  }
+  decl {int subNoteO;} {public local
+  }
+  decl {int padNoteX;} {public local
+  }
+  decl {int padNoteY;} {public local
+  }
+  decl {int padNoteO;} {public local
+  }
+  decl {int addNoteX;} {public local
+  }
+  decl {int addNoteY;} {public local
+  }
+  decl {int addNoteO;} {public local
   }
 } 

@@ -246,8 +246,9 @@ synth = parameters->getSynthEngine();
   Function {make_window()} {} {
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {136 254 535 450} type Double hide
+      xywh {136 254 535 450} type Double
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
+      code1 {o->position(synth->getGuiMaster()->padNoteX, synth->getGuiMaster()->padNoteY);} visible
     } {
       Fl_Tabs {} {
         callback {//
@@ -1046,7 +1047,9 @@ synth = parameters->getSynthEngine();
       }
       Fl_Button {} {
         label Close
-        callback {padnotewindow->hide();}
+        callback {synth->getGuiMaster()->padNoteX = padnotewindow->x();
+synth->getGuiMaster()->padNoteY = padnotewindow->y();
+padnotewindow->hide();}
         xywh {466 410 61 24} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {

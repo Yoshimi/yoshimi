@@ -81,10 +81,14 @@ It is now possible to set up a new bank root path when starting from the command
 
 yoshimi -D /home/{username}/{directory}/{subdirectory}/bank
 
-Yoshimi will then immediately scan this path for new banks, but won't make the root 9or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
+Yoshimi will then immediately scan this path for new banks, but won't make the root (or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
 
 Also, when running from the command line there is now access to many of the system and Root, Bank etc. settings.
 
 ###
 
 Yoshimi now remembers where major windows were last placed (per instance), and if any were left open at shutdown, they will be reopened at the same location on the next run.
+
+###
+
+We have an experimental implimentation of CC2 - breath control. This combines volument with filter cutoff.
