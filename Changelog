@@ -1,6 +1,13 @@
+yoshimi 1.3.x
+
+2015-11-17 Will
+- Minor display corrections
+- Changed XML minimum Zyn instrument compatibility version to 2.4
+- Activated addsynth voice filter velocity sensimg.
+
 yoshimi 1.3.7
 
-2015-11-16
+2015-11-16 Will
 - Added experimental breath control CC2
 - Set release version 1.3.7
 

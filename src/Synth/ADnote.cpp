@@ -316,7 +316,11 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         NoteVoicePar[nvoice].FilterLfo = NULL;
 
         NoteVoicePar[nvoice].FilterCenterPitch =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreq();
+            adpars->VoicePar[nvoice].VoiceFilter->getfreq()
+            + adpars->VoicePar[nvoice].PFilterVelocityScale
+            / 127.0f * 6.0f       //velocity sensing
+            * (velF(velocity,
+                    adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
         NoteVoicePar[nvoice].filterbypass = adpars->VoicePar[nvoice].Pfilterbypass;
 
         switch (adpars->VoicePar[nvoice].PFMEnabled)
@@ -516,7 +520,11 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                 NoteVoicePar[nvoice].OscilSmp[i];
 
         NoteVoicePar[nvoice].FilterCenterPitch =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreq();
+            adpars->VoicePar[nvoice].VoiceFilter->getfreq()
+            + adpars->VoicePar[nvoice].PFilterVelocityScale
+            / 127.0f * 6.0f       //velocity sensing
+            * (velF(velocity,
+                    adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
         NoteVoicePar[nvoice].filterbypass =
             adpars->VoicePar[nvoice].Pfilterbypass;
 

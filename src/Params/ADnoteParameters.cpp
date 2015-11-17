@@ -135,6 +135,8 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFilterEnabled = 0;
     VoicePar[nvoice].PFilterEnvelopeEnabled = 0;
     VoicePar[nvoice].PFilterLfoEnabled = 0;
+    VoicePar[nvoice].PFilterVelocityScale = 0;
+    VoicePar[nvoice].PFilterVelocityScaleFunction = 64;
     VoicePar[nvoice].PFMEnabled = 0;
 
     // I use the internal oscillator (-1)
@@ -371,6 +373,8 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     if ((VoicePar[nvoice].PFilterEnabled != 0) || (!xml->minimal))
     {
         xml->beginbranch("FILTER_PARAMETERS");
+        xml->addpar("velocity_sensing_amplitude", VoicePar[nvoice].PFilterVelocityScale);
+        xml->addpar("velocity_sensing", VoicePar[nvoice].PFilterVelocityScaleFunction);
         xml->beginbranch("FILTER");
         VoicePar[nvoice].VoiceFilter->add2XML(xml);
         xml->endbranch();
@@ -705,6 +709,13 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 
     if (xml->enterbranch("FILTER_PARAMETERS"))
     {
+        VoicePar[nvoice].PFilterVelocityScale =
+            xml->getpar127("velocity_sensing_amplitude",
+            VoicePar[nvoice].PFilterVelocityScale);
+        VoicePar[nvoice].PFilterVelocityScaleFunction =
+            xml->getpar127("velocity_sensing",
+            VoicePar[nvoice].PFilterVelocityScaleFunction);
+
         if (xml->enterbranch("FILTER"))
         {
             VoicePar[nvoice].VoiceFilter->getfromXML(xml);

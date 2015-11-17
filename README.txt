@@ -1,5 +1,24 @@
 Cal's last entry here is preserved in doc/Histories
 
+V1.3.7
+
+This just a minor release focussing on usability details.
+
+Yoshimi now remembers most window positions on a per instance basis, and will re-open them at the same locations. Also, if you shut down with these windows open, they will be opened again on the next run.
+
+Almost all window titles carry the instance number as well as details such as part number/name, engine, and whether it is kit mode. For addsynth oscillator, the voice number is included. Bank and Instrument windows, as before, show the MIDI ID numbers along with the complete file paths.
+
+The top menu bar has been reorganised for better grouping. Mixing unrelated operations on a single menu is never a winner.
+
+A complete clear-down now has it's own button, 'Reset'. This is as close as possible to a restart, but works independently for each instance. Re-aranging this group of buttons into two rows means they can be longer - "Virtual Keybd" is a bit more obvious than "vrKbd".
+
+The 'Controllers' window now (at last) correctly updates when you hit its reset button.
+
+Other window layouts have had a bit of polish.
+
+There is now an option so you can see the version details of all XML files in the 'Console' window as they are loaded.
+
+Command line access is now more than just a proof of concept. It has a half-decent parser, paging and history. All these are developing alongside considerably more controls.
 
 V1.3.6
 
