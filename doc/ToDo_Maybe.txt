@@ -1,6 +1,8 @@
 
 Check command/gui updates.
 
+Replace usleep with nanosleep
+
 Make loading effect presets update the 'top' line.
 
 Sort out default midi message.

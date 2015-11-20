@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2015-11-19 Will
+- Ported pink noise feature from Zyn 2.5.2
+- No longer clears part output buffers, as they are completely
+  overwritten when in use and ignored otherwise.
+
 2015-11-17 Will
 - Minor display corrections
 - Changed XML minimum Zyn instrument compatibility version to 2.4

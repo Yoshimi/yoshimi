@@ -97,6 +97,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetSystemValue(int type, int value);
         int commandSet(char *point);
         int commandVector(char *point);
+        char readGuiData();
+        void writeGuiData(char data);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
@@ -209,7 +211,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t *processLock;
 
         jack_ringbuffer_t *vuringbuf;
-        
+        jack_ringbuffer_t *guiringbuf;
+
         XMLwrapper *stateXMLtree;
         
         char random_state[256];
