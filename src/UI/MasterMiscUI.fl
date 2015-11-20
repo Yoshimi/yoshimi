@@ -296,11 +296,11 @@ synth = _synth;
             if(guidata != olddata)
             {
                 olddata = guidata;
-                //synth->getRuntime().Log("Data " + asString(guidata));
+                synth->getRuntime().Log("Data " + asString(guidata));
                 if (guidata | 64)
                 {                    
-                    synth->getGuiMaster()->partui->partvol->value(synth->part[guidata & 63]->Pvolume);
-                    synth->getGuiMaster()->partui->redraw();
+                    //synth->getGuiMaster()->partui->partvol->value(synth->part[guidata & 63]->Pvolume);
+                    synth->getGuiMaster()->updatepart();
                     synth->getGuiMaster()->panellistitem[(guidata & 63) % NUM_MIDI_CHANNELS]->refresh();
                 }
                 else if (guidata | 128)

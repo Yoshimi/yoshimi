@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-11-20 Will
+- Fixed regression where sending CCs would close part windows
+  and streams of them blocked the gui.
+
 2015-11-19 Will
 - Ported pink noise feature from Zyn 2.5.2
 - No longer clears part output buffers, as they are completely

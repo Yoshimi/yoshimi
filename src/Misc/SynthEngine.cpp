@@ -439,10 +439,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 {
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
-                    /*{
+                    {
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                    }*/
-                        writeGuiData(npart | 64);
+                    }
+                       //writeGuiData(npart | 64);
                 }
             }
         }

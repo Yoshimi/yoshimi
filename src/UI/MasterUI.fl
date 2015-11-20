@@ -841,7 +841,7 @@ paramsui->Show();}
           npart = nval;
           updatepanel();
           maxparts->value(synth->getRuntime().NumAvailableParts);}
-        xywh {38 265 40 20} labelsize 11 minimum 0 maximum 127 textsize 11
+        xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
         code1 {bankui->init(o);}
       }
@@ -857,7 +857,8 @@ if (tmp == 48)
     o->value(tmp);
 }
 synth->getRuntime().NumAvailableParts = tmp;
-updatepart();
+checkmaxparts();
+updatepanel();
 setinspartlist();}
         xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(synth->getRuntime().NumAvailableParts);}
@@ -1073,8 +1074,12 @@ updatepanel();}
   }
   Function {updatepart()} {} {
     code {//
+    partui->partpan->value(synth->part[npart]->Ppanning);
+    partui->partvol->value(synth->part[npart]->Pvolume);
     checkmaxparts();
-    npartcounter->do_callback();} {}
+    maxparts->value(synth->getRuntime().NumAvailableParts);
+    maxparts->redraw();
+    npartcounter->redraw();} {}
   }
   Function {updatepartprogram(int npart)} {} {
     code {//
