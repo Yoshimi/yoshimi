@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014, Will Godfrey    
+Copyright 2014-2015, Will Godfrey    
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -85,7 +85,7 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 } 
 
-class VUMeter {open : {public Fl_Box, private MiscFuncs}
+class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -281,8 +281,7 @@ synth = _synth;
     if (panelpart.clip[npart + *plgroup])
         fl_rectf(ox, oy, lx, 4, 255, 0, 0);} {}
   }
-  Function {draw()} {open
-  } {
+  Function {draw()} {} {
     code {//
     if (npart>=0)
         draw_part();
@@ -299,9 +298,8 @@ synth = _synth;
                 synth->getRuntime().Log("Data " + asString(guidata));
                 if (guidata | 64)
                 {                    
-                    //synth->getGuiMaster()->partui->partvol->value(synth->part[guidata & 63]->Pvolume);
                     synth->getGuiMaster()->updatepart();
-                    synth->getGuiMaster()->panellistitem[(guidata & 63) % NUM_MIDI_CHANNELS]->refresh();
+                    synth->getGuiMaster()->updatelistitem(guidata & 63);
                 }
                 else if (guidata | 128)
                     synth->getGuiMaster()->updatepartprogram(guidata & 63);
@@ -311,8 +309,7 @@ synth = _synth;
                 synth->getRuntime().Log("Repeat " + asString(guidata));
             guidata = synth->readGuiData();
         }
-    }} {selected
-    }
+    }} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
@@ -425,7 +422,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
@@ -567,17 +564,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     panellistitem->show();
     end();} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {//
 
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
 	
     partenabled->value(synth->part [setpart]->Penabled);
-    if (synth->part[setpart]->Penabled != 0)
-        panellistitemgroup->activate();
-    else
-        panellistitemgroup->deactivate();
     
     setPartLabel(findengines(setpart));        
     
@@ -602,7 +594,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         panellistitemgroup->color(fl_rgb_color(50,190,240));
     panellistitemgroup->redraw();
     string num = asString(setpart + 1);
-    partenabled->copy_label(num.c_str());} {}
+    partenabled->copy_label(num.c_str());
+
+    if (synth->part[setpart]->Penabled != 0)
+        panellistitemgroup->activate();
+    else
+        panellistitemgroup->deactivate();} {}
   }
   Function {setPartLabel(int engine)} {} {
     code {//

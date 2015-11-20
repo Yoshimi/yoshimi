@@ -1094,7 +1094,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             {
                 Runtime.NumAvailableParts = value;
                 Runtime.Log("Set active parts to " + asString(value));
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             }
             else
                 Runtime.Log("Out of range");

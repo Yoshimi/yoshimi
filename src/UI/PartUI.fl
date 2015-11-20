@@ -337,7 +337,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {11 608 375 165} type Double hide
+      xywh {359 617 375 165} type Double hide
       class Fl_Group
     } {
       Fl_Group partgroupui {

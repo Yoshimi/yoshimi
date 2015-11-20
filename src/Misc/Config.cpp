@@ -1195,6 +1195,17 @@ void GuiThreadMsg::processGuiMessages()
             }
         }
             break;
+        case GuiThreadMsg::UpdatePart:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster(false);
+            if(guiMaster)
+            {
+                guiMaster->updatepart();
+                guiMaster->updatepanel();
+            }
+        }
+            break;
         case GuiThreadMsg::UpdatePanelItem:
             if(msg->index < NUM_MIDI_PARTS && msg->data)
             {
@@ -1202,7 +1213,7 @@ void GuiThreadMsg::processGuiMessages()
                 MasterUI *guiMaster = synth->getGuiMaster(false);
                 if(guiMaster)
                 {
-                    guiMaster->panellistitem[(msg->index) % NUM_MIDI_CHANNELS]->refresh();
+                    guiMaster->updatelistitem(msg->index);
                     guiMaster->updatepart();
                 }
             }
@@ -1214,6 +1225,7 @@ void GuiThreadMsg::processGuiMessages()
                 MasterUI *guiMaster = synth->getGuiMaster(false);
                 if(guiMaster)
                 {
+                    guiMaster->updatelistitem(msg->index);
                     guiMaster->updatepartprogram(msg->index);
                 }
             }
