@@ -214,6 +214,7 @@ public:
         UpdateConfig,
         UpdatePaths,
         UpdatePanel,
+        UpdatePart,
         UpdatePanelItem,
         UpdatePartProgram,
         UpdateEffects,

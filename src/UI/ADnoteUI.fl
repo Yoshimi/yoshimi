@@ -11,6 +11,7 @@ comment {ADNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -56,8 +57,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   Function {make_window()} {private
   } {
     Fl_Window ADnoteVoiceListItem {
-      private xywh {691 599 620 30} type Double box ENGRAVED_BOX hide
-      class Fl_Group
+      private xywh {691 599 620 30} type Double box ENGRAVED_BOX
+      class Fl_Group visible
     } {
       Fl_Group voicelistitemgroup {
         private xywh {50 3 567 24} box FLAT_BOX
@@ -93,26 +94,28 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         Fl_Box noiselabel {
           label N
           callback {//
-              if (pars->VoicePar[nvoice].Type == 0)
-              {
-                  o->hide();
-                  voiceresonanceenabled->activate();
-                  detunevalueoutput->activate();
-                  voicedetune->activate();
-                  voicelfofreq->activate();
-                  voiceoscil->activate();
-              }
-              else
-              {
-                  o->show();
-                  voiceresonanceenabled->deactivate();
-                  detunevalueoutput->deactivate();
-                  voicedetune->deactivate();
-                  voicelfofreq->deactivate();
-                  voiceoscil->deactivate();
-              }}
+    int tmp = pars->VoicePar[nvoice].Type;
+    if (tmp == 0)
+    {
+        o->hide();
+        voiceresonanceenabled->activate();
+        detunevalueoutput->activate();
+        voicedetune->activate();
+        voicelfofreq->activate();
+        voiceoscil->activate();
+        return;
+    }
+    if (tmp == 1)
+        o->labelcolor(7);
+    else
+        o->labelcolor(5);
+    o->show();
+    voiceresonanceenabled->deactivate();
+    detunevalueoutput->deactivate();
+    voicedetune->deactivate();
+    voicelfofreq->deactivate();
+    voiceoscil->deactivate();}
           xywh {65 5 20 20} labelfont 1 labelsize 13 labelcolor 7
-          code0 {if (pars->VoicePar[nvoice].Type == 0) o->hide();}
         }
         Fl_Value_Output detunevalueoutput {
           callback {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType), 0, pars->VoicePar[nvoice].PDetune) * pars->getBandwidthDetuneMultiplier());}
@@ -835,7 +838,7 @@ unisongroup->redraw();}
           }
         }
         Fl_Group voicefiltergroup {
-          label FILTER
+          label FILTER open
           xywh {245 5 285 245} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
@@ -894,21 +897,23 @@ unisongroup->redraw();}
           callback {int x = lrint(o->value());
               pars->VoicePar[nvoice].Type = x;
               if (!x)
+              {
                   voicemodegroup->activate();
+              }
               else
                   voicemodegroup->deactivate();
               noiselabel->do_callback();}
-          tooltip {Oscillator Type (sound/noise)} xywh {5 500 65 20} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+          tooltip {Oscillator Type (sound/noise)} xywh {5 500 65 20} down_box BORDER_BOX labelsize 10 when 6 textfont 1 textsize 10
           code0 {o->value(pars->VoicePar[nvoice].Type);}
           code1 {if (pars->VoicePar[nvoice].Type!=0) voicemodegroup->deactivate();}
         } {
           MenuItem {} {
             label Sound
-            xywh {5 5 100 20} labelfont 1 labelsize 11
+            xywh {5 5 100 20} labelfont 1 labelsize 11 labelcolor 2
           }
           MenuItem {} {
-            label NOISE
-            xywh {15 15 100 20} labelfont 1 labelsize 11 labelcolor 1
+            label Noise
+            xywh {15 15 100 20} labelfont 1 labelsize 11
           }
         }
         Fl_Group {} {
@@ -941,10 +946,23 @@ unisongroup->redraw();}
           code0 {o->value(pars->VoicePar[nvoice].PFilterEnabled);}
         }
         Fl_Box noiselabel {
-          label {White Noise}
-          callback {if (pars->VoicePar[nvoice].Type==0) o->hide(); else o->show();}
+          label Noise
+          callback {o->hide();
+switch (pars->VoicePar[nvoice].Type)
+{
+    case 0:
+        return;
+        break;
+    default:
+        o->copy_label("White Noise");
+        o->labelcolor(7);
+        break;
+}
+o->show();}
           xywh {150 415 300 65} labelfont 1 labelsize 50 labelcolor 7
-          code0 {if (pars->VoicePar[nvoice].Type==0) o->hide(); else o->show();}
+          code0 {o->hide(); int tmp = pars->VoicePar[nvoice].Type;}
+          code1 {if (tmp >= 1) {o->copy_label("White Noise"); o->labelcolor(7);}}
+          code2 {if (tmp > 0) o->show();}
         }
       }
       Fl_Check_Button voiceonbutton {

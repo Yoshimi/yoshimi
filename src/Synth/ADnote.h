@@ -80,7 +80,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
         void computeVoiceOscillatorPitchModulation(int nvoice);
 
         void computeVoiceNoise(int nvoice);
-
+        void ComputeVoicePinkNoise(int nvoice);
+        
         void fadein(float *smps);
 
 
@@ -175,6 +176,9 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
         // Internal values of the note and of the voices
         float time; // time from the start of the note
+
+        //pinking filter (Paul Kellet)
+        float pinking[NUM_VOICES][14];
 
         int unison_size[NUM_VOICES]; // the size of unison for a single voice
 

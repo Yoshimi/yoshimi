@@ -239,15 +239,15 @@ class MasterUI {selected : {private MiscFuncs}
                   synth->getRuntime().saveConfig();
                   synth->guiClosed(true);
           }}
-      xywh {4 20 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {4 48 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {
-        xywh {-4 0 400 25} labelsize 13
+        xywh {-7 0 400 25} labelsize 13
         code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
         Submenu {} {
           label {&Yoshimi}
-          xywh {0 0 100 20} labelsize 12
+          xywh {0 0 96 20} labelsize 12
         } {
           MenuItem {} {
             label {&About...}
@@ -395,7 +395,7 @@ paramsui->Show();}
         }
         Submenu {} {
           label {Pat&hs}
-          xywh {0 0 70 20} labelsize 12
+          xywh {0 0 65 20} labelsize 12
         } {
           MenuItem {} {
             label {&Bank Root Dirs...}
@@ -410,7 +410,7 @@ paramsui->Show();}
         }
         Submenu Scales {
           label {&Scales}
-          tooltip {Clear all parameters to default settings} xywh {0 0 70 21} labelsize 12
+          tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
         } {
           MenuItem {} {
             label {&Show Settings...}
@@ -475,7 +475,7 @@ paramsui->Show();}
         }
         Submenu {} {
           label {S&tate}
-          xywh {0 0 70 21} labelsize 12
+          xywh {0 0 65 21} labelsize 12
         } {
           MenuItem loadState {
             label {Load...}
@@ -841,7 +841,7 @@ paramsui->Show();}
           npart = nval;
           updatepanel();
           maxparts->value(synth->getRuntime().NumAvailableParts);}
-        xywh {38 265 40 20} labelsize 11 minimum 0 maximum 127 textsize 11
+        xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
         code1 {bankui->init(o);}
       }
@@ -858,6 +858,7 @@ if (tmp == 48)
 }
 synth->getRuntime().NumAvailableParts = tmp;
 updatepart();
+updatepanel();
 setinspartlist();}
         xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(synth->getRuntime().NumAvailableParts);}
@@ -1036,11 +1037,16 @@ updatepanel();}
             for (int neff2 = neff1 + 1; neff2 < NUM_SYS_EFX; ++neff2)
                 syseffsend[neff1][neff2]->value(synth->Psysefxsend[neff1][neff2]);} {}
   }
+  Function {updatelistitem(int part)} {} {
+    code {//
+    int tmp = part % NUM_MIDI_CHANNELS;
+    panellistitem[tmp]->refresh();} {}
+  }
   Function {updatepanel()} {} {
     code {//
         for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
             panellistitem[npart]->refresh();
-               if (synth->getRuntime().single_row_panel)
+        if (synth->getRuntime().single_row_panel)
         {
         	panelwindow->size(1085,345);
 	        Panelpack2->position(544,10);
@@ -1073,12 +1079,22 @@ updatepanel();}
   }
   Function {updatepart()} {} {
     code {//
-    checkmaxparts();
-    npartcounter->do_callback();} {}
+    if (checkmaxparts())
+    {
+        npartcounter->value(npart + 1);
+        npartcounter->do_callback();
+        return;
+    }
+    partui->partpan->value(synth->part[npart]->Ppanning);
+    partui->partvol->value(synth->part[npart]->Pvolume);
+    maxparts->value(synth->getRuntime().NumAvailableParts);
+    maxparts->redraw();
+    npartcounter->value(npart + 1);
+    npartcounter->redraw();
+    partui->setinstrumentlabel();} {}
   }
   Function {updatepartprogram(int npart)} {} {
     code {//
-    updatepart();
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
         partui->midich->value(partui->part->Prcvchn + 1);
@@ -1088,7 +1104,8 @@ updatepanel();}
     {
          partui->midich->textcolor(FL_WHITE);
          partui->midich->redraw();
-    }} {}
+    }
+    updatepart();} {}
   }
   Function {updateeffects(int data)} {} {
     code {//
@@ -1261,9 +1278,10 @@ updatepanel();}
     else
         Reports->activate();} {}
   }
-  Function {checkmaxparts()} {private
+  Function {checkmaxparts()} {private return_type bool
   } {
     code {//
+    bool changed = false;
     int max = synth->getRuntime().NumAvailableParts;
     if(panelgroup >= max)
     {
@@ -1271,10 +1289,12 @@ updatepanel();}
         npart = 0;
         Panelgroups->value(0);
         Panelsmallgroups->value(0);
+        changed = true;
     }
     npartcounter->range(1.0,max);
     if ( npartcounter->value() >= (max + 1))
-        npartcounter->value(1);} {}
+        npartcounter->value(1);
+    return changed;} {}
   }
   Function {strategicRetreat(void)} {} {
     code {fl_alert("Bad things happened,\\nYoshimi strategically retreats.");} {}
@@ -1567,27 +1587,48 @@ updatepanel();}
 
     if (partui->ctlwindow->x()) // this works, visible() doesn't :(
     	putData("controllers",
-             	partui->ctlwindow->x(),
-             	partui->ctlwindow->y(),
-             	partui->ctlwindow->visible());
+                 partui->ctlwindow->x(),
+                 partui->ctlwindow->y(),
+                 partui->ctlwindow->visible());
     else // no window so store previous values
         putData("controllers",
                  controllersX,
                  controllersY,
                  controllersO);
 
-    putData("instrumentedit",
-             partui->instrumenteditwindow->x(),
-             partui->instrumenteditwindow->y(),
-             partui->instrumenteditwindow->visible());
-    putData("kitlist",
-             partui->instrumentkitlist->x(),
-             partui->instrumentkitlist->y(),
-             partui->instrumentkitlist->visible());
-    putData("partFX",
-             partui->partfx->x(),
-             partui->partfx->y(),
-             partui->partfx->visible());
+    if (partui->instrumenteditwindow->x())
+        putData("instrumentedit",
+                 partui->instrumenteditwindow->x(),
+                 partui->instrumenteditwindow->y(),
+                 partui->instrumenteditwindow->visible());
+    else
+        putData("instrumentedit",
+                 inseditX,
+                 inseditY,
+                 inseditO);
+
+    if (partui->instrumentkitlist->x()) 
+        putData("kitlist",
+                 partui->instrumentkitlist->x(),
+                 partui->instrumentkitlist->y(),
+                 partui->instrumentkitlist->visible());
+    else
+        putData("kitlist",
+                 kitlistX,
+                 kitlistY,
+                 kitlistO);
+
+    if(partui->partfx->x())
+        putData("partFX",
+                 partui->partfx->x(),
+                 partui->partfx->y(),
+                 partui->partfx->visible());
+    else
+        putData("partFX",
+                 partfxX,
+                 partfxY,
+                 partfxO);
+ 
     putData("SUBnote",
              subNoteX,
              subNoteY,

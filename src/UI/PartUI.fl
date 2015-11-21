@@ -333,12 +333,11 @@ class PartKitItem {: {public Fl_Group}
   }
 } 
 
-class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {11 608 375 165} type Double hide
+      xywh {359 617 375 165} type Double hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -1270,8 +1269,7 @@ seteditname();}
         partgroup->show();
         end();} {}
   }
-  Function {showparameters(int kititem,int engine)} {open
-  } {
+  Function {showparameters(int kititem,int engine)} {} {
     code {//
     if (engine == -1)
     {   // this is used if I want to clear the engine from the part
@@ -1318,8 +1316,7 @@ seteditname();}
     if (engine == 1 && subnoteui != NULL)
         subnoteui->SUBparameters->show();
     if (engine == 2 && adnoteui != NULL)
-        padnoteui->padnotewindow->show();} {selected
-    }
+        padnoteui->padnotewindow->show();} {}
   }
   Function {find_engines()} {} {
     code {//

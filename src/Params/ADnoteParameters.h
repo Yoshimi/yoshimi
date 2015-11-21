@@ -148,7 +148,11 @@ struct ADnoteVoiceParam { // Voice parameters
 
     unsigned char PFilterLfoEnabled;         // LFO Envelope
     LFOParams *FilterLfo;
-
+    
+    unsigned char PFilterVelocityScale;
+    unsigned char PFilterVelocityScaleFunction;
+    
+    
     // Modullator parameters
     unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM..
     short int     PFMVoice;   // Voice that I use as modullator instead of FMSmp.

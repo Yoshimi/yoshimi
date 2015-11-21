@@ -26,6 +26,7 @@
 #include <cmath>
 #include <fftw3.h>
 #include <cassert>
+#include <iostream>
 
 using namespace std;
 
@@ -103,6 +104,9 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
 
     for (int nvoice = 0; nvoice < NUM_VOICES; ++nvoice)
     {
+        for (int i = 0; i < 14; i++)
+            pinking[nvoice][i] = 0.0;
+        
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -316,7 +320,11 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         NoteVoicePar[nvoice].FilterLfo = NULL;
 
         NoteVoicePar[nvoice].FilterCenterPitch =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreq();
+            adpars->VoicePar[nvoice].VoiceFilter->getfreq()
+            + adpars->VoicePar[nvoice].PFilterVelocityScale
+            / 127.0f * 6.0f       //velocity sensing
+            * (velF(velocity,
+                    adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
         NoteVoicePar[nvoice].filterbypass = adpars->VoicePar[nvoice].Pfilterbypass;
 
         switch (adpars->VoicePar[nvoice].PFMEnabled)
@@ -516,7 +524,11 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                 NoteVoicePar[nvoice].OscilSmp[i];
 
         NoteVoicePar[nvoice].FilterCenterPitch =
-            adpars->VoicePar[nvoice].VoiceFilter->getfreq();
+            adpars->VoicePar[nvoice].VoiceFilter->getfreq()
+            + adpars->VoicePar[nvoice].PFilterVelocityScale
+            / 127.0f * 6.0f       //velocity sensing
+            * (velF(velocity,
+                    adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
         NoteVoicePar[nvoice].filterbypass =
             adpars->VoicePar[nvoice].Pfilterbypass;
 
@@ -1243,7 +1255,8 @@ void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
  */
 inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
 {
-    for(int k = 0; k < unison_size[nvoice]; ++k) {
+    for (int k = 0; k < unison_size[nvoice]; ++k)
+    {
         int    poshi  = oscposhi[nvoice][k];
         int    poslo  = oscposlo[nvoice][k] * (1<<24);
         int    freqhi = oscfreqhi[nvoice][k];
@@ -1251,7 +1264,8 @@ inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
         float *smps   = NoteVoicePar[nvoice].OscilSmp;
         float *tw     = tmpwave_unison[k];
         assert(oscfreqlo[nvoice][k] < 1.0f);
-        for(int i = 0; i < synth->p_buffersize; ++i) {
+        for (int i = 0; i < synth->p_buffersize; ++i)
+        {
             tw[i]  = (smps[poshi] * ((1<<24) - poslo) + smps[poshi + 1] * poslo)/(1.0f*(1<<24));
             poslo += freqlo;
             poshi += freqhi + (poslo>>24);
@@ -1541,6 +1555,27 @@ void ADnote::computeVoiceNoise(int nvoice)
     }
 }
 
+// ported from Zyn 2.5.2
+void ADnote::ComputeVoicePinkNoise(int nvoice)
+{
+    for (int k = 0; k < unison_size[nvoice]; ++k) {
+        float *tw = tmpwave_unison[k];
+        float *f = &pinking[nvoice][k > 0 ? 7 : 0];
+        for (int i = 0; i < synth->p_buffersize; ++i)
+        {
+            float white = (synth->numRandom() - 0.5 ) / 4.0;
+            f[0] = 0.99886*f[0]+white*0.0555179;
+            f[1] = 0.99332*f[1]+white*0.0750759;
+            f[2] = 0.96900*f[2]+white*0.1538520;
+            f[3] = 0.86650*f[3]+white*0.3104856;
+            f[4] = 0.55000*f[4]+white*0.5329522;
+            f[5] = -0.7616*f[5]-white*0.0168980;
+            tw[i] = f[0]+f[1]+f[2]+f[3]+f[4]+f[5]+f[6]+white*0.5362;
+            f[6] = white*0.115926;
+        }
+    }
+}
+
 
 // Compute the ADnote samples, returns 0 if the note is finished
 int ADnote::noteout(float *outl, float *outr)
@@ -1560,38 +1595,42 @@ int ADnote::noteout(float *outl, float *outr)
     {
         if (!NoteVoicePar[nvoice].Enabled || NoteVoicePar[nvoice].DelayTicks > 0)
             continue;
-        if (!NoteVoicePar[nvoice].noisetype) // 0 == sound
+        switch (NoteVoicePar[nvoice].noisetype)
         {
-            switch(NoteVoicePar[nvoice].FMEnabled)
-            {
-                case MORPH:
-                    computeVoiceOscillatorMorph(nvoice);
-                    break;
+            case 0: //  sound
+                switch(NoteVoicePar[nvoice].FMEnabled)
+                {
+                    case MORPH:
+                        computeVoiceOscillatorMorph(nvoice);
+                        break;
 
-                case RING_MOD:
-                    computeVoiceOscillatorRingModulation(nvoice);
-                    break;
+                    case RING_MOD:
+                        computeVoiceOscillatorRingModulation(nvoice);
+                        break;
 
-                case PHASE_MOD:
-                    computeVoiceOscillatorFrequencyModulation(nvoice, 0);
-                    break;
+                    case PHASE_MOD:
+                        computeVoiceOscillatorFrequencyModulation(nvoice, 0);
+                        break;
 
-                case FREQ_MOD:
-                    computeVoiceOscillatorFrequencyModulation(nvoice, 1);
-                    break;
+                    case FREQ_MOD:
+                        computeVoiceOscillatorFrequencyModulation(nvoice, 1);
+                        break;
 
-                // case PITCH_MOD:
-                //    computeVoiceOscillatorPitchModulation(nvoice);
-                //    break;
+                    // case PITCH_MOD:
+                    //    computeVoiceOscillatorPitchModulation(nvoice);
+                    //    break;
 
-                default:
-                    computeVoiceOscillatorLinearInterpolation(nvoice);
-                    //if (config.cfg.Interpolation) computeVoiceOscillatorCubicInterpolation(nvoice);
-                    break;
-            }
+                    default:
+                        computeVoiceOscillatorLinearInterpolation(nvoice);
+                        //if (config.cfg.Interpolation) computeVoiceOscillatorCubicInterpolation(nvoice);
+                        break;
+                }
+                break;
+            default:
+                computeVoiceNoise(nvoice); // white noise
+                break;
         }
-        else // not sound, is noise
-            computeVoiceNoise(nvoice);
+            
 
         // Mix subvoices into voice
         memset(tmpwavel, 0, synth->p_bufferbytes);
