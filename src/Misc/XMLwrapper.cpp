@@ -48,7 +48,7 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 
 
 XMLwrapper::XMLwrapper(SynthEngine *_synth) :
-    minimal(false),
+    minimal(true),
     stackpos(0),
     synth(_synth)
 {

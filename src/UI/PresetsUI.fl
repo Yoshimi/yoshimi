@@ -55,19 +55,20 @@ class PresetsUI_ {} {
   }
 } 
 
-class PresetsUI {open
+class PresetsUI {selected
 } {
-  Function {PresetsUI(SynthEngine *_synth)} {open
-  } {
-    code {synth = _synth;
-p = NULL;
-        make_window();} {}
+  Function {PresetsUI(SynthEngine *_synth)} {} {
+    code {//
+    synth = _synth;
+    p = NULL;
+    make_window();} {}
   }
   Function {~PresetsUI()} {} {
-    code {copywin->hide();
-      delete(copywin);
-      pastewin->hide();
-      delete(pastewin);} {}
+    code {//
+    copywin->hide();
+    delete(copywin);
+    pastewin->hide();
+    delete(pastewin);} {}
   }
   Function {make_window()} {} {
     Fl_Window copywin {
@@ -76,11 +77,11 @@ p = NULL;
     } {
       Fl_Browser copybrowse {
         callback {int val = o->value();
-          if (val)
-          {
-            presetname->cut(0, presetname->maximum_size());
-            presetname->insert(o->text(val));
-          }}
+    if (val)
+    {
+      presetname->cut(0, presetname->maximum_size());
+      presetname->insert(o->text(val));
+    }}
         xywh {10 25 245 320} type Select
       }
       Fl_Button copypbutton {
@@ -187,64 +188,68 @@ p = NULL;
     }
   }
   Function {copy(Presets *p)} {} {
-    code {copybutton->activate();
-      copypbutton->deactivate();
-      this->p = p;
-      this->pui = NULL;
-      bool but = (Fl::event_button() != FL_LEFT_MOUSE);
-      presetname->cut(0, presetname->maximum_size());
-      if (but)
+    code {//
+    copybutton->activate();
+    copypbutton->deactivate();
+    this->p = p;
+    this->pui = NULL;
+    bool but = (Fl::event_button() != FL_LEFT_MOUSE);
+    presetname->cut(0, presetname->maximum_size());
+    if (but)
         p->copy(NULL);
-      else
-      {
+    else
+    {
         rescan();
-        copytypetext->label(&p->type[1]);
+        copytypetext->label(&p->type[0]); // this was 1  Why?
         copywin->show();
-      }} {}
+    }} {}
   }
   Function {paste(Presets *p,PresetsUI_ *pui)} {} {
-    code {this->p = p;
-      this->pui = pui;
-      bool but = (Fl::event_button() != FL_LEFT_MOUSE);
-      pastepbutton->deactivate();
-      deletepbutton->deactivate();
-      if (but)
-      {
+    code {//
+    this->p = p;
+    this->pui = pui;
+    bool but = (Fl::event_button() != FL_LEFT_MOUSE);
+    pastepbutton->deactivate();
+    deletepbutton->deactivate();
+    if (but)
+    {
         p->paste(0);
         pui->refresh();
-      }
-      else
-      {
+    }
+    else
+    {
         rescan();
-        pastetypetext->label(&p->type[1]);
+        pastetypetext->label(&p->type[0]); // this was 1  Why?
         if (p->checkclipboardtype())
-          pastebutton->activate();
+            pastebutton->activate();
         else
-          pastebutton->deactivate();
+            pastebutton->deactivate();
         pastewin->show();
-      }} {}
+    }} {}
   }
   Function {copy(Presets *p,int n)} {} {
-    code {p->setelement(n);
-      copy(p);} {}
+    code {//
+    p->setelement(n);
+    copy(p);} {}
   }
   Function {paste(Presets *p,PresetsUI_ *pui,int n)} {} {
-    code {p->setelement(n);
-      paste(p, pui);} {}
+    code {//
+    p->setelement(n);
+    paste(p, pui);} {}
   }
-  Function {rescan()} {open
-  } {
-    code {copybrowse->clear();
-      pastebrowse->clear();
-      p->rescanforpresets();
-      for (int i = 0; i < MAX_PRESETS; ++i)
-      {
-          string name = synth->getPresetsStore().presets[i].name;
-          if (name.empty())
-              break;
-          copybrowse->add(name.c_str());
-          pastebrowse->add(name.c_str());
-      }} {}
+  Function {rescan()} {} {
+    code {//
+    copybrowse->clear();
+    pastebrowse->clear();
+    p->rescanforpresets();
+    for (int i = 0; i < MAX_PRESETS; ++i)
+    {
+        string name = synth->getPresetsStore().presets[i].name;
+        if (name.empty())
+            break;
+        copybrowse->add(name.c_str());
+        pastebrowse->add(name.c_str());
+    }} {}
   }
   Function {Hide()} {} {
     code {copywin->hide();} {}
