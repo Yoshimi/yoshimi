@@ -12,7 +12,7 @@ MSB
 
 100 LSB > 63        Send reports to Reports window, otherwise to stderr.
 
-108 LSB channel     List the current vector parameters of {channel}.
+108 LSB x  [13824]  List settings of all vectors.
 
 109 LSB x  [13843]  List the following:
                     Reports destination

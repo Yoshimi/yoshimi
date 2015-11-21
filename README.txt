@@ -1,81 +1,65 @@
-This motley little collection is a snapshot of an ongoing experiment exploring
-how to improve jack io in ZynAddSubFX. And anything else I feel like exploring.
+Cal's last entry here is preserved in doc/Histories
 
-See INSTALL for instructions.
 
-Bon apetite.
-------------
-Changes
-0.058.1 switch fftw planner flag from FFTW_MEASURE back to FFTW_ESTIMATE,
-        enabling plinky-plank to load in realistic time
-0.058 all the rc5 fixes but lose the debug code;welcome Jeremy Jongepier's Dubstep bass.
-0.057.2-rc5 fix a deadlock on loading instruments using PADsynth.
-0.057.2-rc4 more testing of issues.
-0.057.2-rc3 Further adjustment to xml file reads.
-0.057.2-chk2 Reinstate 0.057 interrupt fix.
-0.057.2-chk1 Possible fix for intermittent instrument load failures.
-0.057.1 Fix inverted reverb panning.
-0.057 reinstate jack midi pitchbend fix (from circa 0.022???); incorporate
-      Nedko's lazy signal response fix; check for sse availability, and step
-      over things accordingly. 
-0.056 reinstates PADsynth functionality - a stuff up in XMLwrapper::getparbool(). 
-0.055.6 possibly fixes loading compressed xml. 
-0.055.5 Add airlynx/chip instruments.
-0.055.4 Drop double buffer fltk init; add --no-gui
-0.055.3 use the correct #include <FL/x.H> and move it from MasterUI.fl to GuiThreadUI.fl
-0.055.2 add param file loaded from command line to params history.
-0.055.1 check for (and require) alsa >= 1.0.17.
-0.055 pre5 becomes 0.055, no change.
-0.055-pre5 a jack midi bug fix; some subtle performance enhancers including
-           slightly more granular locking. 
-0.055-pre4 gui ignition sequence adjusted. 
-0.055-pre3 a few gui fixes, maybe even fixed the gui startup issue; LADI 1 support seems ok.
-0.055-pre2 shakes a fist at the gui startup failure; getopt replaced by argp.
-0.055-pre1 shuffled the master gui display about a bit; LADI 1 support seems ok.
-0.054.1 attitudinal adjustment to a few more pans. 
-0.054 a few things from pre4 fixed; ladi1 SIGUSR1 handler in place but still
-      untested in ladish context; interrupt handler now handles rude
-      interuptions better; instrument banks now shipped uncompressed; mostly
-      harmless?
-0.054-pre4 First cut LADI Level 1 compliance. Some new code, and quite a bit of
-           old code moved around, so expect issues. 
-0.054-pre3 formed an alliance with the random_r family; dropped no gui option. 
-0.053.3 fix NUM_KIT_ITEMS, accidentally reduced 16 -> 3; improve handling of
-        rtprio availability on thread creation;       
-0.053.2 set the priority of threads in accordance with jack's firm recommendation
-0.054-pre2 fixed random error in randomness; more menu madness.
-0.054-pre1 improved xmz file selection, including persistent history selection;
-           prune some extraneous code;
-0.053 no change from pre4
-0.053-pre4 reinstate 'last bank' recall
-0.053-pre3 sort out the oversights from recorder fixes:- settings corruption;
-           stray mushroom clouds from recorder
-0.053-pre2 utter rubbish
-0.053-pre1 reverted to 0.045, and just added the sane stuff; recording should
-           be fixed; missing ~/.yoshimiXML.cfg no longer a drama 
-0.046 to 0.051 should be considered as just unfortunate medical outcomes
-0.045 use pthread for managing SCHED_FIFO on threads
-0.044 add alsa period size & samplerate control, and auto-record
-0.039 - 0.043 dismissed as unfortunate medical outcomes
-0.038 re-fix load parameters, flush record buffer at appropriate times, and
-      attempt to reduce xrun impact of private moments (patch changes etc) 2009-11-12
-0.037 Yoshimi records 2009-011-11
-0.036 Will J Godfrey's load parameter file fix
-0.034 Somewhat experimental in nature, adult supervision recommended: use fftw
-      threaded routines. 2009-10-24
-0.031 restore some sanity to the metering (perhaps). 2009-10-23
-0.030 unlink jack midi semaphore on Close(). 2009-10-21
-0.029 put the red line back in formant filter graph. 2009-10-19
-0.028 the theory that started it all is debunked - revoke the reincarnation of
-      the "three tries for lock" theory. Hardcore jack it is then. 2009-10-17
-0.027 fix a little (weeks old) noteon velocity glitch. 2009-10-16
-0.025/0.026 a couple of little optimisations. 2009-10-15
-0.024 fix (ie disable) right-click instrument rename from main panel. It doesn't
-      work in 2.4.0 either, not worth the bother. 2009-10-14
-0.023 fix jack midi pitchbend, update master panel instrument label on bank slot
-      rename. 2009-10-14
-0.022 more bank management fixes 2009-10-13
-0.021 fix right click instrument rename and a couple of bank management issues. 2009-10-13
-0.020 a private matter, not for public dissemination. 2009-10-13
-0.019 add commandline param for client name tag: -N <name tag>. 2009-10-09
-0.018 tidy some "isshoos", and change alsa midi client name. 2009-10-08
+V1.3.6
+
+Principal features for this release are the introduction of controls from the command line, covering many stetup options, as well as extensive root/bank/instrument management. Some of these new controls are also available to MIDI via new NRPNs.
+
+Vector control has been extended so that there are four independent 'features' that each axis can control,
+
+ALSA audio has had a makeover and now can work at your sound card's best bit depth - not just 16 bit (as it used to be).
+
+In the 'examples' directory there is now a complete song set, 'OutThere.mid' and 'OutThere.xmz'. Together these produce a fairly complex 12 part tune that makes Yoshimi work quite hard.
+
+More information on these and other features are in the 'doc' directory.
+
+
+We have a new policy with version numbering. If the Version string contains a 4th number, then this is purely a bugfix version and will have no changed features. If you are having problems you may want to upgrade.
+
+1.3.5 is the current version
+1.3.5.1 is the first bugfix
+This has one minor GUI fix, and a fix for uses of fltk V1.1 with build problems.
+
+V1.3.5
+
+In response to suggestions at LAC 2015 we have made the title bars of all editing windows display both the part number and the current name of the instrument you are working on. In the addsynth oscillator editor you also see the number of the oscillator you are editing.
+
+
+Also, in response to suggestions, horizontal as well as vertical mouse dragging can be used to set rotary controls. Additionally, the mouse scroll wheel can be used, and if you hold down the 'ctrl' key you can get very precise setting.
+
+
+Another request we had was for the part effects window to have the same layout as System and Insertion effects. This has been done and it is now almost identical to Insertion effects.
+
+
+The most noticeable GUI enhancement is colour coded identification of an instrument's use of Add Sub and Pad synth engines, no matter where in the instrument's kit they may be. This can be enabled/disabled in the mixer panel. It does slow down yoshimi's startup, but due to the banks reorganisation (done some time ago) it causes no delay in changing banks/instruments once you are up and running.
+Some saved instruments seem to have had their Info section corrupted. Yoshimi can detect this and step over it to find the true status. Also, if you resave the instrument, not only will the PadSynth status be restored, but Add and Sub will be included, allowing a faster scan next time.
+
+
+
+In Yoshimi V1.3.5 a number of existing, as well as new features have come together to give much greater flexibility (especially for automation) using standard MIDI messages. These are:
+
+NRPNs.
+Independent part control.
+16, 32 or 64 parts.
+Vector Control.
+Direct part stereo audio output.
+
+
+NRPNs can handle individual bytes appearing in either order, and usually the same with the data bytes. Increment and decrement is also supported as graduated values for both data LSB and MSB. Additionally, ALSA sequencer's 14bit NRPN blocks are supported.
+
+
+Independent part control enables you to change instrument, volume, pan, or indeed any other available control of just that part, without affecting any others that are receiving the same MIDI channel. This can be particularly interesting with multiply layered sounds. There are more extensions planned.
+
+
+With 32 and 64 parts it helps to think of 2/4 rows of 16. When you save a parameter block the number of parts is also saved, and will be restored when you reload.
+By default each *column* has the same MIDI channel number, but these can be independently switched around, and by setting (say) number 17 taken right out of normal access.
+
+In tests, *compiling* for 64 parts compared with 16 parts increased processor load by a very small amount when Yoshimi was idling, but this becomes virtually undetectable once you have 8+ instruments actually generating output. In normal use, selecting the different formats makes no detectable difference but using the default 16 reduces clutter when you don't need the extra.
+
+
+Vector control is based on these columns giving you either 2 (X only) or 4 (X + Y) instruments in this channel. Currently the vector CCs you set up can (as inverse pairs) vary any combination of volume, pan and filter cut-off. More will be added.
+To keep the processor load reasonable it pays to use fairly simple instruments, but if you have sufficient processing power it would be theoretically possible to set up all 16 channels with quite independent vector behaviour!
+
+
+Direct part audio is Jack-specific and allows you to apply further processing to just the defined part's audio output (which can still output to the main L+R if you want). This setting is saved with parameter blocks. Currently it is only set in the mixer panel window, but it will also eventually come under MIDI direct part control.
+Again, to reduce unnecessary clutter, part ports are only registered with Jack if they are both enabled, and set for direct output. However, once set they will remain in place for the session to avoid disrupting other applications that may have seen them.

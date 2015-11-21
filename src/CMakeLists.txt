@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.6.1")
+set (YOSHIMI_VERSION "1.3.7")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -182,6 +182,41 @@ mark_as_advanced (FLTK_DIR)
 mark_as_advanced (FLTK_FLUID_EXECUTABLE)
 mark_as_advanced (FLTK_MATH_LIBRARY)
 
+find_path(Readline_ROOT_DIR
+    NAMES include/readline/readline.h
+)
+
+find_path(Readline_INCLUDE_DIR
+    NAMES readline/readline.h
+    HINTS ${Readline_ROOT_DIR}/include
+)
+
+find_library(Readline_LIBRARY
+    NAMES readline
+    HINTS ${Readline_ROOT_DIR}/lib
+)
+
+if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+  set(READLINE_FOUND TRUE)
+else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+  FIND_LIBRARY(Readline_LIBRARY NAMES readline)
+  include(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
+  MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
+endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+
+mark_as_advanced(
+    Readline_ROOT_DIR
+    Readline_INCLUDE_DIR
+    Readline_LIBRARY
+)
+
+if(READLINE_FOUND)
+    message (STATUS "Readline library found" )
+else(READLINE_FOUND)
+    message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
+endif(READLINE_FOUND)
+
 set (GuiFluids
     UI/WidgetPDialUI.fl  UI/PresetsUI.fl  UI/EnvelopeUI.fl
     UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboardUI.fl
@@ -234,6 +269,7 @@ set (Effects_sources
 set (Misc_sources
     Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp  Misc/Microtonal.cpp
     Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+    Misc/CmdInterface.cpp
 )
 
 set (Params_sources
@@ -284,6 +320,14 @@ add_definitions (-DPI=3.1415926536f)
 add_definitions (-DTWOPI=6.28318530718f)
 add_definitions (-DHALFPI=1.57079632679f)
 add_definitions (-DLOG_2=0.693147181f)
+
+#probably not the best way to do this :(
+add_definitions (-DXML_INSTRUMENT=1)
+add_definitions (-DXML_PARAMETERS=2)
+add_definitions (-DXML_MICROTONAL=3)
+add_definitions (-DXML_PRESETS=4)
+add_definitions (-DXML_STATE=5)
+add_definitions (-DXML_CONFIG=6)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
@@ -362,6 +406,7 @@ include_directories (AFTER
     ${FLTK_INCLUDE_DIR}
     ${FFTW3F_INC_DIR}
     ${LIBCAIRO_INCLUDE_DIRS}
+    ${Readline_INCLUDE_DIR}
 )
 
 set(ExternLibraries
@@ -373,6 +418,8 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
+    ${Readline_LIBRARY}
+    ncurses
     z
     dl
 )
@@ -466,7 +513,9 @@ if (BuildLV2Plugin)
 
 include(GNUInstallDirs)
 
-set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+#set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+set(LV2_INSTALL_DIR lib/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+
 pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
 if (LV2_FOUND)
     message (STATUS "Found lv2 package ${LV2_VERSION}")

@@ -86,6 +86,8 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
+        case 2:
+            ctl = C_breath;
         case 6: // data MSB
             ctl = C_dataH;
             break;
@@ -252,6 +254,12 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             return;
         }
         // pick up a drop-through if CC doesn't match the above
+        if (ctrl == C_breath)
+        {
+            synth->SetController(ch, C_volume, param);
+            ctrl = C_filtercutoff;
+        }
+ 
         synth->SetController(ch, ctrl, param);
     }
 }

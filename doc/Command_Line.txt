@@ -1,8 +1,10 @@
 When running from the command line all the following can now be entered after the 'up and running' message.
 
-setup - displays the current dynamic system settings.
+load patchset <s> - loads a complete patch set from the named file.
 
-save - saves these settings.
+save patchset <s> - saves the patch set to the named file.
+
+save setup - saves the current dynamic system settings.
 
 paths - display all the currently defined bank root paths and their IDs.
 
@@ -10,63 +12,68 @@ path add [s] - defines a new bank root path and returns its ID.
 
 path remove [n] - removes path entry ID from the bank roots (doesn't delete anything)
 
-list root (n) - lists all the banks and their IDs in root path 'n' (or the current root).
+list banks (n) - lists all the banks and their IDs in root path 'n' (or the current root).
 
-list bank (n) - lists all the instruments and their IDs in bank 'n' (or the current bank) of the current root.
+list instruments (n) - lists all the instruments and their IDs in bank 'n' (or the current bank) of the current root.
 
-list vector [n] - lists the settings for vector on channel 'n'
+list current - lists the number of parts available and parts with instruments currently installed along with any enabled with the default sound. Also shows their audio destination 'M' = main L/R, 'P' = part, 'B' = both, '-' = disabled or unavailable.
 
-set root [n] - set current root path to ID 'n'.
+list vectors - lists the settings for all enabled vectors.
 
-set bank [n] - set current bank to ID 'n'.
+list setup - displays the current dynamic system settings.
 
-set part [n1] program [n2] - load instrument 'n2' into part 'n1'.
+set reports [n] - set report destination (1 = GUI, anything else sets stderr).
 
-set part [n1] channel [n2] - set the MIDI channel 'n2' for part 'n1'. if the channel number is greater than 15 no further MIDI messages will be accepted by that part.
+set root <n> - set current root path to ID 'n'.
 
-set part [n1] destination [n2] set the audio destination of part 'n1' to main (1), part (2), both (3). Also enables part if not already enables.
+set bank <n> - set current bank to ID 'n'.
 
-set rootcc [n] - set the MIDI CC for root path changes (anything greater than 119 disables).
+set part [n1] program <n2> - load instrument 'n2' into part 'n1'.
 
-set bankcc [n] - set the MIDI CC for bank changes (anything other than 0 or 32 disables).
+set part [n1] channel <n2> - set the MIDI channel 'n2' for part 'n1'. if the channel number is greater than 15 no further MIDI messages will be accepted by that part.
 
-set program (n) - set MIDI program change (0 disables, anything else enables).
+set part [n1] destination <n2> set the audio destination of part 'n1' to main (1), part (2), both (3). Also enables part if not already enables.
 
-set activate (n) - set part activate on program change (0 disables, anything else enables). This applies to command line program change as well.
+set ccroot <n> - set the MIDI CC for root path changes (anything greater than 119 disables).
 
-set extend [n] - set CC for extended program change (anything greater than 119 disables).
+set ccbank <n> - set the MIDI CC for bank changes (anything other than 0 or 32 disables).
 
-set available [n] - set number of available parts (16, 32, 64).
+set program <n> - set MIDI program change (0 disables, anything else enables).
 
-set reports (n) - set reports destination (1 gui console, anything esle stderr).
+set activate <n> - set part activate on program change (0 disables, anything else enables). This applies to command line program change as well.
 
-set volume [n] - set master volume.
-set shift [n] - set master key shift for following notes in semitones (+- octave, 64 no shift).
+set extend <n> - set CC for extended program change (anything greater than 119 disables).
 
-set alsa midi [s] - * sets the name of the MIDI device ALSA looks for.
+set available <n> - set number of available parts (16, 32, 64).
 
-set alsa audio [s] - * sets the name of the audio hardware device ALSA looks for.
+set volume <n> - set master volume to 'n'.
 
-set jack server [s] - * sets the name of the jack server Yoshimi tries to connect to.
+set shift <n> - set master key shift in semitones (64 = no shift).
 
-set vector [n1] x cc [n2] - CC 'n2' is used for channel 'n1' X axis sweep. This also enables vector control for this channel.
+set alsa midi <s> - * sets the name of the MIDI device ALSA looks for.
 
-set vector [n1] y cc [n2] - CC 'n2' is used for channel 'n1' Y axis sweep.
+set alsa audio <s> - * sets the name of the audio hardware device ALSA looks for.
 
-set vector [n1] x features [n2] - sets channel 'n1' X features to 'n2'.
+set jack server <s> - * sets the name of the jack server Yoshimi tries to connect to.
 
-set vector [n1] y features [n2] - sets channel 'n1' Y features to 'n2'.
+set vector [n1] x/y cc <n2> - CC 'n2' is used for channel 'n1' X or Y axis sweep. For X, this also enables vector control for the channel.
 
-set vector [n1] x program [l/r] [n2] - loads program 'n2' to channel 'n1' X 'left' or 'right' part.
+set vector [n1] x/y features <n2> - sets channel 'n1' X or Y features to 'n2'.
 
-set vector [n1] y program [l/r] [n2] - loads program 'n2' to channel 'n1' X 'left' or 'right' part.
+set vector [n1] x/y program [l/r] <n2> - loads program 'n2' to channel 'n1' X or Y 'left' or 'right' part.
+
+set vector [n] <off> - disables vector control for channel 'n'.
 
 stop - cease all sound immediately!
+
+mode <s> - change to different menus, (addsynth, subsynth, padsynth)
+
+? / help - list commands for current mode.
 
 exit - tidy up and close yoshimi down.
 
 
-Commands are not case sensitive and an invalid one will print a reminder. Usually, you only need the first 4 letters of the names - as long as it is unabiguous. i.e. 'rootcc' has to be in full so it isn't confused with 'root'.
+Commands are not case sensitive and an invalid one will print a reminder. Often you only need the first letter of a command - as long as it is unabiguous.
 
 Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
 

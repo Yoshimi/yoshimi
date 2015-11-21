@@ -1,0 +1,20 @@
+Yoshimi can have up to 64 parts. By default these are wraped around the normal MIDI channels, so 1, 17, 33 & 49 all respond to channel 1 messages. This was originally implemented for Vector Control, working with up to four sounds on a channel (similar to the Yamaha SY hardware series).
+
+However, these have other less obvious uses. One of these is getting far more than 16 completely independent tracks addressed by just the 16 channels. Most tunes run with instruments having a relatively narrow pitch range, and this is what we can make use of.
+
+As an example, in Yoshimi's main window select 64 parts, then on part 1 set (say) Steel Bass and maximum note as 52 (E).
+
+Next select part 17 and enable it (easiest to use the mixer panel for this) set Tunnel Piano, the *minimum* note as 53 and maximum as 71 (B).
+
+Finally, enable part 33, set Rushes and set it's minimum note as 72, but key shift down an octave.
+
+With a 61 note keyboard that gives you quite a useful working range, on just one channel.
+
+However, the idea really comes into its own with a sequencer like Rosegarden where you can record multiple parts over the full MIDI range and track them to the same channel. Also, in Rosegarden the parts can be separately named, and identified as Bass and Treble in the notation editor. This makes it very convenient for those wanting a more formal musical layout.
+
+So, with very little effort you can now have 48 tracks playing at once!
+
+Ummm, you do need a decent processor though :)
+
+Yes, I know you could run more instances of Yoshimi on different MIDI ports, but
+where's the fun in that?

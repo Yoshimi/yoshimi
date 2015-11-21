@@ -103,7 +103,6 @@ class Config : public MiscFuncs
 
         bool          runSynth;
         bool          showGui;
-        bool          showConsole;
         int           VirKeybLayout;
 
         audio_drivers audioEngine;
@@ -126,8 +125,10 @@ class Config : public MiscFuncs
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
         bool          SimpleCheck;
+        int           xmlType;
         int           EnableProgChange;
         bool          consoleMenuItem;
+        bool          logXMLheaders;
         int           rtprio;
         int           midi_bank_root;
         int           midi_bank_C;
@@ -135,12 +136,15 @@ class Config : public MiscFuncs
         int           enable_part_on_voice_load;
         int           single_row_panel;
         int           NumAvailableParts;
+        int           currentPart;
+        int           currentChannel;
+        int           currentMode;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;
         unsigned char dataH;
         bool          nrpnActive;
-        
+
         struct IOdata{
             unsigned char vectorXaxis[NUM_MIDI_CHANNELS];
             unsigned char vectorYaxis[NUM_MIDI_CHANNELS];
@@ -157,7 +161,7 @@ class Config : public MiscFuncs
             bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
         
-        IOdata nrpndata;
+        IOdata nrpndata;        
         
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem>::iterator itx;
@@ -208,6 +212,7 @@ public:
         NewSynthEngine = 0,
         UpdateMaster,
         UpdateConfig,
+        UpdatePaths,
         UpdatePanel,
         UpdatePanelItem,
         UpdatePartProgram,

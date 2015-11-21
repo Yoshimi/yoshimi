@@ -165,6 +165,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
     if (synth->getRuntime().presetsDirlist[0].empty())
         return;
+    synth->getRuntime().xmlType = XML_PRESETS;
     synth->getRuntime().Log(name);
     string tmpfilename = name;
     legit_filename(tmpfilename);

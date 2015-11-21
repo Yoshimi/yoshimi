@@ -600,6 +600,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
 
 bool Microtonal::saveXML(string filename)
 {
+    synth->getRuntime().xmlType = XML_MICROTONAL;
     XMLwrapper *xml = new XMLwrapper(synth);
 
     xml->beginbranch("MICROTONAL");
@@ -626,7 +627,7 @@ bool Microtonal::loadXML(string filename)
     }
     if (!xml->enterbranch("MICROTONAL"))
     {
-        synth->getRuntime().Log("Microtonal: " + filename + " is not a scale file");
+        synth->getRuntime().Log(filename + " is not a scale file");
         return false;
     }
     getfromXML(xml);

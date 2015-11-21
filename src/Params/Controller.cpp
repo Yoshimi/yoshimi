@@ -73,6 +73,7 @@ void Controller::resetall()
     setPanDepth(64);
     filtercutoff.depth = 64;
     setfiltercutoff(64);
+    filterq.depth = 64;
     setfilterq(64);
     bandwidth.depth = 64;
     bandwidth.exponential = 0;
@@ -83,6 +84,8 @@ void Controller::resetall()
     fmamp.receive = 1;
     setfmamp(127);
     volume.receive = 1;
+    volume.data = 96;
+    volume.volume = 96.0f/127.0f;
     setvolume(96);
     sustain.receive = 1;
     setsustain(0);

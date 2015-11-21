@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0300 
+version 1.0302 
 header_name {.h} 
 code_name {.cc}
 comment {MicrotonalUI.h} {not_in_source in_header
@@ -39,12 +39,10 @@ decl {\#include <FL/fl_ask.H>} {public local
 decl {\#include "Misc/Microtonal.h"} {public local
 } 
 
-class MicrotonalUI {selected
-} {
-  Function {make_window()} {open
-  } {
+class MicrotonalUI {} {
+  Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
-      label Scales open
+      label Scales selected
       xywh {99 164 405 450} type Double hide
     } {
       Fl_Group {} {
@@ -203,7 +201,7 @@ class MicrotonalUI {selected
           tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {243 428 84 16} box THIN_UP_BOX labelfont 1 labelsize 10
         }
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {108 2 140 45} box ENGRAVED_FRAME
       } {
         Fl_Counter anotecounter {
@@ -271,8 +269,9 @@ class MicrotonalUI {selected
         delete [] tmpbuf;} {}
   }
   Function {MicrotonalUI(Microtonal *microtonal_)} {} {
-    code {microtonal=microtonal_;
-        make_window();} {}
+    code {//
+    microtonal=microtonal_;
+    make_window();} {}
   }
   Function {~MicrotonalUI()} {} {
     code {microtonaluiwindow->hide();
@@ -299,5 +298,7 @@ class MicrotonalUI {selected
         //applybutton->color(FL_GRAY);} {}
   }
   decl {Microtonal *microtonal;} {private local
+  }
+  decl {string winlabel;} {private local
   }
 } 

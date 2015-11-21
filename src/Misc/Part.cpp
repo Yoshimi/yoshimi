@@ -119,7 +119,7 @@ void Part::defaults(void)
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
-    Pnoteon = 1;
+//    Pnoteon = 1;
     Ppolymode = 1;
     Plegatomode = 0;
     setVolume(96);
@@ -235,7 +235,8 @@ Part::~Part()
 // Note On Messages
 void Part::NoteOn(int note, int velocity, int masterkeyshift)
 {
-    if (!Pnoteon || note < Pminkey || note > Pmaxkey)
+//    if (!Pnoteon || note < Pminkey || note > Pmaxkey)
+    if (note < Pminkey || note > Pmaxkey)
         return;
 
     // Legato and MonoMem used vars:
@@ -331,7 +332,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     if (pos == -1)
     {
         // test
-        synth->getRuntime().Log("Too may notes - notes > poliphony, PartNoteOn()");
+        synth->getRuntime().Log("Too many notes - notes > poliphony");
     }
     else
     {
@@ -615,7 +616,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         }
     }
 
-    // this only relase the keys if there is maximum number of keys allowed
+    // this only release the keys if there is maximum number of keys allowed
     setkeylimit(Pkeylimit);
 }
 
@@ -768,9 +769,9 @@ void Part::MonoMemRenote(void)
 {
     unsigned char mmrtempnote = monomemnotes.back(); // Last list element.
     monomemnotes.pop_back(); // We remove it, will be added again in NoteOn(...).
-    if (Pnoteon == 0)
+/*    if (Pnoteon == 0)
         RelaseNotePos(lastpos);
-    else
+    else*/
         NoteOn(mmrtempnote, monomem[mmrtempnote].velocity,
                monomem[mmrtempnote].mkeyshift);
 }
@@ -1088,14 +1089,14 @@ void Part::setkititemstatus(int kititem, int Penabled_)
 
 void Part::add2XMLinstrument(XMLwrapper *xml)
 {
-    if (Pname == "Simple Sound")
-        return;
     xml->beginbranch("INFO");
     xml->addparstr("name", Pname);
     xml->addparstr("author", info.Pauthor);
     xml->addparstr("comments", info.Pcomments);
     xml->addpar("type",info.Ptype);
     xml->endbranch();
+    if (Pname == "Simple Sound")
+        return;
 
 
     xml->beginbranch("INSTRUMENT_KIT");
@@ -1179,7 +1180,7 @@ void Part::add2XML(XMLwrapper *xml)
     xml->addpar("velocity_sensing", Pvelsns);
     xml->addpar("velocity_offset", Pveloffs);
 
-    xml->addparbool("note_on", Pnoteon);
+//    xml->addparbool("note_on", Pnoteon);
     xml->addparbool("poly_mode", Ppolymode);
     xml->addpar("legato_mode", Plegatomode);
     xml->addpar("key_limit", Pkeylimit);
@@ -1197,6 +1198,7 @@ void Part::add2XML(XMLwrapper *xml)
 
 bool Part::saveXML(string filename)
 {
+    synth->getRuntime().xmlType = XML_INSTRUMENT;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
@@ -1271,7 +1273,12 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("INSTRUMENT_KIT"))
+    if (!xml->enterbranch("INSTRUMENT_KIT"))
+    {
+        defaultsinstrument();
+        return;
+    }
+    else
     {
         Pkitmode = xml->getpar127("kit_mode", Pkitmode);
         Pdrummode = xml->getparbool("drum_mode", Pdrummode);
@@ -1350,7 +1357,7 @@ void Part::getfromXML(XMLwrapper *xml)
     Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
     Pveloffs = xml->getpar127("velocity_offset", Pveloffs);
 
-    Pnoteon = xml->getparbool("note_on", Pnoteon);
+//    Pnoteon = xml->getparbool("note_on", Pnoteon);
     Ppolymode = xml->getparbool("poly_mode", Ppolymode);
     Plegatomode = xml->getparbool("legato_mode", Plegatomode); // older versions
     if (!Plegatomode)

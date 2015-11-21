@@ -34,13 +34,12 @@ decl {\#include "Misc/Config.h"} {private global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class ConsoleUI {open
+class ConsoleUI {selected
 } {
-  Function {make_window(void)} {open
-  } {
+  Function {make_window(void)} {} {
     Fl_Window logConsole {
       label {yoshimi console}
-      callback {o->hide()} open selected
+      callback {o->hide()}
       xywh {5 20 385 185} type Double color 54 selection_color 36 labelfont 13 labelsize 13 align 0 when 1 hide resizable
     } {
       Fl_Text_Display logText {
@@ -49,12 +48,11 @@ class ConsoleUI {open
       }
     }
   }
-  Function {ConsoleUI()} {open
-  } {
-    code {make_window();
-      txtbuf = new Fl_Text_Buffer(8192);
-      logText->buffer(txtbuf);
-      logConsole->copy_label(string("yoshimi console").c_str());} {}
+  Function {ConsoleUI()} {} {
+    code {//
+    make_window();
+    txtbuf = new Fl_Text_Buffer(8192);
+    logText->buffer(txtbuf);} {}
   }
   Function {Show()} {} {
     code {logConsole->show();} {}
@@ -73,11 +71,6 @@ class ConsoleUI {open
       logConsole->redraw();
       if (txtbuf->length() > 8000)
         txtbuf->remove(0, txtbuf->line_end(1));} {}
-  }
-  Function {setLabel(const char *_label)} {open return_type void
-  } {
-    code {logConsole->copy_label((string(_label)
-                              + string(" reports")).c_str());} {}
   }
   decl {Fl_Text_Buffer *txtbuf;} {private local
   }

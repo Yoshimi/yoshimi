@@ -71,6 +71,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadXML(string filename);
         void applyparameters(void);
         int loadParameters(string filename);
+        int loadPatchSetAndUpdate(string filename);
         
         bool getfromXML(XMLwrapper *xml);
 
@@ -86,13 +87,20 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetProgram(unsigned char chan, unsigned short pgm);
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
+        void cliOutput(list<string>& msg_buf, unsigned int lines);
+        void ListPaths(list<string>& msg_buf);
+        void ListBanks(int rootNum, list<string>& msg_buf);
+        void ListInstruments(int bankNum, list<string>& msg_buf);
+        void ListCurrentParts(list<string>& msg_buf);
+        void ListVectors(list<string>& msg_buf);
+        void ListSettings(list<string>& msg_buf);
         void SetSystemValue(int type, int value);
-        void DecodeCommands(char *buffer);
         int commandSet(char *point);
         int commandVector(char *point);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
+        void resetAll(void);
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);
@@ -182,7 +190,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         }
         void closeGui();
         int getLFOtime() {return LFOtime;}
-        std::string makeUniqueName(const char *name);
+        string makeUniqueName(string name);
 
         Bank &getBankRef() {return bank;}
         Bank *getBankPtr() {return &bank;}

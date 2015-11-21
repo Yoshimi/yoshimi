@@ -30,10 +30,10 @@ bool JackAlsaClient::openAudio(void)
             return true;
         }
         else
-            synth->getRuntime().Log("Error, failed to register audio");
+            synth->getRuntime().Log("Failed to register audio");
     }
     else
-        synth->getRuntime().Log("Error, failed to connect to jack server");
+        synth->getRuntime().Log("Failed to connect to jack server");
     return false;
 }
 

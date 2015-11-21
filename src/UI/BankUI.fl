@@ -492,7 +492,7 @@ removeselection();}
     }
     Fl_Window rootuiwindow {
       label Root
-      xywh {14 352 775 575} type Double labelsize 12 hide
+      xywh {55 519 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -617,6 +617,7 @@ removeselection();}
       callback {o->hide();}
       xywh {30 70 465 295} type Double hide
       code0 {readbankcfg();}
+      code1 {o->copy_label(synth->makeUniqueName("Bank Root Paths").c_str());}
     } {
       Fl_Browser rootsbrowse {
         callback {int tmp = o->value();
@@ -763,7 +764,8 @@ fnr = &RootProcess_::rootprocess;
     bankuiwindow->hide();} {}
   }
   Function {init(Fl_Spinner *cbwig_)} {} {
-    code {cbwig = cbwig_;rescan_for_banks(false);} {}
+    code {//
+    cbwig = cbwig_;rescan_for_banks(false);} {}
   }
   Function {process()} {return_type void
   } {
@@ -1161,5 +1163,7 @@ if(reload)
   decl {int oldBank;} {private local
   }
   decl {int oldrootID;} {private local
+  }
+  decl {string pathwindowlabel;} {private local
   }
 } 

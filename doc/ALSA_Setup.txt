@@ -14,7 +14,7 @@ This ensures you will always connect to this card at startup regardless of the o
 
 Another benefit of doing this is that ALSA will now use Yoshimi's internal buffer size, otherwise it will force Yoshimi to accept its default size.
 
-You can also set the sample rate as well - bear in mind that not all cards can use all of these but 44100 and 48000 are almost always available.
+You can also set the sample rate - bear in mind that not all cards can use all of these but 44100 and 48000 are almost always available.
 
 If you set a Midi Device as well (such as a keyboard) Yoshimi will try to find and connect to this at startup.
 

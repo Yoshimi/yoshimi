@@ -50,7 +50,6 @@ using namespace std;
 #include "MasterUI.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-
 const unsigned short Config::MaxParamsHistory = 25;
 
 static char prog_doc[] =
@@ -67,7 +66,6 @@ static struct argp_option cmd_options[] = {
     {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input" },
     {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
-    {"show-console",      'c',  NULL,         0,  "show console on startup" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
     {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
@@ -92,10 +90,9 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreJackSession(false),
     Samplerate(48000),
     Buffersize(256),
-    Oscilsize(1024),
+    Oscilsize(512),
     runSynth(true),
     showGui(true),
-    showConsole(false),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -109,8 +106,10 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     GzipCompression(3),
     Interpolation(0),
     checksynthengines(1),
+    xmlType(0),
     EnableProgChange(1), // default will be inverted
     consoleMenuItem(0),
+    logXMLheaders(0),
     rtprio(50),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
@@ -118,9 +117,13 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     enable_part_on_voice_load(1),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
+    currentPart(0),
+    currentChannel(0),
+    currentMode(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
+
     deadObjects(NULL),
     nextHistoryIndex(numeric_limits<unsigned int>::max()),
     sigIntActive(0),
@@ -139,7 +142,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     //which befaves exactly the same when flag FE_TOWARDZERO is set
 
     cerr.precision(4);
-    deadObjects = new BodyDisposal();
+    deadObjects = new BodyDisposal();    
     bRuntimeSetupCompleted = Setup(argc, argv);
 }
 
@@ -204,6 +207,7 @@ bool Config::Setup(int argc, char **argv)
             no_state0: Log("Invalid state file specified for restore " + StateFile);
             return false;
         }
+        Log(StateFile);
     }    
     return true;
 }
@@ -386,7 +390,7 @@ bool Config::loadConfig(void)
     string homedir = string(getenv("HOME"));
     if (homedir.empty() || !isDirectory(homedir))
         homedir = string("/tmp");
-    ConfigDir = homedir + string("/.config/yoshimi");
+    ConfigDir = homedir + string("/.config/") + programcommand;
     if (!isDirectory(ConfigDir))
     {
         cmd = string("mkdir -p ") + ConfigDir;
@@ -396,40 +400,19 @@ bool Config::loadConfig(void)
             return false;
         }
     }
-    ConfigFile = ConfigDir + string("/yoshimi.config");
-    StateFile = ConfigDir + string("/yoshimi.state");
-    string resConfigFile = ConfigFile;
-    if(synth->getUniqueId() > 0)
+    string yoshimi = "/" + programcommand;
+    if (synth->getUniqueId() > 0)
+        yoshimi += ("-" + asString(synth->getUniqueId()));
+    string presetDir = ConfigDir + "/presets";
+    if (!isDirectory(presetDir))
     {
-        resConfigFile += asString(synth->getUniqueId());
+        cmd = string("mkdir -p ") + presetDir;
+        if ((chk = system(cmd.c_str())) < 0)
+            Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
-/*    if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
-    {
-        Log("ConfigFile " + resConfigFile + " not found");
-        Log("Trying for old config file");
-        string oldConfigFile = string(getenv("HOME")) + string("/.yoshimiXML.cfg");
-        if (!isRegFile(oldConfigFile))
-        {
-            Log("Old config file " + resConfigFile + " not found");
-            Log("Trying for ZynAddSubFX config file");
-            oldConfigFile = string(getenv("HOME")) + string("/.zynaddsubfxXML.cfg");
-        }
-        if (isRegFile(oldConfigFile))
-        {
-            Log("Copying old config file " + oldConfigFile + " to new location " + resConfigFile);
-            FILE *oldfle = fopen (oldConfigFile.c_str(), "r");
-            FILE *newfle = fopen (resConfigFile.c_str(), "w");
-            if (oldfle != NULL && newfle != NULL)
-                while (!feof(oldfle))
-                    putc(getc(oldfle), newfle);
-            else
-                Log("Failed to copy old config file " + oldConfigFile + " to " + resConfigFile);
-            if (newfle)
-                fclose(newfle);
-            if (oldfle)
-                fclose(oldfle);
-        }
-    }*/
+    ConfigFile = ConfigDir + yoshimi + string(".config");
+    StateFile = ConfigDir + yoshimi + string(".state");
+    string resConfigFile = ConfigFile;
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
@@ -475,7 +458,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         return false;
     }
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 32, 1024);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
     Oscilsize = xml->getpar("oscil_size", Oscilsize,
                                         MAX_AD_HARMONICS * 2, 131072);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
@@ -483,6 +466,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     consoleMenuItem = xml->getpar("reports_destination", consoleMenuItem, 0, 1);
+    logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
     // get bank dirs
@@ -519,7 +503,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
             ++ i;
         }
     }
-
+    
     // alsa settings
     alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
     alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
@@ -532,7 +516,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
-    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
+//    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
 
     if (xml->enterbranch("XMZ_HISTORY"))
@@ -559,6 +543,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
 void Config::saveConfig(void)
 {
+    xmlType = XML_CONFIG;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
@@ -570,10 +555,7 @@ void Config::saveConfig(void)
     GzipCompression = 0;
 
     string resConfigFile = ConfigFile;
-    if(synth->getUniqueId() > 0)
-    {
-        resConfigFile += asString(synth->getUniqueId());
-    }
+
     if (!xmltree->saveXMLfile(resConfigFile))
     {
         Log("Failed to save config to " + resConfigFile);
@@ -588,7 +570,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
 
-    xmltree->addparstr("state_file", StateFile);
     xmltree->addpar("sample_rate", Samplerate);
     xmltree->addpar("sound_buffer_size", Buffersize);
     xmltree->addpar("oscil_size", Oscilsize);
@@ -597,6 +578,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("reports_destination", consoleMenuItem);
+    xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
     synth->getBankRef().saveToConfigFile(xmltree);
@@ -608,6 +590,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
             xmltree->addparstr("presets_root", presetsDirlist[i]);
             xmltree->endbranch();
         }
+
     xmltree->addpar("interpolation", Interpolation);
 
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
@@ -618,7 +601,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
-    xmltree->addpar("enable_console_window", consoleMenuItem);
+//    xmltree->addpar("enable_console_window", consoleMenuItem);
     xmltree->addpar("single_row_panel", single_row_panel);
 
     // Parameters history
@@ -642,6 +625,10 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
 void Config::saveSessionData(string savefile)
 {
+    string ext = ".state";
+    if (savefile.rfind(ext) != (savefile.length() - 6))
+        savefile += ext;
+    synth->getRuntime().xmlType = XML_STATE;
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
@@ -662,6 +649,8 @@ bool Config::restoreSessionData(string sessionfile)
 {
     XMLwrapper *xml = NULL;
     bool ok = false;
+    if (sessionfile.size() && !isRegFile(sessionfile))
+        sessionfile += ".state";
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", true);
@@ -720,15 +709,8 @@ void Config::addRuntimeXML(XMLwrapper *xml)
 
 void Config::Log(string msg, bool tostderr)
 {
-    int pos;
     if (showGui && !tostderr && consoleMenuItem)
-    {
-        pos = msg.find(":");
-        if (pos > 1)
-            LogList.push_back(msg.substr(pos + 2));
-        else
-            LogList.push_back(msg);
-    }
+        LogList.push_back(msg);
     else
         cerr << msg << endl;
 }
@@ -737,7 +719,7 @@ void Config::Log(string msg, bool tostderr)
 void Config::StartupReport(MusicClient *musicClient)
 {
     Log(string(argp_program_version));
-    Log("Config: Clientname: " + musicClient->midiClientName());
+    Log("Clientname: " + musicClient->midiClientName());
     string report = "Config: Audio: ";
     switch (audioEngine)
     {
@@ -752,7 +734,7 @@ void Config::StartupReport(MusicClient *musicClient)
     }
     report += (" -> '" + audioDevice + "'");
     Log(report);
-    report = "Config: Midi: ";
+    report = "Midi: ";
     switch (midiEngine)
     {
         case jack_midi:
@@ -768,9 +750,9 @@ void Config::StartupReport(MusicClient *musicClient)
         midiDevice = "default";
     report += (" -> '" + midiDevice + "'");
     Log(report);
-    Log("Config: Oscilsize: " + asString(synth->oscilsize));
-    Log("Config: Samplerate: " + asString(synth->samplerate));
-    Log("Config: Period size: " + asString(synth->buffersize));
+    Log("Oscilsize: " + asString(synth->oscilsize));
+    Log("Samplerate: " + asString(synth->samplerate));
+    Log("Period size: " + asString(synth->buffersize));
 }
 
 
@@ -1036,7 +1018,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
     switch (key)
     {
-        case 'c': settings->showConsole = true; break;
         case 'N': settings->nameTag = string(arg); break;
         case 'l': settings->paramsLoad = string(arg); break;
         case 'L': settings->instrumentLoad = string(arg); break;
@@ -1064,8 +1045,10 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 num = 128;
             else if (num >= 64)
                 num = 64;
-            else
+            else if (num >= 32)
                 num = 32;
+            else
+                num = 16;
             settings->Buffersize = num;
             break;
         case 'D':
@@ -1074,7 +1057,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
         case 'i':
             settings->showGui = false;
-            settings->showConsole = false;
             break;
         case 'J':
             settings->audioEngine = jack_audio;
@@ -1190,6 +1172,16 @@ void GuiThreadMsg::processGuiMessages()
             if(guiMaster)
             {
                 guiMaster->configui->update_config(msg->index);
+            }
+        }
+            break;
+        case GuiThreadMsg::UpdatePaths:
+        {
+            SynthEngine *synth = ((SynthEngine *)msg->data);
+            MasterUI *guiMaster = synth->getGuiMaster(false);
+            if(guiMaster)
+            {
+                guiMaster->updatepaths(msg->index);
             }
         }
             break;

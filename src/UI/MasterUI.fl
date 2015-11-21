@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014, Will Godfrey    
+Copyright 2014-2015, Will Godfrey    
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -85,7 +85,7 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -109,6 +109,7 @@ class MasterUI {: {private MiscFuncs}
   }
   Function {~MasterUI()} {} {
     code {//
+      saveWindowData();
       masterwindow->hide();
       aboutwindow->hide();
       delete aboutwindow;
@@ -155,15 +156,24 @@ class MasterUI {: {private MiscFuncs}
   }
   Function {Init(const char *_label)} {} {
     code {//
+      instance = synth->getUniqueId();
+      
+      filename = synth->getRuntime().ConfigDir + "/" +synth->getRuntime().programCmd();
+      if (instance > 0)
+      {
+          filename += ("-" + asString(instance));
+      }
+      filename += ".windows";
       microtonalui = new MicrotonalUI(&synth->microtonal);
-      bankui = new BankUI(&npart, synth);
-      virkeyboard = new VirKeyboard(synth);
+      bankui = new BankUI(&npart, synth);;
+      virkeyboard = new VirKeyboard(synth); 
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
-      yoshiLog->setLabel(_label);
+      
       make_window();
+      loadWindowData();
       if(synth->getIsLV2Plugin())
       {
       	masterwindow->label(_label);
@@ -173,10 +183,37 @@ class MasterUI {: {private MiscFuncs}
 	setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
-      if (synth->getRuntime().showConsole)
-        yoshiLog->Show();
-      else
-          yoshiLog->Hide();} {}
+      
+      // these don't have access to synth ->
+      microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
+      yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str()); 
+      
+      if (panelO)
+          mixerpanel->do_callback();
+      if (instrumentsO)
+          bankui->Show();
+      if (banksO)
+          bankui->rootuiwindow->show();
+      if (presetsO)
+          configui->presets->show();
+      if (rootsO)
+          bankui->pathwindow->show();
+      if (scalesO)
+          microtonalui->microtonaluiwindow->show();
+      if (virkbdO)
+          virkeyboard->Show();
+      if (settingsO)
+          configui->Show();
+      if (yoshiLogO)
+          yoshiLog->Show();
+      if (controllersO)
+          partui->ctlwindow->show();
+      if (inseditO)
+          partui->instrumenteditwindow->show();
+      if (kitlistO)
+          partui->instrumentkitlist->show();
+      if (partfxO)
+          partui->partfx->show();} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -206,6 +243,7 @@ class MasterUI {: {private MiscFuncs}
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-4 0 400 25} labelsize 13
+        code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
         Submenu {} {
           label {&Yoshimi}
@@ -216,12 +254,12 @@ class MasterUI {: {private MiscFuncs}
             callback {aboutwindow->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem newinstance {
             label {&New instance}
             callback {mainCreateNewInstance(0)}
             xywh {0 0 100 20} labelsize 12
           }
-          MenuItem {} {
+          MenuItem newinstanceid {
             label {New instance with id...}
             callback {if(synth->getIsLV2Plugin())
 {
@@ -250,24 +288,16 @@ mainCreateNewInstance(forceId);}
           }
         }
         Submenu {} {
-          label {&Instrument}
+          label {&Instruments}
           xywh {10 10 100 20} labelsize 12
         } {
           MenuItem {} {
-            label {&Clear Instrument...}
-            callback {//
-                if (fl_choice("Clear instrument's parameters ?", "No", "Yes", NULL))
-                {
-                    synth->actionLock(lockmute);
-                    synth->part[npart]->defaultsinstrument();
-                    synth->actionLock(unlock);
-                    npartcounter->do_callback();
-                }
-                updatepanel();}
-            xywh {35 35 100 20} labelsize 12
+            label {&Show Stored...}
+            callback {bankui->Show();}
+            xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Open Instrument...}
+            label {&Load External...}
             callback {//
                 const char *filename;
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
@@ -283,7 +313,7 @@ mainCreateNewInstance(forceId);}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Save Instrument ...}
+            label {&Save External...}
             callback {//
     if (synth->part[npart]->Pname == "Simple Sound")
     {
@@ -306,24 +336,17 @@ mainCreateNewInstance(forceId);}
             tooltip {Save current instrument to an .xiz file} xywh {20 20 100 20} labelsize 12
           }
           MenuItem {} {
-            label {Show &Instruments...}
-            callback {bankui->Show();}
-            xywh {0 0 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {Show &Banks...}
-            callback {bankui->rootuiwindow->show();}
-            xywh {10 10 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {Show Root &Paths...}
-            callback {bankui->pathwindow->show();}
-            xywh {20 20 100 20} labelsize 12
-          }
-          MenuItem {} {
-            label {&Virtual Keyboard...}
-            callback {virkeyboard->Show();}
-            xywh {15 15 100 20} labelsize 12
+            label {&Clear}
+            callback {//
+    if (!fl_choice("Clear instrument's parameters ?", "Yes", "No", NULL))
+    {
+        synth->actionLock(lockmute);
+        synth->part[npart]->defaultsinstrument();
+        synth->actionLock(unlock);
+        npartcounter->do_callback();
+    }
+    updatepanel();}
+            xywh {35 35 100 20} labelsize 12
           }
         }
         Submenu Parameters {
@@ -335,20 +358,20 @@ mainCreateNewInstance(forceId);}
               else
                   RecentParams->activate();}
         } {
-          MenuItem RecentParams {
-            label {&Recent}
-            callback {paramsui->Show();}
-            xywh {0 0 34 21} labelsize 12
+          MenuItem {} {
+            label {&Show Patch Banks...}
+            callback {bankui->rootuiwindow->show();}
+            xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Open}
+            label {&Load External...}
             callback {//
                 do_load_master(true, NULL);
                 paramsui->loadRecent();}
-            tooltip {Load a parameters (.xmz) file} xywh {0 0 34 21} labelsize 12
+            tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
-            label {&Save}
+            label {&Save External...}
             callback {//
     bool valid = false;
     for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
@@ -363,10 +386,26 @@ mainCreateNewInstance(forceId);}
         fl_alert("Nothing to save!");}
             tooltip {Save current parameters to an .xmz file} xywh {0 0 34 21} labelsize 12
           }
+          MenuItem RecentParams {
+            label {&Recent Sets...}
+            callback {paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+paramsui->Show();}
+            xywh {0 0 34 21} labelsize 12
+          }
+        }
+        Submenu {} {
+          label {Pat&hs}
+          xywh {0 0 70 20} labelsize 12
+        } {
           MenuItem {} {
-            label {&Clear}
-            callback {do_new_master();}
-            xywh {20 20 100 20} labelsize 12
+            label {&Bank Root Dirs...}
+            callback {bankui->pathwindow->show();}
+            xywh {30 30 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Preset Dirs...}
+            callback {configui->presets->show();}
+            xywh {0 0 34 20} labelsize 12
           }
         }
         Submenu Scales {
@@ -374,26 +413,33 @@ mainCreateNewInstance(forceId);}
           tooltip {Clear all parameters to default settings} xywh {0 0 70 21} labelsize 12
         } {
           MenuItem {} {
-            label {&Load Scale Settings...}
+            label {&Show Settings...}
+            callback {microtonalui->Show();}
+            xywh {20 20 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Load...}
             callback {//
-                char *filename;
-                filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
-                if (filename == NULL)
-                    return;
-                string fname = string(filename);
-                synth->actionLock(lockmute);
-                synth->microtonal.defaults(); // clear all parameters
-                bool result = synth->microtonal.loadXML(fname);
-                synth->actionLock(unlock);
-                if (NULL != microtonalui)
-                    delete microtonalui;
-                microtonalui = new MicrotonalUI(&synth->microtonal);
-                if (!result)
-                    fl_alert("Failed to load scale settings file");}
+    char *filename;
+    filename = fl_file_chooser("Open:", "({*.xsz})", NULL, 0);
+    if (filename == NULL)
+        return;
+    string fname = string(filename);
+    synth->actionLock(lockmute);
+    synth->microtonal.defaults(); // clear all parameters
+    bool result = synth->microtonal.loadXML(fname);
+    synth->actionLock(unlock);
+    if (NULL != microtonalui)
+        delete microtonalui;
+    microtonalui = new MicrotonalUI(&synth->microtonal);
+    if (!result)
+        fl_alert("Failed to load scale settings file");
+    else
+        microtonalui->apply();}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
-            label {Save Sc&ale Settings ..}
+            label {&Save...}
             callback {//
                 char *filename;
                 filename = fl_file_chooser("Save:", "({*.xsz})", NULL, 0);
@@ -412,17 +458,41 @@ mainCreateNewInstance(forceId);}
             xywh {25 25 100 20} labelsize 12
           }
           MenuItem {} {
-            label {Show Scale Settings...}
-            callback {microtonalui->Show();}
-            xywh {0 0 100 20} labelsize 12
+            label {&Clear}
+            callback {\#
+    if (!fl_choice("Set scales to the defaults?", "Yes", "No", NULL))
+    {
+        synth->actionLock(lockmute);
+        synth->microtonal.defaults();
+        synth->actionLock(unlock);
+        if (NULL != microtonalui)
+            delete microtonalui;
+        microtonalui = new MicrotonalUI(&synth->microtonal);
+
+    }}
+            xywh {0 0 34 20} labelsize 12
           }
         }
         Submenu {} {
-          label State
+          label {S&tate}
           xywh {0 0 70 21} labelsize 12
         } {
+          MenuItem loadState {
+            label {Load...}
+            callback {// for Alessandro
+    char *fle = fl_file_chooser("Load:", "({*.state})",
+                                laststatefile.c_str(), 0);
+    if (fle)
+    {
+        laststatefile = string(fle);
+        synth->getRuntime().loadState(laststatefile);
+    }
+    refresh_master_ui();
+    microtonalui->apply();}
+            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
+          }
           MenuItem saveState {
-            label Save
+            label {Save...}
             callback {// for Alessandro
 
                 char *fle = fl_file_chooser("Save:", "({*.state})",
@@ -433,19 +503,6 @@ mainCreateNewInstance(forceId);}
                     synth->getRuntime().saveState(laststatefile);
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
-          }
-          MenuItem loadState {
-            label Load
-            callback {// for Alessandro
-                char *fle = fl_file_chooser("Load:", "({*.state})",
-                                            laststatefile.c_str(), 0);
-                if (fle)
-                {
-                    laststatefile = string(fle);
-                    synth->getRuntime().loadState(laststatefile);
-                }
-                refresh_master_ui();}
-            tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
         }
       }
@@ -470,7 +527,7 @@ mainCreateNewInstance(forceId);}
           class WidgetPDial
         }
         Fl_Button {} {
-          label Reset
+          label Zero
           callback {//
               globalfinedetune->value(64.0);
               synth->microtonal.Pglobalfinedetune = 64.0f;
@@ -493,7 +550,7 @@ mainCreateNewInstance(forceId);}
               	}              	
               }
               synth->allStop();}
-          tooltip {Cease all sound immediately!} xywh {11 46 50 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {15 32 80 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -503,16 +560,22 @@ mainCreateNewInstance(forceId);}
           class WidgetPDial
         }
         Fl_Button {} {
-          label virKbd
+          label {Virtual Keybd}
           callback {virkeyboard->Show();}
-          tooltip {Virtual Keyboard} xywh {148 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {116 60 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
-        Fl_Button {} {
-          label Panel
+        Fl_Button mixerpanel {
+          label {Mixer Panel}
           callback {//
                 updatepanel();
                 panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {79 46 50 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {116 32 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+        }
+        Fl_Button {} {
+          label Reset
+          callback {//
+    do_new_master();}
+          tooltip {Clear all dynamic settings} xywh {15 60 80 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
       }
       Fl_Tabs sysinsgroup {
@@ -599,7 +662,6 @@ mainCreateNewInstance(forceId);}
           Fl_Button {} {
             label P
             callback {//
-    int tmp;
     synth->actionLock(lockmute);
     presetsui->paste(synth->sysefx[nsyseff], syseffectui);
     synth->actionLock(unlock);}
@@ -721,7 +783,7 @@ mainCreateNewInstance(forceId);}
       Fl_Button Reports {
         label Reports
         callback {yoshiLog->Show();}
-        xywh {289 90 60 24} box PLASTIC_UP_BOX labelsize 11
+        xywh {289 93 70 20} box PLASTIC_UP_BOX color 228 labelsize 11
         code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
       }
       Fl_Group syseffectuigroup {
@@ -869,10 +931,10 @@ ZynAddSubFX}
       }
     }
     Fl_Window panelwindow {
-      label {Yoshimi Panel 2 x 8}
-      xywh {4 20 550 675} type Double labelfont 13 labelsize 13 hide
-      code0 {if (synth->getRuntime().single_row_panel)
-       Panelbox1->hide();}
+      label {Yoshimi Mixer Panel}
+      xywh {6 48 550 675} type Double labelfont 13 labelsize 13 hide
+      code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
+      code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
       Fl_Pack Panelpack1 {open
         xywh {8 10 533 286} type HORIZONTAL
@@ -986,7 +1048,6 @@ updatepanel();}
 	        Panelrefresh->position(950,314);
 	        Panelgroups->position(48,314);
 	        Panelsmallgroups->position(48,314);
-	        panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 1 x 16 ");
         }
         else
         {
@@ -996,11 +1057,10 @@ updatepanel();}
 	        Panelrefresh->position(414,645);
 	        Panelgroups->position(48,645);
 	        Panelsmallgroups->position(48,645);
-	       	panelwindowlabel = synth->makeUniqueName("Yoshimi Panel 2 x 8 ");
 
         }
         int partmax = synth->getRuntime().NumAvailableParts;
-        //synth->getRuntime().Log("Parts " + asString(partmax));
+
         if (partmax == 64)
             Panelgroups->show();
         else
@@ -1009,7 +1069,6 @@ updatepanel();}
             Panelsmallgroups->show();
         else
             Panelsmallgroups->hide();
-        panelwindow->label(panelwindowlabel.c_str());
         panelwindow->changed();} {}
   }
   Function {updatepart()} {} {
@@ -1086,26 +1145,27 @@ updatepanel();}
   }
   Function {setMasterLabel(string name)} {} {
     code {//
-        masterwindowlabel = synth->makeUniqueName("Yoshimi");
-        if (name.size())
-            masterwindowlabel += (" : " + name);
-        masterwindow->label(masterwindowlabel.c_str());
-        masterwindow->changed();} {}
+    string prefix;
+    if  (name.size())
+    	prefix = synth->makeUniqueName(name);
+    else
+    {
+    	prefix = synth->makeUniqueName("");
+    	prefix = prefix.substr(0, prefix.length() - 3);
+    }
+    masterwindow->copy_label(prefix.c_str());
+    masterwindow->changed();} {}
   }
   Function {do_new_master()} {} {
     code {//
-        if (fl_choice("Clear *ALL* parameters ?", "No", "Yes", NULL))
-        {
-            delete microtonalui;
-
-            synth->actionLock(lockmute);
-            synth->defaults();
-            synth->ClearNRPNs();
-            synth->actionLock(unlock);
-
-            npartcounter->value(1);
-            refresh_master_ui();
-            updatepanel();
+    if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
+    {
+        delete microtonalui;
+        synth->resetAll();
+        setMasterLabel("");
+        npartcounter->value(1);
+        refresh_master_ui();
+        updatepanel();
         }} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
@@ -1120,11 +1180,10 @@ updatepanel();}
                 return;
         }
         int result = synth->loadParameters(fname);
-        checkmaxparts();
         setinspartlist();
         npartcounter->value(1);
         refresh_master_ui();
-        if (result >= 0) // shouldn't this be just > ?
+        if (result >= 0)
         {
             if (updatehistory)
                 setMasterLabel(synth->getRuntime().addParamHistory(string(fname)));
@@ -1137,7 +1196,7 @@ updatepanel();}
             string msg = "Could not load file " + string(fname);
             if (result == -10)
             {
-                msg += ",\\nit does not appear to be a valid parameter file.";
+                msg += ",\\nit does not appear to be a valid patch set file.";
                 fl_alert("%s",msg.c_str());
             }
             else
@@ -1177,23 +1236,30 @@ updatepanel();}
   }
   Function {refresh_master_ui()} {} {
     code {//
-        ninseff = 0;
-        nsyseff = 0;
-        npart = 0;
-        npartcounter->do_callback();
-        syseffnocounter->do_callback();
-        inseffnocounter->do_callback();
-        masterkeyshift->value(synth->Pkeyshift - 64);
-        mastervolumedial->value(synth->Pvolume);
-        globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
-        microtonalui = new MicrotonalUI(&synth->microtonal);
-        updatesendwindow();
-        updatepanel();
-        bankui->Hide();
-        if (synth->getRuntime().consoleMenuItem == false)
-            Reports->deactivate();
-        else
-             Reports->activate();} {}
+    ninseff = 0;
+    nsyseff = 0;
+    npart = 0;
+    npartcounter->do_callback();
+    nsyseff = 0;
+    syseffnocounter->value(nsyseff + 1);
+    syseffnocounter->do_callback();
+    ninseff = 0;
+    inseffnocounter->value(nsyseff + 1);
+    inseffnocounter->do_callback();
+    sysinsgroup->value(SystemEffectsGrp);
+    sysinsgroup->do_callback();
+    masterkeyshift->value(synth->Pkeyshift - 64);
+    mastervolumedial->value(synth->Pvolume);
+    globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
+    microtonalui = new MicrotonalUI(&synth->microtonal);
+    checkmaxparts();
+    updatesendwindow();
+    updatepanel();
+    bankui->Hide();
+    if (synth->getRuntime().consoleMenuItem == false)
+        Reports->deactivate();
+    else
+        Reports->activate();} {}
   }
   Function {checkmaxparts()} {private
   } {
@@ -1275,11 +1341,13 @@ updatepanel();}
             }
         }} {}
   }
-  Function {set_part_window_title(string prefix)} {return_type string
+  Function {setPartWindowTitle(string prefix)} {return_type string
   } {
     code {//
-    string name = prefix + " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
-    return name;} {}
+    string extension = " - Part " + asString(partui->npart + 1) + " " + partui->part->Pname;
+    if (partui->part->Pkitmode)
+        extension += ", Kit ";
+    return synth->makeUniqueName(prefix + extension);} {}
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
@@ -1323,9 +1391,253 @@ updatepanel();}
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}
   }
+  Function {updatepaths(int type)} {} {
+    code {//
+    if (type == 0)
+    {
+        bankui->readbankcfg();
+        bankui-> rescan_for_banks(false);
+    }} {}
+  }
   Function {getSynth()} {return_type {SynthEngine *}
   } {
     code {return synth;} {}
+  }
+  Function {loadWindowData()} {} {
+    code {//
+
+    int ok = false;
+    int masterX;
+    int masterY;
+    int masterO;
+
+    windows = fopen(filename.c_str(), "r");
+    if (windows != NULL)
+        ok = true;
+    // we carry on anyway to set defaults
+    ok = getData(ok,
+                "master",
+                 masterX,
+                 masterY,
+                 masterO);
+    ok = getData(ok,
+                "panel",
+                 panelX,
+                 panelY,
+                 panelO);
+    ok = getData(ok,
+                "instruments",
+                 instrumentsX,
+                 instrumentsY,
+                 instrumentsO);
+    ok = getData(ok,
+                "banks",
+                 banksX,
+                 banksY,
+                 banksO);
+    ok = getData(ok,
+                "roots",
+                 rootsX,
+                 rootsY,
+                 rootsO);
+    ok = getData(ok,
+                "presets",
+                 presetsX,
+                 presetsY,
+                 presetsO);
+    ok = getData(ok,
+                "scales",
+                 scalesX,
+                 scalesY,
+                 scalesO);
+    ok = getData(ok,
+                "virtkeybd",
+                 virkbdX,
+                 virkbdY,
+                 virkbdO);
+    ok = getData(ok,
+                "settings",
+                 settingsX,
+                 settingsY,
+                 settingsO);
+    ok = getData(ok,
+                "yoshiLog",
+                 yoshiLogX,
+                 yoshiLogY,
+                 yoshiLogO);
+    ok = getData(ok,
+                "controllers",
+                 controllersX,
+                 controllersY,
+                 controllersO);    
+    ok = getData(ok,
+                "instrumentedit",
+                 inseditX,
+                 inseditY,
+                 inseditO);
+    ok = getData(ok,
+                "kitlist",
+                 kitlistX,
+                 kitlistY,
+                 kitlistO);
+    ok = getData(ok,
+                "partFX",
+                 partfxX,
+                 partfxY,
+                 partfxO);
+
+    ok = getData(ok,
+                "SUBnote",
+                 subNoteX,
+                 subNoteY,
+                 subNoteO);
+    ok = getData(ok,
+                "PADnote",
+                 padNoteX,
+                 padNoteY,
+                 padNoteO);
+    ok = getData(ok,
+                "ADDnote",
+                 addNoteX,
+                 addNoteY,
+                 addNoteO);
+
+   if (windows != NULL)
+        fclose(windows);
+        
+    masterwindow->position(masterX, masterY);
+    panelwindow->position(panelX, panelY);
+    bankui->bankuiwindow->position(instrumentsX, instrumentsY);
+    bankui->rootuiwindow->position(banksX, banksY);
+    bankui->pathwindow->position(rootsX, rootsY);
+    configui->presets->position(presetsX, presetsY);
+    microtonalui->microtonaluiwindow->position(scalesX, scalesY);
+    virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
+    configui->configwindow->position(settingsX, settingsY);
+    yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
+    partui->ctlwindow->position(controllersX, controllersY);
+    partui->instrumenteditwindow->position(inseditX, inseditY);
+    partui->instrumentkitlist->position(kitlistX, kitlistY);
+    partui->partfx->position(partfxX, partfxY);} {}
+  }
+  Function {saveWindowData()} {} {
+    code {//
+    windows = fopen(filename.c_str(), "w");
+
+    putData("master",
+             masterwindow->x(),
+             masterwindow->y(),
+             masterwindow->visible());
+    putData("panel",
+             panelwindow->x(),
+             panelwindow->y(),
+             panelwindow->visible());
+    putData("instruments",
+             bankui->bankuiwindow->x(),
+             bankui->bankuiwindow->y(),
+             bankui->bankuiwindow->visible());
+    putData("banks",
+             bankui->rootuiwindow->x(),
+             bankui->rootuiwindow->y(),
+             bankui->rootuiwindow->visible());
+    putData("roots",
+             bankui->pathwindow->x(),
+             bankui->pathwindow->y(),
+             bankui->pathwindow->visible());
+    putData("presets",
+             configui->presets->x(),
+             configui->presets->y(),
+             configui->presets->visible());
+    putData("scales",
+             microtonalui->microtonaluiwindow->x(),
+             microtonalui->microtonaluiwindow->y(),
+             microtonalui->microtonaluiwindow->visible());
+    putData("virtkeybd",
+             virkeyboard->virkeyboardwindow->x(),
+             virkeyboard->virkeyboardwindow->y(),
+             virkeyboard->virkeyboardwindow->visible());
+    putData("settings",
+             configui->configwindow->x(),
+             configui->configwindow->y(),
+             configui->configwindow->visible());
+    putData("yoshiLog",
+             yoshiLog->logConsole->x(),
+             yoshiLog->logConsole->y(),
+             yoshiLog->logConsole->visible());
+
+    if (partui->ctlwindow->x()) // this works, visible() doesn't :(
+    	putData("controllers",
+             	partui->ctlwindow->x(),
+             	partui->ctlwindow->y(),
+             	partui->ctlwindow->visible());
+    else // no window so store previous values
+        putData("controllers",
+                 controllersX,
+                 controllersY,
+                 controllersO);
+
+    putData("instrumentedit",
+             partui->instrumenteditwindow->x(),
+             partui->instrumenteditwindow->y(),
+             partui->instrumenteditwindow->visible());
+    putData("kitlist",
+             partui->instrumentkitlist->x(),
+             partui->instrumentkitlist->y(),
+             partui->instrumentkitlist->visible());
+    putData("partFX",
+             partui->partfx->x(),
+             partui->partfx->y(),
+             partui->partfx->visible());
+    putData("SUBnote",
+             subNoteX,
+             subNoteY,
+             subNoteO);
+    putData("PADnote",
+             padNoteX,
+             padNoteY,
+             padNoteO);
+             
+    putData("ADDnote",
+             addNoteX,
+             addNoteY,
+             addNoteO);
+
+    fclose(windows);} {}
+  }
+  Function {getData(bool ok, string name, int& X, int& Y, int& O)} {return_type bool
+  } {
+    code {//
+    X = 1;
+    Y = 1;
+    O = 0;
+    if (!ok)
+        return false;
+    
+    ok = (fgets(word, 30, windows) != NULL);
+    if (ok)
+    	ok = strstr(word, name.c_str());
+    if (true)
+    {
+        ok = false;
+        if (fgets(word, 30, windows) != NULL)
+    	    X = atoi(word);
+        if (fgets(word, 30, windows) != NULL)
+    	    Y = atoi(word);
+    	if (fgets(word, 30, windows) != NULL)
+    	{
+    	    O = atoi(word);
+    	    ok = true;
+    	}
+    }
+    return ok;} {}
+  }
+  Function {putData(string name, int X, int Y, int O)} {} {
+    code {//
+    string tosend = name + "\\n"
+                  + asString(X)+ "\\n"
+                  + asString(Y) + "\\n"
+                  + asString(O) + "\\n";
+    fputs(tosend.c_str(), windows);} {}
   }
   decl {ConfigUI *configui;} {public local
   }
@@ -1345,8 +1657,6 @@ updatepanel();}
   }
   decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
   }
-  decl {string masterwindowlabel;} {private local
-  }
   decl {Panellistitem *panellistitem[NUM_MIDI_PARTS];} {public local
   }
   decl {ConsoleUI *yoshiLog;} {public local
@@ -1359,6 +1669,110 @@ updatepanel();}
   }
   decl {string panelwindowlabel} {private local
   }
+  decl {int instance;} {private local
+  }
   decl {int panelgroup;} {public local
+  }
+  decl {char word [20];} {private local
+  }
+  decl {FILE *windows;} {private local
+  }
+  decl {string filename;} {private local
+  }
+  decl {int panelX;} {private local
+  }
+  decl {int panelY;} {private local
+  }
+  decl {int panelO;} {private local
+  }
+  decl {int instrumentsX;} {private local
+  }
+  decl {int instrumentsY;} {private local
+  }
+  decl {int instrumentsO;} {private local
+  }
+  decl {int banksX;} {private local
+  }
+  decl {int banksY;} {private local
+  }
+  decl {int banksO;} {private local
+  }
+  decl {int rootsX;} {private local
+  }
+  decl {int rootsY;} {private local
+  }
+  decl {int rootsO;} {private local
+  }
+  decl {int presetsX;} {private local
+  }
+  decl {int presetsY;} {private local
+  }
+  decl {int presetsO;} {private local
+  }
+  decl {int scalesX;} {private local
+  }
+  decl {int scalesY;} {private local
+  }
+  decl {int scalesO;} {private local
+  }
+  decl {int virkbdX;} {private local
+  }
+  decl {int virkbdY;} {private local
+  }
+  decl {int virkbdO;} {private local
+  }
+  decl {int settingsX;} {private local
+  }
+  decl {int settingsY;} {private local
+  }
+  decl {int settingsO;} {private local
+  }
+  decl {int yoshiLogX;} {private local
+  }
+  decl {int yoshiLogY;} {private local
+  }
+  decl {int yoshiLogO;} {private local
+  }
+  decl {int controllersX;} {public local
+  }
+  decl {int controllersY;} {public local
+  }
+  decl {int controllersO;} {private local
+  }
+  decl {int inseditX;} {private local
+  }
+  decl {int inseditY;} {private local
+  }
+  decl {int inseditO;} {private local
+  }
+  decl {int kitlistX;} {private local
+  }
+  decl {int kitlistY;} {private local
+  }
+  decl {int kitlistO;} {private local
+  }
+  decl {int partfxX;} {private local
+  }
+  decl {int partfxY;} {private local
+  }
+  decl {int partfxO;} {private local
+  }
+  decl {int subNoteX;} {public local
+  }
+  decl {int subNoteY;} {public local
+  }
+  decl {int subNoteO;} {public local
+  }
+  decl {int padNoteX;} {public local
+  }
+  decl {int padNoteY;} {public local
+  }
+  decl {int padNoteO;} {public local
+  }
+  decl {int addNoteX;} {public local
+  }
+  decl {int addNoteY;} {public local
+  }
+  decl {int addNoteO;} {public local
   }
 } 

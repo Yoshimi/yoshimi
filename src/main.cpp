@@ -20,7 +20,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
-#include <fcntl.h>
+#include <termios.h>
 
 using namespace std;
 
@@ -42,6 +42,11 @@ using namespace std;
 #include <FL/Fl_PNG_Image.H>
 #include "yoshimi-logo.h"
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
+extern void cmdIfaceCommandLoop();
+
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
 map<SynthEngine *, MusicClient *> synthInstances;
@@ -52,38 +57,6 @@ static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
-
-int commandStyle;
-int commandCount;
-char commandChr;
-char commandBuffer[COMMAND_SIZE + 2]; // allow for overcount and terminator
-
-
-bool commandProcess(char chr)
-{
-    if (chr >= 0x20 && chr < 0x7f && commandCount < COMMAND_SIZE)
-    {
-        commandBuffer[commandCount] = chr;
-        printf("%c", chr);
-        ++commandCount;
-    }
-    else if (chr == 0x7f)
-    {
-        if (commandCount > 0)
-        {
-            printf("%c %c", 0x08, 0x08);
-            --commandCount;
-            commandBuffer[commandCount] = 0;
-        }
-    }
-    else
-    {
-        commandBuffer[commandCount] = 0;
-        commandCount = 0;
-        return true;
-    }
-    return false;
-}
 
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -206,9 +179,10 @@ static void *mainGuiThread(void *arg)
         if (firstSynth->getUniqueId() == 0)
         {
             firstSynth->getRuntime().signalCheck();
-            if (read(0, &commandChr, 1) > 0)
+            /*if (read(0, &commandChr, 1) > 0)
                 if (commandProcess(commandChr))
                     firstSynth->DecodeCommands( commandBuffer);//getRuntime().Log(commandBuffer);
+                    */
         }
 
         for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -263,6 +237,7 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
+    
     return NULL;
 }
 
@@ -327,7 +302,6 @@ bool mainCreateNewInstance(unsigned int forceId)
     return true;
 
 bail_out:
-    fcntl(0, F_SETFL, commandStyle);
     synth->getRuntime().runSynth = false;
     synth->getRuntime().Log("Bail: Yoshimi stages a strategic retreat :-(");
     if (musicClient)
@@ -344,12 +318,16 @@ bail_out:
     return false;
 }
 
+void *commandThread(void *arg)
+{
+    cmdIfaceCommandLoop();
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
-    commandCount = 0;
-    commandStyle = fcntl(0, F_GETFL, 0);
-    fcntl (0, F_SETFL, (commandStyle | O_NDELAY)); 
-    
+    struct termios  oldTerm;
+    tcgetattr(0, &oldTerm);
     
     cout << "Yoshimi is starting" << endl; // guaranteed start message
     globalArgc = argc;
@@ -403,18 +381,28 @@ int main(int argc, char *argv[])
 
     splashMessages.push_back("Startup complete!");
 
+    //create command line processing thread
+
+    pthread_t cmdThr;
+    if (pthread_attr_init(&attr) == 0)
+    {
+        if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+        {
+
+        }
+        pthread_attr_destroy(&attr);
+    }
+
     void *ret;
     pthread_join(thr, &ret);    
     if(ret == (void *)1)
     {
         goto bail_out;
     }
-
     cout << "\nGoodbye - Play again soon?\n";
     bExitSuccess = true;
 
 bail_out:
-    fcntl(0, F_SETFL, commandStyle);
     if (bShowGui && !bExitSuccess) // this could be done better!
         usleep(2000000);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
@@ -440,6 +428,7 @@ bail_out:
             delete _synth;
         }
     }
+    tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else

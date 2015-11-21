@@ -1,32 +1,3 @@
-When using the jack audio backend, parts can be individually routed and/or sent to the main L/R outputs. This is controlled from the panel window, and the settings are saved with all the other data in patch sets.
-
-Direct part outputs carry the part and insertion effects, but not system ones.
-
-###
-
-As well as bank and program changes there is the ability to set a MIDI CC to access the voices from 129 to 160. All the Bank controls are contained in a tab in the 'settings' window and take immediate effect.
-
-###
-
-Bank and program changes can be completely disabled in 'settings' - some hardware synths don't play nice!
-
-###
-
-There is now the possibility to add a 'naturalising' random pitch element to a part. This is found in the part edit window. The settings are not currently saved, but will be once the control values are settled, and there has been enough experience to decide whether it should be a part or voice setting.
-
-###
-
-From the command line, as well as autoconnecting the main L & R outputs to jack, with either jack or alsa midi you can now auto connect to a known source.
-
-e.g.
-
- ./yoshimi -K --alsa-midi="Virtual Keyboard"
- ./yoshimi -K --jack-midi="jack-keyboard:midi_out"
- 
-Alsa can often manage with just the client name, but jack needs the port as well. These commands are case sensitive, and quite fussy about spaces etc. so it's wise to use quotes for the source name, even if they don't seem to be needed.
-
-###
-
 Yoshimi can now run as an LV2 plugin
 
 Supported features:
@@ -110,9 +81,14 @@ It is now possible to set up a new bank root path when starting from the command
 
 yoshimi -D /home/{username}/{directory}/{subdirectory}/bank
 
-Yoshimi will then immediately scan this path for new banks, but won't make the root 9or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
+Yoshimi will then immediately scan this path for new banks, but won't make the root (or any of its banks) current. The final directory doesn't in fact have to be 'banks' but traditionally we have always done this.
 
 Also, when running from the command line there is now access to many of the system and Root, Bank etc. settings.
 
 ###
 
+Yoshimi now remembers where major windows were last placed (per instance), and if any were left open at shutdown, they will be reopened at the same location on the next run.
+
+###
+
+We have an experimental implimentation of CC2 - breath control. This combines volument with filter cutoff.

@@ -76,20 +76,17 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class OscilSpectrum {open : {public Fl_Box, MiscFuncs}
+class OscilSpectrum {: {public Fl_Box, MiscFuncs}
 } {
-  Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
-  } {
+  Function {OscilSpectrum(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {oscil=NULL;} {}
   }
-  Function {init(OscilGen *oscil_,int oscbase_, SynthEngine *_synth)} {open
-  } {
+  Function {init(OscilGen *oscil_,int oscbase_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil = oscil_;
         oscbase = oscbase_;} {}
   }
-  Function {draw()} {open
-  } {
+  Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h(), i;
         const int maxdb = 60; // must be multiple of 10
         int GX = 2;
@@ -176,7 +173,7 @@ oscil = oscil_;
   }
 } 
 
-class PSlider {open : {public Fl_Slider}
+class PSlider {: {public Fl_Slider}
 } {
   Function {PSlider(int x,int y, int w, int h, const char *label=0):Fl_Slider(x,y,w,h,label)} {} {
     code {;} {}
@@ -206,33 +203,29 @@ return(1);} {}
   }
 } 
 
-class Oscilloscope {open : {public Fl_Box}
+class Oscilloscope {: {public Fl_Box}
 } {
   Function {Oscilloscope(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {oscil=NULL;
 phase=64;
 oscbase=0;} {}
   }
-  Function {init(OscilGen *oscil_, SynthEngine *_synth)} {open
-  } {
+  Function {init(OscilGen *oscil_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil=oscil_;} {}
   }
-  Function {init(OscilGen *oscil_,int oscbase_, SynthEngine *_synth)} {open
-  } {
+  Function {init(OscilGen *oscil_,int oscbase_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil=oscil_;
 oscbase=oscbase_;} {}
   }
-  Function {init(OscilGen *oscil_,int oscbase_,int phase_, SynthEngine *_synth)} {open
-  } {
+  Function {init(OscilGen *oscil_,int oscbase_,int phase_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil=oscil_;
 oscbase=oscbase_;
 phase=phase_;} {}
   }
-  Function {draw()} {open
-  } {
+  Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h() - 1;
         float smps[synth->oscilsize];
         synth->actionLock(lock);
@@ -312,13 +305,13 @@ phase=phase_;} {}
   }
 } 
 
-class Oscilharmonic {open : {public Fl_Group}
+class Oscilharmonic {: {public Fl_Group}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
-    Fl_Window harmonic {open
-      private xywh {329 192 90 225} type Double
-      class Fl_Group visible
+    Fl_Window harmonic {
+      private xywh {329 192 90 225} type Double hide
+      class Fl_Group
     } {
       Fl_Slider mag {
         callback {int x=64;
@@ -390,16 +383,14 @@ if (cbwidget!=NULL) {
       }
     }
   }
-  Function {Oscilharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {Oscilharmonic(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;
 oscil=NULL;
 display=NULL;
 applybutton=NULL;
 cbwidget=NULL;} {}
   }
-  Function {init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, SynthEngine *_synth)} {open
-  } {
+  Function {init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil=oscil_;
 n=n_;
@@ -434,17 +425,15 @@ if (oscil->Phmag[n]==64) mag->selection_color(0);
   }
 } 
 
-class OscilEditor {open : {public PresetsUI_}
+class OscilEditor {selected : {public PresetsUI_}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window osceditUI {
-      label {ADsynth Oscillator Editor} open
+      label {ADsynth Oscillator Editor}
       xywh {63 44 735 595} type Double hide
       code0 {string tname;}
       code1 {if (oscil->ADvsPAD) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Oscillator "; tname += char(nvoice + 49);}}
-      code2 {tname = synth->getGuiMaster()->set_part_window_title(tname);}
-      code3 {o->copy_label(tname.c_str());}
+      code2 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
     } {
       Fl_Button applybutton {
         label Apply
@@ -458,7 +447,7 @@ if (cbapplywidget!=NULL) {
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
-      Fl_Group oscildisplaygroup {open
+      Fl_Group oscildisplaygroup {
         xywh {5 5 360 300} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
@@ -769,7 +758,7 @@ synth->actionLock(lock);
  oscil->prepare();
 synth->actionLock(unlock);
 
-redrawoscil();} selected
+redrawoscil();}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {
@@ -1149,8 +1138,7 @@ refresh();}
       }
     }
   }
-  Function {OscilEditor(OscilGen *oscil_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *cbapplywidget_, int nvoice_, SynthEngine *_synth)} {open
-  } {
+  Function {OscilEditor(OscilGen *oscil_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *cbapplywidget_, int nvoice_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil=oscil_;
 oldosc=oldosc_;
@@ -1161,14 +1149,13 @@ make_window();
 refresh();
 osceditUI->show();} {}
   }
-  Function {~OscilEditor()} {open return_type virtual
+  Function {~OscilEditor()} {return_type virtual
   } {
     code {osceditUI->hide();
 //for (int i=0;i<MAX_AD_HARMONICS;i++) delete (h[i]);
 delete (osceditUI);} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {magtype->value(oscil->Phmagtype);
 rndslider->value(oscil->Prand-64);
 

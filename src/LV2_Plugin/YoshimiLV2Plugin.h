@@ -84,7 +84,7 @@ public:
    unsigned int getSamplerate(void) {return _sampleRate; }
    int getBuffersize(void) {return _bufferSize; }
    bool Start(void) {synth->Unmute(); return true; }
-   void Close(void) {synth->Mute(); synth->defaults();}
+   void Close(void) {synth->Mute();}
 
    //static methods
    static LV2_Handle	instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);

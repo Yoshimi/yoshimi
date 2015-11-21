@@ -152,8 +152,6 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     if (names == 7)
     {
         bRet = true;
-//        if (information.SUBsynth_used)
-//                synth->getRuntime().Log("Sub found");
     }
     else
     {
@@ -288,9 +286,35 @@ char *XMLwrapper::getXMLdata()
     memset(tabs, 0, STACKSIZE + 2);
     mxml_node_t *oldnode=node;
     node = info;
-    addparbool("ADDsynth_used", information.ADDsynth_used);
-    addparbool("SUBsynth_used", information.SUBsynth_used);
-    addparbool("PADsynth_used", information.PADsynth_used);
+    switch (synth->getRuntime().xmlType)
+    {
+        case 0:
+            addparstr("XMLtype", "Invalid");
+            break;
+        case XML_INSTRUMENT:
+            addparbool("ADDsynth_used", information.ADDsynth_used);
+            addparbool("SUBsynth_used", information.SUBsynth_used);
+            addparbool("PADsynth_used", information.PADsynth_used);
+            break;
+        case XML_PARAMETERS:
+            addparstr("XMLtype", "Parameters");
+            break;
+        case XML_MICROTONAL:
+            addparstr("XMLtype", "Scales");
+            break;
+        case XML_PRESETS:
+            addparstr("XMLtype", "Presets");
+            break;
+        case XML_STATE:
+            addparstr("XMLtype", "Session");
+            break;
+        case XML_CONFIG:
+            addparstr("XMLtype", "Config");
+            break;
+        default:
+            addparstr("XMLtype", "Unknown");
+            break;
+    }
     node = oldnode;
     char *xmldata = mxmlSaveAllocString(tree, XMLwrapper_whitespace_callback);
     return xmldata;
@@ -350,6 +374,7 @@ void XMLwrapper::endbranch()
 
 bool XMLwrapper::loadXMLfile(const string& filename)
 {
+    bool yoshitoo = false;
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
@@ -380,12 +405,19 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     if (mxmlElementGetAttr(root, "Yoshimi-major"))
     {
         xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));
+        yoshitoo = true;
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_major));
     }
     if (mxmlElementGetAttr(root, "Yoshimi-minor"))
     {
         xml_version.y_minor = string2int(mxmlElementGetAttr(root, "Yoshimi-minor"));
 //        synth->getRuntime().Log("XML: Yoshimi " + asString(xml_version.y_minor));
+    }
+    if (synth->getRuntime().logXMLheaders)
+    {
+        synth->getRuntime().Log("ZynAddSubFX version major " + asString(xml_version.major) + "   minor " + asString(xml_version.minor));
+        if (yoshitoo)
+            synth->getRuntime().Log("Yoshimi version major " + asString(xml_version.y_major) + "   minor " + asString(xml_version.y_minor));
     }
     return true;
 }

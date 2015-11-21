@@ -54,13 +54,13 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class SUBnoteharmonic {open : {public Fl_Group}
+class SUBnoteharmonic {: {public Fl_Group}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
-    Fl_Window harmonic {open
-      xywh {558 534 90 310} type Double
-      class Fl_Group visible
+    Fl_Window harmonic {
+      xywh {558 534 90 310} type Double hide
+      class Fl_Group
     } {
       Fl_Slider mag {
         callback {int x=0;
@@ -126,17 +126,16 @@ hide();
   }
 } 
 
-class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
+class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window SUBparameters {
-      label {SUBsynth Parameters} open
+      label {SUBsynth Parameters}
       xywh {6 183 735 475} type Double hide
-      code0 {string tname = synth->getGuiMaster()->set_part_window_title("SubSynth");}
-      code1 {o->copy_label(tname.c_str());}
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
+      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
-      Fl_Scroll {} {open
+      Fl_Scroll {} {
         xywh {5 140 434 325} type HORIZONTAL box THIN_UP_BOX
       } {
         Fl_Pack harmonics {open
@@ -146,11 +145,13 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
       }
       Fl_Button {} {
         label Close
-        callback {SUBparameters->hide();}
+        callback {synth->getGuiMaster()->subNoteX = SUBparameters->x();
+synth->getGuiMaster()->subNoteY = SUBparameters->y();
+SUBparameters->hide();}
         xywh {625 446 105 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {
-        label AMPLITUDE open
+        label AMPLITUDE
         xywh {5 5 215 135} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Dial vol {
@@ -370,7 +371,7 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
             pars->Phmag[0] = 127;
             h[0]->mag->selection_color(222);
             h[0]->mag->value(0);
-            SUBparameters->redraw();} selected
+            SUBparameters->redraw();}
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group bandwidthsettingsui {
@@ -452,13 +453,13 @@ class SUBnoteUI {open : {public PresetsUI_, SynthHelper}
         xywh {576 449 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Group {} {
-        label OVERTONES open
+        label OVERTONES
         xywh {440 140 290 81} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Choice spreadtype {
           label {Overtones  Position}
           callback {pars->POvertoneSpread.type = (int)o->value();
-pars->updateFrequencyMultipliers();} open
+pars->updateFrequencyMultipliers();}
           xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
           code0 {o->value(pars->POvertoneSpread.type);}
         } {
@@ -585,17 +586,16 @@ pars->updateFrequencyMultipliers();}
         filterui->refresh();
         filterenv->refresh();} {}
   }
-  Function {SUBnoteUI(SUBnoteParameters *parameters)} {open
-  } {
+  Function {SUBnoteUI(SUBnoteParameters *parameters)} {} {
     code {pars = parameters; 
 synth = pars->getSynthEngine();
 make_window();} {}
   }
   Function {~SUBnoteUI()} {return_type virtual
   } {
-    code {//for (int i=0;i<MAX_SUB_HARMONICS;i++) delete (h[i]);
-        SUBparameters->hide();
-        delete(SUBparameters);} {}
+    code {//
+    SUBparameters->hide();
+    delete(SUBparameters);} {}
   }
   decl {SUBnoteParameters *pars;} {private local
   }

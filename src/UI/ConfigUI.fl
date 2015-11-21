@@ -52,14 +52,15 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {230 126 465 330} type Double hide
+      xywh {4 197 390 330} type Double hide
+      code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
     } {
       Fl_Tabs {} {
-        xywh {5 5 455 297}
+        xywh {5 5 381 297}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 455 277} labelsize 12
+          xywh {5 25 382 277} labelsize 12
         } {
           Fl_Choice {} {
             label {AddSynth Oscillator Size}
@@ -111,15 +112,19 @@ class ConfigUI {selected : {private MiscFuncs}
             label {Internal Buffer Size}
             callback {//
     unsigned int old = synth->getRuntime().Buffersize;
-    unsigned int changed = 32 << o->value();
+    unsigned int changed = 16 << o->value();
     if (old != changed)
     {
         synth->getRuntime().Buffersize = changed;
         configChanged = true;
     }}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {249 80 100 20} down_box BORDER_BOX labelsize 12 textsize 11
-            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 32.0f - 1.0f) / logf(2.0f)) + 1);}
+            tooltip {ADSynth Oscillator Size (samples)} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
+            MenuItem {} {
+              label 16
+              xywh {55 55 100 20} labelfont 1
+            }
             MenuItem {} {
               label 32
               xywh {45 45 100 20} labelfont 1
@@ -152,7 +157,7 @@ class ConfigUI {selected : {private MiscFuncs}
                 synth->getRuntime().Interpolation = (int) o->value();
                 if (synth->getRuntime().Interpolation != tmp)
                 	configChanged = true;}
-            xywh {250 115 100 20} down_box BORDER_BOX labelsize 12 textsize 12
+            xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
             MenuItem {} {
@@ -171,7 +176,7 @@ class ConfigUI {selected : {private MiscFuncs}
                 synth->getRuntime().VirKeybLayout = (int) o->value();
                 if (synth->getRuntime().VirKeybLayout != tmp)
                 	configChanged = true;}
-            xywh {250 150 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
+            xywh {250 135 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
             MenuItem {} {
@@ -202,7 +207,7 @@ class ConfigUI {selected : {private MiscFuncs}
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
 		if(synth->getRuntime().GzipCompression != tmp)
 			configChanged = true;}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 185 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
           }
           Fl_Choice reports {
@@ -215,7 +220,7 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            xywh {200 220 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().consoleMenuItem);}
           } {
             MenuItem {} {
@@ -227,105 +232,41 @@ else
               xywh {0 0 34 20} labelsize 12
             }
           }
-          Fl_Input SessionStateFile {
-            label {Session state save file}
-            callback {//
-              synth->getRuntime().StateFile = string(o->value());
-              SessionStateFile->changed();}
-            xywh {160 250 220 20} labelsize 12 when 1 textsize 12
-            code0 {o->value(synth->getRuntime().StateFile.c_str());}
-          }
-          Fl_Button StateFileButton {
-            label Select
-            callback {//
-                const char *filename = fl_file_chooser("Nominate session save state file",
-                                                       NULL, synth->getRuntime().StateFile.c_str(), 0);
-                if (NULL != filename)
-                {
-                    synth->getRuntime().StateFile = string(filename);
-                    SessionStateFile->value(synth->getRuntime().StateFile.c_str());
-                    SessionStateFile->changed();
-                    configChanged = true;
-                }}
-            xywh {401 250 49 20} box THIN_UP_BOX labelsize 12
-            code0 {/* code */}
-          }
           Fl_Box {} {
             label {Most settings changes require a restart}
-            xywh {100 282 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {58 282 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
-        }
-        Fl_Group {} {
-          label {Presets dirs}
-          xywh {5 25 455 272} labelsize 12 hide
-        } {
-          Fl_Browser presetbrowse {
-            callback {activatebutton_presetdir(o->value() != 0);}
-            xywh {10 35 450 200} type Hold labelsize 12 textsize 12
-          }
-          Fl_Button {} {
-            label {Add preset directory...}
-            callback {//
-                const char *dirname;
-                dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
-                if (!dirname)
-                    return;
-                presetbrowse->add(dirname);
-                configChanged = true;}
-            xywh {15 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-          }
-          Fl_Button removepresetbutton {
-            label {Remove preset dir...}
-            callback {//
-                if (presetbrowse->value() != 0)
-                {
-                    presetbrowse->remove(presetbrowse->value());
-                }
-                activatebutton_presetdir(false);
-                configChanged = true;}
-            xywh {105 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-            code0 {o->deactivate();}
-          }
-          Fl_Button makedefaultpresetbutton {
-            label {Make default}
-            callback {//
-                int n = presetbrowse->value();
-                if (n != 0)
-                {
-                    presetbrowse->move(1, n);
-                    presetbrowse->value(1);
-                    presetbrowse->redraw();
-                }
-                activatebutton_presetdir(true);
-                configChanged = true;}
-            xywh {190 244 80 35} box THIN_UP_BOX labelsize 12 align 128
-            code0 {o->deactivate();}
-          }
-          Fl_Box {} {
-            label {Settings changes require a restart}
-            xywh {110 285 267 12} labelfont 1 labelsize 11 labelcolor 38 align 128
+          Fl_Check_Button {} {
+            label {Log XML headers}
+            callback {if (synth->getRuntime().logXMLheaders != o->value())
+{
+    synth->getRuntime().logXMLheaders = o->value();
+    configChanged = true;
+}}
+            xywh {320 239 20 20} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
         }
         Fl_Group {} {
           label Jack
-          xywh {5 25 455 277} labelsize 12 hide
+          xywh {5 25 385 277} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Jack Server}
             callback {//
                 synth->getRuntime().jackServer = string(o->value());
                 configChanged = true;}
-            tooltip {Name of the jack server to connect to - default, ...} xywh {218 149 100 22} labelsize 12 textsize 12
+            tooltip {Name of the jack server to connect to - default, ...} xywh {177 149 100 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackServer.c_str());}
           }
           Fl_Box {} {
             label {Settings changes require a restart}
-            xywh {110 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {60 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group {} {
           label Alsa
-          xywh {5 25 455 277} labelsize 12 hide
+          xywh {5 25 384 277} labelsize 12 hide
         } {
           Fl_Input {} {
             label {Alsa Midi Device}
@@ -372,7 +313,7 @@ else
                 }
                 synth->getRuntime().Samplerate = sample_rate;
                 configChanged = true;}
-            xywh {195 131 84 50} labelsize 12 align 4 when 1 textsize 12
+            xywh {195 131 120 54} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("96000");
                 o->add("48000");
@@ -387,7 +328,7 @@ else
           }
           Fl_Box {} {
             label {Settings changes require a restart}
-            xywh {110 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {52 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group {} {
@@ -416,14 +357,14 @@ else
         BankRoot->value(BankRootvalue);
         BankRoot->activate();
     }}
-          tooltip {MIDI CC preferences} xywh {5 25 455 275} labelsize 12 hide
+          tooltip {MIDI CC preferences} xywh {5 25 381 275} labelsize 12 hide
           code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
           code1 {BankRootvalue = synth->getRuntime().midi_bank_root;}
         } {
           Fl_Spinner BankRoot {
             label {Bank Root Change}
             callback {Rpend->show();}
-            xywh {275 81 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+            xywh {235 81 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
           }
@@ -453,7 +394,7 @@ else
         o->hide();
         configChanged = true;
     }}
-            tooltip {Click to set} xywh {340 81 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+            tooltip {Click to set} xywh {300 81 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button rootcheck {
             label {Enable Bank Root Change}
@@ -474,7 +415,7 @@ else
     }
     BankRoot->redraw();
     configChanged = true;}
-            xywh {275 60 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 60 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
             code1 {if (o->value() == 0) BankRoot->deactivate();}
           }
@@ -507,7 +448,7 @@ else
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         configChanged = true;}
-            tooltip {CC0 = msb, CC32 = lsb} xywh {275 122 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
+            tooltip {CC0 = msb, CC32 = lsb} xywh {235 122 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
           } {
@@ -531,7 +472,7 @@ else
 		synth->getRuntime().EnableProgChange = o->value();
 		if (synth->getRuntime().EnableProgChange != tmp)
 			configChanged = true;}
-            tooltip {MIDI program change enable/disable} xywh {275 162 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
+            tooltip {MIDI program change enable/disable} xywh {234 162 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
           Fl_Check_Button progpartenable {
@@ -541,13 +482,13 @@ else
 		synth->getRuntime().enable_part_on_voice_load = o->value();
 		if (synth->getRuntime().enable_part_on_voice_load != tmp)
 			configChanged = true;}
-            tooltip {Part enabled if MIDI program changed} xywh {275 182 18 18} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Part enabled if MIDI program changed} xywh {234 182 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
           Fl_Spinner EPCspinner {
             label {Extended Program Change}
             callback {Epend->show();}
-            xywh {275 241 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
+            xywh {235 241 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
           }
@@ -579,7 +520,7 @@ else
         o->hide();
         configChanged = true;
     }}
-            tooltip {Click to set} xywh {340 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+            tooltip {Click to set} xywh {300 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button Epcheck {
             label {Enable Extended Program Change}
@@ -600,30 +541,9 @@ else
     }
     EPCspinner->redraw();
     configChanged = true;}
-            xywh {275 220 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 220 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
-          }
-          Fl_Spinner Control {
-            label {Set immediate -- Control}
-            callback {CCpend->show();}
-            xywh {181 272 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
-          }
-          Fl_Spinner Value {
-            label Value
-            callback {CCpend->show();}
-            xywh {275 272 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
-          }
-          Fl_Button CCpend {
-            label Pending
-            callback {//
-    o->hide();
-    int cc = (int) Control->value();
-    int val = (int) Value->value();
-    int part = synth->getGuiMaster()->partui->npart;
-    synth->SetController(part, cc, val);
-    synth->getRuntime().Log(" Part " + asString(part) + "  Midi CC " + asString(cc) + " set to " + asString(val));}
-            tooltip {Click to set} xywh {340 272 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
         }
       }
@@ -631,7 +551,7 @@ else
         label {Close Unsaved}
         callback {synth->getGuiMaster()->bankui->readbankcfg();
 configwindow->do_callback();}
-        xywh {345 305 105 20} box THIN_UP_BOX labelsize 12
+        xywh {275 305 105 20} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label {Save and Close}
@@ -639,7 +559,67 @@ configwindow->do_callback();}
 synth->getGuiMaster()->bankui->readbankcfg();
 configChanged = false;
 configwindow->do_callback();}
-        xywh {225 305 105 20} box THIN_UP_BOX labelsize 12
+        xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
+      }
+    }
+    Fl_Window presets {
+      label Presets
+      xywh {5 437 460 295} type Double hide
+      code0 {o->copy_label(synth->makeUniqueName("Presets").c_str());}
+    } {
+      Fl_Browser presetbrowse {
+        callback {activatebutton_presetdir(o->value() != 0);}
+        xywh {5 5 450 200} type Hold labelsize 12 textsize 12
+      }
+      Fl_Button {} {
+        label {Add preset directory...}
+        callback {//
+    const char *dirname;
+    dirname = fl_dir_chooser("Add a preset directory :", NULL, 0);
+    if (!dirname)
+        return;
+    presetbrowse->add(dirname);
+    configChanged = true;
+    writepresetcfg();}
+        xywh {10 220 80 35} box THIN_UP_BOX labelsize 12 align 128
+      }
+      Fl_Button removepresetbutton {
+        label {Remove preset dir...}
+        callback {//
+    if (presetbrowse->value() != 0)
+        presetbrowse->remove(presetbrowse->value());
+    activatebutton_presetdir(false);
+    configChanged = true;
+    writepresetcfg();}
+        xywh {110 220 80 35} box THIN_UP_BOX labelsize 12 align 128
+        code0 {o->deactivate();}
+      }
+      Fl_Button makedefaultpresetbutton {
+        label {Make default}
+        callback {//
+    int n = presetbrowse->value();
+    if (n != 0)
+    {
+        presetbrowse->move(1, n);
+        presetbrowse->value(1);
+        presetbrowse->redraw();
+    }
+    activatebutton_presetdir(true);
+    configChanged = true;}
+        xywh {210 220 80 35} box THIN_UP_BOX labelsize 12 align 128
+        code0 {o->deactivate();}
+      }
+      Fl_Button {} {
+        label {Save and Close}
+        callback {synth->getRuntime().saveConfig();
+configChanged = false;
+presets->hide();}
+        xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
+      }
+      Fl_Button {} {
+        label {Close Unsaved}
+        callback {presets->hide();}
+        xywh {345 268 105 20} box THIN_UP_BOX labelsize 12
       }
     }
   }
@@ -675,16 +655,16 @@ configwindow->do_callback();}
   }
   Function {readpresetcfg()} {} {
     code {//
-        presetbrowse->clear();
-        for (int i = 0; i < MAX_PRESETS; ++i)
-            if (synth->getRuntime().presetsDirlist[i].size())
-                presetbrowse->add(synth->getRuntime().presetsDirlist[i].c_str());} {}
+    presetbrowse->clear();
+    for (int i = 0; i < MAX_PRESETS; ++i)
+        if (synth->getRuntime().presetsDirlist[i].size())
+            presetbrowse->add(synth->getRuntime().presetsDirlist[i].c_str());} {}
   }
   Function {writepresetcfg()} {} {
     code {//
-        synth->getRuntime().clearPresetsDirlist();
-        for (int n = 0; n < presetbrowse->size(); ++n)
-            synth->getRuntime().presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
+    synth->getRuntime().clearPresetsDirlist();
+    for (int n = 0; n < presetbrowse->size(); ++n)
+        synth->getRuntime().presetsDirlist[n] = string(presetbrowse->text(n + 1));} {}
   }
   Function {update_config(int tabnumber)} {} {
     code {//
@@ -756,8 +736,7 @@ configwindow->do_callback();}
   Function {savesettings(void)} {private return_type void
   } {
     code {//
-        synth->getRuntime().saveConfig();
-        writepresetcfg();} {}
+    synth->getRuntime().saveConfig();} {}
   }
   decl {bool configChanged;} {public local
   }

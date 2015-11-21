@@ -1,4 +1,5 @@
-Vector control is only possible if you have 32 or 64 parts active.
+
+Vector control is only possible if you have 32 or 64 parts active. Setup is per MIDI channel, so you can have totally different vector behaviour on say channel 1 and channel 5.
 
 In vector mode parts will still play together but the vector controls can change their volume, pan, etc. in pairs, controlled by user defined CCs set up with NRPNs
 
@@ -13,19 +14,20 @@ Setting up is currently done as follows.
 
 In the required channel send:
 NRPN MSB (99)  set to 64, LSB (98)  set to 1  [8129]
-Data MSB ( 6)  set mode
-              0 = X sweep CC
-              1 = Y sweep CC
-              2 = enable X features
-              3 = enable Y features
 
-Data LSB (38) features to enable
+Data MSB (6)      LSB (38)
+      0         X sweep CC
+      1         Y sweep CC
+      2         enable X features
+      3         enable Y features
+
+Data LSB features values
 
 Features:
-    1 = fixed as Volume
-    2 = default is Pan
-    4 = default is Filter Cutoff (Brightness)
-    8 = default is Mod Wheel
+        1 = fixed as Volume
+        2 = default is Pan
+        4 = default is Filter Cutoff (Brightness)
+        8 = default is Mod Wheel
     
 0x12 = 18 = Reversed Pan
 0x24 = 36 = Reversed Filter Cutoff
@@ -41,18 +43,21 @@ The feature numbers are chosen so they can be combined. So, 5 would be Volume + 
 
 
 Optional settings
-              4 = x1 instrument
-              5 = x2 instrument
-              6 = y1 instrument
-              7 = y2 instrument
+   MSB          LSB
+    4       x1 instrument ID
+    5       x2 instrument ID
+    6       y1 instrument ID
+    7       y2 instrument ID
+    
+IDs are instruments in the current bank.
 
-              8 = set CC for X feature 2
-              9 = set CC for X feature 4
-             10 = set CC for X feature 8
+    8       new CC for X feature 2
+    9       new CC for X feature 4
+   10       new CC for X feature 8
 
-             11 = set CC for Y feature 2
-             12 = set CC for Y feature 4
-             13 = set CC for Y feature 8
+   11       new CC for Y feature 2
+   12       new CC for Y feature 4
+   13       new CC for Y feature 8
               
 Any data MSB value outside the above list disables vector control.
 
