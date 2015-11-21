@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey    
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -108,7 +108,7 @@ class PartKitItem {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window partkititem {
-      private xywh {121 479 670 30} type Double hide
+      private xywh {30 431 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -1271,6 +1271,7 @@ seteditname();}
   }
   Function {showparameters(int kititem,int engine)} {} {
     code {//
+    string tname;
     if (engine == -1)
     {   // this is used if I want to clear the engine from the part
         if (kititem == lastkititem)
@@ -1303,20 +1304,41 @@ seteditname();}
 
         if (part->kit[kititem].adpars)
             adnoteui = new ADnoteUI(part->kit[kititem].adpars);
-
         if (part->kit[kititem].subpars)
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars);
 
         if (part->kit[kititem].padpars)
             padnoteui = new PADnoteUI(part->kit[kititem].padpars);
     }
-
+    if (engine == 0)
+        tname = "AddSynth";
+    else if (engine == 1)
+        tname = "SubSynth";
+    else if (engine == 2)
+        tname = "PadSynth";
+ 
+    tname = synth->getGuiMaster()->setPartWindowTitle(tname);
+    if (part->Pkitmode)
+    {
+        tname += asString(kititem + 1);
+        if(part->kit[kititem].Pname > "")
+            tname += (" - " + part->kit[kititem].Pname);
+    }
     if (engine == 0 && adnoteui != NULL)
+    {
+        adnoteui->ADnoteGlobalParameters->copy_label(tname.c_str());
         adnoteui->ADnoteGlobalParameters->show();
+    }
     if (engine == 1 && subnoteui != NULL)
+    {
+        subnoteui->SUBparameters->copy_label(tname.c_str());
         subnoteui->SUBparameters->show();
+    }
     if (engine == 2 && adnoteui != NULL)
-        padnoteui->padnotewindow->show();} {}
+    {
+        padnoteui->padnotewindow->copy_label(tname.c_str());
+        padnoteui->padnotewindow->show();
+    }} {}
   }
   Function {find_engines()} {} {
     code {//
