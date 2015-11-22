@@ -134,6 +134,7 @@ class Config : public MiscFuncs
         int           midi_bank_C;
         int           midi_upper_voice_C;
         int           enable_part_on_voice_load;
+        bool          monitorCCin;
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;

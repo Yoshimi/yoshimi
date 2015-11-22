@@ -1,6 +1,12 @@
 yoshimi 1.3.x
 
 2015-11-21 Will
+- Implemented logging of incoming MIDI CCs.
+- Fixed crash bug caused by new kit item name being called before
+  it was created - only when trying to enable a kit item with no
+  engines already defined.
+
+2015-11-21 Will
 - Re-enabled 'minimal' in XMLwrapper for all except presets.
 - Presets wasn't showing 1st character (array offset by 1).
   Corrected.

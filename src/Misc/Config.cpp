@@ -115,6 +115,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     midi_bank_C(32),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(1),
+    monitorCCin(false),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),

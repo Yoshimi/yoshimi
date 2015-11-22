@@ -163,6 +163,8 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 {
     int nLow;
     int nHigh;
+    if (synth->getRuntime().monitorCCin)
+        synth->getRuntime().Log("Chan " + asString((int) ch) + "   CC " + asString((int) ctrl)  + "   Value " + asString((int) param));
     if (ctrl == synth->getRuntime().midi_bank_root)
         setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)
@@ -177,7 +179,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnL != param)
             {
                 synth->getRuntime().nrpnL = param;
-                synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+                //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
             }
             nLow = param;
             nHigh = synth->getRuntime().nrpnH;
@@ -187,7 +189,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnH != param)
             {
                 synth->getRuntime().nrpnH = param;
-                synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
+                //synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
             }
             nHigh = param;
             nLow = synth->getRuntime().nrpnL;

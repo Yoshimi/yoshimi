@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2015, Will Godfrey   
+Copyright 2014 -2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified September 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <cmath>} {public local
@@ -46,7 +46,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -521,6 +521,12 @@ else
         configChanged = true;
     }}
             tooltip {Click to set} xywh {300 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+          }
+          Fl_Check_Button midiMon {
+            label {Log incoming CCs}
+            callback {synth->getRuntime().monitorCCin = o->value();}
+            xywh {234 36 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().monitorCCin);}
           }
           Fl_Check_Button Epcheck {
             label {Enable Extended Program Change}

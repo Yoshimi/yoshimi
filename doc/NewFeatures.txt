@@ -92,3 +92,7 @@ Yoshimi now remembers where major windows were last placed (per instance), and i
 ###
 
 We have an experimental implimentation of CC2 - breath control. This combines volument with filter cutoff.
+
+###
+
+To help when things don't seem to go right, you can now show 'raw' incoming CCs. This is enabled from the 'MIDI' tab in 'Settings'. These are the values before Yoshimi does any processing.
