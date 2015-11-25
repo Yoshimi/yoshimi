@@ -164,7 +164,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     int nLow;
     int nHigh;
     if (synth->getRuntime().monitorCCin)
-        synth->getRuntime().Log("Chan " + asString((int) ch) + "   CC " + asString((int) ctrl)  + "   Value " + asString((int) param));
+        synth->getRuntime().Log("Chan " + asString(((int) ch) + 1) + "   CC " + asString((int) ctrl)  + "   Value " + asString((int) param));
     if (ctrl == synth->getRuntime().midi_bank_root)
         setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)

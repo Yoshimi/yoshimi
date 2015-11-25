@@ -439,10 +439,9 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 {
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
-                    {
+                    //    writeGuiData(npart | 128);
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                    }
-                       //writeGuiData(npart | 64);
+                     
                 }
             }
         }
@@ -453,9 +452,8 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             {
                 part[npart]->SetController(type, par);
                 if (type == 7 || type == 10) // currently only volume and pan
-                {
+                //    writeGuiData(npart | 128);
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                }
             }
         }
         if (type == C_allsoundsoff)
@@ -466,7 +464,6 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 insefx[nefx]->cleanup();
         }
     }
-    //writeGuiData((char)type);
 }
 
 
@@ -586,12 +583,11 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                         partOK = true; 
                         if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
                             partonoff(npart, 1);
+                        //writeGuiData(npart | 64);
                         if (Runtime.showGui && guiMaster && guiMaster->partui
                                             && guiMaster->partui->instrumentlabel
                                             && guiMaster->partui->part)
-                        {
                             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-                        }
                     }
                 }
         }
@@ -605,12 +601,11 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                 {
                     if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
                         partonoff(npart, 1);
+                    //    writeGuiData(npart | 64);
                     if (Runtime.showGui && guiMaster && guiMaster->partui
                                         && guiMaster->partui->instrumentlabel
                                         && guiMaster->partui->part)
-                    {
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-                    }
                 }
             }
         }
@@ -640,10 +635,7 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
         if (Runtime.showGui && guiMaster && guiMaster->partui
                             && guiMaster->partui->instrumentlabel
                             && guiMaster->partui->part)
-        {
-            GuiThreadMsg::sendMessage(this,
-            GuiThreadMsg::UpdatePartProgram, npart);
-        }
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
 }
 
@@ -939,13 +931,13 @@ void SynthEngine::SetSystemValue(int type, int value)
                 value = 52;            
             setPkeyshift(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-            Runtime.Log("Set Master key shift " + asString(value)
+            Runtime.Log("Master key shift set to " + asString(value)
                       + "  (" + asString(value - 64) + ")");
             break;
         case 7: // master volume
             setPvolume(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-            Runtime.Log("Set Master volume " + asString(value));
+            Runtime.Log("Master volume set to " + asString(value));
             break;
             
         case 100: // reports destination
@@ -1012,7 +1004,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (value == 128) // but still report the setting
                 Runtime.Log("MIDI Root Change disabled");
             else if (value > -1)
-                Runtime.Log("Set Root CC to " + asString(value));
+                Runtime.Log("Root CC set to " + asString(value));
             break;
             
         case 114: // bank
@@ -1033,9 +1025,9 @@ void SynthEngine::SetSystemValue(int type, int value)
                 }
             }
             if (value == 0)
-                Runtime.Log("Set Bank CC to MSB (0)");
+                Runtime.Log("Bank CC set to MSB (0)");
             else if (value == 32)
-                Runtime.Log("Set Bank CC to LSB (32)");
+                Runtime.Log("Bank CC set to LSB (32)");
             else if (value > -1)
                 Runtime.Log("MIDI Bank Change disabled");
             break;
@@ -1056,9 +1048,9 @@ void SynthEngine::SetSystemValue(int type, int value)
         case 116: // enable on program change
             value = (value > 63);
             if (value)
-                Runtime.Log("Set MIDI Program Change enables part");
+                Runtime.Log("MIDI Program Change will enable part");
             else
-                Runtime.Log("Set MIDI Program Change doesn't enable part");
+                Runtime.Log("MIDI Program Change doesn't enable part");
             if (value != Runtime.enable_part_on_voice_load)
             {
                 Runtime.enable_part_on_voice_load = value;
@@ -1086,14 +1078,14 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (value == 128) // but still report the setting
                 Runtime.Log("MIDI extended Program Change disabled");
             else if (value > -1)
-                Runtime.Log("Set extended Program Change CC to " + asString(value));
+                Runtime.Log("Extended Program Change CC set to " + asString(value));
             break;
             
         case 118: // active parts
             if (value == 16 or value == 32 or value == 64)
             {
                 Runtime.NumAvailableParts = value;
-                Runtime.Log("Set active parts to " + asString(value));
+                Runtime.Log("Available parts set to " + asString(value));
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             }
             else

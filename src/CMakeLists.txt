@@ -513,8 +513,8 @@ if (BuildLV2Plugin)
 
 include(GNUInstallDirs)
 
-#set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
-set(LV2_INSTALL_DIR lib/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
+#set(LV2_INSTALL_DIR lib/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
 
 pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
 if (LV2_FOUND)
