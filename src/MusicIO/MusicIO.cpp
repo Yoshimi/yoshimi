@@ -194,7 +194,6 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             nHigh = param;
             nLow = synth->getRuntime().nrpnL;
         }
-
         synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
         synth->getRuntime().dataH = 0x80; //  so these are now invalid
         synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
@@ -261,7 +260,6 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             synth->SetController(ch, C_volume, param);
             ctrl = C_filtercutoff;
         }
- 
         synth->SetController(ch, ctrl, param);
     }
 }
@@ -365,9 +363,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;
     }
-    
     bool noHigh = (synth->getRuntime().dataH > 0x7f);
-    
     if (type == C_dataL)
     {
         synth->getRuntime().dataL = par;
@@ -375,7 +371,6 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
         if (noHigh)
             return;
     }
-    
     if (type == C_dataH)
     {
         synth->getRuntime().dataH = par;
@@ -385,14 +380,12 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
         else
             return; // we're currently using MSB as parameter not a value
     }
-
     /*
      * All the above runaround performance is to deal with a data LSB
      * arriving either before or after the MSB and immediately after
      * a new NRPN has been set. After this, running data values expect
      * MSB sub parameter before LSB value until the next full NRPN.
      */
-
     int dHigh = synth->getRuntime().dataH;
     
     if (nLow == 0) // direct part change
@@ -477,8 +470,15 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 //to make changes consistent
 void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place, bool setRootDir)
 {
-    if (setRootDir && (bank_or_root_num == synth->getBankRef().getCurrentRootID()))
-        return; // nothing to do!
+    if (setRootDir)
+    {
+        if (bank_or_root_num == synth->getBankRef().getCurrentRootID())
+            return; // nothing to do!
+    }
+    else
+        if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
+            return; // still nothing to do!
+
     if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
     else
