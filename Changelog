@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-11-27 Will
+- Resolved instrument name anomaly. Part name is now always internal
+  instrument name, regardless of file name.
+
 2015-11-25 Will
 - Applied cmake ARCH and LV2 patches.
 - Added notes ond audio direction in'doc'.

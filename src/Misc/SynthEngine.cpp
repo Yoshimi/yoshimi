@@ -48,9 +48,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     if (remove)
     {
         if (idMap.count(idx) > 0)
-        {
             idMap.erase(idx);
-        }
         return 0;
     }
     else if (idx > 0)
@@ -106,9 +104,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     windowTitle("Yoshimi" + asString(uniqueId))
 {    
     if (bank.roots.empty())
-    {
         bank.addDefaultRootDirs();
-    }
     memset(&random_state, 0, sizeof(random_state));
 
     ctl = new Controller(this);
@@ -491,9 +487,7 @@ void SynthEngine::SetZynControls()
                     Pinsparts[effnum] = value;
             }
             else if (efftype == 0x40) // select effect
-            {
                 insefx[effnum]->changeeffect(value);
-            }
             else
                 insefx[effnum]->seteffectpar(parnum, value);
             data |= (Pinsparts[effnum] + 2) << 24; // needed for both operations
@@ -506,9 +500,7 @@ void SynthEngine::SetZynControls()
                 
             }
             else if (efftype == 0x40) // select effect
-            {
                 sysefx[effnum]->changeeffect(value);
-            }
             else
                 sysefx[effnum]->seteffectpar(parnum, value);
         }
@@ -520,13 +512,9 @@ void SynthEngine::SetZynControls()
 void SynthEngine::SetBankRoot(int rootnum)
 {
     if (bank.setCurrentRootID(rootnum))
-    {
         Runtime.Log("Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
-    }
     else
-    {
         Runtime.Log("No match for root ID " + asString(rootnum));
-    }
     if (Runtime.showGui)
     {
         guiMaster->updateBankRootDirs();
@@ -556,9 +544,7 @@ void SynthEngine::SetBank(int banknum)
 
     }
     else
-    {
         Runtime.Log("No bank " + asString(banknum)+ " in this root");
-    }
 }
 
 
@@ -567,9 +553,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
     bool partOK = false;
     int npart;
     if (bank.getname(pgm) < "!") // can't get a program name less than this
-    {
         Runtime.Log("No Program " + asString(pgm) + " in this bank");
-    }
     else
     {
         if (chan <  NUM_MIDI_CHANNELS) // a normal program change
@@ -610,9 +594,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
             }
         }
         if (partOK)
-        {
             Runtime.Log("Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
-        }
         else
             Runtime.Log("SynthEngine setProgram: Invalid program data");
     }
@@ -672,7 +654,7 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 /*
  * This should really be in MiscFuncs but it has two runtime calls
  * and I can't work out a way to implement that :(
- * We als have to fake long pages when calling via NRPNs as there
+ * We also have to fake long pages when calling via NRPNs as there
  * is no readline entry to set the page length.
  */
 
@@ -2153,9 +2135,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         part[npart]->getfromXML(xml);
         xml->exitbranch();
         if (part[npart]->Penabled && (part[npart]->Paudiodest & 2))
-        {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
-        }
     }
 
     if (xml->enterbranch("MICROTONAL"))
@@ -2269,9 +2249,7 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {
     if (guiMaster == NULL && createGui)
-    {
         guiMaster = new MasterUI(this);
-    }
     return guiMaster;
 }
 
@@ -2309,8 +2287,6 @@ string SynthEngine::makeUniqueName(string name)
 void SynthEngine::setWindowTitle(string _windowTitle)
 {
     if (!_windowTitle.empty())
-    {
         windowTitle = _windowTitle;
-    }
 }
 
