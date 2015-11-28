@@ -4,6 +4,9 @@ yoshimi 1.3.x
 - Fixed regression where renaming instruments failed to actually
   write to the file.
 
+2015-11-28 Andrew
+- Added '-c' option that disables command line interface
+
 2015-11-27 Will
 - Resolved instrument name anomaly. Part name is now always internal
   instrument name, regardless of file name.

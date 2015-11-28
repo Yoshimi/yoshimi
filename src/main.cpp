@@ -57,6 +57,7 @@ static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
+bool bShowCmdLine = true;
 
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -91,18 +92,6 @@ void splashTimeout(void *splashWin)
 
 static void *mainGuiThread(void *arg)
 {
-
-    for (int i = 0; i < globalArgc; ++i)
-    {
-        if (!strcmp(globalArgv [i], "-i")
-           || !strcmp(globalArgv [i], "--no-gui")
-           || !strcmp(globalArgv [i], "--help")
-           || !strcmp(globalArgv [i], "-?"))
-        {
-            bShowGui = false;
-        }
-    }
-
     Fl::lock();
 
     sem_post((sem_t *)arg);
@@ -338,6 +327,22 @@ int main(int argc, char *argv[])
     pthread_t thr;
     pthread_attr_t attr;
     sem_t semGui;
+
+    for (int i = 0; i < globalArgc; ++i)
+    {
+        if (!strcmp(globalArgv [i], "-i")
+           || !strcmp(globalArgv [i], "--no-gui")
+           || !strcmp(globalArgv [i], "--help")
+           || !strcmp(globalArgv [i], "-?"))
+        {
+            bShowGui = false;
+        }
+        else if(!strcmp(globalArgv [i], "-c"))
+        {
+            bShowCmdLine = false;
+        }
+    }
+
     if(sem_init(&semGui, 0, 0) == 0)
     {
         if (pthread_attr_init(&attr) == 0)
@@ -384,13 +389,16 @@ int main(int argc, char *argv[])
     //create command line processing thread
 
     pthread_t cmdThr;
-    if (pthread_attr_init(&attr) == 0)
+    if(bShowCmdLine)
     {
-        if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+        if (pthread_attr_init(&attr) == 0)
         {
+            if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+            {
 
+            }
+            pthread_attr_destroy(&attr);
         }
-        pthread_attr_destroy(&attr);
     }
 
     void *ret;
