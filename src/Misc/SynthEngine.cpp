@@ -512,16 +512,16 @@ void SynthEngine::SetZynControls()
 void SynthEngine::SetBankRoot(int rootnum)
 {
     if (bank.setCurrentRootID(rootnum))
+    {
+        if (Runtime.showGui && guiMaster && guiMaster->bankui)
+        {
+            guiMaster->updateBankRootDirs();
+            guiMaster->bankui->rescan_for_banks(false);
+        }
         Runtime.Log("Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
+    }
     else
         Runtime.Log("No match for root ID " + asString(rootnum));
-    if (Runtime.showGui)
-    {
-        guiMaster->updateBankRootDirs();
-        guiMaster->bankui->rescan_for_banks(false);
-    }
-
-
 }
 
 

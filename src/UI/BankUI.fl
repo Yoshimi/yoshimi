@@ -12,6 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +29,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/Fl_Button.H>} {public local
@@ -307,7 +308,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -796,6 +797,7 @@ fnr = &RootProcess_::rootprocess;
         {   // Rename slot
             const char *newname = fl_input("Instrument name:", thisname.c_str());
             if (newname)
+            {
                 if (strlen(newname) > 3)
                 {
                     if (!bank->setname(slot, string(newname), -1))
@@ -806,10 +808,14 @@ fnr = &RootProcess_::rootprocess;
                     }
                     else
                     {
-                        bs[slot]->refresh();
                         synth->part[*npart]->Pname = newname;
+                        synth->actionLock(lockmute);
+                        bank->savetoslot(slot,synth->part[*npart]);
+                        synth->actionLock(unlock);
+                        bs[slot]->refresh();
                     }
                 }
+            }
             setread();
             cbwig->do_callback();
         }
