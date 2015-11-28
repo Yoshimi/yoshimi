@@ -67,6 +67,7 @@ static struct argp_option cmd_options[] = {
     {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
     {"no-gui",            'i',  NULL,         0,  "no gui"},
+    {"no-cmdline",        'c',  NULL,         0,  "don't show command line interface"},
     {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
@@ -1115,6 +1116,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                         settings->jackSessionUuid = string(arg);
             break;
         #endif
+        case 'c': // no-cmdline is handled in main()
+            break;
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;
