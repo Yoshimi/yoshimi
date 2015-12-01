@@ -95,7 +95,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    guiringbuf(NULL),
+    RBPringbuf(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -123,8 +123,8 @@ SynthEngine::~SynthEngine()
     closeGui();
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
-    if (guiringbuf)
-        jack_ringbuffer_free(guiringbuf);
+    if (RBPringbuf)
+        jack_ringbuffer_free(RBPringbuf);
     
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
@@ -203,7 +203,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-    if (!(guiringbuf = jack_ringbuffer_create(256)))
+    if (!(RBPringbuf = jack_ringbuffer_create(512)))
     {
         Runtime.Log("SynthEngine failed to create GUI ringbuffer");
         goto bail_out;
@@ -306,7 +306,16 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
     }
+    
+    
+    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 1, false))
+    {
+        Runtime.Log("Failed to start RBP thread");
+        goto bail_out;
+    }
+    
     return true;
+    
 
 bail_out:
     if (fft)
@@ -317,9 +326,9 @@ bail_out:
         jack_ringbuffer_free(vuringbuf);
     vuringbuf = NULL;
     
-    if (guiringbuf)
-        jack_ringbuffer_free(guiringbuf);
-    guiringbuf = NULL;
+    if (RBPringbuf)
+        jack_ringbuffer_free(RBPringbuf);
+    RBPringbuf = NULL;
 
     if (tmpmixl)
         fftwf_free(tmpmixl);
@@ -346,6 +355,44 @@ bail_out:
         sysefx[nefx] = NULL;
     }
     return false;
+}
+
+
+void *SynthEngine::_RBPthread(void *arg)
+{
+    return static_cast<SynthEngine*>(arg)->RBPthread();
+}
+
+
+void *SynthEngine::RBPthread(void)
+{
+    char data1 = 0;
+    char data2 = 0;
+    int type;
+    while (Runtime.runSynth)
+    {
+        if (jack_ringbuffer_read_space(RBPringbuf) > 0)
+        {
+            jack_ringbuffer_read(RBPringbuf, &data1, 1);
+            jack_ringbuffer_read(RBPringbuf, &data2, 1);
+            type = (unsigned char)data1;
+            if (type & 128)
+            {
+                SetBankRoot(data2);
+            }
+            else if (type & 64)
+            {
+                SetBank(data2);
+            }
+            else
+            {
+                SetProgram(data1, data2);
+            }
+        }
+        else
+            usleep(500);
+    }
+    return NULL;
 }
 
 
@@ -435,7 +482,6 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 {
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
-                    //    writeGuiData(npart | 128);
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
                      
                 }
@@ -448,7 +494,6 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             {
                 part[npart]->SetController(type, par);
                 if (type == 7 || type == 10) // currently only volume and pan
-                //    writeGuiData(npart | 128);
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
             }
         }
@@ -541,7 +586,6 @@ void SynthEngine::SetBank(int banknum)
             guiMaster->bankui->refreshmainwindow();
         }
         Runtime.Log("Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
-
     }
     else
         Runtime.Log("No bank " + asString(banknum)+ " in this root");
@@ -567,7 +611,6 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                         partOK = true; 
                         if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
                             partonoff(npart, 1);
-                        //writeGuiData(npart | 64);
                         if (Runtime.showGui && guiMaster && guiMaster->partui
                                             && guiMaster->partui->instrumentlabel
                                             && guiMaster->partui->part)
@@ -585,7 +628,6 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                 {
                     if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
                         partonoff(npart, 1);
-                    //    writeGuiData(npart | 64);
                     if (Runtime.showGui && guiMaster && guiMaster->partui
                                         && guiMaster->partui->instrumentlabel
                                         && guiMaster->partui->part)
@@ -1303,21 +1345,26 @@ int SynthEngine::commandSet(char *point)
 }
 
 
-char SynthEngine::readGuiData()
+void SynthEngine::readRBP()
 {
-    char data = 0;
-    if (jack_ringbuffer_read_space(guiringbuf) > 0)
-        jack_ringbuffer_read(guiringbuf, &data, 1);
-    return data;
+    char data1 = 0;
+    char data2 = 0;
+    if (jack_ringbuffer_read_space(RBPringbuf) > 0)
+    {
+        jack_ringbuffer_read(RBPringbuf, &data1, 1);
+        jack_ringbuffer_read(RBPringbuf, &data2, 1);
+        cout << (int)data1 << "  " << (int)data2 << endl;
+    }
 }
 
 
-void SynthEngine::writeGuiData(char data)
+void SynthEngine::writeRBP(char data1, char data2)
 {
-    if (!Runtime.showGui || !guiMaster)
-        return;
-    if (jack_ringbuffer_write_space(guiringbuf) > 0)
-        jack_ringbuffer_write(guiringbuf, &data, 1);
+    if (jack_ringbuffer_write_space(RBPringbuf) > 0)
+    {
+        jack_ringbuffer_write(RBPringbuf, &data1, 1);
+        jack_ringbuffer_write(RBPringbuf, &data2, 1);
+    }
 }
 
 
@@ -1841,7 +1888,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                     VUpeak.values.parts[npart]+= 2;
             }
         }
-    }    
+    }
     return p_buffersize;
 }
 

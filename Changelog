@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-12-1 Will
+- First trial of combined thread and ring buffer foor Root, Bank
+  & program Changes.
+
 2015-11-28 Will
 - Fixed regression where renaming instruments failed to actually
   write to the file.

@@ -482,8 +482,12 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
     if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
     else
-    {        
-        pthread_t tmpBankOrRootDirThread = 0;
+    {
+        if (setRootDir)
+            synth->writeRBP(128 ,bank_or_root_num);
+        else
+            synth->writeRBP(64 ,bank_or_root_num);
+        /*pthread_t tmpBankOrRootDirThread = 0;
         tmpBankOrRootDirThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
         if (tmpBankOrRootDirThread == 0) // don't allow more than one bank change/root dir change process at a time
         {
@@ -495,7 +499,7 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
             }
         }
         else
-            synth->getRuntime().Log("Midi bank/root dir changes too close together");
+            synth->getRuntime().Log("Midi bank/root dir changes too close together");*/
     }
 }
 
@@ -515,7 +519,8 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
             synth->SetProgram(ch, prg);
         else
         {
-            pthread_t tmpPrgThread = 0;
+            synth->writeRBP(ch ,prg);
+            /*pthread_t tmpPrgThread = 0;
             tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [partnum].pPrgThread , 0);
             if (tmpPrgThread == 0) // don't allow more than one program change process at a time
             {
@@ -526,7 +531,7 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
                 {
                     synth->getRuntime().Log("MusicIO::setMidiProgram: failed to start midi program change thread!");
                 }
-            }
+            }*/
         }
     }
 }
