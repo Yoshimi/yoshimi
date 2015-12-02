@@ -1252,6 +1252,40 @@ void GuiThreadMsg::processGuiMessages()
                 mainRegisterAudioPort(synth, msg->index);
             }
             break;
+        case GuiThreadMsg::UpdateBankRootDirs:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster)
+                {
+                    guiMaster->updateBankRootDirs();
+                }
+            }
+            break;
+        case GuiThreadMsg::RescanForBanks:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster && guiMaster->bankui)
+                {
+                    guiMaster->bankui->rescan_for_banks(false);
+                }
+            }
+            break;
+        case GuiThreadMsg::RefreshCurBank:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster && guiMaster->bankui)
+                {
+                    guiMaster->bankui->set_bank_slot();
+                    guiMaster->bankui->refreshmainwindow();
+                }
+            }
+            break;
         default:
             break;
         }

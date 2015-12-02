@@ -558,10 +558,10 @@ void SynthEngine::SetBankRoot(int rootnum)
 {
     if (bank.setCurrentRootID(rootnum))
     {
-        if (Runtime.showGui && guiMaster && guiMaster->bankui)
+        if (Runtime.showGui)
         {
-            guiMaster->updateBankRootDirs();
-            guiMaster->bankui->rescan_for_banks(false);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
         Runtime.Log("Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
     }
@@ -580,10 +580,9 @@ void SynthEngine::SetBank(int banknum)
     //new implementation uses only 1 call :)
     if (bank.setCurrentBankID(banknum, true))
     {
-        if (Runtime.showGui && guiMaster && guiMaster && guiMaster->bankui)
+        if (Runtime.showGui)
         {
-            guiMaster->bankui->set_bank_slot();
-            guiMaster->bankui->refreshmainwindow();
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RefreshCurBank, 0);
         }
         Runtime.Log("Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
     }
