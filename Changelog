@@ -1,8 +1,14 @@
 yoshimi 1.3.x
 
+2015-12-2 Will
+- Minor improvement to Root, Bank, Program selection in ring buffer.
+
+2015-12-2 Rob
+- Corrected gui update method for banks and roots.
+
 2015-12-1 Will
-- First trial of combined thread and ring buffer foor Root, Bank
-  & program Changes.
+- First trial of combined thread and ring buffer for Root, Bank
+  & Program Changes.
 
 2015-11-28 Will
 - Fixed regression where renaming instruments failed to actually

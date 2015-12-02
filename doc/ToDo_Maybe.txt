@@ -6,10 +6,6 @@ Replace usleep with nanosleep - probably not :(
 Separate root/bank/instrument lists from main config as
     single file for all instances.
 
-fix bug caused by malformed rosegarden file that freezes yoshimi gui if either
-    bank or instrument windows are open when this file is loaded :(
-    ... but only if CC to change root is enabled.
-
 Make loading effect presets update the 'top' line.
 
 Sort out default midi message.

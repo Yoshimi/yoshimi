@@ -368,7 +368,7 @@ void *SynthEngine::RBPthread(void)
 {
     char data1 = 0;
     char data2 = 0;
-    int type;
+    unsigned char type;
     while (Runtime.runSynth)
     {
         if (jack_ringbuffer_read_space(RBPringbuf) > 0)
@@ -376,17 +376,17 @@ void *SynthEngine::RBPthread(void)
             jack_ringbuffer_read(RBPringbuf, &data1, 1);
             jack_ringbuffer_read(RBPringbuf, &data2, 1);
             type = (unsigned char)data1;
-            if (type & 128)
+            switch (type)
             {
-                SetBankRoot(data2);
-            }
-            else if (type & 64)
-            {
-                SetBank(data2);
-            }
-            else
-            {
-                SetProgram(data1, data2);
+                case 255:
+                    SetBankRoot(data2);
+                    break;
+                case 254:
+                    SetBank(data2);
+                    break;
+                default:
+                    SetProgram(data1, data2);
+                    break;
             }
         }
         else

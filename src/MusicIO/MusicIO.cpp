@@ -484,9 +484,9 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
     else
     {
         if (setRootDir)
-            synth->writeRBP(128 ,bank_or_root_num);
+            synth->writeRBP(255 ,bank_or_root_num);
         else
-            synth->writeRBP(64 ,bank_or_root_num);
+            synth->writeRBP(254 ,bank_or_root_num);
         /*pthread_t tmpBankOrRootDirThread = 0;
         tmpBankOrRootDirThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
         if (tmpBankOrRootDirThread == 0) // don't allow more than one bank change/root dir change process at a time
