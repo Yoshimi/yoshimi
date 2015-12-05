@@ -97,7 +97,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetSystemValue(int type, int value);
         int commandSet(char *point);
         int commandVector(char *point);
-        void readRBP();
         void writeRBP(char data1, char data2);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);

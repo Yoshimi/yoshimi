@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
 
 bail_out:
     if (bShowGui && !bExitSuccess) // this could be done better!
-        usleep(2000000);
+        sleep(2);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;

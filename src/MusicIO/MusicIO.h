@@ -55,11 +55,11 @@ class MusicIO : virtual protected MiscFuncs
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
         int *interleaved;
-        int rtprio;
+        //int rtprio;
 
         SynthEngine *synth;
     private:
-        pthread_t pBankOrRootDirThread;
+/*        pthread_t pBankOrRootDirThread;
         int bankOrRootDirToChange;
         bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank        
         struct _prgChangeCmd
@@ -74,7 +74,7 @@ class MusicIO : virtual protected MiscFuncs
         void *bankOrRootDirChange_Thread();
         void *prgChange_Thread(_prgChangeCmd *pCmd);
         static void *static_BankOrRootDirChangeThread(void *arg);
-        static void *static_PrgChangeThread(void *arg);
+        static void *static_PrgChangeThread(void *arg);*/
 };
 
 #endif

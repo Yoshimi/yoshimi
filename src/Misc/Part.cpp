@@ -363,9 +363,14 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         else
             notebasefreq = microtonal->getNoteFreq(note);
 
-        if (Pfrand > 0.002)  // effective range 0.005 to 0.1
+        // Humanise
+        if (Pfrand >= 0.001) // otherwise 'off'
         {
-          notebasefreq *= (1 + ((synth->numRandom() - 0.5f) * Pfrand));
+            //synth->getRuntime().Log("\n" + asString(notebasefreq));
+            // this is an approximation to keep the math simple and is
+            // about 4 cents out at 50 cents
+            notebasefreq *= (1 + ((synth->numRandom() - 0.5f) * (Pfrand + 0.003)));
+            //synth->getRuntime().Log(asString(notebasefreq));
         }
 
         // Portamento

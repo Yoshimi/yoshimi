@@ -1344,19 +1344,6 @@ int SynthEngine::commandSet(char *point)
 }
 
 
-void SynthEngine::readRBP()
-{
-    char data1 = 0;
-    char data2 = 0;
-    if (jack_ringbuffer_read_space(RBPringbuf) > 0)
-    {
-        jack_ringbuffer_read(RBPringbuf, &data1, 1);
-        jack_ringbuffer_read(RBPringbuf, &data2, 1);
-        cout << (int)data1 << "  " << (int)data2 << endl;
-    }
-}
-
-
 void SynthEngine::writeRBP(char data1, char data2)
 {
     if (jack_ringbuffer_write_space(RBPringbuf) > 0)

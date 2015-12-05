@@ -34,18 +34,18 @@ using namespace std;
 
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleaved(NULL),
-    rtprio(25),
-    synth(_synth),
-    pBankOrRootDirThread(0)
+//    rtprio(25),
+    synth(_synth)//,
+//    pBankOrRootDirThread(0)
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-    memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
+//    memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
 }
 
 MusicIO::~MusicIO()
 {
-    pthread_t tmpBankThread = 0;
+ /*   pthread_t tmpBankThread = 0;
     pthread_t tmpPrgThread = 0;
     void *threadRet = NULL;
     tmpBankThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
@@ -57,7 +57,7 @@ MusicIO::~MusicIO()
         tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [i].pPrgThread, 0);
         if (tmpPrgThread != 0)
             pthread_join(tmpPrgThread, &threadRet);
-    }
+    }*/
 
     for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
     {
@@ -592,7 +592,7 @@ bail_out:
 }
 
 
-void *MusicIO::bankOrRootDirChange_Thread()
+/*void *MusicIO::bankOrRootDirChange_Thread()
 {
     //std::cerr << "MusicIO::bankChange_Thread(). banknum = " << bankToChange << std::endl;
     isRootDirChangeRequested ? synth->SetBankRoot(bankOrRootDirToChange) : synth->SetBank(bankOrRootDirToChange);
@@ -626,5 +626,5 @@ void *MusicIO::static_PrgChangeThread(void *arg)
 {
     _prgChangeCmd *pCmd = static_cast<_prgChangeCmd *>(arg);
     return pCmd->_this_->prgChange_Thread(pCmd);
-}
+}*/
 

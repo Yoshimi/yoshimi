@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey
+Copyright 2014-2015, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -54,7 +54,7 @@ decl {\#include "MasterUI.h"} {private global
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window syseffsend {
       private xywh {916 904 150 145} type Double hide
@@ -981,9 +981,8 @@ else
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       xywh {147 542 395 360} type Double hide
-      code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
-      code1 {seteditname();}
-      code2 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
+      code0 {seteditname();}
+      code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1194,16 +1193,16 @@ seteditname();}
           }
         }
       }
-      Fl_Spinner rnddet {
-        label {Rnd. Det.}
-        callback {part->Pfrand = o->value() / 200.0f;}
-        tooltip {Small random detune - experimental!} xywh {113 335 44 19} labelsize 12 minimum 0 maximum 20 value 0 textsize 12
-        code0 {o->value((int)part->Pfrand*200);}
+      Fl_Value_Slider humanise {
+        label Humanise
+        callback {part->Pfrand = (float) (o->value() / 1000.0f);}
+        tooltip {Random detune of whole part} xywh {5 337 201 18} type {Horz Knob} box FLAT_BOX labelsize 12 align 8 maximum 50 step 1
+        code0 {o->value(part->Pfrand * 1000);}
       }
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {248 333 95 25} box THIN_UP_BOX
+        xywh {295 333 95 25} box THIN_UP_BOX
       }
     }
   }
