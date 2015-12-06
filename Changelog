@@ -2,6 +2,8 @@ yoshimi 1.3.x
 
 2015-12-6 Will
 - Bugfix MIDI not responding to CC2 sometimes.
+- Removed jack MIDI ringbuffer now served better by guithreadmessage
+  and root/bank/prgoram thread and ring buffer.
 
 2015-12-5 Will
 - Improved 'Humanise' feature and changed to a slider.

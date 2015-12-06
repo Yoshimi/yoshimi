@@ -64,8 +64,8 @@ class JackEngine : public MusicIO
         bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);
         static int _processCallback(jack_nframes_t nframes, void *arg);
-        static void *_midiThread(void *arg);
-        void *midiThread(void);
+   //     static void *_midiThread(void *arg);
+   //     void *midiThread(void);
         static void _errorCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
@@ -95,7 +95,7 @@ class JackEngine : public MusicIO
             pthread_t          pThread;
         } midi;
 
-        sem_t midiSem;
+  //      sem_t midiSem;
 
         struct midi_event {
             jack_nframes_t time;
