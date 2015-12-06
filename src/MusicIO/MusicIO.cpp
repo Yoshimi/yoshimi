@@ -86,8 +86,9 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
-        case 2:
+        case 2: // breath control
             ctl = C_breath;
+            break;
         case 6: // data MSB
             ctl = C_dataH;
             break;

@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-12-6 Will
+- Bugfix MIDI not responding to CC2 sometimes.
+
 2015-12-5 Will
 - Improved 'Humanise' feature and changed to a slider.
 - Small code clean-up arond root,bank, program code.

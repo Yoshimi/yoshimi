@@ -1314,7 +1314,7 @@ seteditname();}
     else if (engine == 1 && subnoteui != NULL)
         tname = synth->getGuiMaster()->setPartWindowTitle("SubSynth");
     else if (engine == 2 && padnoteui != NULL)
-        tname = synth->getGuiMaster()->setPartWindowTitle("SubSynth");
+        tname = synth->getGuiMaster()->setPartWindowTitle("PadSynth");
     else return;
     
     if (part->Pkitmode)
