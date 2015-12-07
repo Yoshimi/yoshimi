@@ -500,23 +500,23 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     }
 
     unsigned int idx;
-//    unsigned int act_write;
+/*    unsigned int act_write;
     struct midi_event midiEvent;
     char *data;
-//    unsigned int wrote = 0;
-//    unsigned int tries = 0;
+    unsigned int wrote = 0;
+    unsigned int tries = 0;*/
     jack_midi_event_t jEvent;
     jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
     for(idx = 0; idx < eventCount; ++idx)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            if (jEvent.size < 1 || (jEvent.size > sizeof(midiEvent.data)))
+            if (jEvent.size < 1 || jEvent.size > 4)
                 continue; // no interest in zero sized or long events
-            midiEvent.time = jEvent.time;
+/*            midiEvent.time = jEvent.time;
             memset(midiEvent.data, 0, sizeof(midiEvent.data));
             memcpy(midiEvent.data, jEvent.buffer, jEvent.size);
-/*           wrote = 0;
+           wrote = 0;
             tries = 0;
             data = (char*)&event;
             while (wrote < sizeof(struct midi_event) && tries < 3)
@@ -551,24 +551,24 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
 //    unsigned int fetch;
     unsigned int ev;
     
-        channel = midiEvent.data[0] & 0x0F;
-        switch ((ev = midiEvent.data[0] & 0xF0))
+        channel = jEvent.buffer[0] & 0x0F;
+        switch ((ev = jEvent.buffer[0] & 0xF0))
         {
             case 0x01: // modulation wheel or lever
                 ctrltype = C_modwheel;
-                par = midiEvent.data[2];
+                par = jEvent.buffer[2];
                 setMidiController(channel, ctrltype, par);
                 break;
 
             case 0x07: // channel volume (formerly main volume)
                 ctrltype = C_volume;
-                par = midiEvent.data[2];
+                par = jEvent.buffer[2];
                 setMidiController(channel, ctrltype, par);
                 break;
 
             case 0x0B: // expression controller
                 ctrltype = C_expression;
-                par = midiEvent.data[2];
+                par = jEvent.buffer[2];
                 setMidiController(channel, ctrltype, par);
                 break;
 
@@ -588,33 +588,33 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                 break;
 
             case 0x80: // note-off
-                note = midiEvent.data[1];
+                note = jEvent.buffer[1];
                 setMidiNote(channel, note);
                 break;
 
             case 0x90: // note-on
-                if ((note = midiEvent.data[1])) // skip note == 0
+                if ((note = jEvent.buffer[1])) // skip note == 0
                 {
-                    velocity = midiEvent.data[2];
+                    velocity = jEvent.buffer[2];
                     setMidiNote(channel, note, velocity);
                 }
                 break;
 
             case 0xB0: // controller
-                ctrltype = getMidiController(midiEvent.data[1]);
-                par = midiEvent.data[2];
+                ctrltype = getMidiController(jEvent.buffer[1]);
+                par = jEvent.buffer[2];
                 setMidiController(channel, ctrltype, par);
                 break;
                 
             case 0xC0: // program change
                 ctrltype = C_programchange;
-                par = midiEvent.data[1];
+                par = jEvent.buffer[1];
                 setMidiProgram(channel, par);
                 break;
 
             case 0xE0: // pitch bend
                 ctrltype = C_pitchwheel;
-                par = ((midiEvent.data[2] << 7) | midiEvent.data[1]) - 8192;
+                par = ((jEvent.buffer[2] << 7) | jEvent.buffer[1]) - 8192;
                 setMidiController(channel, ctrltype, par);
                 break;
 

@@ -95,12 +95,12 @@ class JackEngine : public MusicIO
             pthread_t          pThread;
         } midi;
 
-  //      sem_t midiSem;
+/*        sem_t midiSem;
 
         struct midi_event {
             jack_nframes_t time;
             char data[4]; // all events of interest are <= 4bytes
-        };
+        };*/
         unsigned int internalbuff;
 };
 

@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey 
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -1195,9 +1195,9 @@ seteditname();}
       }
       Fl_Value_Slider humanise {
         label Humanise
-        callback {part->Pfrand = (float) (o->value() / 1000.0f);}
-        tooltip {Random detune of whole part} xywh {5 337 201 18} type {Horz Knob} box FLAT_BOX labelsize 12 align 8 maximum 50 step 1
-        code0 {o->value(part->Pfrand * 1000);}
+        callback {part->Pfrand = o->value();}
+        tooltip {Random detune of whole part in cents} xywh {5 337 201 18} type {Horz Knob} box FLAT_BOX labelsize 12 align 8 maximum 50 step 1
+        code0 {o->value(part->Pfrand);}
       }
       Fl_Button {} {
         label Close

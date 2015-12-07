@@ -430,7 +430,7 @@ target_link_libraries (yoshimi ${ExternLibraries})
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
-install (DIRECTORY ../banks DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
+install (DIRECTORY ../banks DESTINATION share/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -441,7 +441,7 @@ install (DIRECTORY ../banks DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
-install (DIRECTORY ../examples DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
+install (DIRECTORY ../examples DESTINATION share/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -452,7 +452,7 @@ install (DIRECTORY ../examples DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
-install (DIRECTORY ../presets DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
+install (DIRECTORY ../presets DESTINATION share/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -463,7 +463,7 @@ install (DIRECTORY ../presets DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
-install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi-${YOSHIMI_VERSION}
+install (DIRECTORY ../doc/ DESTINATION share/doc/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -475,15 +475,15 @@ install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi-
 )
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
+    DESTINATION share/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pixmaps)
+    DESTINATION share/pixmaps)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.svg
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps)
+    DESTINATION share/icons)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi_alt.svg
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps)
+    DESTINATION share/icons)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.appdata.xml
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/appdata)
+    DESTINATION share/appdata)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
@@ -505,6 +505,8 @@ add_custom_target (distclean
     COMMAND find ${CMAKE_SOURCE_DIR} -type f -name CMakeCache.txt | xargs -r rm -f
     COMMAND find ${CMAKE_SOURCE_DIR} -type d -name CMakeFiles | xargs -r rm -rf
     COMMAND find ${CMAKE_SOURCE_DIR} -type f -name "*.marks" | xargs -r rm -f
+    COMMAND rm -f ${CMAKE_SOURCE_DIR}/LV2_Plugin/Makefile
+    COMMAND rm -f ${CMAKE_SOURCE_DIR}/LV2_Plugin/cmake_install.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
