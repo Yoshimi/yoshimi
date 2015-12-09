@@ -69,7 +69,7 @@ bool JackEngine::connectServer(string server)
     else
     {
         synth->getRuntime().Log("Failed to open jack client on server " + server);
-        splashMessages.push_back("Can't connect to jack audio :(");
+        splashMessages.push_back("Can't connect to jack :(");
     }
     return false;
 }
@@ -191,12 +191,15 @@ bool JackEngine::Start(void)
     }
     
     // style-wise I think the next bit is the wrong place
-    if (synth->getRuntime().midiEngine  == jack_midi and synth->getRuntime().midiDevice.size() and jack_connect(jackClient,synth->getRuntime().midiDevice.c_str(),jack_port_name(midi.port)))
+    if (synth->getRuntime().midiEngine  == jack_midi
+      && synth->getRuntime().midiDevice.size()
+      && synth->getRuntime().midiDevice != "default"
+      && jack_connect(jackClient,synth->getRuntime().midiDevice.c_str(),jack_port_name(midi.port)))
     {
-        synth->getRuntime().Log("Didn't find jack MIDI source '" + synth->getRuntime().midiDevice + "'");
+        synth->getRuntime().Log("Didn't find jack MIDI source '"
+        + synth->getRuntime().midiDevice + "'");
         synth->getRuntime().midiDevice = "";
     }
-    
     return true;
 
 bail_out:

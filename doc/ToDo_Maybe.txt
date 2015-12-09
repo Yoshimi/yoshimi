@@ -8,8 +8,6 @@ Separate root/bank/instrument lists from main config as
 
 Make loading effect presets update the 'top' line.
 
-Sort out default midi message.
-
 startup state load doesn't set buffersize correctly - why?
     size is ignored if loaded when already running (which is reasonable).
 

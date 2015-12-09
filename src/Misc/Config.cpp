@@ -100,6 +100,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     audioDevice("default"),
     midiDevice("default"),
     jackServer("default"),
+    jackMidiDevice("default"),
     startJack(false),
     connectJackaudio(false),
     alsaAudioDevice("default"),
@@ -176,11 +177,10 @@ bool Config::Setup(int argc, char **argv)
     }
     if (!audioDevice.size())
         audioDevice = "default";
-
     switch (midiEngine)
     {
         case jack_midi:
-            midiDevice = string(jackServer);
+            midiDevice = string(jackMidiDevice);
             break;
         case alsa_midi:
             midiDevice = string(alsaMidiDevice);
@@ -512,6 +512,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     // jack settings
     jackServer = xml->getparstr("linux_jack_server");
+    jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
 
     // midi options
     midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
@@ -598,6 +599,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
     xmltree->addparstr("linux_jack_server", jackServer);
+    xmltree->addparstr("linux_jack_midi_dev", jackMidiDevice);
 
     xmltree->addpar("midi_bank_root", midi_bank_root);
     xmltree->addpar("midi_bank_C", midi_bank_C);
@@ -1034,6 +1036,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->midiEngine = alsa_midi;
             if (arg)
                 settings->midiDevice = string(arg);
+            else
+                settings->midiDevice = string(settings->alsaMidiDevice);
             break;
         case 'b': // messy but I can't think of a better way :(
             num = Config::string2int(string(arg));
@@ -1069,6 +1073,8 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->midiEngine = jack_midi;
             if (arg)
                 settings->midiDevice = string(arg);
+            else
+                settings->midiDevice = string(settings->jackMidiDevice);
             break;
         case 'k': settings->startJack = true; break;
         case 'K': settings->connectJackaudio = true; break;

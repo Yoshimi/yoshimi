@@ -111,12 +111,12 @@ class Config : public MiscFuncs
         string        midiDevice;
 
         string        jackServer;
+        string        jackMidiDevice;
         bool          startJack;        // false
         bool          connectJackaudio; // false
         string        jackSessionUuid;
 
         string        alsaAudioDevice;
-
         string        alsaMidiDevice;
         string        nameTag;
 

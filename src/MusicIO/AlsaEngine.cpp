@@ -119,7 +119,7 @@ bool AlsaEngine::openMidi(void)
         synth->getRuntime().Log("Failed to acquire alsa midi port");
         goto bail_out;
     }
-    if (!midi.device.empty())
+    if (!midi.device.empty() && midi.device != "default")
     {
         bool midiSource = false;
         if (snd_seq_parse_address(midi.handle,&midi.addr,midi.device.c_str()) == 0)

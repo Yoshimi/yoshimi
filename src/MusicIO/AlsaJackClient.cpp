@@ -39,12 +39,9 @@ bool AlsaJackClient::openMidi(void)
     if (jackEngine.connectServer(synth->getRuntime().midiDevice))
     {
         if (jackEngine.openMidi())
-        {
             return true;
-        }
-        else
-            synth->getRuntime().Log("AlsaJackClient failed to open midi");
     }
+    synth->getRuntime().Log("AlsaJackClient failed to open midi");
     return false;
 }
 
