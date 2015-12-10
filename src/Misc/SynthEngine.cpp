@@ -366,28 +366,48 @@ void *SynthEngine::_RBPthread(void *arg)
 
 void *SynthEngine::RBPthread(void)
 {
-    char data1 = 0;
-    char data2 = 0;
-    unsigned char type;
+    struct RBP_data block;
+    unsigned int readsize = sizeof(RBP_data);
+    memset(block.data, 0, readsize);
+    char *point;
+    unsigned int toread;
+    unsigned int read;
+    unsigned int found;
+    unsigned int tries;
     while (Runtime.runSynth)
     {
-        if (jack_ringbuffer_read_space(RBPringbuf) > 0)
+        if (jack_ringbuffer_read_space(RBPringbuf) >= readsize)
         {
-            jack_ringbuffer_read(RBPringbuf, &data1, 1);
-            jack_ringbuffer_read(RBPringbuf, &data2, 1);
-            type = (unsigned char)data1;
-            switch (type)
+            toread = readsize;
+            read = 0;
+            tries = 0;
+            point = (char*)&block;
+            while (toread && tries < 3)
             {
-                case 255:
-                    SetBankRoot(data2);
-                    break;
-                case 254:
-                    SetBank(data2);
-                    break;
-                default:
-                    SetProgram(data1, data2);
-                    break;
+                found = jack_ringbuffer_read(RBPringbuf, point, toread);
+                read += found;
+                point += found;
+                toread -= found;
+                ++tries;
+                
             }
+            if (!toread)
+            {
+                switch ((unsigned char)block.data[0])
+                {
+                    case 1:
+                        SetBankRoot(block.data[1]);
+                        break;
+                    case 2:
+                        SetBank(block.data[1]);
+                        break;
+                    case 3:
+                        SetProgram(block.data[1], block.data[2]);
+                        break;
+                }
+            }
+            else
+                Runtime.Log("Unable to read data from Root/bank/Program");
         }
         else
             usleep(500);
@@ -1344,12 +1364,31 @@ int SynthEngine::commandSet(char *point)
 }
 
 
-void SynthEngine::writeRBP(char data1, char data2)
+void SynthEngine::writeRBP(char type, char data0, char data1)
 {
+    struct RBP_data block;
+    unsigned int writesize = sizeof(RBP_data);
+    block.data[0] = type;
+    block.data[1] = data0;
+    block.data[2] = data1;
+    char *point = (char*)&block;
+    unsigned int towrite = writesize;
+    unsigned int wrote = 0;
+    unsigned int found;
+    unsigned int tries = 0;
+
     if (jack_ringbuffer_write_space(RBPringbuf) > 0)
     {
-        jack_ringbuffer_write(RBPringbuf, &data1, 1);
-        jack_ringbuffer_write(RBPringbuf, &data2, 1);
+        while (towrite && tries < 3)
+        {
+            found = jack_ringbuffer_write(RBPringbuf, point, towrite);
+            wrote += found;
+            point += found;
+            towrite -= found;
+            ++tries;
+        }
+        if (towrite)
+            Runtime.Log("Unable to write data to Root/bank/Program");
     }
 }
 

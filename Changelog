@@ -1,5 +1,12 @@
 yoshimi 1.3.x
 
+2015-12-10 Will
+- Enabled AddSynth voice formant filter Q to respond to settings. This
+  brings it into line with the recent Zyn. upgrade but shouldn't change
+  any currently existing patches.
+- Completed Root, Bank, Program change thread & ringbuffer incuding full
+  error checks, and allowance for future expansion.
+
 2015-12-9 Will
 - Corrected jack/alsa MIDI behaviour and added user defined source name
   for jack MIDI in gui.
