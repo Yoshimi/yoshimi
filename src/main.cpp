@@ -44,8 +44,11 @@ using namespace std;
 
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <Misc/CmdInterface.h>
 
-extern void cmdIfaceCommandLoop();
+//extern void cmdIfaceCommandLoop();
+
+CmdInterface commandInt;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
@@ -309,7 +312,7 @@ bail_out:
 
 void *commandThread(void *arg)
 {
-    cmdIfaceCommandLoop();
+    commandInt.cmdIfaceCommandLoop();
     return 0;
 }
 

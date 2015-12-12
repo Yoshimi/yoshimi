@@ -18,18 +18,20 @@
 #include <Misc/SynthEngine.h>
 #include <Misc/MiscFuncs.h>
 #include <Misc/Bank.h>
- 
+
+#include <Misc/CmdInterface.h>
+
 using namespace std;
 
 
 
-extern map<SynthEngine *, MusicClient *> synthInstances;
+//extern map<SynthEngine *, MusicClient *> synthInstances;
 
-MiscFuncs miscFuncs;
+//MiscFuncs miscFuncs;
 
 static int currentInstance = 0;
 
-char welcomeBuffer [128];
+//char welcomeBuffer [128];
 
 string basics[] = {
     "load patchset <s>",          "load a complete set of instruments from named file",
@@ -85,16 +87,7 @@ string errors [] = {
 };
 
 
-bool matchMove(char *&pnt, const char *word)
-{
- bool found = miscFuncs.matchWord(pnt, word);
- if (found)
-     pnt = miscFuncs.skipChars(pnt);
- return found;
-}
-
-
-bool helpList(char *point, string *commands, SynthEngine *synth)
+bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 {
     int level = 0;
     switch (level)
@@ -113,7 +106,7 @@ bool helpList(char *point, string *commands, SynthEngine *synth)
             break;*/
         }
         
-    if (!matchMove(point, "help") && !matchMove(point, "?"))
+    if (!matchnMove(1, point, "help") && !matchnMove(1, point, "?"))
         return false;
 
     int word = 0;
@@ -138,7 +131,299 @@ bool helpList(char *point, string *commands, SynthEngine *synth)
 }
 
 
-bool cmdIfaceProcessCommand(char *buffer)
+int CmdInterface::commandVector(char *point, SynthEngine *synth)
+{
+    static int axis;
+    int error = 0;
+    int tmp;
+    int chan = synth->getRuntime().currentChannel;
+    
+    if (isdigit(point[0]))
+    {
+        chan = string2int(point);
+        if (chan >= NUM_MIDI_CHANNELS)
+            return 4;
+        point = skipChars(point);
+        synth->getRuntime().currentChannel = chan;
+    }
+    else
+        chan = synth->getRuntime().currentChannel;
+
+    if (matchWord(1, point, "off"))
+    {
+        synth->vectorSet(127, chan, 0);
+        return 0;
+    }
+    tmp = point[0] | 32;
+    if (tmp == 32) // would be line end
+        return 2;
+    
+    if (tmp == 'x' || tmp == 'y')
+    {
+        axis = tmp - 'x';
+        ++ point;
+        point = skipSpace(point); // can manage with or without a space
+    }
+    if (matchnMove(1, point, "cc"))
+    {
+        if (point[0] == 0)
+            error = 1;
+        else
+        {
+            tmp = string2int(point);
+            if (!synth->vectorInit(axis, chan, tmp))
+                synth->vectorSet(axis, chan, tmp);
+        } 
+    }
+    else if (matchnMove(1, point, "features"))
+    {
+        if (point[0] == 0)
+            error = 1;
+        else
+        {
+            tmp = string2int(point);
+            if (!synth->vectorInit(axis + 2, chan, tmp))
+                synth->vectorSet(axis + 2, chan, tmp);
+        }
+    }
+    else if (matchnMove(1, point, "program"))
+    {
+        int hand = point[0] | 32;
+        if (point[0] == 'l')
+            hand = 0;
+        else if (point[0] == 'r')
+            hand = 1;
+        else
+            return 2;
+        point = skipChars(point);
+        tmp = string2int(point);
+        if (!synth->vectorInit(axis * 2 + hand + 4, chan, tmp))
+            synth->vectorSet(axis * 2 + hand + 4, chan, tmp);
+    }
+    else
+    {
+        if (!matchnMove(1, point, "control"))
+            return 2;
+        if(isdigit(point[0]))
+        {
+            int cmd = string2int(point) >> 1;
+            if (cmd == 4)
+                cmd = 3; // can't remember how to do this bit-wise :(
+            if (cmd < 1 || cmd > 3)
+                return 4;
+            point = skipChars(point);
+            if (point[0] == 0)
+                return 1;
+            tmp = string2int(point);
+            if (!synth->vectorInit(axis * 2 + cmd + 7, chan, tmp))
+            synth->vectorSet(axis * 2 + cmd + 7, chan, tmp);
+        }
+        else
+            error = 1;
+    }
+    return error;
+}
+
+
+int CmdInterface::commandSet(char *point, SynthEngine *synth)
+{
+    int error = 0;
+    int tmp;
+    int partnum = synth->getRuntime().currentPart;
+
+    if (matchnMove(1, point, "ccroot"))
+    {
+        if (point[0] != 0)
+            synth->SetSystemValue(113, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "ccbank"))
+    {
+        if (point[0] != 0)
+            synth->SetSystemValue(114, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "root"))
+    {
+        if (point[0] != 0)
+            synth->SetBankRoot(string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "bank"))
+    {
+        if (point[0] != 0)
+            synth->SetBank(string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "part"))
+    {
+        if (point[0] == 0)
+            return 1;
+        if (isdigit(point[0]))
+        {
+            partnum = string2int(point);
+            if (partnum >= synth->getRuntime().NumAvailableParts)
+            {
+                synth->getRuntime().Log("Part number too high");
+                return 0;
+            }
+            point = skipChars(point);
+            synth->getRuntime().currentPart = partnum;
+        }
+        if (point[0] == 0)
+        {
+            synth->getRuntime().Log("Part number set to " + asString(partnum));
+            return 0;
+        }
+        else if (matchnMove(1, point, "program"))
+        {
+            if (point[0] != 0) // force part not channel number
+                synth->SetProgram(partnum | 0x80, string2int(point));
+            else
+                error = 1;
+        }
+        else if (matchnMove(1, point, "channel"))
+        {
+            if (point[0] != 0)
+            {
+                tmp = string2int(point);
+                synth->SetPartChan(partnum, tmp);
+                if (tmp < NUM_MIDI_CHANNELS)
+                    synth->getRuntime().Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
+                else
+                    synth->getRuntime().Log("Part " + asString((int) partnum) + " set to no MIDI"); 
+            }
+            else
+                error = 1;
+        }
+        else if (matchnMove(1, point, "destination"))
+        {
+            int dest = point[0] - 48;
+            if (dest > 0 and dest < 4)
+            {
+                synth->partonoff(partnum, 1);
+                synth->SetPartDestination(partnum, dest);
+            }
+            else
+                error = 4;
+        }
+        else
+            error = 2;
+    }
+    else if (matchnMove(1, point, "program"))
+    {
+        if (point[0] == '0')
+            synth->SetSystemValue(115, 0);
+        else
+            synth->SetSystemValue(115, 127);
+    }
+    else if (matchnMove(1, point, "activate"))
+    {
+        if (point[0] == '0')
+            synth->SetSystemValue(116, 0);
+        else
+            synth->SetSystemValue(116, 127);
+    }
+    else if (matchnMove(1, point, "extend"))
+    {
+        if (point[0] != 0)
+            synth->SetSystemValue(117, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "available"))
+    {
+        if (point[0] != 0)
+            synth->SetSystemValue(118, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "reports"))
+    {
+        if (point[0] == '1')
+            synth->SetSystemValue(100, 127);
+        else
+            synth->SetSystemValue(100, 0);
+    }
+    else if (matchnMove(1, point, "volume"))
+    {
+        if (point[0] != 0)
+            synth->SetSystemValue(7, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "shift"))
+    {
+        if (point[0] != 0)
+            synth->SetSystemValue(2, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchWord(1, point, "defaults"))
+    {
+        synth->resetAll();
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+
+    }
+    
+    else if (matchnMove(1, point, "alsa"))
+    {
+        if (matchnMove(1, point, "midi"))
+        {
+            if (point[0] != 0)
+            {
+                synth->getRuntime().alsaMidiDevice = (string) point;
+                synth->getRuntime().Log("* Set ALSA MIDI to " + synth->getRuntime().alsaMidiDevice);
+            }
+            else
+                error = 1;
+        }
+        else if (matchnMove(1, point, "audio"))
+        {
+            if (point[0] != 0)
+            {
+                synth->getRuntime().alsaAudioDevice = (string) point;
+                synth->getRuntime().Log("* Set ALSA AUDIO to " + synth->getRuntime().alsaAudioDevice);
+            }
+            else
+                error = 1;
+        }
+        else
+            error = 2;
+    }
+    else if (matchnMove(1, point, "jack"))
+    {
+        if (matchnMove(1, point, "server"))
+        {
+            if (point[0] != 0)
+            {
+                synth->getRuntime().jackServer = (string) point;
+                synth->getRuntime().Log("* Set Jack server to " + synth->getRuntime().jackServer);
+            }
+            else
+                error = 1;
+        }
+        else
+            error = 2;
+    }
+    else if (matchnMove(1, point, "vector"))
+    {
+        if (point[0] != 0)
+            error = commandVector(point, synth);
+        else
+            error = 1;
+    }
+    else
+        error = 2;
+    return error; 
+}
+
+
+bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
 {
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
     for(int i = 0; i < currentInstance; i++, ++itSynth);
@@ -146,52 +431,45 @@ bool cmdIfaceProcessCommand(char *buffer)
     Config &Runtime = synth->getRuntime();
     
     int ID;
-    int listType = 0;
     int error = 0;
     string *commands = NULL;
     char *point = buffer;
-    point = miscFuncs.skipSpace(point); // just to be sure
+    point = skipSpace(point); // just to be sure
     list<string> msg;
 
     if (helpList(point, commands, synth))
         return false;
-    if (matchMove(point, "list"))
+    if (matchnMove(1, point, "list"))
     {
-        if (miscFuncs.matchWord(point, "bank") || miscFuncs.matchWord(point, "instrument"))
+        if (matchnMove(1, point, "instrument"))
         {
-            if (matchMove(point, "bank"))
-                listType = 2;
-            else if (matchMove(point, "instrument")) // yes we do need this second check!
-                listType = 3;
-                    
             if (point[0] == 0)
                 ID = 255;
             else
-                ID = miscFuncs.string2int(point);
-            if (listType == 2)
-            {
-                synth->ListBanks(ID, msg);
-                synth->cliOutput(msg, LINES);
-            }
-            else
-            {
-                synth->ListInstruments(ID, msg);
-                synth->cliOutput(msg, LINES);
-            }
-            return false;
+                ID = string2int(point);
+            synth->ListInstruments(ID, msg);
+            synth->cliOutput(msg, LINES);
         }
-
-        if (matchMove(point, "vector"))
+        else if (matchnMove(1, point, "bank"))
+        {
+            if (point[0] == 0)
+                ID = 255;
+            else
+                ID = string2int(point);
+            synth->ListBanks(ID, msg);
+            synth->cliOutput(msg, LINES);
+        }
+        else if (matchnMove(1, point, "vector"))
         {
             synth->ListVectors(msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchMove(point, "current"))
+        else if (matchnMove(1, point, "current"))
         {
             synth->ListCurrentParts(msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchMove(point, "settings"))
+        else if (matchnMove(1, point, "settings"))
         {
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
@@ -203,10 +481,10 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
     }
     
-    else if (matchMove(point, "set"))
+    else if (matchnMove(1, point, "set"))
     {
         if (point[0] != 0)
-            error = synth->commandSet(point);
+            error = commandSet(point, synth);
         else
         {
             sprintf(buffer, "set");
@@ -214,11 +492,11 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
     }
     
-    else if (matchMove(point, "stop"))
+    else if (matchnMove(2, point, "stop"))
         synth->allStop();
-    else if (matchMove(point, "path"))
+    else if (matchnMove(2, point, "path"))
     {
-        if (matchMove(point, "add"))
+        if (matchnMove(1, point, "add"))
         {
             int found = synth->getBankRef().addRootDir(point);
             if (!found)
@@ -228,17 +506,17 @@ bool cmdIfaceProcessCommand(char *buffer)
             else
             {
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-                Runtime.Log("Added new root ID " + miscFuncs.asString(found) + " as " + (string) point);
+                Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
             }
         }
-        else if (matchMove(point, "remove"))
+        else if (matchnMove(2, point, "remove"))
         {
             if (isdigit(point[0]))
             {
-                int rootID = miscFuncs.string2int(point);
+                int rootID = string2int(point);
                 string rootname = synth->getBankRef().getRootPath(rootID);
                 if (rootname.empty())
-                    Runtime.Log("Can't find path " + miscFuncs.asString(rootID));
+                    Runtime.Log("Can't find path " + asString(rootID));
                 else
                 {
                     synth->getBankRef().removeRoot(rootID);
@@ -256,9 +534,9 @@ bool cmdIfaceProcessCommand(char *buffer)
         }
     }
 
-    else if (matchMove(point, "load"))
+    else if (matchnMove(2, point, "load"))
     {
-        if (matchMove(point, "patchset") )
+        if (matchnMove(1, point, "patchset") )
         {
             if (point[0] == 0)
                 error = 1;
@@ -277,10 +555,10 @@ bool cmdIfaceProcessCommand(char *buffer)
             error = 3;
         }
     }
-    else if (matchMove(point, "save"))
-        if(matchMove(point, "setup"))
+    else if (matchnMove(2, point, "save"))
+        if(matchnMove(1, point, "setup"))
             synth->SetSystemValue(119, 255);
-        else if (matchMove(point, "patchset"))
+        else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
                 error = 1;
@@ -298,7 +576,7 @@ bool cmdIfaceProcessCommand(char *buffer)
             sprintf(buffer, "save");
             error = 3;
         }
-    else if (matchMove(point, "exit"))
+    else if (matchnMove(2, point, "exit"))
     {
         Runtime.runSynth = false;
         return true;
@@ -314,7 +592,7 @@ bool cmdIfaceProcessCommand(char *buffer)
 }
 
 
-void cmdIfaceCommandLoop()
+void CmdInterface::cmdIfaceCommandLoop()
 {
     // Initialise the history functionality
     // Set up the history filename

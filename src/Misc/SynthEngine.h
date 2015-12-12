@@ -95,8 +95,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ListVectors(list<string>& msg_buf);
         void ListSettings(list<string>& msg_buf);
         void SetSystemValue(int type, int value);
-        int commandSet(char *point);
-        int commandVector(char *point);
         void writeRBP(char type, char data0, char data1);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);

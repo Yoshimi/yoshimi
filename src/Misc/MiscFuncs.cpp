@@ -233,13 +233,21 @@ char *MiscFuncs::skipChars(char *buf)
 }
 
 
-int MiscFuncs::matchWord(char *buf, const char *word)
+int MiscFuncs::matchWord(int numChars, char *buf, const char *word)
 {
     int newp = 0;
     int size = strlen(word);
     while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == word[newp])
             ++ newp;
-    if (newp > 0 && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
+    if (newp >= numChars && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
         return newp;
     return 0;
+}
+
+bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
+{
+ bool found = matchWord(num, pnt, word);
+ if (found)
+     pnt = skipChars(pnt);
+ return found;
 }
