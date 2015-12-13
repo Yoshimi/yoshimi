@@ -28,17 +28,19 @@
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 
-
 class SynthEngine;
 
 class CmdInterface : private MiscFuncs
 {
     public:
+        void defaults();
+        void cmdIfaceCommandLoop();
+        
+    private:
         bool helpList(char *point, string *commands, SynthEngine *synth);
         int commandVector(char *point, SynthEngine *synth);
         int commandSet(char *point, SynthEngine *synth);
         bool cmdIfaceProcessCommand(char *buffer);
-        void cmdIfaceCommandLoop();
     
         char welcomeBuffer [128];
 };

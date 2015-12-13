@@ -441,6 +441,8 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    Runtime.currentPart = 0;
+    //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = 16;
     ShutUp();
 }
@@ -910,12 +912,12 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     else
         msg_buf.push_back("  No paths set");
     
-    msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
-    
-    msg_buf.push_back("  Number of availalbe parts "
+    msg_buf.push_back("  Number of available parts "
                     + asString(Runtime.NumAvailableParts));
     
-    msg_buf.push_back("  Current MIDI channel " + asString(Runtime.currentChannel));
+    msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
+    
+    msg_buf.push_back("  Current part's channel " + asString((int)part[Runtime.currentPart]->Prcvchn));
     
     if (Runtime.midi_bank_root > 119)
         msg_buf.push_back("  MIDI Root Change off");

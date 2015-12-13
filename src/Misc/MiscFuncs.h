@@ -44,6 +44,9 @@ class MiscFuncs
         string asLongString(float n);
         string asHexString(int x);
         string asHexString(unsigned int x);
+        unsigned int bitFindHigh(unsigned int value);
+        unsigned int bitSet(unsigned int value, unsigned int bit);
+        unsigned int bitClear(unsigned int value, unsigned int bit);
         char *skipSpace(char *buf);
         char *skipChars(char *buf);
         int matchWord(int numChars, char *point, const char *word);

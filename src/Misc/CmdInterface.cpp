@@ -24,14 +24,10 @@
 using namespace std;
 
 
-
-//extern map<SynthEngine *, MusicClient *> synthInstances;
-
-//MiscFuncs miscFuncs;
-
 static int currentInstance = 0;
-
-//char welcomeBuffer [128];
+static string errorString = "";
+static unsigned int level = 0;
+static int partnum = 0;
 
 string basics[] = {
     "load patchset <s>",          "load a complete set of instruments from named file",
@@ -86,10 +82,13 @@ string errors [] = {
     "Not at this level"
 };
 
+void CmdInterface::defaults()
+{
+}
 
 bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 {
-    int level = 0;
+    //int level = 0;
     switch (level)
     {
         case 0:
@@ -229,16 +228,27 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
 {
     int error = 0;
     int tmp;
-    int partnum = synth->getRuntime().currentPart;
 
-    if (matchnMove(1, point, "ccroot"))
+    if (matchnMove(1, point, "yoshimi"))
+    {
+        if (point[0] == 0)
+            return 1;
+        tmp = string2int(point);
+        if (tmp >= (int)synthInstances.size())
+            error = 4;
+        else
+            currentInstance = tmp;
+        return error;
+    }
+    
+    if (matchnMove(3, point, "ccroot"))
     {
         if (point[0] != 0)
             synth->SetSystemValue(113, string2int(point));
         else
             error = 1;
     }
-    else if (matchnMove(1, point, "ccbank"))
+    else if (matchnMove(3, point, "ccbank"))
     {
         if (point[0] != 0)
             synth->SetSystemValue(114, string2int(point));
@@ -265,15 +275,18 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
             return 1;
         if (isdigit(point[0]))
         {
-            partnum = string2int(point);
-            if (partnum >= synth->getRuntime().NumAvailableParts)
+            tmp = string2int(point);
+            if (tmp >= synth->getRuntime().NumAvailableParts)
             {
                 synth->getRuntime().Log("Part number too high");
                 return 0;
             }
             point = skipChars(point);
+            partnum = tmp;
             synth->getRuntime().currentPart = partnum;
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
         }
+        level |= (1 << 4);
         if (point[0] == 0)
         {
             synth->getRuntime().Log("Part number set to " + asString(partnum));
@@ -365,8 +378,10 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
     }
     else if (matchWord(1, point, "defaults"))
     {
+        level = 0;
+        currentInstance = 0;
         synth->resetAll();
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
 
     }
     
@@ -426,20 +441,47 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
 bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
 {
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
+    if (currentInstance >= (int)synthInstances.size())
+        currentInstance = 0;
     for(int i = 0; i < currentInstance; i++, ++itSynth);
     SynthEngine *synth = itSynth->first;
     Config &Runtime = synth->getRuntime();
-    
+
+    errorString = "";
+    partnum = synth->getRuntime().currentPart;
     int ID;
     int error = 0;
+    unsigned int tmp;
     string *commands = NULL;
     char *point = buffer;
     point = skipSpace(point); // just to be sure
     list<string> msg;
 
+    if (matchnMove(2, point, "exit"))
+    {
+        Runtime.runSynth = false;
+        return true;
+    }
+    if (point[0] == '/')
+    {
+        ++ point;
+        level = 0;
+        if (point[0] == 0)
+            return false;
+    }
+    else if (point[0] == '.' && point[1] == '.')
+    {
+        point += 2;
+        tmp = bitFindHigh(level);
+        level = bitClear(level, tmp);
+        if (point[0] == 0)
+            return false;
+    }
     if (helpList(point, commands, synth))
         return false;
-    if (matchnMove(1, point, "list"))
+    if (matchnMove(2, point, "stop"))
+        synth->allStop();
+    else if (matchnMove(1, point, "list"))
     {
         if (matchnMove(1, point, "instrument"))
         {
@@ -476,7 +518,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         }
         else
         {
-            sprintf(buffer, "list");
+            errorString = "list";
             error = 3;
         }
     }
@@ -487,13 +529,11 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
             error = commandSet(point, synth);
         else
         {
-            sprintf(buffer, "set");
+            errorString = "set";
             error = 3;
         }
     }
     
-    else if (matchnMove(2, point, "stop"))
-        synth->allStop();
     else if (matchnMove(2, point, "path"))
     {
         if (matchnMove(1, point, "add"))
@@ -551,7 +591,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         }
         else
         {
-            sprintf(buffer, "load");
+            errorString = "load";
             error = 3;
         }
     }
@@ -573,19 +613,14 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         }
         else
         {
-            sprintf(buffer, "save");
+            errorString = "save";
             error = 3;
         }
-    else if (matchnMove(2, point, "exit"))
-    {
-        Runtime.runSynth = false;
-        return true;
-    }
     else
       error = 5;
 
     if (error == 3)
-        Runtime.Log((string) buffer + errors[3]);
+        Runtime.Log(errorString + errors[3]);
     else if (error)
         Runtime.Log(errors[error]);
     return false;
@@ -609,6 +644,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     }
     char *cCmd = NULL;
     bool exit = false;
+//    string prompt = "yoshimi";
     sprintf(welcomeBuffer, "yoshimi> ");
     while(!exit)
     {
@@ -622,6 +658,13 @@ void CmdInterface::cmdIfaceCommandLoop()
             }
             free(cCmd);
             cCmd = NULL;
+            string prompt = "yoshimi";
+            if (currentInstance > 0)
+                prompt += (":" + asString(currentInstance));
+            if (level & (1 << 4))
+                prompt += (" part " + asString(partnum));
+            prompt += "> ";
+            sprintf(welcomeBuffer, prompt.c_str());
         }
         else
             usleep(20000);

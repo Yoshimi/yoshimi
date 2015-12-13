@@ -47,6 +47,7 @@ class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
+class CmdInterface;
 
 class MasterUI;
 

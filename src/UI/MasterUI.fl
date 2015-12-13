@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey
+Copyright 2014-2015, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -85,7 +85,7 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -831,6 +831,7 @@ paramsui->Show();}
         label Part
         callback {//
           int nval = o->value() - 1;
+          synth->getRuntime().currentPart = nval;
           partuigroup->remove(partui);
           delete partui;
           partui = new PartUI(0, 0, 765, 525);
@@ -843,7 +844,8 @@ paramsui->Show();}
           maxparts->value(synth->getRuntime().NumAvailableParts);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
-        code1 {bankui->init(o);}
+        code1 {o->value(synth->getRuntime().currentPart + 1);}
+        code2 {bankui->init(o);}
       }
       Fl_Spinner maxparts {
         label of
@@ -1259,9 +1261,7 @@ updatepanel();}
   }
   Function {refresh_master_ui()} {} {
     code {//
-    ninseff = 0;
-    nsyseff = 0;
-    npart = 0;
+    npartcounter->value((synth->getRuntime().currentPart) + 1);
     npartcounter->do_callback();
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);

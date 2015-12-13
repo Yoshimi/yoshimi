@@ -212,6 +212,33 @@ string MiscFuncs::asHexString(unsigned int x)
 }
 
 
+unsigned int MiscFuncs::bitFindHigh(unsigned int value)
+{
+    unsigned int bit = 0;
+    while (value >>= 1)
+    {
+        bit ++;
+    }
+    return bit;
+}
+
+
+unsigned int MiscFuncs::bitSet(unsigned int value, unsigned int bit)
+{
+    value |= (1>> bit);
+    return value;
+}
+
+
+unsigned int MiscFuncs::bitClear(unsigned int value, unsigned int bit)
+{
+    unsigned int mask = -1;
+    mask ^= (1 << bit);
+    value &= mask;
+    return value;
+}
+
+
 char *MiscFuncs::skipSpace(char *buf)
 {
     while (buf[0] == 0x20)

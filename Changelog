@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2015-12-13 Will
+- Bugfix segfault when doing a reset via command line if gui active.
+- Command line part change now updates gui
+- More reoganisation of cammand interface.
+
 2015-12-12 Will
 - Applied possible Install fix to CMakeLists.txt.
 - Re-organised command interface files ready (hopefully) for a big
