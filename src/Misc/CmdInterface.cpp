@@ -88,8 +88,8 @@ void CmdInterface::defaults()
 
 bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 {
-    //int level = 0;
-    switch (level)
+    int messagelist = 0;
+    switch (messagelist)
     {
         case 0:
             commands = basics;
@@ -224,6 +224,74 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
 }
 
 
+int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
+{
+    int error = 0;
+    int tmp;
+    
+    if (point[0] == 0)
+        return 1;
+    if (justSet || isdigit(point[0]))
+    {
+        level |= (1 << 4);
+        if (isdigit(point[0]))
+        {
+            tmp = string2int(point);
+            if (tmp >= synth->getRuntime().NumAvailableParts)
+            {
+                synth->getRuntime().Log("Part number too high");
+                return 0;
+            }
+            point = skipChars(point);
+            partnum = tmp;
+            synth->getRuntime().currentPart = partnum;
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+            if (point[0] == 0)
+            {
+                synth->getRuntime().Log("Part number set to " + asString(partnum));
+                return 0;
+            }
+        }
+    }
+    if (matchnMove(1, point, "program"))
+    {
+        if (point[0] != 0) // force part not channel number
+            synth->SetProgram(partnum | 0x80, string2int(point));
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "channel"))
+    {
+        if (point[0] != 0)
+        {
+            tmp = string2int(point);
+            synth->SetPartChan(partnum, tmp);
+            if (tmp < NUM_MIDI_CHANNELS)
+                synth->getRuntime().Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
+            else
+                synth->getRuntime().Log("Part " + asString((int) partnum) + " set to no MIDI"); 
+        }
+        else
+            error = 1;
+    }
+    else if (matchnMove(1, point, "destination"))
+    {
+        int dest = point[0] - 48;
+        if (dest > 0 and dest < 4)
+        {
+            synth->partonoff(partnum, 1);
+            synth->SetPartDestination(partnum, dest);
+        }
+        else
+            error = 4;
+    }
+    else
+        error = 2;
+    
+    return error;
+}
+
+
 int CmdInterface::commandSet(char *point, SynthEngine *synth)
 {
     int error = 0;
@@ -269,64 +337,11 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
         else
             error = 1;
     }
+    else if (level & (1 << 4))
+        error = commandPart(point, synth, false);
     else if (matchnMove(1, point, "part"))
-    {
-        if (point[0] == 0)
-            return 1;
-        if (isdigit(point[0]))
-        {
-            tmp = string2int(point);
-            if (tmp >= synth->getRuntime().NumAvailableParts)
-            {
-                synth->getRuntime().Log("Part number too high");
-                return 0;
-            }
-            point = skipChars(point);
-            partnum = tmp;
-            synth->getRuntime().currentPart = partnum;
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
-        }
-        level |= (1 << 4);
-        if (point[0] == 0)
-        {
-            synth->getRuntime().Log("Part number set to " + asString(partnum));
-            return 0;
-        }
-        else if (matchnMove(1, point, "program"))
-        {
-            if (point[0] != 0) // force part not channel number
-                synth->SetProgram(partnum | 0x80, string2int(point));
-            else
-                error = 1;
-        }
-        else if (matchnMove(1, point, "channel"))
-        {
-            if (point[0] != 0)
-            {
-                tmp = string2int(point);
-                synth->SetPartChan(partnum, tmp);
-                if (tmp < NUM_MIDI_CHANNELS)
-                    synth->getRuntime().Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
-                else
-                    synth->getRuntime().Log("Part " + asString((int) partnum) + " set to no MIDI"); 
-            }
-            else
-                error = 1;
-        }
-        else if (matchnMove(1, point, "destination"))
-        {
-            int dest = point[0] - 48;
-            if (dest > 0 and dest < 4)
-            {
-                synth->partonoff(partnum, 1);
-                synth->SetPartDestination(partnum, dest);
-            }
-            else
-                error = 4;
-        }
-        else
-            error = 2;
-    }
+        error = commandPart(point, synth, true);
+
     else if (matchnMove(1, point, "program"))
     {
         if (point[0] == '0')

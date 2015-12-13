@@ -39,6 +39,7 @@ class CmdInterface : private MiscFuncs
     private:
         bool helpList(char *point, string *commands, SynthEngine *synth);
         int commandVector(char *point, SynthEngine *synth);
+        int commandPart(char *point, SynthEngine *synth, bool justSet);
         int commandSet(char *point, SynthEngine *synth);
         bool cmdIfaceProcessCommand(char *buffer);
     
