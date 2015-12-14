@@ -223,19 +223,25 @@ unsigned int MiscFuncs::bitFindHigh(unsigned int value)
 }
 
 
-unsigned int MiscFuncs::bitSet(unsigned int value, unsigned int bit)
+void MiscFuncs::bitSet(unsigned int& value, unsigned int bit)
 {
-    value |= (1>> bit);
-    return value;
+    value |= (1 << bit);
 }
 
 
-unsigned int MiscFuncs::bitClear(unsigned int value, unsigned int bit)
+void MiscFuncs::bitClear(unsigned int& value, unsigned int bit)
 {
     unsigned int mask = -1;
     mask ^= (1 << bit);
     value &= mask;
-    return value;
+}
+
+
+bool MiscFuncs::bitTest(unsigned int value, unsigned int bit)
+{
+    if (value & (1 << bit))
+        return true;
+    return false;
 }
 
 

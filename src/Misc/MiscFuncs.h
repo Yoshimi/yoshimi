@@ -45,8 +45,9 @@ class MiscFuncs
         string asHexString(int x);
         string asHexString(unsigned int x);
         unsigned int bitFindHigh(unsigned int value);
-        unsigned int bitSet(unsigned int value, unsigned int bit);
-        unsigned int bitClear(unsigned int value, unsigned int bit);
+        void bitSet(unsigned int& value, unsigned int bit);
+        void bitClear(unsigned int& value, unsigned int bit);
+        bool bitTest(unsigned int value, unsigned int bit);
         char *skipSpace(char *buf);
         char *skipChars(char *buf);
         int matchWord(int numChars, char *point, const char *word);

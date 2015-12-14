@@ -471,6 +471,9 @@ bool Config::extractConfigData(XMLwrapper *xml)
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
+    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+
     // get bank dirs
     synth->getBankRef().parseConfigFile(xml);
 
@@ -583,6 +586,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("reports_destination", consoleMenuItem);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
+    xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
+    xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
 
     synth->getBankRef().saveToConfigFile(xmltree);
 
@@ -595,7 +600,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
         }
 
     xmltree->addpar("interpolation", Interpolation);
-
+    
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
     xmltree->addparstr("linux_jack_server", jackServer);

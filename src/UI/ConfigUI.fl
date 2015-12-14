@@ -56,14 +56,14 @@ class ConfigUI {selected : {private MiscFuncs}
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
     } {
       Fl_Tabs {} {
-        xywh {5 5 381 297}
+        xywh {5 5 385 297}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12 hide
+          xywh {5 25 382 277} labelsize 12
         } {
           Fl_Choice {} {
-            label {AddSynth Oscillator Size}
+            label {* AddSynth Oscillator Size}
             callback {//
     unsigned int old = synth->getRuntime().Oscilsize;
     unsigned int changed = 128 << o->value();
@@ -109,7 +109,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {Internal Buffer Size}
+            label {* Internal Buffer Size}
             callback {//
     unsigned int old = synth->getRuntime().Buffersize;
     unsigned int changed = 16 << o->value();
@@ -151,7 +151,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {PADsynth Interpolation}
+            label {* PADsynth Interpolation}
             callback {//
                 int tmp = synth->getRuntime().Interpolation;
                 synth->getRuntime().Interpolation = (int) o->value();
@@ -170,7 +170,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {Virtual Keyboard Layout}
+            label {* Virtual Keyboard Layout}
             callback {//
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
@@ -233,8 +233,8 @@ else
             }
           }
           Fl_Box {} {
-            label {Most settings changes require a restart}
-            xywh {58 282 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            label {* These settings changes require a restart}
+            xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
           Fl_Check_Button {} {
             label {Log XML headers}
@@ -243,33 +243,55 @@ else
     synth->getRuntime().logXMLheaders = o->value();
     configChanged = true;
 }}
-            xywh {320 239 20 20} down_box DOWN_BOX labelsize 12 align 4
+            xywh {322 239 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
         }
         Fl_Group {} {
           label Jack
-          xywh {5 25 385 277} labelsize 12
+          xywh {5 25 385 277} labelsize 12 hide
         } {
-          Fl_Input {} {
-            label {Jack Server}
-            callback {//
-                synth->getRuntime().jackServer = string(o->value());
-                configChanged = true;}
-            tooltip {Name of the jack server to connect to - default, ...} xywh {177 149 120 22} labelsize 12 textsize 12
-            code0 {o->insert(synth->getRuntime().jackServer.c_str());}
-          }
           Fl_Input {} {
             label {Jack Midi Source}
             callback {//
                 synth->getRuntime().jackMidiDevice = string(o->value());
                 configChanged = true;}
-            tooltip {Device Jack tries to connect to for input.} xywh {177 62 120 22} labelsize 12 textsize 12
+            tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackMidiDevice.c_str());}
+          }
+          Fl_Check_Button jackMidi {
+            label {Set as preferred MIDI}
+            callback {alsaMidi->value(1 - o->value());
+if (o->value())
+    synth->getRuntime().midiEngine = jack_midi;
+else
+    synth->getRuntime().midiEngine = alsa_midi;
+configChanged = true;}
+            xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
+            code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
+          }
+          Fl_Input {} {
+            label {Jack Server}
+            callback {//
+                synth->getRuntime().jackServer = string(o->value());
+                configChanged = true;}
+            tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textsize 12
+            code0 {o->insert(synth->getRuntime().jackServer.c_str());}
           }
           Fl_Box {} {
             label {Settings changes require a restart}
-            xywh {60 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {60 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
+          Fl_Check_Button jackAudio {
+            label {Set as preferred audio}
+            callback {alsaAudio->value(1 - o->value());
+if (o->value())
+    synth->getRuntime().audioEngine = jack_audio;
+else
+    synth->getRuntime().audioEngine = alsa_audio;
+configChanged = true;}
+            xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
+            code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
         }
         Fl_Group {} {
@@ -284,13 +306,35 @@ else
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaMidiDevice.c_str());}
           }
+          Fl_Check_Button alsaMidi {
+            label {Set as preferred MIDI}
+            callback {jackMidi->value(1 - o->value());
+if (o->value())
+    synth->getRuntime().midiEngine = alsa_midi;
+else
+    synth->getRuntime().midiEngine = jack_midi;
+configChanged = true;}
+            xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
+            code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
+          }
           Fl_Input {} {
             label {Alsa Audio Device}
             callback {//
                 synth->getRuntime().alsaAudioDevice = string(o->value());
                 configChanged = true;}
-            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 93 120 22} labelsize 12 textsize 12
+            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaAudioDevice.c_str());}
+          }
+          Fl_Check_Button alsaAudio {
+            label {Set as preferred audio}
+            callback {jackAudio->value(1 - o->value());
+if (o->value())
+    synth->getRuntime().audioEngine = alsa_audio;
+else
+    synth->getRuntime().audioEngine = jack_audio;
+configChanged = true;}
+            xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
+            code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
           Fl_Check_Browser {} {
             label Samplerate
@@ -321,7 +365,7 @@ else
                 }
                 synth->getRuntime().Samplerate = sample_rate;
                 configChanged = true;}
-            xywh {195 131 120 54} labelsize 12 align 4 when 1 textsize 12
+            xywh {195 215 120 54} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("96000");
                 o->add("48000");
@@ -336,7 +380,7 @@ else
           }
           Fl_Box {} {
             label {Settings changes require a restart}
-            xywh {52 285 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            xywh {52 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group {} {
@@ -533,7 +577,7 @@ else
           Fl_Check_Button midiMon {
             label {Log incoming CCs}
             callback {synth->getRuntime().monitorCCin = o->value();}
-            xywh {234 36 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 271 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
           }
           Fl_Check_Button Epcheck {

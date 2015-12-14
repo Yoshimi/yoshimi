@@ -28,6 +28,10 @@
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 
+typedef enum { all_fx = 0, ins_fx, part_lev, } level_bits;
+
+typedef enum { ok_msg = 0, value_msg, operation_msg, what_msg, range_msg, unrecognised_msg, level_msg, } error_messages;
+
 class SynthEngine;
 
 class CmdInterface : private MiscFuncs
