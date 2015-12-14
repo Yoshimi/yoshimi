@@ -246,7 +246,7 @@ class MasterUI {selected : {private MiscFuncs}
         code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
         Submenu {} {
-          label {&Yoshimi}
+          label {&Yoshimi} open
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem {} {

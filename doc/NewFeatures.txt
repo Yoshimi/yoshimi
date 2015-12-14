@@ -91,7 +91,7 @@ Yoshimi now remembers where major windows were last placed (per instance), and i
 
 ###
 
-We have an experimental implimentation of CC2 - breath control. This combines volume with filter cutoff.
+We have an implimentation of CC2 - breath control. This combines volume with filter cutoff.
 
 ###
 
@@ -104,5 +104,9 @@ The earlier experimantal per part random detune features has now been formalised
 ###
 
 Thanks to the Zyn. devs, we now have pink as well as white noise available on Addsynth voices. Pink noise sounds 'softer'.
+
+###
+
+The preferred jack/alsa MIDI and audio connections are no longer fixed at compile time. There are now checkboxes on 'Settings' to change them.
 
 ###

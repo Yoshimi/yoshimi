@@ -3,6 +3,7 @@ Yoshimi responds to the following messages.
 
   0 or 32: Bank Change (user selectable and does *not* force a program change)
   1: Modulation Wheel
+  2: Breath Control
   6: Data MSB
   7: Volume
  10: Panning
