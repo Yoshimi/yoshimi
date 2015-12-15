@@ -194,7 +194,7 @@ int CmdInterface::volPanShift(char *point, SynthEngine *synth, int level)
         {
             case part_lev:
                 synth->part[partnum]->Pkeyshift = value;
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart,0);
+                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
                 break;
             default:
                 synth->SetSystemValue(2, value);
@@ -556,7 +556,7 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
             if (point[0] != 0)
             {
                 synth->getRuntime().alsaMidiDevice = (string) point;
-                synth->getRuntime().Log("* Set ALSA MIDI to " + synth->getRuntime().alsaMidiDevice);
+                synth->getRuntime().Log("* ALSA MIDI set to " + synth->getRuntime().alsaMidiDevice);
             }
             else
                 error = value_msg;
@@ -566,28 +566,43 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
             if (point[0] != 0)
             {
                 synth->getRuntime().alsaAudioDevice = (string) point;
-                synth->getRuntime().Log("* Set ALSA AUDIO to " + synth->getRuntime().alsaAudioDevice);
+                synth->getRuntime().Log("* ALSA AUDIO set to " + synth->getRuntime().alsaAudioDevice);
             }
             else
                 error = value_msg;
         }
         else
             error = opp_msg;
+        if (error == ok_msg)
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 3);
+            
     }
     else if (matchnMove(1, point, "jack"))
     {
-        if (matchnMove(1, point, "server"))
+        if (matchnMove(1, point, "midi"))
+        {
+            if (point[0] != 0)
+            {
+                synth->getRuntime().jackMidiDevice = (string) point;
+                synth->getRuntime().Log("* jack MIDI set to " + synth->getRuntime().jackMidiDevice);
+            }
+            else
+                error = value_msg;
+        }
+        else if (matchnMove(1, point, "server"))
         {
             if (point[0] != 0)
             {
                 synth->getRuntime().jackServer = (string) point;
-                synth->getRuntime().Log("* Set Jack server to " + synth->getRuntime().jackServer);
+                synth->getRuntime().Log("* Jack server set to " + synth->getRuntime().jackServer);
             }
             else
                 error = value_msg;
         }
         else
             error = opp_msg;
+        if (error == ok_msg)
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 2);
     }
     else
         error = opp_msg;

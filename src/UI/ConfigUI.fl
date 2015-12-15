@@ -46,9 +46,10 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {selected
+  } {
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
@@ -251,7 +252,7 @@ else
           label Jack
           xywh {5 25 385 277} labelsize 12 hide
         } {
-          Fl_Input {} {
+          Fl_Input jackSource {
             label {Jack Midi Source}
             callback {//
                 synth->getRuntime().jackMidiDevice = string(o->value());
@@ -270,17 +271,13 @@ configChanged = true;}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
-          Fl_Input {} {
+          Fl_Input jackServer {
             label {Jack Server}
             callback {//
                 synth->getRuntime().jackServer = string(o->value());
                 configChanged = true;}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackServer.c_str());}
-          }
-          Fl_Box {} {
-            label {Settings changes require a restart}
-            xywh {60 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
           Fl_Check_Button jackAudio {
             label {Set as preferred audio}
@@ -293,12 +290,16 @@ configChanged = true;}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
+          Fl_Box {} {
+            label {Settings changes require a restart}
+            xywh {60 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
         }
         Fl_Group {} {
           label Alsa
           xywh {5 25 384 277} labelsize 12 hide
         } {
-          Fl_Input {} {
+          Fl_Input alsaSource {
             label {Alsa Midi Source}
             callback {//
                 synth->getRuntime().alsaMidiDevice = string(o->value());
@@ -317,7 +318,7 @@ configChanged = true;}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
-          Fl_Input {} {
+          Fl_Input alsaDevice {
             label {Alsa Audio Device}
             callback {//
                 synth->getRuntime().alsaAudioDevice = string(o->value());
@@ -336,7 +337,7 @@ configChanged = true;}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
-          Fl_Check_Browser {} {
+          Fl_Check_Browser alsaRate {
             label Samplerate
             callback {//
                 int chk = o->value();
@@ -732,13 +733,47 @@ presets->hide();}
         case 1 : //Main
             reports->value(synth->getRuntime().consoleMenuItem);
             break;
-        case 2 : // Presets
+        case 2 : // Jack
+            jackSource->value(synth->getRuntime().jackMidiDevice.c_str());
+            if (synth->getRuntime().midiEngine == jack_midi)
+            {
+                jackMidi->value(1);
+                alsaMidi->value(0);
+            }
+            jackServer->value(synth->getRuntime().jackServer.c_str());
+            if (synth->getRuntime().audioEngine == jack_audio)
+            {
+                jackAudio->value(1);
+                alsaAudio->value(0);
+            }
             break;
-        case 3 : // Jack
+        case 3 : // Alsa
+            {
+            alsaSource->value(synth->getRuntime().alsaMidiDevice.c_str());
+            if (synth->getRuntime().midiEngine == alsa_midi)
+            {
+                alsaMidi->value(1);
+                jackMidi->value(0);
+            }
+            alsaDevice->value(synth->getRuntime().alsaAudioDevice.c_str());
+            if (synth->getRuntime().audioEngine == alsa_audio)
+            {
+                alsaAudio->value(1);
+                jackAudio->value(0);
+            }
+//            alsaRate->add("96000");
+//            alsaRate->add("48000");
+//            alsaRate->add("44100");
+            switch (synth->getRuntime().Samplerate)
+            {
+                case 96000: alsaRate->set_checked(1); break;
+                case 44100: alsaRate->set_checked(3); break;
+                case 48000:
+               default: alsaRate->set_checked(2); break;
+            }
+            }
             break;
-        case 4 : // Alsa
-            break;
-        case 5 : // MIDI
+        case 4 : // MIDI
             tmp = synth->getRuntime().midi_bank_root;
             if (tmp == 128)
             {

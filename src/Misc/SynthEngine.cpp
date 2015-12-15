@@ -948,6 +948,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
         
     msg_buf.push_back("  ALSA MIDI " + Runtime.alsaMidiDevice);
     msg_buf.push_back("  ALSA AUDIO " + Runtime.alsaAudioDevice);
+    msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  Jack server " + Runtime.jackServer);
 
     if (Runtime.consoleMenuItem)
@@ -1043,7 +1044,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_bank_root = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
                 }
             }
             if (value == 128) // but still report the setting
@@ -1066,7 +1067,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_bank_C = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
                 }
             }
             if (value == 0)
@@ -1086,7 +1087,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (value != Runtime.EnableProgChange)
             {
                 Runtime.EnableProgChange = value;
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
             }
             break;
             
@@ -1099,7 +1100,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (value != Runtime.enable_part_on_voice_load)
             {
                 Runtime.enable_part_on_voice_load = value;
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
             }
             break;
             
@@ -1117,7 +1118,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_upper_voice_C = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
                 }
             }
             if (value == 128) // but still report the setting

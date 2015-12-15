@@ -3,7 +3,8 @@ yoshimi 1.3.x
 2015-12-15 Will
 - Vector control now has it's own level on command line.
 - Setting audio destination is now by names (not numbers).
-- Part volume pan & keyshift now available.
+- Part volume, pan & keyshift now available.
+- Can now change jack config as well as alsa.
 
 2015-12-14 Will
 - Audio and midi preferences can now be set in config window.
