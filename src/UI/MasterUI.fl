@@ -1093,6 +1093,7 @@ updatepanel();}
         partui->partgroupui->deactivate();
     partui->partpan->value(synth->part[npart]->Ppanning);
     partui->partvol->value(synth->part[npart]->Pvolume);
+    partui->partkeyshift->value(synth->part[npart]->Pkeyshift - 64);
     maxparts->value(synth->getRuntime().NumAvailableParts);
     maxparts->redraw();
     npartcounter->value(npart + 1);

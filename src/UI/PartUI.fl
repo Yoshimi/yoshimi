@@ -479,7 +479,7 @@ Offset}
         tooltip {Enable/Disable the portamento} xywh {82 59 15 20} down_box DOWN_BOX labelsize 11 align 8
         code0 {o->value(part->ctl->portamento.portamento);}
       }
-      Fl_Spinner {} {
+      Fl_Spinner partkeyshift {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
         xywh {202 116 38 18} labelsize 10 minimum -24 maximum 24 textsize 11
