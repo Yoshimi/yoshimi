@@ -576,6 +576,46 @@ void SynthEngine::SetZynControls()
 }
 
 
+void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value)
+{
+    // category 0-sysFX, 1-insFX, 2-partFX
+    // commands 0-nFX, 1-nType, 2-nPar, 3-value, 4-sends
+    
+    int npart = getRuntime().currentPart;
+    if (command == 1);
+    {
+        actionLock(lockmute);
+        switch (category)
+        {
+            case 1:
+                insefx[nFX]->changeeffect(nType);
+                break;
+            case 2:
+                part[npart]->partefx[nFX]->changeeffect(nType);
+                break;  
+            default:
+                sysefx[nFX]->changeeffect(nType);
+                break;      
+        }
+        actionLock(unlock);
+    }
+    if (command == 4)
+    {
+        switch (category)
+        {
+            case 1:
+                Pinsparts[nFX] = nPar;
+                break;
+            case 2:
+                setPsysefxvol(nFX, nPar, value);
+                break;  
+            default:
+                break;      
+        }
+    }
+}
+
+
 void SynthEngine::SetBankRoot(int rootnum)
 {
     if (bank.setCurrentRootID(rootnum))

@@ -53,20 +53,18 @@ decl {\#include "PresetsUI.h"} {public local
 
 class EQGraph {open : {public Fl_Box}
 } {
-  Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
-  } {
+  Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {eff = NULL;
         maxdB = 30;} {}
   }
-  Function {init(EffectMgr *eff_)} {open
+  Function {init(EffectMgr *eff_)} {selected
   } {
     code {synth = eff_->getSynthEngine();
 eff = eff_;
         oldx = -1;
         khzval = -1;} {}
   }
-  Function {draw_freq_line(float freq, int type)} {open
-  } {
+  Function {draw_freq_line(float freq, int type)} {} {
     code {fl_color(FL_GRAY);
         float freqx = getfreqpos(freq);
         switch(type)
@@ -90,8 +88,7 @@ eff = eff_;
         fl_line(x() + (int) (freqx * w()), y(),
             x() + (int) (freqx * w()), y( ) + h());} {}
   }
-  Function {draw()} {open
-  } {
+  Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h(), i, iy, oiy;
         float freqx;
 
@@ -174,13 +171,13 @@ eff = eff_;
 
         return idbresp;} {}
   }
-  Function {getfreqx(float x)} {open return_type float
+  Function {getfreqx(float x)} {return_type float
   } {
     code {if (x > 1.0)
             x = 1.0;
         return 20.0 * powf(1000.0, x);} {}
   }
-  Function {getfreqpos(float freq)} {open return_type float
+  Function {getfreqpos(float freq)} {return_type float
   } {
     code {if (freq < 0.00001)
             freq = 0.00001;
@@ -200,8 +197,7 @@ eff = eff_;
 
 class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
-  Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
     eff = NULL;
     filterwindow = NULL;} {}
@@ -229,13 +225,12 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
       class Fl_Group
     } {
       Fl_Text_Display {} {
-        label {no Efx applied}
+        label {No Effects Applied}
         xywh {120 35 10 20} box NO_BOX labelfont 1 labelcolor 37 align 8
       }
     }
   }
-  Function {make_reverb_window()} {open
-  } {
+  Function {make_reverb_window()} {} {
     Fl_Window effreverbwindow {
       xywh {1016 535 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
       class Fl_Group
@@ -628,11 +623,10 @@ refresh(eff);}
       }
     }
   }
-  Function {make_phaser_window()} {open
-  } {
-    Fl_Window effphaserwindow {open
-      xywh {866 341 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11
-      class Fl_Group visible
+  Function {make_phaser_window()} {} {
+    Fl_Window effphaserwindow {
+      xywh {866 341 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
+      class Fl_Group
     } {
       Fl_Choice phaserp {
         label Preset
@@ -695,7 +689,7 @@ refresh(eff);}
       }
       Fl_Dial phaserp0 {
         label Vol
-        callback {eff->seteffectpar(0,(int) o->value());} selected
+        callback {eff->seteffectpar(0,(int) o->value());}
         tooltip {Effect Volume} xywh {10 50 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         class WidgetPDial
       }
@@ -719,7 +713,7 @@ refresh(eff);}
       }
       Fl_Choice phaserp4 {
         label LFO
-        callback {eff->seteffectpar(4,(int) o->value());} open
+        callback {eff->seteffectpar(4,(int) o->value());}
         tooltip {LFO function} xywh {314 60 50 16} down_box BORDER_BOX labelsize 10 align 130 textsize 8
       } {
         MenuItem {} {
@@ -790,8 +784,7 @@ refresh(eff);}
       }
     }
   }
-  Function {make_alienwah_window()} {open
-  } {
+  Function {make_alienwah_window()} {} {
     Fl_Window effalienwahwindow {
       xywh {1019 326 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
@@ -899,8 +892,7 @@ refresh(eff);} open
       }
     }
   }
-  Function {make_distorsion_window()} {open
-  } {
+  Function {make_distorsion_window()} {} {
     Fl_Window effdistorsionwindow {
       xywh {1009 738 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
@@ -1061,8 +1053,7 @@ refresh(eff);}
       }
     }
   }
-  Function {make_eq_window()} {open
-  } {
+  Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
       xywh {766 606 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
@@ -1199,8 +1190,7 @@ eqgraph->redraw();}
       }
     }
   }
-  Function {make_dynamicfilter_window()} {open
-  } {
+  Function {make_dynamicfilter_window()} {} {
     Fl_Window effdynamicfilterwindow {
       xywh {1019 421 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
@@ -1314,10 +1304,9 @@ refresh(eff);}
       }
     }
   }
-  Function {make_filter_window()} {open
-  } {
+  Function {make_filter_window()} {} {
     Fl_Window filterwindow {
-      label {Filter Parameters for DynFilter Eff.} open
+      label {Filter Parameters for DynFilter Eff.}
       xywh {1109 779 290 110} type Double hide
     } {
       Fl_Group {} {
@@ -1334,8 +1323,7 @@ refresh(eff);}
       }
     }
   }
-  Function {init(EffectMgr *eff_)} {open
-  } {
+  Function {init(EffectMgr *eff_)} {} {
     code {eff=eff_;
 
 make_null_window();
@@ -1507,7 +1495,9 @@ refresh(eff);} {}
              case 8:
                 make_filter_window();
                 dfp->value(eff->getpreset());
-                dfp0->value(eff->geteffectpar(0));if (eff->insertion!=0) dfp0->label("D/W");
+                dfp0->value(eff->geteffectpar(0));
+                if (eff->insertion!=0)
+                    dfp0->label("D/W");
                 dfp1->value(eff->geteffectpar(1));
                 dfp2->value(eff->geteffectpar(2));
                 dfp3->value(eff->geteffectpar(3));

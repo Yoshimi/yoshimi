@@ -138,8 +138,6 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
-        int           currentChannel;
-        int           currentMode;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;

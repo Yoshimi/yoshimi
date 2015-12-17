@@ -25,10 +25,12 @@ using namespace std;
 
 
 static int currentInstance = 0;
-static string errorString = "";
+static string replyString = "";
 static unsigned int level = 0;
 static int chan = 0;
-static int partnum = 0;
+static int npart = 0;
+static int nFX = 0;
+static int nFXtype = 0;
 
 string basics[] = {
     "load patchset <s>",          "load a complete set of instruments from named file",
@@ -42,15 +44,22 @@ string basics[] = {
     "list current",               "list parts with instruments installed",
     "list vectors",               "list settings for all enabled vectors",
     "list setup",                 "show dynamic settings",
+    "list effects",               "show effect types",
     "set reports [n]",            "set report destination (1 GUI console, other stderr)",
     "set root <n>",               "set current root path to ID",
     "set bank <n>",               "set current bank to ID",
+    "set system effects [n]",     "set system effects for editing",
+    "set insert effects [n1]",    "set insertion effects for editing",
+    "  send <s>/<n2>",            "set where: master, off or part number",
     "set part [n1]",              "set part ID operations",
     "  enable",                   "enables the part",
     "  disable",                  "disables the part",
     "  volume <n2>",              "part volume",
     "  pan <n2>",                 "part panning",
     "  shift <n>",                "part key shift semitones (64 no shift)",
+    "  effects [n2]",             "set part effects for editing",
+    "    type <s>",               "set the effect type",
+    "    send <n3> <n4>",         "the effect number and volume to send to system effects",
     "  program <n2>",             "loads instrument ID",
     "  channel <n2>",             "sets MIDI channel (> 15 disables)",
     "  destination <s2>",         "sets audio destination (main, part, both)",
@@ -80,22 +89,37 @@ string basics[] = {
     "end"
 };
 
-string errors [] = {
+string replies [] = {
     "OK",
     "Done",
     "Value?",
-    "Which Operation",
+    "Which Operation?,",
     " what?",
     "Out of range",
     "Unrecognised",
+    "Parameter?",
     "Not at this level"
+};
+
+string fx_list [] = {
+    "off",
+    "reverb",
+    "echo",
+    "chorus",
+    "phaser",
+    "alienWah",
+    "distortion",
+    "eq",
+    "dynfilter"
 };
 
 void CmdInterface::defaults()
 {
     level = 0;
     chan = 0;
-    partnum = 0;
+    npart = 0;
+    nFX = 0;
+    nFXtype = 0;
 }
 
 bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
@@ -122,6 +146,7 @@ bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 
     int word = 0;
     string left;
+    string right;
     string blanks;
     list<string>msg;
     msg.push_back("Commands:");
@@ -142,9 +167,117 @@ bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 }
 
 
+int CmdInterface::effects(char *point, SynthEngine *synth, int level)
+{
+    int reply = done_msg;
+    int nFXavail;
+    
+    int category;
+    int par;
+    int value;
+    
+    bool flag;
+
+    if (bitTest(level, part_lev))
+    {
+        nFXavail = 3;
+    }
+    else if (bitTest(level, ins_fx))
+    {
+        nFXavail = 8;
+    }
+    else
+    {
+        nFXavail = 4;
+    }
+    if (nFX >= nFXavail)
+        nFX = nFXavail - 1; // we may have changed effects base
+    if (point[0] == 0)
+        return done_msg;
+   
+    if (isdigit(point[0]))
+    {
+        value = string2int(point);
+        point = skipChars(point);
+        if (value >= nFXavail)
+            return range_msg;
+        if (value != nFX)
+        {
+            nFX = value;
+            
+        }
+        if (point[0] == 0)
+        {
+            synth->getRuntime().Log("FX number set to " + asString(nFX));
+            return done_msg;
+        }
+    }
+
+    if (matchnMove(1, point, "type"))
+    {
+        flag = true;
+        for (int i = 0; i < 9; ++ i)
+        {
+            synth->getRuntime().Log("com " + (string) point + "  list " + fx_list[i]);
+            if (matchnMove(2, point, fx_list[i].c_str()))
+            {
+                nFXtype = i;
+                flag = false;
+                break;
+            }
+        }
+        if (flag)
+            return unrecognised_msg;
+        
+        synth->getRuntime().Log("FX type set to " + fx_list[nFXtype]);
+        if (bitTest(level, part_lev))
+            category = 2;
+        else if (bitTest(level, ins_fx))
+            category = 1;
+        else
+            category = 0;
+        synth->SetEffects(category, 1, nFX, nFXtype, 0, 0);
+        return done_msg;
+    }
+    else if (matchnMove(1, point, "send"))
+    {
+        if (point[0] == 0)
+            return parameter_msg;
+        
+        if (bitTest(level, ins_fx))
+        {
+            if (matchnMove(1, point, "master"))
+                par = -2;
+            else if (matchnMove(1, point, "off"))
+                par = -1;
+            else 
+                par = string2int(point);
+            value = 0;
+        }
+        else
+        {
+            par = string2int(point);
+            point = skipChars(point);
+            if (point[0] == 0)
+                return value_msg;
+            value = string2int(point);
+        }
+        if (bitTest(level, part_lev))
+            category = 2;
+        else if (bitTest(level, ins_fx))
+            category = 1;
+        else
+            category = 0;
+        synth->SetEffects(category, 4, nFX, nFXtype, par, value);
+    }
+    
+    return reply;
+}
+
+
 int CmdInterface::volPanShift(char *point, SynthEngine *synth, int level)
 {
-    int error = ok_msg;
+    int reply = ok_msg;
     int value;
     int type = 0;
     
@@ -159,13 +292,13 @@ int CmdInterface::volPanShift(char *point, SynthEngine *synth, int level)
         switch (level)
         {
             case part_lev:
-                synth->part[partnum]->SetController(type, value);
+                synth->part[npart]->SetController(type, value);
                 break;
             default:
                 synth->SetSystemValue(type, value);
                 break;
         }
-        error = done_msg;
+        reply = done_msg;
     }
     else if (level >= part_lev && matchnMove(1, point, "pan"))
     {
@@ -176,13 +309,13 @@ int CmdInterface::volPanShift(char *point, SynthEngine *synth, int level)
         switch (level)
         {
             case part_lev:
-                synth->part[partnum]->SetController(type, value);
+                synth->part[npart]->SetController(type, value);
                 break;
             default:
                 synth->SetSystemValue(type, value);
                 break;
         }        
-        error = done_msg;
+        reply = done_msg;
     }
     else if (matchnMove(1, point, "shift"))
     {
@@ -193,26 +326,26 @@ int CmdInterface::volPanShift(char *point, SynthEngine *synth, int level)
         switch (level)
         {
             case part_lev:
-                synth->part[partnum]->Pkeyshift = value;
+                synth->part[npart]->Pkeyshift = value;
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
                 break;
             default:
                 synth->SetSystemValue(2, value);
                 break;
         }
-        error = done_msg;
+        reply = done_msg;
     }
 
     if (level == part_lev && (type == 7 || type == 10)) // currently only volume and pan
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, partnum);
-    return error;
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
+    return reply;
 }
 
 
 int CmdInterface::commandVector(char *point, SynthEngine *synth)
 {
     static int axis;
-    int error = ok_msg;
+    int reply = ok_msg;
     int tmp;
     
     if (isdigit(point[0]))
@@ -222,14 +355,9 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
             return range_msg;
         point = skipChars(point);
         if (chan != tmp)
-        {
             chan = tmp;
-            synth->getRuntime().currentChannel = chan;
-        }
         synth->getRuntime().Log("Vector channel set to " + asString(chan));
     }
-    else
-        chan = synth->getRuntime().currentChannel;
 
     if (point[0] == 0)
         return done_msg;
@@ -249,25 +377,25 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
     if (matchnMove(1, point, "cc"))
     {
         if (point[0] == 0)
-            error = value_msg;
+            reply = value_msg;
         else
         {
             tmp = string2int(point);
             if (!synth->vectorInit(axis, chan, tmp))
                 synth->vectorSet(axis, chan, tmp);
-            error = done_msg;
+            reply = done_msg;
         } 
     }
     else if (matchnMove(1, point, "features"))
     {
         if (point[0] == 0)
-            error = value_msg;
+            reply = value_msg;
         else
         {
             tmp = string2int(point);
             if (!synth->vectorInit(axis + 2, chan, tmp))
                 synth->vectorSet(axis + 2, chan, tmp);
-            error = done_msg;
+            reply = done_msg;
         }
     }
     else if (matchnMove(1, point, "program"))
@@ -283,7 +411,7 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
         tmp = string2int(point);
         if (!synth->vectorInit(axis * 2 + hand + 4, chan, tmp))
             synth->vectorSet(axis * 2 + hand + 4, chan, tmp);
-        error = done_msg;
+        reply = done_msg;
     }
     else
     {
@@ -302,22 +430,24 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
             tmp = string2int(point);
             if (!synth->vectorInit(axis * 2 + cmd + 7, chan, tmp))
             synth->vectorSet(axis * 2 + cmd + 7, chan, tmp);
-            error = done_msg;
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
-    return error;
+    return reply;
 }
 
 
 int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
 {
-    int error = ok_msg;
+    int reply = ok_msg;
     int tmp;
 
     if (point[0] == 0)
         return done_msg;
+    if (bitTest(level, all_fx))
+        return effects(point, synth, level);
     if (justSet || isdigit(point[0]))
     {
         if (isdigit(point[0]))
@@ -329,60 +459,66 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
                 return done_msg;
             }
             point = skipChars(point);
-            if (partnum != tmp)
+            if (npart != tmp)
             {
-                partnum = tmp;
-                synth->getRuntime().currentPart = partnum;
+                npart = tmp;
+                synth->getRuntime().currentPart = npart;
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
             }
             if (point[0] == 0)
             {
-                synth->getRuntime().Log("Part number set to " + asString(partnum));
+                synth->getRuntime().Log("Part number set to " + asString(npart));
                 return done_msg;
             }
         }
+    }
+    if (matchnMove(2, point, "effects"))
+    {
+        level = 1; // clear out any higher levels
+        bitSet(level, part_lev);
+        return effects(point, synth, level);
     }
     tmp = volPanShift(point, synth, part_lev);
     if(tmp != ok_msg)
         return tmp;
     if (matchnMove(1, point, "enable"))
     {
-        synth->partonoff(partnum, 1);
+        synth->partonoff(npart, 1);
         synth->getRuntime().Log("Part enabled");
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, partnum);
-        error = done_msg;
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
+        reply = done_msg;
     }
     else if (matchnMove(1, point, "disable"))
     {
-        synth->partonoff(partnum, 0);
+        synth->partonoff(npart, 0);
         synth->getRuntime().Log("Part disabled");
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, partnum);
-        error = done_msg;
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
+        reply = done_msg;
     }
     else if (matchnMove(1, point, "program"))
     {
         if (point[0] != 0) // force part not channel number
         {
-            synth->SetProgram(partnum | 0x80, string2int(point));
-            error = done_msg;
+            synth->SetProgram(npart | 0x80, string2int(point));
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(1, point, "channel"))
     {
         if (point[0] != 0)
         {
             tmp = string2int(point);
-            synth->SetPartChan(partnum, tmp);
+            synth->SetPartChan(npart, tmp);
             if (tmp < NUM_MIDI_CHANNELS)
-                synth->getRuntime().Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
+                synth->getRuntime().Log("Part " + asString((int) npart) + " set to channel " + asString(tmp));
             else
-                synth->getRuntime().Log("Part " + asString((int) partnum) + " set to no MIDI"); 
-            error = done_msg;
+                synth->getRuntime().Log("Part " + asString((int) npart) + " set to no MIDI"); 
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(1, point, "destination"))
     {
@@ -396,23 +532,23 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
             dest = 3;
         if (dest > 0)
         {
-            synth->partonoff(partnum, 1);
-            synth->SetPartDestination(partnum, dest);
-            error = done_msg;
+            synth->partonoff(npart, 1);
+            synth->SetPartDestination(npart, dest);
+            reply = done_msg;
         }
         else
-            error = range_msg;
+            reply = range_msg;
     }
     else
-        error = opp_msg;
+        reply = opp_msg;
     
-    return error;
+    return reply;
 }
 
 
 int CmdInterface::commandSet(char *point, SynthEngine *synth)
 {
-    int error = ok_msg;
+    int reply = ok_msg;
     int tmp;
 
     if (matchnMove(1, point, "yoshimi"))
@@ -421,9 +557,12 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
             return value_msg;
         tmp = string2int(point);
         if (tmp >= (int)synthInstances.size())
-            error = range_msg;
+            reply = range_msg;
         else
+        {
             currentInstance = tmp;
+            defaults();
+        }
         return done_msg;
     }
         
@@ -432,74 +571,75 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
         if (point[0] != 0)
         {
             synth->SetSystemValue(113, string2int(point));
-            error = done_msg;
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(3, point, "ccbank"))
     {
         if (point[0] != 0)
         {
             synth->SetSystemValue(114, string2int(point));
-            error = done_msg;
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(1, point, "root"))
     {
         if (point[0] != 0)
         {
             synth->SetBankRoot(string2int(point));
-            error = done_msg;
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(1, point, "bank"))
     {
         if (point[0] != 0)
         {
             synth->SetBank(string2int(point));
-            error = done_msg;
+            reply = done_msg;
         }
         else
-            error = value_msg;
+            reply = value_msg;
     }
    
-    else if (matchnMove(1, point, "fx"))
-    {
-        level = 1;
-        if (matchnMove(1, point, "part"))
-        {
-            bitSet(level, part_lev);
-        }
-        else if (matchnMove(1, point, "insert"))
-        {
-            bitSet(level, ins_fx);
-        }
-        error = done_msg;
-    }
-
     else if (bitTest(level, part_lev))
-        error = commandPart(point, synth, false);
+        reply = commandPart(point, synth, false);
     else if (bitTest(level, vect_lev))
-        error = commandVector(point, synth);
-    else if (matchnMove(2, point, "vector"))
-    {
-        level = 0; // clear all first
-        bitSet(level, vect_lev);
-        error = commandVector(point, synth);
-    }
-    else if (matchnMove(1, point, "part"))
+        reply = commandVector(point, synth);
+    if (reply > ok_msg)
+        return reply;
+
+    if (matchnMove(1, point, "part"))
     {
         level = 0; // clear all first
         bitSet(level, part_lev);
-        error = commandPart(point, synth, true);
+        return commandPart(point, synth, true);
     }
-    if (error > ok_msg)
-        return error;
+    if (matchnMove(2, point, "vector"))
+    {
+        level = 0; // clear all first
+        bitSet(level, vect_lev);
+        return commandVector(point, synth);
+    }
+    if (level < 4 && matchnMove(3, point, "sys"))
+    {
+        level = 1;
+        matchnMove(2, point, "effects"); // clear it if given
+        return effects(point, synth, level);
+    }
+    if (level < 4 && matchnMove(3, point, "ins"))
+    {
+        level = 3;
+        matchnMove(2, point, "effects"); // clear it if given
+        return effects(point, synth, level);
+    }
+    if (bitTest(level, all_fx))
+        return effects(point, synth, level);
     
     tmp = volPanShift(point, synth, 0);
     if(tmp > ok_msg)
@@ -524,14 +664,14 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
         if (point[0] != 0)
             synth->SetSystemValue(117, string2int(point));
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(1, point, "available"))
     {
         if (point[0] != 0)
             synth->SetSystemValue(118, string2int(point));
         else
-            error = value_msg;
+            reply = value_msg;
     }
     else if (matchnMove(1, point, "reports"))
     {
@@ -559,7 +699,7 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
                 synth->getRuntime().Log("* ALSA MIDI set to " + synth->getRuntime().alsaMidiDevice);
             }
             else
-                error = value_msg;
+                reply = value_msg;
         }
         else if (matchnMove(1, point, "audio"))
         {
@@ -569,11 +709,11 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
                 synth->getRuntime().Log("* ALSA AUDIO set to " + synth->getRuntime().alsaAudioDevice);
             }
             else
-                error = value_msg;
+                reply = value_msg;
         }
         else
-            error = opp_msg;
-        if (error == ok_msg)
+            reply = opp_msg;
+        if (reply == ok_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 3);
             
     }
@@ -587,7 +727,7 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
                 synth->getRuntime().Log("* jack MIDI set to " + synth->getRuntime().jackMidiDevice);
             }
             else
-                error = value_msg;
+                reply = value_msg;
         }
         else if (matchnMove(1, point, "server"))
         {
@@ -597,16 +737,16 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
                 synth->getRuntime().Log("* Jack server set to " + synth->getRuntime().jackServer);
             }
             else
-                error = value_msg;
+                reply = value_msg;
         }
         else
-            error = opp_msg;
-        if (error == ok_msg)
+            reply = opp_msg;
+        if (reply == ok_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 2);
     }
     else
-        error = opp_msg;
-    return error; 
+        reply = opp_msg;
+    return reply; 
 }
 
 
@@ -614,15 +754,18 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
 {
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
     if (currentInstance >= (int)synthInstances.size())
+    {
         currentInstance = 0;
+        defaults();
+    }
     for(int i = 0; i < currentInstance; i++, ++itSynth);
     SynthEngine *synth = itSynth->first;
     Config &Runtime = synth->getRuntime();
 
-    errorString = "";
-    partnum = synth->getRuntime().currentPart;
+    replyString = "";
+    npart = synth->getRuntime().currentPart;
     int ID;
-    int error = ok_msg;
+    int reply = ok_msg;
     int tmp;
     string *commands = NULL;
     char *point = buffer;
@@ -637,6 +780,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
     if (point[0] == '/')
     {
         ++ point;
+        point = skipSpace(point);
         level = 0;
         if (point[0] == 0)
             return false;
@@ -697,21 +841,26 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
         }
+        else if (matchnMove(1, point, "effects"))
+        {
+            for (int i = 0; i < 9; ++ i)
+                synth->getRuntime().Log("  " + fx_list[i]);
+        }
         else
         {
-            errorString = "list";
-            error = what_msg;
+            replyString = "list";
+            reply = what_msg;
         }
     }
     
     else if (matchnMove(1, point, "set"))
     {
         if (point[0] != 0)
-            error = commandSet(point, synth);
+            reply = commandSet(point, synth);
         else
         {
-            errorString = "set";
-            error = what_msg;
+            replyString = "set";
+            reply = what_msg;
         }
     }
     
@@ -746,7 +895,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
                 }
             }
             else
-                error = value_msg;
+                reply = value_msg;
         }
         else
         {
@@ -760,7 +909,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         if (matchnMove(1, point, "patchset") )
         {
             if (point[0] == 0)
-                error = value_msg;
+                reply = value_msg;
             else
             {
                 int loadResult = synth->loadPatchSetAndUpdate((string) point);
@@ -772,8 +921,8 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         }
         else
         {
-            errorString = "load";
-            error = what_msg;
+            replyString = "load";
+            reply = what_msg;
         }
     }
     else if (matchnMove(2, point, "save"))
@@ -782,7 +931,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
-                error = value_msg;
+                reply = value_msg;
             else
             {
                 int saveResult = synth->saveXML((string) point);
@@ -794,16 +943,16 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         }
         else
         {
-            errorString = "save";
-            error = what_msg;
+            replyString = "save";
+            reply = what_msg;
         }
     else
-      error = unrecognised_msg;
+      reply = unrecognised_msg;
 
-    if (error == what_msg)
-        Runtime.Log(errorString + errors[what_msg]);
-    else if (error > done_msg)
-        Runtime.Log(errors[error]);
+    if (reply == what_msg)
+        Runtime.Log(replyString + replies[what_msg]);
+    else if (reply > done_msg)
+        Runtime.Log(replies[reply]);
     return false;
 }
 
@@ -842,9 +991,10 @@ void CmdInterface::cmdIfaceCommandLoop()
             string prompt = "yoshimi";
             if (currentInstance > 0)
                 prompt += (":" + asString(currentInstance));
+            if (bitTest(level, part_lev))
+                prompt += (" part " + asString(npart));
             if (bitTest(level, all_fx))
             {
-                prompt += " FX";
                 if (!bitTest(level, part_lev))
                 {
                     if (bitTest(level, ins_fx))
@@ -852,11 +1002,10 @@ void CmdInterface::cmdIfaceCommandLoop()
                     else
                         prompt += " Sys";
                 }
+                prompt += (" FX " + asString(nFX));
             }
             if (bitTest(level, vect_lev))
                 prompt += (" vect " + asString(chan));
-            if (bitTest(level, part_lev))
-                prompt += (" part " + asString(partnum));
             prompt += "> ";
             sprintf(welcomeBuffer, prompt.c_str());
         }
