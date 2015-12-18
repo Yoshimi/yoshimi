@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2015-12-18 Will
+- All effect sends in place (no gui update)
+- More code cleanups
+
 2015-12-17 Will
 - Implemented major effects settings for command line.
   Effect number, type and send.

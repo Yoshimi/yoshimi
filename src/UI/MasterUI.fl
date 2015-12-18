@@ -513,7 +513,7 @@ paramsui->Show();}
         Fl_Spinner masterkeyshift {
           label {Key Shift}
           callback {synth->setPkeyshift(o->value() + 64);}
-          tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -12 maximum 12 textsize 10
+          tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -24 maximum 24 textsize 10
           code0 {o->range(-12.0, 12.0);o->step(1.0);}
           code1 {o->value(synth->Pkeyshift - 64);}
         }

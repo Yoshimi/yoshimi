@@ -54,6 +54,7 @@ class MiscFuncs
         bool matchnMove(int num, char *&pnt, const char *word);
         static float string2float(string str);
         static int string2int(string str);
+        static char string2char(string str);
         static unsigned int string2uint(string str);
         bool isRegFile(string chkpath);
         bool isDirectory(string chkpath);

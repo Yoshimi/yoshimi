@@ -607,9 +607,10 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                 Pinsparts[nFX] = nPar;
                 break;
             case 2:
-                setPsysefxvol(nFX, nPar, value);
+                setPsysefxvol(npart, nPar, value);
                 break;  
             default:
+                setPsysefxsend(nFX, nPar, value);
                 break;      
         }
     }

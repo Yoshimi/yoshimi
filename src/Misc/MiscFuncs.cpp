@@ -75,6 +75,18 @@ int MiscFuncs::string2int(string str)
     return intval;
 }
 
+char MiscFuncs::string2char(string str)
+{
+    istringstream machine(str);
+    int intval;
+    machine >> intval;
+    if (intval < 0)
+        intval = 0;
+    else if (intval > 127)
+        intval = 127;
+    return intval;
+}
+
 unsigned int MiscFuncs::string2uint(string str)
 {
     istringstream machine(str);
