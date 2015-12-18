@@ -44,13 +44,16 @@ string basics[] = {
     "list current",               "list parts with instruments installed",
     "list vectors",               "list settings for all enabled vectors",
     "list setup",                 "show dynamic settings",
-    "list effects",               "show effect types",
+    "list effects [s]",           "show effect types ('all' include preset numbers and names)",
     "set reports [n]",            "set report destination (1 GUI console, other stderr)",
     "set root <n>",               "set current root path to ID",
     "set bank <n>",               "set current bank to ID",
     "set system effects [n]",     "set system effects for editing",
+    "  send <n2> <n3>",           "send system effect to effect n2 at volume n3",
+    "  prefix <n2>",              " set numbered effect preset to n2",
     "set insert effects [n1]",    "set insertion effects for editing",
     "  send <s>/<n2>",            "set where: master, off or part number",
+    "  prefix <n2>",              " set numbered effect preset to n2",
     "set part [n1]",              "set part ID operations",
     "  enable",                   "enables the part",
     "  disable",                  "disables the part",
@@ -60,6 +63,7 @@ string basics[] = {
     "  effects [n2]",             "set part effects for editing",
     "    type <s>",               "set the effect type",
     "    send <n3> <n4>",         "send part effect to system effect n3 at volume n4",
+    "    prefix <n3>",            " set numbered effect preset to n3",
     "  program <n2>",             "loads instrument ID",
     "  channel <n2>",             "sets MIDI channel (> 15 disables)",
     "  destination <s2>",         "sets audio destination (main, part, both)",
@@ -98,7 +102,8 @@ string replies [] = {
     "Out of range",
     "Unrecognised",
     "Parameter?",
-    "Not at this level"
+    "Not at this level",
+    "Not available"
 };
 
 string fx_list [] = {
@@ -111,6 +116,18 @@ string fx_list [] = {
     "distortion",
     "eq",
     "dynfilter"
+};
+
+string fx_presets [] = {
+    "1, off",
+    "13, cathedral 1, cathedral 2, cathedral 3, hall 1, hall 2, room 1, room 2, basement, tunnel, echoed 1, echoed 2, very long 1, very long 2",
+    "8, echo 1, echo 2, simple echo, canyon, panning echo 1, panning echo 2, panning echo 3, feedback echo",
+    "10, chorus 1, chorus 2, chorus 3, celeste 1, celeste 2, flange 1, flange 2, flange 3, flange 4, flange 5",
+    "12, phaser 1, phaser 2, phaser 3, phaser 4, phaser 5, phaser 6, aphaser 1, aphaser 2, aphaser 3, aphaser 4, aphaser 5, aphaser 6",
+    "4, alienwah 1, alienwah 2, alienwah 3, alienwah 4 ",
+    "6, overdrive 1, overdrive 2, exciter 1, exciter 2, guitar amp, quantisize",
+    "1, not available",
+    "4, wahwah, autowah, vocal morph 1, vocal morph 2"
 };
 
 void CmdInterface::defaults()
@@ -164,6 +181,48 @@ bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
  
     synth->cliOutput(msg, LINES);
     return true;
+}
+
+
+int CmdInterface::effectsList(char *point, SynthEngine *synth)
+{
+    list<string>msg;
+    
+    size_t presetsPos;
+    size_t presetsLast;
+    int presetsCount;
+    string blanks;
+    string left;
+    
+    bool all = matchnMove(1, point, "all");
+    if (!all)
+        msg.push_back("  effect     presets");
+    for (int i = 0; i < 9; ++ i)
+    {
+        presetsPos = 1;
+        presetsLast = fx_presets [i].find(',') + 1; // skip over count
+        presetsCount = 0;
+        if (all)
+        {
+            msg.push_back("  " + fx_list[i]);
+            msg.push_back("    presets");
+            while (presetsPos != string::npos)
+            {
+                presetsPos = fx_presets [i].find(',', presetsLast);
+                msg.push_back("      " + asString(presetsCount) + " =" + fx_presets [i].substr(presetsLast, presetsPos - presetsLast));
+                presetsLast = presetsPos + 1;
+                ++ presetsCount;
+            }
+        }
+        else
+        {
+            left = fx_list[i];            
+            msg.push_back("    " + left + blanks.assign<int>(12 - left.length(), ' ') + fx_presets [i].substr(0, presetsLast - 1));
+        }
+    }
+    
+    synth->cliOutput(msg, LINES);
+    return done_msg;
 }
 
 
@@ -299,6 +358,34 @@ int CmdInterface::effects(char *point, SynthEngine *synth, int level)
 
         synth->SetEffects(category, 4, nFX, nFXtype, par, value);
         Runtime.Log(dest);
+    }
+    else if (matchnMove(3, point, "preset"))
+    {
+        par = string2int(fx_presets [nFXtype].substr(0, fx_presets [nFXtype].find(',')));
+        if (par == 1)
+            return available_msg;
+        if (point[0] == 0)
+            return value_msg;
+        value = string2char(point);
+        if (value >= par)
+            return range_msg;
+        if (bitTest(level, part_lev))
+        {
+            category = 2;
+            dest = "part " + asString(npart);
+        }
+        else if (bitTest(level, ins_fx))
+        {
+            category = 1;
+            dest = "insert";
+        }
+        else
+        {
+            category = 0;
+            dest = "system";
+        }
+        synth->SetEffects(category, 8, nFX, nFXtype, 0, value);
+        Runtime.Log(dest + " fx preset set to number " + asString(value));
     }
     return reply;
 }
@@ -881,10 +968,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
             synth->cliOutput(msg, LINES);
         }
         else if (matchnMove(1, point, "effects"))
-        {
-            for (int i = 0; i < 9; ++ i)
-                Runtime.Log("  " + fx_list[i]);
-        }
+            reply = effectsList(point, synth);
         else
         {
             replyString = "list";

@@ -582,6 +582,7 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
     // commands 0-nFX, 1-nType, 2-nPar, 3-value, 4-sends
     
     int npart = getRuntime().currentPart;
+    
     if (command == 1);
     {
         actionLock(lockmute);
@@ -599,6 +600,7 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
         }
         actionLock(unlock);
     }
+    
     if (command == 4)
     {
         switch (category)
@@ -611,6 +613,22 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                 break;  
             default:
                 setPsysefxsend(nFX, nPar, value);
+                break;      
+        }
+    }
+    
+    if (command == 8)
+    {
+        switch (category)
+        {
+            case 1:
+                insefx[nFX]->changepreset(value);
+                break;
+            case 2:
+                part[npart]->partefx[nFX]->changepreset(value);
+                break;  
+            default:
+                sysefx[nFX]->changepreset(value);
                 break;      
         }
     }
