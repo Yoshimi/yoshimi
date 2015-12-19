@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey
+Copyright 2014-2015, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -374,7 +374,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
           callback {instrumenteditwindow->show();}
           xywh {330 7 40 21} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
-        Fl_Dial {} {
+        Fl_Dial velocitysense {
           label {Velocity
 Sense}
           callback {part->Pvelsns = o->value();}
@@ -382,7 +382,7 @@ Sense}
           code0 {o->value(part->Pvelsns);}
           class WidgetPDial
         }
-        Fl_Dial {} {
+        Fl_Dial velocityoffset {
           label {Velocity
 Offset}
           callback {part->Pveloffs = o->value();}
@@ -448,7 +448,7 @@ Offset}
         code0 {o->value(part->Prcvchn + 1);}
         code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
       }
-      Fl_Choice {} {
+      Fl_Choice keymode {
         label Mode
         callback {//
             switch (o->value())
@@ -473,7 +473,7 @@ Offset}
         code1 {if (part->Ppolymode) o->value(0); else o->value(1);}
         code2 {if (!part->Ppolymode && part->Plegatomode) o->value(2);}
       } {}
-      Fl_Check_Button {} {
+      Fl_Check_Button enportamento {
         label Portamento
         callback {part->ctl->portamento.portamento = o->value();}
         tooltip {Enable/Disable the portamento} xywh {82 59 15 20} down_box DOWN_BOX labelsize 11 align 8
@@ -485,7 +485,7 @@ Offset}
         xywh {202 116 38 18} labelsize 10 minimum -24 maximum 24 textsize 11
         code0 {o->value(part->Pkeyshift - 64);}
       }
-      Fl_Spinner {} {
+      Fl_Spinner partkeylimit {
         label {Key Limit}
         callback {part->setkeylimit(o->value());}
         tooltip {Maximum keys for this part} xywh {202 140 38 18} labelsize 10 value 20 textsize 11

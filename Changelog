@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-12-19 Will
+- All base level part controls available to command line.
+
 2015-12-18 Will
 - All command line effect sends in place (no gui update).
 - All command line effect presets available.

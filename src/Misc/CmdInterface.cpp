@@ -50,23 +50,30 @@ string basics[] = {
     "set bank <n>",               "set current bank to ID",
     "set system effects [n]",     "set system effects for editing",
     "  send <n2> <n3>",           "send system effect to effect n2 at volume n3",
-    "  prefix <n2>",              " set numbered effect preset to n2",
+    "  prefix <n2>",              "set effect preset to number n2",
     "set insert effects [n1]",    "set insertion effects for editing",
     "  send <s>/<n2>",            "set where: master, off or part number",
-    "  prefix <n2>",              " set numbered effect preset to n2",
+    "  prefix <n2>",              "set numbered effect preset to n2",
     "set part [n1]",              "set part ID operations",
     "  enable",                   "enables the part",
     "  disable",                  "disables the part",
-    "  volume <n2>",              "part volume",
-    "  pan <n2>",                 "part panning",
-    "  shift <n>",                "part key shift semitones (64 no shift)",
-    "  effects [n2]",             "set part effects for editing",
+    "  volume <n2>",              "volume",
+    "  pan <n2>",                 "panning",
+    "  velocity <n2>",            "velocity sensing sensitivity",
+    "  offset <n2>",              "velocity sense offest",
+    "  portamento <s>",           "portamento (en - enable, other - disable",
+    "  mode <s>",                 "key mode (poly, mono, legato)",
+    "  note <n2>",                "note polyphony",
+    "  shift <n2>",               "key shift semitones (64 no shift)",
+    "  min <n2>",                 "minimum MIDI note value",
+    "  max <n2>",                 "maximum MIDI note value",
+    "  effects [n2]",             "set effects for editing",
     "    type <s>",               "set the effect type",
     "    send <n3> <n4>",         "send part effect to system effect n3 at volume n4",
-    "    prefix <n3>",            " set numbered effect preset to n3",
+    "    prefix <n3>",            "set numbered effect preset to n3",
     "  program <n2>",             "loads instrument ID",
     "  channel <n2>",             "sets MIDI channel (> 15 disables)",
-    "  destination <s2>",         "sets audio destination (main, part, both)",
+    "  destination <s2>",         "sets jack audio destination (main, part, both)",
     "set ccroot <n>",             "set CC for root path changes (> 119 disables)",
     "set ccbank <n>",             "set CC for bank changes (0, 32, other disables)",
     "set program <n>",            "set MIDI program change (0 off, other on)",
@@ -100,6 +107,8 @@ string replies [] = {
     "Which Operation?",
     " what?",
     "Out of range",
+    "Too low",
+    "Too high",
     "Unrecognised",
     "Parameter?",
     "Not at this level",
@@ -334,13 +343,13 @@ int CmdInterface::effects(char *point, SynthEngine *synth, int level)
             point = skipChars(point);
             if (point[0] == 0)
                 return value_msg;
-            value = string2char(point);
+            value = string2int127(point);
         }
         if (bitTest(level, part_lev))
         {
             category = 2;
             dest = "part " + asString(npart) + " fx sent to system "
-                 + asString(par) + " at " + asString((int) value);
+                 + asString(par) + " at " + asString(value);
         }
         else if (bitTest(level, ins_fx))
         {
@@ -353,7 +362,7 @@ int CmdInterface::effects(char *point, SynthEngine *synth, int level)
                 return range_msg;
             category = 0;
             dest = "system fx " + asString(nFX) + " sent to " 
-                 + asString(par) + " at " + asString((int) value);
+                 + asString(par) + " at " + asString(value);
         }
 
         synth->SetEffects(category, 4, nFX, nFXtype, par, value);
@@ -366,7 +375,7 @@ int CmdInterface::effects(char *point, SynthEngine *synth, int level)
             return available_msg;
         if (point[0] == 0)
             return value_msg;
-        value = string2char(point);
+        value = string2int127(point);
         if (value >= par)
             return range_msg;
         if (bitTest(level, part_lev))
@@ -391,77 +400,87 @@ int CmdInterface::effects(char *point, SynthEngine *synth, int level)
 }
 
 
-int CmdInterface::volPanShift(char *point, SynthEngine *synth, int level)
+int CmdInterface::volPanShift(char *point, SynthEngine *synth)
 {
     Config &Runtime = synth->getRuntime();
     int reply = ok_msg;
     int value;
-    int type = 0;
-    
-//    synth->getRuntime().Log("Level " + asString(level));
+    bool panelFlag = false;
+    bool partFlag = false;
     
     if (matchnMove(1, point, "volume"))
     {
         if (point[0] == 0)
             return value_msg;
-        type = 7;
-        value = string2char(point);
-        switch (level)
+        value = string2int127(point);
+        if(bitTest(level, part_lev))
         {
-            case part_lev:
-                synth->part[npart]->SetController(type, value);
-                Runtime.Log("Volume set to " + asString((int)value));
-                break;
-            default:
-                synth->SetSystemValue(type, value);
-                break;
+                synth->part[npart]->SetController(7, value);
+                Runtime.Log("Volume set to " + asString(value));
+                panelFlag = true;
         }
+        else
+                synth->SetSystemValue(7, value);
         reply = done_msg;
     }
-    else if (level >= part_lev && matchnMove(1, point, "pan"))
+    else if(bitTest(level, part_lev) && matchnMove(1, point, "pan"))
     {
         if (point[0] == 0)
             return value_msg;
-       type = 10;
-       value = string2char(point);
-        switch (level)
-        {
-            case part_lev:
-                synth->part[npart]->SetController(type, value);
-                break;
-            default:
-                synth->SetSystemValue(type, value);
-                break;
-        }        
+        value = string2int127(point);
+        synth->part[npart]->SetController(10, value);
         reply = done_msg;
-        Runtime.Log("Panning set to " + asString((int)value));
+        Runtime.Log("Panning set to " + asString(value));
+        panelFlag = true;
     }
     else if (matchnMove(1, point, "shift"))
     {
         if (point[0] == 0)
             return value_msg;
-        type = 1;
         value = string2int(point);
         if (value < 40)
             value = 40;
         else if(value > 88)
             value = 88;
-        switch (level)
+        if(bitTest(level, part_lev))
         {
-            case part_lev:
-                synth->part[npart]->Pkeyshift = value;
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
-                Runtime.Log("Key Shift set to " + asString(value) + "  (" + asString(value - 64) + ")");
-                break;
-            default:
+            synth->part[npart]->Pkeyshift = value;
+            Runtime.Log("Key Shift set to " + asString(value) + "  (" + asString(value - 64) + ")");
+            partFlag = true;
+        }
+        else
                 synth->SetSystemValue(2, value);
-                break;
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "velocity"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        value = string2int127(point);
+        if (bitTest(level, part_lev))
+        {
+            synth->part[npart]->Pvelsns = value;
+            Runtime.Log("Velocity sense set to " + asString(value));
+            partFlag = true;
         }
         reply = done_msg;
     }
+    else if (bitTest(level, part_lev) && matchnMove(2, point, "offset"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        value = string2int127(point);
+        synth->part[npart]->Pveloffs = value;
+        Runtime.Log("Velocity offset set to " + asString(value));
+        partFlag = true;
+        reply = done_msg;
+    }
+    
 
-    if (level == part_lev && (type == 7 || type == 10)) // currently only volume and pan
+    if (panelFlag) // currently only volume and pan
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
+    if (partFlag)
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
     return reply;
 }
 
@@ -474,7 +493,7 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
     
     if (isdigit(point[0]))
     {
-        tmp = string2int(point);
+        tmp = string2int127(point);
         if (tmp >= NUM_MIDI_CHANNELS)
             return range_msg;
         point = skipChars(point);
@@ -568,6 +587,7 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
     Config &Runtime = synth->getRuntime();
     int reply = ok_msg;
     int tmp;
+    bool partFlag = false;
 
     if (point[0] == 0)
         return done_msg;
@@ -577,7 +597,7 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
     {
         if (isdigit(point[0]))
         {
-            tmp = string2int(point);
+            tmp = string2int127(point);
             if (tmp >= Runtime.NumAvailableParts)
             {
                 Runtime.Log("Part number too high");
@@ -603,17 +623,17 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
         bitSet(level, part_lev);
         return effects(point, synth, level);
     }
-    tmp = volPanShift(point, synth, part_lev);
+    tmp = volPanShift(point, synth);
     if(tmp != ok_msg)
         return tmp;
-    if (matchnMove(1, point, "enable"))
+    if (matchnMove(2, point, "enable"))
     {
         synth->partonoff(npart, 1);
         Runtime.Log("Part enabled");
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
         reply = done_msg;
     }
-    else if (matchnMove(1, point, "disable"))
+    else if (matchnMove(2, point, "disable"))
     {
         synth->partonoff(npart, 0);
         Runtime.Log("Part disabled");
@@ -634,12 +654,12 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
     {
         if (point[0] != 0)
         {
-            tmp = string2int(point);
+            tmp = string2int127(point);
             synth->SetPartChan(npart, tmp);
             if (tmp < NUM_MIDI_CHANNELS)
-                Runtime.Log("Part " + asString((int) npart) + " set to channel " + asString(tmp));
+                Runtime.Log("Part " + asString(npart) + " set to channel " + asString(tmp));
             else
-                Runtime.Log("Part " + asString((int) npart) + " set to no MIDI"); 
+                Runtime.Log("Part " + asString(npart) + " set to no MIDI"); 
             reply = done_msg;
         }
         else
@@ -664,9 +684,100 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
         else
             reply = range_msg;
     }
+    else if (matchnMove(1, point, "note"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        tmp = string2int(point);
+        if (tmp < 1 || (tmp > POLIPHONY - 20))
+            return range_msg;
+        else
+        {
+            synth->part[npart]->setkeylimit(tmp);
+            Runtime.Log("Note limit set to " + asString(tmp));
+            partFlag = true;
+        }
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "min"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        tmp = string2int127(point);
+        if (tmp > synth->part[npart]->Pmaxkey)
+            return high_msg;
+        else
+        {
+            synth->part[npart]->Pminkey = tmp;
+            Runtime.Log("Min key set to " + asString(tmp));
+            partFlag = true;
+        }
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "max"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        tmp = string2int127(point);
+        if (tmp < synth->part[npart]->Pminkey)
+            return low_msg;
+        else
+        {
+            synth->part[npart]->Pmaxkey = tmp;
+            Runtime.Log("Max key set to " + asString(tmp));
+            partFlag = true;
+        }
+        reply = done_msg;
+    }
+    else if (matchnMove(1, point, "mode"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        if (matchnMove(1, point, "poly"))
+        {
+             synth->part[npart]->Ppolymode = 1;
+             synth->part[npart]->Plegatomode = 0;
+             Runtime.Log("mode set to 'poly'");
+        }
+        else 
+            if (matchnMove(1, point, "mono"))
+        {
+            synth->part[npart]->Ppolymode = 0;
+            synth->part[npart]->Plegatomode = 0;
+            Runtime.Log("mode set to 'mono'");
+        }
+        else if (matchnMove(1, point, "legato"))
+        {
+            synth->part[npart]->Ppolymode = 0;
+            synth->part[npart]->Plegatomode = 1;
+            Runtime.Log("mode set to 'legato'");
+        }
+        else
+            return value_msg;
+        partFlag = true;
+        reply = done_msg;
+    }
+    else if (matchnMove(2, point, "portamento"))
+    {
+        if (point[0] == 0)
+            return value_msg;
+        if (matchnMove(1, point, "enable"))
+        {
+           synth->SetPartPortamento(npart, 1);
+           Runtime.Log("Portamento enabled");
+        }
+        else
+        {
+           synth->SetPartPortamento(npart, 0);
+           Runtime.Log("Portamento disabled");
+        }
+        reply = done_msg;
+        partFlag = true;
+    }
     else
         reply = opp_msg;
-    
+    if (partFlag)
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
     return reply;
 }
 
@@ -767,7 +878,7 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
     if (bitTest(level, all_fx))
         return effects(point, synth, level);
     
-    tmp = volPanShift(point, synth, 0);
+    tmp = volPanShift(point, synth);
     if(tmp > ok_msg)
         return tmp;
     
@@ -1097,7 +1208,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     }
     char *cCmd = NULL;
     bool exit = false;
-//    string prompt = "yoshimi";
+
     sprintf(welcomeBuffer, "yoshimi> ");
     while(!exit)
     {

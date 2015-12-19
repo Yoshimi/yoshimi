@@ -75,7 +75,8 @@ int MiscFuncs::string2int(string str)
     return intval;
 }
 
-char MiscFuncs::string2char(string str)
+// ensures MIDI compatible numbers without errors
+int MiscFuncs::string2int127(string str)
 {
     istringstream machine(str);
     int intval;

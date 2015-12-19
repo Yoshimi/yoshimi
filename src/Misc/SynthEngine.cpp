@@ -773,6 +773,11 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
+void SynthEngine::SetPartPortamento(int npart, bool state)
+{
+    part[npart]->ctl->portamento.portamento = state;
+}
+    
 /*
  * This should really be in MiscFuncs but it has two runtime calls
  * and I can't work out a way to implement that :(
