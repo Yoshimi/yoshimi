@@ -72,6 +72,7 @@ string basics[] = {
     "    send <n3> <n4>",         "send part effect to system effect n3 at volume n4",
     "    prefix <n3>",            "set numbered effect preset to n3",
     "  program <n2>",             "loads instrument ID",
+    "  name <s>",                 "Sets the display name the part can be saved with",
     "  channel <n2>",             "sets MIDI channel (> 15 disables)",
     "  destination <s2>",         "sets jack audio destination (main, part, both)",
     "set ccroot <n>",             "set CC for root path changes (> 119 disables)",
@@ -95,8 +96,9 @@ string basics[] = {
     "stop",                       "all sound off",
     "..",                         "step back one level",
     "/",                          "step back to top level",
-    "?  help",                   "list commands",
-    "exit",                       "tidy up and close Yoshimi",
+    "?  help",                    "list commands",
+    "reset",                      "return to start-up conditions (if 'y')",
+    "exit",                       "tidy up and close Yoshimi (if 'y')",
     "end"
 };
 
@@ -147,6 +149,40 @@ void CmdInterface::defaults()
     nFX = 0;
     nFXtype = 0;
 }
+
+
+bool CmdInterface::query(string text, bool priority)
+{
+    char *line = NULL;
+    string suffix;
+    char result;
+    char test;
+    
+    priority = !priority; // so calls make more sense
+    
+    if (priority)
+    {
+        suffix = " N/y? ";
+        test = 'n';
+    }
+    else
+    {
+        suffix = " Y/n? ";
+        test = 'y';
+    }
+    result = test;
+    text += suffix;
+    line = readline(text.c_str());
+    if (line)
+    {
+        if (line[0] != 0)
+            result = line[0];
+        free(line);
+        line = NULL;
+    }
+    return (((result | 32) == test) ^ priority);
+}
+
 
 bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 {
@@ -774,6 +810,12 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
         reply = done_msg;
         partFlag = true;
     }
+    else if (matchnMove(2, point, "name"))
+    {
+        synth->part[npart]->Pname = point;
+        reply = done_msg;
+        partFlag = true;
+    }
     else
         reply = opp_msg;
     if (partFlag)
@@ -1011,8 +1053,12 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
 
     if (matchnMove(2, point, "exit"))
     {
-        Runtime.runSynth = false;
-        return true;
+        if (query("All data will be lost. Still exit", false))
+        {
+            Runtime.runSynth = false;
+            return true;
+        }
+        return false;
     }
     if (point[0] == '/')
     {
@@ -1022,6 +1068,17 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         if (point[0] == 0)
             return false;
     }
+    
+    if (matchnMove(3, point, "reset"))
+    {
+        if (query("Restore to basic settings", false))
+        {
+            synth->resetAll();
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+        }
+        return false;
+    }
+    
     else if (point[0] == '.' && point[1] == '.')
     {
         point += 2;

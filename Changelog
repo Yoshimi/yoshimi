@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2015-12-20
+- (MusicIO) hooks in place for key and channel pressure.
+- Implemented Y/N query for command line.
+- Command line can now change part names.
+- Added reset capability.
+
 2015-12-19 Will
 - All base level part controls available to command line.
 

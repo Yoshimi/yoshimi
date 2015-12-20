@@ -553,7 +553,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     int par = 0;
 //    unsigned int fetch;
     unsigned int ev;
-    
+    //synth->getRuntime().Log(">>"+asString((int)jEvent.buffer[0])+">>"+asString((int)jEvent.buffer[1])+">>"+asString((int)jEvent.buffer[2])+">>"+asString((int)jEvent.buffer[3]));
         channel = jEvent.buffer[0] & 0x0F;
         switch ((ev = jEvent.buffer[0] & 0xF0))
         {
@@ -603,6 +603,13 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                 }
                 break;
 
+            case 0xA0: // key aftertouch
+                ctrltype = C_keypressure;
+                // need to work out how to use key values >> j Event.buffer[1]
+                par = jEvent.buffer[2];
+                setMidiController(channel, ctrltype, par);
+                break;
+
             case 0xB0: // controller
                 ctrltype = getMidiController(jEvent.buffer[1]);
                 par = jEvent.buffer[2];
@@ -615,6 +622,12 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                 setMidiProgram(channel, par);
                 break;
 
+            case 0xD0: // channel aftertouch
+                ctrltype = C_channelpressure;
+                par = jEvent.buffer[1];
+                setMidiController(channel, ctrltype, par);
+                break;
+                
             case 0xE0: // pitch bend
                 ctrltype = C_pitchwheel;
                 par = ((jEvent.buffer[2] << 7) | jEvent.buffer[1]) - 8192;
@@ -625,7 +638,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                 break;
 
             default: // wot, more? commented out some progs spam us :(
-                // synth->getRuntime().Log("other event: " + asString((int)ev));
+                synth->getRuntime().Log("other event: " + asString((int)ev));
                 break;
         }
         }

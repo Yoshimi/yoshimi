@@ -96,6 +96,8 @@ bool AlsaEngine::openMidi(void)
     midi.alsaId = snd_seq_client_info_get_client(seq_info);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_NOTEON);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_NOTEOFF);
+    snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_KEYPRESS);
+    snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_CHANPRESS);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_CONTROLLER);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PGMCHANGE);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PITCHBEND);
@@ -593,6 +595,20 @@ void *AlsaEngine::MidiThread(void)
                     setMidiNote(channel, note);
                     break;
                     
+                case SND_SEQ_EVENT_KEYPRESS:
+                    channel = event->data.note.channel;
+                    ctrltype = C_keypressure;
+                    par = event->data.note.velocity;
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case SND_SEQ_EVENT_CHANPRESS:
+                    channel = event->data.control.channel;
+                    ctrltype = C_channelpressure;
+                    par = event->data.control.value;
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
                 case SND_SEQ_EVENT_PGMCHANGE:
                     channel = event->data.control.channel;
                     ctrltype = C_programchange;

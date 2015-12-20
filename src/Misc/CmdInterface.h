@@ -43,6 +43,7 @@ class CmdInterface : private MiscFuncs
         void cmdIfaceCommandLoop();
         
     private:
+        bool query(string text, bool priority);
         bool helpList(char *point, string *commands, SynthEngine *synth);
         int effectsList(char *point, SynthEngine *synth);
         int effects(char *point, SynthEngine *synth, int level);
