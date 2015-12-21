@@ -174,11 +174,6 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         }
         synth->getRuntime().Log("Chan " + asString(((int) ch) + 1) + "   CC " + ctltype  + "   Value " + asString(param));
     }
-    if (ctrl == C_keypressure || ctrl == C_channelpressure)
-    {
-        synth->getRuntime().Log("MusicIO::setMidiController -> Aftertouch not yet supported");
-        return;
-    }
     if (ctrl == synth->getRuntime().midi_bank_root)
         setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)

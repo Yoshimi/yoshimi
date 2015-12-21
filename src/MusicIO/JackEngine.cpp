@@ -506,7 +506,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                     break;
 
                 case 0xB0: // controller
-                    ctrltype = getMidiController(jEvent.buffer[1]);
+                    ctrltype = jEvent.buffer[1];//getMidiController(jEvent.buffer[1]);
                     par = jEvent.buffer[2];
                     setMidiController(channel, ctrltype, par);
                     break;

@@ -625,7 +625,7 @@ void *AlsaEngine::MidiThread(void)
 
                 case SND_SEQ_EVENT_CONTROLLER:
                     channel = event->data.control.channel;
-                    ctrltype = getMidiController(event->data.control.param);
+                    ctrltype = event->data.control.param;//getMidiController(event->data.control.param);
                     par = event->data.control.value;
                     setMidiController(channel, ctrltype, par);
                     break;
