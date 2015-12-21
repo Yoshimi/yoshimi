@@ -625,7 +625,7 @@ void *AlsaEngine::MidiThread(void)
 
                 case SND_SEQ_EVENT_CONTROLLER:
                     channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;
+                    ctrltype = getMidiController(event->data.control.param);
                     par = event->data.control.value;
                     setMidiController(channel, ctrltype, par);
                     break;
@@ -659,8 +659,7 @@ void *AlsaEngine::MidiThread(void)
             }
             snd_seq_free_event(event);
         }
-        //if (chk < 0)
-            //synth->getRuntime().Log("ALSA midi input read failed: " + asString(chk));
+;
         if(chk < 0)
         {
             usleep(1024);

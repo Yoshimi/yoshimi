@@ -25,7 +25,6 @@ bool AlsaJackClient::openAudio(void)
     if (alsaEngine.openAudio())
     {
         synth->getRuntime().Samplerate = getSamplerate();
-        //synth->getRuntime().Buffersize = getBuffersize();
         return true;
     }
     else

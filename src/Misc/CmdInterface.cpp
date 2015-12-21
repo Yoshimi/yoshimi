@@ -184,7 +184,7 @@ bool CmdInterface::query(string text, bool priority)
 }
 
 
-bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
+bool CmdInterface::helpList(string *commands)
 {
     int messagelist = 0;
     switch (messagelist)
@@ -229,7 +229,7 @@ bool CmdInterface::helpList(char *point, string *commands, SynthEngine *synth)
 }
 
 
-int CmdInterface::effectsList(char *point, SynthEngine *synth)
+int CmdInterface::effectsList()
 {
     list<string>msg;
     
@@ -271,7 +271,7 @@ int CmdInterface::effectsList(char *point, SynthEngine *synth)
 }
 
 
-int CmdInterface::effects(char *point, SynthEngine *synth, int level)
+int CmdInterface::effects(int level)
 {
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
@@ -436,7 +436,7 @@ int CmdInterface::effects(char *point, SynthEngine *synth, int level)
 }
 
 
-int CmdInterface::volPanShift(char *point, SynthEngine *synth)
+int CmdInterface::volPanShift()
 {
     Config &Runtime = synth->getRuntime();
     int reply = ok_msg;
@@ -521,7 +521,7 @@ int CmdInterface::volPanShift(char *point, SynthEngine *synth)
 }
 
 
-int CmdInterface::commandVector(char *point, SynthEngine *synth)
+int CmdInterface::commandVector()
 {
     static int axis;
     int reply = ok_msg;
@@ -618,7 +618,7 @@ int CmdInterface::commandVector(char *point, SynthEngine *synth)
 }
 
 
-int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
+int CmdInterface::commandPart(bool justSet)
 {
     Config &Runtime = synth->getRuntime();
     int reply = ok_msg;
@@ -628,7 +628,7 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
     if (point[0] == 0)
         return done_msg;
     if (bitTest(level, all_fx))
-        return effects(point, synth, level);
+        return effects(level);
     if (justSet || isdigit(point[0]))
     {
         if (isdigit(point[0]))
@@ -657,9 +657,9 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
     {
         level = 1; // clear out any higher levels
         bitSet(level, part_lev);
-        return effects(point, synth, level);
+        return effects(level);
     }
-    tmp = volPanShift(point, synth);
+    tmp = volPanShift();
     if(tmp != ok_msg)
         return tmp;
     if (matchnMove(2, point, "enable"))
@@ -824,7 +824,7 @@ int CmdInterface::commandPart(char *point, SynthEngine *synth, bool justSet)
 }
 
 
-int CmdInterface::commandSet(char *point, SynthEngine *synth)
+int CmdInterface::commandSet()
 {
     Config &Runtime = synth->getRuntime();
     int reply = ok_msg;
@@ -887,9 +887,9 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
     }
    
     else if (bitTest(level, part_lev))
-        reply = commandPart(point, synth, false);
+        reply = commandPart(false);
     else if (bitTest(level, vect_lev))
-        reply = commandVector(point, synth);
+        reply = commandVector();
     if (reply > ok_msg)
         return reply;
 
@@ -897,30 +897,30 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
     {
         level = 0; // clear all first
         bitSet(level, part_lev);
-        return commandPart(point, synth, true);
+        return commandPart(true);
     }
     if (matchnMove(2, point, "vector"))
     {
         level = 0; // clear all first
         bitSet(level, vect_lev);
-        return commandVector(point, synth);
+        return commandVector();
     }
     if (level < 4 && matchnMove(3, point, "sys"))
     {
         level = 1;
         matchnMove(2, point, "effects"); // clear it if given
-        return effects(point, synth, level);
+        return effects(level);
     }
     if (level < 4 && matchnMove(3, point, "ins"))
     {
         level = 3;
         matchnMove(2, point, "effects"); // clear it if given
-        return effects(point, synth, level);
+        return effects(level);
     }
     if (bitTest(level, all_fx))
-        return effects(point, synth, level);
+        return effects(level);
     
-    tmp = volPanShift(point, synth);
+    tmp = volPanShift();
     if(tmp > ok_msg)
         return tmp;
     
@@ -1029,7 +1029,7 @@ int CmdInterface::commandSet(char *point, SynthEngine *synth)
 }
 
 
-bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
+bool CmdInterface::cmdIfaceProcessCommand()
 {
     map<SynthEngine *, MusicClient *>::iterator itSynth = synthInstances.begin();
     if (currentInstance >= (int)synthInstances.size())
@@ -1038,7 +1038,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         defaults();
     }
     for(int i = 0; i < currentInstance; i++, ++itSynth);
-    SynthEngine *synth = itSynth->first;
+    synth = itSynth->first;
     Config &Runtime = synth->getRuntime();
 
     replyString = "";
@@ -1047,7 +1047,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
     int reply = ok_msg;
     int tmp;
     string *commands = NULL;
-    char *point = buffer;
+    point = cCmd;
     point = skipSpace(point); // just to be sure
     list<string> msg;
 
@@ -1096,7 +1096,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
         if (point[0] == 0)
             return false;
     }
-    if (helpList(point, commands, synth))
+    if (helpList(commands))
         return false;
     if (matchnMove(2, point, "stop"))
         synth->allStop();
@@ -1136,7 +1136,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
             synth->cliOutput(msg, LINES);
         }
         else if (matchnMove(1, point, "effects"))
-            reply = effectsList(point, synth);
+            reply = effectsList();
         else
         {
             replyString = "list";
@@ -1147,7 +1147,7 @@ bool CmdInterface::cmdIfaceProcessCommand(char *buffer)
     else if (matchnMove(1, point, "set"))
     {
         if (point[0] != 0)
-            reply = commandSet(point, synth);
+            reply = commandSet();
         else
         {
             replyString = "set";
@@ -1263,7 +1263,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     {
         perror(hist_filename.c_str());
     }
-    char *cCmd = NULL;
+    cCmd = NULL;
     bool exit = false;
 
     sprintf(welcomeBuffer, "yoshimi> ");
@@ -1274,7 +1274,7 @@ void CmdInterface::cmdIfaceCommandLoop()
         {
             if(cCmd[0] != 0)
             {
-                exit = cmdIfaceProcessCommand(cCmd);
+                exit = cmdIfaceProcessCommand();
                 add_history(cCmd);
             }
             free(cCmd);

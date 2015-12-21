@@ -44,14 +44,17 @@ class CmdInterface : private MiscFuncs
         
     private:
         bool query(string text, bool priority);
-        bool helpList(char *point, string *commands, SynthEngine *synth);
-        int effectsList(char *point, SynthEngine *synth);
-        int effects(char *point, SynthEngine *synth, int level);
-        int volPanShift(char *point, SynthEngine *synth);
-        int commandVector(char *point, SynthEngine *synth);
-        int commandPart(char *point, SynthEngine *synth, bool justSet);
-        int commandSet(char *point, SynthEngine *synth);
-        bool cmdIfaceProcessCommand(char *buffer);
+        bool helpList(string *commands);
+        int effectsList();
+        int effects(int level);
+        int volPanShift();
+        int commandVector();
+        int commandPart(bool justSet);
+        int commandSet();
+        bool cmdIfaceProcessCommand();
+        char *cCmd;
+        char *point;
+        SynthEngine *synth;
     
         char welcomeBuffer [128];
 };
