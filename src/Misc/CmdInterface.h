@@ -31,10 +31,7 @@ extern map<SynthEngine *, MusicClient *> synthInstances;
 // all_fx and ins_fx MUST be the first two
 typedef enum { all_fx = 0, ins_fx, vect_lev, part_lev, } level_bits;
 
-typedef enum { ok_msg = 0, done_msg, value_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,} error_messages;
-
-//class EffectMgr;
-//class SynthEngine;
+typedef enum { todo_msg = 0, done_msg, value_msg, opp_msg, what_msg, range_msg, low_msg, high_msg, unrecognised_msg, parameter_msg, level_msg, available_msg,} error_messages;
 
 class CmdInterface : private MiscFuncs
 {
@@ -54,8 +51,15 @@ class CmdInterface : private MiscFuncs
         bool cmdIfaceProcessCommand();
         char *cCmd;
         char *point;
-        SynthEngine *synth;
-    
+        SynthEngine *synth;  
         char welcomeBuffer [128];
+        
+        int npart;
+        int nFX;
+        int nFXtype;
+        int chan;
+        int axis;
+        unsigned int level;
+        string replyString;
 };
 #endif

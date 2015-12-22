@@ -25,12 +25,6 @@ using namespace std;
 
 
 static int currentInstance = 0;
-static string replyString = "";
-static unsigned int level = 0;
-static int chan = 0;
-static int npart = 0;
-static int nFX = 0;
-static int nFXtype = 0;
 
 string basics[] = {
     "load patchset <s>",          "load a complete set of instruments from named file",
@@ -145,6 +139,7 @@ void CmdInterface::defaults()
 {
     level = 0;
     chan = 0;
+    axis = 0;
     npart = 0;
     nFX = 0;
     nFXtype = 0;
@@ -439,7 +434,7 @@ int CmdInterface::effects(int level)
 int CmdInterface::volPanShift()
 {
     Config &Runtime = synth->getRuntime();
-    int reply = ok_msg;
+    int reply = todo_msg;
     int value;
     bool panelFlag = false;
     bool partFlag = false;
@@ -523,10 +518,12 @@ int CmdInterface::volPanShift()
 
 int CmdInterface::commandVector()
 {
-    static int axis;
-    int reply = ok_msg;
+    int reply = todo_msg;
     int tmp;
     
+    if (point[0] == 0)
+        return done_msg;
+
     if (isdigit(point[0]))
     {
         tmp = string2int127(point);
@@ -534,38 +531,56 @@ int CmdInterface::commandVector()
             return range_msg;
         point = skipChars(point);
         if (chan != tmp)
+        {
             chan = tmp;
+            axis = 0;
+        }
         synth->getRuntime().Log("Vector channel set to " + asString(chan));
     }
 
-    if (point[0] == 0)
-        return done_msg;
-    
     if (matchWord(1, point, "off"))
     {
         synth->vectorSet(127, chan, 0);
+        axis = 0;
         return done_msg;
     }
-    tmp = point[0] | 32; // trap upper case    
-    if (tmp == 'x' || tmp == 'y')
+    if (matchnMove(1, point, "xaxis"))
+        axis = 0;
+    else if (matchnMove(1, point, "yaxis"))
     {
-        axis = tmp - 'x';
-        ++ point;
-        point = skipSpace(point); // can manage with or without a space
+        if (synth->getRuntime().nrpndata.vectorXaxis[chan] > 0x7f)
+        {
+            synth->getRuntime().Log("Vector X must be set first");
+            return done_msg;
+        }
+        axis = 1;
     }
+    if (point[0] == 0)
+        return done_msg;
+    
     if (matchnMove(1, point, "cc"))
     {
         if (point[0] == 0)
-            reply = value_msg;
-        else
-        {
-            tmp = string2int(point);
-            if (!synth->vectorInit(axis, chan, tmp))
-                synth->vectorSet(axis, chan, tmp);
-            reply = done_msg;
-        } 
+            return value_msg;
+
+        tmp = string2int(point);
+        if (!synth->vectorInit(axis, chan, tmp))
+            synth->vectorSet(axis, chan, tmp);
+        return done_msg;
     }
-    else if (matchnMove(1, point, "features"))
+    if (!synth->getRuntime().nrpndata.vectorEnabled[chan])
+    {
+        synth->getRuntime().Log("Vector X CC must be set first");
+        return done_msg;
+    }
+    
+    if (axis == 1 && (synth->getRuntime().nrpndata.vectorYaxis[chan] > 0x7f))
+    {
+        synth->getRuntime().Log("Vector Y CC must be set first");
+        return done_msg;
+    }
+    
+    if (matchnMove(1, point, "features"))
     {
         if (point[0] == 0)
             reply = value_msg;
@@ -621,7 +636,7 @@ int CmdInterface::commandVector()
 int CmdInterface::commandPart(bool justSet)
 {
     Config &Runtime = synth->getRuntime();
-    int reply = ok_msg;
+    int reply = todo_msg;
     int tmp;
     bool partFlag = false;
 
@@ -660,7 +675,7 @@ int CmdInterface::commandPart(bool justSet)
         return effects(level);
     }
     tmp = volPanShift();
-    if(tmp != ok_msg)
+    if(tmp != todo_msg)
         return tmp;
     if (matchnMove(2, point, "enable"))
     {
@@ -827,10 +842,10 @@ int CmdInterface::commandPart(bool justSet)
 int CmdInterface::commandSet()
 {
     Config &Runtime = synth->getRuntime();
-    int reply = ok_msg;
+    int reply = todo_msg;
     int tmp;
 
-    if (matchnMove(1, point, "yoshimi"))
+    if (matchnMove(4, point, "yoshimi"))
     {
         if (point[0] == 0)
             return value_msg;
@@ -890,7 +905,7 @@ int CmdInterface::commandSet()
         reply = commandPart(false);
     else if (bitTest(level, vect_lev))
         reply = commandVector();
-    if (reply > ok_msg)
+    if (reply > todo_msg)
         return reply;
 
     if (matchnMove(1, point, "part"))
@@ -921,7 +936,7 @@ int CmdInterface::commandSet()
         return effects(level);
     
     tmp = volPanShift();
-    if(tmp > ok_msg)
+    if(tmp > todo_msg)
         return tmp;
     
     if (matchnMove(1, point, "program"))
@@ -992,7 +1007,7 @@ int CmdInterface::commandSet()
         }
         else
             reply = opp_msg;
-        if (reply == ok_msg)
+        if (reply == todo_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 3);
             
     }
@@ -1020,7 +1035,7 @@ int CmdInterface::commandSet()
         }
         else
             reply = opp_msg;
-        if (reply == ok_msg)
+        if (reply == todo_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 2);
     }
     else
@@ -1044,7 +1059,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     replyString = "";
     npart = Runtime.currentPart;
     int ID;
-    int reply = ok_msg;
+    int reply = todo_msg;
     int tmp;
     string *commands = NULL;
     point = cCmd;
@@ -1296,8 +1311,14 @@ void CmdInterface::cmdIfaceCommandLoop()
                 prompt += (" FX " + asString(nFX));
             }
             if (bitTest(level, vect_lev))
-                prompt += (" vect " + asString(chan));
-            prompt += "> ";
+            {
+                prompt += (" Vect Ch " + asString(chan) + " ");
+                if (axis == 0)
+                    prompt += "X";
+                else
+                    prompt += "Y";
+            }
+            prompt += " > ";
             sprintf(welcomeBuffer, prompt.c_str());
         }
         else
