@@ -25,6 +25,7 @@
 #include <string>
 #include <Misc/MiscFuncs.h>
 #include <Misc/SynthEngine.h>
+#include <Effects/EffectMgr.h>
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 

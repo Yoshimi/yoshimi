@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2015-12-23 Will
+- Small improvements to command line access.
+
 2015-12-22 Will
 - Bugfix. Had screwed up vector Y control. Now better
   error checked too.
