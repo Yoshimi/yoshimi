@@ -333,6 +333,7 @@ int CmdInterface::effects(int level)
             return unrecognised_msg;
         
         Runtime.Log("FX type set to " + fx_list[nFXtype]);
+        Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
             category = 2;
         else if (bitTest(level, ins_fx))
@@ -1307,7 +1308,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                     else
                         prompt += " Sys";
                 }
-                prompt += (" FX " + fx_list[nFXtype].substr(0, 5));
+                prompt += (" FX " + asString(nFX) + " " + fx_list[nFXtype].substr(0, 5));
             }
             if (bitTest(level, vect_lev))
             {
