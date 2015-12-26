@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey 
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -1134,25 +1134,27 @@ updatepanel();}
   }
   Function {updateeffects(int data)} {} {
     code {//
-    int effect = (data >> 16) & 0xff;
-    int type =  (data >> 12) & 3;
+    int partnum = data >> 24;
+    int effclass = (data >> 22) & 3; 
+    int effect = (data >> 16) & 0x3f;
+    int type = (data >> 12) & 3;
     int parameter = (data >> 8) & 0x7f;
     int value = data & 0x7f;
-
-    if (effect > 0x3f)
+    string prefix;
+    
+    if (effclass == 2)
     {
-        effect &= 0x3f;
-        synth->getRuntime().Log("Insert  Effect Number "
-        			+ asString(effect)
-        			+ "  Type " + asString(type)
-        			+ "  Parameter "
-        			+ asString(parameter)
-        			+ "  Value " + asString(value));
+         prefix = "Part";
+    }
+    else if (effclass == 1)
+    {
+        prefix = "Insert";
         sysinsgroup->value(InsertionEffectsGrp);
         showInsEfxUI();
         inseffnocounter->value(effect + 1);
-        int partnum = data >> 24;
         inseffpart->value(partnum);
+        if (parameter & 0x40)
+            ninseff = parameter & 0x3f;
         if (partnum != 1)
         {
             insefftype->activate();
@@ -1163,26 +1165,31 @@ updatepanel();}
             insefftype->deactivate();
             inseffectui->deactivate();
         }
-        insefftype->value(synth->insefx[effect]->geteffect());
-        inseffectui->refresh(synth->insefx[effect]);
+        insefftype->value(synth->insefx[ninseff]->geteffect());
+        inseffectui->refresh(synth->insefx[ninseff]);
     }
     else
     {
-        synth->getRuntime().Log("Insert  Effect Number "
+        prefix = "System";
+        sysinsgroup->value(SystemEffectsGrp);
+        syseffnocounter->value(effect + 1);
+        if (parameter & 0x40)
+            nsyseff = parameter & 0x3f;
+        if (type == 1)
+        {
+        // effect output volume to be done!
+        }
+        sysefftype->value(synth->sysefx[ nsyseff]->geteffect());
+        syseffectui->refresh(synth->sysefx[ nsyseff]);      
+        showSysEfxUI();
+        
+        synth->getRuntime().Log(prefix + " Effect Number "
         			+ asString(effect)
         			+ "  Type " + asString(type)
         			+ "  Parameter "
         			+ asString(parameter)
         			+ "  Value " + asString(value));
-        sysinsgroup->value(SystemEffectsGrp);
-        syseffnocounter->value(effect + 1);
-        if (type == 1)
-        {
-        // effect output volume to be done!
-        }
-        sysefftype->value(synth->sysefx[effect]->geteffect());
-        syseffectui->refresh(synth->sysefx[effect]);      
-        showSysEfxUI();
+
     }} {}
   }
   Function {setMasterLabel(string name)} {} {

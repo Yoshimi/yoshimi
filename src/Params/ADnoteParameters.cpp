@@ -78,6 +78,7 @@ void ADnoteParameters::defaults(void)
     GlobalPar.PAmpVelocityScaleFunction = 64;
     GlobalPar.AmpEnvelope->defaults();
     GlobalPar.AmpLfo->defaults();
+    GlobalPar.Fadein_adjustment = FADEIN_ADJUSTMENT_SCALE;
     GlobalPar.PPunchStrength = 0;
     GlobalPar.PPunchTime = 60;
     GlobalPar.PPunchStretch = 64;
@@ -331,7 +332,6 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     xml->addpar("volume", VoicePar[nvoice].PVolume);
     xml->addparbool("volume_minus", VoicePar[nvoice].PVolumeminus);
     xml->addpar("velocity_sensing", VoicePar[nvoice].PAmpVelocityScaleFunction);
-
     xml->addparbool("amp_envelope_enabled", VoicePar[nvoice].PAmpEnvelopeEnabled);
     if ((VoicePar[nvoice].PAmpEnvelopeEnabled!=0) || (!xml->minimal)) {
         xml->beginbranch("AMPLITUDE_ENVELOPE");
@@ -445,6 +445,7 @@ void ADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("volume", GlobalPar.PVolume);
     xml->addpar("panning", GlobalPar.PPanning);
     xml->addpar("velocity_sensing", GlobalPar.PAmpVelocityScaleFunction);
+    xml->addpar("fadein_adjustment", GlobalPar.Fadein_adjustment);
     xml->addpar("punch_strength", GlobalPar.PPunchStrength);
     xml->addpar("punch_time", GlobalPar.PPunchTime);
     xml->addpar("punch_stretch", GlobalPar.PPunchStretch);
@@ -517,6 +518,7 @@ void ADnoteParameters::getfromXML(XMLwrapper *xml)
         setGlobalPan(xml->getpar127("panning", GlobalPar.PPanning));
         GlobalPar.PAmpVelocityScaleFunction =
             xml->getpar127("velocity_sensing", GlobalPar.PAmpVelocityScaleFunction);
+        GlobalPar.Fadein_adjustment = xml->getpar127("fadein_adjustment", GlobalPar.Fadein_adjustment);
         GlobalPar.PPunchStrength =
             xml->getpar127("punch_strength", GlobalPar.PPunchStrength);
         GlobalPar.PPunchTime = xml->getpar127("punch_time", GlobalPar.PPunchTime);

@@ -125,6 +125,9 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
             pars->PFilterVelocityScale / 127.0 * 6.0
             * (velF(velocity, pars->PFilterVelocityScaleFunction) - 1); // velocity sensing
 
+    NoteGlobalPar.Fadein_adjustment =
+            pars->Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
+    NoteGlobalPar.Fadein_adjustment *= NoteGlobalPar.Fadein_adjustment;
     if (pars->PPunchStrength != 0)
     {
         NoteGlobalPar.Punch.Enabled = 1;
@@ -313,6 +316,7 @@ inline void PADnote::fadein(float *smps)
     float tmp = (synth->p_buffersize_f - 1.0) / (zerocrossings + 1) / 3.0;
     if (tmp < 8.0)
         tmp = 8.0;
+    tmp *= NoteGlobalPar.Fadein_adjustment;
 
     // F2I(tmp, n); // how many samples is the fade-in
     int n = (tmp > 0.0f) ? (int)truncf(tmp) : (int)truncf(tmp - 1.0f);
@@ -320,7 +324,7 @@ inline void PADnote::fadein(float *smps)
         n = synth->p_buffersize;
     for (int i = 0; i < n; ++i)
     {   // fade-in
-        float tmp = 0.5 - cosf((float)i / (float) n * PI) * 0.5;
+        float tmp = 0.5 - cosf((float)i / (float) n * PI) * 0.5f;
         smps[i] *= tmp;
     }
 }

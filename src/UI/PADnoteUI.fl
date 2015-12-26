@@ -246,9 +246,9 @@ synth = parameters->getSynthEngine();
   Function {make_window()} {} {
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {136 254 535 450} type Double
+      xywh {22 67 535 450} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
-      code1 {o->position(synth->getGuiMaster()->padNoteX, synth->getGuiMaster()->padNoteY);} visible
+      code1 {o->position(synth->getGuiMaster()->padNoteX, synth->getGuiMaster()->padNoteY);}
     } {
       Fl_Tabs {} {
         callback {//
@@ -955,6 +955,13 @@ synth = parameters->getSynthEngine();
               tooltip {Random panning On/Off} xywh {197 77 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
               code0 {o->value(pars->randomPan());}
             }
+            Fl_Dial dpop {
+              label {D.Pop}
+              callback {pars->Fadein_adjustment = (int) o->value();}
+              tooltip {Pop Suppression} xywh {85 247 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+              code0 {o->value(pars->Fadein_adjustment);}
+              class WidgetPDial
+            }
             Fl_Dial pstr {
               label {P.Str.}
               callback {pars->PPunchStrength = (int) o->value();}
@@ -998,7 +1005,7 @@ synth = parameters->getSynthEngine();
             Fl_Check_Button stereo {
               label Stereo
               callback {pars->PStereo =(o->value()) ? true : false; hprofile->redraw();}
-              xywh {15 245 70 25} down_box DOWN_BOX labelsize 12
+              xywh {15 245 65 25} down_box DOWN_BOX labelsize 11
               code0 {o->value(pars->PStereo);}
             }
           }

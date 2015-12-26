@@ -63,7 +63,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
 
     mxmlElementSetAttr(root, "version-major", "2");
-    mxmlElementSetAttr(root, "version-minor", "4");
+    mxmlElementSetAttr(root, "version-minor", "5");
     mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
 
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");

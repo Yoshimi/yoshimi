@@ -71,6 +71,9 @@ struct ADnoteGlobalParam {
     EnvelopeParams *AmpEnvelope;
     LFOParams      *AmpLfo;
 
+    // Adjustment factor for anti-pop fadein
+    unsigned char Fadein_adjustment;
+
     FilterParams *GlobalFilter;         // Filter global parameters
     unsigned char PFilterVelocityScale; // Filter velocity sensing
     unsigned char PFilterVelocityScaleFunction;

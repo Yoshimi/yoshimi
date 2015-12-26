@@ -95,6 +95,7 @@ class PADnote : public Carcass, private SynthHelper
             Envelope *AmpEnvelope;
             LFO *AmpLfo;
 
+            float Fadein_adjustment;
             struct {
                 int Enabled;
                 float initialvalue;

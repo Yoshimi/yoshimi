@@ -235,8 +235,14 @@ int CmdInterface::effectsList()
     int presetsCount;
     string blanks;
     string left;
-    
-    bool all = matchnMove(1, point, "all");
+    bool all;
+    if (bitTest(level, part_lev) && bitTest(level, all_fx))
+    {
+         synth->getRuntime().Log("Type " + fx_list[nFXtype] + "\nPresets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
+         return done_msg;
+    }
+    else
+        all = matchnMove(1, point, "all");
     if (!all)
         msg.push_back("  effect     presets");
     for (int i = 0; i < 9; ++ i)
@@ -333,7 +339,7 @@ int CmdInterface::effects(int level)
             return unrecognised_msg;
         
         Runtime.Log("FX type set to " + fx_list[nFXtype]);
-        Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
+        //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
             category = 2;
         else if (bitTest(level, ins_fx))
@@ -404,6 +410,13 @@ int CmdInterface::effects(int level)
     }
     else if (matchnMove(3, point, "preset"))
     {
+        /*
+         * Using constant strings and bedding the number into the list
+         * of presets provies a very simple way to keep track of a
+         * moving target with minimal code and data space.
+         * However, all of this should really be in src/Effects
+         * not here *and* in the gui code!
+         */
         par = string2int(fx_presets [nFXtype].substr(0, fx_presets [nFXtype].find(',')));
         if (par == 1)
             return available_msg;

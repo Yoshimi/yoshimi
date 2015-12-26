@@ -534,42 +534,54 @@ void SynthEngine::SetZynControls()
 {
     unsigned char parnum = Runtime.dataH;
     unsigned char value = Runtime.dataL;
+    static unsigned char syseffnum;
+    static unsigned char inseffnum;
+    
     if (parnum <= 0x7f && value <= 0x7f)
     {
         Runtime.dataL = 0xff; // use once then clear it out
-        unsigned char effnum = Runtime.nrpnL;
+        //unsigned char effnum = Runtime.nrpnL;
         unsigned char efftype = (parnum & 0x60);
         int data = value;
         data |= (parnum << 8);
-        data |= (effnum << 16);
         parnum &= 0x1f;
+
         if (Runtime.nrpnH == 8)
         {
             data |= 0x400000;
-            if (efftype == 0x20) // select part
+            if (efftype == 0x40) // select effect
+            {
+                insefx[parnum]->changeeffect(value);
+                inseffnum = parnum;
+            }
+            else if (efftype == 0x20) // select part
             {
                 if (value >= 0x7e)
-                    Pinsparts[effnum] = value - 0x80; // set for 'Off' and 'Master out'
+                    Pinsparts[inseffnum] = value - 0x80; // set for 'Off' and 'Master out'
                 else if (value < Runtime.NumAvailableParts)
-                    Pinsparts[effnum] = value;
+                    Pinsparts[inseffnum] = value;
             }
-            else if (efftype == 0x40) // select effect
-                insefx[effnum]->changeeffect(value);
             else
-                insefx[effnum]->seteffectpar(parnum, value);
-            data |= (Pinsparts[effnum] + 2) << 24; // needed for both operations
+                insefx[inseffnum]->seteffectpar(parnum, value);
+            data |= (Pinsparts[inseffnum] + 2) << 24; // needed for both operations
+            data |= (inseffnum << 16);
         }
         else
         {
-            if (efftype == 0x20) // select output level
+            
+            if (efftype == 0x40) // select effect
+            {
+                sysefx[parnum]->changeeffect(value);
+                syseffnum = parnum;
+            }
+            else if (efftype == 0x20) // select output level
             {
                 // setPsysefxvol(effnum, parnum, value); // this isn't correct!
                 
             }
-            else if (efftype == 0x40) // select effect
-                sysefx[effnum]->changeeffect(value);
             else
-                sysefx[effnum]->seteffectpar(parnum, value);
+                sysefx[syseffnum]->seteffectpar(parnum, value);
+            data |= (syseffnum << 16);
         }
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
     }

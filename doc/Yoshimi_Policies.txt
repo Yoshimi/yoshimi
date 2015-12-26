@@ -21,8 +21,8 @@ Last release was yoshimi-1.3.5.2
 master is shown as yoshimi-1.3.5 M
 
 xml files created with this will have:
-Major version 3
-Minor version 5
+Major version 1
+Minor version 3
 
 
 

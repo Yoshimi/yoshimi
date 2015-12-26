@@ -154,14 +154,15 @@ Yoshimi Extensions
 If the Data MSB bit 6 is set (64) then Data LSB sets the effect type instead of a parameter number.
 This must be set before making a parameter change.
 
-0 - Reverb
-1 - Echo
-2 - Chorus
-3 - Phaser
-4 - AlienWah
-5 - Distortion
-6 - EQ
-7 - DynFilter
+0 - Off
+1 - Reverb
+2 - Echo
+3 - Chorus
+4 - Phaser
+5 - AlienWah
+6 - Distortion
+7 - EQ
+8 - DynFilter
 
 
 For Insert effects, if the Data MSB bit 5 is set (32) then Data LSB sets the destination part number. 127 is off and 126 is the Master Output.

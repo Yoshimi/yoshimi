@@ -127,6 +127,7 @@ void PADnoteParameters::defaults(void)
     PAmpVelocityScaleFunction = 64;
     AmpEnvelope->defaults();
     AmpLfo->defaults();
+    Fadein_adjustment = FADEIN_ADJUSTMENT_SCALE;
     PPunchStrength = 0;
     PPunchTime = 60;
     PPunchStretch = 64;
@@ -732,6 +733,7 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("volume",PVolume);
     xml->addpar("panning",PPanning);
     xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
+    xml->addpar("fadein_adjustment", Fadein_adjustment);
     xml->addpar("punch_strength",PPunchStrength);
     xml->addpar("punch_time",PPunchTime);
     xml->addpar("punch_stretch",PPunchStretch);
@@ -834,6 +836,7 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         PVolume=xml->getpar127("volume",PVolume);
         setPan(xml->getpar127("panning",PPanning));
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
+        Fadein_adjustment = xml->getpar127("fadein_adjustment", Fadein_adjustment);
         PPunchStrength=xml->getpar127("punch_strength",PPunchStrength);
         PPunchTime=xml->getpar127("punch_time",PPunchTime);
         PPunchStretch=xml->getpar127("punch_stretch",PPunchStretch);
