@@ -283,6 +283,7 @@ int CmdInterface::effects(int level)
     int category;
     int par;
     int value;
+    int data;
     
     string dest = "";
     bool flag;
@@ -310,6 +311,7 @@ int CmdInterface::effects(int level)
         point = skipChars(point);
         if (value >= nFXavail)
             return range_msg;
+
         if (value != nFX)
         {
             nFX = value;
@@ -347,6 +349,7 @@ int CmdInterface::effects(int level)
         else
             category = 0;
         synth->SetEffects(category, 1, nFX, nFXtype, 0, 0);
+
         return done_msg;
     }
     else if (matchnMove(1, point, "send"))
@@ -938,14 +941,14 @@ int CmdInterface::commandSet()
         bitSet(level, vect_lev);
         return commandVector();
     }
-    if (level < 4 && matchnMove(3, point, "sys"))
+    if (level < 4 && matchnMove(3, point, "system"))
     {
         level = 1;
         matchnMove(2, point, "effects"); // clear it if given
         nFXtype = synth->sysefx[nFX]->geteffect();
         return effects(level);
     }
-    if (level < 4 && matchnMove(3, point, "ins"))
+    if (level < 4 && matchnMove(3, point, "insert"))
     {
         level = 3;
         matchnMove(2, point, "effects"); // clear it if given

@@ -534,54 +534,47 @@ void SynthEngine::SetZynControls()
 {
     unsigned char parnum = Runtime.dataH;
     unsigned char value = Runtime.dataL;
-    static unsigned char syseffnum;
-    static unsigned char inseffnum;
+
     
     if (parnum <= 0x7f && value <= 0x7f)
     {
         Runtime.dataL = 0xff; // use once then clear it out
-        //unsigned char effnum = Runtime.nrpnL;
+        unsigned char effnum = Runtime.nrpnL;
         unsigned char efftype = (parnum & 0x60);
-        int data = value;
-        data |= (parnum << 8);
+        int data = (effnum << 8);
         parnum &= 0x1f;
 
         if (Runtime.nrpnH == 8)
         {
-            data |= 0x400000;
+            data |= (1 << 22);
             if (efftype == 0x40) // select effect
             {
-                insefx[parnum]->changeeffect(value);
-                inseffnum = parnum;
+                actionLock(lockmute);
+                insefx[effnum]->changeeffect(value);
+                actionLock(unlock);
             }
             else if (efftype == 0x20) // select part
             {
                 if (value >= 0x7e)
-                    Pinsparts[inseffnum] = value - 0x80; // set for 'Off' and 'Master out'
+                    Pinsparts[effnum] = value - 0x80; // set for 'Off' and 'Master out'
                 else if (value < Runtime.NumAvailableParts)
-                    Pinsparts[inseffnum] = value;
+                    Pinsparts[effnum] = value;
             }
             else
-                insefx[inseffnum]->seteffectpar(parnum, value);
-            data |= (Pinsparts[inseffnum] + 2) << 24; // needed for both operations
-            data |= (inseffnum << 16);
+                insefx[effnum]->seteffectpar(parnum, value);
+            data |= ((Pinsparts[effnum] + 2) << 24); // needed for both operations
         }
         else
         {
-            
             if (efftype == 0x40) // select effect
-            {
-                sysefx[parnum]->changeeffect(value);
-                syseffnum = parnum;
-            }
+                sysefx[effnum]->changeeffect(value);
             else if (efftype == 0x20) // select output level
             {
                 // setPsysefxvol(effnum, parnum, value); // this isn't correct!
                 
             }
             else
-                sysefx[syseffnum]->seteffectpar(parnum, value);
-            data |= (syseffnum << 16);
+                sysefx[effnum]->seteffectpar(parnum, value);
         }
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
     }
@@ -591,59 +584,64 @@ void SynthEngine::SetZynControls()
 void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value)
 {
     // category 0-sysFX, 1-insFX, 2-partFX
-    // commands 0-nFX, 1-nType, 2-nPar, 3-value, 4-sends
+    // command 1-set effect, 4-set param, 8-set preset
     
     int npart = getRuntime().currentPart;
+    int data = (nFX) << 8;
     
-    if (command == 1);
-    {
-        actionLock(lockmute);
-        switch (category)
-        {
-            case 1:
-                insefx[nFX]->changeeffect(nType);
-                break;
-            case 2:
-                part[npart]->partefx[nFX]->changeeffect(nType);
-                break;  
-            default:
-                sysefx[nFX]->changeeffect(nType);
-                break;      
-        }
-        actionLock(unlock);
-    }
     
-    if (command == 4)
+    switch (category)
     {
-        switch (category)
-        {
-            case 1:
-                Pinsparts[nFX] = nPar;
-                break;
-            case 2:
-                setPsysefxvol(npart, nPar, value);
-                break;  
-            default:
-                setPsysefxsend(nFX, nPar, value);
-                break;      
-        }
+        case 1:
+            data |= (1 << 22);
+            
+            switch (command)
+            {
+                case 1:
+                    insefx[nFX]->changeeffect(nType);
+                    data |= ((Pinsparts[nFX] + 2) << 24);
+                    break;
+                case 4:
+                    Pinsparts[nFX] = nPar;
+                    data |= ((nPar + 2) << 24);
+                    break;
+                case 8:
+                    insefx[nFX]->changepreset(value);
+                    data |= ((Pinsparts[nFX] + 2) << 24);
+                    break;
+            }
+            break;
+        case 2:
+            data |= (2 << 22);
+            switch (command)
+            {
+                case 1:
+                    part[npart]->partefx[nFX]->changeeffect(nType);
+                    break;
+                case 4:
+                    setPsysefxvol(npart, nPar, value);
+                    break;
+                case 8:
+                    part[npart]->partefx[nFX]->changepreset(value);
+                    break;
+            }
+            break;
+        default:
+            switch (command)
+            {
+                case 1:
+                    sysefx[nFX]->changeeffect(nType);
+                    break;
+                case 4:
+                    setPsysefxsend(nFX, nPar, value);
+                    break;
+                case 8:
+                    sysefx[nFX]->changepreset(value);
+                    break;
+            }
+            break;
     }
-    
-    if (command == 8)
-    {
-        switch (category)
-        {
-            case 1:
-                insefx[nFX]->changepreset(value);
-                break;
-            case 2:
-                part[npart]->partefx[nFX]->changepreset(value);
-                break;  
-            default:
-                sysefx[nFX]->changepreset(value);
-                break;      
-        }
-    }
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
 }
 
 
