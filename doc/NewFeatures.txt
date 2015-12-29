@@ -110,3 +110,7 @@ Thanks to the Zyn. devs, we now have pink as well as white noise available on Ad
 The preferred jack/alsa MIDI and audio connections are no longer fixed at compile time. There are now checkboxes on 'Settings' to change them.
 
 ###
+
+With the latest 'depop' port from Zyn, we are now fully compatibly with all instrument files.
+
+###
