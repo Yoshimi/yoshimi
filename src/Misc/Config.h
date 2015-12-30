@@ -49,7 +49,9 @@ class Config : public MiscFuncs
         Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
         bool Setup(int argc, char **argv);
+#ifndef YOSHIMI_LV2_PLUGIN
         void StartupReport(MusicClient *musicClient);
+#endif
         void Announce(void);
         void Usage(void);
         void Log(string msg, bool tostderr = false);

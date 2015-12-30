@@ -737,7 +737,7 @@ void Config::Log(string msg, bool tostderr)
         cerr << msg << endl;
 }
 
-
+#ifndef YOSHIMI_LV2_PLUGIN
 void Config::StartupReport(MusicClient *musicClient)
 {
     Log(string(argp_program_version));
@@ -777,6 +777,7 @@ void Config::StartupReport(MusicClient *musicClient)
     Log("Period size: " + asString(synth->buffersize));
 }
 
+#endif
 
 void Config::setRtprio(int prio)
 {
