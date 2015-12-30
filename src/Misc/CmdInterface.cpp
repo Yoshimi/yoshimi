@@ -283,7 +283,6 @@ int CmdInterface::effects(int level)
     int category;
     int par;
     int value;
-    int data;
     
     string dest = "";
     bool flag;
