@@ -219,7 +219,7 @@ void JackEngine::Close(void)
     }
 }
 
-void JackEngine::registerJackPort(int partnum)
+void JackEngine::registerAudioPort(int partnum)
 {
     int portnum = partnum * 2;
     if(partnum >=0 && partnum < NUM_MIDI_PARTS)
@@ -251,6 +251,13 @@ void JackEngine::registerJackPort(int partnum)
 
 bool JackEngine::openAudio(void)
 {
+    if(jackClient == 0)
+    {
+        if(!connectServer(synth->getRuntime().audioDevice))
+        {
+            return false;
+        }
+    }
     // Register mixed outputs
     audio.ports[2 * NUM_MIDI_PARTS] = jack_port_register(jackClient, "left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     audio.ports[2 * NUM_MIDI_PARTS + 1] = jack_port_register(jackClient, "right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
@@ -270,6 +277,14 @@ bool JackEngine::openAudio(void)
 
 bool JackEngine::openMidi(void)
 {
+    if(jackClient == 0)
+    {
+        if(!connectServer(synth->getRuntime().midiDevice))
+        {
+            return false;
+        }
+    }
+
     const char *port_name = "midi in";
     midi.port = jack_port_register(jackClient, port_name,
                                    JACK_DEFAULT_MIDI_TYPE,

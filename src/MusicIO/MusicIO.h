@@ -35,6 +35,13 @@ class MusicIO : virtual protected MiscFuncs
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
         virtual void Close(void) = 0;
+        virtual bool openAudio(void) = 0;
+        virtual bool openMidi(void) = 0;
+        virtual string audioClientName(void) = 0;
+        virtual int audioClientId(void) = 0;
+        virtual string midiClientName(void) = 0;
+        virtual int midiClientId(void) = 0;
+        virtual void registerAudioPort(int) = 0;
 
     protected:
         bool prepBuffers(void);

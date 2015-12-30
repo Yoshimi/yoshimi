@@ -86,6 +86,16 @@ public:
    bool Start(void) {synth->Unmute(); return true; }
    void Close(void) {synth->Mute();}
 
+   bool openAudio() { return true; }
+   bool openMidi() { return true; }
+
+   virtual string audioClientName(void) { return "LV2 plugin"; }
+   virtual int audioClientId(void) { return 0; }
+   virtual string midiClientName(void) { return "LV2 plugin"; }
+   virtual int midiClientId(void) { return 0; }
+
+   virtual void registerAudioPort(int) {}
+
    //static methods
    static LV2_Handle	instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features);
    static void connect_port(LV2_Handle instance, uint32_t port, void *data_location);

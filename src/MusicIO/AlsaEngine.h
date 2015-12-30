@@ -44,12 +44,14 @@ class AlsaEngine : public MusicIO
         void Close(void);
 
         unsigned int getSamplerate(void) { return audio.samplerate; }
-        int getBuffersize(void) { return audio.period_size; };
+        int getBuffersize(void) { return audio.period_size; }
 
         string audioClientName(void);
         string midiClientName(void);
         int audioClientId(void) { return audio.alsaId; }
         int midiClientId(void) { return midi.alsaId; }
+        virtual void registerAudioPort(int )  {}
+
         bool little_endian;
         bool card_endian;
         int card_bits;

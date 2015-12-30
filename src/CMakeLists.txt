@@ -288,8 +288,7 @@ set (Synth_sources
 
 set (MusicIO_sources
     MusicIO/MusicClient.cpp  MusicIO/MusicIO.cpp  MusicIO/JackEngine.cpp
-    MusicIO/AlsaEngine.cpp  MusicIO/JackClient.cpp  MusicIO/AlsaClient.cpp
-    MusicIO/JackAlsaClient.cpp  MusicIO/AlsaJackClient.cpp
+    MusicIO/AlsaEngine.cpp
 )
 
 add_definitions (

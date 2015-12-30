@@ -53,7 +53,11 @@ class JackEngine : public MusicIO
         int getBuffersize(void) { return audio.jackNframes; }
         string clientName(void);
         int clientId(void);
-        void registerJackPort(int portnum);
+        virtual string audioClientName(void) { return clientName(); }
+        virtual int audioClientId(void) { return clientId(); }
+        virtual string midiClientName(void) { return clientName(); }
+        virtual int midiClientId(void) { return clientId(); }
+        void registerAudioPort(int portnum);
 
     private:
         bool openJackClient(string server);

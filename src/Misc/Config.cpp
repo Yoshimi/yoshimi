@@ -275,6 +275,21 @@ string Config::historyFilename(int index)
     return string();
 }
 
+bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
+{
+    bool bRet = false;
+    if(showGui)
+    {
+        bRet = fl_choice("%s, ok?", "No", "Yes", "Cancel", guiQuestion.c_str());
+    }
+    else
+    {
+        bRet = bForceCmdLinePositive;//force positive answer if gui is not used (default behavior)
+        cerr << endl << "----- WARNING! -----" << cmdLineWarning << endl << "----- ^^^^^^^^ -----" << endl;
+    }
+    return bRet;
+}
+
 
 string Config::testCCvalue(int cc)
 {

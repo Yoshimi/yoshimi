@@ -38,9 +38,6 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
 
-typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
-typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
-
 class XMLwrapper;
 class BodyDisposal;
 
@@ -85,6 +82,8 @@ class Config : public MiscFuncs
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
+
+        bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive = true);
 
         string        ConfigDir;
         string        ConfigFile;

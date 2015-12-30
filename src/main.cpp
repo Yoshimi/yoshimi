@@ -252,11 +252,14 @@ bool mainCreateNewInstance(unsigned int forceId)
         goto bail_out;
     }
 
+
+    /* this is done in newMusicClient() now! ^^^^^
     if (!(musicClient->Open()))
     {
         synth->getRuntime().Log("Failed to open MusicClient");
         goto bail_out;
     }
+    */
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
