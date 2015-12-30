@@ -24,6 +24,9 @@
 #include <stdlib.h>
 #include <set>
 
+string audio_drivers_str [] = {"no_audio", "jack_audio", "alsa_audio"};
+string midi_drivers_str [] = {"no_midi", "jack_midi", "alsa_midi"};
+
 MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 {
     set<music_clients> clSet;
@@ -52,7 +55,9 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
             if(client->Open()) //found working client combination
             {
                 _synth->getRuntime().runSynth = true; //reset to true
-                _synth->getRuntime().Log("Using " + client->audioClientName() + " for audio and " + client->midiClientName() + " for midi");
+                _synth->getRuntime().audioEngine = it->audioDrv;
+                _synth->getRuntime().midiEngine = it->midiDrv;
+                _synth->getRuntime().Log("Using " + audio_drivers_str [it->audioDrv] + " for audio and " + midi_drivers_str [it->midiDrv] + " for midi");
                 return client;
             }
             delete client;
@@ -66,6 +71,7 @@ void *MusicClient::timerThread_fn(void *arg)
 {
     MusicClient *nmc = (MusicClient *)arg;
     useconds_t sleepInterval = (useconds_t)(1000000.0f * (double)nmc->synth->getRuntime().Buffersize / (double)NMC_SRATE);
+    nmc->timerWorking = true;
     while(nmc->timerWorking)
     {
         nmc->synth->MasterAudio(nmc->buffersL, nmc->buffersR);
@@ -216,13 +222,22 @@ void MusicClient::Close()
     }
     else
     {
-        if(timerThreadId != 0 || timerWorking == false)
+        if(timerThreadId == 0 || timerWorking == false)
             return;
         timerWorking = false;
         void *ret = 0;
         pthread_join(timerThreadId, &ret);
         timerThreadId = 0;
     }
+}
+
+unsigned int MusicClient::getSamplerate()
+{
+    if(audioIO)
+    {
+        return audioIO->getSamplerate();
+    }
+    return NMC_SRATE;
 }
 
 int MusicClient::getBuffersize()

@@ -67,7 +67,7 @@ public:
     bool Open(void);
     bool Start(void);
     void Close(void);
-    unsigned int getSamplerate(void) { return NMC_SRATE; }
+    unsigned int getSamplerate(void);
     int getBuffersize(void);
     string audioClientName(void);
     string midiClientName(void);
