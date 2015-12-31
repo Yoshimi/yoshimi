@@ -7,11 +7,11 @@ List
 RESet
 EXit
 
-Apart from these the command line works on a system of context levels, and normally only the commands relevant to that level will be available. 
+Apart from these, the command line works on a system of context levels, and normally only the commands relevant to that level will be available. 
 
 Commands are not case sensitive and an invalid one will print a reminder. Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
 
-The prompt will always show what level you are on along with relevant information. You will also get a confirmation message, but I haven't included those in the examples below.
+The prompt will always show what level you are on along with relevant information. You will also get a confirmation message, but - for clarity - those are not included in the examples below.
 
 Starting from the yoshimi > prompt:
 
@@ -30,7 +30,7 @@ You are now on part number 4.
 "s ef ty re"
 yoshimi part 4 FX 0 rever >
 
-Sets the part's effect 0 to 'reverb'
+Sets the part's effect 0 to type 'reverb'
 
 Note that many settings are optional and if you ommit them, either a default or last used value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
 
@@ -68,6 +68,9 @@ part 4 volume is now at 70, and you are once again at part level, not part FX le
 
 
 Eventually the help menus and lists will also be made context sensitive. This should help avoid clutter and confusion.
+
+As will as an immediate history Yoshimi maintains a command history file, so provided you make a normal exit your last commands will be available on your next run.
+
 
 Originally this file contained the currently implemented commands, but as this is very much a moving target, it is simpler to just ask you to run Yoshimi and type "?"
 

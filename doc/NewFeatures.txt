@@ -114,3 +114,7 @@ The preferred jack/alsa MIDI and audio connections are no longer fixed at compil
 With the latest 'depop' port from Zyn, we are now fully compatibly with all instrument files.
 
 ###
+
+Yoshimi will now always start even if the audio/midi backend called for doesn't exist. In this situation it will try all combinations in the order jack, alsa, null. This enables you to then change the settings and try again.
+
+####

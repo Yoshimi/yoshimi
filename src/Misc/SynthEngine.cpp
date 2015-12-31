@@ -308,7 +308,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     
     
-    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 1, false))
+    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 3, false))
     {
         Runtime.Log("Failed to start RBP thread");
         goto bail_out;
@@ -1453,22 +1453,27 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     }
 
     int npart;
-/*    for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
-    {
-        if (part[npart]->Penabled)
-        {
-            memset(outl[npart], 0, p_bufferbytes);
-            memset(outr[npart], 0, p_bufferbytes);
-        }
-    }
- * The above was unnecessary as we later do a copy (that completely overwrites
- * the buffers) to just the parts that have a direct output. Only these are
- * sent to jack, so it doesn't matter what the unused ones contain.
- */
+    
     memset(mainL, 0, p_bufferbytes);
     memset(mainR, 0, p_bufferbytes);
-
-    if (!isMuted())
+    
+    if (isMuted())
+    {
+        for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
+        {
+            if (part[npart]->Penabled)
+            {
+                memset(outl[npart], 0, p_bufferbytes);
+                memset(outr[npart], 0, p_bufferbytes);
+            }
+        }
+    }
+/* Normally the above is unnecessary, as we later do a copy to just the parts 
+ * that have a direct output. This completely overwrites the buffers.
+ * Only these are sent to jack, so it doesn't matter what the unused ones contain.
+ * However, this doesn't happen when muted, so the buffers then need to be zeroed.
+ */
+    else
     {
 
         actionLock(lock);

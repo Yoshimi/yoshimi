@@ -243,7 +243,6 @@ class MasterUI {selected : {private MiscFuncs}
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-7 0 400 25} labelsize 13
-        code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
         Submenu {} {
           label {&Yoshimi} open
