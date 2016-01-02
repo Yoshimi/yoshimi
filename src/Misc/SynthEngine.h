@@ -28,6 +28,7 @@
 
 #include <limits.h>
 #include <cstdlib>
+#include <semaphore.h>
 #include <jack/ringbuffer.h>
 
 using namespace std;
@@ -108,7 +109,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ShutUp(void);
         void allStop();
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
-        void partonoff(int npart, int what);
+        void partonoffWrite(int npart, int what);
+        bool partonoffRead(int npart);
+        sem_t partlock;
+        
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }

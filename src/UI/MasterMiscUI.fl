@@ -409,7 +409,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
     } {
       Fl_Group panellistitemgroup {
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
-        code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
+        code0 {if (synth->partonoffRead(npart)==0) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
@@ -509,7 +509,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {synth->actionLock(lockmute);
-            synth->partonoff(npart + *plgroup, o->value());
+            synth->partonoffWrite(npart + *plgroup, o->value());
             synth->actionLock(unlock);
             if (o->value() == 0)
                 panellistitemgroup->deactivate();

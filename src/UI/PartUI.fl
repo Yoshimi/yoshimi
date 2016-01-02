@@ -427,7 +427,7 @@ Offset}
         label Enabled
         callback {//
             synth->actionLock(lockmute);
-            synth->partonoff(npart, o->value());
+            synth->partonoffWrite(npart, o->value());
             synth->actionLock(unlock);
             if (!part->Penabled)
                 partgroupui->deactivate();

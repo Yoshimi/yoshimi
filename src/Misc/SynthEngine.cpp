@@ -216,6 +216,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.Log("SynthEngine tmpmix allocations failed");
         goto bail_out;
     }
+    
+    sem_init(&partlock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -308,7 +310,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     
     
-    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 3, false))
+    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 7, false))
     {
         Runtime.Log("Failed to start RBP thread");
         goto bail_out;
@@ -425,7 +427,7 @@ void SynthEngine::defaults(void)
         part[npart]->defaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
-    partonoff(0, 1); // enable the first part
+    partonoffWrite(0, 1); // enable the first part
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
@@ -458,7 +460,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         {
             if (chan == part[npart]->Prcvchn)
             {
-               if (part[npart]->Penabled)
+               if (partonoffRead(npart))
                 {
                     actionLock(lock);
                     part[npart]->NoteOn(note, velocity, keyshift);
@@ -477,7 +479,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
         // mask values 16 - 31 to still allow a note off
-        if (chan == (part[npart]->Prcvchn & 0xef) && part[npart]->Penabled)
+        if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
         {
             actionLock(lock);
             part[npart]->NoteOff(note);
@@ -500,7 +502,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         {
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {   // Send the controller to all part assigned to the channel
-                if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                if (chan == part[npart]->Prcvchn && partonoffRead(npart))
                 {
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
@@ -698,9 +700,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                 {
                     if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
                     {
+                        
                         partOK = true; 
-                        if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
-                            partonoff(npart, 1);
                         if (Runtime.showGui && guiMaster && guiMaster->partui
                                             && guiMaster->partui->instrumentlabel
                                             && guiMaster->partui->part)
@@ -713,11 +714,10 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
             npart = chan & 0x7f;
             if (npart < Runtime.NumAvailableParts)
             {
+                partonoffWrite(npart, 0);
                 partOK = bank.loadfromslot(pgm, part[npart]);
                 if (partOK)
                 {
-                    if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
-                        partonoff(npart, 1);
                     if (Runtime.showGui && guiMaster && guiMaster->partui
                                         && guiMaster->partui->instrumentlabel
                                         && guiMaster->partui->part)
@@ -918,11 +918,11 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
     msg_buf.push_back(asString(avail) + " parts available");
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if ((part[npart]->Pname) != "Simple Sound" || (part[npart]->Penabled))
+        if ((part[npart]->Pname) != "Simple Sound" || (partonoffRead(npart)))
         {
             name = "  " + asString(npart);
             dest = part[npart]->Paudiodest;
-            if (!part[npart]->Penabled || npart >= avail)
+            if (!partonoffRead(npart) || npart >= avail)
                 name += " -";
             else if(dest == 1)
                 name += " M";
@@ -1413,10 +1413,12 @@ void SynthEngine::resetAll(void)
 
 
 // Enable/Disable a part
-void SynthEngine::partonoff(int npart, int what)
+void SynthEngine::partonoffWrite(int npart, int what)
 {
     if (npart >= Runtime.NumAvailableParts)
         return;
+    
+    sem_wait (&partlock);
     if (what)
     {
         VUpeak.values.parts[npart] = 1e-9f;
@@ -1431,6 +1433,13 @@ void SynthEngine::partonoff(int npart, int what)
                 insefx[nefx]->cleanup();
         VUpeak.values.parts[npart] = -0.2;
     }
+    sem_post (&partlock);
+}
+
+
+bool SynthEngine::partonoffRead(int npart)
+{
+    return (part[npart]->Penabled != 0);
 }
 
 
@@ -1461,7 +1470,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     {
         for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
         {
-            if (part[npart]->Penabled)
+            if (partonoffRead(npart))
             {
                 memset(outl[npart], 0, p_bufferbytes);
                 memset(outr[npart], 0, p_bufferbytes);
@@ -1480,7 +1489,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
         // Compute part samples and store them ->partoutl,partoutr
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
-            if (part[npart]->Penabled)
+            if (partonoffRead(npart))
                 part[npart]->ComputePartSmps();
 
         // Insertion effects
@@ -1498,7 +1507,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Apply the part volumes and pannings (after insertion effects)
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
-            if (!part[npart]->Penabled)
+            if (!partonoffRead(npart))
                 continue;
 
             float oldvol_l = part[npart]->oldvolumel;
@@ -1539,7 +1548,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // Mix the channels according to the part settings about System Effect
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (part[npart]->Penabled        // it's enabled
+                if (partonoffRead(npart)        // it's enabled
                  && Psysefxvol[nefx][npart]      // it's sending an output
                  && part[npart]->Paudiodest & 1) // it's connected to the main outs
                 {
@@ -1651,7 +1660,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Peak computation for part vu meters
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
-            if (part[npart]->Penabled)
+            if (partonoffRead(npart))
             {
                 for (int idx = 0; idx < p_buffersize; ++idx)
                 {
@@ -1672,7 +1681,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuOutPeakR = 1e-12f;
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (part[npart]->Penabled)
+                if (partonoffRead(npart))
                     VUpeak.values.parts[npart] = 1.0e-9;
                 else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
                     VUpeak.values.parts[npart]+= 2;
@@ -1971,7 +1980,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
             continue;
         part[npart]->getfromXML(xml);
         xml->exitbranch();
-        if (part[npart]->Penabled && (part[npart]->Paudiodest & 2))
+        if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
     }
 

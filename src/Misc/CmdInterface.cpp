@@ -698,14 +698,14 @@ int CmdInterface::commandPart(bool justSet)
         return tmp;
     if (matchnMove(2, point, "enable"))
     {
-        synth->partonoff(npart, 1);
+        synth->partonoffWrite(npart, 1);
         Runtime.Log("Part enabled");
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
         reply = done_msg;
     }
     else if (matchnMove(2, point, "disable"))
     {
-        synth->partonoff(npart, 0);
+        synth->partonoffWrite(npart, 0);
         Runtime.Log("Part disabled");
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
         reply = done_msg;
@@ -747,7 +747,7 @@ int CmdInterface::commandPart(bool justSet)
             dest = 3;
         if (dest > 0)
         {
-            synth->partonoff(npart, 1);
+            synth->partonoffWrite(npart, 1);
             synth->SetPartDestination(npart, dest);
             reply = done_msg;
         }

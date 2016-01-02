@@ -230,7 +230,7 @@ void JackEngine::registerAudioPort(int partnum)
             //synth->getRuntime().Log("Jack port " + asString(partnum) + " already registered!");
             return;
         }
-        if(synth->part [partnum] && synth->part [partnum]->Penabled)
+        if(synth->part [partnum] && synth->partonoffRead(partnum))
         {
             string portName = "track_" + asString(partnum + 1) + "_r";
             audio.ports[portnum + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
