@@ -426,14 +426,12 @@ Offset}
       Fl_Check_Button partGroupEnable {
         label Enabled
         callback {//
-            synth->actionLock(lockmute);
-            synth->partonoffWrite(npart, o->value());
-            synth->actionLock(unlock);
-            if (!part->Penabled)
-                partgroupui->deactivate();
-            else
-                partgroupui->activate();
-            synth->getGuiMaster()->updatepanel();}
+        synth->partonoffWrite(npart, o->value());
+        if (!part->Penabled)
+            partgroupui->deactivate();
+        else
+            partgroupui->activate();
+        synth->getGuiMaster()->updatepanel();}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled);}
       }

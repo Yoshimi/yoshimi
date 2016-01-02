@@ -144,9 +144,11 @@ SynthEngine::~SynthEngine()
     if (fft)
         delete fft;
     pthread_mutex_destroy(&processMutex);
+    sem_destroy(&partlock);
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
+
 }
 
 

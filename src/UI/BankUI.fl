@@ -29,7 +29,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Button.H>} {public local
@@ -108,43 +108,6 @@ class BankSlot {: {public Fl_Button, BankProcess_}
   }
   Function {refresh()} {} {
     code {//
-/*    if (bank->emptyslot(nslot))
-    {
-        if (nslot < 128)
-            color(46);
-        else
-            color(16);
-    }
-    else
-    {       
-        int engine = bank->engines_used(nslot);
-        if (engine & 1) // AddSynth
-            labelcolor(72);
-        else
-            labelcolor(0);
-        if (engine & 2) // SubSynth
-        {
-            labelsize(11);
-            labelfont(2);
-        }
-        else
-        {
-            labelsize(12);
-            labelfont(0);
-        }
-        if (engine & 4) // PadSynth
-            color(126);
-	else
-	{
-            if (nslot < 128)
-                color(51);
-            else
-                color(17);
-         }
-    }
-    if (*nselected == nslot)
-        color(6);
-*/
     string instrName = bank->getnamenumbered(nslot);
     copy_label(instrName.c_str());} {}
   }
@@ -308,7 +271,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
