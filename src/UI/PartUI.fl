@@ -426,7 +426,7 @@ Offset}
       Fl_Check_Button partGroupEnable {
         label Enabled
         callback {//
-        synth->partonoffWrite(npart, o->value());
+        synth->partonoffLock(npart, o->value());
         if (!part->Penabled)
             partgroupui->deactivate();
         else

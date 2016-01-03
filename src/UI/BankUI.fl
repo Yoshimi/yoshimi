@@ -740,7 +740,7 @@ fnr = &RootProcess_::rootprocess;
         {
             // Reads from slot
             bank->loadfromslot(slot, synth->part[*npart]);
-            // next line would set file name not internal instrument name
+            // next line would have set file name not internal instrument name
             //synth->part[*npart]->Pname = thisname;
             if (what == 3)
                 bankuiwindow->hide();

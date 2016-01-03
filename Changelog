@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-1-3 Will
+- Improved cleanness of program load from various sources.
+
 2016-1-2 Will
 - Program change no longer mutes the whole synth.
 

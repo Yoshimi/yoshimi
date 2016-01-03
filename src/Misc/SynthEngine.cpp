@@ -690,6 +690,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
     bool partOK = false;
     int npart;
+    int enablestate;
+    
     if (bank.getname(pgm) < "!") // can't get a program name less than this
         Runtime.Log("No Program " + asString(pgm) + " in this bank");
     else
@@ -700,6 +702,12 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                 // we don't want upper parts (16 - 63) activiated!
                 if (chan == part[npart]->Prcvchn)
                 {
+                    sem_wait (&partlock);
+                    if (Runtime.enable_part_on_voice_load)
+                        enablestate = 1;
+                    else
+                        enablestate = partonoffRead(npart);
+                    partonoffWrite(npart, 0);
                     if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
                     {
                         
@@ -709,6 +717,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                                             && guiMaster->partui->part)
                             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                     }
+                    partonoffWrite(npart, enablestate);
+                    sem_post (&partlock);
                 }
         }
         else
@@ -716,7 +726,13 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
             npart = chan & 0x7f;
             if (npart < Runtime.NumAvailableParts)
             {
+                sem_wait (&partlock);
+                if (Runtime.enable_part_on_voice_load)
+                    enablestate = 1;
+                else
+                    enablestate = partonoffRead(npart);
                 partonoffWrite(npart, 0);
+                
                 partOK = bank.loadfromslot(pgm, part[npart]);
                 if (partOK)
                 {
@@ -725,6 +741,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                                         && guiMaster->partui->part)
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
                 }
+                partonoffWrite(npart, enablestate);
+                sem_post (&partlock);
             }
         }
         if (partOK)
@@ -1415,12 +1433,19 @@ void SynthEngine::resetAll(void)
 
 
 // Enable/Disable a part
+void SynthEngine::partonoffLock(int npart, int what)
+{
+    sem_wait (&partlock);
+    partonoffWrite(npart, what);
+    sem_post (&partlock);
+}
+
+
 void SynthEngine::partonoffWrite(int npart, int what)
 {
     if (npart >= Runtime.NumAvailableParts)
         return;
     
-    sem_wait (&partlock);
     if (what)
     {
         VUpeak.values.parts[npart] = 1e-9f;
@@ -1435,7 +1460,6 @@ void SynthEngine::partonoffWrite(int npart, int what)
                 insefx[nefx]->cleanup();
         VUpeak.values.parts[npart] = -0.2;
     }
-    sem_post (&partlock);
 }
 
 
@@ -1486,7 +1510,6 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
  */
     else
     {
-
         actionLock(lock);
 
         // Compute part samples and store them ->partoutl,partoutr

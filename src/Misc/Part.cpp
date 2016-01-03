@@ -1224,7 +1224,6 @@ bool Part::saveXML(string filename)
 
 int Part::loadXMLinstrument(string filename)
 {
-    int enablestate;
     synth->getRuntime().SimpleCheck = false;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
@@ -1244,19 +1243,9 @@ int Part::loadXMLinstrument(string filename)
         synth->getRuntime().Log(filename + " is not an instrument file");
         return 0;
     }
-    
-    sem_wait (&synth->partlock);
-    if (synth->getRuntime().enable_part_on_voice_load)
-        enablestate = 1;
-    else
-        enablestate = Penabled;
-    Penabled = 0;
     defaultsinstrument();
     getfromXMLinstrument(xml);
     applyparameters();
-    Penabled = enablestate;
-    sem_post (&synth->partlock);
-
     xml->exitbranch();
     delete xml;
     if (synth->getRuntime().SimpleCheck)

@@ -109,6 +109,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ShutUp(void);
         void allStop();
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
+        void partonoffLock(int npart, int what);
         void partonoffWrite(int npart, int what);
         bool partonoffRead(int npart);
         sem_t partlock;
