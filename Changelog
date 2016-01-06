@@ -1,6 +1,10 @@
 yoshimi 1.3.x
 
-2016-1-4- Will
+2016-1-6 Rob
+- Completed Program Change improvements and defined common point
+  in SynthEngine for all Program Change calls.
+
+2016-1-4 Will
 - Subsynth bugfix. Buffer size no longer has to be divisible by 8.
 
 2016-1-3 Will
