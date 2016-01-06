@@ -688,7 +688,7 @@ void SynthEngine::SetBank(int banknum)
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
-    bool partOK = false;
+    bool partOK = true;
     int npart;
     string fname = bank.getfilename(pgm);
     if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
@@ -700,15 +700,20 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
             for (npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
                 // we don't want upper parts (16 - 63) activiated!
                 if (chan == part[npart]->Prcvchn)
-                    partOK = SetProgramToPart(npart, pgm, fname);
+                {
+                    // all listening parts must succeed
+                    if (!SetProgramToPart(npart, pgm, fname))
+                    {
+                        partOK = false;
+                        break;
+                    }
+                }
         }
         else
         {
             npart = chan & 0x7f;
             if (npart < Runtime.NumAvailableParts)
-            {
                 partOK = SetProgramToPart(npart, pgm, fname);
-            }
         }
         if (!partOK)
             Runtime.Log("SynthEngine setProgram: Invalid program data");
