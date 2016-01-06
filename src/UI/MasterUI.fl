@@ -302,7 +302,8 @@ mainCreateNewInstance(forceId);}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-                int result = synth->part[npart]->loadXMLinstrument(string(filename));
+				// pgm = -1 here because it's not from a bank
+				int result = synth->SetProgramToPart(npart, -1, string(filename));
                 npartcounter->do_callback();
                 updatepanel();
                 if (result == 0)

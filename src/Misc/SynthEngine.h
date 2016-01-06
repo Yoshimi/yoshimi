@@ -88,6 +88,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetBankRoot(int rootnum);
         void SetBank(int banknum);
         void SetProgram(unsigned char chan, unsigned short pgm);
+        bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
         void SetPartPortamento(int npart, bool state);

@@ -739,7 +739,9 @@ fnr = &RootProcess_::rootprocess;
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
             // Reads from slot
-            bank->loadfromslot(slot, synth->part[*npart]);
+			//formerly told bank to do things to Part
+			//bank->loadfromslot(slot, synth->part[*npart]);
+			synth->SetProgramToPart(*npart, slot, bank->getfilename(slot));
             // next line would have set file name not internal instrument name
             //synth->part[*npart]->Pname = thisname;
             if (what == 3)

@@ -690,9 +690,8 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
     bool partOK = false;
     int npart;
-    int enablestate;
-    
-    if (bank.getname(pgm) < "!") // can't get a program name less than this
+    string fname = bank.getfilename(pgm);
+    if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
         Runtime.Log("No Program " + asString(pgm) + " in this bank");
     else
     {
@@ -701,57 +700,49 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
             for (npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
                 // we don't want upper parts (16 - 63) activiated!
                 if (chan == part[npart]->Prcvchn)
-                {
-                    sem_wait (&partlock);
-                    if (Runtime.enable_part_on_voice_load)
-                        enablestate = 1;
-                    else
-                        enablestate = partonoffRead(npart);
-                    partonoffWrite(npart, 0);
-                    if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
-                    {
-                        
-                        partOK = true; 
-                        if (Runtime.showGui && guiMaster && guiMaster->partui
-                                            && guiMaster->partui->instrumentlabel
-                                            && guiMaster->partui->part)
-                            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-                    }
-                    partonoffWrite(npart, enablestate);
-                    sem_post (&partlock);
-                }
+                    partOK = SetProgramToPart(npart, pgm, fname);
         }
         else
         {
             npart = chan & 0x7f;
             if (npart < Runtime.NumAvailableParts)
             {
-                sem_wait (&partlock);
-                if (Runtime.enable_part_on_voice_load)
-                    enablestate = 1;
-                else
-                    enablestate = partonoffRead(npart);
-                partonoffWrite(npart, 0);
-                
-                partOK = bank.loadfromslot(pgm, part[npart]);
-                if (partOK)
-                {
-                    if (Runtime.showGui && guiMaster && guiMaster->partui
-                                        && guiMaster->partui->instrumentlabel
-                                        && guiMaster->partui->part)
-                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-                }
-                partonoffWrite(npart, enablestate);
-                sem_post (&partlock);
+                partOK = SetProgramToPart(npart, pgm, fname);
             }
         }
-        if (partOK)
-            Runtime.Log("Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
-        else
+        if (!partOK)
             Runtime.Log("SynthEngine setProgram: Invalid program data");
     }
 }
 
+// for de-duplicating bits in SetProgram() and for calling from everywhere else
+// this replaces bank->loadfromslot for thread safety etc.
+bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
+{
+    bool loadOK = false;
+    int enablestate;
+    sem_wait (&partlock);
+    if (Runtime.enable_part_on_voice_load)
+        enablestate = 1;
+    else
+        enablestate = partonoffRead(npart);
+    partonoffWrite(npart, 0);
+    if (part[npart]->loadXMLinstrument(fname))
+    {
+        loadOK = true;
+        // show file instead of program if we got here from Instruments -> Load External...
+        Runtime.Log("Loaded " +
+                    ((pgm == -1) ? fname : asString(pgm) + " \"" + bank.getname(pgm) + "\"")
+                    + " to Part " + asString(npart+1));
+        if (Runtime.showGui && guiMaster && guiMaster->partui
+                            && guiMaster->partui->instrumentlabel
+                            && guiMaster->partui->part)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
+    }
+    partonoffWrite(npart, enablestate);
+    sem_post (&partlock);
+    return loadOK;
+}
 
 // Set part's channel number
 void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)

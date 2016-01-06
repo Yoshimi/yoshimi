@@ -105,6 +105,7 @@ class Bank : private MiscFuncs
         ~Bank();
         bool readOnlyInstrument(int ninstrument);
         string getname(unsigned int ninstrument);
+        string getfilename(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
         bool setname(unsigned int ninstrument, string newname, int newslot);
              // if newslot==-1 then this is ignored, else it will be put on that slot
@@ -114,7 +115,6 @@ class Bank : private MiscFuncs
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
         void clearslot(unsigned int ninstrument);
         void savetoslot(unsigned int ninstrument, Part *part);
-        bool loadfromslot(unsigned int ninstrument, Part *part);
         void swapslot(unsigned int n1, unsigned int n2);
         void swapbanks(unsigned int firstID, unsigned int secondID);
         bool readOnlyBank(int bankID);

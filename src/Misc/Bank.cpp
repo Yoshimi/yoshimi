@@ -97,6 +97,14 @@ string Bank::getname(unsigned int ninstrument)
     return getInstrumentReference(ninstrument).name;
 }
 
+// Get the full path of an instrument from the current bank
+string Bank::getfilename(unsigned int ninstrument)
+{
+    string fname = "";
+    if (!emptyslot(ninstrument))
+        fname = getFullPath(currentRootID, currentBankID, ninstrument);
+    return fname;
+}
 
 // Get the numbered name of an instrument from the bank
 string Bank::getnamenumbered(unsigned int ninstrument)
@@ -194,17 +202,6 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
     part->saveXML(filepath);
     addtobank(currentRootID, currentBankID, ninstrument, filename, part->Pname);
 }
-
-
-// Loads the instrument from the bank
-bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
-{
-    bool flag = false;
-    if (!emptyslot(ninstrument))
-        flag = part->loadXMLinstrument(getFullPath(currentRootID, currentBankID, ninstrument));
-    return flag;
-}
-
 
 bool Bank::readOnlyBank(int bankID)
 {
