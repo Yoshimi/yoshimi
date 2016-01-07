@@ -1,5 +1,13 @@
 yoshimi 1.3.x
 
+2016-1-7 Will
+- bugfix, Yoshimi now exits correctly with '-c' argument and trailing '&'.
+- Help now context sensitive, and list reoganised.
+- Command line can now load individual external instruments to the current part.
+- Tiny optimisation to SybSynth filter.
+- Updated appdata and desktop files.
+- Updated Command_Line.txt
+
 2016-1-6 Rob
 - Completed Program Change improvements and defined common point
   in SynthEngine for all Program Change calls.

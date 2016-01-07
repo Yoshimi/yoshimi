@@ -734,6 +734,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     partonoffWrite(npart, 0);
     if (part[npart]->loadXMLinstrument(fname))
     {
+        partonoffWrite(npart, enablestate); // must be here to update gui
         loadOK = true;
         // show file instead of program if we got here from Instruments -> Load External...
         Runtime.Log("Loaded " +
@@ -744,7 +745,8 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
                             && guiMaster->partui->part)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
-    partonoffWrite(npart, enablestate);
+    else
+        partonoffWrite(npart, enablestate); // also here to restore failed load state.
     sem_post (&partlock);
     return loadOK;
 }

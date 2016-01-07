@@ -1,4 +1,4 @@
-When running from the command line, once the 'up and running' message has been seen much of Yoshim can be controlled here.
+When running from the command line, once the 'up and running' message has been seen much of Yoshimi can be controlled here.
 
 There are a group of commands that are always available. These are 
 
@@ -67,9 +67,9 @@ yoshimi part 4 >
 part 4 volume is now at 70, and you are once again at part level, not part FX level.
 
 
-Eventually the help menus and lists will also be made context sensitive. This should help avoid clutter and confusion.
+The help menus and lists are also partially context sensitive. This should help avoid clutter and confusion.
 
-As will as an immediate history Yoshimi maintains a command history file, so provided you make a normal exit your last commands will be available on your next run.
+As well as an immediate history Yoshimi maintains a command history file, so provided you make a normal command line exit your last commands will be available on your next run.
 
 
 Originally this file contained the currently implemented commands, but as this is very much a moving target, it is simpler to just ask you to run Yoshimi and type "?"

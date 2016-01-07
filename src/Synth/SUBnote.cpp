@@ -498,8 +498,8 @@ void SUBnote::filter(bpfilter &filter, float *smps)
     }
 
 //    assert(synth->p_buffersize % 8 == 0);
-    int blocksize = (synth->p_buffersize / 8) << 3;
     int remainder = synth->p_buffersize % 8;
+    int blocksize = synth->p_buffersize - remainder;
     float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
     float work[4]  = {filter.xn1, filter.xn2, filter.yn1, filter.yn2};
 
@@ -516,7 +516,7 @@ void SUBnote::filter(bpfilter &filter, float *smps)
     }
     if (remainder > 0)
     {
-        for(int i = blocksize; i < blocksize + remainder; i += 2)
+        for(int i = blocksize; i < blocksize + remainder ; i += 2)
         {
             SubFilterA(coeff, smps[i + 0], work);
             SubFilterB(coeff, smps[i + 1], work);

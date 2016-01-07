@@ -442,7 +442,8 @@ bail_out:
             delete _synth;
         }
     }
-    tcsetattr(0, TCSANOW, &oldTerm);
+    if(bShowCmdLine)
+        tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
