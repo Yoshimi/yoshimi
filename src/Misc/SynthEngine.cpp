@@ -1037,9 +1037,34 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     else
         msg_buf.push_back("  MIDI extended Program Change CC "
                         + asString(Runtime.midi_upper_voice_C));
-        
+    switch (Runtime.midiEngine)
+    {
+        case 2:
+            label = "ALSA";
+            break;
+        case 1:
+            label = "jack";
+            break;
+        default:
+            label = "None";
+            break;
+    }
+    msg_buf.push_back("  Preferred MIDI " + label);
+    switch (Runtime.audioEngine)
+    {
+        case 2:
+            label = "ALSA";
+            break;
+        case 1:
+            label = "jack";
+            break;
+        default:
+            label = "None";
+            break;
+    }
+    msg_buf.push_back("  Preferred audio " + label);
     msg_buf.push_back("  ALSA MIDI " + Runtime.alsaMidiDevice);
-    msg_buf.push_back("  ALSA AUDIO " + Runtime.alsaAudioDevice);
+    msg_buf.push_back("  ALSA audio " + Runtime.alsaAudioDevice);
     msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  Jack server " + Runtime.jackServer);
 

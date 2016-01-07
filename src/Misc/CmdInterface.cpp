@@ -69,6 +69,8 @@ string toplist [] = {
     "available <n>",              "available parts (16, 32, 64)",
     "volume <n>",                 "master volume",
     "shift <n>",                  "master key shift semitones (64 no shift)",
+    "preferred midi <s>",         "* MIDI connection type jack/alsa",
+    "preferred audio <s>",        "* audio connection type jack/alsa",
     "alsa midi <s>",              "* name of alsa MIDI source",
     "alsa audio <s>",             "* name of alsa hardware device",
     "jack midi <s>",              "* name of jack MIDI source",
@@ -880,6 +882,7 @@ int CmdInterface::commandSet()
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
+    string name;
 
     if (matchnMove(4, point, "yoshimi"))
     {
@@ -1015,6 +1018,47 @@ int CmdInterface::commandSet()
         else
             reply = value_msg;
     }
+    else if (matchnMove(3, point, "preferred"))
+    {
+        name = " set to ";
+        if (matchnMove(1, point, "midi"))
+        {
+            name = "midi" + name;
+            if (matchnMove(1, point, "alsa"))
+            {
+                Runtime.midiEngine = (midi_drivers) 2;
+                name += "alsa";
+            }
+            else if (matchnMove(1, point, "jack"))
+            {
+                Runtime.midiEngine = (midi_drivers) 1;
+                name += "jack";
+            }
+            else
+                return value_msg;
+        }
+        else if (matchnMove(1, point, "audio"))
+        {
+            name = "audio" + name;
+            if (matchnMove(1, point, "alsa"))
+            {
+                Runtime.audioEngine = (audio_drivers) 2;
+                name += "alsa";
+            }
+            else if (matchnMove(1, point, "jack"))
+            {
+                Runtime.audioEngine = (audio_drivers) 1;
+                name += "jack";
+            }
+            else
+                return value_msg;
+        
+        }
+        else
+            return opp_msg;
+        Runtime.Log("Preferred " + name);
+        return done_msg;
+    }
     else if (matchnMove(1, point, "alsa"))
     {
         if (matchnMove(1, point, "midi"))
@@ -1149,7 +1193,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         synth->allStop();
     else if (matchnMove(1, point, "list"))
     {
-        if (matchnMove(1, point, "instrument"))
+        if (matchnMove(1, point, "instruments"))
         {
             if (point[0] == 0)
                 ID = 255;
@@ -1158,7 +1202,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->ListInstruments(ID, msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchnMove(1, point, "bank"))
+        else if (matchnMove(1, point, "banks"))
         {
             if (point[0] == 0)
                 ID = 255;
@@ -1167,7 +1211,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->ListBanks(ID, msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchnMove(1, point, "vector"))
+        else if (matchnMove(1, point, "vectors"))
         {
             synth->ListVectors(msg);
             synth->cliOutput(msg, LINES);
