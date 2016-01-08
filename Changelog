@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-1-6 Will
+- Synchronised config change warning between gui and command line.
+
 2016-1-7 Will
 - bugfix, Yoshimi now exits correctly with '-c' argument and trailing '&'.
 - Help now context sensitive, and list reoganised.

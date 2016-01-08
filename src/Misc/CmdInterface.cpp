@@ -57,7 +57,7 @@ string basics[] = {
 string toplist [] = {
     "system effects [n]",         "system effects for editing",
     "- send <n2> <n3>",           "send system effect to effect n2 at volume n3",
-    "- prefix <n2>",              "set effect preset to number n2",
+    "- preset <n2>",              "set effect preset to number n2",
     "insert effects [n1]",        "insertion effects for editing",
     "- send <s>/<n2>",            "set where: master, off or part number",
     "- preset <n2>",              "set numbered effect preset to n2",
@@ -906,6 +906,7 @@ int CmdInterface::commandSet()
         else
             synth->SetSystemValue(100, 0);
         reply = done_msg;
+        Runtime.configChanged = true;
     }
     
     else if (matchnMove(1, point, "root"))
@@ -990,6 +991,7 @@ int CmdInterface::commandSet()
         {
             synth->SetSystemValue(113, string2int(point));
             reply = done_msg;
+            Runtime.configChanged = true;
         }
         else
             reply = value_msg;
@@ -1000,6 +1002,7 @@ int CmdInterface::commandSet()
         {
             synth->SetSystemValue(114, string2int(point));
             reply = done_msg;
+            Runtime.configChanged = true;
         }
         else
             reply = value_msg;
@@ -1007,14 +1010,22 @@ int CmdInterface::commandSet()
     else if (matchnMove(1, point, "extend"))
     {
         if (point[0] != 0)
+        {
             synth->SetSystemValue(117, string2int(point));
+            reply = done_msg;
+            Runtime.configChanged = true;
+        }
         else
             reply = value_msg;
     }
     else if (matchnMove(1, point, "available"))
     {
         if (point[0] != 0)
+        {
             synth->SetSystemValue(118, string2int(point));
+            reply = done_msg;
+            Runtime.configChanged = true;
+        }
         else
             reply = value_msg;
     }
@@ -1057,6 +1068,7 @@ int CmdInterface::commandSet()
         else
             return opp_msg;
         Runtime.Log("Preferred " + name);
+        Runtime.configChanged = true;
         return done_msg;
     }
     else if (matchnMove(1, point, "alsa"))
@@ -1067,6 +1079,7 @@ int CmdInterface::commandSet()
             {
                 Runtime.alsaMidiDevice = (string) point;
                 Runtime.Log("* ALSA MIDI set to " + Runtime.alsaMidiDevice);
+                Runtime.configChanged = true;
             }
             else
                 reply = value_msg;
@@ -1077,6 +1090,7 @@ int CmdInterface::commandSet()
             {
                 Runtime.alsaAudioDevice = (string) point;
                 Runtime.Log("* ALSA AUDIO set to " + Runtime.alsaAudioDevice);
+                Runtime.configChanged = true;
             }
             else
                 reply = value_msg;
@@ -1095,6 +1109,7 @@ int CmdInterface::commandSet()
             {
                 Runtime.jackMidiDevice = (string) point;
                 Runtime.Log("* jack MIDI set to " + Runtime.jackMidiDevice);
+                Runtime.configChanged = true;
             }
             else
                 reply = value_msg;
@@ -1105,6 +1120,7 @@ int CmdInterface::commandSet()
             {
                 Runtime.jackServer = (string) point;
                 Runtime.Log("* Jack server set to " + Runtime.jackServer);
+                Runtime.configChanged = true;
             }
             else
                 reply = value_msg;
@@ -1143,7 +1159,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     if (matchnMove(2, point, "exit"))
     {
-        if (query("All data will be lost. Still exit", false))
+        if (Runtime.configChanged)
+            replyString = "System config has been changed. Still exit";
+        else
+            replyString = "All data will be lost. Still exit";
+        if (query(replyString, false))
         {
             Runtime.runSynth = false;
             return true;
@@ -1259,6 +1279,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                 Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
+                Runtime.configChanged = true;
             }
             reply = done_msg;
         }
@@ -1275,6 +1296,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     synth->getBankRef().removeRoot(rootID);
                     GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                     Runtime.Log("Removed " + rootname);
+                    Runtime.configChanged = true;
                 }
                 reply = done_msg;
             }
@@ -1301,8 +1323,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     Runtime.Log("At least one instrument is named 'Simple Sound'. This should be changed before resave");
                 else if  (loadResult == 1)
                     Runtime.Log((string) point + " loaded");
+                reply = done_msg;
             }
-            reply = done_msg;
         }
         else if (matchnMove(1, point, "instrument"))
         {

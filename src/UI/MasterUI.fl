@@ -218,7 +218,7 @@ class MasterUI {selected : {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {if (configui->configChanged)
+      callback {if (synth->getRuntime().configChanged)
           {
               int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
               switch (r)

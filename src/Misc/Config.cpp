@@ -112,6 +112,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     EnableProgChange(1), // default will be inverted
     consoleMenuItem(0),
     logXMLheaders(0),
+    configChanged(false),
     rtprio(50),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
@@ -575,10 +576,10 @@ void Config::saveConfig(void)
 
     string resConfigFile = ConfigFile;
 
-    if (!xmltree->saveXMLfile(resConfigFile))
-    {
+    if (xmltree->saveXMLfile(resConfigFile))
+        configChanged = false;
+    else
         Log("Failed to save config to " + resConfigFile);
-    }
     GzipCompression = tmp;
 
     delete xmltree;

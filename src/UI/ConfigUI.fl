@@ -71,7 +71,7 @@ class ConfigUI {selected : {private MiscFuncs}
     if (old != changed)
     {
         synth->getRuntime().Oscilsize = changed;
-        configChanged = true;
+        synth->getRuntime().configChanged = true;
     }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
@@ -117,7 +117,7 @@ class ConfigUI {selected : {private MiscFuncs}
     if (old != changed)
     {
         synth->getRuntime().Buffersize = changed;
-        configChanged = true;
+        synth->getRuntime().configChanged = true;
     }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
@@ -157,7 +157,7 @@ class ConfigUI {selected : {private MiscFuncs}
                 int tmp = synth->getRuntime().Interpolation;
                 synth->getRuntime().Interpolation = (int) o->value();
                 if (synth->getRuntime().Interpolation != tmp)
-                	configChanged = true;}
+                	synth->getRuntime().configChanged = true;}
             xywh {250 105 100 20} down_box BORDER_BOX labelsize 12 textsize 12
             code0 {o->value(synth->getRuntime().Interpolation);}
           } {
@@ -176,7 +176,7 @@ class ConfigUI {selected : {private MiscFuncs}
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
                 if (synth->getRuntime().VirKeybLayout != tmp)
-                	configChanged = true;}
+                	synth->getRuntime().configChanged = true;}
             xywh {250 135 100 20} down_box BORDER_BOX labelsize 12 textfont 1 textsize 13
             code0 {o->value(synth->getRuntime().VirKeybLayout);}
           } {
@@ -207,7 +207,7 @@ class ConfigUI {selected : {private MiscFuncs}
 		unsigned int tmp = synth->getRuntime().GzipCompression;
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
 		if(synth->getRuntime().GzipCompression != tmp)
-			configChanged = true;}
+			synth->getRuntime().configChanged = true;}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
           }
@@ -242,7 +242,7 @@ else
             callback {if (synth->getRuntime().logXMLheaders != o->value())
 {
     synth->getRuntime().logXMLheaders = o->value();
-    configChanged = true;
+    synth->getRuntime().configChanged = true;
 }}
             xywh {322 239 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
@@ -255,8 +255,12 @@ else
           Fl_Input jackSource {
             label {Jack Midi Source}
             callback {//
-                synth->getRuntime().jackMidiDevice = string(o->value());
-                configChanged = true;}
+    string tmp = string(o->value());
+    if (synth->getRuntime().jackMidiDevice != tmp)
+    {
+        synth->getRuntime().jackMidiDevice = tmp;
+        synth->getRuntime().configChanged = true;
+    }}
             tooltip {Device Jack tries to connect to for input.} xywh {195 62 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackMidiDevice.c_str());}
           }
@@ -267,15 +271,19 @@ if (o->value())
     synth->getRuntime().midiEngine = jack_midi;
 else
     synth->getRuntime().midiEngine = alsa_midi;
-configChanged = true;}
+synth->getRuntime().configChanged = true;}
             xywh {195 88 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == jack_midi) o->value(1);}
           }
           Fl_Input jackServer {
             label {Jack Server}
             callback {//
-                synth->getRuntime().jackServer = string(o->value());
-                configChanged = true;}
+    string tmp = string(o->value());
+    if (synth->getRuntime().jackServer != tmp)
+    {
+        synth->getRuntime().jackServer = tmp;
+        synth->getRuntime().configChanged = true;
+    }}
             tooltip {Name of the jack server to connect to - default, ...} xywh {195 182 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().jackServer.c_str());}
           }
@@ -286,7 +294,7 @@ if (o->value())
     synth->getRuntime().audioEngine = jack_audio;
 else
     synth->getRuntime().audioEngine = alsa_audio;
-configChanged = true;}
+synth->getRuntime().configChanged = true;}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
           }
@@ -302,8 +310,12 @@ configChanged = true;}
           Fl_Input alsaSource {
             label {Alsa Midi Source}
             callback {//
-                synth->getRuntime().alsaMidiDevice = string(o->value());
-                configChanged = true;}
+    string tmp = string(o->value());
+    if (synth->getRuntime().alsaMidiDevice != tmp)
+    {
+        synth->getRuntime().alsaMidiDevice = tmp;
+        synth->getRuntime().configChanged = true;
+    }}
             tooltip {Device Alsa tries to connect to for input.} xywh {195 52 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaMidiDevice.c_str());}
           }
@@ -314,15 +326,19 @@ if (o->value())
     synth->getRuntime().midiEngine = alsa_midi;
 else
     synth->getRuntime().midiEngine = jack_midi;
-configChanged = true;}
+synth->getRuntime().configChanged = true;}
             xywh {195 80 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().midiEngine == alsa_midi) o->value(1);}
           }
           Fl_Input alsaDevice {
             label {Alsa Audio Device}
             callback {//
-                synth->getRuntime().alsaAudioDevice = string(o->value());
-                configChanged = true;}
+    string tmp = string(o->value());
+    if (synth->getRuntime().alsaAudioDevice != tmp)
+    {
+        synth->getRuntime().alsaAudioDevice = tmp;
+        synth->getRuntime().configChanged = true;
+    }}
             tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaAudioDevice.c_str());}
           }
@@ -333,7 +349,7 @@ if (o->value())
     synth->getRuntime().audioEngine = alsa_audio;
 else
     synth->getRuntime().audioEngine = jack_audio;
-configChanged = true;}
+synth->getRuntime().configChanged = true;}
             xywh {195 169 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == alsa_audio) o->value(1);}
           }
@@ -365,7 +381,7 @@ configChanged = true;}
                         break;
                 }
                 synth->getRuntime().Samplerate = sample_rate;
-                configChanged = true;}
+                synth->getRuntime().configChanged = true;}
             xywh {195 215 120 54} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("96000");
@@ -445,7 +461,7 @@ configChanged = true;}
         synth->getRuntime().midi_bank_root = candidate;
         BankRootvalue = candidate;
         o->hide();
-        configChanged = true;
+        synth->getRuntime().configChanged = true;
     }}
             tooltip {Click to set} xywh {300 81 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
@@ -467,7 +483,7 @@ configChanged = true;}
          Rpend->show();
     }
     BankRoot->redraw();
-    configChanged = true;}
+    synth->getRuntime().configChanged = true;}
             xywh {234 60 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
             code1 {if (o->value() == 0) BankRoot->deactivate();}
@@ -500,7 +516,7 @@ configChanged = true;}
         fl_alert("In use for %s",name.c_str());
     }
     if (synth->getRuntime().midi_bank_C == tmp)
-        configChanged = true;}
+        synth->getRuntime().configChanged = true;}
             tooltip {CC0 = msb, CC32 = lsb} xywh {235 122 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
@@ -524,7 +540,7 @@ configChanged = true;}
 		int tmp = synth->getRuntime().EnableProgChange;
 		synth->getRuntime().EnableProgChange = o->value();
 		if (synth->getRuntime().EnableProgChange != tmp)
-			configChanged = true;}
+			synth->getRuntime().configChanged = true;}
             tooltip {MIDI program change enable/disable} xywh {234 162 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
@@ -534,7 +550,7 @@ configChanged = true;}
 		int tmp = synth->getRuntime().enable_part_on_voice_load;
 		synth->getRuntime().enable_part_on_voice_load = o->value();
 		if (synth->getRuntime().enable_part_on_voice_load != tmp)
-			configChanged = true;}
+			synth->getRuntime().configChanged = true;}
             tooltip {Part enabled if MIDI program changed} xywh {234 182 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
@@ -571,7 +587,7 @@ configChanged = true;}
         synth->getRuntime().midi_upper_voice_C = candidate;
         EPCvalue = candidate;
         o->hide();
-        configChanged = true;
+        synth->getRuntime().configChanged = true;
     }}
             tooltip {Click to set} xywh {300 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
@@ -599,7 +615,7 @@ configChanged = true;}
          EPCvalue = 128;
     }
     EPCspinner->redraw();
-    configChanged = true;}
+    synth->getRuntime().configChanged = true;}
             xywh {234 220 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
@@ -616,7 +632,6 @@ configwindow->do_callback();}
         label {Save and Close}
         callback {savesettings();
 synth->getGuiMaster()->bankui->readbankcfg();
-configChanged = false;
 configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -638,7 +653,7 @@ configwindow->do_callback();}
     if (!dirname)
         return;
     presetbrowse->add(dirname);
-    configChanged = true;
+    synth->getRuntime().configChanged = true;
     writepresetcfg();}
         xywh {10 220 80 35} box THIN_UP_BOX labelsize 12 align 128
       }
@@ -648,7 +663,7 @@ configwindow->do_callback();}
     if (presetbrowse->value() != 0)
         presetbrowse->remove(presetbrowse->value());
     activatebutton_presetdir(false);
-    configChanged = true;
+    synth->getRuntime().configChanged = true;
     writepresetcfg();}
         xywh {110 220 80 35} box THIN_UP_BOX labelsize 12 align 128
         code0 {o->deactivate();}
@@ -664,14 +679,14 @@ configwindow->do_callback();}
         presetbrowse->redraw();
     }
     activatebutton_presetdir(true);
-    configChanged = true;}
+    synth->getRuntime().configChanged = true;}
         xywh {210 220 80 35} box THIN_UP_BOX labelsize 12 align 128
         code0 {o->deactivate();}
       }
       Fl_Button {} {
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
-configChanged = false;
+synth->getRuntime().configChanged = false;
 presets->hide();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -685,7 +700,7 @@ presets->hide();}
   Function {ConfigUI(SynthEngine *_synth)} {} {
     code {//
 	synth = _synth;
-        configChanged = false;
+        synth->getRuntime().configChanged = false;
         make_window();
         readpresetcfg();
 	selectedRootID = -1;} {}
@@ -830,8 +845,6 @@ presets->hide();}
   } {
     code {//
     synth->getRuntime().saveConfig();} {}
-  }
-  decl {bool configChanged;} {public local
   }
   decl {SynthEngine *synth;} {private local
   }

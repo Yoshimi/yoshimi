@@ -11,6 +11,8 @@ Apart from these, the command line works on a system of context levels, and norm
 
 Commands are not case sensitive and an invalid one will print a reminder. Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
 
+All number ranges start from zero. This is different from the gui where most (but not all) start from one. So CL part 0 is gui part 1, but CL bank 0 is gui bank 0.
+
 The prompt will always show what level you are on along with relevant information. You will also get a confirmation message, but - for clarity - those are not included in the examples below.
 
 Starting from the yoshimi > prompt:

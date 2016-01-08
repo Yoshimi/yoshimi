@@ -130,6 +130,7 @@ class Config : public MiscFuncs
         int           EnableProgChange;
         bool          consoleMenuItem;
         bool          logXMLheaders;
+        bool          configChanged;
         int           rtprio;
         int           midi_bank_root;
         int           midi_bank_C;

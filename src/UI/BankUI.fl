@@ -603,7 +603,7 @@ Pend->hide();}
     dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
     if (!dirname)
       return;
-    synth->getGuiMaster()->configui->configChanged = true;
+    synth->getRuntime().configChanged = true;
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
     rescan_for_banks(true);
@@ -617,7 +617,7 @@ Pend->hide();}
     {;
         synth->getBankRef().removeRoot(selectedRootID);
         readbankcfg();
-        synth->getGuiMaster()->configui->configChanged = true;
+        synth->getRuntime().configChanged = true;
     }
     activatebutton_rootdir(false);
     rescan_for_banks(false);
@@ -633,7 +633,7 @@ Pend->hide();}
         synth->getBankRef().setCurrentRootID(selectedRootID);
         readbankcfg();
         rescan_for_banks(false);
-        synth->getGuiMaster()->configui->configChanged = true;
+        synth->getRuntime().configChanged = true;
     }
     activatebutton_rootdir(false);
     Pend->hide();}
@@ -662,7 +662,7 @@ Pend->hide();}
         synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value());
         readbankcfg();
         rescan_for_banks(true);
-        synth->getGuiMaster()->configui->configChanged = true;
+        synth->getRuntime().configChanged = true;
 
     }
     oldrootID = changeIDbutton->value();
@@ -684,7 +684,7 @@ Pend->hide();}
       Fl_Button {} {
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
-synth->getGuiMaster()->configui->configChanged = false;
+synth->getRuntime().configChanged = false;
 pathwindow->do_callback();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }
