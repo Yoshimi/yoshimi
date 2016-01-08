@@ -60,6 +60,7 @@ class MiscFuncs
         bool isDirectory(string chkpath);
         bool isFifo(string chkpath);
         void legit_filename(string& fname);
+        string setExtension(string fname, string ext);
         string localPath(string leaf);
         float dB2rap(float dB);
         float rap2dB(float rap);

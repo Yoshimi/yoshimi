@@ -113,6 +113,15 @@ void MiscFuncs::legit_filename(string& fname)
 }
 
 
+// adds or replaces wrong extension with the right one.
+string MiscFuncs::setExtension(string fname, string ext)
+{
+    string tmp = fname.substr(0,fname.find('.'));
+    tmp += ('.' + ext);
+    return tmp;
+}
+
+
 // replace 'src' with a different one in the compilation directory
 string MiscFuncs::localPath(string leaf)
 {

@@ -41,6 +41,7 @@ string basics[] = {
     "  setup",                      "dynamic settings",
     "  effects [s]",                "effect types ('all' include preset numbers and names)",
     "load instrument <s>",          "load an instrument to current part from named file",
+    "save instrument <s>",          "save current part to named file",
     "load patchset <s>",            "load a complete set of instruments from named file",
     "save patchset <s>",            "save a complete set of instruments to named file",
     "save setup",                   "save dynamic settings",
@@ -1348,11 +1349,34 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = value_msg;
             else
             {
-                int saveResult = synth->saveXML((string) point);
-                if (!saveResult)
+                replyString = setExtension((string) point, "xmz");
+                tmp = synth->saveXML(replyString);
+                if (!tmp)
                     Runtime.Log("Could not save " + (string) point);
                 else
-                    Runtime.Log((string) point + " saved");
+                    Runtime.Log("Saved " + replyString);
+            }
+        }
+        else if (matchnMove(1, point, "instrument"))
+        {
+            if (synth->part[npart]->Pname == "Simple Sound")
+            {
+                Runtime.Log("Nothing to save!");
+                reply = done_msg;
+            }
+            else if (point[0] == 0)
+                reply = value_msg;
+            else
+            {
+                replyString = setExtension((string) point, "xiz");
+                synth->actionLock(lockmute);
+                tmp = synth->part[npart]->saveXML(replyString);
+                synth->actionLock(unlock);
+                if (tmp)
+                    Runtime.Log("Saved part " + asString(npart) + "  instrument " + (string) synth->part[npart]->Pname + "  as " +replyString);
+                else
+                    Runtime.Log("Failed to save " + replyString);
+                reply = done_msg;
             }
         }
         else
