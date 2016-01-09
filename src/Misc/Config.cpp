@@ -68,7 +68,8 @@ static struct argp_option cmd_options[] = {
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
     {"no-gui",            'i',  NULL,         0,  "disable gui"},
     {"gui",               'I',  NULL,         0,  "enable gui"},
-    {"no-cmdline",        'c',  NULL,         0,  "don't show command line interface"},
+    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface"},
+    {"cmdline",           'C',  NULL,         0,  "enable command line interface"},
     {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
@@ -95,6 +96,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Oscilsize(512),
     runSynth(true),
     showGui(true),
+    showCLI(true),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -489,6 +491,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
     midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
 
     // get bank dirs
     synth->getBankRef().parseConfigFile(xml);
@@ -605,6 +608,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
     xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
     xmltree->addpar("enable_gui", synth->getRuntime().showGui);
+    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
 
     synth->getBankRef().saveToConfigFile(xmltree);
 
@@ -714,6 +718,7 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
     midiEngine = (midi_drivers)xml->getpar("midi_engine", DEFAULT_MIDI, no_midi, alsa_midi);
     midiDevice = xml->getparstr("midi_device");
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
     nameTag = xml->getparstr("name_tag");
     CurrentXMZ = xml->getparstr("current_xmz");
     xml->exitbranch();
@@ -729,6 +734,7 @@ void Config::addRuntimeXML(XMLwrapper *xml)
     xml->addpar("midi_engine", midiEngine);
     xml->addparstr("midi_device", midiDevice);
     xml->addpar("enable_gui", showGui);
+    xml->addpar("enable_CLI", showCLI);
     xml->addparstr("name_tag", nameTag);
     xml->addparstr("current_xmz", CurrentXMZ);
     xml->endbranch();
@@ -1089,6 +1095,14 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 settings->rootDefine = string(arg);
             break;
+        case 'c':
+            settings->configChanged = true;
+            settings->showCLI = false;
+            break;
+        case 'C':
+            settings->configChanged = true;
+            settings->showCLI = true;
+            break;
         case 'i':
             settings->configChanged = true;
             settings->showGui = false;
@@ -1159,9 +1173,6 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                         settings->jackSessionUuid = string(arg);
             break;
         #endif
-        case 'c': // no-cmdline is handled in main()
-            settings->configChanged = true;
-            break;
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;

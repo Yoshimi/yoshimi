@@ -2,8 +2,10 @@ yoshimi 1.3.x
 
 2016-1-9 Will
 - Added gui state to config file
-- All major statup arguments now trigger the config changed message
+- All major startup arguments now trigger the config changed message
   for both gui and command line.
+- Command line environment status now saved and cross linked with
+  gui status defaulting to CL if attempt to disable both.
 
 2016-1-9 Andrew
 - Reconfigured main so first instance can access saved config before gui.

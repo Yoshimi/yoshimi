@@ -81,11 +81,10 @@ class Config : public MiscFuncs
 
         string addParamHistory(string file);
         string historyFilename(int index);
+        bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
-
-        bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive = true);
 
         string        ConfigDir;
         string        ConfigFile;
@@ -104,6 +103,7 @@ class Config : public MiscFuncs
 
         bool          runSynth;
         bool          showGui;
+        bool          showCLI;
         int           VirKeybLayout;
 
         audio_drivers audioEngine;

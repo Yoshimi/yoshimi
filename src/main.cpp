@@ -347,17 +347,14 @@ int main(int argc, char *argv[])
     it = synthInstances.begin();
     firstRuntime = &it->first->getRuntime();
     firstSynth = it->first;
-    if(!firstRuntime->showGui)
+    bShowGui = firstRuntime->showGui;
+    bShowCmdLine = firstRuntime->showCLI;
+    if (!(bShowGui | bShowCmdLine))
     {
-        bShowGui = false;
-    }
-    
-    for (int i = 0; i < globalArgc; ++i)
-    {
-        if(!strcmp(globalArgv [i], "-c"))
-        {
-            bShowCmdLine = false;
-        }
+        cout << "Can't disable both gui and command line!\nSet for command line.\n";
+        firstRuntime->showCLI = true;
+        bShowCmdLine = true;
+        firstRuntime->configChanged = true;
     }
 
     if(sem_init(&semGui, 0, 0) == 0)
