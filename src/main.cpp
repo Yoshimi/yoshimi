@@ -347,18 +347,14 @@ int main(int argc, char *argv[])
     it = synthInstances.begin();
     firstRuntime = &it->first->getRuntime();
     firstSynth = it->first;
+    if(!firstRuntime->showGui)
+    {
+        bShowGui = false;
+    }
 
     for (int i = 0; i < globalArgc; ++i)
     {
-        /*if (!strcmp(globalArgv [i], "-i")
-           || !strcmp(globalArgv [i], "--no-gui")
-           || !strcmp(globalArgv [i], "--help")
-           || !strcmp(globalArgv [i], "-?"))*/
-        if(!firstRuntime->showGui)
-        {
-            bShowGui = false;
-        }
-        else if(!strcmp(globalArgv [i], "-c"))
+        if(!strcmp(globalArgv [i], "-c"))
         {
             bShowCmdLine = false;
         }
