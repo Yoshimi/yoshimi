@@ -350,10 +350,11 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < globalArgc; ++i)
     {
-        if (!strcmp(globalArgv [i], "-i")
+        /*if (!strcmp(globalArgv [i], "-i")
            || !strcmp(globalArgv [i], "--no-gui")
            || !strcmp(globalArgv [i], "--help")
-           || !strcmp(globalArgv [i], "-?"))
+           || !strcmp(globalArgv [i], "-?"))*/
+        if(!firstRuntime->showGui)
         {
             bShowGui = false;
         }
