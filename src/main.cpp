@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
     {
         bShowGui = false;
     }
-
+    
     for (int i = 0; i < globalArgc; ++i)
     {
         if(!strcmp(globalArgv [i], "-c"))

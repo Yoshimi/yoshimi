@@ -686,7 +686,6 @@ configwindow->do_callback();}
       Fl_Button {} {
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
-synth->getRuntime().configChanged = false;
 presets->hide();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -700,7 +699,6 @@ presets->hide();}
   Function {ConfigUI(SynthEngine *_synth)} {} {
     code {//
 	synth = _synth;
-        synth->getRuntime().configChanged = false;
         make_window();
         readpresetcfg();
 	selectedRootID = -1;} {}
