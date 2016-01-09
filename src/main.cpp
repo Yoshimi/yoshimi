@@ -166,6 +166,8 @@ static void *mainGuiThread(void *arg)
     }
     while (firstSynth == NULL);
 
+    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
+
     while (firstSynth->getRuntime().runSynth)
     {        
         if (firstSynth->getUniqueId() == 0)
@@ -276,7 +278,10 @@ bool mainCreateNewInstance(unsigned int forceId)
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
+        if(firstSynth != NULL) //FLTK is not ready yet - send this messege leter for first synth
+        {
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
+        }
     }
 
     synth->getRuntime().StartupReport(musicClient);
@@ -334,6 +339,15 @@ int main(int argc, char *argv[])
     pthread_attr_t attr;
     sem_t semGui;
 
+    if (!mainCreateNewInstance(0))
+    {
+        goto bail_out;
+    }
+
+    it = synthInstances.begin();
+    firstRuntime = &it->first->getRuntime();
+    firstSynth = it->first;
+
     for (int i = 0; i < globalArgc; ++i)
     {
         if (!strcmp(globalArgv [i], "-i")
@@ -368,14 +382,6 @@ int main(int argc, char *argv[])
     }
     sem_wait(&semGui);
     sem_destroy(&semGui);
-
-    if (!mainCreateNewInstance(0))
-    {
-        goto bail_out;
-    }
-    it = synthInstances.begin();
-    firstRuntime = &it->first->getRuntime();
-    firstSynth = it->first;
 
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;

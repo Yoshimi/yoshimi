@@ -45,8 +45,6 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
     music_clients c7 = {6, no_audio, no_midi}; //this one always will do the work :)
     clSet.insert(c7);
 
-    set<music_clients>::iterator it = clSet.begin();
-
     for(set<music_clients>::iterator it = clSet.begin(); it != clSet.end(); ++it)
     {
         MusicClient *client = new MusicClient(_synth, it->audioDrv, it->midiDrv);
