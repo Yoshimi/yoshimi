@@ -79,3 +79,5 @@ Originally this file contained the currently implemented commands, but as this i
 Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
 
 More will be added, and the organisation of them may be changed slightly.
+
+If any configuratiion settings are changed, either here or in the gui, you will be given a warning when you exit, with the option to continue running so you can save the changes.

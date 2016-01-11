@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2016-1-10 Will
+- Set version as 1.3.8 rc1
+- Moved banks & roots to end of config file. Will eventually be
+  separate file.
+
 2016-1-9 Will
 - Added gui state to config file
 - All major startup arguments now trigger the config changed message

@@ -956,6 +956,9 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 {
     roots.clear();
     hints.clear();
+    size_t tmp_root = xml->getpar("root_current_ID", 0, 0, 127);
+    size_t tmp_bank = xml->getpar("bank_current_ID", 0, 0, 127);
+    
     string nodename = "BANKROOT";
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
@@ -991,12 +994,15 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 
     rescanforbanks();
 
-    setCurrentRootID(xml->getpar("root_current_ID", 0, 0, 127));
-    setCurrentBankID(xml->getpar("bank_current_ID", 0, 0, 127));
+    setCurrentRootID(tmp_root); // done this way so laoding full set
+    setCurrentBankID(tmp_bank); // doesn't change it - need to investigate!
 }
 
 void Bank::saveToConfigFile(XMLwrapper *xml)
 {
+    xml->addpar(string("root_current_ID"), currentRootID);
+    xml->addpar(string("bank_current_ID"), currentBankID);
+    
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; i++)
     {
         if (roots.count(i) > 0 && !roots [i].path.empty())
@@ -1016,7 +1022,4 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
             xml->endbranch();
         }
     }
-    xml->addpar(string("root_current_ID"), currentRootID);
-    xml->addpar(string("bank_current_ID"), currentBankID);
-
 }

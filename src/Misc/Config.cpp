@@ -493,8 +493,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
     showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
 
-    // get bank dirs
-    synth->getBankRef().parseConfigFile(xml);
 
     // get preset dirs
     int count = 0;
@@ -561,6 +559,9 @@ bool Config::extractConfigData(XMLwrapper *xml)
         xml->exitbranch();
     }
 
+    // get bank dirs
+    synth->getBankRef().parseConfigFile(xml);
+    
     xml->exitbranch(); // CONFIGURATION
     return true;
 }
@@ -610,8 +611,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("enable_gui", synth->getRuntime().showGui);
     xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
 
-    synth->getBankRef().saveToConfigFile(xmltree);
-
     for (int i = 0; i < MAX_PRESETS; ++i)
         if (presetsDirlist[i].size())
         {
@@ -649,6 +648,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
         }
         xmltree->endbranch();
     }
+    synth->getBankRef().saveToConfigFile(xmltree);
+
     xmltree->endbranch(); // CONFIGURATION
 }
 
