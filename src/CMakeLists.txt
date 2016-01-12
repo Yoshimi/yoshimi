@@ -484,6 +484,8 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi_alt.svg
     DESTINATION share/icons)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.appdata.xml
     DESTINATION share/appdata)
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
+    DESTINATION share/man/man1)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
