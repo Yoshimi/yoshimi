@@ -82,7 +82,8 @@ string toplist [] = {
 string vectlist [] = {
     "[x/y] cc <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
     "[x/y] features <n2>",      "sets CHANNEL X or Y features",
-    "[x/y] program [l/r] <n2>", "X or Y program change ID for CHANNEL L or R part",
+    "[x] program <l/r> <n2>",   "X program change ID for CHANNEL LEFT or RIGHT part",
+    "[y] program <d/u> <n2>",   "Y program change ID for CHANNEL DOWN or UP part",
     "[x/y] control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
     "off",                      "disable vector for CHANNEL",
     "end"
@@ -634,13 +635,18 @@ int CmdInterface::commandVector()
     else if (matchnMove(1, point, "program"))
     {
         int hand = point[0] | 32;
-        if (point[0] == 'l')
+        point = skipChars(point); // in case they type the entire word
+        if ((axis == 0 && (hand == 'd' || hand == 'u')) || (axis == 1 && (hand == 'l' || hand == 'r')))
+        {
+            Runtime.Log("Bad direction for this axis");
+            return done_msg;
+        }
+        if (hand == 'l' || hand == 'd')
             hand = 0;
-        else if (point[0] == 'r')
+        else if (hand == 'r' || hand == 'u')
             hand = 1;
         else
             return opp_msg;
-        point = skipChars(point);
         tmp = string2int(point);
         if (!synth->vectorInit(axis * 2 + hand + 4, chan, tmp))
             synth->vectorSet(axis * 2 + hand + 4, chan, tmp);

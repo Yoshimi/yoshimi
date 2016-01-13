@@ -117,4 +117,8 @@ With the latest 'depop' port from Zyn, we are now fully compatibly with all inst
 
 Yoshimi will now always start even if the audio/midi backend called for doesn't exist. In this situation it will try all combinations in the order jack, alsa, null. This enables you to then change the settings and try again.
 
-####
+You also have the ability to set 'preferred' startupalsa/jack/ midi & audio devices. these will be remembered on the next run.
+
+###
+
+As we now do a fairly detailed features list for all releases, this file will not be updated any more.

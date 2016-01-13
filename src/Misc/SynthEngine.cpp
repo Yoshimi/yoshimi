@@ -739,7 +739,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
         // show file instead of program if we got here from Instruments -> Load External...
         Runtime.Log("Loaded " +
                     ((pgm == -1) ? fname : asString(pgm) + " \"" + bank.getname(pgm) + "\"")
-                    + " to Part " + asString(npart+1));
+                    + " to Part " + asString(npart));
         if (Runtime.showGui && guiMaster && guiMaster->partui
                             && guiMaster->partui->instrumentlabel
                             && guiMaster->partui->part)

@@ -1,6 +1,12 @@
 yoshimi 1.3.x
 
-2-16-1-12 Will
+2016-1-13 Will
+- Updated docs.
+- Set version as 1.3.8 rc2.
+- Corrected part number (CLI numbers *must* start from zero).
+- CLI Y axis now uses up/down insteand of sharing left/right with X.
+
+2016-1-12 Will
 - Created Yoshimi man page.
 
 2016-1-10 Will

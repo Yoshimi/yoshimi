@@ -57,7 +57,7 @@ static char prog_doc[] =
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
     "Copyright 2009-2011 Alan Calvert, "
     "Copyright 20012-2013 Jeremy Jongepier and others, "
-    "Copyright 20014-2015 Will Godfrey and others";
+    "Copyright 20014-2016 Will Godfrey and others";
 
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
