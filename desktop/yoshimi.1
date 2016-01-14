@@ -1,0 +1,61 @@
+.TH yoshimi "January 2016" "yoshimi 1.3.8"
+.SH NAME
+yoshimi \- a software music synthesiser
+.SH SYNOPSIS
+\fByoshimi\fP [\fI\-option\fP] [\fIcmd\fP]
+.SH DESCRIPTION
+\fBYoshimi\fP is a polyphonic multi-part sound synthesiser utilising three distinct 'engines' that can be used separately or together. These can also be stacked into 'kits', typically for percussion. It fully suports both JACK and ALSA for MIDI input and audio output.
+.PP
+\fBYoshimi\fP can be run in a graphical interface, a command line interface, or with control from both. A number of controls can also be accessed via MIDI. The CLI has it's own Readline parser and built-in help system.
+.SH COMMANDS
+.TP
+.BR \-? ", " \-\-help " Shows command syntax."
+.TP
+.BR \-a ", " \-\-alsa-midi[=<device>] " Use ALSA MIDI input."
+.TP
+.BR \-A ", " \-\-alsa-audio[=<device>] " Use ALSA audio output."
+.TP
+.BR \-b ", " \-\-buffersize=<size> " Set the internal buffer size."
+.TP
+.BR \-c ", " \-\-no-cmdline " Disable command line interface."
+.TP
+.BR \-C ", " \-\-cmdline " Enable command line interface."
+.TP
+.BR \-D ", " \-\-define-root " Define path to new bank root dir."
+.TP
+.BR \-i ", " \-\-no-gui " Disable graphical interface."
+.TP
+.BR \-I ", " \-\-gui " Enable graphical interface."
+.TP
+Attempting 'c' and 'i' will produce a warning and you will be left with the CLI only, regardless of the previous state.
+.TP
+.BR \-j ", " \-\-jack-midi[=<device>] " Use JACK MIDI input."
+.TP
+.BR \-J ", " \-\-jack-audio[=<device>] " Connect to JACK server."
+.TP
+.BR \-k ", " \-\-autostart-jack " Auto start JACK server."
+.TP
+.BR \-K ", " \-\-auto-connect " Auto connect to jack server."
+.TP
+.BR \-l ", " \-\-load=<file> " Load .xmz patch set."
+.TP
+.BR \-L ", " \-\-load-instrument=<file> " Load .xiz instrument file."
+.TP
+.BR \-N ", " \-\-name-tag=<tag> " Add a tag to the client name."
+.TP
+.BR \-o ", " \-\-oscilsize=<size> " Set the AddSynth oscillater size."
+.TP
+.BR \-R ", " \-\-samplerate=<rate> " Set the ALSA audio sample rate."
+.TP
+.BR \-S ", " \-\-state[=<file>] "  Load previously saved state."
+Defaults to "HOME/.config/yoshimi/yoshimi.state"
+.TP
+.BR \-u ", " \-\-jack-seession-file=<file> " Load named JACK session file."
+.TP
+.BR \-U ", " \-\-jack-session-uuid=<uuid> " Use JACK session uuid."
+.TP
+.BR \-V ", " \-\-version " Print Yoshimi version."
+.TP
+"Mandatory or optional arguments for long options are also mandatory or optional for any corresponding short options."
+
+\"nroff -man yoshimi.1 | less

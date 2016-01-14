@@ -91,4 +91,34 @@ Yoshimi now remembers where major windows were last placed (per instance), and i
 
 ###
 
-We have an experimental implimentation of CC2 - breath control. This combines volument with filter cutoff.
+We have an implimentation of CC2 - breath control. This combines volume with filter cutoff.
+
+###
+
+To help when things don't seem to go right, you can now show 'raw' incoming CCs. This is enabled from the 'MIDI' tab in 'Settings'. These are the values before Yoshimi does any processing.
+
+###
+
+The earlier experimantal per part random detune features has now been formalised with a slider covering the range from 0 to +/- 50 cents, which is half-way between adjacent notes on the even tempered scale. This setting is now saved in patch sets so will be restored when you reload the same set.
+
+###
+
+Thanks to the Zyn. devs, we now have pink as well as white noise available on Addsynth voices. Pink noise sounds 'softer'.
+
+###
+
+The preferred jack/alsa MIDI and audio connections are no longer fixed at compile time. There are now checkboxes on 'Settings' to change them.
+
+###
+
+With the latest 'depop' port from Zyn, we are now fully compatibly with all instrument files.
+
+###
+
+Yoshimi will now always start even if the audio/midi backend called for doesn't exist. In this situation it will try all combinations in the order jack, alsa, null. This enables you to then change the settings and try again.
+
+You also have the ability to set 'preferred' startupalsa/jack/ midi & audio devices. these will be remembered on the next run.
+
+###
+
+As we now do a fairly detailed features list for all releases, this file will not be updated any more.

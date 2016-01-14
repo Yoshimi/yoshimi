@@ -75,6 +75,19 @@ int MiscFuncs::string2int(string str)
     return intval;
 }
 
+// ensures MIDI compatible numbers without errors
+int MiscFuncs::string2int127(string str)
+{
+    istringstream machine(str);
+    int intval;
+    machine >> intval;
+    if (intval < 0)
+        intval = 0;
+    else if (intval > 127)
+        intval = 127;
+    return intval;
+}
+
 unsigned int MiscFuncs::string2uint(string str)
 {
     istringstream machine(str);
@@ -97,6 +110,15 @@ void MiscFuncs::legit_filename(string& fname)
               || c == '.'))
             fname.at(i) = '_';
     }
+}
+
+
+// adds or replaces wrong extension with the right one.
+string MiscFuncs::setExtension(string fname, string ext)
+{
+    string tmp = fname.substr(0,fname.find('.'));
+    tmp += ('.' + ext);
+    return tmp;
 }
 
 
@@ -212,6 +234,39 @@ string MiscFuncs::asHexString(unsigned int x)
 }
 
 
+unsigned int MiscFuncs::bitFindHigh(unsigned int value)
+{
+    unsigned int bit = 0;
+    while (value >>= 1)
+    {
+        bit ++;
+    }
+    return bit;
+}
+
+
+void MiscFuncs::bitSet(unsigned int& value, unsigned int bit)
+{
+    value |= (1 << bit);
+}
+
+
+void MiscFuncs::bitClear(unsigned int& value, unsigned int bit)
+{
+    unsigned int mask = -1;
+    mask ^= (1 << bit);
+    value &= mask;
+}
+
+
+bool MiscFuncs::bitTest(unsigned int value, unsigned int bit)
+{
+    if (value & (1 << bit))
+        return true;
+    return false;
+}
+
+
 char *MiscFuncs::skipSpace(char *buf)
 {
     while (buf[0] == 0x20)
@@ -233,13 +288,21 @@ char *MiscFuncs::skipChars(char *buf)
 }
 
 
-int MiscFuncs::matchWord(char *buf, const char *word)
+int MiscFuncs::matchWord(int numChars, char *buf, const char *word)
 {
     int newp = 0;
     int size = strlen(word);
     while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == word[newp])
             ++ newp;
-    if (newp > 0 && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
+    if (newp >= numChars && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
         return newp;
     return 0;
+}
+
+bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
+{
+ bool found = matchWord(num, pnt, word);
+ if (found)
+     pnt = skipChars(pnt);
+ return found;
 }

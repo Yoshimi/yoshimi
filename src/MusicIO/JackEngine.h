@@ -53,7 +53,11 @@ class JackEngine : public MusicIO
         int getBuffersize(void) { return audio.jackNframes; }
         string clientName(void);
         int clientId(void);
-        void registerJackPort(int portnum);
+        virtual string audioClientName(void) { return clientName(); }
+        virtual int audioClientId(void) { return clientId(); }
+        virtual string midiClientName(void) { return clientName(); }
+        virtual int midiClientId(void) { return clientId(); }
+        void registerAudioPort(int portnum);
 
     private:
         bool openJackClient(string server);
@@ -64,8 +68,6 @@ class JackEngine : public MusicIO
         bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);
         static int _processCallback(jack_nframes_t nframes, void *arg);
-        static void *_midiThread(void *arg);
-        void *midiThread(void);
         static void _errorCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
@@ -95,12 +97,6 @@ class JackEngine : public MusicIO
             pthread_t          pThread;
         } midi;
 
-        sem_t midiSem;
-
-        struct midi_event {
-            jack_nframes_t time;
-            char data[4]; // all events of interest are <= 4bytes
-        };
         unsigned int internalbuff;
 };
 

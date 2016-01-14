@@ -44,8 +44,11 @@ using namespace std;
 
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <Misc/CmdInterface.h>
 
-extern void cmdIfaceCommandLoop();
+//extern void cmdIfaceCommandLoop();
+
+CmdInterface commandInt;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
@@ -57,6 +60,7 @@ static Config *firstRuntime = NULL;
 static int globalArgc = 0;
 static char **globalArgv = NULL;
 bool bShowGui = true;
+bool bShowCmdLine = true;
 
 
 //Andrew Deryabin: signal handling moved to main from Config Runtime
@@ -91,18 +95,6 @@ void splashTimeout(void *splashWin)
 
 static void *mainGuiThread(void *arg)
 {
-
-    for (int i = 0; i < globalArgc; ++i)
-    {
-        if (!strcmp(globalArgv [i], "-i")
-           || !strcmp(globalArgv [i], "--no-gui")
-           || !strcmp(globalArgv [i], "--help")
-           || !strcmp(globalArgv [i], "-?"))
-        {
-            bShowGui = false;
-        }
-    }
-
     Fl::lock();
 
     sem_post((sem_t *)arg);
@@ -173,6 +165,8 @@ static void *mainGuiThread(void *arg)
             usleep(33333);
     }
     while (firstSynth == NULL);
+
+    GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::NewSynthEngine, 0);
 
     while (firstSynth->getRuntime().runSynth)
     {        
@@ -260,11 +254,14 @@ bool mainCreateNewInstance(unsigned int forceId)
         goto bail_out;
     }
 
+
+    /* this is done in newMusicClient() now! ^^^^^
     if (!(musicClient->Open()))
     {
         synth->getRuntime().Log("Failed to open MusicClient");
         goto bail_out;
     }
+    */
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
@@ -281,7 +278,10 @@ bool mainCreateNewInstance(unsigned int forceId)
     if (synth->getRuntime().showGui)
     {
         synth->setWindowTitle(musicClient->midiClientName());
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
+        if(firstSynth != NULL) //FLTK is not ready yet - send this messege leter for first synth
+        {
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
+        }
     }
 
     synth->getRuntime().StartupReport(musicClient);
@@ -320,7 +320,7 @@ bail_out:
 
 void *commandThread(void *arg)
 {
-    cmdIfaceCommandLoop();
+    commandInt.cmdIfaceCommandLoop();
     return 0;
 }
 
@@ -338,6 +338,25 @@ int main(int argc, char *argv[])
     pthread_t thr;
     pthread_attr_t attr;
     sem_t semGui;
+
+    if (!mainCreateNewInstance(0))
+    {
+        goto bail_out;
+    }
+
+    it = synthInstances.begin();
+    firstRuntime = &it->first->getRuntime();
+    firstSynth = it->first;
+    bShowGui = firstRuntime->showGui;
+    bShowCmdLine = firstRuntime->showCLI;
+    if (!(bShowGui | bShowCmdLine))
+    {
+        cout << "Can't disable both gui and command line!\nSet for command line.\n";
+        firstRuntime->showCLI = true;
+        bShowCmdLine = true;
+        firstRuntime->configChanged = true;
+    }
+
     if(sem_init(&semGui, 0, 0) == 0)
     {
         if (pthread_attr_init(&attr) == 0)
@@ -358,14 +377,6 @@ int main(int argc, char *argv[])
     sem_wait(&semGui);
     sem_destroy(&semGui);
 
-    if (!mainCreateNewInstance(0))
-    {
-        goto bail_out;
-    }
-    it = synthInstances.begin();
-    firstRuntime = &it->first->getRuntime();
-    firstSynth = it->first;
-
     memset(&yoshimiSigAction, 0, sizeof(yoshimiSigAction));
     yoshimiSigAction.sa_handler = yoshimiSigHandler;
     if (sigaction(SIGUSR1, &yoshimiSigAction, NULL))
@@ -384,13 +395,16 @@ int main(int argc, char *argv[])
     //create command line processing thread
 
     pthread_t cmdThr;
-    if (pthread_attr_init(&attr) == 0)
+    if(bShowCmdLine)
     {
-        if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+        if (pthread_attr_init(&attr) == 0)
         {
+            if (pthread_create(&cmdThr, &attr, commandThread, (void *)firstSynth) == 0)
+            {
 
+            }
+            pthread_attr_destroy(&attr);
         }
-        pthread_attr_destroy(&attr);
     }
 
     void *ret;
@@ -404,7 +418,7 @@ int main(int argc, char *argv[])
 
 bail_out:
     if (bShowGui && !bExitSuccess) // this could be done better!
-        usleep(2000000);
+        sleep(2);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;
@@ -428,7 +442,8 @@ bail_out:
             delete _synth;
         }
     }
-    tcsetattr(0, TCSANOW, &oldTerm);
+    if(bShowCmdLine)
+        tcsetattr(0, TCSANOW, &oldTerm);
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else

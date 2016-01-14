@@ -1,28 +1,15 @@
 
-Check command/gui updates.
+Replace usleep with nanosleep - probably not :(
+
+Separate root/bank/instrument lists from main config as
+    single file for all instances.
 
 Make loading effect presets update the 'top' line.
-
-Sort out default state save/load
-
-Sort out default midi message.
 
 startup state load doesn't set buffersize correctly - why?
     size is ignored if loaded when already running (which is reasonable).
 
-save part [n1] program <[n2] [s]>
-if 'n2' is present it saves to a bank slot and 's' optionally changes the name
-otherwise 's' is a complete filename and the leaf sets the stored instrument name.
-
 Allow headless compilation.
-
-Allow new root path creation to include the ID value.
-
-Enable change of MIDI source while running.
-
-Enable change of audio server while running.
-
-Enable running with no MIDI or audio so that at least settings can be changed.
 
 RPNs (channel based)
 

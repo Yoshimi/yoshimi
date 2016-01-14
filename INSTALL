@@ -11,7 +11,7 @@ which builds an executable called yoshimi, installed by default in
 
 ---- Sample instructions to compile/build using ccmake on Linux , outside-source-tree -----
 
-This uses "yoshimi-1.2.2" as an example, should work fine with other versions.  If these instructions fail to work, perhaps new build instructions should be provided.
+This uses "yoshimi-1.3.8" as an example, should work fine with other versions.  If these instructions fail to work, perhaps new build instructions should be provided.
 
 Here is to build/compile using ccmake, in separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
@@ -19,20 +19,20 @@ Extract source code archive:
 
    mkdir /path/to/workDir/
    cd    /path/to/workDir/
-   tar -jxvf /path/to/yoshimi-1.2.2.tar.bz2
+   tar -jxvf /path/to/yoshimi-1.3.8.tar.bz2
    
 now there should be a directory for
 
-   /path/to/workDir/yoshimi-1.2.2/
+   /path/to/workDir/yoshimi-1.3.8/
 
 create a separate directory for build, spaces in fileName and directoryName can be problematic, try to avoid it.
 
-   mkdir /path/to/workDir/build.yoshimi-1.2.2/
-   cd /path/to/workDir/build.yoshimi-1.2.2/
-   ccmake /path/to/workDir/yoshimi-1.2.2/
+   mkdir /path/to/workDir/build.yoshimi-1.3.8/
+   cd /path/to/workDir/build.yoshimi-1.3.8/
+   ccmake /path/to/workDir/yoshimi-1.3.8/
    
-"/path/to/workDir/yoshimi-1.2.2/" is the source code directory.
-"/path/to/workDir/build.yoshimi-1.2.2/" is now the current working directory, will have make-related files (when ccmake is done with configuring and generate the files).
+"/path/to/workDir/yoshimi-1.3.8/" is the source code directory.
+"/path/to/workDir/build.yoshimi-1.3.8/" is now the current working directory, will have make-related files (when ccmake is done with configuring and generate the files).
    
 Within ccmake, type 'c' (without the quotes) to generate a default configuration.  Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there is any missing pre-requisite libraries and/or softwares, it should prompt you with such info.  You can install such pre-requisite softwares and try this ccmake configuration steps again.
 
@@ -53,8 +53,7 @@ Yoshimi will in fact run anywhere in userspace, which can be convenient as an al
 
 ---- Build and command line options ----
 
-Yoshimi builds with both Jack and Alsa audio and midi options. The default audio and midi options to be used are nominated in the
-ccmake configuration stage. Other options can be nominated at runtime via command line parameters.
+Yoshimi builds with both Jack and Alsa audio and midi options. The default audio and midi options to be used are nominated in the ccmake configuration stage. These, and other options can be nominated at runtime via command line parameters.
 
 
 ---- Instrument banks ----
@@ -65,4 +64,4 @@ Yoshimi installs its own copy of the instrument banks (installed by default in u
 ---- Help ----
 
 If you get stuck, ask for help on LAU or
-  <https://lists.sourceforge.net/mailman/listinfo/yoshimi-user>.
+  <http://www.freelists.org/list/yoshimi>.

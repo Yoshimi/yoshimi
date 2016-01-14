@@ -286,30 +286,7 @@ synth = _synth;
     if (npart>=0)
         draw_part();
     else
-    {
-        draw_master();
-        int olddata = 0;
-        int guidata = synth->readGuiData();
-        while (guidata > 0)
-        {
-            if(guidata != olddata)
-            {
-                olddata = guidata;
-                synth->getRuntime().Log("Data " + asString(guidata));
-                if (guidata | 64)
-                {                    
-                    synth->getGuiMaster()->updatepart();
-                    synth->getGuiMaster()->updatelistitem(guidata & 63);
-                }
-                else if (guidata | 128)
-                    synth->getGuiMaster()->updatepartprogram(guidata & 63);
-                
-            }
-            else
-                synth->getRuntime().Log("Repeat " + asString(guidata));
-            guidata = synth->readGuiData();
-        }
-    }} {}
+        draw_master();} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
@@ -432,7 +409,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
     } {
       Fl_Group panellistitemgroup {
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
-        code0 {if (synth->part[npart]->Penabled==0) o->deactivate();}
+        code0 {if (synth->partonoffRead(npart)==0) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
@@ -532,7 +509,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
       Fl_Check_Button partenabled {
         label 01
         callback {synth->actionLock(lockmute);
-            synth->partonoff(npart + *plgroup, o->value());
+            synth->partonoffWrite(npart + *plgroup, o->value());
             synth->actionLock(unlock);
             if (o->value() == 0)
                 panellistitemgroup->deactivate();

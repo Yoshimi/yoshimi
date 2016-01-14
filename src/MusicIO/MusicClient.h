@@ -25,34 +25,57 @@
 
 using namespace std;
 
+
 #include "MusicIO/MidiControl.h"
 
+
+enum audio_drivers { no_audio = 0, jack_audio, alsa_audio };
+enum midi_drivers { no_midi = 0, jack_midi, alsa_midi };
+
 class SynthEngine;
+class MusicIO;
+
+struct music_clients
+{
+    int order;
+    audio_drivers audioDrv;
+    midi_drivers midiDrv;
+    bool operator ==(const music_clients& other) const { return audioDrv == other.audioDrv && midiDrv == other.midiDrv; }
+    bool operator >(const music_clients& other) const { return (order > other.order) && (other != *this); }
+    bool operator <(const music_clients& other) const { return (order < other.order)  && (other != *this); }
+    bool operator !=(const music_clients& other) const { return audioDrv != other.audioDrv || midiDrv != other.midiDrv; }
+};
+
+#define NMC_SRATE 44100
 
 class MusicClient
 {
-    public:
-        MusicClient(SynthEngine *_synth): synth(_synth) { }
-        virtual ~MusicClient() { }
-        bool Open(void) { return openAudio() && openMidi(); }
-        virtual bool Start(void) = 0;
-        virtual void Close(void) = 0;
-        virtual unsigned int getSamplerate(void) = 0;
-        virtual int getBuffersize(void) = 0;
-        virtual string audioClientName(void) = 0;
-        virtual string midiClientName(void) = 0;
-        virtual int audioClientId(void) = 0;
-        virtual int midiClientId(void) = 0;
-        virtual void registerAudioPort(int /*portnum*/) {}
-        static MusicClient *newMusicClient(SynthEngine *_synth);
-        string audiodevice;
-        string mididevice;
+private:
+    SynthEngine *synth;
+    pthread_t timerThreadId;
+    static void *timerThread_fn(void*);
+    bool timerWorking;
+    float *buffersL [NUM_MIDI_PARTS + 1];
+    float *buffersR [NUM_MIDI_PARTS + 1];
+    audio_drivers audioDrv;
+    midi_drivers midiDrv;
+    MusicIO *audioIO;
+    MusicIO *midiIO;
+public:
+    MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_drivers _midiDrv);
+    ~MusicClient();
+    bool Open(void);
+    bool Start(void);
+    void Close(void);
+    unsigned int getSamplerate(void);
+    int getBuffersize(void);
+    string audioClientName(void);
+    string midiClientName(void);
+    int audioClientId(void);
+    int midiClientId(void);
+    void registerAudioPort(int /*portnum*/);
 
-    protected:
-        virtual bool openAudio(void) = 0;
-        virtual bool openMidi(void) = 0;
-
-        SynthEngine *synth;
+    static MusicClient *newMusicClient(SynthEngine *_synth);
 };
 
 #endif

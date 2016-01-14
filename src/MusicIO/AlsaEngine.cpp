@@ -96,6 +96,8 @@ bool AlsaEngine::openMidi(void)
     midi.alsaId = snd_seq_client_info_get_client(seq_info);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_NOTEON);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_NOTEOFF);
+    snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_KEYPRESS);
+    snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_CHANPRESS);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_CONTROLLER);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PGMCHANGE);
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PITCHBEND);
@@ -119,7 +121,7 @@ bool AlsaEngine::openMidi(void)
         synth->getRuntime().Log("Failed to acquire alsa midi port");
         goto bail_out;
     }
-    if (!midi.device.empty())
+    if (!midi.device.empty() && midi.device != "default")
     {
         bool midiSource = false;
         if (snd_seq_parse_address(midi.handle,&midi.addr,midi.device.c_str()) == 0)
@@ -593,6 +595,20 @@ void *AlsaEngine::MidiThread(void)
                     setMidiNote(channel, note);
                     break;
                     
+                case SND_SEQ_EVENT_KEYPRESS:
+                    channel = event->data.note.channel;
+                    ctrltype = C_keypressure;
+                    par = event->data.note.velocity;
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case SND_SEQ_EVENT_CHANPRESS:
+                    channel = event->data.control.channel;
+                    ctrltype = C_channelpressure;
+                    par = event->data.control.value;
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
                 case SND_SEQ_EVENT_PGMCHANGE:
                     channel = event->data.control.channel;
                     ctrltype = C_programchange;
@@ -609,7 +625,7 @@ void *AlsaEngine::MidiThread(void)
 
                 case SND_SEQ_EVENT_CONTROLLER:
                     channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;
+                    ctrltype = event->data.control.param;//getMidiController(event->data.control.param);
                     par = event->data.control.value;
                     setMidiController(channel, ctrltype, par);
                     break;
@@ -643,8 +659,7 @@ void *AlsaEngine::MidiThread(void)
             }
             snd_seq_free_event(event);
         }
-        //if (chk < 0)
-            //synth->getRuntime().Log("ALSA midi input read failed: " + asString(chk));
+;
         if(chk < 0)
         {
             usleep(1024);

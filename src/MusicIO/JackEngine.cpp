@@ -44,8 +44,6 @@ JackEngine::JackEngine(SynthEngine *_synth) : MusicIO(_synth), jackClient(NULL)
         audio.portBuffs[i] = NULL;
     }
     midi.port = NULL;
-    midi.ringBuf = NULL;
-    midi.pThread = 0;
 }
 
 
@@ -69,7 +67,7 @@ bool JackEngine::connectServer(string server)
     else
     {
         synth->getRuntime().Log("Failed to open jack client on server " + server);
-        splashMessages.push_back("Can't connect to jack audio :(");
+        splashMessages.push_back("Can't connect to jack :(");
     }
     return false;
 }
@@ -153,28 +151,11 @@ bool JackEngine::Start(void)
         goto bail_out;
     }
 
-    if (midi.port && !synth->getRuntime().startThread(&midi.pThread, _midiThread, this, true, 1, false))
-    {
-        synth->getRuntime().Log("Failed to start jack midi thread");
-        goto bail_out;
-    }
-
     if (!latencyPrep())
     {
         synth->getRuntime().Log("Jack latency prep failed ");
         goto bail_out;
     }
-
-    /*
-    for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port) // include mains
-    {
-        if (!audio.ports[port])
-        {
-            jackPortsRegistered = false;
-            break;
-        }
-    }
-    */
 
     if (!jack_activate(jackClient) && jackPortsRegistered)
     {
@@ -191,12 +172,15 @@ bool JackEngine::Start(void)
     }
     
     // style-wise I think the next bit is the wrong place
-    if (synth->getRuntime().midiEngine  == jack_midi and synth->getRuntime().midiDevice.size() and jack_connect(jackClient,synth->getRuntime().midiDevice.c_str(),jack_port_name(midi.port)))
+    if (synth->getRuntime().midiEngine  == jack_midi
+      && synth->getRuntime().midiDevice.size()
+      && synth->getRuntime().midiDevice != "default"
+      && jack_connect(jackClient,synth->getRuntime().midiDevice.c_str(),jack_port_name(midi.port)))
     {
-        synth->getRuntime().Log("Didn't find jack MIDI source '" + synth->getRuntime().midiDevice + "'");
+        synth->getRuntime().Log("Didn't find jack MIDI source '"
+        + synth->getRuntime().midiDevice + "'");
         synth->getRuntime().midiDevice = "";
     }
-    
     return true;
 
 bail_out:
@@ -210,16 +194,6 @@ void JackEngine::Close(void)
     if(synth->getRuntime().runSynth)
     {
         synth->getRuntime().runSynth = false;
-    }
-
-    if(midi.pThread != 0) //wait for midi thread to finish
-    {
-        if (sem_post(&midiSem) == 0)
-        {
-            void *ret = NULL;
-            pthread_join(midi.pThread, &ret);
-            midi.pThread = 0;
-        }
     }
 
     if (NULL != jackClient)
@@ -240,16 +214,12 @@ void JackEngine::Close(void)
         chk = jack_deactivate(jackClient);
         if (chk)
             synth->getRuntime().Log("Failed to close jack client, status: " + asString(chk));
-        if (NULL != midi.ringBuf)
-        {
-            jack_ringbuffer_free(midi.ringBuf);
-            midi.ringBuf = NULL;
-        }
+
         jackClient = NULL;
     }
 }
 
-void JackEngine::registerJackPort(int partnum)
+void JackEngine::registerAudioPort(int partnum)
 {
     int portnum = partnum * 2;
     if(partnum >=0 && partnum < NUM_MIDI_PARTS)
@@ -260,7 +230,7 @@ void JackEngine::registerJackPort(int partnum)
             //synth->getRuntime().Log("Jack port " + asString(partnum) + " already registered!");
             return;
         }
-        if(synth->part [partnum] && synth->part [partnum]->Penabled)
+        if(synth->part [partnum] && synth->partonoffRead(partnum))
         {
             string portName = "track_" + asString(partnum + 1) + "_r";
             audio.ports[portnum + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
@@ -281,30 +251,21 @@ void JackEngine::registerJackPort(int partnum)
 
 bool JackEngine::openAudio(void)
 {
+    if(jackClient == 0)
+    {
+        if(!connectServer(synth->getRuntime().audioDevice))
+        {
+            return false;
+        }
+    }
     // Register mixed outputs
     audio.ports[2 * NUM_MIDI_PARTS] = jack_port_register(jackClient, "left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     audio.ports[2 * NUM_MIDI_PARTS + 1] = jack_port_register(jackClient, "right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
-    // And individual parts
-/* this section is now reduntant!
-    for (int port = 0; port < NUM_MIDI_PARTS; ++port)
-    {
-        //stringstream portName;
-        //portName << "track_" << ((port / 2) + 1) << ((port % 2) ? "_r" : "_l");
-        //audio.ports[port] = jack_port_register(jackClient, portName.str().c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-        registerJackPort(port);
-    }
-*/
-    bool jackPortsRegistered = true;
-    /*for (int port = 0; port < (2 * NUM_MIDI_PARTS + 2); ++port)
-    {        
-        if (!audio.ports[port])
-        {
-            jackPortsRegistered = false;
-            break;
-        }
-    }*/
-
+    bool jackPortsRegistered = true;       
+    if (!audio.ports[2 * NUM_MIDI_PARTS] || !audio.ports[2 * NUM_MIDI_PARTS + 1])
+        jackPortsRegistered = false;
+    
     if (jackPortsRegistered)
         return prepBuffers() && latencyPrep();
     else
@@ -316,6 +277,14 @@ bool JackEngine::openAudio(void)
 
 bool JackEngine::openMidi(void)
 {
+    if(jackClient == 0)
+    {
+        if(!connectServer(synth->getRuntime().midiDevice))
+        {
+            return false;
+        }
+    }
+
     const char *port_name = "midi in";
     midi.port = jack_port_register(jackClient, port_name,
                                    JACK_DEFAULT_MIDI_TYPE,
@@ -323,17 +292,6 @@ bool JackEngine::openMidi(void)
     if (!midi.port)
     {
         synth->getRuntime().Log("Failed to register jack midi port");
-        return false;
-    }
-    midi.ringBuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096);
-    if (!midi.ringBuf)
-    {
-        synth->getRuntime().Log("Failed to create jack midi ringbuffer");
-        return false;
-    }
-    if (jack_ringbuffer_mlock(midi.ringBuf))
-    {
-        synth->getRuntime().Log("Failed to lock memory");
         return false;
     }
     return true;
@@ -431,7 +389,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS + 1));
         return false;
     }    
-    //synth->getRuntime().Log("Jack " + asString(nframes) + "  Internal " + asString(internalbuff));
+
     int framesize = sizeof(float) * nframes;
     if (nframes < internalbuff)
     {
@@ -464,16 +422,11 @@ void JackEngine::sendAudio(int framesize, unsigned int offset)
                 float *rpoint = audio.portBuffs[idx + 1] + offset;
                 if ((synth->part[port]->Paudiodest & 2) && port < currentmax)
                 {
-                    
-//                    memcpy(audio.portBuffs[idx], zynLeft[port], framesize);
-//                    memcpy(audio.portBuffs[idx + 1], zynRight[port], framesize);
                     memcpy(lpoint, zynLeft[port], framesize);
                     memcpy(rpoint, zynRight[port], framesize);
                 }
                 else
                 {
-//                    memset(audio.portBuffs[idx], 0, framesize);
-//                    memset(audio.portBuffs[idx + 1], 0, framesize);
                     memset(lpoint, 0, framesize);
                     memset(rpoint, 0, framesize);
                 }
@@ -485,8 +438,6 @@ void JackEngine::sendAudio(int framesize, unsigned int offset)
     float *Rpoint = audio.portBuffs[2 * NUM_MIDI_PARTS + 1] + offset;
     memcpy(Lpoint, zynLeft[NUM_MIDI_PARTS], framesize);
     memcpy(Rpoint, zynRight[NUM_MIDI_PARTS], framesize);
-//    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS], zynLeft[NUM_MIDI_PARTS], framesize);
-//    memcpy(audio.portBuffs[2 * NUM_MIDI_PARTS + 1], zynRight[NUM_MIDI_PARTS], framesize);
 }
 
 
@@ -500,54 +451,110 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     }
 
     unsigned int idx;
-    unsigned int act_write;
-    struct midi_event event;
-    char *data;
-    unsigned int wrote = 0;
-    unsigned int tries = 0;
     jack_midi_event_t jEvent;
     jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
+    unsigned char channel, note, velocity;
+    int ctrltype;
+    int par;
+    unsigned int ev;
     for(idx = 0; idx < eventCount; ++idx)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            if (jEvent.size < 1 || (jEvent.size > sizeof(event.data)))
-                continue; // no interest in zero sized or long events
-            event.time = jEvent.time;
-            memset(event.data, 0, sizeof(event.data));
-            memcpy(event.data, jEvent.buffer, jEvent.size);
-            wrote = 0;
-            tries = 0;
-            data = (char*)&event;
-            while (wrote < sizeof(struct midi_event) && tries < 3)
+            par = 0;
+            if (jEvent.size < 1 || jEvent.size > 4)
+                continue; // no interest in zero sized or long events    
+            channel = jEvent.buffer[0] & 0x0F;
+            switch ((ev = jEvent.buffer[0] & 0xF0))
             {
-                act_write = jack_ringbuffer_write(midi.ringBuf, (const char*)data,
-                                                  sizeof(struct midi_event) - wrote);
-                wrote += act_write;
-                data += act_write;
-                ++tries;
-            }
-            if (wrote == sizeof(struct midi_event))
-            {
-                if (sem_post(&midiSem) < 0)
-                    synth->getRuntime().Log("processMidi semaphore post error, "
-                                + string(strerror(errno)));
-            }
-            else
-            {
-                synth->getRuntime().Log("Bad write to midi ringbuffer: "
-                            + asString(wrote) + " / "
-                            + asString((int)sizeof(struct midi_event)));
-                return false;
+                case 0x01: // modulation wheel or lever
+                    ctrltype = C_modwheel;
+                    par = jEvent.buffer[2];
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case 0x07: // channel volume (formerly main volume)
+                    ctrltype = C_volume;
+                    par = jEvent.buffer[2];
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case 0x0B: // expression controller
+                    ctrltype = C_expression;
+                    par = jEvent.buffer[2];
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case 0x78: // all sound off
+                    ctrltype = C_allsoundsoff;
+                    setMidiController(channel, ctrltype, 0);
+                    break;
+
+                case 0x79: // reset all controllers
+                    ctrltype = C_resetallcontrollers;
+                    setMidiController(channel, ctrltype, 0);
+                    break;
+
+                case 0x7B:  // all notes off
+                    ctrltype = C_allnotesoff;
+                    setMidiController(channel, ctrltype, 0);
+                    break;
+
+                case 0x80: // note-off
+                    note = jEvent.buffer[1];
+                    setMidiNote(channel, note);
+                    break;
+
+                case 0x90: // note-on
+                    if ((note = jEvent.buffer[1])) // skip note == 0
+                    {
+                        velocity = jEvent.buffer[2];
+                        setMidiNote(channel, note, velocity);
+                    }
+                    break;
+
+                case 0xA0: // key aftertouch
+                    ctrltype = C_keypressure;
+                    // need to work out how to use key values >> j Event.buffer[1]
+                    par = jEvent.buffer[2];
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case 0xB0: // controller
+                    ctrltype = jEvent.buffer[1];//getMidiController(jEvent.buffer[1]);
+                    par = jEvent.buffer[2];
+                    setMidiController(channel, ctrltype, par);
+                    break;
+                
+                case 0xC0: // program change
+                    ctrltype = C_programchange;
+                    par = jEvent.buffer[1];
+                    setMidiProgram(channel, par);
+                    break;
+
+                case 0xD0: // channel aftertouch
+                    ctrltype = C_channelpressure;
+                    par = jEvent.buffer[1];
+                    setMidiController(channel, ctrltype, par);
+                    break;
+                
+                case 0xE0: // pitch bend
+                    ctrltype = C_pitchwheel;
+                    par = ((jEvent.buffer[2] << 7) | jEvent.buffer[1]) - 8192;
+                    setMidiController(channel, ctrltype, par);
+                    break;
+
+                case 0xF0: // system exclusive
+                    break;
+
+                default: // wot, more? commented out some progs spam us :(
+                    synth->getRuntime().Log("other event: " + asString((int)ev));
+                    break;
             }
         }
-        else
-            synth->getRuntime().Log("... jack midi read failed");
     }
     return true;
 }
-
-
 
 
 int JackEngine::_xrunCallback(void *arg)
@@ -560,122 +567,6 @@ int JackEngine::_xrunCallback(void *arg)
 void JackEngine::_errorCallback(const char *msg)
 {
     //synth->getRuntime().Log("Jack reports error: " + string(msg));
-}
-
-
-void *JackEngine::_midiThread(void *arg)
-{
-    return static_cast<JackEngine*>(arg)->midiThread();
-}
-
-void *JackEngine::midiThread(void)
-{
-    unsigned char channel, note, velocity;
-    int ctrltype;
-    int par = 0;
-    unsigned int fetch;
-    unsigned int ev;
-    struct midi_event midiEvent;
-    if (sem_init(&midiSem, 0, 0) < 0)
-    {
-        synth->getRuntime().Log("Error on jack midi sem_init " + string(strerror(errno)));
-        return NULL;
-    }
-
-    while (synth->getRuntime().runSynth)
-    {
-        if (sem_wait(&midiSem) < 0)
-        {
-            synth->getRuntime().Log("midiThread semaphore wait error, "
-                        + string(strerror(errno)));
-            continue;
-        }
-        if (!synth->getRuntime().runSynth)
-            break;
-        fetch = jack_ringbuffer_read(midi.ringBuf, (char*)&midiEvent, sizeof(struct midi_event));
-        if (fetch != sizeof(struct midi_event))
-        {
-            synth->getRuntime().Log("Short ringbuffer read, " + asString(fetch) + " / "
-                        + asString((int)sizeof(struct midi_event)));
-            continue;
-        }
-        channel = midiEvent.data[0] & 0x0F;
-        switch ((ev = midiEvent.data[0] & 0xF0))
-        {
-            case 0x01: // modulation wheel or lever
-                ctrltype = C_modwheel;
-                par = midiEvent.data[2];
-                setMidiController(channel, ctrltype, par);
-                break;
-
-            case 0x07: // channel volume (formerly main volume)
-                ctrltype = C_volume;
-                par = midiEvent.data[2];
-                setMidiController(channel, ctrltype, par);
-                break;
-
-            case 0x0B: // expression controller
-                ctrltype = C_expression;
-                par = midiEvent.data[2];
-                setMidiController(channel, ctrltype, par);
-                break;
-
-            case 0x78: // all sound off
-                ctrltype = C_allsoundsoff;
-                setMidiController(channel, ctrltype, 0);
-                break;
-
-            case 0x79: // reset all controllers
-                ctrltype = C_resetallcontrollers;
-                setMidiController(channel, ctrltype, 0);
-                break;
-
-            case 0x7B:  // all notes off
-                ctrltype = C_allnotesoff;
-                setMidiController(channel, ctrltype, 0);
-                break;
-
-            case 0x80: // note-off
-                note = midiEvent.data[1];
-                setMidiNote(channel, note);
-                break;
-
-            case 0x90: // note-on
-                if ((note = midiEvent.data[1])) // skip note == 0
-                {
-                    velocity = midiEvent.data[2];
-                    setMidiNote(channel, note, velocity);
-                }
-                break;
-
-            case 0xB0: // controller
-                ctrltype = getMidiController(midiEvent.data[1]);
-                par = midiEvent.data[2];
-                setMidiController(channel, ctrltype, par);
-                break;
-                
-            case 0xC0: // program change
-                ctrltype = C_programchange;
-                par = midiEvent.data[1];
-                setMidiProgram(channel, par);
-                break;
-
-            case 0xE0: // pitch bend
-                ctrltype = C_pitchwheel;
-                par = ((midiEvent.data[2] << 7) | midiEvent.data[1]) - 8192;
-                setMidiController(channel, ctrltype, par);
-                break;
-
-            case 0xF0: // system exclusive
-                break;
-
-            default: // wot, more? commented out some progs spam us :(
-                // synth->getRuntime().Log("other event: " + asString((int)ev));
-                break;
-        }
-    }
-    sem_destroy(&midiSem);
-    return NULL;
 }
 
 

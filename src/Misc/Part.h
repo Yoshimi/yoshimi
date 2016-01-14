@@ -120,7 +120,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Plegatomode; // 0 = normal, 1 = legato
         unsigned char Pkeylimit;   // how many keys can play simultaneously,
                                    // time 0 = off, the older will be released
-        float         Pfrand;      // Part randon frequency contend
+        float         Pfrand;      // Part random frequency content
         int           Paudiodest;  // jack output routing
         string        Pname;
         struct {

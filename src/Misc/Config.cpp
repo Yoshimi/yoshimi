@@ -57,7 +57,7 @@ static char prog_doc[] =
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
     "Copyright 2009-2011 Alan Calvert, "
     "Copyright 20012-2013 Jeremy Jongepier and others, "
-    "Copyright 20014-2015 Will Godfrey and others";
+    "Copyright 20014-2016 Will Godfrey and others";
 
 const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
 
@@ -66,7 +66,10 @@ static struct argp_option cmd_options[] = {
     {"alsa-midi",         'a',  "<device>",   1,  "use alsa midi input" },
     {"define-root",       'D',  "<path>",     0,  "define path to new bank root"},
     {"buffersize",        'b',  "<size>",     0,  "set internal buffer size" },
-    {"no-gui",            'i',  NULL,         0,  "no gui"},
+    {"no-gui",            'i',  NULL,         0,  "disable gui"},
+    {"gui",               'I',  NULL,         0,  "enable gui"},
+    {"no-cmdline",        'c',  NULL,         0,  "disable command line interface"},
+    {"cmdline",           'C',  NULL,         0,  "enable command line interface"},
     {"jack-audio",        'J',  "<server>",   1,  "use jack audio output" },
     {"jack-midi",         'j',  "<device>",   1,  "use jack midi input" },
     {"autostart-jack",    'k',  NULL,         0,  "auto start jack server" },
@@ -93,12 +96,14 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Oscilsize(512),
     runSynth(true),
     showGui(true),
+    showCLI(true),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
     audioDevice("default"),
     midiDevice("default"),
     jackServer("default"),
+    jackMidiDevice("default"),
     startJack(false),
     connectJackaudio(false),
     alsaAudioDevice("default"),
@@ -110,16 +115,16 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     EnableProgChange(1), // default will be inverted
     consoleMenuItem(0),
     logXMLheaders(0),
+    configChanged(false),
     rtprio(50),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(1),
+    monitorCCin(false),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
-    currentChannel(0),
-    currentMode(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -142,7 +147,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     //which befaves exactly the same when flag FE_TOWARDZERO is set
 
     cerr.precision(4);
-    deadObjects = new BodyDisposal();    
+    deadObjects = new BodyDisposal();
     bRuntimeSetupCompleted = Setup(argc, argv);
 }
 
@@ -174,11 +179,10 @@ bool Config::Setup(int argc, char **argv)
     }
     if (!audioDevice.size())
         audioDevice = "default";
-
     switch (midiEngine)
     {
         case jack_midi:
-            midiDevice = string(jackServer);
+            midiDevice = string(jackMidiDevice);
             break;
         case alsa_midi:
             midiDevice = string(alsaMidiDevice);
@@ -273,6 +277,21 @@ string Config::historyFilename(int index)
         return itx->file;
     }
     return string();
+}
+
+bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
+{
+    bool bRet = false;
+    if(showGui)
+    {
+        bRet = fl_choice("%s, ok?", "No", "Yes", "Cancel", guiQuestion.c_str());
+    }
+    else
+    {
+        bRet = bForceCmdLinePositive;//force positive answer if gui is not used (default behavior)
+        cerr << endl << "----- WARNING! -----" << cmdLineWarning << endl << "----- ^^^^^^^^ -----" << endl;
+    }
+    return bRet;
 }
 
 
@@ -469,8 +488,11 @@ bool Config::extractConfigData(XMLwrapper *xml)
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
-    // get bank dirs
-    synth->getBankRef().parseConfigFile(xml);
+    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+    showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+
 
     // get preset dirs
     int count = 0;
@@ -510,6 +532,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     // jack settings
     jackServer = xml->getparstr("linux_jack_server");
+    jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
 
     // midi options
     midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
@@ -536,6 +559,9 @@ bool Config::extractConfigData(XMLwrapper *xml)
         xml->exitbranch();
     }
 
+    // get bank dirs
+    synth->getBankRef().parseConfigFile(xml);
+    
     xml->exitbranch(); // CONFIGURATION
     return true;
 }
@@ -556,10 +582,10 @@ void Config::saveConfig(void)
 
     string resConfigFile = ConfigFile;
 
-    if (!xmltree->saveXMLfile(resConfigFile))
-    {
+    if (xmltree->saveXMLfile(resConfigFile))
+        configChanged = false;
+    else
         Log("Failed to save config to " + resConfigFile);
-    }
     GzipCompression = tmp;
 
     delete xmltree;
@@ -580,8 +606,10 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("reports_destination", consoleMenuItem);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
-
-    synth->getBankRef().saveToConfigFile(xmltree);
+    xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
+    xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
+    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
+    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
 
     for (int i = 0; i < MAX_PRESETS; ++i)
         if (presetsDirlist[i].size())
@@ -592,10 +620,11 @@ void Config::addConfigXML(XMLwrapper *xmltree)
         }
 
     xmltree->addpar("interpolation", Interpolation);
-
+    
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
     xmltree->addparstr("linux_jack_server", jackServer);
+    xmltree->addparstr("linux_jack_midi_dev", jackMidiDevice);
 
     xmltree->addpar("midi_bank_root", midi_bank_root);
     xmltree->addpar("midi_bank_C", midi_bank_C);
@@ -619,6 +648,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
         }
         xmltree->endbranch();
     }
+    synth->getBankRef().saveToConfigFile(xmltree);
+
     xmltree->endbranch(); // CONFIGURATION
 }
 
@@ -687,6 +718,8 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
     audioDevice = xml->getparstr("audio_device");
     midiEngine = (midi_drivers)xml->getpar("midi_engine", DEFAULT_MIDI, no_midi, alsa_midi);
     midiDevice = xml->getparstr("midi_device");
+    showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
     nameTag = xml->getparstr("name_tag");
     CurrentXMZ = xml->getparstr("current_xmz");
     xml->exitbranch();
@@ -701,6 +734,8 @@ void Config::addRuntimeXML(XMLwrapper *xml)
     xml->addparstr("audio_device", audioDevice);
     xml->addpar("midi_engine", midiEngine);
     xml->addparstr("midi_device", midiDevice);
+    xml->addpar("enable_gui", showGui);
+    xml->addpar("enable_CLI", showCLI);
     xml->addparstr("name_tag", nameTag);
     xml->addparstr("current_xmz", CurrentXMZ);
     xml->endbranch();
@@ -715,7 +750,7 @@ void Config::Log(string msg, bool tostderr)
         cerr << msg << endl;
 }
 
-
+#ifndef YOSHIMI_LV2_PLUGIN
 void Config::StartupReport(MusicClient *musicClient)
 {
     Log(string(argp_program_version));
@@ -755,6 +790,7 @@ void Config::StartupReport(MusicClient *musicClient)
     Log("Period size: " + asString(synth->buffersize));
 }
 
+#endif
 
 void Config::setRtprio(int prio)
 {
@@ -1022,6 +1058,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'l': settings->paramsLoad = string(arg); break;
         case 'L': settings->instrumentLoad = string(arg); break;
         case 'A':
+            settings->configChanged = true;
             settings->audioEngine = alsa_audio;
             if (arg)
                 settings->audioDevice = string(arg);
@@ -1029,11 +1066,15 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 settings->audioDevice = settings->alsaAudioDevice;
             break;
         case 'a':
+            settings->configChanged = true;
             settings->midiEngine = alsa_midi;
             if (arg)
                 settings->midiDevice = string(arg);
+            else
+                settings->midiDevice = string(settings->alsaMidiDevice);
             break;
         case 'b': // messy but I can't think of a better way :(
+            settings->configChanged = true;
             num = Config::string2int(string(arg));
             if (num >= 1024)
                 num = 1024;
@@ -1055,22 +1096,40 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 settings->rootDefine = string(arg);
             break;
+        case 'c':
+            settings->configChanged = true;
+            settings->showCLI = false;
+            break;
+        case 'C':
+            settings->configChanged = true;
+            settings->showCLI = true;
+            break;
         case 'i':
+            settings->configChanged = true;
             settings->showGui = false;
             break;
+        case 'I':
+            settings->configChanged = true;
+            settings->showGui = true;
+            break;
         case 'J':
+            settings->configChanged = true;
             settings->audioEngine = jack_audio;
             if (arg)
                 settings->audioDevice = string(arg);
             break;
         case 'j':
+            settings->configChanged = true;
             settings->midiEngine = jack_midi;
             if (arg)
                 settings->midiDevice = string(arg);
+            else
+                settings->midiDevice = string(settings->jackMidiDevice);
             break;
         case 'k': settings->startJack = true; break;
         case 'K': settings->connectJackaudio = true; break;
         case 'o':
+            settings->configChanged = true;
             num = Config::string2int(string(arg));
             if (num >= 16384)
                 num = 16384;
@@ -1090,6 +1149,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             settings->Oscilsize = num;
             break;
         case 'R':
+            settings->configChanged = true;
             num = Config::string2int(string(arg));
             if (num >= 96000)
                 num = 96000;
@@ -1120,6 +1180,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         default:
             return ARGP_ERR_UNKNOWN;
     }
+
     return 0;
 }
 
@@ -1246,6 +1307,40 @@ void GuiThreadMsg::processGuiMessages()
             {
                 SynthEngine *synth = ((SynthEngine *)msg->data);
                 mainRegisterAudioPort(synth, msg->index);
+            }
+            break;
+        case GuiThreadMsg::UpdateBankRootDirs:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster)
+                {
+                    guiMaster->updateBankRootDirs();
+                }
+            }
+            break;
+        case GuiThreadMsg::RescanForBanks:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster && guiMaster->bankui)
+                {
+                    guiMaster->bankui->rescan_for_banks(false);
+                }
+            }
+            break;
+        case GuiThreadMsg::RefreshCurBank:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster && guiMaster->bankui)
+                {
+                    guiMaster->bankui->set_bank_slot();
+                    guiMaster->bankui->refreshmainwindow();
+                }
             }
             break;
         default:

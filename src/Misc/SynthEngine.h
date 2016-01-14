@@ -28,6 +28,7 @@
 
 #include <limits.h>
 #include <cstdlib>
+#include <semaphore.h>
 #include <jack/ringbuffer.h>
 
 using namespace std;
@@ -47,6 +48,7 @@ class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
+class CmdInterface;
 
 class MasterUI;
 
@@ -82,11 +84,14 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void NoteOff(unsigned char chan, unsigned char note);
         void SetController(unsigned char chan, int type, short int par);
         void SetZynControls();
+        void SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value);
         void SetBankRoot(int rootnum);
         void SetBank(int banknum);
         void SetProgram(unsigned char chan, unsigned short pgm);
+        bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
+        void SetPartPortamento(int npart, bool state);
         void cliOutput(list<string>& msg_buf, unsigned int lines);
         void ListPaths(list<string>& msg_buf);
         void ListBanks(int rootNum, list<string>& msg_buf);
@@ -95,10 +100,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ListVectors(list<string>& msg_buf);
         void ListSettings(list<string>& msg_buf);
         void SetSystemValue(int type, int value);
-        int commandSet(char *point);
-        int commandVector(char *point);
-        char readGuiData();
-        void writeGuiData(char data);
+        void writeRBP(char type, char data0, char data1);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
@@ -108,7 +110,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ShutUp(void);
         void allStop();
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
-        void partonoff(int npart, int what);
+        void partonoffLock(int npart, int what);
+        void partonoffWrite(int npart, int what);
+        bool partonoffRead(int npart);
+        sem_t partlock;
+        
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
@@ -211,8 +217,16 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t *processLock;
 
         jack_ringbuffer_t *vuringbuf;
-        jack_ringbuffer_t *guiringbuf;
-
+        
+        jack_ringbuffer_t *RBPringbuf;
+        void *RBPthread(void);
+        static void *_RBPthread(void *arg);
+        pthread_t  RBPthreadHandle;
+        
+        struct RBP_data {
+            char data[4];
+        };
+        
         XMLwrapper *stateXMLtree;
         
         char random_state[256];

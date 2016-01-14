@@ -48,7 +48,7 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 
 
 XMLwrapper::XMLwrapper(SynthEngine *_synth) :
-    minimal(false),
+    minimal(true),
     stackpos(0),
     synth(_synth)
 {
@@ -62,8 +62,8 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
 
     node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
 
-    mxmlElementSetAttr(root, "version-major", "1");
-    mxmlElementSetAttr(root, "version-minor", "1");
+    mxmlElementSetAttr(root, "version-major", "2");
+    mxmlElementSetAttr(root, "version-minor", "5");
     mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
 
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");

@@ -38,9 +38,6 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
 
-typedef enum { no_audio = 0, jack_audio, alsa_audio, } audio_drivers;
-typedef enum { no_midi = 0, jack_midi, alsa_midi, } midi_drivers;
-
 class XMLwrapper;
 class BodyDisposal;
 
@@ -52,7 +49,9 @@ class Config : public MiscFuncs
         Config(SynthEngine *_synth, int argc, char **argv);
         ~Config();
         bool Setup(int argc, char **argv);
+#ifndef YOSHIMI_LV2_PLUGIN
         void StartupReport(MusicClient *musicClient);
+#endif
         void Announce(void);
         void Usage(void);
         void Log(string msg, bool tostderr = false);
@@ -82,6 +81,7 @@ class Config : public MiscFuncs
 
         string addParamHistory(string file);
         string historyFilename(int index);
+        bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
@@ -103,6 +103,7 @@ class Config : public MiscFuncs
 
         bool          runSynth;
         bool          showGui;
+        bool          showCLI;
         int           VirKeybLayout;
 
         audio_drivers audioEngine;
@@ -111,12 +112,12 @@ class Config : public MiscFuncs
         string        midiDevice;
 
         string        jackServer;
+        string        jackMidiDevice;
         bool          startJack;        // false
         bool          connectJackaudio; // false
         string        jackSessionUuid;
 
         string        alsaAudioDevice;
-
         string        alsaMidiDevice;
         string        nameTag;
 
@@ -129,16 +130,16 @@ class Config : public MiscFuncs
         int           EnableProgChange;
         bool          consoleMenuItem;
         bool          logXMLheaders;
+        bool          configChanged;
         int           rtprio;
         int           midi_bank_root;
         int           midi_bank_C;
         int           midi_upper_voice_C;
         int           enable_part_on_voice_load;
+        bool          monitorCCin;
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
-        int           currentChannel;
-        int           currentMode;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;
@@ -219,6 +220,9 @@ public:
         UpdatePartProgram,
         UpdateEffects,
         RegisterAudioPort,
+        UpdateBankRootDirs,
+        RescanForBanks,
+        RefreshCurBank,
         UNDEFINED = 9999
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver

@@ -109,6 +109,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
+            
+            float Fadein_adjustment;
             struct {
                 int      Enabled;
                 float initialvalue, dt, t;
@@ -152,6 +154,11 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
+
+            struct {
+                int   Enabled;
+                float initialvalue, dt, t;
+            } Punch;
 
             // Filter parameters
             Filter   *VoiceFilterL;

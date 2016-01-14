@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey    
+Copyright 2014-2015, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -54,7 +54,7 @@ decl {\#include "MasterUI.h"} {private global
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window syseffsend {
       private xywh {916 904 150 145} type Double hide
@@ -108,7 +108,7 @@ class PartKitItem {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window partkititem {
-      private xywh {121 479 670 30} type Double hide
+      private xywh {30 431 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -374,7 +374,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
           callback {instrumenteditwindow->show();}
           xywh {330 7 40 21} box PLASTIC_UP_BOX color 22 labelfont 1 labelsize 12
         }
-        Fl_Dial {} {
+        Fl_Dial velocitysense {
           label {Velocity
 Sense}
           callback {part->Pvelsns = o->value();}
@@ -382,7 +382,7 @@ Sense}
           code0 {o->value(part->Pvelsns);}
           class WidgetPDial
         }
-        Fl_Dial {} {
+        Fl_Dial velocityoffset {
           label {Velocity
 Offset}
           callback {part->Pveloffs = o->value();}
@@ -426,14 +426,12 @@ Offset}
       Fl_Check_Button partGroupEnable {
         label Enabled
         callback {//
-            synth->actionLock(lockmute);
-            synth->partonoff(npart, o->value());
-            synth->actionLock(unlock);
-            if (!part->Penabled)
-                partgroupui->deactivate();
-            else
-                partgroupui->activate();
-            synth->getGuiMaster()->updatepanel();}
+        synth->partonoffLock(npart, o->value());
+        if (!part->Penabled)
+            partgroupui->deactivate();
+        else
+            partgroupui->activate();
+        synth->getGuiMaster()->updatepanel();}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled);}
       }
@@ -448,7 +446,7 @@ Offset}
         code0 {o->value(part->Prcvchn + 1);}
         code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
       }
-      Fl_Choice {} {
+      Fl_Choice keymode {
         label Mode
         callback {//
             switch (o->value())
@@ -473,19 +471,19 @@ Offset}
         code1 {if (part->Ppolymode) o->value(0); else o->value(1);}
         code2 {if (!part->Ppolymode && part->Plegatomode) o->value(2);}
       } {}
-      Fl_Check_Button {} {
+      Fl_Check_Button enportamento {
         label Portamento
         callback {part->ctl->portamento.portamento = o->value();}
         tooltip {Enable/Disable the portamento} xywh {82 59 15 20} down_box DOWN_BOX labelsize 11 align 8
         code0 {o->value(part->ctl->portamento.portamento);}
       }
-      Fl_Spinner {} {
+      Fl_Spinner partkeyshift {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
         xywh {202 116 38 18} labelsize 10 minimum -24 maximum 24 textsize 11
         code0 {o->value(part->Pkeyshift - 64);}
       }
-      Fl_Spinner {} {
+      Fl_Spinner partkeylimit {
         label {Key Limit}
         callback {part->setkeylimit(o->value());}
         tooltip {Maximum keys for this part} xywh {202 140 38 18} labelsize 10 value 20 textsize 11
@@ -981,9 +979,8 @@ else
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
       xywh {147 542 395 360} type Double hide
-      code0 {rnddet->value((int)(0.5+part->Pfrand*100));}
-      code1 {seteditname();}
-      code2 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
+      code0 {seteditname();}
+      code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
@@ -1194,16 +1191,16 @@ seteditname();}
           }
         }
       }
-      Fl_Spinner rnddet {
-        label {Rnd. Det.}
-        callback {part->Pfrand = o->value() / 200.0f;}
-        tooltip {Small random detune - experimental!} xywh {113 335 44 19} labelsize 12 minimum 0 maximum 20 value 0 textsize 12
-        code0 {o->value((int)part->Pfrand*200);}
+      Fl_Value_Slider humanise {
+        label Humanise
+        callback {part->Pfrand = o->value();}
+        tooltip {Random detune of whole part in cents} xywh {5 337 201 18} type {Horz Knob} box FLAT_BOX labelsize 12 align 8 maximum 50 step 1
+        code0 {o->value(part->Pfrand);}
       }
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {248 333 95 25} box THIN_UP_BOX
+        xywh {295 333 95 25} box THIN_UP_BOX
       }
     }
   }
@@ -1271,6 +1268,7 @@ seteditname();}
   }
   Function {showparameters(int kititem,int engine)} {} {
     code {//
+    string tname;
     if (engine == -1)
     {   // this is used if I want to clear the engine from the part
         if (kititem == lastkititem)
@@ -1303,20 +1301,42 @@ seteditname();}
 
         if (part->kit[kititem].adpars)
             adnoteui = new ADnoteUI(part->kit[kititem].adpars);
-
         if (part->kit[kititem].subpars)
             subnoteui = new SUBnoteUI(part->kit[kititem].subpars);
 
         if (part->kit[kititem].padpars)
             padnoteui = new PADnoteUI(part->kit[kititem].padpars);
     }
-
     if (engine == 0 && adnoteui != NULL)
+        tname = synth->getGuiMaster()->setPartWindowTitle("AddSynth");
+    else if (engine == 1 && subnoteui != NULL)
+        tname = synth->getGuiMaster()->setPartWindowTitle("SubSynth");
+    else if (engine == 2 && padnoteui != NULL)
+        tname = synth->getGuiMaster()->setPartWindowTitle("PadSynth");
+    else return;
+    
+    if (part->Pkitmode)
+    {
+        tname += asString(kititem + 1);
+        if(part->kit[kititem].Pname > "")
+           tname += (" - " + part->kit[kititem].Pname);
+    }
+
+    if (engine == 0)
+    {
+        adnoteui->ADnoteGlobalParameters->copy_label(tname.c_str());
         adnoteui->ADnoteGlobalParameters->show();
-    if (engine == 1 && subnoteui != NULL)
+    }
+    else if (engine == 1)
+    {
+        subnoteui->SUBparameters->copy_label(tname.c_str());
         subnoteui->SUBparameters->show();
-    if (engine == 2 && adnoteui != NULL)
-        padnoteui->padnotewindow->show();} {}
+    }
+    else
+    {
+        padnoteui->padnotewindow->copy_label(tname.c_str());
+        padnoteui->padnotewindow->show();
+    }} {}
   }
   Function {find_engines()} {} {
     code {//

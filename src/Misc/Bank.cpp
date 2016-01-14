@@ -97,6 +97,14 @@ string Bank::getname(unsigned int ninstrument)
     return getInstrumentReference(ninstrument).name;
 }
 
+// Get the full path of an instrument from the current bank
+string Bank::getfilename(unsigned int ninstrument)
+{
+    string fname = "";
+    if (!emptyslot(ninstrument))
+        fname = getFullPath(currentRootID, currentBankID, ninstrument);
+    return fname;
+}
 
 // Get the numbered name of an instrument from the bank
 string Bank::getnamenumbered(unsigned int ninstrument)
@@ -194,17 +202,6 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
     part->saveXML(filepath);
     addtobank(currentRootID, currentBankID, ninstrument, filename, part->Pname);
 }
-
-
-// Loads the instrument from the bank
-bool Bank::loadfromslot(unsigned int ninstrument, Part *part)
-{
-    bool flag = false;
-    if (!emptyslot(ninstrument))
-        flag = part->loadXMLinstrument(getFullPath(currentRootID, currentBankID, ninstrument));
-    return flag;
-}
-
 
 bool Bank::readOnlyBank(int bankID)
 {
@@ -959,6 +956,9 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 {
     roots.clear();
     hints.clear();
+    size_t tmp_root = xml->getpar("root_current_ID", 0, 0, 127);
+    size_t tmp_bank = xml->getpar("bank_current_ID", 0, 0, 127);
+    
     string nodename = "BANKROOT";
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
@@ -994,12 +994,15 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 
     rescanforbanks();
 
-    setCurrentRootID(xml->getpar("root_current_ID", 0, 0, 127));
-    setCurrentBankID(xml->getpar("bank_current_ID", 0, 0, 127));
+    setCurrentRootID(tmp_root); // done this way so laoding full set
+    setCurrentBankID(tmp_bank); // doesn't change it - need to investigate!
 }
 
 void Bank::saveToConfigFile(XMLwrapper *xml)
 {
+    xml->addpar(string("root_current_ID"), currentRootID);
+    xml->addpar(string("bank_current_ID"), currentBankID);
+    
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; i++)
     {
         if (roots.count(i) > 0 && !roots [i].path.empty())
@@ -1019,7 +1022,4 @@ void Bank::saveToConfigFile(XMLwrapper *xml)
             xml->endbranch();
         }
     }
-    xml->addpar(string("root_current_ID"), currentRootID);
-    xml->addpar(string("bank_current_ID"), currentBankID);
-
 }

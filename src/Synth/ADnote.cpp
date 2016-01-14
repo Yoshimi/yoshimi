@@ -88,6 +88,9 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f
         * (velF(velocity, adpars->GlobalPar.PFilterVelocityScaleFunction) - 1);
 
+    NoteGlobalPar.Fadein_adjustment =
+        adpars->GlobalPar.Fadein_adjustment / (float)FADEIN_ADJUSTMENT_SCALE;
+    NoteGlobalPar.Fadein_adjustment *= NoteGlobalPar.Fadein_adjustment;
     if (adpars->GlobalPar.PPunchStrength)
     {
         NoteGlobalPar.Punch.Enabled = 1;
@@ -1191,48 +1194,18 @@ void ADnote::fadein(float *smps)
     float tmp = (synth->p_buffersize - 1.0f) / (zerocrossings + 1) / 3.0f;
     if (tmp < 8.0f)
         tmp = 8.0f;
+    tmp *= NoteGlobalPar.Fadein_adjustment;
 
-    // F2I(tmp, n); // how many samples is the fade-in
     int fadein = float2int((tmp < 8.0f) ? 8.0f : tmp); // how many samples is the fade-in
     if (fadein > synth->p_buffersize)
         fadein = synth->p_buffersize;
     for (int i = 0; i < fadein; ++i) // fade-in
     {
-        smps[i] *= (0.5 - cos(PI * i / fadein) * 0.5f);
+        float tmp = 0.5f - cosf((float)i / (float) fadein * PI) * 0.5f;
+        smps[i] *= tmp;
     }
 }
 
-/*
-// Computes the Oscillator (Without Modulation) - LinearInterpolation
-void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
-{
-    int poshi;
-    float poslo;
-    for (int k = 0; k < unison_size[nvoice]; ++k)
-    {
-        poshi = oscposhi[nvoice][k];
-        poslo = oscposlo[nvoice][k];
-        int freqhi = oscfreqhi[nvoice][k];
-        float freqlo = oscfreqlo[nvoice][k];
-        float *smps = NoteVoicePar[nvoice].OscilSmp;
-        float *tw = tmpwave_unison[k];
-        for (int i = 0; i < synth->p_buffersize; ++i)
-        {
-            tw[i] = smps[poshi] * (1.0f - poslo) + smps[poshi + 1] * poslo;
-            poslo += freqlo;
-            if (isgreaterequal(poslo, 1.0f))
-            {
-                poslo -= 1.0f;
-                poshi++;
-            }
-            poshi += freqhi;
-            poshi &= synth->oscilsize - 1;
-        }
-        oscposhi[nvoice][k] = poshi;
-        oscposlo[nvoice][k] = poslo;
-    }
-}
-*/
 
 // ported from, zynaddubfx 2.4.4
 
@@ -1626,8 +1599,11 @@ int ADnote::noteout(float *outl, float *outr)
                         break;
                 }
                 break;
-            default:
+            case 1:
                 computeVoiceNoise(nvoice); // white noise
+                break;
+            default:
+                ComputeVoicePinkNoise(nvoice); // pink noise
                 break;
         }
             

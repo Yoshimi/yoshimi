@@ -57,8 +57,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   Function {make_window()} {private
   } {
     Fl_Window ADnoteVoiceListItem {
-      private xywh {691 599 620 30} type Double box ENGRAVED_BOX
-      class Fl_Group visible
+      private xywh {691 599 620 30} type Double box ENGRAVED_BOX hide
+      class Fl_Group
     } {
       Fl_Group voicelistitemgroup {
         private xywh {50 3 567 24} box FLAT_BOX
@@ -838,14 +838,14 @@ unisongroup->redraw();}
           }
         }
         Fl_Group voicefiltergroup {
-          label FILTER open
+          label FILTER
           xywh {245 5 285 245} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
           Fl_Group {} {
             label {ADsynth Voice - Filter}
             xywh {250 30 275 75} box FLAT_BOX color 50 align 144
-            code0 {o->init(pars->VoicePar[nvoice].VoiceFilter,NULL,NULL);}
+            code0 {o->init(pars->VoicePar[nvoice].VoiceFilter,&pars->VoicePar[nvoice].PFilterVelocityScale, &pars->VoicePar[nvoice].PFilterVelocityScaleFunction);}
             class FilterUI
           } {}
           Fl_Group voicefilterenvgroup {
@@ -915,6 +915,10 @@ unisongroup->redraw();}
             label Noise
             xywh {15 15 100 20} labelfont 1 labelsize 11
           }
+          MenuItem {} {
+            label Noise
+            xywh {25 25 100 20} labelfont 1 labelsize 11 labelcolor 5
+          }
         }
         Fl_Group {} {
           xywh {115 5 95 35} box THIN_UP_BOX
@@ -953,15 +957,19 @@ switch (pars->VoicePar[nvoice].Type)
     case 0:
         return;
         break;
-    default:
+    case 1:
         o->copy_label("White Noise");
         o->labelcolor(7);
+        break;
+    default:
+        o->copy_label("Pink Noise");
+        o->labelcolor(5);
         break;
 }
 o->show();}
           xywh {150 415 300 65} labelfont 1 labelsize 50 labelcolor 7
           code0 {o->hide(); int tmp = pars->VoicePar[nvoice].Type;}
-          code1 {if (tmp >= 1) {o->copy_label("White Noise"); o->labelcolor(7);}}
+          code1 {if (tmp == 1) {o->copy_label("White Noise"); o->labelcolor(7);} else if (tmp > 1) {o->copy_label("Pink Noise"); o->labelcolor(5);}}
           code2 {if (tmp > 0) o->show();}
         }
       }
@@ -1148,6 +1156,13 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
           xywh {194 57 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
           code0 {o->value(pars->randomGlobalPan());}
         }
+        Fl_Dial depop {
+          label {D.Pop}
+          callback {pars->GlobalPar.Fadein_adjustment = lrint(o->value());}
+          tooltip {Pop Suppression} xywh {85 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
+          code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
+          class WidgetPDial
+        }
         Fl_Button {} {
           label Centre
           callback {//
@@ -1199,7 +1214,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Check_Button rndgrp {
           label {Rnd Grp}
           callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());}
-          tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {70 225 40 25} down_box DOWN_BOX labelsize 10 align 148
+          tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {8 231 63 18} down_box DOWN_BOX labelsize 11
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
         }
       }
@@ -1229,7 +1244,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
       Fl_Check_Button stereo {
         label Stereo
         callback {pars->GlobalPar.PStereo = lrint(o->value());}
-        xywh {5 220 65 35} box ENGRAVED_BOX down_box DOWN_BOX labelfont 1 labelsize 11
+        xywh {8 220 65 18} down_box DOWN_BOX labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
       Fl_Button {} {

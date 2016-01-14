@@ -1,5 +1,55 @@
 Cal's last entry here is preserved in doc/Histories
 
+V1.3.8
+
+We have our first code name: The Swan
+
+MIDI program changes have always been pretty clean from the time Cal first introduced them, but now GUI changes are just as clean. While it is generally best to change a program when the part is silent, even if a part is sounding there is usually barely a click. There is no interference at all with any other sounding parts.
+
+Sometimes MIDI CCs don't seem to give the results you expect. Well, there is now a setting that will report all incoming CCs so you can discover what Yoshimi actually sees (which may not be what you were expecting).
+
+At the request of one of our users, we have now implemented CC2, Breath Control.
+
+The 'Humanise' feature has had more interest so it's been upgraded. It's now a slider and it's setting can be saved in patch sets. It provides a tiny per-note random detune to an *entire* part (all engines in all kits), but only to that part.
+
+Audio & Midi preferences have been improved. If you set (say) ALSA MIDI and JACK audio, either from the GUI or the command line, the setting can be saved and will be reinstated on the next run. These settings are per-instance so if you have multiple sound cards you can make full use of them.
+
+Barring major system failures, there are now no circumstances where Yoshimi will fail to start.
+
+There is greater control of your working environment. You can have just the GUI, just a CLI or both, and these settings can be saved. If you try to disable both you will get a polite warning and will be left with just the CLI.
+
+The CLI can now access almost all top level controls as well as the 'main page' part ones and can select any effect and effect preset, but can't yet deal with the individual effects controls. It can be used to set up Vector Control much more quickly and easily than using NRPNs.
+
+It is also context sensitive, which along with careful choice of command names and abreviations allows very fast access with minimal typing.
+
+Yoshimi's parser is case insensitive to commands (but not filenames etc.) and accepts the shortest unambiguous abbreviation. However it is quite pedantic, and expects spelling to be correct regardless of length. Apart from the 'back' commands, it is word-based so spaces are significant.
+
+The CLI prompt always shows what level you are on, and the help lists are also partly context sensitive so you don't get a lot of irrelevent clutter.
+
+There is more, and a lot more to come!
+
+
+While doing all this work, we've alse ensured that Yoshimi instrument patches are still fully compatible with Zyn ones, and have now ported across the new refinements with thanks.
+
+V1.3.7
+
+This just a minor release focussing on usability details.
+
+Yoshimi now remembers most window positions on a per instance basis, and will re-open them at the same locations. Also, if you shut down with these windows open, they will be opened again on the next run.
+
+Almost all window titles carry the instance number as well as details such as part number/name, engine, and whether it is kit mode. For addsynth oscillator, the voice number is included. Bank and Instrument windows, as before, show the MIDI ID numbers along with the complete file paths.
+
+The top menu bar has been reorganised for better grouping. Mixing unrelated operations on a single menu is never a winner.
+
+A complete clear-down now has it's own button, 'Reset'. This is as close as possible to a restart, but works independently for each instance. Re-aranging this group of buttons into two rows means they can be longer - "Virtual Keybd" is a bit more obvious than "vrKbd".
+
+The 'Controllers' window now (at last) correctly updates when you hit its reset button.
+
+Other window layouts have had a bit of polish.
+
+There is now an option so you can see the version details of all XML files in the 'Console' window as they are loaded.
+
+Command line access is now more than just a proof of concept. It has a half-decent parser, paging and history. All these are developing alongside considerably more controls.
 
 V1.3.6
 
@@ -33,33 +83,3 @@ Another request we had was for the part effects window to have the same layout a
 
 The most noticeable GUI enhancement is colour coded identification of an instrument's use of Add Sub and Pad synth engines, no matter where in the instrument's kit they may be. This can be enabled/disabled in the mixer panel. It does slow down yoshimi's startup, but due to the banks reorganisation (done some time ago) it causes no delay in changing banks/instruments once you are up and running.
 Some saved instruments seem to have had their Info section corrupted. Yoshimi can detect this and step over it to find the true status. Also, if you resave the instrument, not only will the PadSynth status be restored, but Add and Sub will be included, allowing a faster scan next time.
-
-
-
-In Yoshimi V1.3.5 a number of existing, as well as new features have come together to give much greater flexibility (especially for automation) using standard MIDI messages. These are:
-
-NRPNs.
-Independent part control.
-16, 32 or 64 parts.
-Vector Control.
-Direct part stereo audio output.
-
-
-NRPNs can handle individual bytes appearing in either order, and usually the same with the data bytes. Increment and decrement is also supported as graduated values for both data LSB and MSB. Additionally, ALSA sequencer's 14bit NRPN blocks are supported.
-
-
-Independent part control enables you to change instrument, volume, pan, or indeed any other available control of just that part, without affecting any others that are receiving the same MIDI channel. This can be particularly interesting with multiply layered sounds. There are more extensions planned.
-
-
-With 32 and 64 parts it helps to think of 2/4 rows of 16. When you save a parameter block the number of parts is also saved, and will be restored when you reload.
-By default each *column* has the same MIDI channel number, but these can be independently switched around, and by setting (say) number 17 taken right out of normal access.
-
-In tests, *compiling* for 64 parts compared with 16 parts increased processor load by a very small amount when Yoshimi was idling, but this becomes virtually undetectable once you have 8+ instruments actually generating output. In normal use, selecting the different formats makes no detectable difference but using the default 16 reduces clutter when you don't need the extra.
-
-
-Vector control is based on these columns giving you either 2 (X only) or 4 (X + Y) instruments in this channel. Currently the vector CCs you set up can (as inverse pairs) vary any combination of volume, pan and filter cut-off. More will be added.
-To keep the processor load reasonable it pays to use fairly simple instruments, but if you have sufficient processing power it would be theoretically possible to set up all 16 channels with quite independent vector behaviour!
-
-
-Direct part audio is Jack-specific and allows you to apply further processing to just the defined part's audio output (which can still output to the main L+R if you want). This setting is saved with parameter blocks. Currently it is only set in the mixer panel window, but it will also eventually come under MIDI direct part control.
-Again, to reduce unnecessary clutter, part ports are only registered with Jack if they are both enabled, and set for direct output. However, once set they will remain in place for the session to avoid disrupting other applications that may have seen them.

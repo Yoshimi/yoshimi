@@ -3,6 +3,7 @@ Yoshimi responds to the following messages.
 
   0 or 32: Bank Change (user selectable and does *not* force a program change)
   1: Modulation Wheel
+  2: Breath Control
   6: Data MSB
   7: Volume
  10: Panning
@@ -24,10 +25,14 @@ Yoshimi responds to the following messages.
 121: Reset All Controllers
 123: All Notes OFF
 
-192: Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
+Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
      There is now an option for making Program Change enable a part if it's currently disabled.
 
-224: Pitch Bend
+Key pressure (aftertouch) is internally translated as CC 900
+
+Channel Pressure in internally translated as CC 901
+     
+Pitch Bend is internally translated as CC 1000
 
 * different to the official GM spec.
 

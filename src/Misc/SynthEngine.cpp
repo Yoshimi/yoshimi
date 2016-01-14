@@ -48,9 +48,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     if (remove)
     {
         if (idMap.count(idx) > 0)
-        {
             idMap.erase(idx);
-        }
         return 0;
     }
     else if (idx > 0)
@@ -97,7 +95,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     tmpmixr(NULL),
     processLock(NULL),
     vuringbuf(NULL),
-    guiringbuf(NULL),
+    RBPringbuf(NULL),
     stateXMLtree(NULL),
     guiMaster(NULL),
     guiClosedCallback(NULL),
@@ -106,9 +104,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     windowTitle("Yoshimi" + asString(uniqueId))
 {    
     if (bank.roots.empty())
-    {
         bank.addDefaultRootDirs();
-    }
     memset(&random_state, 0, sizeof(random_state));
 
     ctl = new Controller(this);
@@ -127,8 +123,8 @@ SynthEngine::~SynthEngine()
     closeGui();
     if (vuringbuf)
         jack_ringbuffer_free(vuringbuf);
-    if (guiringbuf)
-        jack_ringbuffer_free(guiringbuf);
+    if (RBPringbuf)
+        jack_ringbuffer_free(RBPringbuf);
     
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         if (part[npart])
@@ -148,9 +144,11 @@ SynthEngine::~SynthEngine()
     if (fft)
         delete fft;
     pthread_mutex_destroy(&processMutex);
+    sem_destroy(&partlock);
     if (ctl)
         delete ctl;
     getRemoveSynthId(true, uniqueId);
+
 }
 
 
@@ -207,7 +205,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-    if (!(guiringbuf = jack_ringbuffer_create(256)))
+    if (!(RBPringbuf = jack_ringbuffer_create(512)))
     {
         Runtime.Log("SynthEngine failed to create GUI ringbuffer");
         goto bail_out;
@@ -220,6 +218,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.Log("SynthEngine tmpmix allocations failed");
         goto bail_out;
     }
+    
+    sem_init(&partlock, 0, 1);
 
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -310,7 +310,16 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
     }
+    
+    
+    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 7, false))
+    {
+        Runtime.Log("Failed to start RBP thread");
+        goto bail_out;
+    }
+    
     return true;
+    
 
 bail_out:
     if (fft)
@@ -321,9 +330,9 @@ bail_out:
         jack_ringbuffer_free(vuringbuf);
     vuringbuf = NULL;
     
-    if (guiringbuf)
-        jack_ringbuffer_free(guiringbuf);
-    guiringbuf = NULL;
+    if (RBPringbuf)
+        jack_ringbuffer_free(RBPringbuf);
+    RBPringbuf = NULL;
 
     if (tmpmixl)
         fftwf_free(tmpmixl);
@@ -353,6 +362,64 @@ bail_out:
 }
 
 
+void *SynthEngine::_RBPthread(void *arg)
+{
+    return static_cast<SynthEngine*>(arg)->RBPthread();
+}
+
+
+void *SynthEngine::RBPthread(void)
+{
+    struct RBP_data block;
+    unsigned int readsize = sizeof(RBP_data);
+    memset(block.data, 0, readsize);
+    char *point;
+    unsigned int toread;
+    unsigned int read;
+    unsigned int found;
+    unsigned int tries;
+    while (Runtime.runSynth)
+    {
+        if (jack_ringbuffer_read_space(RBPringbuf) >= readsize)
+        {
+            toread = readsize;
+            read = 0;
+            tries = 0;
+            point = (char*)&block;
+            while (toread && tries < 3)
+            {
+                found = jack_ringbuffer_read(RBPringbuf, point, toread);
+                read += found;
+                point += found;
+                toread -= found;
+                ++tries;
+                
+            }
+            if (!toread)
+            {
+                switch ((unsigned char)block.data[0])
+                {
+                    case 1:
+                        SetBankRoot(block.data[1]);
+                        break;
+                    case 2:
+                        SetBank(block.data[1]);
+                        break;
+                    case 3:
+                        SetProgram(block.data[1], block.data[2]);
+                        break;
+                }
+            }
+            else
+                Runtime.Log("Unable to read data from Root/bank/Program");
+        }
+        else
+            usleep(500);
+    }
+    return NULL;
+}
+
+
 void SynthEngine::defaults(void)
 {
     setPvolume(90);
@@ -362,7 +429,7 @@ void SynthEngine::defaults(void)
         part[npart]->defaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
-    partonoff(0, 1); // enable the first part
+    partonoffWrite(0, 1); // enable the first part
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
@@ -378,6 +445,8 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    Runtime.currentPart = 0;
+    //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = 16;
     ShutUp();
 }
@@ -393,7 +462,7 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
         {
             if (chan == part[npart]->Prcvchn)
             {
-               if (part[npart]->Penabled)
+               if (partonoffRead(npart))
                 {
                     actionLock(lock);
                     part[npart]->NoteOn(note, velocity, keyshift);
@@ -412,7 +481,7 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
     for (int npart = 0; npart < Runtime.NumAvailableParts; ++npart)
     {
         // mask values 16 - 31 to still allow a note off
-        if (chan == (part[npart]->Prcvchn & 0xef) && part[npart]->Penabled)
+        if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
         {
             actionLock(lock);
             part[npart]->NoteOff(note);
@@ -435,14 +504,12 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         {
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {   // Send the controller to all part assigned to the channel
-                if (chan == part[npart]->Prcvchn && part[npart]->Penabled)
+                if (chan == part[npart]->Prcvchn && partonoffRead(npart))
                 {
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
-                    {
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                    }
-                       //writeGuiData(npart | 64);
+                     
                 }
             }
         }
@@ -453,9 +520,7 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             {
                 part[npart]->SetController(type, par);
                 if (type == 7 || type == 10) // currently only volume and pan
-                {
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                }
             }
         }
         if (type == C_allsoundsoff)
@@ -466,7 +531,6 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                 insefx[nefx]->cleanup();
         }
     }
-    //writeGuiData((char)type);
 }
 
 
@@ -474,43 +538,44 @@ void SynthEngine::SetZynControls()
 {
     unsigned char parnum = Runtime.dataH;
     unsigned char value = Runtime.dataL;
+
+    
     if (parnum <= 0x7f && value <= 0x7f)
     {
         Runtime.dataL = 0xff; // use once then clear it out
         unsigned char effnum = Runtime.nrpnL;
         unsigned char efftype = (parnum & 0x60);
-        int data = value;
-        data |= (parnum << 8);
-        data |= (effnum << 16);
+        int data = (effnum << 8);
         parnum &= 0x1f;
+
         if (Runtime.nrpnH == 8)
         {
-            data |= 0x400000;
-            if (efftype == 0x20) // select part
+            data |= (1 << 22);
+            if (efftype == 0x40) // select effect
+            {
+                actionLock(lockmute);
+                insefx[effnum]->changeeffect(value);
+                actionLock(unlock);
+            }
+            else if (efftype == 0x20) // select part
             {
                 if (value >= 0x7e)
                     Pinsparts[effnum] = value - 0x80; // set for 'Off' and 'Master out'
                 else if (value < Runtime.NumAvailableParts)
                     Pinsparts[effnum] = value;
             }
-            else if (efftype == 0x40) // select effect
-            {
-                insefx[effnum]->changeeffect(value);
-            }
             else
                 insefx[effnum]->seteffectpar(parnum, value);
-            data |= (Pinsparts[effnum] + 2) << 24; // needed for both operations
+            data |= ((Pinsparts[effnum] + 2) << 24); // needed for both operations
         }
         else
         {
-            if (efftype == 0x20) // select output level
+            if (efftype == 0x40) // select effect
+                sysefx[effnum]->changeeffect(value);
+            else if (efftype == 0x20) // select output level
             {
                 // setPsysefxvol(effnum, parnum, value); // this isn't correct!
                 
-            }
-            else if (efftype == 0x40) // select effect
-            {
-                sysefx[effnum]->changeeffect(value);
             }
             else
                 sysefx[effnum]->seteffectpar(parnum, value);
@@ -520,23 +585,83 @@ void SynthEngine::SetZynControls()
 }
 
 
+void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value)
+{
+    // category 0-sysFX, 1-insFX, 2-partFX
+    // command 1-set effect, 4-set param, 8-set preset
+    
+    int npart = getRuntime().currentPart;
+    int data = (nFX) << 8;
+    
+    
+    switch (category)
+    {
+        case 1:
+            data |= (1 << 22);
+            
+            switch (command)
+            {
+                case 1:
+                    insefx[nFX]->changeeffect(nType);
+                    data |= ((Pinsparts[nFX] + 2) << 24);
+                    break;
+                case 4:
+                    Pinsparts[nFX] = nPar;
+                    data |= ((nPar + 2) << 24);
+                    break;
+                case 8:
+                    insefx[nFX]->changepreset(value);
+                    data |= ((Pinsparts[nFX] + 2) << 24);
+                    break;
+            }
+            break;
+        case 2:
+            data |= (2 << 22);
+            switch (command)
+            {
+                case 1:
+                    part[npart]->partefx[nFX]->changeeffect(nType);
+                    break;
+                case 4:
+                    setPsysefxvol(npart, nPar, value);
+                    break;
+                case 8:
+                    part[npart]->partefx[nFX]->changepreset(value);
+                    break;
+            }
+            break;
+        default:
+            switch (command)
+            {
+                case 1:
+                    sysefx[nFX]->changeeffect(nType);
+                    break;
+                case 4:
+                    setPsysefxsend(nFX, nPar, value);
+                    break;
+                case 8:
+                    sysefx[nFX]->changepreset(value);
+                    break;
+            }
+            break;
+    }
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateEffects, data);
+}
+
+
 void SynthEngine::SetBankRoot(int rootnum)
 {
     if (bank.setCurrentRootID(rootnum))
     {
+        if (Runtime.showGui)
+        {
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
+        }
         Runtime.Log("Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
     }
     else
-    {
         Runtime.Log("No match for root ID " + asString(rootnum));
-    }
-    if (Runtime.showGui)
-    {
-        guiMaster->updateBankRootDirs();
-        guiMaster->bankui->rescan_for_banks(false);
-    }
-
-
 }
 
 
@@ -550,29 +675,24 @@ void SynthEngine::SetBank(int banknum)
     //new implementation uses only 1 call :)
     if (bank.setCurrentBankID(banknum, true))
     {
-        if (Runtime.showGui && guiMaster && guiMaster && guiMaster->bankui)
+        if (Runtime.showGui)
         {
-            guiMaster->bankui->set_bank_slot();
-            guiMaster->bankui->refreshmainwindow();
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RefreshCurBank, 0);
         }
         Runtime.Log("Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
-
     }
     else
-    {
         Runtime.Log("No bank " + asString(banknum)+ " in this root");
-    }
 }
 
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
-    bool partOK = false;
+    bool partOK = true;
     int npart;
-    if (bank.getname(pgm) < "!") // can't get a program name less than this
-    {
+    string fname = bank.getfilename(pgm);
+    if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
         Runtime.Log("No Program " + asString(pgm) + " in this bank");
-    }
     else
     {
         if (chan <  NUM_MIDI_CHANNELS) // a normal program change
@@ -581,17 +701,11 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                 // we don't want upper parts (16 - 63) activiated!
                 if (chan == part[npart]->Prcvchn)
                 {
-                    if (bank.loadfromslot(pgm, part[npart])) // Program indexes start from 0
+                    // all listening parts must succeed
+                    if (!SetProgramToPart(npart, pgm, fname))
                     {
-                        partOK = true; 
-                        if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
-                            partonoff(npart, 1);
-                        if (Runtime.showGui && guiMaster && guiMaster->partui
-                                            && guiMaster->partui->instrumentlabel
-                                            && guiMaster->partui->part)
-                        {
-                            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-                        }
+                        partOK = false;
+                        break;
                     }
                 }
         }
@@ -599,30 +713,43 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
         {
             npart = chan & 0x7f;
             if (npart < Runtime.NumAvailableParts)
-            {
-                partOK = bank.loadfromslot(pgm, part[npart]);
-                if (partOK)
-                {
-                    if (part[npart]->Penabled == 0 && Runtime.enable_part_on_voice_load != 0)
-                        partonoff(npart, 1);
-                    if (Runtime.showGui && guiMaster && guiMaster->partui
-                                        && guiMaster->partui->instrumentlabel
-                                        && guiMaster->partui->part)
-                    {
-                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
-                    }
-                }
-            }
+                partOK = SetProgramToPart(npart, pgm, fname);
         }
-        if (partOK)
-        {
-            Runtime.Log("Loaded " + asString(pgm) + " " + bank.getname(pgm) + " to " + asString(chan & 0x7f));
-        }
-        else
+        if (!partOK)
             Runtime.Log("SynthEngine setProgram: Invalid program data");
     }
 }
 
+// for de-duplicating bits in SetProgram() and for calling from everywhere else
+// this replaces bank->loadfromslot for thread safety etc.
+bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
+{
+    bool loadOK = false;
+    int enablestate;
+    sem_wait (&partlock);
+    if (Runtime.enable_part_on_voice_load)
+        enablestate = 1;
+    else
+        enablestate = partonoffRead(npart);
+    partonoffWrite(npart, 0);
+    if (part[npart]->loadXMLinstrument(fname))
+    {
+        partonoffWrite(npart, enablestate); // must be here to update gui
+        loadOK = true;
+        // show file instead of program if we got here from Instruments -> Load External...
+        Runtime.Log("Loaded " +
+                    ((pgm == -1) ? fname : asString(pgm) + " \"" + bank.getname(pgm) + "\"")
+                    + " to Part " + asString(npart));
+        if (Runtime.showGui && guiMaster && guiMaster->partui
+                            && guiMaster->partui->instrumentlabel
+                            && guiMaster->partui->part)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
+    }
+    else
+        partonoffWrite(npart, enablestate); // also here to restore failed load state.
+    sem_post (&partlock);
+    return loadOK;
+}
 
 // Set part's channel number
 void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
@@ -640,10 +767,7 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
         if (Runtime.showGui && guiMaster && guiMaster->partui
                             && guiMaster->partui->instrumentlabel
                             && guiMaster->partui->part)
-        {
-            GuiThreadMsg::sendMessage(this,
-            GuiThreadMsg::UpdatePartProgram, npart);
-        }
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
 }
 
@@ -677,10 +801,15 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
+void SynthEngine::SetPartPortamento(int npart, bool state)
+{
+    part[npart]->ctl->portamento.portamento = state;
+}
+    
 /*
  * This should really be in MiscFuncs but it has two runtime calls
  * and I can't work out a way to implement that :(
- * We als have to fake long pages when calling via NRPNs as there
+ * We also have to fake long pages when calling via NRPNs as there
  * is no readline entry to set the page length.
  */
 
@@ -807,11 +936,11 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
     msg_buf.push_back(asString(avail) + " parts available");
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if ((part[npart]->Pname) != "Simple Sound" || (part[npart]->Penabled))
+        if ((part[npart]->Pname) != "Simple Sound" || (partonoffRead(npart)))
         {
             name = "  " + asString(npart);
             dest = part[npart]->Paudiodest;
-            if (!part[npart]->Penabled || npart >= avail)
+            if (!partonoffRead(npart) || npart >= avail)
                 name += " -";
             else if(dest == 1)
                 name += " M";
@@ -875,12 +1004,12 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     else
         msg_buf.push_back("  No paths set");
     
-    msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
-    
-    msg_buf.push_back("  Number of availalbe parts "
+    msg_buf.push_back("  Number of available parts "
                     + asString(Runtime.NumAvailableParts));
     
-    msg_buf.push_back("  Current MIDI channel " + asString(Runtime.currentChannel));
+    msg_buf.push_back("  Current part " + asString(Runtime.currentPart));
+    
+    msg_buf.push_back("  Current part's channel " + asString((int)part[Runtime.currentPart]->Prcvchn));
     
     if (Runtime.midi_bank_root > 119)
         msg_buf.push_back("  MIDI Root Change off");
@@ -908,9 +1037,35 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     else
         msg_buf.push_back("  MIDI extended Program Change CC "
                         + asString(Runtime.midi_upper_voice_C));
-        
+    switch (Runtime.midiEngine)
+    {
+        case 2:
+            label = "ALSA";
+            break;
+        case 1:
+            label = "jack";
+            break;
+        default:
+            label = "None";
+            break;
+    }
+    msg_buf.push_back("  Preferred MIDI " + label);
+    switch (Runtime.audioEngine)
+    {
+        case 2:
+            label = "ALSA";
+            break;
+        case 1:
+            label = "jack";
+            break;
+        default:
+            label = "None";
+            break;
+    }
+    msg_buf.push_back("  Preferred audio " + label);
     msg_buf.push_back("  ALSA MIDI " + Runtime.alsaMidiDevice);
-    msg_buf.push_back("  ALSA AUDIO " + Runtime.alsaAudioDevice);
+    msg_buf.push_back("  ALSA audio " + Runtime.alsaAudioDevice);
+    msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  Jack server " + Runtime.jackServer);
 
     if (Runtime.consoleMenuItem)
@@ -939,13 +1094,13 @@ void SynthEngine::SetSystemValue(int type, int value)
                 value = 52;            
             setPkeyshift(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-            Runtime.Log("Set Master key shift " + asString(value)
+            Runtime.Log("Master key shift set to " + asString(value)
                       + "  (" + asString(value - 64) + ")");
             break;
         case 7: // master volume
             setPvolume(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-            Runtime.Log("Set Master volume " + asString(value));
+            Runtime.Log("Master volume set to " + asString(value));
             break;
             
         case 100: // reports destination
@@ -1006,13 +1161,13 @@ void SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_bank_root = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
                 }
             }
             if (value == 128) // but still report the setting
                 Runtime.Log("MIDI Root Change disabled");
             else if (value > -1)
-                Runtime.Log("Set Root CC to " + asString(value));
+                Runtime.Log("Root CC set to " + asString(value));
             break;
             
         case 114: // bank
@@ -1029,13 +1184,13 @@ void SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_bank_C = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
                 }
             }
             if (value == 0)
-                Runtime.Log("Set Bank CC to MSB (0)");
+                Runtime.Log("Bank CC set to MSB (0)");
             else if (value == 32)
-                Runtime.Log("Set Bank CC to LSB (32)");
+                Runtime.Log("Bank CC set to LSB (32)");
             else if (value > -1)
                 Runtime.Log("MIDI Bank Change disabled");
             break;
@@ -1049,20 +1204,20 @@ void SynthEngine::SetSystemValue(int type, int value)
             if (value != Runtime.EnableProgChange)
             {
                 Runtime.EnableProgChange = value;
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
             }
             break;
             
         case 116: // enable on program change
             value = (value > 63);
             if (value)
-                Runtime.Log("Set MIDI Program Change enables part");
+                Runtime.Log("MIDI Program Change will enable part");
             else
-                Runtime.Log("Set MIDI Program Change doesn't enable part");
+                Runtime.Log("MIDI Program Change doesn't enable part");
             if (value != Runtime.enable_part_on_voice_load)
             {
                 Runtime.enable_part_on_voice_load = value;
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
             }
             break;
             
@@ -1080,20 +1235,20 @@ void SynthEngine::SetSystemValue(int type, int value)
                 else
                 {
                     Runtime.midi_upper_voice_C = value;
-                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
                 }
             }
             if (value == 128) // but still report the setting
                 Runtime.Log("MIDI extended Program Change disabled");
             else if (value > -1)
-                Runtime.Log("Set extended Program Change CC to " + asString(value));
+                Runtime.Log("Extended Program Change CC set to " + asString(value));
             break;
             
         case 118: // active parts
             if (value == 16 or value == 32 or value == 64)
             {
                 Runtime.NumAvailableParts = value;
-                Runtime.Log("Set active parts to " + asString(value));
+                Runtime.Log("Available parts set to " + asString(value));
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             }
             else
@@ -1108,340 +1263,34 @@ void SynthEngine::SetSystemValue(int type, int value)
 }
 
 
-// Provides a command line link to system values
-
-int SynthEngine::commandSet(char *point)
+void SynthEngine::writeRBP(char type, char data0, char data1)
 {
-    int error = 0;
-    int tmp;
-    int partnum = Runtime.currentPart;
+    struct RBP_data block;
+    unsigned int writesize = sizeof(RBP_data);
+    block.data[0] = type;
+    block.data[1] = data0;
+    block.data[2] = data1;
+    char *point = (char*)&block;
+    unsigned int towrite = writesize;
+    unsigned int wrote = 0;
+    unsigned int found;
+    unsigned int tries = 0;
 
-    if (matchWord(point, "ccroot"))
+    if (jack_ringbuffer_write_space(RBPringbuf) >= writesize)
     {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetSystemValue(113, string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "ccbank"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetSystemValue(114, string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "root"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetBankRoot(string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "bank"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetBank(string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "part"))
-    {
-        point = skipChars(point);
-        if (point[0] == 0)
-            return 1;
-        if (isdigit(point[0]))
+        while (towrite && tries < 3)
         {
-            partnum = string2int(point);
-            if (partnum >= Runtime.NumAvailableParts)
-            {
-                Runtime.Log("Part number too high");
-                return 0;
-            }
-            point = skipChars(point);
-            Runtime.currentPart = partnum;
+            found = jack_ringbuffer_write(RBPringbuf, point, towrite);
+            wrote += found;
+            point += found;
+            towrite -= found;
+            ++tries;
         }
-        if (point[0] == 0)
-        {
-            Runtime.Log("Part number set to " + asString(partnum));
-            return 0;
-        }
-        else if (matchWord(point, "program"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0) // force part not channel number
-                SetProgram(partnum | 0x80, string2int(point));
-            else
-                error = 1;
-        }
-        else if (matchWord(point, "channel"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-            {
-                tmp = string2int(point);
-                SetPartChan(partnum, tmp);
-                if (tmp < NUM_MIDI_CHANNELS)
-                    Runtime.Log("Part " + asString((int) partnum) + " set to channel " + asString(tmp));
-                else
-                    Runtime.Log("Part " + asString((int) partnum) + " set to no MIDI"); 
-            }
-            else
-                error = 1;
-        }
-        else if (matchWord(point, "destination"))
-        {
-            point = skipChars(point);
-            int dest = point[0] - 48;
-            if (dest > 0 and dest < 4)
-            {
-                partonoff(partnum, 1);
-                SetPartDestination(partnum, dest);
-            }
-            else
-                error = 4;
-        }
-        else
-            error = 2;
-    }
-    else if (matchWord(point, "program"))
-    {
-        point = skipChars(point);
-        if (point[0] == '0')
-            SetSystemValue(115, 0);
-        else
-            SetSystemValue(115, 127);
-    }
-    else if (matchWord(point, "activate"))
-    {
-        point = skipChars(point);
-        if (point[0] == '0')
-            SetSystemValue(116, 0);
-        else
-            SetSystemValue(116, 127);
-    }
-    else if (matchWord(point, "extend"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetSystemValue(117, string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "available"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetSystemValue(118, string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "reports"))
-    {
-        point = skipChars(point);
-        if (point[0] == '1')
-            SetSystemValue(100, 127);
-        else
-            SetSystemValue(100, 0);
-    }
-    else if (matchWord(point, "volume"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetSystemValue(7, string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "shift"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            SetSystemValue(2, string2int(point));
-        else
-            error = 1;
-    }
-    else if (matchWord(point, "defaults"))
-    {
-        resetAll();
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-
-    }
-    
-    else if (matchWord(point, "alsa"))
-    {
-        point = skipChars(point);
-        if (matchWord(point, "midi"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-            {
-                Runtime.alsaMidiDevice = (string) point;
-                Runtime.Log("* Set ALSA MIDI to " + Runtime.alsaMidiDevice);
-            }
-            else
-                error = 1;
-        }
-        else if (matchWord(point, "audio"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-            {
-                Runtime.alsaAudioDevice = (string) point;
-                Runtime.Log("* Set ALSA AUDIO to " + Runtime.alsaAudioDevice);
-            }
-            else
-                error = 1;
-        }
-        else
-            error = 2;
-    }
-    else if (matchWord(point, "jack"))
-    {
-        point = skipChars(point);
-        if (matchWord(point, "server"))
-        {
-            point = skipChars(point);
-            if (point[0] != 0)
-            {
-                Runtime.jackServer = (string) point;
-                Runtime.Log("* Set Jack server to " + Runtime.jackServer);
-            }
-            else
-                error = 1;
-        }
-        else
-            error = 2;
-    }
-    else if (matchWord(point, "vector"))
-    {
-        point = skipChars(point);
-        if (point[0] != 0)
-            error = commandVector(point);
-        else
-            error = 1;
+        if (towrite)
+            Runtime.Log("Unable to write data to Root/bank/Program");
     }
     else
-        error = 2;
-    return error; 
-}
-
-
-char SynthEngine::readGuiData()
-{
-    char data = 0;
-    if (jack_ringbuffer_read_space(guiringbuf) > 0)
-        jack_ringbuffer_read(guiringbuf, &data, 1);
-    return data;
-}
-
-
-void SynthEngine::writeGuiData(char data)
-{
-    if (!Runtime.showGui || !guiMaster)
-        return;
-    if (jack_ringbuffer_write_space(guiringbuf) > 0)
-        jack_ringbuffer_write(guiringbuf, &data, 1);
-}
-
-
-int SynthEngine::commandVector(char *point)
-{
-    static int axis;
-    int error = 0;
-    int tmp;
-    int chan = Runtime.currentChannel;
-    
-    if (isdigit(point[0]))
-    {
-        chan = string2int(point);
-        if (chan >= NUM_MIDI_CHANNELS)
-            return 4;
-        point = skipChars(point);
-        Runtime.currentChannel = chan;
-    }
-    else
-        chan = Runtime.currentChannel;
-
-    if (matchWord(point, "off"))
-    {
-        vectorSet(127, chan, 0);
-        return 0;
-    }
-    tmp = point[0] | 32;
-    if (tmp == 32) // would be line end
-        return 2;
-    
-    if (tmp == 'x' || tmp == 'y')
-    {
-        axis = tmp - 'x';
-        ++ point;
-        point = skipSpace(point); // can manage with or without a space
-    }
-    if (matchWord(point, "cc"))
-    {
-        point = skipChars(point);
-        if (point[0] == 0)
-            error = 1;
-        else
-        {
-            tmp = string2int(point);
-            if (!vectorInit(axis, chan, tmp))
-                vectorSet(axis, chan, tmp);
-        } 
-    }
-    else if (matchWord(point, "features"))
-    {
-        point = skipChars(point);
-        if (point[0] == 0)
-            error = 1;
-        else
-        {
-            tmp = string2int(point);
-            if (!vectorInit(axis + 2, chan, tmp))
-                vectorSet(axis + 2, chan, tmp);
-        }
-    }
-    else if (matchWord(point, "program"))
-    {
-        point = skipChars(point);
-        int hand = point[0] | 32;
-        if (point[0] == 'l')
-            hand = 0;
-        else if (point[0] == 'r')
-            hand = 1;
-        else
-            return 2;
-        point = skipChars(point);
-        tmp = string2int(point);
-        if (!vectorInit(axis * 2 + hand + 4, chan, tmp))
-            vectorSet(axis * 2 + hand + 4, chan, tmp);
-    }
-    else
-    {
-        if (!matchWord(point, "control"))
-            return 2;
-        point = skipChars(point);
-        if(isdigit(point[0]))
-        {
-            int cmd = string2int(point) >> 1;
-            if (cmd == 4)
-                cmd = 3; // can't remember how to do this :(
-            if (cmd < 1 || cmd > 3)
-                return 4;
-            point = skipChars(point);
-            if (point[0] == 0)
-                return 1;
-            tmp = string2int(point);
-            if (!vectorInit(axis * 2 + cmd + 7, chan, tmp))
-            vectorSet(axis * 2 + cmd + 7, chan, tmp);
-        }
-        else
-            error = 1;
-    }
-    return error;
+        Runtime.Log("Root/bank/Program buffer full!");
 }
 
 
@@ -1607,10 +1456,19 @@ void SynthEngine::resetAll(void)
 
 
 // Enable/Disable a part
-void SynthEngine::partonoff(int npart, int what)
+void SynthEngine::partonoffLock(int npart, int what)
+{
+    sem_wait (&partlock);
+    partonoffWrite(npart, what);
+    sem_post (&partlock);
+}
+
+
+void SynthEngine::partonoffWrite(int npart, int what)
 {
     if (npart >= Runtime.NumAvailableParts)
         return;
+    
     if (what)
     {
         VUpeak.values.parts[npart] = 1e-9f;
@@ -1625,6 +1483,12 @@ void SynthEngine::partonoff(int npart, int what)
                 insefx[nefx]->cleanup();
         VUpeak.values.parts[npart] = -0.2;
     }
+}
+
+
+bool SynthEngine::partonoffRead(int npart)
+{
+    return (part[npart]->Penabled != 0);
 }
 
 
@@ -1647,29 +1511,33 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
     }
 
     int npart;
-/*    for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
-    {
-        if (part[npart]->Penabled)
-        {
-            memset(outl[npart], 0, p_bufferbytes);
-            memset(outr[npart], 0, p_bufferbytes);
-        }
-    }
- * The above was unnecessary as we later do a copy (that completely overwrites
- * the buffers) to just the parts that have a direct output. Only these are
- * sent to jack, so it doesn't matter what the unused ones contain.
- */
+    
     memset(mainL, 0, p_bufferbytes);
     memset(mainR, 0, p_bufferbytes);
-
-    if (!isMuted())
+    
+    if (isMuted())
     {
-
+        for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
+        {
+            if (partonoffRead(npart))
+            {
+                memset(outl[npart], 0, p_bufferbytes);
+                memset(outr[npart], 0, p_bufferbytes);
+            }
+        }
+    }
+/* Normally the above is unnecessary, as we later do a copy to just the parts 
+ * that have a direct output. This completely overwrites the buffers.
+ * Only these are sent to jack, so it doesn't matter what the unused ones contain.
+ * However, this doesn't happen when muted, so the buffers then need to be zeroed.
+ */
+    else
+    {
         actionLock(lock);
 
         // Compute part samples and store them ->partoutl,partoutr
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
-            if (part[npart]->Penabled)
+            if (partonoffRead(npart))
                 part[npart]->ComputePartSmps();
 
         // Insertion effects
@@ -1687,7 +1555,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Apply the part volumes and pannings (after insertion effects)
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
-            if (!part[npart]->Penabled)
+            if (!partonoffRead(npart))
                 continue;
 
             float oldvol_l = part[npart]->oldvolumel;
@@ -1728,7 +1596,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // Mix the channels according to the part settings about System Effect
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (part[npart]->Penabled        // it's enabled
+                if (partonoffRead(npart)        // it's enabled
                  && Psysefxvol[nefx][npart]      // it's sending an output
                  && part[npart]->Paudiodest & 1) // it's connected to the main outs
                 {
@@ -1840,7 +1708,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Peak computation for part vu meters
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
-            if (part[npart]->Penabled)
+            if (partonoffRead(npart))
             {
                 for (int idx = 0; idx < p_buffersize; ++idx)
                 {
@@ -1861,13 +1729,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuOutPeakR = 1e-12f;
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (part[npart]->Penabled)
+                if (partonoffRead(npart))
                     VUpeak.values.parts[npart] = 1.0e-9;
                 else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
                     VUpeak.values.parts[npart]+= 2;
             }
         }
-    }    
+    }
     return p_buffersize;
 }
 
@@ -2160,10 +2028,8 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
             continue;
         part[npart]->getfromXML(xml);
         xml->exitbranch();
-        if (part[npart]->Penabled && (part[npart]->Paudiodest & 2))
-        {
+        if (partonoffRead(npart) && (part[npart]->Paudiodest & 2))
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
-        }
     }
 
     if (xml->enterbranch("MICROTONAL"))
@@ -2277,9 +2143,7 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
 MasterUI *SynthEngine::getGuiMaster(bool createGui)
 {
     if (guiMaster == NULL && createGui)
-    {
         guiMaster = new MasterUI(this);
-    }
     return guiMaster;
 }
 
@@ -2317,8 +2181,6 @@ string SynthEngine::makeUniqueName(string name)
 void SynthEngine::setWindowTitle(string _windowTitle)
 {
     if (!_windowTitle.empty())
-    {
         windowTitle = _windowTitle;
-    }
 }
 

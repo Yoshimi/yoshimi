@@ -1,4 +1,4 @@
-Yes We actually have Yoshimi code policies. Look how many there are :)
+Yes! We actually have Yoshimi code policies. Look how many there are :)
 
 If the version string contains a 4th number this will always be just a bugfix, and will never have features added or changed from the main version.
 
@@ -17,12 +17,12 @@ For a start, from bitter experience it is fatally easy to change two variables t
 To avoid possible confusion, from now on 'master' will display the last released version number (without bugfix digits) with an 'M' suffix - unless it is a release candidate in which case the suffix will be rc{n}.
 
 e.g.
-Last release was yoshimi-1.3.5.2
-master is shown as yoshimi-1.3.5 M
+Release was yoshimi-1.3.5.2
+master was shown as yoshimi-1.3.5 M
 
 xml files created with this will have:
-Major version 3
-Minor version 5
+Major version 1
+Minor version 3
 
 
 

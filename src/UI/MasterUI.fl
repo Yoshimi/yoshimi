@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey    
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -218,7 +218,7 @@ class MasterUI {selected : {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {if (configui->configChanged)
+      callback {if (synth->getRuntime().configChanged)
           {
               int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
               switch (r)
@@ -243,10 +243,9 @@ class MasterUI {selected : {private MiscFuncs}
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-7 0 400 25} labelsize 13
-        code0 {if (synth->getRuntime().audioEngine != jack_audio){newinstance->deactivate(); newinstanceid->deactivate();}}
       } {
         Submenu {} {
-          label {&Yoshimi}
+          label {&Yoshimi} open
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem {} {
@@ -303,7 +302,8 @@ mainCreateNewInstance(forceId);}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-                int result = synth->part[npart]->loadXMLinstrument(string(filename));
+				// pgm = -1 here because it's not from a bank
+				int result = synth->SetProgramToPart(npart, -1, string(filename));
                 npartcounter->do_callback();
                 updatepanel();
                 if (result == 0)
@@ -320,7 +320,7 @@ mainCreateNewInstance(forceId);}
         fl_alert("Nothing to save!");
         return;
     }
-    char *filename = fl_file_chooser("Save:", "({*.xiz})", NULL, 0);
+    char *filename = fl_file_chooser("Save:", "({*.xiz})", synth->part[npart]->Pname.c_str(), 0);
     if (filename == NULL)
         return;
     filename = fl_filename_setext(filename, ".xiz");
@@ -513,7 +513,7 @@ paramsui->Show();}
         Fl_Spinner masterkeyshift {
           label {Key Shift}
           callback {synth->setPkeyshift(o->value() + 64);}
-          tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -12 maximum 12 textsize 10
+          tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -24 maximum 24 textsize 10
           code0 {o->range(-12.0, 12.0);o->step(1.0);}
           code1 {o->value(synth->Pkeyshift - 64);}
         }
@@ -831,6 +831,7 @@ paramsui->Show();}
         label Part
         callback {//
           int nval = o->value() - 1;
+          synth->getRuntime().currentPart = nval;
           partuigroup->remove(partui);
           delete partui;
           partui = new PartUI(0, 0, 765, 525);
@@ -843,7 +844,8 @@ paramsui->Show();}
           maxparts->value(synth->getRuntime().NumAvailableParts);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
-        code1 {bankui->init(o);}
+        code1 {o->value(synth->getRuntime().currentPart + 1);}
+        code2 {bankui->init(o);}
       }
       Fl_Spinner maxparts {
         label of
@@ -880,7 +882,7 @@ ZynAddSubFX}
         code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
                                "\\nCopyright 2009-2011, Alan Calvert"
                                "\\nCopyright 2012-2013, Jeremy Jongepier and others"
-                               "\\nCopyright 2014-2015, Will Godfrey and others"
+                               "\\nCopyright 2014-2016, Will Godfrey and others"
                                "\\nLV2 plugin Copyright 2014, Andrew Deryabin"
                                "\\nSplash Image Copyright 2015, James Fraser").c_str());}
       }
@@ -1085,16 +1087,39 @@ updatepanel();}
         npartcounter->do_callback();
         return;
     }
+    if (synth->partonoffRead(npart))
+        partui->partgroupui->activate();
+    else
+        partui->partgroupui->deactivate();
+        
+    partui->partGroupEnable->value(synth->partonoffRead(npart));
     partui->partpan->value(synth->part[npart]->Ppanning);
     partui->partvol->value(synth->part[npart]->Pvolume);
+    partui->partkeylimit->value(synth->part[npart]->Pkeylimit);
+    partui->velocitysense->value(synth->part[npart]->Pvelsns);
+    partui->velocityoffset->value(synth->part[npart]->Pveloffs);
+    partui->partkeyshift->value(synth->part[npart]->Pkeyshift - 64);
+    partui->minkcounter->value(synth->part[npart]->Pminkey);
+    partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
+    partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
+    
+    if (synth->part[npart]->Ppolymode)
+        partui->keymode->value(0);
+    else
+        partui->keymode->value(1);
+    if (!synth->part[npart]->Ppolymode && synth->part[npart]->Plegatomode)
+        partui->keymode->value(2);
+        
     maxparts->value(synth->getRuntime().NumAvailableParts);
     maxparts->redraw();
     npartcounter->value(npart + 1);
     npartcounter->redraw();
     partui->setinstrumentlabel();} {}
   }
-  Function {updatepartprogram(int npart)} {} {
+  Function {updatepartprogram(int _npart)} {} {
     code {//
+    if (_npart != npart)
+        return;
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
         partui->midich->value(partui->part->Prcvchn + 1);
@@ -1109,26 +1134,23 @@ updatepanel();}
   }
   Function {updateeffects(int data)} {} {
     code {//
-    int effect = (data >> 16) & 0xff;
-    int type =  (data >> 12) & 3;
+    int partnum = data >> 24;
+    int effclass = (data >> 22) & 3; 
+    //int type = (data >> 12) & 3;
     int parameter = (data >> 8) & 0x7f;
-    int value = data & 0x7f;
 
-    if (effect > 0x3f)
+    if (effclass == 2)
     {
-        effect &= 0x3f;
-        synth->getRuntime().Log("Insert  Effect Number "
-        			+ asString(effect)
-        			+ "  Type " + asString(type)
-        			+ "  Parameter "
-        			+ asString(parameter)
-        			+ "  Value " + asString(value));
+         // will be part effects
+    }
+    else if (effclass == 1)
+    {
+        ninseff = parameter & 0x3f;
         sysinsgroup->value(InsertionEffectsGrp);
         showInsEfxUI();
-        inseffnocounter->value(effect + 1);
-        int partnum = data >> 24;
+        inseffnocounter->value(ninseff + 1);
         inseffpart->value(partnum);
-        if (partnum != 1)
+        if (partnum != 1) // off
         {
             insefftype->activate();
             inseffectui->activate();
@@ -1138,25 +1160,20 @@ updatepanel();}
             insefftype->deactivate();
             inseffectui->deactivate();
         }
-        insefftype->value(synth->insefx[effect]->geteffect());
-        inseffectui->refresh(synth->insefx[effect]);
+        insefftype->value(synth->insefx[ninseff]->geteffect());
+        inseffectui->refresh(synth->insefx[ninseff]);
     }
     else
     {
-        synth->getRuntime().Log("Insert  Effect Number "
-        			+ asString(effect)
-        			+ "  Type " + asString(type)
-        			+ "  Parameter "
-        			+ asString(parameter)
-        			+ "  Value " + asString(value));
+        nsyseff = parameter & 0x3f;
         sysinsgroup->value(SystemEffectsGrp);
-        syseffnocounter->value(effect + 1);
-        if (type == 1)
-        {
+        syseffnocounter->value(nsyseff + 1);
+       // if (type == 1)
+       // {
         // effect output volume to be done!
-        }
-        sysefftype->value(synth->sysefx[effect]->geteffect());
-        syseffectui->refresh(synth->sysefx[effect]);      
+      //  }
+        sysefftype->value(synth->sysefx[nsyseff]->geteffect());
+        syseffectui->refresh(synth->sysefx[nsyseff]);      
         showSysEfxUI();
     }} {}
   }
@@ -1253,9 +1270,7 @@ updatepanel();}
   }
   Function {refresh_master_ui()} {} {
     code {//
-    ninseff = 0;
-    nsyseff = 0;
-    npart = 0;
+    npartcounter->value((synth->getRuntime().currentPart) + 1);
     npartcounter->do_callback();
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);

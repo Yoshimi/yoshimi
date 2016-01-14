@@ -34,31 +34,15 @@ using namespace std;
 
 MusicIO::MusicIO(SynthEngine *_synth) :
     interleaved(NULL),
-    rtprio(25),
-    synth(_synth),
-    pBankOrRootDirThread(0)
+    synth(_synth)//,
 {
     memset(zynLeft, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
     memset(zynRight, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
-    memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
+//    memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
 }
 
 MusicIO::~MusicIO()
 {
-    pthread_t tmpBankThread = 0;
-    pthread_t tmpPrgThread = 0;
-    void *threadRet = NULL;
-    tmpBankThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
-    if (tmpBankThread != 0)
-        pthread_join(tmpBankThread, &threadRet);
-    for (int i = 0; i < NUM_MIDI_PARTS; ++i)
-    {
-        threadRet = NULL;
-        tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [i].pPrgThread, 0);
-        if (tmpPrgThread != 0)
-            pthread_join(tmpPrgThread, &threadRet);
-    }
-
     for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
     {
         if (zynLeft[npart])
@@ -86,8 +70,9 @@ int MusicIO::getMidiController(unsigned char b)
 	    case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
-        case 2:
+        case 2: // breath control
             ctl = C_breath;
+            break;
         case 6: // data MSB
             ctl = C_dataH;
             break;
@@ -163,6 +148,32 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 {
     int nLow;
     int nHigh;
+    if (synth->getRuntime().monitorCCin)
+    {
+        string ctltype;
+        switch (ctrl)
+        {
+            case C_NULL:
+                ctltype = "Ignored";
+                break;
+            case C_programchange:
+                ctltype = "program";
+                break;
+            case C_pitchwheel:
+                ctltype = "Pitchwheel";
+                break;
+            case C_channelpressure:
+                ctltype = "Ch Press";
+                break;
+            case C_keypressure:
+                ctltype = "Key Press";
+                break;
+            default:
+                ctltype = asString(ctrl);
+                break;
+        }
+        synth->getRuntime().Log("Chan " + asString(((int) ch) + 1) + "   CC " + ctltype  + "   Value " + asString(param));
+    }
     if (ctrl == synth->getRuntime().midi_bank_root)
         setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)
@@ -177,7 +188,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnL != param)
             {
                 synth->getRuntime().nrpnL = param;
-                synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
+                //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
             }
             nLow = param;
             nHigh = synth->getRuntime().nrpnH;
@@ -187,12 +198,11 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnH != param)
             {
                 synth->getRuntime().nrpnH = param;
-                synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
+                //synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
             }
             nHigh = param;
             nLow = synth->getRuntime().nrpnL;
         }
-
         synth->getRuntime().dataL = 0x80; //  we've changed the NRPN
         synth->getRuntime().dataH = 0x80; //  so these are now invalid
         synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
@@ -259,7 +269,6 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             synth->SetController(ch, C_volume, param);
             ctrl = C_filtercutoff;
         }
- 
         synth->SetController(ch, ctrl, param);
     }
 }
@@ -363,9 +372,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;
     }
-    
     bool noHigh = (synth->getRuntime().dataH > 0x7f);
-    
     if (type == C_dataL)
     {
         synth->getRuntime().dataL = par;
@@ -373,7 +380,6 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
         if (noHigh)
             return;
     }
-    
     if (type == C_dataH)
     {
         synth->getRuntime().dataH = par;
@@ -383,14 +389,12 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
         else
             return; // we're currently using MSB as parameter not a value
     }
-
     /*
      * All the above runaround performance is to deal with a data LSB
      * arriving either before or after the MSB and immediately after
      * a new NRPN has been set. After this, running data values expect
      * MSB sub parameter before LSB value until the next full NRPN.
      */
-
     int dHigh = synth->getRuntime().dataH;
     
     if (nLow == 0) // direct part change
@@ -475,25 +479,23 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 //to make changes consistent
 void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place, bool setRootDir)
 {
-    if (setRootDir && (bank_or_root_num == synth->getBankRef().getCurrentRootID()))
-        return; // nothing to do!
+    if (setRootDir)
+    {
+        if (bank_or_root_num == synth->getBankRef().getCurrentRootID())
+            return; // nothing to do!
+    }
+    else
+        if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
+            return; // still nothing to do!
+
     if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
     else
-    {        
-        pthread_t tmpBankOrRootDirThread = 0;
-        tmpBankOrRootDirThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
-        if (tmpBankOrRootDirThread == 0) // don't allow more than one bank change/root dir change process at a time
-        {
-            isRootDirChangeRequested = setRootDir;
-            bankOrRootDirToChange = bank_or_root_num;
-            if (!synth->getRuntime().startThread(&pBankOrRootDirThread, MusicIO::static_BankOrRootDirChangeThread, this, false, 0, false))
-            {
-                synth->getRuntime().Log("MusicIO::setMidiBankOrRootDir: failed to start midi bank/root dir change thread!");
-            }
-        }
+    {
+        if (setRootDir)
+            synth->writeRBP(1 ,bank_or_root_num,0);
         else
-            synth->getRuntime().Log("Midi bank/root dir changes too close together");
+            synth->writeRBP(2 ,bank_or_root_num,0);
     }
 }
 
@@ -512,20 +514,7 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         if (in_place)
             synth->SetProgram(ch, prg);
         else
-        {
-            pthread_t tmpPrgThread = 0;
-            tmpPrgThread = __sync_fetch_and_add(&prgChangeCmd [partnum].pPrgThread , 0);
-            if (tmpPrgThread == 0) // don't allow more than one program change process at a time
-            {
-                prgChangeCmd [partnum].ch = ch;
-                prgChangeCmd [partnum].prg = prg;
-                prgChangeCmd [partnum]._this_ = this;
-                if (!synth->getRuntime().startThread(&prgChangeCmd [partnum].pPrgThread, MusicIO::static_PrgChangeThread, &prgChangeCmd [partnum], false, 0, false))
-                {
-                    synth->getRuntime().Log("MusicIO::setMidiProgram: failed to start midi program change thread!");
-                }
-            }
-        }
+            synth->writeRBP(3, ch ,prg);
     }
 }
 
@@ -583,41 +572,3 @@ bail_out:
     }
     return false;
 }
-
-
-void *MusicIO::bankOrRootDirChange_Thread()
-{
-    //std::cerr << "MusicIO::bankChange_Thread(). banknum = " << bankToChange << std::endl;
-    isRootDirChangeRequested ? synth->SetBankRoot(bankOrRootDirToChange) : synth->SetBank(bankOrRootDirToChange);
-    pBankOrRootDirThread = 0; // done
-    return NULL;
-}
-
-void *MusicIO::prgChange_Thread(_prgChangeCmd *pCmd)
-{
-    pthread_t tmpBankThread = 0;
-    tmpBankThread = __sync_fetch_and_add(&pBankOrRootDirThread, 0);
-    if (tmpBankThread != 0) // wait for active bank thread to finish before continue
-    {
-        //std::cerr << "Waiting for MusicIO::bankChange_Thread()..." << std::endl;
-        void *threadRet = NULL;
-        pthread_join(pBankOrRootDirThread, &threadRet);
-    }
-
-    //std::cerr << "MusicIO::prgChange_Thread(). ch = " << pCmd->ch << ", prg = " << pCmd->prg << std::endl;
-    synth->SetProgram(pCmd->ch, pCmd->prg);
-    pCmd->pPrgThread = 0; //done
-    return NULL;
-}
-
-void *MusicIO::static_BankOrRootDirChangeThread(void *arg)
-{
-    return static_cast<MusicIO *>(arg)->bankOrRootDirChange_Thread();
-}
-
-void *MusicIO::static_PrgChangeThread(void *arg)
-{
-    _prgChangeCmd *pCmd = static_cast<_prgChangeCmd *>(arg);
-    return pCmd->_this_->prgChange_Thread(pCmd);
-}
-

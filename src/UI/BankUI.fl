@@ -12,6 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2014-2015, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -107,43 +108,6 @@ class BankSlot {: {public Fl_Button, BankProcess_}
   }
   Function {refresh()} {} {
     code {//
-/*    if (bank->emptyslot(nslot))
-    {
-        if (nslot < 128)
-            color(46);
-        else
-            color(16);
-    }
-    else
-    {       
-        int engine = bank->engines_used(nslot);
-        if (engine & 1) // AddSynth
-            labelcolor(72);
-        else
-            labelcolor(0);
-        if (engine & 2) // SubSynth
-        {
-            labelsize(11);
-            labelfont(2);
-        }
-        else
-        {
-            labelsize(12);
-            labelfont(0);
-        }
-        if (engine & 4) // PadSynth
-            color(126);
-	else
-	{
-            if (nslot < 128)
-                color(51);
-            else
-                color(17);
-         }
-    }
-    if (*nselected == nslot)
-        color(6);
-*/
     string instrName = bank->getnamenumbered(nslot);
     copy_label(instrName.c_str());} {}
   }
@@ -639,7 +603,7 @@ Pend->hide();}
     dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
     if (!dirname)
       return;
-    synth->getGuiMaster()->configui->configChanged = true;
+    synth->getRuntime().configChanged = true;
     synth->getBankRef().addRootDir(dirname);
     readbankcfg();
     rescan_for_banks(true);
@@ -653,7 +617,7 @@ Pend->hide();}
     {;
         synth->getBankRef().removeRoot(selectedRootID);
         readbankcfg();
-        synth->getGuiMaster()->configui->configChanged = true;
+        synth->getRuntime().configChanged = true;
     }
     activatebutton_rootdir(false);
     rescan_for_banks(false);
@@ -669,7 +633,7 @@ Pend->hide();}
         synth->getBankRef().setCurrentRootID(selectedRootID);
         readbankcfg();
         rescan_for_banks(false);
-        synth->getGuiMaster()->configui->configChanged = true;
+        synth->getRuntime().configChanged = true;
     }
     activatebutton_rootdir(false);
     Pend->hide();}
@@ -698,7 +662,7 @@ Pend->hide();}
         synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value());
         readbankcfg();
         rescan_for_banks(true);
-        synth->getGuiMaster()->configui->configChanged = true;
+        synth->getRuntime().configChanged = true;
 
     }
     oldrootID = changeIDbutton->value();
@@ -720,7 +684,6 @@ Pend->hide();}
       Fl_Button {} {
         label {Save and Close}
         callback {synth->getRuntime().saveConfig();
-synth->getGuiMaster()->configui->configChanged = false;
 pathwindow->do_callback();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }
@@ -775,8 +738,11 @@ fnr = &RootProcess_::rootprocess;
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
             // Reads from slot
-            bank->loadfromslot(slot, synth->part[*npart]);
-            synth->part[*npart]->Pname = thisname;
+			//formerly told bank to do things to Part
+			//bank->loadfromslot(slot, synth->part[*npart]);
+			synth->SetProgramToPart(*npart, slot, bank->getfilename(slot));
+            // next line would have set file name not internal instrument name
+            //synth->part[*npart]->Pname = thisname;
             if (what == 3)
                 bankuiwindow->hide();
             cbwig->do_callback();
@@ -795,6 +761,7 @@ fnr = &RootProcess_::rootprocess;
         {   // Rename slot
             const char *newname = fl_input("Instrument name:", thisname.c_str());
             if (newname)
+            {
                 if (strlen(newname) > 3)
                 {
                     if (!bank->setname(slot, string(newname), -1))
@@ -805,10 +772,14 @@ fnr = &RootProcess_::rootprocess;
                     }
                     else
                     {
-                        bs[slot]->refresh();
                         synth->part[*npart]->Pname = newname;
+                        synth->actionLock(lockmute);
+                        bank->savetoslot(slot,synth->part[*npart]);
+                        synth->actionLock(unlock);
+                        bs[slot]->refresh();
                     }
                 }
+            }
             setread();
             cbwig->do_callback();
         }

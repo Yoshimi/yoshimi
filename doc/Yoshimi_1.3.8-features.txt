@@ -1,0 +1,49 @@
+Yoshimi 1.3.8 highlights
+
+We have our first code name: The Swan
+
+MIDI program changes have always been pretty clean from the time Cal first introduced them, but now GUI changes are just as clean. While it is generally best to change a program when the part is silent, even if a part is sounding there is usually barely a click. There is no interference at all with any other sounding parts.
+
+Sometimes MIDI CCs don't seem to give the results you expect. Well, there is now a setting that will report all incoming CCs so you can discover what Yoshimi actually sees (which may not be what you were expecting).
+
+At the request of one of our users, we have now implemented CC2, Breath Control.
+
+The 'Humanise' feature has had more interest so it's been upgraded. It's now a slider and it's setting can be saved in patch sets. It provides a tiny per-note random detune to an *entire* part (all engines in all kits), but only to that part.
+
+Audio & Midi preferences have been improved. If you set (say) ALSA MIDI and JACK audio, either from the GUI or the command line, the setting can be saved and will be reinstated on the next run. These settings are per-instance so if you have multiple sound cards you can make full use of them.
+
+Barring major system failures, there are now no circumstances where Yoshimi will fail to start.
+
+There is greater control of your working environment. You can have just the GUI, just a CLI or both, and these settings can be saved. If you try to disable both you will get a polite warning and will be left with just the CLI.
+
+The CLI can now access almost all top level controls as well as the 'main page' part ones and can select any effect and effect preset, but can't yet deal with the individual effects controls. It can be used to set up Vector Control much more quickly and easily than using NRPNs.
+
+It is also context sensitive, which along with careful choice of command names and abreviations allows very fast access with minimal typing.
+
+Yoshimi's parser is case insensitive to commands (but not filenames etc.) and accepts the shortest unambiguous abbreviation. However it is quite pedantic, and expects spelling to be correct regardless of length. Apart from the 'back' commands, it is word-based so spaces are significant.
+
+Some examples:
+
+s p 4 pr 6 (set part 4 program 6)
+This sets part 4 to the instrument with ID 6 from the current bank. It also then leaves you at part context level and pointed to part 4. Additionally, it will activate that part if it was off (and the config setting is checked). In most cases the words 'program' and 'instrument' are interchangable.
+
+s ef 1 ty rev
+This moves you up to part effects context level and sets that part's effect number 1 to effect type 'reverb'.
+
+s pre 2
+Sets preset number 2 (we use numbers there as most preset names repeat the effect type).
+
+..s 6 v 80
+Drops you back to part level, switches you to part 6 and sets its volume to 80 (but doesn't actually enable it).
+
+/s ve cc 93
+Goes back to the top level and sets vector control for channel 0, X axis to respond to CC 93 leaving you in the vector context.
+
+Whenever intermediate values are omitted default or last used will be assumed, and all counting starts from zero.
+
+The CLI prompt always shows what level you are on, and the help lists are also partly context sensitive so you don't get a lot of irrelevent clutter.
+
+There is more, and a lot more to come!
+
+
+While doing all this work, we've alse ensured that Yoshimi instrument patches are still fully compatible with Zyn ones, and have now ported across the new refinements with thanks.

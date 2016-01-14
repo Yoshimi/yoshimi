@@ -35,6 +35,13 @@ class MusicIO : virtual protected MiscFuncs
         virtual int getBuffersize(void) = 0;
         virtual bool Start(void) = 0;
         virtual void Close(void) = 0;
+        virtual bool openAudio(void) = 0;
+        virtual bool openMidi(void) = 0;
+        virtual string audioClientName(void) = 0;
+        virtual int audioClientId(void) = 0;
+        virtual string midiClientName(void) = 0;
+        virtual int midiClientId(void) = 0;
+        virtual void registerAudioPort(int) = 0;
 
     protected:
         bool prepBuffers(void);
@@ -55,26 +62,8 @@ class MusicIO : virtual protected MiscFuncs
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
         int *interleaved;
-        int rtprio;
 
         SynthEngine *synth;
-    private:
-        pthread_t pBankOrRootDirThread;
-        int bankOrRootDirToChange;
-        bool isRootDirChangeRequested; // if true then thread will change current bank root dir, else current bank        
-        struct _prgChangeCmd
-        {            
-            int ch;
-            int prg;
-            MusicIO *_this_;
-            pthread_t pPrgThread;
-        };
-        _prgChangeCmd prgChangeCmd [NUM_MIDI_PARTS];
-
-        void *bankOrRootDirChange_Thread();
-        void *prgChange_Thread(_prgChangeCmd *pCmd);
-        static void *static_BankOrRootDirChangeThread(void *arg);
-        static void *static_PrgChangeThread(void *arg);
 };
 
 #endif
