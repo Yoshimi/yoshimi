@@ -632,7 +632,7 @@ int CmdInterface::commandVector()
             reply = done_msg;
         }
     }
-    else if (matchnMove(1, point, "program"))
+    else if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         int hand = point[0] | 32;
         point = skipChars(point); // in case they type the entire word
@@ -736,7 +736,7 @@ int CmdInterface::commandPart(bool justSet)
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
         reply = done_msg;
     }
-    else if (matchnMove(1, point, "program"))
+    else if (matchnMove(2, point, "program") || matchnMove(1, point, "instrument"))
     {
         if (point[0] != 0) // force part not channel number
         {
@@ -978,19 +978,23 @@ int CmdInterface::commandSet()
     if(tmp > todo_msg)
         return tmp;
     
-    if (matchnMove(1, point, "program"))
+    if (matchnMove(2, point, "program") || matchnMove(4, point, "instrument"))
     {
         if (point[0] == '0')
             synth->SetSystemValue(115, 0);
         else
             synth->SetSystemValue(115, 127);
+        Runtime.configChanged = true;
+        return done_msg;
     }
-    else if (matchnMove(1, point, "activate"))
+    else if (matchnMove(2, point, "activate"))
     {
         if (point[0] == '0')
             synth->SetSystemValue(116, 0);
         else
             synth->SetSystemValue(116, 127);
+        Runtime.configChanged = true;
+        return done_msg;
     }
     if (matchnMove(3, point, "ccroot"))
     {
@@ -1025,7 +1029,7 @@ int CmdInterface::commandSet()
         else
             reply = value_msg;
     }
-    else if (matchnMove(1, point, "available"))
+    else if (matchnMove(2, point, "available")) // 16, 32, 64
     {
         if (point[0] != 0)
         {
@@ -1220,7 +1224,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         synth->allStop();
     else if (matchnMove(1, point, "list"))
     {
-        if (matchnMove(1, point, "instruments"))
+        if (matchnMove(1, point, "instruments") || matchnMove(1, point, "programs"))
         {
             if (point[0] == 0)
                 ID = 255;
