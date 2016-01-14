@@ -2,7 +2,7 @@ Yoshimi 1.3.8 highlights
 
 We have our first code name: The Swan
 
-MIDI program changes have always been pretty clean from the time Cal first introduced them, but now GUI changes just as clean. While it is generally best to change a program when the part is silent, even if a part is sounding there is usually barely a click. There is no interference at all with any other sounding parts.
+MIDI program changes have always been pretty clean from the time Cal first introduced them, but now GUI changes are just as clean. While it is generally best to change a program when the part is silent, even if a part is sounding there is usually barely a click. There is no interference at all with any other sounding parts.
 
 Sometimes MIDI CCs don't seem to give the results you expect. Well, there is now a setting that will report all incoming CCs so you can discover what Yoshimi actually sees (which may not be what you were expecting).
 
@@ -39,10 +39,9 @@ Drops you back to part level, switches you to part 6 and sets its volume to 80 (
 /s ve cc 93
 Goes back to the top level and sets vector control for channel 0, X axis to respond to CC 93 leaving you in the vector context.
 
+Whenever intermediate values are omitted default or last used will be assumed, and all counting starts from zero.
 
 The CLI prompt always shows what level you are on, and the help lists are also partly context sensitive so you don't get a lot of irrelevent clutter.
-
-Whenever intermediate values are omitted default or last used will be assumed, and all counting starts from zero.
 
 There is more, and a lot more to come!
 
