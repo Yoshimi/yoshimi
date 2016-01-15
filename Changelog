@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+
+2016-1-15 Will
+- Bugfix. Format string missing from sprintf :)
+
 yoshimi 1.3.8
 
 2016-1-14 Will
