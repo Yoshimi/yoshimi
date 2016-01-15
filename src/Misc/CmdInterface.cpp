@@ -1461,7 +1461,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                     prompt += "Y";
             }
             prompt += " > ";
-            sprintf(welcomeBuffer, prompt.c_str());
+            sprintf(welcomeBuffer,"%s",prompt.c_str());
         }
         else
             usleep(20000);
