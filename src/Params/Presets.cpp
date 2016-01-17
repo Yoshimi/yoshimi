@@ -148,6 +148,10 @@ void Presets::setelement(int n)
 
 void Presets::rescanforpresets(void)
 {
+    char type[MAX_PRESETTYPE_SIZE];
+    strcpy(type, this->type);
+    if (nelement != -1)
+        strcat(type, "n");
     synth->getPresetsStore().rescanforpresets(type);
 }
 

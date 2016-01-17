@@ -1,5 +1,7 @@
 yoshimi 1.3.x
 
+2016-1-17 Will
+- Bugfix. Quick patch from Csaba so Addsynth vice presets are recognised.
 
 2016-1-15 Will
 - Bugfix. Format string missing from sprintf :)
