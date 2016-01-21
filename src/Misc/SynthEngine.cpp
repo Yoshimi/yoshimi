@@ -305,7 +305,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         {
             cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
             bank.scanrootdir(found);
-            Runtime.saveConfig();
+            //Runtime.saveConfig();
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
