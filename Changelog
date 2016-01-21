@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-1-21 Will
+- Started splitting up yoshimi's config files and separated out banks
+  to their own files within .config/yoshimi/.
+
 2016-1-17 Will
 - Bugfix. Quick patch from Csaba so Addsynth vice presets are recognised.
 - Patch from Csaba to hide extension in presets window.

@@ -311,6 +311,9 @@ char *XMLwrapper::getXMLdata()
         case XML_CONFIG:
             addparstr("XMLtype", "Config");
             break;
+        case XML_BANK:
+            addparstr("XMLtype", "Roots and Banks");
+            break;
         default:
             addparstr("XMLtype", "Unknown");
             break;

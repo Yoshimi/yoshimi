@@ -299,6 +299,7 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
+add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
 add_definitions (-DMAX_PRESETS=1000)
 add_definitions (-DMAX_BANK_ROOT_DIRS=127)
@@ -327,6 +328,7 @@ add_definitions (-DXML_MICROTONAL=3)
 add_definitions (-DXML_PRESETS=4)
 add_definitions (-DXML_STATE=5)
 add_definitions (-DXML_CONFIG=6)
+add_definitions (-DXML_BANK=7)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
