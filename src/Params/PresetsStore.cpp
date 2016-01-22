@@ -128,11 +128,13 @@ void PresetsStore::rescanforpresets(string type)
             if (dirname.at(dirname.size() - 1) != '/')
                 dirname += "/";
             presets[presetk].file = dirname + filename;
-            if (filename.find_last_of(ftype) != string::npos)
+         /* if (filename.find_last_of(ftype) != string::npos)
                 presets[presetk].name = filename;
             else
                 presets[presetk].name =
-                    filename.substr(0, filename.find_last_of(ftype));
+                    filename.substr(0, filename.find_last_of(ftype));*/
+            presets[presetk].name =
+                filename.substr(0, filename.find(ftype));
             presetk++;
             if (presetk >= MAX_PRESETS)
                 return;

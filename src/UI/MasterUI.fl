@@ -245,7 +245,7 @@ class MasterUI {selected : {private MiscFuncs}
         xywh {-7 0 400 25} labelsize 13
       } {
         Submenu {} {
-          label {&Yoshimi} open
+          label {&Yoshimi}
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem {} {
@@ -970,11 +970,6 @@ ZynAddSubFX}
         callback {panelwindow->hide();}
         xywh {482 645 55 25} box THIN_UP_BOX labelsize 13
       }
-      Fl_Button Panelrefresh {
-        label Refresh
-        callback {updatepanel();}
-        xywh {414 645 55 25} box THIN_UP_BOX labelsize 13 hide deactivate
-      }
       Fl_Button {} {
         label {Change to 1 x 16}
         callback {//
@@ -1053,7 +1048,6 @@ updatepanel();}
         	panelwindow->size(1085,345);
 	        Panelpack2->position(544,10);
 	        Panelclose->position(1018,314);
-	        Panelrefresh->position(950,314);
 	        Panelgroups->position(48,314);
 	        Panelsmallgroups->position(48,314);
         }
@@ -1062,7 +1056,6 @@ updatepanel();}
 	        panelwindow->size(550,675);
 	        Panelpack2->position(8,325);
 	        Panelclose->position(482,645);
-	        Panelrefresh->position(414,645);
 	        Panelgroups->position(48,645);
 	        Panelsmallgroups->position(48,645);
 

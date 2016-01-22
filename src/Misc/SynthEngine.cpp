@@ -305,7 +305,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         {
             cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
             bank.scanrootdir(found);
-            Runtime.saveConfig();
+            //Runtime.saveConfig();
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
@@ -1875,6 +1875,80 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
     int result = loadParameters(fname);
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
     return result;
+}
+
+
+bool SynthEngine::installBanks(int instance)
+{
+    bool banksFound = true;
+    string branch;
+    string name = Runtime.ConfigDir + '/' + YOSHIMI;
+    if (instance > 0)
+        name += ("-" + asString(instance));
+    string bankname = name + ".banks";
+//    Runtime.Log(bankname);
+    if (!isRegFile(bankname))
+    {
+        banksFound = false;
+        Runtime.Log("Missing bank file");
+        bankname = name + ".config";
+        if (isRegFile(bankname))
+            Runtime.Log("Copying data from config");
+        else
+        {
+            Runtime.Log("Scanning for banks");
+            bank.rescanforbanks();
+            return false;
+        }
+    }
+    if (banksFound)
+        branch = "BANKLIST";
+    else
+        branch = "CONFIGURATION";
+    XMLwrapper *xml = new XMLwrapper(this);
+        if (!xml)
+            Runtime.Log("loadConfig failed XMLwrapper allocation");
+        else
+        {
+            xml->loadXMLfile(bankname);
+            if (!xml->enterbranch(branch))
+            {
+                Runtime. Log("extractConfigData, no " + branch + " branch");
+                return false;
+            }
+            bank.parseConfigFile(xml);
+            xml->exitbranch();
+        }
+    delete xml;
+    return true;
+}
+
+
+bool SynthEngine::saveBanks(int instance)
+{
+    string name = Runtime.ConfigDir + '/' + YOSHIMI;
+    if (instance > 0)
+        name += ("-" + asString(instance));
+    string bankname = name + ".banks";
+    Runtime.xmlType = XML_BANK;
+    unsigned int tmp = Runtime.GzipCompression;
+    Runtime.GzipCompression = 0;
+    XMLwrapper *xmltree = new XMLwrapper(this);
+    if (!xmltree)
+    {
+        Runtime.Log("saveConfig failed xmltree allocation");
+        return false;
+    }
+    xmltree->beginbranch("BANKLIST"); 
+    bank.saveToConfigFile(xmltree);
+    xmltree->endbranch();
+
+    if (!xmltree->saveXMLfile(bankname))
+        Runtime.Log("Failed to save config to " + bankname);
+    Runtime.GzipCompression = tmp;
+    delete xmltree;
+    
+    return true;
 }
 
 

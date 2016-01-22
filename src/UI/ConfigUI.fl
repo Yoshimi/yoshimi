@@ -630,7 +630,7 @@ configwindow->do_callback();}
       }
       Fl_Button {} {
         label {Save and Close}
-        callback {savesettings();
+        callback {synth->getRuntime().saveConfig();
 synth->getGuiMaster()->bankui->readbankcfg();
 configwindow->do_callback();}
         xywh {155 305 105 20} box THIN_UP_BOX labelsize 12
@@ -838,11 +838,6 @@ presets->hide();}
   }
   Function {Hide()} {} {
     code {configwindow->hide();} {}
-  }
-  Function {savesettings(void)} {private return_type void
-  } {
-    code {//
-    synth->getRuntime().saveConfig();} {}
   }
   decl {SynthEngine *synth;} {private local
   }

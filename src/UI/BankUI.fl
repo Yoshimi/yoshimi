@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2015, Will Godfrey
+Copyright 2014-2015, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -456,7 +456,7 @@ removeselection();}
     }
     Fl_Window rootuiwindow {
       label Root
-      xywh {55 519 775 575} type Double labelsize 12 hide
+      xywh {55 474 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
     } {
       Fl_Button {} {
@@ -683,7 +683,7 @@ Pend->hide();}
       }
       Fl_Button {} {
         label {Save and Close}
-        callback {synth->getRuntime().saveConfig();
+        callback {synth->saveBanks(synth->getUniqueId());
 pathwindow->do_callback();}
         xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
       }

@@ -217,18 +217,6 @@ else(READLINE_FOUND)
     message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
 endif(READLINE_FOUND)
 
-set (GuiFluids
-    UI/WidgetPDialUI.fl  UI/PresetsUI.fl  UI/EnvelopeUI.fl
-    UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboardUI.fl
-    UI/ConfigUI.fl  UI/SUBnoteUI.fl  UI/ResonanceUI.fl
-    UI/OscilGenUI.fl  UI/ADnoteUI.fl  UI/PADnoteUI.fl
-    UI/EffUI.fl  UI/BankUI.fl  UI/PartUI.fl
-    UI/MicrotonalUI.fl  UI/MasterUI.fl    UI/MasterMiscUI.fl
-    UI/ParametersUI.fl UI/ConsoleUI.fl
-)
-
-fltk_wrap_ui (yoshimi ${GuiFluids})
-set_source_files_properties (UI/MasterUI.h PROPERTIES GENERATED 1)
 set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
 if (BuildForDebug)
@@ -291,6 +279,52 @@ set (MusicIO_sources
     MusicIO/AlsaEngine.cpp
 )
 
+set (FlGUI_sources
+    WidgetPDialUI.cpp  PresetsUI.cpp  EnvelopeUI.cpp
+    LFOUI.cpp  FilterUI.cpp  VirKeyboardUI.cpp
+    ConfigUI.cpp  SUBnoteUI.cpp  ResonanceUI.cpp
+    OscilGenUI.cpp  ADnoteUI.cpp  PADnoteUI.cpp
+    EffUI.cpp  BankUI.cpp  PartUI.cpp
+    MicrotonalUI.cpp  MasterUI.cpp MasterMiscUI.cpp
+    ParametersUI.cpp ConsoleUI.cpp
+)
+
+# mostly for make clean because cmake doesn't expect 2 files to come from 1 custom command
+set (FlGUI_headers
+    WidgetPDialUI.h  PresetsUI.h  EnvelopeUI.h
+    LFOUI.h  FilterUI.h  VirKeyboardUI.h
+    ConfigUI.h  SUBnoteUI.h  ResonanceUI.h
+    OscilGenUI.h  ADnoteUI.h  PADnoteUI.h
+    EffUI.h  BankUI.h  PartUI.h
+    MicrotonalUI.h  MasterUI.h MasterMiscUI.h
+    ParametersUI.h ConsoleUI.h
+)
+
+# workaround fltk_wrap_ui breakage
+add_custom_command(
+    OUTPUT ${FlGUI_sources}
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/WidgetPDialUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/PresetsUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/EnvelopeUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/LFOUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/FilterUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/VirKeyboardUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ConfigUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/SUBnoteUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ResonanceUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/OscilGenUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ADnoteUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/PADnoteUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/EffUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/BankUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/PartUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/MicrotonalUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/MasterUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/MasterMiscUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ParametersUI.fl
+    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ConsoleUI.fl
+)
+
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
@@ -299,6 +333,7 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
+add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
 add_definitions (-DMAX_PRESETS=1000)
 add_definitions (-DMAX_BANK_ROOT_DIRS=127)
@@ -327,6 +362,7 @@ add_definitions (-DXML_MICROTONAL=3)
 add_definitions (-DXML_PRESETS=4)
 add_definitions (-DXML_STATE=5)
 add_definitions (-DXML_CONFIG=6)
+add_definitions (-DXML_BANK=7)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
@@ -395,7 +431,7 @@ set (ProgSources
     ${DSP_sources}
     ${Effects_sources}
     ${MusicIO_sources}
-    ${yoshimi_FLTK_UI_SRCS}
+    ${FlGUI_sources}
 )
 
 include_directories (AFTER
@@ -488,7 +524,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
     DESTINATION share/man/man1)
 
 set_directory_properties (PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
+    ADDITIONAL_MAKE_CLEAN_FILES "${FlGUI_headers}"
 )
 
 add_custom_target (showversion
