@@ -74,16 +74,20 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     mxmlElementSetAttr(root, "Yoshimi-minor", tmp.substr(pos1+1, pos2-pos1-1).c_str());
 
     info = addparams0("INFORMATION"); // specifications
-    beginbranch("BASE_PARAMETERS");
-    addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
-    addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
 
-    addpar("max_system_effects", NUM_SYS_EFX);
-    addpar("max_insertion_effects", NUM_INS_EFX);
-    addpar("max_instrument_effects", NUM_PART_EFX);
+    if (synth->getRuntime().xmlType <= XML_CONFIG)
+    {
+        beginbranch("BASE_PARAMETERS");
+        addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
+        addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
 
-    addpar("max_addsynth_voices", NUM_VOICES);
-    endbranch();
+        addpar("max_system_effects", NUM_SYS_EFX);
+        addpar("max_insertion_effects", NUM_INS_EFX);
+        addpar("max_instrument_effects", NUM_PART_EFX);
+
+        addpar("max_addsynth_voices", NUM_VOICES);
+        endbranch();
+    }
 }
 
 
@@ -299,17 +303,17 @@ char *XMLwrapper::getXMLdata()
         case XML_PARAMETERS:
             addparstr("XMLtype", "Parameters");
             break;
-        case XML_MICROTONAL:
-            addparstr("XMLtype", "Scales");
-            break;
-        case XML_PRESETS:
-            addparstr("XMLtype", "Presets");
-            break;
         case XML_STATE:
             addparstr("XMLtype", "Session");
             break;
         case XML_CONFIG:
             addparstr("XMLtype", "Config");
+            break;
+        case XML_MICROTONAL:
+            addparstr("XMLtype", "Scales");
+            break;
+        case XML_PRESETS:
+            addparstr("XMLtype", "Presets");
             break;
         case XML_BANK:
             addparstr("XMLtype", "Roots and Banks");
@@ -468,9 +472,6 @@ char *XMLwrapper::doloadfile(const string& filename)
             }
             quit = true;
         }
-        //this call makes yoshimi crash sometimes
-        // comment it out - code in main.cpp already does this
-        //synth->getRuntime().signalCheck();
     }
     gzclose(gzf);
     return xmldata;

@@ -358,10 +358,10 @@ add_definitions (-DLOG_2=0.693147181f)
 #probably not the best way to do this :(
 add_definitions (-DXML_INSTRUMENT=1)
 add_definitions (-DXML_PARAMETERS=2)
-add_definitions (-DXML_MICROTONAL=3)
-add_definitions (-DXML_PRESETS=4)
-add_definitions (-DXML_STATE=5)
-add_definitions (-DXML_CONFIG=6)
+add_definitions (-DXML_STATE=3)
+add_definitions (-DXML_CONFIG=4)
+add_definitions (-DXML_MICROTONAL=5)
+add_definitions (-DXML_PRESETS=6)
 add_definitions (-DXML_BANK=7)
 
 # these were previously (pointlessly) user configurable

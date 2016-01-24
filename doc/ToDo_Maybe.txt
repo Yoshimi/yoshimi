@@ -1,8 +1,7 @@
 
 Replace usleep with nanosleep - probably not :(
 
-Separate root/bank/instrument lists from main config as
-    single file for all instances.
+Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
 
