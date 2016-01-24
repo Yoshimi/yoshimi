@@ -435,7 +435,7 @@ int CmdInterface::effects(int level)
     {
         /*
          * Using constant strings and bedding the number into the list
-         * of presets provies a very simple way to keep track of a
+         * of presets provides a very simple way to keep track of a
          * moving target with minimal code and data space.
          * However, all of this should really be in src/Effects
          * not here *and* in the gui code!
@@ -1277,7 +1277,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
     
-    else if (matchnMove(2, point, "path"))
+    else if (matchnMove(2, point, "paths"))
     {
         if (matchnMove(1, point, "add"))
         {
@@ -1290,7 +1290,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                 Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
-                Runtime.configChanged = true;
+                synth->saveBanks(currentInstance);
             }
             reply = done_msg;
         }
@@ -1307,7 +1307,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     synth->getBankRef().removeRoot(rootID);
                     GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                     Runtime.Log("Removed " + rootname);
-                    Runtime.configChanged = true;
+                    synth->saveBanks(currentInstance);
                 }
                 reply = done_msg;
             }
