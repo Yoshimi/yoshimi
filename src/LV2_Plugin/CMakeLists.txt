@@ -66,52 +66,40 @@ file (GLOB yoshimi_manifest_ttl
 file (GLOB yoshimi_plugin_ttl
     yoshimi.ttl)
 
-# merely copied from top level
-set (FlGUI_sources
-    WidgetPDialUI.cpp  PresetsUI.cpp  EnvelopeUI.cpp
-    LFOUI.cpp  FilterUI.cpp  VirKeyboardUI.cpp
-    ConfigUI.cpp  SUBnoteUI.cpp  ResonanceUI.cpp
-    OscilGenUI.cpp  ADnoteUI.cpp  PADnoteUI.cpp
-    EffUI.cpp  BankUI.cpp  PartUI.cpp
-    MicrotonalUI.cpp  MasterUI.cpp MasterMiscUI.cpp
-    ParametersUI.cpp ConsoleUI.cpp
-)
-
-# mostly for make clean because cmake doesn't expect 2 files to come from 1 custom command
-set (FlGUI_headers
-    WidgetPDialUI.h  PresetsUI.h  EnvelopeUI.h
-    LFOUI.h  FilterUI.h  VirKeyboardUI.h
-    ConfigUI.h  SUBnoteUI.h  ResonanceUI.h
-    OscilGenUI.h  ADnoteUI.h  PADnoteUI.h
-    EffUI.h  BankUI.h  PartUI.h
-    MicrotonalUI.h  MasterUI.h MasterMiscUI.h
-    ParametersUI.h ConsoleUI.h
+set (FltkUI_names
+    "WidgetPDialUI"  "PresetsUI"  "EnvelopeUI"
+    "LFOUI"  "FilterUI"  "VirKeyboardUI"
+    "ConfigUI"  "SUBnoteUI"  "ResonanceUI"
+    "OscilGenUI"  "ADnoteUI"  "PADnoteUI"
+    "EffUI"  "BankUI"  "PartUI"
+    "MicrotonalUI"  "MasterUI" "MasterMiscUI"
+    "ParametersUI" "ConsoleUI"
 )
 
 # workaround fltk_wrap_ui breakage
-add_custom_command(
-    OUTPUT ${FlGUI_sources}
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/WidgetPDialUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/PresetsUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/EnvelopeUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/LFOUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/FilterUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/VirKeyboardUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/ConfigUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/SUBnoteUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/ResonanceUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/OscilGenUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/ADnoteUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/PADnoteUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/EffUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/BankUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/PartUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/MicrotonalUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/MasterUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/MasterMiscUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/ParametersUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/../UI/ConsoleUI.fl
+set (FltkUI_sources)
+set (FltkUI_headers)
+foreach(basename ${FltkUI_names})
+    set (fluidfile "${CMAKE_CURRENT_SOURCE_DIR}/../UI/${basename}.fl")
+    set (sourcefile "${basename}.cpp")
+    set (headerfile "${basename}.h")
+    add_custom_command(
+        OUTPUT ${sourcefile}
+        COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
+        DEPENDS ${fluidfile}
+    )
+    set (FltkUI_sources ${FltkUI_sources} "${sourcefile}")
+    set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
+endforeach(basename ${FltkUI_names})
+
+add_definitions (
+    -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
+    -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
+    ${ALSA_LDFLAGS}
+    ${JACK_LDFLAGS}
+    -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
+
 
 add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
 
@@ -125,7 +113,7 @@ add_library (yoshimi_lv2 MODULE
             ${yoshimi_params_files}
             ${yoshimi_synth_files}
             ${yoshimi_musicio_files}
-            ${FlGUI_sources})
+            ${FltkUI_sources})
 
 add_custom_target(yoshimi_lv2_ttl
                    COMMAND test -f ${yoshimi_manifest_ttl}
@@ -160,4 +148,4 @@ install (FILES ${yoshimi_manifest_ttl} ${yoshimi_plugin_ttl}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/${LV2_INSTALL_DIR}/yoshimi.lv2
 )
 
-set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${FlGUI_headers}")
+set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${FltkUI_headers}")
