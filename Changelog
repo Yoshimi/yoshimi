@@ -1,5 +1,12 @@
 yoshimi 1.3.x
 
+2016-1-25 Will
+- Added correct licence details to CmdInterface files.
+- Synchronised Exherbo cmake.
+
+2016-1-24 Rob
+- Furhter improvements to cmake workround.
+
 2016-1-24 Will
 - Minor reorganisations.
 - Only relevant XML files now carry base parameters.
