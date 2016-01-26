@@ -525,8 +525,6 @@ void Bank::rescanforbanks(void)
     {
         scanrootdir(it->first);
     }
-
-
 }
 
 // private affairs

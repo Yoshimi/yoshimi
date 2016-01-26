@@ -89,7 +89,7 @@ static struct argp_option cmd_options[] = {
 
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
-    restoreState(false),
+    //restoreState(false),
     restoreJackSession(false),
     Samplerate(48000),
     Buffersize(256),

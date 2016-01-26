@@ -276,7 +276,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
       label Bank
-      xywh {46 240 780 575} type Double hide
+      xywh {46 240 780 575} type Double visible
     } {
       Fl_Choice banklist {
         callback {//
@@ -293,12 +293,6 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     refreshmainwindow();}
         xywh {5 8 199 20} down_box BORDER_BOX selection_color 7 labelfont 1 labelsize 12 align 0 textsize 12
       } {}
-      Fl_Button {} {
-        label {Refresh banks}
-        callback {rescan_for_banks(true);
-set_bank_slot();}
-        tooltip {Refresh the bank list (rescan)} xywh {212 5 102 25} box PLASTIC_UP_BOX color 50 labelfont 1 labelsize 11 hide deactivate
-      }
       Fl_Button {} {
         label Roots
         callback {//
