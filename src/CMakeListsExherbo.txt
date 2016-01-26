@@ -343,6 +343,7 @@ add_definitions (-DXML_CONFIG=4)
 add_definitions (-DXML_MICROTONAL=5)
 add_definitions (-DXML_PRESETS=6)
 add_definitions (-DXML_BANK=7)
+add_definitions (-DXML_HISTORY=8)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)

@@ -318,6 +318,9 @@ char *XMLwrapper::getXMLdata()
         case XML_BANK:
             addparstr("XMLtype", "Roots and Banks");
             break;
+        case XML_HISTORY:
+            addparstr("XMLtype", "Recent Files");
+            break;
         default:
             addparstr("XMLtype", "Unknown");
             break;

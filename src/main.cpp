@@ -191,6 +191,7 @@ static void *mainGuiThread(void *arg)
 
                 if (_synth)
                 {
+                    _synth->saveHistory(tmpID);
                     _synth->saveBanks(tmpID);
                     _synth->getRuntime().deadObjects->disposeBodies();
                     _synth->getRuntime().flushLog();
@@ -229,6 +230,7 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
+    firstSynth->saveHistory(0);
     firstSynth->saveBanks(0);
     return NULL;
 }
@@ -299,6 +301,7 @@ bool mainCreateNewInstance(unsigned int forceId)
     }
     
     synth->installBanks(synth->getUniqueId());
+    synth->loadHistory(synth->getUniqueId());
     
     return true;
 

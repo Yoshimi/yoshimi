@@ -76,6 +76,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int loadPatchSetAndUpdate(string filename);
         bool installBanks(int instance);
         bool saveBanks(int instance);
+        bool loadHistory(int instance);
+        bool saveHistory(int instance);
         
         bool getfromXML(XMLwrapper *xml);
 

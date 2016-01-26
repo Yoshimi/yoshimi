@@ -543,28 +543,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
 //    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
-    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
-
-    if (xml->enterbranch("XMZ_HISTORY"))
-    {
-        int hist_size = xml->getpar("history_size", 0, 0, MaxParamsHistory);
-        string xmz;
-        for (int i = 0; i < hist_size; ++i)
-        {
-            if (xml->enterbranch("XMZ_FILE", i))
-            {
-                xmz = xml->getparstr("xmz_file");
-                if (xmz.size() && isRegFile(xmz))
-                    addParamHistory(xmz);
-                xml->exitbranch();
-            }
-        }
-        xml->exitbranch();
-    }
-
-    // get bank dirs
-    //synth->getBankRef().parseConfigFile(xml);
-    
+    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);    
     xml->exitbranch(); // CONFIGURATION
     return true;
 }
@@ -635,24 +614,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
 //    xmltree->addpar("enable_console_window", consoleMenuItem);
     xmltree->addpar("single_row_panel", single_row_panel);
-
-    // Parameters history
-    if (ParamsHistory.size())
-    {
-        xmltree->beginbranch("XMZ_HISTORY");
-        xmltree->addpar("history_size", ParamsHistory.size());
-        deque<HistoryListItem>::reverse_iterator rx = ParamsHistory.rbegin();
-        unsigned int count = 0;
-        for (int x = 0; rx != ParamsHistory.rend() && count <= MaxParamsHistory; ++rx, ++x)
-        {
-            xmltree->beginbranch("XMZ_FILE", x);
-            xmltree->addparstr("xmz_file", rx->file);
-            xmltree->endbranch();
-        }
-        xmltree->endbranch();
-    }
-    //synth->getBankRef().saveToConfigFile(xmltree);
-
     xmltree->endbranch(); // CONFIGURATION
 }
 
