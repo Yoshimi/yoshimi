@@ -5,6 +5,8 @@ yoshimi 1.3.x
 - New config files that are unique to Yoshimi now carry the yoshim
   doctype instead of the ZynAddSubFX one.
 - minor doc spelling corrections.
+- Fixed regression. Alsa can have sample rate selected again.
+- Trial of 192000 sample rate.
 
 2016-1-26 Will
 - Patch Sets History no longer in main .config file but in new

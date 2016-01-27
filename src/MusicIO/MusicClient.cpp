@@ -68,7 +68,7 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
 void *MusicClient::timerThread_fn(void *arg)
 {
     MusicClient *nmc = (MusicClient *)arg;
-    useconds_t sleepInterval = (useconds_t)(1000000.0f * (double)nmc->synth->getRuntime().Buffersize / (double)NMC_SRATE);
+    useconds_t sleepInterval = (useconds_t)(1000000.0f * (double)nmc->synth->getRuntime().Buffersize / nmc->synth->getRuntime().Samplerate);//(double)NMC_SRATE);
     nmc->timerWorking = true;
     while(nmc->timerWorking)
     {
@@ -82,7 +82,7 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     :synth(_synth), timerThreadId(0), timerWorking(false),
     audioDrv(_audioDrv), midiDrv(_midiDrv), audioIO(0), midiIO(0)
 {
-    synth->getRuntime().Samplerate = NMC_SRATE;
+    //synth->getRuntime().Samplerate = NMC_SRATE;
 
     for(int i = 0; i < NUM_MIDI_PARTS + 1; i++)
     {
@@ -231,11 +231,11 @@ void MusicClient::Close()
 
 unsigned int MusicClient::getSamplerate()
 {
-    if(audioIO)
-    {
+    //if(audioIO)
+    //{
         return audioIO->getSamplerate();
-    }
-    return NMC_SRATE;
+    //}
+    //return NMC_SRATE;
 }
 
 int MusicClient::getBuffersize()

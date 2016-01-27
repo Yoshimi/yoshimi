@@ -487,7 +487,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
     Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
     Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 131072);
 
@@ -1119,7 +1119,9 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'R':
             settings->configChanged = true;
             num = Config::string2int(string(arg));
-            if (num >= 96000)
+            if (num >= 192000)
+                num = 192000;
+            else if (num >= 96000)
                 num = 96000;
             else if (num >= 48000)
                 num = 48000;
