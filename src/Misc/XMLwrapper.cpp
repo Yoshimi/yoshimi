@@ -58,14 +58,21 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     memset(&parentstack, 0, sizeof(parentstack));
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
-    mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
 
-    node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
-
-    mxmlElementSetAttr(root, "version-major", "2");
-    mxmlElementSetAttr(root, "version-minor", "5");
-    mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
-
+    if (synth->getRuntime().xmlType <= XML_MICROTONAL)
+    {
+        mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
+        node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
+        mxmlElementSetAttr(root, "version-major", "2");
+        mxmlElementSetAttr(root, "version-minor", "5");
+        mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
+    }
+    else
+    {
+    mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
+    node = root = mxmlNewElement(tree, "Yoshimi-data");
+    }
+    
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
     string tmp = YOSHIMI_VERSION;
     string::size_type pos1 = tmp.find('.'); // != string::npos
@@ -384,6 +391,7 @@ void XMLwrapper::endbranch()
 
 bool XMLwrapper::loadXMLfile(const string& filename)
 {
+    bool zynfile = true;
     bool yoshitoo = false;
     if (tree)
         mxmlDelete(tree);
@@ -403,15 +411,25 @@ bool XMLwrapper::loadXMLfile(const string& filename)
         synth->getRuntime().Log("XML: File " + filename + " is not XML");
         return false;
     }
-    node = root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
+    root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
+    if (!root)
+    {
+        zynfile = false;
+        root = mxmlFindElement(tree, tree, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
+    }
+    
     if (!root)
     {
         synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context");
         return false;
     }
+    node = root;
     push(root);
-    xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
-    xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
+    if (zynfile)
+    {
+        xml_version.major = string2int(mxmlElementGetAttr(root, "version-major"));
+        xml_version.minor = string2int(mxmlElementGetAttr(root, "version-minor"));
+    }
     if (mxmlElementGetAttr(root, "Yoshimi-major"))
     {
         xml_version.y_major = string2int(mxmlElementGetAttr(root, "Yoshimi-major"));

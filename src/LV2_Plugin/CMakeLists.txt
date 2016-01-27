@@ -92,14 +92,6 @@ foreach(basename ${FltkUI_names})
     set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
 endforeach(basename ${FltkUI_names})
 
-add_definitions (
-    -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
-    -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
-    ${ALSA_LDFLAGS}
-    ${JACK_LDFLAGS}
-    -DYOSHI_FIFO_DIR="${FifoDirectory}"
-)
-
 
 add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
 

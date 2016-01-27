@@ -479,23 +479,17 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Log("extractConfigData, no CONFIGURATION branch");
         return false;
     }
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize,
-                                        MAX_AD_HARMONICS * 2, 131072);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
-    checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
-    EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
+    showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);    
     consoleMenuItem = xml->getpar("reports_destination", consoleMenuItem, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
-    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
-    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
-
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 131072);
 
     // get preset dirs
     int count = 0;
@@ -529,6 +523,12 @@ bool Config::extractConfigData(XMLwrapper *xml)
         }
     }
     
+    Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
+    
+    // engines
+    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+
     // alsa settings
     alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
     alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
@@ -541,9 +541,12 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
+    EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
-//    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
-    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);    
+    
+    //misc
+    checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
+    
     xml->exitbranch(); // CONFIGURATION
     return true;
 }
@@ -577,21 +580,17 @@ void Config::saveConfig(void)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
+    xmltree->addpar("gzip_compression", GzipCompression);
+    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
+    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
+    xmltree->addpar("single_row_panel", single_row_panel);
+    xmltree->addpar("reports_destination", consoleMenuItem);
+    xmltree->addpar("report_XMLheaders", logXMLheaders);
+    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
     xmltree->addpar("sample_rate", Samplerate);
     xmltree->addpar("sound_buffer_size", Buffersize);
     xmltree->addpar("oscil_size", Oscilsize);
-
-    xmltree->addpar("gzip_compression", GzipCompression);
-    xmltree->addpar("check_pad_synth", checksynthengines);
-    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
-    xmltree->addpar("reports_destination", consoleMenuItem);
-    xmltree->addpar("report_XMLheaders", logXMLheaders);
-    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
-    xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
-    xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
-    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
-    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
 
     for (int i = 0; i < MAX_PRESETS; ++i)
         if (presetsDirlist[i].size())
@@ -603,17 +602,22 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("interpolation", Interpolation);
     
+    xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
+    xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
+    
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
+    
     xmltree->addparstr("linux_jack_server", jackServer);
     xmltree->addparstr("linux_jack_midi_dev", jackMidiDevice);
 
     xmltree->addpar("midi_bank_root", midi_bank_root);
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
+    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
-//    xmltree->addpar("enable_console_window", consoleMenuItem);
-    xmltree->addpar("single_row_panel", single_row_panel);
+    
+    xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->endbranch(); // CONFIGURATION
 }
 
