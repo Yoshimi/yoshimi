@@ -257,16 +257,16 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     {
         if (!Runtime.restoreJsession())
         {
-            Runtime.Log("Restore jack session failed");
-            goto bail_out;
+            Runtime.Log("Restore jack session failed. Using defaults");
+            defaults();
         }
     }
     else if (Runtime.restoreState)
     {
         if (!Runtime.stateRestore())
          {
-             Runtime.Log("Restore state failed");
-             goto bail_out;
+             Runtime.Log("Restore state failed. Using defaults");
+             defaults();
          }
     }
     else

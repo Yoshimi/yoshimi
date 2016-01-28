@@ -5,7 +5,7 @@ Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
 
-startup state load doesn't set buffersize correctly - why?
+startup state load doesn't set buffersize correctly - partially resolved.
     size is ignored if loaded when already running (which is reasonable).
 
 Allow headless compilation.

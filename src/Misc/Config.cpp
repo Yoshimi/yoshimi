@@ -212,6 +212,19 @@ bool Config::Setup(int argc, char **argv)
             return false;
         }
         Log(StateFile);
+        restoreSessionData(StateFile, true);
+        /* This needs improving!
+         * There is a single state file that contains both startup config
+         * data that must be set early, and runtime data that must be set
+         * after synth has been initialised.
+         * 
+         * Currently we open it here and fetch just the statarup data, then
+         * reopen it in synth and fetch all the data (including the startup
+         * again).
+         * 
+         * This is further complicated because the same functions are
+         * being used by jack session.
+         */
     }    
     return true;
 }
@@ -644,7 +657,7 @@ void Config::saveSessionData(string savefile)
 }
 
 
-bool Config::restoreSessionData(string sessionfile)
+bool Config::restoreSessionData(string sessionfile, bool startup)
 {
     XMLwrapper *xml = NULL;
     bool ok = false;
@@ -666,7 +679,9 @@ bool Config::restoreSessionData(string sessionfile)
         Log("Failed to load xml file " + sessionfile);
         goto end_game;
     }
-    ok = extractConfigData(xml) && extractRuntimeData(xml) && synth->getfromXML(xml);
+    ok = extractConfigData(xml); // this needs improving
+    if (!startup && ok)
+        ok = extractRuntimeData(xml) && synth->getfromXML(xml);
 
 end_game:
     if (xml)
@@ -682,12 +697,7 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
         Log("Config extractRuntimeData, no RUNTIME branch", true);
         return false;
     }
-    audioEngine = (audio_drivers)xml->getpar("audio_engine", DEFAULT_AUDIO, no_audio, alsa_audio);
-    audioDevice = xml->getparstr("audio_device");
-    midiEngine = (midi_drivers)xml->getpar("midi_engine", DEFAULT_MIDI, no_midi, alsa_midi);
-    midiDevice = xml->getparstr("midi_device");
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+// need to put current root and bank here
     nameTag = xml->getparstr("name_tag");
     CurrentXMZ = xml->getparstr("current_xmz");
     xml->exitbranch();
@@ -698,12 +708,7 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
 void Config::addRuntimeXML(XMLwrapper *xml)
 {
     xml->beginbranch("RUNTIME");
-    xml->addpar("audio_engine", audioEngine);
-    xml->addparstr("audio_device", audioDevice);
-    xml->addpar("midi_engine", midiEngine);
-    xml->addparstr("midi_device", midiDevice);
-    xml->addpar("enable_gui", showGui);
-    xml->addpar("enable_CLI", showCLI);
+// need to put current root and bank here
     xml->addparstr("name_tag", nameTag);
     xml->addparstr("current_xmz", CurrentXMZ);
     xml->endbranch();
@@ -904,7 +909,7 @@ void Config::setLadi1Active(void)
 bool Config::restoreJsession(void)
 {
     #if defined(JACK_SESSION)
-        return restoreSessionData(jackSessionFile);
+        return restoreSessionData(jackSessionFile, false);
     #else
         return false;
     #endif
