@@ -816,11 +816,11 @@ void SynthEngine::SetPartPortamento(int npart, bool state)
 void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 {
     list<string>::iterator it;
-    if ((msg_buf.size() < lines) || Runtime.consoleMenuItem) // Output will fit the screen (or console)
+    if ((msg_buf.size() < lines) || Runtime.toConsole) // Output will fit the screen (or console)
     {
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             Runtime.Log(*it);
-        if (Runtime.consoleMenuItem)
+        if (Runtime.toConsole)
             // we need this in case someone is working headless
             cout << "\nReports sent to console window\n\n";
     }
@@ -1068,7 +1068,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  Jack server " + Runtime.jackServer);
 
-    if (Runtime.consoleMenuItem)
+    if (Runtime.toConsole)
     {
         msg_buf.push_back("  Reports sent to console window");
     }
@@ -1106,14 +1106,14 @@ void SynthEngine::SetSystemValue(int type, int value)
         case 100: // reports destination
             if (value > 63)
             {
-                Runtime.consoleMenuItem = true;
+                Runtime.toConsole = true;
                 Runtime.Log("Sending reports to console window");
                 // we need the next line in case someone is working headless
                 cout << "Sending reports to console window\n";
             }
             else
             {
-                Runtime.consoleMenuItem = false;
+                Runtime.toConsole = false;
                 Runtime.Log("Sending reports to stderr");
             }
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);

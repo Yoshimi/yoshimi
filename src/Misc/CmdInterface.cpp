@@ -68,7 +68,8 @@ string basics[] = {
     "path add <s>",                 "add bank root path",
     "path remove <n>",              "remove bank root path ID",
     "set",                          "set all main parameters",
-    "  reports [n]",                "report destination (1 GUI console, other stderr)",
+    "  reports [s]",                "destination (gui/stderr)",
+    "  ",                           "  non-fatal (show/hide)",
     "  root <n>",                   "current root path to ID",
     "  bank <n>",                   "current bank to ID",
     "end"
@@ -257,9 +258,9 @@ bool CmdInterface::helpList()
         msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
     }
     
-    if (synth->getRuntime().consoleMenuItem)
+    if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nset reports [n] - set report destination (1 GUI console, other stderr)\n\n";
+        cout << "\nset reports [s] - set report destination (gui/stderr)\n\n";
  
     synth->cliOutput(msg, LINES);
     return true;
@@ -927,10 +928,26 @@ int CmdInterface::commandSet()
         
     else if (matchnMove(1, point, "reports"))
     {
-        if (point[0] == '1')
+        if (matchnMove(1, point, "gui"))
             synth->SetSystemValue(100, 127);
-        else
+        else if (matchnMove(1, point, "stderr"))
             synth->SetSystemValue(100, 0);
+        else if (matchnMove(1, point, "show"))
+        {
+            Runtime.hideErrors = false;
+            Runtime.Log("Showing all errors");
+        }
+        else if (matchnMove(1, point, "hide"))
+        {
+            Runtime.hideErrors = true;
+            Runtime.Log("Hiding non-fatal errors");
+        }
+        else
+        {
+            synth->SetSystemValue(100, 0);
+            Runtime.hideErrors = false;
+            Runtime.Log("Showing all errors");
+        }
         reply = done_msg;
         Runtime.configChanged = true;
     }

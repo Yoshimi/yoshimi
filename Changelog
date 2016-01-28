@@ -3,10 +3,11 @@ yoshimi 1.3.x
 2016-1-28 Will
 - Bugfix: Loading saved state now correctly sets buffer size.
 - Duplicated calls to state XML data removed.
+- Initial implementation of non-fatal error report hiding.
 
 2016-1-27 Will
 - Reorganised grouping of main .config file
-- New config files that are unique to Yoshimi now carry the yoshim
+- New config files that are unique to Yoshimi now carry the yoshimi
   doctype instead of the ZynAddSubFX one.
 - minor doc spelling corrections.
 - Fixed regression. Alsa can have sample rate selected again.

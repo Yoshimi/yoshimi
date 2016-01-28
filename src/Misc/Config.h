@@ -128,7 +128,8 @@ class Config : public MiscFuncs
         bool          SimpleCheck;
         int           xmlType;
         int           EnableProgChange;
-        bool          consoleMenuItem;
+        bool          toConsole;
+        bool          hideErrors;
         bool          logXMLheaders;
         bool          configChanged;
         int           rtprio;

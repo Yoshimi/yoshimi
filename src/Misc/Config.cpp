@@ -113,7 +113,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     checksynthengines(1),
     xmlType(0),
     EnableProgChange(1), // default will be inverted
-    consoleMenuItem(0),
+    toConsole(0),
+    hideErrors(false),
     logXMLheaders(0),
     configChanged(false),
     rtprio(50),
@@ -496,7 +497,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
     showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);    
-    consoleMenuItem = xml->getpar("reports_destination", consoleMenuItem, 0, 1);
+    toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
+    hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
@@ -597,7 +599,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("enable_gui", synth->getRuntime().showGui);
     xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
     xmltree->addpar("single_row_panel", single_row_panel);
-    xmltree->addpar("reports_destination", consoleMenuItem);
+    xmltree->addpar("reports_destination", toConsole);
+    xmltree->addpar("hide_system_errors", hideErrors);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
@@ -717,7 +720,9 @@ void Config::addRuntimeXML(XMLwrapper *xml)
 
 void Config::Log(string msg, bool tostderr)
 {
-    if (showGui && !tostderr && consoleMenuItem)
+    if (tostderr && hideErrors)
+        return;
+    if (showGui && !tostderr && toConsole)
         LogList.push_back(msg);
     else
         cerr << msg << endl;

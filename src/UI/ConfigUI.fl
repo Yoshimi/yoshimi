@@ -213,7 +213,7 @@ class ConfigUI {selected : {private MiscFuncs}
           }
           Fl_Choice reports {
             label {Send reports to:}
-            callback {synth->getRuntime().consoleMenuItem = o->value();
+            callback {synth->getRuntime().toConsole = o->value();
 if (o->value())
     synth->getGuiMaster()->Reports->activate();
 else
@@ -222,7 +222,7 @@ else
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
             xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
-            code0 {o->value(synth->getRuntime().consoleMenuItem);}
+            code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
               label stderr
@@ -236,6 +236,16 @@ else
           Fl_Box {} {
             label {* These settings changes require a restart}
             xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
+          Fl_Check_Button {} {
+            label {Hide Non Fatal Errors}
+            callback {if (synth->getRuntime().hideErrors != o->value())
+{
+    synth->getRuntime().hideErrors = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
             label {Log XML headers}
@@ -749,7 +759,7 @@ presets->hide();}
     switch (tabnumber)
     {
         case 1 : //Main
-            reports->value(synth->getRuntime().consoleMenuItem);
+            reports->value(synth->getRuntime().toConsole);
             break;
         case 2 : // Jack
             jackSource->value(synth->getRuntime().jackMidiDevice.c_str());

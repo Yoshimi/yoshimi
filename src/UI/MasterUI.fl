@@ -784,7 +784,7 @@ paramsui->Show();}
         label Reports
         callback {yoshiLog->Show();}
         xywh {289 93 70 20} box PLASTIC_UP_BOX color 228 labelsize 11
-        code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
+        code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
       }
       Fl_Group syseffectuigroup {
         xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
@@ -1281,7 +1281,7 @@ updatepanel();}
     updatesendwindow();
     updatepanel();
     bankui->Hide();
-    if (synth->getRuntime().consoleMenuItem == false)
+    if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
         Reports->activate();} {}
