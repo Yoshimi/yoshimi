@@ -79,7 +79,7 @@ class Config : public MiscFuncs
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                          bool schedfifo, char lowprio, bool create_detached = true);
 
-        string addParamHistory(string file);
+        string addParamHistory(string file, string extension, deque<HistoryListItem> &ParamsHistory);
         string historyFilename(int index);
         bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
@@ -166,6 +166,8 @@ class Config : public MiscFuncs
         IOdata nrpndata;        
         
         deque<HistoryListItem> ParamsHistory;
+        deque<HistoryListItem> ScaleHistory;
+        deque<HistoryListItem> StateHistory;
         deque<HistoryListItem>::iterator itx;
         static const unsigned short MaxParamsHistory;
         list<string> LogList;

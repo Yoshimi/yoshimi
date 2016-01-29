@@ -3,7 +3,7 @@ version 1.0302
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2014, Will Godfrey   
+Copyright 2014 - 2016, Will Godfrey   
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -37,37 +37,47 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 } 
 
-class ParametersUI {open
+class ParametersUI {selected
 } {
-  Function {make_window(void)} {open
-  } {
+  Function {make_window(void)} {} {
     Fl_Window Recent {
       label {Recent Parameters}
-      callback {o->hide()} open
-      xywh {917 745 220 180} type Double labelfont 13 labelsize 12 align 0 visible
+      callback {o->hide()}
+      xywh {917 745 220 180} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Browser BrowseRecent {
-        callback {if (o->value() > 0)
-          {
-              deque<HistoryListItem>::iterator ix = synth->getRuntime().ParamsHistory.begin();
-              string fle;
-              switch (Fl::event_button())
-              {
-                case FL_LEFT_MOUSE:
-                    {
-                    	CloseRecent->hide();
-                        fle = synth->getRuntime().ParamsHistory.at(o->value() - 1).file;
+        callback {//
+    if (o->value() > 0)
+    {
+        deque<HistoryListItem>::iterator ix = History.begin();
+        string fle;
+        switch (Fl::event_button())
+        {
+            case FL_LEFT_MOUSE:
+            {
+                CloseRecent->hide();
+                fle = History.at(o->value() - 1).file;
+                switch(H_type)
+                {
+                    case 3:
+                        synth->getGuiMaster()->do_load_scale(fle);
+                        break;
+                    case 4:
+                        synth->getRuntime().addParamHistory(string(fle), ".state", History);
+                    case 2:
+                    default:
                         synth->getGuiMaster()->do_load_master(false, fle.c_str());
-                        synth->getGuiMaster()->setMasterLabel(synth->getRuntime().ParamsHistory.at(o->value() - 1).name);
-                        CloseRecent->show();
-                        Recent->hide();
-                    }
-                    break;
-    
-                default:
-                    break;
-              }
-          }}
+                        synth->getGuiMaster()->setMasterLabel(History.at(o->value() - 1).name);
+                        break;
+                }
+                CloseRecent->show();
+                Recent->hide();
+                break;
+            }
+            default:
+                break;
+        }
+    }}
         xywh {0 0 220 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
         code0 {const int colwidths[] = { 150, 330, 0 };
           o->column_widths(colwidths);
@@ -84,39 +94,56 @@ class ParametersUI {open
       }
     }
   }
-  Function {ParametersUI(SynthEngine *_synth)} {open
-  } {
+  Function {ParametersUI(SynthEngine *_synth)} {} {
     code {synth = _synth;
 make_window();} {}
   }
-  Function {loadRecent()} {open
-  } {
+  Function {loadRecent()} {} {
     code {BrowseRecent->clear();
         const int colwidths[] = { 64, 128, 0 };
         BrowseRecent->column_widths(colwidths);
         BrowseRecent->column_char('	');
-        synth->getRuntime().itx = synth->getRuntime().ParamsHistory.begin();
-        for (; synth->getRuntime().itx != synth->getRuntime().ParamsHistory.end(); ++synth->getRuntime().itx)
+        synth->getRuntime().itx = History.begin();
+        for (; synth->getRuntime().itx != History.end(); ++synth->getRuntime().itx)
         {
             string tag = synth->getRuntime().itx->name;
-                // + "\\t" + synth->getRuntime().itx->file.substr(0, synth->getRuntime().itx->file.rfind("/") + 1);
             BrowseRecent->add(tag.c_str());
         }
         BrowseRecent->set_changed();} {}
   }
-  Function {Show()} {open
-  } {
-    code {loadRecent();
-      Recent->show();} {}
+  Function {Show(int _type)} {} {
+    code {//
+    H_type = _type;
+    switch (H_type)
+    {
+        case 3:
+            Recent->label("Recent Scales");
+            History = synth->getRuntime().ScaleHistory;
+            break;
+        case 4:
+            Recent->label("Recent States");
+            History = synth->getRuntime().StateHistory;
+            break;
+        case 2:
+        default:
+            Recent->label("Recent Patch Sets");
+            History = synth->getRuntime().ParamsHistory;
+            break;
+    }
+   
+    loadRecent();
+    Recent->show();} {}
   }
-  Function {Hide()} {open
-  } {
+  Function {Hide()} {} {
     code {Recent->hide();} {}
   }
-  Function {~ParametersUI()} {open
-  } {
+  Function {~ParametersUI()} {} {
     code {Recent->hide();} {}
   }
-  decl {SynthEngine *synth;} {selected private local
+  decl {SynthEngine *synth;} {private local
+  }
+  decl {deque<HistoryListItem> History;} {private local
+  }
+  decl {int H_type;} {private local
   }
 } 

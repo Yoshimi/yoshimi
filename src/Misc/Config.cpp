@@ -89,7 +89,7 @@ static struct argp_option cmd_options[] = {
 
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
-    //restoreState(false),
+    restoreState(false),
     restoreJackSession(false),
     Samplerate(48000),
     Buffersize(256),
@@ -250,12 +250,12 @@ void Config::flushLog(void)
 }
 
 
-string Config::addParamHistory(string file)
+string Config::addParamHistory(string file, string extension, deque<HistoryListItem> &ParamsHistory)
 {
     if (!file.empty())
     {
         unsigned int name_start = file.rfind("/");
-        unsigned int name_end = file.rfind(".xmz");
+        unsigned int name_end = file.rfind(extension);
         if (name_start != string::npos && name_end != string::npos
             && (name_start - 1) < name_end)
         {
@@ -281,17 +281,6 @@ string Config::addParamHistory(string file)
     return string();
 }
 
-
-string Config::historyFilename(int index)
-{
-    if (index > 0 && index <= (int)ParamsHistory.size())
-    {
-        itx = ParamsHistory.begin();
-        for (int i = index; i > 0; ++itx, --i) ;
-        return itx->file;
-    }
-    return string();
-}
 
 bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
 {

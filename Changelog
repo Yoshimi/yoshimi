@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-1-29 Will
+- Added scale list to history file and recent scales to GUI.
+- State list and recent states also added.
+
 2016-1-28 Will
 - Bugfix: Loading saved state now correctly sets buffer size.
 - Duplicated calls to state XML data removed.

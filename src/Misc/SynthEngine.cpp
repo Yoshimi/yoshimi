@@ -253,7 +253,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     defaults();
     ClearNRPNs();
-    if (Runtime.restoreJackSession)
+    if (Runtime.restoreJackSession) // the following are not fatal if failed
     {
         if (!Runtime.restoreJsession())
         {
@@ -271,12 +271,12 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     else
     {
-        if (Runtime.paramsLoad.size()) // these are not fatal if failed
+        if (Runtime.paramsLoad.size())
         {
             if (loadXML(Runtime.paramsLoad))
             {
                 applyparameters();
-                Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
+                Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad, ".xmz", Runtime.ParamsHistory);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
             else
@@ -1975,22 +1975,58 @@ bool SynthEngine::loadHistory(int instance)
         Runtime. Log("extractHistoryData, no HISTORY branch");
         return false;
     }
+    int hist_size;
+    string filetype;
     if (xml->enterbranch("XMZ_PATCH_SETS"))
     {
-        int hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
-        string xmz;
+        hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
         for (int i = 0; i < hist_size; ++i)
         {
             if (xml->enterbranch("XMZ_FILE", i))
             {
-                xmz = xml->getparstr("xmz_file");
-                if (xmz.size() && isRegFile(xmz))
-                    Runtime.addParamHistory(xmz);
+                filetype = xml->getparstr("xmz_file");
+                if (filetype.size() && isRegFile(filetype))
+                    Runtime.addParamHistory(filetype, ".xmz", Runtime.ParamsHistory);
                 xml->exitbranch();
             }
         }
         xml->exitbranch();
     }
+    
+    if (xml->enterbranch("XMZ_SCALE"))
+    {
+        hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
+
+        for (int i = 0; i < hist_size; ++i)
+        {
+            if (xml->enterbranch("XMZ_FILE", i))
+            {
+                filetype = xml->getparstr("xsz_file");
+                if (filetype.size() && isRegFile(filetype))
+                    Runtime.addParamHistory(filetype, ".xsz", Runtime.ScaleHistory);
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch();
+    }
+
+    if (xml->enterbranch("XMZ_STATE"))
+    {
+        hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
+
+        for (int i = 0; i < hist_size; ++i)
+        {
+            if (xml->enterbranch("XMZ_FILE", i))
+            {
+                filetype = xml->getparstr("state_file");
+                if (filetype.size() && isRegFile(filetype))
+                    Runtime.addParamHistory(filetype, ".state", Runtime.StateHistory);
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch();
+    }
+    
     xml->exitbranch();
     return true;
 }
@@ -2008,7 +2044,7 @@ bool SynthEngine::saveHistory(int instance)
     XMLwrapper *xmltree = new XMLwrapper(this);
     if (!xmltree)
     {
-        Runtime.Log("saveConfig failed xmltree allocation");
+        Runtime.Log("saveHistory failed xmltree allocation");
         return false;
     }
     xmltree->beginbranch("HISTORY");
@@ -2023,6 +2059,34 @@ bool SynthEngine::saveHistory(int instance)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
                 xmltree->addparstr("xmz_file", rx->file);
+                xmltree->endbranch();
+            }
+            xmltree->endbranch();
+        }
+        if (Runtime.ScaleHistory.size())
+        {
+            xmltree->beginbranch("XMZ_SCALE");
+            xmltree->addpar("history_size", Runtime.ScaleHistory.size());
+            deque<HistoryListItem>::reverse_iterator rx = Runtime.ScaleHistory.rbegin();
+            unsigned int count = 0;
+            for (int x = 0; rx != Runtime.ScaleHistory.rend() && count <= Runtime.MaxParamsHistory; ++rx, ++x)
+            {
+                xmltree->beginbranch("XMZ_FILE", x);
+                xmltree->addparstr("xsz_file", rx->file);
+                xmltree->endbranch();
+            }
+            xmltree->endbranch();
+        }
+        if (Runtime.StateHistory.size())
+        {
+            xmltree->beginbranch("XMZ_STATE");
+            xmltree->addpar("history_size", Runtime.StateHistory.size());
+            deque<HistoryListItem>::reverse_iterator rx = Runtime.StateHistory.rbegin();
+            unsigned int count = 0;
+            for (int x = 0; rx != Runtime.StateHistory.rend() && count <= Runtime.MaxParamsHistory; ++rx, ++x)
+            {
+                xmltree->beginbranch("XMZ_FILE", x);
+                xmltree->addparstr("state_file", rx->file);
                 xmltree->endbranch();
             }
             xmltree->endbranch();
