@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2015, Will Godfrey
+Copyright 2014 -2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -61,7 +61,7 @@ class ConfigUI {selected : {private MiscFuncs}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Choice {} {
             label {* AddSynth Oscillator Size}
@@ -119,7 +119,7 @@ class ConfigUI {selected : {private MiscFuncs}
         synth->getRuntime().Buffersize = changed;
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
@@ -152,7 +152,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {* PADsynth Interpolation}
+            label {PADsynth Interpolation}
             callback {//
                 int tmp = synth->getRuntime().Interpolation;
                 synth->getRuntime().Interpolation = (int) o->value();
@@ -171,7 +171,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {* Virtual Keyboard Layout}
+            label {Virtual Keyboard Layout}
             callback {//
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
@@ -221,7 +221,7 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            tooltip {System errors always go to stderr} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
@@ -244,7 +244,7 @@ else
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Only affects stderr output} xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
@@ -315,7 +315,7 @@ synth->getRuntime().configChanged = true;}
         }
         Fl_Group alsaTab {
           label Alsa
-          xywh {5 25 384 277} labelsize 12 hide
+          xywh {5 25 384 277} labelsize 12
         } {
           Fl_Input alsaSource {
             label {Alsa Midi Source}
@@ -349,7 +349,7 @@ synth->getRuntime().configChanged = true;}
         synth->getRuntime().alsaAudioDevice = tmp;
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
+            tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaAudioDevice.c_str());}
           }
           Fl_Check_Button alsaAudio {

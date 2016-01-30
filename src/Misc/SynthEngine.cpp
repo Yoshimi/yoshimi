@@ -1931,8 +1931,8 @@ bool SynthEngine::saveBanks(int instance)
         name += ("-" + asString(instance));
     string bankname = name + ".banks";
     Runtime.xmlType = XML_BANK;
-    unsigned int tmp = Runtime.GzipCompression;
-    Runtime.GzipCompression = 0;
+ //   unsigned int tmp = Runtime.GzipCompression;
+ //   Runtime.GzipCompression = 0;
     XMLwrapper *xmltree = new XMLwrapper(this);
     if (!xmltree)
     {
@@ -1945,7 +1945,7 @@ bool SynthEngine::saveBanks(int instance)
 
     if (!xmltree->saveXMLfile(bankname))
         Runtime.Log("Failed to save config to " + bankname);
-    Runtime.GzipCompression = tmp;
+ //   Runtime.GzipCompression = tmp;
     delete xmltree;
     
     return true;
@@ -1979,7 +1979,7 @@ bool SynthEngine::loadHistory(int instance)
     string filetype;
     if (xml->enterbranch("XMZ_PATCH_SETS"))
     {
-        hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
+        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
         for (int i = 0; i < hist_size; ++i)
         {
             if (xml->enterbranch("XMZ_FILE", i))
@@ -1995,7 +1995,7 @@ bool SynthEngine::loadHistory(int instance)
     
     if (xml->enterbranch("XMZ_SCALE"))
     {
-        hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
+        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
 
         for (int i = 0; i < hist_size; ++i)
         {
@@ -2012,7 +2012,7 @@ bool SynthEngine::loadHistory(int instance)
 
     if (xml->enterbranch("XMZ_STATE"))
     {
-        hist_size = xml->getpar("history_size", 0, 0, Runtime.MaxParamsHistory);
+        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
 
         for (int i = 0; i < hist_size; ++i)
         {
@@ -2055,7 +2055,7 @@ bool SynthEngine::saveHistory(int instance)
             xmltree->addpar("history_size", Runtime.ParamsHistory.size());
             deque<HistoryListItem>::reverse_iterator rx = Runtime.ParamsHistory.rbegin();
             unsigned int count = 0;
-            for (int x = 0; rx != Runtime.ParamsHistory.rend() && count <= Runtime.MaxParamsHistory; ++rx, ++x)
+            for (int x = 0; rx != Runtime.ParamsHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
                 xmltree->addparstr("xmz_file", rx->file);
@@ -2069,7 +2069,7 @@ bool SynthEngine::saveHistory(int instance)
             xmltree->addpar("history_size", Runtime.ScaleHistory.size());
             deque<HistoryListItem>::reverse_iterator rx = Runtime.ScaleHistory.rbegin();
             unsigned int count = 0;
-            for (int x = 0; rx != Runtime.ScaleHistory.rend() && count <= Runtime.MaxParamsHistory; ++rx, ++x)
+            for (int x = 0; rx != Runtime.ScaleHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
                 xmltree->addparstr("xsz_file", rx->file);
@@ -2083,7 +2083,7 @@ bool SynthEngine::saveHistory(int instance)
             xmltree->addpar("history_size", Runtime.StateHistory.size());
             deque<HistoryListItem>::reverse_iterator rx = Runtime.StateHistory.rbegin();
             unsigned int count = 0;
-            for (int x = 0; rx != Runtime.StateHistory.rend() && count <= Runtime.MaxParamsHistory; ++rx, ++x)
+            for (int x = 0; rx != Runtime.StateHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
                 xmltree->addparstr("state_file", rx->file);

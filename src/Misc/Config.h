@@ -169,7 +169,6 @@ class Config : public MiscFuncs
         deque<HistoryListItem> ScaleHistory;
         deque<HistoryListItem> StateHistory;
         deque<HistoryListItem>::iterator itx;
-        static const unsigned short MaxParamsHistory;
         list<string> LogList;
         BodyDisposal *deadObjects;
 

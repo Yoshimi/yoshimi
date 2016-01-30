@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2016-1-30 Will
+- Corrected some GUI text and tooltips.
+- Added check for ncurses in cmake.
+- MAX_HISTORY now set to 25 in CMakeLists.txt
+- Banks file now follows compression schedule.
+
 2016-1-29 Will
 - Added scale list to history file and recent scales to GUI.
 - State list and recent states also added.

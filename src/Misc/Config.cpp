@@ -50,7 +50,6 @@ using namespace std;
 #include "MasterUI.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-const unsigned short Config::MaxParamsHistory = 25;
 
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
@@ -268,7 +267,7 @@ string Config::addParamHistory(string file, string extension, deque<HistoryListI
                 if (ParamsHistory.at(i).sameFile(file))
                     ParamsHistory.erase(itx);
             ParamsHistory.insert(ParamsHistory.begin(), item);
-            if (ParamsHistory.size() > MaxParamsHistory)
+            if (ParamsHistory.size() > MAX_HISTORY)
             {
                 itx = ParamsHistory.end();
                 ParamsHistory.erase(--itx);

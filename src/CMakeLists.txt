@@ -182,6 +182,14 @@ mark_as_advanced (FLTK_DIR)
 mark_as_advanced (FLTK_FLUID_EXECUTABLE)
 mark_as_advanced (FLTK_MATH_LIBRARY)
 
+# libncurses
+pkg_check_modules (LIBNCURSES REQUIRED ncurses)
+if (LIBNCURSES_FOUND)
+    message (STATUS "Found libncurses ${LIBNCURSES_VERSION}")
+else (LIBCAIRO_FOUND)
+    message (FATAL_ERROR "libncurses required but not found")
+endif (LIBNCURSES_FOUND)
+
 find_path(Readline_ROOT_DIR
     NAMES include/readline/readline.h
 )
@@ -315,6 +323,7 @@ add_definitions (
 
 add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
+add_definitions (-DMAX_HISTORY=25)
 add_definitions (-DMAX_PRESETS=1000)
 add_definitions (-DMAX_BANK_ROOT_DIRS=127)
 add_definitions (-DMAX_BANKS_IN_ROOT=127)
