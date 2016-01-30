@@ -218,7 +218,7 @@ bool Config::Setup(int argc, char **argv)
          * data that must be set early, and runtime data that must be set
          * after synth has been initialised.
          * 
-         * Currently we open it here and fetch just the statarup data, then
+         * Currently we open it here and fetch just the startup data, then
          * reopen it in synth and fetch all the data (including the startup
          * again).
          * 
@@ -620,7 +620,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
-    
     xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->endbranch(); // CONFIGURATION
 }

@@ -447,7 +447,7 @@ void SynthEngine::defaults(void)
     microtonal.defaults();
     Runtime.currentPart = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
-    Runtime.NumAvailableParts = 16;
+    Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
     ShutUp();
 }
 
@@ -2105,6 +2105,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
     actionLock(lockmute);
+    xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
 
@@ -2234,13 +2235,14 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         Runtime.NumAvailableParts = NUM_MIDI_CHANNELS; // set default to be safe
         return false;
     }
-    Runtime.NumAvailableParts = xml->getpar("max_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS * 4);
+    Runtime.NumAvailableParts = xml->getpar("max_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS); // for backwards compatibility
     xml->exitbranch();
     if (!xml->enterbranch("MASTER"))
     {
         Runtime.Log("SynthEngine getfromXML, no MASTER branch");
         return false;
     }
+    Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar127("key_shift", Pkeyshift));
 

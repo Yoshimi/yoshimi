@@ -5,6 +5,8 @@ yoshimi 1.3.x
 - Added check for ncurses in cmake.
 - MAX_HISTORY now set to 25 in CMakeLists.txt
 - Banks file now follows compression schedule.
+- Current available parts now stored in 'MASTER' part of patch sets.
+- .config & .state now marked as yoshimi only.
 
 2016-1-29 Will
 - Added scale list to history file and recent scales to GUI.

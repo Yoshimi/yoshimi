@@ -59,7 +59,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     tree = mxmlNewElement(MXML_NO_PARENT, "?xml version=\"1.0\" encoding=\"UTF-8\"?");
     mxml_node_t *doctype = mxmlNewElement(tree, "!DOCTYPE");
 
-    if (synth->getRuntime().xmlType <= XML_MICROTONAL)
+    if (synth->getRuntime().xmlType <= XML_PRESETS)
     {
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
@@ -310,17 +310,17 @@ char *XMLwrapper::getXMLdata()
         case XML_PARAMETERS:
             addparstr("XMLtype", "Parameters");
             break;
-        case XML_STATE:
-            addparstr("XMLtype", "Session");
-            break;
-        case XML_CONFIG:
-            addparstr("XMLtype", "Config");
-            break;
         case XML_MICROTONAL:
             addparstr("XMLtype", "Scales");
             break;
         case XML_PRESETS:
             addparstr("XMLtype", "Presets");
+            break;
+        case XML_STATE:
+            addparstr("XMLtype", "Session");
+            break;
+        case XML_CONFIG:
+            addparstr("XMLtype", "Config");
             break;
         case XML_BANK:
             addparstr("XMLtype", "Roots and Banks");
@@ -443,7 +443,8 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     }
     if (synth->getRuntime().logXMLheaders)
     {
-        synth->getRuntime().Log("ZynAddSubFX version major " + asString(xml_version.major) + "   minor " + asString(xml_version.minor));
+        if (zynfile)
+            synth->getRuntime().Log("ZynAddSubFX version major " + asString(xml_version.major) + "   minor " + asString(xml_version.minor));
         if (yoshitoo)
             synth->getRuntime().Log("Yoshimi version major " + asString(xml_version.y_major) + "   minor " + asString(xml_version.y_minor));
     }
