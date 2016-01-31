@@ -61,7 +61,7 @@ class ConfigUI {selected : {private MiscFuncs}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12 hide
+          xywh {5 25 382 277} labelsize 12
         } {
           Fl_Choice {} {
             label {* AddSynth Oscillator Size}
@@ -315,7 +315,7 @@ synth->getRuntime().configChanged = true;}
         }
         Fl_Group alsaTab {
           label Alsa
-          xywh {5 25 384 277} labelsize 12
+          xywh {5 25 384 277} labelsize 12 hide
         } {
           Fl_Input alsaSource {
             label {Alsa Midi Source}
@@ -395,7 +395,7 @@ synth->getRuntime().configChanged = true;}
                 }
                 synth->getRuntime().Samplerate = sample_rate;
                 synth->getRuntime().configChanged = true;}
-            xywh {195 215 120 54} labelsize 12 align 4 when 1 textsize 12
+            xywh {195 199 121 66} labelsize 12 align 4 when 1 textsize 12
             code0 {//
                 o->add("192000");
                 o->add("96000");

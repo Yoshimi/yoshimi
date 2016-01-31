@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2016-1-31 Will
+- Small gui correction to remove unnecessary scroll bar.
+- Recent Scale/State now greyed out if empty.
+- Bugfix: Wrong name in CMakeLists.txt failed in some environments.
+
 2016-1-30 Will
 - Corrected some GUI text and tooltips.
 - Added check for ncurses in cmake.

@@ -186,7 +186,7 @@ mark_as_advanced (FLTK_MATH_LIBRARY)
 pkg_check_modules (LIBNCURSES REQUIRED ncurses)
 if (LIBNCURSES_FOUND)
     message (STATUS "Found libncurses ${LIBNCURSES_VERSION}")
-else (LIBCAIRO_FOUND)
+else (LIBNCURSES_FOUND)
     message (FATAL_ERROR "libncurses required but not found")
 endif (LIBNCURSES_FOUND)
 

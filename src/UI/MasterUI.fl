@@ -435,6 +435,11 @@ paramsui->Show(2);}
         Submenu Scales {
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
+          code0 {o = o; // suppress warning;
+              if (synth->getRuntime().ScaleHistory.empty())
+        RecentScale->deactivate();
+    else
+        RecentScale->activate();}
         } {
           MenuItem {} {
             label {&Show Settings...}
@@ -449,7 +454,8 @@ paramsui->Show(2);}
     if (filename == NULL)
         return;
     string fname = string(filename);
-    do_load_scale(fname);}
+    do_load_scale(fname);
+    RecentScale->activate();}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
@@ -469,7 +475,10 @@ paramsui->Show(2);}
                 if (!result)
                     fl_alert("Failed to save scale settings");
                 else
+                {
                     synth->getRuntime().addParamHistory(filename, ".xsz", synth->getRuntime().ScaleHistory);
+                    RecentScale->activate();
+                }
                 updatepanel();}
             xywh {25 25 100 20} labelsize 12
           }
@@ -498,6 +507,11 @@ paramsui->Show(3);}
         Submenu {} {
           label {S&tate}
           xywh {0 0 65 21} labelsize 12
+          code0 {o = o; // suppress warning;
+              if (synth->getRuntime().StateHistory.empty())
+        RecentState->deactivate();
+    else
+        RecentState->activate();}
         } {
           MenuItem loadState {
             label {Load...}
@@ -509,6 +523,7 @@ paramsui->Show(3);}
         laststatefile = string(fle);
         synth->getRuntime().loadState(laststatefile);
         synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
+        RecentState->activate();
     }
     refresh_master_ui();
     microtonalui->apply();}
@@ -525,6 +540,7 @@ paramsui->Show(3);}
                     laststatefile = string(fle);
                     synth->getRuntime().saveState(laststatefile);
                     synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
+                    RecentState->activate();
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
           }
