@@ -242,27 +242,28 @@ class MasterUI {selected : {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {if (synth->getRuntime().configChanged)
-          {
-              int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
-              switch (r)
-              {
-                  case 0:
-                      synth->getRuntime().saveConfig();
-                      synth->guiClosed(true);
-                      break;
-                  case 2:
-                      synth->guiClosed(true);
-                      break;
-                  default:
-                      break;
-              }
-          }
-          else
-          {
-                  synth->getRuntime().saveConfig();
-                  synth->guiClosed(true);
-          }}
+      callback {//
+    if (synth->getRuntime().configChanged)
+    {
+        int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
+        switch (r)
+        {
+            case 0:
+                synth->getRuntime().saveConfig();
+                synth->guiClosed(true);
+                break;
+            case 2:
+                synth->guiClosed(true);
+                break;
+            default:
+                break;
+        }
+    }
+    else
+    {
+//        synth->getRuntime().saveConfig();
+        synth->guiClosed(true);
+    }}
       xywh {4 48 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {

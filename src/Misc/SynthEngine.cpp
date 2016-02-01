@@ -305,7 +305,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         {
             cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
             bank.scanrootdir(found);
-            //Runtime.saveConfig();
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
@@ -1936,7 +1935,7 @@ bool SynthEngine::saveBanks(int instance)
     XMLwrapper *xmltree = new XMLwrapper(this);
     if (!xmltree)
     {
-        Runtime.Log("saveConfig failed xmltree allocation");
+        Runtime.Log("saveBanks failed xmltree allocation");
         return false;
     }
     xmltree->beginbranch("BANKLIST"); 

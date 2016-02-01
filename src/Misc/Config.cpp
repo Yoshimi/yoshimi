@@ -113,7 +113,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     xmlType(0),
     EnableProgChange(1), // default will be inverted
     toConsole(0),
-    hideErrors(false),
+    hideErrors(0),
     logXMLheaders(0),
     configChanged(false),
     rtprio(50),
