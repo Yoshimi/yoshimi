@@ -54,7 +54,7 @@ class Config : public MiscFuncs
 #endif
         void Announce(void);
         void Usage(void);
-        void Log(string msg, bool tostderr = false);
+        void Log(string msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
         void flushLog(void);
 
         void clearPresetsDirlist(void);

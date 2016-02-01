@@ -221,7 +221,7 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            tooltip {System errors always go to stderr} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            tooltip {Some system errors always go to stderr} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
@@ -244,7 +244,7 @@ else
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            tooltip {Only affects stderr output} xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
