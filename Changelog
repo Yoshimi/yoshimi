@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-2-7 Will
+- Corrected man page.
+
 2016-2-1 Will
 - Fixed regression. Config was being resaved when nothing had changed.
 - Refined message hiding. Applies to Reports console and CLI. Hiding
