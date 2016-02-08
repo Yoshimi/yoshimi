@@ -228,7 +228,7 @@ void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent)
     while (commands[word] != "end")
     {
         left = commands[word];
-        msg.push_back(dent.assign<int>(indent, ' ') + left + blanks.assign<int>(spaces - left.length(), ' ') + "- " + commands[word + 1]);
+        msg.push_back(dent.assign(indent, ' ') + left + blanks.assign(spaces - left.length(), ' ') + "- " + commands[word + 1]);
         word += 2;
     }
 }
