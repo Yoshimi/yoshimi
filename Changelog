@@ -1,5 +1,14 @@
 yoshimi 1.3.x
 
+2016-2-14 Will
+- Removed jack/alsa tests from CMakeLists.txt It's now redundant.
+
+2016-2-14 Andrew
+- Removed ControlInterface (obsoleted) + fixes for gcc-6 
+
+2016-2-8 Will
+- GCC 6 fix?
+
 2016-2-7 Will
 - Corrected man page.
 
