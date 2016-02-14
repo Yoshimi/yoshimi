@@ -46,12 +46,10 @@ file (GLOB yoshimi_params_files
     ../Params/FilterParams.cpp  ../Params/LFOParams.cpp
     ../Params/SUBnoteParameters.cpp  ../Params/PADnoteParameters.cpp
     ../Params/Controller.cpp  ../Params/Presets.cpp ../Params/PresetsStore.cpp
-    ../Params/ControlInterface.cpp
     ../Params/ADnoteParameters.h  ../Params/EnvelopeParams.h
     ../Params/FilterParams.h  ../Params/LFOParams.h
     ../Params/SUBnoteParameters.h  ../Params/PADnoteParameters.h
-    ../Params/Controller.h  ../Params/Presets.h ../Params/PresetsStore.h
-    ../Params/ControlInterface.h)
+    ../Params/Controller.h  ../Params/Presets.h ../Params/PresetsStore.h)
 file (GLOB yoshimi_synth_files
     ../Synth/ADnote.cpp  ../Synth/Envelope.cpp  ../Synth/LFO.cpp  ../Synth/OscilGen.cpp
     ../Synth/SUBnote.cpp  ../Synth/Resonance.cpp  ../Synth/PADnote.cpp
