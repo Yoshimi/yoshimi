@@ -861,8 +861,6 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
     string label;
-    if (rootNum >= MAX_BANK_ROOT_DIRS)
-        rootNum = bank.currentRootID;
     if (bank.roots.count(rootNum) > 0
                 && !bank.roots [rootNum].path.empty())
     {
@@ -890,8 +888,6 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
     if (bank.roots.count(root) > 0
         && !bank.roots [root].path.empty())
     {
-        if (bankNum >= MAX_BANKS_IN_ROOT)
-            bankNum = bank.currentBankID;
         if (!bank.roots [root].banks [bankNum].instruments.empty())
         {
             label = bank.roots [root].path;

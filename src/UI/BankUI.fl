@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2015, Will Godfrey 
+Copyright 2014-2016, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -247,11 +247,6 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
   Function {rootrefresh()} {} {
     code {//
-    if (nslot == 127)
-    {
-        hide();
-        return;
-    }
     string bankName = root->getBankIDname(nslot);
     if (bankName.empty())
         color(46);
@@ -276,7 +271,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
       label Bank
-      xywh {46 240 780 575} type Double visible
+      xywh {210 403 780 575} type Double hide
     } {
       Fl_Choice banklist {
         callback {//
@@ -472,7 +467,7 @@ if ((Fl::event_button() == 3))
     rootuiwindow->hide();}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
-      Fl_Group {} {open
+      Fl_Group {} {
         xywh {5 34 766 491} box ENGRAVED_FRAME
       } {
         Fl_Pack {} {
@@ -838,8 +833,6 @@ fnr = &RootProcess_::rootprocess;
   } {
     code {//
     unsigned int slot = this->slot;
-    if (slot == 127)
-    return;
     string thisname = bank->getBankName(slot);
 
     
