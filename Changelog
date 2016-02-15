@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-2-15
+- Fixed regression. Moved bank and history loading back into config.
+  Previous change didn't improve startup behaviour and messed with LV2.
+
 2016-2-14 Will
 - Removed jack/alsa tests from CMakeLists.txt It's now redundant.
 - Re-enabled up to 128 roots and banks and removed redundant maximum

@@ -298,11 +298,7 @@ bool mainCreateNewInstance(unsigned int forceId)
         {
             mainRegisterAudioPort(synth, npart);
         }
-    }
-    
-    synth->installBanks(synth->getUniqueId());
-    synth->loadHistory(synth->getUniqueId());
-    
+    }    
     return true;
 
 bail_out:

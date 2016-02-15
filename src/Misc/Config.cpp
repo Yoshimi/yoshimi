@@ -159,6 +159,9 @@ bool Config::Setup(int argc, char **argv)
 
     if (!loadConfig())
         return false;
+    
+    synth->installBanks(synth->getUniqueId());
+    synth->loadHistory(synth->getUniqueId());
 
     if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
         return true;
