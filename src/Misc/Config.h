@@ -92,6 +92,7 @@ class Config : public MiscFuncs
         string        instrumentLoad;
         string        rootDefine;
         bool          restoreState;
+        bool          stateChanged;
         string        StateFile;
         string        CurrentXMZ;
         bool          restoreJackSession;
