@@ -4,6 +4,7 @@ yoshimi 1.3.x
 - Instrument file changes are now individually checked after the attempt
   instead of tested for writability in advance.
 - Path window no longer offers save/not on close - always saves.
+- Bugfix: above changes didn't update gui correctly :(
 
 2016-2-15 Will
 - Fixed regression. Moved bank and history loading back into config.

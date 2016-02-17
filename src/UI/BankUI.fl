@@ -744,7 +744,6 @@ fnr = &RootProcess_::rootprocess;
                     {
                         setread();
                         fl_alert("Could not rename instrument %d to %s", slot, newname);
-                        return;
                     }
                     else
                     {
@@ -781,11 +780,7 @@ fnr = &RootProcess_::rootprocess;
             {
                 synth->actionLock(lockmute);
                 if (!bank->savetoslot(slot,synth->part[*npart]))
-                {
                     fl_alert("Could not save to this location");
-                    setread();
-                    return;
-                }
                 synth->actionLock(unlock);
                 bs[slot]->refresh();
                 setread();
@@ -797,11 +792,9 @@ fnr = &RootProcess_::rootprocess;
             if (!fl_choice("Clear the slot no. %d ?", "Yes", "No", NULL, slot + 1))
             {
                 if (!bank->clearslot(slot))
-                {
-                    setread();
                     fl_alert("Could not clear this location");
-                }
-                bs[slot]->refresh();
+                else
+                    bs[slot]->refresh();
                 setread();
             }
             else
@@ -814,14 +807,14 @@ fnr = &RootProcess_::rootprocess;
             if (what == 1 && nselected >= 0)
             {
                 if (!bank->swapslot(nselected, slot))
-                {
-                    setread();
                     fl_alert("Could not swap these locations");
+                else
+                {
+                    int ns = nselected;
+                    nselected = -1;
+                    bs[slot]->refresh();
+                    bs[ns]->refresh();
                 }
-                int ns = nselected;
-                nselected = -1;
-                bs[slot]->refresh();
-                bs[ns]->refresh();
                 setread();
                 done = true;
             }
