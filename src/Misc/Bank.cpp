@@ -78,17 +78,6 @@ string Bank::getRootFileTitle()
 }
 
 
-bool Bank::readOnlyInstrument(int ninstrument)
-{
-    if (readOnlyBank(currentBankID))
-        return true; // root and bank not writable
-    if (emptyslot(ninstrument)) // nothing there so must be OK to write
-        return false;
-    const char * file = getFullPath(currentRootID, currentBankID, ninstrument).c_str();
-    return access(file, W_OK);
-}
-
-
 // Get the name of an instrument from the bank
 string Bank::getname(unsigned int ninstrument)
 {
@@ -160,28 +149,30 @@ bool Bank::emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrumen
 
 
 // Removes the instrument from the bank
-void Bank::clearslot(unsigned int ninstrument)
+bool Bank::clearslot(unsigned int ninstrument)
 {
     if (emptyslot(ninstrument))
-        return;
+        return true;
     int chk = remove(getFullPath(currentRootID, currentBankID, ninstrument).c_str());
     if (chk < 0)
     {
         synth->getRuntime().Log(asString(ninstrument) + " Failed to remove "
                      + getFullPath(currentRootID, currentBankID, ninstrument) + " "
                      + string(strerror(errno)));
+        return false;
     }
     deletefrombank(currentRootID, currentBankID, ninstrument);
+    return true;
 }
 
 
 // Save the instrument to a slot
-void Bank::savetoslot(unsigned int ninstrument, Part *part)
+bool Bank::savetoslot(unsigned int ninstrument, Part *part)
 {
     if (ninstrument >= BANK_SIZE)
     {
-        synth->getRuntime().Log("Saved " + asString(ninstrument) + ", slot > BANK_SIZE");
-        return;
+        synth->getRuntime().Log("Can't save " + asString(ninstrument) + ", slot > bank size");
+        return false;
     }
     clearslot(ninstrument);
     string filename = "0000" + asString(ninstrument + 1);
@@ -196,22 +187,16 @@ void Bank::savetoslot(unsigned int ninstrument, Part *part)
     {
         int chk = remove(filepath.c_str());
         if (chk < 0)
+        {
             synth->getRuntime().Log("saveToSlot failed to unlink " + filepath
                         + ", " + string(strerror(errno)));
+            return false;
+        }
     }
-    part->saveXML(filepath);
+    if (!part->saveXML(filepath))
+        return false;
     addtobank(currentRootID, currentBankID, ninstrument, filename, part->Pname);
-}
-
-bool Bank::readOnlyBank(int bankID)
-{
-    const char * root = getRootPath(currentRootID).c_str();
-    if (access(root, W_OK)) // root not writable
-        return true;
-    if (getBankName(bankID).empty())
-        return false; // not there so must be OK to write
-    const char * file = getBankPath(currentRootID, bankID).c_str();
-    return access(file, W_OK);
+    return true;
 }
 
 
@@ -418,22 +403,24 @@ bool Bank::removebank(unsigned int bankID)
 
 
 // Swaps a slot with another
-void Bank::swapslot(unsigned int n1, unsigned int n2)
+bool Bank::swapslot(unsigned int n1, unsigned int n2)
 {
     if (n1 == n2)
-        return;
+        return true;
 
     if (emptyslot(n1) && emptyslot(n2))
-        return;
+        return true;
     if (emptyslot(n1)) // make the empty slot the destination
     {
-        setname(n2, getname(n2), n1);
+        if (!setname(n2, getname(n2), n1))
+            return false;
         getInstrumentReference(n1) = getInstrumentReference(n2);
         getInstrumentReference(n2).clear();
     }
     else if (emptyslot(n2)) // this is just a movement to an empty slot
     {
-        setname(n1, getname(n1), n2);
+        if (!setname(n1, getname(n1), n2))
+            return false;
         getInstrumentReference(n2) = getInstrumentReference(n1);
         getInstrumentReference(n1).clear();
     }
@@ -446,12 +433,15 @@ void Bank::swapslot(unsigned int n1, unsigned int n2)
             // change the name of the second instrument if the name are equal
             instrRef2.name += "2";
         }
-        setname(n2, getname(n2), n1);
-        setname(n1, getname(n1), n2);
+        if (!setname(n2, getname(n2), n1))
+            return false;
+        if (!setname(n1, getname(n1), n2))
+            return false;
         InstrumentEntry instrTmp = instrRef1;
         instrRef1 = instrRef2;
         instrRef2 = instrTmp;
     }
+    return true;
 }
 
 

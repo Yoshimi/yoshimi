@@ -592,8 +592,8 @@ Pend->hide();}
     dirname = fl_dir_chooser("Add a root directory for banks:", NULL, 0);
     if (!dirname)
       return;
-//    synth->getRuntime().configChanged = true;
     synth->getBankRef().addRootDir(dirname);
+    synth->saveBanks(synth->getUniqueId());
     readbankcfg();
     rescan_for_banks(true);
     Pend->hide();}
@@ -605,8 +605,8 @@ Pend->hide();}
     if (selectedRootID >= 0)
     {;
         synth->getBankRef().removeRoot(selectedRootID);
+        synth->saveBanks(synth->getUniqueId());
         readbankcfg();
-//        synth->getRuntime().configChanged = true;
     }
     activatebutton_rootdir(false);
     rescan_for_banks(false);
@@ -620,9 +620,9 @@ Pend->hide();}
     if (selectedRootID >= 0)
     {
         synth->getBankRef().setCurrentRootID(selectedRootID);
+        synth->saveBanks(synth->getUniqueId());
         readbankcfg();
         rescan_for_banks(false);
-//        synth->getRuntime().configChanged = true;
     }
     activatebutton_rootdir(false);
     Pend->hide();}
@@ -649,9 +649,9 @@ Pend->hide();}
     {
 
         synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value());
+        synth->saveBanks(synth->getUniqueId());
         readbankcfg();
         rescan_for_banks(true);
-//        synth->getRuntime().configChanged = true;
 
     }
     oldrootID = changeIDbutton->value();
@@ -666,15 +666,9 @@ Pend->hide();}
         code0 {oldrootID = o->value();}
       }
       Fl_Button {} {
-        label {Close Unsaved}
+        label Close
         callback {pathwindow->do_callback();}
-        xywh {345 268 105 20} box THIN_UP_BOX labelsize 12
-      }
-      Fl_Button {} {
-        label {Save and Close}
-        callback {synth->saveBanks(synth->getUniqueId());
-pathwindow->do_callback();}
-        xywh {225 268 105 20} box THIN_UP_BOX labelsize 12
+        xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
     }
   }
@@ -739,13 +733,6 @@ fnr = &RootProcess_::rootprocess;
             return;
         }
 
-        if (mode > 1 and bank->readOnlyInstrument(nselected))
-        {
-            setread();
-            fl_alert("This instrument file cannot be changed");
-            return;
-        }
-
         if (mode == 5 && !bank->emptyslot(slot))
         {   // Rename slot
             const char *newname = fl_input("Instrument name:", thisname.c_str());
@@ -779,15 +766,26 @@ fnr = &RootProcess_::rootprocess;
             if (synth->part[*npart]->Pname == "Simple Sound")
             {
                 fl_alert("Can't store instrument with default name");
+                setread();
                 doit = false;
             }
             else if (!bank->emptyslot(slot))
+            {
                 if (fl_choice("Overwrite the slot no. %d ?", "Yes", "No", NULL, slot + 1))
+                {
+                    setread();
                     doit = false;
+                }
+            }
             if (doit)
             {
                 synth->actionLock(lockmute);
-                bank->savetoslot(slot,synth->part[*npart]);
+                if (!bank->savetoslot(slot,synth->part[*npart]))
+                {
+                    fl_alert("Could not save to this location");
+                    setread();
+                    return;
+                }
                 synth->actionLock(unlock);
                 bs[slot]->refresh();
                 setread();
@@ -798,10 +796,16 @@ fnr = &RootProcess_::rootprocess;
         {   // Clears the slot (choices reversed for 'No' priority)
             if (!fl_choice("Clear the slot no. %d ?", "Yes", "No", NULL, slot + 1))
             {
-                bank->clearslot(slot);
+                if (!bank->clearslot(slot))
+                {
+                    setread();
+                    fl_alert("Could not clear this location");
+                }
                 bs[slot]->refresh();
                 setread();
             }
+            else
+                setread();
         }
 
         if (mode == 4)
@@ -809,12 +813,16 @@ fnr = &RootProcess_::rootprocess;
             bool done = false;
             if (what == 1 && nselected >= 0)
             {
-                bank->swapslot(nselected, slot);
+                if (!bank->swapslot(nselected, slot))
+                {
+                    setread();
+                    fl_alert("Could not swap these locations");
+                }
                 int ns = nselected;
                 nselected = -1;
-                setread();
                 bs[slot]->refresh();
                 bs[ns]->refresh();
+                setread();
                 done = true;
             }
             if ((nselected < 0 || what == 2) && !done)
@@ -855,14 +863,6 @@ fnr = &RootProcess_::rootprocess;
             refreshmainwindow();
             return;
         }
-
-        if (mode > 1 and mode != 4 and bank->readOnlyBank(nselected))
-        {
-            setrootread();
-            fl_alert("This bank directory cannot be changed");
-            return;
-        }
-        
 
         if (mode == 5 && !thisname.empty())
         {   // Rename bank
