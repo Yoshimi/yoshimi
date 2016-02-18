@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2016-2-18 Will
+- Bugfix: CLI can again list current bank/root
+- Bugfix: on debian testing GUI was locking up if you reduced the ID of the
+  last root path in the list.git status
+  
+
 2016-2-17 Will
 - Instrument file changes are now individually checked after the attempt
   instead of tested for writability in advance.

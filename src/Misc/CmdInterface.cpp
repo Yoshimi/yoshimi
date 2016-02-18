@@ -1263,7 +1263,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (matchnMove(1, point, "instruments") || matchnMove(1, point, "programs"))
         {
             if (point[0] == 0)
-                ID = 255;
+                ID = 128;
             else
                 ID = string2int(point);
             synth->ListInstruments(ID, msg);
@@ -1272,7 +1272,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "banks"))
         {
             if (point[0] == 0)
-                ID = 255;
+                ID = 128;
             else
                 ID = string2int(point);
             synth->ListBanks(ID, msg);

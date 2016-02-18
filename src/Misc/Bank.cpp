@@ -878,13 +878,13 @@ bool Bank::changeRootID(size_t oldID, size_t newID)
     roots [newID] = oldRoot;
     setCurrentRootID(newID);
     RootEntryMap::iterator it;
-    for(it = roots.begin(); it != roots.end(); ++it)
+/*    for(it = roots.begin(); it != roots.end(); ++it)
     {
         if(it->second.path.empty())
         {
             roots.erase(it);
         }
-    }
+    }*/
 
     return true;
 }
@@ -982,7 +982,7 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 
     rescanforbanks();
 
-    setCurrentRootID(tmp_root); // done this way so laoding full set
+    setCurrentRootID(tmp_root); // done this way so loading full set
     setCurrentBankID(tmp_bank); // doesn't change it - need to investigate!
 }
 

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2016, Will Godfrey 
+Copyright 2014-2016, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -266,7 +266,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -640,7 +640,8 @@ Pend->hide();}
       Fl_Button Pend {
         label Pending
         callback {//
-    if (changeIDbutton->value() == oldrootID)
+    int tmp = changeIDbutton->value();
+    if (tmp == oldrootID)
     {
         o->hide();
         return;
@@ -648,13 +649,13 @@ Pend->hide();}
     if (selectedRootID >= 0)
     {
 
-        synth->getBankRef().changeRootID(selectedRootID, changeIDbutton->value());
+        synth->getBankRef().changeRootID(selectedRootID, tmp);
         synth->saveBanks(synth->getUniqueId());
         readbankcfg();
         rescan_for_banks(true);
 
     }
-    oldrootID = changeIDbutton->value();
+    oldrootID = tmp;
     activatebutton_rootdir(false);
     o->hide();}
         tooltip {Click to set} xywh {400 239 56 18} box PLASTIC_UP_BOX color 90 labelsize 10 hide
@@ -1004,25 +1005,26 @@ fnr = &RootProcess_::rootprocess;
         }} {}
   }
   Function {rescan_for_banks(bool reload)} {} {
-    code {banklist->clear();
-if(reload)
-{
+    code {//
+    banklist->clear();
+    if(reload)
+    {
         bank->rescanforbanks();
-}
-       const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
-          BankEntryMap::const_iterator it;
-          for (it = banks.begin(); it != banks.end(); ++it)
-          {
-              if (!it->second.dirname.empty())
-              {
-                  int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
-                  if(it->first == bank->getCurrentBankID())
-                  {
-  	                banklist->value(n);
-  	        }
-              }   
-          }
-          refreshmainwindow();} {}
+    }
+    const BankEntryMap &banks = bank->getBanks(bank->getCurrentRootID());
+    BankEntryMap::const_iterator it;
+    for (it = banks.begin(); it != banks.end(); ++it)
+    {
+        if (!it->second.dirname.empty())
+        {
+            int n = banklist->add((asString(it->first) + ". " + it->second.dirname).c_str(), (const char *)0, (Fl_Callback*)0, reinterpret_cast<void *>(it->first));
+//            if(it->first == bank->getCurrentBankID())
+            {
+                banklist->value(n);
+            }
+        }   
+    }
+    refreshmainwindow();} {}
   }
   Function {set_bank_slot()} {} {
     code {// 
@@ -1064,21 +1066,26 @@ if(reload)
             Pend->hide();
         }} {}
   }
-  Function {readbankcfg()} {} {
+  Function {readbankcfg()} {open
+  } {
     code {//
     string tmp;
     rootsbrowse->clear();
     const RootEntryMap &roots = synth->getBankRef().getRoots();
-      RootEntryMap::const_iterator it;
-      for(it = roots.begin(); it != roots.end(); ++it)
-      {
-        tmp = asString(it->first) + ". " + it->second.path;
-        if(it->first == synth->getBankRef().getCurrentRootID())
-      	{
-      	   tmp += " *";
-      	}
-        rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
-      }} {}
+    RootEntryMap::const_iterator it;
+    for(it = roots.begin(); it != roots.end(); ++it)
+    {
+        if (!it->second.path.empty())
+        {
+            tmp = asString(it->first) + ". " + it->second.path;
+            if(it->first == synth->getBankRef().getCurrentRootID())
+            {
+      	       tmp += " *";
+      	    }
+            rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
+        }
+    }} {selected
+    }
   }
   Function {recoverID()} {return_type int
   } {
