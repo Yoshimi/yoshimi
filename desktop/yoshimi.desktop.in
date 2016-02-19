@@ -2,7 +2,6 @@
 Name=Yoshimi
 Comment=Real Time Synthesizer
 GenericName=Synthesizer
-Version=@YOSHIMI_VERSION@
 Type=Application
 Categories=Music;Midi;AudioVideo;X-Sound;Audio;X-Multitrack;X-Alsa;X-Jack;
 Keywords=music;synthesiser;softsynth;microtonal;multichannel;midi;alsa;jack;realtime;standalone;lv2;
