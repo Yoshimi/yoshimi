@@ -877,14 +877,18 @@ bool Bank::changeRootID(size_t oldID, size_t newID)
     roots [oldID] = roots [newID];
     roots [newID] = oldRoot;
     setCurrentRootID(newID);
-    RootEntryMap::iterator it;
-/*    for(it = roots.begin(); it != roots.end(); ++it)
+    RootEntryMap::iterator it = roots.begin();
+    while(it != roots.end())
     {
         if(it->second.path.empty())
         {
-            roots.erase(it);
+            roots.erase(it++);
         }
-    }*/
+        else
+        {
+            ++it;
+        }
+    }
 
     return true;
 }
