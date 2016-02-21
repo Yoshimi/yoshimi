@@ -1402,9 +1402,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         tmp = synth->getBankRef().getBankSize(bankID);
                         if (tmp)
                         {
-                            Runtime.Log("Bank " + replyString + " has " + asString(tmp) + "Instruments");
+                            Runtime.Log("Bank " + replyString + " has " + asString(tmp) + " Instruments");
                             if (query("Delete bank and all of these", false))
-                            tmp = 0;
+                                tmp = 0;
+                            else
+                                Runtime.Log("Aborted");
                         }
                         if (tmp == 0)
                         {
@@ -1412,6 +1414,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                                 Runtime.Log("Removed bank " + replyString);
                             else
                                 Runtime.Log("Deleting failed. Some files may still exist");
+                            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                         }
                     }
                         

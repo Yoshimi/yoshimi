@@ -367,8 +367,8 @@ bool Bank::newbankfile(string newbankdir)
 bool Bank::removebank(unsigned int bankID)
 {
     int chk;
-
     for (int inst = 0; inst < BANK_SIZE; ++ inst)
+    {
         if (!roots [currentRootID].banks [bankID].instruments [inst].name.empty())
         {
             chk = remove(getFullPath(currentRootID, bankID, inst).c_str());
@@ -376,29 +376,33 @@ bool Bank::removebank(unsigned int bankID)
             {
                 synth->getRuntime().Log(asString(inst) + " Failed to remove "
                                         + getFullPath(currentRootID, bankID, inst) + " "
-                                        + string(strerror(errno)));
+                                        + string(strerror(errno)), 2);
                 return false;
             }
             deletefrombank(currentRootID, bankID, inst);
         }
-        string tmp = getBankPath(currentRootID, bankID)+"/.bankdir";
+    }
+    string tmp = getBankPath(currentRootID, bankID)+"/.bankdir";
+    if (!access(tmp.c_str(), W_OK))
+    {
         chk = remove(tmp.c_str());
         if (chk < 0)
         {
-            synth->getRuntime().Log("Failed to remove bank ID file"
-                                    + string(strerror(errno)));
+            synth->getRuntime().Log("Failed to remove bank ID file "
+                                    + string(strerror(errno)), 2);
             return false;
         }
-        chk = remove(getBankPath(currentRootID, bankID).c_str());
-        if (chk < 0)
-        {
-            synth->getRuntime().Log("Failed to remove bank"
-                                    + asString(bankID) + ": "
-                                    + string(strerror(errno)));
-            return false;
-        }
-        roots [currentRootID].banks.erase(bankID);
-   return true;
+    }
+    chk = remove(getBankPath(currentRootID, bankID).c_str());
+    if (chk < 0)
+    {
+        synth->getRuntime().Log("Failed to remove bank"
+                                + asString(bankID) + ": "
+                                + string(strerror(errno)), 2);
+        return false;
+    }
+    roots [currentRootID].banks.erase(bankID);
+    return true;
 }
 
 
