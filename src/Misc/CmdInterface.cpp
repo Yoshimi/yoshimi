@@ -312,7 +312,7 @@ int CmdInterface::effectsList()
         else
         {
             left = fx_list[i];            
-            msg.push_back("    " + left + blanks.assign<int>(12 - left.length(), ' ') + fx_presets [i].substr(0, presetsLast - 1));
+            msg.push_back("    " + left + blanks.assign(12 - left.length(), ' ') + fx_presets [i].substr(0, presetsLast - 1));
         }
     }
     
