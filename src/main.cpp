@@ -290,7 +290,7 @@ bool mainCreateNewInstance(unsigned int forceId)
         cout << "\nYay! We're up and running :-)\n";
     else
         cout << "\nStarted "<< synth->getUniqueId() << "\n";
-    synthInstances.insert(std::make_pair<SynthEngine *, MusicClient *>(synth, musicClient));
+    synthInstances.insert(std::make_pair(synth, musicClient));
     //register jack ports for enabled parts
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
