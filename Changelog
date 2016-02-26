@@ -1,4 +1,8 @@
-yoshimi 1.3.9 rc2
+yoshimi 1.3.9 rc3
+
+2016-2-26 Andrew
+- Bugfix: in 'main' another GCC6 issue.
+- Set version for rc3
 
 2016-2-25 Will
 - Bugfix: another GCC6 incompatibility resolved.
