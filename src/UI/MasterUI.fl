@@ -46,6 +46,30 @@ decl {\#include "SUBnoteUI.h"} {public local
 decl {\#include "EffUI.h"} {public local
 } 
 
+comment {
+Original ZynAddSubFX author Nasca Octavian Paul
+Copyright (C) 2002-2005 Nasca Octavian Paul
+Copyright 2009-2010, Alan Calvert
+Copyright 2014-2016, Will Godfrey and others
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+This file is derivative of original ZynAddSubFX code, modified November 2010
+} {in_source in_header
+} 
+
 decl {\#include "VirKeyboardUI.h"} {public local
 } 
 
@@ -218,27 +242,28 @@ class MasterUI {selected : {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
-      callback {if (synth->getRuntime().configChanged)
-          {
-              int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
-              switch (r)
-              {
-                  case 0:
-                      synth->getRuntime().saveConfig();
-                      synth->guiClosed(true);
-                      break;
-                  case 2:
-                      synth->guiClosed(true);
-                      break;
-                  default:
-                      break;
-              }
-          }
-          else
-          {
-                  synth->getRuntime().saveConfig();
-                  synth->guiClosed(true);
-          }}
+      callback {//
+    if (synth->getRuntime().configChanged)
+    {
+        int r = fl_choice("Parameters Changed", "Save Changes", "Cancel", "Don't Save");
+        switch (r)
+        {
+            case 0:
+                synth->getRuntime().saveConfig();
+                synth->guiClosed(true);
+                break;
+            case 2:
+                synth->guiClosed(true);
+                break;
+            default:
+                break;
+        }
+    }
+    else
+    {
+//        synth->getRuntime().saveConfig();
+        synth->guiClosed(true);
+    }}
       xywh {4 48 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {
@@ -389,7 +414,7 @@ mainCreateNewInstance(forceId);}
           MenuItem RecentParams {
             label {&Recent Sets...}
             callback {paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
-paramsui->Show();}
+paramsui->Show(2);}
             xywh {0 0 34 21} labelsize 12
           }
         }
@@ -411,6 +436,11 @@ paramsui->Show();}
         Submenu Scales {
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
+          code0 {o = o; // suppress warning;
+              if (synth->getRuntime().ScaleHistory.empty())
+        RecentScale->deactivate();
+    else
+        RecentScale->activate();}
         } {
           MenuItem {} {
             label {&Show Settings...}
@@ -425,17 +455,8 @@ paramsui->Show();}
     if (filename == NULL)
         return;
     string fname = string(filename);
-    synth->actionLock(lockmute);
-    synth->microtonal.defaults(); // clear all parameters
-    bool result = synth->microtonal.loadXML(fname);
-    synth->actionLock(unlock);
-    if (NULL != microtonalui)
-        delete microtonalui;
-    microtonalui = new MicrotonalUI(&synth->microtonal);
-    if (!result)
-        fl_alert("Failed to load scale settings file");
-    else
-        microtonalui->apply();}
+    do_load_scale(fname);
+    RecentScale->activate();}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
@@ -454,8 +475,19 @@ paramsui->Show();}
                 synth->actionLock(unlock);
                 if (!result)
                     fl_alert("Failed to save scale settings");
+                else
+                {
+                    synth->getRuntime().addParamHistory(filename, ".xsz", synth->getRuntime().ScaleHistory);
+                    RecentScale->activate();
+                }
                 updatepanel();}
             xywh {25 25 100 20} labelsize 12
+          }
+          MenuItem RecentScale {
+            label {&Recent Scales...}
+            callback {paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+paramsui->Show(3);}
+            xywh {20 20 34 21} labelsize 12
           }
           MenuItem {} {
             label {&Clear}
@@ -476,6 +508,11 @@ paramsui->Show();}
         Submenu {} {
           label {S&tate}
           xywh {0 0 65 21} labelsize 12
+          code0 {o = o; // suppress warning;
+              if (synth->getRuntime().StateHistory.empty())
+        RecentState->deactivate();
+    else
+        RecentState->activate();}
         } {
           MenuItem loadState {
             label {Load...}
@@ -486,6 +523,8 @@ paramsui->Show();}
     {
         laststatefile = string(fle);
         synth->getRuntime().loadState(laststatefile);
+        synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
+        RecentState->activate();
     }
     refresh_master_ui();
     microtonalui->apply();}
@@ -501,8 +540,16 @@ paramsui->Show();}
                 {
                     laststatefile = string(fle);
                     synth->getRuntime().saveState(laststatefile);
+                    synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
+                    RecentState->activate();
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
+          }
+          MenuItem RecentState {
+            label {&Recent States...}
+            callback {paramsui->Recent->position(masterwindow->x() + masterwindow->w() - paramsui->Recent->w(),masterwindow->y()+20);
+paramsui->Show(4);}
+            xywh {10 10 34 21} labelsize 12
           }
         }
       }
@@ -784,7 +831,7 @@ paramsui->Show();}
         label Reports
         callback {yoshiLog->Show();}
         xywh {289 93 70 20} box PLASTIC_UP_BOX color 228 labelsize 11
-        code0 {if (synth->getRuntime().consoleMenuItem == false)Reports->deactivate();}
+        code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
       }
       Fl_Group syseffectuigroup {
         xywh {3 158 384 95} box FLAT_BOX color 48 labeltype NO_LABEL
@@ -1183,6 +1230,23 @@ updatepanel();}
     masterwindow->copy_label(prefix.c_str());
     masterwindow->changed();} {}
   }
+  Function {do_load_scale(string fname)} {} {
+    code {//
+    synth->actionLock(lockmute);
+    synth->microtonal.defaults(); // clear all parameters
+    bool result = synth->microtonal.loadXML(fname);
+    synth->actionLock(unlock);
+    if (NULL != microtonalui)
+        delete microtonalui;
+    microtonalui = new MicrotonalUI(&synth->microtonal);
+    if (!result)
+        fl_alert("Failed to load scale settings file");
+    else
+    {
+        synth->getRuntime().addParamHistory(fname, ".xsz", synth->getRuntime().ScaleHistory);
+        microtonalui->apply();
+    }} {}
+  }
   Function {do_new_master()} {} {
     code {//
     if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
@@ -1213,7 +1277,7 @@ updatepanel();}
         if (result >= 0)
         {
             if (updatehistory)
-                setMasterLabel(synth->getRuntime().addParamHistory(string(fname)));
+                setMasterLabel(synth->getRuntime().addParamHistory(string(fname), ".xmz", synth->getRuntime().ParamsHistory));
             RecentParams->activate();
             if(result > 1)
             	fl_alert("At least one instrument is called 'Simple Sound', the name of Yoshimi's basic sound. You should change this if you wish to re-save.");
@@ -1256,7 +1320,7 @@ updatepanel();}
             fl_alert("Could not save the file.");
         else
         {
-            setMasterLabel(synth->getRuntime().addParamHistory(fname));
+            setMasterLabel(synth->getRuntime().addParamHistory(fname, ".xmz", synth->getRuntime().ParamsHistory));
             RecentParams->activate();
         }
         updatepanel();} {}
@@ -1281,7 +1345,7 @@ updatepanel();}
     updatesendwindow();
     updatepanel();
     bankui->Hide();
-    if (synth->getRuntime().consoleMenuItem == false)
+    if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
         Reports->activate();} {}

@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2015, Will Godfrey
+Copyright 2014 -2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -119,7 +119,7 @@ class ConfigUI {selected : {private MiscFuncs}
         synth->getRuntime().Buffersize = changed;
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {ADSynth Oscillator Size (samples)} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
+            tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
             MenuItem {} {
@@ -152,7 +152,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {* PADsynth Interpolation}
+            label {PADsynth Interpolation}
             callback {//
                 int tmp = synth->getRuntime().Interpolation;
                 synth->getRuntime().Interpolation = (int) o->value();
@@ -171,7 +171,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Choice {} {
-            label {* Virtual Keyboard Layout}
+            label {Virtual Keyboard Layout}
             callback {//
                 int tmp = synth->getRuntime().VirKeybLayout;
                 synth->getRuntime().VirKeybLayout = (int) o->value();
@@ -213,7 +213,7 @@ class ConfigUI {selected : {private MiscFuncs}
           }
           Fl_Choice reports {
             label {Send reports to:}
-            callback {synth->getRuntime().consoleMenuItem = o->value();
+            callback {synth->getRuntime().toConsole = o->value();
 if (o->value())
     synth->getGuiMaster()->Reports->activate();
 else
@@ -221,8 +221,8 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
-            code0 {o->value(synth->getRuntime().consoleMenuItem);}
+            tooltip {Some system errors always go to stderr} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
               label stderr
@@ -236,6 +236,16 @@ else
           Fl_Box {} {
             label {* These settings changes require a restart}
             xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+          }
+          Fl_Check_Button {} {
+            label {Hide Non Fatal Errors}
+            callback {if (synth->getRuntime().hideErrors != o->value())
+{
+    synth->getRuntime().hideErrors = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
             label {Log XML headers}
@@ -339,7 +349,7 @@ synth->getRuntime().configChanged = true;}
         synth->getRuntime().alsaAudioDevice = tmp;
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {Alsa audio device - default, hw:0, front:CARD=Live,DEV=0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
+            tooltip {Alsa audio device - default, hw:0, ...} xywh {195 143 120 22} labelsize 12 textsize 12
             code0 {o->insert(synth->getRuntime().alsaAudioDevice.c_str());}
           }
           Fl_Check_Button alsaAudio {
@@ -358,11 +368,11 @@ synth->getRuntime().configChanged = true;}
             callback {//
                 int chk = o->value();
                 if (o->nchecked() < 1)
-                    o->set_checked(chk = 2);
+                    o->set_checked(chk = 3);
                 else if (o->nchecked() > 1)
                 {
                     if (!chk)
-                        chk = 2;
+                        chk = 3;
                     o->check_none();
                     o->set_checked(chk);
                 }
@@ -370,29 +380,34 @@ synth->getRuntime().configChanged = true;}
                 switch (chk)
                 {
                     case 1:
-                        sample_rate = 96000;
-                        break;
-                    case 3:
-                        sample_rate = 44100;
+                    sample_rate = 192000;
                         break;
                     case 2:
+                        sample_rate = 96000;
+                        break;
+                    case 4:
+                        sample_rate = 44100;
+                        break;
+                    case 3:
                     default:
                         sample_rate = 48000;
                         break;
                 }
                 synth->getRuntime().Samplerate = sample_rate;
                 synth->getRuntime().configChanged = true;}
-            xywh {195 215 120 54} labelsize 12 align 4 when 1 textsize 12
+            xywh {195 199 121 66} labelsize 12 align 4 when 1 textsize 12
             code0 {//
+                o->add("192000");
                 o->add("96000");
                 o->add("48000");
                 o->add("44100");
                 switch (synth->getRuntime().Samplerate)
                 {
-                    case 96000: o->set_checked(1); break;
-                    case 44100: o->set_checked(3); break;
+                    case 192000: o->set_checked(1); break;
+                    case 96000: o->set_checked(2); break;
+                    case 44100: o->set_checked(4); break;
                     case 48000:
-                    default: o->set_checked(2); break;
+                    default: o->set_checked(3); break;
                 }}
           }
           Fl_Box {} {
@@ -744,7 +759,7 @@ presets->hide();}
     switch (tabnumber)
     {
         case 1 : //Main
-            reports->value(synth->getRuntime().consoleMenuItem);
+            reports->value(synth->getRuntime().toConsole);
             break;
         case 2 : // Jack
             jackSource->value(synth->getRuntime().jackMidiDevice.c_str());
@@ -774,15 +789,13 @@ presets->hide();}
                 alsaAudio->value(1);
                 jackAudio->value(0);
             }
-//            alsaRate->add("96000");
-//            alsaRate->add("48000");
-//            alsaRate->add("44100");
             switch (synth->getRuntime().Samplerate)
             {
-                case 96000: alsaRate->set_checked(1); break;
-                case 44100: alsaRate->set_checked(3); break;
+                case 192000: alsaRate->set_checked(1); break;
+                case 96000: alsaRate->set_checked(2); break;
+                case 44100: alsaRate->set_checked(4); break;
                 case 48000:
-               default: alsaRate->set_checked(2); break;
+               default: alsaRate->set_checked(3); break;
             }
             }
             break;

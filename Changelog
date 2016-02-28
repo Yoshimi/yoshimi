@@ -1,4 +1,114 @@
-yoshimi 1.3.x
+yoshimi 1.3.9
+
+2016-2-28 Will
+- Effect preset number is now included in prompt.
+- Removed duplicate instrument "0085-old_pad.xiz from Mysterious bank.
+- Set version to 1.3.9 for release.
+
+2016-2-26 Andrew
+- Bugfix: in 'main' another GCC6 issue.
+- Set version for rc3
+
+2016-2-25 Will
+- Bugfix: another GCC6 incompatibility resolved.
+- Set version for rc2
+
+2016-2-21 Andrew
+- setCurrentRootID properly fixed.
+
+2016-2-21 Will
+- Reorganised CLI root and bank commands.
+- Implemented creating & deleteing new banks in CLI.
+- Bugfix: deleting bank failed if there was no .bankdir file.
+- Set version to 1.3.9 rc1.
+
+2016-2-19 Will
+- Corrected desktop file.
+- Updated docs & screen images.
+
+2016-2-18 Will
+- Bugfix: CLI can again list current bank/root.
+- Bugfix: on debian testing GUI was locking up if you reduced the ID of the
+  last root path in the list.
+  
+
+2016-2-17 Will
+- Instrument file changes are now individually checked after the attempt
+  instead of tested for writability in advance.
+- Path window no longer offers save/not on close - always saves.
+- Bugfix: above changes didn't update gui correctly :(
+
+2016-2-15 Will
+- Fixed regression. Moved bank and history loading back into config.
+  Previous change didn't improve startup behaviour and messed with LV2.
+- Created 'stateChanged' variable for future use. 
+
+2016-2-14 Will
+- Removed jack/alsa tests from CMakeLists.txt It's now redundant.
+- Re-enabled up to 128 roots and banks and removed redundant maximum
+  test - MIDI can't send > 127 and command line does it's own check.
+- Updated docs.
+- Added 'Muted Synth' instrument patch. 
+
+2016-2-14 Andrew
+- Removed ControlInterface (obsoleted) + fixes for gcc-6 
+
+2016-2-8 Will
+- GCC 6 fix?
+
+2016-2-7 Will
+- Corrected man page.
+
+2016-2-1 Will
+- Fixed regression. Config was being resaved when nothing had changed.
+- Refined message hiding. Applies to Reports console and CLI. Hiding
+  is also independent from those forced to CLI only.
+
+2016-1-31 Will
+- Small gui correction to remove unnecessary scroll bar.
+- Recent Scale/State now greyed out if empty.
+- Bugfix: Wrong name in CMakeLists.txt failed in some environments.
+
+2016-1-30 Will
+- Corrected some GUI text and tooltips.
+- Added check for ncurses in cmake.
+- MAX_HISTORY now set to 25 in CMakeLists.txt
+- Banks file now follows compression schedule.
+- Current available parts now stored in 'MASTER' part of patch sets.
+- .config & .state now marked as yoshimi only.
+
+2016-1-29 Will
+- Added scale list to history file and recent scales to GUI.
+- State list and recent states also added.
+
+2016-1-28 Will
+- Bugfix: Loading saved state now correctly sets buffer size.
+- Duplicated calls to state XML data removed.
+- Initial implementation of non-fatal error report hiding.
+
+2016-1-27 Will
+- Reorganised grouping of main .config file
+- New config files that are unique to Yoshimi now carry the yoshimi
+  doctype instead of the ZynAddSubFX one.
+- minor doc spelling corrections.
+- Fixed regression. Alsa can have sample rate selected again.
+- Trial of 192000 sample rate.
+
+2016-1-26 Will
+- Patch Sets History no longer in main .config file but in new
+  .history file, subsection "PATCH_SETS"
+
+2016-1-25 Will
+- Added correct licence details to CmdInterface files.
+- Synchronised Exherbo cmake.
+
+2016-1-24 Rob
+- Furhter improvements to cmake workround.
+
+2016-1-24 Will
+- Minor reorganisations.
+- Only relevant XML files now carry base parameters.
+- CLI no longer sets configChanged when altering the new banks file.
 
 2016-1-22 Will
 - Set bugfix version 1.3.8.2

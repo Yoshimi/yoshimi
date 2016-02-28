@@ -1,15 +1,19 @@
 
 Replace usleep with nanosleep - probably not :(
 
-Separate root/bank/instrument lists from main config as
-    single file for all instances.
+Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
 
-startup state load doesn't set buffersize correctly - why?
+startup state load doesn't set buffersize correctly - partially resolved.
     size is ignored if loaded when already running (which is reasonable).
 
 Allow headless compilation.
+
+Make add/pad windws show kit number.
+
+Make aatempt to start second independed instace open a new one in running
+yoshimi instead - saves memory and more consistent.
 
 RPNs (channel based)
 

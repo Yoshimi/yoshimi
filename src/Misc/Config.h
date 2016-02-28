@@ -54,7 +54,7 @@ class Config : public MiscFuncs
 #endif
         void Announce(void);
         void Usage(void);
-        void Log(string msg, bool tostderr = false);
+        void Log(string msg, char tostderr = 0); // 1 = cli only ored 2 = hideable
         void flushLog(void);
 
         void clearPresetsDirlist(void);
@@ -65,9 +65,9 @@ class Config : public MiscFuncs
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
         bool loadState(const string statefile)
-            { return restoreSessionData(statefile); }
+            { return restoreSessionData(statefile, false); }
         bool stateRestore(void)
-            { return restoreSessionData(StateFile); }
+            { return restoreSessionData(StateFile, false); }
         bool restoreJsession(void);
         void setJackSessionSave(int event_type, string session_file);
 
@@ -79,7 +79,7 @@ class Config : public MiscFuncs
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                          bool schedfifo, char lowprio, bool create_detached = true);
 
-        string addParamHistory(string file);
+        string addParamHistory(string file, string extension, deque<HistoryListItem> &ParamsHistory);
         string historyFilename(int index);
         bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
@@ -92,6 +92,7 @@ class Config : public MiscFuncs
         string        instrumentLoad;
         string        rootDefine;
         bool          restoreState;
+        bool          stateChanged;
         string        StateFile;
         string        CurrentXMZ;
         bool          restoreJackSession;
@@ -128,7 +129,8 @@ class Config : public MiscFuncs
         bool          SimpleCheck;
         int           xmlType;
         int           EnableProgChange;
-        bool          consoleMenuItem;
+        bool          toConsole;
+        bool          hideErrors;
         bool          logXMLheaders;
         bool          configChanged;
         int           rtprio;
@@ -165,8 +167,9 @@ class Config : public MiscFuncs
         IOdata nrpndata;        
         
         deque<HistoryListItem> ParamsHistory;
+        deque<HistoryListItem> ScaleHistory;
+        deque<HistoryListItem> StateHistory;
         deque<HistoryListItem>::iterator itx;
-        static const unsigned short MaxParamsHistory;
         list<string> LogList;
         BodyDisposal *deadObjects;
 
@@ -178,7 +181,7 @@ class Config : public MiscFuncs
         void addConfigXML(XMLwrapper *xml);
         void addRuntimeXML(XMLwrapper *xml);
         void saveSessionData(string savefile);
-        bool restoreSessionData(string sessionfile);
+        bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);

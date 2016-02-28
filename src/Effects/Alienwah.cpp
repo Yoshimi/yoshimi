@@ -70,7 +70,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
         tmp = clfol * x + oldclfol * x1;
 
         out = tmp * oldl[oldk];
-        out.real() += (1 - abs(fb)) * smpsl[i] * pangainL;
+        out += (1 - abs(fb)) * smpsl[i] * pangainL;
 
         oldl[oldk] = out;
         float l = out.real() * 10.0f * (fb + 0.1f);
@@ -79,7 +79,7 @@ void Alienwah::out(float *smpsl, float *smpsr)
         tmp = clfor * x + oldclfor * x1;
 
         out = tmp * oldr[oldk];
-        out.real() += (1 - abs(fb)) * smpsr[i] * pangainR;
+        out += (1 - abs(fb)) * smpsr[i] * pangainR;
 
         oldr[oldk] = out;
         float r = out.real() * 10.0f * (fb + 0.1f);

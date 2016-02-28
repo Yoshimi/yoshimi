@@ -1,5 +1,7 @@
 If Yoshimi has been started from the command line, all of the system setting that don't require a restart can now be viewed by sending the appropriate NRPN. Most of them can also be changed in this way.
 
+Please also refer to command line.
+
 To access this, set NRPN MSB (CC 99) to 64 and NRPN LSB (CC 98) to 2 [8130]
 
 After that send the following DATA values. Commands with LSB x don't actually use DATA LSB but you still need to send it (unless it has already been set by a previous command in this control group).

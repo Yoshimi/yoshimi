@@ -50,7 +50,6 @@ using namespace std;
 #include "MasterUI.h"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
-const unsigned short Config::MaxParamsHistory = 25;
 
 static char prog_doc[] =
     "Yoshimi " YOSHIMI_VERSION ", a derivative of ZynAddSubFX - "
@@ -90,6 +89,7 @@ static struct argp_option cmd_options[] = {
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
+    stateChanged(false),
     restoreJackSession(false),
     Samplerate(48000),
     Buffersize(256),
@@ -113,7 +113,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     checksynthengines(1),
     xmlType(0),
     EnableProgChange(1), // default will be inverted
-    consoleMenuItem(0),
+    toConsole(0),
+    hideErrors(0),
     logXMLheaders(0),
     configChanged(false),
     rtprio(50),
@@ -159,6 +160,9 @@ bool Config::Setup(int argc, char **argv)
 
     if (!loadConfig())
         return false;
+    
+    synth->installBanks(synth->getUniqueId());
+    synth->loadHistory(synth->getUniqueId());
 
     if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
         return true;
@@ -212,6 +216,19 @@ bool Config::Setup(int argc, char **argv)
             return false;
         }
         Log(StateFile);
+        restoreSessionData(StateFile, true);
+        /* This needs improving!
+         * There is a single state file that contains both startup config
+         * data that must be set early, and runtime data that must be set
+         * after synth has been initialised.
+         * 
+         * Currently we open it here and fetch just the startup data, then
+         * reopen it in synth and fetch all the data (including the startup
+         * again).
+         * 
+         * This is further complicated because the same functions are
+         * being used by jack session.
+         */
     }    
     return true;
 }
@@ -236,12 +253,12 @@ void Config::flushLog(void)
 }
 
 
-string Config::addParamHistory(string file)
+string Config::addParamHistory(string file, string extension, deque<HistoryListItem> &ParamsHistory)
 {
     if (!file.empty())
     {
         unsigned int name_start = file.rfind("/");
-        unsigned int name_end = file.rfind(".xmz");
+        unsigned int name_end = file.rfind(extension);
         if (name_start != string::npos && name_end != string::npos
             && (name_start - 1) < name_end)
         {
@@ -254,7 +271,7 @@ string Config::addParamHistory(string file)
                 if (ParamsHistory.at(i).sameFile(file))
                     ParamsHistory.erase(itx);
             ParamsHistory.insert(ParamsHistory.begin(), item);
-            if (ParamsHistory.size() > MaxParamsHistory)
+            if (ParamsHistory.size() > MAX_HISTORY)
             {
                 itx = ParamsHistory.end();
                 ParamsHistory.erase(--itx);
@@ -267,17 +284,6 @@ string Config::addParamHistory(string file)
     return string();
 }
 
-
-string Config::historyFilename(int index)
-{
-    if (index > 0 && index <= (int)ParamsHistory.size())
-    {
-        itx = ParamsHistory.begin();
-        for (int i = index; i > 0; ++itx, --i) ;
-        return itx->file;
-    }
-    return string();
-}
 
 bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
 {
@@ -440,7 +446,6 @@ bool Config::loadConfig(void)
     {
         Log("ConfigFile " + resConfigFile + " not found, will use default settings");
         configChanged = true; // give the user the choice
-        //saveConfig();
     }
     else
     {
@@ -479,23 +484,18 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Log("extractConfigData, no CONFIGURATION branch");
         return false;
     }
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 96000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize,
-                                        MAX_AD_HARMONICS * 2, 131072);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
-    checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
-    EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
-    consoleMenuItem = xml->getpar("reports_destination", consoleMenuItem, 0, 1);
+    showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);    
+    toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
+    hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
-    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
-    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
-
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 131072);
 
     // get preset dirs
     int count = 0;
@@ -529,6 +529,12 @@ bool Config::extractConfigData(XMLwrapper *xml)
         }
     }
     
+    Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
+    
+    // engines
+    audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
+    midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
+
     // alsa settings
     alsaAudioDevice = xml->getparstr("linux_alsa_audio_dev");
     alsaMidiDevice = xml->getparstr("linux_alsa_midi_dev");
@@ -541,29 +547,11 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
     midi_bank_C = xml->getpar("midi_bank_C", midi_bank_C, 0, 128);
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
+    EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
-//    consoleMenuItem = xml->getpar("enable_console_window", consoleMenuItem, 0, 1);
-    single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
-
-    if (xml->enterbranch("XMZ_HISTORY"))
-    {
-        int hist_size = xml->getpar("history_size", 0, 0, MaxParamsHistory);
-        string xmz;
-        for (int i = 0; i < hist_size; ++i)
-        {
-            if (xml->enterbranch("XMZ_FILE", i))
-            {
-                xmz = xml->getparstr("xmz_file");
-                if (xmz.size() && isRegFile(xmz))
-                    addParamHistory(xmz);
-                xml->exitbranch();
-            }
-        }
-        xml->exitbranch();
-    }
-
-    // get bank dirs
-    //synth->getBankRef().parseConfigFile(xml);
+    
+    //misc
+    checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
     
     xml->exitbranch(); // CONFIGURATION
     return true;
@@ -598,21 +586,18 @@ void Config::saveConfig(void)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
+    xmltree->addpar("gzip_compression", GzipCompression);
+    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
+    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
+    xmltree->addpar("single_row_panel", single_row_panel);
+    xmltree->addpar("reports_destination", toConsole);
+    xmltree->addpar("hide_system_errors", hideErrors);
+    xmltree->addpar("report_XMLheaders", logXMLheaders);
+    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
     xmltree->addpar("sample_rate", Samplerate);
     xmltree->addpar("sound_buffer_size", Buffersize);
     xmltree->addpar("oscil_size", Oscilsize);
-
-    xmltree->addpar("gzip_compression", GzipCompression);
-    xmltree->addpar("check_pad_synth", checksynthengines);
-    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
-    xmltree->addpar("reports_destination", consoleMenuItem);
-    xmltree->addpar("report_XMLheaders", logXMLheaders);
-    xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
-    xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
-    xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
-    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
-    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
 
     for (int i = 0; i < MAX_PRESETS; ++i)
         if (presetsDirlist[i].size())
@@ -624,35 +609,21 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addpar("interpolation", Interpolation);
     
+    xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
+    xmltree->addpar("midi_engine", synth->getRuntime().midiEngine);
+    
     xmltree->addparstr("linux_alsa_audio_dev", alsaAudioDevice);
     xmltree->addparstr("linux_alsa_midi_dev", alsaMidiDevice);
+    
     xmltree->addparstr("linux_jack_server", jackServer);
     xmltree->addparstr("linux_jack_midi_dev", jackMidiDevice);
 
     xmltree->addpar("midi_bank_root", midi_bank_root);
     xmltree->addpar("midi_bank_C", midi_bank_C);
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
+    xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
-//    xmltree->addpar("enable_console_window", consoleMenuItem);
-    xmltree->addpar("single_row_panel", single_row_panel);
-
-    // Parameters history
-    if (ParamsHistory.size())
-    {
-        xmltree->beginbranch("XMZ_HISTORY");
-        xmltree->addpar("history_size", ParamsHistory.size());
-        deque<HistoryListItem>::reverse_iterator rx = ParamsHistory.rbegin();
-        unsigned int count = 0;
-        for (int x = 0; rx != ParamsHistory.rend() && count <= MaxParamsHistory; ++rx, ++x)
-        {
-            xmltree->beginbranch("XMZ_FILE", x);
-            xmltree->addparstr("xmz_file", rx->file);
-            xmltree->endbranch();
-        }
-        xmltree->endbranch();
-    }
-    //synth->getBankRef().saveToConfigFile(xmltree);
-
+    xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->endbranch(); // CONFIGURATION
 }
 
@@ -666,7 +637,7 @@ void Config::saveSessionData(string savefile)
     XMLwrapper *xmltree = new XMLwrapper(synth);
     if (!xmltree)
     {
-        Log("saveSessionData failed xmltree allocation", true);
+        Log("saveSessionData failed xmltree allocation", 1);
         return;
     }
     addConfigXML(xmltree);
@@ -675,11 +646,11 @@ void Config::saveSessionData(string savefile)
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
     else
-        Log("Failed to save session data to " + savefile, true);
+        Log("Failed to save session data to " + savefile, 1);
 }
 
 
-bool Config::restoreSessionData(string sessionfile)
+bool Config::restoreSessionData(string sessionfile, bool startup)
 {
     XMLwrapper *xml = NULL;
     bool ok = false;
@@ -687,12 +658,12 @@ bool Config::restoreSessionData(string sessionfile)
         sessionfile += ".state";
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
-        Log("Session file " + sessionfile + " not available", true);
+        Log("Session file " + sessionfile + " not available", 1);
         goto end_game;
     }
     if (!(xml = new XMLwrapper(synth)))
     {
-        Log("Failed to init xmltree for restoreState", true);
+        Log("Failed to init xmltree for restoreState", 1);
         goto end_game;
     }
 
@@ -701,7 +672,9 @@ bool Config::restoreSessionData(string sessionfile)
         Log("Failed to load xml file " + sessionfile);
         goto end_game;
     }
-    ok = extractConfigData(xml) && extractRuntimeData(xml) && synth->getfromXML(xml);
+    ok = extractConfigData(xml); // this needs improving
+    if (!startup && ok)
+        ok = extractRuntimeData(xml) && synth->getfromXML(xml);
 
 end_game:
     if (xml)
@@ -714,15 +687,10 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
 {
     if (!xml->enterbranch("RUNTIME"))
     {
-        Log("Config extractRuntimeData, no RUNTIME branch", true);
+        Log("Config extractRuntimeData, no RUNTIME branch", 1);
         return false;
     }
-    audioEngine = (audio_drivers)xml->getpar("audio_engine", DEFAULT_AUDIO, no_audio, alsa_audio);
-    audioDevice = xml->getparstr("audio_device");
-    midiEngine = (midi_drivers)xml->getpar("midi_engine", DEFAULT_MIDI, no_midi, alsa_midi);
-    midiDevice = xml->getparstr("midi_device");
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+// need to put current root and bank here
     nameTag = xml->getparstr("name_tag");
     CurrentXMZ = xml->getparstr("current_xmz");
     xml->exitbranch();
@@ -733,21 +701,18 @@ bool Config::extractRuntimeData(XMLwrapper *xml)
 void Config::addRuntimeXML(XMLwrapper *xml)
 {
     xml->beginbranch("RUNTIME");
-    xml->addpar("audio_engine", audioEngine);
-    xml->addparstr("audio_device", audioDevice);
-    xml->addpar("midi_engine", midiEngine);
-    xml->addparstr("midi_device", midiDevice);
-    xml->addpar("enable_gui", showGui);
-    xml->addpar("enable_CLI", showCLI);
+// need to put current root and bank here
     xml->addparstr("name_tag", nameTag);
     xml->addparstr("current_xmz", CurrentXMZ);
     xml->endbranch();
 }
 
 
-void Config::Log(string msg, bool tostderr)
+void Config::Log(string msg, char tostderr)
 {
-    if (showGui && !tostderr && consoleMenuItem)
+    if ((tostderr & 2) && hideErrors)
+        return;
+    if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
     else
         cerr << msg << endl;
@@ -826,7 +791,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     {
                         Log("Failed to set SCHED_FIFO policy in thread attribute "
                                     + string(strerror(errno))
-                                    + " (" + asString(chk) + ")", true);
+                                    + " (" + asString(chk) + ")", 1);
                         schedfifo = false;
                         continue;
                     }
@@ -834,7 +799,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     {
                         Log("Failed to set inherit scheduler thread attribute "
                                     + string(strerror(errno)) + " ("
-                                    + asString(chk) + ")", true);
+                                    + asString(chk) + ")", 1);
                         schedfifo = false;
                         continue;
                     }
@@ -847,7 +812,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     {
                         Log("Failed to set thread priority attribute ("
                                     + asString(chk) + ")  "
-                                    + string(strerror(errno)), true);
+                                    + string(strerror(errno)), 1);
                         schedfifo = false;
                         continue;
                     }
@@ -866,21 +831,21 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                 break;
             }
             else
-                Log("Failed to set thread detach state " + asString(chk), true);
+                Log("Failed to set thread detach state " + asString(chk), 1);
             pthread_attr_destroy(&attr);
         }
         else
-            Log("Failed to initialise thread attributes " + asString(chk), true);
+            Log("Failed to initialise thread attributes " + asString(chk), 1);
 
         if (schedfifo)
         {
             Log("Failed to start thread (sched_fifo) " + asString(chk)
-                + "  " + string(strerror(errno)), true);
+                + "  " + string(strerror(errno)), 1);
             schedfifo = false;
             continue;
         }
         Log("Failed to start thread (sched_other) " + asString(chk)
-            + "  " + string(strerror(errno)), true);
+            + "  " + string(strerror(errno)), 1);
         outcome = false;
         break;
     }
@@ -925,7 +890,7 @@ void Config::signalCheck(void)
 
 void Config::setInterruptActive(void)
 {
-    Log("Interrupt received", true);
+    Log("Interrupt received", 1);
     __sync_or_and_fetch(&sigIntActive, 0xFF);
 }
 
@@ -939,7 +904,7 @@ void Config::setLadi1Active(void)
 bool Config::restoreJsession(void)
 {
     #if defined(JACK_SESSION)
-        return restoreSessionData(jackSessionFile);
+        return restoreSessionData(jackSessionFile, false);
     #else
         return false;
     #endif
@@ -1154,7 +1119,9 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
         case 'R':
             settings->configChanged = true;
             num = Config::string2int(string(arg));
-            if (num >= 96000)
+            if (num >= 192000)
+                num = 192000;
+            else if (num >= 96000)
                 num = 96000;
             else if (num >= 48000)
                 num = 48000;

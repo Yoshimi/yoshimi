@@ -1,3 +1,22 @@
+/*
+    CmdInterface.cpp
+
+    Copyright 2015-2016, Will Godfrey and others.
+
+    This file is part of yoshimi, which is free software: you can
+    redistribute it and/or modify it under the terms of the GNU General
+    Public License as published by the Free Software Foundation, either
+    version 2 of the License, or (at your option) any later version.
+
+    yoshimi is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -27,29 +46,36 @@ using namespace std;
 static int currentInstance = 0;
 
 string basics[] = {
-    "?  help",                      "list commands",
+    "?  help",                      "show commands",
     "stop",                         "all sound off",
     "reset",                        "return to start-up conditions (if 'y')",
     "exit",                         "tidy up and close Yoshimi (if 'y')",
     "..",                           "step back one level",
     "/",                            "step back to top level",
     "list",                         "various available parameters",
+    "  roots",                      "all available root paths",
     "  banks [n]",                  "banks in root ID or current",
     "  instruments [n]",            "instruments in bank ID or current",
-    "  current",                    "parts with instruments installed",
+    "  parts",                      "parts with instruments installed",
     "  vectors",                    "settings for all enabled vectors",
     "  setup",                      "dynamic settings",
     "  effects [s]",                "effect types ('all' include preset numbers and names)",
-    "load instrument <s>",          "load an instrument to current part from named file",
-    "save instrument <s>",          "save current part to named file",
-    "load patchset <s>",            "load a complete set of instruments from named file",
-    "save patchset <s>",            "save a complete set of instruments to named file",
-    "save setup",                   "save dynamic settings",
-    "paths",                        "display bank root paths",
-    "path add <s>",                 "add bank root path",
-    "path remove <n>",              "remove bank root path ID",
+    "load",                         "load patch files",
+    "  instrument <s>",             "instrument to current part from named file",
+    "  patchset <s>",               "complete set of instruments from named file",
+    "save",                         "save various files",
+    "  instrument <s>",             "current part to named file",
+    "  patchset <s>",               "complete set of instruments to named file",
+    "  setup",                      "save dynamic settings",
+    "add",                          "add paths and files",
+    "  root <s>",                   "root path to list",
+    "  bank <s>",                   "bank to current root",
+    "remove",                       "remove paths and files",
+    "  root <n>",                   "de-list root path ID",
+    "  bank <n>",                   "delete bank ID (and all contents) from current root",
     "set",                          "set all main parameters",
-    "  reports [n]",                "report destination (1 GUI console, other stderr)",
+    "  reports [s]",                "destination (gui/stderr)",
+    "  ",                           "  non-fatal (show/hide)",
     "  root <n>",                   "current root path to ID",
     "  bank <n>",                   "current bank to ID",
     "end"
@@ -160,6 +186,7 @@ void CmdInterface::defaults()
     npart = 0;
     nFX = 0;
     nFXtype = 0;
+    nFXpreset = 0;
 }
 
 
@@ -208,7 +235,7 @@ void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent)
     while (commands[word] != "end")
     {
         left = commands[word];
-        msg.push_back(dent.assign<int>(indent, ' ') + left + blanks.assign<int>(spaces - left.length(), ' ') + "- " + commands[word + 1]);
+        msg.push_back(dent.assign(indent, ' ') + left + blanks.assign(spaces - left.length(), ' ') + "- " + commands[word + 1]);
         word += 2;
     }
 }
@@ -238,9 +265,9 @@ bool CmdInterface::helpList()
         msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
     }
     
-    if (synth->getRuntime().consoleMenuItem)
+    if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nset reports [n] - set report destination (1 GUI console, other stderr)\n\n";
+        cout << "\nset reports [s] - set report destination (gui/stderr)\n\n";
  
     synth->cliOutput(msg, LINES);
     return true;
@@ -286,7 +313,7 @@ int CmdInterface::effectsList()
         else
         {
             left = fx_list[i];            
-            msg.push_back("    " + left + blanks.assign<int>(12 - left.length(), ' ') + fx_presets [i].substr(0, presetsLast - 1));
+            msg.push_back("    " + left + blanks.assign(12 - left.length(), ' ') + fx_presets [i].substr(0, presetsLast - 1));
         }
     }
     
@@ -307,6 +334,8 @@ int CmdInterface::effects(int level)
     
     string dest = "";
     bool flag;
+    
+    nFXpreset = 0; // changing effect always sets the default preset.
 
     if (bitTest(level, part_lev))
     {
@@ -335,7 +364,7 @@ int CmdInterface::effects(int level)
         if (value != nFX)
         {
             nFX = value;
-            
+#warning  We need to reset the effect type here
         }
         if (point[0] == 0)
         {
@@ -435,7 +464,7 @@ int CmdInterface::effects(int level)
     {
         /*
          * Using constant strings and bedding the number into the list
-         * of presets provies a very simple way to keep track of a
+         * of presets provides a very simple way to keep track of a
          * moving target with minimal code and data space.
          * However, all of this should really be in src/Effects
          * not here *and* in the gui code!
@@ -463,8 +492,9 @@ int CmdInterface::effects(int level)
             category = 0;
             dest = "system";
         }
-        synth->SetEffects(category, 8, nFX, nFXtype, 0, value);
-        Runtime.Log(dest + " fx preset set to number " + asString(value));
+        nFXpreset = value;
+        synth->SetEffects(category, 8, nFX, nFXtype, 0, nFXpreset);
+        Runtime.Log(dest + " fx preset set to number " + asString(nFXpreset));
     }
     return reply;
 }
@@ -908,10 +938,26 @@ int CmdInterface::commandSet()
         
     else if (matchnMove(1, point, "reports"))
     {
-        if (point[0] == '1')
+        if (matchnMove(1, point, "gui"))
             synth->SetSystemValue(100, 127);
-        else
+        else if (matchnMove(1, point, "stderr"))
             synth->SetSystemValue(100, 0);
+        else if (matchnMove(1, point, "show"))
+        {
+            Runtime.hideErrors = false;
+            Runtime.Log("Showing all errors");
+        }
+        else if (matchnMove(1, point, "hide"))
+        {
+            Runtime.hideErrors = true;
+            Runtime.Log("Hiding non-fatal errors");
+        }
+        else
+        {
+            synth->SetSystemValue(100, 0);
+            Runtime.hideErrors = false;
+            Runtime.Log("Showing all errors");
+        }
         reply = done_msg;
         Runtime.configChanged = true;
     }
@@ -1224,10 +1270,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
         synth->allStop();
     else if (matchnMove(1, point, "list"))
     {
-        if (matchnMove(1, point, "instruments") || matchnMove(1, point, "programs"))
+        if (matchnMove(1, point, "instruments") || matchnMove(2, point, "programs"))
         {
             if (point[0] == 0)
-                ID = 255;
+                ID = 128;
             else
                 ID = string2int(point);
             synth->ListInstruments(ID, msg);
@@ -1236,10 +1282,15 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "banks"))
         {
             if (point[0] == 0)
-                ID = 255;
+                ID = 128;
             else
                 ID = string2int(point);
             synth->ListBanks(ID, msg);
+            synth->cliOutput(msg, LINES);
+        }
+        else if (matchnMove(1, point, "roots"))
+        {
+            synth->ListPaths(msg);
             synth->cliOutput(msg, LINES);
         }
         else if (matchnMove(1, point, "vectors"))
@@ -1247,7 +1298,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->ListVectors(msg);
             synth->cliOutput(msg, LINES);
         }
-        else if (matchnMove(1, point, "current"))
+        else if (matchnMove(1, point, "parts"))
         {
             synth->ListCurrentParts(msg);
             synth->cliOutput(msg, LINES);
@@ -1277,9 +1328,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
     
-    else if (matchnMove(2, point, "path"))
+    else if (matchnMove(3, point, "add"))
     {
-        if (matchnMove(1, point, "add"))
+        if (matchnMove(1, point, "root"))
         {
             int found = synth->getBankRef().addRootDir(point);
             if (!found)
@@ -1290,11 +1341,35 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                 Runtime.Log("Added new root ID " + asString(found) + " as " + (string) point);
-                Runtime.configChanged = true;
+                synth->saveBanks(currentInstance);
             }
             reply = done_msg;
         }
-        else if (matchnMove(2, point, "remove"))
+        else if (matchnMove(1, point, "bank"))
+        {
+            int slot;
+            for (slot = 0; slot < MAX_BANKS_IN_ROOT; ++slot)
+            {
+                if (synth->getBankRef().getBankName(slot).empty())
+                    break;
+            }
+            if (!synth->getBankRef().newIDbank(point, (unsigned int)slot))
+            {
+                Runtime.Log("Could not create bank " + (string) point + " for ID " + asString(slot));
+            }
+
+            Runtime.Log("Created  new bank " + (string) point + " with ID " + asString(slot));
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+        }
+        else
+        {
+            replyString = "add";
+            reply = what_msg;
+        }
+    }
+    else if (matchnMove(3, point, "remove"))
+    {
+        if  (matchnMove(1, point, "root"))
         {
             if (isdigit(point[0]))
             {
@@ -1306,18 +1381,56 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 {
                     synth->getBankRef().removeRoot(rootID);
                     GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
-                    Runtime.Log("Removed " + rootname);
-                    Runtime.configChanged = true;
+                    Runtime.Log("Un-linked " + rootname);
+                    synth->saveBanks(currentInstance);
                 }
                 reply = done_msg;
             }
             else
                 reply = value_msg;
         }
+        else if (matchnMove(1, point, "bank"))
+        {
+            if (isdigit(point[0]))
+            {
+                int bankID = string2int(point);
+                if (bankID >= MAX_BANKS_IN_ROOT)
+                    reply = range_msg;
+                else
+                {
+                    replyString = synth->getBankRef().getBankName(bankID);
+                    if (replyString.empty())
+                        Runtime.Log("No bank at this location");
+                    else
+                    {
+                        tmp = synth->getBankRef().getBankSize(bankID);
+                        if (tmp)
+                        {
+                            Runtime.Log("Bank " + replyString + " has " + asString(tmp) + " Instruments");
+                            if (query("Delete bank and all of these", false))
+                                tmp = 0;
+                            else
+                                Runtime.Log("Aborted");
+                        }
+                        if (tmp == 0)
+                        {
+                            if (synth->getBankRef().removebank(bankID))
+                                Runtime.Log("Removed bank " + replyString);
+                            else
+                                Runtime.Log("Deleting failed. Some files may still exist");
+                            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
+                        }
+                    }
+                        
+                }                
+            }
+            else
+                reply = value_msg;
+        }
         else
         {
-            synth->ListPaths(msg);
-            synth->cliOutput(msg, LINES);
+            replyString = "remove";
+            reply = what_msg;
         }
     }
 
@@ -1451,6 +1564,8 @@ void CmdInterface::cmdIfaceCommandLoop()
                         prompt += " Sys";
                 }
                 prompt += (" FX " + asString(nFX) + " " + fx_list[nFXtype].substr(0, 5));
+                if (nFXtype > 0)
+                    prompt += ("-" + asString(nFXpreset));
             }
             if (bitTest(level, vect_lev))
             {

@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.8.2")
+set (YOSHIMI_VERSION "1.3.9")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -57,8 +57,8 @@ else (HasJackSession)
     set (JackSessionSupport OFF)
 endif (HasJackSession)
 
-set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
-set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
+#set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
+#set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
 
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
@@ -182,6 +182,14 @@ mark_as_advanced (FLTK_DIR)
 mark_as_advanced (FLTK_FLUID_EXECUTABLE)
 mark_as_advanced (FLTK_MATH_LIBRARY)
 
+# libncurses
+pkg_check_modules (LIBNCURSES REQUIRED ncurses)
+if (LIBNCURSES_FOUND)
+    message (STATUS "Found libncurses ${LIBNCURSES_VERSION}")
+else (LIBNCURSES_FOUND)
+    message (FATAL_ERROR "libncurses required but not found")
+endif (LIBNCURSES_FOUND)
+
 find_path(Readline_ROOT_DIR
     NAMES include/readline/readline.h
 )
@@ -265,7 +273,6 @@ set (Params_sources
     Params/FilterParams.cpp  Params/LFOParams.cpp
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
     Params/Controller.cpp  Params/Presets.cpp Params/PresetsStore.cpp
-    Params/ControlInterface.cpp
 )
 
 set (Synth_sources
@@ -279,51 +286,31 @@ set (MusicIO_sources
     MusicIO/AlsaEngine.cpp
 )
 
-set (FlGUI_sources
-    WidgetPDialUI.cpp  PresetsUI.cpp  EnvelopeUI.cpp
-    LFOUI.cpp  FilterUI.cpp  VirKeyboardUI.cpp
-    ConfigUI.cpp  SUBnoteUI.cpp  ResonanceUI.cpp
-    OscilGenUI.cpp  ADnoteUI.cpp  PADnoteUI.cpp
-    EffUI.cpp  BankUI.cpp  PartUI.cpp
-    MicrotonalUI.cpp  MasterUI.cpp MasterMiscUI.cpp
-    ParametersUI.cpp ConsoleUI.cpp
-)
-
-# mostly for make clean because cmake doesn't expect 2 files to come from 1 custom command
-set (FlGUI_headers
-    WidgetPDialUI.h  PresetsUI.h  EnvelopeUI.h
-    LFOUI.h  FilterUI.h  VirKeyboardUI.h
-    ConfigUI.h  SUBnoteUI.h  ResonanceUI.h
-    OscilGenUI.h  ADnoteUI.h  PADnoteUI.h
-    EffUI.h  BankUI.h  PartUI.h
-    MicrotonalUI.h  MasterUI.h MasterMiscUI.h
-    ParametersUI.h ConsoleUI.h
+set (FltkUI_names
+    "WidgetPDialUI"  "PresetsUI"  "EnvelopeUI"
+    "LFOUI"  "FilterUI"  "VirKeyboardUI"
+    "ConfigUI"  "SUBnoteUI"  "ResonanceUI"
+    "OscilGenUI"  "ADnoteUI"  "PADnoteUI"
+    "EffUI"  "BankUI"  "PartUI"
+    "MicrotonalUI"  "MasterUI" "MasterMiscUI"
+    "ParametersUI" "ConsoleUI"
 )
 
 # workaround fltk_wrap_ui breakage
-add_custom_command(
-    OUTPUT ${FlGUI_sources}
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/WidgetPDialUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/PresetsUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/EnvelopeUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/LFOUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/FilterUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/VirKeyboardUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ConfigUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/SUBnoteUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ResonanceUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/OscilGenUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ADnoteUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/PADnoteUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/EffUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/BankUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/PartUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/MicrotonalUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/MasterUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/MasterMiscUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ParametersUI.fl
-    COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${CMAKE_CURRENT_SOURCE_DIR}/UI/ConsoleUI.fl
-)
+set (FltkUI_sources)
+set (FltkUI_headers)
+foreach(basename ${FltkUI_names})
+    set (fluidfile "${CMAKE_CURRENT_SOURCE_DIR}/UI/${basename}.fl")
+    set (sourcefile "${basename}.cpp")
+    set (headerfile "${basename}.h")
+    add_custom_command(
+        OUTPUT ${sourcefile}
+        COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
+        DEPENDS ${fluidfile}
+    )
+    set (FltkUI_sources ${FltkUI_sources} "${sourcefile}")
+    set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
+endforeach(basename ${FltkUI_names})
 
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
@@ -335,9 +322,10 @@ add_definitions (
 
 add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
+add_definitions (-DMAX_HISTORY=25)
 add_definitions (-DMAX_PRESETS=1000)
-add_definitions (-DMAX_BANK_ROOT_DIRS=127)
-add_definitions (-DMAX_BANKS_IN_ROOT=127)
+add_definitions (-DMAX_BANK_ROOT_DIRS=128)
+add_definitions (-DMAX_BANKS_IN_ROOT=128)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
 add_definitions (-DPAD_MAX_SAMPLES=96)
@@ -363,6 +351,7 @@ add_definitions (-DXML_PRESETS=4)
 add_definitions (-DXML_STATE=5)
 add_definitions (-DXML_CONFIG=6)
 add_definitions (-DXML_BANK=7)
+add_definitions (-DXML_HISTORY=8)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
@@ -381,25 +370,25 @@ add_definitions (-DFF_MAX_SEQUENCE=8)
 add_definitions (-DMAX_PHASER_STAGES=12)
 add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
-if (${DefaultAudio} STREQUAL "jack")
-    message(STATUS "Default audio driver is Jack")
+#if (${DefaultAudio} STREQUAL "jack")
+#    message(STATUS "Default audio driver is Jack")
     add_definitions(-DDEFAULT_AUDIO=jack_audio)
-elseif (${DefaultAudio} STREQUAL "alsa")
-    message(STATUS "Default audio driver is Alsa")
-    add_definitions(-DDEFAULT_AUDIO=alsa_audio)
-else (${DefaultAudio} STREQUAL "alsa")
-    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
-endif (${DefaultAudio} STREQUAL "jack")
+#elseif (${DefaultAudio} STREQUAL "alsa")
+#    message(STATUS "Default audio driver is Alsa")
+#    add_definitions(-DDEFAULT_AUDIO=alsa_audio)
+#else (${DefaultAudio} STREQUAL "alsa")
+#    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
+#endif (${DefaultAudio} STREQUAL "jack")
 
-if (${DefaultMidi} STREQUAL "jack")
-    message(STATUS "Default midi driver is Jack")
+#if (${DefaultMidi} STREQUAL "jack")
+#    message(STATUS "Default midi driver is Jack")
     add_definitions(-DDEFAULT_MIDI=jack_midi)
-elseif (${DefaultMidi} STREQUAL "alsa")
-    message(STATUS "Default midi driver is Alsa")
-    add_definitions(-DDEFAULT_MIDI=alsa_midi)
-else (${DefaultMidi} STREQUAL "alsa")
-    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
-endif (${DefaultMidi} STREQUAL "jack")
+#elseif (${DefaultMidi} STREQUAL "alsa")
+#    message(STATUS "Default midi driver is Alsa")
+#    add_definitions(-DDEFAULT_MIDI=alsa_midi)
+#else (${DefaultMidi} STREQUAL "alsa")
+#    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
+#endif (${DefaultMidi} STREQUAL "jack")
 
 if (JackSessionSupport)
     message(STATUS "With jack session support")
@@ -431,7 +420,7 @@ set (ProgSources
     ${DSP_sources}
     ${Effects_sources}
     ${MusicIO_sources}
-    ${FlGUI_sources}
+    ${FltkUI_sources}
 )
 
 include_directories (AFTER
@@ -524,7 +513,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
     DESTINATION share/man/man1)
 
 set_directory_properties (PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES "${FlGUI_headers}"
+    ADDITIONAL_MAKE_CLEAN_FILES "${FltkUI_headers}"
 )
 
 add_custom_target (showversion

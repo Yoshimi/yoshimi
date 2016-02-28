@@ -191,6 +191,7 @@ static void *mainGuiThread(void *arg)
 
                 if (_synth)
                 {
+                    _synth->saveHistory(tmpID);
                     _synth->saveBanks(tmpID);
                     _synth->getRuntime().deadObjects->disposeBodies();
                     _synth->getRuntime().flushLog();
@@ -229,6 +230,7 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
+    firstSynth->saveHistory(0);
     firstSynth->saveBanks(0);
     return NULL;
 }
@@ -288,7 +290,7 @@ bool mainCreateNewInstance(unsigned int forceId)
         cout << "\nYay! We're up and running :-)\n";
     else
         cout << "\nStarted "<< synth->getUniqueId() << "\n";
-    synthInstances.insert(std::make_pair<SynthEngine *, MusicClient *>(synth, musicClient));
+    synthInstances.insert(std::make_pair(synth, musicClient));
     //register jack ports for enabled parts
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -296,10 +298,7 @@ bool mainCreateNewInstance(unsigned int forceId)
         {
             mainRegisterAudioPort(synth, npart);
         }
-    }
-    
-    synth->installBanks(synth->getUniqueId());
-    
+    }    
     return true;
 
 bail_out:

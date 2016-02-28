@@ -103,7 +103,6 @@ class Bank : private MiscFuncs
     public:
         Bank(SynthEngine *_synth);
         ~Bank();
-        bool readOnlyInstrument(int ninstrument);
         string getname(unsigned int ninstrument);
         string getfilename(unsigned int ninstrument);
         string getnamenumbered(unsigned int ninstrument);
@@ -113,22 +112,19 @@ class Bank : private MiscFuncs
         int engines_used(unsigned int ninstrument);
         bool emptyslotWithID(size_t rootID, size_t bankID, unsigned int ninstrument);
         bool emptyslot(unsigned int ninstrument) { return emptyslotWithID(currentRootID, currentBankID, ninstrument); }
-        void clearslot(unsigned int ninstrument);
-        void savetoslot(unsigned int ninstrument, Part *part);
-        void swapslot(unsigned int n1, unsigned int n2);
+        bool clearslot(unsigned int ninstrument);
+        bool savetoslot(unsigned int ninstrument, Part *part);
+        bool swapslot(unsigned int n1, unsigned int n2);
         void swapbanks(unsigned int firstID, unsigned int secondID);
-        bool readOnlyBank(int bankID);
         string getBankName(int bankID);
         string getBankIDname(int bankID);
         int getBankSize(int bankID);
         bool setbankname(unsigned int BankID, string newname);
         bool loadbank(size_t rootID, size_t banknum);
-//        bool newbank(string newbankdirname);
         bool newIDbank(string newbankdir, unsigned int bankID);
         bool newbankfile(string newbankdir);
         bool removebank(unsigned int bankID);
         void rescanforbanks(void);
-        //bankstruct_t banks[MAX_NUM_BANKS];
         void clearBankrootDirlist(void);        
         void removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);

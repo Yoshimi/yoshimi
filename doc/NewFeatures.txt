@@ -69,10 +69,6 @@ This is duplicated in the current part, the mixer panel for the currently loaded
 
 ###
 
-CCs can now be entered from the gui as if they'd been sent by MIDI, although currently this doesn't include NRPNs. The entry is made at the bottom of the 'MIDI' tab in the 'Settings' window.
-
-###
-
 NRPNs have been extended so that via MIDI you can read most of the dynamic system settings (to the Log file). These can now also be set.
 
 ###
@@ -117,7 +113,7 @@ With the latest 'depop' port from Zyn, we are now fully compatibly with all inst
 
 Yoshimi will now always start even if the audio/midi backend called for doesn't exist. In this situation it will try all combinations in the order jack, alsa, null. This enables you to then change the settings and try again.
 
-You also have the ability to set 'preferred' startupalsa/jack/ midi & audio devices. these will be remembered on the next run.
+You also have the ability to set 'preferred' startup alsa/jack/ midi & audio devices. these will be remembered on the next run.
 
 ###
 

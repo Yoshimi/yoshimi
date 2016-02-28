@@ -253,30 +253,30 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
     defaults();
     ClearNRPNs();
-    if (Runtime.restoreJackSession)
+    if (Runtime.restoreJackSession) // the following are not fatal if failed
     {
         if (!Runtime.restoreJsession())
         {
-            Runtime.Log("Restore jack session failed");
-            goto bail_out;
+            Runtime.Log("Restore jack session failed. Using defaults");
+            defaults();
         }
     }
     else if (Runtime.restoreState)
     {
         if (!Runtime.stateRestore())
          {
-             Runtime.Log("Restore state failed");
-             goto bail_out;
+             Runtime.Log("Restore state failed. Using defaults");
+             defaults();
          }
     }
     else
     {
-        if (Runtime.paramsLoad.size()) // these are not fatal if failed
+        if (Runtime.paramsLoad.size())
         {
             if (loadXML(Runtime.paramsLoad))
             {
                 applyparameters();
-                Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad);
+                Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad, ".xmz", Runtime.ParamsHistory);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
             else
@@ -305,7 +305,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         {
             cout << "Defined new root ID " << asString(found) << " as " << Runtime.rootDefine << endl;
             bank.scanrootdir(found);
-            //Runtime.saveConfig();
         }
         else
             cout << "Can't find path " << Runtime.rootDefine << endl;
@@ -447,7 +446,7 @@ void SynthEngine::defaults(void)
     microtonal.defaults();
     Runtime.currentPart = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
-    Runtime.NumAvailableParts = 16;
+    Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
     ShutUp();
 }
 
@@ -816,11 +815,11 @@ void SynthEngine::SetPartPortamento(int npart, bool state)
 void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 {
     list<string>::iterator it;
-    if ((msg_buf.size() < lines) || Runtime.consoleMenuItem) // Output will fit the screen (or console)
+    if ((msg_buf.size() < lines) || Runtime.toConsole) // Output will fit the screen (or console)
     {
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
             Runtime.Log(*it);
-        if (Runtime.consoleMenuItem)
+        if (Runtime.toConsole)
             // we need this in case someone is working headless
             cout << "\nReports sent to console window\n\n";
     }
@@ -862,7 +861,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
     string label;
-    if (rootNum >= MAX_BANK_ROOT_DIRS)
+    if (rootNum < 0 || rootNum >= MAX_BANK_ROOT_DIRS)
         rootNum = bank.currentRootID;
     if (bank.roots.count(rootNum) > 0
                 && !bank.roots [rootNum].path.empty())
@@ -888,11 +887,11 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
 {
     int root = bank.currentRootID;
     string label;
+    if (bankNum < 0 || bankNum >= MAX_BANKS_IN_ROOT)
+        bankNum = bank.currentBankID;
     if (bank.roots.count(root) > 0
         && !bank.roots [root].path.empty())
     {
-        if (bankNum >= MAX_BANKS_IN_ROOT)
-            bankNum = bank.currentBankID;
         if (!bank.roots [root].banks [bankNum].instruments.empty())
         {
             label = bank.roots [root].path;
@@ -1068,7 +1067,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  Jack server " + Runtime.jackServer);
 
-    if (Runtime.consoleMenuItem)
+    if (Runtime.toConsole)
     {
         msg_buf.push_back("  Reports sent to console window");
     }
@@ -1106,14 +1105,14 @@ void SynthEngine::SetSystemValue(int type, int value)
         case 100: // reports destination
             if (value > 63)
             {
-                Runtime.consoleMenuItem = true;
+                Runtime.toConsole = true;
                 Runtime.Log("Sending reports to console window");
                 // we need the next line in case someone is working headless
                 cout << "Sending reports to console window\n";
             }
             else
             {
-                Runtime.consoleMenuItem = false;
+                Runtime.toConsole = false;
                 Runtime.Log("Sending reports to stderr");
             }
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
@@ -1906,19 +1905,19 @@ bool SynthEngine::installBanks(int instance)
     else
         branch = "CONFIGURATION";
     XMLwrapper *xml = new XMLwrapper(this);
-        if (!xml)
-            Runtime.Log("loadConfig failed XMLwrapper allocation");
-        else
-        {
-            xml->loadXMLfile(bankname);
-            if (!xml->enterbranch(branch))
-            {
-                Runtime. Log("extractConfigData, no " + branch + " branch");
-                return false;
-            }
-            bank.parseConfigFile(xml);
-            xml->exitbranch();
-        }
+    if (!xml)
+    {
+        Runtime.Log("loadConfig failed XMLwrapper allocation");
+        return false;
+    }
+    xml->loadXMLfile(bankname);
+    if (!xml->enterbranch(branch))
+    {
+        Runtime. Log("extractConfigData, no " + branch + " branch");
+        return false;
+    }
+    bank.parseConfigFile(xml);
+    xml->exitbranch();
     delete xml;
     return true;
 }
@@ -1931,12 +1930,12 @@ bool SynthEngine::saveBanks(int instance)
         name += ("-" + asString(instance));
     string bankname = name + ".banks";
     Runtime.xmlType = XML_BANK;
-    unsigned int tmp = Runtime.GzipCompression;
-    Runtime.GzipCompression = 0;
+ //   unsigned int tmp = Runtime.GzipCompression;
+ //   Runtime.GzipCompression = 0;
     XMLwrapper *xmltree = new XMLwrapper(this);
     if (!xmltree)
     {
-        Runtime.Log("saveConfig failed xmltree allocation");
+        Runtime.Log("saveBanks failed xmltree allocation");
         return false;
     }
     xmltree->beginbranch("BANKLIST"); 
@@ -1945,9 +1944,158 @@ bool SynthEngine::saveBanks(int instance)
 
     if (!xmltree->saveXMLfile(bankname))
         Runtime.Log("Failed to save config to " + bankname);
-    Runtime.GzipCompression = tmp;
+ //   Runtime.GzipCompression = tmp;
     delete xmltree;
     
+    return true;
+}
+
+
+bool SynthEngine::loadHistory(int instance)
+{
+    string name = Runtime.ConfigDir + '/' + YOSHIMI;
+    if (instance > 0)
+        name += ("-" + asString(instance));
+    string historyname = name + ".history";
+    if (!isRegFile(historyname))
+    {
+        Runtime.Log("Missing history file");
+        return false;
+    }
+    XMLwrapper *xml = new XMLwrapper(this);
+    if (!xml)
+    {
+        Runtime.Log("loadHistory failed XMLwrapper allocation");
+        return false;
+    }
+    xml->loadXMLfile(historyname);
+    if (!xml->enterbranch("HISTORY"))
+    {
+        Runtime. Log("extractHistoryData, no HISTORY branch");
+        return false;
+    }
+    int hist_size;
+    string filetype;
+    if (xml->enterbranch("XMZ_PATCH_SETS"))
+    {
+        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
+        for (int i = 0; i < hist_size; ++i)
+        {
+            if (xml->enterbranch("XMZ_FILE", i))
+            {
+                filetype = xml->getparstr("xmz_file");
+                if (filetype.size() && isRegFile(filetype))
+                    Runtime.addParamHistory(filetype, ".xmz", Runtime.ParamsHistory);
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch();
+    }
+    
+    if (xml->enterbranch("XMZ_SCALE"))
+    {
+        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
+
+        for (int i = 0; i < hist_size; ++i)
+        {
+            if (xml->enterbranch("XMZ_FILE", i))
+            {
+                filetype = xml->getparstr("xsz_file");
+                if (filetype.size() && isRegFile(filetype))
+                    Runtime.addParamHistory(filetype, ".xsz", Runtime.ScaleHistory);
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch();
+    }
+
+    if (xml->enterbranch("XMZ_STATE"))
+    {
+        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
+
+        for (int i = 0; i < hist_size; ++i)
+        {
+            if (xml->enterbranch("XMZ_FILE", i))
+            {
+                filetype = xml->getparstr("state_file");
+                if (filetype.size() && isRegFile(filetype))
+                    Runtime.addParamHistory(filetype, ".state", Runtime.StateHistory);
+                xml->exitbranch();
+            }
+        }
+        xml->exitbranch();
+    }
+    
+    xml->exitbranch();
+    return true;
+}
+
+
+bool SynthEngine::saveHistory(int instance)
+{
+    string name = Runtime.ConfigDir + '/' + YOSHIMI;
+    if (instance > 0)
+        name += ("-" + asString(instance));
+    string historyname = name + ".history";
+    Runtime.xmlType = XML_HISTORY;
+    unsigned int tmp = Runtime.GzipCompression;
+    Runtime.GzipCompression = 0;
+    XMLwrapper *xmltree = new XMLwrapper(this);
+    if (!xmltree)
+    {
+        Runtime.Log("saveHistory failed xmltree allocation");
+        return false;
+    }
+    xmltree->beginbranch("HISTORY");
+    {
+        if (Runtime.ParamsHistory.size())
+        {
+            xmltree->beginbranch("XMZ_PATCH_SETS");
+            xmltree->addpar("history_size", Runtime.ParamsHistory.size());
+            deque<HistoryListItem>::reverse_iterator rx = Runtime.ParamsHistory.rbegin();
+            unsigned int count = 0;
+            for (int x = 0; rx != Runtime.ParamsHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
+            {
+                xmltree->beginbranch("XMZ_FILE", x);
+                xmltree->addparstr("xmz_file", rx->file);
+                xmltree->endbranch();
+            }
+            xmltree->endbranch();
+        }
+        if (Runtime.ScaleHistory.size())
+        {
+            xmltree->beginbranch("XMZ_SCALE");
+            xmltree->addpar("history_size", Runtime.ScaleHistory.size());
+            deque<HistoryListItem>::reverse_iterator rx = Runtime.ScaleHistory.rbegin();
+            unsigned int count = 0;
+            for (int x = 0; rx != Runtime.ScaleHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
+            {
+                xmltree->beginbranch("XMZ_FILE", x);
+                xmltree->addparstr("xsz_file", rx->file);
+                xmltree->endbranch();
+            }
+            xmltree->endbranch();
+        }
+        if (Runtime.StateHistory.size())
+        {
+            xmltree->beginbranch("XMZ_STATE");
+            xmltree->addpar("history_size", Runtime.StateHistory.size());
+            deque<HistoryListItem>::reverse_iterator rx = Runtime.StateHistory.rbegin();
+            unsigned int count = 0;
+            for (int x = 0; rx != Runtime.StateHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
+            {
+                xmltree->beginbranch("XMZ_FILE", x);
+                xmltree->addparstr("state_file", rx->file);
+                xmltree->endbranch();
+            }
+            xmltree->endbranch();
+        }
+    }
+    xmltree->endbranch();
+    if (!xmltree->saveXMLfile(historyname))
+        Runtime.Log("Failed to save data to " + historyname);
+    Runtime.GzipCompression = tmp;
+    delete xmltree;
     return true;
 }
 
@@ -1956,6 +2104,7 @@ void SynthEngine::add2XML(XMLwrapper *xml)
 {
     xml->beginbranch("MASTER");
     actionLock(lockmute);
+    xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
 
@@ -2085,13 +2234,14 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         Runtime.NumAvailableParts = NUM_MIDI_CHANNELS; // set default to be safe
         return false;
     }
-    Runtime.NumAvailableParts = xml->getpar("max_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS * 4);
+    Runtime.NumAvailableParts = xml->getpar("max_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS); // for backwards compatibility
     xml->exitbranch();
     if (!xml->enterbranch("MASTER"))
     {
         Runtime.Log("SynthEngine getfromXML, no MASTER branch");
         return false;
     }
+    Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar127("key_shift", Pkeyshift));
 

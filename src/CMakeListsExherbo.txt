@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-set (YOSHIMI_VERSION "1.3.8.1")
+set (YOSHIMI_VERSION "1.3.9")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -57,8 +57,8 @@ else (HasJackSession)
     set (JackSessionSupport OFF)
 endif (HasJackSession)
 
-set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
-set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
+#set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
+#set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
 
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
@@ -182,6 +182,14 @@ mark_as_advanced (FLTK_DIR)
 mark_as_advanced (FLTK_FLUID_EXECUTABLE)
 mark_as_advanced (FLTK_MATH_LIBRARY)
 
+# libncurses
+pkg_check_modules (LIBNCURSES REQUIRED ncurses)
+if (LIBNCURSES_FOUND)
+    message (STATUS "Found libncurses ${LIBNCURSES_VERSION}")
+else (LIBNCURSES_FOUND)
+    message (FATAL_ERROR "libncurses required but not found")
+endif (LIBNCURSES_FOUND)
+
 find_path(Readline_ROOT_DIR
     NAMES include/readline/readline.h
 )
@@ -217,18 +225,6 @@ else(READLINE_FOUND)
     message( FATAL_ERROR "Readline library not found! Please install development components (libreadline-dev)" )
 endif(READLINE_FOUND)
 
-set (GuiFluids
-    UI/WidgetPDialUI.fl  UI/PresetsUI.fl  UI/EnvelopeUI.fl
-    UI/LFOUI.fl  UI/FilterUI.fl  UI/VirKeyboardUI.fl
-    UI/ConfigUI.fl  UI/SUBnoteUI.fl  UI/ResonanceUI.fl
-    UI/OscilGenUI.fl  UI/ADnoteUI.fl  UI/PADnoteUI.fl
-    UI/EffUI.fl  UI/BankUI.fl  UI/PartUI.fl
-    UI/MicrotonalUI.fl  UI/MasterUI.fl    UI/MasterMiscUI.fl
-    UI/ParametersUI.fl UI/ConsoleUI.fl
-)
-
-fltk_wrap_ui (yoshimi ${GuiFluids})
-set_source_files_properties (UI/MasterUI.h PROPERTIES GENERATED 1)
 set (YOSHI_INCLUDES ${FLTK_INCLUDE_DIR})
 
 if (BuildForDebug)
@@ -277,7 +273,6 @@ set (Params_sources
     Params/FilterParams.cpp  Params/LFOParams.cpp
     Params/SUBnoteParameters.cpp  Params/PADnoteParameters.cpp
     Params/Controller.cpp  Params/Presets.cpp Params/PresetsStore.cpp
-    Params/ControlInterface.cpp
 )
 
 set (Synth_sources
@@ -291,6 +286,32 @@ set (MusicIO_sources
     MusicIO/AlsaEngine.cpp
 )
 
+set (FltkUI_names
+    "WidgetPDialUI"  "PresetsUI"  "EnvelopeUI"
+    "LFOUI"  "FilterUI"  "VirKeyboardUI"
+    "ConfigUI"  "SUBnoteUI"  "ResonanceUI"
+    "OscilGenUI"  "ADnoteUI"  "PADnoteUI"
+    "EffUI"  "BankUI"  "PartUI"
+    "MicrotonalUI"  "MasterUI" "MasterMiscUI"
+    "ParametersUI" "ConsoleUI"
+)
+
+# workaround fltk_wrap_ui breakage
+set (FltkUI_sources)
+set (FltkUI_headers)
+foreach(basename ${FltkUI_names})
+    set (fluidfile "${CMAKE_CURRENT_SOURCE_DIR}/UI/${basename}.fl")
+    set (sourcefile "${basename}.cpp")
+    set (headerfile "${basename}.h")
+    add_custom_command(
+        OUTPUT ${sourcefile}
+        COMMAND ${FLTK_FLUID_EXECUTABLE} ARGS -c -o .cpp ${fluidfile}
+        DEPENDS ${fluidfile}
+    )
+    set (FltkUI_sources ${FltkUI_sources} "${sourcefile}")
+    set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
+endforeach(basename ${FltkUI_names})
+
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
@@ -301,9 +322,10 @@ add_definitions (
 
 add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
+add_definitions (-DMAX_HISTORY=25)
 add_definitions (-DMAX_PRESETS=1000)
-add_definitions (-DMAX_BANK_ROOT_DIRS=127)
-add_definitions (-DMAX_BANKS_IN_ROOT=127)
+add_definitions (-DMAX_BANK_ROOT_DIRS=128)
+add_definitions (-DMAX_BANKS_IN_ROOT=128)
 add_definitions (-DMAX_AD_HARMONICS=128)
 add_definitions (-DMAX_SUB_HARMONICS=64)
 add_definitions (-DPAD_MAX_SAMPLES=96)
@@ -329,6 +351,7 @@ add_definitions (-DXML_PRESETS=4)
 add_definitions (-DXML_STATE=5)
 add_definitions (-DXML_CONFIG=6)
 add_definitions (-DXML_BANK=7)
+add_definitions (-DXML_HISTORY=8)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
@@ -347,25 +370,25 @@ add_definitions (-DFF_MAX_SEQUENCE=8)
 add_definitions (-DMAX_PHASER_STAGES=12)
 add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
-if (${DefaultAudio} STREQUAL "jack")
-    message(STATUS "Default audio driver is Jack")
+#if (${DefaultAudio} STREQUAL "jack")
+#    message(STATUS "Default audio driver is Jack")
     add_definitions(-DDEFAULT_AUDIO=jack_audio)
-elseif (${DefaultAudio} STREQUAL "alsa")
-    message(STATUS "Default audio driver is Alsa")
-    add_definitions(-DDEFAULT_AUDIO=alsa_audio)
-else (${DefaultAudio} STREQUAL "alsa")
-    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
-endif (${DefaultAudio} STREQUAL "jack")
+#elseif (${DefaultAudio} STREQUAL "alsa")
+#    message(STATUS "Default audio driver is Alsa")
+#    add_definitions(-DDEFAULT_AUDIO=alsa_audio)
+#else (${DefaultAudio} STREQUAL "alsa")
+#    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
+#endif (${DefaultAudio} STREQUAL "jack")
 
-if (${DefaultMidi} STREQUAL "jack")
-    message(STATUS "Default midi driver is Jack")
+#if (${DefaultMidi} STREQUAL "jack")
+#    message(STATUS "Default midi driver is Jack")
     add_definitions(-DDEFAULT_MIDI=jack_midi)
-elseif (${DefaultMidi} STREQUAL "alsa")
-    message(STATUS "Default midi driver is Alsa")
-    add_definitions(-DDEFAULT_MIDI=alsa_midi)
-else (${DefaultMidi} STREQUAL "alsa")
-    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
-endif (${DefaultMidi} STREQUAL "jack")
+#elseif (${DefaultMidi} STREQUAL "alsa")
+#    message(STATUS "Default midi driver is Alsa")
+#    add_definitions(-DDEFAULT_MIDI=alsa_midi)
+#else (${DefaultMidi} STREQUAL "alsa")
+#    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
+#endif (${DefaultMidi} STREQUAL "jack")
 
 if (JackSessionSupport)
     message(STATUS "With jack session support")
@@ -397,7 +420,7 @@ set (ProgSources
     ${DSP_sources}
     ${Effects_sources}
     ${MusicIO_sources}
-    ${yoshimi_FLTK_UI_SRCS}
+    ${FltkUI_sources}
 )
 
 include_directories (AFTER
@@ -490,7 +513,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
     DESTINATION share/man/man1)
 
 set_directory_properties (PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES "${CMAKE_SOURCE_DIR}/*UI.c* ${CMAKE_SOURCE_DIR}/src/*UI.h"
+    ADDITIONAL_MAKE_CLEAN_FILES "${FltkUI_headers}"
 )
 
 add_custom_target (showversion

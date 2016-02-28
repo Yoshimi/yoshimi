@@ -1,5 +1,7 @@
 When running from the command line, once the 'up and running' message has been seen much of Yoshimi can be controlled here.
 
+Commands are not case sensitive and an invalid one will return a message that attempts to highlight the problem.
+
 There are a group of commands that are always available. These are 
 
 ? (Help)
@@ -9,20 +11,25 @@ EXit
 
 Apart from these, the command line works on a system of context levels, and normally only the commands relevant to that level will be available. 
 
-Commands are not case sensitive and an invalid one will print a reminder. Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
+Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
 
-All number ranges start from zero. This is different from the gui where most (but not all) start from one. So CL part 0 is gui part 1, but CL bank 0 is gui bank 0.
+All number ranges start from zero. This is different from the gui where most (but not all) start from one. So CLI part 0 is GUI part 1, but CLI bank 0 is GUI bank 0.
 
-The prompt will always show what level you are on along with relevant information. You will also get a confirmation message, but - for clarity - those are not included in the examples below.
+The prompt will always show what level you are on along with relevant information. You will also get a confirmation message after each command, but - for clarity - those are not included in the examples below.
 
-Starting from the yoshimi > prompt:
+Starting from the prompt: yoshimi >
+
+Enter:
 
 "s p 2 pr 107"
+
+and the prompt will change to:
+
 yoshimi part 2 >
 
 This will set part number 2 to program number 107 from the current instrument bank.
 
-You are now on part 2 as the current part and all commands relate to this. At this level you can change the current part simply with:
+You are now on part 2 as the current part and all commands will now relate to this. At this level you can change the current part simply with:
 
 "s 4"
 yoshimi part 4 >
@@ -34,15 +41,15 @@ yoshimi part 4 FX 0 rever >
 
 Sets the part's effect 0 to type 'reverb'
 
-Note that many settings are optional and if you ommit them, either a default or last used value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
+Note that many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
 
 From here you can set a preset for this effect:
 
 "s pre 3"
 
-Currently the presets are not shown in the prompt , but you will get a confirmation message.
+Currently the presets are not shown in the prompt, but you will get a confirmation message.
 
-Settings that follow in a direct line can be made all at once and you will be left at the appropriate level:
+Settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
 
 "s p 4 ef 2 ty re"
 yoshimi part 4 FX 2 rever >
@@ -80,4 +87,4 @@ Commands with '*' in the description need the setup to be saved, and Yoshimi res
 
 More will be added, and the organisation of them may be changed slightly.
 
-If any configuratiion settings are changed, either here or in the gui, you will be given a warning when you exit, with the option to continue running so you can save the changes.
+If any configuration settings are changed, either here or in the gui, you will be given a warning when you exit, with the option to continue running so you can save the changes.

@@ -76,6 +76,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int loadPatchSetAndUpdate(string filename);
         bool installBanks(int instance);
         bool saveBanks(int instance);
+        bool loadHistory(int instance);
+        bool saveHistory(int instance);
         
         bool getfromXML(XMLwrapper *xml);
 
@@ -162,9 +164,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         // part that's apply the insertion effect; -1 to disable
         short int Pinsparts[NUM_INS_EFX];
-
-        // peaks for part VU-meters
-        float vuoutpeakpart[NUM_MIDI_PARTS];
 
         // others ...
         Controller *ctl;
