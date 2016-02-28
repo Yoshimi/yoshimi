@@ -1,5 +1,33 @@
 Cal's last entry here is preserved in doc/Histories
 
+V1.3.9
+
+Our new code name: Skylark
+
+A major part of our work on this release is attempting to future-proof our code. Many distros anre moving to GCC version 6, and code that built quite happily with older compilers is now rejected by the much more critical requirements.
+
+While doing this, the very extensive testing also shook out some more obscure bugs which have of course been squashed.
+
+However, amongst other improvements, we've split out roots and banks from the main config file and also created a new histories file. The separation means that the different functions can be implemented, saved and loaded, at the most appropriate time. These files have yoshimi as the doctype as they are in no way relevant to ZynAddSubFX.
+
+The 'banks' file is saved every time roots, banks or instruments are changed, andf again on a normal exit to catch current root and bank (which don't otherwise trigger a save).
+
+The 'history' file is only saved on exit.
+
+The 'config' file is only saved when you specifically call for it to be saved.
+
+As well as recent Patch sets, we now record recent Scales and recent States. Scales in particilar had been requested by one of our users what composes with very different scale settings.
+
+In the CLI prompt, when effects are being managed, the preset number is also shown on the prompt so you'll typically see something like:
+
+yoshimi part 2 FX 1 Rever-7 >
+
+Yoshim is now verified as being able to use 192000 Hz sample rate in both ALSA and Jack - if you have a suitable soundcard!
+
+There have been a few minor GUI corrections and additions to the doc folder.
+
+Many non-fatal system error messages can now be surpressed. this is particularly relevant for CLI use. This will be extended over time.
+
 V1.3.8
 
 We have our first code name: The Swan
@@ -69,17 +97,3 @@ We have a new policy with version numbering. If the Version string contains a 4t
 1.3.5 is the current version
 1.3.5.1 is the first bugfix
 This has one minor GUI fix, and a fix for uses of fltk V1.1 with build problems.
-
-V1.3.5
-
-In response to suggestions at LAC 2015 we have made the title bars of all editing windows display both the part number and the current name of the instrument you are working on. In the addsynth oscillator editor you also see the number of the oscillator you are editing.
-
-
-Also, in response to suggestions, horizontal as well as vertical mouse dragging can be used to set rotary controls. Additionally, the mouse scroll wheel can be used, and if you hold down the 'ctrl' key you can get very precise setting.
-
-
-Another request we had was for the part effects window to have the same layout as System and Insertion effects. This has been done and it is now almost identical to Insertion effects.
-
-
-The most noticeable GUI enhancement is colour coded identification of an instrument's use of Add Sub and Pad synth engines, no matter where in the instrument's kit they may be. This can be enabled/disabled in the mixer panel. It does slow down yoshimi's startup, but due to the banks reorganisation (done some time ago) it causes no delay in changing banks/instruments once you are up and running.
-Some saved instruments seem to have had their Info section corrupted. Yoshimi can detect this and step over it to find the true status. Also, if you resave the instrument, not only will the PadSynth status be restored, but Add and Sub will be included, allowing a faster scan next time.
