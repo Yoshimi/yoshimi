@@ -56,6 +56,7 @@ class CmdInterface : private MiscFuncs
         int npart;
         int nFX;
         int nFXtype;
+        int nFXpreset;
         int chan;
         int axis;
         unsigned int level;

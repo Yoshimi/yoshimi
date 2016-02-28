@@ -186,6 +186,7 @@ void CmdInterface::defaults()
     npart = 0;
     nFX = 0;
     nFXtype = 0;
+    nFXpreset = 0;
 }
 
 
@@ -333,6 +334,8 @@ int CmdInterface::effects(int level)
     
     string dest = "";
     bool flag;
+    
+    nFXpreset = 0; // changing effect always sets the default preset.
 
     if (bitTest(level, part_lev))
     {
@@ -361,7 +364,7 @@ int CmdInterface::effects(int level)
         if (value != nFX)
         {
             nFX = value;
-            
+#warning  We need to reset the effect type here
         }
         if (point[0] == 0)
         {
@@ -489,8 +492,9 @@ int CmdInterface::effects(int level)
             category = 0;
             dest = "system";
         }
-        synth->SetEffects(category, 8, nFX, nFXtype, 0, value);
-        Runtime.Log(dest + " fx preset set to number " + asString(value));
+        nFXpreset = value;
+        synth->SetEffects(category, 8, nFX, nFXtype, 0, nFXpreset);
+        Runtime.Log(dest + " fx preset set to number " + asString(nFXpreset));
     }
     return reply;
 }
@@ -1560,6 +1564,8 @@ void CmdInterface::cmdIfaceCommandLoop()
                         prompt += " Sys";
                 }
                 prompt += (" FX " + asString(nFX) + " " + fx_list[nFXtype].substr(0, 5));
+                if (nFXtype > 0)
+                    prompt += ("-" + asString(nFXpreset));
             }
             if (bitTest(level, vect_lev))
             {
