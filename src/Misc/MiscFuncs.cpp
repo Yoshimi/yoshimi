@@ -2,6 +2,7 @@
     MiscFuncs.cpp
 
     Copyright 2010, Alan Calvert
+    Copyright 2014-2016, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -292,7 +293,7 @@ int MiscFuncs::matchWord(int numChars, char *buf, const char *word)
 {
     int newp = 0;
     int size = strlen(word);
-    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == word[newp])
+    while (buf[newp] > 0x20 && buf[newp] < 0x7f && newp < size && (buf[newp] | 0x20) == (word[newp] | 0x20))
             ++ newp;
     if (newp >= numChars && (buf[newp] <= 0x20 || buf[newp] >= 0x7f))
         return newp;

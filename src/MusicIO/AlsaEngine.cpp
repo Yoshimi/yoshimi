@@ -266,7 +266,7 @@ bool AlsaEngine::prepHwparams(void)
     card_endian = card_formats[formidx].card_endian;
     card_signed = card_formats[formidx].card_signed;
     
-    synth->getRuntime().Log("March little endian = " + asString(little_endian));
+    synth->getRuntime().Log("March little endian = " + asString(little_endian), 2);
 
     if (card_signed) // not currently used, may be later
         formattxt = "Signed";
@@ -305,11 +305,11 @@ bool AlsaEngine::prepHwparams(void)
                 NULL), "failed to get period size"))
         goto bail_out;
 
-    synth->getRuntime().Log("Format = " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" );
+    synth->getRuntime().Log("Format = " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
     if (ask_buffersize != audio.period_size)
     {
-        synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize)
-                    + ", Alsa dictates " + asString((unsigned int)audio.period_size));
+        synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
+                    + ", Alsa dictates " + asString((unsigned int)audio.period_size), 2);
         synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;

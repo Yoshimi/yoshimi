@@ -723,7 +723,7 @@ void Config::StartupReport(MusicClient *musicClient)
 {
     Log(string(argp_program_version));
     Log("Clientname: " + musicClient->midiClientName());
-    string report = "Config: Audio: ";
+    string report = "Audio: ";
     switch (audioEngine)
     {
         case jack_audio:
@@ -736,7 +736,7 @@ void Config::StartupReport(MusicClient *musicClient)
             report += "nada";
     }
     report += (" -> '" + audioDevice + "'");
-    Log(report);
+    Log(report, 2);
     report = "Midi: ";
     switch (midiEngine)
     {
@@ -752,10 +752,10 @@ void Config::StartupReport(MusicClient *musicClient)
     if (!midiDevice.size())
         midiDevice = "default";
     report += (" -> '" + midiDevice + "'");
-    Log(report);
-    Log("Oscilsize: " + asString(synth->oscilsize));
-    Log("Samplerate: " + asString(synth->samplerate));
-    Log("Period size: " + asString(synth->buffersize));
+    Log(report, 2);
+    Log("Oscilsize: " + asString(synth->oscilsize), 2);
+    Log("Samplerate: " + asString(synth->samplerate), 2);
+    Log("Period size: " + asString(synth->buffersize), 2);
 }
 
 #endif
