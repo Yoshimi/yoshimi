@@ -403,7 +403,7 @@ string Config::masterCCtest(int cc)
 
 void Config::clearPresetsDirlist(void)
 {
-    for (int i = 0; i < MAX_PRESETS; ++i)
+    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
         presetsDirlist[i].clear();
 }
 
@@ -445,6 +445,7 @@ bool Config::loadConfig(void)
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
     {
         Log("ConfigFile " + resConfigFile + " not found, will use default settings");
+        defaultPresets();
         configChanged = true; // give the user the choice
     }
     else
@@ -469,6 +470,30 @@ bool Config::loadConfig(void)
         }
     }
     return isok;
+}
+
+
+void Config::defaultPresets(void)
+{
+    string presetdirs[]  = {
+        "/usr/share/yoshimi/presets",
+        "/usr/local/share/yoshimi/presets",
+        "/usr/share/zynaddsubfx/presets",
+        "/usr/local/share/zynaddsubfx/presets",
+        string(getenv("HOME")) + "/.config/yoshimi/presets",
+        localPath("/presets"),
+        "end"
+    };
+    int i = 0;
+    while (presetdirs[i] != "end")
+    {
+        if (isDirectory(presetdirs[i]))
+        {
+            Log(presetdirs[i], 2);
+            presetsDirlist[i] = presetdirs[i];
+        }
+        ++ i;
+    }
 }
 
 
@@ -499,38 +524,28 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     // get preset dirs
     int count = 0;
-    for (int i = 0; i < MAX_PRESETS; ++i)
+    bool found = false;
+    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
     {
         if (xml->enterbranch("PRESETSROOT", i))
         {
             string dir = xml->getparstr("presets_root");
             if (isDirectory(dir))
+            {
                 presetsDirlist[count++] = dir;
+                found = true;
+            }
             xml->exitbranch();
         }
     }
-    if (!count)
+    if (!found)
     {
-        string presetdirs[]  = {
-            "/usr/share/yoshimi/presets",
-            "/usr/local/share/yoshimi/presets",
-            "/usr/share/zynaddsubfx/presets",
-            "/usr/local/share/zynaddsubfx/presets",
-            string(getenv("HOME")) + "/.config/yoshimi/presets",
-            localPath("/presets"),
-            "end"
-        };
-        int i = 0;
-        while (presetdirs[i] != "end")
-        {
-            if (isDirectory(presetdirs[i]))
-                presetsDirlist[count++] = presetdirs[i];
-            ++ i;
-        }
+        defaultPresets();
+        configChanged = true; // give the user the choice
     }
-    
+
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
-    
+
     // engines
     audioEngine = (audio_drivers)xml->getpar("audio_engine", audioEngine, no_audio, alsa_audio);
     midiEngine = (midi_drivers)xml->getpar("midi_engine", midiEngine, no_midi, alsa_midi);
@@ -599,7 +614,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("sound_buffer_size", Buffersize);
     xmltree->addpar("oscil_size", Oscilsize);
 
-    for (int i = 0; i < MAX_PRESETS; ++i)
+    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
         if (presetsDirlist[i].size())
         {
             xmltree->beginbranch("PRESETSROOT",i);

@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -660,7 +660,7 @@ configwindow->do_callback();}
         callback {activatebutton_presetdir(o->value() != 0);}
         xywh {5 5 450 200} type Hold labelsize 12 textsize 12
       }
-      Fl_Button {} {
+      Fl_Button addpreset {
         label {Add preset directory...}
         callback {//
     const char *dirname;
@@ -669,14 +669,19 @@ configwindow->do_callback();}
         return;
     presetbrowse->add(dirname);
     synth->getRuntime().configChanged = true;
-    writepresetcfg();}
+    writepresetcfg();
+    if (presetbrowse->size() >= MAX_PRESET_DIRS)
+        o->deactivate();}
         xywh {10 220 80 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button removepresetbutton {
         label {Remove preset dir...}
         callback {//
     if (presetbrowse->value() != 0)
+    {
         presetbrowse->remove(presetbrowse->value());
+        addpreset->activate();
+    }
     activatebutton_presetdir(false);
     synth->getRuntime().configChanged = true;
     writepresetcfg();}
@@ -743,7 +748,7 @@ presets->hide();}
   Function {readpresetcfg()} {} {
     code {//
     presetbrowse->clear();
-    for (int i = 0; i < MAX_PRESETS; ++i)
+    for (int i = 0; i < MAX_PRESET_DIRS; ++i)
         if (synth->getRuntime().presetsDirlist[i].size())
             presetbrowse->add(synth->getRuntime().presetsDirlist[i].c_str());} {}
   }
