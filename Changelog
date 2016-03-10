@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-3-10 Will
+- Reorganised CMakeLists.txt files for better integration with
+  different distros, and to recognise LV2_PATH.
+
 2016-3-8 Will
 - Bugfix: CMakeLists.txt now recognises both ncurses and ncursesw.
 - Bugfix: Default presets were only being set if there were none in

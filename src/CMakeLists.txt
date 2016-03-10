@@ -549,11 +549,12 @@ if (BuildLV2Plugin)
 
 include(GNUInstallDirs)
 
-if (EXISTS "/etc/debian_version")
-    set(LV2_INSTALL_DIR lib/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
-else (EXISTS "/etc/debian_version")
+if (EXISTS $ENV{LV2_PATH})
+    set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH "Specifies where the LV2 libraries should be installed")
+else()
     set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
-endif (EXISTS "/etc/debian_version")
+endif()
+
 pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
 if (LV2_FOUND)
     message (STATUS "Found lv2 package ${LV2_VERSION}")
