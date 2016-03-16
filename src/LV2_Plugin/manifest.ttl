@@ -13,6 +13,6 @@
   rdfs:seeAlso <yoshimi.ttl>.
 
 <http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI>
-    a <http://lv2plug.in/ns/extensions/ui#X11UI> ;
+    a <http://kxstudio.sf.net/ns/lv2ext/external-ui#Widget> ;
     ui:binary <yoshimi_lv2.so> ;
     lv2:requiredFeature <http://lv2plug.in/ns/ext/instance-access> .
