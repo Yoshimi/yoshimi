@@ -35,6 +35,7 @@ set (CMAKE_SKIP_RULE_DEPENDENCY OFF)
 message (STATUS "Building Yoshimi version ${YOSHIMI_VERSION} for ${CMAKE_SYSTEM_NAME}")
 
 include (CheckCSourceCompiles)
+include(GNUInstallDirs)
 
 mark_as_advanced (EXECUTABLE_OUTPUT_PATH)
 mark_as_advanced (LIBRARY_OUTPUT_PATH)
@@ -462,7 +463,7 @@ target_link_libraries (yoshimi ${ExternLibraries})
 
 install (TARGETS yoshimi RUNTIME DESTINATION bin)
 
-install (DIRECTORY ../banks DESTINATION share/yoshimi
+install (DIRECTORY ../banks DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -473,7 +474,7 @@ install (DIRECTORY ../banks DESTINATION share/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
-install (DIRECTORY ../examples DESTINATION share/yoshimi
+install (DIRECTORY ../examples DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -484,7 +485,7 @@ install (DIRECTORY ../examples DESTINATION share/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
-install (DIRECTORY ../presets DESTINATION share/yoshimi
+install (DIRECTORY ../presets DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -495,7 +496,7 @@ install (DIRECTORY ../presets DESTINATION share/yoshimi
         WORLD_READ WORLD_EXECUTE
 )
 
-install (DIRECTORY ../doc/ DESTINATION share/doc/yoshimi
+install (DIRECTORY ../doc/ DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/yoshimi
     FILE_PERMISSIONS
         OWNER_READ OWNER_WRITE
         GROUP_READ GROUP_WRITE
@@ -507,17 +508,17 @@ install (DIRECTORY ../doc/ DESTINATION share/doc/yoshimi
 )
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/yoshimi.desktop
-    DESTINATION share/applications)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.png
-    DESTINATION share/pixmaps)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pixmaps)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.svg
-    DESTINATION share/icons)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi_alt.svg
-    DESTINATION share/icons)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.appdata.xml
-    DESTINATION share/appdata)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/appdata)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/../desktop/yoshimi.1
-    DESTINATION share/man/man1)
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/man/man1)
 
 set_directory_properties (PROPERTIES
     ADDITIONAL_MAKE_CLEAN_FILES "${FltkUI_headers}"
@@ -546,20 +547,19 @@ add_custom_target (distclean
 
 
 if (BuildLV2Plugin)
+    if (EXISTS $ENV{LV2_PATH})
+        set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH
+        "Specifies where the LV2 libraries should be installed")
+    else()
+        set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH
+        "Specifies where the LV2 libraries should be installed")
+    endif()
 
-include(GNUInstallDirs)
-
-if (EXISTS $ENV{LV2_PATH})
-    set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH "Specifies where the LV2 libraries should be installed")
-else()
-    set(LV2_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/lv2 CACHE PATH "Specifies where the LV2 libraries should be installed")
-endif()
-
-pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
-if (LV2_FOUND)
-    message (STATUS "Found lv2 package ${LV2_VERSION}")
-else (LV2_FOUND)
-    message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
-endif (LV2_FOUND)
-add_subdirectory(LV2_Plugin)
+    pkg_check_modules(LV2 REQUIRED lv2>=1.0.0)
+    if (LV2_FOUND)
+        message (STATUS "Found lv2 package ${LV2_VERSION}")
+    else (LV2_FOUND)
+        message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
+    endif (LV2_FOUND)
+    add_subdirectory(LV2_Plugin)
 endif (BuildLV2Plugin)

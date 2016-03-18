@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-3-18 Will
+- Patched CMakeLists.txt to make it more distro agnostic.
+
 2016-3-16 Will
 - Fixed regression: LV2 gui now displays correctly again.
 
