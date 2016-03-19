@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2016-3-19 Will
+- Reorganised startup so that bank and history loading
+  doesn't slow down intial stand-alone display, as this
+  had made some users think it had failed, so tried again.
+  LV2 startup as before.
+
 2016-3-18 Will
 - Patched CMakeLists.txt to make it more distro agnostic.
 

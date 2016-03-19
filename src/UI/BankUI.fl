@@ -266,7 +266,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {open : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -419,7 +419,8 @@ removeselection();}
     synth->getRuntime().checksynthengines = (int) o->value();
     rescan_for_banks(true);
     synth->getGuiMaster()->partui->resetlabels();
-    synth->getGuiMaster()->updatepanel();}
+    synth->getGuiMaster()->updatepanel();
+    synth->getRuntime().configChanged = true;}
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
           code0 {o->value(synth->getRuntime().checksynthengines);}
         }
@@ -1066,8 +1067,7 @@ fnr = &RootProcess_::rootprocess;
             Pend->hide();
         }} {}
   }
-  Function {readbankcfg()} {open
-  } {
+  Function {readbankcfg()} {} {
     code {//
     string tmp;
     rootsbrowse->clear();
@@ -1084,8 +1084,7 @@ fnr = &RootProcess_::rootprocess;
       	    }
             rootsbrowse->add(tmp.c_str(), reinterpret_cast<void *>(static_cast<long>(it->first)));
         }
-    }} {selected
-    }
+    }} {}
   }
   Function {recoverID()} {return_type int
   } {
