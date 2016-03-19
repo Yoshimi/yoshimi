@@ -59,6 +59,7 @@ string basics[] = {
     "  parts",                      "parts with instruments installed",
     "  vectors",                    "settings for all enabled vectors",
     "  setup",                      "dynamic settings",
+    "  history [s]",                "recent files (patchsets, scales, states)",
     "  effects [s]",                "effect types ('all' include preset numbers and names)",
     "load",                         "load patch files",
     "  instrument <s>",             "instrument to current part from named file",
@@ -274,10 +275,63 @@ bool CmdInterface::helpList()
 }
 
 
-int CmdInterface::effectsList()
+int CmdInterface::historyList(int type)
+{
+    Config &Runtime = synth->getRuntime();
+    list<string>msg;
+    bool anyfound = false;
+
+    if ((type & 1) && Runtime.ParamsHistory.size())
+    {
+        msg.push_back(" ");
+        msg.push_back("Recent Patch Sets:");
+        anyfound = true;
+        deque<HistoryListItem>::reverse_iterator rx = Runtime.ParamsHistory.rbegin();
+        while (rx != Runtime.ParamsHistory.rend())
+        {
+            msg.push_back("  " + rx->file);
+            ++rx;
+        }
+    }
+
+    if ((type & 2) && Runtime.ScaleHistory.size())
+    {
+        msg.push_back(" ");
+        msg.push_back("Recent Scales:");
+        anyfound = true;
+        deque<HistoryListItem>::reverse_iterator rx = Runtime.ScaleHistory.rbegin();
+        while (rx != Runtime.ScaleHistory.rend())
+        {
+            msg.push_back("  " + rx->file);
+            ++rx;
+        }
+    }
+
+    if ((type & 4) && Runtime.StateHistory.size())
+    {
+        msg.push_back(" ");
+        msg.push_back("Recent States:");
+        anyfound = true;
+        deque<HistoryListItem>::reverse_iterator rx = Runtime.StateHistory.rbegin();
+        while (rx != Runtime.StateHistory.rend())
+        {
+            msg.push_back("  " + rx->file);
+            ++rx;
+        }
+    }
+
+    if (!anyfound)
+        msg.push_back("\nNo Saved History");
+
+    synth->cliOutput(msg, LINES);
+    return done_msg;
+}
+
+
+    int CmdInterface::effectsList()
 {
     list<string>msg;
-    
+
     size_t presetsPos;
     size_t presetsLast;
     int presetsCount;
@@ -1307,6 +1361,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
+        }
+        else if (matchnMove(1, point, "history"))
+        {
+            if (matchnMove(1, point, "patchsets"))
+                reply = historyList(1);
+            else if (matchnMove(2, point, "scales"))
+                reply = historyList(2);
+            else if (matchnMove(2, point, "states"))
+                reply = historyList(4);
+            else
+                reply = historyList(7);
         }
         else if (matchnMove(1, point, "effects"))
             reply = effectsList();

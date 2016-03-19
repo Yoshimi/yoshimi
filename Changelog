@@ -5,6 +5,7 @@ yoshimi 1.3.x
   doesn't slow down intial stand-alone display, as this
   had made some users think it had failed, so tried again.
   LV2 startup as before.
+- CLI can now list recent histories.
 
 2016-3-18 Will
 - Patched CMakeLists.txt to make it more distro agnostic.
