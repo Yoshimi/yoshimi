@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -1279,6 +1279,7 @@ updatepanel();}
             if (updatehistory)
                 setMasterLabel(synth->getRuntime().addParamHistory(string(fname), ".xmz", synth->getRuntime().ParamsHistory));
             RecentParams->activate();
+            microtonalui->apply();
             if(result > 1)
             	fl_alert("At least one instrument is called 'Simple Sound', the name of Yoshimi's basic sound. You should change this if you wish to re-save.");
         }
@@ -1758,7 +1759,7 @@ updatepanel();}
   }
   decl {BankUI *bankui;} {public local
   }
-  decl {MicrotonalUI *microtonalui;} {private local
+  decl {MicrotonalUI *microtonalui;} {public local
   }
   decl {VirKeyboard *virkeyboard;} {private local
   }

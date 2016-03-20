@@ -804,7 +804,8 @@ void SynthEngine::SetPartPortamento(int npart, bool state)
 {
     part[npart]->ctl->portamento.portamento = state;
 }
-    
+
+
 /*
  * This should really be in MiscFuncs but it has two runtime calls
  * and I can't work out a way to implement that :(
@@ -815,15 +816,17 @@ void SynthEngine::SetPartPortamento(int npart, bool state)
 void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 {
     list<string>::iterator it;
-    if ((msg_buf.size() < lines) || Runtime.toConsole) // Output will fit the screen (or console)
-    {
-        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
-            Runtime.Log(*it);
-        if (Runtime.toConsole)
+    list<string>::reverse_iterator rx;
+    if (Runtime.toConsole)
+    { // reversed so they come out the right order in the console.
+        for (rx = msg_buf.rbegin(); rx != msg_buf.rend(); ++rx)
+            Runtime.Log(*rx);
             // we need this in case someone is working headless
             cout << "\nReports sent to console window\n\n";
     }
-
+    else if (msg_buf.size() < lines) // Output will fit the screen
+        for (it = msg_buf.begin(); it != msg_buf.end(); ++it)
+            Runtime.Log(*it);
     else // Output is too long, page it
     {
         // JBS: make that a class member variable

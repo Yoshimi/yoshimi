@@ -5,16 +5,16 @@ Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
 
-startup state load doesn't set buffersize correctly - partially resolved.
+Startup state load doesn't set buffersize correctly - partially resolved.
     size is ignored if loaded when already running (which is reasonable).
 
 Allow headless compilation.
 
 Make add/pad windows show kit number.
 
-Make attempt to start second independet instace open a new one in running
-yoshimi instead - saves memory and more consistent.
+Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
 
+Add scale control to CLI.
 
 Make things like LFOs either floats or much higher resolution.
 

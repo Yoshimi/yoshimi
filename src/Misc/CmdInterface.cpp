@@ -64,10 +64,12 @@ string basics[] = {
     "load",                         "load patch files",
     "  instrument <s>",             "instrument to current part from named file",
     "  patchset <s>",               "complete set of instruments from named file",
+    "  state <s>",                  "all system settings and patch sets from named file",
     "save",                         "save various files",
     "  instrument <s>",             "current part to named file",
     "  patchset <s>",               "complete set of instruments to named file",
-    "  setup",                      "save dynamic settings",
+    "  state <s>",                  "all system settings and patch sets to named file",
+    "  setup",                      "dynamic settings",
     "add",                          "add paths and files",
     "  root <s>",                   "root path to list",
     "  bank <s>",                   "bank to current root",
@@ -1501,7 +1503,15 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     else if (matchnMove(2, point, "load"))
     {
-        if (matchnMove(1, point, "patchset"))
+        if(matchnMove(1, point, "state"))
+        {
+            if (Runtime.loadState(point))
+            {
+                Runtime.Log("Loaded " + (string) point + ".state");
+                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+            }
+        }
+        else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
                 reply = value_msg;
@@ -1529,7 +1539,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
     else if (matchnMove(2, point, "save"))
-        if(matchnMove(1, point, "setup"))
+        if(matchnMove(1, point, "state"))
+            Runtime.saveState(point);
+        else if(matchnMove(1, point, "setup"))
             synth->SetSystemValue(119, 255);
         else if (matchnMove(1, point, "patchset"))
         {
