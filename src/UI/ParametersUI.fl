@@ -70,7 +70,6 @@ class ParametersUI {selected
                         synth->getGuiMaster()->setMasterLabel(History.at(o->value() - 1).name);
                         break;
                 }
-                synth->getGuiMaster()->microtonalui->apply(); // may need to move this later
                 CloseRecent->show();
                 Recent->hide();
                 break;

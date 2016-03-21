@@ -65,10 +65,12 @@ string basics[] = {
     "  instrument <s>",             "instrument to current part from named file",
     "  patchset <s>",               "complete set of instruments from named file",
     "  state <s>",                  "all system settings and patch sets from named file",
+    "  scale <s>",                  "scale settings from named file",
     "save",                         "save various files",
     "  instrument <s>",             "current part to named file",
     "  patchset <s>",               "complete set of instruments to named file",
     "  state <s>",                  "all system settings and patch sets to named file",
+    "  scale <s>",                  "current scale settings to named file",
     "  setup",                      "dynamic settings",
     "add",                          "add paths and files",
     "  root <s>",                   "root path to list",
@@ -1503,12 +1505,25 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     else if (matchnMove(2, point, "load"))
     {
-        if(matchnMove(1, point, "state"))
+        if(matchnMove(2, point, "state"))
         {
-            if (Runtime.loadState(point))
+            if (point[0] == 0)
+                reply = value_msg;
+            else if (Runtime.loadState(point))
             {
                 Runtime.Log("Loaded " + (string) point + ".state");
                 GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+                reply = done_msg;
+            }
+        }
+        else if (matchnMove(2, point, "scale"))
+        {
+            if (point[0] == 0)
+                reply = value_msg;
+            else
+            {
+                synth->microtonal.loadXML((string) point);
+                reply = done_msg;
             }
         }
         else if (matchnMove(1, point, "patchset"))
@@ -1539,11 +1554,26 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
     else if (matchnMove(2, point, "save"))
-        if(matchnMove(1, point, "state"))
-            Runtime.saveState(point);
+        if(matchnMove(2, point, "state"))
+            if (point[0] == 0)
+                reply = value_msg;
+            else
+            {
+                Runtime.saveState(point);
+                reply = done_msg;
+            }
         else if(matchnMove(1, point, "setup"))
             synth->SetSystemValue(119, 255);
-        else if (matchnMove(1, point, "patchset"))
+        else if (matchnMove(2, point, "scale"))
+        {
+            if (point[0] == 0)
+                reply = value_msg;
+            else
+            {
+                synth->microtonal.saveXML((string) point);
+                reply = done_msg;
+            }
+        }else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
                 reply = value_msg;

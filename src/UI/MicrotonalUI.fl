@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {MicrotonalUI.h} {not_in_source in_header
@@ -39,10 +39,11 @@ decl {\#include <FL/fl_ask.H>} {public local
 decl {\#include "Misc/Microtonal.h"} {public local
 } 
 
-class MicrotonalUI {} {
+class MicrotonalUI {selected
+} {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
-      label Scales selected
+      label Scales
       xywh {99 164 405 450} type Double hide
     } {
       Fl_Group {} {
@@ -126,7 +127,7 @@ class MicrotonalUI {} {
               }
               else
                 fl_alert("Error: Could not load the file.");}
-          tooltip {Inport Scala .scl file (tunnings)} xywh {243 411 84 15} box THIN_UP_BOX labelfont 1 labelsize 10
+          tooltip {Inport Scala .scl file (tunnings)} xywh {225 411 100 15} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Group keymappinggroup {
           label {Keyboard Mapping}
@@ -198,7 +199,7 @@ class MicrotonalUI {} {
               }
               else
                   fl_alert("Error: Could not load the file.");}
-          tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {243 428 84 16} box THIN_UP_BOX labelfont 1 labelsize 10
+          tooltip {Inport Scala .kbm file (keyboard mapping)} xywh {225 428 100 16} box THIN_UP_BOX labelfont 1 labelsize 10
         }
       }
       Fl_Group {} {
@@ -284,18 +285,19 @@ class MicrotonalUI {} {
     code {microtonaluiwindow->hide();} {}
   }
   Function {apply()} {} {
-    code {int err = microtonal->texttotunings(tuningsinput->value());
-        if (err >= 0)
-            fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");
-        if (err == -2)
-            fl_alert("Parse Error: The input is empty.");
-        octavesizeoutput->do_callback();
+    code {//
+    int err = microtonal->texttotunings(tuningsinput->value());
+    if (err >= 0)
+        fl_alert("Parse Error: The input may contain only numbers (like 232.59)\\n or divisions (like 121/64).");
+    if (err == -2)
+        fl_alert("Parse Error: The input is empty.");
+    octavesizeoutput->do_callback();
 
-        microtonal->texttomapping(mappinginput->value());
-        mapsizeoutput->do_callback();
-        anotecounter->do_callback();
+    microtonal->texttomapping(mappinginput->value());
+    mapsizeoutput->do_callback();
+    anotecounter->do_callback();
 
-        //applybutton->color(FL_GRAY);} {}
+    //applybutton->color(FL_GRAY);} {}
   }
   decl {Microtonal *microtonal;} {private local
   }

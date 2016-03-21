@@ -526,8 +526,7 @@ paramsui->Show(3);}
         synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
         RecentState->activate();
     }
-    refresh_master_ui();
-    microtonalui->apply();}
+    refresh_master_ui();}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
@@ -1244,7 +1243,6 @@ updatepanel();}
     else
     {
         synth->getRuntime().addParamHistory(fname, ".xsz", synth->getRuntime().ScaleHistory);
-        microtonalui->apply();
     }} {}
   }
   Function {do_new_master()} {} {

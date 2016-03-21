@@ -565,7 +565,10 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                 octave[i].x2 = xml->getpar127("denominator", octave[i].x2);
 
                 if (octave[i].x2)
+                {
                     octave[i].type = 2;
+                    octave[i].tuning = ((float)octave[i].x1) / octave[i].x2;
+                }
                 else {
                     octave[i].type = 1;
                     //populate fields for display
