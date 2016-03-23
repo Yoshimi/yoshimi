@@ -114,6 +114,23 @@ void MiscFuncs::legit_filename(string& fname)
 }
 
 
+// make a complete path extra legal
+void MiscFuncs::legit_pathname(string& fname)
+{
+    for (unsigned int i = 0; i < fname.size(); ++i)
+    {
+        char c = fname.at(i);
+        if (!((c >= '0' && c <= '9')
+              || (c >= 'A' && c <= 'Z')
+              || (c >= 'a' && c <= 'z')
+              || c == '-'
+              || c == '/'
+              || c == '.'))
+            fname.at(i) = '_';
+    }
+}
+
+
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {

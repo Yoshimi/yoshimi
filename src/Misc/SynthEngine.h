@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2015, Will Godfrey & others
+    Copyright 2014-2016, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified January 2015
+    This file is derivative of ZynAddSubFX original code, last modified March 2016
 */
 
 #ifndef SYNTHENGINE_H
@@ -54,12 +54,12 @@ class MasterUI;
 
 class SynthEngine : private SynthHelper, MiscFuncs
 {
-    private:    
+    private:
         unsigned int uniqueId;
         bool isLV2Plugin;
         Bank bank;
         Config Runtime;
-        PresetsStore presetsstore;        
+        PresetsStore presetsstore;
     public:
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
@@ -78,7 +78,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveBanks(int instance);
         bool loadHistory(int instance);
         bool saveHistory(int instance);
-        
+        bool loadVector(unsigned char baseChan, string name, bool full);
+        bool saveVector(unsigned char baseChan, string name, bool full);
+
         bool getfromXML(XMLwrapper *xml);
 
         int getalldata(char **data);
@@ -118,7 +120,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partonoffWrite(int npart, int what);
         bool partonoffRead(int npart);
         sem_t partlock;
-        
+
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
@@ -183,7 +185,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
             char bytes [sizeof(values)];
         };
         union VUtransfer VUpeak, VUdata;
-        
+
         bool fetchMeterData(VUtransfer *VUdata);
 
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
@@ -218,18 +220,18 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t *processLock;
 
         jack_ringbuffer_t *vuringbuf;
-        
+
         jack_ringbuffer_t *RBPringbuf;
         void *RBPthread(void);
         static void *_RBPthread(void *arg);
         pthread_t  RBPthreadHandle;
-        
+
         struct RBP_data {
             char data[4];
         };
-        
+
         XMLwrapper *stateXMLtree;
-        
+
         char random_state[256];
         struct random_data random_buf;
         int32_t random_result;

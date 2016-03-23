@@ -98,7 +98,10 @@ class XMLwrapper : private MiscFuncs
         // the same as getpar, but the limits are 0 and 127
         int getpar127(const string& name, int defaultpar);
 
-        int getparbool(const string& name, int defaultpar);
+         // the same as getpar, but the limits are 0 and 255
+        int getpar255(const string& name, int defaultpar);
+
+       int getparbool(const string& name, int defaultpar);
 
          string getparstr(const string& name);
 

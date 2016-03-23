@@ -46,101 +46,104 @@ using namespace std;
 static int currentInstance = 0;
 
 string basics[] = {
-    "?  help",                      "show commands",
-    "stop",                         "all sound off",
-    "reset",                        "return to start-up conditions (if 'y')",
-    "exit",                         "tidy up and close Yoshimi (if 'y')",
+    "?  Help",                      "show commands",
+    "STop",                         "all sound off",
+    "RESet",                        "return to start-up conditions (if 'y')",
+    "EXit",                         "tidy up and close Yoshimi (if 'y')",
     "..",                           "step back one level",
     "/",                            "step back to top level",
-    "list",                         "various available parameters",
-    "  roots",                      "all available root paths",
-    "  banks [n]",                  "banks in root ID or current",
-    "  instruments [n]",            "instruments in bank ID or current",
-    "  parts",                      "parts with instruments installed",
-    "  vectors",                    "settings for all enabled vectors",
-    "  setup",                      "dynamic settings",
-    "  history [s]",                "recent files (patchsets, scales, states)",
-    "  effects [s]",                "effect types ('all' include preset numbers and names)",
-    "load",                         "load patch files",
-    "  instrument <s>",             "instrument to current part from named file",
-    "  patchset <s>",               "complete set of instruments from named file",
-    "  state <s>",                  "all system settings and patch sets from named file",
-    "  scale <s>",                  "scale settings from named file",
-    "save",                         "save various files",
-    "  instrument <s>",             "current part to named file",
-    "  patchset <s>",               "complete set of instruments to named file",
-    "  state <s>",                  "all system settings and patch sets to named file",
-    "  scale <s>",                  "current scale settings to named file",
-    "  setup",                      "dynamic settings",
-    "add",                          "add paths and files",
-    "  root <s>",                   "root path to list",
-    "  bank <s>",                   "bank to current root",
-    "remove",                       "remove paths and files",
-    "  root <n>",                   "de-list root path ID",
-    "  bank <n>",                   "delete bank ID (and all contents) from current root",
-    "set",                          "set all main parameters",
-    "  reports [s]",                "destination (gui/stderr)",
-    "  ",                           "  non-fatal (show/hide)",
-    "  root <n>",                   "current root path to ID",
-    "  bank <n>",                   "current bank to ID",
+    "List",                         "various available parameters",
+    "  Roots",                      "all available root paths",
+    "  Banks [n]",                  "banks in root ID or current",
+    "  Instruments [n]",            "instruments in bank ID or current",
+    "  Parts",                      "parts with instruments installed",
+    "  Vectors",                    "settings for all enabled vectors",
+    "  Settings",                   "dynamic settings",
+    "  History [s]",                "recent files (Patchsets, SCales, STates)",
+    "  Effects [s]",                "effect types ('all' include preset numbers and names)",
+    "LOad",                         "load patch files",
+    "  Instrument <s>",             "instrument to current part from named file",
+    "  Patchset <s>",               "complete set of instruments from named file",
+    "  STate <s>",                  "all system settings and patch sets from named file",
+    "  SCale <s>",                  "scale settings from named file",
+    "  VEctor [{channel}n] <s>",    "vector on channnel n from named file",
+    "SAve",                         "save various files",
+    "  Instrument <s>",             "current part to named file",
+    "  Patchset <s>",               "complete set of instruments to named file",
+    "  STate <s>",                  "all system settings and patch sets to named file",
+    "  SCale <s>",                  "current scale settings to named file",
+    "  VEctor [{Channel}n] <s>",    "vector on channnel n to named file",
+    "  Setup",                      "dynamic settings",
+    "ADD",                          "add paths and files",
+    "  Root <s>",                   "root path to list",
+    "  Bank <s>",                   "bank to current root",
+    "REMove",                       "remove paths and files",
+    "  Root <n>",                   "de-list root path ID",
+    "  Bank <n>",                   "delete bank ID (and all contents) from current root",
+    "Set",                          "set all main parameters",
+    "  REPorts [s]",                "destination (Gui/Stderr)",
+    "  ",                           "  non-fatal (SHow/Hide)",
+    "  Root <n>",                   "current root path to ID",
+    "  Bank <n>",                   "current bank to ID",
     "end"
 };
 
 string toplist [] = {
-    "system effects [n]",         "system effects for editing",
-    "- send <n2> <n3>",           "send system effect to effect n2 at volume n3",
+    "SYStem effects [n]",         "system effects for editing",
+    "- Send <n2> <n3>",           "send system effect to effect n2 at volume n3",
     "- preset <n2>",              "set effect preset to number n2",
-    "insert effects [n1]",        "insertion effects for editing",
-    "- send <s>/<n2>",            "set where: master, off or part number",
-    "- preset <n2>",              "set numbered effect preset to n2",
-    "program <n>",                "MIDI program change enabled (0 off, other on)",
-    "activate <n>",               "MIDI program change activates part (0 off, other on)",
-    "ccroot <n>",                 "CC for root path changes (> 119 disables)",
-    "ccbank <n>",                 "CC for bank changes (0, 32, other disables)",
-    "extend <n>",                 "CC for extended MIDI program change (> 119 disables)",
-    "available <n>",              "available parts (16, 32, 64)",
-    "volume <n>",                 "master volume",
-    "shift <n>",                  "master key shift semitones (64 no shift)",
-    "preferred midi <s>",         "* MIDI connection type jack/alsa",
-    "preferred audio <s>",        "* audio connection type jack/alsa",
-    "alsa midi <s>",              "* name of alsa MIDI source",
-    "alsa audio <s>",             "* name of alsa hardware device",
-    "jack midi <s>",              "* name of jack MIDI source",
-    "jack server <s>",            "* jack server name",
+    "INSert effects [n1]",        "insertion effects for editing",
+    "- Send <s>/<n2>",            "set where (Master, Off or part number)",
+    "- PREset <n2>",              "set numbered effect preset to n2",
+    "PRogram <n>",                "MIDI program change enabled (0 off, other on)",
+    "ACtivate <n>",               "MIDI program change activates part (0 off, other on)",
+    "CCRoot <n>",                 "CC for root path changes (> 119 disables)",
+    "CCBank <n>",                 "CC for bank changes (0, 32, other disables)",
+    "EXtend <n>",                 "CC for extended MIDI program change (> 119 disables)",
+    "AVailable <n>",              "available parts (16, 32, 64)",
+    "Volume <n>",                 "master volume",
+    "SHift <n>",                  "master key shift semitones (64 no shift)",
+    "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
+    "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
+    "Alsa Midi <s>",              "* name of alsa MIDI source",
+    "Alsa Audio <s>",             "* name of alsa hardware device",
+    "Jack Midi <s>",              "* name of jack MIDI source",
+    "Jack Server <s>",            "* jack server name",
     "end"
 };
 
 string vectlist [] = {
-    "[x/y] cc <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
-    "[x/y] features <n2>",      "sets CHANNEL X or Y features",
-    "[x] program <l/r> <n2>",   "X program change ID for CHANNEL LEFT or RIGHT part",
-    "[y] program <d/u> <n2>",   "Y program change ID for CHANNEL DOWN or UP part",
-    "[x/y] control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
-    "off",                      "disable vector for CHANNEL",
+    "[X/Y] Cc <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
+    "[X/Y] Features <n2>",      "sets CHANNEL X or Y features",
+    "[X] PRogram <l/r> <n2>",   "X program change ID for CHANNEL LEFT or RIGHT part",
+    "[Y] PRogram <d/u> <n2>",   "Y program change ID for CHANNEL DOWN or UP part",
+    "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
+    "Off",                      "disable vector for CHANNEL",
     "end"
 };
 
 
 string partlist [] = {
-    "enable",                   "enables the part",
-    "disable",                  "disables the part",
-    "volume <n2>",              "volume",
-    "pan <n2>",                 "panning",
-    "velocity <n2>",            "velocity sensing sensitivity",
-    "offset <n2>",              "velocity sense offest",
-    "portamento <s>",           "portamento (en - enable, other - disable",
-    "mode <s>",                 "key mode (poly, mono, legato)",
-    "note <n2>",                "note polyphony",
-    "shift <n2>",               "key shift semitones (64 no shift)",
-    "min <n2>",                 "minimum MIDI note value",
-    "max <n2>",                 "maximum MIDI note value",
-    "effects [n2]",             "effects for editing",
-    "- type <s>",               "the effect type",
-    "- preset <n3>",            "set numbered effect preset to n3",
-    "- send <n3> <n4>",         "send part to system effect n3 at volume n4",    "program <n2>",             "loads instrument ID",
-    "name <s>",                 "sets the display name the part can be saved with",
-    "channel <n2>",             "MIDI channel (> 15 disables)",
-    "destination <s2>",         "jack audio destination (main, part, both)",
+    "ENable",                   "enables the part",
+    "DIsable",                  "disables the part",
+    "Volume <n2>",              "volume",
+    "Pan <n2>",                 "panning",
+    "VElocity <n2>",            "velocity sensing sensitivity",
+    "OFfset <n2>",              "velocity sense offest",
+    "POrtamento <s>",           "portamento (Enable, other - disable",
+    "Mode <s>",                 "key mode (Poly, Mono, Legato)",
+    "Note <n2>",                "note polyphony",
+    "SHift <n2>",               "key shift semitones (64 no shift)",
+    "MIn <n2>",                 "minimum MIDI note value",
+    "MAx <n2>",                 "maximum MIDI note value",
+    "EFfects [n2]",             "effects for editing",
+    "- Type <s>",               "the effect type",
+    "- PREset <n3>",            "set numbered effect preset to n3",
+    "- Send <n3> <n4>",         "send part to system effect n3 at volume n4",
+    "PRogram <n2>",             "loads instrument ID",
+    "NAme <s>",                 "sets the display name the part can be saved with",
+    "Channel <n2>",             "MIDI channel (> 15 disables)",
+    "Destination <s2>",         "jack audio destination (Main, Part, Both)",
     "end"
 };
 
@@ -148,6 +151,7 @@ string replies [] = {
     "OK",
     "Done",
     "Value?",
+    "Name?",
     "Which Operation?",
     " what?",
     "Out of range",
@@ -160,15 +164,15 @@ string replies [] = {
 };
 
 string fx_list [] = {
-    "off",
-    "reverb",
-    "echo",
-    "chorus",
-    "phaser",
-    "alienwah",
-    "distortion",
-    "eq",
-    "dynfilter"
+    "OFf",
+    "REverb",
+    "ECho",
+    "CHorus",
+    "PHaser",
+    "ALienwah",
+    "DIstortion",
+    "EQ",
+    "DYnfilter"
 };
 
 string fx_presets [] = {
@@ -255,11 +259,11 @@ bool CmdInterface::helpList()
     helpLoop(msg, basics, 2);
     
     if (!bitTest(level, vect_lev))
-        msg.push_back("    part [n1]                 - set part ID operations");
+        msg.push_back("    Part [n1]                 - set part ID operations");
     if (bitTest(level, part_lev))
         helpLoop(msg, partlist, 6);
     else
-        msg.push_back("    vector [n1]               - vector CHANNEL, operations");
+        msg.push_back("    VEctor [n1]               - vector CHANNEL, operations");
     
     if (bitTest(level, vect_lev))
         helpLoop(msg, vectlist, 6);        
@@ -272,7 +276,7 @@ bool CmdInterface::helpList()
     
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
-        cout << "\nset reports [s] - set report destination (gui/stderr)\n\n";
+        cout << "\nSet REPorts [s] - set report destination (gui/stderr)\n\n";
  
     synth->cliOutput(msg, LINES);
     return true;
@@ -446,7 +450,7 @@ int CmdInterface::effects(int level)
         }
         if (flag)
             return unrecognised_msg;
-        
+
         Runtime.Log("FX type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
@@ -463,7 +467,7 @@ int CmdInterface::effects(int level)
     {
         if (point[0] == 0)
             return parameter_msg;
-        
+
         if (bitTest(level, ins_fx))
         {
             if (matchnMove(1, point, "master"))
@@ -591,7 +595,7 @@ int CmdInterface::volPanShift()
         Runtime.Log("Panning set to " + asString(value));
         panelFlag = true;
     }
-    else if (matchnMove(1, point, "shift"))
+    else if (matchnMove(2, point, "shift"))
     {
         if (point[0] == 0)
             return value_msg;
@@ -648,7 +652,7 @@ int CmdInterface::commandVector()
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
     int tmp;
-    
+
     if (point[0] == 0)
         return done_msg;
 
@@ -701,13 +705,13 @@ int CmdInterface::commandVector()
         Runtime.Log("Vector X CC must be set first");
         return done_msg;
     }
-    
+
     if (axis == 1 && (Runtime.nrpndata.vectorYaxis[chan] > 0x7f))
     {
         Runtime.Log("Vector Y CC must be set first");
         return done_msg;
     }
-    
+
     if (matchnMove(1, point, "features"))
     {
         if (point[0] == 0)
@@ -852,7 +856,7 @@ int CmdInterface::commandPart(bool justSet)
     else if (matchnMove(1, point, "destination"))
     {
         int dest = 0;
-        
+
         if (matchnMove(1, point, "main"))
             dest = 1;
         else if (matchnMove(1, point, "part"))
@@ -994,13 +998,13 @@ int CmdInterface::commandSet()
         return done_msg;
     }
         
-    else if (matchnMove(1, point, "reports"))
+    else if (matchnMove(3, point, "reports"))
     {
         if (matchnMove(1, point, "gui"))
             synth->SetSystemValue(100, 127);
         else if (matchnMove(1, point, "stderr"))
             synth->SetSystemValue(100, 0);
-        else if (matchnMove(1, point, "show"))
+        else if (matchnMove(2, point, "show"))
         {
             Runtime.hideErrors = false;
             Runtime.Log("Showing all errors");
@@ -1293,7 +1297,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (point[0] == 0)
             return false;
     }
-    
+
     if (matchnMove(3, point, "reset"))
     {
         if (query("Restore to basic settings", false))
@@ -1304,7 +1308,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         return false;
     }
-    
+
     else if (point[0] == '.' && point[1] == '.')
     {
         point += 2;
@@ -1385,7 +1389,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             reply = what_msg;
         }
     }
-    
+
     else if (matchnMove(1, point, "set"))
     {
         if (point[0] != 0)
@@ -1396,7 +1400,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             reply = what_msg;
         }
     }
-    
+
     else if (matchnMove(3, point, "add"))
     {
         if (matchnMove(1, point, "root"))
@@ -1490,8 +1494,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
                             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePaths, 0);
                         }
                     }
-                        
-                }                
+
+                }
             }
             else
                 reply = value_msg;
@@ -1505,10 +1509,30 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     else if (matchnMove(2, point, "load"))
     {
-        if(matchnMove(2, point, "state"))
+        if(matchnMove(2, point, "vector"))
+        {
+            tmp = chan;
+            if(matchnMove(1, point, "channel"))
+            {
+                tmp = string2int127(point);
+                point = skipChars(point);
+            }
+            if (tmp >= NUM_MIDI_CHANNELS)
+                reply = range_msg;
+            else if (point[0] == 0)
+                reply = name_msg;
+            else
+            {
+                chan = tmp;
+                if(synth->loadVector(chan, (string) point, true))
+                    Runtime.Log("Loaded Vector " + (string) point + " to channel " + asString(chan));
+                reply = done_msg;
+            }
+        }
+        else if(matchnMove(2, point, "state"))
         {
             if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else if (Runtime.loadState(point))
             {
                 Runtime.Log("Loaded " + (string) point + ".state");
@@ -1519,7 +1543,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else
             {
                 synth->microtonal.loadXML((string) point);
@@ -1529,7 +1553,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else
             {
                 int loadResult = synth->loadPatchSetAndUpdate((string) point);
@@ -1543,7 +1567,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "instrument"))
         {
             if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else if (synth->SetProgramToPart(npart, -1, (string) point))
                 reply = done_msg;
         }
@@ -1554,7 +1578,27 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
     else if (matchnMove(2, point, "save"))
-        if(matchnMove(2, point, "state"))
+        if(matchnMove(2, point, "vector"))
+        {
+            tmp = chan;
+            if(matchnMove(1, point, "channel"))
+            {
+                tmp = string2int127(point);
+                point = skipChars(point);
+            }
+            if (tmp >= NUM_MIDI_CHANNELS)
+                reply = range_msg;
+            else if (point[0] == 0)
+                reply = name_msg;
+            else
+            {
+                chan = tmp;
+                if(synth->saveVector(chan, (string) point, true))
+                    Runtime.Log("Saved channel " + asString(chan) + " Vector to " + (string) point);
+                reply = done_msg;
+            }
+        }
+        else if(matchnMove(2, point, "state"))
             if (point[0] == 0)
                 reply = value_msg;
             else
@@ -1567,7 +1611,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(2, point, "scale"))
         {
             if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else
             {
                 synth->microtonal.saveXML((string) point);
@@ -1576,7 +1620,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }else if (matchnMove(1, point, "patchset"))
         {
             if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else
             {
                 replyString = setExtension((string) point, "xmz");
@@ -1595,7 +1639,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = done_msg;
             }
             else if (point[0] == 0)
-                reply = value_msg;
+                reply = name_msg;
             else
             {
                 replyString = setExtension((string) point, "xiz");

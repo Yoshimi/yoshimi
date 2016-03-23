@@ -578,6 +578,12 @@ int XMLwrapper::getpar127(const string& name, int defaultpar)
 }
 
 
+int XMLwrapper::getpar255(const string& name, int defaultpar)
+{
+    return(getpar(name, defaultpar, 0, 255));
+}
+
+
 int XMLwrapper::getparbool(const string& name, int defaultpar)
 {
     node = mxmlFindElement(peek(), peek(), "par_bool", "name", name.c_str(), MXML_DESCEND_FIRST);

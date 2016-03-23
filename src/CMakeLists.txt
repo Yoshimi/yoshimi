@@ -360,6 +360,7 @@ add_definitions (-DXML_STATE=5)
 add_definitions (-DXML_CONFIG=6)
 add_definitions (-DXML_BANK=7)
 add_definitions (-DXML_HISTORY=8)
+add_definitions (-DXML_VECTOR=9)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
