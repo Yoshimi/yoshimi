@@ -66,13 +66,13 @@ string basics[] = {
     "  Patchset <s>",               "complete set of instruments from named file",
     "  STate <s>",                  "all system settings and patch sets from named file",
     "  SCale <s>",                  "scale settings from named file",
-    "  VEctor [{channel}n] <s>",    "vector on channnel n from named file",
+    "  VEctor [{Channel}n] <s>",    "vector on channel n from named file",
     "SAve",                         "save various files",
     "  Instrument <s>",             "current part to named file",
     "  Patchset <s>",               "complete set of instruments to named file",
     "  STate <s>",                  "all system settings and patch sets to named file",
     "  SCale <s>",                  "current scale settings to named file",
-    "  VEctor [{Channel}n] <s>",    "vector on channnel n to named file",
+    "  VEctor <{Channel}n> <s>",    "vector on channel n to named file",
     "  Setup",                      "dynamic settings",
     "ADD",                          "add paths and files",
     "  Root <s>",                   "root path to list",
@@ -1532,12 +1532,19 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if(matchnMove(2, point, "vector"))
         {
             tmp = chan;
+            string loadChan;
             if(matchnMove(1, point, "channel"))
             {
                 tmp = string2int127(point);
                 point = skipChars(point);
+                loadChan = "channel " + asString(chan);
             }
-            if (tmp >= NUM_MIDI_CHANNELS)
+            else
+            {
+                tmp = 255;
+                loadChan = "source channel";
+            }
+            if (tmp != 255 && tmp >= NUM_MIDI_CHANNELS)
                 reply = range_msg;
             else if (point[0] == 0)
                 reply = name_msg;
@@ -1545,7 +1552,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 chan = tmp;
                 if(synth->loadVector(chan, (string) point, true))
-                    Runtime.Log("Loaded Vector " + (string) point + " to channel " + asString(chan));
+                    Runtime.Log("Loaded Vector " + (string) point + " to " + loadChan);
                 reply = done_msg;
             }
         }

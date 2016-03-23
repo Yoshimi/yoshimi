@@ -4,6 +4,9 @@ yoshimi 1.3.x
 - Implemented CLI Vector save and load.
 - Minimum CLI abbreviations capitalised.
 - Reorganised CLI vector features setting.
+- Giving no channel number for vector load now loads to the same
+  channel as it was saved from.
+- Now ensures the channel numbers are correct for all four parts.
 
 2016-3-21 Will
 - Bugfix: All file loads incorporating scales now correctly tuned.

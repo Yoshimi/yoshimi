@@ -2135,11 +2135,11 @@ bool SynthEngine::saveHistory(int instance)
 
 bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
-    if (baseChan >= NUM_MIDI_CHANNELS)
+    /*if (baseChan >= NUM_MIDI_CHANNELS)
     {
         Runtime.Log("Invalid channel number");
         return false;
-    }
+    }*/
     if (name.empty())
     {
         Runtime.Log("No filename");
@@ -2160,6 +2160,8 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
         return false;
     }
     int lastPart = NUM_MIDI_PARTS;
+    if (baseChan >= NUM_MIDI_CHANNELS)
+        baseChan = xml->getpar255("Source_channel", 0);
     Runtime.nrpndata.vectorXaxis[baseChan] = xml->getpar255("X_sweep_CC", 0xff);
     if (Runtime.nrpndata.vectorXaxis[baseChan] < 0x7f)
         Runtime.nrpndata.vectorEnabled[baseChan] = true;;
@@ -2213,12 +2215,14 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 
     if (full)
     {
+        Runtime.Log("base " + asString((int)baseChan));
         Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
             if (!xml->enterbranch("PART", npart))
                 continue;
             part[npart + baseChan]->getfromXML(xml);
+            part[npart + baseChan]->Prcvchn = baseChan;
             xml->exitbranch();
             if (partonoffRead(npart + baseChan) && (part[npart + baseChan]->Paudiodest & 2))
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + baseChan);
@@ -2265,6 +2269,7 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     int x_feat = Runtime.nrpndata.vectorXfeatures[baseChan];
     int y_feat = Runtime.nrpndata.vectorYfeatures[baseChan];
     xml->beginbranch("VECTOR");
+    xml->addpar("Source_channel", baseChan);
     xml->addpar("X_sweep_CC", Runtime.nrpndata.vectorXaxis[baseChan]);
     xml->addpar("Y_sweep_CC", Runtime.nrpndata.vectorYaxis[baseChan]);
     xml->addparbool("X_feature_1", (x_feat & 1) > 0);
