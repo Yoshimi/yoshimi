@@ -1247,7 +1247,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
 
         case 118: // active parts
-            if (value == 16 or value == 32 or value == 64)
+            if (value == 16 || value == 32 || value == 64)
             {
                 Runtime.NumAvailableParts = value;
                 Runtime.Log("Available parts set to " + asString(value));
@@ -1333,6 +1333,35 @@ return false;
 
 void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
 {
+    string featureList = "";
+    if (dHigh == 2 || dHigh == 3)
+    {
+        if (bitTest(par, 0))
+        {
+            featureList += "1 en  ";
+        }
+        if (bitTest(par, 1))
+        {
+            if (!bitTest(par, 4))
+                featureList += "2 en  ";
+            else
+                featureList += "2 rev  ";
+        }
+        if (bitTest(par, 2))
+        {
+            if (!bitTest(par, 5))
+                featureList += "3 en  ";
+            else
+                featureList += "3 rev  ";
+        }
+         if (bitTest(par, 3))
+        {
+            if (!bitTest(par, 6))
+                featureList += "4 en";
+            else
+                featureList += "4 rev";
+        }
+   }
     switch (dHigh)
     {
         case 0:
@@ -1366,13 +1395,13 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
         case 2:
             Runtime.nrpndata.vectorXfeatures[chan] = par;
-            Runtime.Log("Enabled X features " + asString(par));
+            Runtime.Log("Set X features " + featureList);
             break;
         case 3:
             if (Runtime.NumAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
                 Runtime.nrpndata.vectorYfeatures[chan] = par;
-                Runtime.Log("Enabled Y features " + asString(par));
+                Runtime.Log("Set Y features " + featureList);
             }
             break;
 
@@ -1402,11 +1431,11 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
         case 9:
             Runtime.nrpndata.vectorXcc4[chan] = par;
-            Runtime.Log("Channel " + asString((int) chan) + " X feature 4 set to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " X feature 3 set to " + asString(par));
             break;
         case 10:
             Runtime.nrpndata.vectorXcc8[chan] = par;
-            Runtime.Log("Channel " + asString((int) chan) + " X feature 8 set to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " X feature 4 set to " + asString(par));
             break;
         case 11:
             Runtime.nrpndata.vectorYcc2[chan] = par;
@@ -1414,11 +1443,11 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             break;
         case 12:
             Runtime.nrpndata.vectorYcc4[chan] = par;
-            Runtime.Log("Channel " + asString((int) chan) + " Y feature 4 set to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " Y feature 3 set to " + asString(par));
             break;
         case 13:
             Runtime.nrpndata.vectorYcc8[chan] = par;
-            Runtime.Log("Channel " + asString((int) chan) + " Y feature 8 set to " + asString(par));
+            Runtime.Log("Channel " + asString((int) chan) + " Y feature 4 set to " + asString(par));
             break;
 
         default:

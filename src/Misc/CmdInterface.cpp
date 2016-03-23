@@ -113,11 +113,11 @@ string toplist [] = {
 };
 
 string vectlist [] = {
-    "[X/Y] Cc <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
-    "[X/Y] Features <n2>",      "sets CHANNEL X or Y features",
+    "[X/Y] CC <n2>",            "CC n2 is used for CHANNEL X or Y axis sweep",
+    "[X/Y] Features <n2> <s>",   "sets CHANNEL X or Y features 1-4 (Enable, Reverse, {other} off)",
     "[X] PRogram <l/r> <n2>",   "X program change ID for CHANNEL LEFT or RIGHT part",
     "[Y] PRogram <d/u> <n2>",   "Y program change ID for CHANNEL DOWN or UP part",
-    "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2, 4, 8)",
+    "[X/Y] Control <n2> <n3>",  "sets n3 CC to use for X or Y feature n2 (2-4)",
     "Off",                      "disable vector for CHANNEL",
     "end"
 };
@@ -257,23 +257,23 @@ bool CmdInterface::helpList()
     list<string>msg;
     msg.push_back("Commands:");
     helpLoop(msg, basics, 2);
-    
+
     if (!bitTest(level, vect_lev))
         msg.push_back("    Part [n1]                 - set part ID operations");
     if (bitTest(level, part_lev))
         helpLoop(msg, partlist, 6);
     else
         msg.push_back("    VEctor [n1]               - vector CHANNEL, operations");
-    
+
     if (bitTest(level, vect_lev))
-        helpLoop(msg, vectlist, 6);        
+        helpLoop(msg, vectlist, 6);
 
     if (level <= 3)
     {
         helpLoop(msg, toplist, 4);
         msg.push_back("'*' entries need to be saved and Yoshimi restarted to activate");
     }
-    
+
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
         cout << "\nSet REPorts [s] - set report destination (gui/stderr)\n\n";
@@ -689,8 +689,8 @@ int CmdInterface::commandVector()
     }
     if (point[0] == 0)
         return done_msg;
-    
-    if (matchnMove(1, point, "cc"))
+
+    if (matchnMove(2, point, "cc"))
     {
         if (point[0] == 0)
             return value_msg;
@@ -714,13 +714,35 @@ int CmdInterface::commandVector()
 
     if (matchnMove(1, point, "features"))
     {
+        unsigned int vecfeat = Runtime.nrpndata.vectorXfeatures[chan];
         if (point[0] == 0)
             reply = value_msg;
         else
         {
             tmp = string2int(point);
-            if (!synth->vectorInit(axis + 2, chan, tmp))
-                synth->vectorSet(axis + 2, chan, tmp);
+            if (tmp < 1 || tmp > 4)
+                return range_msg;
+            point = skipChars(point);
+            if (matchnMove(1, point, "enable"))
+            {
+                bitSet(vecfeat, tmp - 1);
+                if (tmp > 1) // volume is not reversible
+                    bitClear(vecfeat, (tmp + 2)); // disable reverse
+            }
+            else if(matchnMove(1, point, "reverse"))
+            {
+                bitSet(vecfeat, tmp - 1);
+                if (tmp > 1)
+                    bitSet(vecfeat, (tmp + 2));
+            }
+            else
+            {
+                bitClear(vecfeat, tmp - 1);
+                if (tmp > 1)
+                    bitClear(vecfeat, (tmp + 2));
+            }
+            if (!synth->vectorInit(axis + 2, chan, vecfeat))
+                synth->vectorSet(axis + 2, chan, vecfeat);
             reply = done_msg;
         }
     }
@@ -750,17 +772,15 @@ int CmdInterface::commandVector()
             return opp_msg;
         if(isdigit(point[0]))
         {
-            int cmd = string2int(point) >> 1;
-            if (cmd == 4)
-                cmd = 3; // can't remember how to do this bit-wise :(
-            if (cmd < 1 || cmd > 3)
+            int cmd = string2int(point);
+            if (cmd < 2 || cmd > 4)
                 return range_msg;
             point = skipChars(point);
             if (point[0] == 0)
                 return value_msg;
             tmp = string2int(point);
-            if (!synth->vectorInit(axis * 2 + cmd + 7, chan, tmp))
-            synth->vectorSet(axis * 2 + cmd + 7, chan, tmp);
+            if (!synth->vectorInit(axis * 3 + cmd + 6, chan, tmp))
+            synth->vectorSet(axis * 3 + cmd + 6, chan, tmp);
             reply = done_msg;
         }
         else
