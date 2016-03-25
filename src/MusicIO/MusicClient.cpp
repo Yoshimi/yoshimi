@@ -235,7 +235,7 @@ unsigned int MusicClient::getSamplerate()
     {
         return audioIO->getSamplerate();
     }
-    //return NMC_SRATE;
+    return NMC_SRATE;
 }
 
 int MusicClient::getBuffersize()

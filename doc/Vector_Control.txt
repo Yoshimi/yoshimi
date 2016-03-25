@@ -117,9 +117,9 @@ There are 4 features available
 
 We'll select volume for this example so:
 
-yoshimi Vect Ch 1 X > set features 2 enable.
+yoshimi Vect Ch 1 X > set features 1 enable.
 Set X features 1 en
-Set Y features 1 en
+
 
 Now you need the set the instruments that will be used. These can only be the ones in the current bank, so, assuming we are in Will Godfrey Companion
 
@@ -133,7 +133,7 @@ If you now sweep the the controller assigned to 14 the sound will morph between 
 
 To go on to using the other axis as well you need to have 64 parts set so:
 
-yoshimi Vect Ch 1 X > set available 64
+yoshimi Vect Ch 1 X > /set available 64
 Available parts set to 64
 
 Then:
@@ -144,7 +144,7 @@ Vector 1 Y CC set to 15
 Well use panning for this vector so:
 
 yoshimi Vect Ch 1 Y > set features 2 enable
-Set Y features 1 en  2 en
+Set Y features 2 en
 
 yoshimi Vect Ch 1 Y > set program down 107
 Loaded 107 "Angel Harp" to Part 32
