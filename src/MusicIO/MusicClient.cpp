@@ -231,10 +231,10 @@ void MusicClient::Close()
 
 unsigned int MusicClient::getSamplerate()
 {
-    //if(audioIO)
-    //{
+    if(audioIO)
+    {
         return audioIO->getSamplerate();
-    //}
+    }
     //return NMC_SRATE;
 }
 

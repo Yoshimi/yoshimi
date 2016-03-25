@@ -107,7 +107,7 @@ Then:
 yoshimi > set vector 1 x cc 14
 Vector channel set to 1
 
-This command must aways the first as everthing esle hangs on it. It the command that enables vector control. cc is the incoming sweep CC that will vary the features you set.
+This command must aways be the first as everthing else hangs on it. It's the command that enables vector control. cc is the incoming sweep CC that will vary the features you set.
 
 There are 4 features available
 1 is fixed as volume
@@ -115,10 +115,11 @@ There are 4 features available
 3 is brightness by default
 4 is modulation by default
 
-We'll select panning for this example so:
+We'll select volume for this example so:
 
 yoshimi Vect Ch 1 X > set features 2 enable.
-Set X features 2 en
+Set X features 1 en
+Set Y features 1 en
 
 Now you need the set the instruments that will be used. These can only be the ones in the current bank, so, assuming we are in Will Godfrey Companion
 

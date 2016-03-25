@@ -2220,7 +2220,6 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 
     if (full)
     {
-        Runtime.Log("base " + asString((int)baseChan));
         Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {

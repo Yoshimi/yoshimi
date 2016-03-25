@@ -2,6 +2,8 @@ yoshimi 1.3.x
 
 2016-3-25 Will
 - Added error check for invalid vector files.
+- Bugfix: if jack not running and ALSA not available yoshimi 
+  sometimes segfalted.
 
 2016-3-23 Will
 - Implemented CLI Vector save and load.
