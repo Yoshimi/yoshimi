@@ -2147,6 +2147,11 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
     }
     string file = setExtension(name, "xvy");
     legit_pathname(file);
+    if (!isRegFile(file))
+    {
+        Runtime.Log("Can't find " + file);
+        return false;
+    }
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml)
     {

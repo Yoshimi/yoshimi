@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-3-25 Will
+- Added error check for invalid vector files.
+
 2016-3-23 Will
 - Implemented CLI Vector save and load.
 - Minimum CLI abbreviations capitalised.
