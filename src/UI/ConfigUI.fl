@@ -257,6 +257,16 @@ else
             xywh {322 239 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
+          Fl_Check_Button {} {
+            label {Show Splash}
+            callback {if (synth->getRuntime().showSplash != o->value())
+{
+    synth->getRuntime().showSplash = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {143 239 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showSplash);}
+          }
         }
         Fl_Group jackTab {
           label Jack

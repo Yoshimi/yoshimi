@@ -96,6 +96,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     Oscilsize(512),
     runSynth(true),
     showGui(true),
+    showSplash(true),
     showCLI(true),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
@@ -518,6 +519,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     }
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
     showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);    
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
@@ -610,6 +612,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->beginbranch("CONFIGURATION");
     xmltree->addpar("gzip_compression", GzipCompression);
     xmltree->addpar("enable_gui", synth->getRuntime().showGui);
+    xmltree->addpar("enable_splash", synth->getRuntime().showSplash);
     xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
     xmltree->addpar("single_row_panel", single_row_panel);
     xmltree->addpar("reports_destination", toConsole);

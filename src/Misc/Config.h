@@ -104,6 +104,7 @@ class Config : public MiscFuncs
 
         bool          runSynth;
         bool          showGui;
+        bool          showSplash;
         bool          showCLI;
         int           VirKeybLayout;
 
