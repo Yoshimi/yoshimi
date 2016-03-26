@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2016, Will Godfrey
+Copyright 2014 -2016, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -52,9 +52,9 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {16 162 390 330} type Double hide
+      xywh {16 162 390 330} type Double
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
-      code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
+      code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}} visible
     } {
       Fl_Tabs {} {
         xywh {5 5 385 297}
@@ -458,7 +458,7 @@ synth->getRuntime().configChanged = true;}
           Fl_Spinner BankRoot {
             label {Bank Root Change}
             callback {Rpend->show();}
-            xywh {235 81 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+            xywh {235 60 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
           }
@@ -488,7 +488,7 @@ synth->getRuntime().configChanged = true;}
         o->hide();
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {Click to set} xywh {300 81 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+            tooltip {Click to set} xywh {300 60 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button rootcheck {
             label {Enable Bank Root Change}
@@ -509,7 +509,7 @@ synth->getRuntime().configChanged = true;}
     }
     BankRoot->redraw();
     synth->getRuntime().configChanged = true;}
-            xywh {234 60 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 40 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
             code1 {if (o->value() == 0) BankRoot->deactivate();}
           }
@@ -542,7 +542,7 @@ synth->getRuntime().configChanged = true;}
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         synth->getRuntime().configChanged = true;}
-            tooltip {CC0 = msb, CC32 = lsb} xywh {235 122 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
+            tooltip {CC0 = msb, CC32 = lsb} xywh {235 100 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
           } {
@@ -566,7 +566,7 @@ synth->getRuntime().configChanged = true;}
 		synth->getRuntime().EnableProgChange = o->value();
 		if (synth->getRuntime().EnableProgChange != tmp)
 			synth->getRuntime().configChanged = true;}
-            tooltip {MIDI program change enable/disable} xywh {234 162 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
+            tooltip {MIDI program change enable/disable} xywh {234 130 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
           Fl_Check_Button progpartenable {
@@ -576,13 +576,13 @@ synth->getRuntime().configChanged = true;}
 		synth->getRuntime().enable_part_on_voice_load = o->value();
 		if (synth->getRuntime().enable_part_on_voice_load != tmp)
 			synth->getRuntime().configChanged = true;}
-            tooltip {Part enabled if MIDI program changed} xywh {234 182 18 18} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Part enabled if MIDI program changed} xywh {234 150 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
           Fl_Spinner EPCspinner {
             label {Extended Program Change}
             callback {Epend->show();}
-            xywh {235 241 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
+            xywh {235 200 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
           }
@@ -614,12 +614,22 @@ synth->getRuntime().configChanged = true;}
         o->hide();
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {Click to set} xywh {300 241 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+            tooltip {Click to set} xywh {300 200 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+          }
+          Fl_Check_Button {} {
+            label {Ignore Reset all CCs}
+            callback {if (synth->getRuntime().ignoreResetCCs != o->value())
+{
+    synth->getRuntime().ignoreResetCCs = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
             label {Log incoming CCs}
             callback {synth->getRuntime().monitorCCin = o->value();}
-            xywh {234 271 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
           }
           Fl_Check_Button Epcheck {
@@ -641,7 +651,7 @@ synth->getRuntime().configChanged = true;}
     }
     EPCspinner->redraw();
     synth->getRuntime().configChanged = true;}
-            xywh {234 220 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 180 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
           }

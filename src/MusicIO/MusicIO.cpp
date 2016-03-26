@@ -251,7 +251,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                         param = 0;
                 }
             }
-            
+
             if (ctrl == C_dataL || ctrl == C_dataH)
             {
                 nrpnProcessData(ch, ctrl, param);
@@ -264,6 +264,11 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             return;
         }
         // pick up a drop-through if CC doesn't match the above
+        if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
+        {
+            //synth->getRuntime().Log("Reset controllers ignored");
+            return;
+        }
         if (ctrl == C_breath)
         {
             synth->SetController(ch, C_volume, param);

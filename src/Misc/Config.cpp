@@ -123,6 +123,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     midi_bank_C(32),
     midi_upper_voice_C(128),
     enable_part_on_voice_load(1),
+    ignoreResetCCs(false),
     monitorCCin(false),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
@@ -573,6 +574,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     midi_upper_voice_C = xml->getpar("midi_upper_voice_C", midi_upper_voice_C, 0, 128);
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
+    ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
 
     //misc
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
@@ -648,6 +650,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("midi_upper_voice_C", midi_upper_voice_C);
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
+    xmltree->addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->endbranch(); // CONFIGURATION
 }
