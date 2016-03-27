@@ -79,5 +79,6 @@ class Unison
 
         SynthEngine *synth;
 };
+
 #endif
 

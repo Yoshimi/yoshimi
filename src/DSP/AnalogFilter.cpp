@@ -122,6 +122,7 @@ void AnalogFilter::computefiltercoefs(void)
             d[2] = 0.0f;
             order = 1;
             break;
+
         case 1: // HPF 1 pole
             if (zerocoefs == 0)
                 tmp = expf(-2.0f * PI * freq / synth->samplerate_f);
@@ -134,6 +135,7 @@ void AnalogFilter::computefiltercoefs(void)
             d[2] = 0.0f;
             order = 1;
             break;
+
         case 2:// LPF 2 poles
             if (zerocoefs == 0)
             {
@@ -160,6 +162,7 @@ void AnalogFilter::computefiltercoefs(void)
             }
             order = 2;
             break;
+
         case 3: // HPF 2 poles
             if (zerocoefs == 0)
             {
@@ -178,6 +181,7 @@ void AnalogFilter::computefiltercoefs(void)
                 c[0] = c[1] = c[2] = d[1] = d[2] = 0.0f;
             order = 2;
             break;
+
         case 4: // BPF 2 poles
             if (zerocoefs == 0)
             {
@@ -196,6 +200,7 @@ void AnalogFilter::computefiltercoefs(void)
                 c[0] = c[1] = c[2] = d[1] = d[2] = 0.0f;
             order = 2;
             break;
+
         case 5: // NOTCH 2 poles
             if (zerocoefs == 0)
             {
@@ -217,6 +222,7 @@ void AnalogFilter::computefiltercoefs(void)
             }
             order = 2;
             break;
+
         case 6: // PEAK (2 poles)
             if (zerocoefs == 0)
             {
@@ -239,6 +245,7 @@ void AnalogFilter::computefiltercoefs(void)
             }
             order = 2;
             break;
+
         case 7: // Low Shelf - 2 poles
             if (zerocoefs == 0)
             {
@@ -263,6 +270,7 @@ void AnalogFilter::computefiltercoefs(void)
             }
             order = 2;
             break;
+
         case 8: // High Shelf - 2 poles
             if (zerocoefs == 0)
             {
@@ -287,6 +295,7 @@ void AnalogFilter::computefiltercoefs(void)
             }
             order = 2;
             break;
+
         default: // wrong type
             type = 0;
             computefiltercoefs();
@@ -381,7 +390,8 @@ void AnalogFilter::singlefilterout(float *smp, fstage &x, fstage &y, float *c, f
             smp[i] = y0; // out it goes
         }
     }
-    if (order == 2) { // Second order filter
+    if (order == 2)
+    { // Second order filter
         for (int i = 0; i < synth->p_buffersize; ++i)
         {
             y0 = smp[i] * c[0] + x.c1 * c[1] + x.c2 * c[2] + y.c1 * d[1] + y.c2 * d[2];

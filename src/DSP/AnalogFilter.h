@@ -75,7 +75,7 @@ class AnalogFilter : public Filter_, private MiscFuncs
         int needsinterpolation, firsttime;
         int abovenq;    // this is 1 if the frequency is above the nyquist
         int oldabovenq; // if the last time was above nyquist (used to see if it needs interpolation)
-        
+
         float *tmpismp; // used if it needs interpolation in filterout()
         SynthEngine *synth;
 };

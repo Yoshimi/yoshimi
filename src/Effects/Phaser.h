@@ -44,7 +44,7 @@ class Phaser : public Effect
         unsigned char getpar(int npar);
         void cleanup(void);
         void setdryonly(void);
-    
+
     private:
         // Parametrii Phaser
         EffectLFO lfo;           // <lfo-ul Phaser
@@ -61,7 +61,7 @@ class Phaser : public Effect
         unsigned char Pphase;
         unsigned char Phyper;       //lfo^2 -- converts tri into hyper-sine
         unsigned char Panalog;
-    
+
         // Control Parametrii
         void setvolume(unsigned char Pvolume_);
         void setdepth(unsigned char Pdepth_);
@@ -71,7 +71,7 @@ class Phaser : public Effect
         void setoffset(unsigned char Poffset_);
         void setstages(unsigned char Pstages_);
         void setphase(unsigned char Pphase_);
-    
+
         // Internal Values
         // int insertion; // inherited from Effect
         bool    barber; // Barber pole phasing flag
@@ -92,7 +92,7 @@ class Phaser : public Effect
         float  *xn1r;
         float  *yn1l;
         float  *yn1r;
-        
+
         float   diffl;
         float   diffr;
         float   oldlgain;
@@ -113,7 +113,7 @@ class Phaser : public Effect
 
         void NormalPhase(float *smpsl, float *smpsr);
         float applyPhase(float x, float g, float *old);
-        
+
         SynthEngine *synth;
 };
 

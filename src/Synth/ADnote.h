@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey    
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -81,7 +81,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
         void computeVoiceNoise(int nvoice);
         void ComputeVoicePinkNoise(int nvoice);
-        
+
         void fadein(float *smps);
 
 
@@ -109,7 +109,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
             Envelope *AmpEnvelope;
             LFO      *AmpLfo;
-            
+
             float Fadein_adjustment;
             struct {
                 int      Enabled;
@@ -126,7 +126,6 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             LFO      *FilterLfo;
         } NoteGlobalPar;
 
-
         // Voice parameters
         struct ADnoteVoice {
             bool Enabled;
@@ -138,7 +137,6 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             // Frequency parameters
             int fixedfreq;   // if the frequency is fixed to 440 Hz
             int fixedfreqET; // if the "fixed" frequency varies according to the note (ET)
-
 
             float Detune;     // cents = basefreq * VoiceDetune
             float FineDetune;

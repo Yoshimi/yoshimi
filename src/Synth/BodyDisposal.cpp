@@ -25,6 +25,7 @@ void BodyDisposal::addBody(Carcass *body)
         corpses.push_back(body);
 }
 
+
 void BodyDisposal::disposeBodies(void)
 {
     for (int x = corpses.size(); x > 0; --x)

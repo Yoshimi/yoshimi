@@ -245,6 +245,7 @@ inline float OscilGen::numRandom(void)
 
 **/
 
+
 inline float OscilGen::harmonicRandom(void)
 {
     if (!random_r(&harmonic_random_buf, &harmonic_random_result))

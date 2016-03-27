@@ -70,9 +70,11 @@ LFO::LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth):
         case 1:
             lfointensity = lfopars->Pintensity / 127.0f;
             break;
+
         case 2:
             lfointensity = lfopars->Pintensity / 127.0f * 4.0f;
             break; // in octave
+
         default:
             lfointensity = powf(2.0f, lfopars->Pintensity / 127.0f * 11.0f) - 1.0f; // in centi
             x -= 0.25f; // chance the starting phase
@@ -104,24 +106,30 @@ float LFO::lfoout(void)
             else
                 out = 4.0f * x - 4.0f;
             break;
+
         case 2: // LFO_SQUARE
             if (x < 0.5f)
                 out = -1.0f;
             else
                 out = 1.0f;
             break;
+
         case 3: // LFO_RAMPUP
             out = (x - 0.5f) * 2.0f;
             break;
+
         case 4: // LFO_RAMPDOWN
             out = (0.5f - x) * 2.0f;
             break;
+
         case 5: // LFO_EXP_DOWN 1
             out = powf(0.05f, x) * 2.0f - 1.0f;
             break;
+
         case 6: // LFO_EXP_DOWN 2
             out = powf(0.001f, x) * 2.0f - 1.0f;
             break;
+
         default:
             out = cosf( x * TWOPI); // LFO_SINE
     }

@@ -33,6 +33,7 @@ Resonance::Resonance(SynthEngine *_synth) : Presets(_synth)
     defaults();
 }
 
+
 void Resonance::defaults(void)
 {
     Penabled = 0;
@@ -46,6 +47,7 @@ void Resonance::defaults(void)
         Prespoints[i] = 64;
 }
 
+
 // Set a point of resonance function with a value
 void Resonance::setpoint(int n, unsigned char p)
 {
@@ -53,6 +55,7 @@ void Resonance::setpoint(int n, unsigned char p)
         return;
     Prespoints[n] = p;
 }
+
 
 // Apply the resonance to FFT data
 void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
@@ -94,6 +97,7 @@ void Resonance::applyres(int n, FFTFREQS fftdata, float freq)
     }
 }
 
+
 // Gets the response at the frequency "freq"
 float Resonance::getfreqresponse(float freq)
 {
@@ -125,6 +129,7 @@ float Resonance::getfreqresponse(float freq)
     return result;
 }
 
+
 // Smooth the resonance function
 void Resonance::smooth()
 {
@@ -144,6 +149,7 @@ void Resonance::smooth()
     }
 }
 
+
 // Randomize the resonance function
 void Resonance::randomize(int type)
 {
@@ -160,6 +166,7 @@ void Resonance::randomize(int type)
     }
     smooth();
 }
+
 
 // Interpolate the peaks
 void Resonance::interpolatepeaks(int type)
@@ -183,6 +190,7 @@ void Resonance::interpolatepeaks(int type)
     }
 }
 
+
 // Get the frequency from x, where x is [0..1]; x is the x coordinate
 float Resonance::getfreqx(float x)
 {
@@ -192,11 +200,13 @@ float Resonance::getfreqx(float x)
     return (getcenterfreq() / sqrtf(octf) * powf(octf, x));
 }
 
+
 // Get the x coordinate from frequency (used by the UI)
 float Resonance::getfreqpos(float freq)
 {
     return (logf(freq) - logf(getfreqx(0.0))) / logf(2.0f) / getoctavesfreq();
 }
+
 
 // Get the center frequency of the resonance graph
 float Resonance::getcenterfreq(void)
@@ -204,11 +214,13 @@ float Resonance::getcenterfreq(void)
     return 10000.0 * powf(10.0f, -(1.0f - Pcenterfreq / 127.0f) * 2.0f);
 }
 
+
 // Get the number of octave that the resonance functions applies to
 float Resonance::getoctavesfreq(void)
 {
     return 0.25 + 10.0 * Poctavesfreq / 127.0;
 }
+
 
 void Resonance::sendcontroller(MidiControllers ctl, float par)
 {
@@ -217,6 +229,7 @@ void Resonance::sendcontroller(MidiControllers ctl, float par)
     else
         ctlbw = par;
 }
+
 
 void Resonance::add2XML(XMLwrapper *xml)
 {
@@ -229,12 +242,14 @@ void Resonance::add2XML(XMLwrapper *xml)
     xml->addpar("octaves_freq",Poctavesfreq);
     xml->addparbool("protect_fundamental_frequency",Pprotectthefundamental);
     xml->addpar("resonance_points",N_RES_POINTS);
-    for (int i=0;i<N_RES_POINTS;i++) {
+    for (int i=0;i<N_RES_POINTS;i++)
+    {
         xml->beginbranch("RESPOINT",i);
         xml->addpar("val",Prespoints[i]);
         xml->endbranch();
     }
 }
+
 
 void Resonance::getfromXML(XMLwrapper *xml)
 {
@@ -244,7 +259,8 @@ void Resonance::getfromXML(XMLwrapper *xml)
     Pcenterfreq=xml->getpar127("center_freq",Pcenterfreq);
     Poctavesfreq=xml->getpar127("octaves_freq",Poctavesfreq);
     Pprotectthefundamental=xml->getparbool("protect_fundamental_frequency",Pprotectthefundamental);
-    for (int i=0;i<N_RES_POINTS;i++) {
+    for (int i=0;i<N_RES_POINTS;i++)
+    {
         if (xml->enterbranch("RESPOINT",i)==0) continue;
         Prespoints[i]=xml->getpar127("val",Prespoints[i]);
         xml->exitbranch();

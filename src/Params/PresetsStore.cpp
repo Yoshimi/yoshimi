@@ -47,6 +47,7 @@ PresetsStore::PresetsStore(SynthEngine *_synth) :
     }
 }
 
+
 PresetsStore::~PresetsStore()
 {
     if (clipboard.data != NULL)
@@ -58,8 +59,8 @@ PresetsStore::~PresetsStore()
     clearpresets();
 }
 
-// Clipboard management
 
+// Clipboard management
 void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
 {
     clipboard.type = type;
@@ -72,6 +73,7 @@ void PresetsStore::copyclipboard(XMLwrapper *xml, string type)
     clipboard.data = xml->getXMLdata();
 }
 
+
 bool PresetsStore::pasteclipboard(XMLwrapper *xml)
 {
     if (clipboard.data != NULL)
@@ -82,6 +84,7 @@ bool PresetsStore::pasteclipboard(XMLwrapper *xml)
     return false;
 }
 
+
 bool PresetsStore::checkclipboardtype(string type)
 {
     // makes LFO's compatible
@@ -90,6 +93,7 @@ bool PresetsStore::checkclipboardtype(string type)
         return true;
     return (!type.compare(clipboard.type));
 }
+
 
 void PresetsStore::clearpresets(void)
 {
@@ -163,6 +167,7 @@ void PresetsStore::rescanforpresets(string type)
     }
 }
 
+
 void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
 {
     if (synth->getRuntime().presetsDirlist[0].empty())
@@ -177,6 +182,7 @@ void PresetsStore::copypreset(XMLwrapper *xml, string type, string name)
     xml->saveXMLfile(dirname + tmpfilename + "." + type + preset_extension);
 }
 
+
 bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
 {
     if (npreset >= MAX_PRESETS || npreset < 1)
@@ -186,6 +192,7 @@ bool PresetsStore::pastepreset(XMLwrapper *xml, int npreset)
         return false;
     return xml->loadXMLfile(presets[npreset].file);
 }
+
 
 void PresetsStore::deletepreset(int npreset)
 {

@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey    
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -109,7 +109,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
     {
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
-        
+
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -144,12 +144,14 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             case 1: // if no unison, set the subvoice to the default note
                 unison_base_freq_rap[nvoice][0] = 1.0f;
                 break;
+
             case 2:  // unison for 2 subvoices
                 {
                     unison_base_freq_rap[nvoice][0] = 1.0f / unison_real_spread;
                     unison_base_freq_rap[nvoice][1] = unison_real_spread;
                 }
                 break;
+
             default: // unison for more than 2 subvoices
                 {
                     float unison_values[unison];
@@ -221,10 +223,12 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                     for (int k = 0; k < unison; ++k)
                         unison_invert_phase[nvoice][k] = false;
                     break;
+
                 case 1:
                     for (int k = 0; k < unison; ++k)
                         unison_invert_phase[nvoice][k] = (synth->numRandom() > 0.5f);
                     break;
+
                 default:
                     for (int k = 0; k < unison; ++k)
                         unison_invert_phase[nvoice][k] = (k % inv == 0) ? true : false;
@@ -335,18 +339,23 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             case 1:
                 NoteVoicePar[nvoice].FMEnabled = MORPH;
                 break;
+
             case 2:
                 NoteVoicePar[nvoice].FMEnabled = RING_MOD;
                 break;
+
             case 3:
                 NoteVoicePar[nvoice].FMEnabled = PHASE_MOD;
                 break;
+
             case 4:
                 NoteVoicePar[nvoice].FMEnabled = FREQ_MOD;
                 break;
+
             case 5:
                 NoteVoicePar[nvoice].FMEnabled = PITCH_MOD;
                 break;
+
             default:
                 NoteVoicePar[nvoice].FMEnabled = NONE;
         }
@@ -374,6 +383,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                     (expf(adpars->VoicePar[nvoice].PFMVolume / 127.0f
                           * FM_AMP_MULTIPLIER) - 1.0f) * fmvoldamp * 4.0f;
                 break;
+
             //    case PITCH_MOD:NoteVoicePar[nvoice].FMVolume=(adpars->VoicePar[nvoice].PFMVolume/127.0*8.0)*fmvoldamp;//???????????
             //	      break;
 
@@ -552,13 +562,16 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
                     (expf(adpars->VoicePar[nvoice].PFMVolume / 127.0f
                           * FM_AMP_MULTIPLIER) - 1.0f) * fmvoldamp * 4.0f;
                 break;
+
             case FREQ_MOD:
                 NoteVoicePar[nvoice].FMVolume =
                     (expf(adpars->VoicePar[nvoice].PFMVolume / 127.0f
                           * FM_AMP_MULTIPLIER) - 1.0f) * fmvoldamp * 4.0f;
                 break;
+
             //    case PITCH_MOD:NoteVoicePar[nvoice].FMVolume=(adpars->VoicePar[nvoice].PFMVolume/127.0*8.0)*fmvoldamp;//???????????
             //	          break;
+
             default:
                 if (fmvoldamp > 1.0f)
                     fmvoldamp = 1.0f;
@@ -672,7 +685,6 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             if (NoteVoicePar[i].FMVoice == nvoice && !voicetmp[i])
                 voicetmp[i] = 1;
     }
-    ///////////////
 
     // End of the ADlegatonote function.
 }
@@ -749,6 +761,7 @@ void ADnote::killVoice(int nvoice)
     NoteVoicePar[nvoice].Enabled = false;
 }
 
+
 // Kill the note
 void ADnote::killNote()
 {
@@ -776,6 +789,7 @@ void ADnote::killNote()
 
     NoteEnabled = false;
 }
+
 
 ADnote::~ADnote()
 {
@@ -1528,10 +1542,12 @@ void ADnote::computeVoiceNoise(int nvoice)
     }
 }
 
+
 // ported from Zyn 2.5.2
 void ADnote::ComputeVoicePinkNoise(int nvoice)
 {
-    for (int k = 0; k < unison_size[nvoice]; ++k) {
+    for (int k = 0; k < unison_size[nvoice]; ++k)
+    {
         float *tw = tmpwave_unison[k];
         float *f = &pinking[nvoice][k > 0 ? 7 : 0];
         for (int i = 0; i < synth->p_buffersize; ++i)
@@ -1606,7 +1622,6 @@ int ADnote::noteout(float *outl, float *outr)
                 ComputeVoicePinkNoise(nvoice); // pink noise
                 break;
         }
-            
 
         // Mix subvoices into voice
         memset(tmpwavel, 0, synth->p_bufferbytes);
@@ -1727,7 +1742,6 @@ int ADnote::noteout(float *outl, float *outr)
             }
             // the voice is killed later
         }
-
 
         // Put the ADnote samples in VoiceOut (without appling Global volume,
         // because I wish to use this voice as a modulator)
@@ -1863,7 +1877,8 @@ int ADnote::noteout(float *outl, float *outr)
         case LM_CatchUp:  // Continue the catch-up...
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
-            for (i = 0; i < synth->p_buffersize; ++i) { // Yea, could be done without the loop...
+            for (i = 0; i < synth->p_buffersize; ++i)
+            { // Yea, could be done without the loop...
                 Legato.decounter--;
                 if (Legato.decounter < 1)
                 {

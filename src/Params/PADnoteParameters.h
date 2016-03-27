@@ -129,7 +129,7 @@ class PADnoteParameters : public Presets
 
         EnvelopeParams *AmpEnvelope;
         LFOParams *AmpLfo;
-        
+
         // Adjustment factor for anti-pop fadein
         unsigned char Fadein_adjustment;
 
@@ -148,7 +148,7 @@ class PADnoteParameters : public Presets
 
         void applyparameters(bool islocked);
         void export2wav(std::string basefilename);
-        
+
         OscilGen *oscilgen;
         Resonance *resonance;
 

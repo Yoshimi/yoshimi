@@ -341,7 +341,8 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         // start the note
         partnote[pos].status = KEY_PLAYING;
         partnote[pos].note = note;
-        if (legatomodevalid) {
+        if (legatomodevalid)
+        {
             partnote[posb].status = KEY_PLAYING;
             partnote[posb].note = note;
         }

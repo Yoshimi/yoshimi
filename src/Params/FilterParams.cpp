@@ -255,29 +255,6 @@ void FilterParams::formantfilterH(int nvowel, int nfreqs, float *freqs)
 }
 
 
-// Transforms a parameter to the real value
-//float FilterParams::getformantfreq(unsigned char freq)
-//{
-//    float result = getfreqx(freq / 127.0f);
-//    return result;
-//}
-
-
-//float FilterParams::getformantamp(unsigned char amp)
-//{
-//    float result = powf(0.1f, (1.0f - amp / 127.0f) * 4.0f);
-//    return result;
-//}
-
-
-//float FilterParams::getformantq(unsigned char q)
-//{
-//    // temp
-//    float result = powf(25.0f, (q - 32.0f) / 64.0f);
-//    return result;
-//}
-
-
 void FilterParams::add2XMLsection(XMLwrapper *xml,int n)
 {
     int nvowel = n;
@@ -304,14 +281,16 @@ void FilterParams::add2XML(XMLwrapper *xml)
     xml->addpar("gain",Pgain);
 
     //formant filter parameters
-    if ((Pcategory==1)||(!xml->minimal)) {
+    if ((Pcategory==1)||(!xml->minimal))
+    {
         xml->beginbranch("FORMANT_FILTER");
         xml->addpar("num_formants",Pnumformants);
         xml->addpar("formant_slowness",Pformantslowness);
         xml->addpar("vowel_clearness",Pvowelclearness);
         xml->addpar("center_freq",Pcenterfreq);
         xml->addpar("octaves_freq",Poctavesfreq);
-        for (int nvowel=0;nvowel<FF_MAX_VOWELS;nvowel++) {
+        for (int nvowel=0;nvowel<FF_MAX_VOWELS;nvowel++)
+        {
             xml->beginbranch("VOWEL",nvowel);
             add2XMLsection(xml,nvowel);
             xml->endbranch();
@@ -319,7 +298,8 @@ void FilterParams::add2XML(XMLwrapper *xml)
         xml->addpar("sequence_size",Psequencesize);
         xml->addpar("sequence_stretch",Psequencestretch);
         xml->addparbool("sequence_reversed",Psequencereversed);
-        for (int nseq=0;nseq<FF_MAX_SEQUENCE;nseq++) {
+        for (int nseq=0;nseq<FF_MAX_SEQUENCE;nseq++)
+        {
             xml->beginbranch("SEQUENCE_POS",nseq);
             xml->addpar("vowel_id",Psequence[nseq].nvowel);
             xml->endbranch();

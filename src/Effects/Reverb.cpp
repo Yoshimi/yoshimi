@@ -216,7 +216,6 @@ void Reverb::out(float *smps_l, float *smps_r)
 
 
 // Parameter control
-
 void Reverb::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;

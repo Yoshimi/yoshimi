@@ -53,7 +53,8 @@ Unison::Unison(int update_period_samples_, float max_delay_sec_, SynthEngine *_s
 }
 
 
-Unison::~Unison() {
+Unison::~Unison()
+{
     if (delay_buffer)
         delete [] delay_buffer;
     if (uv)
@@ -69,7 +70,8 @@ void Unison::setSize(int new_size)
     if (uv)
         delete [] uv;
     uv = new UnisonVoice [unison_size];
-    for(int i = 0; i < unison_size; ++i) {
+    for(int i = 0; i < unison_size; ++i)
+    {
         uv [i].setPosition(synth->numRandom() * 1.8f - 0.9f);
     }
     first_time = true;

@@ -33,7 +33,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, 
     Pdepth(0),
     Pampsns(90),
     Pampsnsinv(0),
-    Pampsmooth(60),    
+    Pampsmooth(60),
     filterl(NULL),
     filterr(NULL),
     synth(_synth)
@@ -42,6 +42,7 @@ DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, 
     changepar(1, 64); // pan
     cleanup();
 }
+
 
 DynamicFilter::~DynamicFilter()
 {
@@ -98,6 +99,7 @@ void DynamicFilter::out(float *smpsl, float *smpsr)
     }
 }
 
+
 // Cleanup the effect
 void DynamicFilter::cleanup(void)
 {
@@ -134,6 +136,7 @@ void DynamicFilter::setampsns(unsigned char Pampsns_)
     ampsmooth = expf(-Pampsmooth / 127.0f * 10.0f) * 0.99f;
 }
 
+
 void DynamicFilter::reinitfilter(void)
 {
     if (filterl != NULL)
@@ -143,6 +146,7 @@ void DynamicFilter::reinitfilter(void)
     filterl = new Filter(filterpars, synth);
     filterr = new Filter(filterpars, synth);
 }
+
 
 void DynamicFilter::setpreset(unsigned char npreset)
 {
@@ -178,6 +182,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
             filterpars->Pstages = 1;
             filterpars->Pgain = 64;
             break;
+
         case 1:
             filterpars->Pcategory = 2;
             filterpars->Ptype = 0;
@@ -186,6 +191,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
             filterpars->Pstages = 0;
             filterpars->Pgain = 64;
             break;
+
         case 2:
             filterpars->Pcategory = 0;
             filterpars->Ptype = 4;
@@ -194,6 +200,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
             filterpars->Pstages = 2;
             filterpars->Pgain = 64;
             break;
+
         case 3:
             filterpars->Pcategory = 1;
             filterpars->Ptype = 0;
@@ -224,6 +231,7 @@ void DynamicFilter::setpreset(unsigned char npreset)
             filterpars->Pvowels[1].formants[2].amp = 117;
             filterpars->Pvowels[1].formants[2].q = 64;
             break;
+
         case 4:
             filterpars->Pcategory = 1;
             filterpars->Ptype = 0;
@@ -267,41 +275,51 @@ void DynamicFilter::changepar(int npar, unsigned char value)
         case 0:
             setvolume(value);
             break;
+
         case 1:
             setpanning(value);
             break;
+
         case 2:
             lfo.Pfreq = value;
             lfo.updateparams();
             break;
+
         case 3:
             lfo.Prandomness = value;
             lfo.updateparams();
             break;
+
         case 4:
             lfo.PLFOtype = value;
             lfo.updateparams();
             break;
+
         case 5:
             lfo.Pstereo = value;
             lfo.updateparams();
             break;
+
         case 6:
             setdepth(value);
             break;
+
         case 7:
             setampsns(value);
             break;
+
         case 8:
             Pampsnsinv = value;
             setampsns(Pampsns);
             break;
+
         case 9:
             Pampsmooth = value;
             setampsns(Pampsns);
             break;
     }
 }
+
 
 unsigned char DynamicFilter::getpar(int npar)
 {

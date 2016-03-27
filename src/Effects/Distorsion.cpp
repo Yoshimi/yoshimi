@@ -47,14 +47,15 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     cleanup();
 }
 
+
 Distorsion::~Distorsion()
 {
     delete lpfl;
     delete lpfr;
     delete hpfl;
     delete hpfr;
-
 }
+
 
 // Cleanup the effect
 void Distorsion::cleanup(void)
@@ -137,6 +138,7 @@ void Distorsion::setvolume(unsigned char Pvolume_)
         cleanup();
 }
 
+
 void Distorsion::setlpf(unsigned char Plpf_)
 {
     Plpf = Plpf_;
@@ -193,39 +195,49 @@ void Distorsion::changepar(int npar, unsigned char value)
         case 0:
             setvolume(value);
             break;
+
         case 1:
             setpanning(value);
             break;
+
         case 2:
             setlrcross(value);
             break;
+
         case 3:
             Pdrive = value;
             break;
+
         case 4:
             Plevel = value;
             break;
+
         case 5:
             if (value > 13)
                 Ptype = 13; // this must be increased if more distorsion types are added
             else
                 Ptype = value;
             break;
+
         case 6:
             if (value > 1)
                 Pnegate = 1;
             else
                 Pnegate = value;
             break;
+
         case 7:
             setlpf(value);
             break;
+
         case 8:
             sethpf(value);
             break;
+
         case 9:
-            Pstereo = (value > 0) ? 1 : 0; 
+            Pstereo = (value > 0) ? 1 : 0;
             break;
+
         case 10:
             Pprefiltering = value;
             break;
