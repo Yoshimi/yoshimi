@@ -1,11 +1,15 @@
 yoshimi 1.3.x
 
+2016-3-27 Will
+- Bugfix: Setting default preset path was being indicated in the GUI
+  but wasn't being actioned :(
+
 2016-3-26 Will
 - Added "Ignore reset all controllers" to MIDI config.
 
 2016-3-25 Will
 - Added error check for invalid vector files.
-- Bugfix: if jack not running and ALSA not available yoshimi 
+- Bugfix: if jack not running and ALSA not available yoshimi
   sometimes segfalted.
 - Splash screen can now be disabled.
 
@@ -92,7 +96,7 @@ yoshimi 1.3.9
 - Bugfix: CLI can again list current bank/root.
 - Bugfix: on debian testing GUI was locking up if you reduced the ID of the
   last root path in the list.
-  
+
 
 2016-2-17 Will
 - Instrument file changes are now individually checked after the attempt
@@ -103,17 +107,17 @@ yoshimi 1.3.9
 2016-2-15 Will
 - Fixed regression. Moved bank and history loading back into config.
   Previous change didn't improve startup behaviour and messed with LV2.
-- Created 'stateChanged' variable for future use. 
+- Created 'stateChanged' variable for future use.
 
 2016-2-14 Will
 - Removed jack/alsa tests from CMakeLists.txt It's now redundant.
 - Re-enabled up to 128 roots and banks and removed redundant maximum
   test - MIDI can't send > 127 and command line does it's own check.
 - Updated docs.
-- Added 'Muted Synth' instrument patch. 
+- Added 'Muted Synth' instrument patch.
 
 2016-2-14 Andrew
-- Removed ControlInterface (obsoleted) + fixes for gcc-6 
+- Removed ControlInterface (obsoleted) + fixes for gcc-6
 
 2016-2-8 Will
 - GCC 6 fix?
@@ -173,7 +177,7 @@ yoshimi 1.3.9
 - CLI no longer sets configChanged when altering the new banks file.
 
 2016-1-22 Rob
-- Workaround to avoid cmake 3.4.1 bug by using our own routine to 
+- Workaround to avoid cmake 3.4.1 bug by using our own routine to
   generate .cpp files from .fl ones and not using fltk_wrap_ui
 
 2016-1-21 Will
@@ -257,7 +261,7 @@ yoshimi 1.3.8
 2015-12-30 Andrew
 - Revised music clients so that Yoshimi can always start.
   If the wanted backend is missing it will try the other
-  option and if that fails, set a null backend. 
+  option and if that fails, set a null backend.
 
 2015-12-29 Will
 - Updated docs (especially command line)
@@ -686,7 +690,7 @@ yoshimi 1.3.5-rc2
 yoshimi 1.3.5-rc
 
 2015-6-7 Will
-- Jack port only registered if direct part output is set as well as 
+- Jack port only registered if direct part output is set as well as
   the part being enabled.
 - Mixer panel refresh button hidden (redundant).
   Will eventually be removed if no problems seen.
@@ -1123,7 +1127,7 @@ yoshimi-1.3.0
 - Fixed bug in wide panel window.
 - panel settings saved to yoshimi.config.
 - patch provided by xnakos fixes part enable sync between panel and main window.
-  This revealed it wasn't done properly for MIDI so that's been added too. 
+  This revealed it wasn't done properly for MIDI so that's been added too.
 - removed spammy default midi messages.
 - patch provided by xnakos to fix bug in Simple Sound representation.
 - better resolution yoshimi icon.
@@ -1221,10 +1225,10 @@ yoshimi-1.2.3
 - Disabled part audio out selection if not running jack.
 - Put some more info in Docs - much more to do!
 - Updated copyright notices.
-- Temporarily disabled ALSA MIDI auto connect till I can find out why 
+- Temporarily disabled ALSA MIDI auto connect till I can find out why
   it crashes - seems it's never worked.
 
-  
+
 yoshimi-1.2.2
 
 - Started some documentation. Much more needed!
@@ -1242,7 +1246,7 @@ yoshimi-1.2.2
 - Reinstated gzip compression on voice and parameter files.
 - Added compression level to settings. 0 = plain XML save.
 - Bug fix. Controllers window would sometimes freeze - thanks to Rob Couto for the fix.
-- Added appdata as requested in the sourceforge features tickets. 
+- Added appdata as requested in the sourceforge features tickets.
 - Revised 'make install' to make sure everything goes to the right place.
 - Changed position of Pitch bend roller in Vkeyboard to make things clearer.
 - Small update to Will_Godfrey_Companion bank.
@@ -1327,4 +1331,4 @@ yoshimi-0.060.8
 
 Nothing too adventurous, just an incremental advance on 0.058.1 adding Paul's
 Unison and Reverb enhancements, jack session support, panning inversion
-corrections and assorted other tweaks and bug fixes. 
+corrections and assorted other tweaks and bug fixes.

@@ -52,9 +52,9 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {16 162 390 330} type Double
+      xywh {16 162 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
-      code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}} visible
+      code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
       Fl_Tabs {} {
         xywh {5 5 385 297}
@@ -717,6 +717,7 @@ configwindow->do_callback();}
         presetbrowse->move(1, n);
         presetbrowse->value(1);
         presetbrowse->redraw();
+        writepresetcfg();
     }
     activatebutton_presetdir(true);
     synth->getRuntime().configChanged = true;}
