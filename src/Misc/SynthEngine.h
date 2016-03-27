@@ -135,7 +135,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float samplerate_f;
         float halfsamplerate_f;
         int buffersize;
-        float buffersize_f;        
+        float buffersize_f;
         int bufferbytes;
         int oscilsize;
         float oscilsize_f;
@@ -169,10 +169,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         // others ...
         Controller *ctl;
-        Microtonal microtonal;        
+        Microtonal microtonal;
         FFTwrapper *fft;
 
-        // peaks for VU-meters        
+        // peaks for VU-meters
         union VUtransfer{
             struct{
                 float vuOutPeakL;

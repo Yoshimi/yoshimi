@@ -205,9 +205,9 @@ bool CmdInterface::query(string text, bool priority)
     string suffix;
     char result;
     char test;
-    
+
     priority = !priority; // so calls make more sense
-    
+
     if (priority)
     {
         suffix = " N/y? ";
@@ -240,7 +240,7 @@ void CmdInterface::helpLoop(list<string>& msg, string *commands, int indent)
     string right;
     string dent;
     string blanks;
-    
+
     while (commands[word] != "end")
     {
         left = commands[word];
@@ -277,7 +277,7 @@ bool CmdInterface::helpList()
     if (synth->getRuntime().toConsole)
         // we need this in case someone is working headless
         cout << "\nSet REPorts [s] - set report destination (gui/stderr)\n\n";
- 
+
     synth->cliOutput(msg, LINES);
     return true;
 }
@@ -346,6 +346,7 @@ int CmdInterface::historyList(int type)
     string blanks;
     string left;
     bool all;
+
     if (bitTest(level, part_lev) && bitTest(level, all_fx))
     {
          synth->getRuntime().Log("Type " + fx_list[nFXtype] + "\nPresets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
@@ -374,11 +375,11 @@ int CmdInterface::historyList(int type)
         }
         else
         {
-            left = fx_list[i];            
+            left = fx_list[i];
             msg.push_back("    " + left + blanks.assign(12 - left.length(), ' ') + fx_presets [i].substr(0, presetsLast - 1));
         }
     }
-    
+
     synth->cliOutput(msg, LINES);
     return done_msg;
 }
@@ -389,14 +390,14 @@ int CmdInterface::effects(int level)
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
     int nFXavail;
-    
+
     int category;
     int par;
     int value;
-    
+
     string dest = "";
     bool flag;
-    
+
     nFXpreset = 0; // changing effect always sets the default preset.
 
     if (bitTest(level, part_lev))
@@ -415,7 +416,7 @@ int CmdInterface::effects(int level)
         nFX = nFXavail - 1; // we may have changed effects base
     if (point[0] == 0)
         return done_msg;
-   
+
     if (isdigit(point[0]))
     {
         value = string2int(point);
@@ -515,7 +516,7 @@ int CmdInterface::effects(int level)
             if (par <= nFX)
                 return range_msg;
             category = 0;
-            dest = "system fx " + asString(nFX) + " sent to " 
+            dest = "system fx " + asString(nFX) + " sent to "
                  + asString(par) + " at " + asString(value);
         }
 
@@ -569,7 +570,7 @@ int CmdInterface::volPanShift()
     int value;
     bool panelFlag = false;
     bool partFlag = false;
-    
+
     if (matchnMove(1, point, "volume"))
     {
         if (point[0] == 0)
@@ -637,7 +638,7 @@ int CmdInterface::volPanShift()
         partFlag = true;
         reply = done_msg;
     }
-    
+
 
     if (panelFlag) // currently only volume and pan
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
@@ -867,7 +868,7 @@ int CmdInterface::commandPart(bool justSet)
             if (tmp < NUM_MIDI_CHANNELS)
                 Runtime.Log("Part " + asString(npart) + " set to channel " + asString(tmp));
             else
-                Runtime.Log("Part " + asString(npart) + " set to no MIDI"); 
+                Runtime.Log("Part " + asString(npart) + " set to no MIDI");
             reply = done_msg;
         }
         else
@@ -947,7 +948,7 @@ int CmdInterface::commandPart(bool justSet)
              synth->part[npart]->Plegatomode = 0;
              Runtime.Log("mode set to 'poly'");
         }
-        else 
+        else
             if (matchnMove(1, point, "mono"))
         {
             synth->part[npart]->Ppolymode = 0;
@@ -1017,7 +1018,7 @@ int CmdInterface::commandSet()
         }
         return done_msg;
     }
-        
+
     else if (matchnMove(3, point, "reports"))
     {
         if (matchnMove(1, point, "gui"))
@@ -1043,7 +1044,7 @@ int CmdInterface::commandSet()
         reply = done_msg;
         Runtime.configChanged = true;
     }
-    
+
     else if (matchnMove(1, point, "root"))
     {
         if (point[0] != 0)
@@ -1064,7 +1065,7 @@ int CmdInterface::commandSet()
         else
             reply = value_msg;
     }
-   
+
     else if (bitTest(level, part_lev))
         reply = commandPart(false);
     else if (bitTest(level, vect_lev))
@@ -1101,11 +1102,11 @@ int CmdInterface::commandSet()
     }
     if (bitTest(level, all_fx))
         return effects(level);
-    
+
     tmp = volPanShift();
     if(tmp > todo_msg)
         return tmp;
-    
+
     if (matchnMove(2, point, "program") || matchnMove(4, point, "instrument"))
     {
         if (point[0] == '0')
@@ -1202,7 +1203,7 @@ int CmdInterface::commandSet()
             }
             else
                 return value_msg;
-        
+
         }
         else
             return opp_msg;
@@ -1238,7 +1239,7 @@ int CmdInterface::commandSet()
             reply = opp_msg;
         if (reply == todo_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 3);
-            
+
     }
     else if (matchnMove(1, point, "jack"))
     {
@@ -1271,7 +1272,7 @@ int CmdInterface::commandSet()
     }
     else
         reply = opp_msg;
-    return reply; 
+    return reply;
 }
 
 
@@ -1701,6 +1702,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     // Initialise the history functionality
     // Set up the history filename
     string hist_filename;
+
     { // put this in a block to lose the passwd afterwards
         struct passwd *pw = getpwuid(getuid());
         hist_filename = string(pw->pw_dir) + string("/.yoshimi_history");

@@ -120,7 +120,6 @@ void Part::defaults(void)
     Penabled = 0;
     Pminkey = 0;
     Pmaxkey = 127;
-//    Pnoteon = 1;
     Ppolymode = 1;
     Plegatomode = 0;
     setVolume(96);
@@ -135,6 +134,7 @@ void Part::defaults(void)
     defaultsinstrument();
     ctl->defaults();
 }
+
 
 void Part::defaultsinstrument(void)
 {
@@ -593,7 +593,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     if (kit[item].adpars && kit[item].Padenabled)
                     {
                         partnote[posb].kititem[ci].adnote =
-                            new ADnote(kit[item].adpars, ctl, notebasefreq, 
+                            new ADnote(kit[item].adpars, ctl, notebasefreq,
                                         vel, portamento, note, true, synth); // silent
                     }
                     if (kit[item].subpars && kit[item].Psubenabled)
@@ -624,6 +624,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
     // this only release the keys if there is maximum number of keys allowed
     setkeylimit(Pkeylimit);
 }
+
 
 // Note Off Messages
 void Part::NoteOff(int note) //relase the key
@@ -662,47 +663,60 @@ void Part::SetController(unsigned int type, int par)
         case C_pitchwheel:
             ctl->setpitchwheel(par);
             break;
+
         case C_expression:
             ctl->setexpression(par);
             setVolume(Pvolume);
             break;
+
         case C_portamento:
             ctl->setportamento(par);
             break;
+
         case C_panning:
             par = 64 + (par - 64) * (ctl->panning.depth / 64.0); // force float during calculation
             setPan(par);
             break;
+
         case C_filtercutoff:
             ctl->setfiltercutoff(par);
             break;
+
         case C_filterq:
             ctl->setfilterq(par);
             break;
+
         case C_bandwidth:
             ctl->setbandwidth(par);
             break;
+
         case C_modwheel:
             ctl->setmodwheel(par);
             break;
+
         case C_fmamp:
             ctl->setfmamp(par);
             break;
+
         case C_volume:
             if (ctl->volume.receive)
                 setVolume(par * ctl->volume.volume);
             break;
+
         case C_sustain:
             ctl->setsustain(par);
             if (!ctl->sustain.sustain)
                 RelaseSustainedKeys();
             break;
+
         case C_legatofootswitch:
             ctl->setlegato(par);
             break;
+
         case C_allsoundsoff:
             AllNotesOff(); // Panic
             break;
+
         case C_resetallcontrollers:
             ctl->resetall();
             RelaseSustainedKeys();
@@ -718,9 +732,11 @@ void Part::SetController(unsigned int type, int par)
             }
             // more update to add here if I add controllers
             break;
+
         case C_allnotesoff:
             RelaseAllKeys();
             break;
+
         case C_resonance_center:
             ctl->setresonancecenter(par);
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
@@ -731,6 +747,7 @@ void Part::SetController(unsigned int type, int par)
                                                                   ctl->resonancecenter.relcenter);
             }
             break;
+
         case C_resonance_bandwidth:
             ctl->setresonancebw(par);
             kit[0].adpars->GlobalPar.Reson->sendcontroller(C_resonance_bandwidth,
@@ -1379,7 +1396,7 @@ void Part::getfromXML(XMLwrapper *xml)
     if (Pfrand > 50)
         Pfrand = 50;
     setDestination(xml->getpar127("destination", Paudiodest));
-    
+
     if (xml->enterbranch("INSTRUMENT"))
     {
         getfromXMLinstrument(xml);

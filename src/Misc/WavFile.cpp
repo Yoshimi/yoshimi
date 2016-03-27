@@ -38,6 +38,7 @@ WavFile::WavFile(string filename, int samplerate, int channels)
     }
 }
 
+
 WavFile::~WavFile()
 {
     if(file)
@@ -76,10 +77,12 @@ WavFile::~WavFile()
     }
 }
 
+
 bool WavFile::good() const
 {
     return file;
 }
+
 
 void WavFile::writeStereoSamples(int nsmps, short int *smps)
 {
@@ -89,6 +92,7 @@ void WavFile::writeStereoSamples(int nsmps, short int *smps)
         sampleswritten += nsmps;
     }
 }
+
 
 void WavFile::writeMonoSamples(int nsmps, short int *smps)
 {

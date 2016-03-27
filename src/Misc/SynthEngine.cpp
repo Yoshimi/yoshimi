@@ -63,7 +63,8 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     set<unsigned int>::const_iterator it;
     unsigned int nextId = 0;
     for (it = idMap.begin(); it != itEnd && nextId == *it; ++it, ++nextId)
-    {}
+    {
+    }
     idMap.insert(nextId);
     return nextId;
 }
@@ -177,7 +178,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-
     memset(random_state, 0, sizeof(random_state));
     memset(&random_buf, 0, sizeof(random_buf));
 
@@ -211,8 +211,8 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-     tmpmixl = (float*)fftwf_malloc(bufferbytes);
-     tmpmixr = (float*)fftwf_malloc(bufferbytes);
+    tmpmixl = (float*)fftwf_malloc(bufferbytes);
+    tmpmixr = (float*)fftwf_malloc(bufferbytes);
     if (!tmpmixl || !tmpmixr)
     {
         Runtime.Log("SynthEngine tmpmix allocations failed");
@@ -339,6 +339,7 @@ bail_out:
     if (tmpmixr)
         fftwf_free(tmpmixr);
     tmpmixr = NULL;
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         if (part[npart])
@@ -401,9 +402,11 @@ void *SynthEngine::RBPthread(void)
                     case 1:
                         SetBankRoot(block.data[1]);
                         break;
+
                     case 2:
                         SetBank(block.data[1]);
                         break;
+
                     case 3:
                         SetProgram(block.data[1], block.data[2]);
                         break;
@@ -538,7 +541,6 @@ void SynthEngine::SetZynControls()
     unsigned char parnum = Runtime.dataH;
     unsigned char value = Runtime.dataL;
 
-
     if (parnum <= 0x7f && value <= 0x7f)
     {
         Runtime.dataL = 0xff; // use once then clear it out
@@ -592,7 +594,6 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
     int npart = getRuntime().currentPart;
     int data = (nFX) << 8;
 
-
     switch (category)
     {
         case 1:
@@ -614,6 +615,7 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                     break;
             }
             break;
+
         case 2:
             data |= (2 << 22);
             switch (command)
@@ -629,6 +631,7 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                     break;
             }
             break;
+
         default:
             switch (command)
             {
@@ -690,6 +693,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
     bool partOK = true;
     int npart;
     string fname = bank.getfilename(pgm);
+
     if ((fname == "") || (bank.getname(pgm) < "!")) // can't get a program name less than this
         Runtime.Log("No Program " + asString(pgm) + " in this bank");
     else
@@ -726,6 +730,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     bool loadOK = false;
     int enablestate;
     sem_wait (&partlock);
+
     if (Runtime.enable_part_on_voice_load)
         enablestate = 1;
     else
@@ -755,7 +760,7 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 {
     if (npart < Runtime.NumAvailableParts)
     {
-        /* We allow direct controls to set out of range channel numbers. 
+        /* We allow direct controls to set out of range channel numbers.
          * This gives us a way to disable all channel messages to a part.
          * Values 16 to 31 will still allow a note off but values greater
          * than that allow a drone to be set.
@@ -778,6 +783,7 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
 void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 {
     part[npart]->Paudiodest = dest;
+
     if (part[npart]->Paudiodest & 2)
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
         string name;
@@ -785,10 +791,12 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
     {
         case 1:
             name = "Main";
-            break;   
+            break;
+
         case 2:
             name = "Part";
             break;
+
         case 3:
             name = "Both";
             break;
@@ -817,6 +825,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 {
     list<string>::iterator it;
     list<string>::reverse_iterator rx;
+
     if (Runtime.toConsole)
     { // reversed so they come out the right order in the console.
         for (rx = msg_buf.rbegin(); rx != msg_buf.rend(); ++rx)
@@ -848,6 +857,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
     string label;
     int idx;
     msg_buf.push_back("Root Paths");
+
     for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
     {
         if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
@@ -864,6 +874,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
     string label;
+
     if (rootNum < 0 || rootNum >= MAX_BANK_ROOT_DIRS)
         rootNum = bank.currentRootID;
     if (bank.roots.count(rootNum) > 0
@@ -890,6 +901,7 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
 {
     int root = bank.currentRootID;
     string label;
+
     if (bankNum < 0 || bankNum >= MAX_BANKS_IN_ROOT)
         bankNum = bank.currentBankID;
     if (bank.roots.count(root) > 0
@@ -935,6 +947,7 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
     int dest;
     string name;
     int avail = Runtime.NumAvailableParts;
+
     msg_buf.push_back(asString(avail) + " parts available");
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -960,6 +973,7 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
 void SynthEngine::ListVectors(list<string>& msg_buf)
 {
     bool found = false;
+
     for (int value = 0; value < NUM_MIDI_CHANNELS; ++value)
     {
         if (Runtime.nrpndata.vectorEnabled[value])
@@ -987,6 +1001,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 {
     int root;
     string label;
+
     msg_buf.push_back("Settings");
     msg_buf.push_back("  Master volume " + asString((int) Pvolume));
     msg_buf.push_back("  Master key shift " + asString(Pkeyshift)
@@ -1044,9 +1059,11 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
         case 2:
             label = "ALSA";
             break;
+
         case 1:
             label = "jack";
             break;
+
         default:
             label = "None";
             break;
@@ -1057,9 +1074,11 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
         case 2:
             label = "ALSA";
             break;
+
         case 1:
             label = "jack";
             break;
+
         default:
             label = "None";
             break;
@@ -1087,18 +1106,20 @@ void SynthEngine::SetSystemValue(int type, int value)
     list<string> msg;
     string label;
     label = "";
+
     switch (type)
     {
         case 2: // master key shift
             if (value > 76)
                 value = 76;
             else if (value < 52) // 2 octaves is enough for anybody :)
-                value = 52;            
+                value = 52;
             setPkeyshift(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             Runtime.Log("Master key shift set to " + asString(value)
                       + "  (" + asString(value - 64) + ")");
             break;
+
         case 7: // master volume
             setPvolume(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
@@ -1122,17 +1143,15 @@ void SynthEngine::SetSystemValue(int type, int value)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
             break;
 
-
         case 108: // list vector parameters
             ListVectors(msg);
             cliOutput(msg, 255);
             break;
 
-
         case 109: // list dynamics
             ListSettings(msg);
             cliOutput(msg, 255);
-            break; 
+            break;
 
         case 110 : // list paths
             ListPaths(msg);
@@ -1299,6 +1318,7 @@ void SynthEngine::writeRBP(char type, char data0, char data1)
 bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
 {
     string name = "";
+
     if (dHigh < 2)
     {
         int parts = Runtime.NumAvailableParts;
@@ -1327,13 +1347,14 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
         Runtime.Log("CC " + asString(par) + " in use for " + name);
         return true;
     }
-return false;
+    return false;
 }
 
 
 void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
 {
     string featureList = "";
+
     if (dHigh == 2 || dHigh == 3)
     {
         if (bitTest(par, 0))
@@ -1361,7 +1382,8 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             else
                 featureList += "4 rev";
         }
-   }
+    }
+
     switch (dHigh)
     {
         case 0:
@@ -1379,6 +1401,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
             Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
+
         case 1:
             if (!Runtime.nrpndata.vectorEnabled[chan])
                 Runtime.Log("Vector X axis must be set before Y");
@@ -1393,10 +1416,12 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
             }
             break;
+
         case 2:
             Runtime.nrpndata.vectorXfeatures[chan] = par;
             Runtime.Log("Set X features " + featureList);
             break;
+
         case 3:
             if (Runtime.NumAvailableParts > NUM_MIDI_CHANNELS * 2)
             {
@@ -1415,12 +1440,15 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
         case 4:
             SetProgram(chan | 0x80, par);
             break;
+
         case 5:
             SetProgram(chan | 0x90, par);
             break;
+
         case 6:
             SetProgram(chan | 0xa0, par);
             break;
+
         case 7:
             SetProgram(chan | 0xb0, par);
             break;
@@ -1429,22 +1457,27 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc2[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " X feature 2 set to " + asString(par));
             break;
+
         case 9:
             Runtime.nrpndata.vectorXcc4[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " X feature 3 set to " + asString(par));
             break;
+
         case 10:
             Runtime.nrpndata.vectorXcc8[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " X feature 4 set to " + asString(par));
             break;
+
         case 11:
             Runtime.nrpndata.vectorYcc2[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " Y feature 2 set to " + asString(par));
             break;
+
         case 12:
             Runtime.nrpndata.vectorYcc4[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " Y feature 3 set to " + asString(par));
             break;
+
         case 13:
             Runtime.nrpndata.vectorYcc8[chan] = par;
             Runtime.Log("Channel " + asString((int) chan) + " Y feature 4 set to " + asString(par));
@@ -1467,6 +1500,7 @@ void SynthEngine::ClearNRPNs(void)
     Runtime.nrpnL = 127;
     Runtime.nrpnH = 127;
     Runtime.nrpnActive = false;
+
     for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
     {
         Runtime.nrpndata.vectorEnabled[chan] = false;
@@ -1526,7 +1560,6 @@ bool SynthEngine::partonoffRead(int npart)
 // Master audio out (the final sound)
 int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process)
 {
-
     float *mainL = outl[NUM_MIDI_PARTS]; // tiny optimisation
     float *mainR = outr[NUM_MIDI_PARTS]; // makes code clearer
 
@@ -1557,7 +1590,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
         }
     }
-/* Normally the above is unnecessary, as we later do a copy to just the parts 
+/* Normally the above is unnecessary, as we later do a copy to just the parts
  * that have a direct output. This completely overwrites the buffers.
  * Only these are sent to jack, so it doesn't matter what the unused ones contain.
  * However, this doesn't happen when muted, so the buffers then need to be zeroed.
@@ -1820,9 +1853,10 @@ void SynthEngine::setPaudiodest(int value)
 
 // Panic! (Clean up all parts and effects)
 void SynthEngine::ShutUp(void)
-{    
+{
     VUpeak.values.vuOutPeakL = 1e-12f;
     VUpeak.values.vuOutPeakR = 1e-12f;
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         part[npart]->cleanup();
@@ -1849,6 +1883,7 @@ void SynthEngine::allStop()
 bool SynthEngine::actionLock(lockset request)
 {
     int chk  = -1;
+
     switch (request)
     {
         case trylock:
@@ -1888,6 +1923,7 @@ int SynthEngine::loadParameters(string fname)
 {
     int result = 0;
     Runtime.SimpleCheck = false;
+
     actionLock(lockmute);
     defaults(); // clear all parameters
     if (loadXML(fname)) // load the data
@@ -1914,6 +1950,7 @@ bool SynthEngine::installBanks(int instance)
     bool banksFound = true;
     string branch;
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
+
     if (instance > 0)
         name += ("-" + asString(instance));
     string bankname = name + ".banks";
@@ -1970,7 +2007,7 @@ bool SynthEngine::saveBanks(int instance)
         Runtime.Log("saveBanks failed xmltree allocation");
         return false;
     }
-    xmltree->beginbranch("BANKLIST"); 
+    xmltree->beginbranch("BANKLIST");
     bank.saveToConfigFile(xmltree);
     xmltree->endbranch();
 
@@ -1986,6 +2023,7 @@ bool SynthEngine::saveBanks(int instance)
 bool SynthEngine::loadHistory(int instance)
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
+
     if (instance > 0)
         name += ("-" + asString(instance));
     string historyname = name + ".history";
@@ -2067,6 +2105,7 @@ bool SynthEngine::loadHistory(int instance)
 bool SynthEngine::saveHistory(int instance)
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
+
     if (instance > 0)
         name += ("-" + asString(instance));
     string historyname = name + ".history";
@@ -2243,6 +2282,7 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
 {
     bool ok = true;
+
     if (baseChan >= NUM_MIDI_CHANNELS)
     {
         Runtime.Log("Invalid channel number");
@@ -2273,51 +2313,52 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     int x_feat = Runtime.nrpndata.vectorXfeatures[baseChan];
     int y_feat = Runtime.nrpndata.vectorYfeatures[baseChan];
     xml->beginbranch("VECTOR");
-    xml->addpar("Source_channel", baseChan);
-    xml->addpar("X_sweep_CC", Runtime.nrpndata.vectorXaxis[baseChan]);
-    xml->addpar("Y_sweep_CC", Runtime.nrpndata.vectorYaxis[baseChan]);
-    xml->addparbool("X_feature_1", (x_feat & 1) > 0);
-    xml->addparbool("X_feature_2", (x_feat & 2) > 0);
-    xml->addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
-    xml->addparbool("X_feature_4", (x_feat & 4) > 0);
-    xml->addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
-    xml->addparbool("X_feature_8", (x_feat & 8) > 0);
-    xml->addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
-    xml->addpar("X_CCout_2",Runtime.nrpndata.vectorXcc2[baseChan]);
-    xml->addpar("X_CCout_4",Runtime.nrpndata.vectorXcc4[baseChan]);
-    xml->addpar("X_CCout_8",Runtime.nrpndata.vectorXcc8[baseChan]);
-    if (Runtime.nrpndata.vectorYaxis[baseChan] > 0x7f)
-    {
-        lastPart /= 2;
-    }
-    else
-    {
-        xml->addparbool("Y_feature_1", (y_feat & 1) > 0);
-        xml->addparbool("Y_feature_2", (y_feat & 2) > 0);
-        xml->addparbool("Y_feature_2_R", (y_feat & 0x10) > 0);
-        xml->addparbool("Y_feature_4", (y_feat & 4) > 0);
-        xml->addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
-        xml->addparbool("Y_feature_8", (y_feat & 8) > 0);
-        xml->addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
-        xml->addpar("Y_CCout_2",Runtime.nrpndata.vectorYcc2[baseChan]);
-        xml->addpar("Y_CCout_4",Runtime.nrpndata.vectorYcc4[baseChan]);
-        xml->addpar("Y_CCout_8",Runtime.nrpndata.vectorYcc8[baseChan]);
-    }
-    if (full)
-    {
-        xml->addpar("current_midi_parts", lastPart);
-        for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
+        xml->addpar("Source_channel", baseChan);
+        xml->addpar("X_sweep_CC", Runtime.nrpndata.vectorXaxis[baseChan]);
+        xml->addpar("Y_sweep_CC", Runtime.nrpndata.vectorYaxis[baseChan]);
+        xml->addparbool("X_feature_1", (x_feat & 1) > 0);
+        xml->addparbool("X_feature_2", (x_feat & 2) > 0);
+        xml->addparbool("X_feature_2_R", (x_feat & 0x10) > 0);
+        xml->addparbool("X_feature_4", (x_feat & 4) > 0);
+        xml->addparbool("X_feature_4_R", (x_feat & 0x20) > 0);
+        xml->addparbool("X_feature_8", (x_feat & 8) > 0);
+        xml->addparbool("X_feature_8_R", (x_feat & 0x40) > 0);
+        xml->addpar("X_CCout_2",Runtime.nrpndata.vectorXcc2[baseChan]);
+        xml->addpar("X_CCout_4",Runtime.nrpndata.vectorXcc4[baseChan]);
+        xml->addpar("X_CCout_8",Runtime.nrpndata.vectorXcc8[baseChan]);
+        if (Runtime.nrpndata.vectorYaxis[baseChan] > 0x7f)
         {
-            xml->beginbranch("PART",npart);
-            part[npart + baseChan]->add2XML(xml);
-            xml->endbranch();
+            lastPart /= 2;
         }
-    }
-    if (!xml->saveXMLfile(file))
-    {
-        Runtime.Log("Failed to save data to " + file);
-        ok = false;
-    }
+        else
+        {
+            xml->addparbool("Y_feature_1", (y_feat & 1) > 0);
+            xml->addparbool("Y_feature_2", (y_feat & 2) > 0);
+            xml->addparbool("Y_feature_2_R", (y_feat & 0x10) > 0);
+            xml->addparbool("Y_feature_4", (y_feat & 4) > 0);
+            xml->addparbool("Y_feature_4_R", (y_feat & 0x20) > 0);
+            xml->addparbool("Y_feature_8", (y_feat & 8) > 0);
+            xml->addparbool("Y_feature_8_R", (y_feat & 0x40) > 0);
+            xml->addpar("Y_CCout_2",Runtime.nrpndata.vectorYcc2[baseChan]);
+            xml->addpar("Y_CCout_4",Runtime.nrpndata.vectorYcc4[baseChan]);
+            xml->addpar("Y_CCout_8",Runtime.nrpndata.vectorYcc8[baseChan]);
+        }
+        if (full)
+        {
+            xml->addpar("current_midi_parts", lastPart);
+            for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
+            {
+                xml->beginbranch("PART",npart);
+                    part[npart + baseChan]->add2XML(xml);
+                xml->endbranch();
+            }
+        }
+        if (!xml->saveXMLfile(file))
+        {
+            Runtime.Log("Failed to save data to " + file);
+            ok = false;
+        }
+        xml->endbranch();
     delete xml;
     return ok;
 }
@@ -2546,8 +2587,8 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
     float octdet = 0.0f;
     float cdet = 0.0f;
     float findet = 0.0f;
-
     int octave = coarsedetune / 1024; // get Octave
+
     if (octave >= 8)
         octave -= 16;
     octdet = octave * 1200.0f;
@@ -2564,14 +2605,17 @@ float SynthHelper::getDetune(unsigned char type, unsigned short int coarsedetune
             cdet = fabs(cdetune * 10.0f);
             findet = fabs(fdetune / 8192.0f) * 10.0f;
             break;
+
         case 3:
             cdet = fabsf(cdetune * 100.0f);
             findet = powf(10.0f, fabs(fdetune / 8192.0f) * 3.0f) / 10.0f - 0.1f;
             break;
+
         case 4:
             cdet = fabs(cdetune * 701.95500087f); // perfect fifth
             findet = (powf(2.0f, fabs(fdetune / 8192.0f) * 12.0f) - 1.0f) / 4095.0f * 1200.0f;
             break;
+
             // case ...: need to update N_DETUNE_TYPES, if you'll add more
         default:
             cdet = fabs(cdetune * 50.0f);
@@ -2598,7 +2642,7 @@ MasterUI *SynthEngine::getGuiMaster(bool createGui)
 void SynthEngine::guiClosed(bool stopSynth)
 {
     if (stopSynth && !isLV2Plugin)
-        Runtime.runSynth = false;    
+        Runtime.runSynth = false;
     if (guiClosedCallback != NULL)
         guiClosedCallback(guiCallbackArg);
 }

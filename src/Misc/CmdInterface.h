@@ -36,7 +36,7 @@ class CmdInterface : private MiscFuncs
     public:
         void defaults();
         void cmdIfaceCommandLoop();
-        
+
     private:
         bool query(string text, bool priority);
         void helpLoop(list<string>& msg, string *commands, int indent);
@@ -51,9 +51,9 @@ class CmdInterface : private MiscFuncs
         bool cmdIfaceProcessCommand();
         char *cCmd;
         char *point;
-        SynthEngine *synth;  
+        SynthEngine *synth;
         char welcomeBuffer [128];
-        
+
         int npart;
         int nFX;
         int nFXtype;
@@ -63,4 +63,5 @@ class CmdInterface : private MiscFuncs
         unsigned int level;
         string replyString;
 };
+
 #endif

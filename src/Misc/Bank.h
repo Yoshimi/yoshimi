@@ -125,7 +125,7 @@ class Bank : private MiscFuncs
         bool newbankfile(string newbankdir);
         bool removebank(unsigned int bankID);
         void rescanforbanks(void);
-        void clearBankrootDirlist(void);        
+        void clearBankrootDirlist(void);
         void removeRoot(size_t rootID);
         bool changeRootID(size_t oldID, size_t newID);
 
@@ -147,7 +147,7 @@ class Bank : private MiscFuncs
 
         string getBankFileTitle();
         string getRootFileTitle();
-        
+
     private:
         bool addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name);
              // add an instrument to the bank, if pos is -1 try to find a position

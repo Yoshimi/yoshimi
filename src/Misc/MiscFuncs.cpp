@@ -186,7 +186,7 @@ string MiscFuncs::asString(unsigned long n)
     oss << n;
     return string(oss.str());
 }
-//#endif
+
 
 string MiscFuncs::asString(long n)
 {
@@ -217,6 +217,7 @@ string MiscFuncs::asString(unsigned char c)
     oss << c;
     return oss.str();
 }
+
 
 string MiscFuncs::asString(float n)
 {
@@ -294,6 +295,7 @@ char *MiscFuncs::skipSpace(char *buf)
     return buf;
 }
 
+
 char *MiscFuncs::skipChars(char *buf)
 {
     while (buf[0] > 0x20) // will also stop on line ends
@@ -316,6 +318,7 @@ int MiscFuncs::matchWord(int numChars, char *buf, const char *word)
         return newp;
     return 0;
 }
+
 
 bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
 {
