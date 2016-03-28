@@ -41,6 +41,7 @@ MusicIO::MusicIO(SynthEngine *_synth) :
 //    memset(&prgChangeCmd, 0, sizeof(prgChangeCmd));
 }
 
+
 MusicIO::~MusicIO()
 {
     for (int npart = 0; npart < (NUM_MIDI_PARTS + 1); ++npart)
@@ -64,82 +65,106 @@ int MusicIO::getMidiController(unsigned char b)
     int ctl = C_NULL;
     switch (b)
     {
-	    case 0: // Bank Select MSB
+        case 0: // Bank Select MSB
             ctl = C_bankselectmsb;
-            break;        
-	    case 1: // Modulation Wheel
+            break;
+
+        case 1: // Modulation Wheel
             ctl = C_modwheel;
             break;
+
         case 2: // breath control
             ctl = C_breath;
             break;
+
         case 6: // data MSB
             ctl = C_dataH;
             break;
-	    case 7: // Volume
+
+        case 7: // Volume
             ctl = C_volume;
-    		break;
-	    case 10: // Panning
+            break;
+
+        case 10: // Panning
             ctl = C_panning;
             break;
-            case 32: // Bank Select LSB
+
+        case 32: // Bank Select LSB
             ctl = C_bankselectlsb;
-            break;        
-	    case 11: // Expression
+            break;
+
+        case 11: // Expression
             ctl = C_expression;
             break;
+
         case 38: // data LSB
             ctl = C_dataL;
             break;
-	    case 64: // Sustain pedal
+
+        case 64: // Sustain pedal
             ctl = C_sustain;
-	        break;
-	    case 65: // Portamento
+            break;
+
+        case 65: // Portamento
             ctl = C_portamento;
-	        break;
-	    case 71: // Filter Q (Sound Timbre)
+            break;
+
+        case 71: // Filter Q (Sound Timbre)
             ctl = C_filterq;
             break;
-	    case 74: // Filter Cutoff (Brightness)
+
+        case 74: // Filter Cutoff (Brightness)
             ctl = C_filtercutoff;
-	        break;
-	    case 75: // BandWidth
+            break;
+
+        case 75: // BandWidth
             ctl = C_bandwidth;
-	        break;
-	    case 76: // FM amplitude
+            break;
+
+        case 76: // FM amplitude
             ctl = C_fmamp;
-	        break;
-	    case 77: // Resonance Center Frequency
+            break;
+
+        case 77: // Resonance Center Frequency
             ctl = C_resonance_center;
-	        break;
-	    case 78: // Resonance Bandwith
+            break;
+
+        case 78: // Resonance Bandwith
             ctl = C_resonance_bandwidth;
-	        break;
+            break;
+
         case 96: // data increment
             ctl = C_dataI;
             break;
+
         case 97: // data decrement
             ctl = C_dataD;
             break;
+
         case 98: // NRPN LSB
             ctl = C_nrpnL;
             break;
+
         case 99: // NRPN MSB
             ctl = C_nrpnH;
             break;
-	    case 120: // All Sounds OFF
+
+        case 120: // All Sounds OFF
             ctl = C_allsoundsoff;
-	        break;
-	    case 121: // Reset All Controllers
+            break;
+
+        case 121: // Reset All Controllers
             ctl = C_resetallcontrollers;
-	        break;
-	    case 123: // All Notes OFF
+            break;
+
+        case 123: // All Notes OFF
             ctl = C_allnotesoff;
-	        break;
-	    default: // an unrecognised controller!
+            break;
+
+        default: // an unrecognised controller!
             ctl = C_NULL;
             break;
-	}
+    }
     return ctl;
 }
 
@@ -156,18 +181,23 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             case C_NULL:
                 ctltype = "Ignored";
                 break;
+
             case C_programchange:
                 ctltype = "program";
                 break;
+
             case C_pitchwheel:
                 ctltype = "Pitchwheel";
                 break;
+
             case C_channelpressure:
                 ctltype = "Ch Press";
                 break;
+
             case C_keypressure:
                 ctltype = "Key Press";
                 break;
+
             default:
                 ctltype = asString(ctrl);
                 break;
@@ -401,13 +431,13 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
      * MSB sub parameter before LSB value until the next full NRPN.
      */
     int dHigh = synth->getRuntime().dataH;
-    
+
     if (nLow == 0) // direct part change
         nrpnDirectPart(dHigh, par);
 
     else if (nLow == 1) // it's vector control
         nrpnSetVector(dHigh, chan, par);
-    
+
     else if (nLow == 2) // system settings
         synth->SetSystemValue(dHigh, par);
 }
@@ -427,19 +457,24 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
                 synth->getRuntime().dataL = 128;
                 synth->getRuntime().dataH = 128;
             break;
+
         case 1: // Program Change
             setMidiProgram(synth->getRuntime().nrpndata.Part | 0x80, par);
             break;
+
         case 2: // Set controller number
             synth->getRuntime().nrpndata.Controller = par;
             synth->getRuntime().dataL = par;
             break;
+
         case 3: // Set controller value
             synth->SetController(synth->getRuntime().nrpndata.Part | 0x80, synth->getRuntime().nrpndata.Controller, par);
             break;
+
         case 4: // Set part's channel number
             synth->SetPartChan(synth->getRuntime().nrpndata.Part, par);
             break;
+
         case 5: // Set part's audio destination
             if (par > 0 and par < 4)
                 synth->SetPartDestination(synth->getRuntime().nrpndata.Part, par);
@@ -464,15 +499,19 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
         case 4:
             setMidiProgram(chan | 0x80, par);
             break;
+
         case 5:
             setMidiProgram(chan | 0x90, par);
             break;
+
         case 6:
             setMidiProgram(chan | 0xa0, par);
             break;
+
         case 7:
             setMidiProgram(chan | 0xb0, par);
             break;
+
         default:
             synth->vectorSet(dHigh, chan, par);
             break;

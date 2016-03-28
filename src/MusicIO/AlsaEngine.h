@@ -57,7 +57,7 @@ class AlsaEngine : public MusicIO
         int card_bits;
         bool card_signed;
         unsigned int card_chans;
-        
+
     private:
         bool prepHwparams(void);
         bool prepSwparams(void);

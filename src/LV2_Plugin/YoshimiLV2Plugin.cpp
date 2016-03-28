@@ -51,6 +51,7 @@ typedef enum {
     LV2_OPTIONS_PORT
 } Yoshimi_LV2_Options_Context;
 
+
 typedef struct _Yoshimi_LV2_Options_Option {
  Yoshimi_LV2_Options_Context context;  /**< Context (type of subject). */
  uint32_t            subject;  /**< Subject. */
@@ -60,7 +61,9 @@ typedef struct _Yoshimi_LV2_Options_Option {
  const void*         value;    /**< Pointer to value (object). */
 } Yoshimi_LV2_Options_Option;
 
+
 using namespace std;
+
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
 {
@@ -94,7 +97,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
         if (event->body.type == _midi_event_id)
         {
-            next_frame = event->time.frames;                       
+            next_frame = event->time.frames;
             if (next_frame >= real_sample_count)
                 continue;
             /*if (next_frame == _bufferSize - 1
@@ -192,6 +195,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
 }
 
+
 void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 {
     unsigned char channel, note, velocity;
@@ -276,6 +280,7 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 
 }
 
+
 void *YoshimiLV2Plugin::midiThread()
 {
     struct midi_event midiEvent;
@@ -300,6 +305,7 @@ void *YoshimiLV2Plugin::midiThread()
     }
     return NULL;
 }
+
 
 void *YoshimiLV2Plugin::idleThread()
 {
@@ -380,12 +386,12 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
             }
             ++options;
         }
-
     }
 
     if (_bufferSize == 0)
         _bufferSize = 8192;
 }
+
 
 YoshimiLV2Plugin::~YoshimiLV2Plugin()
 {
@@ -395,8 +401,8 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
         {
             getProgram(flatbankprgs.size() + 1);
         }
-        _synth->getRuntime().runSynth = false;        
-        sem_post(&_midiSem);        
+        _synth->getRuntime().runSynth = false;
+        sem_post(&_midiSem);
         pthread_join(_pMidiThread, NULL);
         pthread_join(_pIdleThread, NULL);
         sem_destroy(&_midiSem);
@@ -409,6 +415,7 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
         _synth = NULL;
     }
 }
+
 
 bool YoshimiLV2Plugin::init()
 {
@@ -461,8 +468,6 @@ bool YoshimiLV2Plugin::init()
 }
 
 
-
-
 LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
@@ -475,6 +480,7 @@ LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double
         delete inst;
     return NULL;
 }
+
 
 void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *data_location)
 {
@@ -501,7 +507,6 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
      else
          port -= 2;
 
-
      int portIndex = static_cast<int>(floorf((float)port/2.0f));
      if (port % 2 == 0) //left channel
          inst->lv2Left[portIndex] = static_cast<float *>(data_location);
@@ -510,6 +515,7 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
 
 }
 
+
 void YoshimiLV2Plugin::activate(LV2_Handle instance)
 {
     YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
@@ -517,12 +523,14 @@ void YoshimiLV2Plugin::activate(LV2_Handle instance)
 
 }
 
+
 void YoshimiLV2Plugin::deactivate(LV2_Handle instance)
 {
     YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
     inst->Close();
 
 }
+
 
 void YoshimiLV2Plugin::run(LV2_Handle instance, uint32_t sample_count)
 {
@@ -553,6 +561,7 @@ LV2_Programs_Interface yoshimi_prg_iface =
     YoshimiLV2Plugin::static_SelectProgramNew
 };
 
+
 const void *YoshimiLV2Plugin::extension_data(const char *uri)
 {
     static const LV2_State_Interface state_iface = { YoshimiLV2Plugin::static_StateSave, YoshimiLV2Plugin::static_StateRestore };
@@ -573,6 +582,7 @@ const void *YoshimiLV2Plugin::extension_data(const char *uri)
     return NULL;
 }
 
+
 LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
     char *data = NULL;
@@ -584,6 +594,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
     free(data);
     return LV2_STATE_SUCCESS;
 }
+
 
 LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
@@ -604,6 +615,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     }
     return LV2_STATE_SUCCESS;
 }
+
 
 const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
 {
@@ -645,9 +657,9 @@ const LV2_Program_Descriptor *YoshimiLV2Plugin::getProgram(uint32_t index)
         flatbankprgs.clear();
         return NULL;
     }
-
     return &flatbankprgs [index];
 }
+
 
 void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program)
 {
@@ -661,35 +673,42 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
     setMidiProgram(channel, program, isFreeWheel);
 }
 
+
 void *YoshimiLV2Plugin::static_midiThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->midiThread();
 }
+
 
 void *YoshimiLV2Plugin::static_idleThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->idleThread();
 }
 
+
 LV2_State_Status YoshimiLV2Plugin::static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
     return static_cast<YoshimiLV2Plugin *>(instance)->stateSave(store, handle, flags, features);
 }
+
 
 LV2_State_Status YoshimiLV2Plugin::static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature * const *features)
 {
     return static_cast<YoshimiLV2Plugin *>(instance)->stateRestore(retrieve, handle, flags, features);
 }
 
+
 const LV2_Program_Descriptor *YoshimiLV2Plugin::static_GetProgram(LV2_Handle handle, uint32_t index)
 {
     return static_cast<YoshimiLV2Plugin *>(handle)->getProgram(index);
 }
 
+
 void YoshimiLV2Plugin::static_SelectProgramNew(LV2_Handle handle, unsigned char channel, uint32_t bank, uint32_t program)
 {
     return static_cast<YoshimiLV2Plugin *>(handle)->selectProgramNew(channel, bank, program);
 }
+
 
 /*
 LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_work(LV2_Handle instance, LV2_Worker_Respond_Function respond, LV2_Worker_Respond_Handle handle, uint32_t size, const void *data)
@@ -697,10 +716,12 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_work(LV2_Handle instance, LV2_Worker_
 
 }
 
+
 LV2_Worker_Status YoshimiLV2Plugin::lv2wrk_response(LV2_Handle instance, uint32_t size, const void *body)
 {
 
 }
+
 
 LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 {
@@ -708,7 +729,6 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 }
 
 */
-
 
 
 YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
@@ -755,7 +775,6 @@ YoshimiLV2PluginUI::~YoshimiLV2PluginUI()
 }
 
 
-
 bool YoshimiLV2PluginUI::init()
 {
     if (_plugin == NULL || uiHost.ui_closed == NULL)
@@ -780,17 +799,20 @@ LV2UI_Handle YoshimiLV2PluginUI::instantiate(const _LV2UI_Descriptor *descriptor
 
 }
 
+
 void YoshimiLV2PluginUI::cleanup(LV2UI_Handle ui)
 {
-    YoshimiLV2PluginUI *uiinst = static_cast<YoshimiLV2PluginUI *>(ui);    
+    YoshimiLV2PluginUI *uiinst = static_cast<YoshimiLV2PluginUI *>(ui);
     delete uiinst;
 }
 
+
 void YoshimiLV2PluginUI::static_guiClosed(void *arg)
 {
-    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = NULL;    
+    static_cast<YoshimiLV2PluginUI *>(arg)->_masterUI = NULL;
     static_cast<YoshimiLV2PluginUI *>(arg)->_plugin->_synth->closeGui();
 }
+
 
 void YoshimiLV2PluginUI::run()
 {
@@ -811,6 +833,7 @@ void YoshimiLV2PluginUI::run()
             uiHost.ui_closed(_controller);
     }
 }
+
 
 void YoshimiLV2PluginUI::show()
 {
@@ -833,6 +856,7 @@ void YoshimiLV2PluginUI::show()
 
 }
 
+
 void YoshimiLV2PluginUI::hide()
 {
     if (_masterUI)
@@ -846,10 +870,12 @@ void YoshimiLV2PluginUI::static_Run(_LV2_External_UI_Widget *_this_)
 
 }
 
+
 void YoshimiLV2PluginUI::static_Show(_LV2_External_UI_Widget *_this_)
 {
     reinterpret_cast<_externalUI *>(_this_)->uiInst->show();
 }
+
 
 void YoshimiLV2PluginUI::static_Hide(_LV2_External_UI_Widget *_this_)
 {
@@ -870,6 +896,7 @@ LV2_Descriptor yoshimi_lv2_desc =
     YoshimiLV2Plugin::extension_data
 };
 
+
 LV2_Descriptor yoshimi_lv2_multi_desc =
 {
     "http://yoshimi.sourceforge.net/lv2_plugin_multi",
@@ -881,6 +908,7 @@ LV2_Descriptor yoshimi_lv2_multi_desc =
     YoshimiLV2Plugin::cleanup,
     YoshimiLV2Plugin::extension_data
 };
+
 
 extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
 {
@@ -896,6 +924,7 @@ extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)
     return NULL;
 }
 
+
 LV2UI_Descriptor yoshimi_lv2ui_desc =
 {
     "http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI",
@@ -904,6 +933,7 @@ LV2UI_Descriptor yoshimi_lv2ui_desc =
     NULL,
     NULL
 };
+
 
 extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 {
@@ -918,10 +948,12 @@ extern "C" const LV2UI_Descriptor* lv2ui_descriptor(uint32_t index)
 
 }
 
+
 bool mainCreateNewInstance(unsigned int) //stub
 {
     return true;
 }
+
 
 void mainRegisterAudioPort(SynthEngine *, int ) //stub
 {

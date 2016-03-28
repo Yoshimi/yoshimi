@@ -124,7 +124,7 @@ class Config : public MiscFuncs
         string        nameTag;
 
         unsigned int  GzipCompression;
-        int           Interpolation;        
+        int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
         bool          SimpleCheck;
@@ -165,9 +165,9 @@ class Config : public MiscFuncs
             int Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
-        
-        IOdata nrpndata;        
-        
+
+        IOdata nrpndata;
+
         deque<HistoryListItem> ParamsHistory;
         deque<HistoryListItem> ScaleHistory;
         deque<HistoryListItem> StateHistory;
@@ -202,6 +202,7 @@ class Config : public MiscFuncs
 
         friend class YoshimiLV2Plugin;
 };
+
 
 //struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
 class GuiThreadMsg

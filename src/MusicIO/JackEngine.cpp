@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Modified October 2014
 */
 
@@ -170,7 +170,7 @@ bool JackEngine::Start(void)
         synth->getRuntime().Log("Failed to activate jack client");
         goto bail_out;
     }
-    
+
     // style-wise I think the next bit is the wrong place
     if (synth->getRuntime().midiEngine  == jack_midi
       && synth->getRuntime().midiDevice.size()
@@ -219,6 +219,7 @@ void JackEngine::Close(void)
     }
 }
 
+
 void JackEngine::registerAudioPort(int partnum)
 {
     int portnum = partnum * 2;
@@ -249,6 +250,7 @@ void JackEngine::registerAudioPort(int partnum)
     }
 }
 
+
 bool JackEngine::openAudio(void)
 {
     if(jackClient == 0)
@@ -262,10 +264,10 @@ bool JackEngine::openAudio(void)
     audio.ports[2 * NUM_MIDI_PARTS] = jack_port_register(jackClient, "left", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     audio.ports[2 * NUM_MIDI_PARTS + 1] = jack_port_register(jackClient, "right", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
-    bool jackPortsRegistered = true;       
+    bool jackPortsRegistered = true;
     if (!audio.ports[2 * NUM_MIDI_PARTS] || !audio.ports[2 * NUM_MIDI_PARTS + 1])
         jackPortsRegistered = false;
-    
+
     if (jackPortsRegistered)
         return prepBuffers() && latencyPrep();
     else
@@ -321,6 +323,7 @@ bool JackEngine::connectJackPorts(void)
     }
     return true;
 }
+
 
 int JackEngine::clientId(void)
 {
@@ -388,7 +391,7 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
     {
         synth->getRuntime().Log("Failed to get jack audio port buffer: " + asString(2 * NUM_MIDI_PARTS + 1));
         return false;
-    }    
+    }
 
     int framesize = sizeof(float) * nframes;
     if (nframes < internalbuff)
@@ -463,7 +466,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
         {
             par = 0;
             if (jEvent.size < 1 || jEvent.size > 4)
-                continue; // no interest in zero sized or long events    
+                continue; // no interest in zero sized or long events
             channel = jEvent.buffer[0] & 0x0F;
             switch ((ev = jEvent.buffer[0] & 0xF0))
             {
@@ -525,7 +528,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                     par = jEvent.buffer[2];
                     setMidiController(channel, ctrltype, par);
                     break;
-                
+
                 case 0xC0: // program change
                     ctrltype = C_programchange;
                     par = jEvent.buffer[1];
@@ -537,7 +540,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                     par = jEvent.buffer[1];
                     setMidiController(channel, ctrltype, par);
                     break;
-                
+
                 case 0xE0: // pitch bend
                     ctrltype = C_pitchwheel;
                     par = ((jEvent.buffer[2] << 7) | jEvent.buffer[1]) - 8192;
@@ -594,6 +597,7 @@ bool JackEngine::latencyPrep(void)
 
 #endif
 }
+
 
 #if defined(JACK_SESSION)
 
