@@ -67,19 +67,15 @@ class ConfigUI {selected : {private MiscFuncs}
             label {* AddSynth Oscillator Size}
             callback {//
     unsigned int old = synth->getRuntime().Oscilsize;
-    unsigned int changed = 128 << o->value();
+    unsigned int changed = 256 << o->value();
     if (old != changed)
     {
         synth->getRuntime().Oscilsize = changed;
         synth->getRuntime().configChanged = true;
     }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
-            code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 128.0f - 1.0f) / logf(2.0f)) + 1);}
+            code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
           } {
-            MenuItem {} {
-              label 128
-              xywh {25 25 100 20} labelfont 1
-            }
             MenuItem {} {
               label 256
               xywh {35 35 100 20} labelfont 1

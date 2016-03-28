@@ -209,6 +209,10 @@ bool Config::Setup(int argc, char **argv)
     if (!midiDevice.size())
         midiDevice = "";
     loadCmdArgs(argc, argv);
+    Oscilsize = nearestPowerOf2(Oscilsize, 256, 16384);
+    Buffersize = nearestPowerOf2(Buffersize, 16, 1024);
+    //Log(asString(Oscilsize));
+    //Log(asString(Buffersize));
     if (restoreState)
     {
         char * fp;
@@ -1105,24 +1109,9 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
                 settings->midiDevice = string(settings->alsaMidiDevice);
             break;
 
-        case 'b': // messy but I can't think of a better way :(
+        case 'b':
             settings->configChanged = true;
-            num = Config::string2int(string(arg));
-            if (num >= 1024)
-                num = 1024;
-            else if (num >= 512)
-                num = 512;
-            else if (num >= 256)
-                num = 256;
-            else if (num >= 128)
-                num = 128;
-            else if (num >= 64)
-                num = 64;
-            else if (num >= 32)
-                num = 32;
-            else
-                num = 16;
-            settings->Buffersize = num;
+            settings->Buffersize = Config::string2int(string(arg));
             break;
 
         case 'D':
@@ -1172,23 +1161,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'o':
             settings->configChanged = true;
-            num = Config::string2int(string(arg));
-            if (num >= 16384)
-                num = 16384;
-            else if (num >= 8192)
-                num = 8192;
-            else if (num >= 4096)
-                num = 4096;
-            else if (num >= 2048)
-                num = 2048;
-            else if (num >= 1024)
-                num = 1024;
-            else if (num >= 512)
-                num = 512;
-            else if (num >= 256)
-                num = 256;
-            else num = 128;
-            settings->Oscilsize = num;
+            settings->Oscilsize = Config::string2int(string(arg));
             break;
 
         case 'R':
