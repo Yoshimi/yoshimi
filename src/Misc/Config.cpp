@@ -209,7 +209,7 @@ bool Config::Setup(int argc, char **argv)
     if (!midiDevice.size())
         midiDevice = "";
     loadCmdArgs(argc, argv);
-    Oscilsize = nearestPowerOf2(Oscilsize, 256, 16384);
+    Oscilsize = nearestPowerOf2(Oscilsize, MAX_AD_HARMONICS * 2, 16384);
     Buffersize = nearestPowerOf2(Buffersize, 16, 1024);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
@@ -557,7 +557,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
     Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 131072);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
 
     // get preset dirs
     int count = 0;
@@ -1166,15 +1166,9 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
 
         case 'R':
             settings->configChanged = true;
-            num = Config::string2int(string(arg));
-            if (num >= 192000)
-                num = 192000;
-            else if (num >= 96000)
-                num = 96000;
-            else if (num >= 48000)
-                num = 48000;
-            else
-                num = 44100;
+            num = (Config::string2int(string(arg)) / 48 ) * 48;
+            if (num < 48000 || num > 192000)
+                num = 44100; // play safe
             settings->Samplerate = num;
             break;
 

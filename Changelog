@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-3-29 Will
+- Rationalsed allowable sizes for sample rate and Oscilsize so all
+  input routes have the same limits.
+
 2016-3-28 Will
 - Bugfix: Min Oscilsize is 256 but would allow less at CLI resulting
   in a segfault. GUI seemed to accept 128 but silently changed it :(
