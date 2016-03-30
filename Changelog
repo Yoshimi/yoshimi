@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-3-30 Will
+- Improved CLI error checks when setting vectors.
+
 2016-3-29 Will
 - Rationalsed allowable sizes for sample rate and Oscilsize so all
   input routes have the same limits.

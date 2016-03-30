@@ -668,6 +668,7 @@ int CmdInterface::commandVector()
             chan = tmp;
             axis = 0;
         }
+
         Runtime.Log("Vector channel set to " + asString(chan));
     }
 
@@ -675,13 +676,14 @@ int CmdInterface::commandVector()
     {
         synth->vectorSet(127, chan, 0);
         axis = 0;
+        bitClear(level, vect_lev);
         return done_msg;
     }
     if (matchnMove(1, point, "xaxis"))
         axis = 0;
     else if (matchnMove(1, point, "yaxis"))
     {
-        if (Runtime.nrpndata.vectorXaxis[chan] > 0x7f)
+        if (!Runtime.nrpndata.vectorEnabled[chan])
         {
             Runtime.Log("Vector X must be set first");
             return done_msg;
@@ -699,6 +701,8 @@ int CmdInterface::commandVector()
         tmp = string2int(point);
         if (!synth->vectorInit(axis, chan, tmp))
             synth->vectorSet(axis, chan, tmp);
+        if(Runtime.nrpndata.vectorEnabled[chan])
+            bitSet(level, vect_lev);
         return done_msg;
     }
     if (!Runtime.nrpndata.vectorEnabled[chan])
@@ -1083,7 +1087,6 @@ int CmdInterface::commandSet()
     if (matchnMove(2, point, "vector"))
     {
         level = 0; // clear all first
-        bitSet(level, vect_lev);
         return commandVector();
     }
     if (level < 4 && matchnMove(3, point, "system"))
