@@ -1051,6 +1051,7 @@ void Part::setVolume(float value)
     volume  = dB2rap((value - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
 }
 
+
 void Part::setDestination(int value)
 {
     Paudiodest = value;

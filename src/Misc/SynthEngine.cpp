@@ -134,6 +134,7 @@ SynthEngine::~SynthEngine()
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
         if (insefx[nefx])
             delete insefx[nefx];
+
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         if (sysefx[nefx])
             delete sysefx[nefx];
@@ -251,6 +252,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             goto bail_out;
         }
     }
+
     defaults();
     ClearNRPNs();
     if (Runtime.restoreJackSession) // the following are not fatal if failed
@@ -316,7 +318,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.Log("Failed to start RBP thread");
         goto bail_out;
     }
-
     return true;
 
 
@@ -336,6 +337,7 @@ bail_out:
     if (tmpmixl)
         fftwf_free(tmpmixl);
     tmpmixl = NULL;
+
     if (tmpmixr)
         fftwf_free(tmpmixr);
     tmpmixr = NULL;
@@ -346,12 +348,14 @@ bail_out:
             delete part[npart];
         part[npart] = NULL;
     }
+
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         if (insefx[nefx])
             delete insefx[nefx];
         insefx[nefx] = NULL;
     }
+
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
         if (sysefx[nefx])
@@ -393,7 +397,6 @@ void *SynthEngine::RBPthread(void)
                 point += found;
                 toread -= found;
                 ++tries;
-
             }
             if (!toread)
             {
@@ -431,12 +434,14 @@ void SynthEngine::defaults(void)
         part[npart]->defaults();
         part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
     }
+
     partonoffWrite(0, 1); // enable the first part
     for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
     {
         insefx[nefx]->defaults();
         Pinsparts[nefx] = -1;
     }
+
     // System Effects init
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
     {
@@ -512,7 +517,6 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
                     part[npart]->SetController(type, par);
                     if (type == 7 || type == 10) // currently only volume and pan
                         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-
                 }
             }
         }
@@ -606,10 +610,12 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                     insefx[nFX]->changeeffect(nType);
                     data |= ((Pinsparts[nFX] + 2) << 24);
                     break;
+
                 case 4:
                     Pinsparts[nFX] = nPar;
                     data |= ((nPar + 2) << 24);
                     break;
+
                 case 8:
                     insefx[nFX]->changepreset(value);
                     data |= ((Pinsparts[nFX] + 2) << 24);
@@ -624,9 +630,11 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                 case 1:
                     part[npart]->partefx[nFX]->changeeffect(nType);
                     break;
+
                 case 4:
                     setPsysefxvol(npart, nPar, value);
                     break;
+
                 case 8:
                     part[npart]->partefx[nFX]->changepreset(value);
                     break;
@@ -639,9 +647,11 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
                 case 1:
                     sysefx[nFX]->changeeffect(nType);
                     break;
+
                 case 4:
                     setPsysefxsend(nFX, nPar, value);
                     break;
+
                 case 8:
                     sysefx[nFX]->changepreset(value);
                     break;
@@ -724,6 +734,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
     }
 }
 
+
 // for de-duplicating bits in SetProgram() and for calling from everywhere else
 // this replaces bank->loadfromslot for thread safety etc.
 bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
@@ -755,6 +766,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     sem_post (&partlock);
     return loadOK;
 }
+
 
 // Set part's channel number
 void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)

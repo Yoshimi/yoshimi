@@ -234,6 +234,7 @@ int Bank::getBankSize(int bankID)
     return found;
 }
 
+
 // Changes a bank name 'in place' and updates the filename
 bool Bank::setbankname(unsigned int bankID, string newname)
 {
@@ -613,6 +614,7 @@ void Bank::scanrootdir(int root_idx)
     roots [root_idx].bankIdStep = 0;
 }
 
+
 bool Bank::addtobank(size_t rootID, size_t bankID, int pos, const string filename, const string name)
 {
     BankEntry &bank = roots [rootID].banks [bankID];
@@ -719,6 +721,7 @@ InstrumentEntry &Bank::getInstrumentReference(size_t rootID, size_t bankID, size
 {
     return roots [rootID].banks [bankID].instruments [ninstrument];
 }
+
 
 void Bank::addDefaultRootDirs()
 {

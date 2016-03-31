@@ -65,6 +65,7 @@ void Microtonal::defaults(void)
     Pglobalfinedetune = 64.0;
 }
 
+
 // Get the frequency according to the note number
 float Microtonal::getNoteFreq(int note, int keyshift)
 {
@@ -236,6 +237,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     return -1; // ok
 }
 
+
 // Convert the text to tunnings
 int Microtonal::texttotunings(const char *text)
 {
@@ -279,6 +281,7 @@ int Microtonal::texttotunings(const char *text)
     return -1; // ok
 }
 
+
 // Convert the text to mapping
 void Microtonal::texttomapping(const char *text)
 {
@@ -317,6 +320,7 @@ void Microtonal::texttomapping(const char *text)
         tx = 1;
     Pmapsize = tx;
 }
+
 
 // Convert tunning to text line
 void Microtonal::tuningtoline(int n, char *line, int maxn)
@@ -386,6 +390,7 @@ int Microtonal::loadscl(string filename)
     return 0;
 }
 
+
 // Loads the mapping from a kbm file
 int Microtonal::loadkbm(string filename)
 {
@@ -397,8 +402,10 @@ int Microtonal::loadkbm(string filename)
     // loads the mapsize
     if (loadline(file,&tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d",&x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -407,8 +414,10 @@ int Microtonal::loadkbm(string filename)
     // loads first MIDI note to retune
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -417,8 +426,10 @@ int Microtonal::loadkbm(string filename)
     // loads last MIDI note to retune
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -427,8 +438,10 @@ int Microtonal::loadkbm(string filename)
     // loads last the middle note where scale fro scale degree=0
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -437,8 +450,10 @@ int Microtonal::loadkbm(string filename)
     // loads the reference note
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -447,9 +462,11 @@ int Microtonal::loadkbm(string filename)
     // loads the reference freq.
     if (loadline(file, &tmp[0]))
         return 2;
+
     float tmpPAfreq = 440.0f;
     if (!sscanf(&tmp[0], "%f", &tmpPAfreq))
         return 2;
+
     PAfreq = tmpPAfreq;
 
     // the scale degree(which is the octave) is not loaded, it is obtained by the tunnings with getoctavesize() method
@@ -535,6 +552,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
     xml->endbranch();
 }
 
+
 void Microtonal::getfromXML(XMLwrapper *xml)
 {
     Pname = xml->getparstr("name");
@@ -616,6 +634,7 @@ bool Microtonal::saveXML(string filename)
     delete xml;
     return result;
 }
+
 
 bool Microtonal::loadXML(string filename)
 {

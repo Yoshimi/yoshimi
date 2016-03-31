@@ -773,6 +773,7 @@ void Config::Log(string msg, char tostderr)
         cerr << msg << endl;
 }
 
+
 #ifndef YOSHIMI_LV2_PLUGIN
 void Config::StartupReport(MusicClient *musicClient)
 {
@@ -1177,17 +1178,19 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             if (arg)
                 settings->StateFile = string(arg);
             break;
-        #if defined(JACK_SESSION)
-            case 'u':
-                if (arg)
-                    settings->jackSessionFile = string(arg);
-                break;
 
-            case 'U':
-                    if (arg)
-                        settings->jackSessionUuid = string(arg);
+#if defined(JACK_SESSION)
+        case 'u':
+            if (arg)
+                settings->jackSessionFile = string(arg);
             break;
-        #endif
+
+        case 'U':
+                if (arg)
+                    settings->jackSessionUuid = string(arg);
+        break;
+#endif
+
         case ARGP_KEY_ARG:
         case ARGP_KEY_END:
             break;

@@ -85,14 +85,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     if (synth->getRuntime().xmlType <= XML_CONFIG)
     {
         beginbranch("BASE_PARAMETERS");
-        addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
-        addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
+            addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
+            addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
 
-        addpar("max_system_effects", NUM_SYS_EFX);
-        addpar("max_insertion_effects", NUM_INS_EFX);
-        addpar("max_instrument_effects", NUM_PART_EFX);
+            addpar("max_system_effects", NUM_SYS_EFX);
+            addpar("max_insertion_effects", NUM_INS_EFX);
+            addpar("max_instrument_effects", NUM_PART_EFX);
 
-        addpar("max_addsynth_voices", NUM_VOICES);
+            addpar("max_addsynth_voices", NUM_VOICES);
         endbranch();
     }
 }

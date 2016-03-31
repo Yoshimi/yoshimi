@@ -187,6 +187,7 @@ string fx_presets [] = {
     "4, wahwah, autowah, vocal morph 1, vocal morph 2"
 };
 
+
 void CmdInterface::defaults()
 {
     level = 0;
@@ -638,7 +639,6 @@ int CmdInterface::volPanShift()
         partFlag = true;
         reply = done_msg;
     }
-
 
     if (panelFlag) // currently only volume and pan
         GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
@@ -1464,6 +1464,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             reply = what_msg;
         }
     }
+
     else if (matchnMove(3, point, "remove"))
     {
         if  (matchnMove(1, point, "root"))
@@ -1608,6 +1609,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             reply = what_msg;
         }
     }
+
     else if (matchnMove(2, point, "save"))
         if(matchnMove(2, point, "vector"))
         {
