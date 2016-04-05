@@ -1536,12 +1536,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         if(matchnMove(2, point, "vector"))
         {
-            tmp = chan;
             string loadChan;
             if(matchnMove(1, point, "channel"))
             {
-                tmp = string2int127(point);
-                point = skipChars(point);
+                if (isdigit(point[0]))
+                {
+                    tmp = string2int127(point);
+                    point = skipChars(point);
+                    chan = tmp;
+                }
+                else
+                    tmp = chan;
                 loadChan = "channel " + asString(chan);
             }
             else
@@ -1555,8 +1560,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                chan = tmp;
-                if(synth->loadVector(chan, (string) point, true))
+                if(synth->loadVector(tmp, (string) point, true))
                     Runtime.Log("Loaded Vector " + (string) point + " to " + loadChan);
                 reply = done_msg;
             }

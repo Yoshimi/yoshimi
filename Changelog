@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-4-5 Will
+- Extra CLI error check when loading vectors.
+
 2016-3-30 Will
 - Improved CLI error checks when setting vectors.
 
