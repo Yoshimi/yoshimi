@@ -719,11 +719,15 @@ int CmdInterface::commandVector()
 
     if (matchnMove(1, point, "features"))
     {
-        unsigned int vecfeat = Runtime.nrpndata.vectorXfeatures[chan];
+        unsigned int vecfeat;
         if (point[0] == 0)
             reply = value_msg;
         else
         {
+            if (axis == 0)
+                vecfeat = Runtime.nrpndata.vectorXfeatures[chan];
+            else
+                vecfeat = Runtime.nrpndata.vectorYfeatures[chan];
             tmp = string2int(point);
             if (tmp < 1 || tmp > 4)
                 return range_msg;
