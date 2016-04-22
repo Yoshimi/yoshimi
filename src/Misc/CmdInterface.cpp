@@ -197,6 +197,7 @@ void CmdInterface::defaults()
     nFX = 0;
     nFXtype = 0;
     nFXpreset = 0;
+    isRead = false;
 }
 
 
@@ -1005,7 +1006,7 @@ int CmdInterface::commandPart(bool justSet)
 }
 
 
-int CmdInterface::commandSet()
+int CmdInterface::commandReadnSet()
 {
     Config &Runtime = synth->getRuntime();
     int reply = todo_msg;
@@ -1014,6 +1015,11 @@ int CmdInterface::commandSet()
 
     if (matchnMove(4, point, "yoshimi"))
     {
+        if (isRead)
+        {
+            Runtime.Log("Instance " + asString(currentInstance), 1);
+            return done_msg;
+        }
         if (point[0] == 0)
             return value_msg;
         tmp = string2int(point);
@@ -1029,6 +1035,20 @@ int CmdInterface::commandSet()
 
     else if (matchnMove(3, point, "reports"))
     {
+        if (isRead)
+        {
+            if (Runtime.hideErrors)
+                name = "Non-fatal reports";
+            else
+                name = "All reports";
+            name += " sent to ";
+            if (Runtime.toConsole)
+                name += "console window";
+            else
+                name += "stderr";
+            Runtime.Log(name, 1); // only ever sent to stderr
+            return done_msg;
+        }
         if (matchnMove(1, point, "gui"))
             synth->SetSystemValue(100, 127);
         else if (matchnMove(1, point, "stderr"))
@@ -1055,6 +1075,11 @@ int CmdInterface::commandSet()
 
     else if (matchnMove(1, point, "root"))
     {
+        if (isRead)
+        {
+            Runtime.Log("Root is ID " + asString(synth->ReadBankRoot()), 1);
+            return done_msg;
+        }
         if (point[0] != 0)
         {
             synth->SetBankRoot(string2int(point));
@@ -1065,6 +1090,11 @@ int CmdInterface::commandSet()
     }
     else if (matchnMove(1, point, "bank"))
     {
+        if (isRead)
+        {
+            Runtime.Log("Bank is ID " + asString(synth->ReadBank()), 1);
+            return done_msg;
+        }
         if (point[0] != 0)
         {
             synth->SetBank(string2int(point));
@@ -1083,6 +1113,11 @@ int CmdInterface::commandSet()
 
     if (matchnMove(1, point, "part"))
     {
+        if (isRead && point[0] == 0)
+        {
+            Runtime.Log("Current part " + asString(npart), 1);
+            return done_msg;
+        }
         level = 0; // clear all first
         bitSet(level, part_lev);
         nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
@@ -1134,6 +1169,11 @@ int CmdInterface::commandSet()
     }
     if (matchnMove(3, point, "ccroot"))
     {
+        if (isRead)
+        {
+            Runtime.Log("Root CC is " + asString(Runtime.midi_bank_root));
+            return done_msg;
+        }
         if (point[0] != 0)
         {
             synth->SetSystemValue(113, string2int(point));
@@ -1145,6 +1185,11 @@ int CmdInterface::commandSet()
     }
     else if (matchnMove(3, point, "ccbank"))
     {
+        if (isRead)
+        {
+            Runtime.Log("Bank CC is " + asString(Runtime.midi_bank_C));
+            return done_msg;
+        }
         if (point[0] != 0)
         {
             synth->SetSystemValue(114, string2int(point));
@@ -1421,10 +1466,27 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (matchnMove(1, point, "set"))
     {
         if (point[0] != 0)
-            reply = commandSet();
+        {
+            isRead = false;
+            reply = commandReadnSet();
+        }
         else
         {
             replyString = "set";
+            reply = what_msg;
+        }
+    }
+
+    else if (matchnMove(1, point, "read"))
+    {
+        if (point[0] != 0)
+        {
+            isRead = true;
+            reply = commandReadnSet();
+        }
+        else
+        {
+            replyString = "read";
             reply = what_msg;
         }
     }

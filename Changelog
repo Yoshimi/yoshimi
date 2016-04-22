@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-4-22 Will
+- Started to implement CLI read values.
+- Rationalised some error messages.
+
 2016-4-8 Will
 - Bugfix: CLI vector Y fetures now correctly set.
 

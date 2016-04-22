@@ -664,6 +664,8 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
 
 void SynthEngine::SetBankRoot(int rootnum)
 {
+    string name;
+    int currentRoot;
     if (bank.setCurrentRootID(rootnum))
     {
         if (Runtime.showGui)
@@ -671,10 +673,20 @@ void SynthEngine::SetBankRoot(int rootnum)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
-        Runtime.Log("Set root " + asString(rootnum) + " " + bank.getRootPath(bank.getCurrentRootID()));
+        currentRoot = bank.getCurrentRootID();
+        if (rootnum != currentRoot)
+            name = "Cant find ID " + asString(rootnum) + ". Current root is ";
+        else name = "Root set to ";
+        Runtime.Log(name + asString(currentRoot) + " " + bank.getRootPath(currentRoot));
     }
     else
         Runtime.Log("No match for root ID " + asString(rootnum));
+}
+
+
+int SynthEngine::ReadBankRoot(void)
+{
+    return bank.currentRootID;
 }
 
 
@@ -692,10 +704,18 @@ void SynthEngine::SetBank(int banknum)
         {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RefreshCurBank, 0);
         }
-        Runtime.Log("Set bank " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
+        Runtime.Log("Bank set to " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
     }
     else
-        Runtime.Log("No bank " + asString(banknum)+ " in this root");
+    {
+        Runtime.Log("No bank " + asString(banknum)+ " in this root. Current bank is " + asString(ReadBank()));
+    }
+}
+
+
+int SynthEngine::ReadBank(void)
+{
+    return bank.currentBankID;
 }
 
 

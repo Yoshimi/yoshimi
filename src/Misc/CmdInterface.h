@@ -47,7 +47,7 @@ class CmdInterface : private MiscFuncs
         int volPanShift();
         int commandVector();
         int commandPart(bool justSet);
-        int commandSet();
+        int commandReadnSet();
         bool cmdIfaceProcessCommand();
         char *cCmd;
         char *point;
@@ -62,6 +62,7 @@ class CmdInterface : private MiscFuncs
         int axis;
         unsigned int level;
         string replyString;
+        bool isRead;
 };
 
 #endif
