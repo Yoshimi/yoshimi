@@ -847,6 +847,51 @@ void SynthEngine::SetPartPortamento(int npart, bool state)
 }
 
 
+bool SynthEngine::ReadPartPortamento(int npart)
+{
+    return part[npart]->ctl->portamento.portamento;
+}
+
+
+void SynthEngine::SetPartKeyMode(int npart, int mode)
+{
+    switch(mode)
+    {
+        case 2:
+            part[npart]->Ppolymode = 0;
+            part[npart]->Plegatomode = 1;
+            Runtime.Log("mode set to 'legato'");
+            break;
+        case 1:
+            part[npart]->Ppolymode = 0;
+            part[npart]->Plegatomode = 0;
+            Runtime.Log("mode set to 'mono'");
+            break;
+        case 0:
+        default:
+            part[npart]->Ppolymode = 1;
+            part[npart]->Plegatomode = 0;
+            Runtime.Log("mode set to 'poly'");
+            break;
+    }
+}
+
+
+int SynthEngine::ReadPartKeyMode(int npart)
+{
+    int result;
+    bool poly = part[npart]->Ppolymode;
+    bool legato = part[npart]->Plegatomode;
+    if (!poly && legato)
+        result = 2;
+    else if (!poly && !legato)
+        result = 1;
+    else
+        result = 0;;
+    return result;
+}
+
+
 /*
  * This should really be in MiscFuncs but it has two runtime calls
  * and I can't work out a way to implement that :(

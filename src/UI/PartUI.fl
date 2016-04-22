@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey 
+Copyright 2014-2016, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -449,27 +449,10 @@ Offset}
       Fl_Choice keymode {
         label Mode
         callback {//
-            switch (o->value())
-            {
-                case 0: // Poly (implies no legato)
-                    part->Ppolymode = 1;
-                    part->Plegatomode = 0;
-                    break;
-                case 1: // Mono (implies no legato)
-                    part->Ppolymode = 0;
-                    part->Plegatomode = 0;
-                    break;
-                case 2: // Legato (implies mono)
-                    part->Ppolymode = 0;
-                    part->Plegatomode = 1;
-                    break;
-                default:
-                    break;
-            }}
+    synth->SetPartKeyMode(npart, o->value());}
         tooltip {Poly, Mono or Legato mode} xywh {81 36 66 18} down_box BORDER_BOX labelsize 11 align 8 textfont 1 textsize 10
         code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
-        code1 {if (part->Ppolymode) o->value(0); else o->value(1);}
-        code2 {if (!part->Ppolymode && part->Plegatomode) o->value(2);}
+        code1 {o->value(synth->ReadPartKeyMode(npart));}
       } {}
       Fl_Check_Button enportamento {
         label Portamento

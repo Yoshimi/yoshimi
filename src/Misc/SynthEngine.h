@@ -100,6 +100,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
         void SetPartPortamento(int npart, bool state);
+        bool ReadPartPortamento(int npart);
+        void SetPartKeyMode(int npart, int mode);
+        int  ReadPartKeyMode(int npart);
         void cliOutput(list<string>& msg_buf, unsigned int lines);
         void ListPaths(list<string>& msg_buf);
         void ListBanks(int rootNum, list<string>& msg_buf);
