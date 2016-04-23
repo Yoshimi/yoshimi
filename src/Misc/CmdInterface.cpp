@@ -1635,7 +1635,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
 
-    else if (matchnMove(1, point, "read"))
+    else if (matchnMove(1, point, "read") || matchnMove(1, point, "get"))
     {
         if (point[0] != 0)
         {
