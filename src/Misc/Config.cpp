@@ -267,38 +267,6 @@ void Config::flushLog(void)
 }
 
 
-string Config::addParamHistory(string file, string extension, deque<HistoryListItem> &ParamsHistory)
-{
-    if (!file.empty())
-    {
-        unsigned int name_start = file.rfind("/");
-        unsigned int name_end = file.rfind(extension);
-        if (name_start != string::npos && name_end != string::npos
-            && (name_start - 1) < name_end)
-        {
-            HistoryListItem item;
-            item.name = file.substr(name_start + 1, name_end - name_start - 1);
-            item.file = file;
-            item.index = nextHistoryIndex--;
-            itx = ParamsHistory.begin();
-            for (unsigned int i = 0; i < ParamsHistory.size(); ++i, ++itx)
-                if (ParamsHistory.at(i).sameFile(file))
-                    ParamsHistory.erase(itx);
-            ParamsHistory.insert(ParamsHistory.begin(), item);
-            if (ParamsHistory.size() > MAX_HISTORY)
-            {
-                itx = ParamsHistory.end();
-                ParamsHistory.erase(--itx);
-            }
-            return (CurrentXMZ = item.name);
-        }
-        else
-            Log("Invalid param file proffered to history:" + file);
-    }
-    return string();
-}
-
-
 bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
 {
     bool bRet = false;

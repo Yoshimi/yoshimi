@@ -36,8 +36,6 @@ RPNs (channel based)
 Maybe a NRPN variation of this for global fine tuning.
 
 
-Add 'Ignore MIDI Reset All' to deal with brain dead sequencers :(
-
 Gui to set up vector control!
 
 Review tooltips.

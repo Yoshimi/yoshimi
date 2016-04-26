@@ -69,6 +69,12 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
     return nextId;
 }
 
+// histories
+static vector<string> ParamsHistory;
+static vector<string> ScaleHistory;
+static vector<string> StateHistory;
+
+
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
     isLV2Plugin(_isLV2Plugin),
@@ -278,7 +284,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             if (loadXML(Runtime.paramsLoad))
             {
                 applyparameters();
-                Runtime.paramsLoad = Runtime.addParamHistory(Runtime.paramsLoad, ".xmz", Runtime.ParamsHistory);
+                addHistory(Runtime.paramsLoad, 0);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
             else
@@ -2098,6 +2104,65 @@ bool SynthEngine::saveBanks(int instance)
 }
 
 
+void SynthEngine::addHistory(string name, int group)
+{
+
+    unsigned int name_start = name.rfind("/");
+    unsigned int name_end = name.rfind(".");//extension);
+
+    if (name_start == string::npos || name_end == string::npos
+            || (name_start - 1) >= name_end)
+        return;
+
+    bool copy = false;
+
+    switch (group)
+    {
+        case 2:
+            for (vector<string>::iterator it = StateHistory.begin(); it != StateHistory.end(); ++it)
+            {
+                if (*it == name)
+                    copy = true;
+            }
+            if (!copy)
+                StateHistory.push_back(name);
+            break;
+
+        case 1:
+            for (vector<string>::iterator it = ScaleHistory.begin(); it != ScaleHistory.end(); ++it)
+            {
+                if (*it == name)
+                    copy = true;
+            }
+            if (!copy)
+                ScaleHistory.push_back(name);
+            break;
+
+        case 0:
+        default:
+            for (vector<string>::iterator it = ParamsHistory.begin(); it != ParamsHistory.end(); ++it)
+            {
+                if (*it == name)
+                    copy = true;
+            }
+            if (!copy)
+                ParamsHistory.push_back(name);
+            break;
+    }
+}
+
+
+vector<string> * SynthEngine::getHistory(int group)
+{
+    if (group == 2)
+        return &StateHistory;
+    else if (group == 1)
+        return &ScaleHistory;
+    return &ParamsHistory;
+}
+
+
+
 bool SynthEngine::loadHistory(int instance)
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
@@ -2133,7 +2198,7 @@ bool SynthEngine::loadHistory(int instance)
             {
                 filetype = xml->getparstr("xmz_file");
                 if (filetype.size() && isRegFile(filetype))
-                    Runtime.addParamHistory(filetype, ".xmz", Runtime.ParamsHistory);
+                    addHistory(filetype, 0);
                 xml->exitbranch();
             }
         }
@@ -2150,7 +2215,7 @@ bool SynthEngine::loadHistory(int instance)
             {
                 filetype = xml->getparstr("xsz_file");
                 if (filetype.size() && isRegFile(filetype))
-                    Runtime.addParamHistory(filetype, ".xsz", Runtime.ScaleHistory);
+                    addHistory(filetype, 1);
                 xml->exitbranch();
             }
         }
@@ -2167,7 +2232,7 @@ bool SynthEngine::loadHistory(int instance)
             {
                 filetype = xml->getparstr("state_file");
                 if (filetype.size() && isRegFile(filetype))
-                    Runtime.addParamHistory(filetype, ".state", Runtime.StateHistory);
+                    addHistory(filetype, 2);
                 xml->exitbranch();
             }
         }
@@ -2198,45 +2263,59 @@ bool SynthEngine::saveHistory(int instance)
     }
     xmltree->beginbranch("HISTORY");
     {
-        if (Runtime.ParamsHistory.size())
+
+        if (ParamsHistory.size())
         {
+            unsigned int offset = 0;
+            int x = 0;
             xmltree->beginbranch("XMZ_PATCH_SETS");
-            xmltree->addpar("history_size", Runtime.ParamsHistory.size());
-            deque<HistoryListItem>::reverse_iterator rx = Runtime.ParamsHistory.rbegin();
-            unsigned int count = 0;
-            for (int x = 0; rx != Runtime.ParamsHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
+            xmltree->addpar("history_size", ParamsHistory.size());
+            if (ParamsHistory.size() > MAX_HISTORY)
+                offset = ParamsHistory.size() - MAX_HISTORY;
+            for (vector<string>::iterator it = ParamsHistory.begin() + offset; it != ParamsHistory.end(); ++it)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
-                xmltree->addparstr("xmz_file", rx->file);
+                    xmltree->addparstr("xmz_file", *it);
                 xmltree->endbranch();
+                ++x;
             }
             xmltree->endbranch();
         }
-        if (Runtime.ScaleHistory.size())
+
+        if (ScaleHistory.size())
         {
+            unsigned int offset = 0;
+            int x = 0;
             xmltree->beginbranch("XMZ_SCALE");
-            xmltree->addpar("history_size", Runtime.ScaleHistory.size());
-            deque<HistoryListItem>::reverse_iterator rx = Runtime.ScaleHistory.rbegin();
-            unsigned int count = 0;
-            for (int x = 0; rx != Runtime.ScaleHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
+            xmltree->addpar("history_size", ScaleHistory.size());
+
+            if (ScaleHistory.size() > MAX_HISTORY)
+                offset = ScaleHistory.size() - MAX_HISTORY;
+            for (vector<string>::iterator it = ScaleHistory.begin() + offset; it != ScaleHistory.end(); ++it)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
-                xmltree->addparstr("xsz_file", rx->file);
+                    xmltree->addparstr("xsz_file", *it);
                 xmltree->endbranch();
+                ++x;
             }
             xmltree->endbranch();
         }
-        if (Runtime.StateHistory.size())
+
+        if (StateHistory.size())
         {
+            unsigned int offset = 0;
+            int x = 0;
             xmltree->beginbranch("XMZ_STATE");
-            xmltree->addpar("history_size", Runtime.StateHistory.size());
-            deque<HistoryListItem>::reverse_iterator rx = Runtime.StateHistory.rbegin();
-            unsigned int count = 0;
-            for (int x = 0; rx != Runtime.StateHistory.rend() && count <= MAX_HISTORY; ++rx, ++x)
+            xmltree->addpar("history_size", StateHistory.size());
+
+            if (StateHistory.size() > MAX_HISTORY)
+                offset = StateHistory.size() - MAX_HISTORY;
+            for (vector<string>::iterator it = StateHistory.begin() + offset; it != StateHistory.end(); ++it)
             {
                 xmltree->beginbranch("XMZ_FILE", x);
-                xmltree->addparstr("state_file", rx->file);
+                    xmltree->addparstr("state_file", *it);
                 xmltree->endbranch();
+                ++x;
             }
             xmltree->endbranch();
         }

@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey
+Copyright 2014-2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -181,7 +181,7 @@ class MasterUI {selected : {private MiscFuncs}
   Function {Init(const char *_label)} {} {
     code {//
       instance = synth->getUniqueId();
-      
+
       filename = synth->getRuntime().ConfigDir + "/" +synth->getRuntime().programCmd();
       if (instance > 0)
       {
@@ -190,12 +190,12 @@ class MasterUI {selected : {private MiscFuncs}
       filename += ".windows";
       microtonalui = new MicrotonalUI(&synth->microtonal);
       bankui = new BankUI(&npart, synth);;
-      virkeyboard = new VirKeyboard(synth); 
+      virkeyboard = new VirKeyboard(synth);
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       yoshiLog = new ConsoleUI();
-      
+
       make_window();
       loadWindowData();
       if(synth->getIsLV2Plugin())
@@ -207,11 +207,11 @@ class MasterUI {selected : {private MiscFuncs}
 	setMasterLabel(synth->getRuntime().paramsLoad);
       }
       masterwindow->show();
-      
+
       // these don't have access to synth ->
       microtonalui->microtonaluiwindow->copy_label(synth->makeUniqueName("Scales").c_str());
-      yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str()); 
-      
+      yoshiLog->logConsole->copy_label(synth->makeUniqueName("Console").c_str());
+
       if (panelO)
           mixerpanel->do_callback();
       if (instrumentsO)
@@ -378,10 +378,10 @@ mainCreateNewInstance(forceId);}
           label {&Patch Sets}
           xywh {0 0 70 21} labelsize 12
           code0 {o = o; // suppress warning
-              if (synth->getRuntime().ParamsHistory.empty())
+              /*if (synth->getRuntime().ParamsHistory.empty())
                   RecentParams->deactivate();
               else
-                  RecentParams->activate();}
+                  */RecentParams->activate();}
         } {
           MenuItem {} {
             label {&Show Patch Banks...}
@@ -391,8 +391,7 @@ mainCreateNewInstance(forceId);}
           MenuItem {} {
             label {&Load External...}
             callback {//
-                do_load_master(true, NULL);
-                paramsui->loadRecent();}
+                do_load_master(true, NULL);}
             tooltip {Load a patch set (.xmz) file} xywh {0 0 34 21} labelsize 12
           }
           MenuItem Save {
@@ -437,10 +436,10 @@ paramsui->Show(2);}
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
           code0 {o = o; // suppress warning;
-              if (synth->getRuntime().ScaleHistory.empty())
+              /*if (synth->getRuntime().ScaleHistory.empty())
         RecentScale->deactivate();
     else
-        RecentScale->activate();}
+        */RecentScale->activate();}
         } {
           MenuItem {} {
             label {&Show Settings...}
@@ -477,7 +476,7 @@ paramsui->Show(2);}
                     fl_alert("Failed to save scale settings");
                 else
                 {
-                    synth->getRuntime().addParamHistory(filename, ".xsz", synth->getRuntime().ScaleHistory);
+                    synth->addHistory(filename, 1);
                     RecentScale->activate();
                 }
                 updatepanel();}
@@ -509,10 +508,10 @@ paramsui->Show(3);}
           label {S&tate}
           xywh {0 0 65 21} labelsize 12
           code0 {o = o; // suppress warning;
-              if (synth->getRuntime().StateHistory.empty())
+              /*if (synth->getRuntime().StateHistory.empty())
         RecentState->deactivate();
     else
-        RecentState->activate();}
+        */RecentState->activate();}
         } {
           MenuItem loadState {
             label {Load...}
@@ -523,8 +522,12 @@ paramsui->Show(3);}
     {
         laststatefile = string(fle);
         synth->getRuntime().loadState(laststatefile);
-        synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
+        synth->addHistory(laststatefile, 2);
         RecentState->activate();
+        unsigned int name_start = laststatefile.rfind("/");
+    	unsigned int name_end = laststatefile.rfind(".");
+    	setMasterLabel(laststatefile.substr(name_start + 1, name_end - name_start - 1));
+
     }
     refresh_master_ui();}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
@@ -539,7 +542,7 @@ paramsui->Show(3);}
                 {
                     laststatefile = string(fle);
                     synth->getRuntime().saveState(laststatefile);
-                    synth->getRuntime().addParamHistory(laststatefile, ".state", synth->getRuntime().StateHistory);
+                    synth->addHistory(laststatefile, 2);
                     RecentState->activate();
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -587,13 +590,13 @@ paramsui->Show(4);}
               vumeter->init(-1, synth);
               for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
               {
-              	if(panelwindow)              
+              	if(panelwindow)
               	{
 	              	if(panellistitem[i]->partVUMeter)
 	              	{
 	              		panellistitem[i]->partVUMeter->resetPart();
 	              	}
-              	}              	
+              	}
               }
               synth->allStop();}
           tooltip {Cease all sound immediately!} xywh {15 32 80 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
@@ -1130,7 +1133,7 @@ updatepanel();}
         partui->partgroupui->activate();
     else
         partui->partgroupui->deactivate();
-        
+
     partui->partGroupEnable->value(synth->partonoffRead(npart));
     partui->partpan->value(synth->part[npart]->Ppanning);
     partui->partvol->value(synth->part[npart]->Pvolume);
@@ -1141,14 +1144,14 @@ updatepanel();}
     partui->minkcounter->value(synth->part[npart]->Pminkey);
     partui->maxkcounter->value(synth->part[npart]->Pmaxkey);
     partui->enportamento->value(synth->part[npart]->ctl->portamento.portamento);
-    
+
     if (synth->part[npart]->Ppolymode)
         partui->keymode->value(0);
     else
         partui->keymode->value(1);
     if (!synth->part[npart]->Ppolymode && synth->part[npart]->Plegatomode)
         partui->keymode->value(2);
-        
+
     maxparts->value(synth->getRuntime().NumAvailableParts);
     maxparts->redraw();
     npartcounter->value(npart + 1);
@@ -1174,7 +1177,7 @@ updatepanel();}
   Function {updateeffects(int data)} {} {
     code {//
     int partnum = data >> 24;
-    int effclass = (data >> 22) & 3; 
+    int effclass = (data >> 22) & 3;
     //int type = (data >> 12) & 3;
     int parameter = (data >> 8) & 0x7f;
 
@@ -1212,7 +1215,7 @@ updatepanel();}
         // effect output volume to be done!
       //  }
         sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-        syseffectui->refresh(synth->sysefx[nsyseff]);      
+        syseffectui->refresh(synth->sysefx[nsyseff]);
         showSysEfxUI();
     }} {}
   }
@@ -1241,9 +1244,7 @@ updatepanel();}
     if (!result)
         fl_alert("Failed to load scale settings file");
     else
-    {
-        synth->getRuntime().addParamHistory(fname, ".xsz", synth->getRuntime().ScaleHistory);
-    }} {}
+        synth->addHistory(fname, 1);} {}
   }
   Function {do_new_master()} {} {
     code {//
@@ -1274,8 +1275,13 @@ updatepanel();}
         refresh_master_ui();
         if (result >= 0)
         {
+            string name = (string)fname;
+            unsigned int name_start = name.rfind("/");
+    	    unsigned int name_end = name.rfind(".");
+    	    setMasterLabel(name.substr(name_start + 1, name_end - name_start - 1));
+    	    
             if (updatehistory)
-                setMasterLabel(synth->getRuntime().addParamHistory(string(fname), ".xmz", synth->getRuntime().ParamsHistory));
+                 synth->addHistory(fname, 0);
             RecentParams->activate();
             microtonalui->apply();
             if(result > 1)
@@ -1319,7 +1325,7 @@ updatepanel();}
             fl_alert("Could not save the file.");
         else
         {
-            setMasterLabel(synth->getRuntime().addParamHistory(fname, ".xmz", synth->getRuntime().ParamsHistory));
+            synth->addHistory(fname, 0);
             RecentParams->activate();
         }
         updatepanel();} {}
@@ -1560,7 +1566,7 @@ updatepanel();}
                 "controllers",
                  controllersX,
                  controllersY,
-                 controllersO);    
+                 controllersO);
     ok = getData(ok,
                 "instrumentedit",
                  inseditX,
@@ -1595,7 +1601,7 @@ updatepanel();}
 
    if (windows != NULL)
         fclose(windows);
-        
+
     masterwindow->position(masterX, masterY);
     panelwindow->position(panelX, panelY);
     bankui->bankuiwindow->position(instrumentsX, instrumentsY);
@@ -1678,7 +1684,7 @@ updatepanel();}
                  inseditY,
                  inseditO);
 
-    if (partui->instrumentkitlist->x()) 
+    if (partui->instrumentkitlist->x())
         putData("kitlist",
                  partui->instrumentkitlist->x(),
                  partui->instrumentkitlist->y(),
@@ -1699,7 +1705,7 @@ updatepanel();}
                  partfxX,
                  partfxY,
                  partfxO);
- 
+
     putData("SUBnote",
              subNoteX,
              subNoteY,
@@ -1708,7 +1714,7 @@ updatepanel();}
              padNoteX,
              padNoteY,
              padNoteO);
-             
+
     putData("ADDnote",
              addNoteX,
              addNoteY,
@@ -1724,7 +1730,7 @@ updatepanel();}
     O = 0;
     if (!ok)
         return false;
-    
+
     ok = (fgets(word, 30, windows) != NULL);
     if (ok)
     	ok = strstr(word, name.c_str());

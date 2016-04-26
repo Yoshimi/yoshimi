@@ -287,50 +287,28 @@ bool CmdInterface::helpList()
 
 int CmdInterface::historyList(int type)
 {
-    Config &Runtime = synth->getRuntime();
     list<string>msg;
-    bool anyfound = false;
 
-    if ((type & 1) && Runtime.ParamsHistory.size())
+    vector<string> location = *synth->getHistory(type);
+    if (location.size() > 0)
     {
         msg.push_back(" ");
-        msg.push_back("Recent Patch Sets:");
-        anyfound = true;
-        deque<HistoryListItem>::reverse_iterator rx = Runtime.ParamsHistory.rbegin();
-        while (rx != Runtime.ParamsHistory.rend())
+        switch (type)
         {
-            msg.push_back("  " + rx->file);
-            ++rx;
+            case 0:
+                msg.push_back("Recent Patch Sets:");
+                break;
+            case 1:
+                msg.push_back("Recent Scales:");
+                break;
+            case 2:
+                msg.push_back("Recent States:");
+                break;
         }
+        for (vector<string>::iterator it = location.begin(); it != location.end(); ++it)
+                msg.push_back("  " + *it);
     }
-
-    if ((type & 2) && Runtime.ScaleHistory.size())
-    {
-        msg.push_back(" ");
-        msg.push_back("Recent Scales:");
-        anyfound = true;
-        deque<HistoryListItem>::reverse_iterator rx = Runtime.ScaleHistory.rbegin();
-        while (rx != Runtime.ScaleHistory.rend())
-        {
-            msg.push_back("  " + rx->file);
-            ++rx;
-        }
-    }
-
-    if ((type & 4) && Runtime.StateHistory.size())
-    {
-        msg.push_back(" ");
-        msg.push_back("Recent States:");
-        anyfound = true;
-        deque<HistoryListItem>::reverse_iterator rx = Runtime.StateHistory.rbegin();
-        while (rx != Runtime.StateHistory.rend())
-        {
-            msg.push_back("  " + rx->file);
-            ++rx;
-        }
-    }
-
-    if (!anyfound)
+    else
         msg.push_back("\nNo Saved History");
 
     synth->cliOutput(msg, LINES);
@@ -338,7 +316,7 @@ int CmdInterface::historyList(int type)
 }
 
 
-    int CmdInterface::effectsList()
+int CmdInterface::effectsList()
 {
     list<string>msg;
 
@@ -1604,11 +1582,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "history"))
         {
             if (matchnMove(1, point, "patchsets"))
-                reply = historyList(1);
+                reply = historyList(0);
             else if (matchnMove(2, point, "scales"))
-                reply = historyList(2);
+                reply = historyList(1);
             else if (matchnMove(2, point, "states"))
-                reply = historyList(4);
+                reply = historyList(2);
             else
                 reply = historyList(7);
         }
@@ -1619,6 +1597,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
             replyString = "list";
             reply = what_msg;
         }
+    }
+
+    else if (matchnMove(1, point, "test"))
+    {
+        vector<string> location = *synth->getHistory(1);
+        int offset = 0;
+        //if (location.size() > 5)
+            //offset = location.size() - 5;
+
+        for (vector<string>::iterator it = location.begin() + offset; it != location.end(); ++it)
+                Runtime.Log(*it);
     }
 
     else if (matchnMove(1, point, "set"))

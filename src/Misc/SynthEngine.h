@@ -76,6 +76,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int loadPatchSetAndUpdate(string filename);
         bool installBanks(int instance);
         bool saveBanks(int instance);
+        void addHistory(string name, int group);
+        vector<string> * getHistory(int group);
         bool loadHistory(int instance);
         bool saveHistory(int instance);
         bool loadVector(unsigned char baseChan, string name, bool full);

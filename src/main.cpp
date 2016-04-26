@@ -191,7 +191,6 @@ static void *mainGuiThread(void *arg)
 
                 if (_synth)
                 {
-                    _synth->saveHistory(tmpID);
                     _synth->saveBanks(tmpID);
                     _synth->getRuntime().deadObjects->disposeBodies();
                     _synth->getRuntime().flushLog();
@@ -292,7 +291,6 @@ bool mainCreateNewInstance(unsigned int forceId)
     {
         cout << "\nStarted "<< synth->getUniqueId() << "\n";
         // following copied here for other instances
-        synth->loadHistory(synth->getUniqueId());
         synth->installBanks(synth->getUniqueId());
     }
     synthInstances.insert(std::make_pair(synth, musicClient));
