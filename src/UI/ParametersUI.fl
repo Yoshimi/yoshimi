@@ -37,7 +37,8 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 } 
 
-class ParametersUI {} {
+class ParametersUI {selected
+} {
   Function {make_window(void)} {} {
     Fl_Window Recent {
       label {Recent Parameters}
@@ -48,7 +49,7 @@ class ParametersUI {} {
         callback {//
     if (o->value() > 0)
     {
-        vector<string> location = *synth->getHistory(H_type-2);
+        vector<string> location = *synth->getHistory(H_type);
         string fle;
         switch (Fl::event_button())
         {
@@ -62,7 +63,7 @@ class ParametersUI {} {
                         synth->getGuiMaster()->do_load_scale(fle);
                         break;
                     case 4:
-                        synth->addHistory(fle, 2);
+                        synth->addHistory(fle, 4);
                     case 2:
                     default:
                         synth->getGuiMaster()->do_load_master(false, fle.c_str());
@@ -118,7 +119,7 @@ make_window();} {}
             break;
     }
     
-    vector<string> location = *synth->getHistory(H_type-2);
+    vector<string> location = *synth->getHistory(H_type);
     BrowseRecent->clear();
     const int colwidths[] = { 64, 128, 0 };
     BrowseRecent->column_widths(colwidths);

@@ -229,7 +229,7 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
-    firstSynth->saveHistory(0);
+    firstSynth->saveHistory();
     firstSynth->saveBanks(0);
     return NULL;
 }
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
     if (sigaction(SIGQUIT, &yoshimiSigAction, NULL))
         firstSynth->getRuntime().Log("Setting SIGQUIT handler failed");
     // following moved here for faster first synth startup
-    firstSynth->loadHistory(0);
+    firstSynth->loadHistory();
     firstSynth->installBanks(0);
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
     }
 
     void *ret;
-    pthread_join(thr, &ret);    
+    pthread_join(thr, &ret);
     if(ret == (void *)1)
     {
         goto bail_out;

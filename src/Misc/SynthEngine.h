@@ -78,8 +78,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveBanks(int instance);
         void addHistory(string name, int group);
         vector<string> * getHistory(int group);
-        bool loadHistory(int instance);
-        bool saveHistory(int instance);
+        bool loadHistory(void);
+        bool saveHistory(void);
         bool loadVector(unsigned char baseChan, string name, bool full);
         bool saveVector(unsigned char baseChan, string name, bool full);
 

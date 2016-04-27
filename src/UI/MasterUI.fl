@@ -377,11 +377,9 @@ mainCreateNewInstance(forceId);}
         Submenu Parameters {
           label {&Patch Sets}
           xywh {0 0 70 21} labelsize 12
-          code0 {o = o; // suppress warning
-              /*if (synth->getRuntime().ParamsHistory.empty())
-                  RecentParams->deactivate();
-              else
-                  */RecentParams->activate();}
+          code0 {o = o; // suppress warning}
+          code1 {vector <string> location = *synth->getHistory(2);}
+          code2 {if (location.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
           MenuItem {} {
             label {&Show Patch Banks...}
@@ -435,11 +433,9 @@ paramsui->Show(2);}
         Submenu Scales {
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
-          code0 {o = o; // suppress warning;
-              /*if (synth->getRuntime().ScaleHistory.empty())
-        RecentScale->deactivate();
-    else
-        */RecentScale->activate();}
+          code0 {o = o; // suppress warning}
+          code1 {vector <string> location = *synth->getHistory(3);}
+          code2 {if (location.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
           MenuItem {} {
             label {&Show Settings...}
@@ -476,7 +472,7 @@ paramsui->Show(2);}
                     fl_alert("Failed to save scale settings");
                 else
                 {
-                    synth->addHistory(filename, 1);
+                    synth->addHistory(filename, 3);
                     RecentScale->activate();
                 }
                 updatepanel();}
@@ -507,11 +503,9 @@ paramsui->Show(3);}
         Submenu {} {
           label {S&tate}
           xywh {0 0 65 21} labelsize 12
-          code0 {o = o; // suppress warning;
-              /*if (synth->getRuntime().StateHistory.empty())
-        RecentState->deactivate();
-    else
-        */RecentState->activate();}
+          code0 {o = o; // suppress warning}
+          code1 {vector <string> location = *synth->getHistory(4);}
+          code2 {if (location.size() == 0) RecentState->deactivate(); else RecentState->activate();}
         } {
           MenuItem loadState {
             label {Load...}
@@ -522,7 +516,7 @@ paramsui->Show(3);}
     {
         laststatefile = string(fle);
         synth->getRuntime().loadState(laststatefile);
-        synth->addHistory(laststatefile, 2);
+        synth->addHistory(laststatefile, 4);
         RecentState->activate();
         unsigned int name_start = laststatefile.rfind("/");
     	unsigned int name_end = laststatefile.rfind(".");
@@ -542,7 +536,7 @@ paramsui->Show(3);}
                 {
                     laststatefile = string(fle);
                     synth->getRuntime().saveState(laststatefile);
-                    synth->addHistory(laststatefile, 2);
+                    synth->addHistory(laststatefile, 4);
                     RecentState->activate();
                 }}
             tooltip {Save session state} xywh {10 10 34 21} labelsize 12
@@ -1232,7 +1226,8 @@ updatepanel();}
     masterwindow->copy_label(prefix.c_str());
     masterwindow->changed();} {}
   }
-  Function {do_load_scale(string fname)} {} {
+  Function {do_load_scale(string fname)} {open
+  } {
     code {//
     synth->actionLock(lockmute);
     synth->microtonal.defaults(); // clear all parameters
@@ -1244,7 +1239,7 @@ updatepanel();}
     if (!result)
         fl_alert("Failed to load scale settings file");
     else
-        synth->addHistory(fname, 1);} {}
+        synth->addHistory(fname, 3);} {}
   }
   Function {do_new_master()} {} {
     code {//
@@ -1281,7 +1276,7 @@ updatepanel();}
     	    setMasterLabel(name.substr(name_start + 1, name_end - name_start - 1));
     	    
             if (updatehistory)
-                 synth->addHistory(fname, 0);
+                 synth->addHistory(fname, 2);
             RecentParams->activate();
             microtonalui->apply();
             if(result > 1)
@@ -1325,7 +1320,7 @@ updatepanel();}
             fl_alert("Could not save the file.");
         else
         {
-            synth->addHistory(fname, 0);
+            synth->addHistory(fname, 2);
             RecentParams->activate();
         }
         updatepanel();} {}

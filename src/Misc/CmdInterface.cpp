@@ -295,13 +295,13 @@ int CmdInterface::historyList(int type)
         msg.push_back(" ");
         switch (type)
         {
-            case 0:
+            case 2:
                 msg.push_back("Recent Patch Sets:");
                 break;
-            case 1:
+            case 3:
                 msg.push_back("Recent Scales:");
                 break;
-            case 2:
+            case 4:
                 msg.push_back("Recent States:");
                 break;
         }
@@ -1582,13 +1582,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "history"))
         {
             if (matchnMove(1, point, "patchsets"))
-                reply = historyList(0);
-            else if (matchnMove(2, point, "scales"))
-                reply = historyList(1);
-            else if (matchnMove(2, point, "states"))
                 reply = historyList(2);
+            else if (matchnMove(2, point, "scales"))
+                reply = historyList(3);
+            else if (matchnMove(2, point, "states"))
+                reply = historyList(4);
             else
-                reply = historyList(7);
+                reply = range_msg;
         }
         else if (matchnMove(1, point, "effects"))
             reply = effectsList();
@@ -1599,15 +1599,18 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     }
 
-    else if (matchnMove(1, point, "test"))
+    else if (matchnMove(4, point, "test"))
     {
-        vector<string> location = *synth->getHistory(1);
+        for( int i = 2; i < 5 ; ++i)
+        {
+        vector<string> location = *synth->getHistory(i);
         int offset = 0;
-        //if (location.size() > 5)
-            //offset = location.size() - 5;
+        if (location.size() > 5)
+            offset = location.size() - 5;
 
         for (vector<string>::iterator it = location.begin() + offset; it != location.end(); ++it)
                 Runtime.Log(*it);
+        }
     }
 
     else if (matchnMove(1, point, "set"))

@@ -284,7 +284,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
             if (loadXML(Runtime.paramsLoad))
             {
                 applyparameters();
-                addHistory(Runtime.paramsLoad, 0);
+                addHistory(Runtime.paramsLoad, 2);
                 Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
             }
             else
@@ -2083,8 +2083,7 @@ bool SynthEngine::saveBanks(int instance)
         name += ("-" + asString(instance));
     string bankname = name + ".banks";
     Runtime.xmlType = XML_BANK;
- //   unsigned int tmp = Runtime.GzipCompression;
- //   Runtime.GzipCompression = 0;
+
     XMLwrapper *xmltree = new XMLwrapper(this);
     if (!xmltree)
     {
@@ -2097,7 +2096,7 @@ bool SynthEngine::saveBanks(int instance)
 
     if (!xmltree->saveXMLfile(bankname))
         Runtime.Log("Failed to save config to " + bankname);
- //   Runtime.GzipCompression = tmp;
+
     delete xmltree;
 
     return true;
@@ -2108,17 +2107,16 @@ void SynthEngine::addHistory(string name, int group)
 {
 
     unsigned int name_start = name.rfind("/");
-    unsigned int name_end = name.rfind(".");//extension);
+    unsigned int name_end = name.rfind(".");
 
     if (name_start == string::npos || name_end == string::npos
             || (name_start - 1) >= name_end)
         return;
 
     bool copy = false;
-
     switch (group)
     {
-        case 2:
+        case 4:
             for (vector<string>::iterator it = StateHistory.begin(); it != StateHistory.end(); ++it)
             {
                 if (*it == name)
@@ -2128,7 +2126,7 @@ void SynthEngine::addHistory(string name, int group)
                 StateHistory.push_back(name);
             break;
 
-        case 1:
+        case 3:
             for (vector<string>::iterator it = ScaleHistory.begin(); it != ScaleHistory.end(); ++it)
             {
                 if (*it == name)
@@ -2138,7 +2136,7 @@ void SynthEngine::addHistory(string name, int group)
                 ScaleHistory.push_back(name);
             break;
 
-        case 0:
+        case 2:
         default:
             for (vector<string>::iterator it = ParamsHistory.begin(); it != ParamsHistory.end(); ++it)
             {
@@ -2154,21 +2152,17 @@ void SynthEngine::addHistory(string name, int group)
 
 vector<string> * SynthEngine::getHistory(int group)
 {
-    if (group == 2)
+    if (group == 4)
         return &StateHistory;
-    else if (group == 1)
+    else if (group == 3)
         return &ScaleHistory;
     return &ParamsHistory;
 }
 
 
-
-bool SynthEngine::loadHistory(int instance)
+bool SynthEngine::loadHistory()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
-
-    if (instance > 0)
-        name += ("-" + asString(instance));
     string historyname = name + ".history";
     if (!isRegFile(historyname))
     {
@@ -2189,72 +2183,53 @@ bool SynthEngine::loadHistory(int instance)
     }
     int hist_size;
     string filetype;
-    if (xml->enterbranch("XMZ_PATCH_SETS"))
+    string type;
+    string extension;
+    for (int count = 2; count < 5; ++count)
     {
-        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
-        for (int i = 0; i < hist_size; ++i)
+        switch (count)
         {
-            if (xml->enterbranch("XMZ_FILE", i))
-            {
-                filetype = xml->getparstr("xmz_file");
-                if (filetype.size() && isRegFile(filetype))
-                    addHistory(filetype, 0);
-                xml->exitbranch();
-            }
+            case 2:
+                type = "XMZ_PATCH_SETS";
+                extension = "xmz_file";
+                break;
+            case 3:
+                type = "XMZ_SCALE";
+                extension = "xsz_file";
+                break;
+            case 4:
+                type = "XMZ_STATE";
+                extension = "state_file";
+                break;
         }
-        xml->exitbranch();
-    }
-
-    if (xml->enterbranch("XMZ_SCALE"))
-    {
-        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
-
-        for (int i = 0; i < hist_size; ++i)
-        {
-            if (xml->enterbranch("XMZ_FILE", i))
+        if (xml->enterbranch(type))
+        { // should never exceed max history as size trimmed on save
+            hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
+            for (int i = 0; i < hist_size; ++i)
             {
-                filetype = xml->getparstr("xsz_file");
-                if (filetype.size() && isRegFile(filetype))
-                    addHistory(filetype, 1);
-                xml->exitbranch();
+                if (xml->enterbranch("XMZ_FILE", i))
+                {
+                    filetype = xml->getparstr(extension);
+                    if (filetype.size() && isRegFile(filetype))
+                        addHistory(filetype, count);
+                    xml->exitbranch();
+                }
             }
+            xml->exitbranch();
         }
-        xml->exitbranch();
     }
-
-    if (xml->enterbranch("XMZ_STATE"))
-    {
-        hist_size = xml->getpar("history_size", 0, 0, MAX_HISTORY);
-
-        for (int i = 0; i < hist_size; ++i)
-        {
-            if (xml->enterbranch("XMZ_FILE", i))
-            {
-                filetype = xml->getparstr("state_file");
-                if (filetype.size() && isRegFile(filetype))
-                    addHistory(filetype, 2);
-                xml->exitbranch();
-            }
-        }
-        xml->exitbranch();
-    }
-
     xml->exitbranch();
     delete xml;
     return true;
 }
 
 
-bool SynthEngine::saveHistory(int instance)
+bool SynthEngine::saveHistory()
 {
     string name = Runtime.ConfigDir + '/' + YOSHIMI;
-
-    if (instance > 0)
-        name += ("-" + asString(instance));
     string historyname = name + ".history";
     Runtime.xmlType = XML_HISTORY;
-    unsigned int tmp = Runtime.GzipCompression;
-    Runtime.GzipCompression = 0;
+
     XMLwrapper *xmltree = new XMLwrapper(this);
     if (!xmltree)
     {
@@ -2263,67 +2238,50 @@ bool SynthEngine::saveHistory(int instance)
     }
     xmltree->beginbranch("HISTORY");
     {
-
-        if (ParamsHistory.size())
+        unsigned int offset;
+        int x;
+        string type;
+        string extension;
+        for (int count = 2; count < 5; ++count)
         {
-            unsigned int offset = 0;
-            int x = 0;
-            xmltree->beginbranch("XMZ_PATCH_SETS");
-            xmltree->addpar("history_size", ParamsHistory.size());
-            if (ParamsHistory.size() > MAX_HISTORY)
-                offset = ParamsHistory.size() - MAX_HISTORY;
-            for (vector<string>::iterator it = ParamsHistory.begin() + offset; it != ParamsHistory.end(); ++it)
+            switch (count)
             {
-                xmltree->beginbranch("XMZ_FILE", x);
-                    xmltree->addparstr("xmz_file", *it);
-                xmltree->endbranch();
-                ++x;
+                case 2:
+                    type = "XMZ_PATCH_SETS";
+                    extension = "xmz_file";
+                    break;
+                case 3:
+                    type = "XMZ_SCALE";
+                    extension = "xsz_file";
+                    break;
+                case 4:
+                    type = "XMZ_STATE";
+                    extension = "state_file";
+                    break;
             }
-            xmltree->endbranch();
-        }
-
-        if (ScaleHistory.size())
-        {
-            unsigned int offset = 0;
-            int x = 0;
-            xmltree->beginbranch("XMZ_SCALE");
-            xmltree->addpar("history_size", ScaleHistory.size());
-
-            if (ScaleHistory.size() > MAX_HISTORY)
-                offset = ScaleHistory.size() - MAX_HISTORY;
-            for (vector<string>::iterator it = ScaleHistory.begin() + offset; it != ScaleHistory.end(); ++it)
+            vector<string> listType = *getHistory(count);
+            if (listType.size())
             {
-                xmltree->beginbranch("XMZ_FILE", x);
-                    xmltree->addparstr("xsz_file", *it);
+                offset = 0;
+                x = 0;
+                xmltree->beginbranch(type);
+                    xmltree->addpar("history_size", listType.size());
+                    if (listType.size() > MAX_HISTORY)
+                    offset = listType.size() - MAX_HISTORY;
+                    for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
+                    {
+                        xmltree->beginbranch("XMZ_FILE", x);
+                            xmltree->addparstr(extension, *it);
+                        xmltree->endbranch();
+                        ++x;
+                    }
                 xmltree->endbranch();
-                ++x;
             }
-            xmltree->endbranch();
-        }
-
-        if (StateHistory.size())
-        {
-            unsigned int offset = 0;
-            int x = 0;
-            xmltree->beginbranch("XMZ_STATE");
-            xmltree->addpar("history_size", StateHistory.size());
-
-            if (StateHistory.size() > MAX_HISTORY)
-                offset = StateHistory.size() - MAX_HISTORY;
-            for (vector<string>::iterator it = StateHistory.begin() + offset; it != StateHistory.end(); ++it)
-            {
-                xmltree->beginbranch("XMZ_FILE", x);
-                    xmltree->addparstr("state_file", *it);
-                xmltree->endbranch();
-                ++x;
-            }
-            xmltree->endbranch();
         }
     }
     xmltree->endbranch();
     if (!xmltree->saveXMLfile(historyname))
         Runtime.Log("Failed to save data to " + historyname);
-    Runtime.GzipCompression = tmp;
     delete xmltree;
     return true;
 }

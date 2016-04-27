@@ -172,7 +172,7 @@ bool Config::Setup(int argc, char **argv)
          * they failed and trying to start again.
          */
         synth->installBanks(synth->getUniqueId());
-        synth->loadHistory(synth->getUniqueId());
+        synth->loadHistory();
         return true;
     }
     switch (audioEngine)
@@ -589,16 +589,12 @@ void Config::saveConfig(void)
         return;
     }
     addConfigXML(xmltree);
-    unsigned int tmp = GzipCompression;
-    GzipCompression = 0;
-
     string resConfigFile = ConfigFile;
 
     if (xmltree->saveXMLfile(resConfigFile))
         configChanged = false;
     else
         Log("Failed to save config to " + resConfigFile);
-    GzipCompression = tmp;
 
     delete xmltree;
 }

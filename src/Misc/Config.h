@@ -165,7 +165,7 @@ class Config : public MiscFuncs
         };
 
         IOdata nrpndata;
-        
+
         list<string> LogList;
         BodyDisposal *deadObjects;
 
