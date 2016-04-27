@@ -365,12 +365,11 @@ int CmdInterface::effectsList()
 }
 
 
-int CmdInterface::effects(int level)
+int CmdInterface::effects()
 {
     Config &Runtime = synth->getRuntime();
     int reply = done_msg;
     int nFXavail;
-
     int category;
     int par;
     int value;
@@ -392,12 +391,14 @@ int CmdInterface::effects(int level)
     {
         nFXavail = NUM_SYS_EFX;
     }
-    if (nFX >= nFXavail)
-        nFX = nFXavail - 1; // we may have changed effects base
     if (point[0] == 0)
+    {
+        if (isRead)
+            Runtime.Log("Current FX number is " + asString(nFX));
         return done_msg;
+    }
 
-    if (isdigit(point[0]))
+    if (!isRead && isdigit(point[0]))
     {
         value = string2int(point);
         point = skipChars(point);
@@ -418,6 +419,11 @@ int CmdInterface::effects(int level)
 
     if (matchnMove(1, point, "type"))
     {
+        if (isRead)
+        {
+            Runtime.Log("Current FX type is " + fx_list[nFXtype]);
+            return done_msg;
+        }
         flag = true;
         for (int i = 0; i < 9; ++ i)
         {
@@ -788,7 +794,7 @@ int CmdInterface::commandPart(bool justSet)
     if (point[0] == 0)
         return done_msg;
     if (bitTest(level, all_fx))
-        return effects(level);
+        return effects();
     if (justSet || isdigit(point[0]))
     {
         if (isdigit(point[0]))
@@ -817,7 +823,7 @@ int CmdInterface::commandPart(bool justSet)
     {
         level = 1; // clear out any higher levels
         bitSet(level, part_lev);
-        return effects(level);
+        return effects();
     }
     tmp = volPanShift();
     if(tmp != todo_msg)
@@ -1172,6 +1178,7 @@ int CmdInterface::commandReadnSet()
 
     if (matchnMove(1, point, "part"))
     {
+        nFX = 0; // effects number limit changed
         if (isRead && point[0] == 0)
         {
             if (synth->partonoffRead(npart))
@@ -1194,19 +1201,21 @@ int CmdInterface::commandReadnSet()
     if (level < 4 && matchnMove(3, point, "system"))
     {
         level = 1;
+        nFX = 0; // effects number limit changed
         matchnMove(2, point, "effects"); // clear it if given
         nFXtype = synth->sysefx[nFX]->geteffect();
-        return effects(level);
+        return effects();
     }
     if (level < 4 && matchnMove(3, point, "insert"))
     {
         level = 3;
+        nFX = 0; // effects number limit changed
         matchnMove(2, point, "effects"); // clear it if given
         nFXtype = synth->insefx[nFX]->geteffect();
-        return effects(level);
+        return effects();
     }
     if (bitTest(level, all_fx))
-        return effects(level);
+        return effects();
 
     tmp = volPanShift();
     if(tmp > todo_msg)
@@ -1960,6 +1969,7 @@ void CmdInterface::cmdIfaceCommandLoop()
             if (bitTest(level, part_lev))
             {
                 prompt += (" part " + asString(npart));
+                nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
                 if (synth->partonoffRead(npart))
                     prompt += " on";
                 else
@@ -1970,9 +1980,15 @@ void CmdInterface::cmdIfaceCommandLoop()
                 if (!bitTest(level, part_lev))
                 {
                     if (bitTest(level, ins_fx))
+                    {
                         prompt += " Ins";
+                        nFXtype = synth->insefx[nFX]->geteffect();
+                    }
                     else
+                    {
                         prompt += " Sys";
+                        nFXtype = synth->sysefx[nFX]->geteffect();
+                    }
                 }
                 prompt += (" FX " + asString(nFX) + " " + fx_list[nFXtype].substr(0, 5));
                 if (nFXtype > 0)

@@ -43,7 +43,7 @@ class CmdInterface : private MiscFuncs
         bool helpList();
         int historyList(int type);
         int effectsList();
-        int effects(int level);
+        int effects();
         int volPanShift();
         int commandVector();
         int commandPart(bool justSet);
