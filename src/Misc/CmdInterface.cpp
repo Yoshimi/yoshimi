@@ -289,8 +289,8 @@ int CmdInterface::historyList(int type)
 {
     list<string>msg;
 
-    vector<string> location = *synth->getHistory(type);
-    if (location.size() > 0)
+    vector<string> listType = *synth->getHistory(type);
+    if (listType.size() > 0)
     {
         msg.push_back(" ");
         switch (type)
@@ -305,7 +305,7 @@ int CmdInterface::historyList(int type)
                 msg.push_back("Recent States:");
                 break;
         }
-        for (vector<string>::iterator it = location.begin(); it != location.end(); ++it)
+        for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
                 msg.push_back("  " + *it);
     }
     else
@@ -1603,12 +1603,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         for( int i = 2; i < 5 ; ++i)
         {
-        vector<string> location = *synth->getHistory(i);
+        vector<string> listType = *synth->getHistory(i);
         int offset = 0;
-        if (location.size() > 5)
-            offset = location.size() - 5;
+        if (listType.size() > 5)
+            offset = listType.size() - 5;
 
-        for (vector<string>::iterator it = location.begin() + offset; it != location.end(); ++it)
+        for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
                 Runtime.Log(*it);
         }
     }

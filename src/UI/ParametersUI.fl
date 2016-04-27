@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2014 - 2016, Will Godfrey   
+Copyright 2014 - 2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -20,22 +20,22 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified September 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <set>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {private global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 class ParametersUI {selected
 } {
@@ -49,14 +49,14 @@ class ParametersUI {selected
         callback {//
     if (o->value() > 0)
     {
-        vector<string> location = *synth->getHistory(H_type);
+        vector<string> listType = *synth->getHistory(H_type);
         string fle;
         switch (Fl::event_button())
         {
             case FL_LEFT_MOUSE:
             {
                 CloseRecent->hide();
-                fle = location.at(location.size() - o->value());
+                fle = listType.at(listType.size() - o->value());
                 switch(H_type)
                 {
                     case 3:
@@ -100,11 +100,11 @@ make_window();} {}
   Function {Show(int _type)} {} {
     code {//
     H_type = _type;
-    
+
     unsigned int name_start;
     unsigned int name_end;
     string name;
-    
+
     switch (H_type)
     {
         case 3:
@@ -118,16 +118,16 @@ make_window();} {}
             Recent->label("Recent Patch Sets");
             break;
     }
-    
-    vector<string> location = *synth->getHistory(H_type);
+
+    vector<string> listType = *synth->getHistory(H_type);
     BrowseRecent->clear();
     const int colwidths[] = { 64, 128, 0 };
     BrowseRecent->column_widths(colwidths);
     BrowseRecent->column_char('	');
     unsigned int offset = 0;
-    if (location.size() > MAX_HISTORY)
-        offset = location.size() -MAX_HISTORY;
-    for (vector<string>::reverse_iterator itr = location.rbegin(); itr != location.rend() - offset; ++itr)
+    if (listType.size() > MAX_HISTORY)
+        offset = listType.size() -MAX_HISTORY;
+    for (vector<string>::reverse_iterator itr = listType.rbegin(); itr != listType.rend() - offset; ++itr)
     {
         name = *itr;
         name_start = name.rfind("/");
@@ -135,7 +135,7 @@ make_window();} {}
         name = name.substr(name_start + 1, name_end - name_start - 1);
         BrowseRecent->add(name.c_str());
     }
-    
+
     BrowseRecent->set_changed();
     Recent->show();} {}
   }
@@ -149,4 +149,4 @@ make_window();} {}
   }
   decl {int H_type;} {private local
   }
-} 
+}

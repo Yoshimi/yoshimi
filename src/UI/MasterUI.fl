@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,22 +29,22 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "EffUI.h"} {public local
-} 
+}
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -68,46 +68,46 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public local
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "PartUI.h"} {public local
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public local
-} 
+}
 
 decl {\#include "MasterMiscUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-} 
+}
 
 decl {class MasterUI;} {public local
-} 
+}
 
 class MasterUI {selected : {private MiscFuncs}
 } {
@@ -378,8 +378,8 @@ mainCreateNewInstance(forceId);}
           label {&Patch Sets}
           xywh {0 0 70 21} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> location = *synth->getHistory(2);}
-          code2 {if (location.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
+          code1 {vector <string> listType = *synth->getHistory(2);}
+          code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
           MenuItem {} {
             label {&Show Patch Banks...}
@@ -434,8 +434,8 @@ paramsui->Show(2);}
           label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> location = *synth->getHistory(3);}
-          code2 {if (location.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
+          code1 {vector <string> listType = *synth->getHistory(3);}
+          code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
           MenuItem {} {
             label {&Show Settings...}
@@ -504,8 +504,8 @@ paramsui->Show(3);}
           label {S&tate}
           xywh {0 0 65 21} labelsize 12
           code0 {o = o; // suppress warning}
-          code1 {vector <string> location = *synth->getHistory(4);}
-          code2 {if (location.size() == 0) RecentState->deactivate(); else RecentState->activate();}
+          code1 {vector <string> listType = *synth->getHistory(4);}
+          code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
         } {
           MenuItem loadState {
             label {Load...}
@@ -1274,7 +1274,7 @@ updatepanel();}
             unsigned int name_start = name.rfind("/");
     	    unsigned int name_end = name.rfind(".");
     	    setMasterLabel(name.substr(name_start + 1, name_end - name_start - 1));
-    	    
+
             if (updatehistory)
                  synth->addHistory(fname, 2);
             RecentParams->activate();
@@ -1888,4 +1888,4 @@ updatepanel();}
   }
   decl {int addNoteO;} {public local
   }
-} 
+}
