@@ -1058,26 +1058,64 @@ void SynthEngine::ListVectors(list<string>& msg_buf)
 {
     bool found = false;
 
-    for (int value = 0; value < NUM_MIDI_CHANNELS; ++value)
+    for (int chan = 0; chan < NUM_MIDI_CHANNELS; ++chan)
     {
-        if (Runtime.nrpndata.vectorEnabled[value])
-        {
+        if(SingleVector(msg_buf, chan))
             found = true;
-            msg_buf.push_back("Channel " + asString(value));
-            msg_buf.push_back("  X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[value])
-                            + "    features = " + asString((int)  Runtime.nrpndata.vectorXfeatures[value]));
-
-            if (Runtime.nrpndata.vectorYaxis[value] > 0x7f || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
-            msg_buf.push_back("  Y axis disabled");
-            else
-            {
-                msg_buf.push_back("  Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[value])
-                + "    features = " + asString((int) Runtime.nrpndata.vectorYfeatures[value]));
-            }
-        }
     }
     if (!found)
         msg_buf.push_back("No vectors enabled");
+}
+
+
+bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
+{
+    if (!Runtime.nrpndata.vectorEnabled[chan])
+        return false;
+
+    int Xfeatures = Runtime.nrpndata.vectorXfeatures[chan];
+    string Xtext = "Features =";
+    if (Xfeatures == 0)
+        Xtext = "No Features :(";
+    else
+    {
+        if (Xfeatures & 1)
+            Xtext += " 1";
+        if (Xfeatures & 2)
+            Xtext += " 2";
+        if (Xfeatures & 4)
+            Xtext += " 3";
+        if (Xfeatures & 8)
+            Xtext += " 4";
+    }
+    msg_buf.push_back("Channel " + asString(chan));
+    msg_buf.push_back("  X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[chan]) + ",  " + Xtext);
+    msg_buf.push_back("    L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
+
+    if (Runtime.nrpndata.vectorYaxis[chan] > 0x7f
+        || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
+        msg_buf.push_back("  Y axis disabled");
+    else
+    {
+        int Yfeatures = Runtime.nrpndata.vectorYfeatures[chan];
+        string Ytext = "Features =";
+        if (Yfeatures == 0)
+            Ytext = "No Features :(";
+        else
+        {
+            if (Yfeatures & 1)
+                Ytext += " 1";
+            if (Yfeatures & 2)
+                Ytext += " 2";
+            if (Yfeatures & 4)
+                Ytext += " 3";
+            if (Yfeatures & 8)
+                Ytext += " 4";
+        }
+        msg_buf.push_back("  Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[chan]) + ",  " + Ytext);
+        msg_buf.push_back("    U = " + part[chan + 32]->Pname + ",  D = " + part[chan + 48]->Pname);
+    }
+    return true;
 }
 
 

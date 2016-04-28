@@ -41,7 +41,7 @@ class CmdInterface : private MiscFuncs
         bool query(string text, bool priority);
         void helpLoop(list<string>& msg, string *commands, int indent);
         bool helpList();
-        int historyList(int type);
+        void historyList(int listnum);
         int effectsList();
         int effects();
         int volPanShift();

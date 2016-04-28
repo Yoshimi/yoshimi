@@ -285,34 +285,45 @@ bool CmdInterface::helpList()
 }
 
 
-int CmdInterface::historyList(int type)
+void CmdInterface::historyList(int listnum)
 {
     list<string>msg;
+    int start = 2;
+    int end = 4;
+    bool found = false;
 
-    vector<string> listType = *synth->getHistory(type);
-    if (listType.size() > 0)
+    if (listnum != 0)
     {
-        msg.push_back(" ");
-        switch (type)
-        {
-            case 2:
-                msg.push_back("Recent Patch Sets:");
-                break;
-            case 3:
-                msg.push_back("Recent Scales:");
-                break;
-            case 4:
-                msg.push_back("Recent States:");
-                break;
-        }
-        for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
-                msg.push_back("  " + *it);
+        start = listnum;
+        end = listnum;
     }
-    else
+    for (int type = start; type <= end; ++type)
+    {
+        vector<string> listType = *synth->getHistory(type);
+        if (listType.size() > 0)
+        {
+            msg.push_back(" ");
+            switch (type)
+            {
+                case 2:
+                    msg.push_back("Recent Patch Sets:");
+                    break;
+                case 3:
+                    msg.push_back("Recent Scales:");
+                    break;
+                case 4:
+                    msg.push_back("Recent States:");
+                    break;
+            }
+            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
+                msg.push_back("  " + *it);
+            found = true;
+        }
+    }
+    if (!found)
         msg.push_back("\nNo Saved History");
 
     synth->cliOutput(msg, LINES);
-    return done_msg;
 }
 
 
@@ -373,6 +384,7 @@ int CmdInterface::effects()
     int category;
     int par;
     int value;
+    unsigned int old_level = level;
 
     string dest = "";
     bool flag;
@@ -393,6 +405,19 @@ int CmdInterface::effects()
     }
     if (point[0] == 0)
     {
+        if (bitTest(level, part_lev))
+        {
+            synth->SetEffects(2, 1, nFX, nFXtype, 0, 0);
+        }
+        else if (bitTest(level, ins_fx))
+        {
+            synth->SetEffects(1, 1, nFX, nFXtype, 0, 0);
+        }
+        else
+        {
+            synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+        }
+
         if (isRead)
             Runtime.Log("Current FX number is " + asString(nFX));
         return done_msg;
@@ -406,9 +431,23 @@ int CmdInterface::effects()
             return range_msg;
 
         if (value != nFX)
-        {
+        { // dummy 'SetEffects' calls to update GUI
             nFX = value;
-#warning  We need to reset the effect type here
+            if (bitTest(level, part_lev))
+            {
+                nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
+                synth->SetEffects(0, 2, nFX, nFXtype, 0, 0);
+            }
+            else if (bitTest(level, ins_fx))
+            {
+                nFXtype = synth->insefx[nFX]->geteffect();
+                synth->SetEffects(0, 1, nFX, nFXtype, 0, 0);
+            }
+            else
+            {
+                nFXtype = synth->sysefx[nFX]->geteffect();
+                synth->SetEffects(0, 0, nFX, nFXtype, 0, 0);
+            }
         }
         if (point[0] == 0)
         {
@@ -636,11 +675,26 @@ int CmdInterface::volPanShift()
 int CmdInterface::commandVector()
 {
     Config &Runtime = synth->getRuntime();
+    list<string> msg;
     int reply = todo_msg;
     int tmp;
 
-    if (point[0] == 0)
+    if (isRead)
+    {
+        if (synth->SingleVector(msg, chan))
+            synth->cliOutput(msg, LINES);
+        else
+            Runtime.Log("No vector on channel " + asString(chan));
         return done_msg;
+    }
+    if (point[0] == 0)
+    {
+        if (Runtime.nrpndata.vectorEnabled[chan])
+            bitSet(level, vect_lev);
+        else
+            Runtime.Log("No vector on channel " + asString(chan));
+        return done_msg;
+    }
 
     if (isdigit(point[0]))
     {
@@ -1591,13 +1645,14 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if (matchnMove(1, point, "history"))
         {
             if (matchnMove(1, point, "patchsets"))
-                reply = historyList(2);
+                historyList(2);
             else if (matchnMove(2, point, "scales"))
-                reply = historyList(3);
+                historyList(3);
             else if (matchnMove(2, point, "states"))
-                reply = historyList(4);
+                historyList(4);
             else
-                reply = range_msg;
+                historyList(0);
+            reply = done_msg;
         }
         else if (matchnMove(1, point, "effects"))
             reply = effectsList();
@@ -1605,20 +1660,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             replyString = "list";
             reply = what_msg;
-        }
-    }
-
-    else if (matchnMove(4, point, "test"))
-    {
-        for( int i = 2; i < 5 ; ++i)
-        {
-        vector<string> listType = *synth->getHistory(i);
-        int offset = 0;
-        if (listType.size() > 5)
-            offset = listType.size() - 5;
-
-        for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
-                Runtime.Log(*it);
         }
     }
 
