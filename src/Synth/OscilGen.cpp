@@ -1463,6 +1463,7 @@ void OscilGen::add2XML(XMLwrapper *xml)
     xml->addpar("adaptive_harmonics", Padaptiveharmonics);
     xml->addpar("adaptive_harmonics_base_frequency", Padaptiveharmonicsbasefreq);
     xml->addpar("adaptive_harmonics_power", Padaptiveharmonicspower);
+    xml->addpar("adaptive_harmonics_par", Padaptiveharmonicspar);
 
     xml->beginbranch("HARMONICS");
         for (int n = 0; n < MAX_AD_HARMONICS; ++n)
@@ -1546,6 +1547,7 @@ void OscilGen::getfromXML(XMLwrapper *xml)
     Padaptiveharmonics = xml->getpar("adaptive_harmonics", Padaptiveharmonics, 0, 127);
     Padaptiveharmonicsbasefreq = xml->getpar("adaptive_harmonics_base_frequency", Padaptiveharmonicsbasefreq,0,255);
     Padaptiveharmonicspower = xml->getpar("adaptive_harmonics_power", Padaptiveharmonicspower, 0, 200);
+    Padaptiveharmonicspar = xml->getpar("adaptive_harmonics_par", Padaptiveharmonicspar, 0, 100);
 
     if (xml->enterbranch("HARMONICS"))
     {

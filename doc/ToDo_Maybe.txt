@@ -1,5 +1,5 @@
 
-Replace usleep with nanosleep - probably not :(
+Make right click close most windows when opening another.
 
 Change root/bank/instrument lists to single file for all instances.
 

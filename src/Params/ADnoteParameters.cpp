@@ -117,6 +117,8 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].Type = 0;
     VoicePar[nvoice].Pfixedfreq = 0;
     VoicePar[nvoice].PfixedfreqET = 0;
+    VoicePar[nvoice].PBendAdjust = 88; // 64 + 24
+    VoicePar[nvoice].POffsetHz     = 64;
     VoicePar[nvoice].Presonance = 1;
     VoicePar[nvoice].Pfilterbypass = 0;
     VoicePar[nvoice].Pextoscil = -1;
@@ -354,6 +356,8 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
     xml->beginbranch("FREQUENCY_PARAMETERS");
         xml->addparbool("fixed_freq", VoicePar[nvoice].Pfixedfreq);
         xml->addpar("fixed_freq_et", VoicePar[nvoice].PfixedfreqET);
+        xml->addpar("bend_adjust", VoicePar[nvoice].PBendAdjust);
+        xml->addpar("offset_hz", VoicePar[nvoice].POffsetHz);
         xml->addpar("detune", VoicePar[nvoice].PDetune);
         xml->addpar("coarse_detune", VoicePar[nvoice].PCoarseDetune);
         xml->addpar("detune_type", VoicePar[nvoice].PDetuneType);
@@ -689,6 +693,11 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
             xml->getparbool("fixed_freq", VoicePar[nvoice].Pfixedfreq);
         VoicePar[nvoice].PfixedfreqET =
             xml->getpar127("fixed_freq_et", VoicePar[nvoice].PfixedfreqET);
+        VoicePar[nvoice].PBendAdjust =
+            xml->getpar127("bend_adjust", VoicePar[nvoice].PBendAdjust);
+        VoicePar[nvoice].POffsetHz =
+            xml->getpar127("offset_hz", VoicePar[nvoice].POffsetHz);
+
 
         VoicePar[nvoice].PDetune =
             xml->getpar("detune", VoicePar[nvoice].PDetune, 0, 16383);

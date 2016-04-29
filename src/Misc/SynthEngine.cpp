@@ -2150,41 +2150,20 @@ void SynthEngine::addHistory(string name, int group)
     if (name_start == string::npos || name_end == string::npos
             || (name_start - 1) >= name_end)
         return;
-
+    unsigned int offset;
     bool copy = false;
-    switch (group)
+    vector<string> &listType = *getHistory(group);
+    if (listType.size() > MAX_HISTORY)
+        offset = listType.size() - MAX_HISTORY;
+     // don't test against names that will be dropped when saving
+    for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
     {
-        case 4:
-            for (vector<string>::iterator it = StateHistory.begin(); it != StateHistory.end(); ++it)
-            {
-                if (*it == name)
-                    copy = true;
-            }
-            if (!copy)
-                StateHistory.push_back(name);
-            break;
-
-        case 3:
-            for (vector<string>::iterator it = ScaleHistory.begin(); it != ScaleHistory.end(); ++it)
-            {
-                if (*it == name)
-                    copy = true;
-            }
-            if (!copy)
-                ScaleHistory.push_back(name);
-            break;
-
-        case 2:
-        default:
-            for (vector<string>::iterator it = ParamsHistory.begin(); it != ParamsHistory.end(); ++it)
-            {
-                if (*it == name)
-                    copy = true;
-            }
-            if (!copy)
-                ParamsHistory.push_back(name);
-            break;
+        if (*it == name)
+            copy = true;
     }
+    if (!copy)
+        listType.push_back(name);
+    return;
 }
 
 
@@ -2305,7 +2284,7 @@ bool SynthEngine::saveHistory()
                 xmltree->beginbranch(type);
                     xmltree->addpar("history_size", listType.size());
                     if (listType.size() > MAX_HISTORY)
-                    offset = listType.size() - MAX_HISTORY;
+                        offset = listType.size() - MAX_HISTORY;
                     for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
                     {
                         xmltree->beginbranch("XMZ_FILE", x);

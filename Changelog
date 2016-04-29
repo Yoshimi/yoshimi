@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2016-4-29 Will
+- Bugfix: file not added to end of history list if copy had
+  just gone over the maximium, so was still technically there
+  but wouldn't have been saved.
+- Reinstated missing XML instrument parameters, although never used.
+
 2016-4-28 Will
 - Implemented CLI read/get for vectors.
 - Improved CLI vector listing.

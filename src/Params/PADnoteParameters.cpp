@@ -117,6 +117,8 @@ void PADnoteParameters::defaults(void)
     // Frequency Global Parameters
     Pfixedfreq = 0;
     PfixedfreqET = 0;
+    PBendAdjust = 88; // 64 + 24
+    POffsetHz = 64;
     PDetune = 8192; // zero
     PCoarseDetune = 0;
     PDetuneType = 1;
@@ -781,6 +783,8 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->beginbranch("FREQUENCY_PARAMETERS");
         xml->addpar("fixed_freq",Pfixedfreq);
         xml->addpar("fixed_freq_et",PfixedfreqET);
+        xml->addpar("bend_adjust", PBendAdjust);
+        xml->addpar("offset_hz", POffsetHz);
         xml->addpar("detune",PDetune);
         xml->addpar("coarse_detune",PCoarseDetune);
         xml->addpar("detune_type",PDetuneType);
@@ -892,6 +896,8 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     {
         Pfixedfreq=xml->getpar127("fixed_freq",Pfixedfreq);
         PfixedfreqET=xml->getpar127("fixed_freq_et",PfixedfreqET);
+        PBendAdjust=xml->getpar127("bend_adjust", PBendAdjust);
+        POffsetHz =xml->getpar127("offset_hz", POffsetHz);
         PDetune=xml->getpar("detune",PDetune,0,16383);
         PCoarseDetune=xml->getpar("coarse_detune",PCoarseDetune,0,16383);
         PDetuneType=xml->getpar127("detune_type",PDetuneType);
