@@ -1,5 +1,10 @@
 yoshimi 1.3.x
 
+2016-4-30 Will
+- Implemented right click on child window button closes parent
+  and right click on child close button opens parent.
+  To and from resonance yet to do.
+
 2016-4-29 Will
 - Bugfix: file not added to end of history list if copy had
   just gone over the maximium, so was still technically there

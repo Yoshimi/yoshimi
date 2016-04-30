@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
@@ -11,6 +11,7 @@ comment {SubNoteUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
+Copyright 2015-2016, Will Godfreyt
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -147,7 +148,9 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
         label Close
         callback {synth->getGuiMaster()->subNoteX = SUBparameters->x();
 synth->getGuiMaster()->subNoteY = SUBparameters->y();
-SUBparameters->hide();}
+SUBparameters->hide();
+if ((Fl::event_button() == 3))
+    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         xywh {625 446 105 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {

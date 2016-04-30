@@ -54,7 +54,7 @@ decl {\#include "MasterUI.h"} {private global
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window syseffsend {
       private xywh {916 904 150 145} type Double hide
@@ -150,13 +150,17 @@ class PartKitItem {: {public Fl_Group}
         }
         Fl_Button adeditbutton {
           label edit
-          callback {partui->showparameters(n,0);}
+          callback {partui->showparameters(n,0);
+if ((Fl::event_button() == 3))
+    synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {420 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Padenabled==0) o->deactivate();}
         }
         Fl_Button subeditbutton {
           label edit
-          callback {partui->showparameters(n,1);}
+          callback {partui->showparameters(n,1);
+if ((Fl::event_button() == 3))
+    synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {490 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Psubenabled==0) o->deactivate();}
         }
@@ -216,7 +220,9 @@ class PartKitItem {: {public Fl_Group}
         } {}
         Fl_Button padeditbutton {
           label edit
-          callback {partui->showparameters(n,2);}
+          callback {partui->showparameters(n,2);
+if ((Fl::event_button() == 3))
+    synth->getGuiMaster()->partui->instrumentkitlist->hide();}
           xywh {560 0 40 15} box THIN_UP_BOX labelsize 11
           code0 {if (part->kit[n].Ppadenabled==0) o->deactivate();}
         }
@@ -321,7 +327,7 @@ class PartKitItem {: {public Fl_Group}
     code {partkititem->hide();
       //delete(partkititem);} {}
   }
-  decl {Part *part;} {private local
+  decl {Part *part;} {public local
   }
   decl {int n;} {private local
   }
@@ -813,7 +819,7 @@ else
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Group inseffectuigroup {open
+      Fl_Group inseffectuigroup {
         xywh {5 37 380 96} box FLAT_BOX color 48
       } {
         Fl_Group inseffectui {
@@ -824,7 +830,9 @@ else
       }
       Fl_Button {} {
         label Close
-        callback {partfx->hide();}
+        callback {partfx->hide();
+if ((Fl::event_button() == 3))
+    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         xywh {314 136 60 20} box THIN_UP_BOX
       }
       Fl_Choice sendtochoice {
@@ -881,7 +889,9 @@ else
     } {
       Fl_Button {} {
         label Close
-        callback {instrumentkitlist->hide();}
+        callback {instrumentkitlist->hide();
+if ((Fl::event_button() == 3))
+    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
         xywh {569 348 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
@@ -997,7 +1007,9 @@ else
             label Edit
             callback {showparameters(0,0);
 copylabeltopanel();
-seteditname();}
+seteditname();
+if ((Fl::event_button() == 3))
+    instrumenteditwindow->hide();}
             xywh {15 281 80 34} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
@@ -1031,7 +1043,9 @@ seteditname();}
             label Edit
             callback {showparameters(0,1);
 copylabeltopanel();
-seteditname();}
+seteditname();
+if ((Fl::event_button() == 3))
+    instrumenteditwindow->hide();}
             xywh {115 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
@@ -1065,19 +1079,25 @@ seteditname();}
             label Edit
             callback {showparameters(0,2);
 copylabeltopanel();
-seteditname();}
+seteditname();
+if ((Fl::event_button() == 3))
+    instrumenteditwindow->hide();}
             xywh {215 280 80 35} box PLASTIC_UP_BOX color 222 selection_color 220 labelfont 1 labelsize 13 align 128
             code0 {if (part->kit[0].Ppadenabled==0) o->deactivate();}
           }
         }
         Fl_Button {} {
           label {Kit Edit}
-          callback {instrumentkitlist->show();}
+          callback {instrumentkitlist->show();
+if ((Fl::event_button() == 3))
+    instrumenteditwindow->hide();}
           xywh {310 245 80 35} box PLASTIC_UP_BOX color 238 selection_color 220 labelfont 1 align 128
         }
         Fl_Button {} {
           label Effects
-          callback {partfx->show();}
+          callback {partfx->show();
+if ((Fl::event_button() == 3))
+    instrumenteditwindow->hide();}
           xywh {310 290 80 35} box PLASTIC_UP_BOX color 230 labelfont 1 labelsize 13
         }
       }
@@ -1412,7 +1432,7 @@ seteditname();}
   }
   decl {SUBnoteUI *subnoteui;} {private local
   }
-  decl {PADnoteUI *padnoteui;} {private local
+  decl {PADnoteUI *padnoteui;} {public local
   }
   decl {PartSysEffSend *psyef[NUM_SYS_EFX];} {private local
   }
