@@ -102,7 +102,7 @@ string toplist [] = {
     "EXtend <n>",                 "CC for extended MIDI program change (> 119 disables)",
     "AVailable <n>",              "available parts (16, 32, 64)",
     "Volume <n>",                 "master volume",
-    "SHift <n>",                  "master key shift semitones (64 no shift)",
+    "SHift <n>",                  "master key shift semitones (0 no shift)",
     "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
     "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
     "Alsa Midi <s>",              "* name of alsa MIDI source",
@@ -133,7 +133,7 @@ string partlist [] = {
     "POrtamento <s>",           "portamento (Enable, other - disable",
     "Mode <s>",                 "key mode (Poly, Mono, Legato)",
     "Note <n2>",                "note polyphony",
-    "SHift <n2>",               "key shift semitones (64 no shift)",
+    "SHift <n2>",               "key shift semitones (0 no shift)",
     "MIn <n2>",                 "minimum MIDI note value",
     "MAx <n2>",                 "maximum MIDI note value",
     "EFfects [n2]",             "effects for editing",
@@ -384,8 +384,6 @@ int CmdInterface::effects()
     int category;
     int par;
     int value;
-    unsigned int old_level = level;
-
     string dest = "";
     bool flag;
 
@@ -626,18 +624,14 @@ int CmdInterface::volPanShift()
         if (point[0] == 0)
             return value_msg;
         value = string2int(point);
-        if (value < 40)
-            value = 40;
-        else if(value > 88)
-            value = 88;
+        if (value < MIN_KEY_SHIFT)
+            value = MIN_KEY_SHIFT;
+        else if(value > MAX_KEY_SHIFT)
+            value = MAX_KEY_SHIFT;
         if(bitTest(level, part_lev))
-        {
-            synth->part[npart]->Pkeyshift = value;
-            Runtime.Log("Key Shift set to " + asString(value) + "  (" + asString(value - 64) + ")");
-            partFlag = true;
-        }
+            synth->SetPartShift(npart, value + 64);
         else
-                synth->SetSystemValue(2, value);
+                synth->SetSystemValue(2, value + 64);
         reply = done_msg;
     }
     else if (matchnMove(2, point, "velocity"))
@@ -1644,15 +1638,20 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(1, point, "history"))
         {
-            if (matchnMove(1, point, "patchsets"))
+            reply = done_msg;
+            if (point[0] == 0)
+                historyList(0);
+            else if (matchnMove(1, point, "patchsets"))
                 historyList(2);
             else if (matchnMove(2, point, "scales"))
                 historyList(3);
             else if (matchnMove(2, point, "states"))
                 historyList(4);
             else
-                historyList(0);
-            reply = done_msg;
+            {
+                replyString = "list history";
+                reply = what_msg;
+            }
         }
         else if (matchnMove(1, point, "effects"))
             reply = effectsList();

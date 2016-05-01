@@ -1,7 +1,4 @@
 
-Complete fature;
-    right click close most windows when opening another or returning.
-
 Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.

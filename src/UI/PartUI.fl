@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2016, Will Godfrey 
+Copyright 2014-2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified August 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/fl_ask.H>
@@ -339,7 +339,7 @@ if ((Fl::event_button() == 3))
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -469,8 +469,9 @@ Offset}
       Fl_Spinner partkeyshift {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;}
-        xywh {202 116 38 18} labelsize 10 minimum -24 maximum 24 textsize 11
-        code0 {o->value(part->Pkeyshift - 64);}
+        xywh {202 116 38 18} labelsize 10 minimum -36 maximum 36 textsize 11
+        code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
+        code1 {o->value(part->Pkeyshift - 64);}
       }
       Fl_Spinner partkeylimit {
         label {Key Limit}
@@ -897,7 +898,7 @@ if ((Fl::event_button() == 3))
       Fl_Scroll kitlist {
         xywh {0 15 670 330} type VERTICAL box THIN_UP_BOX
       } {
-        Fl_Pack {} {open
+        Fl_Pack {} {
           xywh {0 20 670 320}
           code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){partkititem[i]=new PartKitItem(0,0,670,20,"");partkititem[i]->init(part,i,this);}}
         } {}
@@ -930,12 +931,14 @@ if ((Fl::event_button() == 3))
         label Mode
         callback {//
     part->Pkitmode = o->value();
+    partKitOn = o->value() > 0;
     if (part->Pkitmode == 0)
         kitlist->deactivate();
     else
         kitlist->activate();}
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 70 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {o->value(part->Pkitmode);}
+        code1 {partKitOn = o->value() > 0;}
       } {
         MenuItem {} {
           label Off
@@ -1449,5 +1452,7 @@ if ((Fl::event_button() == 3))
   decl {int *plgroup;} {private local
   }
   decl {int engine;} {private local
+  }
+  decl {bool partKitOn;} {public local
   }
 } 

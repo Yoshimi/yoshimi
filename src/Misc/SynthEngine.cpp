@@ -847,6 +847,18 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 }
 
 
+void SynthEngine::SetPartShift(unsigned char npart, unsigned char shift)
+{
+    if (shift < MIN_KEY_SHIFT + 64)
+        shift = MIN_KEY_SHIFT + 64;
+    else if(shift > MAX_KEY_SHIFT + 64)
+        shift = MAX_KEY_SHIFT + 64;
+    part[npart]->Pkeyshift = shift;
+    Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(shift - 64));
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
+}
+
+
 void SynthEngine::SetPartPortamento(int npart, bool state)
 {
     part[npart]->ctl->portamento.portamento = state;
@@ -1126,8 +1138,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 
     msg_buf.push_back("Settings");
     msg_buf.push_back("  Master volume " + asString((int) Pvolume));
-    msg_buf.push_back("  Master key shift " + asString(Pkeyshift)
-              + "  (" + asString(Pkeyshift - 64) + ")");
+    msg_buf.push_back("  Master key shift " + asString(Pkeyshift - 64));
 
     root = bank.currentRootID;
     if (bank.roots.count(root) > 0 && !bank.roots [root].path.empty())
@@ -1232,20 +1243,40 @@ void SynthEngine::SetSystemValue(int type, int value)
     switch (type)
     {
         case 2: // master key shift
-            if (value > 76)
-                value = 76;
-            else if (value < 52) // 2 octaves is enough for anybody :)
-                value = 52;
+            if (value > MAX_KEY_SHIFT + 64)
+                value = MAX_KEY_SHIFT + 64;
+            else if (value < MIN_KEY_SHIFT + 64) // 3 octaves is enough for anybody :)
+                value = MIN_KEY_SHIFT + 64;
             setPkeyshift(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
-            Runtime.Log("Master key shift set to " + asString(value)
-                      + "  (" + asString(value - 64) + ")");
+            Runtime.Log("Master key shift set to " + asString(value - 64));
             break;
 
         case 7: // master volume
             setPvolume(value);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             Runtime.Log("Master volume set to " + asString(value));
+            break;
+
+        case 64:
+        case 65:
+        case 66:
+        case 67:
+        case 68:
+        case 69:
+        case 70:
+        case 71:
+        case 72:
+        case 73:
+        case 74:
+        case 75:
+        case 76:
+        case 77:
+        case 78:
+        case 79:
+            for (int npart = 0; npart < Runtime.NumAvailableParts; ++ npart)
+                if (part[npart]->Penabled && part[npart]->Prcvchn == (type - 64))
+                    SetPartShift(npart, value);
             break;
 
         case 100: // reports destination
@@ -2639,7 +2670,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     }
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
-    setPkeyshift(xml->getpar127("key_shift", Pkeyshift));
+    setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
 
     part[0]->Penabled = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)

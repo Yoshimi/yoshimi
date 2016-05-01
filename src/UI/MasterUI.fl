@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-}
+} 
 
 comment {MasterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,22 +29,22 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <string>} {public local
-}
+} 
 
 decl {using namespace std;} {public local
-}
+} 
 
 decl {\#include "ADnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "SUBnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "EffUI.h"} {public local
-}
+} 
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -68,46 +68,46 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include "VirKeyboardUI.h"} {public local
-}
+} 
 
 decl {\#include "ConfigUI.h"} {public local
-}
+} 
 
 decl {\#include "BankUI.h"} {public local
-}
+} 
 
 decl {\#include "PartUI.h"} {public local
-}
+} 
 
 decl {\#include "MicrotonalUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "ParametersUI.h"} {public local
-}
+} 
 
 decl {\#include "ConsoleUI.h"} {public local
-}
+} 
 
 decl {\#include "MasterMiscUI.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-}
+} 
 
 decl {class MasterUI;} {public local
-}
+} 
 
 class MasterUI {selected : {private MiscFuncs}
 } {
@@ -556,8 +556,8 @@ paramsui->Show(4);}
         Fl_Spinner masterkeyshift {
           label {Key Shift}
           callback {synth->setPkeyshift(o->value() + 64);}
-          tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -24 maximum 24 textsize 10
-          code0 {o->range(-12.0, 12.0);o->step(1.0);}
+          tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -36 maximum 36 textsize 10
+          code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
           code1 {o->value(synth->Pkeyshift - 64);}
         }
         Fl_Dial globalfinedetune {
@@ -1226,8 +1226,7 @@ updatepanel();}
     masterwindow->copy_label(prefix.c_str());
     masterwindow->changed();} {}
   }
-  Function {do_load_scale(string fname)} {open
-  } {
+  Function {do_load_scale(string fname)} {} {
     code {//
     synth->actionLock(lockmute);
     synth->microtonal.defaults(); // clear all parameters
@@ -1498,14 +1497,19 @@ updatepanel();}
   Function {loadWindowData()} {} {
     code {//
 
-    int ok = false;
+    bool ok = false;
+    bool tmpWindows;
     int masterX;
     int masterY;
     int masterO;
 
     windows = fopen(filename.c_str(), "r");
-    if (windows != NULL)
-        ok = true;
+    if (windows == NULL)
+        NewWindows = true;
+    else
+        NewWindows = false;
+    ok = !NewWindows;
+    tmpWindows = NewWindows;
     // we carry on anyway to set defaults
     ok = getData(ok,
                 "master",
@@ -1542,11 +1546,19 @@ updatepanel();}
                  scalesX,
                  scalesY,
                  scalesO);
+    if (NewWindows)
+    {
+         NewWindows = false;
+         virkbdX = 400;
+         virkbdY = 1;
+         virkbdO = 1;
+    }
     ok = getData(ok,
                 "virtkeybd",
                  virkbdX,
                  virkbdY,
                  virkbdO);
+    NewWindows = tmpWindows;
     ok = getData(ok,
                 "settings",
                  settingsX,
@@ -1720,9 +1732,12 @@ updatepanel();}
   Function {getData(bool ok, string name, int& X, int& Y, int& O)} {return_type bool
   } {
     code {//
-    X = 1;
-    Y = 1;
-    O = 0;
+    if (NewWindows)
+    {
+    	X = 1;
+    	Y = 1;
+    	O = 0;
+    }
     if (!ok)
         return false;
 
@@ -1888,4 +1903,6 @@ updatepanel();}
   }
   decl {int addNoteO;} {public local
   }
-}
+  decl {bool NewWindows;} {private local
+  }
+} 

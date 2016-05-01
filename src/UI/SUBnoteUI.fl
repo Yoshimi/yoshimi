@@ -150,7 +150,12 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 synth->getGuiMaster()->subNoteY = SUBparameters->y();
 SUBparameters->hide();
 if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+{
+    if (synth->getGuiMaster()->partui->partKitOn)
+        synth->getGuiMaster()->partui->instrumentkitlist->show();
+    else
+        synth->getGuiMaster()->partui->instrumenteditwindow->show();
+}}
         xywh {625 446 105 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {

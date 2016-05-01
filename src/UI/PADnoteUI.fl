@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -234,7 +234,7 @@ this->pars=pars;} {}
   }
 } 
 
-class PADnoteUI {: {public PresetsUI_, private SynthHelper}
+class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
   Function {PADnoteUI(PADnoteParameters *parameters)} {} {
     code {//
@@ -471,9 +471,11 @@ synth = parameters->getSynthEngine();
           Fl_Button {} {
             label Resonance
             callback {//
-                resui->resonancewindow->redraw();
-                resui->Show(false);
-                resui->setcbwidget(cbwidget, applybutton);}
+    resui->resonancewindow->redraw();
+    resui->Show(false);
+    resui->setcbwidget(cbwidget, applybutton);
+    if ((Fl::event_button() == 3))
+        padnotewindow->hide();}
             xywh {375 225 80 20} box THIN_UP_BOX labelsize 12
           }
           Fl_Dial bwdial {
@@ -1061,7 +1063,12 @@ synth = parameters->getSynthEngine();
 synth->getGuiMaster()->padNoteY = padnotewindow->y();
 padnotewindow->hide();
 if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+{
+    if (synth->getGuiMaster()->partui->partKitOn)
+        synth->getGuiMaster()->partui->instrumentkitlist->show();
+    else
+        synth->getGuiMaster()->partui->instrumenteditwindow->show();
+}}
         xywh {466 410 61 24} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {

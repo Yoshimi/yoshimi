@@ -432,6 +432,15 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
      */
     int dHigh = synth->getRuntime().dataH;
 
+    /*synth->getRuntime().Log("   nHigh " + asString((int)nHigh)
+                          + "   nLow " + asString((int)nLow)
+                          + "   dataH " + asString((int)synth->getRuntime().dataH)
+                          + "   dataL " + asString((int)synth->getRuntime().dataL)
+                          + "   chan " + asString((int)chan)
+                          + "   type"  + asString((int)type)
+                          + "   par " + asString((int)par));
+    */
+
     if (nLow == 0) // direct part change
         nrpnDirectPart(dHigh, par);
 
@@ -478,6 +487,10 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
         case 5: // Set part's audio destination
             if (par > 0 and par < 4)
                 synth->SetPartDestination(synth->getRuntime().nrpndata.Part, par);
+            break;
+
+        case 64:
+            synth->SetPartShift(synth->getRuntime().nrpndata.Part, par);
             break;
     }
 }

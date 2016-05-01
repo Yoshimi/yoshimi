@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {ResonanceUI.h} {not_in_source in_header
@@ -11,6 +11,7 @@ comment {ResonanceUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2015-2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -241,7 +242,14 @@ class ResonanceUI {selected : PresetsUI_
       } {}
       Fl_Button {} {
         label Close
-        callback {resonancewindow->hide();}
+        callback {resonancewindow->hide();
+if ((Fl::event_button() == 3))
+{
+    if (ADvsPAD)
+         synth->getGuiMaster()->partui->adnoteui->ADnoteGlobalParameters->show();
+    else
+        synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
+}}
         xywh {690 283 84 17} box THIN_UP_BOX
       }
       Fl_Button {} {
@@ -416,7 +424,8 @@ synth = respar->getSynthEngine();
         p1st->value(respar->Pprotectthefundamental);
         rg->redraw();} {}
   }
-  Function {Show(bool _ADvsPAD)} {} {
+  Function {Show(bool _ADvsPAD)} {open
+  } {
     code {//
     ADvsPAD = _ADvsPAD;
     string tname;

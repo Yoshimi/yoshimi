@@ -196,21 +196,20 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
 } 
 
-class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open
+      label Voice
       xywh {398 90 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {open
+      Fl_Group voiceparametersgroup {
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
-        Fl_Group voicemodegroup {open
+        Fl_Group voicemodegroup {
           xywh {0 5 760 575}
         } {
           Fl_Group voiceFMparametersgroup {
@@ -583,7 +582,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
         nv=pars->VoicePar[nvoice].Pextoscil;
     oscedit = new OscilEditor(pars->VoicePar[nv].OscilSmp, voiceoscil, NULL, NULL, nvoice, synth);
     if ((Fl::event_button() == 3))
-        synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();} selected
+        synth->getGuiMaster()->partui->adnoteui->ADnoteVoice->hide();}
             xywh {5 475 65 20} box THIN_UP_BOX labelfont 1 labelsize 11
             code0 {if (pars->VoicePar[nvoice].Pextoscil>=0) o->labelcolor(FL_BLUE);}
           }
@@ -1029,12 +1028,12 @@ o->show();}
   }
 } 
 
-class ADnoteUI {open : {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
-      label {ADsynth Global Parameters of the Instrument} open
+      label {ADsynth Global Parameters of the Instrument}
       xywh {822 549 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
@@ -1276,14 +1275,21 @@ class ADnoteUI {open : {public PresetsUI_, SynthHelper}
 synth->getGuiMaster()->addNoteY = ADnoteGlobalParameters->y();
 ADnoteGlobalParameters->hide();
 if ((Fl::event_button() == 3))
-    synth->getGuiMaster()->partui->instrumenteditwindow->show();}
+{
+    if (synth->getGuiMaster()->partui->partKitOn)
+        synth->getGuiMaster()->partui->instrumentkitlist->show();
+    else
+        synth->getGuiMaster()->partui->instrumenteditwindow->show();
+}}
         xywh {470 375 60 25} box THIN_UP_BOX labelsize 12
       }
       Fl_Button {} {
         label Resonance
         callback {//
-            resui->resonancewindow->redraw();
-            resui->Show(true);}
+    resui->resonancewindow->redraw();
+    resui->Show(true);
+    if ((Fl::event_button() == 3))
+        ADnoteGlobalParameters->hide();}
         tooltip Resonance xywh {309 375 86 25} labelsize 12
       }
       Fl_Button {} {
@@ -1298,7 +1304,7 @@ if ((Fl::event_button() == 3))
       }
     }
     Fl_Window ADnoteVoice {
-      label {ADsynth Voice Parameters} open
+      label {ADsynth Voice Parameters}
       xywh {531 31 765 615} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice").c_str());}
     } {
