@@ -382,7 +382,7 @@ virkeyboardwindow->hide();}
             }
             virkeys->take_focus();}
         xywh {524 105 100 15} down_box BORDER_BOX labelsize 10 align 1 when 6 textfont 1 textsize 10
-        code0 {midictl=C_filterq;o->value(7);}
+        code0 {midictl=C_filtercutoff;o->value(7);}
       } {
         MenuItem {} {
           label {01: Mod.Wheel}

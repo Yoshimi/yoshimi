@@ -1221,6 +1221,11 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     msg_buf.push_back("  ALSA audio " + Runtime.alsaAudioDevice);
     msg_buf.push_back("  jack MIDI " + Runtime.jackMidiDevice);
     msg_buf.push_back("  Jack server " + Runtime.jackServer);
+    if (Runtime.connectJackaudio)
+        label = "on";
+    else
+        label = "off";
+    msg_buf.push_back("  Jack autoconnect " + label);
 
     if (Runtime.toConsole)
     {

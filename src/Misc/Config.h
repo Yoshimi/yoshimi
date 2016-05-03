@@ -114,7 +114,7 @@ class Config : public MiscFuncs
         string        jackServer;
         string        jackMidiDevice;
         bool          startJack;        // false
-        bool          connectJackaudio; // false
+        bool          connectJackaudio;
         string        jackSessionUuid;
 
         string        alsaAudioDevice;

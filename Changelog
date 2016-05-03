@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-5-3 Will
+- Implemented setting jack autoconnect status in both GUI and CLI.
+
 2016-5-1 Will
 - Completed right click to and from resonance
 - First-time startup now opens the virtual keyboard.

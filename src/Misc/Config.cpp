@@ -106,7 +106,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     jackServer("default"),
     jackMidiDevice("default"),
     startJack(false),
-    connectJackaudio(false),
+    connectJackaudio(true),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     GzipCompression(3),
@@ -562,6 +562,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     // jack settings
     jackServer = xml->getparstr("linux_jack_server");
     jackMidiDevice = xml->getparstr("linux_jack_midi_dev");
+    connectJackaudio = xml->getpar("connect_jack_audio", connectJackaudio, 0, 1);
 
     // midi options
     midi_bank_root = xml->getpar("midi_bank_root", midi_bank_root, 0, 128);
@@ -635,6 +636,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
 
     xmltree->addparstr("linux_jack_server", jackServer);
     xmltree->addparstr("linux_jack_midi_dev", jackMidiDevice);
+    xmltree->addpar("connect_jack_audio", connectJackaudio);
 
     xmltree->addpar("midi_bank_root", midi_bank_root);
     xmltree->addpar("midi_bank_C", midi_bank_C);

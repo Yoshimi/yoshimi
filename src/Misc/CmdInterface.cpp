@@ -109,6 +109,7 @@ string toplist [] = {
     "Alsa Audio <s>",             "* name of alsa hardware device",
     "Jack Midi <s>",              "* name of jack MIDI source",
     "Jack Server <s>",            "* jack server name",
+    "Jack AUto <s>",              "* (0 off, other on)",
     "end"
 };
 
@@ -1509,6 +1510,22 @@ int CmdInterface::commandReadnSet()
             }
             else
                 reply = value_msg;
+        }
+        else if (matchnMove(2, point, "auto"))
+        {
+            name = "Jack autoconnect ";
+            if (point[0] == '1')
+            {
+                Runtime.connectJackaudio = 1;
+                name = "on";
+            }
+            else
+            {
+                Runtime.connectJackaudio = 0;
+                name = "off";
+            }
+            Runtime.Log("Jack autoconnect " + name);
+            Runtime.configChanged = true;
         }
         else
             reply = opp_msg;

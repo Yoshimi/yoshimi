@@ -52,7 +52,7 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {16 162 390 330} type Double hide
+      xywh {645 95 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
@@ -313,6 +313,18 @@ else
 synth->getRuntime().configChanged = true;}
             xywh {195 209 37 26} down_box DOWN_BOX labelsize 12 align 4
             code0 {if (synth->getRuntime().audioEngine == jack_audio) o->value(1);}
+          }
+          Fl_Check_Button connectJackAudio {
+            label {Autoconnect audio}
+            callback {int tmp = synth->getRuntime().connectJackaudio;
+if (o->value() != tmp)
+{
+    synth->getRuntime().connectJackaudio = o->value();
+    synth->getRuntime().audioEngine = alsa_audio;
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {195 233 37 26} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().connectJackaudio);}
           }
           Fl_Box {} {
             label {Settings changes require a restart}
