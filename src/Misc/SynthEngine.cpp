@@ -2186,7 +2186,7 @@ void SynthEngine::addHistory(string name, int group)
     if (name_start == string::npos || name_end == string::npos
             || (name_start - 1) >= name_end)
         return;
-    unsigned int offset;
+    unsigned int offset = 0;
     bool copy = false;
     vector<string> &listType = *getHistory(group);
     if (listType.size() > MAX_HISTORY)

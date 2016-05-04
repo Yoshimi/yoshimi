@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified August 2014
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/fl_ask.H>
@@ -339,7 +339,7 @@ if ((Fl::event_button() == 3))
   }
 } 
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -1443,7 +1443,7 @@ if ((Fl::event_button() == 3))
   }
   decl {int ninseff;} {private local
   }
-  decl {int lastkititem;} {private local
+  decl {int lastkititem;} {public local
   }
   decl {PartKitItem *partkititem[NUM_KIT_ITEMS];} {private local
   }

@@ -196,16 +196,17 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
 } 
 
-class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window ADnoteVoiceParameters {
-      label Voice
+      label Voice open
       xywh {398 90 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {
+      Fl_Group voiceparametersgroup {open
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
@@ -748,12 +749,13 @@ unisongroup->redraw();}
           }
         }
         Fl_Group amplitudegroup {
-          label AMPLITUDE
+          label AMPLITUDE open
           xywh {5 40 240 210} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
         } {
           Fl_Dial voicevolume {
             label Volume
-            callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());}
+            callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());
+//synth->getRuntime().Log("Part "+asString(npart) + "  Kit " + asString(kititem) + "  Voice " + asString(nvoice) + "  Volume");} selected
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PVolume);}
             class WidgetPDial
@@ -1000,6 +1002,8 @@ o->show();}
 	synth = parameters->getSynthEngine();
         pars = parameters;
         nvoice = nvoice_;
+        npart = synth->getGuiMaster()->partui->npart;
+        kititem = synth->getGuiMaster()->partui->lastkititem;
         make_window();
         end();
         ADnoteVoiceParameters->show();} {}
@@ -1016,6 +1020,10 @@ o->show();}
   }
   decl {int nvoice;} {private local
   }
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
+  }
   decl {ADnoteParameters *pars;} {private local
   }
   decl {OscilEditor *oscedit;} {private local
@@ -1028,9 +1036,9 @@ o->show();}
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
