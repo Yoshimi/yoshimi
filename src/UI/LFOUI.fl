@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
@@ -12,6 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
+Copyright 2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -29,6 +30,9 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {in_source in_header
+} 
+
+decl {\#include <iostream>} {public local
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
@@ -58,10 +62,9 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class LFOUI {open : {public Fl_Group, PresetsUI_}
+class LFOUI {selected : {public Fl_Group, PresetsUI_}
 } {
-  Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
 pars=NULL;} {}
   }
@@ -70,10 +73,9 @@ pars=NULL;} {}
 hide();
 //delete (lfoui);} {}
   }
-  Function {make_window()} {open
-  } {
-    Fl_Window lfoui {open
-      xywh {1433 434 230 70} type Double color 50 labelfont 1 labelsize 12
+  Function {make_window()} {} {
+    Fl_Window lfoui {
+      xywh {1169 434 230 70} type Double color 50 labelfont 1 labelsize 12
       class Fl_Group visible
     } {
       Fl_Group lfoparamswindow {
@@ -82,7 +84,36 @@ hide();
       } {
         Fl_Dial freq {
           label {Freq.}
-          callback {pars->Pfreq=o->value();}
+          callback {pars->Pfreq=o->value();
+string name;
+int voice = 0;
+if (engine == 1)
+    name = "  AddSynth";
+else if (engine == 3)
+    name = "  PadSynth";
+else if (engine >= 128)
+{
+    name = "  AddSynth Voice ";
+    voice = engine & 0x7f;
+}
+
+string lfo;
+if (type == 2)
+    lfo = "  Filt";
+else if (type == 1)
+    lfo = "  Amp";
+else
+    lfo = "  Freq";
+
+
+if ((Fl::event_button() == 2))
+{
+    if (engine < 129)
+    	cout << "Part "<< synth->getGuiMaster()->partui->npart << "  Kit " << synth->getGuiMaster()->partui->lastkititem  << name << lfo << " LFO  Freq value " << o->value() << "\\n";
+    else
+    	cout << "Part "<< synth->getGuiMaster()->partui->npart << "  Kit " << synth->getGuiMaster()->partui->lastkititem  << name << voice << lfo << " LFO  Freq value " << o->value() << "\\n";
+    
+}}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           class WidgetPDial
         }
@@ -185,22 +216,26 @@ randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);
 LFOtype->value(pars->PLFOtype);} {}
   }
-  Function {init(LFOParams *lfopars_)} {open
-  } {
+  Function {init(LFOParams *lfopars_, int engine_, int type_)} {} {
     code {pars=lfopars_;
 synth = pars->getSynthEngine();
 make_window();
 end();
+engine = engine_;
+type = type_;
 
 refresh();
 
 lfoui->resize(this->x(),this->y(),this->w(),this->h());
 
-lfoparamswindow->label(this->label());} {selected
-    }
+lfoparamswindow->label(this->label());} {}
   }
   decl {LFOParams *pars;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int type;} {private local
+  }
+  decl {int engine;} {private local
   }
 } 

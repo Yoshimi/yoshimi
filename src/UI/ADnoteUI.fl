@@ -196,17 +196,16 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
 } 
 
-class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open
-      xywh {398 90 770 580} type Double hide
+      label Voice
+      xywh {398 90 770 580} type Double
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
-      class Fl_Group
+      class Fl_Group visible
     } {
-      Fl_Group voiceparametersgroup {open
+      Fl_Group voiceparametersgroup {
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
@@ -479,7 +478,7 @@ class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Group voicefreqlfogroup {
               label {Frequency LFO     }
               xywh {215 290 230 70} box FLAT_BOX color 47 align 144
-              code0 {o->init(pars->VoicePar[nvoice].FreqLfo);}
+              code0 {o->init(pars->VoicePar[nvoice].FreqLfo, 128 + nvoice, 0);}
               code1 {if (pars->VoicePar[nvoice].PFreqLfoEnabled==0) o->deactivate();}
               class LFOUI
             } {}
@@ -749,13 +748,14 @@ unisongroup->redraw();}
           }
         }
         Fl_Group amplitudegroup {
-          label AMPLITUDE open
+          label AMPLITUDE
           xywh {5 40 240 210} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
         } {
           Fl_Dial voicevolume {
             label Volume
             callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());
-//synth->getRuntime().Log("Part "+asString(npart) + "  Kit " + asString(kititem) + "  Voice " + asString(nvoice) + "  Volume");} selected
+if ((Fl::event_button() == 2))
+  synth->getRuntime().Log("Part "+asString(npart) + "  Kit " + asString(kititem) + "  AddSynth Voice " + asString(nvoice) + "  Volume " + asString(lrint(o->value())));}
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PVolume);}
             class WidgetPDial
@@ -818,7 +818,7 @@ unisongroup->redraw();}
           Fl_Group voiceamplfogroup {
             label {Amplitude LFO     }
             xywh {10 175 230 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(pars->VoicePar[nvoice].AmpLfo);}
+            code0 {o->init(pars->VoicePar[nvoice].AmpLfo, 128 + nvoice, 1);}
             code1 {if (pars->VoicePar[nvoice].PAmpLfoEnabled==0) o->deactivate();}
             class LFOUI
           } {}
@@ -874,7 +874,7 @@ unisongroup->redraw();}
           Fl_Group voicefilterlfogroup {
             label {Filter LFO     }
             xywh {250 175 230 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(pars->VoicePar[nvoice].FilterLfo);}
+            code0 {o->init(pars->VoicePar[nvoice].FilterLfo, 128 + nvoice, 2);}
             code1 {if (pars->VoicePar[nvoice].PFilterLfoEnabled==0) o->deactivate();}
             class LFOUI
           } {}
@@ -1036,9 +1036,9 @@ o->show();}
   }
 } 
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
@@ -1082,7 +1082,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Group freqlfo {
           label {Frequency LFO     } open
           xywh {215 295 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqLfo);}
+          code0 {o->init(pars->GlobalPar.FreqLfo, 1, 0);}
           class LFOUI
         } {}
         Fl_Slider freq {
@@ -1218,7 +1218,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Group amplfo {
           label {Amplitude LFO          }
           xywh {10 145 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpLfo);}
+          code0 {o->init(pars->GlobalPar.AmpLfo, 1, 1);}
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {
@@ -1241,7 +1241,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Group filterlfo {
           label {Filter LFO}
           xywh {250 180 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterLfo);}
+          code0 {o->init(pars->GlobalPar.FilterLfo, 1, 2);}
           class LFOUI
         } {}
         Fl_Group filterui {
@@ -1471,7 +1471,7 @@ if ((Fl::event_button() == 3))
   }
   decl {ResonanceUI *resui;} {private local
   }
-  decl {int nvoice;} {private local
+  decl {int nvoice;} {public local
   }
   decl {ADvoicelistitem *voicelistitem[NUM_VOICES];} {private local
   }
