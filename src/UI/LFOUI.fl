@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016, Will Godfrey
+Copyright 2016, Will Godfrey 
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -86,16 +86,12 @@ hide();
           label {Freq.}
           callback {pars->Pfreq=o->value();
 string name;
-int voice = 0;
 if (engine == 1)
     name = "  AddSynth";
 else if (engine == 3)
     name = "  PadSynth";
-else if (engine >= 128)
-{
+else if (engine >= 0x80)
     name = "  AddSynth Voice ";
-    voice = engine & 0x7f;
-}
 
 string lfo;
 if (type == 2)
@@ -105,14 +101,36 @@ else if (type == 1)
 else
     lfo = "  Freq";
 
+// all a bit messy but just for test.
+
+string partStr;
+ostringstream oss;
+oss << synth->getGuiMaster()->partui->npart;
+partStr = oss.str();
+
+string kitStr;
+ostringstream oss2;
+oss2 << synth->getGuiMaster()->partui->lastkititem;
+kitStr  = oss2.str();
+
+string voiceStr;
+ostringstream oss3;
+oss3 << (engine & 0x7f);
+voiceStr  = oss3.str();
+
+string valStr;
+ostringstream oss4;
+oss4.precision(3);
+oss4.width(3);
+oss4 << o->value();
+valStr = oss4.str();
 
 if ((Fl::event_button() == 2))
 {
-    if (engine < 129)
-    	cout << "Part "<< synth->getGuiMaster()->partui->npart << "  Kit " << synth->getGuiMaster()->partui->lastkititem  << name << lfo << " LFO  Freq value " << o->value() << "\\n";
+    if (engine < 0x80)
+        synth->getRuntime().Log("Part " + partStr + "  Kit " + kitStr + name + lfo + " LFO  Freq value " + valStr);
     else
-    	cout << "Part "<< synth->getGuiMaster()->partui->npart << "  Kit " << synth->getGuiMaster()->partui->lastkititem  << name << voice << lfo << " LFO  Freq value " << o->value() << "\\n";
-    
+    synth->getRuntime().Log("Part " + partStr + "  Kit " + kitStr + name + voiceStr + lfo + " LFO  Freq value " + valStr);
 }}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           class WidgetPDial
