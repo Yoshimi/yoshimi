@@ -997,10 +997,12 @@ o->show();}
         pars = NULL;
         oscedit = NULL;} {}
   }
-  Function {init(ADnoteParameters *parameters,int nvoice_)} {} {
+  Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
 	synth = parameters->getSynthEngine();
         pars = parameters;
+        npart = npart_;
+        kititem = kititem_;
         nvoice = nvoice_;
         make_window();
         end();
@@ -1034,9 +1036,9 @@ o->show();}
   }
 }
 
-class ADnoteUI {open : {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
@@ -1316,7 +1318,7 @@ if ((Fl::event_button() == 3))
     } {
       Fl_Group advoice {
         xywh {0 0 760 575} box BORDER_BOX
-        code0 {o->init(pars,nvoice);}
+        code0 {o->init(pars, npart, kititem, nvoice);}
         code1 {o->show();}
         class ADvoiceUI
       } {}
@@ -1329,7 +1331,7 @@ if ((Fl::event_button() == 3))
             delete advoice;
             advoice = new ADvoiceUI(0, 0, 765, 585);
             ADnoteVoice->add(advoice);
-            advoice->init(pars, nvoice);
+            advoice->init(pars, npart, kititem, nvoice);
             advoice->show();
             ADnoteVoice->redraw();}
         xywh {35 584 40 24} labelfont 1 labelsize 12 align 8 maximum 8 textfont 1
@@ -1407,8 +1409,7 @@ if ((Fl::event_button() == 3))
       }
     }
   }
-  Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {open
-  } {
+  Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
 	synth = parameters->getSynthEngine();
         pars = parameters;
@@ -1429,8 +1430,7 @@ if ((Fl::event_button() == 3))
         delete ADnoteVoice;
         delete resui;} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {//
         globalvolume->value(pars->GlobalPar.PVolume);
         vsns->value(pars->GlobalPar.PAmpVelocityScaleFunction);
@@ -1467,8 +1467,7 @@ if ((Fl::event_button() == 3))
             voicelistitem[i]->refreshlist();
 
         resui->refresh();
-        currentvoicecounter->do_callback();} {selected
-    }
+        currentvoicecounter->do_callback();} {}
   }
   decl {ADnoteParameters *pars;} {private local
   }
