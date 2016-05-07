@@ -85,83 +85,42 @@ hide();
         Fl_Dial freq {
           label {Freq.}
           callback {pars->Pfreq=o->value();
-string name;
-if (engine == 1)
-    name = "  AddSynth";
-else if (engine == 3)
-    name = "  PadSynth";
-else if (engine >= 0x80)
-    name = "  AddSynth Voice ";
-
-string lfo;
-if (type == 2)
-    lfo = "  Filt";
-else if (type == 1)
-    lfo = "  Amp";
-else
-    lfo = "  Freq";
-
-// all a bit messy but just for test.
-
-string partStr;
-ostringstream oss;
-oss << synth->getGuiMaster()->partui->npart;
-partStr = oss.str();
-
-string kitStr;
-ostringstream oss2;
-oss2 << synth->getGuiMaster()->partui->lastkititem;
-kitStr  = oss2.str();
-
-string voiceStr;
-ostringstream oss3;
-oss3 << (engine & 0x7f);
-voiceStr  = oss3.str();
-
-string valStr;
-ostringstream oss4;
-oss4.precision(3);
-oss4.width(3);
-oss4 << o->value();
-valStr = oss4.str();
-
-if ((Fl::event_button() == 2))
-{
-    if (engine < 0x80)
-        synth->getRuntime().Log("Part " + partStr + "  Kit " + kitStr + name + lfo + " LFO  Freq value " + valStr);
-    else
-    synth->getRuntime().Log("Part " + partStr + "  Kit " + kitStr + name + voiceStr + lfo + " LFO  Freq value " + valStr);
-}}
+send_data(type, 0, 1, o->value());}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           class WidgetPDial
         }
         Fl_Dial intensity {
           label Depth
-          callback {pars->Pintensity=(int)o->value();}
+          callback {pars->Pintensity=(int)o->value();
+send_data(type, 1, o->value());}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial delay {
           label Delay
-          callback {pars->Pdelay=(int)o->value();}
+          callback {pars->Pdelay=(int)o->value();
+send_data(type, 2, o->value());}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial startphase {
           label Start
-          callback {pars->Pstartphase=(int)o->value();}
+          callback {pars->Pstartphase=(int)o->value();
+send_data(type, 3, o->value());}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial randomness {
           label {A.R.}
-          callback {pars->Prandomness=(int)o->value();}
+          callback {pars->Prandomness=(int)o->value();
+send_data(type, 4, o->value());}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Choice LFOtype {
           label Type
-          callback {pars->PLFOtype=(int)o->value();}
+          callback {pars->PLFOtype=(int)o->value();
+send_data(type, 5, o->value());}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
         } {
           MenuItem {} {
@@ -195,18 +154,21 @@ if ((Fl::event_button() == 2))
         }
         Fl_Check_Button continous {
           label {C.}
-          callback {pars->Pcontinous=(int)o->value();}
+          callback {pars->Pcontinous=(int)o->value();
+send_data(type, 6, o->value());}
           tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
-          callback {pars->Pfreqrand=(int)o->value();}
+          callback {pars->Pfreqrand=(int)o->value();
+send_data(type, 7, o->value());}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
         Fl_Dial stretch {
           label {Str.}
-          callback {pars->Pstretch=(int)o->value();}
+          callback {pars->Pstretch=(int)o->value();
+send_data(type, 8, o->value());}
           tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           class WidgetPDial
         }
@@ -234,13 +196,73 @@ randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);
 LFOtype->value(pars->PLFOtype);} {}
   }
-  Function {init(LFOParams *lfopars_, int engine_, int type_)} {} {
+  Function {send_data(int type, int control, int value, float fvalue = 1)} {} {
+    code {//
+if ((Fl::event_button() != 2) && control != 5)
+    return;
+    
+string name;
+if (engine == 1)
+    name = "  AddSynth";
+else if (engine == 3)
+    name = "  PadSynth";
+else if (engine >= 0x80)
+    name = "  AddSynth Voice ";
+
+string lfo;
+if (type == 2)
+    lfo = "  Filt";
+else if (type == 1)
+    lfo = "  Amp";
+else
+    lfo = "  Freq";
+
+string contstr;
+switch (control)
+{
+    case 0:
+    	contstr = "Freq";
+    	break;
+    case 1:
+        contstr = "Depth";
+        break;
+    case 2:
+        contstr = "Delay";
+        break;
+    case 3:
+        contstr = "Start";
+        break;
+    case 4:
+        contstr = "AmpRand";
+        break;
+    case 5:
+        contstr = "Type";
+        break;
+    case 6:
+        contstr = "Cont";
+        break;
+    case 7:
+        contstr = "FreqRand";
+        break;
+    case 8:
+        contstr = "Stretch";
+        break;
+}
+float actual = (float) value * fvalue;
+if (engine < 0x80)
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + to_string(actual));
+else
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x7f) + lfo + " LFO  " + contstr + " value " + to_string(actual));} {}
+  }
+  Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {pars=lfopars_;
 synth = pars->getSynthEngine();
-make_window();
-end();
+npart = npart_;
+kititem = kititem_;
 engine = engine_;
 type = type_;
+make_window();
+end();
 
 refresh();
 
@@ -251,6 +273,10 @@ lfoparamswindow->label(this->label());} {}
   decl {LFOParams *pars;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
   }
   decl {int type;} {private local
   }

@@ -978,11 +978,11 @@ if ((Fl::event_button() == 3))
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
-      Fl_Group {} {
+      Fl_Group {} {open
         xywh {0 220 395 110} box ENGRAVED_FRAME
       } {
         Fl_Group {} {
-          label ADDsynth
+          label ADDsynth open
           xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
           Fl_Check_Button adsynenabledcheck {
@@ -1306,12 +1306,12 @@ if ((Fl::event_button() == 3))
             return;
 
         if (part->kit[kititem].adpars)
-            adnoteui = new ADnoteUI(part->kit[kititem].adpars);
+            adnoteui = new ADnoteUI(part->kit[kititem].adpars, npart, lastkititem);
         if (part->kit[kititem].subpars)
-            subnoteui = new SUBnoteUI(part->kit[kititem].subpars);
+            subnoteui = new SUBnoteUI(part->kit[kititem].subpars, npart, lastkititem);
 
         if (part->kit[kititem].padpars)
-            padnoteui = new PADnoteUI(part->kit[kititem].padpars);
+            padnoteui = new PADnoteUI(part->kit[kititem].padpars, npart, lastkititem);
     }
     if (engine == 0 && adnoteui != NULL)
         tname = synth->getGuiMaster()->setPartWindowTitle("AddSynth");

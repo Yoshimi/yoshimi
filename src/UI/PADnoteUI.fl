@@ -236,10 +236,12 @@ this->pars=pars;} {}
 
 class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
-  Function {PADnoteUI(PADnoteParameters *parameters)} {} {
+  Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
 synth = parameters->getSynthEngine();
         pars = parameters;
+        npart = npart_;
+        kititem = kititem_;
         oscui = NULL;
         resui = new ResonanceUI(pars->resonance);
         make_window();} {}
@@ -866,7 +868,7 @@ synth = parameters->getSynthEngine();
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 315 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(pars->FreqLfo, 3, 0);}
+              code0 {o->init(pars->FreqLfo, npart, kititem, 3, 0);}
               class LFOUI
             } {}
             Fl_Slider detune {
@@ -1004,7 +1006,7 @@ synth = parameters->getSynthEngine();
             Fl_Group amplfo {
               label {Amplitude LFO     } open
               xywh {10 165 230 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->AmpLfo, 3, 1);}
+              code0 {o->init(pars->AmpLfo, npart, kititem, 3, 1);}
               class LFOUI
             } {}
             Fl_Check_Button stereo {
@@ -1027,7 +1029,7 @@ synth = parameters->getSynthEngine();
             Fl_Group filterlfo {
               label {Filter LFO     } open
               xywh {250 200 230 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->FilterLfo, 3, 2);}
+              code0 {o->init(pars->FilterLfo, npart, kititem, 3, 2);}
               class LFOUI
             } {}
             Fl_Group filterui {
@@ -1207,5 +1209,9 @@ pars->export2wav(filename);}
   decl {ResonanceUI *resui;} {public local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
   }
 }

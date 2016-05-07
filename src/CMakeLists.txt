@@ -23,7 +23,7 @@ cmake_policy (SET CMP0004 OLD)
 if (POLICY CMP0046)
     cmake_policy (SET CMP0046 OLD)
 endif (POLICY CMP0046)
-# set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 11)
 set (YOSHIMI_VERSION "1.3.9 M")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
