@@ -478,7 +478,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
             Fl_Group voicefreqlfogroup {
               label {Frequency LFO     }
               xywh {215 290 230 70} box FLAT_BOX color 47 align 144
-              code0 {o->init(pars->VoicePar[nvoice].FreqLfo,npart, kititem, 128 + nvoice, 0);}
+              code0 {o->init(pars->VoicePar[nvoice].FreqLfo, npart, kititem, 128 + nvoice, 0);}
               code1 {if (pars->VoicePar[nvoice].PFreqLfoEnabled==0) o->deactivate();}
               class LFOUI
             } {}
@@ -849,7 +849,7 @@ if ((Fl::event_button() == 2))
           Fl_Group {} {
             label {ADsynth Voice - Filter}
             xywh {250 30 275 75} box FLAT_BOX color 50 align 144
-            code0 {o->init(pars->VoicePar[nvoice].VoiceFilter,&pars->VoicePar[nvoice].PFilterVelocityScale, &pars->VoicePar[nvoice].PFilterVelocityScaleFunction);}
+            code0 {o->init(pars->VoicePar[nvoice].VoiceFilter,&pars->VoicePar[nvoice].PFilterVelocityScale, &pars->VoicePar[nvoice].PFilterVelocityScaleFunction, npart, kititem, 128 + nvoice);}
             class FilterUI
           } {}
           Fl_Group voicefilterenvgroup {
@@ -1247,7 +1247,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Group filterui {
           label {ADsynth Global - Filter}
           xywh {250 35 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction);}
+          code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction, npart, kititem, 1);}
           class FilterUI
         } {}
       }

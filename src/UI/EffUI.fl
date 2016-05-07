@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {EffUI.h} {not_in_source in_header
@@ -51,14 +51,13 @@ decl {\#include "Effects/EffectMgr.h"} {public local
 decl {\#include "PresetsUI.h"} {public local
 } 
 
-class EQGraph {open : {public Fl_Box}
+class EQGraph {: {public Fl_Box}
 } {
   Function {EQGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {eff = NULL;
         maxdB = 30;} {}
   }
-  Function {init(EffectMgr *eff_)} {selected
-  } {
+  Function {init(EffectMgr *eff_)} {} {
     code {synth = eff_->getSynthEngine();
 eff = eff_;
         oldx = -1;
@@ -195,7 +194,7 @@ eff = eff_;
   }
 } 
 
-class EffUI {open : {public Fl_Group,public PresetsUI_}
+class EffUI {selected : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -1310,10 +1309,11 @@ refresh(eff);}
       xywh {1109 779 290 110} type Double hide
     } {
       Fl_Group {} {
-        label {DynFilter effect  - Filter}
+        label {DynFilter effect  - Filter} open
         xywh {5 5 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-        code0 {o->init(eff->filterpars,NULL,NULL);}
+        code0 {o->init(eff->filterpars,NULL,NULL, 0, 0, 16);}
         code1 {o->use_for_dynamic_filter();}
+        code3 {// 0, 0, 16 are temp part, kit, engine values}
         class FilterUI
       } {}
       Fl_Button {} {
@@ -1351,8 +1351,7 @@ effdynamicfilterwindow->position(px,py);
 
 refresh(eff);} {}
   }
-  Function {refresh(EffectMgr *eff_)} {open
-  } {
+  Function {refresh(EffectMgr *eff_)} {} {
     code {eff = eff_;
         this->hide();
         effnullwindow->hide();
@@ -1515,8 +1514,7 @@ refresh(eff);} {}
         }
         this->show();} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {refresh(eff);} {}
   }
   decl {EffectMgr *eff;} {private local

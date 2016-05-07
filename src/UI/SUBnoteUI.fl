@@ -433,7 +433,7 @@ if ((Fl::event_button() == 3))
         Fl_Group filterui {
           label {SUBsynthl - Filter}
           xywh {445 246 275 75} box FLAT_BOX color 50 align 144
-          code0 {o->init(pars->GlobalFilter,&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction);}
+          code0 {o->init(pars->GlobalFilter,&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction, npart, kititem, 2);}
           class FilterUI
         } {}
       }
