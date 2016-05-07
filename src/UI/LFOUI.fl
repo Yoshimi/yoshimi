@@ -75,8 +75,8 @@ hide();
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
-      xywh {1169 434 230 70} type Double color 50 labelfont 1 labelsize 12
-      class Fl_Group visible
+      xywh {1169 434 230 70} type Double color 50 labelfont 1 labelsize 12 hide
+      class Fl_Group
     } {
       Fl_Group lfoparamswindow {
         label LFO
@@ -198,7 +198,7 @@ LFOtype->value(pars->PLFOtype);} {}
   }
   Function {send_data(int type, int control, int value, float fvalue = 1)} {} {
     code {//
-if ((Fl::event_button() != 2) && control != 5)
+if (Fl::event_button() != 2)
     return;
     
 string name;
