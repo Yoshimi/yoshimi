@@ -2,6 +2,7 @@ yoshimi 1.3.x
 
 2016-5-8 Will
 - Filter params complete.
+- Small improvement to the way we return control values.
 
 2016-5-7 Will
 - Yoshimi now requires C++11

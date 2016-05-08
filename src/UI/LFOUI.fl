@@ -85,7 +85,7 @@ hide();
         Fl_Dial freq {
           label {Freq.}
           callback {pars->Pfreq=o->value();
-send_data(type, 0, 1, o->value());}
+send_data(type, 0, o->value(), false);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           class WidgetPDial
         }
@@ -196,11 +196,17 @@ randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);
 LFOtype->value(pars->PLFOtype);} {}
   }
-  Function {send_data(int type, int control, int value, float fvalue = 1)} {} {
+  Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
     code {//
 if (Fl::event_button() != 2)
     return;
-    
+
+string actual;
+if (isInteger)
+    actual = to_string((int)round(value));
+else
+    actual = to_string(value);
+
 string name;
 if (engine == 1)
     name = "  AddSynth";
@@ -248,11 +254,11 @@ switch (control)
         contstr = "Stretch";
         break;
 }
-float actual = (float) value * fvalue;
+
 if (engine < 0x80)
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + to_string(actual));
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
 else
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x7f) + lfo + " LFO  " + contstr + " value " + to_string(actual));} {}
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x7f) + lfo + " LFO  " + contstr + " value " + actual);} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {pars=lfopars_;
