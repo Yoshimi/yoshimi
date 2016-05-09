@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-5-9
+- Bugfix: Different versions of CMake require different ways of
+  specifying C++11
+
 2016-5-8 Will
 - Filter params complete.
 - Small improvement to the way we return control values.
