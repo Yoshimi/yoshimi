@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-5-10
+- All of SubSynth identified (except embedded envelopes)
+
 2016-5-9
 - Bugfix: Different versions of CMake require different ways of
   specifying C++11
