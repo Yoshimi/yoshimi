@@ -183,7 +183,7 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {6 183 735 475} type Double hide
+      xywh {24 62 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
@@ -216,7 +216,7 @@ if ((Fl::event_button() == 3))
         Fl_Dial vol {
           label Volume
           callback {pars->PVolume = (int)o->value();
-send_data (0, 0, o->value());}
+send_data (0, o->value());}
           tooltip Volume xywh {40 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PVolume);}
           class WidgetPDial
@@ -224,7 +224,7 @@ send_data (0, 0, o->value());}
         Fl_Dial vsns {
           label {Veloc Sens}
           callback {pars->PAmpVelocityScaleFunction = (int) o->value();
-send_data (0, 1, o->value());}
+send_data (1, o->value());}
           tooltip {Velocity sensing} xywh {101 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           class WidgetPDial
@@ -234,7 +234,7 @@ send_data (0, 1, o->value());}
           callback {//
     pars->setPan((char)o->value());
     randompan->value(pars->randomPan());
-    send_data (0, 2, o->value());}
+    send_data (2, o->value());}
           tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->PPanning);}
           class WidgetPDial
@@ -273,14 +273,14 @@ send_data (0, 1, o->value());}
         Fl_Counter filterstages {
           label {Filter Stages}
           callback {pars->Pnumstages = (int) o->value();
-send_data (5, 81, o->value());}
+send_data (80, o->value());}
           tooltip {How many times the noise is filtered} xywh {515 421 45 15} type Simple labelfont 1 labelsize 10 align 1 minimum 1 maximum 5 step 1 textsize 10
           code0 {o->value(pars->Pnumstages);}
         }
         Fl_Choice magtype {
           label {Mag.Type}
           callback {pars->Phmagtype = (int) o->value();
-send_data (5, 82, o->value());}
+send_data (81, o->value());}
           xywh {585 421 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Phmagtype);}
         } {
@@ -308,7 +308,7 @@ send_data (5, 82, o->value());}
         Fl_Choice start {
           label Start
           callback {pars->Pstart = (int) o->value();
-send_data (5, 83, o->value());}
+send_data (82, o->value());}
           xywh {670 421 50 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Pstart);}
         } {
@@ -347,7 +347,7 @@ send_data (5, 83, o->value());}
         freqenvelopegroup->activate();
     o->show();
     freqsettingsui->redraw();
-    send_data (2, 38, o->value());}
+    send_data (38, o->value());}
           xywh {445 68 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
           code0 {o->value(pars->PFreqEnvelopeEnabled);}
         }
@@ -358,7 +358,7 @@ send_data (5, 83, o->value());}
     if (k < 0)
         k += 16;
     pars->PCoarseDetune = k * 1024 + pars->PCoarseDetune % 1024;
-    send_data (2, 35, o->value());}
+    send_data (35, o->value());}
           tooltip Octave xywh {670 50 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
@@ -370,7 +370,7 @@ send_data (5, 83, o->value());}
     if (k < 0)
         k += 1024;
     pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;
-    send_data (2, 37, k);}
+    send_data (37, k);}
           tooltip {Coarse Detune} xywh {655 115 60 20} labelsize 10 align 1 minimum -64 maximum 63 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune%1024;if (k>=512) k-=1024;}
           code2 {o->value(k);}
@@ -380,7 +380,7 @@ send_data (5, 83, o->value());}
           callback {//
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
-    send_data (2, 32, o->value() + 8192);}
+    send_data (32, o->value() + 8192);}
           tooltip {Fine Detune (cents)} xywh {495 25 230 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
         }
@@ -400,14 +400,14 @@ send_data (5, 83, o->value());}
         fixedfreqetdial->deactivate();
     else
         fixedfreqetdial->activate();
-    send_data (2, 34, x);}
+    send_data (34, x);}
           tooltip {set the base frequency to 440Hz} xywh {555 45 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
           code0 {o->value(pars->Pfixedfreq);}
         }
         Fl_Dial fixedfreqetdial {
           label {Eq.T.}
           callback {pars->PfixedfreqET=(int) o->value();
-send_data (2, 33, o->value());}
+send_data (33, o->value());}
           tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {610 45 15 15} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
@@ -418,7 +418,7 @@ send_data (2, 33, o->value());}
           callback {//
     pars->PDetuneType = (int) o->value() + 1;
     detunevalueoutput->do_callback();
-    send_data (2, 36, o->value() + 1);}
+    send_data (36, o->value() + 1);}
           xywh {655 85 70 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
           code1 {o->value(pars->PDetuneType-1);}
@@ -427,26 +427,27 @@ send_data (2, 33, o->value());}
       Fl_Check_Button stereo {
         label Stereo
         callback {pars->Pstereo=(int) o->value();
-send_data (5, 80, o->value());}
+send_data (112, o->value());}
         xywh {440 406 55 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
       }
       Fl_Button {} {
         label Clear
         callback {//
-            for (int i = 0; i < MAX_SUB_HARMONICS; i++)
-            {
-                h[i]->mag->value(127);
-                h[i]->mag->selection_color(0);
-                pars->Phmag[i] = 0;
-                h[i]->bw->value(64);
-                h[i]->bw->selection_color(0);
-                pars->Phrelbw[i] = 64;
-            }
-            pars->Phmag[0] = 127;
-            h[0]->mag->selection_color(222);
-            h[0]->mag->value(0);
-            SUBparameters->redraw();}
+    for (int i = 0; i < MAX_SUB_HARMONICS; i++)
+    {
+        h[i]->mag->value(127);
+        h[i]->mag->selection_color(0);
+        pars->Phmag[i] = 0;
+        h[i]->bw->value(64);
+        h[i]->bw->selection_color(0);
+        pars->Phrelbw[i] = 64;
+    }
+    pars->Phmag[0] = 127;
+    h[0]->mag->selection_color(222);
+    h[0]->mag->value(0);
+    SUBparameters->redraw();
+    send_data (96, o->value());}
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group bandwidthsettingsui {
@@ -470,21 +471,21 @@ send_data (5, 80, o->value());}
         bandwidthenvelopegroup->activate();
     o->show();
     bandwidthsettingsui->redraw();
-    send_data (1, 18, o->value());}
+    send_data (18, o->value());}
           xywh {225 67 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
           code0 {o->value(pars->PBandWidthEnvelopeEnabled);}
         }
         Fl_Value_Slider bandwidth {
           label {Band Width}
           callback {pars->Pbandwidth=(int) o->value();
-send_data (1, 16, o->value());}
+send_data (16, o->value());}
           xywh {225 40 115 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->Pbandwidth);}
         }
         Fl_Value_Slider bwidthscale {
           label {B.Width Scale}
           callback {pars->Pbwscale=(int) o->value() + 64;
-send_data (1, 17, o->value() + 64);}
+send_data (17, o->value() + 64);}
           tooltip {How much I increase the BandWidth according to lower/higher harmonics} xywh {345 40 90 15} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {o->value(pars->Pbwscale-64);}
         }
@@ -517,7 +518,7 @@ send_data (1, 17, o->value() + 64);}
         globalfiltergroup->activate();
     o->show();
     globalfiltergroup->redraw();
-    send_data (4, 64, o->value());}
+    send_data (64, o->value());}
         xywh {445 226 85 20} down_box DOWN_BOX labelfont 1 labelsize 11
         code0 {o->value(pars->PGlobalFilterEnabled);}
       }
@@ -539,7 +540,7 @@ send_data (1, 17, o->value() + 64);}
           label {Overtones  Position}
           callback {pars->POvertoneSpread.type = (int)o->value();
 pars->updateFrequencyMultipliers();
-send_data (3, 51, o->value());}
+send_data (51, o->value());}
           xywh {460 171 87 20} down_box BORDER_BOX labelsize 10 align 2 textsize 10
           code0 {o->value(pars->POvertoneSpread.type);}
         } {
@@ -580,7 +581,7 @@ send_data (3, 51, o->value());}
           label Par1
           callback {pars->POvertoneSpread.par1 = o->value();
 pars->updateFrequencyMultipliers();
-send_data (3, 48, o->value());}
+send_data (48, o->value());}
           xywh {572 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           class WidgetPDial
@@ -589,7 +590,7 @@ send_data (3, 48, o->value());}
           label Par2
           callback {pars->POvertoneSpread.par2 = o->value();
 pars->updateFrequencyMultipliers();
-send_data (3, 49, o->value());}
+send_data (49, o->value());}
           xywh {626 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
           class WidgetPDial
@@ -598,7 +599,7 @@ send_data (3, 49, o->value());}
           label ForceH
           callback {pars->POvertoneSpread.par3 = o->value();
 pars->updateFrequencyMultipliers();
-send_data (3, 50, o->value());}
+send_data (50, o->value());}
           xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           class WidgetPDial
@@ -669,7 +670,7 @@ send_data (3, 50, o->value());}
         filterui->refresh();
         filterenv->refresh();} {}
   }
-  Function {send_data(int insert, int control, float value, bool isInteger = true)} {} {
+  Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
 if (Fl::event_button() != 2)
     return;
@@ -681,28 +682,22 @@ else
     actual = to_string(value);
 
 string name = "";
-switch (insert)
+switch (control & 0x70)
 {
     case 0:
     	name = " Amplitude ";
         break;
-    case 1:
+    case 16:
     	name = " Bandwidth ";
         break;
-    case 2:
+    case 32:
     	name = " Frequency ";
         break;
-    case 3:
+    case 48:
     	name = " Overtones ";
         break;
-    case 4:
+    case 64:
     	name = " Filter ";
-        break;
-    case 6:
-    	name = " Harmonic Amplitude ";
-        break;
-    case 7:
-    	name = " Harmonic Bandwidth ";
         break;
 }
 
@@ -767,16 +762,19 @@ switch (control)
         contstr = "Enable";
         break;
     case 80:
-        contstr = "Stereo";
-        break;
-    case 81:
         contstr = "Filt Stages";
         break;
-    case 82:
+    case 81:
         contstr = "Mag Type";
         break;
-    case 83:
+    case 82:
         contstr = "Start";
+        break;
+    case 96:
+        contstr = "Clear Harmonics";
+        break;
+    case 112:
+        contstr = "Stereo";
         break;
 }
 

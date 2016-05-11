@@ -668,13 +668,13 @@ switch (control)
     case 1:
         contstr = "Q";
         break;
-    case 2:
+    case 3:
         contstr = "VsensA";
         break;
-    case 3:
+    case 4:
         contstr = "Vsens";
         break;
-    case 4:
+    case 2:
         contstr = "FreqTr";
         break;
     case 5:

@@ -11,6 +11,7 @@ comment {OscilgenUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2016 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -84,7 +85,7 @@ class OscilSpectrum {: {public Fl_Box, MiscFuncs}
   Function {init(OscilGen *oscil_,int oscbase_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 oscil = oscil_;
-        oscbase = oscbase_;} {}
+oscbase = oscbase_;} {}
   }
   Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h(), i;
@@ -315,26 +316,33 @@ class Oscilharmonic {: {public Fl_Group}
     } {
       Fl_Slider mag {
         callback {int x=64;
-if (Fl::event_button3()) o->value(x);
-   else x=127-(int)o->value();
-if (x==64) o->selection_color(0);
-    else o->selection_color(222);
+if (Fl::event_button3())
+    o->value(x);
+else
+    x=127-(int)o->value();
+
+if (x==64)
+    o->selection_color(0);
+else
+    o->selection_color(222);
 
 synth->actionLock(lock);
- oscil->Phmag[n]=x;
- if (x==64) {
+oscil->Phmag[n]=x;
+if (x==64)
+{
     oscil->Phphase[n]=64;
     phase->value(64);
- };
- oscil->prepare();
+};
+oscil->prepare();
 synth->actionLock(unlock);
 
 display->redraw();
 oldosc->redraw();
-if (cbwidget!=NULL) {
-	cbwidget->do_callback();
-	applybutton->color(FL_RED);
-	applybutton->redraw();
+if (cbwidget!=NULL)
+{
+    cbwidget->do_callback();
+    applybutton->color(FL_RED);
+    applybutton->redraw();
 };}
         xywh {0 15 15 115} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-oscil->Phmag[n]);}
@@ -343,22 +351,28 @@ if (cbwidget!=NULL) {
       }
       Fl_Slider phase {
         callback {int x=64;
-if (Fl::event_button3()) o->value(x);
-   else x=(int)o->value();
-if (x==64) o->selection_color(0);
-    else o->selection_color(222);
+if (Fl::event_button3())
+    o->value(x);
+else
+    x=(int)o->value();
+
+if (x==64)
+    o->selection_color(0);
+else
+    o->selection_color(222);
 
 synth->actionLock(lock);
- oscil->Phphase[n]=x;
- oscil->prepare();
+oscil->Phphase[n]=x;
+oscil->prepare();
 synth->actionLock(unlock);
 
 display->redraw();
 oldosc->redraw();
-if (cbwidget!=NULL) {
-	cbwidget->do_callback();
-	applybutton->color(FL_RED);
-	applybutton->redraw();
+if (cbwidget!=NULL)
+{
+    cbwidget->do_callback();
+    applybutton->color(FL_RED);
+    applybutton->redraw();
 };}
         xywh {0 135 15 75} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(oscil->Phphase[n]);}
@@ -432,7 +446,7 @@ class OscilEditor {selected : {public PresetsUI_}
       label {ADsynth Oscillator Editor}
       xywh {63 44 735 595} type Double hide
       code0 {string tname;}
-      code1 {if (oscil->ADvsPAD) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Oscillator "; tname += char(nvoice + 49);}}
+      code1 {if (engine == 3) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Oscillator " + to_string((engine & 0x7f) + 1);}}
       code2 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
     } {
       Fl_Button applybutton {
@@ -1145,13 +1159,15 @@ refresh();}
       }
     }
   }
-  Function {OscilEditor(OscilGen *oscil_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *cbapplywidget_, int nvoice_, SynthEngine *_synth)} {} {
+  Function {OscilEditor(OscilGen *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {synth = _synth;
-oscil=oscil_;
-oldosc=oldosc_;
-cbwidget=cbwidget_;
+npart = npart_;
+kititem = kititem_;
+engine = engine_;
+oscil = oscil_;
+oldosc = oldosc_;
+cbwidget = cbwidget_;
 cbapplywidget=cbapplywidget_;
-nvoice = nvoice_;
 make_window();
 refresh();
 osceditUI->show();} {}
@@ -1227,7 +1243,11 @@ if (cbwidget!=NULL) {
   }
   decl {Oscilharmonic *h[MAX_AD_HARMONICS];} {private local
   }
-  decl {int nvoice;} {private local
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
+  }
+  decl {int engine;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

@@ -1,9 +1,15 @@
 yoshimi 1.3.x
 
-2016-5-10
-- All of SubSynth identified (except embedded envelopes)
+2016-5-11 Will
+- Improved SubSynth ID code.
+- Corrected swapped controls in filters
+- Identifed AddSynth global controls
+- Identifed PadSynth controls
 
-2016-5-9
+2016-5-10 Will
+- All of SubSynth identified (except embedded envelopes).
+
+2016-5-9 Will
 - Bugfix: Different versions of CMake require different ways of
   specifying C++11
 
