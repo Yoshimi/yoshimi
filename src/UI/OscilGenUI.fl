@@ -423,7 +423,11 @@ string eng_name;
 if (engine == 3)
     eng_name = "  Padsysnth";
 else
-    eng_name = "  Addsynth Voice" + to_string( engine & 0x7f);
+{
+    eng_name = "  Addsynth Voice " + to_string( engine & 0x3f);
+    if (engine & 0x40)
+        eng_name += " Modulator";
+}
 
 string name = "";
 switch (insert)
@@ -491,8 +495,9 @@ class OscilEditor {selected : {public PresetsUI_}
       label {ADsynth Oscillator Editor}
       xywh {12 36 735 595} type Double hide
       code0 {string tname;}
-      code1 {if (engine == 3) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Oscillator " + to_string((engine & 0x7f) + 1);}}
-      code2 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
+      code1 {if (engine == 3) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
+      code2 {if (engine & 0x40) tname += " Modulation Oscillator"; else tname += " Oscillator";}
+      code3 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
     } {
       Fl_Button applybutton {
         label Apply
@@ -1253,7 +1258,11 @@ string eng_name;
 if (engine == 3)
     eng_name = "  Padsynth";
 else
-    eng_name = "  Addsynth Voice " + to_string( engine & 0x7f);
+{
+    eng_name = "  Addsynth Voice " + to_string( engine & 0x3f);
+    if (engine & 0x40)
+        eng_name += " Modulator";
+}
 
 string name = "";
 switch (control & 0x70)
