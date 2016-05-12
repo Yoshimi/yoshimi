@@ -1,10 +1,13 @@
 yoshimi 1.3.x
 
+2016-5-12 Will
+- Identified AddSynth 7 PadSynth oscillator controls.
+
 2016-5-11 Will
 - Improved SubSynth ID code.
-- Corrected swapped controls in filters
-- Identifed AddSynth global controls
-- Identifed PadSynth controls
+- Corrected swapped controls in filters.
+- Identifed AddSynth global controls.
+- Identifed PadSynth controls.
 
 2016-5-10 Will
 - All of SubSynth identified (except embedded envelopes).

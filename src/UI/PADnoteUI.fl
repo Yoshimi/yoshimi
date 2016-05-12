@@ -1084,7 +1084,8 @@ send_data(112, o->value());}
             {
                 resui->applybutton->color(FL_GRAY);
                 resui->applybutton->redraw();
-            }}
+            }
+            send_data(104, o->value());}
         xywh {324 410 123 24} box THIN_UP_BOX labelfont 1 labelsize 12
         code0 {o->color(FL_RED);}
       }
@@ -1269,6 +1270,10 @@ switch (control)
         break;
     case 83:
         contstr = "Size";
+        break;
+
+    case 104:
+        contstr = "Apply Changes";
         break;
 
     case 112:
