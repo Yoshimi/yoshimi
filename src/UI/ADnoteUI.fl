@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -1273,9 +1273,9 @@ synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kitite
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
@@ -1768,7 +1768,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kitite
         npart = npart_;
         kititem = kititem_;
         nvoice = 0;
-        resui = new ResonanceUI(pars->GlobalPar.Reson);
+        resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 1);
         make_window();} {}
   }
   Function {~ADnoteUI()} {return_type virtual

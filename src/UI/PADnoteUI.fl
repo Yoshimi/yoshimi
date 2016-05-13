@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -234,7 +234,7 @@ this->pars=pars;} {}
   }
 } 
 
-class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
+class PADnoteUI {: {public PresetsUI_, private SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {
@@ -1306,7 +1306,7 @@ synth = parameters->getSynthEngine();
         npart = npart_;
         kititem = kititem_;
         oscui = NULL;
-        resui = new ResonanceUI(pars->resonance);
+        resui = new ResonanceUI(pars->resonance, npart, kititem, 3);
         make_window();} {}
   }
   Function {refresh(void)} {} {

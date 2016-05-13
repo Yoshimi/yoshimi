@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2016-5-13 Will
+- Identifed Resonance controls.
+- Moved max resonance points definition to CMakeLists.txt
+  and changed to more obvious name. In future we want to check
+  this size outside immediate resonance code.
+
 2016-5-12 Will
 - Identified AddSynth & PadSynth oscillator controls.
 - Included Adsynth Voice & Modulator controls.
