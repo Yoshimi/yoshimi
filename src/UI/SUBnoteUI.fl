@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified September 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
@@ -178,12 +178,12 @@ hide();
   }
 } 
 
-class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
+class SUBnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {24 62 735 475} type Double hide
+      xywh {7 317 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
@@ -263,7 +263,7 @@ send_data (1, o->value());}
         Fl_Group ampenv {
           label {SUBsynth - Amplitude Envelope}
           xywh {10 65 205 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->AmpEnvelope);}
+          code0 {o->init(pars->AmpEnvelope, npart, kititem, 2, 0);}
           class EnvelopeUI
         } {}
       }
@@ -333,7 +333,7 @@ send_data (82, o->value());}
         Fl_Group freqenvelopegroup {
           label {SUBsynth - Frequency Envelope}
           xywh {445 65 205 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->FreqEnvelope);}
+          code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);}
           code1 {if (pars->PFreqEnvelopeEnabled == 0) o->deactivate();}
           class EnvelopeUI
         } {}
@@ -457,7 +457,7 @@ send_data (112, o->value());}
         Fl_Group bandwidthenvelopegroup {
           label {SUBsynth - BandWidth Envelope}
           xywh {225 65 205 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->BandWidthEnvelope);}
+          code0 {o->init(pars->BandWidthEnvelope, npart, kititem, 2, 3);}
           code1 {if (pars->PBandWidthEnvelopeEnabled==0) o->deactivate();}
           class EnvelopeUI
         } {}
@@ -498,7 +498,7 @@ send_data (17, o->value() + 64);}
         Fl_Group filterenv {
           label {SUBsynth - Filter Envelope}
           xywh {445 331 275 70} box FLAT_BOX color 51 align 144
-          code0 {o->init(pars->GlobalFilterEnvelope);}
+          code0 {o->init(pars->GlobalFilterEnvelope, npart, kititem, 2, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterui {

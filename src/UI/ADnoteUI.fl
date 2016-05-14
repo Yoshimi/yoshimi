@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -224,7 +224,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
               Fl_Group voiceFMfreqenvgroup {
                 label {ADSynth Modulator - Frequency Envelope}
                 xywh {540 290 205 70} box FLAT_BOX color 51 align 144
-                code0 {o->init(pars->VoicePar[nvoice].FMFreqEnvelope);}
+                code0 {o->init(pars->VoicePar[nvoice].FMFreqEnvelope, npart, kititem, nvoice | 0xc0, 1);}
                 code1 {if (pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
               } {}
@@ -321,7 +321,7 @@ send_data(81, o->value());}
               Fl_Group voiceFMampenvgroup {
                 label {ADSynth Modulator - Amplitude Envelope} open
                 xywh {540 145 205 70} box FLAT_BOX color 51 align 144
-                code0 {o->init(pars->VoicePar[nvoice].FMAmpEnvelope);}
+                code0 {o->init(pars->VoicePar[nvoice].FMAmpEnvelope, npart, kititem, nvoice | 0xc0, 0);}
                 code1 {if (pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
               } {}
@@ -474,7 +474,7 @@ send_data(82, o->value());}
             Fl_Group voicefreqenvgroup {
               label {ADSynth Voice - Frequency Envelope}
               xywh {10 290 205 70} box FLAT_BOX color 51 align 144
-              code0 {o->init(pars->VoicePar[nvoice].FreqEnvelope);}
+              code0 {o->init(pars->VoicePar[nvoice].FreqEnvelope, npart, kititem, nvoice | 0x80, 1);}
               code1 {if (pars->VoicePar[nvoice].PFreqEnvelopeEnabled==0) o->deactivate();}
               class EnvelopeUI
             } {}
@@ -804,7 +804,7 @@ send_data(1, o->value());}
           Fl_Group voiceampenvgroup {
             label {ADSynth Voice - Amplitude Envelope}
             xywh {10 105 205 70} box FLAT_BOX color 51 align 144
-            code0 {o->init(pars->VoicePar[nvoice].AmpEnvelope);}
+            code0 {o->init(pars->VoicePar[nvoice].AmpEnvelope, npart, kititem, nvoice | 0x80, 0);}
             code1 {if (!pars->VoicePar[nvoice].PAmpEnvelopeEnabled) o->deactivate();}
             class EnvelopeUI
           } {}
@@ -894,7 +894,7 @@ send_data(4, o->value());}
           Fl_Group voicefilterenvgroup {
             label {ADSynth Voice - Filter Envelope}
             xywh {250 105 275 70} box FLAT_BOX color 51 align 144
-            code0 {o->init(pars->VoicePar[nvoice].FilterEnvelope);}
+            code0 {o->init(pars->VoicePar[nvoice].FilterEnvelope, npart, kititem, nvoice | 0x80, 2);}
             code1 {if (pars->VoicePar[nvoice].PFilterEnvelopeEnabled==0) o->deactivate();}
             class EnvelopeUI
           } {}
@@ -1277,7 +1277,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kitite
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
@@ -1294,7 +1294,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Group freqenv {
           label {ADSynth Global - Frequency Envelope} open
           xywh {10 295 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqEnvelope);}
+          code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, 1, 1);}
           class EnvelopeUI
         } {}
         Fl_Counter octave {
@@ -1467,7 +1467,7 @@ send_data(124, o->value());}
         Fl_Group ampenv {
           label {ADSynth Global - Amplitude Envelope}
           xywh {10 75 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpEnvelope);}
+          code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, 1, 0);}
           class EnvelopeUI
         } {}
         Fl_Group amplfo {
@@ -1491,7 +1491,7 @@ send_data(113, o->value());}
         Fl_Group filterenv {
           label {ADSynth Global - Filter Envelope}
           xywh {250 110 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterEnvelope);}
+          code0 {o->init(pars->GlobalPar.FilterEnvelope, npart, kititem, 1, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterlfo {

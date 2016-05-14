@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {Envelope.h} {not_in_source in_header
@@ -12,6 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
+Copyright 2016 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -221,10 +222,9 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
 } {
-  Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
 env=NULL;
 freemodeeditwindow=NULL;
@@ -240,11 +240,10 @@ hide();
 freemodeeditwindow->hide();
 delete (freemodeeditwindow);} {}
   }
-  Function {make_freemode_edit_window()} {open
-  } {
+  Function {make_freemode_edit_window()} {} {
     Fl_Window freemodeeditwindow {
-      label Envelope open
-      xywh {623 229 575 180} type Double visible
+      label Envelope
+      xywh {813 22 575 180} type Double visible
     } {
       Fl_Box freeedit {
         label Envelope
@@ -276,7 +275,8 @@ freeedit->redraw();
 envfree->redraw();
 
 sustaincounter->value(env->Penvsustain);
-sustaincounter->maximum(env->Penvpoints-2);}
+sustaincounter->maximum(env->Penvpoints-2);
+send_data(type, 33, o->value());}
         xywh {115 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -302,7 +302,8 @@ freeedit->redraw();
 envfree->redraw();
 
 sustaincounter->value(env->Penvsustain);
-sustaincounter->maximum(env->Penvpoints-2);}
+sustaincounter->maximum(env->Penvpoints-2);
+send_data(type, 34, o->value());}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -311,19 +312,22 @@ sustaincounter->maximum(env->Penvpoints-2);}
         callback {reinit();
 
 freeedit->lastpoint=-1;
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 32, o->value());}
         tooltip {Enable or disable the freemode} xywh {10 155 95 22} box PLASTIC_UP_BOX labelsize 11
       }
       Fl_Check_Button forcedreleasecheck {
         label frcR
-        callback {env->Pforcedrelease=(int)o->value();}
+        callback {env->Pforcedrelease=(int)o->value();
+send_data(type, 48, o->value());}
         tooltip {Forced Relase} xywh {410 165 40 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
       }
       Fl_Dial envstretchdial {
         label {Str.}
-        callback {env->Penvstretch=(int)o->value();}
+        callback {env->Penvstretch=(int)o->value();
+send_data(type, 39, o->value());}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 155 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -336,7 +340,8 @@ freeedit->redraw();}
       }
       Fl_Check_Button linearenvelopecheck {
         label L
-        callback {env->Plinearenvelope=(int)o->value();}
+        callback {env->Plinearenvelope=(int)o->value();
+send_data(type, 49, o->value());}
         tooltip {Linear Envelope} xywh {410 151 30 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Plinearenvelope);}
         code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
@@ -345,7 +350,8 @@ freeedit->redraw();}
         label Sust
         callback {env->Penvsustain=(int) o->value();
 freeedit->redraw();
-envfree->redraw();}
+envfree->redraw();
+send_data(type, 35, o->value());}
         tooltip {Sustain (0 is disabled)} xywh {315 155 40 15} type Simple labelsize 11 align 4 minimum 0 maximum 127 step 1
         code0 {o->value(env->Penvsustain);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -363,20 +369,20 @@ envfree->redraw();}
       }
     }
   }
-  Function {make_ADSR_window()} {open
-  } {
-    Fl_Window envADSR {open
-      xywh {1326 253 205 70} type Double color 50 labelfont 1
+  Function {make_ADSR_window()} {} {
+    Fl_Window envADSR {
+      xywh {1183 227 205 70} type Double color 50 labelfont 1
       class Fl_Group visible
     } {
       Fl_Group {} {
-        label {Amplitude Env} open
+        label {Amplitude Env}
         xywh {0 0 205 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e1adt {
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 1, o->value());}
           tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -384,7 +390,8 @@ freeedit->redraw();}
         Fl_Dial e1ddt {
           label {D.dt}
           callback {env->PD_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 3, o->value());}
           tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_dt);}
           class WidgetPDial
@@ -392,7 +399,8 @@ freeedit->redraw();}
         Fl_Dial e1rdt {
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 5, o->value());}
           tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -400,32 +408,37 @@ freeedit->redraw();}
         Fl_Dial e1sval {
           label {S.val}
           callback {env->PS_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 4, o->value());}
           tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PS_val);}
           class WidgetPDial
         }
         Fl_Check_Button e1forcedrelease {
           label frcR
-          callback {env->Pforcedrelease=(int)o->value();}
+          callback {env->Pforcedrelease=(int)o->value();
+send_data(type, 16, o->value());}
           tooltip {Forced Relase} xywh {180 35 20 15} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Dial e1envstretch {
           label Stretch
-          callback {env->Penvstretch=(int)o->value();}
+          callback {env->Penvstretch=(int)o->value();
+send_data(type, 7, o->value());}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           class WidgetPDial
         }
         Fl_Button {} {
           label E
-          callback {freemodeeditwindow->show();}
+          callback {freemodeeditwindow->show();
+send_data(type, 24, o->value());}
           tooltip {Envelope window} xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Check_Button e1linearenvelope {
           label L
-          callback {env->Plinearenvelope=(int)o->value();}
+          callback {env->Plinearenvelope=(int)o->value();
+send_data(type, 17, o->value());}
           tooltip {The evelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
@@ -442,20 +455,20 @@ freeedit->redraw();}
       }
     }
   }
-  Function {make_ASR_window()} {open
-  } {
-    Fl_Window envASR {open
-      xywh {714 202 210 70} type Double
-      class Fl_Group visible
+  Function {make_ASR_window()} {} {
+    Fl_Window envASR {
+      xywh {1181 324 210 70} type Double hide
+      class Fl_Group
     } {
       Fl_Group {} {
-        label {Frequency Env} open
+        label {Frequency Env}
         xywh {0 0 210 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e2aval {
           label {A.val}
           callback {env->PA_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 0, o->value());}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           class WidgetPDial
@@ -463,7 +476,8 @@ freeedit->redraw();}
         Fl_Dial e2adt {
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 1, o->value());}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -471,7 +485,8 @@ freeedit->redraw();}
         Fl_Dial e2rval {
           label {R.val}
           callback {env->PR_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 6, o->value());}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           class WidgetPDial
@@ -479,21 +494,24 @@ freeedit->redraw();}
         Fl_Dial e2rdt {
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 5, o->value());}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           class WidgetPDial
         }
         Fl_Dial e2envstretch {
           label Stretch
-          callback {env->Penvstretch=(int)o->value();}
+          callback {env->Penvstretch=(int)o->value();
+send_data(type, 7, o->value());}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           class WidgetPDial
         }
         Fl_Check_Button e2forcedrelease {
           label frcR
-          callback {env->Pforcedrelease=(int)o->value();}
+          callback {env->Pforcedrelease=(int)o->value();
+send_data(type, 16, o->value());}
           tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
@@ -510,16 +528,16 @@ freeedit->redraw();}
       }
       Fl_Button {} {
         label E
-        callback {freemodeeditwindow->show();}
+        callback {freemodeeditwindow->show();
+send_data(type, 24, o->value());}
         tooltip {Envelope window} xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
   }
-  Function {make_ADSRfilter_window()} {open
-  } {
-    Fl_Window envADSRfilter {open
-      xywh {445 113 275 70} type Double color 50 labelfont 1
-      class Fl_Group visible
+  Function {make_ADSRfilter_window()} {} {
+    Fl_Window envADSRfilter {
+      xywh {1116 422 275 70} type Double color 50 labelfont 1 hide
+      class Fl_Group
     } {
       Fl_Group {} {
         label {Filter Env}
@@ -528,7 +546,8 @@ freeedit->redraw();}
         Fl_Dial e3aval {
           label {A.val}
           callback {env->PA_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 0, o->value());}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           class WidgetPDial
@@ -536,7 +555,8 @@ freeedit->redraw();}
         Fl_Dial e3adt {
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 1, o->value());}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -544,7 +564,8 @@ freeedit->redraw();}
         Fl_Dial e3dval {
           label {D.val}
           callback {env->PD_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 2, o->value());}
           tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_val);}
           class WidgetPDial
@@ -552,7 +573,8 @@ freeedit->redraw();}
         Fl_Dial e3ddt {
           label {D.dt}
           callback {env->PD_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 3, o->value());}
           tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_dt);}
           class WidgetPDial
@@ -560,7 +582,8 @@ freeedit->redraw();}
         Fl_Dial e3rdt {
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 5, o->value());}
           tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           class WidgetPDial
@@ -568,27 +591,31 @@ freeedit->redraw();}
         Fl_Dial e3rval {
           label {R.val}
           callback {env->PR_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 6, o->value());}
           tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           class WidgetPDial
         }
         Fl_Dial e3envstretch {
           label Stretch
-          callback {env->Penvstretch=(int)o->value();}
+          callback {env->Penvstretch=(int)o->value();
+send_data(type, 7, o->value());}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           class WidgetPDial
         }
         Fl_Check_Button e3forcedrelease {
           label frcR
-          callback {env->Pforcedrelease=(int)o->value();}
+          callback {env->Pforcedrelease=(int)o->value();
+send_data(type, 16, o->value());}
           tooltip {Forced Relase} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Button {} {
           label E
-          callback {freemodeeditwindow->show();}
+          callback {freemodeeditwindow->show();
+send_data(type, 24, o->value());}
           xywh {255 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button {} {
@@ -604,11 +631,10 @@ freeedit->redraw();}
       }
     }
   }
-  Function {make_ASRbw_window()} {open
-  } {
-    Fl_Window envASRbw {open
-      xywh {1597 595 210 70} type Double
-      class Fl_Group visible
+  Function {make_ASRbw_window()} {} {
+    Fl_Window envASRbw {
+      xywh {1177 520 210 70} type Double hide
+      class Fl_Group
     } {
       Fl_Group {} {
         label {BandWidth Env}
@@ -617,7 +643,8 @@ freeedit->redraw();}
         Fl_Dial e4aval {
           label {A.val}
           callback {env->PA_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 0, o->value());}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           class WidgetPDial
@@ -625,7 +652,8 @@ freeedit->redraw();}
         Fl_Dial e4adt {
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 1, o->value());}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           class WidgetPDial
@@ -633,7 +661,8 @@ freeedit->redraw();}
         Fl_Dial e4rval {
           label {R.val}
           callback {env->PR_val=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 6, o->value());}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           class WidgetPDial
@@ -641,21 +670,24 @@ freeedit->redraw();}
         Fl_Dial e4rdt {
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
-freeedit->redraw();}
+freeedit->redraw();
+send_data(type, 5, o->value());}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           class WidgetPDial
         }
         Fl_Dial e4envstretch {
           label Stretch
-          callback {env->Penvstretch=(int)o->value();}
+          callback {env->Penvstretch=(int)o->value();
+send_data(type, 7, o->value());}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           class WidgetPDial
         }
         Fl_Check_Button e4forcedrelease {
           label frcR
-          callback {env->Pforcedrelease=(int)o->value();}
+          callback {env->Pforcedrelease=(int)o->value();
+send_data(type, 16, o->value());}
           tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
@@ -672,15 +704,15 @@ freeedit->redraw();}
       }
       Fl_Button {} {
         label E
-        callback {freemodeeditwindow->show();}
+        callback {freemodeeditwindow->show();
+send_data(type, 24, o->value());}
         xywh {190 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
       }
     }
   }
-  Function {make_free_window()} {open
-  } {
-    Fl_Window envfree {open
-      xywh {1539 374 205 70} type Double color 50 labelfont 1 resizable
+  Function {make_free_window()} {} {
+    Fl_Window envfree {
+      xywh {874 240 205 70} type Double color 50 labelfont 1 resizable
       class Fl_Group visible
     } {
       Fl_Group envfreegroup {
@@ -696,7 +728,8 @@ freeedit->redraw();}
         }
         Fl_Button {} {
           label E
-          callback {freemodeeditwindow->show();}
+          callback {freemodeeditwindow->show();
+send_data(type, 24, o->value());}
           xywh {185 5 15 15} box PLASTIC_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button {} {
@@ -712,10 +745,112 @@ freeedit->redraw();}
       }
     }
   }
-  Function {init(EnvelopeParams *env_)} {open
-  } {
-    code {env=env_;
+  Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
+    code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 2, type);
+
+if (Fl::event_button() != 2)
+    return;
+
+string actual;
+if (isInteger)
+    actual = to_string((int)round(value));
+else
+    actual = to_string(value);
+
+string name;
+if (engine == 1)
+    name = "  AddSynth";
+else if (engine == 3)
+    name = "  PadSynth";
+else if (engine >= 0x80)
+    name = "  AddSynth Voice ";
+
+string env;
+if (type == 2)
+    env = "  Filt";
+else if (type == 1)
+    env = "  Freq";
+else
+    env = "  Amp";
+
+string contstr;
+switch (control)
+{
+    case 0:
+    	contstr = "A val";
+    	break;
+    case 1:
+        contstr = "A dt";
+        break;
+    case 2:
+        contstr = "D val";
+        break;
+    case 3:
+        contstr = "D dt";
+        break;
+    case 4:
+        contstr = "S val";
+        break;
+    case 5:
+        contstr = "R dt";
+        break;
+    case 6:
+        contstr = "R val";
+        break;
+    case 7:
+        contstr = "Stretch";
+        break;
+
+    case 16:
+        contstr = "frcR";
+        break;
+    case 17:
+        contstr = "L";
+        break;
+
+    case 24:
+        contstr = "Edit";
+        break;
+
+    case 32:
+        contstr = "Freemode";
+        break;
+    case 33:
+        contstr = "Add Point";
+        break;
+    case 34:
+        contstr = "Del Point";
+        break;
+    case 35:
+        contstr = "Sust";
+        break;
+    case 39:
+        contstr = "Stretch";
+        break;
+
+    case 48:
+        contstr = "frcR";
+        break;
+    case 49:
+        contstr = "L";
+        break;
+
+}
+
+if (engine < 0x80)
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + env + " Env  " + contstr + " value " + actual);
+else
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x3f) + env + " Env  " + contstr + " value " + actual);} {}
+  }
+  Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int type_)} {} {
+    code {//
+env=env_;
 synth = env->getSynthEngine();
+npart = npart_;
+kititem = kititem_;
+engine = engine_;
+type = type_;
 make_ADSR_window();
 make_ASR_window();
 make_ADSRfilter_window();
@@ -736,11 +871,9 @@ freeeditsmall->setpair(freeedit);
 freeedit->setpair(freeeditsmall);
 
 
-refresh();} {selected
-    }
+refresh();} {}
   }
-  Function {reinit()} {open
-  } {
+  Function {reinit()} {} {
     code {if (env->Pfreemode!=0){
   int answer=fl_choice("Disable the free mode of the Envelope?","No","Yes",NULL);
   if (env->Pfreemode!=0) freemodebutton->value(1);
@@ -783,8 +916,7 @@ if (env->Pfreemode!=0) {
 	forcedreleasecheck->hide();
 };} {}
   }
-  Function {refresh()} {open
-  } {
+  Function {refresh()} {} {
     code {freemodebutton->value(env->Pfreemode);
 
 sustaincounter->value(env->Penvsustain);
@@ -889,5 +1021,13 @@ envwindow->show();} {}
   decl {Fl_Group *envwindow;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
+  }
+  decl {int engine;} {private local
+  }
+  decl {int type;} {private local
   }
 } 

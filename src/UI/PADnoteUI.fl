@@ -239,7 +239,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
   Function {make_window()} {} {
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {39 20 535 450} type Double hide
+      xywh {33 212 535 450} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->padNoteX, synth->getGuiMaster()->padNoteY);}
     } {
@@ -253,7 +253,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
+          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12 hide
         } {
           Fl_Group bwprofilegroup {
             xywh {5 30 90 260} box ENGRAVED_FRAME
@@ -840,7 +840,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         }
         Fl_Group {} {
           label {Envelopes&LFOs}
-          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12 hide
+          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12
         } {
           Fl_Group {} {
             label FREQUENCY
@@ -849,7 +849,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             Fl_Group freqenv {
               label {PADSynth - Frequency Envelope}
               xywh {10 315 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FreqEnvelope);}
+              code0 {o->init(pars->FreqEnvelope, npart, kititem, 3, 1);}
               class EnvelopeUI
             } {}
             Fl_Counter octave {
@@ -1028,7 +1028,7 @@ send_data(124, o->value());}
             Fl_Group ampenv {
               label {PADSynth - Amplitude Envelope} open
               xywh {10 95 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->AmpEnvelope);}
+              code0 {o->init(pars->AmpEnvelope, npart, kititem, 3, 0);}
               class EnvelopeUI
             } {}
             Fl_Group amplfo {
@@ -1052,7 +1052,7 @@ send_data(112, o->value());}
             Fl_Group filterenv {
               label {PADSynth - Filter Envelope} open
               xywh {250 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FilterEnvelope);}
+              code0 {o->init(pars->FilterEnvelope, npart, kititem, 3, 2);}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
