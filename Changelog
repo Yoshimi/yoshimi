@@ -4,6 +4,7 @@ yoshimi 1.3.x
 - All Identifed data now passed to synthengine in uniform manner.
 - Bugfix: Right click on mod oscilator didn't close AddVoice window.
 - Mostly Identified Envelopes (not fee mode).
+- Identified most of basic part controls.
 
 2016-5-13 Will
 - Identifed Resonance controls.
