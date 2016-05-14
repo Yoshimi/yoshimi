@@ -75,7 +75,7 @@ hide();
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
-      xywh {1169 434 230 70} type Double color 50 labelfont 1 labelsize 12 hide
+      xywh {1126 445 230 70} type Double color 50 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
@@ -198,6 +198,8 @@ LFOtype->value(pars->PLFOtype);} {}
   }
   Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
     code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 0, type);
+
 if (Fl::event_button() != 2)
     return;
 
@@ -258,7 +260,7 @@ switch (control)
 if (engine < 0x80)
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
 else
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x7f) + lfo + " LFO  " + contstr + " value " + actual);} {}
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x3f) + lfo + " LFO  " + contstr + " value " + actual);} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {pars=lfopars_;

@@ -725,6 +725,28 @@ int SynthEngine::ReadBank(void)
 }
 
 
+void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
+{
+    /*
+     * while testing, this simply sends everything to commandSend but eventually it will
+     * partially do the decding and direction via ring buffers for actualy control.
+     */
+    bool isGui = type & 0x20;
+    char button = type & 0x1f;
+    if (isGui && button != 2)
+        commandSend(value, type, control, part, kit, engine, insert, insertParam);
+}
+
+
+void SynthEngine::commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
+{
+    string isf;
+    if (!(type &0x80))
+        isf = "f";
+    Runtime.Log("\nButton " + asString((int) type & 7) + "\nPart " + asString((int) part) + "\nKit " + asString((int) kit) + "\nEngine " + asString((int) engine) + "\nInsert " + asString((int) insert) + "  Insert Param " + asString((int) insertParam) + "\nControl " + asString((int) control) + "  Value " + asString(value) + isf);
+}
+
+
 void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
     bool partOK = true;

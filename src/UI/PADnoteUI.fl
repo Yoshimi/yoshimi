@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -234,7 +234,7 @@ this->pars=pars;} {}
   }
 } 
 
-class PADnoteUI {: {public PresetsUI_, private SynthHelper}
+class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {
@@ -1129,6 +1129,8 @@ pars->export2wav(filename);}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 3);
+
 if (Fl::event_button() != 2)
     return;
 

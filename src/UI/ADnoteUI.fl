@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -1043,6 +1043,8 @@ o->show();}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, nvoice | 0x80);
+
 if (Fl::event_button() != 2)
     return;
 
@@ -1273,7 +1275,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kitite
   }
 } 
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
@@ -1664,6 +1666,8 @@ if ((Fl::event_button() == 3))
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 1);
+
 if (Fl::event_button() != 2)
     return;
 

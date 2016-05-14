@@ -120,6 +120,8 @@ else
   }
   Function {send_data(int insert, int control, float value, bool isInteger = true)} {} {
     code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 2, insert);
+
 if (Fl::event_button() != 2)
     return;
 
@@ -670,6 +672,9 @@ send_data (50, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 2);
+
+
 if (Fl::event_button() != 2)
     return;
 

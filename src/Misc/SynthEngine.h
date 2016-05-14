@@ -97,6 +97,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetBank(int banknum);
         int ReadBankRoot(void);
         int ReadBank(void);
+
+        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+        void commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+
         void SetProgram(unsigned char chan, unsigned short pgm);
         bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);

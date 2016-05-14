@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-5-14 Will
+- All Identifed data now passed to synthengine in uniform manner.
+
 2016-5-13 Will
 - Identifed Resonance controls.
 - Moved max resonance points definition to CMakeLists.txt
