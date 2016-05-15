@@ -6,6 +6,9 @@ yoshimi 1.3.x
 - Bugfix: Filter control had wrong ID
 - Bugfix: LFO had wrong insert parameters.
 - Bugfix: Got interpolation button names the wrong way round :(
+- Documented most of the defined controls in dev-notes
+- Bugfix: SubSynth wrong control ID.
+- Bugfix: PadSynth missing control ID
 
 2016-5-14 Will
 - All Identifed data now passed to synthengine in uniform manner.

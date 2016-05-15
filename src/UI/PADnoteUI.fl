@@ -253,7 +253,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12 hide
+          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
         } {
           Fl_Group bwprofilegroup {
             xywh {5 30 90 260} box ENGRAVED_FRAME
@@ -508,7 +508,8 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
               callback {//
                   pars->Phrpos.type=o->value();
                   overtonepos->redraw();
-                  cbwidget->do_callback();}
+                  cbwidget->do_callback();
+                  send_data(51, o->value());}
               xywh {325 310 80 20} down_box BORDER_BOX labelsize 10 align 5 textsize 11
               code0 {o->value(pars->Phrpos.type);}
             } {
@@ -840,7 +841,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         }
         Fl_Group {} {
           label {Envelopes&LFOs}
-          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12
+          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Group {} {
             label FREQUENCY
