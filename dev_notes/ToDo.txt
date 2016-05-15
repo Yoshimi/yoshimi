@@ -1,4 +1,17 @@
 
+Investigate new Zyn voice parameters AddSynth voice:
+
+<par name="bend_adjust" value="88" />
+<par name="offset_hz" value="64" />
+
+Currently we load and save them (for compatibility) but make
+no use of them.
+
+Also, Pitchwheel split range in Controllers, but that one seems
+a bit pointless to me!
+
+
+
 Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
@@ -12,7 +25,7 @@ Make add/pad windows show kit number.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
 
-Add scale control to CLI.
+Add scales control to CLI.
 
 Make things like LFOs either floats or much higher resolution.
 

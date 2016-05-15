@@ -1,0 +1,5 @@
+voice aftertouch
+A0-AF
+
+channel aftertouch
+D0 = DF

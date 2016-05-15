@@ -1,0 +1,88 @@
+
+data to send from gui
+
+Chars are unsigned. Set unused ones to 0xff as a general test.
+
+e.g.
+if part is 0xf0 (main) and kit is 0xff you're there and it
+is main volume, key shift etc.
+
+
+if part is < 0x40 and kit is 0xff it's the general part
+level controls.
+If kit < 0x10 and engine is  0xff it's the engine enable controls (kit number | engine)
+if kit is 0xf0 you go to the part controllers menu.
+
+
+unsigned char   type
+unsigned char   part
+unsigned char   kit
+unsigned char   engine
+unsigned char   insert
+unsigned char   insert param
+unsigned char   controller
+float           value
+string          name - not using this yet
+
+
+type bits
+0-4 event button (action to take)
+5   read/write data value
+6   source is GUI (else 0-4 = source & action)
+7   round to int (will be sent as float)
+
+
+engine
+1       addsynth
+2       subsynth
+3       padsynth
+>= 0xC0 adsynth voice modulator
+>= 0x80 addsynth voice
+
+kit (if engine is main)
+0   sys \
+1   ins / currently only for effects
+
+
+inserts
+0   lfo
+1   filter
+2   envelope base
+3   envelope graph X
+4   envelope graph Y
+
+5   oscillator (for add voice & pad harmonics)
+6   oscillator harmonic amplitude (for add voice & pad)
+    harmonic amplitude (sub)
+7   oscillator harmonic phase (add, pad)
+    harmonc bandwidth (sub)
+
+8   resonance base (for add & pad harmonics)
+9   resonance graph
+
+16  effects None
+17          Reverb
+18          Echo
+19          Chorus
+20          Phaser
+21          Alienwah
+22          Distorsion
+23          EQ
+24          Dynfilter
+
+32+ engine specific ?
+
+
+insert param
+    type
+        lfo
+            0 = Frequency
+            1 = Amplitude
+            2 = Filter
+
+        envelope
+            0 = Amplitude
+            1 = Frequency
+            2 = Filter
+
+?       envelope free mode
