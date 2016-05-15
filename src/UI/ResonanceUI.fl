@@ -293,13 +293,13 @@ class ResonanceUI {selected : PresetsUI_
     } {
       Fl_Value_Output khzvalue {
         label kHz
-        xywh {415 264 45 18} labelsize 12 align 8 minimum 0.001 maximum 48 textfont 1 textsize 12
+        xywh {435 264 40 18} labelsize 12 align 8 minimum 0.001 maximum 48 textfont 1 textsize 12
         code0 {o->step(0.01, 1);}
         code1 {//this widget must be before the calling widgets}
       }
       Fl_Value_Output dbvalue {
         label dB
-        xywh {415 282 45 18} labelsize 12 align 8 minimum -150 maximum 150 textfont 1 textsize 12
+        xywh {435 282 40 18} labelsize 12 align 8 minimum -150 maximum 150 textfont 1 textsize 12
         code0 {o->step(0.1, 1);}
         code1 {//this widget must be before the calling widgets}
       }
@@ -319,7 +319,7 @@ if ((Fl::event_button() == 3))
     else
         synth->getGuiMaster()->partui->padnoteui->padnotewindow->show();
 }}
-        xywh {690 283 84 17} box THIN_UP_BOX
+        xywh {700 285 74 16} box THIN_UP_BOX
       }
       Fl_Button {} {
         label Clear
@@ -328,7 +328,7 @@ if ((Fl::event_button() == 3))
                 resonancewindow->redraw();
                 redrawPADnoteApply();
                 send_data(96, o->value());}
-        tooltip {Clear the resonance function} xywh {491 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Clear the resonance function} xywh {507 264 66 15} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label Smooth
@@ -336,45 +336,62 @@ if ((Fl::event_button() == 3))
             resonancewindow->redraw();
             redrawPADnoteApply();
             send_data(97, o->value());}
-        tooltip {Smooth the resonance function} xywh {491 282 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
+        tooltip {Smooth the resonance function} xywh {507 282 66 18} box THIN_UP_BOX labelfont 1 labelsize 12
       }
       Fl_Check_Button enabled {
         label Enable
         callback {respar->Penabled = (int) o->value();
             redrawPADnoteApply();
             send_data(8, o->value());}
-        xywh {6 270 78 27} box THIN_UP_BOX down_box DOWN_BOX
+        xywh {6 265 78 15} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {o->value(respar->Penabled);}
       }
-      Fl_Roller maxdb {
-        callback {maxdbvo->value(o->value());
-            respar->PmaxdB = (int) o->value();
-            redrawPADnoteApply();
-            send_data(0, o->value());}
-        xywh {90 282 84 15} type Horizontal minimum 1 maximum 90 step 1 value 30
-      }
       Fl_Value_Output maxdbvo {
-        label {Max.}
+        label {Max dB}
         callback {o->value(respar->PmaxdB);}
-        tooltip {The Maximum amplitude (dB)} xywh {126 264 24 18} labelsize 12 minimum 1 maximum 127 step 1 value 30 textfont 1 textsize 12
+        tooltip {The Maximum amplitude (dB)} xywh {55 282 117 18} labelsize 12 minimum 1 maximum 127 step 1 value 30 textfont 1 textsize 12
         code0 {o->value(respar->PmaxdB);}
       }
-      Fl_Box {} {
-        label dB
-        xywh {150 264 24 18}
+      Fl_Slider maxdb {
+        callback {//
+	maxdbvo->value(o->value());
+        respar->PmaxdB = (int) o->value();
+        redrawPADnoteApply();
+        send_data(0, o->value());}
+        xywh {76 284 92 14} type {Horz Knob} box NO_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
       }
       Fl_Value_Output centerfreqvo {
         label {C.f.}
         callback {o->value(respar->getcenterfreq()/1000.0);}
-        tooltip {Center Frequency (kHz)} xywh {210 264 33 18} labelsize 12 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 12
+        tooltip {Center Frequency (kHz)} xywh {210 264 146 18} labelsize 12 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 12
         code0 {o->step(0.01, 1);}
         code1 {o->value(respar->getcenterfreq()/1000.0);}
+      }
+      Fl_Slider centerfreq {
+        callback {//
+	respar->Pcenterfreq=(int)o->value();
+        centerfreqvo->do_callback();
+        rg->redraw();
+        redrawPADnoteApply();
+        send_data(1, o->value());}
+        xywh {242 266 110 14} type {Horz Knob} box NO_BOX labelsize 11 align 8 maximum 127 step 0.1
+        code0 {o->value(respar->Pcenterfreq);}
       }
       Fl_Value_Output octavesfreqvo {
         label {Oct.}
         callback {o->value(respar->getoctavesfreq());}
-        tooltip {No. of octaves} xywh {210 282 33 18} labelsize 12 when 3 minimum 1 maximum 127 step 1 value 30 textfont 1 textsize 12
+        tooltip {No. of octaves} xywh {210 282 146 18} labelsize 12 when 3 minimum 1 maximum 127 step 1 value 30 textfont 1 textsize 12
         code0 {o->value(respar->getoctavesfreq());}
+      }
+      Fl_Slider octavesfreq {
+        callback {//
+	respar->Poctavesfreq=(int)o->value();
+        octavesfreqvo->do_callback();
+        rg->redraw();
+        redrawPADnoteApply();
+        send_data(2, o->value());}
+        xywh {243 285 110 14} type {Horz Knob} box NO_BOX labelsize 11 align 8 maximum 127 step 0.1
+        code0 {o->value(respar->Poctavesfreq);}
       }
       Fl_Button {} {
         label RND2
@@ -382,7 +399,7 @@ if ((Fl::event_button() == 3))
 resonancewindow->redraw();
 redrawPADnoteApply();
 send_data(11, o->value());}
-        tooltip {Randomize the resonance function} xywh {566 276 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+        tooltip {Randomize the resonance function} xywh {583 276 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
       }
       Fl_Button {} {
         label RND1
@@ -390,7 +407,7 @@ send_data(11, o->value());}
 resonancewindow->redraw();
 redrawPADnoteApply();
 send_data(10, o->value());}
-        tooltip {Randomize the resonance function} xywh {566 264 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+        tooltip {Randomize the resonance function} xywh {583 264 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
       }
       Fl_Button {} {
         label RND3
@@ -398,60 +415,50 @@ send_data(10, o->value());}
 resonancewindow->redraw();
 redrawPADnoteApply();
 send_data(12, o->value());}
-        tooltip {Randomize the resonance function} xywh {566 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+        tooltip {Randomize the resonance function} xywh {583 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
       }
       Fl_Check_Button p1st {
-        label {P.1st}
+        label {Prot.1st}
         callback {respar->Pprotectthefundamental=(int) o->value();
 redrawPADnoteApply();
 send_data(21, o->value());}
-        tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {365 285 45 15} down_box DOWN_BOX labelsize 10
+        tooltip {Protect the fundamental frequency (do not damp the first harmonic)} xywh {106 265 45 15} down_box DOWN_BOX labelsize 12
         code0 {o->value(respar->Pprotectthefundamental);}
       }
+      Fl_Text_Display {} {
+        label InterpPk
+        xywh {364 280 62 0} box NO_BOX labelsize 13 align 33 textsize 13
+      }
+      Fl_Box {} {
+        tooltip {Interpolate the peaks (left button type 0, right button type 1)} xywh {359 264 72 36} box THIN_DOWN_FRAME
+      }
       Fl_Button {} {
-        label InterpP
-        callback {int type;
-            if (Fl::event_button() == FL_LEFT_MOUSE)
-                type = 0;
-            else
-                type = 1;
-            respar->interpolatepeaks(type);
-            resonancewindow->redraw();
-            redrawPADnoteApply();
-            send_data(20, o->value());}
-        tooltip {Interpolate the peaks (left button type 0, other button type 1)} xywh {365 265 46 15} box THIN_UP_BOX labelfont 1 labelsize 10
+        label L
+        callback {//
+	respar->interpolatepeaks(0);
+        resonancewindow->redraw();
+        redrawPADnoteApply();
+        send_data(20, 0);}
+        xywh {365 282 14 14} labelfont 1 labelsize 12
       }
-      Fl_Dial centerfreq {
-        label {C.f.}
-        callback {respar->Pcenterfreq=(int)o->value();
-            centerfreqvo->do_callback();
-            rg->redraw();
-            redrawPADnoteApply();
-            send_data(1, o->value());}
-        xywh {245 265 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-        code0 {o->value(respar->Pcenterfreq);}
-        class WidgetPDial
-      }
-      Fl_Dial octavesfreq {
-        label {Oct.}
-        callback {respar->Poctavesfreq=(int)o->value();
-            octavesfreqvo->do_callback();
-            rg->redraw();
-            redrawPADnoteApply();
-            send_data(2, o->value());}
-        xywh {280 265 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-        code0 {o->value(respar->Poctavesfreq);}
-        class WidgetPDial
+      Fl_Button {} {
+        label H
+        callback {//
+	respar->interpolatepeaks(1);
+        resonancewindow->redraw();
+        redrawPADnoteApply();
+        send_data(20, 1);}
+        xywh {411 282 14 14} labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(respar);}
-        xywh {625 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {635 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(respar,this);}
-        xywh {655 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+        xywh {665 275 25 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
       }
       Fl_Button applybutton {
         label Apply
@@ -464,7 +471,7 @@ send_data(21, o->value());}
                 cbapplywidget->redraw();
             }
             send_data(104, o->value());}
-        xywh {690 265 85 15} box THIN_UP_BOX labelfont 1 labelsize 11
+        xywh {700 265 74 17} box THIN_UP_BOX down_box THIN_DOWN_BOX labelfont 1 labelsize 11
       }
     }
   }

@@ -198,6 +198,13 @@ LFOtype->value(pars->PLFOtype);} {}
   }
   Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
     code {//
+
+// temp bugfix :(
+if (type == 1)
+    type = 0;
+else if (type == 0)
+    type = 1;
+    
 synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 0, type);
 
 if (Fl::event_button() != 2)
@@ -221,9 +228,9 @@ string lfo;
 if (type == 2)
     lfo = "  Filt";
 else if (type == 1)
-    lfo = "  Amp";
-else
     lfo = "  Freq";
+else
+    lfo = "  Amp";
 
 string contstr;
 switch (control)

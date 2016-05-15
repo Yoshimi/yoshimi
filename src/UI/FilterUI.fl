@@ -637,7 +637,7 @@ send_data(17, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 2);
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 1);
 
 if (Fl::event_button() != 2)
     return;

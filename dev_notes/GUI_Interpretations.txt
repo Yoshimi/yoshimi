@@ -76,8 +76,8 @@ inserts
 insert param
     type
         lfo
-            0 = Frequency
-            1 = Amplitude
+            0 = Amplitude
+            1 = Frequency
             2 = Filter
 
         envelope
