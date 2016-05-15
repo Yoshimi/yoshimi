@@ -433,22 +433,22 @@ send_data(21, o->value());}
         tooltip {Interpolate the peaks (left button type 0, right button type 1)} xywh {359 264 72 36} box THIN_DOWN_FRAME
       }
       Fl_Button {} {
-        label L
+        label S
         callback {//
 	respar->interpolatepeaks(0);
         resonancewindow->redraw();
         redrawPADnoteApply();
         send_data(20, 0);}
-        xywh {365 282 14 14} labelfont 1 labelsize 12
+        tooltip {Smooth interpolation} xywh {365 282 14 14} labelfont 1 labelsize 12
       }
       Fl_Button {} {
-        label H
+        label L
         callback {//
 	respar->interpolatepeaks(1);
         resonancewindow->redraw();
         redrawPADnoteApply();
         send_data(20, 1);}
-        xywh {411 282 14 14} labelfont 1 labelsize 12
+        tooltip {Linear interpolation} xywh {411 282 14 14} labelfont 1 labelsize 12
       }
       Fl_Button {} {
         label C

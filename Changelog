@@ -4,7 +4,8 @@ yoshimi 1.3.x
 - Changed Resonance interpolation control to clarify two types
   and reorganised layout of neighboring controls for uniformity.
 - Bugfix: Filter control had wrong ID
-- Bugfix: LFO had wroing insert parameters.
+- Bugfix: LFO had wrong insert parameters.
+- Bugfix: Got interpolation button names the wrong way round :(
 
 2016-5-14 Will
 - All Identifed data now passed to synthengine in uniform manner.
