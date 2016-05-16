@@ -264,7 +264,7 @@ class MasterUI {selected : {private MiscFuncs}
 //        synth->getRuntime().saveConfig();
         synth->guiClosed(true);
     }}
-      xywh {4 48 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {11 99 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-7 0 400 25} labelsize 13
@@ -555,7 +555,8 @@ paramsui->Show(4);}
       } {
         Fl_Spinner masterkeyshift {
           label {Key Shift}
-          callback {synth->setPkeyshift(o->value() + 64);}
+          callback {synth->setPkeyshift(o->value() + 64);
+send_data(35, o->value());}
           tooltip {Shift pitch +/- N semitones} xywh {216 46 40 18} labelsize 10 align 2 minimum -36 maximum 36 textsize 10
           code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
           code1 {o->value(synth->Pkeyshift - 64);}
@@ -564,7 +565,8 @@ paramsui->Show(4);}
           label Detune
           callback {//
               synth->microtonal.Pglobalfinedetune = o->value();
-              globalfinedetune->changed();}
+              globalfinedetune->changed();
+              send_data(32, o->value());}
           tooltip {global fine detune} xywh {275 34 30 30} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->value(synth->microtonal.Pglobalfinedetune);}
           class WidgetPDial
@@ -574,7 +576,8 @@ paramsui->Show(4);}
           callback {//
               globalfinedetune->value(64.0);
               synth->microtonal.Pglobalfinedetune = 64.0f;
-              globalfinedetune->changed();}
+              globalfinedetune->changed();
+              send_data(34, o->value());}
           tooltip {Master fine detune reset} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
         Fl_Button {} {
@@ -592,12 +595,14 @@ paramsui->Show(4);}
 	              	}
               	}
               }
-              synth->allStop();}
+              synth->allStop();
+              send_data(128, o->value());}
           tooltip {Cease all sound immediately!} xywh {15 32 80 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
-          callback {synth->setPvolume(o->value());}
+          callback {synth->setPvolume(o->value());
+send_data(0, o->value(),false);}
           tooltip {Master Volume} xywh {329 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 align 130 maximum 127 step 1
           code0 {o->value(synth->Pvolume);}
           class WidgetPDial
@@ -617,7 +622,8 @@ paramsui->Show(4);}
         Fl_Button {} {
           label Reset
           callback {//
-    do_new_master();}
+    do_new_master();
+    send_data(96, o->value());}
           tooltip {Clear all dynamic settings} xywh {15 60 80 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
       }
@@ -853,7 +859,7 @@ paramsui->Show(4);}
       Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {open
+        Fl_Group partui {
           xywh {3 255 376 166} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
@@ -884,7 +890,8 @@ paramsui->Show(4);}
           o->redraw();
           npart = nval;
           updatepanel();
-          maxparts->value(synth->getRuntime().NumAvailableParts);}
+          maxparts->value(synth->getRuntime().NumAvailableParts);
+          send_data(14, o->value()-1);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -904,7 +911,8 @@ if (tmp == 48)
 synth->getRuntime().NumAvailableParts = tmp;
 updatepart();
 updatepanel();
-setinspartlist();}
+setinspartlist();
+send_data(15, o->value());}
         xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(synth->getRuntime().NumAvailableParts);}
       }
@@ -1070,6 +1078,53 @@ updatepanel();}
         }
       }
     }
+  }
+  Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
+    code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, 0xf0);
+
+if (Fl::event_button() != 2)
+    return;
+
+string actual;
+if (isInteger)
+    actual = to_string((int)round(value));
+else
+    actual = to_string(value);
+    
+string contstr = "";
+switch (control)
+{
+    case 0:
+    	contstr = "Volume";
+    	break;
+  
+    case 14:
+        contstr = "Part Number";
+        break;
+    case 15:
+        contstr = "Available Parts";
+        break;
+
+    case 32:
+        contstr = "Detune";
+        break;
+    case 34:
+        contstr = "Detune clear";
+        break;
+    case 35:
+        contstr = "Key Shift";
+        break;
+
+    case 96:
+        contstr = "Reset All";
+        break;
+    case 128:
+        contstr = "Stop";
+        break;
+}
+
+synth->getRuntime().Log("Main " + contstr + " value " + actual);} {}
   }
   Function {updatesendwindow()} {} {
     code {//

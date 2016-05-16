@@ -595,7 +595,7 @@ send_data(7, o->value());}
       Fl_Spinner partkeyshift {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;
-send_data(32, o->value());}
+send_data(35, o->value());}
         xywh {202 116 38 18} labelsize 10 minimum -36 maximum 36 textsize 11
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(part->Pkeyshift - 64);}
@@ -682,7 +682,7 @@ send_data(33, o->value());}
             minkcounter->do_callback();
             maxkcounter->value(127);
             maxkcounter->do_callback();
-            send_data(20, o->value());}
+            send_data(96, o->value());}
         tooltip {reset the minimum key to 0 and maximum key to 127} xywh {127 130 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
       }
     }
@@ -1428,15 +1428,12 @@ switch (control)
     case 19:
         contstr = "Max To Last";
         break;
-    case 20:
-        contstr = "Clear";
-        break;
 
-    case 32:
-        contstr = "Key Shift";
-        break;
     case 33:
         contstr = "Key Limit";
+        break;
+    case 35:
+        contstr = "Key Shift";
         break;
 
     case 48:
@@ -1451,6 +1448,10 @@ switch (control)
         break;
     case 58:
         contstr = "Kit Mode";
+        break;
+
+    case 96:
+        contstr = "Clear";
         break;
 }
 

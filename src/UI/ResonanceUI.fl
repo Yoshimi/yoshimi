@@ -430,7 +430,7 @@ send_data(21, o->value());}
         xywh {364 280 62 0} box NO_BOX labelsize 13 align 33 textsize 13
       }
       Fl_Box {} {
-        tooltip {Interpolate the peaks (left button type 0, right button type 1)} xywh {359 264 72 36} box THIN_DOWN_FRAME
+        tooltip {Interpolate the peaks (left button smooth, right button linear)} xywh {359 264 72 36} box THIN_DOWN_FRAME
       }
       Fl_Button {} {
         label S
