@@ -11,8 +11,6 @@ is main volume, key shift etc.
 if part is < 0x40 and kit is 0xff it's the general part
 level controls.
 If kit < 0x10 and engine is  0xff it's the engine enable controls (kit number | engine)
-if kit is 0xf0 you go to the part controllers menu.
-
 
 unsigned char   type
 unsigned char   part
