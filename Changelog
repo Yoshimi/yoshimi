@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-5-18 Will
+- Started moving controls ID text form GUI to main code.
+- New sound Pad Organ :)
+
 2016-5-17 Will
 - Identified controls in Part Controllers.
 - Updated dev-notes/Yoshimi Controller Numbers.ods

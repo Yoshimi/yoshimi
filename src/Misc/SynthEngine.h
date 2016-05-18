@@ -100,6 +100,12 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
         void commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+        void commandMain(float value, unsigned char type, unsigned char control);
+        void commandPart(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
+        void commandAdd(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
+        void commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
+        void commandSub(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char insert);
+        void commandPad(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
 
         void SetProgram(unsigned char chan, unsigned short pgm);
         bool SetProgramToPart(int npart, int pgm, string fname);

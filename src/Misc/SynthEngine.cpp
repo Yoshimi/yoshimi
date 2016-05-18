@@ -731,19 +731,867 @@ void SynthEngine::commandFetch(float value, unsigned char type, unsigned char co
      * while testing, this simply sends everything to commandSend but eventually it will
      * partially do the decding and direction via ring buffers for actualy control.
      */
-    bool isGui = type & 0x20;
-    char button = type & 0x1f;
-    if (isGui && button != 2)
-        commandSend(value, type, control, part, kit, engine, insert, insertParam);
+    commandSend(value, type, control, part, kit, engine, insert, insertParam);
+    return;
 }
 
 
 void SynthEngine::commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
 {
+    bool isGui = type & 0x20;
+    char button = type & 0x1f;
     string isf;
-    if (!(type &0x80))
-        isf = "f";
-    Runtime.Log("\nButton " + asString((int) type & 7) + "\nPart " + asString((int) part) + "\nKit " + asString((int) kit) + "\nEngine " + asString((int) engine) + "\nInsert " + asString((int) insert) + "  Insert Param " + asString((int) insertParam) + "\nControl " + asString((int) control) + "  Value " + asString(value) + isf);
+    if (isGui && button != 2)
+    {
+        if (!(type &0x80))
+            isf = "f";
+        Runtime.Log("\nButton " + asString((int) type & 7) + "\nPart " + asString((int) part) + "\nKit " + asString((int) kit) + "\nEngine " + asString((int) engine) + "\nInsert " + asString((int) insert) + "  Insert Param " + asString((int) insertParam) + "\nControl " + asString((int) control) + "  Value " + asString(value) + isf);
+        return;
+    }
+    if (part == 0xf0)
+        commandMain(value, type, control);
+    else if (kit == 0xff)
+        commandPart(value, type, control, part, kit, engine);
+    else if (engine == 3)
+    {
+        if (insert == 0xff)
+            commandPad(value, type, control, part, kit);
+    }
+    else if (engine == 2)
+    {
+        if (insert == 0xff)
+            commandSub(value, type, control, part, kit, insert);
+    }
+    else if (engine >= 0x80)
+    {
+        if (insert == 0xff)
+            commandAddVoice(value, type, control, part, kit, engine);
+    }
+    else
+    {
+        if (insert == 0xff)
+            commandAdd(value, type, control, part, kit);
+    }
+}
+
+
+void SynthEngine::commandMain(float value, unsigned char type, unsigned char control)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+
+        case 14:
+            contstr = "Part Number";
+            break;
+        case 15:
+            contstr = "Available Parts";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 34:
+            contstr = "Detune clear";
+        break;
+        case 35:
+            contstr = "Key Shift";
+            break;
+
+        case 96:
+            contstr = "Reset All";
+            break;
+        case 128:
+            contstr = "Stop";
+            break;
+    }
+    Runtime.Log("Main " + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandPart(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+
+    string kitnum;
+    if (kit <= 0x10)
+        kitnum = "  Kit " + to_string(kit);
+    else
+        kitnum = "  ";
+
+    string name;
+    if (control >= 0x80)
+    {
+        if (control >= 0xe0)
+            name = "";
+        else
+        {
+            name = "Controller ";
+            if (control >= 0xa0)
+                name += "Portamento ";
+        }
+    }
+    else
+    {
+        switch (engine)
+        {
+            case 1:
+                name = "AddSynth ";
+                break;
+            case 2:
+                name = "SubSynth ";
+                break;
+            case 3:
+                name = "PadSynth ";
+                break;
+        }
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 3:
+            contstr = "Pan Zero";
+            break;
+        case 4:
+            contstr = "Vel Offset";
+            break;
+        case 5:
+            contstr = "Midi";
+            break;
+        case 6:
+            contstr = "Mode";
+            break;
+        case 7:
+            contstr = "Portamento";
+            break;
+        case 8:
+            contstr = "Enable";
+            break;
+        case 9:
+            contstr = "Mute";
+            break;
+
+        case 16:
+            contstr = "Min Note";
+            break;
+        case 17:
+            contstr = "Max Note";
+            break;
+        case 18:
+            contstr = "Min To Last";
+            break;
+        case 19:
+            contstr = "Max To Last";
+            break;
+
+        case 33:
+            contstr = "Key Limit";
+            break;
+        case 35:
+            contstr = "Key Shift";
+            break;
+
+        case 48:
+            contstr = "Humanise";
+            break;
+
+        case 56:
+            contstr = "Mode";
+            break;
+        case 57:
+            contstr = "Drum Mode";
+            break;
+        case 58:
+            contstr = "Kit Mode";
+            break;
+
+        case 96:
+            contstr = "Clear";
+            break;
+
+        case 128:
+            contstr = "Vol Range";
+            break;
+        case 129:
+            contstr = "Vol Enable";
+            break;
+        case 130:
+            contstr = "Pan Width";
+            break;
+        case 131:
+            contstr = "Mod Wheel Depth";
+            break;
+        case 132:
+            contstr = "Exp Mod Wheel";
+            break;
+        case 133:
+            contstr = "Bandwidth depth";
+            break;
+        case 134:
+            contstr = "Exp Bandwidth";
+            break;
+        case 135:
+            contstr = "Expression Enable";
+            break;
+        case 136:
+            contstr = "FM Amp Enable";
+            break;
+        case 137:
+            contstr = "Sustain Ped Enable";
+            break;
+        case 138:
+            contstr = "Pitch Wheel Range";
+            break;
+        case 139:
+            contstr = "Filter Q Depth";
+            break;
+        case 140:
+            contstr = "Filter Cutoff Depth";
+            break;
+
+        case 144:
+            contstr = "Res Cent Freq Depth";
+            break;
+        case 145:
+            contstr = "Res Band Depth";
+            break;
+
+        case 160:
+            contstr = "Time";
+            break;
+        case 161:
+            contstr = "Tme Stretch";
+            break;
+        case 162:
+            contstr = "Threshold";
+            break;
+        case 163:
+            contstr = "Threshold Type";
+            break;
+        case 164:
+            contstr = "Prop Enable";
+            break;
+        case 165:
+            contstr = "Prop Rate";
+            break;
+        case 166:
+            contstr = "Prop depth";
+            break;
+        case 168:
+            contstr = "Enable";
+            break;
+
+        case 224:
+            contstr = "Clear";
+            break;
+    }
+    Runtime.Log("Part " + to_string(part) + kitnum + name + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandAdd(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 3:
+            contstr = "Pan Zero";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+        case 39:
+            contstr = "Rel B Wdth";
+            break;
+
+        case 48:
+            contstr = "Par 1";
+            break;
+        case 49:
+            contstr = "Par 2";
+            break;
+        case 50:
+            contstr = "Force H";
+            break;
+        case 51:
+            contstr = "Position";
+            break;
+
+        case 112:
+            contstr = "Stereo";
+            break;
+        case 113:
+            contstr = "Rnd Grp";
+            break;
+
+        case 120:
+            contstr = "De Pop";
+            break;
+        case 121:
+            contstr = "Punch Strngth";
+            break;
+        case 122:
+            contstr = "Punch Time";
+            break;
+        case 123:
+            contstr = "Punch Strtch";
+            break;
+        case 124:
+            contstr = "Punch Vel";
+            break;
+    }
+
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  AddSynth " + name + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit,unsigned char engine)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name = "";
+    switch (control & 0xF0)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 16:
+            name = " Modulator ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+        case 48:
+            name = " Unison ";
+            break;
+        case 64:
+            name = " Filter ";
+            break;
+        case 80:
+            name = " Modulator Amp ";
+            break;
+        case 96:
+            name = " Modulator Freq ";
+            break;
+        case 112:
+            name = " Modulator Osc ";
+            break;
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 3:
+            contstr = "Pan Zero";
+            break;
+        case 4:
+            contstr = "Minus";
+            break;
+        case 8:
+            contstr = "Enable Env";
+            break;
+        case 9:
+            contstr = "Enable LFO";
+            break;
+
+        case 16:
+            contstr = "Type";
+            break;
+        case 17:
+            contstr = "Extern Mod";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+        case 40:
+            contstr = "Enable Env";
+            break;
+        case 41:
+            contstr = "Enable LFO";
+            break;
+
+        case 48:
+            contstr = "Freq Spread";
+            break;
+        case 49:
+            contstr = "Phase Rnd";
+            break;
+        case 50:
+            contstr = "Stereo";
+            break;
+        case 51:
+            contstr = "Vibrato";
+            break;
+        case 52:
+            contstr = "Vib Speed";
+            break;
+        case 53:
+            contstr = "Size";
+            break;
+        case 54:
+            contstr = "Invert";
+            break;
+        case 56:
+            contstr = "Enable";
+            break;
+
+        case 64:
+            contstr = "Bypass Global";
+            break;
+        case 68:
+            contstr = "Enable";
+            break;
+        case 72:
+            contstr = "Enable Env";
+            break;
+        case 73:
+            contstr = "Enable LFO";
+            break;
+
+        case 80:
+            contstr = "Volume";
+            break;
+        case 81:
+            contstr = "V Sense";
+            break;
+        case 82:
+            contstr = "F Damp";
+            break;
+        case 88:
+            contstr = "Enable Env";
+            break;
+
+        case 96:
+            contstr = "Detune";
+            break;
+        case 99:
+            contstr = "Octave";
+            break;
+        case 100:
+            contstr = "Det type";
+            break;
+        case 101:
+            contstr = "Coarse Det";
+            break;
+        case 104:
+            contstr = "Enable Env";
+            break;
+
+        case 112:
+            contstr = " Phase";
+            break;
+        case 113:
+            contstr = " Source";
+            break;
+
+        case 128:
+            contstr = " Delay";
+            break;
+        case 129:
+            contstr = " ON";
+            break;
+        case 130:
+            contstr = " Resonance";
+            break;
+        case 136:
+            contstr = " Osc Phase";
+            break;
+        case 137:
+            contstr = " Osc Source";
+            break;
+        case 138:
+            contstr = " Sound type";
+            break;
+    }
+
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  AddSynth Voice " + to_string(engine & 0x1f) + name + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandSub(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char insert)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    if (insert == 6)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  Subsynth Harmonic " + to_string(control) + " Amplitude value " + actual);
+        return;
+    }
+
+    if (insert == 7)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  Subsynth Harmonic " + to_string(control) + " Bandwidth value " + actual);
+        return;
+    }
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 16:
+            name = " Bandwidth ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+        case 48:
+            name = " Overtones ";
+            break;
+        case 64:
+            name = " Filter ";
+            break;
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 3:
+            contstr = "Pan Zero";
+            break;
+        case 16:
+            contstr = "Bandwidth";
+            break;
+        case 17:
+            contstr = "Band Scale";
+            break;
+        case 18:
+            contstr = "Env Enab";
+            break;
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+        case 38:
+            contstr = "Env Ena";
+            break;
+        case 48:
+            contstr = "Par 1";
+            break;
+        case 49:
+            contstr = "Par 2";
+            break;
+        case 50:
+            contstr = "Force H";
+            break;
+        case 51:
+            contstr = "Position";
+            break;
+        case 64:
+            contstr = "Enable";
+            break;
+        case 80:
+            contstr = "Filt Stages";
+            break;
+        case 81:
+            contstr = "Mag Type";
+            break;
+        case 82:
+            contstr = "Start";
+            break;
+        case 96:
+            contstr = "Clear Harmonics";
+            break;
+        case 112:
+            contstr = "Stereo";
+            break;
+    }
+
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  SubSynth " + name + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandPad(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 16:
+            name = " Bandwidth ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+        case 48:
+            name = " Overtones ";
+            break;
+        case 64:
+            name = " Harmonic Base ";
+            break;
+        case 80:
+            name = " Harmonic Samples ";
+            break;
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 3:
+            contstr = "Pan Zero";
+            break;
+
+        case 16:
+            contstr = "Bandwidth";
+            break;
+        case 17:
+            contstr = "Band Scale";
+            break;
+        case 19:
+            contstr = "Spect Mode";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+        case 38:
+            contstr = "Env Ena";
+            break;
+
+        case 48:
+            contstr = "Par 1";
+            break;
+        case 49:
+            contstr = "Par 2";
+            break;
+        case 50:
+            contstr = "Force H";
+            break;
+        case 51:
+            contstr = "Position";
+            break;
+
+        case 64:
+            contstr = "Width";
+            break;
+        case 65:
+            contstr = "Freq Mult";
+            break;
+        case 66:
+            contstr = "Str";
+            break;
+        case 67:
+            contstr = "S freq";
+            break;
+        case 68:
+            contstr = "Size";
+            break;
+        case 69:
+            contstr = "Type";
+            break;
+        case 70:
+            contstr = "Halves";
+            break;
+        case 71:
+            contstr = "Par 1";
+            break;
+        case 72:
+            contstr = "Par 2";
+            break;
+        case 73:
+            contstr = "Amp Mult";
+            break;
+        case 74:
+            contstr = "Amp Mode";
+            break;
+        case 75:
+            contstr = "Autoscale";
+            break;
+
+        case 80:
+            contstr = "Base";
+            break;
+        case 81:
+            contstr = "samp/Oct";
+            break;
+        case 82:
+            contstr = "Num Oct";
+            break;
+        case 83:
+            contstr = "Size";
+            break;
+
+        case 104:
+            contstr = "Apply Changes";
+            break;
+
+        case 112:
+            contstr = "Stereo";
+            break;
+
+        case 120:
+            contstr = "De Pop";
+            break;
+        case 121:
+            contstr = "Punch Strngth";
+            break;
+        case 122:
+            contstr = "Punch Time";
+            break;
+        case 123:
+            contstr = "Punch Strtch";
+            break;
+        case 124:
+            contstr = "Punch Vel";
+            break;
+    }
+
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  PadSynth " + name + contstr + " value " + actual);
 }
 
 

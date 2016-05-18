@@ -67,7 +67,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include "VirKeyboardUI.h"} {public local
@@ -109,7 +109,7 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1081,50 +1081,7 @@ updatepanel();}
   }
   Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, 0xf0);
-
-if (Fl::event_button() != 2)
-    return;
-
-string actual;
-if (isInteger)
-    actual = to_string((int)round(value));
-else
-    actual = to_string(value);
-    
-string contstr = "";
-switch (control)
-{
-    case 0:
-    	contstr = "Volume";
-    	break;
-  
-    case 14:
-        contstr = "Part Number";
-        break;
-    case 15:
-        contstr = "Available Parts";
-        break;
-
-    case 32:
-        contstr = "Detune";
-        break;
-    case 34:
-        contstr = "Detune clear";
-        break;
-    case 35:
-        contstr = "Key Shift";
-        break;
-
-    case 96:
-        contstr = "Reset All";
-        break;
-    case 128:
-        contstr = "Stop";
-        break;
-}
-
-synth->getRuntime().Log("Main " + contstr + " value " + actual);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, 0xf0);} {}
   }
   Function {updatesendwindow()} {} {
     code {//
