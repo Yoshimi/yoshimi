@@ -25,8 +25,8 @@ string          name - not using this yet
 
 type bits
 0-4 event button (action to take)
-5   read/write data value
-6   source is GUI (else 0-4 = source & action)
+5   source is GUI (else bits 0-4 = source & action)
+6   read/write data value
 7   round to int (will be sent as float)
 
 

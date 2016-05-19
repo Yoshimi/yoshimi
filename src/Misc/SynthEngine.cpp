@@ -754,24 +754,91 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
         commandPart(value, type, control, part, kit, engine);
     else if (engine == 3)
     {
-        if (insert == 0xff)
-            commandPad(value, type, control, part, kit);
+        switch(insert)
+        {
+            case 0xff:
+                commandPad(value, type, control, part, kit);
+                break;
+            case 0:
+                commandLFO(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+            case 1:
+                commandFilter(value, type, control, part, kit, engine, insert);
+                break;
+             case 2:
+                commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+            case 5:
+            case 6:
+            case 7:
+                commandOscillator(value, type, control, part, kit, engine, insert);
+                break;
+            case 8:
+            case 9:
+                commandResonance(value, type, control, part, kit, engine, insert);
+                break;
+        }
     }
     else if (engine == 2)
     {
-        if (insert == 0xff)
-            commandSub(value, type, control, part, kit, insert);
+        switch (insert)
+        {
+            case 0xff:
+                commandSub(value, type, control, part, kit, insert);
+                break;
+            case 1:
+                commandFilter(value, type, control, part, kit, engine, insert);
+                break;
+            case 2:
+                commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+        }
     }
     else if (engine >= 0x80)
     {
-        if (insert == 0xff)
-            commandAddVoice(value, type, control, part, kit, engine);
+        switch (insert)
+        {
+            case 0xff:
+                commandAddVoice(value, type, control, part, kit, engine);
+                break;
+            case 0:
+                commandLFO(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+            case 1:
+                commandFilter(value, type, control, part, kit, engine, insert);
+                break;
+            case 2:
+                commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+            case 5:
+            case 6:
+            case 7:
+                commandOscillator(value, type, control, part, kit, engine, insert);
+                break;
+        }
     }
-    else
+    else if (engine == 1)
     {
-        if (insert == 0xff)
-            commandAdd(value, type, control, part, kit);
+        switch (insert)
+        {
+            case 0xff:
+                commandAdd(value, type, control, part, kit);
+                break;
+            case 0:
+                commandLFO(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+            case 1:
+                commandFilter(value, type, control, part, kit, engine, insert);
+                break;
+            case 2:
+                commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
+                break;
+            case 8:
+                commandResonance(value, type, control, part, kit, engine, insert);
+                break;
+        }
     }
+    // just do nothing if not recognised
 }
 
 
@@ -1592,6 +1659,530 @@ void SynthEngine::commandPad(float value, unsigned char type, unsigned char cont
     }
 
     Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + "  PadSynth " + name + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandOscillator(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string eng_name;
+    if (engine == 3)
+        eng_name = "  Padsysnth";
+    else
+    {
+        eng_name = "  Addsynth Voice " + to_string( engine & 0x3f);
+        if (engine & 0x40)
+            eng_name += " Modulator";
+    }
+
+    if (insert == 6)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + actual);
+        return;
+    }
+    else if(insert == 7)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + eng_name + " Harmonic " + to_string(control) + " Phase value " + actual);
+        return;
+    }
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Oscillator";
+            break;
+        case 16:
+            name = " Base Funct";
+            break;
+        case 32:
+            name = " Base Mods";
+            break;
+        case 64:
+            name = " Harm Mods";
+            break;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = " Random";
+            break;
+        case 1:
+            contstr = " Mag Type";
+            break;
+        case 2:
+            contstr = " Harm Rnd";
+            break;
+        case 3:
+            contstr = " Harm Rnd Type";
+            break;
+
+        case 16:
+            contstr = " Par";
+            break;
+        case 17:
+            contstr = " Type";
+            break;
+        case 18:
+            contstr = " Mod Par 1";
+            break;
+        case 19:
+            contstr = " Mod Par 2";
+            break;
+        case 20:
+            contstr = " Mod Par 3";
+            break;
+        case 21:
+            contstr = " Mod Type";
+            break;
+
+        case 32:
+            contstr = " Osc Autoclear";
+            break;
+        case 33:
+            contstr = " Osc As Base";
+            break;
+
+        case 34:
+            contstr = " Waveshape Par";
+            break;
+        case 35:
+            contstr = " Waveshape Type";
+            break;
+
+        case 36:
+            contstr = " Osc Filt Par 1";
+            break;
+        case 37:
+            contstr = " Osc Filt Par 2";
+            break;
+        case 38:
+            contstr = " Osc Filt B4 Waveshape";
+            break;
+        case 39:
+            contstr = " Osc Filt Type";
+            break;
+
+        case 40:
+            contstr = " Osc Mod Par 1";
+            break;
+        case 41:
+            contstr = " Osc Mod Par 2";
+            break;
+        case 42:
+            contstr = " Osc Mod Par 3";
+            break;
+        case 43:
+            contstr = " Osc Mod Type";
+            break;
+
+        case 44:
+            contstr = " Osc Spect Par";
+            break;
+        case 45:
+            contstr = " Osc Spect Type";
+            break;
+
+        case 64:
+            contstr = " Shift";
+            break;
+        case 65:
+            contstr = " Reset";
+            break;
+        case 66:
+            contstr = " B4 Waveshape & Filt";
+            break;
+
+        case 67:
+            contstr = " Adapt Param";
+            break;
+        case 68:
+            contstr = " Adapt Base Freq";
+            break;
+        case 69:
+            contstr = " Adapt Power";
+            break;
+        case 70:
+            contstr = " Adapt Type";
+            break;
+
+        case 96:
+            contstr = " Clear Harmonics";
+            break;
+        case 97:
+            contstr = " Conv To Sine";
+            break;
+
+        case 104:
+            contstr = " Apply Changes";
+            break;
+    }
+
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + eng_name + name + contstr + "  value " + actual);
+
+}
+
+
+void SynthEngine::commandResonance(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name;
+    if (engine == 1)
+        name = "  AddSynth";
+    else
+        name = "  PadSynth";
+
+    if (insert == 9)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + " Resonance Point " + to_string(control) + "  value " + actual);
+        return;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "Max dB";
+            break;
+        case 1:
+            contstr = "Centre Freq";
+            break;
+        case 2:
+            contstr = "Octaves";
+            break;
+
+        case 8:
+            contstr = "Enable";
+            break;
+
+        case 10:
+            contstr = "Random 1";
+            break;
+        case 11:
+            contstr = "Random 2";
+            break;
+        case 12:
+            contstr = "Random 3";
+            break;
+
+        case 20:
+            contstr = "Interpolate Peaks";
+            break;
+        case 21:
+            contstr = "Protect Fundamental";
+            break;
+
+        case 96:
+            contstr = "Clear";
+            break;
+        case 97:
+            contstr = "Smooth";
+            break;
+
+        case 104:
+            contstr = "Apply Changes";
+            break;
+    }
+
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + " Resonance " + contstr + "  value " + actual);
+}
+
+
+void SynthEngine::commandLFO(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name;
+    if (engine == 1)
+        name = "  AddSynth";
+    else if (engine == 3)
+        name = "  PadSynth";
+    else if (engine >= 0x80)
+        name = "  AddSynth Voice ";
+
+    string lfo;
+    switch (parameter)
+    {
+        case 0:
+            lfo = "  Amp";
+            break;
+        case 1:
+            lfo = "  Freq";
+            break;
+        case 2:
+            lfo = "  Filt";
+            break;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "Freq";
+            break;
+        case 1:
+            contstr = "Depth";
+            break;
+        case 2:
+            contstr = "Delay";
+            break;
+        case 3:
+            contstr = "Start";
+            break;
+        case 4:
+            contstr = "AmpRand";
+            break;
+        case 5:
+            contstr = "Type";
+            break;
+        case 6:
+            contstr = "Cont";
+            break;
+        case 7:
+            contstr = "FreqRand";
+            break;
+        case 8:
+            contstr = "Stretch";
+            break;
+    }
+
+    if (engine < 0x80)
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + lfo + " LFO  " + contstr + " value " + actual);
+    else
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + to_string(engine & 0x3f) + lfo + " LFO  " + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandFilter(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name;
+    if (part == 0xf0)
+        name = "  Sys or Ins";
+    else if (engine == 1)
+        name = "  AddSynth";
+    else if (engine == 2)
+        name = "  SubSynth";
+    else if (engine == 3)
+        name = "  PadSynth";
+    else if (engine >= 0x80)
+        name = "  Adsynth Voice ";
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "C_Freq";
+            break;
+        case 1:
+            contstr = "Q";
+            break;
+        case 3:
+            contstr = "VsensA";
+            break;
+        case 4:
+            contstr = "Vsens";
+            break;
+        case 2:
+            contstr = "FreqTr";
+            break;
+        case 5:
+            contstr = "gain";
+            break;
+        case 6:
+            contstr = "Stages";
+            break;
+        case 7:
+            contstr = "Filt Type";
+            break;
+        case 8:
+            contstr = "An Type";
+            break;
+        case 9:
+            contstr = "St Type";
+            break;
+
+        case 16:
+            contstr = "Form Fr Sl";
+            break;
+        case 17:
+            contstr = "Form Vw Cl";
+            break;
+        case 18:
+            contstr = "Form Freq";
+            break;
+        case 19:
+            contstr = "Form Q";
+            break;
+        case 20:
+            contstr = "Form Amp";
+            break;
+        case 21:
+            contstr = "Form Stretch";
+            break;
+        case 22:
+            contstr = "Form Cent Freq";
+            break;
+        case 23:
+            contstr = "Form Octave";
+            break;
+
+        case 32:
+            contstr = "Formants";
+            break;
+        case 33:
+            contstr = "Vowel Num";
+            break;
+        case 34:
+            contstr = "Formant Num";
+            break;
+        case 35:
+            contstr = "Seq Size";
+            break;
+        case 36:
+            contstr = "Seq Pos";
+            break;
+        case 37:
+            contstr = "Seq Vowel";
+            break;
+        case 38:
+            contstr = "Neg Input";
+            break;
+    }
+
+    if (engine < 0x80)
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + " Filter  " + contstr + " value " + actual);
+    else
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + to_string(engine & 0x7f) + " Filter  " + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name;
+    if (part == 0xf0)
+        name = "  Sys or Ins";
+    else if (engine == 1)
+        name = "  AddSynth";
+    else if (engine == 2)
+        name = "  SubSynth";
+    else if (engine == 3)
+        name = "  PadSynth";
+    else if (engine >= 0x80)
+    {
+        name = "  Adsynth Voice ";
+        if (engine >= 0xC0)
+            name += "Modulator ";
+    }
+
+    string env;
+    switch(parameter)
+    {
+        case 0:
+            env = "  Amp";
+            break;
+        case 1:
+            env = "  Freq";
+            break;
+        case 2:
+            env = "  Filt";
+            break;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "A val";
+            break;
+        case 1:
+            contstr = "A dt";
+            break;
+        case 2:
+            contstr = "D val";
+            break;
+        case 3:
+            contstr = "D dt";
+            break;
+        case 4:
+            contstr = "S val";
+            break;
+        case 5:
+            contstr = "R dt";
+            break;
+        case 6:
+            contstr = "R val";
+            break;
+        case 7:
+            contstr = "Stretch";
+            break;
+
+        case 16:
+            contstr = "frcR";
+            break;
+        case 17:
+            contstr = "L";
+            break;
+
+        case 24:
+            contstr = "Edit";
+            break;
+
+        case 32:
+            contstr = "Freemode";
+            break;
+        case 33:
+            contstr = "Add Point";
+            break;
+        case 34:
+            contstr = "Del Point";
+            break;
+        case 35:
+            contstr = "Sust";
+            break;
+        case 39:
+            contstr = "Stretch";
+            break;
+
+        case 48:
+            contstr = "frcR";
+            break;
+        case 49:
+            contstr = "L";
+            break;
+    }
+
+    if (engine < 0x80)
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + env + " Env  " + contstr + " value " + actual);
+    else
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + to_string(engine & 0x3f) + env + " Env  " + contstr + " value " + actual);
 }
 
 

@@ -205,69 +205,7 @@ if (type == 1)
 else if (type == 0)
     type = 1;
     
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 0, type);
-
-if (Fl::event_button() != 2)
-    return;
-
-string actual;
-if (isInteger)
-    actual = to_string((int)round(value));
-else
-    actual = to_string(value);
-
-string name;
-if (engine == 1)
-    name = "  AddSynth";
-else if (engine == 3)
-    name = "  PadSynth";
-else if (engine >= 0x80)
-    name = "  AddSynth Voice ";
-
-string lfo;
-if (type == 2)
-    lfo = "  Filt";
-else if (type == 1)
-    lfo = "  Freq";
-else
-    lfo = "  Amp";
-
-string contstr;
-switch (control)
-{
-    case 0:
-    	contstr = "Freq";
-    	break;
-    case 1:
-        contstr = "Depth";
-        break;
-    case 2:
-        contstr = "Delay";
-        break;
-    case 3:
-        contstr = "Start";
-        break;
-    case 4:
-        contstr = "AmpRand";
-        break;
-    case 5:
-        contstr = "Type";
-        break;
-    case 6:
-        contstr = "Cont";
-        break;
-    case 7:
-        contstr = "FreqRand";
-        break;
-    case 8:
-        contstr = "Stretch";
-        break;
-}
-
-if (engine < 0x80)
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
-else
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + to_string(engine & 0x3f) + lfo + " LFO  " + contstr + " value " + actual);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 0, type);} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {pars=lfopars_;

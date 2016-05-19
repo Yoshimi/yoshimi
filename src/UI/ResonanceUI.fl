@@ -70,24 +70,7 @@ applybutton=NULL;} {}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 9);
-
-if (Fl::event_button() != 2)
-    return;
-
-string name;
-if (engine == 1)
-    name = "  AddSynth";
-else
-    name = "  PadSynth";
-
-string actual;
-if (isInteger)
-    actual = to_string((int)round(value));
-else
-    actual = to_string(value);
-
-synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + actual);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 9);} {}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -477,70 +460,7 @@ send_data(21, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 8);
-
-if (Fl::event_button() != 2)
-    return;
-
-string name;
-if (engine == 1)
-    name = "  AddSynth ";
-else
-    name = "  PadSynth ";
-
-string actual;
-if (isInteger)
-    actual = to_string((int)round(value));
-else
-    actual = to_string(value);
-
-string contstr;
-switch (control)
-{
-    case 0:
-        contstr = "Max dB";
-        break;
-    case 1:
-        contstr = "Centre Freq";
-        break;
-    case 2:
-        contstr = "Octaves";
-        break;
-
-    case 8:
-        contstr = "Enable";
-        break;
-
-    case 10:
-        contstr = "Random 1";
-        break;
-    case 11:
-        contstr = "Random 2";
-        break;
-    case 12:
-        contstr = "Random 3";
-        break;
-
-    case 20:
-        contstr = "Interpolate Peaks";
-        break;
-    case 21:
-        contstr = "Protect Fundamental";
-        break;
-
-    case 96:
-        contstr = "Clear";
-        break;
-    case 97:
-        contstr = "Smooth";
-        break;
-
-    case 104:
-        contstr = "Apply Changes";
-        break;
-}
-
-synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + actual);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 8);} {}
   }
   Function {ResonanceUI(Resonance *respar_, int npart_, int kititem_, int engine_)} {} {
     code {//

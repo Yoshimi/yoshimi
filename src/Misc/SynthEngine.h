@@ -106,6 +106,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
         void commandSub(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char insert);
         void commandPad(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
+        void commandOscillator(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
+        void commandResonance(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
+        void commandLFO(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
+        void commandFilter(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
+        void commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
 
         void SetProgram(unsigned char chan, unsigned short pgm);
         bool SetProgramToPart(int npart, int pgm, string fname);
