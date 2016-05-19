@@ -148,7 +148,7 @@ else (JACK_FOUND)
 endif (JACK_FOUND)
 
 # Boost
-find_package (Boost)
+find_package (Boost COMPONENTS system filesystem REQUIRED)
 if (Boost_FOUND)
     message(STATUS "Found boost headers version " ${Boost_VERSION})
 else (Boost_FOUND)
@@ -458,6 +458,8 @@ set(ExternLibraries
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
     ${Readline_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
     ncurses
     z
     dl
