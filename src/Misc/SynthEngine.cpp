@@ -749,7 +749,14 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
         return;
     }
     if (part == 0xf0)
-        commandMain(value, type, control);
+    {
+        if (engine == 32)
+            ;   // system effects
+        else if (engine == 33)
+            ;   // insertion effects
+        else
+            commandMain(value, type, control);
+    }
     else if (kit == 0xff)
         commandPart(value, type, control, part, kit, engine);
     else if (engine == 3)
@@ -765,7 +772,9 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
             case 1:
                 commandFilter(value, type, control, part, kit, engine, insert);
                 break;
-             case 2:
+            case 2:
+            case 3:
+            case 4:
                 commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
                 break;
             case 5:
@@ -790,6 +799,8 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
                 commandFilter(value, type, control, part, kit, engine, insert);
                 break;
             case 2:
+            case 3:
+            case 4:
                 commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
                 break;
         }
@@ -808,6 +819,8 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
                 commandFilter(value, type, control, part, kit, engine, insert);
                 break;
             case 2:
+            case 3:
+            case 4:
                 commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
                 break;
             case 5:
@@ -831,6 +844,8 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
                 commandFilter(value, type, control, part, kit, engine, insert);
                 break;
             case 2:
+            case 3:
+            case 4:
                 commandEnvelope(value, type, control, part, kit, engine, insert, insertParam);
                 break;
             case 8:
@@ -2087,9 +2102,7 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
         actual = to_string(value);
 
     string name;
-    if (part == 0xf0)
-        name = "  Sys or Ins";
-    else if (engine == 1)
+    if (engine == 1)
         name = "  AddSynth";
     else if (engine == 2)
         name = "  SubSynth";
@@ -2100,6 +2113,7 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
         name = "  Adsynth Voice ";
         if (engine >= 0xC0)
             name += "Modulator ";
+        name += to_string(engine & 0x3f);
     }
 
     string env;
@@ -2114,6 +2128,18 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
         case 2:
             env = "  Filt";
             break;
+    }
+
+
+    if (insert == 3)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name  + env + " Env Freemode Control " + to_string(control) + "  X value " + actual);
+        return;
+    }
+    if (insert == 4)
+    {
+        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name  + env + " Env Freemode Control " +  to_string(control) + "  Y value " + actual);
+        return;
     }
 
     string contstr;
@@ -2179,10 +2205,7 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
             break;
     }
 
-    if (engine < 0x80)
-        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + env + " Env  " + contstr + " value " + actual);
-    else
-        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + to_string(engine & 0x3f) + env + " Env  " + contstr + " value " + actual);
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name  + env + " Env  " + contstr + " value " + actual);
 }
 
 

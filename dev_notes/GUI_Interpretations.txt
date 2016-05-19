@@ -37,9 +37,9 @@ engine
 >= 0xC0 adsynth voice modulator
 >= 0x80 addsynth voice
 
-kit (if engine is main)
-0   sys \
-1   ins / currently only for effects
+engine (if part is main)
+32   sys \
+33   ins / currently only for effects
 
 
 inserts
@@ -83,4 +83,5 @@ insert param
             1 = Frequency
             2 = Filter
 
-?       envelope free mode
+       envelope free mode
+            0 to 39 = point number
