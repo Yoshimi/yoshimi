@@ -1883,13 +1883,7 @@ void SynthEngine::commandResonance(float value, unsigned char type, unsigned cha
             break;
 
         case 10:
-            contstr = "Random 1";
-            break;
-        case 11:
-            contstr = "Random 2";
-            break;
-        case 12:
-            contstr = "Random 3";
+            contstr = "Random";
             break;
 
         case 20:

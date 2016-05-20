@@ -1,5 +1,9 @@
 yoshimi 1.3.x
 
+2016-5-20 Will
+- Rearanged some control values.
+- Corrected amp/freq lfo anomaly.
+
 2016-5-19 Will
 - Completed moving controls ID text from GUI to main code.
 - Corrected dev-notes/Yoshimi Controller Numbers.ods

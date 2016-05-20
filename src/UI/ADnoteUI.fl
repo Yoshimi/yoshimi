@@ -201,7 +201,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {88 197 770 580} type Double hide
+      xywh {10 324 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -494,7 +494,7 @@ send_data(82, o->value());}
             Fl_Group voicefreqlfogroup {
               label {Frequency LFO     }
               xywh {215 290 230 70} box FLAT_BOX color 47 align 144
-              code0 {o->init(pars->VoicePar[nvoice].FreqLfo, npart, kititem, 128 + nvoice, 0);}
+              code0 {o->init(pars->VoicePar[nvoice].FreqLfo, npart, kititem, 128 + nvoice, 1);}
               code1 {if (pars->VoicePar[nvoice].PFreqLfoEnabled==0) o->deactivate();}
               class LFOUI
             } {}
@@ -855,7 +855,7 @@ send_data(1, o->value());}
           Fl_Group voiceamplfogroup {
             label {Amplitude LFO     }
             xywh {10 175 230 70} box FLAT_BOX color 47 align 144
-            code0 {o->init(pars->VoicePar[nvoice].AmpLfo, npart, kititem, 128 + nvoice, 1);}
+            code0 {o->init(pars->VoicePar[nvoice].AmpLfo, npart, kititem, 128 + nvoice, 0);}
             code1 {if (pars->VoicePar[nvoice].PAmpLfoEnabled==0) o->deactivate();}
             class LFOUI
           } {}
@@ -1134,7 +1134,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Group freqlfo {
           label {Frequency LFO     } open
           xywh {215 295 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, 1, 0);}
+          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, 1, 1);}
           class LFOUI
         } {}
         Fl_Slider freq {
@@ -1282,7 +1282,7 @@ send_data(124, o->value());}
         Fl_Group amplfo {
           label {Amplitude LFO          }
           xywh {10 145 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, 1, 1);}
+          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, 1, 0);}
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {

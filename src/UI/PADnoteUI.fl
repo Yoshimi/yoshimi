@@ -884,7 +884,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 315 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(pars->FreqLfo, npart, kititem, 3, 0);}
+              code0 {o->init(pars->FreqLfo, npart, kititem, 3, 1);}
               class LFOUI
             } {}
             Fl_Slider detune {
@@ -1035,7 +1035,7 @@ send_data(124, o->value());}
             Fl_Group amplfo {
               label {Amplitude LFO     } open
               xywh {10 165 230 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->AmpLfo, npart, kititem, 3, 1);}
+              code0 {o->init(pars->AmpLfo, npart, kititem, 3, 0);}
               class LFOUI
             } {}
             Fl_Check_Button stereo {

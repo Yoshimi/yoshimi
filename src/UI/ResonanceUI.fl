@@ -377,27 +377,27 @@ if ((Fl::event_button() == 3))
         code0 {o->value(respar->Poctavesfreq);}
       }
       Fl_Button {} {
-        label RND2
-        callback {respar->randomize(1);
-resonancewindow->redraw();
-redrawPADnoteApply();
-send_data(11, o->value());}
-        tooltip {Randomize the resonance function} xywh {583 276 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
-      }
-      Fl_Button {} {
         label RND1
         callback {respar->randomize(0);
 resonancewindow->redraw();
 redrawPADnoteApply();
-send_data(10, o->value());}
+send_data(10, 0);}
         tooltip {Randomize the resonance function} xywh {583 264 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
+      }
+      Fl_Button {} {
+        label RND2
+        callback {respar->randomize(1);
+resonancewindow->redraw();
+redrawPADnoteApply();
+send_data(10, 1);}
+        tooltip {Randomize the resonance function} xywh {583 276 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
       }
       Fl_Button {} {
         label RND3
         callback {respar->randomize(2);
 resonancewindow->redraw();
 redrawPADnoteApply();
-send_data(12, o->value());}
+send_data(10, 2);}
         tooltip {Randomize the resonance function} xywh {583 288 42 12} box THIN_UP_BOX labelfont 1 labelsize 10
       }
       Fl_Check_Button p1st {
