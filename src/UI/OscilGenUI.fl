@@ -463,7 +463,7 @@ class OscilEditor {selected : {public PresetsUI_}
       label {ADsynth Oscillator Editor}
       xywh {12 36 735 595} type Double hide
       code0 {string tname;}
-      code1 {if (engine == 3) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
+      code1 {if (engine == 2) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
       code2 {if (engine & 0x40) tname += " Modulation Oscillator"; else tname += " Oscillator";}
       code3 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle(tname).c_str());}
     } {

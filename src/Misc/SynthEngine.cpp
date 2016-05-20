@@ -752,14 +752,14 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
     {
         if (engine == 32)
             ;   // system effects
-        else if (engine == 33)
+        else if (engine == 64)
             ;   // insertion effects
         else
             commandMain(value, type, control);
     }
     else if (kit == 0xff)
         commandPart(value, type, control, part, kit, engine);
-    else if (engine == 3)
+    else if (engine == 2)
     {
         switch(insert)
         {
@@ -788,7 +788,7 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
                 break;
         }
     }
-    else if (engine == 2)
+    else if (engine == 1)
     {
         switch (insert)
         {
@@ -830,7 +830,7 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
                 break;
         }
     }
-    else if (engine == 1)
+    else if (engine == 0)
     {
         switch (insert)
         {
@@ -931,13 +931,13 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
     {
         switch (engine)
         {
-            case 1:
+            case 0:
                 name = "AddSynth ";
                 break;
-            case 2:
+            case 1:
                 name = "SubSynth ";
                 break;
-            case 3:
+            case 2:
                 name = "PadSynth ";
                 break;
         }
@@ -1686,7 +1686,7 @@ void SynthEngine::commandOscillator(float value, unsigned char type, unsigned ch
         actual = to_string(value);
 
     string eng_name;
-    if (engine == 3)
+    if (engine == 2)
         eng_name = "  Padsysnth";
     else
     {
@@ -1854,7 +1854,7 @@ void SynthEngine::commandResonance(float value, unsigned char type, unsigned cha
         actual = to_string(value);
 
     string name;
-    if (engine == 1)
+    if (engine == 0)
         name = "  AddSynth";
     else
         name = "  PadSynth";
@@ -1918,12 +1918,12 @@ void SynthEngine::commandLFO(float value, unsigned char type, unsigned char cont
         actual = to_string(value);
 
     string name;
-    if (engine == 1)
+    if (engine == 0)
         name = "  AddSynth";
-    else if (engine == 3)
+    else if (engine == 2)
         name = "  PadSynth";
     else if (engine >= 0x80)
-        name = "  AddSynth Voice ";
+        name = "  AddSynth Voice " + to_string(engine & 0x3f);
 
     string lfo;
     switch (parameter)
@@ -1971,10 +1971,7 @@ void SynthEngine::commandLFO(float value, unsigned char type, unsigned char cont
             break;
     }
 
-    if (engine < 0x80)
-        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + lfo + " LFO  " + contstr + " value " + actual);
-    else
-        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + to_string(engine & 0x3f) + lfo + " LFO  " + contstr + " value " + actual);
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + lfo + " LFO  " + contstr + " value " + actual);
 }
 
 
@@ -1989,14 +1986,14 @@ void SynthEngine::commandFilter(float value, unsigned char type, unsigned char c
     string name;
     if (part == 0xf0)
         name = "  Sys or Ins";
-    else if (engine == 1)
+    else if (engine == 0)
         name = "  AddSynth";
-    else if (engine == 2)
+    else if (engine == 1)
         name = "  SubSynth";
-    else if (engine == 3)
+    else if (engine == 2)
         name = "  PadSynth";
     else if (engine >= 0x80)
-        name = "  Adsynth Voice ";
+        name = "  Adsynth Voice " + to_string(engine & 0x3f);
 
     string contstr;
     switch (control)
@@ -2080,10 +2077,7 @@ void SynthEngine::commandFilter(float value, unsigned char type, unsigned char c
             break;
     }
 
-    if (engine < 0x80)
-        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + " Filter  " + contstr + " value " + actual);
-    else
-        Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + to_string(engine & 0x7f) + " Filter  " + contstr + " value " + actual);
+    Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name + " Filter  " + contstr + " value " + actual);
 }
 
 
@@ -2096,11 +2090,11 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
         actual = to_string(value);
 
     string name;
-    if (engine == 1)
+    if (engine == 0)
         name = "  AddSynth";
-    else if (engine == 2)
+    else if (engine == 1)
         name = "  SubSynth";
-    else if (engine == 3)
+    else if (engine == 2)
         name = "  PadSynth";
     else if (engine >= 0x80)
     {

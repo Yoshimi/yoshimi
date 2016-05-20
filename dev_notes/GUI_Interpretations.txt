@@ -31,15 +31,15 @@ type bits
 
 
 engine
-1       addsynth
-2       subsynth
-3       padsynth
+0       addsynth
+1       subsynth
+2       padsynth
 >= 0xC0 adsynth voice modulator
 >= 0x80 addsynth voice
 
 engine (if part is main)
 32   sys \
-33   ins / currently only for effects
+64   ins / currently only for effects
 
 
 inserts

@@ -507,7 +507,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
     code {//
     ADvsPAD = _ADvsPAD;
     string tname;
-    if (engine == 1)
+    if (engine == 0)
         tname = "AddSynth Resonance";
     else
         tname = "PadSynth Resonance ";

@@ -1103,7 +1103,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Group freqenv {
           label {ADSynth Global - Frequency Envelope} open
           xywh {10 295 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, 1, 1);}
+          code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, 0, 1);}
           class EnvelopeUI
         } {}
         Fl_Counter octave {
@@ -1134,7 +1134,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         Fl_Group freqlfo {
           label {Frequency LFO     } open
           xywh {215 295 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, 1, 1);}
+          code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, 0, 1);}
           class LFOUI
         } {}
         Fl_Slider freq {
@@ -1276,13 +1276,13 @@ send_data(124, o->value());}
         Fl_Group ampenv {
           label {ADSynth Global - Amplitude Envelope}
           xywh {10 75 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, 1, 0);}
+          code0 {o->init(pars->GlobalPar.AmpEnvelope, npart, kititem, 0, 0);}
           class EnvelopeUI
         } {}
         Fl_Group amplfo {
           label {Amplitude LFO          }
           xywh {10 145 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, 1, 0);}
+          code0 {o->init(pars->GlobalPar.AmpLfo, npart, kititem, 0, 0);}
           class LFOUI
         } {}
         Fl_Check_Button rndgrp {
@@ -1300,19 +1300,19 @@ send_data(113, o->value());}
         Fl_Group filterenv {
           label {ADSynth Global - Filter Envelope}
           xywh {250 110 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterEnvelope, npart, kititem, 1, 2);}
+          code0 {o->init(pars->GlobalPar.FilterEnvelope, npart, kititem, 0, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterlfo {
           label {Filter LFO}
           xywh {250 180 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.FilterLfo, npart, kititem, 1, 2);}
+          code0 {o->init(pars->GlobalPar.FilterLfo, npart, kititem, 0, 2);}
           class LFOUI
         } {}
         Fl_Group filterui {
           label {ADsynth Global - Filter}
           xywh {250 35 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-          code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction, npart, kititem, 1);}
+          code0 {o->init(pars->GlobalPar.GlobalFilter, &pars->GlobalPar.PFilterVelocityScale, &pars->GlobalPar.PFilterVelocityScaleFunction, npart, kititem, 0);}
           class FilterUI
         } {}
       }
@@ -1477,7 +1477,7 @@ if ((Fl::event_button() == 3))
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 1);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 0);} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
@@ -1486,7 +1486,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         npart = npart_;
         kititem = kititem_;
         nvoice = 0;
-        resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 1);
+        resui = new ResonanceUI(pars->GlobalPar.Reson, npart, kititem, 0);
         make_window();} {}
   }
   Function {~ADnoteUI()} {return_type virtual

@@ -459,7 +459,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             label Change
             callback {//
     if (oscui!=NULL) delete (oscui);
-        oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton, synth, npart, kititem, 3);
+        oscui = new OscilEditor(pars->oscilgen, osc, cbwidget, applybutton, synth, npart, kititem, 2);
     if ((Fl::event_button() == 3))
         padnotewindow->hide();}
             xywh {375 270 60 20} box THIN_UP_BOX labelfont 1 labelsize 11
@@ -850,7 +850,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             Fl_Group freqenv {
               label {PADSynth - Frequency Envelope}
               xywh {10 315 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FreqEnvelope, npart, kititem, 3, 1);}
+              code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);}
               class EnvelopeUI
             } {}
             Fl_Counter octave {
@@ -884,7 +884,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             Fl_Group freqlfo {
               label {Frequency LFO     }
               xywh {215 315 230 70} box FLAT_BOX color 47 labelsize 12 align 144
-              code0 {o->init(pars->FreqLfo, npart, kititem, 3, 1);}
+              code0 {o->init(pars->FreqLfo, npart, kititem, 2, 1);}
               class LFOUI
             } {}
             Fl_Slider detune {
@@ -936,7 +936,7 @@ send_data(33, o->value());}
             }
           }
           Fl_Group {} {
-            label AMPLITUDE
+            label AMPLITUDE open
             xywh {5 25 240 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
           } {
             Fl_Dial volume {
@@ -1029,13 +1029,13 @@ send_data(124, o->value());}
             Fl_Group ampenv {
               label {PADSynth - Amplitude Envelope} open
               xywh {10 95 205 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->AmpEnvelope, npart, kititem, 3, 0);}
+              code0 {o->init(pars->AmpEnvelope, npart, kititem, 2, 0);}
               class EnvelopeUI
             } {}
             Fl_Group amplfo {
               label {Amplitude LFO     } open
               xywh {10 165 230 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->AmpLfo, npart, kititem, 3, 0);}
+              code0 {o->init(pars->AmpLfo, npart, kititem, 2, 0);}
               class LFOUI
             } {}
             Fl_Check_Button stereo {
@@ -1053,19 +1053,19 @@ send_data(112, o->value());}
             Fl_Group filterenv {
               label {PADSynth - Filter Envelope} open
               xywh {250 130 275 70} box FLAT_BOX color 51 labelsize 12 align 144
-              code0 {o->init(pars->FilterEnvelope, npart, kititem, 3, 2);}
+              code0 {o->init(pars->FilterEnvelope, npart, kititem, 2, 2);}
               class EnvelopeUI
             } {}
             Fl_Group filterlfo {
               label {Filter LFO     } open
               xywh {250 200 230 70} box FLAT_BOX color 47 labelfont 1 labelsize 12 align 144
-              code0 {o->init(pars->FilterLfo, npart, kititem, 3, 2);}
+              code0 {o->init(pars->FilterLfo, npart, kititem, 2, 2);}
               class LFOUI
             } {}
             Fl_Group filterui {
               label {PADsynth - Filter}
               xywh {250 55 275 75} box FLAT_BOX color 50 labelsize 12 align 144
-              code0 {o->init(pars->GlobalFilter,&pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 3);}
+              code0 {o->init(pars->GlobalFilter,&pars->PFilterVelocityScale,&pars->PFilterVelocityScaleFunction, npart, kititem, 2);}
               class FilterUI
             } {}
           }
@@ -1130,16 +1130,16 @@ pars->export2wav(filename);}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 3);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 2);} {}
   }
   Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
-synth = parameters->getSynthEngine();
+	synth = parameters->getSynthEngine();
         pars = parameters;
         npart = npart_;
         kititem = kititem_;
         oscui = NULL;
-        resui = new ResonanceUI(pars->resonance, npart, kititem, 3);
+        resui = new ResonanceUI(pars->resonance, npart, kititem, 2);
         make_window();} {}
   }
   Function {refresh(void)} {} {
