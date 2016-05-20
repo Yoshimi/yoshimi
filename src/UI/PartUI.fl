@@ -922,7 +922,7 @@ send_data(128, o->value());}
             ninseff = o->value() - 1;
             insefftype->value(part->partefx[ninseff]->geteffect());
             // insefftype->do_callback();
-            inseffectui->refresh(part->partefx[ninseff]);
+            inseffectui->refresh(part->partefx[ninseff], npart);
             int x = part->Pefxroute[ninseff];
             if (x == 127)
                 x = 1;
@@ -936,7 +936,7 @@ send_data(128, o->value());}
             synth->actionLock(lockmute);
             part->partefx[ninseff]->changeeffect(o->value());
             synth->actionLock(unlock);
-            inseffectui->refresh(part->partefx[ninseff]);}
+            inseffectui->refresh(part->partefx[ninseff], npart);}
         tooltip {Effect Type} xywh {104 7 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
@@ -982,7 +982,7 @@ send_data(128, o->value());}
       } {
         Fl_Group inseffectui {
           xywh {5 37 380 95}
-          code0 {o->init(part->partefx[ninseff]);}
+          code0 {o->init(part->partefx[ninseff], npart);}
           class EffUI
         } {}
       }

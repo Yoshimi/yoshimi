@@ -749,14 +749,9 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
         return;
     }
     if (part == 0xf0)
-    {
-        if (engine == 32)
-            ;   // system effects
-        else if (engine == 64)
-            ;   // insertion effects
-        else
-            commandMain(value, type, control);
-    }
+        commandMain(value, type, control);
+    else if (part == 0xf1 || part == 0xf2 || (insert >= 16 && insert < 32))
+        commandEffects(value, type, control, part, insert);
     else if (kit == 0xff)
         commandPart(value, type, control, part, kit, engine);
     else if (engine == 2)
@@ -1984,8 +1979,10 @@ void SynthEngine::commandFilter(float value, unsigned char type, unsigned char c
         actual = to_string(value);
 
     string name;
-    if (part == 0xf0)
-        name = "  Sys or Ins";
+    if (part == 0xf1)
+        name = "  Sys";
+    else if (part == 0xf1)
+        name = "Ins";
     else if (engine == 0)
         name = "  AddSynth";
     else if (engine == 1)
@@ -2195,6 +2192,30 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
 
     Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name  + env + " Env  " + contstr + " value " + actual);
 }
+
+
+void SynthEngine::commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char insert)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name;
+    if (part == 0xf1)
+        name = "System";
+    else if (part == 0xf2)
+        name = "Insert";
+    else
+        name = "Part " + to_string(part);
+    name += " Effect ";
+
+    string contstr = "  Control " + to_string(control);
+
+    Runtime.Log(name + "Type " + to_string(insert) + contstr + "  Value " + actual);
+}
+
 
 
 void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)

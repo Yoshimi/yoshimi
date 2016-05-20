@@ -7,6 +7,8 @@ e.g.
 if part is 0xf0 (main) and kit is 0xff you're there and it
 is main volume, key shift etc.
 
+part is 0xf1 for system effects.
+part is 0xf2 for insertion effects
 
 if part is < 0x40 and kit is 0xff it's the general part
 level controls.
@@ -36,10 +38,6 @@ engine
 2       padsynth
 >= 0xC0 adsynth voice modulator
 >= 0x80 addsynth voice
-
-engine (if part is main)
-32   sys \
-64   ins / currently only for effects
 
 
 inserts

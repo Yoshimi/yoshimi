@@ -5,6 +5,7 @@ yoshimi 1.3.x
 - Corrected amp/freq lfo anomaly.
 - Changed engine numbers.
 - Updated docs.
+- Started Identifying effects controls.
 
 2016-5-19 Will
 - Completed moving controls ID text from GUI to main code.

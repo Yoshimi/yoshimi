@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,22 +29,22 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "EffUI.h"} {public local
-} 
+}
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
@@ -67,49 +67,49 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
-} {selected in_source in_header
-} 
+} {in_source in_header
+}
 
 decl {\#include "VirKeyboardUI.h"} {public local
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "PartUI.h"} {public local
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public local
-} 
+}
 
 decl {\#include "MasterMiscUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-} 
+}
 
 decl {class MasterUI;} {public local
-} 
+}
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -645,7 +645,7 @@ send_data(0, o->value(),false);}
             callback {//
               nsyseff = o->value() - 1;
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-              syseffectui->refresh(synth->sysefx[nsyseff]);}
+              syseffectui->refresh(synth->sysefx[nsyseff], 0xf1);}
             xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
@@ -656,7 +656,7 @@ send_data(0, o->value(),false);}
               synth->actionLock(lockmute);
               synth->sysefx[nsyseff]->changeeffect(o->value());
               synth->actionLock(unlock);
-              syseffectui->refresh(synth->sysefx[nsyseff]);
+              syseffectui->refresh(synth->sysefx[nsyseff], 0xf1);
               showSysEfxUI();}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
@@ -727,7 +727,7 @@ send_data(0, o->value(),false);}
               ninseff = o->value() - 1;
               insefftype->value(synth->insefx[ninseff]->geteffect());
               inseffpart->value(synth->Pinsparts[ninseff] + 2);
-              inseffectui->refresh(synth->insefx[ninseff]);
+              inseffectui->refresh(synth->insefx[ninseff], 0xf2);
               if (synth->Pinsparts[ninseff] != -1)
               {
                 insefftype->activate();
@@ -750,7 +750,7 @@ send_data(0, o->value(),false);}
               synth->actionLock(lockmute);
               synth->insefx[ninseff]->changeeffect(o->value());
               synth->actionLock(unlock);
-              inseffectui->refresh(synth->insefx[ninseff]);
+              inseffectui->refresh(synth->insefx[ninseff], 0xf2);
               showInsEfxUI();}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
@@ -841,7 +841,7 @@ send_data(0, o->value(),false);}
       } {
         Fl_Group syseffectui {open
           xywh {3 158 384 95} labeltype NO_LABEL
-          code0 {o->init(synth->sysefx[nsyseff]);o->activate();o->show();}
+          code0 {o->init(synth->sysefx[nsyseff], 0xf1);o->activate();o->show();}
           class EffUI
         } {}
       }
@@ -851,7 +851,7 @@ send_data(0, o->value(),false);}
       } {
         Fl_Group inseffectui {open
           xywh {3 158 380 95} color 52
-          code0 {o->init(synth->insefx[ninseff]);o->hide();}
+          code0 {o->init(synth->insefx[ninseff], 0xf2);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}
@@ -1209,7 +1209,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
             inseffectui->deactivate();
         }
         insefftype->value(synth->insefx[ninseff]->geteffect());
-        inseffectui->refresh(synth->insefx[ninseff]);
+        inseffectui->refresh(synth->insefx[ninseff], 0xf2);
     }
     else
     {
@@ -1221,7 +1221,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         // effect output volume to be done!
       //  }
         sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-        syseffectui->refresh(synth->sysefx[nsyseff]);
+        syseffectui->refresh(synth->sysefx[nsyseff], 0xf1);
         showSysEfxUI();
     }} {}
   }
@@ -1917,4 +1917,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool NewWindows;} {private local
   }
-} 
+}
