@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
-} 
+}
 
 comment {OscilgenUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -30,52 +30,52 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is a derivative of the ZynAddSubFX original, modified October 2009 -
 January 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include "ResonanceUI.h"} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Slider.H>} {public local
-} 
+}
 
 decl {\#include <cmath>} {private local
-} 
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
-} 
+}
 
 decl {\#include "LFOUI.h"} {public local
-} 
+}
 
 decl {\#include "FilterUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Synth/OscilGen.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class OscilSpectrum {: {public Fl_Box, MiscFuncs}
 } {
@@ -154,7 +154,7 @@ oscbase = oscbase_;} {}
         {
             int tmp = i * GX + 2;
             x = spc[i] / max;
-   
+
             if (x > dB2rap(-maxdb))
                 x = rap2dB(x) / maxdb + 1;
             else
@@ -172,7 +172,7 @@ oscbase = oscbase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PSlider {: {public Fl_Slider}
 } {
@@ -191,7 +191,7 @@ if (!Fl::event_inside(X,Y,W,H)) {
 		Fl_Slider::handle(FL_LEAVE);
 		deactivate();
 		activate();
-		return(1);	
+		return(1);
 	}else{
 		return(Fl_Slider::handle(event));
 	};
@@ -202,7 +202,7 @@ if (!Fl::event_inside(X,Y,W,H)) {
 
 return(1);} {}
   }
-} 
+}
 
 class Oscilloscope {: {public Fl_Box}
 } {
@@ -228,25 +228,27 @@ phase=phase_;} {}
   }
   Function {draw()} {} {
     code {int ox = x(), oy = y(), lx = w(), ly = h() - 1;
-        float smps[synth->oscilsize];
-        synth->actionLock(lock);
-        if (oscbase == 0)
-            oscil->get(smps, -1.0);
-        else
-            oscil->getcurrentbasefunction(smps);
-        synth->actionLock(unlock);
+            float smps[synth->oscilsize];
+            synth->actionLock(lock);
+            if (oscbase == 0)
+                oscil->get(smps, -1.0);
+            else
+                oscil->getcurrentbasefunction(smps);
+            synth->actionLock(unlock);
 
-        if (damage( )!= 1)
-        {
-            fl_color(0, 0, 0);
-            fl_rectf(ox, oy, lx, ly);
-        }
+            if (damage( )!= 1)
+            {
+                fl_color(0, 0, 0);
+                fl_rectf(ox, oy, lx, ly);
+            }
 
-        // normalize
-        float max = 0;
-        for (int o = 0; o < synth->oscilsize; ++o)
-            if (max < fabsf(smps[o]))
-                max = fabsf(smps[o]);
+            // normalize
+            float max = 0;
+            for (int o = 0; o < synth->oscilsize; ++o)
+            {
+                if (max < fabsf(smps[o]))
+                    max = fabsf(smps[o]);
+            }
             //fprintf(stderr,"%.4f\\n",max);
             if (max < 0.00001)
                 max = 1.0;
@@ -304,7 +306,7 @@ phase=phase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class Oscilharmonic {: {public Fl_Group}
 } {
@@ -454,7 +456,7 @@ if (oscil->Phmag[n]==64) mag->selection_color(0);
   }
   decl {int engine;} {private local
   }
-} 
+}
 
 class OscilEditor {selected : {public PresetsUI_}
 } {
@@ -1307,4 +1309,4 @@ if (cbwidget!=NULL) {
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}

@@ -131,9 +131,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
-
     deadObjects(NULL),
-    nextHistoryIndex(numeric_limits<unsigned int>::max()),
     sigIntActive(0),
     ladi1IntActive(0),
     sse_level(0),
@@ -688,7 +686,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         goto end_game;
     }
 
-    if (xml->loadXMLfile(sessionfile) < 0)
+    if (!xml->loadXMLfile(sessionfile))
     {
         Log("Failed to load xml file " + sessionfile);
         goto end_game;

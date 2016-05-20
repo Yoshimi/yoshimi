@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
-} 
+}
 
 comment {PartUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,12 +29,12 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified August 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-} 
+}
 
 decl {\#include "EffUI.h"
     \#include "BankUI.h"
@@ -43,14 +43,14 @@ decl {\#include "EffUI.h"
     \#include "PADnoteUI.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-} 
+}
 
 decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
@@ -94,14 +94,14 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PartUI_ {} {
   Function {showparameters(int kititem,int engine)} {return_type virtual
   } {
     code {;} {}
   }
-} 
+}
 
 class PartKitItem {: {public Fl_Group}
 } {
@@ -218,11 +218,11 @@ send_data(17, o->value(), true, n, 0xff)}
         }
         Fl_Choice sendtoeffect {
           callback {//
-              if (o->value())
-                  part->kit[n].Psendtoparteffect = o->value() - 1;
-              else
-                  part->kit[n].Psendtoparteffect = 127;
-                  send_data(64, o->value(), true, n, 0xff)}
+                    if (o->value())
+                        part->kit[n].Psendtoparteffect = o->value() - 1;
+                    else
+                        part->kit[n].Psendtoparteffect = 127;
+                    send_data(64, o->value(), true, n, 0xff)}
           xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("OFF"); char nrstr[10]; for(int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
@@ -314,7 +314,7 @@ case 1:
         name = "PadSynth ";
         break;
 }
-    
+
 
 string contstr = "";
 switch (control)
@@ -402,7 +402,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + kit + name + contstr + " va
         adcheck->do_callback();
         subcheck->value(part->kit[n].Psubenabled);
         subcheck->do_callback();
-        
+
         sendtoeffect->value(part->kit[n].Psendtoparteffect + 1);
         if (part->kit[n].Psendtoparteffect == 127)
             sendtoeffect->value(0);
@@ -416,7 +416,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + kit + name + contstr + " va
                 synth->actionLock(lockmute);
                 part->setkititemstatus(n, o->value());
                 synth->actionLock(unlock);
-    
+
                 if (!o->value())
                     partkititemgroup->deactivate();
                 else
@@ -454,7 +454,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + kit + name + contstr + " va
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
@@ -518,10 +518,10 @@ send_data(4, o->value());}
         Fl_Dial partpan {
           label Pan
           callback {//
-    part->SetController(C_panning, o->value());
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
-        send_data(2, o->value());}
+                    part->SetController(C_panning, o->value());
+                    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+                        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
+                    send_data(2, o->value());}
           xywh {290 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Ppanning);}
           class WidgetPDial
@@ -529,20 +529,20 @@ send_data(4, o->value());}
         Fl_Button {} {
           label Centre
           callback {//
-    part->SetController(C_panning, 64);
-    partpan->value(64);
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, 64);
-        send_data(3, o->value());}
+                    part->SetController(C_panning, 64);
+                    partpan->value(64);
+                    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+                        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, 64);
+                    send_data(3, o->value());}
           tooltip {Centre panning} xywh {300 84 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial partvol {
           label Volume
           callback {//
-    part->setVolume(o->value());
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
-        send_data(0, o->value());}
+                    part->setVolume(o->value());
+                    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+                        synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
+                    send_data(0, o->value());}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           class WidgetPDial
@@ -567,11 +567,11 @@ send_data(4, o->value());}
       Fl_Spinner midich {
         label Midi
         callback {//
-    part->Prcvchn = lrint(o->value()) - 1;
-    o->textcolor(FL_BLACK);
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);
-        send_data(5, o->value());}
+                    part->Prcvchn = lrint(o->value()) - 1;
+                    o->textcolor(FL_BLACK);
+                    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+                        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);
+                    send_data(5, o->value());}
         tooltip {Midi channel for this part} xywh {35 36 40 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
         code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
@@ -633,12 +633,12 @@ send_data(33, o->value());}
       Fl_Spinner minkcounter {
         label {Minimum Note}
         callback {//
-            part->Pminkey = o->value();
-            if (part->Pminkey>part->Pmaxkey)
-                o->textcolor(FL_RED);
-            else
-                o->textcolor(FL_BLACK);
-                send_data(16, o->value());}
+                    part->Pminkey = o->value();
+                    if (part->Pminkey>part->Pmaxkey)
+                        o->textcolor(FL_RED);
+                    else
+                        o->textcolor(FL_BLACK);
+                    send_data(16, o->value());}
         tooltip {Minimum note the part receives} xywh {82 116 42 18} labelsize 10 minimum 0 maximum 127 textsize 11
         code0 {o->range(0.0, 127.0);o->step(1.0);}
         code1 {o->value(part->Pminkey);}
@@ -646,12 +646,12 @@ send_data(33, o->value());}
       Fl_Spinner maxkcounter {
         label {Maximum Note}
         callback {//
-            part->Pmaxkey = o->value();
-            if (part->Pminkey > part->Pmaxkey)
-                o->textcolor(FL_RED);
-            else
-                o->textcolor(FL_BLACK);
-                send_data(17, o->value());}
+                    part->Pmaxkey = o->value();
+                    if (part->Pminkey > part->Pmaxkey)
+                        o->textcolor(FL_RED);
+                    else
+                        o->textcolor(FL_BLACK);
+                    send_data(17, o->value());}
         tooltip {Maximum note the part receives} xywh {82 140 42 18} labelsize 10 minimum 0 maximum 127 textsize 11
         code0 {o->range(0.0, 127.0);o->step(1.0);}
         code1 {o->value(part->Pmaxkey);}
@@ -1221,18 +1221,18 @@ if ((Fl::event_button() == 3))
           Fl_Check_Button padsynenabledcheck {
             label Enabled
             callback {//
-    int x = o->value();
-    part->kit[0].Ppadenabled = x;
-    if (x == 0)
-        padeditbutton->deactivate();
-    else
-        padeditbutton->activate();
+                        int x = o->value();
+                        part->kit[0].Ppadenabled = x;
+                        if (x == 0)
+                            padeditbutton->deactivate();
+                        else
+                            padeditbutton->activate();
 
-    if(engine == 0 || x == 0)
-        padbox->color(BASE_COLOUR);
-    else
-        padbox->color(PAD_COLOUR);
-        send_data(8, o->value(), true, 0xff, 3);}
+                        if(engine == 0 || x == 0)
+                            padbox->color(BASE_COLOUR);
+                        else
+                            padbox->color(PAD_COLOUR);
+                        send_data(8, o->value(), true, 0xff, 3);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
@@ -1388,8 +1388,8 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   Function {updatecontrollers()} {} {
     code {//
     part->SetController(C_resetallcontrollers,0);
-    
-    
+
+
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);
@@ -1403,10 +1403,10 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
     fmamp->value(part->ctl->fmamp.receive);
     vol->value(part->ctl->volume.receive);
     sustain->value(part->ctl->sustain.receive);
-    
+
     cfdpth->value(part->ctl->resonancecenter.depth);
     rbwdpth->value(part->ctl->resonancebandwidth.depth);
-    
+
     rcv->value(part->ctl->portamento.receive);
     thresh->value(part->ctl->portamento.pitchthresh);
     propta->value(part->ctl->portamento.propRate);
@@ -1487,7 +1487,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
     else if (engine == 2 && padnoteui != NULL)
         tname = synth->getGuiMaster()->setPartWindowTitle("PadSynth");
     else return;
-    
+
     if (part->Pkitmode)
     {
         tname += asString(kititem + 1);
@@ -1622,4 +1622,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool partKitOn;} {public local
   }
-} 
+}

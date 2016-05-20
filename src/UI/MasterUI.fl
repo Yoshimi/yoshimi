@@ -1454,13 +1454,13 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
-        if (_npart == npart)
-            partui->partvol->value(_value);} {}
+            if (_npart == npart)
+                partui->partvol->value(_value);} {}
   }
   Function {setPartPanWidget(int _npart, float _value)} {} {
     code {//
-        if (_npart == npart)
-            partui->partpan->value(_value);} {}
+            if (_npart == npart)
+                partui->partpan->value(_value);} {}
   }
   Function {setPanelPartVolWidget(int _npart, float _value)} {} {
     code {//
@@ -1472,8 +1472,8 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   Function {setPartMidiWidget(int _npart, unsigned char _value)} {} {
     code {//
-        if (_npart == npart)
-            partui->midich->value(_value);
+            if (_npart == npart)
+                partui->midich->value(_value);
             partui->midich->textcolor(FL_BLACK);} {}
   }
   Function {setPanelPartMidiWidget(int _npart, unsigned char _value)} {} {

@@ -290,8 +290,8 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         }
         if (synth->getRuntime().nrpndata.vectorEnabled[ch] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
         { // vector control is direct to parts
-           if (nrpnRunVector(ch, ctrl, param));
-            return;
+            if (nrpnRunVector(ch, ctrl, param))
+                return; // **** test this it may be wrong!
         }
         // pick up a drop-through if CC doesn't match the above
         if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
@@ -463,8 +463,10 @@ void MusicIO::nrpnDirectPart(int dHigh, int par)
                 synth->getRuntime().nrpndata.Part = par;
             }
             else // It's bad. Kill it
+            {
                 synth->getRuntime().dataL = 128;
                 synth->getRuntime().dataH = 128;
+            }
             break;
 
         case 1: // Program Change

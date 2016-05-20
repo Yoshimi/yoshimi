@@ -62,8 +62,11 @@ bool AlsaEngine::openAudio(void)
         goto bail_out;
 
     if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
+    {
         if (prepHwparams())
+        {
             if (prepSwparams())
+            {
                 if (prepBuffers())
                 {
                     int buffersize = getBuffersize();
@@ -72,7 +75,10 @@ bool AlsaEngine::openAudio(void)
                         goto bail_out;
                     memset(interleaved, 0, sizeof(int) * buffersize * card_chans);
                 }
-                return true;
+            }
+        }
+    }
+    return true;
 bail_out:
     Close();
     splashMessages.push_back("Can't connect to alsa audio :(");

@@ -183,7 +183,6 @@ class Config : public MiscFuncs
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
 
-        unsigned short nextHistoryIndex;
         int sigIntActive;
         int ladi1IntActive;
         int sse_level;

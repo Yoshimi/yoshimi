@@ -2318,7 +2318,7 @@ void SynthEngine::SetPartDestination(unsigned char npart, unsigned char dest)
 
     if (part[npart]->Paudiodest & 2)
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart);
-        string name;
+    string name;
     switch (dest)
     {
         case 1:
@@ -2420,7 +2420,7 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
         for (rx = msg_buf.rbegin(); rx != msg_buf.rend(); ++rx)
             Runtime.Log(*rx);
             // we need this in case someone is working headless
-            cout << "\nReports sent to console window\n\n";
+        cout << "\nReports sent to console window\n\n";
     }
     else if (msg_buf.size() < lines) // Output will fit the screen
         for (it = msg_buf.begin(); it != msg_buf.end(); ++it)

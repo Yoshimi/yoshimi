@@ -608,7 +608,7 @@ void ADnoteParameters::getfromXML(XMLwrapper *xml)
         VoicePar[nvoice].Enabled=0;
         if (xml->enterbranch("VOICE", nvoice) == 0)
             continue;
-            getfromXMLsection(xml, nvoice);
+        getfromXMLsection(xml, nvoice);
         xml->exitbranch();
     }
 }

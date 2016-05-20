@@ -1291,9 +1291,9 @@ int OscilGen::get(float *smps, float freqHz, int resonance)
 //        srandom_r(randseed, &harmonic_random_buf);
         memset(harmonic_random_state, 0, sizeof(harmonic_random_state));
         memset(&harmonic_random_buf, 0, sizeof(harmonic_random_buf));
-    if (initstate_r(randseed, harmonic_random_state,
+        if (initstate_r(randseed, harmonic_random_state,
                     sizeof(harmonic_random_state), &harmonic_random_buf))
-        synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");
+            synth->getRuntime().Log("OscilGen failed to init harmonic amplitude amplitude randomness");
         float power = Pamprandpower / 127.0f;
         float normalize = 1.0f / (1.2f - power);
         switch (Pamprandtype)
