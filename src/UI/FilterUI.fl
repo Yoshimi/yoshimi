@@ -8,8 +8,7 @@ comment {FilterUI.h} {not_in_source in_header
 comment {FilterUI.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
 Copyright 2016 Will Godfrey
@@ -29,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified March 2011
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
@@ -190,7 +189,7 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   }
 } 
 
-class FilterUI {selected : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;

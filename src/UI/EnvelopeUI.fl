@@ -8,8 +8,7 @@ comment {Envelope.h} {not_in_source in_header
 comment {Envelope.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
 Copyright 2016 Will Godfrey

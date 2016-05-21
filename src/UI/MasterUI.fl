@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,85 +29,61 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "EffUI.h"} {public local
-} 
-
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
-Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
-Copyright 2014-2016, Will Godfrey and others
-
-This file is part of yoshimi, which is free software: you can redistribute
-it and/or modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either version 2 of
-the License, or (at your option) any later version.
-
-yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
-later) for more details.
-
-You should have received a copy of the GNU General Public License along with
-yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
-Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-This file is derivative of original ZynAddSubFX code, modified November 2010
-} {in_source in_header
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public local
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "PartUI.h"} {public local
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public local
-} 
+}
 
 decl {\#include "MasterMiscUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-} 
+}
 
 decl {class MasterUI;} {public local
-} 
+}
 
 class MasterUI {selected : {private MiscFuncs}
 } {
@@ -1917,4 +1893,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool NewWindows;} {private local
   }
-} 
+}

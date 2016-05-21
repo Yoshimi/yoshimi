@@ -8,8 +8,7 @@ comment {VirKeyboard.h} {not_in_source in_header
 comment {VirKeyboard.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
 Copyright 2014-2016, Will Godfrey    
@@ -29,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of origional ZynAddSubFX code, modified June 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <stdlib.h>} {public local
@@ -303,8 +302,7 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
   }
 } 
 
-class VirKeyboard {selected
-} {
+class VirKeyboard {} {
   Function {make_window()} {} {
     Fl_Window virkeyboardwindow {
       label {Yoshimi Virtual Keyboard}

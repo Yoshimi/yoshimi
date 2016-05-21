@@ -8,8 +8,7 @@ comment {LFOUI.h} {not_in_source in_header
 comment {LFOUI.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
 Copyright 2016, Will Godfrey 
@@ -29,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2009
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <iostream>} {public local
@@ -62,7 +61,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class LFOUI {selected : {public Fl_Group, PresetsUI_}
+class LFOUI {: {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
