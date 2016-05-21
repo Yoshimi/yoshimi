@@ -117,7 +117,8 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     switch(midiDrv)
     {
         case jack_midi:
-            midiIO = new JackEngine(synth);
+            if (audioDrv != jack_audio)
+                midiIO = new JackEngine(synth);
             break;
 
         case alsa_midi:
@@ -137,7 +138,7 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     }
     if(midiDrv != no_midi)
     {
-        if(!midiIO)
+        if(!midiIO && audioDrv != jack_audio)
         {
             abort();
         }
@@ -179,6 +180,10 @@ bool MusicClient::Open()
     if(midiIO)
     {
         bMidi = midiIO->openMidi();
+    }
+    else if (audioDrv == jack_audio)
+    {
+        bMidi = audioIO->openMidi();
     }
     if(bAudio && bMidi)
     {

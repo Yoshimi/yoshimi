@@ -2,6 +2,7 @@ yoshimi 1.3.x
 
 2016-5-21 Will
 - Effects controls now mostly identified.
+- Yoshimi now only sets a single client if jack is both midi & audio
 
 2016-5-20 Will
 - Rearanged some control values.
