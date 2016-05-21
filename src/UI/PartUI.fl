@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
-}
+} 
 
 comment {PartUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,12 +29,12 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified August 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-}
+} 
 
 decl {\#include "EffUI.h"
     \#include "BankUI.h"
@@ -43,14 +43,14 @@ decl {\#include "EffUI.h"
     \#include "PADnoteUI.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-}
+} 
 
 decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
@@ -94,14 +94,14 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PartUI_ {} {
   Function {showparameters(int kititem,int engine)} {return_type virtual
   } {
     code {;} {}
   }
-}
+} 
 
 class PartKitItem {: {public Fl_Group}
 } {
@@ -454,7 +454,7 @@ synth->getRuntime().Log("Part " + to_string(npart) + kit + name + contstr + " va
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
@@ -922,7 +922,7 @@ send_data(128, o->value());}
             ninseff = o->value() - 1;
             insefftype->value(part->partefx[ninseff]->geteffect());
             // insefftype->do_callback();
-            inseffectui->refresh(part->partefx[ninseff], npart);
+            inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
             int x = part->Pefxroute[ninseff];
             if (x == 127)
                 x = 1;
@@ -936,7 +936,7 @@ send_data(128, o->value());}
             synth->actionLock(lockmute);
             part->partefx[ninseff]->changeeffect(o->value());
             synth->actionLock(unlock);
-            inseffectui->refresh(part->partefx[ninseff], npart);}
+            inseffectui->refresh(part->partefx[ninseff], npart, ninseff);}
         tooltip {Effect Type} xywh {104 7 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
@@ -982,7 +982,7 @@ send_data(128, o->value());}
       } {
         Fl_Group inseffectui {
           xywh {5 37 380 95}
-          code0 {o->init(part->partefx[ninseff], npart);}
+          code0 {o->init(part->partefx[ninseff], npart, ninseff);}
           class EffUI
         } {}
       }
@@ -1622,4 +1622,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool partKitOn;} {public local
   }
-}
+} 

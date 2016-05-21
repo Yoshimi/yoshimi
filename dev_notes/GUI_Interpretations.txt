@@ -25,11 +25,24 @@ float           value
 string          name - not using this yet
 
 
-type bits
+Type bits
 0-4 event button (action to take)
 5   source is GUI (else bits 0-4 = source & action)
 6   read/write data value
 7   round to int (will be sent as float)
+
+
+Effetcs are special kit numbers offset by 0x80.
+They can't be inserts, as Dynefilter has Filter as an insert!
+0   None
+1   Reverb
+2   Echo
+3   Chorus
+4   Phaser
+5   Alienwah
+6   Distorsion
+7   EQ
+8   Dynfilter
 
 
 engine
@@ -55,16 +68,6 @@ inserts
 
 8   resonance base (for add & pad harmonics)
 9   resonance graph
-
-16  effects None
-17          Reverb
-18          Echo
-19          Chorus
-20          Phaser
-21          Alienwah
-22          Distorsion
-23          EQ
-24          Dynfilter
 
 32+ engine specific ?
 

@@ -750,10 +750,15 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
     }
     if (part == 0xf0)
         commandMain(value, type, control);
-    else if (part == 0xf1 || part == 0xf2 || (insert >= 16 && insert < 32))
-        commandEffects(value, type, control, part, insert);
     else if (kit == 0xff)
         commandPart(value, type, control, part, kit, engine);
+    else if (kit >= 0x80)
+    {
+        if (insert < 0xff)
+            commandFilter(value, type, control, part, kit, engine, insert);
+        else
+            commandEffects(value, type, control, part, kit, engine);
+    }
     else if (engine == 2)
     {
         switch(insert)
@@ -1979,11 +1984,51 @@ void SynthEngine::commandFilter(float value, unsigned char type, unsigned char c
         actual = to_string(value);
 
     string name;
-    if (part == 0xf1)
-        name = "  Sys";
-    else if (part == 0xf1)
-        name = "Ins";
-    else if (engine == 0)
+    if (kit >= 0x80)
+    {
+        string efftype;
+        switch (kit & 0xf)
+        {
+            case 0:
+                efftype = " NO Effect";
+                break;
+            case 1:
+                efftype = " Reverb";
+                break;
+            case 2:
+                efftype = " Echo";
+                break;
+            case 3:
+                efftype = " Chorus";
+                break;
+            case 4:
+                efftype = " Phaser";
+                break;
+            case 5:
+                efftype = " AlienWah";
+                break;
+            case 6:
+                efftype = " Distortion";
+                break;
+            case 7:
+                efftype = " EQ";
+                break;
+            case 8:
+                efftype = " DynFilter";
+                break;
+        }
+
+        if (part == 0xf1)
+            name = "System";
+        else if (part == 0xf2)
+            name = "Insert";
+        else name = "Part " + to_string(part);
+        name += " Effect " + to_string(engine); // this is the effect number
+        Runtime.Log(name + efftype + " ~ Filter Parameter " + to_string(control) + "  Value " + actual);
+    return;
+    }
+
+    if (engine == 0)
         name = "  AddSynth";
     else if (engine == 1)
         name = "  SubSynth";
@@ -2194,7 +2239,7 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
 }
 
 
-void SynthEngine::commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char insert)
+void SynthEngine::commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine)
 {
     string actual;
     if (type & 0x80)
@@ -2209,11 +2254,43 @@ void SynthEngine::commandEffects(float value, unsigned char type, unsigned char 
         name = "Insert";
     else
         name = "Part " + to_string(part);
-    name += " Effect ";
+    name += " Effect " + to_string(engine);
+
+    string efftype;
+    switch (kit & 0xf)
+    {
+        case 0:
+            efftype = " NO Effect";
+            break;
+        case 1:
+            efftype = " Reverb";
+            break;
+        case 2:
+            efftype = " Echo";
+            break;
+        case 3:
+            efftype = " Chorus";
+            break;
+        case 4:
+            efftype = " Phaser";
+            break;
+        case 5:
+            efftype = " AlienWah";
+            break;
+        case 6:
+            efftype = " Distortion";
+            break;
+        case 7:
+            efftype = " EQ";
+            break;
+        case 8:
+            efftype = " DynFilter";
+            break;
+    }
 
     string contstr = "  Control " + to_string(control);
 
-    Runtime.Log(name + "Type " + to_string(insert) + contstr + "  Value " + actual);
+    Runtime.Log(name + efftype + contstr + "  Value " + actual);
 }
 
 

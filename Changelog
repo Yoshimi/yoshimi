@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-5-21 Will
+- Effects controls now mostly identified.
+
 2016-5-20 Will
 - Rearanged some control values.
 - Corrected amp/freq lfo anomaly.
