@@ -750,7 +750,7 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
     }
     if (part == 0xf0)
         commandMain(value, type, control);
-    else if (kit == 0xff)
+    else if (kit == 0xff || (kit & 0x20))
         commandPart(value, type, control, part, kit, engine);
     else if (kit >= 0x80)
     {
@@ -910,8 +910,8 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
 
 
     string kitnum;
-    if (kit <= 0x10)
-        kitnum = "  Kit " + to_string(kit);
+    if (kit < 0xff)
+        kitnum = "  Kit " + to_string(kit & 0x1f);
     else
         kitnum = "  ";
 
@@ -929,16 +929,16 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
     }
     else
     {
-        switch (engine)
+        switch (engine) // needs aligning with other engine numbers
         {
-            case 0:
-                name = "AddSynth ";
-                break;
             case 1:
-                name = "SubSynth ";
+                name = " AddSynth ";
                 break;
             case 2:
-                name = "PadSynth ";
+                name = " SubSynth ";
+                break;
+            case 3:
+                name = " PadSynth ";
                 break;
         }
     }

@@ -1,27 +1,14 @@
 
 data to send from gui
 
-Chars are unsigned. Set unused ones to 0xff as a general test.
-
-e.g.
-if part is 0xf0 (main) and kit is 0xff you're there and it
-is main volume, key shift etc.
-
-part is 0xf1 for system effects.
-part is 0xf2 for insertion effects
-
-if part is < 0x40 and kit is 0xff it's the general part
-level controls.
-If kit < 0x10 and engine is  0xff it's the engine enable controls (kit number | engine)
-
-unsigned char   type
-unsigned char   part
+unsigned char   type        (mandatory)
+unsigned char   part        (mandatory)
 unsigned char   kit
 unsigned char   engine
 unsigned char   insert
 unsigned char   insert param
-unsigned char   controller
-float           value
+unsigned char   controller  (mandatory)
+float           value       (mandatory)
 string          name - not using this yet
 
 
@@ -31,9 +18,27 @@ Type bits
 6   read/write data value
 7   round to int (will be sent as float)
 
+Unused chars are set to 0xff as a general test.
 
-Effetcs are special kit numbers offset by 0x80.
-They can't be inserts, as Dynefilter has Filter as an insert!
+e.g.
+If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it
+is main volume, key shift etc.
+
+If part is < 0x40 and kit is 0xff it's the general part level controls, otherwise it's the kit level controls.
+
+If kit >= 0x20 it's the engine enable controls.
+    (kit number ORed with 0x20)
+
+
+Effects and effect sources.
+In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects.
+For these and normal part effects, 'kit' ORed with 0x80 is used to denote the effect type (reverb echo etc.) and 'engine' is used to denote the
+number of the effect being worked on (the limit depends on the effect
+source). As 'kit' and 'engine' are not relevant for effects it is safe
+to use them here.
+
+Effects 'part' numbers offset by 0x80.
+
 0   None
 1   Reverb
 2   Echo
@@ -43,6 +48,8 @@ They can't be inserts, as Dynefilter has Filter as an insert!
 6   Distorsion
 7   EQ
 8   Dynfilter
+
+These can't be inserts, as Dynefilter has Filter as an insert!
 
 
 engine
