@@ -48,6 +48,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Misc/Config.h"
 #include "MasterUI.h"
+#include "ConfBuild.cpp"
 
 extern void mainRegisterAudioPort(SynthEngine *s, int portnum);
 
@@ -57,8 +58,8 @@ static char prog_doc[] =
     "Copyright 2009-2011 Alan Calvert, "
     "Copyright 20012-2013 Jeremy Jongepier and others, "
     "Copyright 20014-2016 Will Godfrey and others";
-
-const char* argp_program_version = "Yoshimi " YOSHIMI_VERSION;
+string argline = "Yoshimi " + (string) YOSHIMI_VERSION + "\nBuild Number " + to_string(BUILD_NUMBER);
+const char* argp_program_version = argline.c_str();
 
 static struct argp_option cmd_options[] = {
     {"alsa-audio",        'A',  "<device>",   1,  "use alsa audio output" },
