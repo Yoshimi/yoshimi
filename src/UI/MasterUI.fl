@@ -34,6 +34,12 @@ This file is a derivative of the ZynAddSubFX original, modified October 2014
 decl {\#include <string>} {public local
 }
 
+decl {\#include <boost/filesystem.hpp>} {public local
+}
+
+decl {\#include <FL/filename.H>} {public local
+} 
+
 decl {using namespace std;} {public local
 }
 
@@ -277,7 +283,201 @@ mainCreateNewInstance(forceId);}
             xywh {0 0 31 21} labelsize 12
           }
           MenuItem {} {
-            label {&Settings...}
+            label {&Load project...}
+            callback {//
+            
+                const char *filename;
+                filename = fl_dir_chooser("Load:", NULL, 0);
+                if (filename == NULL)
+                    return;
+				// pgm = -1 here because it's not from a bank
+				
+				size_t found;
+                string tmpStr(filename);
+                found = tmpStr.find_last_of("/\\\\");   // TODO Test on Windows, or just use Boost for this.
+				
+				// Instrument
+				int result = synth->SetProgramToPart(npart, -1, string(filename)+"/"+tmpStr.substr(found+1)+".xiz");
+                npartcounter->do_callback();
+                updatepanel();
+                if (result == 0)
+                    fl_alert("Failed to load instrument file");
+                else if (result == 3)
+                    fl_alert("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save.");
+                
+                // Patch Set
+                do_load_master(true, (string(filename)+"/"+tmpStr.substr(found+1)+".xmz").c_str());
+                
+                // Scales
+                string fname = string(filename)+"/"+tmpStr.substr(found+1)+".xsz";
+                do_load_scale(fname);
+                RecentScale->activate();
+                
+                // State
+                laststatefile = string(filename)+"/"+tmpStr.substr(found+1)+".state";
+                synth->getRuntime().loadState(laststatefile);
+                synth->addHistory(laststatefile, 4);
+                RecentState->activate();
+                unsigned int name_start = laststatefile.rfind("/");
+            	unsigned int name_end = laststatefile.rfind(".");
+            	setMasterLabel(laststatefile.substr(name_start + 1, name_end - name_start - 1));
+                refresh_master_ui();
+            }
+           
+            tooltip {Load a Yoshimi project from a folder containing the .x*z and .state files.} xywh {25 25 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Save project...}
+            callback {//
+            
+            const char *tmp = fl_dir_chooser("Save:", NULL, 0);
+            if (tmp == NULL)
+                return;
+            
+            bool valid = false;
+            for(int npart = 0; npart < NUM_MIDI_PARTS; npart ++)
+                if (synth->part[npart]->Pname != "Simple Sound")
+                {
+                    valid = true;
+                    npart = NUM_MIDI_PARTS;
+                }
+                if (valid){
+                    const char *file = NULL;
+                    const char *fname;
+                    bool result = false;
+                    if (file == NULL)
+                    {
+                        size_t found;
+                        string tmpStr(tmp);
+                        found = tmpStr.find_last_of("/\\\\");   // TODO Test on Windows, or just use Boost for this.
+                        
+                        boost::filesystem::create_directories(tmp);
+                        
+                        char buf[FL_PATH_MAX];
+
+                        // Instrument
+                        for (unsigned int i = 0; i <= strlen(tmp); i++) {
+
+                            if (i < strlen(tmp)) {
+                                buf[i] = tmp[i];
+                            
+                            } else {
+                                buf[i] = 0;
+                            }
+                        }
+                        
+                        fl_filename_setext(buf, sizeof(buf), (string("/")+tmpStr.substr(found+1)+".xiz").c_str());
+                        if (isRegFile(string(buf)))
+                            if (!fl_choice("The instrument (.xiz) file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                                return;
+                        synth->actionLock(lockmute);
+                        bool result = synth->part[npart]->saveXML(string(buf));
+                        synth->actionLock(unlock);
+                        if (!result)
+                            fl_alert("Failed to save instrument file");
+                        updatepanel();
+                    
+                        // Patch set
+                        for (unsigned int i = 0; i <= strlen(tmp); i++) {
+
+                            if (i < strlen(tmp)) {
+                                buf[i] = tmp[i];
+                            
+                            } else {
+                                buf[i] = 0;
+                            }
+                        }
+                        
+                        fl_filename_setext(buf, sizeof(buf), (string("/")+tmpStr.substr(found+1)+".xmz").c_str());
+                        
+                        fname = buf;
+                        result = isRegFile(string(buf));
+                        if (result)
+                        {
+                            result = false;
+                            if (!fl_choice("The patch set (.xmz) file exists. Overwrite it?", "No", "Yes", NULL))
+                                return;
+                        }
+
+                        result = synth->saveXML(fname);
+                        
+                        if (!result)
+                            fl_alert("Could not save the file.");
+                        else
+                        {
+                            synth->addHistory(fname, 2);
+                            RecentParams->activate();
+                        }
+                        updatepanel();
+                        
+                        // Scales
+                        for (unsigned int i = 0; i <= strlen(tmp); i++) {
+
+                            if (i < strlen(tmp)) {
+                                buf[i] = tmp[i];
+                            
+                            } else {
+                                buf[i] = 0;
+                            }
+                        }
+                        
+                        fl_filename_setext(buf, sizeof(buf), (string("/")+tmpStr.substr(found+1)+".xsz").c_str());
+                        if (isRegFile(string(buf)))
+                            if (!fl_choice("The scale (.xsz) file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                                return;
+                        synth->actionLock(lockmute);
+                        result = synth->microtonal.saveXML(string(buf));
+                        synth->actionLock(unlock);
+                        if (!result)
+                            fl_alert("Failed to save scale settings");
+                        else
+                        {
+                            synth->addHistory(filename, 3);
+                            RecentScale->activate();
+                        }
+                        updatepanel();
+                        
+                        
+                        // State
+                        for (unsigned int i = 0; i <= strlen(tmp); i++) {
+
+                            if (i < strlen(tmp)) {
+                                buf[i] = tmp[i];
+                            
+                            } else {
+                                buf[i] = 0;
+                            }
+                        }
+                        
+                        fl_filename_setext(buf, sizeof(buf), (string("/")+tmpStr.substr(found+1)+".state").c_str());
+                        if (isRegFile(string(buf)))
+                            if (!fl_choice("The state (.state) file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                                return;
+                        laststatefile = string(buf);
+                        synth->getRuntime().saveState(laststatefile);
+                        synth->addHistory(laststatefile, 4);
+                        RecentState->activate();
+                    }
+                    else {
+                        fname = file;
+                        result = synth->saveXML(fname);
+                        
+                        if (!result)
+                            fl_alert("Could not save the file.");
+                        else
+                        {
+                            synth->addHistory(fname, 2);
+                            RecentParams->activate();
+                        }
+                        updatepanel();
+                    }
+              }
+          }
+           
+            tooltip {Save your current Yoshimi project as a folder containing the .x*z and .state files.} xywh {25 25 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {S&ettings...}
             callback {configui->Show();}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
           }

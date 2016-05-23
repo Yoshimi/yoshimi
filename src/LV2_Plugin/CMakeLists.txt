@@ -127,6 +127,8 @@ target_link_libraries(yoshimi_lv2
                       ${FFTW3F_LIBRARIES}
                       ${LIBCAIRO_LIBRARIES}
                       ${JACK_LIBRARIES}
+                      ${Boost_FILESYSTEM_LIBRARY}
+                      ${Boost_SYSTEM_LIBRARY}
                       z
                       dl
 )
