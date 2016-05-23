@@ -252,6 +252,13 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
             }
             break;
 
+        case 0xA0: // key aftertouch
+            ctrltype = C_keypressure;
+            // need to work out how to use key values >> j Event.buffer[1]
+            par = msg[2];
+            setMidiController(channel, ctrltype, par, in_place);
+            break;
+
         case 0xB0: // controller
             ctrltype = getMidiController(msg[1]);
             par = msg[2];
@@ -263,6 +270,13 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
             par = msg[1];
             setMidiProgram(channel, par, in_place);
             break;
+
+        case 0xD0: // channel aftertouch
+            ctrltype = C_channelpressure;
+            par = msg[2];
+            setMidiController(channel, ctrltype, par, in_place);
+            break;
+
 
         case 0xE0: // pitch bend
             ctrltype = C_pitchwheel;
