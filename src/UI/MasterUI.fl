@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-}
+} 
 
 comment {MasterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,61 +29,64 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <string>} {public local
-}
+} 
+
+decl {\#include <iostream>} {public local
+} 
 
 decl {using namespace std;} {public local
-}
+} 
 
 decl {\#include "ADnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "SUBnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "EffUI.h"} {public local
-}
+} 
 
 decl {\#include "VirKeyboardUI.h"} {public local
-}
+} 
 
 decl {\#include "ConfigUI.h"} {public local
-}
+} 
 
 decl {\#include "BankUI.h"} {public local
-}
+} 
 
 decl {\#include "PartUI.h"} {public local
-}
+} 
 
 decl {\#include "MicrotonalUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "ParametersUI.h"} {public local
-}
+} 
 
 decl {\#include "ConsoleUI.h"} {public local
-}
+} 
 
 decl {\#include "MasterMiscUI.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-}
+} 
 
 decl {class MasterUI;} {public local
-}
+} 
 
 class MasterUI {selected : {private MiscFuncs}
 } {
@@ -240,7 +243,7 @@ class MasterUI {selected : {private MiscFuncs}
 //        synth->getRuntime().saveConfig();
         synth->guiClosed(true);
     }}
-      xywh {11 99 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {11 99 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-7 0 400 25} labelsize 13
@@ -610,19 +613,20 @@ send_data(0, o->value(),false);}
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
                showInsEfxUI();}
-        xywh {3 88 380 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
+        xywh {3 88 382 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
           label {System Effects}
-          xywh {3 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
+          xywh {5 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
             label Effect
             callback {//
               nsyseff = o->value() - 1;
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
-              syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);}
-            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
+              syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
+              send_data(0, o->value() - 1, true, 0xf1);}
+            xywh {42 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
           }
@@ -633,8 +637,9 @@ send_data(0, o->value(),false);}
               synth->sysefx[nsyseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
-              showSysEfxUI();}
-            xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
+              showSysEfxUI();
+              send_data(1, o->value(), true, 0xf1);}
+            xywh {120 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
             MenuItem {} {
@@ -677,12 +682,12 @@ send_data(0, o->value(),false);}
           Fl_Button {} {
             label {Send to}
             callback {syseffsendwindow->show();}
-            xywh {260 127 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
+            xywh {262 127 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
           }
           Fl_Button {} {
             label C
             callback {presetsui->copy(synth->sysefx[nsyseff]);}
-            xywh {350 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {352 122 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
           Fl_Button {} {
             label P
@@ -690,7 +695,7 @@ send_data(0, o->value(),false);}
     synth->actionLock(lockmute);
     presetsui->paste(synth->sysefx[nsyseff], syseffectui);
     synth->actionLock(unlock);}
-            xywh {350 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
+            xywh {352 137 25 14} box THIN_UP_BOX color 179 labelfont 1 labelsize 11 labelcolor 7
           }
         }
         Fl_Group InsertionEffectsGrp {
@@ -715,7 +720,8 @@ send_data(0, o->value(),false);}
                 insefftype->deactivate();
                 inseffectui->deactivate();
                 inseffectuigroup->deactivate();
-              }}
+              }
+              send_data(0, o->value() - 1, true, 0xf2);}
             xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
@@ -727,7 +733,8 @@ send_data(0, o->value(),false);}
               synth->insefx[ninseff]->changeeffect(o->value());
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
-              showInsEfxUI();}
+              showInsEfxUI();
+              send_data(1, o->value(), 0xf2);}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -785,7 +792,8 @@ send_data(0, o->value(),false);}
                 insefftype->activate();
                 inseffectui->activate();
               }
-              synth->insefx[ninseff]->cleanup();}
+              synth->insefx[ninseff]->cleanup();
+              send_data(2, o->value() - 2, true, 0xf2);}
             xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
@@ -1057,7 +1065,9 @@ updatepanel();}
   }
   Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, 0xf0);} {}
+if (kititem == 0xff)
+kititem = 0xf0;
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, kititem);} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -1478,7 +1488,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         bankui-> rescan_for_banks(false);
     }} {}
   }
-  Function {getSynth()} {return_type {SynthEngine *}
+  Function {getSynth()} {open return_type {SynthEngine *}
   } {
     code {return synth;} {}
   }
@@ -1893,4 +1903,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool NewWindows;} {private local
   }
-}
+} 

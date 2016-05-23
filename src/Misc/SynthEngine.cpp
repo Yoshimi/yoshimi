@@ -911,7 +911,7 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
 
     string kitnum;
     if (kit < 0xff)
-        kitnum = "  Kit " + to_string(kit & 0x1f);
+        kitnum = "  Kit " + to_string(kit & 0x1f) + " ";
     else
         kitnum = "  ";
 
@@ -932,13 +932,13 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
         switch (engine) // needs aligning with other engine numbers
         {
             case 1:
-                name = " AddSynth ";
+                name = "AddSynth ";
                 break;
             case 2:
-                name = " SubSynth ";
+                name = "SubSynth ";
                 break;
             case 3:
-                name = " PadSynth ";
+                name = "PadSynth ";
                 break;
         }
     }
@@ -997,6 +997,19 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
             contstr = "Key Shift";
             break;
 
+        case 40:
+            contstr = "Effect Send 0";
+            break;
+        case 41:
+            contstr = "Effect Send 1";
+            break;
+        case 42:
+            contstr = "Effect Send 2";
+            break;
+        case 43:
+            contstr = "Effect Send 3";
+            break;
+
         case 48:
             contstr = "Humanise";
             break;
@@ -1011,8 +1024,12 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
             contstr = "Kit Mode";
             break;
 
+        case 64:
+            contstr = "Effect Number";
+            break;
+
         case 96:
-            contstr = "Clear";
+            contstr = "Reset Note Range";
             break;
 
         case 128:

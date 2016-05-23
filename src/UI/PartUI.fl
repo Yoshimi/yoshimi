@@ -57,12 +57,13 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   Function {make_window()} {private
   } {
     Fl_Window syseffsend {
-      private xywh {916 904 150 145} type Double hide
+      private xywh {916 904 150 50} type Double hide
       class Fl_Group
     } {
       Fl_Dial {} {
         label 01
-        callback {synth->setPsysefxvol(npart,neff, o->value());}
+        callback {synth->setPsysefxvol(npart,neff, o->value());
+send_data(neff, o->value());}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 align 130 maximum 127 step 1
         code0 {o->size(25,25);}
         code1 {o->value(synth->Psysefxvol[neff][npart]);}
@@ -74,6 +75,10 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   Function {PartSysEffSend(int x, int y, int w, int h) :
     Fl_Group(x, y, w, h, NULL)} {} {
     code {neff = 0;npart = 0;} {}
+  }
+  Function {send_data(int control, float value, bool isInteger = true)} {} {
+    code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control + 0x28, npart);} {}
   }
   Function {init(int npart_, int neff_, SynthEngine *_synth)} {} {
     code {//
@@ -149,7 +154,7 @@ send_data(16, o->value(), true, n, 0xff)}
               minkcounter->do_callback();
               maxkcounter->value(127);
               maxkcounter->do_callback();
-              send_data(20, o->value(), true, n, 0xff)}
+              send_data(96, o->value(), true, n, 0xff)}
           tooltip {reset the minimum key to 0 and maximum key to 127} xywh {300 3 15 12} box THIN_UP_BOX labelfont 1 labelsize 10
         }
         Fl_Button adeditbutton {

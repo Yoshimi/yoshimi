@@ -2,6 +2,9 @@ yoshimi 1.3.x
 
 2016-5-23 Will
 - Added aftertouch recognition to LV2 (not actually used yet)
+- Identified part to system effect sends.
+- Identified insert and system effect controls (not system sends)
+- More adjustment to control ID numbers.
 
 2016-5-22 Will
 - Bugfix: Kit level IDs were wrong.
