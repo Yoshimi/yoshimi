@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-}
+} 
 
 comment {MasterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,61 +29,64 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <string>} {public local
-}
+} 
+
+decl {\#include <iostream>} {public local
+} 
 
 decl {using namespace std;} {public local
-}
+} 
 
 decl {\#include "ADnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "SUBnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "EffUI.h"} {public local
-}
+} 
 
 decl {\#include "VirKeyboardUI.h"} {public local
-}
+} 
 
 decl {\#include "ConfigUI.h"} {public local
-}
+} 
 
 decl {\#include "BankUI.h"} {public local
-}
+} 
 
 decl {\#include "PartUI.h"} {public local
-}
+} 
 
 decl {\#include "MicrotonalUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "ParametersUI.h"} {public local
-}
+} 
 
 decl {\#include "ConsoleUI.h"} {public local
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {\#define MIN_DB -48.0} {public local
-}
+} 
 
 decl {\#define NO_DB -68.0} {public local
-}
+} 
 
 class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
@@ -359,9 +362,9 @@ synth = _synth;
 	  }
       }} {}
   }
-}
+} 
 
-class SysEffSend {: {public WidgetPDial, private MiscFuncs}
+class SysEffSend {selected : {public WidgetPDial, private MiscFuncs}
 } {
   Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {} {
     code {neff1=0; neff2=0;} {}
@@ -385,9 +388,11 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {if (event == FL_PUSH || event == FL_DRAG)
+    code {//
+	if (event == FL_PUSH || event == FL_DRAG)
         {
             synth->setPsysefxsend(neff1,neff2,value());
+            synth->commandFetch(value(), (Fl::event_button() | 0x20 | (1 << 7)), neff1, 0xf1, 0xff, neff2 | 0x20);
         }
         return WidgetPDial::handle(event);} {}
   }
@@ -397,9 +402,9 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
-class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
+class Panellistitem {: {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
@@ -626,4 +631,4 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   }
   decl {int *plgroup;} {public local
   }
-}
+} 

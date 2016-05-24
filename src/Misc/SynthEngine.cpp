@@ -750,6 +750,8 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
     }
     if (part == 0xf0)
         commandMain(value, type, control);
+    else if ((part == 0xf1 || part == 0xf2) && kit == 0xff)
+        commandSysIns(value, type, control, part, engine);
     else if (kit == 0xff || (kit & 0x20))
         commandPart(value, type, control, part, kit, engine);
     else if (kit >= 0x80)
@@ -2253,6 +2255,49 @@ void SynthEngine::commandEnvelope(float value, unsigned char type, unsigned char
     }
 
     Runtime.Log("Part " + to_string(part) + "  Kit " + to_string(kit) + name  + env + " Env  " + contstr + " value " + actual);
+}
+
+
+void SynthEngine::commandSysIns(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char engine)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string name;
+    if (part == 0xf1)
+        name = "System ";
+    else
+        name = "Insert ";
+
+    string contstr;
+    string second;
+    if (engine == 0xff)
+    {
+        second = "";
+        switch (control)
+        {
+            case 0:
+                contstr = "Effect Number ";
+                break;
+            case 1:
+                contstr = "Effect Type ";
+                break;
+            case 2:
+                contstr = "Effect To ";
+                break;
+        }
+        contstr += actual;
+    }
+    else
+    {
+        contstr = "From Effect " + to_string(control);
+        second = " To Effect " + to_string(engine & 0x1f)  + "  Value " + actual;
+    }
+
+    Runtime.Log(name  + contstr + second);
 }
 
 

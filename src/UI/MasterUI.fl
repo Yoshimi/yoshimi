@@ -243,7 +243,7 @@ class MasterUI {selected : {private MiscFuncs}
 //        synth->getRuntime().saveConfig();
         synth->guiClosed(true);
     }}
-      xywh {11 99 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {11 99 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-7 0 400 25} labelsize 13
@@ -734,7 +734,7 @@ send_data(0, o->value(),false);}
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
               showInsEfxUI();
-              send_data(1, o->value(), 0xf2);}
+              send_data(1, o->value(), true, 0xf2);}
             xywh {118 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
