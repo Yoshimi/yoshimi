@@ -23,6 +23,6 @@ while line != "" and found == 0:
 if found == 0:
     found = mark
 f.seek(found)
-f.write("#define BUILD_NUMBER " + text)
+f.write("#define BUILD_NUMBER " + text + "\n")
 f.truncate()
 f.close()

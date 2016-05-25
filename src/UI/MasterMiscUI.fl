@@ -364,7 +364,7 @@ synth = _synth;
   }
 } 
 
-class SysEffSend {selected : {public WidgetPDial, private MiscFuncs}
+class SysEffSend {: {public WidgetPDial, private MiscFuncs}
 } {
   Function {SysEffSend(int x,int y, int w, int h, const char *label=0):WidgetPDial(x,y,w,h,label)} {} {
     code {neff1=0; neff2=0;} {}
@@ -392,7 +392,7 @@ class SysEffSend {selected : {public WidgetPDial, private MiscFuncs}
 	if (event == FL_PUSH || event == FL_DRAG)
         {
             synth->setPsysefxsend(neff1,neff2,value());
-            synth->commandFetch(value(), (Fl::event_button() | 0x20 | (1 << 7)), neff1, 0xf1, 0xff, neff2 | 0x20);
+            synth->commandFetch(value(), (Fl::event_button() | 0x20 | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
         }
         return WidgetPDial::handle(event);} {}
   }
@@ -404,7 +404,7 @@ class SysEffSend {selected : {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {

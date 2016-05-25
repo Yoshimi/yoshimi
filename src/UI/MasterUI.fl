@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -88,7 +88,7 @@ decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 decl {class MasterUI;} {public local
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1066,8 +1066,16 @@ updatepanel();}
   Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
 if (kititem == 0xff)
-kititem = 0xf0;
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, kititem);} {}
+    kititem = 0xf0;
+int eng;
+if (kititem == 0xf1)
+    eng = nsyseff;
+else if (kititem == 0xf2)
+    eng = ninseff;
+else
+    eng = 0xff;
+
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, kititem, 0xff, eng);} {}
   }
   Function {updatesendwindow()} {} {
     code {//

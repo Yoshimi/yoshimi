@@ -76,7 +76,7 @@ inserts
 8   resonance base (for add & pad harmonics)
 9   resonance graph
 
-32+ engine specific ?
+16  System effect sends
 
 
 insert param

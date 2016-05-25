@@ -1,0 +1,8 @@
+#!/bin/bash
+
+python incbuildnumber.py
+
+git push origin master
+git push upstream master
+
+
