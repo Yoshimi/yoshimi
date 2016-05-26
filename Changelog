@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-5-26 Will
+- Initial implementation of GUI vectro control.
+
 2016-5-25 Will
 - Refinements to system and insertion effect selectors
 - Updated docs

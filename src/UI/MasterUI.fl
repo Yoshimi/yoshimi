@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -70,6 +70,9 @@ decl {\#include "PresetsUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 } 
 
+decl {\#include "VectorUI.h"} {public local
+} 
+
 decl {\#include "ConsoleUI.h"} {public local
 } 
 
@@ -85,10 +88,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-decl {class MasterUI;} {public local
-} 
-
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -150,6 +150,11 @@ class MasterUI {: {private MiscFuncs}
         paramsui->Hide();
         delete paramsui;
       }
+      if (vectorui)
+      {
+        vectorui->Hide();
+        delete vectorui;
+      }
       if (yoshiLog)
       {
         yoshiLog->Hide();
@@ -173,6 +178,7 @@ class MasterUI {: {private MiscFuncs}
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
+      vectorui = new VectorUI(synth, bankui);
       yoshiLog = new ConsoleUI();
 
       make_window();
@@ -278,6 +284,11 @@ forceId = string2uint(sId);
 
 mainCreateNewInstance(forceId);}
             xywh {0 0 31 21} labelsize 12
+          }
+          MenuItem {} {
+            label {&Vectors}
+            callback {vectorui->Show();}
+            xywh {0 0 34 20}
           }
           MenuItem {} {
             label {&Settings...}
@@ -1090,8 +1101,14 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   Function {updatepanel()} {} {
     code {//
-        for (int npart = 0; npart < NUM_MIDI_CHANNELS; ++npart)
-            panellistitem[npart]->refresh();
+        int partmax = synth->getRuntime().NumAvailableParts;
+        for (int npart = 0; npart < partmax; ++npart)
+        {
+            if (npart < NUM_MIDI_CHANNELS)
+            	panellistitem[npart]->refresh();
+            vectorui->setInstrumentLabel(npart);
+        }
+
         if (synth->getRuntime().single_row_panel)
         {
         	panelwindow->size(1085,345);
@@ -1107,9 +1124,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
 	        Panelclose->position(482,645);
 	        Panelgroups->position(48,645);
 	        Panelsmallgroups->position(48,645);
-
         }
-        int partmax = synth->getRuntime().NumAvailableParts;
 
         if (partmax == 64)
             Panelgroups->show();
@@ -1355,7 +1370,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
     else
         Reports->activate();} {}
   }
-  Function {checkmaxparts()} {private return_type bool
+  Function {checkmaxparts()} {return_type bool
   } {
     code {//
     bool changed = false;
@@ -1368,7 +1383,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         Panelsmallgroups->value(0);
         changed = true;
     }
-    npartcounter->range(1.0,max);
+    npartcounter->range(1, max);
     if ( npartcounter->value() >= (max + 1))
         npartcounter->value(1);
     return changed;} {}
@@ -1496,7 +1511,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         bankui-> rescan_for_banks(false);
     }} {}
   }
-  Function {getSynth()} {open return_type {SynthEngine *}
+  Function {getSynth()} {return_type {SynthEngine *}
   } {
     code {return synth;} {}
   }
@@ -1777,6 +1792,8 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {ParametersUI *paramsui;} {private local
   }
+  decl {VectorUI *vectorui;} {private local
+  }
   decl {BankUI *bankui;} {public local
   }
   decl {MicrotonalUI *microtonalui;} {public local
@@ -1785,7 +1802,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int ninseff;} {public local
   }
-  decl {int npart;} {private local
+  decl {int npart;} {public local
   }
   decl {int nsyseff;} {private local
   }

@@ -71,7 +71,7 @@ set (FltkUI_names
     "OscilGenUI"  "ADnoteUI"  "PADnoteUI"
     "EffUI"  "BankUI"  "PartUI"
     "MicrotonalUI"  "MasterUI" "MasterMiscUI"
-    "ParametersUI" "ConsoleUI"
+    "ParametersUI" "ConsoleUI" "VectorUI"
 )
 
 # workaround fltk_wrap_ui breakage
