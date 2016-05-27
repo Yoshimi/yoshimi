@@ -73,6 +73,7 @@ static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 static vector<string> ParamsHistory;
 static vector<string> ScaleHistory;
 static vector<string> StateHistory;
+static vector<string> VectorHistory;
 
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
@@ -3189,7 +3190,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc2[chan] = C_panning;
             Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
-            Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
+            //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
         case 1:
@@ -3203,7 +3204,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.nrpndata.vectorYcc2[chan] = C_panning;
                 Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
                 Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
-                Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
+                //Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
             }
             break;
 
@@ -3811,7 +3812,6 @@ bool SynthEngine::saveBanks(int instance)
 
 void SynthEngine::addHistory(string name, int group)
 {
-
     unsigned int name_start = name.rfind("/");
     unsigned int name_end = name.rfind(".");
 
@@ -3837,7 +3837,9 @@ void SynthEngine::addHistory(string name, int group)
 
 vector<string> * SynthEngine::getHistory(int group)
 {
-    if (group == 4)
+    if (group == 5)
+        return &VectorHistory;
+    else if (group == 4)
         return &StateHistory;
     else if (group == 3)
         return &ScaleHistory;
@@ -3870,7 +3872,7 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = 2; count < 5; ++count)
+    for (int count = 2; count < 6; ++count)
     {
         switch (count)
         {
@@ -3885,6 +3887,10 @@ bool SynthEngine::loadHistory()
             case 4:
                 type = "XMZ_STATE";
                 extension = "state_file";
+                break;
+            case 5:
+                type = "XMZ_VECTOR";
+                extension = "xvy_file";
                 break;
         }
         if (xml->enterbranch(type))
@@ -3927,7 +3933,7 @@ bool SynthEngine::saveHistory()
         int x;
         string type;
         string extension;
-        for (int count = 2; count < 5; ++count)
+        for (int count = 2; count < 6; ++count)
         {
             switch (count)
             {
@@ -3942,6 +3948,10 @@ bool SynthEngine::saveHistory()
                 case 4:
                     type = "XMZ_STATE";
                     extension = "state_file";
+                    break;
+                case 5:
+                    type = "XMZ_VECTOR";
+                    extension = "xvy_file";
                     break;
             }
             vector<string> listType = *getHistory(count);
@@ -4003,6 +4013,7 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
         Runtime. Log("Extract Data, no VECTOR branch");
         return false;
     }
+    addHistory(file, 5);
     int lastPart = NUM_MIDI_PARTS;
     if (baseChan >= NUM_MIDI_CHANNELS)
         baseChan = xml->getpar255("Source_channel", 0);
@@ -4153,7 +4164,9 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
                 xml->endbranch();
             }
         }
-        if (!xml->saveXMLfile(file))
+        if (xml->saveXMLfile(file))
+            addHistory(file, 5);
+        else
         {
             Runtime.Log("Failed to save data to " + file);
             ok = false;

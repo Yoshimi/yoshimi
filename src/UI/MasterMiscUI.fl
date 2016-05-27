@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey
+Copyright 2014-2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -404,7 +404,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
+class Panellistitem {: {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
@@ -451,8 +451,13 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         }
         Fl_Slider partvolume {
           callback {//
-              synth->part[npart + *plgroup]->setVolume(o->value());
-              synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, o->value());}
+	if (Fl::event_button() == 3)
+	{
+	    o->value(96);
+	    o->redraw();	    
+	}
+        synth->part[npart + *plgroup]->setVolume(o->value());
+        synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, o->value());}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
         }

@@ -224,6 +224,17 @@ void MiscFuncs::legit_pathname(string& fname)
 }
 
 
+string MiscFuncs::findleafname(string name)
+{
+    unsigned int name_start;
+    unsigned int name_end;
+
+    name_start = name.rfind("/");
+    name_end = name.rfind(".");
+    return name.substr(name_start + 1, name_end - name_start - 1);
+}
+
+
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {

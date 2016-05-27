@@ -42,13 +42,16 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "PartUI.h"} {public local
 } 
 
+decl {\#include "ParametersUI.h"} {public local
+} 
+
 class VectorUI {selected : {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
-      label Vectors
+      label {Yoshimi : Vectors}
       callback {o->hide()}
-      xywh {65 178 375 295} type Double labelfont 13 labelsize 12 align 0 hide
+      xywh {941 293 375 295} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Spinner {} {
         label {Base Channel}
@@ -63,15 +66,19 @@ updateAll();}
       } {
         MenuItem {} {
           label Load
+          callback {loadVector("");}
           xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
           label Save
+          callback {saveVector();}
           xywh {10 10 34 20} labelsize 12
         }
-        MenuItem {} {
+        MenuItem recenthistory {
           label Recent
-          xywh {20 20 34 20} labelsize 12
+          callback {paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
+paramsui->Show(5);}
+          xywh {20 20 34 20} labelsize 12 deactivate
         }
         MenuItem {} {
           label Clear
@@ -87,14 +94,14 @@ updateAll();}
           callback {synth->getGuiMaster()->npart = BaseChan;
 synth->partonoffLock(BaseChan, 1);
 bankui->Show();}
-          xywh {20 53 142 20} box DOWN_BOX color 51 labelsize 12 align 64
+          xywh {20 53 160 20} color 51 labelsize 12 align 64
         }
         Fl_Button XinstR {
           label {Simple Sound}
           callback {synth->getGuiMaster()->npart = BaseChan + 16;
 synth->partonoffLock(BaseChan + 16, 1);
 bankui->Show();}
-          xywh {20 115 142 20} box DOWN_BOX color 51 labelsize 12 align 64
+          xywh {20 115 160 20} color 51 labelsize 12 align 64
         }
         Fl_Text_Display Xfeat {
           label Features
@@ -250,14 +257,14 @@ o->redraw();}
           callback {synth->getGuiMaster()->npart = BaseChan + 32;
 synth->partonoffLock(BaseChan + 32, 1);
 bankui->Show();}
-          xywh {20 163 142 20} box DOWN_BOX color 51 labelsize 12 align 64
+          xywh {20 163 160 20} color 51 labelsize 12 align 64
         }
         Fl_Button YinstD {
           label {Simple Sound}
           callback {synth->getGuiMaster()->npart = BaseChan + 48;
 synth->partonoffLock(BaseChan + 48, 1);
 bankui->Show();}
-          xywh {20 225 142 20} box DOWN_BOX color 51 labelsize 12 align 64
+          xywh {20 225 160 20} color 51 labelsize 12 align 64
         }
         Fl_Text_Display Yfeat {
           label Features
@@ -390,12 +397,16 @@ o->redraw();}
         xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
+      Fl_Button Loaded {
+        xywh {45 265 198 20} box FLAT_BOX labelfont 1 labelsize 12
+      }
     }
   }
-  Function {VectorUI(SynthEngine *_synth, BankUI *_bankui)} {} {
+  Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
 synth = _synth;
 bankui = _bankui;
+paramsui = _paramsui;
 BaseChan = 0;
 Xcc = 0;
 Xf = 0;
@@ -420,6 +431,10 @@ XinstL->copy_label(synth->part[BaseChan]->Pname.c_str());
 XinstR->copy_label(synth->part[BaseChan + 16]->Pname.c_str());
 YinstU->copy_label(synth->part[BaseChan + 32]->Pname.c_str());
 YinstD->copy_label(synth->part[BaseChan + 48]->Pname.c_str());
+setbuttons();} {}
+  }
+  Function {setbuttons()} {} {
+    code {//
 Xcc = synth->getRuntime().nrpndata.vectorXaxis[BaseChan];
 if (Xcc > 119)
     Xcc = 0;
@@ -486,7 +501,11 @@ else if (bitTest(Yf,3))
 else
     Yfeat4->value(0);
 
-Ycontrol->do_callback();} {}
+Ycontrol->do_callback();
+
+Loaded->copy_label(loadlabel[BaseChan].c_str());
+//if (VectorHistory.size() > 0) @@@ needs sorting!
+    recenthistory->activate();} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
@@ -497,11 +516,55 @@ else if (npart == BaseChan + 16)
 else if (npart == BaseChan + 32)
     YinstU->copy_label(synth->part[npart]->Pname.c_str());
 else if (npart == BaseChan + 48)
-    YinstD->copy_label(synth->part[npart]->Pname.c_str());} {}
+    YinstD->copy_label(synth->part[npart]->Pname.c_str());
+setbuttons();} {}
+  }
+  Function {loadVector(string fname)} {} {
+    code {//
+    if (fname == "")
+    {
+    	char *filename;
+    	filename = fl_file_chooser("Open:", "({*.xvy})", NULL, 0);
+    	if (filename == NULL)
+        	return;
+    	fname = string(filename);
+    }
+    synth->actionLock(lockmute);
+    bool result = synth->loadVector(BaseChan, fname, true);
+    synth->actionLock(unlock);
+    recenthistory->activate();
+    if (!result)
+        fl_alert("Failed to load vector");
+    else
+    {
+        loadlabel[BaseChan] = findleafname(fname);
+        Loaded->copy_label(loadlabel[BaseChan].c_str());
+    }
+    setbuttons();} {}
+  }
+  Function {saveVector()} {} {
+    code {//
+            char *filename;
+            filename = fl_file_chooser("Save:", "({*.xvy})", NULL, 0);
+            if (filename == NULL)
+                return;
+            filename = fl_filename_setext(filename, ".xvy");
+            if (isRegFile(string(filename)))
+                if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                    return;
+            synth->actionLock(lockmute);
+            bool result = synth->saveVector(BaseChan, string(filename), true);
+            synth->actionLock(unlock);
+            if (result)
+            	recenthistory->activate();
+            else
+                fl_alert("Failed to save vector");} {}
   }
   decl {SynthEngine *synth;} {private local
   }
   decl {BankUI *bankui;} {private local
+  }
+  decl {ParametersUI *paramsui;} {private local
   }
   decl {int BaseChan;} {private local
   }
@@ -512,5 +575,7 @@ else if (npart == BaseChan + 48)
   decl {int Ycc;} {private local
   }
   decl {unsigned int Yf;} {private local
+  }
+  decl {string loadlabel [16];} {private local
   }
 } 

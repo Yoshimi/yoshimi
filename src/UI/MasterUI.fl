@@ -178,7 +178,7 @@ class MasterUI {selected : {private MiscFuncs}
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
-      vectorui = new VectorUI(synth, bankui);
+      vectorui = new VectorUI(synth, bankui, paramsui);
       yoshiLog = new ConsoleUI();
 
       make_window();
@@ -288,7 +288,7 @@ mainCreateNewInstance(forceId);}
           MenuItem {} {
             label {&Vectors}
             callback {vectorui->Show();}
-            xywh {0 0 34 20}
+            xywh {0 0 34 20} labelsize 12
           }
           MenuItem {} {
             label {&Settings...}
@@ -1792,7 +1792,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {ParametersUI *paramsui;} {private local
   }
-  decl {VectorUI *vectorui;} {private local
+  decl {VectorUI *vectorui;} {public local
   }
   decl {BankUI *bankui;} {public local
   }

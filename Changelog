@@ -1,7 +1,11 @@
 yoshimi 1.3.x
 
+2016-5-27 Will
+- Mixer sliders now right click to home position.
+- All vector options implemented except 'Clear'.
+
 2016-5-26 Will
-- Initial implementation of GUI vectro control.
+- Initial implementation of GUI vector control.
 
 2016-5-25 Will
 - Refinements to system and insertion effect selectors
