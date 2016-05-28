@@ -29,6 +29,8 @@ If part is < 0x40 and kit is 0xff it's the general part level controls, otherwis
 If kit >= 0x20 it's the engine enable controls.
     (kit number ORed with 0x20)
 
+Vector Control
+This uses part number 0xc0
 
 Effects and effect sources.
 In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects.

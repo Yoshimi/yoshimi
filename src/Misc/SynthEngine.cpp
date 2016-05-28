@@ -749,7 +749,9 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
         Runtime.Log("\nButton " + asString((int) type & 7) + "\nPart " + asString((int) part) + "\nKit " + asString((int) kit) + "\nEngine " + asString((int) engine) + "\nInsert " + asString((int) insert) + "  Insert Param " + asString((int) insertParam) + "\nControl " + asString((int) control) + "  Value " + asString(value) + isf);
         return;
     }
-    if (part == 0xf0)
+    if (part == 0xc0)
+        commandVector(value, type, control);
+    else if (part == 0xf0)
         commandMain(value, type, control);
     else if ((part == 0xf1 || part == 0xf2) && kit == 0xff)
         commandSysIns(value, type, control, part, engine, insert);
@@ -857,6 +859,67 @@ void SynthEngine::commandSend(float value, unsigned char type, unsigned char con
         }
     }
     // just do nothing if not recognised
+}
+
+
+void SynthEngine::commandVector(float value, unsigned char type, unsigned char control)
+{
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Base Channel";
+            break;
+        case 1:
+            contstr = "Options";
+            break;
+
+        case 16:
+        case 32:
+            contstr = "Controller";
+            break;
+        case 17:
+            contstr = "Left Instrument";
+            break;
+        case 18:
+            contstr = "Right Instrument";
+            break;
+        case 19:
+        case 35:
+            contstr = "Feature 0";
+            break;
+        case 20:
+        case 36:
+            contstr = "Feature 1";
+            break;
+        case 21:
+        case 37:
+            contstr = "Feature 2 ";
+            break;
+        case 22:
+        case 38:
+            contstr = "Feature 3";
+            break;
+        case 33:
+            contstr = "Up Instrument";
+            break;
+        case 34:
+            contstr = "Down Instrument";
+            break;
+    }
+    string name = "Vector ";
+    if (control >= 32)
+        name += "Y ";
+
+    else if(control >= 16)
+        name += "X ";
+    Runtime.Log(name + contstr + " value " + actual);
 }
 
 

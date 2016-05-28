@@ -3,6 +3,8 @@ yoshimi 1.3.x
 2016-5-28 Will
 - Vector control 'Clear' implemented.
 - Improved Vector GUI structure.
+- Identified vector controls.
+- Updated docs.
 
 2016-5-27 Will
 - Mixer sliders now right click to home position.
