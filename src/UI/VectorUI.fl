@@ -21,9 +21,6 @@ Modified September 2014
 } {in_source in_header
 } 
 
-decl {\#include <set>} {public local
-} 
-
 decl {using namespace std;} {public local
 } 
 
@@ -37,9 +34,6 @@ decl {\#include "Misc/MiscFuncs.h"} {private global
 } 
 
 decl {\#include "BankUI.h"} {public local
-} 
-
-decl {\#include "PartUI.h"} {public local
 } 
 
 decl {\#include "ParametersUI.h"} {public local
@@ -63,6 +57,9 @@ updateAll();}
       Fl_Menu_Button {} {
         label Options
         xywh {275 12 74 20} labelsize 12 textsize 12
+        code0 {o = o; // suppress warning}
+        code1 {vector <string> listType = *synth->getHistory(5);}
+        code2 {if (listType.size() == 0) recenthistory->deactivate(); else recenthistory->activate();}
       } {
         MenuItem {} {
           label Load
@@ -82,6 +79,7 @@ paramsui->Show(5);}
         }
         MenuItem {} {
           label Clear
+          callback {clearVector();}
           xywh {30 30 34 20} labelsize 12
         }
       }
@@ -394,7 +392,7 @@ else
 Ycc =  tmp;
 o->value(tmp);
 o->redraw();}
-        xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
+        xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {o->value(Ycc);}
       }
       Fl_Button Loaded {
@@ -437,10 +435,32 @@ setbuttons();} {}
     code {//
 Xcc = synth->getRuntime().nrpndata.vectorXaxis[BaseChan];
 if (Xcc > 119)
+{
     Xcc = 0;
-Xcontrol->value(Xcc);
-Xf = synth->getRuntime().nrpndata.vectorXfeatures[BaseChan];
+    Xf = 0;
+    Xgroup->deactivate();
+    Ycc = 0;
+    Yf = 0;
+    Ygroup->deactivate();
+}
+else
+{
+    Xf = synth->getRuntime().nrpndata.vectorXfeatures[BaseChan];
+    Xgroup->activate();
+    Ycc = synth->getRuntime().nrpndata.vectorYaxis[BaseChan];
+    if (Ycc > 119)
+    {
+        Ycc = 0;
+        Ygroup->deactivate();
+    }
+    else
+    {
+        Yf = synth->getRuntime().nrpndata.vectorYfeatures[BaseChan];
+        Ygroup->activate();
+    }
+}
 
+Xcontrol->value(Xcc);
 if (bitTest(Xf,0))
     Xfeat1->value(1);
 else
@@ -467,14 +487,7 @@ else if (bitTest(Xf,3))
 else
     Xfeat4->value(0);
 
-Xcontrol->do_callback();
-
-Ycc = synth->getRuntime().nrpndata.vectorYaxis[BaseChan];
-if (Ycc > 119)
-    Ycc = 0;
 Ycontrol->value(Ycc);
-Yf = synth->getRuntime().nrpndata.vectorYfeatures[BaseChan];
-
 if (bitTest(Yf,0))
     Yfeat1->value(1);
 else
@@ -501,11 +514,7 @@ else if (bitTest(Yf,3))
 else
     Yfeat4->value(0);
 
-Ycontrol->do_callback();
-
-Loaded->copy_label(loadlabel[BaseChan].c_str());
-//if (VectorHistory.size() > 0) @@@ needs sorting!
-    recenthistory->activate();} {}
+Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
@@ -559,6 +568,17 @@ setbuttons();} {}
             	recenthistory->activate();
             else
                 fl_alert("Failed to save vector");} {}
+  }
+  Function {clearVector()} {} {
+    code {//
+synth->getRuntime().nrpndata.vectorXaxis[BaseChan] = 0xff;
+synth->getRuntime().nrpndata.vectorYaxis[BaseChan] = 0xff;
+synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = 0;
+synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = 0;
+synth->getRuntime().nrpndata.vectorEnabled[BaseChan] = false;
+loadlabel[BaseChan] = "";
+Loaded->copy_label(loadlabel[BaseChan].c_str());
+setbuttons();} {}
   }
   decl {SynthEngine *synth;} {private local
   }

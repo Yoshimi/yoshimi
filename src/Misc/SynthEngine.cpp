@@ -3190,7 +3190,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc2[chan] = C_panning;
             Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
-            //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
+            Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
         case 1:
@@ -3204,7 +3204,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.nrpndata.vectorYcc2[chan] = C_panning;
                 Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
                 Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
-                //Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
+                Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
             }
             break;
 
@@ -3297,6 +3297,8 @@ void SynthEngine::ClearNRPNs(void)
         Runtime.nrpndata.vectorEnabled[chan] = false;
         Runtime.nrpndata.vectorXaxis[chan] = 0xff;
         Runtime.nrpndata.vectorYaxis[chan] = 0xff;
+        Runtime.nrpndata.vectorXfeatures[chan] = 0;
+        Runtime.nrpndata.vectorYfeatures[chan] = 0;
     }
 }
 
@@ -4079,7 +4081,7 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
             part[npart + baseChan]->Prcvchn = baseChan;
             xml->exitbranch();
             if (partonoffRead(npart + baseChan) && (part[npart + baseChan]->Paudiodest & 2))
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + baseChan);
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + baseChan);
         }
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
     // need to ensure thread safety here.
