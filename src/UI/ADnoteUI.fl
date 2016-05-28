@@ -201,7 +201,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {10 324 770 580} type Double hide
+      xywh {4 167 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -219,7 +219,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
           } {
             Fl_Group modfrequency {
               label {Mod FREQUENCY}
-              xywh {535 220 220 145} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
+              xywh {535 204 220 161} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
               Fl_Group voiceFMfreqenvgroup {
                 label {ADSynth Modulator - Frequency Envelope}
@@ -268,21 +268,21 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
               }
+              Fl_Value_Output fmdetunevalueoutput {
+                label Detune
+                callback {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
+                xywh {540 225 210 13} labelsize 8 align 5 minimum -5000 maximum 5000 textfont 1 textsize 8
+                code0 {o->step(0.01, 1);}
+                code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
+                code2 {//o->value(getdetune(pars->VoicePar[nvoice].PFMDetuneType,0,pars->VoicePar[nvoice].PFMDetune));}
+              }
               Fl_Slider {} {
                 callback {//
                     pars->VoicePar[nvoice].PFMDetune = lrint(o->value()) + 8192;
                     fmdetunevalueoutput->do_callback();
                     send_data(96, o->value());}
-                tooltip {Fine Detune (cents)} xywh {590 245 160 10} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
+                tooltip {Fine Detune (cents)} xywh {586 227 160 10} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetune-8192);}
-              }
-              Fl_Value_Output fmdetunevalueoutput {
-                label Detune
-                callback {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-                xywh {540 245 45 13} labelsize 8 align 5 minimum -5000 maximum 5000 textfont 1 textsize 8
-                code0 {o->step(0.01, 1);}
-                code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
-                code2 {//o->value(getdetune(pars->VoicePar[nvoice].PFMDetuneType,0,pars->VoicePar[nvoice].PFMDetune));}
               }
               Fl_Choice {} {
                 label {Detune Type}
@@ -299,28 +299,38 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                     o->add("E1200cents");}
                 code1 {o->value(pars->VoicePar[nvoice].PFMDetuneType);}
               } {}
+              Fl_Check_Button Mod440 {
+                label 440Hz
+                callback {pars->VoicePar[nvoice].PFMFixedFreq = o->value();
+if (o->value() == 0 && lrint(Freq440->value() == 0))
+    fixedfreqetdial->deactivate();
+else
+    fixedfreqetdial->activate();}
+                tooltip {Set the modulator base frequency to 440Hz} xywh {683 242 55 15} down_box DOWN_BOX labelfont 1 labelsize 11
+                code0 {o->value(pars->VoicePar[nvoice].PFMFixedFreq);}
+              }
             }
             Fl_Group {} {
               label {Mod AMPLITUDE}
-              xywh {535 60 220 160} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
+              xywh {535 55 220 149} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
               Fl_Value_Slider {} {
                 label Vol
                 callback {pars->VoicePar[nvoice].PFMVolume = lrint(o->value());
 send_data(80, o->value());}
-                tooltip Volume xywh {540 80 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
+                tooltip Volume xywh {540 70 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolume);}
               }
               Fl_Value_Slider {} {
                 label {V.Sns}
                 callback {pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(o->value());
 send_data(81, o->value());}
-                tooltip {Velocity Sensing Function - rightmost/max to disable)} xywh {540 100 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
+                tooltip {Velocity Sensing Function - rightmost/max to disable)} xywh {540 90 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVelocityScaleFunction);}
               }
               Fl_Group voiceFMampenvgroup {
                 label {ADSynth Modulator - Amplitude Envelope} open
-                xywh {540 145 205 70} box FLAT_BOX color 51 align 144
+                xywh {542 129 205 70} box FLAT_BOX color 51 align 144
                 code0 {o->init(pars->VoicePar[nvoice].FMAmpEnvelope, npart, kititem, nvoice | 0xc0, 0);}
                 code1 {if (pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
@@ -335,14 +345,14 @@ send_data(81, o->value());}
                         voiceFMampenvgroup->activate();
                     o->redraw();
                     send_data(88, o->value());}
-                tooltip {Forced Relase} xywh {545 150 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                tooltip {Forced Relase} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
               }
               Fl_Value_Slider {} {
                 label {F.Damp}
                 callback {pars->VoicePar[nvoice].PFMVolumeDamp = lrint(o->value()) + 64;
 send_data(82, o->value());}
-                tooltip {Modulator Damp at Higher frequency} xywh {540 120 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 minimum -64 maximum 63 step 1
+                tooltip {Modulator Damp at Higher frequency} xywh {540 110 160 15} type {Horz Knob} box FLAT_BOX labelsize 11 align 8 minimum -64 maximum 63 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolumeDamp-64);}
               }
             }
@@ -422,7 +432,7 @@ send_data(82, o->value());}
                   }
                   voiceFMparametersgroup->redraw();
                   send_data(17, o->value());}
-              xywh {635 40 85 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {635 32 85 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("OFF");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtMod.%2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
@@ -439,7 +449,7 @@ send_data(82, o->value());}
                     voiceFMparametersgroup->activate();
                 o->redraw();
                 send_data(16, o->value());}
-            xywh {535 40 80 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
+            xywh {535 32 80 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
             MenuItem {} {
@@ -553,12 +563,12 @@ send_data(82, o->value());}
               code0 {o->step(0.01, 1);}
               code1 {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
             }
-            Fl_Check_Button {} {
+            Fl_Check_Button Freq440 {
               label 440Hz
               callback {//
                   int x = lrint(o->value());
                   pars->VoicePar[nvoice].Pfixedfreq = x;
-                  if (x == 0)
+                  if (x == 0 && Mod440->value() == 0)
                       fixedfreqetdial->deactivate();
                   else
                       fixedfreqetdial->activate();

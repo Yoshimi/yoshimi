@@ -143,6 +143,7 @@ void ADnoteParameters::defaults(int n)
     VoicePar[nvoice].PFilterVelocityScale = 0;
     VoicePar[nvoice].PFilterVelocityScaleFunction = 64;
     VoicePar[nvoice].PFMEnabled = 0;
+    VoicePar[nvoice].PFMFixedFreq = false;
 
     // I use the internal oscillator (-1)
     VoicePar[nvoice].PFMVoice = -1;
@@ -427,6 +428,7 @@ void ADnoteParameters::add2XMLsection(XMLwrapper *xml, int n)
                 xml->addpar("detune_type", VoicePar[nvoice].PFMDetuneType);
 
                 xml->addparbool("freq_envelope_enabled", VoicePar[nvoice].PFMFreqEnvelopeEnabled);
+                xml->addparbool("fixed_freq", VoicePar[nvoice].PFMFixedFreq);
                 if ((VoicePar[nvoice].PFMFreqEnvelopeEnabled != 0) || (!xml->minimal))
                 {
                     xml->beginbranch("FREQUENCY_ENVELOPE");
@@ -789,6 +791,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
             VoicePar[nvoice].PFMFreqEnvelopeEnabled =
                 xml->getparbool("freq_envelope_enabled",
                                 VoicePar[nvoice].PFMFreqEnvelopeEnabled);
+            VoicePar[nvoice].PFMFixedFreq = xml->getparbool("fixed_freq", VoicePar[nvoice].PFMFixedFreq);
             if (xml->enterbranch("FREQUENCY_ENVELOPE"))
             {
                 VoicePar[nvoice].FMFreqEnvelope->getfromXML(xml);

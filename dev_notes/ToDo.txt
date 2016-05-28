@@ -7,13 +7,8 @@ Investigate new Zyn voice parameters AddSynth voice:
 Currently we load and save them (for compatibility) but make
 no use of them.
 
-Investigate A = 440 in modulator
-
-<par_bool name="fixed_freq" value="yes" />
-
 Also, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
-
 
 
 Change root/bank/instrument lists to single file for all instances.
@@ -50,8 +45,6 @@ RPNs (channel based)
 
 Maybe a NRPN variation of this for global fine tuning.
 
-
-Gui to set up vector control!
 
 Review tooltips.
 

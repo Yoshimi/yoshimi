@@ -170,6 +170,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
             // Modulator parameters
             FMTYPE FMEnabled;
+            unsigned char FMFreqFixed;
             int    FMVoice;
             float *VoiceOut; // Voice Output used by other voices if use this as modullator
             float *FMSmp;    // Wave of the Voice
