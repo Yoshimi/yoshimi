@@ -377,31 +377,29 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
                     adpars->VoicePar[nvoice].PFilterVelocityScaleFunction) - 1);
         NoteVoicePar[nvoice].filterbypass = adpars->VoicePar[nvoice].Pfilterbypass;
 
-        switch (adpars->VoicePar[nvoice].PFMEnabled)
-        {
-            case 1:
-                NoteVoicePar[nvoice].FMEnabled = MORPH;
-                break;
-
-            case 2:
-                NoteVoicePar[nvoice].FMEnabled = RING_MOD;
-                break;
-
-            case 3:
-                NoteVoicePar[nvoice].FMEnabled = PHASE_MOD;
-                break;
-
-            case 4:
-                NoteVoicePar[nvoice].FMEnabled = FREQ_MOD;
-                break;
-
-            case 5:
-                NoteVoicePar[nvoice].FMEnabled = PW_MOD;
-                break;
-
-            default:
-                NoteVoicePar[nvoice].FMEnabled = NONE;
-        }
+        if (adpars->VoicePar[nvoice].Type != 0)
+            NoteVoicePar[nvoice].FMEnabled = NONE;
+        else
+            switch (adpars->VoicePar[nvoice].PFMEnabled)
+            {
+                case 1:
+                    NoteVoicePar[nvoice].FMEnabled = MORPH;
+                    break;
+                case 2:
+                    NoteVoicePar[nvoice].FMEnabled = RING_MOD;
+                    break;
+                case 3:
+                    NoteVoicePar[nvoice].FMEnabled = PHASE_MOD;
+                    break;
+                case 4:
+                    NoteVoicePar[nvoice].FMEnabled = FREQ_MOD;
+                    break;
+                case 5:
+                    NoteVoicePar[nvoice].FMEnabled = PW_MOD;
+                    break;
+                default:
+                    NoteVoicePar[nvoice].FMEnabled = NONE;
+            }
 
         NoteVoicePar[nvoice].FMVoice = adpars->VoicePar[nvoice].PFMVoice;
         NoteVoicePar[nvoice].FMFreqEnvelope = NULL;
@@ -958,9 +956,9 @@ void ADnote::initParameters(void)
                 vc = adpars->VoicePar[nvoice].PextFMoscil;
 
             float freqtmp = 1.0f;
-            if (adpars->VoicePar[vc].FMSmp->Padaptiveharmonics
-               || NoteVoicePar[nvoice].FMEnabled == MORPH
-               || NoteVoicePar[nvoice].FMEnabled == RING_MOD)
+            if (adpars->VoicePar[vc].FMSmp->Padaptiveharmonics != 0
+               || (NoteVoicePar[nvoice].FMEnabled == MORPH)
+               || (NoteVoicePar[nvoice].FMEnabled == RING_MOD))
                freqtmp = getFMVoiceBaseFreq(nvoice);
 
             if (!adpars->GlobalPar.Hrandgrouping)
@@ -1310,7 +1308,6 @@ inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
 // Computes the Oscillator (Morphing)
 void ADnote::computeVoiceOscillatorMorph(int nvoice)
 {
-    float amp;
     computeVoiceOscillatorLinearInterpolation(nvoice);
     if (isgreater(FMnewamplitude[nvoice], 1.0f))
         FMnewamplitude[nvoice] = 1.0f;
@@ -1326,7 +1323,7 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
             float *tw = tmpwave_unison[k];
             for (int i = 0; i < synth->p_buffersize; ++i)
             {
-                amp = interpolateAmplitude(FMoldamplitude[nvoice],
+                float amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice], i,
                                            synth->p_buffersize);
                 tw[i] *= (1.0f - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
@@ -1344,10 +1341,10 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
             float *tw = tmpwave_unison[k];
             for (int i = 0; i < synth->p_buffersize; ++i)
             {
-                amp = interpolateAmplitude(FMoldamplitude[nvoice],
+                float amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice], i,
                                            synth->p_buffersize);
-                tw[i] *= (1.0f - amp) + amp * (NoteVoicePar[nvoice].FMSmp[poshiFM]
+                tw[i] = tw[i] * (1.0f - amp) + amp * (NoteVoicePar[nvoice].FMSmp[poshiFM]
                           * (1 - posloFM) + NoteVoicePar[nvoice].FMSmp[poshiFM + 1]
                           * posloFM);
                 posloFM += freqloFM;
@@ -1646,17 +1643,14 @@ int ADnote::noteout(float *outl, float *outr)
                     case MORPH:
                         computeVoiceOscillatorMorph(nvoice);
                         break;
-
                     case RING_MOD:
                         computeVoiceOscillatorRingModulation(nvoice);
                         break;
-
                     case FREQ_MOD:
                     case PHASE_MOD:
                     case PW_MOD:
                         computeVoiceOscillatorFrequencyModulation(nvoice, NoteVoicePar[nvoice].FMEnabled);
                         break;
-
                     default:
                         computeVoiceOscillatorLinearInterpolation(nvoice);
                         //if (config.cfg.Interpolation) computeVoiceOscillatorCubicInterpolation(nvoice);

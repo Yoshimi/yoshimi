@@ -98,17 +98,16 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char Type;                     // Type of the voice 0 = Sound, 1 = Noise
     unsigned char PDelay;                   // Voice Delay
     unsigned char Presonance;               // If resonance is enabled for this voice
-    int           Pextoscil,                // What external oscil should I use,
+    short int     Pextoscil,                // What external oscil should I use,
                   PextFMoscil;              // -1 for internal OscilSmp & FMSmp
                                             // it is not allowed that the externoscil,
                                             // externFMoscil => current voice
-    unsigned char Poscilphase;              // oscillator phases
-    unsigned char PFMoscilphase;
+    unsigned char Poscilphase, PFMoscilphase; // oscillator phases
     unsigned char Pfilterbypass;            // filter bypass
     OscilGen     *OscilSmp;
 
     // Frequency parameters
-    unsigned char Pfixedfreq;
+    unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
     unsigned char PfixedfreqET; // Equal temperate (this is used only if the
                                 // Pfixedfreq is enabled). If this parameter is 0,
                                 // the frequency is fixed (to 440 Hz); if this

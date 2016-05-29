@@ -178,9 +178,9 @@ void OscilGen::convert2sine(int magtype)
         float newmag = mag[i] / max;
         float newphase = phase[i];
 
-        Phmag[i] = (int)truncf(newmag * 64.0f) + 64;
+        Phmag[i] = (int)(newmag * 64.0f) + 64;
 
-        Phphase[i] = 64 - (int)truncf(64.0f * newphase / PI);
+        Phphase[i] = 64 - (int)(64.0f * newphase / PI);
         if (Phphase[i] > 127)
             Phphase[i] = 127;
 
