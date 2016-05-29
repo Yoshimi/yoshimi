@@ -34,7 +34,7 @@
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
 
-enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD };
+enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PW_MOD };
 
 extern int ADnote_unison_sizes[];
 
@@ -160,7 +160,7 @@ struct ADnoteVoiceParam { // Voice parameters
 
 
     // Modullator parameters
-    unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM..
+    unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
     short int     PFMVoice;   // Voice that I use as modullator instead of FMSmp.
                               // It is -1 if I use FMSmp(default).
                               // It may not be equal or bigger than current voice

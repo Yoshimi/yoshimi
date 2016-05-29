@@ -133,6 +133,7 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
             int filterbypass;
             int DelayTicks;
             float *OscilSmp;  // Waveform of the Voice
+            int phase_offset; // PWM emulation
 
             // Frequency parameters
             int fixedfreq;   // if the frequency is fixed to 440 Hz
