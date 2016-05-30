@@ -65,7 +65,9 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         code0 {if (pars->VoicePar[nvoice].Enabled == 0) o->deactivate();}
       } {
         Fl_Value_Slider voicevolume {
-          callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());}
+          callback {if (Fl::event_button() == 3)
+   			 o->value(100);
+pars->VoicePar[nvoice].PVolume = lrint(o->value());}
           tooltip Volume xywh {90 5 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
         }
@@ -75,7 +77,9 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
           code0 {o->value(pars->VoicePar[nvoice].Presonance);}
         }
         Fl_Value_Slider voicelfofreq {
-          callback {pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());}
+          callback {if (Fl::event_button() == 3)
+    o->value(40);
+pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());}
           tooltip {Frequency LFO amount} xywh {500 5 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
         }
@@ -125,6 +129,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         }
         Fl_Slider voicedetune {
           callback {//
+              if (Fl::event_button() == 3)
+                  o->value(0);
               pars->VoicePar[nvoice].PDetune = lrint(o->value()) + 8192;
               detunevalueoutput->do_callback();}
           tooltip {Fine Detune (cents)} xywh {310 5 185 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
@@ -200,16 +206,16 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice
+      label Voice open
       xywh {4 167 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {
+      Fl_Group voiceparametersgroup {open
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
-        Fl_Group voicemodegroup {
+        Fl_Group voicemodegroup {open
           xywh {0 5 760 575}
         } {
           Fl_Group voiceFMparametersgroup {
@@ -489,7 +495,7 @@ send_data(82, o->value());}
             }
           }
           Fl_Group {} {
-            label FREQUENCY
+            label FREQUENCY open
             xywh {5 250 525 120} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -811,7 +817,7 @@ send_data(49, o->value());}
           }
         }
         Fl_Group amplitudegroup {
-          label AMPLITUDE
+          label AMPLITUDE open
           xywh {5 40 240 210} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
         } {
           Fl_Dial voicevolume {
@@ -1118,7 +1124,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
