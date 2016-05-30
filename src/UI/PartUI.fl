@@ -1267,9 +1267,11 @@ if ((Fl::event_button() == 3))
       }
       Fl_Value_Slider humanise {
         label Humanise
-        callback {part->Pfrand = o->value();
-send_data(48, o->value(), true, 0xff, 0xff);}
-        tooltip {Random detune of whole part in cents} xywh {5 337 201 18} type {Horz Knob} box FLAT_BOX labelsize 12 align 8 maximum 50 step 1
+        callback {if (Fl::event_button() == 3)
+    o->value(0);
+part->Pfrand = o->value();
+send_data(48, o->value());}
+        tooltip {Random detune of whole part in cents} xywh {8 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code0 {o->value(part->Pfrand);}
       }
       Fl_Button {} {

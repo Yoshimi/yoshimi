@@ -2,7 +2,9 @@
 Investigate new Zyn voice parameters AddSynth voice:
 
 <par name="bend_adjust" value="88" />
+PBendAdjust
 <par name="offset_hz" value="64" />
+PoffsetHz
 
 Currently we load and save them (for compatibility) but make
 no use of them.

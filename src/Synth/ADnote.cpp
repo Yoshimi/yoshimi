@@ -1326,7 +1326,7 @@ void ADnote::computeVoiceOscillatorMorph(int nvoice)
                 float amp = interpolateAmplitude(FMoldamplitude[nvoice],
                                            FMnewamplitude[nvoice], i,
                                            synth->p_buffersize);
-                tw[i] *= (1.0f - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
+                tw[i] = tw[i] * (1.0f - amp) + amp * NoteVoicePar[FMVoice].VoiceOut[i];
             }
         }
     }

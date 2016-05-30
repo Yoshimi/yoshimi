@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
-}
+} 
 
 comment {OscilgenUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -30,52 +30,52 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is a derivative of the ZynAddSubFX original, modified October 2009 -
 January 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include "ResonanceUI.h"} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Group.H>} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Slider.H>} {public local
-}
+} 
 
 decl {\#include <cmath>} {private local
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "EnvelopeUI.h"} {public local
-}
+} 
 
 decl {\#include "LFOUI.h"} {public local
-}
+} 
 
 decl {\#include "FilterUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "Synth/OscilGen.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {\#include "Misc/Config.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class OscilSpectrum {: {public Fl_Box, MiscFuncs}
 } {
@@ -172,7 +172,7 @@ oscbase = oscbase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PSlider {: {public Fl_Slider}
 } {
@@ -202,7 +202,7 @@ if (!Fl::event_inside(X,Y,W,H)) {
 
 return(1);} {}
   }
-}
+} 
 
 class Oscilloscope {: {public Fl_Box}
 } {
@@ -306,7 +306,7 @@ phase=phase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class Oscilharmonic {: {public Fl_Group}
 } {
@@ -456,7 +456,7 @@ if (oscil->Phmag[n]==64) mag->selection_color(0);
   }
   decl {int engine;} {private local
   }
-}
+} 
 
 class OscilEditor {selected : {public PresetsUI_}
 } {
@@ -496,11 +496,13 @@ send_data (104, o->value());}
         }
         Fl_Value_Slider rndslider {
           label rnd
-          callback {oscil->Prand=(int)o->value()+64;
+          callback {if (Fl::event_button() == 3)
+    o->value(0);
+oscil->Prand=(int)o->value()+64;
 oscildisplaygroup->redraw();
 oldosc->redraw();
 send_data (0, o->value());}
-          tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 10} type {Horz Knob} box FLAT_BOX labelsize 10 align 5 minimum -64 maximum 63 step 1
+          tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
         }
         Fl_Group {} {
@@ -1122,10 +1124,12 @@ send_data (68, o->value());}
           class WidgetPDial
         }
         Fl_Slider adhrpar {
-          callback {oscil->Padaptiveharmonicspar=(int)o->value();
+          callback {if (Fl::event_button() == 3)
+    o->value(50);
+oscil->Padaptiveharmonicspar=(int)o->value();
 redrawoscil();
 send_data (67, o->value());}
-          tooltip {Adaptive harmonics parameter} xywh {670 445 55 10} type {Horz Knob} box FLAT_BOX maximum 100 step 1 value 50
+          tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
         }
       }
       Fl_Group {} {
@@ -1309,4 +1313,4 @@ if (cbwidget!=NULL) {
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 

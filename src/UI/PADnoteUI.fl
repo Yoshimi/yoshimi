@@ -889,10 +889,12 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             } {}
             Fl_Slider detune {
               callback {//
+    if (Fl::event_button() == 3)
+        o->value(0);
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
     send_data(32, o->value() + 8192);}
-              tooltip {Fine Detune (cents)} xywh {60 295 295 15} type {Horz Knob} box FLAT_BOX minimum -8192 maximum 8191 step 1
+              tooltip {Fine Detune (cents)} xywh {57 295 295 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
             }
             Fl_Value_Output detunevalueoutput {
@@ -936,7 +938,7 @@ send_data(33, o->value());}
             }
           }
           Fl_Group {} {
-            label AMPLITUDE open
+            label AMPLITUDE
             xywh {5 25 240 250} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
           } {
             Fl_Dial volume {

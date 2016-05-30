@@ -1,5 +1,11 @@
 yoshimi 1.3.x
 
+2016-5-30 Will
+- Bugfix: Default resonance was showing 30dB but was actually 20dB.
+- All horizontal sliders now home on a right click.
+- Made GUI sliders clearer and more consistent.
+- More doc updates.
+
 2016-5-29 Will
 - Implemented Zyn. compatible AddSynth modulator fixed frequency.
 - Updated some docs.
