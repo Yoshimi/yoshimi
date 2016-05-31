@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {ADNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -38,7 +38,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "WidgetPDialUI.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "Misc/MiscFuncs.h"
@@ -47,10 +47,10 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
@@ -200,22 +200,22 @@ pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open
-      xywh {4 167 770 580} type Double hide
+      label Voice
+      xywh {141 319 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {open
+      Fl_Group voiceparametersgroup {
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
-        Fl_Group voicemodegroup {open
+        Fl_Group voicemodegroup {
           xywh {0 5 760 575}
         } {
           Fl_Group voiceFMparametersgroup {
@@ -495,7 +495,7 @@ send_data(82, o->value());}
             }
           }
           Fl_Group {} {
-            label FREQUENCY open
+            label FREQUENCY
             xywh {5 250 525 120} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -613,6 +613,22 @@ send_data(36, o->value());}
               code0 {o->add("Default");o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->VoicePar[nvoice].PDetuneType);}
             } {}
+            Fl_Dial bend {
+              label Bend
+              callback {pars->VoicePar[nvoice].PBendAdjust = lrint(o->value());
+send_data(38, o->value());}
+              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              code0 {o->value(pars->VoicePar[nvoice].PBendAdjust);}
+              class WidgetPDial
+            }
+            Fl_Dial offset {
+              label Offset
+              callback {pars->VoicePar[nvoice].POffsetHz = lrint(o->value());
+send_data(39, o->value());}
+              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
+              class WidgetPDial
+            }
           }
           Fl_Group voiceoscil {
             xywh {80 375 445 145} box THIN_DOWN_BOX color 32 selection_color 71 labelcolor 179
@@ -817,7 +833,7 @@ send_data(49, o->value());}
           }
         }
         Fl_Group amplitudegroup {
-          label AMPLITUDE open
+          label AMPLITUDE
           xywh {5 40 240 210} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
         } {
           Fl_Dial voicevolume {
@@ -1122,9 +1138,9 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
@@ -1593,4 +1609,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int kititem;} {private local
   }
-} 
+}

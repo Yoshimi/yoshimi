@@ -409,7 +409,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {private
   } {
     Fl_Window panellistitem {
-      private xywh {1195 47 60 275} type Double hide
+      private xywh {1195 44 60 275} type Double hide
       class Fl_Group
     } {
       Fl_Group panellistitemgroup {
@@ -438,7 +438,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         }
         Fl_Text_Display partname {
           label test
-          xywh {4 53 55 1} box NO_BOX labelsize 10 align 193
+          xywh {4 53 55 1} box NO_BOX labelfont 1 labelsize 10 align 193
           code0 {setPartLabel(findengines(npart | *plgroup));}
         }
         Fl_Button partnam {

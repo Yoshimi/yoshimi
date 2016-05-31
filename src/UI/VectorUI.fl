@@ -106,9 +106,7 @@ send_data(1, 3);}
         }
         Fl_Button XL {
           callback {synth->getGuiMaster()->npart = BaseChan;
-synth->partonoffLock(BaseChan, 1);
 bankui->Show();
-synth->partonoffLock(BaseChan, 0);
 send_data(17, o->value());}
           xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
@@ -126,9 +124,7 @@ send_data(17, o->value());}
         }
         Fl_Button XR {
           callback {synth->getGuiMaster()->npart = BaseChan + 16;
-synth->partonoffLock(BaseChan + 16, 1);
 bankui->Show();
-synth->partonoffLock(BaseChan + 16, 0);
 send_data(18, o->value());}
           xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
@@ -255,6 +251,7 @@ if (tmp < 14)
 }
 else
 {
+
     if (synth->getRuntime().NumAvailableParts < 32)
     {
         synth->getRuntime().NumAvailableParts = 32;
@@ -300,9 +297,7 @@ send_data(16, o->value());}
         }
         Fl_Button YU {
           callback {synth->getGuiMaster()->npart = BaseChan + 32;
-synth->partonoffLock(BaseChan + 32, 1);
 bankui->Show();
-synth->partonoffLock(BaseChan + 32, 0);
 send_data(33, o->value());}
           xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
@@ -320,9 +315,7 @@ send_data(33, o->value());}
         }
         Fl_Button YD {
           callback {synth->getGuiMaster()->npart = BaseChan + 48;
-synth->partonoffLock(BaseChan + 48, 1);
 bankui->Show();
-synth->partonoffLock(BaseChan + 48, 0);
 send_data(34, o->value());}
           xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
@@ -463,7 +456,8 @@ send_data(32, o->value());}
         code0 {o->value(Ycc);}
       }
       Fl_Button Loaded {
-        xywh {45 265 198 20} box FLAT_BOX labelfont 1 labelsize 12
+        label {No Name}
+        xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
   }
@@ -713,7 +707,12 @@ return col;} {}
             bool result = synth->saveVector(BaseChan, string(filename), true);
             synth->actionLock(unlock);
             if (result)
+            {
             	recenthistory->activate();
+            	loadlabel[BaseChan] = findleafname((string)filename);
+            	Loaded->copy_label(loadlabel[BaseChan].c_str());
+            	
+            }
             else
                 fl_alert("Failed to save vector");} {}
   }
@@ -724,7 +723,7 @@ synth->getRuntime().nrpndata.vectorYaxis[BaseChan] = 0xff;
 synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = 0;
 synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = 0;
 synth->getRuntime().nrpndata.vectorEnabled[BaseChan] = false;
-loadlabel[BaseChan] = "";
+loadlabel[BaseChan] = "No Name";
 Loaded->copy_label(loadlabel[BaseChan].c_str());
 setbuttons();} {}
   }

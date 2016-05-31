@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {PADNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -42,15 +42,15 @@ decl {\#include <FL/Fl_Box.H>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
@@ -130,7 +130,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
   decl {PADnoteParameters *pars;} {public local
   }
-} 
+}
 
 class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
 } {
@@ -232,7 +232,7 @@ this->pars=pars;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
@@ -249,7 +249,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
                 applybutton->hide();
             else
                 applybutton->show();}
-        xywh {0 0 535 395}
+        xywh {0 0 535 405}
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
@@ -841,15 +841,15 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         }
         Fl_Group {} {
           label {Envelopes&LFOs}
-          xywh {0 20 535 375} box ENGRAVED_BOX labelsize 12 hide
+          xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Group {} {
             label FREQUENCY
-            xywh {5 275 525 115} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
+            xywh {5 275 525 125} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
           } {
             Fl_Group freqenv {
               label {PADSynth - Frequency Envelope}
-              xywh {10 315 205 70} box FLAT_BOX color 51 labelsize 12 align 144
+              xywh {10 325 205 70} box FLAT_BOX color 51 labelsize 12 align 144
               code0 {o->init(pars->FreqEnvelope, npart, kititem, 2, 1);}
               class EnvelopeUI
             } {}
@@ -862,7 +862,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     pars->PCoarseDetune = k*1024+
     pars->PCoarseDetune%1024;
     send_data(35, o->value());}
-              tooltip Octave xywh {470 295 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+              tooltip Octave xywh {465 305 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune/1024;}
               code1 {if (k>=8) k-=16;}
               code2 {o->value(k);}
@@ -875,7 +875,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         k += 1024;
     pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;
     send_data(37, o->value());}
-              tooltip {Coarse Detune} xywh {455 365 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
+              tooltip {Coarse Detune} xywh {455 375 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune%1024;}
               code1 {if (k>=512) k-=1024;}
               code2 {o->value(k);}
@@ -883,7 +883,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             }
             Fl_Group freqlfo {
               label {Frequency LFO     }
-              xywh {215 315 230 70} box FLAT_BOX color 47 labelsize 12 align 144
+              xywh {215 325 230 70} box FLAT_BOX color 47 labelsize 12 align 144
               code0 {o->init(pars->FreqLfo, npart, kititem, 2, 1);}
               class LFOUI
             } {}
@@ -894,13 +894,13 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
     send_data(32, o->value() + 8192);}
-              tooltip {Fine Detune (cents)} xywh {57 295 295 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
+              tooltip {Fine Detune (cents)} xywh {57 305 388 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
             }
             Fl_Value_Output detunevalueoutput {
               label Detune
               callback {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
-              xywh {12 295 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+              xywh {12 305 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
               code0 {o->step(0.01, 1);}
               code1 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
             }
@@ -910,7 +910,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     pars->PDetuneType = (int) o->value() + 1;
     detunevalueoutput->do_callback();
     send_data(36, o->value() + 1);}
-              xywh {450 335 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {450 345 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("L35cents");o->add("L10cents");o->add("E100cents");o->add("E1200cents");}
               code1 {o->value(pars->PDetuneType-1);}
             } {}
@@ -924,16 +924,32 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     else
         fixedfreqetdial->activate();
     send_data(34, x);}
-              tooltip {set the base frequency to 440Hz} xywh {365 295 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
+              tooltip {set the base frequency to 440Hz} xywh {365 284 50 15} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->Pfixedfreq);}
             }
             Fl_Dial fixedfreqetdial {
               label {Eq.T.}
               callback {pars->PfixedfreqET=(int) o->value();
 send_data(33, o->value());}
-              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {420 295 15 15} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {420 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->PfixedfreqET);}
               code1 {if (pars->Pfixedfreq==0) o->deactivate();}
+              class WidgetPDial
+            }
+            Fl_Dial bend {
+              label Bend
+              callback {pars->PBendAdjust = lrint(o->value());
+send_data(38, o->value());}
+              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {80 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              code0 {o->value(pars->PBendAdjust);}
+              class WidgetPDial
+            }
+            Fl_Dial offset {
+              label Offset
+              callback {pars->POffsetHz = lrint(o->value());
+send_data(39, o->value());}
+              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {140 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              code0 {o->value(pars->POffsetHz);}
               class WidgetPDial
             }
           }
@@ -1261,4 +1277,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int kititem;} {private local
   }
-} 
+}
