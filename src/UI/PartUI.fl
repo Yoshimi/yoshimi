@@ -382,7 +382,10 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Box instrumentpadbox {
           xywh {262 9 63 16} box FLAT_BOX deactivate
         }
-        Fl_Button instrumentlabel {
+        Fl_Text_Display instrumentlabel {
+          xywh {134 24 192 1} box NO_BOX labelfont 1 labelsize 12 align 65 textsize 12
+        }
+        Fl_Button instrumentlab {
           callback {//
     int event = Fl::event_button();
     const char *tmp = NULL;
@@ -1438,21 +1441,22 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   Function {setinstrumentlabel()} {} {
     code {//
     find_engines();
+    instrumentaddbox->damage(1);
+    instrumentsubbox->damage(1);
+    instrumentpadbox->damage(1);
     if (engine & 1)
         instrumentaddbox->color(ADD_COLOUR);
     else
         instrumentaddbox->color(BASE_COLOUR);
-    instrumentaddbox->redraw();
     if (engine & 2)
         instrumentsubbox->color(SUB_COLOUR);
     else
         instrumentsubbox->color(BASE_COLOUR);
-    instrumentsubbox->redraw();
+
     if (engine & 4)
         instrumentpadbox->color(PAD_COLOUR);
     else
         instrumentpadbox->color(BASE_COLOUR);
-    instrumentpadbox->redraw();
     instrumentlabel->copy_label(part->Pname.c_str());} {}
   }
   Function {copylabeltopanel()} {} {

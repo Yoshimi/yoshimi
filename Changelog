@@ -1,5 +1,8 @@
 yoshimi 1.3.x
 
+2016-5-31 Will
+- Reviewed instrument name boxes to make them clearer.
+
 2016-5-30 Will
 - Bugfix: Default resonance was showing 30dB but was actually 20dB.
 - All horizontal sliders now home on a right click.

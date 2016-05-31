@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -404,7 +404,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
@@ -428,15 +428,20 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
           }
         }
         Fl_Box partadd {
-          xywh {5 28 17 27} box FLAT_BOX deactivate
+          xywh {5 25 17 30} box FLAT_BOX deactivate
         }
         Fl_Box partsub {
-          xywh {23 28 17 27} box FLAT_BOX deactivate
+          xywh {22 25 18 30} box FLAT_BOX deactivate
         }
         Fl_Box partpad {
-          xywh {40 28 17 27} box FLAT_BOX deactivate
+          xywh {40 25 17 30} box FLAT_BOX deactivate
         }
-        Fl_Button partname {
+        Fl_Text_Display partname {
+          label test
+          xywh {4 53 55 1} box NO_BOX labelsize 10 align 193
+          code0 {setPartLabel(findengines(npart | *plgroup));}
+        }
+        Fl_Button partnam {
           label {  }
           callback {//
     if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
@@ -445,9 +450,8 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         bankui->cbwig->do_callback();
     }
     bankui->Show();
-    setPartLabel(findengines(npart | *plgroup));}
-          xywh {4 27 55 30} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
-          code0 {setPartLabel(findengines(npart | *plgroup));}
+    //setPartLabel(findengines(npart | *plgroup));}
+          xywh {4 24 55 33} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
           callback {//
@@ -590,21 +594,21 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   }
   Function {setPartLabel(int engine)} {} {
     code {//
+    partadd->damage(1);
+    partsub->damage(1);
+    partpad->damage(1);
     if (engine & 1)
         partadd->color(ADD_COLOUR);
     else
         partadd->color(BASE_COLOUR);
-    partadd->redraw();
     if (engine & 2)
         partsub->color(SUB_COLOUR);
     else
         partsub->color(BASE_COLOUR);
-    partsub->redraw();
     if (engine & 4)
         partpad->color(PAD_COLOUR);
     else
         partpad->color(BASE_COLOUR);
-    partpad->redraw();
     partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}
