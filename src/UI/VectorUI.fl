@@ -52,7 +52,7 @@ class VectorUI {selected : {private MiscFuncs}
         callback {BaseChan = o->value() - 1;
 updateAll();
 send_data(0, o->value() - 1);}
-        xywh {121 12 38 20} labelfont 1 labelsize 12 maximum 16 textsize 12
+        tooltip {The channel number for this vector} xywh {121 12 38 20} labelfont 1 labelsize 12 maximum 16 textsize 12
         code0 {o->value(BaseChan + 1);}
       }
       Fl_Menu_Button {} {
@@ -108,7 +108,7 @@ send_data(1, 3);}
           callback {synth->getGuiMaster()->npart = BaseChan;
 bankui->Show();
 send_data(17, o->value());}
-          xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'left' position} xywh {20 53 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Box AddBackR {
           xywh {21 115 53 19} box FLAT_BOX color 50
@@ -126,7 +126,7 @@ send_data(17, o->value());}
           callback {synth->getGuiMaster()->npart = BaseChan + 16;
 bankui->Show();
 send_data(18, o->value());}
-          xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Text_Display Xfeat {
           label Features
@@ -271,7 +271,7 @@ Xcc =  tmp;
 o->value(tmp);
 o->redraw();
 send_data(16, o->value());}
-        xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
+        tooltip {The MIDI CC this axis reponds to} xywh {110 85 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {o->value(Xcc);}
       }
       Fl_Button Closevector {
@@ -299,7 +299,7 @@ send_data(16, o->value());}
           callback {synth->getGuiMaster()->npart = BaseChan + 32;
 bankui->Show();
 send_data(33, o->value());}
-          xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Box AddBackD {
           xywh {21 225 53 19} box FLAT_BOX color 50
@@ -317,7 +317,7 @@ send_data(33, o->value());}
           callback {synth->getGuiMaster()->npart = BaseChan + 48;
 bankui->Show();
 send_data(34, o->value());}
-          xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
+          tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
         }
         Fl_Text_Display Yfeat {
           label Features
@@ -452,12 +452,12 @@ Ycc =  tmp;
 o->value(tmp);
 o->redraw();
 send_data(32, o->value());}
-        xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
+        tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
         code0 {o->value(Ycc);}
       }
       Fl_Button Loaded {
         label {No Name}
-        xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Last saved or loaded vector file} xywh {45 265 198 20} box THIN_DOWN_BOX labelfont 1 labelsize 12
       }
     }
   }

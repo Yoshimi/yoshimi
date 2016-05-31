@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-}
+} 
 
 comment {PADNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -42,15 +42,15 @@ decl {\#include <FL/Fl_Box.H>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
@@ -130,7 +130,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
   decl {PADnoteParameters *pars;} {public local
   }
-}
+} 
 
 class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
 } {
@@ -232,7 +232,7 @@ this->pars=pars;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
@@ -253,7 +253,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
+          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12 hide
         } {
           Fl_Group bwprofilegroup {
             xywh {5 30 90 260} box ENGRAVED_FRAME
@@ -841,7 +841,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         }
         Fl_Group {} {
           label {Envelopes&LFOs}
-          xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12 hide
+          xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12
         } {
           Fl_Group {} {
             label FREQUENCY
@@ -940,7 +940,7 @@ send_data(33, o->value());}
               label Bend
               callback {pars->PBendAdjust = lrint(o->value());
 send_data(38, o->value());}
-              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {80 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {How the frequency varies according to the pitch wheel} xywh {80 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->PBendAdjust);}
               class WidgetPDial
             }
@@ -948,7 +948,7 @@ send_data(38, o->value());}
               label Offset
               callback {pars->POffsetHz = lrint(o->value());
 send_data(39, o->value());}
-              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {140 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {Offset of the frequency in Hz.} xywh {140 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->POffsetHz);}
               class WidgetPDial
             }
@@ -1277,4 +1277,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int kititem;} {private local
   }
-}
+} 

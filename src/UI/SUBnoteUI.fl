@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
-}
+} 
 
 comment {SubNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,31 +29,31 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified September 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "EnvelopeUI.h"} {public local
-}
+} 
 
 decl {\#include "FilterUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthHelper.h"} {public local
-}
+} 
 
 decl {\#include "Params/SUBnoteParameters.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class SUBnoteharmonic {: {public Fl_Group}
 } {
@@ -152,14 +152,14 @@ hide();
   }
   decl {int kititem;} {private local
   }
-}
+} 
 
 class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {7 317 735 475} type Double hide
+      xywh {573 217 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
@@ -405,7 +405,7 @@ send_data (33, o->value());}
           label Bend
           callback {pars->PBendAdjust = lrint(o->value());
 send_data(38, o->value());}
-          tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+          tooltip {How the frequency varies according to the pitch wheel} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
           class WidgetPDial
         }
@@ -413,7 +413,7 @@ send_data(38, o->value());}
           label Offset
           callback {pars->POffsetHz = lrint(o->value());
 send_data(39, o->value());}
-          tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+          tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
           class WidgetPDial
         }
@@ -695,4 +695,4 @@ make_window();} {}
   }
   decl {int kititem;} {private local
   }
-}
+} 

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
-}
+} 
 
 comment {ADNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -38,7 +38,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "WidgetPDialUI.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "Misc/MiscFuncs.h"
@@ -47,10 +47,10 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"} {public global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
@@ -200,14 +200,14 @@ pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
-class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {selected : {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {141 319 770 580} type Double hide
+      xywh {40 319 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -617,7 +617,7 @@ send_data(36, o->value());}
               label Bend
               callback {pars->VoicePar[nvoice].PBendAdjust = lrint(o->value());
 send_data(38, o->value());}
-              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {How the frequency varies according to the pitch wheel} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PBendAdjust);}
               class WidgetPDial
             }
@@ -625,7 +625,7 @@ send_data(38, o->value());}
               label Offset
               callback {pars->VoicePar[nvoice].POffsetHz = lrint(o->value());
 send_data(39, o->value());}
-              tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {Offset of the frequency in Hz.} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
               class WidgetPDial
             }
@@ -1138,9 +1138,9 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
@@ -1609,4 +1609,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int kititem;} {private local
   }
-}
+} 
