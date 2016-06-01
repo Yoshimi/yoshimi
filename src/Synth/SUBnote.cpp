@@ -99,6 +99,15 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
                 basefreq *= powf(3.0f, tmp);
         }
     }
+
+    int BendAdj = pars->PBendAdjust - 64;
+    if (BendAdj % 24 == 0)
+        BendAdjust = BendAdj / 24;
+    else
+        BendAdjust = BendAdj / 24.0f;
+    float offset_val = (pars->POffsetHz - 64)/64.0f;
+    OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+
     float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
     basefreq *= powf(2.0f, detune / 1200.0f); // detune
 //    basefreq*=ctl->pitchwheel.relfreq;//pitch wheel
@@ -189,9 +198,9 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
             float amp = 1.0f;
             if (nph == 0)
                 amp = gain;
-            initfilter(lfilter[nph + n * numstages], freq, bw, amp, hgain);
+            initfilter(lfilter[nph + n * numstages], freq + OffsetHz, bw, amp, hgain);
             if (stereo)
-                initfilter(rfilter[nph + n * numstages], freq, bw, amp, hgain);
+                initfilter(rfilter[nph + n * numstages], freq + OffsetHz, bw, amp, hgain);
         }
     }
 
@@ -642,7 +651,9 @@ void SUBnote::computecurrentparameters(void)
             envfreq = FreqEnvelope->envout() / 1200;
             envfreq = powf(2.0f, envfreq);
         }
-        envfreq *= ctl->pitchwheel.relfreq; // pitch wheel
+
+        envfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
+
         if (portamento != 0)
         {   // portamento is used
             envfreq *= ctl->portamento.freqrap;

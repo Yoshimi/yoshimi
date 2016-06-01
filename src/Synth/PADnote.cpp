@@ -82,6 +82,14 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         }
     }
 
+    int BendAdj = pars->PBendAdjust - 64;
+    if (BendAdj % 24 == 0)
+        BendAdjust = BendAdj / 24;
+    else
+        BendAdjust = BendAdj / 24.0f;
+    float offset_val = (pars->POffsetHz - 64)/64.0f;
+    OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+
     realfreq = basefreq;
     NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
 
@@ -370,7 +378,7 @@ void PADnote::computecurrentparameters()
     }
 
     realfreq = basefreq * portamentofreqrap * powf(2.0f, globalpitch / 12.0)
-               * ctl->pitchwheel.relfreq;
+               * powf(ctl->pitchwheel.relfreq, BendAdjust) + OffsetHz;
 }
 
 

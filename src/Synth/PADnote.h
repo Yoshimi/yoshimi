@@ -65,6 +65,8 @@ class PADnote : public Carcass, private SynthHelper
         float poslo;
 
         float basefreq;
+        float BendAdjust;
+        float OffsetHz;
         bool firsttime;
         bool released;
 

@@ -141,6 +141,8 @@ class ADnote : public Carcass, private SynthHelper, private Float2Int
 
             float Detune;     // cents = basefreq * VoiceDetune
             float FineDetune;
+            float BendAdjust;
+            float OffsetHz;
 
             Envelope *FreqEnvelope;
             LFO      *FreqLfo;

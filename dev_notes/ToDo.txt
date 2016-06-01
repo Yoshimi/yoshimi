@@ -1,15 +1,5 @@
 
-Complete new Zyn voice parameters AddSynth voice:
-
-<par name="bend_adjust" value="88" />
-PBendAdjust
-<par name="offset_hz" value="64" />
-POffsetHz
-
-Currently we load and save them (for compatibility) but make
-no use of them.
-
-Also, Pitchwheel split range in Controllers, but that one seems
+Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
 
 

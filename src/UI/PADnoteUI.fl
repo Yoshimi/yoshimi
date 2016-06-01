@@ -253,7 +253,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
       } {
         Fl_Group harmonicstructuregroup {
           label {Harmonic Structure}
-          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12 hide
+          xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
         } {
           Fl_Group bwprofilegroup {
             xywh {5 30 90 260} box ENGRAVED_FRAME
@@ -841,7 +841,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         }
         Fl_Group {} {
           label {Envelopes&LFOs}
-          xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12
+          xywh {0 20 535 385} box ENGRAVED_BOX labelsize 12 hide
         } {
           Fl_Group {} {
             label FREQUENCY

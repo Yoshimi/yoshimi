@@ -110,6 +110,7 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         for (int i = 0; i < 14; i++)
             pinking[nvoice][i] = 0.0;
 
+        adpars->VoicePar[nvoice].OscilSmp->newrandseed(); // so it really will be random
         NoteVoicePar[nvoice].OscilSmp = NULL;
         NoteVoicePar[nvoice].FMSmp = NULL;
         NoteVoicePar[nvoice].VoiceOut = NULL;
@@ -122,7 +123,17 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
             NoteVoicePar[nvoice].Enabled = false;
             continue; // the voice is disabled
         }
-        adpars->VoicePar[nvoice].OscilSmp->newrandseed(); // so it really will be random
+
+        int BendAdj = adpars->VoicePar[nvoice].PBendAdjust - 64;
+        if (BendAdj % 24 == 0)
+            NoteVoicePar[nvoice].BendAdjust = BendAdj / 24;
+        else
+            NoteVoicePar[nvoice].BendAdjust = BendAdj / 24.0f;
+
+        float offset_val = (adpars->VoicePar[nvoice].POffsetHz - 64)/64.0f;
+        NoteVoicePar[nvoice].OffsetHz =
+            15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+
         unison_stereo_spread[nvoice] =
             adpars->VoicePar[nvoice].Unison_stereo_spread / 127.0f;
         int unison = adpars->VoicePar[nvoice].Unison_size;
@@ -1207,9 +1218,10 @@ void ADnote::computeCurrentParameters(void)
             }
 
             float voicefreq = getVoiceBaseFreq(nvoice)
-                              * powf(2.0f, (voicepitch + globalpitch) / 12.0f)
-                              * portamentofreqrap * ctl->pitchwheel.relfreq;
-            setfreq(nvoice, voicefreq);
+                              * powf(2.0f, (voicepitch + globalpitch) / 12.0f);
+            voicefreq *=
+                powf(ctl->pitchwheel.relfreq, NoteVoicePar[nvoice].BendAdjust); //change the frequency by the controller
+            setfreq(nvoice, voicefreq * portamentofreqrap + NoteVoicePar[nvoice].OffsetHz);
 
             // Modulator
             if (NoteVoicePar[nvoice].FMEnabled != NONE)
