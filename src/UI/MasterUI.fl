@@ -1364,6 +1364,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
     checkmaxparts();
     updatesendwindow();
     updatepanel();
+    vectorui->updateAll();
     bankui->Hide();
     if (synth->getRuntime().toConsole == false)
         Reports->deactivate();

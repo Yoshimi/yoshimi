@@ -1448,10 +1448,10 @@ void SynthEngine::commandAddVoice(float value, unsigned char type, unsigned char
             contstr = " Delay";
             break;
         case 129:
-            contstr = " ON";
+            contstr = " Enable";
             break;
         case 130:
-            contstr = " Resonance";
+            contstr = " Resonance Enable";
             break;
         case 136:
             contstr = " Osc Phase";

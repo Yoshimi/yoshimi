@@ -47,10 +47,10 @@ class VectorUI {selected : {private MiscFuncs}
       callback {o->hide()}
       xywh {245 162 375 295} type Double labelfont 13 labelsize 12 align 0 hide
     } {
-      Fl_Spinner {} {
+      Fl_Spinner setbasechan {
         label {Base Channel}
         callback {BaseChan = o->value() - 1;
-updateAll();
+updateAll(false);
 send_data(0, o->value() - 1);}
         tooltip {The channel number for this vector} xywh {121 12 38 20} labelfont 1 labelsize 12 maximum 16 textsize 12
         code0 {o->value(BaseChan + 1);}
@@ -252,10 +252,15 @@ if (tmp < 14)
 else
 {
 
-    if (synth->getRuntime().NumAvailableParts < 32)
+    if (synth->getRuntime().NumAvailableParts < (NUM_MIDI_CHANNELS * 2))
     {
-        synth->getRuntime().NumAvailableParts = 32;
-        synth->getGuiMaster()->checkmaxparts();
+        synth->getRuntime().NumAvailableParts = NUM_MIDI_CHANNELS * 2;
+        synth->partonoffLock(BaseChan, 1);
+        synth->partonoffLock(BaseChan + NUM_MIDI_CHANNELS, 1);
+        synth->part[BaseChan]->Prcvchn = BaseChan;
+        synth->part[BaseChan + NUM_MIDI_CHANNELS]->Prcvchn = BaseChan;
+        synth->getGuiMaster()->updatepart();
+        synth->getGuiMaster()->updatepanel();
     }
     if (!synth->vectorInit(0, BaseChan, tmp))
         synth->vectorSet(0, BaseChan, tmp);
@@ -439,10 +444,15 @@ if (tmp < 14)
 }
 else
 {
-    if (synth->getRuntime().NumAvailableParts < 64)
+    if (synth->getRuntime().NumAvailableParts < (NUM_MIDI_CHANNELS * 4))
     {
-        synth->getRuntime().NumAvailableParts = 64;
-        synth->getGuiMaster()->checkmaxparts();
+        synth->getRuntime().NumAvailableParts = NUM_MIDI_CHANNELS * 4;
+        synth->partonoffLock(BaseChan + (NUM_MIDI_CHANNELS * 2), 1);
+        synth->partonoffLock(BaseChan + (NUM_MIDI_CHANNELS * 3), 1);
+        synth->part[BaseChan + (NUM_MIDI_CHANNELS * 2)]->Prcvchn = BaseChan;
+        synth->part[BaseChan + (NUM_MIDI_CHANNELS * 3)]->Prcvchn = BaseChan;
+        synth->getGuiMaster()->updatepart();
+        synth->getGuiMaster()->updatepanel();
     }
     if (!synth->vectorInit(1, BaseChan, tmp))
         synth->vectorSet(1, BaseChan, tmp);
@@ -488,12 +498,22 @@ updateAll();} {}
   Function {Hide()} {} {
     code {vectorwindow->hide();} {}
   }
-  Function {updateAll()} {} {
+  Function {updateAll(bool everything = true)} {} {
     code {//
+if (everything)
+{
+    BaseChan = 0;
+    setbasechan->value(BaseChan + 1);
+}
 setInstrumentLabel(BaseChan);
-setInstrumentLabel(BaseChan + 16);
-setInstrumentLabel(BaseChan + 32);
-setInstrumentLabel(BaseChan + 48);} {}
+setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS);
+setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 2);
+setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 3);
+for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+    loadlabel[i] = "No Name";
+
+Loaded->copy_label(loadlabel[BaseChan].c_str());
+setbuttons();} {}
   }
   Function {setbuttons()} {} {
     code {//
@@ -576,9 +596,7 @@ if (bitTest(Yf,6))
 else if (bitTest(Yf,3))
     Yfeat4->value(1);
 else
-    Yfeat4->value(0);
-
-Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
+    Yfeat4->value(0);} {}
   }
   Function {setInstrumentLabel(int npart)} {} {
     code {//
@@ -630,7 +648,8 @@ else if (npart == BaseChan + 48)
     PadBackD->color(padcol);
     YinstD->copy_label(synth->part[npart]->Pname.c_str());
 }
-setbuttons();} {}
+
+Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}
   } {
@@ -743,6 +762,6 @@ setbuttons();} {}
   }
   decl {unsigned int Yf;} {private local
   }
-  decl {string loadlabel [16];} {private local
+  decl {string loadlabel [NUM_MIDI_CHANNELS];} {private local
   }
 } 
