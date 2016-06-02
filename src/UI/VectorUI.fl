@@ -82,10 +82,18 @@ send_data(1, 2);}
           xywh {20 20 34 20} labelsize 12 deactivate
         }
         MenuItem {} {
-          label Clear
-          callback {clearVector();
+          label {Clear Chan}
+          callback {clearVector(BaseChan);
 send_data(1, 3);}
           xywh {30 30 34 20} labelsize 12
+        }
+        MenuItem {} {
+          label {Clear All}
+          callback {//
+for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+    clearVector(i);
+send_data(1, 4);}
+          xywh {40 40 34 20} labelsize 12
         }
       }
       Fl_Group Xgroup {
@@ -504,13 +512,14 @@ if (everything)
 {
     BaseChan = 0;
     setbasechan->value(BaseChan + 1);
+    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+    	loadlabel[i] = "No Name";
+
 }
 setInstrumentLabel(BaseChan);
 setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS);
 setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 2);
 setInstrumentLabel(BaseChan + NUM_MIDI_CHANNELS * 3);
-for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
-    loadlabel[i] = "No Name";
 
 Loaded->copy_label(loadlabel[BaseChan].c_str());
 setbuttons();} {}
@@ -735,15 +744,15 @@ return col;} {}
             else
                 fl_alert("Failed to save vector");} {}
   }
-  Function {clearVector()} {} {
+  Function {clearVector(int BaseC)} {} {
     code {//
-synth->getRuntime().nrpndata.vectorXaxis[BaseChan] = 0xff;
-synth->getRuntime().nrpndata.vectorYaxis[BaseChan] = 0xff;
-synth->getRuntime().nrpndata.vectorXfeatures[BaseChan] = 0;
-synth->getRuntime().nrpndata.vectorYfeatures[BaseChan] = 0;
-synth->getRuntime().nrpndata.vectorEnabled[BaseChan] = false;
+synth->getRuntime().nrpndata.vectorXaxis[BaseC] = 0xff;
+synth->getRuntime().nrpndata.vectorYaxis[BaseC] = 0xff;
+synth->getRuntime().nrpndata.vectorXfeatures[BaseC] = 0;
+synth->getRuntime().nrpndata.vectorYfeatures[BaseC] = 0;
+synth->getRuntime().nrpndata.vectorEnabled[BaseC] = false;
 loadlabel[BaseChan] = "No Name";
-Loaded->copy_label(loadlabel[BaseChan].c_str());
+Loaded->copy_label(loadlabel[BaseC].c_str());
 setbuttons();} {}
   }
   decl {SynthEngine *synth;} {private local

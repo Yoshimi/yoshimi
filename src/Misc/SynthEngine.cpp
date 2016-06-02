@@ -1098,6 +1098,10 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
             contstr = "Reset Note Range";
             break;
 
+        case 120:
+            contstr = "Audio destination";
+            break;
+
         case 128:
             contstr = "Vol Range";
             break;
