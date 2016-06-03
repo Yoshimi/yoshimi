@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {FilterUI.h} {not_in_source in_header
+comment {FilterUI.h} {selected not_in_source in_header
 } 
 
 comment {FilterUI.cc} {in_source not_in_header
@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified March 2011
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
@@ -209,7 +209,7 @@ pars=NULL;
   }
   Function {make_window()} {} {
     Fl_Window filterui {
-      xywh {695 162 275 75} type Double color 247 labelfont 1 labelsize 12 hide
+      xywh {840 20 275 75} type Double color 247 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
@@ -313,6 +313,7 @@ send_data(7, o->value());}
 send_data(0, o->value());}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {75 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pfreq);}
+          code1 {if (kititem == 0x88) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
           class WidgetPDial
         }
         Fl_Dial qdial {
@@ -322,6 +323,7 @@ formantfiltergraph->redraw();
 send_data(1, o->value());}
           tooltip {Filter resonance or bandwidth} xywh {110 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
+          code1 {if (kititem == 0x88) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
@@ -330,6 +332,7 @@ send_data(1, o->value());}
 send_data(2, o->value());}
           tooltip {Filter frequency tracking (left is negative, middle is 0, and right is positive)} xywh {215 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pfreqtrack);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial vsnsadial {
@@ -337,6 +340,7 @@ send_data(2, o->value());}
           callback {if (velsnsamp!=NULL) *velsnsamp=(int)o->value();
 send_data(3, o->value());}
           tooltip {Velocity sensing amount of the Filter} xywh {145 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (kititem == 0x88) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
@@ -344,6 +348,7 @@ send_data(3, o->value());}
           callback {if (velsns!=NULL) *velsns=(int)o->value();
 send_data(4, o->value());}
           tooltip {Velocity Sensing Function of the Filter} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (kititem == 0x88) o->init(127); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial gaindial {
@@ -354,6 +359,7 @@ pars->changed = true;
 send_data(5, o->value());}
           tooltip {Filter output gain/damp} xywh {250 35 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Choice stcounter {

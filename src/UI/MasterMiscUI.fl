@@ -475,6 +475,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
               send_data(2, o->value());}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {

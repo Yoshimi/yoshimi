@@ -239,7 +239,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
   Function {make_window()} {} {
     Fl_Window padnotewindow {
       label {PAD synth Parameters}
-      xywh {33 212 535 450} type Double hide
+      xywh {733 66 535 450} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("PadSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->padNoteX, synth->getGuiMaster()->padNoteY);}
     } {
@@ -268,6 +268,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(64, o->value());}
               xywh {20 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.base.par1);}
+              code1 {o->init(80);}
               class WidgetPDial
             }
             Fl_Choice hpbasetype {
@@ -302,6 +303,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(65, o->value());}
               xywh {55 75 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.freqmult);}
+              code1 {o->init(8);}
               class WidgetPDial
             }
             Fl_Dial hpmpar1 {
@@ -313,6 +315,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(66, o->value());}
               xywh {15 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.par1);}
+              code1 {o->init(0);}
               class WidgetPDial
             }
             Fl_Dial hpmfreq {
@@ -324,6 +327,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(67, o->value());}
               xywh {40 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.modulator.freq);}
+              code1 {o->init(30);}
               class WidgetPDial
             }
             Fl_Group {} {
@@ -392,6 +396,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(71, o->value());}
                 xywh {15 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par1);}
+                code1 {o->init(80);}
                 class WidgetPDial
               }
               Fl_Dial hpamppar2 {
@@ -403,6 +408,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(72, o->value());}
                 xywh {55 235 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
                 code0 {o->value(pars->Php.amp.par2);}
+                code1 {o->init(64);}
                 class WidgetPDial
               }
             }
@@ -447,6 +453,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(68, o->value());}
               xywh {65 115 20 20} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Php.width);}
+              code1 {o->init(127);}
               class WidgetPDial
             }
           }
@@ -491,6 +498,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
             xywh {15 295 35 35} box ROUND_UP_BOX labelsize 10 maximum 1000 step 1
             code0 {o->value(pars->Pbandwidth);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
+            code2 {o->init(500);}
             class WidgetPDial
           }
           Fl_Value_Output bwcents {
@@ -551,6 +559,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(48, o->value());}
               xywh {425 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Dial hrpospar2 {
@@ -562,6 +571,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(49, o->value());}
               xywh {460 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Dial hrpospar3 {
@@ -573,6 +583,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(50, o->value());}
               xywh {495 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
+              code1 {o->init(0);}
               class WidgetPDial
             }
           }
@@ -934,6 +945,7 @@ send_data(33, o->value());}
               tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {420 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->PfixedfreqET);}
               code1 {if (pars->Pfixedfreq==0) o->deactivate();}
+              code2 {o->init(0);}
               class WidgetPDial
             }
             Fl_Dial bend {
@@ -942,6 +954,7 @@ send_data(33, o->value());}
 send_data(38, o->value());}
               tooltip {How the frequency varies according to the pitch wheel} xywh {80 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->PBendAdjust);}
+              code1 {o->init(88);}
               class WidgetPDial
             }
             Fl_Dial offset {
@@ -950,6 +963,7 @@ send_data(38, o->value());}
 send_data(39, o->value());}
               tooltip {Offset of the frequency in Hz.} xywh {140 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->POffsetHz);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
           }
@@ -963,6 +977,7 @@ send_data(39, o->value());}
 send_data(0, o->value());}
               tooltip Volume xywh {24 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
               code0 {o->value(pars->PVolume);}
+              code1 {o->init(90);}
               class WidgetPDial
             }
             Fl_Dial vsns {
@@ -971,6 +986,7 @@ send_data(0, o->value());}
 send_data(1, o->value());}
               tooltip {Velocity Sensing Function (rightmost to disable)} xywh {102 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
               code0 {o->value(pars->PAmpVelocityScaleFunction);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Dial pan {
@@ -981,6 +997,7 @@ send_data(1, o->value());}
     send_data(2, o->value());}
               tooltip {Panning - leftmost/zero is Random} xywh {175 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
               code0 {o->value(pars->PPanning);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Button {} {
@@ -1010,6 +1027,7 @@ send_data(1, o->value());}
 send_data(120, o->value());}
               tooltip {Pop Suppression} xywh {85 247 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->Fadein_adjustment);}
+              code1 {o->init(20);}
               class WidgetPDial
             }
             Fl_Dial pstr {
@@ -1018,6 +1036,7 @@ send_data(120, o->value());}
 send_data(121, o->value());}
               tooltip {Punch Strength} xywh {125 247 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchStrength);}
+              code1 {o->init(0);}
               class WidgetPDial
             }
             Fl_Dial pt {
@@ -1026,6 +1045,7 @@ send_data(121, o->value());}
 send_data(122, o->value());}
               tooltip {Punch Time (duration)} xywh {155 247 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchTime);}
+              code1 {o->init(60);}
               class WidgetPDial
             }
             Fl_Dial pstc {
@@ -1034,6 +1054,7 @@ send_data(122, o->value());}
 send_data(123, o->value());}
               tooltip {Punch Stretch} xywh {185 247 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchStretch);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Dial pvel {
@@ -1042,6 +1063,7 @@ send_data(123, o->value());}
 send_data(124, o->value());}
               tooltip {Punch Velocity Sensing} xywh {215 247 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->PPunchVelocitySensing);}
+              code1 {o->init(72);}
               class WidgetPDial
             }
             Fl_Group ampenv {

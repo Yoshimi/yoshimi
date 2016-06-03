@@ -11,7 +11,7 @@ comment {LFOUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016, Will Godfrey 
+Copyright 2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -86,6 +86,8 @@ hide();
           callback {pars->Pfreq=o->value();
 send_data(type, 0, o->value(), false);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
+          code0 {if (engine < 0x80){if (type == 1) o->init(0.551f); else o->init(0.63f);}}
+          code1 {if (engine >= 0x80){if (type == 0) o->init(0.708f); else o->init(0.393f);}}
           class WidgetPDial
         }
         Fl_Dial intensity {
@@ -93,6 +95,7 @@ send_data(type, 0, o->value(), false);}
           callback {pars->Pintensity=(int)o->value();
 send_data(type, 1, o->value());}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (engine < 0x80) o->init(0); else if (type == 0) o->init(32); else if (type == 1) o->init(40); else o->init(20);}
           class WidgetPDial
         }
         Fl_Dial delay {
@@ -100,6 +103,7 @@ send_data(type, 1, o->value());}
           callback {pars->Pdelay=(int)o->value();
 send_data(type, 2, o->value());}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (engine >= 0x80 && type == 0) o->init(30); else o->init(0);}
           class WidgetPDial
         }
         Fl_Dial startphase {
@@ -107,6 +111,7 @@ send_data(type, 2, o->value());}
           callback {pars->Pstartphase=(int)o->value();
 send_data(type, 3, o->value());}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (engine >= 0x80 && type == 1) o->init(0); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial randomness {
@@ -114,6 +119,7 @@ send_data(type, 3, o->value());}
           callback {pars->Prandomness=(int)o->value();
 send_data(type, 4, o->value());}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Choice LFOtype {
@@ -162,6 +168,7 @@ send_data(type, 6, o->value());}
           callback {pars->Pfreqrand=(int)o->value();
 send_data(type, 7, o->value());}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Dial stretch {
@@ -169,6 +176,7 @@ send_data(type, 7, o->value());}
           callback {pars->Pstretch=(int)o->value();
 send_data(type, 8, o->value());}
           tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {

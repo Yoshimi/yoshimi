@@ -39,7 +39,7 @@ number of the effect being worked on (the limit depends on the effect
 source). As 'kit' and 'engine' are not relevant for effects it is safe
 to use them here.
 
-Effects 'part' numbers offset by 0x80.
+Effects 'kit' numbers offset by 0x80.
 
 0   None
 1   Reverb

@@ -60,7 +60,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
       private xywh {691 599 620 30} type Double box ENGRAVED_BOX hide
       class Fl_Group
     } {
-      Fl_Group voicelistitemgroup {open
+      Fl_Group voicelistitemgroup {
         private xywh {50 3 567 24} box FLAT_BOX
         code0 {if (pars->VoicePar[nvoice].Enabled == 0) o->deactivate();}
       } {
@@ -94,6 +94,7 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 1, npart
 synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 2, npart, kititem, 0x80 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {215 5 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PPanning);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Group voiceoscil {open
@@ -620,6 +621,7 @@ send_data(33, o->value());}
               tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {400 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PfixedfreqET);}
               code1 {if (pars->VoicePar[nvoice].Pfixedfreq==0) o->deactivate();}
+              code2 {o->init(0);}
               class WidgetPDial
             }
             Fl_Choice {} {
@@ -636,6 +638,7 @@ send_data(36, o->value());}
 send_data(38, o->value());}
               tooltip {How the frequency varies according to the pitch wheel} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PBendAdjust);}
+              code1 {o->init(88);}
               class WidgetPDial
             }
             Fl_Dial offset {
@@ -644,6 +647,7 @@ send_data(38, o->value());}
 send_data(39, o->value());}
               tooltip {Offset of the frequency in Hz.} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
           }
@@ -790,6 +794,7 @@ send_data(53, o->value());}
 send_data(50, o->value());}
               tooltip {Stereo Spread} xywh {349 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Dial {} {
@@ -798,6 +803,7 @@ send_data(50, o->value());}
 send_data(51, o->value());}
               tooltip Vibratto xywh {384 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Choice {} {
@@ -840,6 +846,7 @@ send_data(54, o->value());}
 send_data(52, o->value());}
               tooltip {Vibratto Average Speed} xywh {420 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
+              code1 {o->init(64);}
               class WidgetPDial
             }
             Fl_Dial {} {
@@ -848,6 +855,7 @@ send_data(52, o->value());}
 send_data(49, o->value());}
               tooltip {Phase randomness} xywh {315 540 25 25} box ROUND_UP_BOX labelsize 10 align 9 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_phase_randomness);}
+              code1 {o->init(127);}
               class WidgetPDial
             }
           }
@@ -862,6 +870,7 @@ send_data(49, o->value());}
 send_data(0, o->value());}
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PVolume);}
+            code1 {o->init(100);}
             class WidgetPDial
           }
           Fl_Dial {} {
@@ -870,6 +879,7 @@ send_data(0, o->value());}
 send_data(1, o->value());}
             tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {107 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
+            code1 {o->init(127);}
             class WidgetPDial
           }
           Fl_Group voiceampenvgroup {
@@ -887,6 +897,7 @@ send_data(1, o->value());}
                  send_data(2, o->value());}
             tooltip {Voice panning - leftmost/zero gives random panning} xywh {174 56 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PPanning);}
+            code1 {o->init(64);}
             class WidgetPDial
           }
           Fl_Button {} {
@@ -1166,7 +1177,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
-      xywh {26 33 535 405} type Double hide
+      xywh {753 20 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
     } {
@@ -1254,6 +1265,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
     send_data(39, o->value());}
           tooltip {Bandwidth - how the relative fine detune of the voice are changed} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -1267,6 +1279,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 send_data(0, o->value());}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PVolume);}
+          code1 {o->init(90);}
           class WidgetPDial
         }
         Fl_Dial vsns {
@@ -1275,6 +1288,7 @@ send_data(0, o->value());}
 send_data(1, o->value());}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial globalpan {
@@ -1286,6 +1300,7 @@ send_data(1, o->value());}
     send_data(2, o->value());}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPanning);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Light_Button globalrandompan {
@@ -1306,6 +1321,7 @@ send_data(1, o->value());}
 send_data(120, o->value());}
           tooltip {Pop Suppression} xywh {85 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
+          code1 {o->init(20);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -1323,6 +1339,7 @@ send_data(120, o->value());}
 send_data(121, o->value());}
           tooltip {Punch Strength} xywh {125 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStrength);}
+          code1 {o->init(0);}
           class WidgetPDial
         }
         Fl_Dial pt {
@@ -1331,6 +1348,7 @@ send_data(121, o->value());}
 send_data(122, o->value());}
           tooltip {Punch Time (duration)} xywh {155 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchTime);}
+          code1 {o->init(60);}
           class WidgetPDial
         }
         Fl_Dial pstc {
@@ -1339,6 +1357,7 @@ send_data(122, o->value());}
 send_data(123, o->value());}
           tooltip {Punch Stretch} xywh {185 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStretch);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial pvel {
@@ -1347,6 +1366,7 @@ send_data(123, o->value());}
 send_data(124, o->value());}
           tooltip {Punch Velocity Sensing} xywh {215 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
+          code1 {o->init(72);}
           class WidgetPDial
         }
         Fl_Group ampenv {

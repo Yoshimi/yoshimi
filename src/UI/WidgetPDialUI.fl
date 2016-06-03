@@ -107,10 +107,11 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
 } 
 
-class WidgetPDial {selected : {public Fl_Dial}
+class WidgetPDial {open : {public Fl_Dial}
 } {
   Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
-    code {callback(value_cb, (void*)this);
+    code {//
+	callback(value_cb, (void*)this);
         Fl_Group *save = Fl_Group::current();
         tipwin = new TipWin();
         tipwin->hide();
@@ -119,18 +120,27 @@ class WidgetPDial {selected : {public Fl_Dial}
         pos = false;
         textset = false;} {}
   }
+  Function {init(float home_ = -1)} {} {
+    code {home = home_;} {}
+  }
   Function {~WidgetPDial()} {} {
     code {delete tipwin;} {}
   }
-  Function {handle(int event)} {return_type int
+  Function {handle(int event)} {open return_type int
   } {
     code {double dragsize, v, min = minimum(), max = maximum();
         int my;
         int mx;
+        
         switch (event)
         {
             case FL_PUSH:
-                 oldvalue = value();
+                if (home > -0.5f && Fl::event_button() == 3)
+        	{
+            	    value(home);
+            	    value_damage();
+        	}
+                oldvalue = value();
             case FL_DRAG:
                  if(!pos)
                  {
@@ -175,12 +185,7 @@ class WidgetPDial {selected : {public Fl_Dial}
                 return 1;
                 break;
             case FL_ENTER:
-                 //if(textset)
-                 /*
-                 Above was moved because it stopped scroll wheel
-                 working when there was no tooltip.
-                 */
-                 {
+                {
                      if(!pos)
                      {
                          tipwin->position(Fl::event_x_root(), Fl::event_y_root() + 20);
@@ -207,7 +212,8 @@ class WidgetPDial {selected : {public Fl_Dial}
                  return 1;
                  break;
         }
-        return 0;} {}
+        return 0;} {selected
+    }
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {
@@ -310,5 +316,7 @@ class WidgetPDial {selected : {public Fl_Dial}
   decl {double oldvalue;} {private local
   }
   decl {TipWin *tipwin;} {private local
+  }
+  decl {float home;} {private local
   }
 } 

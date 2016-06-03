@@ -463,7 +463,7 @@ class OscilEditor {selected : {public PresetsUI_}
   Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
-      xywh {12 36 735 595} type Double hide
+      xywh {538 209 735 595} type Double hide
       code0 {string tname;}
       code1 {if (engine == 2) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
       code2 {if (engine & 0x40) tname += " Modulation Oscillator"; else tname += " Oscillator";}
@@ -537,6 +537,7 @@ send_data (3, o->value());}
             callback {oscil->Pamprandpower=(int) o->value();
 send_data (2, o->value());}
             tooltip {Oscillator's spectrum adjust parameter} xywh {338 280 18 18} maximum 127 step 1
+            code0 {o->init(64);}
             class WidgetPDial
           }
         }
@@ -561,6 +562,7 @@ bfparval->value(oscil->Pbasefuncpar-64);
 redrawoscil();
 send_data (16, o->value());}
           tooltip {Base Function Parameter} xywh {520 280 20 20} minimum -64 maximum 63 step 1
+          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Choice bftype {
@@ -649,9 +651,12 @@ if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodula
           code0 {OscilSpectrum *spc=new OscilSpectrum (o->x(),o->y(),o->w(),o->h(),"");}
           code1 {spc->init(oscil,1, synth);}
         } {}
-        Fl_Value_Output bfparval {
+        Fl_Box {} {
           label {Par.}
-          xywh {490 285 25 15} labelsize 12 minimum -63 maximum 63 step 1
+          xywh {460 285 30 16} box FLAT_BOX labelsize 11
+        }
+        Fl_Value_Output bfparval {
+          xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1
         }
         Fl_Group basefuncmodulation {
           xywh {550 276 169 25} box ENGRAVED_BOX
@@ -687,7 +692,8 @@ send_data (21, o->value());}
 basefuncdisplaygroup->redraw();
 redrawoscil();
 send_data (18, o->value());}
-            tooltip {Oscillator's modulation parameter 1} xywh {659 281 15 15} maximum 127 step 1
+            tooltip {Oscillator's modulation parameter 1} xywh {654 280 17 17} maximum 127 step 1
+            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial bfmodpar2 {
@@ -695,7 +701,8 @@ send_data (18, o->value());}
 basefuncdisplaygroup->redraw();
 redrawoscil();
 send_data (19, o->value());}
-            tooltip {Oscillator's modulation parameter 2} xywh {679 281 15 15} maximum 127 step 1
+            tooltip {Oscillator's modulation parameter 2} xywh {676 280 17 17} maximum 127 step 1
+            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial bfmodpar3 {
@@ -703,7 +710,8 @@ send_data (19, o->value());}
 basefuncdisplaygroup->redraw();
 redrawoscil();
 send_data (20, o->value());}
-            tooltip {Oscillator's modulation parameter 3} xywh {699 281 15 15} maximum 127 step 1
+            tooltip {Oscillator's modulation parameter 3} xywh {698 280 17 17} maximum 127 step 1
+            code0 {o->init(32);}
             class WidgetPDial
           }
         }
@@ -895,6 +903,7 @@ wsparval->value(oscil->Pwaveshaping-64);
 redrawoscil();
 send_data (34, o->value());}
           tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
+          code0 {o->init(0);}
           class WidgetPDial
         }
         Fl_Value_Output wsparval {
@@ -980,6 +989,7 @@ send_data (39, o->value());}
 redrawoscil();
 send_data (36, o->value());}
           tooltip {Oscillator's filter parameter1} xywh {367 313 20 20} maximum 127 step 1
+          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Check_Button filterpref {
@@ -996,18 +1006,19 @@ send_data (38, o->value());}
 redrawoscil();
 send_data (37, o->value());}
           tooltip {Oscillator's filter parameter2} xywh {392 313 20 20} maximum 127 step 1
+          code0 {o->init(64);}
           class WidgetPDial
         }
       }
       Fl_Group {} {
-        xywh {590 308 135 30} box ENGRAVED_BOX
+        xywh {594 308 136 30} box ENGRAVED_BOX
       } {
         Fl_Choice sabutton {
           label {Sp.adj.}
           callback {oscil->Psatype=(int) o->value();
 redrawoscil();
 send_data (45, o->value());}
-          tooltip {Oscillator's spectrum adjust} xywh {630 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
+          tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
             label None
@@ -1030,7 +1041,8 @@ send_data (45, o->value());}
           callback {oscil->Psapar=(int)o->value();
 redrawoscil();
 send_data (44, o->value());}
-          tooltip {Oscillator's spectrum adjust parameter} xywh {695 313 20 20} maximum 127 step 1
+          tooltip {Oscillator's spectrum adjust parameter} xywh {699 313 20 20} maximum 127 step 1
+          code0 {o->init(64);}
           class WidgetPDial
         }
       }
@@ -1113,6 +1125,7 @@ send_data (70, o->value());}
 redrawoscil();
 send_data (69, o->value());}
           tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 maximum 200 step 1
+          code0 {o->init(100);}
           class WidgetPDial
         }
         Fl_Dial adhrbf {
@@ -1121,6 +1134,7 @@ send_data (69, o->value());}
 redrawoscil();
 send_data (68, o->value());}
           tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 maximum 255 step 1
+          code0 {o->init(128);}
           class WidgetPDial
         }
         Fl_Slider adhrpar {
@@ -1133,7 +1147,7 @@ send_data (67, o->value());}
         }
       }
       Fl_Group {} {
-        xywh {440 308 150 30} box ENGRAVED_BOX
+        xywh {440 308 154 30} box ENGRAVED_BOX
       } {
         Fl_Choice modtype {
           label {Mod.}
@@ -1165,7 +1179,8 @@ send_data (43, o->value());}
 
 redrawoscil();
 send_data (40, o->value());}
-          tooltip {Oscillator's modulation parameter 1} xywh {530 315 15 15} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} maximum 127 step 1
+          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial modpar2 {
@@ -1173,14 +1188,16 @@ send_data (40, o->value());}
 
 redrawoscil();
 send_data (41, o->value());}
-          tooltip {Oscillator's modulation parameter 2} xywh {550 315 15 15} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} maximum 127 step 1
+          code0 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial modpar3 {
           callback {oscil->Pmodulationpar3=(int)o->value();
 redrawoscil();
 send_data (42, o->value());}
-          tooltip {Oscillator's modulation parameter 3} xywh {570 315 15 15} maximum 127 step 1
+          tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} maximum 127 step 1
+          code0 {o->init(32);}
           class WidgetPDial
         }
       }

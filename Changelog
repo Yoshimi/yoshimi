@@ -1,5 +1,8 @@
 yoshimi 1.4.0 rc2
 
+2016-6-3 Will
+- All knobs 'home' on right mouse click except effects.
+
 2016-6-2 Will
 - Bugfix: vector 'Clear' was removing all vector names.
 - Added 'Clear All' to vector options.
