@@ -165,106 +165,119 @@ void DynamicFilter::setpreset(unsigned char npreset)
         {127, 64, 50, 0, 0, 96, 64, 0, 0, 60 }
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-
-    filterpars->defaults();
-
-    switch (npreset)
+if (npreset < 0xf)
     {
-        case 0:
-            filterpars->Pcategory = 0;
-            filterpars->Ptype = 2;
-            filterpars->Pfreq = 45;
-            filterpars->Pq = 64;
-            filterpars->Pstages = 1;
-            filterpars->Pgain = 64;
-            break;
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
 
-        case 1:
-            filterpars->Pcategory = 2;
-            filterpars->Ptype = 0;
-            filterpars->Pfreq = 72;
-            filterpars->Pq = 64;
-            filterpars->Pstages = 0;
-            filterpars->Pgain = 64;
-            break;
+        filterpars->defaults();
 
-        case 2:
-            filterpars->Pcategory = 0;
-            filterpars->Ptype = 4;
-            filterpars->Pfreq = 64;
-            filterpars->Pq = 64;
-            filterpars->Pstages = 2;
-            filterpars->Pgain = 64;
-            break;
+        switch (npreset)
+        {
+            case 0:
+                filterpars->Pcategory = 0;
+                filterpars->Ptype = 2;
+                filterpars->Pfreq = 45;
+                filterpars->Pq = 64;
+                filterpars->Pstages = 1;
+                filterpars->Pgain = 64;
+                break;
 
-        case 3:
-            filterpars->Pcategory = 1;
-            filterpars->Ptype = 0;
-            filterpars->Pfreq = 50;
-            filterpars->Pq = 70;
-            filterpars->Pstages = 1;
-            filterpars->Pgain = 64;
+            case 1:
+                filterpars->Pcategory = 2;
+                filterpars->Ptype = 0;
+                filterpars->Pfreq = 72;
+                filterpars->Pq = 64;
+                filterpars->Pstages = 0;
+                filterpars->Pgain = 64;
+                break;
 
-            filterpars->Psequencesize = 2;
-            // "I"
-            filterpars->Pvowels[0].formants[0].freq = 34;
-            filterpars->Pvowels[0].formants[0].amp = 127;
-            filterpars->Pvowels[0].formants[0].q = 64;
-            filterpars->Pvowels[0].formants[1].freq = 99;
-            filterpars->Pvowels[0].formants[1].amp = 122;
-            filterpars->Pvowels[0].formants[1].q = 64;
-            filterpars->Pvowels[0].formants[2].freq = 108;
-            filterpars->Pvowels[0].formants[2].amp = 112;
-            filterpars->Pvowels[0].formants[2].q = 64;
-            // "A"
-            filterpars->Pvowels[1].formants[0].freq = 61;
-            filterpars->Pvowels[1].formants[0].amp = 127;
-            filterpars->Pvowels[1].formants[0].q = 64;
-            filterpars->Pvowels[1].formants[1].freq = 71;
-            filterpars->Pvowels[1].formants[1].amp = 121;
-            filterpars->Pvowels[1].formants[1].q = 64;
-            filterpars->Pvowels[1].formants[2].freq = 99;
-            filterpars->Pvowels[1].formants[2].amp = 117;
-            filterpars->Pvowels[1].formants[2].q = 64;
-            break;
+            case 2:
+                filterpars->Pcategory = 0;
+                filterpars->Ptype = 4;
+                filterpars->Pfreq = 64;
+                filterpars->Pq = 64;
+                filterpars->Pstages = 2;
+                filterpars->Pgain = 64;
+                break;
 
-        case 4:
-            filterpars->Pcategory = 1;
-            filterpars->Ptype = 0;
-            filterpars->Pfreq = 64;
-            filterpars->Pq = 70;
-            filterpars->Pstages = 1;
-            filterpars->Pgain = 64;
+            case 3:
+                filterpars->Pcategory = 1;
+                filterpars->Ptype = 0;
+                filterpars->Pfreq = 50;
+                filterpars->Pq = 70;
+                filterpars->Pstages = 1;
+                filterpars->Pgain = 64;
 
-            filterpars->Psequencesize = 2;
-            filterpars->Pnumformants = 2;
-            filterpars->Pvowelclearness = 0;
+                filterpars->Psequencesize = 2;
+                // "I"
+                filterpars->Pvowels[0].formants[0].freq = 34;
+                filterpars->Pvowels[0].formants[0].amp = 127;
+                filterpars->Pvowels[0].formants[0].q = 64;
+                filterpars->Pvowels[0].formants[1].freq = 99;
+                filterpars->Pvowels[0].formants[1].amp = 122;
+                filterpars->Pvowels[0].formants[1].q = 64;
+                filterpars->Pvowels[0].formants[2].freq = 108;
+                filterpars->Pvowels[0].formants[2].amp = 112;
+                filterpars->Pvowels[0].formants[2].q = 64;
+                // "A"
+                filterpars->Pvowels[1].formants[0].freq = 61;
+                filterpars->Pvowels[1].formants[0].amp = 127;
+                filterpars->Pvowels[1].formants[0].q = 64;
+                filterpars->Pvowels[1].formants[1].freq = 71;
+                filterpars->Pvowels[1].formants[1].amp = 121;
+                filterpars->Pvowels[1].formants[1].q = 64;
+                filterpars->Pvowels[1].formants[2].freq = 99;
+                filterpars->Pvowels[1].formants[2].amp = 117;
+                filterpars->Pvowels[1].formants[2].q = 64;
+                break;
 
-            filterpars->Pvowels[0].formants[0].freq = 70;
-            filterpars->Pvowels[0].formants[0].amp = 127;
-            filterpars->Pvowels[0].formants[0].q = 64;
-            filterpars->Pvowels[0].formants[1].freq = 80;
-            filterpars->Pvowels[0].formants[1].amp = 122;
-            filterpars->Pvowels[0].formants[1].q = 64;
+            case 4:
+                filterpars->Pcategory = 1;
+                filterpars->Ptype = 0;
+                filterpars->Pfreq = 64;
+                filterpars->Pq = 70;
+                filterpars->Pstages = 1;
+                filterpars->Pgain = 64;
 
-            filterpars->Pvowels[1].formants[0].freq = 20;
-            filterpars->Pvowels[1].formants[0].amp = 127;
-            filterpars->Pvowels[1].formants[0].q = 64;
-            filterpars->Pvowels[1].formants[1].freq = 100;
-            filterpars->Pvowels[1].formants[1].amp = 121;
-            filterpars->Pvowels[1].formants[1].q = 64;
-            break;
-    }
+                filterpars->Psequencesize = 2;
+                filterpars->Pnumformants = 2;
+                filterpars->Pvowelclearness = 0;
 
-    if (insertion == 0)
-        changepar(0, presets[npreset][0] * 0.5f); // lower the volume if this is
+                filterpars->Pvowels[0].formants[0].freq = 70;
+                filterpars->Pvowels[0].formants[0].amp = 127;
+                filterpars->Pvowels[0].formants[0].q = 64;
+                filterpars->Pvowels[0].formants[1].freq = 80;
+                filterpars->Pvowels[0].formants[1].amp = 122;
+                filterpars->Pvowels[0].formants[1].q = 64;
+
+                filterpars->Pvowels[1].formants[0].freq = 20;
+                filterpars->Pvowels[1].formants[0].amp = 127;
+                filterpars->Pvowels[1].formants[0].q = 64;
+                filterpars->Pvowels[1].formants[1].freq = 100;
+                filterpars->Pvowels[1].formants[1].amp = 121;
+                filterpars->Pvowels[1].formants[1].q = 64;
+                break;
+        }
+
+        if (insertion == 0)
+            changepar(0, presets[npreset][0] * 0.5f); // lower the volume if this is
                                                   // system effect
-    Ppreset = npreset;
-    reinitfilter();
+        Ppreset = npreset;
+        reinitfilter();
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if ((insertion == 0) && (param == 0))
+            changepar(0, presets[preset][0] * 0.5f);
+    }
 }
 
 

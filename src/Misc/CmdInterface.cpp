@@ -59,7 +59,7 @@ string basics[] = {
     "  Parts",                      "parts with instruments installed",
     "  Vectors",                    "settings for all enabled vectors",
     "  Settings",                   "dynamic settings",
-    "  History [s]",                "recent files (Patchsets, SCales, STates)",
+    "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors)",
     "  Effects [s]",                "effect types ('all' include preset numbers and names)",
     "LOad",                         "load patch files",
     "  Instrument <s>",             "instrument to current part from named file",
@@ -290,7 +290,7 @@ void CmdInterface::historyList(int listnum)
 {
     list<string>msg;
     int start = 2;
-    int end = 4;
+    int end = 5;
     bool found = false;
 
     if (listnum != 0)
@@ -314,6 +314,9 @@ void CmdInterface::historyList(int listnum)
                     break;
                 case 4:
                     msg.push_back("Recent States:");
+                    break;
+                case 5:
+                    msg.push_back("Recent Vectors:");
                     break;
             }
             for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
@@ -1664,6 +1667,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 historyList(3);
             else if (matchnMove(2, point, "states"))
                 historyList(4);
+            else if (matchnMove(1, point, "vectors"))
+                historyList(5);
             else
             {
                 replyString = "list history";

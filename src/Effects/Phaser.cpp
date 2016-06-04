@@ -393,11 +393,24 @@ void Phaser::setpreset(unsigned char npreset)
         {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20,
          1 }
     };
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
 }
 
 

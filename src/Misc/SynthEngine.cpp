@@ -948,9 +948,6 @@ void SynthEngine::commandMain(float value, unsigned char type, unsigned char con
         case 32:
             contstr = "Detune";
             break;
-        case 34:
-            contstr = "Detune clear";
-        break;
         case 35:
             contstr = "Key Shift";
             break;
@@ -1020,9 +1017,6 @@ void SynthEngine::commandPart(float value, unsigned char type, unsigned char con
             break;
         case 2:
             contstr = "Panning";
-            break;
-        case 3:
-            contstr = "Pan Zero";
             break;
         case 4:
             contstr = "Vel Offset";
@@ -1213,9 +1207,6 @@ void SynthEngine::commandAdd(float value, unsigned char type, unsigned char cont
         case 2:
             contstr = "Panning";
             break;
-        case 3:
-            contstr = "Pan Zero";
-            break;
 
         case 32:
             contstr = "Detune";
@@ -1328,9 +1319,6 @@ void SynthEngine::commandAddVoice(float value, unsigned char type, unsigned char
             break;
         case 2:
             contstr = "Panning";
-            break;
-        case 3:
-            contstr = "Pan Zero";
             break;
         case 4:
             contstr = "Minus";
@@ -1524,9 +1512,6 @@ void SynthEngine::commandSub(float value, unsigned char type, unsigned char cont
         case 2:
             contstr = "Panning";
             break;
-        case 3:
-            contstr = "Pan Zero";
-            break;
         case 16:
             contstr = "Bandwidth";
             break;
@@ -1635,9 +1620,6 @@ void SynthEngine::commandPad(float value, unsigned char type, unsigned char cont
             break;
         case 2:
             contstr = "Panning";
-            break;
-        case 3:
-            contstr = "Pan Zero";
             break;
 
         case 16:

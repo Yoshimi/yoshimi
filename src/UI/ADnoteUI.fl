@@ -900,15 +900,6 @@ send_data(1, o->value());}
             code1 {o->init(64);}
             class WidgetPDial
           }
-          Fl_Button {} {
-            label Centre
-            callback {//
-              voicepan->value(64);
-              pars->setVoicePan(nvoice, 64);
-              voicerandompan->value(pars->randomVoicePan(nvoice));
-              send_data(3, o->value());}
-            tooltip {Centre panning} xywh {213 69 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
-          }
           Fl_Light_Button voicerandompan {
             label Rand
             callback {//
@@ -1323,15 +1314,6 @@ send_data(120, o->value());}
           code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
           code1 {o->init(20);}
           class WidgetPDial
-        }
-        Fl_Button {} {
-          label Centre
-          callback {//
-    globalpan->value(64);
-    pars->setGlobalPan(64);
-    globalrandompan->value(pars->randomGlobalPan());
-    send_data(3, o->value());}
-          tooltip {Centre panning} xywh {213 36 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
         }
         Fl_Dial pstr {
           label {P.Str.}

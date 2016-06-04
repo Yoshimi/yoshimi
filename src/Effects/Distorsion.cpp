@@ -43,7 +43,7 @@ Distorsion::Distorsion(bool insertion_, float *efxoutl_, float *efxoutr_, SynthE
     hpfl = new AnalogFilter(3, 20, 1, 0, synth);
     hpfr = new AnalogFilter(3, 20, 1, 0, synth);
     setpreset(Ppreset);
-    changepar(2, 40);
+    changepar(2, 35);
     cleanup();
 }
 
@@ -176,14 +176,26 @@ void Distorsion::setpreset(unsigned char npreset)
         { 127, 64, 35, 88, 75, 4, 0, 127, 0, 1, 0 }
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    if (!insertion)
-        // lower the volume if this is system effect
-        changepar(0, (int)roundf(((float)presets[npreset][0] * 0.7f)));
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        if (insertion)
+            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
     cleanup();
 }
 

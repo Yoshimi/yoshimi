@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {MasterUI.h} {not_in_source in_header
+comment {MasterUI.h} {selected not_in_source in_header
 } 
 
 comment {MasterUI.cc} {in_source not_in_header
@@ -88,7 +88,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -557,19 +557,10 @@ send_data(35, o->value());}
               synth->microtonal.Pglobalfinedetune = o->value();
               globalfinedetune->changed();
               send_data(32, o->value());}
-          tooltip {global fine detune} xywh {275 34 30 30} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
+          tooltip {global fine detune} xywh {275 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->value(synth->microtonal.Pglobalfinedetune);}
           code1 {o->init(64);}
           class WidgetPDial
-        }
-        Fl_Button {} {
-          label Zero
-          callback {//
-              globalfinedetune->value(64.0);
-              synth->microtonal.Pglobalfinedetune = 64.0f;
-              globalfinedetune->changed();
-              send_data(34, o->value());}
-          tooltip {Master fine detune reset} xywh {304 76 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
         Fl_Button {} {
           label {Stop!}

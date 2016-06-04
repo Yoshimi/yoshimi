@@ -1,7 +1,16 @@
-yoshimi 1.4.0 rc2
+yoshimi 1.4.0 rc3
+
+2016-6-4 Will
+- Effects knobs home correctly.
+- Removed now unnecessary reset buttons.
+- CLI histories reporting now includes vectors.
+- Added fix from Frank for c++11 issues with older compilers.
+- Bugfix: default l/r cross for Echo and Distortion effects.
 
 2016-6-3 Will
 - All knobs 'home' on right mouse click except effects.
+
+yoshimi 1.4.0 rc2
 
 2016-6-2 Will
 - Bugfix: vector 'Clear' was removing all vector names.

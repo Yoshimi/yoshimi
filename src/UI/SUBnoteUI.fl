@@ -230,15 +230,6 @@ send_data (1, o->value());}
           xywh {182 49 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
           code0 {o->value(pars->randomPan());}
         }
-        Fl_Button {} {
-          label Centre
-          callback {//
-    pan->value(64);
-    pars->setPan(64);
-    randompan->value(pars->randomPan());
-    send_data (3, o->value());}
-          tooltip {Centre panning} xywh {192 32 10 10} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labeltype NO_LABEL labelsize 10
-        }
         Fl_Group ampenv {
           label {SUBsynth - Amplitude Envelope}
           xywh {10 65 205 70} box FLAT_BOX color 51 align 144

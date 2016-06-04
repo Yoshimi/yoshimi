@@ -22,6 +22,8 @@
     This file is derivative of ZynAddSubFX original code, modified March 2011
 */
 
+#include <iostream>
+
 #include "Misc/SynthEngine.h"
 #include "Effects/Echo.h"
 
@@ -38,7 +40,7 @@ Echo::Echo(bool insertion_, float* efxoutl_, float* efxoutr_, SynthEngine *_synt
     synth(_synth)
 {
     setpreset(Ppreset);
-    changepar(4, 100); // lrcross
+    changepar(4, 30); // lrcross
     cleanup();
 }
 
@@ -183,13 +185,26 @@ void Echo::setpreset(unsigned char npreset)
         { 62, 64, 28, 64, 100, 90, 55 }    // Feedback Echo
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    if (insertion != 0)
-        setvolume(presets[npreset][0] / 2); // lower the volume if this is insertion effect
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        if (insertion)
+            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
 }
 
 
