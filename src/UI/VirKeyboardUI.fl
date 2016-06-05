@@ -50,7 +50,13 @@ decl {\#include "MusicIO/MidiControl.h"} {public local
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
+
+decl {\#include "WidgetMWSliderUI.h"} {public local
+}
+
+decl {\#include "WidgetMWRollerUI.h"} {public local
+}
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
 } 
@@ -338,6 +344,7 @@ virkeys->take_focus();}
 virkeys->take_focus();}
         tooltip Velocity xywh {96 106 110 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
+        class mwheel_val_slider_rev
       }
       Fl_Counter {} {
         label Octave
@@ -359,6 +366,7 @@ virkeyboardwindow->hide();}
             synth->SetController(virkeys->midich, ctl, (int) o->value());
             virkeys->take_focus();}
         tooltip {Controller value} xywh {630 10 15 115} type {Vert Fill} box ENGRAVED_BOX selection_color 229 labelsize 8 align 5 minimum 127 maximum 0 step 1 value 64 textsize 7
+        class mwheel_val_slider
       }
       Fl_Choice {} {
         label Controller
@@ -436,6 +444,7 @@ virkeyboardwindow->hide();}
         callback {synth->SetController(virkeys->midich, C_pitchwheel, -(int) o->value());
             virkeys->take_focus();}
         tooltip {Pitch Wheel} xywh {5 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
+        class mwheel_roller
       }
       Fl_Button {} {
         label R

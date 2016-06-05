@@ -36,6 +36,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "Params/ADnoteParameters.h"
     \#include "Misc/SynthEngine.h"
     \#include "WidgetPDialUI.h"
+    \#include "WidgetMWSliderUI.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
 } 
@@ -72,6 +73,7 @@ pars->VoicePar[nvoice].PVolume = lrint(o->value());
 synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 0, npart, kititem, 0x80 + nvoice);}
           tooltip Volume xywh {90 5 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
+          class mwheel_val_slider_rev
         }
         Fl_Check_Button voiceresonanceenabled {
           callback {pars->VoicePar[nvoice].Presonance = lrint(o->value());
@@ -87,6 +89,7 @@ pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());
 synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 1, npart, kititem, 0x80 + nvoice, 0, 1);}
           tooltip {Frequency LFO amount} xywh {500 5 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
+          class mwheel_val_slider_rev
         }
         Fl_Dial voicepanning {
           callback {pars->setVoicePan(nvoice, lrint(o->value()));
@@ -145,6 +148,7 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 2, npart
               synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 32, npart, kititem, 0x80 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {310 5 185 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
+          class mwheel_slider_rev
         }
       }
       Fl_Check_Button voiceenabled {
@@ -308,6 +312,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                     send_data(96, o->value());}
                 tooltip {Fine Detune (cents)} xywh {578 224 168 16} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetune-8192);}
+                class mwheel_slider_rev
               }
               Fl_Choice {} {
                 label {Detune Type}
@@ -347,6 +352,7 @@ pars->VoicePar[nvoice].PFMVolume = lrint(o->value());
 send_data(80, o->value());}
                 tooltip Volume xywh {540 70 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolume);}
+                class mwheel_val_slider_rev
               }
               Fl_Value_Slider {} {
                 label {V.Sns}
@@ -356,6 +362,7 @@ pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(o->value());
 send_data(81, o->value());}
                 tooltip {Velocity Sensing Function - rightmost/max to disable)} xywh {540 90 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVelocityScaleFunction);}
+                class mwheel_val_slider_rev
               }
               Fl_Group voiceFMampenvgroup {
                 label {ADSynth Modulator - Amplitude Envelope} open
@@ -386,6 +393,7 @@ pars->VoicePar[nvoice].PFMVolumeDamp = lrint(o->value()) + 64;
 send_data(82, o->value());}
                 tooltip {Modulator Damp at Higher frequency} xywh {540 110 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum -64 maximum 63 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolumeDamp-64);}
+                class mwheel_val_slider_rev
               }
             }
             Fl_Group modoscil {
@@ -428,6 +436,7 @@ send_data(82, o->value());}
                     send_data(112, o->value());}
                 xywh {665 396 65 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
                 code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
+                class mwheel_slider_rev
               }
               Fl_Choice {} {
                 label Use
@@ -600,6 +609,7 @@ send_data(82, o->value());}
                   send_data(32, o->value());}
               tooltip {Fine Detune (cents)} xywh {48 276 397 16} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->VoicePar[nvoice].PDetune-8192);}
+              class mwheel_slider_rev
             }
             Fl_Check_Button Freq440 {
               label 440Hz
@@ -692,6 +702,7 @@ send_data(39, o->value());}
                 send_data(136, o->value());}
             xywh {9 420 65 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
             code0 {o->value(64-pars->VoicePar[nvoice].Poscilphase);}
+            class mwheel_slider_rev
           }
           Fl_Box {} {
             xywh {200 5 45 35} box THIN_UP_FRAME
@@ -832,6 +843,7 @@ send_data(54, o->value());}
                   send_data(48, o->value());}
               tooltip {Frequency Spread of the Unison} xywh {185 545 120 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 9 maximum 127 step 1 value 64
               code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
+              class mwheel_slider_rev
             }
             Fl_Value_Output unisonspreadoutput {
               label {(cents)}
@@ -1051,6 +1063,7 @@ pars->VoicePar[nvoice].PDelay = lrint(o->value());
 send_data(128, o->value());}
             tooltip Volume xywh {111 21 84 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
+            class mwheel_val_slider_rev
           }
         }
         Fl_Check_Button bypassfiltercheckbutton {
@@ -1222,6 +1235,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
     send_data(32, o->value() + 8192);}
           tooltip {Fine Detune (cents)} xywh {57 275 385 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->GlobalPar.PDetune - 8192);}
+          class mwheel_slider_rev
         }
         Fl_Value_Output detunevalueoutput {
           label Detune

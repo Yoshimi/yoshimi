@@ -32,7 +32,10 @@ This file is derivative of ZynAddSubFX original code, modified March 2011
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
+
+decl {\#include "WidgetMWSliderUI.h"} {public local
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
 } 
@@ -539,6 +542,7 @@ pars->changed = true;
 send_data(22, o->value());}
         xywh {556 167 84 15} type {Horz Knob} box FLAT_BOX maximum 127
         code0 {o->value(pars->Pcenterfreq);}
+        class mwheel_slider_rev
       }
       Fl_Slider octknob {
         callback {pars->Poctavesfreq=(int)o->value();
@@ -547,6 +551,7 @@ formantfiltergraph->redraw();
 send_data(23, o->value());}
         xywh {556 185 84 15} type {Horz Knob} box FLAT_BOX maximum 127
         code0 {o->value(pars->Poctavesfreq);}
+        class mwheel_slider_rev
       }
       Fl_Box formantfiltergraph {
         xywh {5 5 475 195} box BORDER_BOX

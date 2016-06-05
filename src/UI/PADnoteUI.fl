@@ -907,6 +907,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
     send_data(32, o->value() + 8192);}
               tooltip {Fine Detune (cents)} xywh {57 305 388 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
+              class mwheel_slider_rev
             }
             Fl_Value_Output detunevalueoutput {
               label Detune

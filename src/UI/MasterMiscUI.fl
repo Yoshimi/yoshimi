@@ -74,7 +74,10 @@ decl {\#include "ConsoleUI.h"} {public local
 } 
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
+
+decl {\#include "WidgetMWSliderUI.h"} {private global
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
@@ -466,6 +469,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         send_data(0, o->value());}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
+          class mwheel_slider
         }
         Fl_Dial partpanning {
           callback {//

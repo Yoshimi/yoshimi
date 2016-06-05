@@ -48,7 +48,10 @@ decl {\#include <cmath>} {private local
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
+
+decl {\#include "WidgetMWSliderUI.h"} {public local
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
 } 
@@ -174,30 +177,30 @@ oscbase = oscbase_;} {}
   }
 } 
 
-class PSlider {: {public Fl_Slider}
+class PSlider {: {public mwheel_slider}
 } {
-  Function {PSlider(int x,int y, int w, int h, const char *label=0):Fl_Slider(x,y,w,h,label)} {} {
+  Function {PSlider(int x,int y, int w, int h, const char *label=0):mwheel_slider(x,y,w,h,label)} {} {
     code {;} {}
   }
   Function {handle(int event)} {return_type int
   } {
     code {int X=x(),Y=y(),W=w(),H=h();
 
-if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0)) return(Fl_Slider::handle(event));
+if ((!Fl::event_buttons())|| (event==0)||(Fl::event_shift()==0)) return(mwheel_slider::handle(event));
 
 if (!Fl::event_inside(X,Y,W,H)) {
 	if (event==FL_DRAG){
-		Fl_Slider::handle(FL_RELEASE);
-		Fl_Slider::handle(FL_LEAVE);
+        mwheel_slider::handle(FL_RELEASE);
+        mwheel_slider::handle(FL_LEAVE);
 		deactivate();
 		activate();
 		return(1);
 	}else{
-		return(Fl_Slider::handle(event));
+        return(mwheel_slider::handle(event));
 	};
 } else {
-	//Fl_Slider::handle(FL_FOCUS);
-	Fl_Slider::handle(FL_PUSH);
+    //mwheel_slider::handle(FL_FOCUS);
+    mwheel_slider::handle(FL_PUSH);
 };
 
 return(1);} {}
@@ -504,6 +507,7 @@ oldosc->redraw();
 send_data (0, o->value());}
           tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
+          class mwheel_val_slider_rev
         }
         Fl_Group {} {
           xywh {10 30 350 50} box THIN_DOWN_BOX color 32 selection_color 218 labelcolor 63
@@ -1143,6 +1147,7 @@ send_data (68, o->value());}
 oscil->Padaptiveharmonicspar=(int)o->value();
 redrawoscil();
 send_data (67, o->value());}
+          class mwheel_slider_rev
           tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
         }
       }

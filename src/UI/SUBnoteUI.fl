@@ -32,7 +32,10 @@ This file is derivative of ZynAddSubFX original code, modified September 2014
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
+
+decl {\#include "WidgetMWSliderUI.h"} {public local
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
 } 
@@ -80,6 +83,7 @@ else
         tooltip {harmonic's magnitude} xywh {0 15 10 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
         code0 {o->value(127-pars->Phmag[n]);}
         code1 {if (pars->Phmag[n]==0) o->selection_color(0);}
+        class mwheel_slider
       }
       Fl_Slider bw {
         callback {int x=64;
@@ -98,6 +102,7 @@ else
         tooltip {harmonic's bandwidth} xywh {0 156 10 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
         code0 {o->value(127-pars->Phrelbw[n]);}
         code1 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
+        class mwheel_slider
       }
       Fl_Box {} {
         xywh {10 216 5 5} box FLAT_BOX color 39
@@ -355,6 +360,7 @@ send_data (82, o->value());}
     send_data (32, o->value() + 8192);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
+          class mwheel_slider_rev
         }
         Fl_Value_Output detunevalueoutput {
           label Detune
@@ -474,6 +480,7 @@ pars->Pbandwidth=(int) o->value();
 send_data (16, o->value());}
           xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->Pbandwidth);}
+          class mwheel_val_slider_rev
         }
         Fl_Value_Slider bwidthscale {
           label {B.Width Scale}
@@ -483,6 +490,7 @@ pars->Pbwscale=(int) o->value() + 64;
 send_data (17, o->value() + 64);}
           tooltip {How much I increase the BandWidth according to lower/higher harmonics} xywh {345 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {o->value(pars->Pbwscale-64);}
+          class mwheel_val_slider_rev
         }
       }
       Fl_Group globalfiltergroup {
