@@ -47,10 +47,10 @@ decl {\#include <iostream>} {private local
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
 } 
@@ -368,7 +368,7 @@ if ((Fl::event_button() == 3))
         rg->redraw();
         redrawPADnoteApply();
         send_data(1, o->value());}
-        xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 0.1
+        xywh {243 264 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
         code0 {o->value(respar->Pcenterfreq);}
         class mwheel_slider_rev
       }
@@ -388,7 +388,7 @@ if ((Fl::event_button() == 3))
         rg->redraw();
         redrawPADnoteApply();
         send_data(2, o->value());}
-        xywh {243 282 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 0.1
+        xywh {243 282 110 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
         code0 {o->value(respar->Poctavesfreq);}
         class mwheel_slider_rev
       }
