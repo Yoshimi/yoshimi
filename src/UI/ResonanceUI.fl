@@ -270,7 +270,7 @@ this->applybutton=applybutton;} {}
   }
 } 
 
-class ResonanceUI {selected : PresetsUI_
+class ResonanceUI {: PresetsUI_
 } {
   Function {make_window()} {} {
     Fl_Window resonancewindow {
@@ -347,7 +347,7 @@ if ((Fl::event_button() == 3))
         respar->PmaxdB = (int) o->value();
         redrawPADnoteApply();
         send_data(0, o->value());}
-        xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 30
+        xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 20
         code0 {o->value(respar->PmaxdB);}
         class mwheel_slider_rev
       }

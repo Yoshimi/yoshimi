@@ -37,26 +37,26 @@ decl {\#include <FL/Fl.H>
     \#include <FL/Fl_Value_Slider.H>} {public global
 } 
 
-class mwheel_slider {open : {public Fl_Slider}
+class mwheel_slider {: {public Fl_Slider}
 } {
   decl {int reverse;} {public local
   }
-  Function {mwheel_slider(int x, int y, int w, int h, const char *l=0) : Fl_Slider (x,y,w,h,l)} {open
-  } {
+  Function {mwheel_slider(int x, int y, int w, int h, const char *l=0) : Fl_Slider (x,y,w,h,l)} {} {
     code {reverse = 1;} {}
   }
-  Function {handle(int ev)} {open return_type int
+  Function {handle(int ev)} {return_type int
   } {
-    code {double drag, v1, min = minimum(), max = maximum();
+    code {double v1, min = minimum(), max = maximum();
     int res = Fl_Slider::handle(ev); // do the base-class actions
 
     if (ev == FL_MOUSEWHEEL) // now check for wheel-mouse events
     {
         int d = reverse * Fl::event_dy(); // correct for weirdness
-        drag = 0.1;
-        if(Fl::event_state(FL_CTRL) == 0)
-            drag *= 10.0;
-        d *= (drag  * sqrt(max - min));
+        int sign = 1 - (d<0) * 2;
+        if(Fl::event_state(FL_CTRL) != 0)
+            d = step() * sign;
+        else
+            d = d * (max - min) / 10;
         v1 = value(); // current value
         v1 = increment(v1, d); // change
         v1 = clamp(v1); // clamp to valuator limits
@@ -75,27 +75,27 @@ class mwheel_slider_rev {: {public mwheel_slider}
   }
 } 
 
-class mwheel_val_slider {open : {public Fl_Value_Slider}
+class mwheel_val_slider {selected : {public Fl_Value_Slider}
 } {
   decl {int reverse;} {public local
   }
   Function {mwheel_val_slider(int x, int y, int w, int h, const char *l=0) : Fl_Value_Slider (x,y,w,h,l)} {} {
     code {reverse = 1;} {}
   }
-  Function {handle(int ev)} {open return_type int
+  Function {handle(int ev)} {return_type int
   } {
     code {//
-    double drag, v1, min = minimum(), max = maximum();
+    double v1, min = minimum(), max = maximum();
     int res = Fl_Value_Slider::handle(ev); // do the base-class actions
 
     if (ev == FL_MOUSEWHEEL) // now check for wheel-mouse events
     {
         int d = Fl::Fl::event_dy();
         int sign = 1 - (d<0) * 2;
-        drag = 0.05;
-        if(Fl::event_state(FL_CTRL) == 0)
-            drag *= 10.0;
-        d = (d * drag * sqrt(max - min) + sign);
+        if(Fl::event_state(FL_CTRL) != 0)
+            d = step() * sign;
+        else
+            d = d * (max - min) / 10;
         v1 = value(); // current value
         v1 = increment(v1, d * reverse); // change it, maybe invert
         v1 = clamp(v1); // clamp to valuator limits
@@ -103,8 +103,7 @@ class mwheel_val_slider {open : {public Fl_Value_Slider}
         this->do_callback(); //maybe update
         return 1; // say we ate this event
     }
-    return res;} {selected
-    }
+    return res;} {}
   }
 } 
 
