@@ -4,6 +4,7 @@ yoshimi 1.4.0 rc4
 - Brought in extended slider controls from Rob's ideas.
 - Modifed knobs for similar mouse wheel behaviour.
 - Bumped rc version.
+- Added existence check when saving vectors.
 
 yoshimi 1.4.0 rc3
 

@@ -70,7 +70,11 @@ send_data(1, 0);}
         }
         MenuItem {} {
           label Save
-          callback {saveVector();
+          callback {if(Xcc < 14)
+    fl_alert("Nothing to save!");
+else
+    saveVector();
+    
 send_data(1, 1);}
           xywh {10 10 34 20} labelsize 12
         }
