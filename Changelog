@@ -1,5 +1,8 @@
 yoshimi 1.4.0 rc3
 
+2016-6-7 Chris
+- Replaced buggy file extension test.
+
 2016-6-4 Will
 - Effects knobs home correctly.
 - Removed now unnecessary reset buttons.

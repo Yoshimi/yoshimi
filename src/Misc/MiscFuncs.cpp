@@ -238,8 +238,44 @@ string MiscFuncs::findleafname(string name)
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {
-    string tmp = fname.substr(0,fname.find('.'));
-    tmp += ('.' + ext);
+
+    string tmp;                         // return value
+    size_t ext_pos = fname.rfind('.');  // period, if any
+    size_t slash_pos = fname.find('/'); // UNIX path-separator
+    if (slash_pos == string::npos)
+    {
+        // There are no slashes in the string, therefore the last period, if
+        // any, must be at the position of the extension period.
+
+        ext_pos = fname.rfind('.');
+        if (ext_pos == string::npos || ext_pos == 0)
+        {
+            // There is no period, therefore there is no extension.
+            // Append the extension.
+
+            tmp = fname + "." + ext;
+        }
+        else
+        {
+            // Replace everything after the last period.
+
+            tmp = fname.substr(0, ext_pos);
+            tmp += "." + ext;
+        }
+    }
+    else
+    {
+        // If the period precedes the slash, then it is not the extension.
+        // Add the whole extension.  Otherwise, replace the extension.
+
+        if (slash_pos > ext_pos)
+            tmp = fname + "." + ext;
+        else
+        {
+            tmp = fname.substr(0, ext_pos);
+            tmp += "." + ext;
+        }
+    }
     return tmp;
 }
 
