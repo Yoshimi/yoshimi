@@ -8,9 +8,8 @@ comment {WidgetMWSlider.h} {not_in_source in_header
 comment {WidgetMWSlider.cc} {in_source not_in_header
 } 
 
-comment {Original ZynAddSubFX author Nasca Octavian Paul
-Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
+comment {Idea developed from ZynAddSubFX Pdial
+Copyright 2016 Rob Couto & Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -30,11 +29,8 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
-decl {\#include <cmath>} {public local
-} 
-
 decl {\#include <FL/Fl.H>
-    \#include <FL/Fl_Value_Slider.H>} {public global
+    \#include <FL/Fl_Value_Slider.H>} {selected public global
 } 
 
 class mwheel_slider {: {public Fl_Slider}
@@ -56,7 +52,7 @@ class mwheel_slider {: {public Fl_Slider}
         if(Fl::event_state(FL_CTRL) != 0)
             d = step() * sign;
         else
-            d = d * (max - min) / 10;
+            d = ((max - min) / 20) * sign;
         v1 = value(); // current value
         v1 = increment(v1, d); // change
         v1 = clamp(v1); // clamp to valuator limits
@@ -75,7 +71,7 @@ class mwheel_slider_rev {: {public mwheel_slider}
   }
 } 
 
-class mwheel_val_slider {selected : {public Fl_Value_Slider}
+class mwheel_val_slider {: {public Fl_Value_Slider}
 } {
   decl {int reverse;} {public local
   }
@@ -95,7 +91,7 @@ class mwheel_val_slider {selected : {public Fl_Value_Slider}
         if(Fl::event_state(FL_CTRL) != 0)
             d = step() * sign;
         else
-            d = d * (max - min) / 10;
+            d = ((max - min) / 20) * sign;
         v1 = value(); // current value
         v1 = increment(v1, d * reverse); // change it, maybe invert
         v1 = clamp(v1); // clamp to valuator limits
