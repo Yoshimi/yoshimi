@@ -8,9 +8,8 @@ comment {WidgetMWSlider.h} {not_in_source in_header
 comment {WidgetMWSlider.cc} {in_source not_in_header
 } 
 
-comment {Original ZynAddSubFX author Nasca Octavian Paul
-Copyright (C) 2002-2005 Nasca Octavian Paul
-Copyright 2009-2010, Alan Calvert
+comment {Idea developed from ZynAddSubFX Pdial
+Copyright 2016 Rob Couto & Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -31,29 +30,29 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } 
 
 decl {\#include <FL/Fl.H>
-    \#include <FL/Fl_Value_Slider.H>
-} {public global}
-
+    \#include <FL/Fl_Value_Slider.H>} {selected public global
+} 
 
 class mwheel_slider {: {public Fl_Slider}
 } {
-decl {int reverse;} {public local
-}
-Function {mwheel_slider(int x, int y, int w, int h, const char *l=0) : Fl_Slider (x,y,w,h,l)} {}
-{
-    code { reverse = -1; } {}
-}
-
-Function {handle(int ev)} {return_type int}
-{
-code {
-    double v1;
+  decl {int reverse;} {public local
+  }
+  Function {mwheel_slider(int x, int y, int w, int h, const char *l=0) : Fl_Slider (x,y,w,h,l)} {} {
+    code {reverse = 1;} {}
+  }
+  Function {handle(int ev)} {return_type int
+  } {
+    code {double v1, min = minimum(), max = maximum();
     int res = Fl_Slider::handle(ev); // do the base-class actions
 
     if (ev == FL_MOUSEWHEEL) // now check for wheel-mouse events
     {
-        // use both dx & dy to admit horiz. scrolling, up & right should be +
-        int d = reverse * Fl::event_dx() - reverse * Fl::event_dy(); // correct for weirdness
+        int d = reverse * Fl::event_dy(); // correct for weirdness
+        int sign = 1 - (d<0) * 2;
+        if(Fl::event_state(FL_CTRL) != 0)
+            d = step() * sign;
+        else
+            d = ((max - min) / 20) * sign;
         v1 = value(); // current value
         v1 = increment(v1, d); // change
         v1 = clamp(v1); // clamp to valuator limits
@@ -61,39 +60,38 @@ code {
         this->do_callback(); //maybe update
         return 1; // say we ate this event
     }
-    return res;
-} {}
-}}
-
+    return res;} {}
+  }
+} 
 
 class mwheel_slider_rev {: {public mwheel_slider}
 } {
-Function {mwheel_slider_rev(int x, int y, int w, int h, const char *l=0) : mwheel_slider (x,y,w,h,l)} {}
-{
-    code { reverse = 1; } {}
-}
-}
-
+  Function {mwheel_slider_rev(int x, int y, int w, int h, const char *l=0) : mwheel_slider (x,y,w,h,l)} {} {
+    code {reverse = -1;} {}
+  }
+} 
 
 class mwheel_val_slider {: {public Fl_Value_Slider}
 } {
-decl {int reverse;} {public local
-}
-Function {mwheel_val_slider(int x, int y, int w, int h, const char *l=0) : Fl_Value_Slider (x,y,w,h,l)} {}
-{
-    code { reverse = -1; } {}
-}
-
-Function {handle(int ev)} {return_type int}
-{
-code {
-    double v1;
+  decl {int reverse;} {public local
+  }
+  Function {mwheel_val_slider(int x, int y, int w, int h, const char *l=0) : Fl_Value_Slider (x,y,w,h,l)} {} {
+    code {reverse = 1;} {}
+  }
+  Function {handle(int ev)} {return_type int
+  } {
+    code {//
+    double v1, min = minimum(), max = maximum();
     int res = Fl_Value_Slider::handle(ev); // do the base-class actions
 
     if (ev == FL_MOUSEWHEEL) // now check for wheel-mouse events
     {
-    // use dx & dy to admit horiz. scrolling & only reverse vert, up is positive now
-        int d = Fl::event_dx() - Fl::event_dy();
+        int d = Fl::Fl::event_dy();
+        int sign = 1 - (d<0) * 2;
+        if(Fl::event_state(FL_CTRL) != 0)
+            d = step() * sign;
+        else
+            d = ((max - min) / 20) * sign;
         v1 = value(); // current value
         v1 = increment(v1, d * reverse); // change it, maybe invert
         v1 = clamp(v1); // clamp to valuator limits
@@ -101,16 +99,13 @@ code {
         this->do_callback(); //maybe update
         return 1; // say we ate this event
     }
-    return res;
-} {}
-}}
+    return res;} {}
+  }
+} 
 
 class mwheel_val_slider_rev {: {public mwheel_val_slider}
 } {
-Function {mwheel_val_slider_rev(int x, int y, int w, int h, const char *l=0) : mwheel_val_slider (x,y,w,h,l)} {}
-{
-    code { reverse = 1; } {}
-}
-}
-
-
+  Function {mwheel_val_slider_rev(int x, int y, int w, int h, const char *l=0) : mwheel_val_slider (x,y,w,h,l)} {} {
+    code {reverse = -1;} {}
+  }
+} 

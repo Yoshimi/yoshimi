@@ -58,8 +58,8 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
   Function {make_window()} {private
   } {
     Fl_Window syseffsend {
-      private xywh {916 904 150 50} type Double
-      class Fl_Group visible
+      private xywh {916 904 150 50} type Double hide
+      class Fl_Group
     } {
       Fl_Dial {} {
         label 01
@@ -1049,9 +1049,9 @@ send_data(57, o->value());}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {897 125 395 360} type Double hide
+      xywh {897 125 395 360} type Double
       code0 {seteditname();}
-      code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
+      code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());} visible
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME

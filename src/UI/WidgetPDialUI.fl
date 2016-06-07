@@ -11,6 +11,7 @@ comment {WidgetPDial.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2016 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -107,7 +108,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
 } 
 
-class WidgetPDial {open : {public Fl_Dial}
+class WidgetPDial {selected : {public Fl_Dial}
 } {
   Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
     code {//
@@ -126,7 +127,7 @@ class WidgetPDial {open : {public Fl_Dial}
   Function {~WidgetPDial()} {} {
     code {delete tipwin;} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {double dragsize, v, min = minimum(), max = maximum();
         int my;
@@ -173,7 +174,7 @@ class WidgetPDial {open : {public Fl_Dial}
                 if (Fl::belowmouse() != this)
                     return 1;
                 my = - Fl::event_dy();
-                dragsize = 100.0f;
+                dragsize = 30.0f;
                 if(Fl::event_state(FL_CTRL) != 0)
                     dragsize *= 20;
                 value(limit(value() + my / dragsize * (max - min), min, max));
@@ -212,8 +213,7 @@ class WidgetPDial {open : {public Fl_Dial}
                  return 1;
                  break;
         }
-        return 0;} {selected
-    }
+        return 0;} {}
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {

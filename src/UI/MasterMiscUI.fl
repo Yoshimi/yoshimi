@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -74,10 +74,10 @@ decl {\#include "ConsoleUI.h"} {public local
 } 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
 } 
@@ -407,7 +407,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
+class Panellistitem {: {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {
@@ -458,17 +458,21 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         }
         Fl_Slider partvolume {
           callback {//
+        int realvalue;
 	if (Fl::event_button() == 3)
 	{
-	    o->value(96);
+	    realvalue = 96;
+	    o->value(127-realvalue);
 	    o->redraw();	    
 	}
-        synth->part[npart + *plgroup]->setVolume(o->value());
-        synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, o->value());
+	else
+	    realvalue = 127 - o->value();
+        synth->part[npart + *plgroup]->setVolume(realvalue);
+        synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
         
-        send_data(0, o->value());}
-          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
-          code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
+        send_data(0, realvalue);}
+          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
+          code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
           class mwheel_slider
         }
         Fl_Dial partpanning {
@@ -583,7 +587,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
 
     setPartLabel(findengines(setpart));
 
-    partvolume->value(synth->part[setpart]->Pvolume);
+    partvolume->value(127 - synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
     int tmpch = synth->part[setpart]->Prcvchn;
     if (tmpch < NUM_MIDI_CHANNELS)

@@ -31,23 +31,19 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } 
 
 decl {\#include <FL/Fl.H>
-    \#include <FL/Fl_Roller.H>
-} {public global}
+    \#include <FL/Fl_Roller.H>} {public global
+} 
 
-
-class mwheel_roller {: {public Fl_Roller}
+class mwheel_roller {open : {public Fl_Roller}
 } {
-decl {int reverse;} {public local
-}
-Function {mwheel_roller(int x, int y, int w, int h, const char *l=0) : Fl_Roller (x,y,w,h,l)} {}
-{
-    code { reverse = -1; } {}
-}
-
-Function {handle(int ev)} {return_type int}
-{
-code {
-    double v1;
+  decl {int reverse;} {public local
+  }
+  Function {mwheel_roller(int x, int y, int w, int h, const char *l=0) : Fl_Roller (x,y,w,h,l)} {} {
+    code {reverse = -1;} {}
+  }
+  Function {handle(int ev)} {open return_type int
+  } {
+    code {double v1;
     int res = Fl_Roller::handle(ev); // do the base-class actions
 
     if (ev == FL_MOUSEWHEEL) // now check for wheel-mouse events
@@ -61,7 +57,7 @@ code {
         this->do_callback(); //maybe update
         return 1; // say we ate this event
     }
-    return res;
-} {}
-}}
-
+    return res;} {selected
+    }
+  }
+} 
