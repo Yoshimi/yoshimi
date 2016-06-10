@@ -33,25 +33,26 @@ decl {\#include <FL/Fl.H>
     \#include <FL/Fl_Value_Slider.H>} {public global
 } 
 
-class mwheel_slider {open : {public Fl_Slider}
+class mwheel_slider {selected : {public Fl_Slider}
 } {
   decl {int reverse;} {public local
   }
   Function {mwheel_slider(int x, int y, int w, int h, const char *l=0) : Fl_Slider (x,y,w,h,l)} {} {
     code {reverse = 1;} {}
   }
-  Function {handle(int ev)} {open return_type int
+  Function {handle(int ev)} {return_type int
   } {
     code {//
     double min = minimum(), max = maximum();
-    double size = max - min;
-    double deltav = 0;
-    static double v1;
+    //double size = max - min;
+    //double deltav = 0;
+    //static double v1;
+    //static int button;
+    //static int ctrl;
+    double v1;
     int res = Fl_Slider::handle(ev); // do the base-class actions
     int sign;
     int d = 0;
-    static int button;
-    //static int ctrl;
     switch (ev)
     {
         /*case FL_PUSH:   // *** here be dragons :(
@@ -98,8 +99,7 @@ class mwheel_slider {open : {public Fl_Slider}
             break;
         }
     }
-    return res;} {selected
-    }
+    return res;} {}
   }
 } 
 

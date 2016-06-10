@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {WidgetPDial.h} {selected not_in_source in_header
+comment {WidgetPDial.h} {not_in_source in_header
 } 
 
 comment {WidgetPDial.cc} {in_source not_in_header
@@ -140,6 +140,9 @@ class WidgetPDial {: {public Fl_Dial}
         	{
             	    value(home);
             	    value_damage();
+            	    if (this->when() != 0)
+                         do_callback();
+                    return 1;
         	}
                 oldvalue = value();
             case FL_DRAG:
@@ -217,7 +220,8 @@ class WidgetPDial {: {public Fl_Dial}
                  return 1;
                  break;
         }
-        return 0;} {}
+        return 0;} {selected
+    }
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {

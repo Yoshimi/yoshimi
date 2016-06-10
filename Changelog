@@ -1,3 +1,9 @@
+yoshimi 1.4.0 rc6
+
+2016-6-10 Will
+- Bugfix: 'home' on some controls updated the GUI but didn't send.
+- Bugfix: Missing 'includes' in LV2 CMakeLists.txt :(
+
 yoshimi 1.4.0 rc5
 
 2016-6-10 Will
@@ -7,6 +13,8 @@ yoshimi 1.4.0 rc5
   Available parts incremented if necessary & parts enabled.
 - Setting GUI incoming CC only set to 14 if a lower value entered.
 - More adjustments to knobs and sliders.
+- Modified '64ft Organ'. Sounds the same but Extreme LF balanced.
+- Modified 'Tomita Whistle'. Attack time was too short.
 
 yoshimi 1.4.0 rc4
 
@@ -263,6 +271,7 @@ yoshimi 1.4.0 rc1
 - Bugfix: if jack not running and ALSA not available yoshimi
   sometimes segfalted.
 - Splash screen can now be disabled.
+- Added 'Tomita Whistle' instrument patch.
 
 2016-3-23 Will
 - Implemented CLI Vector save and load.

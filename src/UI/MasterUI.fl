@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {MasterUI.h} {selected not_in_source in_header
+comment {MasterUI.h} {not_in_source in_header
 } 
 
 comment {MasterUI.cc} {in_source not_in_header
@@ -88,7 +88,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
