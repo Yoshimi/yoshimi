@@ -48,10 +48,10 @@ decl {\#include <cmath>} {private local
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include "EnvelopeUI.h"} {public local
 } 
@@ -322,7 +322,11 @@ class Oscilharmonic {: {public Fl_Group}
       Fl_Slider mag {
         callback {int x=64;
 if (Fl::event_button3())
-    o->value(x);
+{
+    if (n == 0)
+        x = 127;
+    o->value(127 -x);
+}
 else
     x=127-(int)o->value();
 
@@ -1147,8 +1151,8 @@ send_data (68, o->value());}
 oscil->Padaptiveharmonicspar=(int)o->value();
 redrawoscil();
 send_data (67, o->value());}
-          class mwheel_slider_rev
           tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
+          class mwheel_slider_rev
         }
       }
       Fl_Group {} {

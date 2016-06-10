@@ -248,9 +248,9 @@ send_data(22, o->value());}
       Fl_Spinner Xcontrol {
         label Controller
         callback {int tmp = o->value();
-if (Xcc < 14 && tmp > Xcc)
+if (Xcc < 14 && tmp < 14)
     tmp = 14;
-else if (Xcc == 14 && tmp < Xcc)
+else if (tmp < 14)
     tmp = 0;
 
 if (tmp < 14)
@@ -263,17 +263,6 @@ if (tmp < 14)
 }
 else
 {
-
-    if (synth->getRuntime().NumAvailableParts < (NUM_MIDI_CHANNELS * 2))
-    {
-        synth->getRuntime().NumAvailableParts = NUM_MIDI_CHANNELS * 2;
-        synth->partonoffLock(BaseChan, 1);
-        synth->partonoffLock(BaseChan + NUM_MIDI_CHANNELS, 1);
-        synth->part[BaseChan]->Prcvchn = BaseChan;
-        synth->part[BaseChan + NUM_MIDI_CHANNELS]->Prcvchn = BaseChan;
-        synth->getGuiMaster()->updatepart();
-        synth->getGuiMaster()->updatepanel();
-    }
     if (!synth->vectorInit(0, BaseChan, tmp))
         synth->vectorSet(0, BaseChan, tmp);
     Xgroup->activate();
@@ -444,9 +433,9 @@ send_data(38, o->value());}
       Fl_Spinner Ycontrol {
         label Controller
         callback {int tmp = o->value();
-if (Ycc < 14 && tmp > Ycc)
+if (Ycc < 14 && tmp < 14)
     tmp = 14;
-else if (Ycc == 14 && tmp < Ycc)
+else if (tmp < 14)
     tmp = 0;
 
 if (tmp < 14)
@@ -456,16 +445,6 @@ if (tmp < 14)
 }
 else
 {
-    if (synth->getRuntime().NumAvailableParts < (NUM_MIDI_CHANNELS * 4))
-    {
-        synth->getRuntime().NumAvailableParts = NUM_MIDI_CHANNELS * 4;
-        synth->partonoffLock(BaseChan + (NUM_MIDI_CHANNELS * 2), 1);
-        synth->partonoffLock(BaseChan + (NUM_MIDI_CHANNELS * 3), 1);
-        synth->part[BaseChan + (NUM_MIDI_CHANNELS * 2)]->Prcvchn = BaseChan;
-        synth->part[BaseChan + (NUM_MIDI_CHANNELS * 3)]->Prcvchn = BaseChan;
-        synth->getGuiMaster()->updatepart();
-        synth->getGuiMaster()->updatepanel();
-    }
     if (!synth->vectorInit(1, BaseChan, tmp))
         synth->vectorSet(1, BaseChan, tmp);
     Ygroup->activate();

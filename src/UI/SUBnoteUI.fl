@@ -32,10 +32,10 @@ This file is derivative of ZynAddSubFX original code, modified September 2014
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include "EnvelopeUI.h"} {public local
 } 
@@ -71,7 +71,11 @@ class SUBnoteharmonic {: {public Fl_Group}
 if (Fl::event_button() != 3)
     x=127-(int)o->value();
 else
+{
+    if (n == 0)
+    	x = 127;
     o->value(127-x);
+}
 pars->Phmag[n]=x;
 
 send_data(6, n, x);

@@ -3164,13 +3164,14 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
         int parts = Runtime.NumAvailableParts;
         if ((dHigh == 0) && (parts < NUM_MIDI_CHANNELS * 2))
         {
-            Runtime.Log("Vector control needs at least " + asString(NUM_MIDI_CHANNELS * 2) + " parts");
-            return true;
+            SetSystemValue(118, NUM_MIDI_CHANNELS * 2);
+            partonoffLock(chan + NUM_MIDI_CHANNELS, 1);
         }
         else if ((dHigh == 1) && (parts < NUM_MIDI_CHANNELS * 4))
         {
-            Runtime.Log("Vector control Y axis needs " + asString(NUM_MIDI_CHANNELS * 4) + " parts");
-            return true;
+            SetSystemValue(118, NUM_MIDI_CHANNELS * 4);
+            partonoffLock(chan + NUM_MIDI_CHANNELS * 2, 1);
+            partonoffLock(chan + NUM_MIDI_CHANNELS * 3, 1);
         }
         name = Runtime.testCCvalue(par);
     }
