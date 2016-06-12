@@ -1,3 +1,11 @@
+yoshimi 1.4.0
+
+2016-6-13 Will
+- Set version to 1.4.0 for release.
+- Implemented shortform NRPN channel change.
+- Bugfix: Vector X CC didn't enable lowest part.
+- Added extra sanity checks to vector control.
+
 yoshimi 1.4.0 rc6
 
 2016-6-10 Will

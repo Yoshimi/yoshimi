@@ -18,9 +18,6 @@ Data MSB (6)
                     3 = both
                     all other values ignored
 
-
-   35 (0x23) : data LSB = controller LSB value {not yet implemented}
-
    64 (0x40) : data LSB = key shift value      { 64 = no shift}
 
 Other values currently ignored.

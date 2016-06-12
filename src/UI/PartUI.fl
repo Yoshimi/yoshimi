@@ -471,11 +471,17 @@ send_data(4, o->value());}
       Fl_Spinner midich {
         label Midi
         callback {//
-                    part->Prcvchn = lrint(o->value()) - 1;
+		    int tmp = ((int)o->value() -1);
+		    if (tmp > 15)
+		    {
+		        tmp &= 15;
+		        o->value(tmp +1);
+		    }
+                    part->Prcvchn = tmp;
                     o->textcolor(FL_BLACK);
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-                        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, o->value() - 1);
-                    send_data(5, o->value());}
+                        synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+                    send_data(5, tmp);}
         tooltip {Midi channel for this part} xywh {35 36 40 18} labelsize 11 maximum 16 textsize 10
         code0 {o->value(part->Prcvchn + 1);}
         code1 {if (part->Prcvchn < NUM_MIDI_CHANNELS) o->textcolor(FL_BLACK); else o->textcolor(FL_WHITE);}
@@ -1049,9 +1055,9 @@ send_data(57, o->value());}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {897 125 395 360} type Double
+      xywh {897 125 395 360} type Double hide
       code0 {seteditname();}
-      code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());} visible
+      code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME

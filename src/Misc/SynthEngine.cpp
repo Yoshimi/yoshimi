@@ -426,7 +426,7 @@ void *SynthEngine::RBPthread(void)
                 Runtime.Log("Unable to read data from Root/bank/Program");
         }
         else
-            usleep(500);
+            usleep(100); // yes it's a hack but is totally reliable
     }
     return NULL;
 }
@@ -732,7 +732,7 @@ void SynthEngine::commandFetch(float value, unsigned char type, unsigned char co
      * while testing, this simply sends everything to commandSend but eventually it will
      * partially do the decding and direction via ring buffers for actualy control.
      */
-    commandSend(value, type, control, part, kit, engine, insert, insertParam);
+    //commandSend(value, type, control, part, kit, engine, insert, insertParam);
     return;
 }
 
@@ -3120,6 +3120,34 @@ void SynthEngine::SetSystemValue(int type, int value)
             Runtime.saveConfig();
             Runtime.Log("Settings saved");
             break;
+
+        case 128: // shortform NRPN channel switch
+
+            if (value >= NUM_MIDI_PARTS) // single row
+            {
+                int start = value & 0xc;
+                value &= 0x3f;
+                for (int i = start; i < start + 4; ++i)
+                {
+                    if (i != value)
+                        part[i]->Prcvchn = start | NUM_MIDI_CHANNELS;
+                    else
+                        part[i]->Prcvchn = start;
+                }
+            }
+            else // columns
+            {
+                int chan = value & 0xf;
+                for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
+                {
+                    if (i != value)
+                        part[i]->Prcvchn = chan | NUM_MIDI_CHANNELS;
+                    else
+                       part[i]->Prcvchn = chan;
+                }
+            }
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
+            break;
     }
 }
 
@@ -3165,6 +3193,7 @@ bool SynthEngine::vectorInit(int dHigh, unsigned char chan, int par)
         if ((dHigh == 0) && (parts < NUM_MIDI_CHANNELS * 2))
         {
             SetSystemValue(118, NUM_MIDI_CHANNELS * 2);
+            partonoffLock(chan, 1);
             partonoffLock(chan + NUM_MIDI_CHANNELS, 1);
         }
         else if ((dHigh == 1) && (parts < NUM_MIDI_CHANNELS * 4))

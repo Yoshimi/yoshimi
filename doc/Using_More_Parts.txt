@@ -44,3 +44,5 @@ Now when you play this through, the last 'Simple Chimes' note will have it's ful
 When you want to go back to using 'Simple Chimes' just reverse the NRPNs.
 
 The only time this gets complicated is if the new note is exactly the same pitch as the old one, in which case the NRPNs need to be between the old note-off and the new note-on.
+
+Some of this control is now made easier with the new shortform NRPNs. See doc/Shortform_NRPN for details.

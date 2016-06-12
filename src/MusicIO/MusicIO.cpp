@@ -204,6 +204,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         }
         synth->getRuntime().Log("Chan " + asString(((int) ch) + 1) + "   CC " + ctltype  + "   Value " + asString(param));
     }
+
     if (ctrl == synth->getRuntime().midi_bank_root)
         setMidiBankOrRootDir(param, in_place, true);
     else if (ctrl == synth->getRuntime().midi_bank_C)
@@ -211,6 +212,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     else if (ctrl == synth->getRuntime().midi_upper_voice_C)
         // it's really an upper set program change
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
+
     else if (ctrl == C_nrpnL || ctrl == C_nrpnH)
     {
         if (ctrl == C_nrpnL)
@@ -218,17 +220,27 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnL != param)
             {
                 synth->getRuntime().nrpnL = param;
+                if (synth->getRuntime().nrpnH == 0x41) // shortform
+                {
+                    synth->SetSystemValue(0x80, param);
+                    return;
+                }
                 //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
             }
             nLow = param;
             nHigh = synth->getRuntime().nrpnH;
         }
-        else
+        else // MSB
         {
             if (synth->getRuntime().nrpnH != param)
             {
                 synth->getRuntime().nrpnH = param;
                 //synth->getRuntime().Log("Set nrpn MSB to " + asString(param));
+            if (param == 0x41) // set shortform
+            {
+                synth->getRuntime().nrpnL = 0x7f;
+                return;
+            }
             }
             nHigh = param;
             nLow = synth->getRuntime().nrpnL;

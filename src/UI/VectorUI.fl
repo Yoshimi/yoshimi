@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {Copyright 2016, Will Godfrey
 
@@ -19,25 +19,25 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified September 2014
 } {in_source in_header
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {private global
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 class VectorUI {selected : {private MiscFuncs}
 } {
@@ -70,12 +70,44 @@ send_data(1, 0);}
         }
         MenuItem {} {
           label Save
-          callback {if(Xcc < 14)
+          callback {bool ok = true;
+int count;
+int size;
+string name;
+
+if(Xcc < 14)
+{
     fl_alert("Nothing to save!");
+    ok = false;
+}
 else
+{
+    count = 0;
+    if (Ycc >= 14)
+        size = NUM_MIDI_CHANNELS * 4;
+    else
+       size = NUM_MIDI_CHANNELS * 2;
+    for (int i = 0; i < size; i += NUM_MIDI_CHANNELS)
+    {
+        if (synth->part[BaseChan + i]->Pname != "Simple Sound")
+            count += NUM_MIDI_CHANNELS;
+    }
+    if (count != size)
+    {
+        if (count == 0)
+            name = "No instruments set!";
+        else
+            name = "Only " + to_string(count/NUM_MIDI_CHANNELS) + " of " +  to_string(size/NUM_MIDI_CHANNELS) + " instruments set!";
+        fl_alert(name.c_str());
+        ok = false;
+    }
+}
+
+if (ok)
+{
     saveVector();
-    
-send_data(1, 1);}
+    send_data(1, 1);
+}}
           xywh {10 10 34 20} labelsize 12
         }
         MenuItem recenthistory {
@@ -135,7 +167,7 @@ send_data(17, o->value());}
           private xywh {20 131 160 1} box NO_BOX labelsize 12 align 97 textsize 12
         }
         Fl_Button XR {
-          callback {synth->getGuiMaster()->npart = BaseChan + 16;
+          callback {synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS;
 bankui->Show();
 send_data(18, o->value());}
           tooltip {Part corresponding to joystick 'right' position} xywh {20 115 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -302,7 +334,7 @@ send_data(16, o->value());}
           private xywh {20 179 160 1} box NO_BOX labelsize 12 align 97 textsize 12
         }
         Fl_Button YU {
-          callback {synth->getGuiMaster()->npart = BaseChan + 32;
+          callback {synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 2;
 bankui->Show();
 send_data(33, o->value());}
           tooltip {Part corresponding to joystick 'up' position} xywh {20 163 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -320,7 +352,7 @@ send_data(33, o->value());}
           private xywh {20 241 160 1} box NO_BOX labelsize 12 align 97 textsize 12
         }
         Fl_Button YD {
-          callback {synth->getGuiMaster()->npart = BaseChan + 48;
+          callback {synth->getGuiMaster()->npart = BaseChan + NUM_MIDI_CHANNELS * 3;
 bankui->Show();
 send_data(34, o->value());}
           tooltip {Part corresponding to joystick 'down'position} xywh {20 225 160 20} box UP_FRAME color 51 labelsize 12 align 64
@@ -453,7 +485,7 @@ Ycc =  tmp;
 o->value(tmp);
 o->redraw();
 send_data(32, o->value());}
-        tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12
+        tooltip {The MIDI CC this axis reponds to} xywh {110 195 50 20} labelfont 1 labelsize 12 minimum 0 maximum 119 value 0 textsize 12 deactivate
         code0 {o->value(Ycc);}
       }
       Fl_Button Loaded {
@@ -610,7 +642,7 @@ if (npart == BaseChan)
     PadBackL->color(padcol);
     XinstL->copy_label(synth->part[npart]->Pname.c_str());
 }
-else if (npart == BaseChan + 16)
+else if (npart == BaseChan + NUM_MIDI_CHANNELS)
 {
     AddBackR->damage(1);
     AddBackR->color(addcol);
@@ -620,7 +652,7 @@ else if (npart == BaseChan + 16)
     PadBackR->color(padcol);
     XinstR->copy_label(synth->part[npart]->Pname.c_str());
 }
-else if (npart == BaseChan + 32)
+else if (npart == BaseChan + NUM_MIDI_CHANNELS * 2)
 {
     AddBackU->damage(1);
     AddBackU->color(addcol);
@@ -630,7 +662,7 @@ else if (npart == BaseChan + 32)
     PadBackU->color(padcol);
     YinstU->copy_label(synth->part[npart]->Pname.c_str());
 }
-else if (npart == BaseChan + 48)
+else if (npart == BaseChan + NUM_MIDI_CHANNELS * 3)
 {
     AddBackD->damage(1);
     AddBackD->color(addcol);
@@ -667,7 +699,7 @@ Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
 switch(engine)
 {
     case 1:
-        col = ADD_COLOUR; 
+        col = ADD_COLOUR;
         break;
     case 2:
         col = SUB_COLOUR;
@@ -701,6 +733,8 @@ return col;} {}
     {
         loadlabel[BaseChan] = findleafname(fname);
         Loaded->copy_label(loadlabel[BaseChan].c_str());
+        Ycontrol->activate();
+        Ycontrol->damage();
     }
     setbuttons();} {}
   }
@@ -722,7 +756,7 @@ return col;} {}
             	recenthistory->activate();
             	loadlabel[BaseChan] = findleafname((string)filename);
             	Loaded->copy_label(loadlabel[BaseChan].c_str());
-            	
+
             }
             else
                 fl_alert("Failed to save vector");} {}
@@ -736,7 +770,11 @@ synth->getRuntime().nrpndata.vectorYfeatures[BaseC] = 0;
 synth->getRuntime().nrpndata.vectorEnabled[BaseC] = false;
 loadlabel[BaseChan] = "No Name";
 Loaded->copy_label(loadlabel[BaseC].c_str());
-setbuttons();} {}
+setbuttons();
+Xcontrol->activate();
+Xcontrol->damage();
+Ycontrol->deactivate();
+Ycontrol->damage();} {}
   }
   decl {SynthEngine *synth;} {private local
   }
@@ -756,4 +794,4 @@ setbuttons();} {}
   }
   decl {string loadlabel [NUM_MIDI_CHANNELS];} {private local
   }
-} 
+}
