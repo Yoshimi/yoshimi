@@ -1,7 +1,7 @@
 V 1.4.0
 Diamond Dove
 
-About 18 months ago vector control became a 'thing' for Yoshimi and later, was first demonstrated to a handful of people at LAC 2015. At that time it was only acessible via NRPNs. Then about 6 months ago it became available to command line users as well, and 3 months ago vector saving and loading became possible.
+About 18 months ago vector control became a 'thing' for Yoshimi and later, was first demonstrated to a handful of people at LAC 2015. At that time it was only accessible via NRPNs. Then about 6 months ago it became available to command line users as well, and 3 months ago vector saving and loading became possible.
 
 Now however, there is a shiny new window so the poor disadvantaged pointer-pushers can also have full control. This is currently reached via the 'Yoshimi' tab, but we may move it to its own button. Also, saving and loading vectors is now preserved in the recent histories file so you can quickly restore these - the same as you can for saved patch sets, scales and states.
 
@@ -11,7 +11,7 @@ Vector entry via NRPNs and the CLI have also been upgraded slightly, so they wil
 A new concept is shortform NRPNs. This is where instead of the NRPN setting up for data entry of values, the NRPN is of itself the entire command. With a suitable sequencer like Rosegarden, you start with a two byte value, then only need to enter single byte CCs to change the setting.
 See doc/Shortform_NRPN.txt
 
-This came about through discussion after my demo of channel switching on MiniLAC2016. The idea was liked, but having to mess about with mulitple NRPNs and their data settings was a fiddle.
+This came about through discussion after my demo of channel switching on MiniLAC2016. The idea was liked, but having to mess about with multiple NRPNs and their data settings was a fiddle.
 
 
 Some other usability enhancements:
@@ -19,7 +19,7 @@ Some other usability enhancements:
 Some people don't like our splash window - Boo!
 You can now disable it in settings {mutter}{mutter}
 
-Many people didn't realise there were two types of resonance interpolation, detirmined by whether you click the left or right mouse button. This has now been split into two with better tooltips.
+Many people didn't realise there were two types of resonance interpolation, determined by whether you click the left or right mouse button. This has now been split into two with better tooltips.
 
 Jack audio autoconnect is now configurable in the GUI and stored so you don't have to set it with a startup argument.
 
