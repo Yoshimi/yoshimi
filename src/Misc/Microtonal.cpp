@@ -65,6 +65,7 @@ void Microtonal::defaults(void)
     Pglobalfinedetune = 64.0;
 }
 
+
 // Get the frequency according to the note number
 float Microtonal::getNoteFreq(int note, int keyshift)
 {
@@ -178,6 +179,7 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
     int x1 = -1, x2 = -1, type = -1;
     float x = -1.0f, tmp, tuning = 1.0f;
+
     if (strstr(line, "/") == NULL)
     {
         if (strstr(line, ".") == NULL)
@@ -235,12 +237,14 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     return -1; // ok
 }
 
+
 // Convert the text to tunnings
 int Microtonal::texttotunings(const char *text)
 {
     int i;
     unsigned int k = 0, nl = 0;
     char *lin;
+
     lin = new char[MAX_LINE_SIZE + 1];
     while (k < strlen(text))
     {
@@ -277,11 +281,13 @@ int Microtonal::texttotunings(const char *text)
     return -1; // ok
 }
 
+
 // Convert the text to mapping
 void Microtonal::texttomapping(const char *text)
 {
     unsigned int i, k = 0;
     char *lin;
+
     lin = new char[MAX_LINE_SIZE + 1];
     for (i = 0; i < 128; ++i)
         Pmapping[i] = -1;
@@ -315,6 +321,7 @@ void Microtonal::texttomapping(const char *text)
     Pmapsize = tx;
 }
 
+
 // Convert tunning to text line
 void Microtonal::tuningtoline(int n, char *line, int maxn)
 {
@@ -345,6 +352,7 @@ int Microtonal::loadscl(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
     char tmp[500];
+
     fseek(file, 0, SEEK_SET);
     // loads the short description
     if (loadline(file, &tmp[0]))
@@ -382,6 +390,7 @@ int Microtonal::loadscl(string filename)
     return 0;
 }
 
+
 // Loads the mapping from a kbm file
 int Microtonal::loadkbm(string filename)
 {
@@ -393,8 +402,10 @@ int Microtonal::loadkbm(string filename)
     // loads the mapsize
     if (loadline(file,&tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d",&x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -403,8 +414,10 @@ int Microtonal::loadkbm(string filename)
     // loads first MIDI note to retune
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -413,8 +426,10 @@ int Microtonal::loadkbm(string filename)
     // loads last MIDI note to retune
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -423,8 +438,10 @@ int Microtonal::loadkbm(string filename)
     // loads last the middle note where scale fro scale degree=0
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -433,8 +450,10 @@ int Microtonal::loadkbm(string filename)
     // loads the reference note
     if (loadline(file, &tmp[0]))
         return 2;
+
     if (!sscanf(&tmp[0], "%d", &x))
         return 2;
+
     if (x < 1)
         x = 0;
     if (x > 127)
@@ -443,9 +462,11 @@ int Microtonal::loadkbm(string filename)
     // loads the reference freq.
     if (loadline(file, &tmp[0]))
         return 2;
+
     float tmpPAfreq = 440.0f;
     if (!sscanf(&tmp[0], "%f", &tmpPAfreq))
         return 2;
+
     PAfreq = tmpPAfreq;
 
     // the scale degree(which is the octave) is not loaded, it is obtained by the tunnings with getoctavesize() method
@@ -495,41 +516,42 @@ void Microtonal::add2XML(XMLwrapper *xml)
         return;
 
     xml->beginbranch("SCALE");
-    xml->addpar("scale_shift", Pscaleshift);
-    xml->addpar("first_key", Pfirstkey);
-    xml->addpar("last_key", Plastkey);
-    xml->addpar("middle_note", Pmiddlenote);
+        xml->addpar("scale_shift", Pscaleshift);
+        xml->addpar("first_key", Pfirstkey);
+        xml->addpar("last_key", Plastkey);
+        xml->addpar("middle_note", Pmiddlenote);
 
-    xml->beginbranch("OCTAVE");
-    xml->addpar("octave_size", octavesize);
-    for (int i = 0; i < octavesize; ++i)
-    {
-        xml->beginbranch("DEGREE", i);
-        if (octave[i].type == 1)
+        xml->beginbranch("OCTAVE");
+        xml->addpar("octave_size", octavesize);
+        for (int i = 0; i < octavesize; ++i)
         {
-            xml->addparreal("cents", octave[i].tuning);
-        }
-        if (octave[i].type == 2)
-        {
-            xml->addpar("numerator", octave[i].x1);
-            xml->addpar("denominator", octave[i].x2);
+            xml->beginbranch("DEGREE", i);
+            if (octave[i].type == 1)
+            {
+                xml->addparreal("cents", octave[i].tuning);
+            }
+            if (octave[i].type == 2)
+            {
+                xml->addpar("numerator", octave[i].x1);
+                xml->addpar("denominator", octave[i].x2);
+            }
+            xml->endbranch();
         }
         xml->endbranch();
-    }
-    xml->endbranch();
 
-    xml->beginbranch("KEYBOARD_MAPPING");
-    xml->addpar("map_size", Pmapsize);
-    xml->addpar("mapping_enabled", Pmappingenabled);
-    for (int i = 0; i < Pmapsize; ++i)
-    {
-        xml->beginbranch("KEYMAP", i);
-        xml->addpar("degree", Pmapping[i]);
+        xml->beginbranch("KEYBOARD_MAPPING");
+        xml->addpar("map_size", Pmapsize);
+        xml->addpar("mapping_enabled", Pmappingenabled);
+        for (int i = 0; i < Pmapsize; ++i)
+        {
+            xml->beginbranch("KEYMAP", i);
+            xml->addpar("degree", Pmapping[i]);
+            xml->endbranch();
+        }
         xml->endbranch();
-    }
-    xml->endbranch();
     xml->endbranch();
 }
+
 
 void Microtonal::getfromXML(XMLwrapper *xml)
 {
@@ -565,7 +587,10 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                 octave[i].x2 = xml->getpar127("denominator", octave[i].x2);
 
                 if (octave[i].x2)
+                {
                     octave[i].type = 2;
+                    octave[i].tuning = ((float)octave[i].x1) / octave[i].x2;
+                }
                 else {
                     octave[i].type = 1;
                     //populate fields for display
@@ -573,8 +598,6 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                     octave[i].x1 = (int) floor(x);
                     octave[i].x2 = (int) (floor(fmodf(x, 1.0f) * 1e6));
                 }
-
-
                 xml->exitbranch();
             }
             xml->exitbranch();
@@ -611,6 +634,7 @@ bool Microtonal::saveXML(string filename)
     delete xml;
     return result;
 }
+
 
 bool Microtonal::loadXML(string filename)
 {

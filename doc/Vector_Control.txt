@@ -1,7 +1,13 @@
 
 Vector control is only possible if you have 32 or 64 parts active. Setup is per MIDI channel, so you can have totally different vector behaviour on say channel 1 and channel 5.
 
-In vector mode parts will still play together but the vector controls can change their volume, pan, etc. in pairs, controlled by user defined CCs set up with NRPNs
+In vector mode parts will still play together but the vector controls can change their volume, pan, etc. in pairs, controlled by user defined CCs.
+
+The first section of the notes below is for NRPN control. The second section is for the Command Line Interface and the third section is for the Graphical User Interface.
+
+
+###################################
+
 
 You must set the X axis CC before Y, but if you don't set Y at all you can run just a single axis. If you only have 32 parts active Y settings are ignored.
 
@@ -28,7 +34,7 @@ Features:
         2 = default is Pan
         4 = default is Filter Cutoff (Brightness)
         8 = default is Mod Wheel
-    
+
 0x12 = 18 = Reversed Pan
 0x24 = 36 = Reversed Filter Cutoff
 0x48 = 72 = Reversed Mod Wheel
@@ -48,7 +54,7 @@ Optional settings
     5       x2 instrument ID
     6       y1 instrument ID
     7       y2 instrument ID
-    
+
 IDs are instruments in the current bank.
 
     8       new CC for X feature 2
@@ -58,7 +64,7 @@ IDs are instruments in the current bank.
    11       new CC for Y feature 2
    12       new CC for Y feature 4
    13       new CC for Y feature 8
-              
+
 Any data MSB value outside the above list disables vector control.
 
 Sweep CCs and feature CCs are sanity checked.
@@ -89,4 +95,104 @@ You can either go on with the NRPNs to set the instruments (this will load and
 enable instruments from the current bank) or enable and load them by hand.
 For channel 1 this would be part 1 and 17 for X and part 33 and 49 for Y
 
-The (*) CCs ensure that the data bytes are reset each time. This is not really necessary for the earlier commands, but should be done if you set the instruments with NRPNs as well, otherwise you will try to set them twice! 
+The (*) CCs ensure that the data bytes are reset each time. This is not really necessary for the earlier commands, but should be done if you set the instruments with NRPNs as well, otherwise you will try to set them twice!
+
+
+###################################
+
+
+An example to set up vectors from the command line:
+Assuming we want just a single axis on channel 1 (2 in the GUI)
+
+So:
+
+yoshimi > set vector 1 x cc 14
+Vector channel set to 1
+
+This command must aways be the first as everthing else hangs on it. It's the command that enables vector control. cc is the incoming sweep CC that will vary the features you set. Also, if the number of available parts is set to 16, this will be increased to 32.
+
+There are 4 features available
+1 is fixed as volume
+2 is pan by default
+3 is brightness by default
+4 is modulation by default
+
+We'll select volume for this example so:
+
+yoshimi Vect Ch 1 X > set features 1 enable.
+Set X features 1 en
+
+
+Now you need the set the instruments that will be used. These can only be the ones in the current bank, so, assuming we are in Will Godfrey Companion
+
+yoshimi Vect Ch 1 X > set program left 20
+Loaded 20 "Bubbles" to Part 1
+
+yoshimi Vect Ch 1 X > set program right 120
+Loaded 120 "Ghost Ensemble" to Part 16
+
+If you now sweep the the controller assigned to 14 the sound will morph between these two instruments.
+
+
+To go on to using the other axis as well:
+
+yoshimi > set vector y cc 15
+Vector 1 Y CC set to 15
+
+If the number of available parts was less than 64 this command will als set it to 64:
+
+We'll use panning for this vector so:
+
+yoshimi Vect Ch 1 Y > set features 2 enable
+Set Y features 2 en
+
+yoshimi Vect Ch 1 Y > set program down 107
+Loaded 107 "Angel Harp" to Part 32
+
+yoshimi Vect Ch 1 Y > set program up 78
+Loaded 78 "Brassy Flutter" to Part 48
+
+Notice that the directions left,right,up,down match a traditional joystick.
+
+Now you can save your ultimate vector sound:
+
+yoshimi Vect Ch 1 Y > save vector CoolSound
+Saved channel 1 Vector to CoolSound
+
+At any time you can reload this.
+yoshimi> load vector channel 0 CoolSound
+Loaded Vector CoolSound to channel 0
+
+If you don't give a channel then it will be loaded to the same channel as it was saved from:
+
+yoshimi> load vector CoolSound
+Loaded Vector CoolSound to source channel
+
+The file extension we use is .xvy but this will be added automatically.
+
+
+###################################
+
+
+As of Yoshimi V 1.4.0 there is also GUI access to vector control. This is currently accessed via the Yoshim drop-down menu (but we may later move it to its own button). This opens a new 'Vectors' window.
+
+Initially most of this is deactivated, but the base channel can already be set to the incomming channel (and part 'column') you want to respond to.
+
+As soon as you set an incoming X CC, the rest of the X controls become active, as well as the Y CC spinner. Also, Yoshimi will be set for 32 parts if it is currently 16, and the requred ones will be enabled and checked to ensure that are set to the base channel.
+
+The two instrument panels behave in the same way as the main parts one, in that clicking on this brings up the instrument selection window.
+
+The previously mentioned features are laid out fairly obviously as drop-down choices, although at this time it is not possible to apply the extensions to change which outgoing CC they emulate.
+
+Setting the incoming Y CC is similar. In this case it will set 64 parts if it was a lower figure.
+
+All changes made are immediately effective, however, disabling them will not disable the underlying instruments, nor will it lower the number of avaiable parts. This is done to protect other elements that may have already been been set up.
+
+The options menu allows you to load and save complete vector sets, and 'save' will double check that you have a valid set! Vectors appear in the saved histories file, so you can re-fetch a previously managed one.
+
+Either loading or saving a vector set will write its name in the small panel alongside the 'Close' button.
+
+
+Finally, you can clear just the vector set on the currently selected base channel, or clear all that may have been managed.
+
+

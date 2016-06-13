@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {VirKeyboard.h} {not_in_source in_header
@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014, Will Godfrey    
+Copyright 2014 -2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -51,6 +51,9 @@ decl {\#include "MusicIO/MidiControl.h"} {public local
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
+} 
+
+decl {\#include "WidgetMWSliderUI.h"} {public local
 } 
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
@@ -160,7 +163,7 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
         if (event == FL_PUSH || event == FL_DRAG || event == FL_RELEASE)
         {
             int kpos = -1;
-  
+
             if (y_ > ly * 3 / 5)
             {   // white keys
                 int pos = x_ / SIZE_WHITE;
@@ -218,7 +221,7 @@ for (int i = 0; i < N_OCT * 12 + 1; ++i)
             keysoct1 = keysoct1qwertz;
             keysoct2 = keysoct2qwertz;
         }
-        else if (synth->getRuntime().VirKeybLayout == 4) 
+        else if (synth->getRuntime().VirKeybLayout == 4)
         {
             keysoct1 = keysoct1azerty;
             keysoct2 = keysoct2azerty;
@@ -310,7 +313,7 @@ class VirKeyboard {selected
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
 virkeyboardwindow->hide();}
-      xywh {749 239 650 130} type Double hide
+      xywh {21 265 650 130} type Double hide
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -336,10 +339,13 @@ virkeys->take_focus();}
       }
       Fl_Value_Slider {} {
         label Velocity
-        callback {virkeys->midivel=(int) o->value();
+        callback {if (Fl::event_button() == 3)
+    o->value(100);
+virkeys->midivel=(int) o->value();
 virkeys->take_focus();}
         tooltip Velocity xywh {96 106 110 16} type {Horz Knob} box FLAT_BOX labelsize 10 align 1 minimum 1 maximum 127 step 1
         code0 {o->value(virkeys->midivel);}
+        class mwheel_val_slider_rev
       }
       Fl_Counter {} {
         label Octave
@@ -355,12 +361,28 @@ virkeys->take_focus();}
 virkeyboardwindow->hide();}
         xywh {452 101 55 20} box THIN_UP_BOX labelsize 12
       }
-      Fl_Value_Slider {} {
+      Fl_Value_Output ctlval {
         label Cval
-        callback {int ctl = midictl;
-            synth->SetController(virkeys->midich, ctl, (int) o->value());
-            virkeys->take_focus();}
-        tooltip {Controller value} xywh {630 10 15 115} type {Vert Fill} box ENGRAVED_BOX selection_color 229 labelsize 8 align 5 minimum 127 maximum 0 step 1 value 64 textsize 7
+        callback {o->value(oldcontrol);}
+        xywh {630 12 15 15} box ENGRAVED_BOX labelsize 8 align 1 textsize 7
+        code0 {o->value(oldcontrol);}
+      }
+      Fl_Slider {} {
+        callback {//
+        oldcontrol = 127 - o->value();
+	if (Fl::event_button() == 3)
+	{
+	    oldcontrol = 64;
+	    o->value(64);
+	    o->damage();
+	}
+	ctlval->do_callback();
+	int ctl = midictl;
+        synth->SetController(virkeys->midich, ctl, oldcontrol);
+        virkeys->take_focus();}
+        tooltip {Controller value} xywh {630 25 15 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
+        code0 {o->value(127 - oldcontrol);}
+        class mwheel_slider
       }
       Fl_Choice {} {
         label Controller
@@ -435,8 +457,16 @@ virkeyboardwindow->hide();}
       }
       Fl_Roller pitchwheelroller {
         label Pwh
-        callback {synth->SetController(virkeys->midich, C_pitchwheel, -(int) o->value());
-            virkeys->take_focus();}
+        callback {//
+        int old = o->value();
+        if (Fl::event_button() == 3)
+        {
+            old = 0;
+            o->value(old);
+            o->damage();
+        }
+	synth->SetController(virkeys->midich, C_pitchwheel, - old);
+        virkeys->take_focus();}
         tooltip {Pitch Wheel} xywh {5 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
       }
       Fl_Button {} {
@@ -450,6 +480,7 @@ virkeyboardwindow->hide();}
         callback {virkeys->rndvelocity=(int) o->value();}
         tooltip {Velocity Randomness} xywh {221 106 20 21} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
         code0 {o->value(virkeys->rndvelocity);}
+        code1 {o->init(0);}
         class WidgetPDial
       }
       Fl_Spinner midichannel {
@@ -464,8 +495,10 @@ virkeyboardwindow->hide();}
     }
   }
   Function {VirKeyboard(SynthEngine *_synth)} {} {
-    code {synth = _synth;
-midictl = 75;
+    code {//
+	synth = _synth;
+	midictl = 75;
+	oldcontrol = 64;
         make_window();
         keyboardlabel = synth->makeUniqueName("Virtual Keyboard");
         virkeyboardwindow->label(keyboardlabel.c_str());} {}
@@ -483,6 +516,8 @@ midictl = 75;
     code {virkeys->relaseallkeys(0);} {}
   }
   decl {int midictl;} {private local
+  }
+  decl {int oldcontrol;} {private local
   }
   decl {SynthEngine *synth;} {private local
   }

@@ -5,7 +5,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey    
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -99,6 +99,15 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
                 basefreq *= powf(3.0f, tmp);
         }
     }
+
+    int BendAdj = pars->PBendAdjust - 64;
+    if (BendAdj % 24 == 0)
+        BendAdjust = BendAdj / 24;
+    else
+        BendAdjust = BendAdj / 24.0f;
+    float offset_val = (pars->POffsetHz - 64)/64.0f;
+    OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+
     float detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
     basefreq *= powf(2.0f, detune / 1200.0f); // detune
 //    basefreq*=ctl->pitchwheel.relfreq;//pitch wheel
@@ -165,15 +174,19 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
             case 1:
                 hgain = expf(hmagnew * log_0_01);
                 break;
+
             case 2:
                 hgain = expf(hmagnew * log_0_001);
                 break;
+
             case 3:
                 hgain = expf(hmagnew * log_0_0001);
                 break;
+
             case 4:
                 hgain = expf(hmagnew * log_0_00001);
                 break;
+
             default:
                 hgain = 1.0 - hmagnew;
         }
@@ -185,9 +198,9 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
             float amp = 1.0f;
             if (nph == 0)
                 amp = gain;
-            initfilter(lfilter[nph + n * numstages], freq, bw, amp, hgain);
+            initfilter(lfilter[nph + n * numstages], freq + OffsetHz, bw, amp, hgain);
             if (stereo)
-                initfilter(rfilter[nph + n * numstages], freq, bw, amp, hgain);
+                initfilter(rfilter[nph + n * numstages], freq + OffsetHz, bw, amp, hgain);
         }
     }
 
@@ -330,15 +343,19 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
             case 1:
                 hgain = expf(hmagnew * log_0_01);
                 break;
+
             case 2:
                 hgain = expf(hmagnew * log_0_001);
                 break;
+
             case 3:
                 hgain = expf(hmagnew * log_0_0001);
                 break;
+
             case 4:
                 hgain = expf(hmagnew * log_0_00001);
                 break;
+
             default:
                 hgain = 1.0f - hmagnew;
         }
@@ -368,22 +385,19 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
     else
         freq *= basefreq / 440.0f;
 
-    ///////////////
     // Altered initparameters(...) content:
-
     if (pars->PGlobalFilterEnabled)
     {
         globalfiltercenterq = pars->GlobalFilter->getq();
         GlobalFilterFreqTracking = pars->GlobalFilter->getfreqtracking(basefreq);
     }
-
     // end of the altered initparameters function content.
-    ///////////////
 
     oldamplitude = newamplitude;
 
     // End of the SUBlegatonote function.
 }
+
 
 SUBnote::~SUBnote()
 {
@@ -392,6 +406,7 @@ SUBnote::~SUBnote()
     fftwf_free(tmpsmp);
     fftwf_free(tmprnd);
 }
+
 
 // Kill the note
 void SUBnote::KillNote(void)
@@ -411,6 +426,7 @@ void SUBnote::KillNote(void)
         NoteEnabled = false;
     }
 }
+
 
 // Compute the filters coefficients
 void SUBnote::computefiltercoefs(bpfilter &filter, float freq, float bw, float gain)
@@ -435,6 +451,7 @@ void SUBnote::computefiltercoefs(bpfilter &filter, float freq, float bw, float g
     filter.a1 = -2.0f * cs / (1.0f + alpha);
     filter.a2 = (1.0f - alpha) / (1.0f + alpha);
 }
+
 
 // Initialise the filters
 void SUBnote::initfilter(bpfilter &filter, float freq, float bw, float amp, float mag)
@@ -471,8 +488,8 @@ void SUBnote::initfilter(bpfilter &filter, float freq, float bw, float amp, floa
     computefiltercoefs(filter, freq, bw, 1.0f);
 }
 
-// Do the filtering
 
+// Do the filtering
 inline void SubFilterA(const float coeff[4], float &src, float work[4])
 {
     work[3] = src*coeff[0]+work[1]*coeff[1]+work[2]*coeff[2]+work[3]*coeff[3];
@@ -480,12 +497,14 @@ inline void SubFilterA(const float coeff[4], float &src, float work[4])
     src     = work[3];
 }
 
+
 inline void SubFilterB(const float coeff[4], float &src, float work[4])
 {
     work[2] = src*coeff[0]+work[0]*coeff[1]+work[3]*coeff[2]+work[2]*coeff[3];
     work[0] = src;
     src     = work[2];
 }
+
 
 // ported from zynaddsubfx V 2.4.4
 //This dance is designed to minimize unneeded memory operations which can result
@@ -497,7 +516,6 @@ void SUBnote::filter(bpfilter &filter, float *smps)
         return;
     }
 
-//    assert(synth->p_buffersize % 8 == 0);
     int remainder = synth->p_buffersize % 8;
     int blocksize = synth->p_buffersize - remainder;
     float coeff[4] = {filter.b0, filter.b2,  -filter.a1, -filter.a2};
@@ -527,6 +545,7 @@ void SUBnote::filter(bpfilter &filter, float *smps)
     filter.yn1 = work[2];
     filter.yn2 = work[3];
 }
+
 
 //Andrew Deryabin: support for variable-length runs
 //currently only for lv2 plugin
@@ -594,6 +613,7 @@ void SUBnote::initparameters(float freq)
 }
 //end of port
 
+
 // Compute how much to reduce amplitude near nyquist or subaudible frequencies.
 float SUBnote::computerolloff(float freq)
 {
@@ -611,6 +631,7 @@ float SUBnote::computerolloff(float freq)
         return (1.0f - cosf(M_PI * (freq - lower_limit) / lower_width)) / 2.0f;
     return (1.0f - cosf(M_PI * (freq - upper_limit) / upper_width)) / 2.0f;
 }
+
 
 // Compute Parameters of SUBnote for each tick
 void SUBnote::computecurrentparameters(void)
@@ -630,7 +651,9 @@ void SUBnote::computecurrentparameters(void)
             envfreq = FreqEnvelope->envout() / 1200;
             envfreq = powf(2.0f, envfreq);
         }
-        envfreq *= ctl->pitchwheel.relfreq; // pitch wheel
+
+        envfreq *= powf(ctl->pitchwheel.relfreq, BendAdjust); // pitch wheel
+
         if (portamento != 0)
         {   // portamento is used
             envfreq *= ctl->portamento.freqrap;
@@ -693,6 +716,7 @@ void SUBnote::computecurrentparameters(void)
             GlobalFilterR->setfreq_and_q(filterfreq, globalfiltercenterq * ctl->filterq.relq);
     }
 }
+
 
 // Note Output
 int SUBnote::noteout(float *outl, float *outr)
@@ -813,6 +837,7 @@ int SUBnote::noteout(float *outl, float *outr)
                 }
             }
             break;
+
         case LM_FadeIn : // Fade-in
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
@@ -832,6 +857,7 @@ int SUBnote::noteout(float *outl, float *outr)
                 outr[i] *= Legato.fade.m;
             }
             break;
+
         case LM_FadeOut : // Fade-out, then set the catch-up
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
@@ -863,6 +889,7 @@ int SUBnote::noteout(float *outl, float *outr)
                 outr[i] *= Legato.fade.m;
             }
             break;
+
         default :
             break;
     }
@@ -880,6 +907,7 @@ int SUBnote::noteout(float *outl, float *outr)
     }
     return 1;
 }
+
 
 // Relase Key (Note Off)
 void SUBnote::relasekey(void)

@@ -65,6 +65,7 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
     return 0;
 }
 
+
 void *MusicClient::timerThread_fn(void *arg)
 {
     MusicClient *nmc = (MusicClient *)arg;
@@ -77,6 +78,7 @@ void *MusicClient::timerThread_fn(void *arg)
     }
     return 0;
 }
+
 
 MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_drivers _midiDrv)
     :synth(_synth), timerThreadId(0), timerWorking(false),
@@ -100,26 +102,31 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
 
     switch(audioDrv)
     {
-    case jack_audio:
-        audioIO = new JackEngine(synth);
-        break;
-    case alsa_audio:
-        audioIO = new AlsaEngine(synth);
-        break;
-    default:
-        break;
+        case jack_audio:
+            audioIO = new JackEngine(synth);
+            break;
+
+        case alsa_audio:
+            audioIO = new AlsaEngine(synth);
+            break;
+
+        default:
+            break;
     }
 
     switch(midiDrv)
     {
-    case jack_midi:
-        midiIO = new JackEngine(synth);
-        break;
-    case alsa_midi:
-        midiIO = new AlsaEngine(synth);
-        break;
-    default:
-        break;
+        case jack_midi:
+            if (audioDrv != jack_audio)
+                midiIO = new JackEngine(synth);
+            break;
+
+        case alsa_midi:
+            midiIO = new AlsaEngine(synth);
+            break;
+
+        default:
+            break;
     }
 
     if(audioDrv != no_audio)
@@ -131,12 +138,13 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     }
     if(midiDrv != no_midi)
     {
-        if(!midiIO)
+        if(!midiIO && audioDrv != jack_audio)
         {
             abort();
         }
     }
 }
+
 
 MusicClient::~MusicClient()
 {
@@ -160,6 +168,7 @@ MusicClient::~MusicClient()
     }
 }
 
+
 bool MusicClient::Open()
 {
     bool bAudio = true;
@@ -172,6 +181,10 @@ bool MusicClient::Open()
     {
         bMidi = midiIO->openMidi();
     }
+    else if (audioDrv == jack_audio)
+    {
+        bMidi = audioIO->openMidi();
+    }
     if(bAudio && bMidi)
     {
         synth->getRuntime().audioEngine = audioDrv;
@@ -180,6 +193,7 @@ bool MusicClient::Open()
 
     return bAudio && bMidi;
 }
+
 
 bool MusicClient::Start()
 {
@@ -207,6 +221,7 @@ bool MusicClient::Start()
     return bAudio && bMidi;
 }
 
+
 void MusicClient::Close()
 {
     if(midiIO)
@@ -229,14 +244,16 @@ void MusicClient::Close()
     }
 }
 
+
 unsigned int MusicClient::getSamplerate()
 {
-    //if(audioIO)
-    //{
+    if(audioIO)
+    {
         return audioIO->getSamplerate();
-    //}
-    //return NMC_SRATE;
+    }
+    return NMC_SRATE;
 }
+
 
 int MusicClient::getBuffersize()
 {
@@ -248,6 +265,7 @@ int MusicClient::getBuffersize()
     return synth->getRuntime().Buffersize;
 }
 
+
 string MusicClient::audioClientName()
 {
     if(audioIO)
@@ -258,6 +276,7 @@ string MusicClient::audioClientName()
     return "null_audio";
 }
 
+
 string MusicClient::midiClientName()
 {
     if(midiIO)
@@ -266,6 +285,7 @@ string MusicClient::midiClientName()
     }
     return "null_midi";
 }
+
 
 int MusicClient::audioClientId()
 {
@@ -277,6 +297,7 @@ int MusicClient::audioClientId()
 
 }
 
+
 int MusicClient::midiClientId()
 {
     if(midiIO)
@@ -286,6 +307,7 @@ int MusicClient::midiClientId()
     return 0;
 
 }
+
 
 void MusicClient::registerAudioPort(int portnum)
 {

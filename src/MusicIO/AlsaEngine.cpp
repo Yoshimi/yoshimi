@@ -60,10 +60,13 @@ bool AlsaEngine::openAudio(void)
                              SND_PCM_STREAM_PLAYBACK, SND_PCM_NO_AUTO_CHANNELS),
             "failed to open alsa audio device:" + audio.device))
         goto bail_out;
-    
+
     if (!alsaBad(snd_pcm_nonblock(audio.handle, 0), "set blocking failed"))
+    {
         if (prepHwparams())
+        {
             if (prepSwparams())
+            {
                 if (prepBuffers())
                 {
                     int buffersize = getBuffersize();
@@ -72,7 +75,10 @@ bool AlsaEngine::openAudio(void)
                         goto bail_out;
                     memset(interleaved, 0, sizeof(int) * buffersize * card_chans);
                 }
-                return true;
+            }
+        }
+    }
+    return true;
 bail_out:
     Close();
     splashMessages.push_back("Can't connect to alsa audio :(");
@@ -109,9 +115,9 @@ bool AlsaEngine::openMidi(void)
     snd_seq_client_info_event_filter_add(seq_info, SND_SEQ_EVENT_PORT_UNSUBSCRIBED);
     if (0 > snd_seq_set_client_info(midi.handle, seq_info))
         synth->getRuntime().Log("Failed to set midi event filtering");
-    
+
     snd_seq_set_client_name(midi.handle, midiClientName().c_str());
-    
+
     port_num = snd_seq_create_simple_port(midi.handle, port_name,
                                        SND_SEQ_PORT_CAP_WRITE
                                        | SND_SEQ_PORT_CAP_SUBS_WRITE,
@@ -133,7 +139,6 @@ bool AlsaEngine::openMidi(void)
             synth->getRuntime().Log("Didn't find alsa MIDI source '" + midi.device + "'");
             synth->getRuntime().midiDevice = "";
         }
-        
     }
     return true;
 
@@ -214,7 +219,7 @@ bool AlsaEngine::prepHwparams(void)
         bool card_endian;
         bool card_signed;
     }
-    card_formats[] = 
+    card_formats[] =
     {
         {SND_PCM_FORMAT_S32_LE, 32, true, true},
         {SND_PCM_FORMAT_S32_BE, 32, false, true},
@@ -227,7 +232,7 @@ bool AlsaEngine::prepHwparams(void)
     int formidx;
     string formattxt = "";
     card_chans = 2; // got to start somewhere
-    
+
     unsigned int ask_samplerate = audio.samplerate;
     unsigned int ask_buffersize = audio.period_size;
 
@@ -260,24 +265,24 @@ bool AlsaEngine::prepHwparams(void)
         {
             synth->getRuntime().Log("alsa audio failed to find matching format");
             goto bail_out;
-        }    
+        }
     }
     card_bits = card_formats[formidx].card_bits;
     card_endian = card_formats[formidx].card_endian;
     card_signed = card_formats[formidx].card_signed;
-    
-    synth->getRuntime().Log("March little endian = " + asString(little_endian));
+
+    synth->getRuntime().Log("March little endian = " + asString(little_endian), 2);
 
     if (card_signed) // not currently used, may be later
         formattxt = "Signed";
     else
         formattxt = "Unsigned";
-    
+
     if (card_endian)
         formattxt += " Little";
     else
         formattxt += " Big";
- 
+
 
     alsaBad(snd_pcm_hw_params_set_rate_resample(audio.handle, hwparams, 1),
             "alsa audio failed to set allow resample");
@@ -305,11 +310,11 @@ bool AlsaEngine::prepHwparams(void)
                 NULL), "failed to get period size"))
         goto bail_out;
 
-    synth->getRuntime().Log("Format = " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" );
+    synth->getRuntime().Log("Format = " + formattxt + " Endian " + asString(card_bits) +" Bit " + asString(card_chans) + " Channel" , 2);
     if (ask_buffersize != audio.period_size)
     {
-        synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize)
-                    + ", Alsa dictates " + asString((unsigned int)audio.period_size));
+        synth->getRuntime().Log("Asked for buffersize " + asString(ask_buffersize, 2)
+                    + ", Alsa dictates " + asString((unsigned int)audio.period_size), 2);
         synth->getRuntime().Buffersize = audio.period_size; // we shouldn't need to do this :(
     }
     return true;
@@ -360,7 +365,7 @@ void AlsaEngine::Interleave(int buffersize)
     unsigned int shift = 0x78000000;
     if (card_bits == 24)
         shift = 0x780000;
-    
+
     if (card_bits == 16)
     {
         chans = card_chans / 2; // because we're pairing them on a single integer
@@ -416,6 +421,7 @@ void *AlsaEngine::AudioThread(void)
             switch (audio.pcm_state)
             {
                 case SND_PCM_STATE_XRUN:
+
                 case SND_PCM_STATE_SUSPENDED:
                     if (!xrunRecover())
                         break;
@@ -424,9 +430,11 @@ void *AlsaEngine::AudioThread(void)
                     if (alsaBad(snd_pcm_prepare(audio.handle),
                                 "alsa audio pcm prepare failed"))
                         break;
+                    // and again
                 case SND_PCM_STATE_PREPARED:
                     alsaBad(snd_pcm_start(audio.handle), "pcm start failed");
                     break;
+
                 default:
                     synth->getRuntime().Log("Alsa AudioThread, weird SND_PCM_STATE: "
                                 + asString(audio.pcm_state));
@@ -473,12 +481,15 @@ void AlsaEngine::Write(snd_pcm_uframes_t towrite)
                 case -EBADFD:
                     alsaBad(-EBADFD, "alsa audio unfit for writing");
                     break;
+
                 case -EPIPE:
                     xrunRecover();
                     break;
+
                 case -ESTRPIPE:
                     Recover(wrote);
                     break;
+
                 default:
                     alsaBad(wrote, "alsa audio, snd_pcm_writei ==> weird state");
                     break;
@@ -499,16 +510,19 @@ bool AlsaEngine::Recover(int err)
         case -EINTR:
             isgood = true; // nuthin to see here
             break;
+
         case -ESTRPIPE:
             if (!alsaBad(snd_pcm_prepare(audio.handle),
                          "Error, AlsaEngine failed to recover from suspend"))
                 isgood = true;
             break;
+
         case -EPIPE:
             if (!alsaBad(snd_pcm_prepare(audio.handle),
                          "Error, AlsaEngine failed to recover from underrun"))
                 isgood = true;
             break;
+
         default:
             break;
     }
@@ -567,7 +581,7 @@ void *AlsaEngine::MidiThread(void)
     unsigned char channel;
     unsigned char note;
     unsigned char velocity;
-    unsigned int ctrltype;    
+    unsigned int ctrltype;
     unsigned int par;
     int chk;
     while (synth->getRuntime().runSynth)
@@ -594,7 +608,7 @@ void *AlsaEngine::MidiThread(void)
                     note = event->data.note.note;
                     setMidiNote(channel, note);
                     break;
-                    
+
                 case SND_SEQ_EVENT_KEYPRESS:
                     channel = event->data.note.channel;
                     ctrltype = C_keypressure;
@@ -615,7 +629,7 @@ void *AlsaEngine::MidiThread(void)
                     par = event->data.control.value;
                     setMidiProgram(channel, par);
                     break;
-                    
+
                 case SND_SEQ_EVENT_PITCHBEND:
                     channel = event->data.control.channel;
                     ctrltype = C_pitchwheel;
@@ -629,6 +643,7 @@ void *AlsaEngine::MidiThread(void)
                     par = event->data.control.value;
                     setMidiController(channel, ctrltype, par);
                     break;
+
                 case SND_SEQ_EVENT_NONREGPARAM:
                     channel = event->data.control.channel;
                     ctrltype = event->data.control.param;
@@ -638,6 +653,7 @@ void *AlsaEngine::MidiThread(void)
                     setMidiController(channel, 6, par >> 7);
                     setMidiController(channel, 38, par & 0x7f);
                     break;
+
                 case SND_SEQ_EVENT_RESET: // reset to power-on state
                     channel = event->data.control.channel;
                     ctrltype = C_resetallcontrollers;

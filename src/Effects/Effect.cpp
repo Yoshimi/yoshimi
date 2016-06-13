@@ -35,7 +35,7 @@ Effect::Effect(bool insertion_, float *efxoutl_, float *efxoutr_,
 {
     setpanning(64);
     setlrcross(40);
- }
+}
 
 
 void Effect::setpanning(char Ppanning_)

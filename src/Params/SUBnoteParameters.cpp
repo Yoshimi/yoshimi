@@ -48,6 +48,8 @@ void SUBnoteParameters::defaults(void)
     PAmpVelocityScaleFunction = 90;
     Pfixedfreq = 0;
     PfixedfreqET = 0;
+    PBendAdjust = 88; // 64 + 24
+    POffsetHz = 64;
     Pnumstages = 2;
     Pbandwidth = 40;
     Phmagtype = 0;
@@ -113,13 +115,14 @@ void SUBnoteParameters::setPan(char pan)
 void SUBnoteParameters::add2XML(XMLwrapper *xml)
 {
     xml->information.SUBsynth_used = 1;
-    
+
     xml->addpar("num_stages",Pnumstages);
     xml->addpar("harmonic_mag_type",Phmagtype);
     xml->addpar("start",Pstart);
 
     xml->beginbranch("HARMONICS");
-    for (int i=0;i<MAX_SUB_HARMONICS;i++) {
+    for (int i=0;i<MAX_SUB_HARMONICS;i++)
+    {
         if ((Phmag[i]==0)&&(xml->minimal)) continue;
         xml->beginbranch("HARMONIC",i);
         xml->addpar("mag",Phmag[i]);
@@ -129,64 +132,70 @@ void SUBnoteParameters::add2XML(XMLwrapper *xml)
     xml->endbranch();
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
-    xml->addparbool("stereo", (Pstereo) ? 1 : 0);
-    xml->addpar("volume",PVolume);
-    xml->addpar("panning",PPanning);
-    xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
-    xml->beginbranch("AMPLITUDE_ENVELOPE");
-    AmpEnvelope->add2XML(xml);
-    xml->endbranch();
+        xml->addparbool("stereo", (Pstereo) ? 1 : 0);
+        xml->addpar("volume",PVolume);
+        xml->addpar("panning",PPanning);
+        xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
+        xml->beginbranch("AMPLITUDE_ENVELOPE");
+            AmpEnvelope->add2XML(xml);
+        xml->endbranch();
     xml->endbranch();
 
     xml->beginbranch("FREQUENCY_PARAMETERS");
-    xml->addparbool("fixed_freq",Pfixedfreq);
-    xml->addpar("fixed_freq_et",PfixedfreqET);
+        xml->addparbool("fixed_freq",Pfixedfreq);
+        xml->addpar("fixed_freq_et",PfixedfreqET);
+        xml->addpar("bend_adjust", PBendAdjust);
+        xml->addpar("offset_hz", POffsetHz);
 
-    xml->addpar("detune",PDetune);
-    xml->addpar("coarse_detune",PCoarseDetune);
-    xml->addpar("overtone_spread_type", POvertoneSpread.type);
-    xml->addpar("overtone_spread_par1", POvertoneSpread.par1);
-    xml->addpar("overtone_spread_par2", POvertoneSpread.par2);
-    xml->addpar("overtone_spread_par3", POvertoneSpread.par3);
-    xml->addpar("detune_type",PDetuneType);
+        xml->addpar("detune",PDetune);
+        xml->addpar("coarse_detune",PCoarseDetune);
+        xml->addpar("overtone_spread_type", POvertoneSpread.type);
+        xml->addpar("overtone_spread_par1", POvertoneSpread.par1);
+        xml->addpar("overtone_spread_par2", POvertoneSpread.par2);
+        xml->addpar("overtone_spread_par3", POvertoneSpread.par3);
+        xml->addpar("detune_type",PDetuneType);
 
-    xml->addpar("bandwidth",Pbandwidth);
-    xml->addpar("bandwidth_scale",Pbwscale);
+        xml->addpar("bandwidth",Pbandwidth);
+        xml->addpar("bandwidth_scale",Pbwscale);
 
-    xml->addparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-    if ((PFreqEnvelopeEnabled!=0)||(!xml->minimal)) {
-        xml->beginbranch("FREQUENCY_ENVELOPE");
-        FreqEnvelope->add2XML(xml);
-        xml->endbranch();
-    }
+        xml->addparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
+        if ((PFreqEnvelopeEnabled!=0)||(!xml->minimal))
+        {
+            xml->beginbranch("FREQUENCY_ENVELOPE");
+            FreqEnvelope->add2XML(xml);
+            xml->endbranch();
+        }
 
-    xml->addparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-    if ((PBandWidthEnvelopeEnabled!=0)||(!xml->minimal)) {
-        xml->beginbranch("BANDWIDTH_ENVELOPE");
-        BandWidthEnvelope->add2XML(xml);
-        xml->endbranch();
-    }
+        xml->addparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
+        if ((PBandWidthEnvelopeEnabled!=0)||(!xml->minimal))
+        {
+            xml->beginbranch("BANDWIDTH_ENVELOPE");
+                BandWidthEnvelope->add2XML(xml);
+            xml->endbranch();
+        }
     xml->endbranch();
 
     xml->beginbranch("FILTER_PARAMETERS");
-    xml->addparbool("enabled",PGlobalFilterEnabled);
-    if ((PGlobalFilterEnabled!=0)||(!xml->minimal)) {
-        xml->beginbranch("FILTER");
-        GlobalFilter->add2XML(xml);
-        xml->endbranch();
+        xml->addparbool("enabled",PGlobalFilterEnabled);
+        if ((PGlobalFilterEnabled!=0)||(!xml->minimal))
+        {
+            xml->beginbranch("FILTER");
+                GlobalFilter->add2XML(xml);
+            xml->endbranch();
 
-        xml->addpar("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
-        xml->addpar("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
+            xml->addpar("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
+            xml->addpar("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
 
-        xml->beginbranch("FILTER_ENVELOPE");
-        GlobalFilterEnvelope->add2XML(xml);
+            xml->beginbranch("FILTER_ENVELOPE");
+                GlobalFilterEnvelope->add2XML(xml);
+            xml->endbranch();
+        }
         xml->endbranch();
-    }
-    xml->endbranch();
 }
 
 
-void SUBnoteParameters::updateFrequencyMultipliers(void) {
+void SUBnoteParameters::updateFrequencyMultipliers(void)
+{
     float par1 = POvertoneSpread.par1 / 255.0f;
     float par1pow = powf(10.0f,
             -(1.0f - POvertoneSpread.par1 / 255.0f) * 3.0f);
@@ -196,9 +205,11 @@ void SUBnoteParameters::updateFrequencyMultipliers(void) {
     float tmp = 0.0f;
     int   thresh = 0;
 
-    for(int n = 0; n < MAX_SUB_HARMONICS; ++n) {
+    for(int n = 0; n < MAX_SUB_HARMONICS; ++n)
+    {
         float n1     = n + 1.0f;
-        switch(POvertoneSpread.type) {
+        switch(POvertoneSpread.type)
+        {
             case 1:
                 thresh = (int)(100.0f * par2 * par2) + 1;
                 if (n1 < thresh)
@@ -206,6 +217,7 @@ void SUBnoteParameters::updateFrequencyMultipliers(void) {
                 else
                     result = n1 + 8.0f * (n1 - thresh) * par1pow;
                 break;
+
             case 2:
                 thresh = (int)(100.0f * par2 * par2) + 1;
                 if (n1 < thresh)
@@ -213,10 +225,12 @@ void SUBnoteParameters::updateFrequencyMultipliers(void) {
                 else
                     result = n1 + 0.9f * (thresh - n1) * par1pow;
                 break;
+
             case 3:
                 tmp = par1pow * 100.0f + 1.0f;
                 result = powf(n / tmp, 1.0f - 0.8f * par2) * tmp + 1.0f;
                 break;
+
             case 4:
                 result = n * (1.0f - par1pow) +
                     powf(0.1f * n, 3.0f * par2 + 1.0f) *
@@ -227,6 +241,7 @@ void SUBnoteParameters::updateFrequencyMultipliers(void) {
                 result = n1 + 2.0f * sinf(n * par2 * par2 * PI * 0.999f) *
                     sqrt(par1pow);
                 break;
+
             case 6:
                 tmp    = powf(2.0f * par2, 2.0f) + 0.1f;
                 result = n * powf(par1 * powf(0.8f * n, tmp) + 1.0f, tmp) +
@@ -251,9 +266,11 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
     Phmagtype=xml->getpar127("harmonic_mag_type",Phmagtype);
     Pstart=xml->getpar127("start",Pstart);
 
-    if (xml->enterbranch("HARMONICS")) {
+    if (xml->enterbranch("HARMONICS"))
+    {
         Phmag[0]=0;
-        for (int i=0;i<MAX_SUB_HARMONICS;i++) {
+        for (int i=0;i<MAX_SUB_HARMONICS;i++)
+        {
             if (xml->enterbranch("HARMONIC",i)==0) continue;
             Phmag[i]=xml->getpar127("mag",Phmag[i]);
             Phrelbw[i]=xml->getpar127("relbw",Phrelbw[i]);
@@ -269,16 +286,20 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         PVolume=xml->getpar127("volume",PVolume);
         setPan(xml->getpar127("panning",PPanning));
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
-        if (xml->enterbranch("AMPLITUDE_ENVELOPE")) {
+        if (xml->enterbranch("AMPLITUDE_ENVELOPE"))
+        {
             AmpEnvelope->getfromXML(xml);
             xml->exitbranch();
         }
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("FREQUENCY_PARAMETERS")) {
+    if (xml->enterbranch("FREQUENCY_PARAMETERS"))
+    {
         Pfixedfreq=xml->getparbool("fixed_freq",Pfixedfreq);
         PfixedfreqET=xml->getpar127("fixed_freq_et",PfixedfreqET);
+        PBendAdjust  = xml->getpar127("bend_adjust", PBendAdjust);
+        POffsetHz  = xml->getpar127("offset_hz", POffsetHz);
 
         PDetune=xml->getpar("detune",PDetune,0,16383);
         PCoarseDetune=xml->getpar("coarse_detune",PCoarseDetune,0,16383);
@@ -297,22 +318,26 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         Pbwscale=xml->getpar127("bandwidth_scale",Pbwscale);
 
         PFreqEnvelopeEnabled=xml->getparbool("freq_envelope_enabled",PFreqEnvelopeEnabled);
-        if (xml->enterbranch("FREQUENCY_ENVELOPE")) {
+        if (xml->enterbranch("FREQUENCY_ENVELOPE"))
+        {
             FreqEnvelope->getfromXML(xml);
             xml->exitbranch();
         }
 
         PBandWidthEnvelopeEnabled=xml->getparbool("band_width_envelope_enabled",PBandWidthEnvelopeEnabled);
-        if (xml->enterbranch("BANDWIDTH_ENVELOPE")) {
+        if (xml->enterbranch("BANDWIDTH_ENVELOPE"))
+        {
             BandWidthEnvelope->getfromXML(xml);
             xml->exitbranch();
         }
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("FILTER_PARAMETERS")) {
+    if (xml->enterbranch("FILTER_PARAMETERS"))
+    {
         PGlobalFilterEnabled=xml->getparbool("enabled",PGlobalFilterEnabled);
-        if (xml->enterbranch("FILTER")) {
+        if (xml->enterbranch("FILTER"))
+        {
             GlobalFilter->getfromXML(xml);
             xml->exitbranch();
         }
@@ -320,7 +345,8 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
         PGlobalFilterVelocityScaleFunction=xml->getpar127("filter_velocity_sensing",PGlobalFilterVelocityScaleFunction);
         PGlobalFilterVelocityScale=xml->getpar127("filter_velocity_sensing_amplitude",PGlobalFilterVelocityScale);
 
-        if (xml->enterbranch("FILTER_ENVELOPE")) {
+        if (xml->enterbranch("FILTER_ENVELOPE"))
+        {
             GlobalFilterEnvelope->getfromXML(xml);
             xml->exitbranch();
         }

@@ -230,6 +230,7 @@ void Controller::setlegato(int value)
     legato.legato = (value < 64) ? 0 : 1;
 }
 
+
 void Controller::setportamento(int value)
 {
     portamento.data = value;
@@ -255,7 +256,8 @@ int Controller::initportamento(float oldfreq, float newfreq, bool in_progress)
 
     float portamentotime = powf(100.0f, portamento.time / 127.0f) / 50.0f; // portamento time in seconds
 
-    if(portamento.proportional) {
+    if(portamento.proportional)
+    {
         //If there is a min(float,float) and a max(float,float) then they
         //could be used here
         //Linear functors could also make this nicer

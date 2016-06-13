@@ -9,3 +9,5 @@ If you open the mixer panel window you'll see a field just above the Edit button
 Once activated they will remain in place for the entire session, even if the part is later disabled or routed to main only. This is so that other programs won't see links suddenly disappear - although they will become silent.
 
 This setting is preserved in Yoshimi's patch sets and will be re-instated when next loaded.
+
+As of Yoshimi 1.4.0, in the Jack settings tab there is a new checkbox for auto-connecting the main L & R outputs. With this set there is no longer a need to set it manualy on startup.

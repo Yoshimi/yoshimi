@@ -30,8 +30,6 @@
 #include "Params/Presets.h"
 #include "MusicIO/MidiControl.h"
 
-#define N_RES_POINTS 256
-
 class SynthEngine;
 
 class Resonance : public Presets
@@ -58,7 +56,7 @@ class Resonance : public Presets
 
         // parameters
         unsigned char Penabled;                 //if the ressonance is enabled
-        unsigned char Prespoints[N_RES_POINTS];	// how many points define the resonance function
+        unsigned char Prespoints[MAX_RESONANCE_POINTS];	// how many points define the resonance function
         unsigned char PmaxdB;			        // how many dB the signal may be amplified
         unsigned char Pcenterfreq,Poctavesfreq; // the center frequency of the res. func., and the number of octaves
         unsigned char Pprotectthefundamental;   // the fundamental (1-st harmonic) is not damped, even it resonance function is low

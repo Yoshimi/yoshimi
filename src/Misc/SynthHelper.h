@@ -34,10 +34,12 @@ class SynthHelper {
                         unsigned short int finedetune) const;
 };
 
+
 inline bool SynthHelper::aboveAmplitudeThreshold(float a, float b)
 {
     return ((2.0f * fabsf(b - a) / fabsf(b + a + 0.0000000001f)) > 0.0001f);
 }
+
 
 inline float SynthHelper::interpolateAmplitude(float a, float b, int x, int size)
 {
@@ -52,8 +54,5 @@ inline float SynthHelper::velF(float velocity, unsigned char scaling)
     else
         return powf(velocity, (powf(8.0f, (64.0f - (float)scaling) / 64.0f)));
 }
-
-// -----------------------------
-
 
 #endif

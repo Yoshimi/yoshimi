@@ -1,9 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
-Copyright 2014 - 2016, Will Godfrey   
+Copyright 2014 - 2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -49,25 +49,27 @@ class ParametersUI {selected
         callback {//
     if (o->value() > 0)
     {
-        deque<HistoryListItem>::iterator ix = History.begin();
+        vector<string> listType = *synth->getHistory(H_type);
         string fle;
         switch (Fl::event_button())
         {
             case FL_LEFT_MOUSE:
             {
                 CloseRecent->hide();
-                fle = History.at(o->value() - 1).file;
+                fle = listType.at(listType.size() - o->value());
                 switch(H_type)
                 {
                     case 3:
                         synth->getGuiMaster()->do_load_scale(fle);
                         break;
+                    case 5:
+                    	synth->getGuiMaster()->vectorui->loadVector(fle);
+                        break;
                     case 4:
-                        synth->getRuntime().addParamHistory(string(fle), ".state", History);
+                        synth->addHistory(fle, 4);
                     case 2:
                     default:
                         synth->getGuiMaster()->do_load_master(false, fle.c_str());
-                        synth->getGuiMaster()->setMasterLabel(History.at(o->value() - 1).name);
                         break;
                 }
                 CloseRecent->show();
@@ -98,40 +100,49 @@ class ParametersUI {selected
     code {synth = _synth;
 make_window();} {}
   }
-  Function {loadRecent()} {} {
-    code {BrowseRecent->clear();
-        const int colwidths[] = { 64, 128, 0 };
-        BrowseRecent->column_widths(colwidths);
-        BrowseRecent->column_char('	');
-        synth->getRuntime().itx = History.begin();
-        for (; synth->getRuntime().itx != History.end(); ++synth->getRuntime().itx)
-        {
-            string tag = synth->getRuntime().itx->name;
-            BrowseRecent->add(tag.c_str());
-        }
-        BrowseRecent->set_changed();} {}
-  }
   Function {Show(int _type)} {} {
     code {//
     H_type = _type;
+
+    unsigned int name_start;
+    unsigned int name_end;
+    string name;
+
     switch (H_type)
     {
         case 3:
             Recent->label("Recent Scales");
-            History = synth->getRuntime().ScaleHistory;
+            break;
+        case 5:
+            Recent->label("Recent Vectors");
             break;
         case 4:
             Recent->label("Recent States");
-            History = synth->getRuntime().StateHistory;
             break;
         case 2:
         default:
             Recent->label("Recent Patch Sets");
-            History = synth->getRuntime().ParamsHistory;
             break;
     }
-   
-    loadRecent();
+
+    vector<string> listType = *synth->getHistory(H_type);
+    BrowseRecent->clear();
+    const int colwidths[] = { 64, 128, 0 };
+    BrowseRecent->column_widths(colwidths);
+    BrowseRecent->column_char('	');
+    unsigned int offset = 0;
+    if (listType.size() > MAX_HISTORY)
+        offset = listType.size() -MAX_HISTORY;
+    for (vector<string>::reverse_iterator itr = listType.rbegin(); itr != listType.rend() - offset; ++itr)
+    {
+        name = *itr;
+        name_start = name.rfind("/");
+        name_end = name.rfind(".");
+        name = name.substr(name_start + 1, name_end - name_start - 1);
+        BrowseRecent->add(name.c_str());
+    }
+
+    BrowseRecent->set_changed();
     Recent->show();} {}
   }
   Function {Hide()} {} {
@@ -141,8 +152,6 @@ make_window();} {}
     code {Recent->hide();} {}
   }
   decl {SynthEngine *synth;} {private local
-  }
-  decl {deque<HistoryListItem> History;} {private local
   }
   decl {int H_type;} {private local
   }

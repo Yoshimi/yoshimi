@@ -2,7 +2,7 @@ Using NRPNs Yoshi can now directly set some part values regardless of what chann
 
 Set NRPN
  MSB = 64 {same as for vectors}, LSB = 0  [8128]
- 
+
 then (all value ranges start from zero, not 1)
 
 Data MSB (6)
@@ -17,8 +17,7 @@ Data MSB (6)
                     2 = direct L&R
                     3 = both
                     all other values ignored
-                    
 
-   35 (0x23) : data LSB = controller LSB value {not yet implemented}
+   64 (0x40) : data LSB = key shift value      { 64 = no shift}
 
 Other values currently ignored.

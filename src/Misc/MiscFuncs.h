@@ -32,11 +32,7 @@ class MiscFuncs
         ~MiscFuncs() { }
         string asString(int n);
         string asString(long long n);
-//#if !defined( __i386__ ) && !defined( __arm__ )
-        //remove ambiguity while compiling for most 64-bit/32-bit arches
-        //string asString(size_t n);
         string asString(unsigned long n);
-//#endif
         string asString(long n);
         string asString(unsigned int n, unsigned int width = 0);
         string asString(unsigned char c);// { return asString((unsigned int)c); }
@@ -44,24 +40,32 @@ class MiscFuncs
         string asLongString(float n);
         string asHexString(int x);
         string asHexString(unsigned int x);
-        unsigned int bitFindHigh(unsigned int value);
-        void bitSet(unsigned int& value, unsigned int bit);
-        void bitClear(unsigned int& value, unsigned int bit);
-        bool bitTest(unsigned int value, unsigned int bit);
-        char *skipSpace(char *buf);
-        char *skipChars(char *buf);
-        int matchWord(int numChars, char *point, const char *word);
-        bool matchnMove(int num, char *&pnt, const char *word);
+
         static float string2float(string str);
         static int string2int(string str);
         static int string2int127(string str);
         static unsigned int string2uint(string str);
+
         bool isRegFile(string chkpath);
         bool isDirectory(string chkpath);
         bool isFifo(string chkpath);
         void legit_filename(string& fname);
+        void legit_pathname(string& fname);
+        string findleafname(string name);
         string setExtension(string fname, string ext);
         string localPath(string leaf);
+
+        char *skipSpace(char *buf);
+        char *skipChars(char *buf);
+        int matchWord(int numChars, char *point, const char *word);
+        bool matchnMove(int num, char *&pnt, const char *word);
+
+        unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max);
+        unsigned int bitFindHigh(unsigned int value);
+        void bitSet(unsigned int& value, unsigned int bit);
+        void bitClear(unsigned int& value, unsigned int bit);
+        bool bitTest(unsigned int value, unsigned int bit);
+
         float dB2rap(float dB);
         float rap2dB(float rap);
 };

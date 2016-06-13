@@ -34,7 +34,7 @@
 #include "DSP/FFTwrapper.h"
 #include "Params/Presets.h"
 
-enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PITCH_MOD };
+enum FMTYPE { NONE, MORPH, RING_MOD, PHASE_MOD, FREQ_MOD, PW_MOD };
 
 extern int ADnote_unison_sizes[];
 
@@ -98,17 +98,16 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned char Type;                     // Type of the voice 0 = Sound, 1 = Noise
     unsigned char PDelay;                   // Voice Delay
     unsigned char Presonance;               // If resonance is enabled for this voice
-    int           Pextoscil,                // What external oscil should I use,
+    short int     Pextoscil,                // What external oscil should I use,
                   PextFMoscil;              // -1 for internal OscilSmp & FMSmp
                                             // it is not allowed that the externoscil,
                                             // externFMoscil => current voice
-    unsigned char Poscilphase;              // oscillator phases
-    unsigned char PFMoscilphase;
+    unsigned char Poscilphase, PFMoscilphase; // oscillator phases
     unsigned char Pfilterbypass;            // filter bypass
     OscilGen     *OscilSmp;
 
     // Frequency parameters
-    unsigned char Pfixedfreq;
+    unsigned char Pfixedfreq;   // If the base frequency is fixed to 440 Hz
     unsigned char PfixedfreqET; // Equal temperate (this is used only if the
                                 // Pfixedfreq is enabled). If this parameter is 0,
                                 // the frequency is fixed (to 440 Hz); if this
@@ -117,6 +116,9 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned short int PDetune;
     unsigned short int PCoarseDetune;
     unsigned char PDetuneType;
+
+    unsigned char PBendAdjust; // Pitch Bend
+    unsigned char POffsetHz;
 
     unsigned char PFreqEnvelopeEnabled;      // Frequency Envelope
     EnvelopeParams *FreqEnvelope;
@@ -151,13 +153,13 @@ struct ADnoteVoiceParam { // Voice parameters
 
     unsigned char PFilterLfoEnabled;         // LFO Envelope
     LFOParams *FilterLfo;
-    
+
     unsigned char PFilterVelocityScale;
     unsigned char PFilterVelocityScaleFunction;
-    
-    
+
+
     // Modullator parameters
-    unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM..
+    unsigned char PFMEnabled; // 0 = off, 1 = Morph, 2 = RM, 3 = PM, 4 = FM, 5 = PWM
     short int     PFMVoice;   // Voice that I use as modullator instead of FMSmp.
                               // It is -1 if I use FMSmp(default).
                               // It may not be equal or bigger than current voice
@@ -169,6 +171,7 @@ struct ADnoteVoiceParam { // Voice parameters
     unsigned short int PFMDetune;                // Fine Detune of the Modulator
     unsigned short int PFMCoarseDetune;          // Coarse Detune of the Modulator
     unsigned char      PFMDetuneType;            // The detune type
+    unsigned char      PFMFixedFreq;             // FM base freq fixed at 440Hz
     unsigned char      PFMFreqEnvelopeEnabled;   // Frequency Envelope of the Modulator
     EnvelopeParams    *FMFreqEnvelope;
     unsigned char      PFMAmpEnvelopeEnabled;    // Frequency Envelope of the Modulator

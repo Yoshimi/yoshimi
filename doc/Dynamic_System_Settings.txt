@@ -9,8 +9,10 @@ After that send the following DATA values. Commands with LSB x don't actually us
 DATA
 MSB
 
-  2 LSB key         Set master key shift {52 <= key <= 76} (-12 to + 12)
+  2 LSB key         Set master key shift {28 <= key <= 100} (-36 to + 36)
   7 LSB volume      Set master Volume {volume}
+
+  64 - 79 LSB key   Set channel (n - 64) key shift
 
 100 LSB > 63        Send reports to Reports window, otherwise to stderr.
 
@@ -26,7 +28,7 @@ MSB
                     Activate part when program changed {enabled/disabled}
                     CC to control Extended Program change {instruments 127 to 159}
                     Number of available parts
-    
+
 110 LSB x  [13970]  List all root paths
 111 LSB path        List all banks in Root ID {path}
            [14224]  {path = 127 for current root}

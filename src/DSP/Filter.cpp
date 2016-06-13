@@ -37,12 +37,14 @@ Filter::Filter(FilterParams *pars, SynthEngine *_synth):
         case 1:
             filter = new FormantFilter(pars, synth);
             break;
+
         case 2:
             filter = new SVFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
             filter->outgain = dB2rap(pars->getgain());
             if (filter->outgain > 1.0f)
                 filter->outgain = sqrtf(filter->outgain);
             break;
+
         default:
             filter = new AnalogFilter(Ftype, 1000.0f, pars->getq(), Fstages, synth);
             if (Ftype >= 6 && Ftype <= 8)
@@ -53,30 +55,36 @@ Filter::Filter(FilterParams *pars, SynthEngine *_synth):
     }
 }
 
+
 Filter::~Filter()
 {
     delete filter;
 }
+
 
 void Filter::filterout(float *smp)
 {
     filter->filterout(smp);
 }
 
+
 void Filter::setfreq(float frequency)
 {
     filter->setfreq(frequency);
 }
+
 
 void Filter::setfreq_and_q(float frequency, float q_)
 {
     filter->setfreq_and_q(frequency, q_);
 }
 
+
 void Filter::setq(float q_)
 {
     filter->setq(q_);
 }
+
 
 float Filter::getrealfreq(float freqpitch)
 {

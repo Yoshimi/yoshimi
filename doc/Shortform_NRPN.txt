@@ -1,0 +1,25 @@
+
+NRPN MSB is CC 99, and LSB is CC 98
+
+A new concept is shortform NRPNs. This is where instead of the NRPN setting up for data entry of values, the NRPN is of itself the entire command. With a suitable sequencer like Rosegarden, you start with a two byte MSB/LSB value, then only need to enter a single byte LSB to change the setting.
+
+There is only one defined so far and this is for silent channel switching of parts.
+
+The idea is you have a base channel number and a group of 4 parts that reference it. Only one part at a time is active, the others have their channel number set to only accept note-off.
+
+The value of this is that, as you are not actually switching parts on and off, there are no clicks and no messed up note release tails. Yet you can have up to four parts responding to just one channel, and it can be any of the 16 available MIDI channels.
+
+You should set up Yoshimi to have the 64 parts made available (32 if you only want to switch between 2 instruments) and load up all the wanted instrument patches - either manually of via root/bank & program change commands in your MIDI file.
+
+Then the format is;
+MSB 65 = the uninque identifier for this shortform command
+LSB 0 - 63 = the part number to make active
+
+So, if your part number is, say 35, your base channel is 3. Sending this will set part 35 to receive channel 3 and parts 3, 19 & 51 to 19, so they will only accept note off commands from channel 3.
+
+Later, provided you haven't used any other NRPNs just change the LSB. If you make it 19, then this part will start to receive messages on channel 3 and all the others (including 35) will only see note offs.
+
+You never need to be concerned with the data values, and only need this single command to manage all four parts.
+
+Note:
+NRPN channel numbers start from zero, but will be displayed on the GUI starting from 1.

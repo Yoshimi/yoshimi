@@ -65,6 +65,7 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
     defaults();
 }
 
+
 PADnoteParameters::~PADnoteParameters()
 {
     deletesamples();
@@ -78,6 +79,7 @@ PADnoteParameters::~PADnoteParameters()
     delete FilterEnvelope;
     delete FilterLfo;
 }
+
 
 void PADnoteParameters::defaults(void)
 {
@@ -115,6 +117,8 @@ void PADnoteParameters::defaults(void)
     // Frequency Global Parameters
     Pfixedfreq = 0;
     PfixedfreqET = 0;
+    PBendAdjust = 88; // 64 + 24
+    POffsetHz = 64;
     PDetune = 8192; // zero
     PCoarseDetune = 0;
     PDetuneType = 1;
@@ -142,6 +146,7 @@ void PADnoteParameters::defaults(void)
     deletesamples();
 }
 
+
 void PADnoteParameters::deletesample(int n)
 {
     if (n < 0 || n >= PAD_MAX_SAMPLES)
@@ -155,11 +160,13 @@ void PADnoteParameters::deletesample(int n)
     sample[n].basefreq = 440.0f;
 }
 
+
 void PADnoteParameters::deletesamples(void)
 {
     for (int i = 0; i < PAD_MAX_SAMPLES; ++i)
         deletesample(i);
 }
+
 
 // Get the harmonic profile (i.e. the frequency distributio of a single harmonic)
 float PADnoteParameters::getprofile(float *smp, int size)
@@ -201,6 +208,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
         case 1:
             x = x * 0.5f + 0.5f;
             break;
+
         case 2:
             x = x * 0.5f;
             break;
@@ -223,9 +231,11 @@ float PADnoteParameters::getprofile(float *smp, int size)
             else
                 f = 1.0f;
             break;
+
         case 2:
             f = expf(-(fabsf(x)) * sqrtf(basepar));
             break;
+
         default:
             f = expf(-(x * x) * basepar);
             break;
@@ -240,9 +250,11 @@ float PADnoteParameters::getprofile(float *smp, int size)
         case 1:
             amp = expf(-(origx * origx) * 10.0f * amppar1);
             break;
+
         case 2:
             amp = 0.5f * (1.0f + cosf(PI * origx * sqrtf(amppar1 * 4.0f + 1.0f)));
             break;
+
         case 3:
             amp = 1.0f / (powf(origx * (amppar1 * 2.0f + 0.8f), 14.0f) + 1.0f);
             break;
@@ -259,10 +271,12 @@ float PADnoteParameters::getprofile(float *smp, int size)
             case 1:
                 finalsmp *= amp * (1.0f - amppar2) + amppar2;
                 break;
+
             case 2:
                 finalsmp =
                     finalsmp / (amp + powf(amppar2, 4.0f) * 20.0f + 0.0001f);
                 break;
+
             case 3:
                 finalsmp =
                     amp / (finalsmp + powf(amppar2, 4.0f) * 20.0f + 0.0001f);
@@ -299,6 +313,7 @@ float PADnoteParameters::getprofile(float *smp, int size)
     return result;
 }
 
+
 // Compute the real bandwidth in cents and returns it
 // Also, sets the bandwidth parameter
 float PADnoteParameters::setPbandwidth(int Pbandwidth)
@@ -308,6 +323,7 @@ float PADnoteParameters::setPbandwidth(int Pbandwidth)
     result = powf(10.0f, result * 4.0f) * 0.25f;
     return result;
 }
+
 
 // Get the harmonic(overtone) position
 float PADnoteParameters::getNhr(int n)
@@ -328,6 +344,7 @@ float PADnoteParameters::getNhr(int n)
         else
             result = 1.0f + n0 + (n0 - thresh + 1.0f) * par1 * 8.0f;
         break;
+
     case 2:
         thresh = (int)truncf(par2 * par2 * 100.0f) + 1;
         if (n < thresh)
@@ -335,20 +352,25 @@ float PADnoteParameters::getNhr(int n)
         else
             result = 1.0f + n0 - (n0 - thresh + 1.0f) * par1 * 0.90f;
         break;
+
     case 3:
         tmp = par1 * 100.0f + 1.0f;
         result = powf(n0 / tmp, (1.0f - par2 * 0.8f)) * tmp + 1.0f;
         break;
+
     case 4:
         result = n0 * (1.0f - par1) + powf(n0 * 0.1f, par2 * 3.0f + 1.0f) * par1 * 10.0f + 1.0f;
         break;
+
     case 5:
         result = n0 + sinf(n0 * par2 * par2 * PI * 0.999f) * sqrtf(par1) * 2.0f + 1.0f;
         break;
+
     case 6:
         tmp = powf((par2 * 2.0f), 2.0f) + 0.1f;
         result = n0 * powf(1.0f + par1 * powf(n0 * 0.8f, tmp), tmp) + 1.0f;
         break;
+
     default:
         result=n;
         break;
@@ -359,6 +381,7 @@ float PADnoteParameters::getNhr(int n)
     result = iresult + (1.0f - par3) * dresult;
     return result;
 }
+
 
 // Generates the long spectrum for Bandwidth mode (only amplitudes are generated;
 // phases will be random)
@@ -407,24 +430,31 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         case 0:
             power = 1.0f;
             break;
+
         case 1:
             power = 0.0f;
             break;
+
         case 2:
             power = 0.25f;
             break;
+
         case 3:
             power = 0.5f;
             break;
+
         case 4:
             power = 0.75f;
             break;
+
         case 5:
             power = 1.5f;
             break;
+
         case 6:
             power = 2.0f;
             break;
+
         case 7:
             power = -0.5;
             break;
@@ -469,6 +499,7 @@ void PADnoteParameters::generatespectrum_bandwidthMode(float *spectrum,
         }
     }
 }
+
 
 // Generates the long spectrum for non-Bandwidth modes (only amplitudes are generated; phases will be random)
 void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
@@ -539,6 +570,7 @@ void PADnoteParameters::generatespectrum_otherModes(float *spectrum,
         }
     }
 }
+
 
 // Applies the parameters (i.e. computes all the samples, based on parameters);
 void PADnoteParameters::applyparameters(bool islocked)
@@ -693,93 +725,94 @@ void PADnoteParameters::add2XML(XMLwrapper *xml)
     xml->addpar("bandwidth_scale",Pbwscale);
 
     xml->beginbranch("HARMONIC_PROFILE");
-    xml->addpar("base_type",Php.base.type);
-    xml->addpar("base_par1",Php.base.par1);
-    xml->addpar("frequency_multiplier",Php.freqmult);
-    xml->addpar("modulator_par1",Php.modulator.par1);
-    xml->addpar("modulator_frequency",Php.modulator.freq);
-    xml->addpar("width",Php.width);
-    xml->addpar("amplitude_multiplier_type",Php.amp.type);
-    xml->addpar("amplitude_multiplier_mode",Php.amp.mode);
-    xml->addpar("amplitude_multiplier_par1",Php.amp.par1);
-    xml->addpar("amplitude_multiplier_par2",Php.amp.par2);
-    xml->addparbool("autoscale",Php.autoscale);
-    xml->addpar("one_half",Php.onehalf);
+        xml->addpar("base_type",Php.base.type);
+        xml->addpar("base_par1",Php.base.par1);
+        xml->addpar("frequency_multiplier",Php.freqmult);
+        xml->addpar("modulator_par1",Php.modulator.par1);
+        xml->addpar("modulator_frequency",Php.modulator.freq);
+        xml->addpar("width",Php.width);
+        xml->addpar("amplitude_multiplier_type",Php.amp.type);
+        xml->addpar("amplitude_multiplier_mode",Php.amp.mode);
+        xml->addpar("amplitude_multiplier_par1",Php.amp.par1);
+        xml->addpar("amplitude_multiplier_par2",Php.amp.par2);
+        xml->addparbool("autoscale",Php.autoscale);
+        xml->addpar("one_half",Php.onehalf);
     xml->endbranch();
 
     xml->beginbranch("OSCIL");
-    oscilgen->add2XML(xml);
+        oscilgen->add2XML(xml);
     xml->endbranch();
 
     xml->beginbranch("RESONANCE");
-    resonance->add2XML(xml);
+        resonance->add2XML(xml);
     xml->endbranch();
 
     xml->beginbranch("HARMONIC_POSITION");
-    xml->addpar("type",Phrpos.type);
-    xml->addpar("parameter1",Phrpos.par1);
-    xml->addpar("parameter2",Phrpos.par2);
-    xml->addpar("parameter3",Phrpos.par3);
+        xml->addpar("type",Phrpos.type);
+        xml->addpar("parameter1",Phrpos.par1);
+        xml->addpar("parameter2",Phrpos.par2);
+        xml->addpar("parameter3",Phrpos.par3);
     xml->endbranch();
 
     xml->beginbranch("SAMPLE_QUALITY");
-    xml->addpar("samplesize",Pquality.samplesize);
-    xml->addpar("basenote",Pquality.basenote);
-    xml->addpar("octaves",Pquality.oct);
-    xml->addpar("samples_per_octave",Pquality.smpoct);
+        xml->addpar("samplesize",Pquality.samplesize);
+        xml->addpar("basenote",Pquality.basenote);
+        xml->addpar("octaves",Pquality.oct);
+        xml->addpar("samples_per_octave",Pquality.smpoct);
     xml->endbranch();
 
     xml->beginbranch("AMPLITUDE_PARAMETERS");
-    xml->addpar("volume",PVolume);
-    xml->addpar("panning",PPanning);
-    xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
-    xml->addpar("fadein_adjustment", Fadein_adjustment);
-    xml->addpar("punch_strength",PPunchStrength);
-    xml->addpar("punch_time",PPunchTime);
-    xml->addpar("punch_stretch",PPunchStretch);
-    xml->addpar("punch_velocity_sensing",PPunchVelocitySensing);
+        xml->addpar("volume",PVolume);
+        xml->addpar("panning",PPanning);
+        xml->addpar("velocity_sensing",PAmpVelocityScaleFunction);
+        xml->addpar("fadein_adjustment", Fadein_adjustment);
+        xml->addpar("punch_strength",PPunchStrength);
+        xml->addpar("punch_time",PPunchTime);
+        xml->addpar("punch_stretch",PPunchStretch);
+        xml->addpar("punch_velocity_sensing",PPunchVelocitySensing);
 
-    xml->beginbranch("AMPLITUDE_ENVELOPE");
-    AmpEnvelope->add2XML(xml);
-    xml->endbranch();
+        xml->beginbranch("AMPLITUDE_ENVELOPE");
+            AmpEnvelope->add2XML(xml);
+        xml->endbranch();
 
-    xml->beginbranch("AMPLITUDE_LFO");
-    AmpLfo->add2XML(xml);
-    xml->endbranch();
-
+        xml->beginbranch("AMPLITUDE_LFO");
+            AmpLfo->add2XML(xml);
+        xml->endbranch();
     xml->endbranch();
 
     xml->beginbranch("FREQUENCY_PARAMETERS");
-    xml->addpar("fixed_freq",Pfixedfreq);
-    xml->addpar("fixed_freq_et",PfixedfreqET);
-    xml->addpar("detune",PDetune);
-    xml->addpar("coarse_detune",PCoarseDetune);
-    xml->addpar("detune_type",PDetuneType);
+        xml->addpar("fixed_freq",Pfixedfreq);
+        xml->addpar("fixed_freq_et",PfixedfreqET);
+        xml->addpar("bend_adjust", PBendAdjust);
+        xml->addpar("offset_hz", POffsetHz);
+        xml->addpar("detune",PDetune);
+        xml->addpar("coarse_detune",PCoarseDetune);
+        xml->addpar("detune_type",PDetuneType);
 
-    xml->beginbranch("FREQUENCY_ENVELOPE");
-    FreqEnvelope->add2XML(xml);
-    xml->endbranch();
+        xml->beginbranch("FREQUENCY_ENVELOPE");
+            FreqEnvelope->add2XML(xml);
+        xml->endbranch();
 
-    xml->beginbranch("FREQUENCY_LFO");
-    FreqLfo->add2XML(xml);
-    xml->endbranch();
+        xml->beginbranch("FREQUENCY_LFO");
+            FreqLfo->add2XML(xml);
+        xml->endbranch();
     xml->endbranch();
 
     xml->beginbranch("FILTER_PARAMETERS");
-    xml->addpar("velocity_sensing_amplitude",PFilterVelocityScale);
-    xml->addpar("velocity_sensing",PFilterVelocityScaleFunction);
+        xml->addpar("velocity_sensing_amplitude",PFilterVelocityScale);
+        xml->addpar("velocity_sensing",PFilterVelocityScaleFunction);
 
-    xml->beginbranch("FILTER");
-    GlobalFilter->add2XML(xml);
-    xml->endbranch();
+        xml->beginbranch("FILTER");
+            GlobalFilter->add2XML(xml);
+        xml->endbranch();
 
-    xml->beginbranch("FILTER_ENVELOPE");
-    FilterEnvelope->add2XML(xml);
-    xml->endbranch();
+        xml->beginbranch("FILTER_ENVELOPE");
+            FilterEnvelope->add2XML(xml);
+        xml->endbranch();
 
-    xml->beginbranch("FILTER_LFO");
-    FilterLfo->add2XML(xml);
-    xml->endbranch();
+        xml->beginbranch("FILTER_LFO");
+            FilterLfo->add2XML(xml);
+        xml->endbranch();
     xml->endbranch();
 }
 
@@ -790,7 +823,8 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
     Pbandwidth=xml->getpar("bandwidth",Pbandwidth,0,1000);
     Pbwscale=xml->getpar127("bandwidth_scale",Pbwscale);
 
-    if (xml->enterbranch("HARMONIC_PROFILE")) {
+    if (xml->enterbranch("HARMONIC_PROFILE"))
+    {
         Php.base.type=xml->getpar127("base_type",Php.base.type);
         Php.base.par1=xml->getpar127("base_par1",Php.base.par1);
         Php.freqmult=xml->getpar127("frequency_multiplier",Php.freqmult);
@@ -806,17 +840,20 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("OSCIL")) {
+    if (xml->enterbranch("OSCIL"))
+    {
         oscilgen->getfromXML(xml);
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("RESONANCE")) {
+    if (xml->enterbranch("RESONANCE"))
+    {
         resonance->getfromXML(xml);
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("HARMONIC_POSITION")) {
+    if (xml->enterbranch("HARMONIC_POSITION"))
+    {
         Phrpos.type=xml->getpar127("type",Phrpos.type);
         Phrpos.par1=xml->getpar("parameter1",Phrpos.par1,0,255);
         Phrpos.par2=xml->getpar("parameter2",Phrpos.par2,0,255);
@@ -824,7 +861,8 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("SAMPLE_QUALITY")) {
+    if (xml->enterbranch("SAMPLE_QUALITY"))
+    {
         Pquality.samplesize=xml->getpar127("samplesize",Pquality.samplesize);
         Pquality.basenote=xml->getpar127("basenote",Pquality.basenote);
         Pquality.oct=xml->getpar127("octaves",Pquality.oct);
@@ -832,7 +870,8 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("AMPLITUDE_PARAMETERS")) {
+    if (xml->enterbranch("AMPLITUDE_PARAMETERS"))
+    {
         PVolume=xml->getpar127("volume",PVolume);
         setPan(xml->getpar127("panning",PPanning));
         PAmpVelocityScaleFunction=xml->getpar127("velocity_sensing",PAmpVelocityScaleFunction);
@@ -843,48 +882,54 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         PPunchVelocitySensing=xml->getpar127("punch_velocity_sensing",PPunchVelocitySensing);
 
         xml->enterbranch("AMPLITUDE_ENVELOPE");
-        AmpEnvelope->getfromXML(xml);
+            AmpEnvelope->getfromXML(xml);
         xml->exitbranch();
 
         xml->enterbranch("AMPLITUDE_LFO");
-        AmpLfo->getfromXML(xml);
+            AmpLfo->getfromXML(xml);
         xml->exitbranch();
 
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("FREQUENCY_PARAMETERS")) {
+    if (xml->enterbranch("FREQUENCY_PARAMETERS"))
+    {
         Pfixedfreq=xml->getpar127("fixed_freq",Pfixedfreq);
         PfixedfreqET=xml->getpar127("fixed_freq_et",PfixedfreqET);
+        PBendAdjust=xml->getpar127("bend_adjust", PBendAdjust);
+        POffsetHz =xml->getpar127("offset_hz", POffsetHz);
         PDetune=xml->getpar("detune",PDetune,0,16383);
         PCoarseDetune=xml->getpar("coarse_detune",PCoarseDetune,0,16383);
         PDetuneType=xml->getpar127("detune_type",PDetuneType);
 
         xml->enterbranch("FREQUENCY_ENVELOPE");
-        FreqEnvelope->getfromXML(xml);
+            FreqEnvelope->getfromXML(xml);
         xml->exitbranch();
 
         xml->enterbranch("FREQUENCY_LFO");
-        FreqLfo->getfromXML(xml);
+            FreqLfo->getfromXML(xml);
         xml->exitbranch();
+
         xml->exitbranch();
     }
 
-    if (xml->enterbranch("FILTER_PARAMETERS")) {
+    if (xml->enterbranch("FILTER_PARAMETERS"))
+    {
         PFilterVelocityScale=xml->getpar127("velocity_sensing_amplitude",PFilterVelocityScale);
         PFilterVelocityScaleFunction=xml->getpar127("velocity_sensing",PFilterVelocityScaleFunction);
 
         xml->enterbranch("FILTER");
-        GlobalFilter->getfromXML(xml);
+            GlobalFilter->getfromXML(xml);
         xml->exitbranch();
 
         xml->enterbranch("FILTER_ENVELOPE");
-        FilterEnvelope->getfromXML(xml);
+            FilterEnvelope->getfromXML(xml);
         xml->exitbranch();
 
         xml->enterbranch("FILTER_LFO");
-        FilterLfo->getfromXML(xml);
+            FilterLfo->getfromXML(xml);
         xml->exitbranch();
+
         xml->exitbranch();
     }
 }

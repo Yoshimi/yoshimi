@@ -79,8 +79,6 @@ class Config : public MiscFuncs
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                          bool schedfifo, char lowprio, bool create_detached = true);
 
-        string addParamHistory(string file, string extension, deque<HistoryListItem> &ParamsHistory);
-        string historyFilename(int index);
         bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
 
@@ -104,6 +102,7 @@ class Config : public MiscFuncs
 
         bool          runSynth;
         bool          showGui;
+        bool          showSplash;
         bool          showCLI;
         int           VirKeybLayout;
 
@@ -115,7 +114,7 @@ class Config : public MiscFuncs
         string        jackServer;
         string        jackMidiDevice;
         bool          startJack;        // false
-        bool          connectJackaudio; // false
+        bool          connectJackaudio;
         string        jackSessionUuid;
 
         string        alsaAudioDevice;
@@ -123,7 +122,7 @@ class Config : public MiscFuncs
         string        nameTag;
 
         unsigned int  GzipCompression;
-        int           Interpolation;        
+        int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
         bool          SimpleCheck;
@@ -138,6 +137,7 @@ class Config : public MiscFuncs
         int           midi_bank_C;
         int           midi_upper_voice_C;
         int           enable_part_on_voice_load;
+        bool          ignoreResetCCs;
         bool          monitorCCin;
         int           single_row_panel;
         int           NumAvailableParts;
@@ -163,19 +163,16 @@ class Config : public MiscFuncs
             int Controller;
             bool vectorEnabled[NUM_MIDI_CHANNELS];
         };
-        
-        IOdata nrpndata;        
-        
-        deque<HistoryListItem> ParamsHistory;
-        deque<HistoryListItem> ScaleHistory;
-        deque<HistoryListItem> StateHistory;
-        deque<HistoryListItem>::iterator itx;
+
+        IOdata nrpndata;
+
         list<string> LogList;
         BodyDisposal *deadObjects;
 
     private:
         void loadCmdArgs(int argc, char **argv);
         bool loadConfig(void);
+        void defaultPresets(void);
         bool extractConfigData(XMLwrapper *xml);
         bool extractRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
@@ -186,7 +183,6 @@ class Config : public MiscFuncs
         void AntiDenormals(bool set_daz_ftz);
         void saveJackSession(void);
 
-        unsigned short nextHistoryIndex;
         int sigIntActive;
         int ladi1IntActive;
         int sse_level;
@@ -199,6 +195,7 @@ class Config : public MiscFuncs
 
         friend class YoshimiLV2Plugin;
 };
+
 
 //struct GuiThreadMsg must be allocated by caller via `new` and is freed by receiver via `delete`
 class GuiThreadMsg

@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {FilterUI.h} {not_in_source in_header
+comment {FilterUI.h} {selected not_in_source in_header
 } 
 
 comment {FilterUI.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
+Copyright 2016 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -32,7 +32,10 @@ This file is derivative of ZynAddSubFX original code, modified March 2011
 } 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
+
+decl {\#include "WidgetMWSliderUI.h"} {public local
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
 } 
@@ -61,25 +64,22 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 } 
 
-class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
+class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 } {
-  Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {open
-  } {
+  Function {FormantFilterGraph(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {pars = NULL;
         nvowel = NULL;
         nformant = NULL;
         graphpoints = NULL;} {}
   }
-  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {open
-  } {
+  Function {init(FilterParams *pars_,int *nvowel_,int *nformant_)} {} {
     code {pars = pars_;
         nvowel = nvowel_;
         nformant = nformant_;
         oldx = -1;
         graphpoints = new float [w()];} {}
   }
-  Function {draw_freq_line(float freq,int type)} {open
-  } {
+  Function {draw_freq_line(float freq,int type)} {} {
     code {float freqx = pars->getfreqpos(freq);
         switch (type)
         {
@@ -97,8 +97,7 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
         if (freqx > 0.0 && freqx < 1.0)
             fl_line(x() + (int) (freqx * w()), y(), x() + (int)(freqx * w()), y() + h());} {}
   }
-  Function {draw()} {open
-  } {
+  Function {draw()} {} {
     code {int maxdB = 30;
         int ox = x(), oy = y(), lx = w(), ly = h(), i, oiy;
         float freqx;
@@ -193,10 +192,9 @@ class FormantFilterGraph {open : {public Fl_Box, MiscFuncs}
   }
 } 
 
-class FilterUI {open : {public Fl_Group,PresetsUI_}
+class FilterUI {: {public Fl_Group,PresetsUI_}
 } {
-  Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {open
-  } {
+  Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
 pars=NULL;
         velsnsamp=NULL;
@@ -213,9 +211,9 @@ pars=NULL;
         delete (formantparswindow);} {}
   }
   Function {make_window()} {} {
-    Fl_Window filterui {open
-      xywh {455 488 275 75} type Double color 247 labelfont 1 labelsize 12
-      class Fl_Group visible
+    Fl_Window filterui {
+      xywh {840 20 275 75} type Double color 247 labelfont 1 labelsize 12 hide
+      class Fl_Group
     } {
       Fl_Group filterparamswindow {
         label {Filter Params}
@@ -223,7 +221,9 @@ pars=NULL;
       } {
         Fl_Choice analogfiltertypechoice {
           label FilterType
-          callback {pars->Ptype=(int)o->value(); pars->changed=true;}
+          callback {pars->Ptype=(int)o->value();
+pars->changed=true;
+send_data(8, o->value());}
           tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
@@ -266,7 +266,9 @@ pars=NULL;
         }
         Fl_Choice svfiltertypechoice {
           label FilterType
-          callback {pars->Ptype=(int)o->value(); pars->changed=true;}
+          callback {pars->Ptype=(int)o->value();
+pars->changed=true;
+send_data(9, o->value());}
           tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
@@ -289,7 +291,9 @@ pars=NULL;
         }
         Fl_Choice filtertype {
           label Category
-          callback {switchcategory((int)o->value()); pars->changed=true;}
+          callback {switchcategory((int)o->value());
+pars->changed=true;
+send_data(7, o->value());}
           tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {10 20 60 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code0 {o->value(pars->Pcategory);}
         } {
@@ -308,51 +312,65 @@ pars=NULL;
         }
         Fl_Dial cfreqdial {
           label {C.Freq}
-          callback {pars->Pfreq=(int)o->value();}
+          callback {pars->Pfreq=(int)o->value();
+send_data(0, o->value());}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {75 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pfreq);}
+          code1 {if (kititem == 0x88) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
           class WidgetPDial
         }
         Fl_Dial qdial {
           label Q
-          callback {pars->Pq=(int)o->value(); formantfiltergraph->redraw();}
+          callback {pars->Pq=(int)o->value();
+formantfiltergraph->redraw();
+send_data(1, o->value());}
           tooltip {Filter resonance or bandwidth} xywh {110 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
+          code1 {if (kititem == 0x88) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
           label {freq.tr.}
-          callback {pars->Pfreqtrack=(int) o->value();}
+          callback {pars->Pfreqtrack=(int) o->value();
+send_data(2, o->value());}
           tooltip {Filter frequency tracking (left is negative, middle is 0, and right is positive)} xywh {215 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pfreqtrack);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial vsnsadial {
           label {V.SnsA.}
-          callback {if (velsnsamp!=NULL) *velsnsamp=(int)o->value();}
+          callback {if (velsnsamp!=NULL) *velsnsamp=(int)o->value();
+send_data(3, o->value());}
           tooltip {Velocity sensing amount of the Filter} xywh {145 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (kititem == 0x88) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
           label {V.Sns.}
-          callback {if (velsns!=NULL) *velsns=(int)o->value();}
+          callback {if (velsns!=NULL) *velsns=(int)o->value();
+send_data(4, o->value());}
           tooltip {Velocity Sensing Function of the Filter} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {if (kititem == 0x88) o->init(127); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial gaindial {
           label gain
           callback {pars->Pgain = (int)o->value();
-              formantfiltergraph->redraw();
-              pars->changed = true;}
+formantfiltergraph->redraw();
+pars->changed = true;
+send_data(5, o->value());}
           tooltip {Filter output gain/damp} xywh {250 35 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Choice stcounter {
           label St
           callback {pars->Pstages = (int)o->value();
-              formantfiltergraph->redraw();
-              pars->changed = true;}
+formantfiltergraph->redraw();
+pars->changed = true;
+send_data(6, o->value());}
           tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {235 5 35 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
           code1 {for (int i=0;i<MAX_FILTER_STAGES;i++) {char tmp[10];snprintf(tmp,10,"%dx",i+1);o->add(tmp);};}
           code2 {o->value(pars->Pstages);}
@@ -377,8 +395,8 @@ pars=NULL;
   }
   Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
-      label {Formant Filter Parameters} open
-      xywh {699 714 700 205} type Double labelfont 1 labelsize 12 visible
+      label {Formant Filter Parameters}
+      xywh {552 743 700 205} type Double labelfont 1 labelsize 12 hide
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -386,8 +404,9 @@ pars=NULL;
         Fl_Counter {} {
           label {Formant }
           callback {nformant = (int) o->value();
-              update_formant_window();
-              formantfiltergraph->redraw();}
+update_formant_window();
+formantfiltergraph->redraw();
+send_data(34, o->value());}
           xywh {545 80 40 15} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_FORMANTS-1);}
           code1 {o->value(nformant);}
@@ -395,36 +414,40 @@ pars=NULL;
         Fl_Counter {} {
           label {Vowel no.}
           callback {nvowel = (int) o->value();
-              update_formant_window();
-              formantfiltergraph->redraw();}
+update_formant_window();
+formantfiltergraph->redraw();
+send_data(33, o->value());}
           xywh {545 55 40 20} type Simple labelfont 1 labelsize 10 align 4 minimum 0 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,FF_MAX_VOWELS-1);}
           code1 {o->value(nvowel);}
         }
-        Fl_Group formantparsgroup {open
+        Fl_Group formantparsgroup {
           xywh {490 105 95 50} box ENGRAVED_FRAME
         } {
           Fl_Dial formant_freq_dial {
             label freq
             callback {pars->Pvowels[nvowel].formants[nformant].freq = (int) o->value();
-                formantfiltergraph->redraw();
-                pars->changed = true;}
+formantfiltergraph->redraw();
+pars->changed = true;
+send_data(18, o->value());}
             tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             class WidgetPDial
           }
           Fl_Dial formant_q_dial {
             label Q
             callback {pars->Pvowels[nvowel].formants[nformant].q = (int) o->value();
-                formantfiltergraph->redraw();
-                pars->changed=true;}
+formantfiltergraph->redraw();
+pars->changed=true;
+send_data(19, o->value());}
             tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             class WidgetPDial
           }
           Fl_Dial formant_amp_dial {
             label amp
             callback {pars->Pvowels[nvowel].formants[nformant].amp = (int) o->value();
-                formantfiltergraph->redraw();
-                pars->changed = true;}
+formantfiltergraph->redraw();
+pars->changed = true;
+send_data(20, o->value());}
             tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             class WidgetPDial
           }
@@ -436,8 +459,9 @@ pars=NULL;
         Fl_Counter {} {
           label {Seq.Size}
           callback {pars->Psequencesize = (int) o->value();
-              update_formant_window();
-              pars->changed = true;}
+update_formant_window();
+pars->changed = true;
+send_data(35, o->value());}
           xywh {595 62 55 20} type Simple labelfont 1 labelsize 10 align 5 minimum 0 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(1,FF_MAX_SEQUENCE-1);}
           code1 {o->value(pars->Psequencesize);}
@@ -445,27 +469,34 @@ pars=NULL;
         Fl_Counter {} {
           label {S.Pos.}
           callback {nseqpos = (int) o->value();
-              update_formant_window();
-              pars->changed=true;}
+update_formant_window();
+pars->changed=true;
+send_data(36, o->value());}
           tooltip {Current position from the sequence} xywh {595 97 40 15} type Simple labelfont 1 labelsize 10 align 9 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_SEQUENCE-2);}
           code1 {o->value(nseqpos);}
         }
         Fl_Counter vowel_counter {
           label Vowel
-          callback {pars->Psequence[nseqpos].nvowel=(int) o->value();pars->changed=true;}
+          callback {pars->Psequence[nseqpos].nvowel=(int) o->value();
+pars->changed=true;
+send_data(37, o->value());}
           xywh {640 97 40 15} type Simple labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 10
           code0 {o->bounds(0,FF_MAX_VOWELS-1);}
         }
         Fl_Check_Button {} {
           label {Neg.Input}
-          callback {pars->Psequencereversed=(int) o->value();pars->changed=true;}
+          callback {pars->Psequencereversed=(int) o->value();
+pars->changed=true;
+send_data(38, o->value());}
           tooltip {Negate the input from LFO/envelopes/etc.} xywh {625 132 60 20} down_box DOWN_BOX labelsize 10
           code0 {o->value(pars->Psequencereversed);}
         }
         Fl_Dial strchdial {
           label Strch
-          callback {pars->Psequencestretch=(int) o->value();pars->changed=true;}
+          callback {pars->Psequencestretch=(int) o->value();
+pars->changed=true;
+send_data(21, o->value());}
           tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->Psequencestretch);}
           class WidgetPDial
@@ -474,16 +505,18 @@ pars=NULL;
       Fl_Counter {} {
         label Formants
         callback {pars->Pnumformants = (int) o->value();
-            update_formant_window();
-            pars->changed=true;
-            formantfiltergraph->redraw();}
+update_formant_window();
+pars->changed=true;
+formantfiltergraph->redraw();
+send_data(32, o->value());}
         xywh {485 15 65 20} type Simple labelfont 1 labelsize 10 align 1 minimum 0 maximum 127 step 1 textsize 12
         code0 {o->bounds(1,FF_MAX_FORMANTS);}
         code1 {o->value(pars->Pnumformants);}
       }
       Fl_Dial frsldial {
         label {Fr.Sl.}
-        callback {pars->Pformantslowness=(int) o->value();pars->changed=true;}
+        callback {pars->Pformantslowness=(int) o->value();pars->changed=true;
+send_data(16, o->value());}
         tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
         code0 {o->value(pars->Pformantslowness);}
         class WidgetPDial
@@ -503,18 +536,22 @@ pars=NULL;
       }
       Fl_Slider cfknob {
         callback {pars->Pcenterfreq = (int)o->value();
-            centerfreqvo->do_callback();
-            formantfiltergraph->redraw();
-            pars->changed = true;}
+centerfreqvo->do_callback();
+formantfiltergraph->redraw();
+pars->changed = true;
+send_data(22, o->value());}
         xywh {556 167 84 15} type {Horz Knob} box FLAT_BOX maximum 127
         code0 {o->value(pars->Pcenterfreq);}
+        class mwheel_slider_rev
       }
       Fl_Slider octknob {
         callback {pars->Poctavesfreq=(int)o->value();
-            octavesfreqvo->do_callback();
-            formantfiltergraph->redraw();}
+octavesfreqvo->do_callback();
+formantfiltergraph->redraw();
+send_data(23, o->value());}
         xywh {556 185 84 15} type {Horz Knob} box FLAT_BOX maximum 127
         code0 {o->value(pars->Poctavesfreq);}
+        class mwheel_slider_rev
       }
       Fl_Box formantfiltergraph {
         xywh {5 5 475 195} box BORDER_BOX
@@ -523,7 +560,8 @@ pars=NULL;
       }
       Fl_Dial wvknob {
         label {Vw.Cl.}
-        callback {pars->Pvowelclearness=(int) o->value();pars->changed = true;}
+        callback {pars->Pvowelclearness=(int) o->value();pars->changed = true;
+send_data(17, o->value());}
         tooltip {Vowel "clearness" (how the mixed vowels are avoided)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
         code0 {o->value(pars->Pvowelclearness);}
         class WidgetPDial
@@ -549,8 +587,7 @@ pars=NULL;
       }
     }
   }
-  Function {update_formant_window()} {open
-  } {
+  Function {update_formant_window()} {} {
     code {formant_freq_dial->value(pars->Pvowels[nvowel].formants[nformant].freq);
         formant_q_dial->value(pars->Pvowels[nvowel].formants[nformant].q);
         formant_amp_dial->value(pars->Pvowels[nvowel].formants[nformant].amp);
@@ -608,36 +645,42 @@ pars=NULL;
         }
         filterparamswindow->redraw();} {}
   }
-  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_)} {open
-  } {
-    code {pars=filterpars_;
-synth = pars->getSynthEngine();
-        velsnsamp = velsnsamp_;
-        velsns = velsns_;
-        make_window();
-        end();
-        make_formant_window();
-        filterui->resize(this->x(), this->y(), this->w(), this->h());
+  Function {send_data(int control, float value, bool isInteger = true)} {} {
+    code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 1);} {}
+  }
+  Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
+    code {//
+    pars=filterpars_;
+    synth = pars->getSynthEngine();
+    velsnsamp = velsnsamp_;
+    velsns = velsns_;
+    npart = npart_;
+    kititem = kititem_;
+    engine = engine_;
+    make_window();
+    end();
+    make_formant_window();
+    filterui->resize(this->x(), this->y(), this->w(), this->h());
 
-        if (velsnsamp == NULL)
-        {
-            vsnsadial->deactivate();
-            vsnsadial->value(127);
-        }
-        else
-            vsnsadial->value(*velsnsamp);
-
-        if (velsns == NULL)
-        {
-            vsnsdial->deactivate();
-            vsnsdial->value(127);
-        }
-        else
-            vsnsdial->value(*velsns);
-        switchcategory(pars->Pcategory);
-        formantparswindow->label(this->label());
-        update_formant_window();} {selected
+    if (velsnsamp == NULL)
+    {
+        vsnsadial->deactivate();
+        vsnsadial->value(127);
     }
+    else
+        vsnsadial->value(*velsnsamp);
+
+    if (velsns == NULL)
+    {
+        vsnsdial->deactivate();
+        vsnsdial->value(127);
+    }
+    else
+        vsnsdial->value(*velsns);
+    switchcategory(pars->Pcategory);
+    formantparswindow->label(this->label());
+    update_formant_window();} {}
   }
   Function {switchcategory(int newcat)} {} {
     code {if (pars->Pcategory != newcat)
@@ -673,5 +716,11 @@ synth = pars->getSynthEngine();
   decl {int nvowel,nformant,nseqpos;} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {int npart;} {private local
+  }
+  decl {int kititem;} {private local
+  }
+  decl {int engine;} {private local
   }
 } 

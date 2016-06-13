@@ -72,7 +72,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     mxmlElementSetAttr(doctype, "Yoshimi-data", NULL);
     node = root = mxmlNewElement(tree, "Yoshimi-data");
     }
-    
+
     mxmlElementSetAttr(root, "Yoshimi-author", "Alan Ernest Calvert");
     string tmp = YOSHIMI_VERSION;
     string::size_type pos1 = tmp.find('.'); // != string::npos
@@ -85,14 +85,14 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     if (synth->getRuntime().xmlType <= XML_CONFIG)
     {
         beginbranch("BASE_PARAMETERS");
-        addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
-        addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
+            addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
+            addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
 
-        addpar("max_system_effects", NUM_SYS_EFX);
-        addpar("max_insertion_effects", NUM_INS_EFX);
-        addpar("max_instrument_effects", NUM_PART_EFX);
+            addpar("max_system_effects", NUM_SYS_EFX);
+            addpar("max_insertion_effects", NUM_INS_EFX);
+            addpar("max_instrument_effects", NUM_PART_EFX);
 
-        addpar("max_addsynth_voices", NUM_VOICES);
+            addpar("max_addsynth_voices", NUM_VOICES);
         endbranch();
     }
 }
@@ -116,7 +116,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     char *xmldata = doloadfile(filename);
     if (!xmldata)
         return -1;
-    
+
     bool bRet = false; // we're not actually using this!
     char *start = strstr(xmldata, "<INFORMATION>");
     char *end = strstr(xmldata, "</INFORMATION>");
@@ -132,7 +132,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
     char *idx = start;
     *end = 0; // fiddle to limit search - I can't find a better way :(
     unsigned short names = 0;
-    
+
     /* the following could be in any order. We are checking for
      * the actual exisitence of the fields as well as their value.
      */
@@ -143,7 +143,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
         if(strstr(idx, "name=\"ADDsynth_used\" value=\"yes\""))
             information.ADDsynth_used = 1;
     }
-    
+
     idx = strstr(start, "name=\"SUBsynth_used\"");
     if (idx != NULL)
     {
@@ -151,7 +151,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
         if(strstr(idx, "name=\"SUBsynth_used\" value=\"yes\""))
             information.SUBsynth_used = 1;
     }
-    
+
     idx = strstr(start, "name=\"PADsynth_used\"");
     if (idx != NULL)
     {
@@ -159,7 +159,7 @@ bool XMLwrapper::checkfileinformation(const string& filename)
         if(strstr(idx, "name=\"PADsynth_used\" value=\"yes\""))
             information.PADsynth_used = 1;
     }
-    
+
     if (names == 7)
     {
         bRet = true;
@@ -181,10 +181,10 @@ bool XMLwrapper::slowinfosearch(char *idx)
     idx = strstr(idx, "<INSTRUMENT_KIT>");
     if (idx == NULL)
         return false;
-    
+
     string mark;
     int max = NUM_KIT_ITEMS;
-    
+
     /*
      * The following *must* exist, otherwise the file is corrupted.
      * They will always be in this order, which means we only need
@@ -204,13 +204,13 @@ bool XMLwrapper::slowinfosearch(char *idx)
         idx = strstr(idx, mark.c_str());
         if (idx == NULL)
             return false;
-        
+
         idx = strstr(idx, "name=\"enabled\"");
         if (idx == NULL)
             return false;
         if (!strstr(idx, "name=\"enabled\" value=\"yes\""))
             continue;
-        
+
         if (!information.ADDsynth_used)
         {
             idx = strstr(idx, "name=\"add_enabled\"");
@@ -252,6 +252,7 @@ bool XMLwrapper::slowinfosearch(char *idx)
 bool XMLwrapper::saveXMLfile(const string& filename)
 {
     char *xmldata = getXMLdata();
+
     if (!xmldata)
     {
         synth->getRuntime().Log("XML: Failed to allocate xml data space");
@@ -297,37 +298,47 @@ char *XMLwrapper::getXMLdata()
     memset(tabs, 0, STACKSIZE + 2);
     mxml_node_t *oldnode=node;
     node = info;
+
     switch (synth->getRuntime().xmlType)
     {
         case 0:
             addparstr("XMLtype", "Invalid");
             break;
+
         case XML_INSTRUMENT:
             addparbool("ADDsynth_used", information.ADDsynth_used);
             addparbool("SUBsynth_used", information.SUBsynth_used);
             addparbool("PADsynth_used", information.PADsynth_used);
             break;
+
         case XML_PARAMETERS:
             addparstr("XMLtype", "Parameters");
             break;
+
         case XML_MICROTONAL:
             addparstr("XMLtype", "Scales");
             break;
+
         case XML_PRESETS:
             addparstr("XMLtype", "Presets");
             break;
+
         case XML_STATE:
             addparstr("XMLtype", "Session");
             break;
+
         case XML_CONFIG:
             addparstr("XMLtype", "Config");
             break;
+
         case XML_BANK:
             addparstr("XMLtype", "Roots and Banks");
             break;
+
         case XML_HISTORY:
             addparstr("XMLtype", "Recent Files");
             break;
+
         default:
             addparstr("XMLtype", "Unknown");
             break;
@@ -388,11 +399,11 @@ void XMLwrapper::endbranch()
 
 
 // LOAD XML members
-
 bool XMLwrapper::loadXMLfile(const string& filename)
 {
     bool zynfile = true;
     bool yoshitoo = false;
+
     if (tree)
         mxmlDelete(tree);
     tree = NULL;
@@ -417,7 +428,7 @@ bool XMLwrapper::loadXMLfile(const string& filename)
         zynfile = false;
         root = mxmlFindElement(tree, tree, "Yoshimi-data", NULL, NULL, MXML_DESCEND);
     }
-    
+
     if (!root)
     {
         synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context");
@@ -575,6 +586,12 @@ int XMLwrapper::getpar(const string& name, int defaultpar, int min, int max)
 int XMLwrapper::getpar127(const string& name, int defaultpar)
 {
     return(getpar(name, defaultpar, 0, 127));
+}
+
+
+int XMLwrapper::getpar255(const string& name, int defaultpar)
+{
+    return(getpar(name, defaultpar, 0, 255));
 }
 
 

@@ -1,0 +1,49 @@
+
+Consider, Pitchwheel split range in Controllers, but that one seems
+a bit pointless to me!
+
+
+Change root/bank/instrument lists to single file for all instances.
+
+Make loading effect presets update the 'top' line.
+
+Startup state load doesn't set buffersize correctly - partially resolved.
+    size is ignored if loaded when already running (which is reasonable).
+
+Allow headless compilation.
+
+Make add/pad windows show kit number.
+
+Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
+
+Add scales control to CLI.
+
+Make things like LFOs either floats or much higher resolution.
+
+LFO frequency should be stated in Hz.
+Ampitude LFO depth should be in %
+Frequency LFO depth should be in cents.
+
+Consider filter settings too.
+
+
+RPNs (channel based)
+
+101,0 (MSB)
+
+100,0 Pitch bend range
+100,1 Fine detune
+100,2 Coarse detune
+
+Maybe a NRPN variation of this for global fine tuning.
+
+
+Review tooltips.
+
+Consider enabling and disabling tooltips.
+
+Consider scroll wheel control of sliders.
+
+Improve Copy & Paste functionality.
+
+Documentation!

@@ -62,6 +62,9 @@ class SUBnoteParameters : public Presets
         unsigned char PBandWidthEnvelopeEnabled;
         EnvelopeParams *BandWidthEnvelope;
 
+        unsigned char PBendAdjust; // Pitch Bend
+        unsigned char POffsetHz;
+
         // Filter Parameters (Global)
         unsigned char PGlobalFilterEnabled;
         FilterParams *GlobalFilter;
@@ -87,7 +90,7 @@ class SUBnoteParameters : public Presets
             unsigned char par3;
         } POvertoneSpread;
         float POvertoneFreqMult[MAX_SUB_HARMONICS];
-        
+
         unsigned char Pnumstages;   // how many times the filters are applied
         unsigned char Pbandwidth;
 

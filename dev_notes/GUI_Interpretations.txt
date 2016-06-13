@@ -1,0 +1,97 @@
+
+data to send from gui
+
+unsigned char   type        (mandatory)
+unsigned char   part        (mandatory)
+unsigned char   kit
+unsigned char   engine
+unsigned char   insert
+unsigned char   insert param
+unsigned char   controller  (mandatory)
+float           value       (mandatory)
+string          name - not using this yet
+
+
+Type bits
+0-4 event button (action to take)
+5   source is GUI (else bits 0-4 = source & action)
+6   read/write data value
+7   round to int (will be sent as float)
+
+Unused chars are set to 0xff as a general test.
+
+e.g.
+If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it
+is main volume, key shift etc.
+
+If part is < 0x40 and kit is 0xff it's the general part level controls, otherwise it's the kit level controls.
+
+If kit >= 0x20 it's the engine enable controls.
+    (kit number ORed with 0x20)
+
+Vector Control
+This uses part number 0xc0
+
+Effects and effect sources.
+In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects.
+For these and normal part effects, 'kit' ORed with 0x80 is used to denote the effect type (reverb echo etc.) and 'engine' is used to denote the
+number of the effect being worked on (the limit depends on the effect
+source). As 'kit' and 'engine' are not relevant for effects it is safe
+to use them here.
+
+Effects 'kit' numbers offset by 0x80.
+
+0   None
+1   Reverb
+2   Echo
+3   Chorus
+4   Phaser
+5   Alienwah
+6   Distorsion
+7   EQ
+8   Dynfilter
+
+These can't be inserts, as Dynefilter has Filter as an insert!
+
+
+engine
+0       addsynth
+1       subsynth
+2       padsynth
+>= 0xC0 adsynth voice modulator
+>= 0x80 addsynth voice
+
+
+inserts
+0   lfo
+1   filter
+2   envelope base
+3   envelope graph X
+4   envelope graph Y
+
+5   oscillator (for add voice & pad harmonics)
+6   oscillator harmonic amplitude (for add voice & pad)
+    harmonic amplitude (sub)
+7   oscillator harmonic phase (add, pad)
+    harmonc bandwidth (sub)
+
+8   resonance base (for add & pad harmonics)
+9   resonance graph
+
+16  System effect sends
+
+
+insert param
+    type
+        lfo
+            0 = Amplitude
+            1 = Frequency
+            2 = Filter
+
+        envelope
+            0 = Amplitude
+            1 = Frequency
+            2 = Filter
+
+       envelope free mode
+            0 to 39 = point number

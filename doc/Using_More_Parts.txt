@@ -18,3 +18,31 @@ Ummm, you do need a decent processor though :)
 
 Yes, I know you could run more instances of Yoshimi on different MIDI ports, but
 where's the fun in that?
+
+
+Another possibility is getting really smooth transitions between different sounds on the same channel.
+
+If you use program change to do this, that part has to be muted, and there is a variable time lag (while the new part is loaded) before you can play any more notes on that channel. However, with 32 and 64 parts you can actually overlap notes with different instruments on a playing channel.
+
+This is done by pre-loading the wanted instruments, then switching channel numbers. If (via the direct part NRPN) you add 16 to a sounding part's channel number it will then only respond to note-off events. To bring it back into operation simply restore the original channel number.
+
+An example:
+
+Enable 32 parts
+
+Load 'Simple Chimes' into part 0 (part 1 in the GUI).
+Load 'Silver Bell' into part 16 (part 17 in the GUI).
+In your sequencer, via direct part NRPN set part 16 to channel 16.
+    This will now be 'whited out' in the GUI
+
+Record some notes to channel 0 - usually represented in sequencers as channel 1 - yes I know this gets confusing :(
+
+In your sequencer just before the first note that you want to sound as 'Silver Bell' insert two direct part NRPNs. One to set part 0 to channel 16, and the other to set part 16 to channel 0.
+
+Now when you play this through, the last 'Simple Chimes' note will have it's full release and reverb tail, blending into the first 'Silver Bell' note.
+
+When you want to go back to using 'Simple Chimes' just reverse the NRPNs.
+
+The only time this gets complicated is if the new note is exactly the same pitch as the old one, in which case the NRPNs need to be between the old note-off and the new note-on.
+
+Some of this control is now made easier with the new shortform NRPNs. See doc/Shortform_NRPN for details.

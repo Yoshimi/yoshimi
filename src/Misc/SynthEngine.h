@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2015, Will Godfrey & others
+    Copyright 2014-2016, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified January 2015
+    This file is derivative of ZynAddSubFX original code, last modified March 2016
 */
 
 #ifndef SYNTHENGINE_H
@@ -54,12 +54,12 @@ class MasterUI;
 
 class SynthEngine : private SynthHelper, MiscFuncs
 {
-    private:    
+    private:
         unsigned int uniqueId;
         bool isLV2Plugin;
         Bank bank;
         Config Runtime;
-        PresetsStore presetsstore;        
+        PresetsStore presetsstore;
     public:
         SynthEngine(int argc, char **argv, bool _isLV2Plugin = false, unsigned int forceId = 0);
         ~SynthEngine();
@@ -76,9 +76,13 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int loadPatchSetAndUpdate(string filename);
         bool installBanks(int instance);
         bool saveBanks(int instance);
-        bool loadHistory(int instance);
-        bool saveHistory(int instance);
-        
+        void addHistory(string name, int group);
+        vector<string> * getHistory(int group);
+        bool loadHistory(void);
+        bool saveHistory(void);
+        bool loadVector(unsigned char baseChan, string name, bool full);
+        bool saveVector(unsigned char baseChan, string name, bool full);
+
         bool getfromXML(XMLwrapper *xml);
 
         int getalldata(char **data);
@@ -91,17 +95,42 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetEffects(unsigned char category, unsigned char command, unsigned char nFX, unsigned char nType, int nPar, unsigned char value);
         void SetBankRoot(int rootnum);
         void SetBank(int banknum);
+        int ReadBankRoot(void);
+        int ReadBank(void);
+
+        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+        void commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+        void commandVector(float value, unsigned char type, unsigned char control);
+        void commandMain(float value, unsigned char type, unsigned char control);
+        void commandPart(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
+        void commandAdd(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
+        void commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
+        void commandSub(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char insert);
+        void commandPad(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
+        void commandOscillator(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
+        void commandResonance(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
+        void commandLFO(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
+        void commandFilter(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
+        void commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
+        void commandSysIns(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char engine, unsigned char insert);
+        void commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
+
         void SetProgram(unsigned char chan, unsigned short pgm);
         bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);
         void SetPartDestination(unsigned char npart, unsigned char dest);
+        void SetPartShift(unsigned char npart, unsigned char shift);
         void SetPartPortamento(int npart, bool state);
+        bool ReadPartPortamento(int npart);
+        void SetPartKeyMode(int npart, int mode);
+        int  ReadPartKeyMode(int npart);
         void cliOutput(list<string>& msg_buf, unsigned int lines);
         void ListPaths(list<string>& msg_buf);
         void ListBanks(int rootNum, list<string>& msg_buf);
         void ListInstruments(int bankNum, list<string>& msg_buf);
         void ListCurrentParts(list<string>& msg_buf);
         void ListVectors(list<string>& msg_buf);
+        bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         void SetSystemValue(int type, int value);
         void writeRBP(char type, char data0, char data1);
@@ -118,7 +147,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partonoffWrite(int npart, int what);
         bool partonoffRead(int npart);
         sem_t partlock;
-        
+
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
@@ -133,7 +162,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float samplerate_f;
         float halfsamplerate_f;
         int buffersize;
-        float buffersize_f;        
+        float buffersize_f;
         int bufferbytes;
         int oscilsize;
         float oscilsize_f;
@@ -167,10 +196,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         // others ...
         Controller *ctl;
-        Microtonal microtonal;        
+        Microtonal microtonal;
         FFTwrapper *fft;
 
-        // peaks for VU-meters        
+        // peaks for VU-meters
         union VUtransfer{
             struct{
                 float vuOutPeakL;
@@ -183,7 +212,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
             char bytes [sizeof(values)];
         };
         union VUtransfer VUpeak, VUdata;
-        
+
         bool fetchMeterData(VUtransfer *VUdata);
 
         inline bool getIsLV2Plugin() {return isLV2Plugin; }
@@ -218,18 +247,18 @@ class SynthEngine : private SynthHelper, MiscFuncs
         pthread_mutex_t *processLock;
 
         jack_ringbuffer_t *vuringbuf;
-        
+
         jack_ringbuffer_t *RBPringbuf;
         void *RBPthread(void);
         static void *_RBPthread(void *arg);
         pthread_t  RBPthreadHandle;
-        
+
         struct RBP_data {
             char data[4];
         };
-        
+
         XMLwrapper *stateXMLtree;
-        
+
         char random_state[256];
         struct random_data random_buf;
         int32_t random_result;

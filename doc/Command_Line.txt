@@ -2,14 +2,14 @@ When running from the command line, once the 'up and running' message has been s
 
 Commands are not case sensitive and an invalid one will return a message that attempts to highlight the problem.
 
-There are a group of commands that are always available. These are 
+There are a group of commands that are always available. These are
 
 ? (Help)
 List
 RESet
 EXit
 
-Apart from these, the command line works on a system of context levels, and normally only the commands relevant to that level will be available. 
+Apart from these, the command line works on a system of context levels, and normally only the commands relevant to that level will be available.
 
 Often you only need the first letter of a command - as long as it is unabiguous. The above examples show their minimum abbreviations in capitals. However, Yoshimi is quite pedantic, and if you type the command in full it must be exactly correct!
 
@@ -25,41 +25,46 @@ Enter:
 
 and the prompt will change to:
 
-yoshimi part 2 >
+yoshimi part 2 on >
 
 This will set part number 2 to program number 107 from the current instrument bank.
 
 You are now on part 2 as the current part and all commands will now relate to this. At this level you can change the current part simply with:
 
 "s 4"
-yoshimi part 4 >
+yoshimi part 4 off >
 
-You are now on part number 4.
+You are now on part number 4, but that part is currently disabled.
 
 "s ef ty re"
-yoshimi part 4 FX 0 rever >
+yoshimi part 4 off FX 0 REver-0 >
 
 Sets the part's effect 0 to type 'reverb'
 
-Note that many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
+Even thogh the part is disabled you can still set up its chnaraxcteristics. Also, notice the two capitals in reverb, these remind you of the minimum abbreviation.
+
+Many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
+
 
 From here you can set a preset for this effect:
 
 "s pre 3"
 
-Currently the presets are not shown in the prompt, but you will get a confirmation message.
+yoshimi part 4 off FX 0 REver-3 >
 
-Settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
+Currently the presets are shown only numerically in the prompt.
 
-"s p 4 ef 2 ty re"
-yoshimi part 4 FX 2 rever >
+from the top leveve, settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
 
-You can't combine type and preset as thay are both at the same level.
+"s p 5 ef 2 ty re"
+yoshimi part 5 off FX 2 REver-0 >
+
+You can't combine type and preset as they are both at the same level.
 
 To go back one level:
 
 ".."
-yoshimi part 4 >
+yoshimi part 5 off>
 
 and to go back to the top:
 
@@ -69,9 +74,9 @@ yoshimi >
 These last can also be put on the front of any other command.
 Starting where we were before:
 
-yoshimi part 4 FX 2 rever >
+yoshimi part 4 off FX 2 REver-3 >
 " ..s vol 70"
-yoshimi part 4 >
+yoshimi part 4 off>
 
 part 4 volume is now at 70, and you are once again at part level, not part FX level.
 
@@ -83,7 +88,7 @@ As well as an immediate history Yoshimi maintains a command history file, so pro
 
 Originally this file contained the currently implemented commands, but as this is very much a moving target, it is simpler to just ask you to run Yoshimi and type "?"
 
-Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated. 
+Commands with '*' in the description need the setup to be saved, and Yoshimi restarted to be activated.
 
 More will be added, and the organisation of them may be changed slightly.
 

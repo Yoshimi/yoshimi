@@ -26,12 +26,12 @@ Yoshimi responds to the following messages.
 123: All Notes OFF
 
 Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
-     There is now an option for making Program Change enable a part if it's currently disabled.
+There is also an option for making Program Change enable a part if it's currently disabled.
 
-Key pressure (aftertouch) is internally translated as CC 900
+Key pressure (aftertouch) is internally translated as CC 900 but not currently implemented.
 
-Channel Pressure in internally translated as CC 901
-     
+Channel Pressure in internally translated as CC 901 but not currently implemented.
+
 Pitch Bend is internally translated as CC 1000
 
 * different to the official GM spec.

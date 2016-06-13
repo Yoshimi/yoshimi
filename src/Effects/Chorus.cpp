@@ -127,6 +127,7 @@ void Chorus::out(float *smpsl, float *smpsr)
     }
 }
 
+
 // Cleanup the effect
 void Chorus::cleanup(void)
 {
@@ -192,11 +193,24 @@ void Chorus::setpreset(unsigned char npreset)
         {64, 64, 55, 105, 0, 24, 39, 19, 17, 0, 0, 1 }
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
 }
 
 

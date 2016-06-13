@@ -54,6 +54,7 @@ SVFilter::~SVFilter()
         fftwf_free(tmpismp);
 }
 
+
 void SVFilter::cleanup()
 {
     for (int i = 0; i < MAX_FILTER_STAGES + 1; ++i)
@@ -61,6 +62,7 @@ void SVFilter::cleanup()
     oldabovenq = 0;
     abovenq = 0;
 }
+
 
 void SVFilter::computefiltercoefs(void)
 {
@@ -98,11 +100,13 @@ void SVFilter::setfreq(float frequency)
     firsttime = 0;
 }
 
+
 void SVFilter::setfreq_and_q(float frequency, float q_)
 {
     q = q_;
     setfreq(frequency);
 }
+
 
 void SVFilter::setq(float q_)
 {
@@ -110,17 +114,20 @@ void SVFilter::setq(float q_)
     computefiltercoefs();
 }
 
+
 void SVFilter::settype(int type_)
 {
     type = type_;
     computefiltercoefs();
 }
 
+
 void SVFilter::setgain(float dBgain)
 {
     gain = dB2rap(dBgain);
     computefiltercoefs();
 }
+
 
 void SVFilter::setstages(int stages_)
 {
@@ -130,6 +137,7 @@ void SVFilter::setstages(int stages_)
     cleanup();
     computefiltercoefs();
 }
+
 
 void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
 {
@@ -159,6 +167,7 @@ void SVFilter::singlefilterout(float *smp, fstage &x, parameters &par)
         smp[i] = *out;
     }
 }
+
 
 void SVFilter::filterout(float *smp)
 {

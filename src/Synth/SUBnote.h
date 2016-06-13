@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2010 Alan Calvert
-    Copyright 2014, Will Godfrey    
+    Copyright 2014, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -68,6 +68,8 @@ class SUBnote : public Carcass, private SynthHelper
         int firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
         int start; // how the harmonics start
         float basefreq;
+        float BendAdjust;
+        float OffsetHz;
         float randpanL;
         float randpanR;
 
@@ -115,7 +117,7 @@ class SUBnote : public Carcass, private SynthHelper
 
         float overtone_rolloff[MAX_SUB_HARMONICS];
         float overtone_freq[MAX_SUB_HARMONICS];
-        
+
         float *tmpsmp;
         float *tmprnd; // this is filled with random numbers
 

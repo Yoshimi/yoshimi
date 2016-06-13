@@ -58,11 +58,13 @@ EnvelopeParams::EnvelopeParams(unsigned char Penvstretch_,
     store2defaults();
 }
 
+
 float EnvelopeParams::getdt(char i)
 {
     float result = (powf(2.0f, Penvdt[(int)i] / 127.0f * 12.0f) - 1.0f) * 10.0f; // miliseconds
     return result;
 }
+
 
 // ADSR/ASR... initialisations
 void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
@@ -78,6 +80,7 @@ void EnvelopeParams::ADSRinit(char A_dt, char D_dt, char S_val, char R_dt)
     store2defaults();
 }
 
+
 void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
 {
     setpresettype("Penvamplitude");
@@ -91,6 +94,7 @@ void EnvelopeParams::ADSRinit_dB(char A_dt, char D_dt, char S_val, char R_dt)
     store2defaults();
 }
 
+
 void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
 {
     setpresettype("Penvfrequency");
@@ -103,6 +107,7 @@ void EnvelopeParams::ASRinit(char A_val, char A_dt, char R_val, char R_dt)
     converttofree();
     store2defaults();
 }
+
 
 void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_dt, char R_dt, char R_val)
 {
@@ -119,6 +124,7 @@ void EnvelopeParams::ADSRinit_filter(char A_val, char A_dt, char D_val, char D_d
     store2defaults();
 }
 
+
 void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
 {
     setpresettype("Penvbandwidth");
@@ -132,10 +138,12 @@ void EnvelopeParams::ASRinit_bw(char A_val, char A_dt, char R_val, char R_dt)
     store2defaults();
 }
 
+
 // Convert the Envelope to freemode
 void EnvelopeParams::converttofree(void)
 {
-    switch (Envmode) {
+    switch (Envmode)
+    {
     case 1:
         Penvpoints = 4;
         Penvsustain = 2;
@@ -147,6 +155,7 @@ void EnvelopeParams::converttofree(void)
         Penvdt[3] = PR_dt;
         Penvval[3] = 0;
         break;
+
     case 2:
         Penvpoints = 4;
         Penvsustain = 2;
@@ -158,6 +167,7 @@ void EnvelopeParams::converttofree(void)
         Penvdt[3] = PR_dt;
         Penvval[3] = 0;
         break;
+
     case 3:
         Penvpoints = 3;
         Penvsustain = 1;
@@ -167,6 +177,7 @@ void EnvelopeParams::converttofree(void)
         Penvdt[2] = PR_dt;
         Penvval[2] = PR_val;
         break;
+
     case 4:
         Penvpoints = 4;
         Penvsustain = 2;
@@ -178,6 +189,7 @@ void EnvelopeParams::converttofree(void)
         Penvdt[3] = PR_dt;
         Penvval[3] = PR_val;
         break;
+
     case 5:
         Penvpoints = 3;
         Penvsustain = 1;
@@ -189,6 +201,7 @@ void EnvelopeParams::converttofree(void)
         break;
     }
 }
+
 
 void EnvelopeParams::add2XML(XMLwrapper *xml)
 {
@@ -206,8 +219,10 @@ void EnvelopeParams::add2XML(XMLwrapper *xml)
     xml->addpar("S_val",PS_val);
     xml->addpar("R_val",PR_val);
 
-    if ((Pfreemode!=0)||(!xml->minimal)) {
-        for (int i=0;i<Penvpoints;i++) {
+    if ((Pfreemode!=0)||(!xml->minimal))
+    {
+        for (int i=0;i<Penvpoints;i++)
+        {
             xml->beginbranch("POINT",i);
             if (i!=0) xml->addpar("dt",Penvdt[i]);
             xml->addpar("val",Penvval[i]);
@@ -215,6 +230,7 @@ void EnvelopeParams::add2XML(XMLwrapper *xml)
         }
     }
 }
+
 
 void EnvelopeParams::getfromXML(XMLwrapper *xml)
 {
@@ -233,7 +249,8 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
     PS_val=xml->getpar127("S_val",PS_val);
     PR_val=xml->getpar127("R_val",PR_val);
 
-    for (int i=0;i<Penvpoints;i++) {
+    for (int i=0;i<Penvpoints;i++)
+    {
         if (xml->enterbranch("POINT",i)==0) continue;
         if (i!=0) Penvdt[i]=xml->getpar127("dt",Penvdt[i]);
         Penvval[i]=xml->getpar127("val",Penvval[i]);
@@ -243,6 +260,7 @@ void EnvelopeParams::getfromXML(XMLwrapper *xml)
     if (!Pfreemode)
         converttofree();
 }
+
 
 void EnvelopeParams::defaults(void)
 {
@@ -259,6 +277,7 @@ void EnvelopeParams::defaults(void)
     Pfreemode = 0;
     converttofree();
 }
+
 
 void EnvelopeParams::store2defaults(void)
 {

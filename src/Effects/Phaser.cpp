@@ -84,7 +84,7 @@ Phaser::~Phaser()
         delete [] oldl;
     if (oldr != NULL)
         delete [] oldr;
-    
+
     if(xn1l)
         delete[] xn1l;
     if(yn1l)
@@ -116,15 +116,16 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     float gr;
     float hpfl = 0;
     float hpfr = 0;
-    
+
     lfo.effectlfoout(&lfoVall, &lfoValr);
     modl = lfoVall * width + (depth - 0.5f);
     modr = lfoValr * width + (depth - 0.5f);
 
     modl = limit(modl, ZERO_, ONE_);
     modr = limit(modr, ZERO_, ONE_);
-    
-    if(Phyper) {
+
+    if(Phyper)
+    {
         // Triangle wave squared is approximately sin on bottom, tri on top
         // Result is exponential sweep more akin to filter in synth with
         // exponential generator circuitry.
@@ -144,14 +145,16 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
     oldlgain = modl;
     oldrgain = modr;
 
-   for(int i = 0; i < synth->p_buffersize; ++i) {
+   for(int i = 0; i < synth->p_buffersize; ++i)
+   {
         gl += diffl; // Linear interpolation between LFO samples
         gr += diffr;
 
         float xnl(smpsl[i] * pangainL);
         float xnr(smpsr[i] * pangainR);
 
-        if(barber) {
+        if(barber)
+        {
             gl = fmodf((gl + 0.25f), ONE_);
             gr = fmodf((gr + 0.25f), ONE_);
         }
@@ -165,8 +168,9 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
         efxoutl[i] = xnl;
         efxoutr[i] = xnr;
     }
-    
-    if(Poutsub) {
+
+    if(Poutsub)
+    {
         invSignal(efxoutl, synth->p_buffersize);
         invSignal(efxoutr, synth->p_buffersize);
     }
@@ -176,7 +180,8 @@ void Phaser::AnalogPhase(float *smpsl, float *smpsr)
 float Phaser::applyPhase(float x, float g, float fb,
                          float &hpf, float *yn1, float *xn1)
 {
-    for(int j = 0; j < Pstages; ++j) { //Phasing routine
+    for(int j = 0; j < Pstages; ++j)
+    { //Phasing routine
         mis = 1.0f + offsetpct * offset[j];
 
         // This is symmetrical.
@@ -312,11 +317,13 @@ void Phaser::setdistortion(unsigned char Pdistortion_)
     distortion = (float)Pdistortion / 127.0f;
 }
 
+
 void Phaser::setoffset(unsigned char Poffset_)
 {
     Poffset = Poffset_;
     offsetpct     = (float)Poffset / 127.0f;
 }
+
 
 void Phaser::setstages(unsigned char Pstages_)
 {
@@ -332,7 +339,7 @@ void Phaser::setstages(unsigned char Pstages_)
         delete[] xn1r;
     if(yn1r)
         delete[] yn1r;
-    
+
     Pstages = (Pstages_ >= MAX_PHASER_STAGES) ? MAX_PHASER_STAGES - 1 : Pstages_;
     oldl = new float[Pstages * 2];
     oldr = new float[Pstages * 2];
@@ -386,11 +393,24 @@ void Phaser::setpreset(unsigned char npreset)
         {64, 64, 1,   10,  1, 64,  70,  40,  12, 10,  0, 110,1,  20,
          1 }
     };
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
 }
 
 
@@ -401,52 +421,66 @@ void Phaser::changepar(int npar, unsigned char value)
         case 0:
             setvolume(value);
             break;
+
         case 1:
             setpanning(value);
             break;
+
         case 2:
             lfo.Pfreq = value;
             lfo.updateparams();
             break;
+
         case 3:
             lfo.Prandomness = value;
             lfo.updateparams();
             break;
+
         case 4:
             lfo.PLFOtype = value;
             lfo.updateparams();
             barber = (2 == value);
             break;
+
         case 5:
             lfo.Pstereo = value;
             lfo.updateparams();
             break;
+
         case 6:
             setdepth(value);
             break;
+
         case 7:
             setfb(value);
             break;
+
         case 8:
             setstages(value);
             break;
+
         case 9:
             setlrcross(value);
             setoffset(value);
             break;
+
         case 10:
             Poutsub = (value > 1) ? 1 : value;
             break;
+
         case 11:
             setphase(value);
             setwidth(value);
             break;
+
         case 12:
             Phyper = min((int)value, 1);
             break;
+
         case 13:
             setdistortion(value);
             break;
+
         case 14:
             Panalog = value;
             break;

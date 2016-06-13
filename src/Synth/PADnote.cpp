@@ -82,6 +82,14 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         }
     }
 
+    int BendAdj = pars->PBendAdjust - 64;
+    if (BendAdj % 24 == 0)
+        BendAdjust = BendAdj / 24;
+    else
+        BendAdjust = BendAdj / 24.0f;
+    float offset_val = (pars->POffsetHz - 64)/64.0f;
+    OffsetHz = 15.0f*(offset_val * sqrtf(fabsf(offset_val)));
+
     realfreq = basefreq;
     NoteGlobalPar.Detune = getDetune(pars->PDetuneType, pars->PCoarseDetune, pars->PDetune);
 
@@ -119,7 +127,7 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         randpanL = cosf(t * HALFPI);
         randpanR = cosf((1.0f - t) * HALFPI);
     }
-    
+
     NoteGlobalPar.FilterCenterPitch =
         pars->GlobalFilter->getfreq() + // center freq
             pars->PFilterVelocityScale / 127.0 * 6.0
@@ -138,7 +146,8 @@ PADnote::PADnote(PADnoteParameters *parameters, Controller *ctl_, float freq,
         float time = powf(10.0f, 3.0f * pars->PPunchTime / 127.0f) / 10000.0f; // 0.1 .. 100 ms
         float stretch = powf(440.0f / freq, pars->PPunchStretch / 64.0f);
         NoteGlobalPar.Punch.dt = 1.0f / (time * synth->samplerate_f * stretch);
-    } else
+    }
+    else
         NoteGlobalPar.Punch.Enabled = 0;
 
     NoteGlobalPar.FreqEnvelope = new Envelope(pars->FreqEnvelope, basefreq, synth);
@@ -203,7 +212,9 @@ void PADnote::PADlegatonote(float freq, float velocity,
             {
                 Legato.fade.m = 0.0;
                 Legato.msg = LM_FadeIn;
-            } else {
+            }
+            else
+            {
                 Legato.fade.m = 1.0;
                 Legato.msg = LM_FadeOut;
                 return;
@@ -367,7 +378,7 @@ void PADnote::computecurrentparameters()
     }
 
     realfreq = basefreq * portamentofreqrap * powf(2.0f, globalpitch / 12.0)
-               * ctl->pitchwheel.relfreq;
+               * powf(ctl->pitchwheel.relfreq, BendAdjust) + OffsetHz;
 }
 
 
@@ -519,7 +530,8 @@ int PADnote::noteout(float *outl,float *outr)
             outl[i] *= tmpvol * pangainL;
             outr[i] *= tmpvol * pangainR;
         }
-    } else
+    }
+    else
     {
         for (int i = 0; i < synth->p_buffersize; ++i)
         {
@@ -529,7 +541,8 @@ int PADnote::noteout(float *outl,float *outr)
     }
 
     // Apply legato-specific sound signal modifications
-    if (Legato.silent) { // Silencer
+    if (Legato.silent)
+    { // Silencer
         if (Legato.msg != LM_FadeIn)
         {
             memset(outl, 0, synth->p_bufferbytes);
@@ -557,6 +570,7 @@ int PADnote::noteout(float *outl,float *outr)
                 }
             }
             break;
+
         case LM_FadeIn : // Fade-in
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
@@ -576,6 +590,7 @@ int PADnote::noteout(float *outl,float *outr)
                 outr[i] *= Legato.fade.m;
             }
             break;
+
         case LM_FadeOut : // Fade-out, then set the catch-up
             if (Legato.decounter == -10)
                 Legato.decounter = Legato.fade.length;
@@ -608,10 +623,10 @@ int PADnote::noteout(float *outl,float *outr)
                 outr[i] *= Legato.fade.m;
             }
             break;
+
         default :
             break;
     }
-
 
     // Check if the global amplitude is finished.
     // If it does, disable the note

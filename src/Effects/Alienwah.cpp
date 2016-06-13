@@ -172,13 +172,26 @@ void Alienwah::setpreset(unsigned char npreset)
         { 93, 64, 25, 0, 1, 66, 101, 11, 47, 0, 86 }
     };
 
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    if (insertion == 0)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if this is system effect
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        if (insertion)
+            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
 }
 
 

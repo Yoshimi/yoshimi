@@ -27,3 +27,11 @@ Minor version 3
 
 
 If using Fluid to edit GUI files, please close all windows and collapse all menus *before* the last save. I know it's tedious, but it avoids storms of spurious 'changes' that make genuine ones harder to see.
+
+
+
+Please try to avoid creating trailing whitespace.
+
+
+
+We now implement a build number. This is only bumped up when I push new commits to master (both github and sourceforge) so may represent several actual commits.

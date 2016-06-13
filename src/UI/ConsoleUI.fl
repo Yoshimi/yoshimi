@@ -1,8 +1,9 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
+Copyright 2015-2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -50,8 +51,9 @@ class ConsoleUI {selected
   }
   Function {ConsoleUI()} {} {
     code {//
+    bufsize = 8192;
     make_window();
-    txtbuf = new Fl_Text_Buffer(8192);
+    txtbuf = new Fl_Text_Buffer(bufsize);
     logText->buffer(txtbuf);} {}
   }
   Function {Show()} {} {
@@ -66,12 +68,16 @@ class ConsoleUI {selected
         delete txtbuf;} {}
   }
   Function {log(string msg)} {} {
-    code {txtbuf->append(msg.c_str());
-      txtbuf->append(string("\\n").c_str());
-      logConsole->redraw();
-      if (txtbuf->length() > 8000)
-        txtbuf->remove(0, txtbuf->line_end(1));} {}
+    code {//
+    msg += "\\n";
+    txtbuf->insert(0, msg.c_str());
+    logConsole->redraw();
+    int endpos = txtbuf->length();
+    if (endpos > (bufsize - 256))
+        txtbuf->remove(txtbuf->line_start(bufsize - 256), endpos);} {}
   }
   decl {Fl_Text_Buffer *txtbuf;} {private local
+  }
+  decl {int bufsize;} {private local
   }
 } 

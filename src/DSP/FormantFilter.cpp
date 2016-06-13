@@ -76,6 +76,7 @@ FormantFilter::FormantFilter(FilterParams *pars, SynthEngine *_synth):
     firsttime = 1;
 }
 
+
 FormantFilter::~FormantFilter()
 {
     for (int i = 0; i < numformants; ++i)
@@ -90,6 +91,7 @@ void FormantFilter::cleanup()
     for (int i = 0; i < numformants; ++i)
         formant[i]->cleanup();
 }
+
 
 void FormantFilter::setpos(float input)
 {
@@ -169,10 +171,12 @@ void FormantFilter::setpos(float input)
     oldQfactor = Qfactor;
 }
 
+
 void FormantFilter::setfreq(float frequency)
 {
     setpos(frequency);
 }
+
 
 void FormantFilter::setq(float q_)
 {
@@ -181,6 +185,7 @@ void FormantFilter::setq(float q_)
         formant[i]->setq(Qfactor * currentformants[i].q);
 }
 
+
 void FormantFilter::setfreq_and_q(float frequency, float q_)
 {
 /*     //Convert form real freq[Hz]
@@ -188,6 +193,7 @@ void FormantFilter::setfreq_and_q(float frequency, float q_)
    Qfactor = q_;
     setpos(frequency); // setpos(freq) // zyn code doesn't seem to do anything ???
 }
+
 
 void FormantFilter::filterout(float *smp)
 {

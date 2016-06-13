@@ -216,7 +216,6 @@ void Reverb::out(float *smps_l, float *smps_r)
 
 
 // Parameter control
-
 void Reverb::setvolume(unsigned char Pvolume_)
 {
     Pvolume = Pvolume_;
@@ -466,14 +465,26 @@ void Reverb::setpreset(unsigned char npreset)
         // VeryLong2
         {90,  64,  111, 30,  0,  0,  0, 114, 90, 74,   1,  80,  20 }
     };
-
-    if (npreset >= NUM_PRESETS)
-        npreset = NUM_PRESETS - 1;
-    for (int n = 0; n < PRESET_SIZE; ++n)
-        changepar(n, presets[npreset][n]);
-    if (insertion)
-        changepar(0, presets[npreset][0] / 2); // lower the volume if reverb is insertion effect
-    Ppreset = npreset;
+    if (npreset < 0xf)
+    {
+        if (npreset >= NUM_PRESETS)
+            npreset = NUM_PRESETS - 1;
+        for (int n = 0; n < PRESET_SIZE; ++n)
+            changepar(n, presets[npreset][n]);
+        if (insertion)
+            changepar(0, presets[npreset][0] / 2); // lower the volume if this is insertion effect
+        Ppreset = npreset;
+    }
+    else
+    {
+        unsigned char preset = npreset & 0xf;
+        unsigned char param = npreset >> 4;
+        if (param == 0xf)
+            param = 0;
+        changepar(param, presets[preset][param]);
+        if (insertion && (param == 0))
+            changepar(0, presets[preset][0] / 2);
+    }
 }
 
 

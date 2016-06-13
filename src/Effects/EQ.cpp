@@ -56,6 +56,7 @@ void EQ::cleanup(void)
     }
 }
 
+
 // Effect output
 void EQ::out(float *smpsl, float *smpsr)
 {
@@ -132,24 +133,28 @@ void EQ::changepar(int npar, unsigned char value)
                 filter[nb].r->settype(value - 1);
             }
             break;
+
         case 1:
             filter[nb].Pfreq = value;
             tmp = 600.0f * powf(30.0f, (value - 64.0f) / 64.0f);
             filter[nb].l->setfreq(tmp);
             filter[nb].r->setfreq(tmp);
             break;
+
         case 2:
             filter[nb].Pgain = value;
             tmp = 30.0f * (value - 64.0f) / 64.0f;
             filter[nb].l->setgain(tmp);
             filter[nb].r->setgain(tmp);
             break;
+
         case 3:
             filter[nb].Pq = value;
             tmp = powf(30.0f, (value - 64.0f) / 64.0f);
             filter[nb].l->setq(tmp);
             filter[nb].r->setq(tmp);
             break;
+
         case 4:
             filter[nb].Pstages = value;
             if (value >= MAX_FILTER_STAGES)
@@ -159,6 +164,7 @@ void EQ::changepar(int npar, unsigned char value)
             break;
     }
 }
+
 
 unsigned char EQ::getpar(int npar)
 {
@@ -180,15 +186,19 @@ unsigned char EQ::getpar(int npar)
         case 0:
             return(filter[nb].Ptype);
             break;
+
         case 1:
             return(filter[nb].Pfreq);
             break;
+
         case 2:
             return(filter[nb].Pgain);
             break;
+
         case 3:
             return(filter[nb].Pq);
             break;
+
         case 4:
             return(filter[nb].Pstages);
             break;

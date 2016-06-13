@@ -1,0 +1,9 @@
+voice aftertouch
+A0-AF
+becomes CC 900
+but don't yet know how to interpret (or claim extra parameter)
+
+channel aftertouch
+D0 = DF
+becomes CC 901
+but not implemented yet

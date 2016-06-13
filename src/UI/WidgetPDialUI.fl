@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {WidgetPDial.h} {not_in_source in_header
@@ -8,10 +8,10 @@ comment {WidgetPDial.h} {not_in_source in_header
 comment {WidgetPDial.cc} {in_source not_in_header
 } 
 
-comment {
-Original ZynAddSubFX author Nasca Octavian Paul
+comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
+Copyright 2016 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -44,7 +44,7 @@ decl {\#include <FL/fl_draw.H>
     \#include <cairo/cairo-xlib.h>} {private global
 } 
 
-class TipWin {open : {public Fl_Menu_Window, MiscFuncs}
+class TipWin {: {public Fl_Menu_Window, MiscFuncs}
 } {
   Function {TipWin():Fl_Menu_Window(1,1)} {} {
     code {tip.clear();
@@ -108,10 +108,11 @@ class TipWin {open : {public Fl_Menu_Window, MiscFuncs}
   }
 } 
 
-class WidgetPDial {open : {public Fl_Dial}
+class WidgetPDial {: {public Fl_Dial}
 } {
   Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
-    code {callback(value_cb, (void*)this);
+    code {//
+	callback(value_cb, (void*)this);
         Fl_Group *save = Fl_Group::current();
         tipwin = new TipWin();
         tipwin->hide();
@@ -120,53 +121,69 @@ class WidgetPDial {open : {public Fl_Dial}
         pos = false;
         textset = false;} {}
   }
+  Function {init(float home_ = -1)} {} {
+    code {home = home_;} {}
+  }
   Function {~WidgetPDial()} {} {
     code {delete tipwin;} {}
   }
-  Function {handle(int event)} {open return_type int
+  Function {handle(int event)} {return_type int
   } {
     code {double dragsize, v, min = minimum(), max = maximum();
         int my;
         int mx;
+        
         switch (event)
         {
             case FL_PUSH:
-                 oldvalue = value();
+                if (home > -0.5f && Fl::event_button() == 3)
+        	{
+            	    value(home);
+            	    value_damage();
+            	    if (this->when() != 0)
+                         do_callback();
+                    return 1;
+        	}
+                oldvalue = value();
             case FL_DRAG:
                  if(!pos)
                  {
                      tipwin->position(Fl::event_x_root(), Fl::event_y_root() + 20);
                      pos = true;
                  }
-                 tipwin->value(value());
+                 if (step() >= 1)
+                     tipwin->value((int)value());
+                 else
+                     tipwin->value(value());
                  tipwin->show();
-                 my = -(Fl::event_y() - y() - h() / 2);
-                 mx = -(Fl::event_x() - x() - w() / 2);
-                 my = (my - mx);
+                 my = -((Fl::event_y() - y()) * 2 - h());
+                 mx = ((Fl::event_x() - x()) * 2 - w());
+                 my = (my + mx);
 
                  dragsize = 200.0;
-                 if (Fl::event_state(FL_BUTTON1) == 0)
+                 if(Fl::event_state(FL_CTRL) != 0)
                      dragsize *= 10;
-
-                 v = oldvalue + my / dragsize * (max - min);
-                 if (v < min)
-                     v = min;
-                 else if (v > max)
-                     v = max;
-                 // printf("%d   %g    %g\\n",my,v,oldvalue);
-                 value(v);
-                 value_damage();
-                 if (this->when() != 0)
-                     do_callback();
+		 else if (Fl::event_button() == 2)
+		     dragsize *= 3;
+		 if (Fl::event_button() != 3)
+		 {
+		     v = oldvalue + my / dragsize * (max - min);
+                     v = clamp(v);
+                     //printf("%d   %g    %g\\n",my,v,oldvalue);
+                     value(v);
+                     value_damage();
+                     if (this->when() != 0)
+                         do_callback();
+                 }
                  return 1;
                  break;
             case FL_MOUSEWHEEL:
                 if (Fl::belowmouse() != this)
                     return 1;
                 my = - Fl::event_dy();
-                dragsize = 100.0f;
+                dragsize = 25.0f;
                 if(Fl::event_state(FL_CTRL) != 0)
-                    dragsize *= 20;
+                    dragsize *= 10;
                 value(limit(value() + my / dragsize * (max - min), min, max));
                 tipwin->value(value());
                 tipwin->show();
@@ -176,12 +193,7 @@ class WidgetPDial {open : {public Fl_Dial}
                 return 1;
                 break;
             case FL_ENTER:
-                 //if(textset)
-                 /*
-                 Above was moved because it stopped scroll wheel
-                 working when there was no tooltip.
-                 */
-                 {
+                {
                      if(!pos)
                      {
                          tipwin->position(Fl::event_x_root(), Fl::event_y_root() + 20);
@@ -312,5 +324,7 @@ class WidgetPDial {open : {public Fl_Dial}
   decl {double oldvalue;} {private local
   }
   decl {TipWin *tipwin;} {private local
+  }
+  decl {float home;} {private local
   }
 } 

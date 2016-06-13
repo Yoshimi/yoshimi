@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0302 
+version 1.0303 
 header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2015, Will Godfrey    
+Copyright 2014-2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -32,6 +32,9 @@ This file is a derivative of the ZynAddSubFX original, modified October 2014
 } 
 
 decl {\#include <string>} {public local
+} 
+
+decl {\#include <iostream>} {public local
 } 
 
 decl {using namespace std;} {public local
@@ -71,6 +74,9 @@ decl {\#include "ConsoleUI.h"} {public local
 } 
 
 decl {\#include "MasterUI.h"} {private global
+} 
+
+decl {\#include "WidgetMWSliderUI.h"} {private global
 } 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
@@ -116,123 +122,123 @@ synth = _synth;
   }
   Function {draw_master()} {} {
     code {//
-    int ox = x();
-    int oy = y();
-    int lx = w();
-    int ly = h();
-    float dbl = rap2dB(synth->VUdata.values.vuOutPeakL);
-    float dbr = rap2dB(synth->VUdata.values.vuOutPeakR);
-    float rmsdbl = rap2dB(synth->VUdata.values.vuRmsPeakL);
-    float rmsdbr = rap2dB( synth->VUdata.values.vuRmsPeakR);
-    
-    clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
+            int ox = x();
+            int oy = y();
+            int lx = w();
+            int ly = h();
+            float dbl = rap2dB(synth->VUdata.values.vuOutPeakL);
+            float dbr = rap2dB(synth->VUdata.values.vuOutPeakR);
+            float rmsdbl = rap2dB(synth->VUdata.values.vuRmsPeakL);
+            float rmsdbr = rap2dB( synth->VUdata.values.vuRmsPeakR);
 
-    if (dbl > maxdbl)
-        maxdbl = dbl;
-        if (dbr > maxdbr)
-          maxdbr = dbr;
-       
-        dbl = (MIN_DB - dbl) / MIN_DB;
-        if (dbl < 0.0)
-            dbl = 0.0;
-        else if (dbl > 1.0)
-            dbl = 1.0;
-        dbr = (MIN_DB - dbr) / MIN_DB;
-        if (dbr < 0.0)
-            dbr = 0.0;
-        else if (dbr > 1.0)
-            dbr = 1.0;
-\#      define VULENX (lx-35)
-\#      define VULENY (ly/2-3)
-        dbl *= VULENX;
-        dbr *= VULENX;
+            clipped = clipped | (dbl > 0) | ((dbr > 0) << 1);
 
-        if (dbl >= oldpeakl)
-            oldpeakl = (int)dbl;
-        else if (oldpeakl >= 8)
-            oldpeakl -= 8;
-        else if (oldpeakl)
-            oldpeakl -= 1;
-        if (dbr >= oldpeakr)
-            oldpeakr = (int)dbr;
-        else if (oldpeakr >= 8)
-            oldpeakr -= 8;
-        else if (oldpeakr)
-            oldpeakr -= 1;
+            if (dbl > maxdbl)
+                maxdbl = dbl;
+            if (dbr > maxdbr)
+                maxdbr = dbr;
 
-        // compute RMS - start
-        rmsdbl = ((MIN_DB - rmsdbl) / MIN_DB);
-        if (rmsdbl < 0.0)
-            rmsdbl = 0.0;
-        else if (rmsdbl >  1.0)
-            rmsdbl =  1.0;
-        rmsdbr = ((MIN_DB - rmsdbr) / MIN_DB);
-        if (rmsdbr < 0.0)
-            rmsdbr = 0.0;
-        else if (rmsdbr >1.0)
-            rmsdbr = 1.0;
-        rmsdbl = (rmsdbl + oldrmsdbl * 7) / 8;
-        rmsdbr = (rmsdbr + oldrmsdbr * 7) / 8;
-        oldrmsdbl = rmsdbl;
-        oldrmsdbr = rmsdbr;
-        int irmsdbl = rmsdbl * VULENX;
-        int irmsdbr = rmsdbr * VULENX;
-        // compute RMS - end
+            dbl = (MIN_DB - dbl) / MIN_DB;
+            if (dbl < 0.0)
+                dbl = 0.0;
+            else if (dbl > 1.0)
+                dbl = 1.0;
+            dbr = (MIN_DB - dbr) / MIN_DB;
+            if (dbr < 0.0)
+                dbr = 0.0;
+            else if (dbr > 1.0)
+                dbr = 1.0;
+\#          define VULENX (lx-35)
+\#          define VULENY (ly/2-3)
+            dbl *= VULENX;
+            dbr *= VULENX;
 
-        // draw db level
-        fl_rectf(ox, oy, oldpeakl, VULENY, 0, 200, 255);
-        fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY, 0, 200, 255);
+            if (dbl >= oldpeakl)
+                oldpeakl = (int)dbl;
+            else if (oldpeakl >= 8)
+                oldpeakl -= 8;
+            else if (oldpeakl)
+                oldpeakl -= 1;
+            if (dbr >= oldpeakr)
+                oldpeakr = (int)dbr;
+            else if (oldpeakr >= 8)
+                oldpeakr -= 8;
+            else if (oldpeakr)
+                oldpeakr -= 1;
 
-        // fill with black
-        fl_rectf(ox + oldpeakl, oy, VULENX - oldpeakl, VULENY, 0, 0, 0);
-        fl_rectf(ox + oldpeakr, oy + ly / 2, VULENX - oldpeakr, VULENY, 0, 0, 0);
+            // compute RMS - start
+            rmsdbl = ((MIN_DB - rmsdbl) / MIN_DB);
+            if (rmsdbl < 0.0)
+                rmsdbl = 0.0;
+            else if (rmsdbl >  1.0)
+                rmsdbl =  1.0;
+            rmsdbr = ((MIN_DB - rmsdbr) / MIN_DB);
+            if (rmsdbr < 0.0)
+                rmsdbr = 0.0;
+            else if (rmsdbr >1.0)
+                rmsdbr = 1.0;
+            rmsdbl = (rmsdbl + oldrmsdbl * 7) / 8;
+            rmsdbr = (rmsdbr + oldrmsdbr * 7) / 8;
+            oldrmsdbl = rmsdbl;
+            oldrmsdbr = rmsdbr;
+            int irmsdbl = rmsdbl * VULENX;
+            int irmsdbr = rmsdbr * VULENX;
+            // compute RMS - end
 
-        // draw scale
-        float tmp = VULENX * 1.0 / MIN_DB;
-        for (int i = 1; i < 1 - MIN_DB; ++i)
-        {
-           int tx = VULENX + (int)(tmp * i);
-           fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 160, 200);
-           if (i % 5 == 0)
-               fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 230, 240);
-           if (i % 10 == 0)
-               fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, 0, 225, 255);
-        }
+            // draw db level
+            fl_rectf(ox, oy, oldpeakl, VULENY, 0, 200, 255);
+            fl_rectf(ox, oy + ly / 2, oldpeakr, VULENY, 0, 200, 255);
 
-        // mellow yellow rms indicator
-        if (irmsdbl)
-            fl_rectf(ox + irmsdbl - 1, oy, 3, VULENY, 255, 255, 0);
-        if (irmsdbr)
-            fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, 255, 255, 0);
+            // fill with black
+            fl_rectf(ox + oldpeakl, oy, VULENX - oldpeakl, VULENY, 0, 0, 0);
+            fl_rectf(ox + oldpeakr, oy + ly / 2, VULENX - oldpeakr, VULENY, 0, 0, 0);
 
-        // see red if clipped
-        if (clipped & 1)
-            fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 250, 10, 10);
-        else
-            fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 0, 0, 10);
+            // draw scale
+            float tmp = VULENX * 1.0 / MIN_DB;
+            for (int i = 1; i < 1 - MIN_DB; ++i)
+            {
+                int tx = VULENX + (int)(tmp * i);
+                fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 160, 200);
+                if (i % 5 == 0)
+                    fl_rectf(ox + tx, oy, 1, VULENY + ly / 2, 0, 230, 240);
+                if (i % 10 == 0)
+                    fl_rectf(ox + tx - 1, oy, 2, VULENY + ly / 2, 0, 225, 255);
+            }
 
-        if (clipped & 2)
-            fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 250, 10, 10);
-        else
-            fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 0, 0, 10);
+            // mellow yellow rms indicator
+            if (irmsdbl)
+                fl_rectf(ox + irmsdbl - 1, oy, 3, VULENY, 255, 255, 0);
+            if (irmsdbr)
+                fl_rectf(ox + irmsdbr - 1, oy + ly / 2, 3, VULENY, 255, 255, 0);
 
-        // show maxdB
-        static char tmpstr[8];
-        const char *dbtag = "dB";
-        if ((maxdbl > NO_DB))
-        {
-            fl_font(FL_HELVETICA | FL_BOLD, 9);
-            fl_color(255, 255, 255);
-            snprintf(tmpstr, 7, "%+3.f%s", maxdbl + 0.5f, dbtag);
-            fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
+            // see red if clipped
+            if (clipped & 1)
+                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 250, 10, 10);
+            else
+                fl_rectf(ox + VULENX + 2, oy, lx - VULENX - 3, ly / 2 - 3, 0, 0, 10);
+
+            if (clipped & 2)
+                fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 250, 10, 10);
+            else
+                fl_rectf(ox + VULENX + 2, oy + ly / 2, lx - VULENX - 3, (ly - 2) / 2 - 2, 0, 0, 10);
+
+            // show maxdB
+            static char tmpstr[8];
+            const char *dbtag = "dB";
+            if ((maxdbl > NO_DB))
+            {
+                fl_font(FL_HELVETICA | FL_BOLD, 9);
+                fl_color(255, 255, 255);
+                snprintf(tmpstr, 7, "%+3.f%s", maxdbl + 0.5f, dbtag);
+                fl_draw(tmpstr, ox + VULENX + 1, oy + 1,
                     lx - VULENX - 4, VULENY - 2, FL_ALIGN_RIGHT, NULL, 0);
-        }
-        if ((maxdbr > NO_DB))
-        {
-            fl_font(FL_HELVETICA | FL_BOLD, 9);
-            fl_color(255, 255, 255);
-            snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
-            fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
+            }
+            if ((maxdbr > NO_DB))
+            {
+                fl_font(FL_HELVETICA | FL_BOLD, 9);
+                fl_color(255, 255, 255);
+                snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
+                fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
         }} {}
   }
@@ -249,10 +255,10 @@ synth = _synth;
         fl_rectf(ox + 2, oy + ly + fakedb, lx - 4, -fakedb, 0, 0, 0);
         return;
     }
-        
+
     if (Vpeak > 1.0)
         panelpart.clip[npart + *plgroup] = true;
- 
+
     // draw the vu lines
     float db = rap2dB(Vpeak);
     db = (MIN_DB - db) / MIN_DB;
@@ -264,7 +270,7 @@ synth = _synth;
         panelpart.oldpeak[npart + *plgroup] -= 4;
     else
         panelpart.oldpeak[npart + *plgroup] = 0;
-        
+
     fl_rectf(ox, oy, lx, ly, 0, 0, 0);
     fl_rectf(ox, oy + ly - panelpart.oldpeak[npart + *plgroup], lx, panelpart.oldpeak[npart + *plgroup], 0, 200, 255);
 
@@ -314,7 +320,7 @@ synth = _synth;
                 maxdbr = NO_DB;
                 clipped = 0;
                	MasterUI *masterUI = synth->getGuiMaster(false);
-               	if(masterUI)               
+               	if(masterUI)
                	{
                		masterUI->resetPartsClip();
                	}
@@ -385,9 +391,11 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {if (event == FL_PUSH || event == FL_DRAG)
+    code {//
+	if (event == FL_PUSH || event == FL_DRAG)
         {
             synth->setPsysefxsend(neff1,neff2,value());
+            synth->commandFetch(value(), (Fl::event_button() | 0x20 | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
         }
         return WidgetPDial::handle(event);} {}
   }
@@ -404,7 +412,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
   Function {make_window()} {private
   } {
     Fl_Window panellistitem {
-      private xywh {1195 47 60 275} type Double hide
+      private xywh {1195 44 60 275} type Double hide
       class Fl_Group
     } {
       Fl_Group panellistitemgroup {
@@ -423,15 +431,20 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
           }
         }
         Fl_Box partadd {
-          xywh {5 28 17 27} box FLAT_BOX deactivate
+          xywh {5 25 17 30} box FLAT_BOX deactivate
         }
         Fl_Box partsub {
-          xywh {23 28 17 27} box FLAT_BOX deactivate
+          xywh {22 25 18 30} box FLAT_BOX deactivate
         }
         Fl_Box partpad {
-          xywh {40 28 17 27} box FLAT_BOX deactivate
+          xywh {40 25 17 30} box FLAT_BOX deactivate
         }
-        Fl_Button partname {
+        Fl_Text_Display partname {
+          label test
+          xywh {4 53 55 1} box NO_BOX labelfont 1 labelsize 10 align 193
+          code0 {setPartLabel(findengines(npart | *plgroup));}
+        }
+        Fl_Button partnam {
           label {  }
           callback {//
     if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
@@ -440,23 +453,37 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         bankui->cbwig->do_callback();
     }
     bankui->Show();
-    setPartLabel(findengines(npart | *plgroup));}
-          xywh {4 27 55 30} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
-          code0 {setPartLabel(findengines(npart | *plgroup));}
+    //setPartLabel(findengines(npart | *plgroup));}
+          xywh {4 24 55 33} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
           callback {//
-              synth->part[npart + *plgroup]->setVolume(o->value());
-              synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, o->value());}
-          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1 value 127
-          code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
+        int realvalue;
+	if (Fl::event_button() == 3)
+	{
+	    realvalue = 96;
+	    o->value(127-realvalue);
+	    o->redraw();	    
+	}
+	else
+	    realvalue = 127 - o->value();
+        synth->part[npart + *plgroup]->setVolume(realvalue);
+        synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
+        
+        send_data(0, realvalue);}
+          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
+          code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
+          class mwheel_slider
         }
         Fl_Dial partpanning {
           callback {//
               synth->part[npart + *plgroup]->SetController(C_panning, o->value());
-              synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());}
+              synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
+              
+              send_data(2, o->value());}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
+          code1 {o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -474,9 +501,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         }
         Fl_Choice partrcv {
           callback {//
-              synth->part[npart + *plgroup]->Prcvchn=o->value();
-              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, o->value() + 1);
-              o->textcolor(FL_BLACK);}
+	      int tmp = o->value() & 0xf;
+              synth->part[npart + *plgroup]->Prcvchn = tmp;
+              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
+              o->textcolor(FL_BLACK);
+              
+              send_data(5, tmp);}
           tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -488,7 +518,9 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
           code1 {o->value(synth->part[npart + *plgroup]->Prcvchn);}
         } {}
         Fl_Choice audiosend {
-          callback {synth->SetPartDestination(npart + *plgroup, o->value() + 1);}
+          callback {synth->SetPartDestination(npart + *plgroup, o->value() + 1);
+
+send_data(120, o->value());}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textsize 9
           code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
@@ -521,11 +553,17 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
             }
             if ((int)bankui->cbwig->value() == (npart + 1 + *plgroup))
                 bankui->cbwig->do_callback();
-            o->redraw();}
+            o->redraw();
+            
+            send_data(8, o->value());}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
         code0 {o->value(synth->part[npart + *plgroup]->Penabled);}
       }
     }
+  }
+  Function {send_data(int control, float value, bool isInteger = true)} {} {
+    code {//
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, 0xff, 0xff);} {}
   }
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {npart = 0;
@@ -545,12 +583,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
     code {//
 
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
-	
+
     partenabled->value(synth->part [setpart]->Penabled);
-    
-    setPartLabel(findengines(setpart));        
-    
-    partvolume->value(synth->part[setpart]->Pvolume);
+
+    setPartLabel(findengines(setpart));
+
+    partvolume->value(127 - synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
     int tmpch = synth->part[setpart]->Prcvchn;
     if (tmpch < NUM_MIDI_CHANNELS)
@@ -580,21 +618,21 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   }
   Function {setPartLabel(int engine)} {} {
     code {//
+    partadd->damage(1);
+    partsub->damage(1);
+    partpad->damage(1);
     if (engine & 1)
         partadd->color(ADD_COLOUR);
     else
         partadd->color(BASE_COLOUR);
-    partadd->redraw();
     if (engine & 2)
         partsub->color(SUB_COLOUR);
     else
         partsub->color(BASE_COLOUR);
-    partsub->redraw();
     if (engine & 4)
         partpad->color(PAD_COLOUR);
     else
         partpad->color(BASE_COLOUR);
-    partpad->redraw();
     partname->label(synth->part[npart | *plgroup]->Pname.c_str());} {}
   }
   Function {findengines(int npart)} {return_type {unsigned int}

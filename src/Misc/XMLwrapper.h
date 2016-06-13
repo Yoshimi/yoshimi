@@ -98,7 +98,10 @@ class XMLwrapper : private MiscFuncs
         // the same as getpar, but the limits are 0 and 127
         int getpar127(const string& name, int defaultpar);
 
-        int getparbool(const string& name, int defaultpar);
+         // the same as getpar, but the limits are 0 and 255
+        int getpar255(const string& name, int defaultpar);
+
+       int getparbool(const string& name, int defaultpar);
 
          string getparstr(const string& name);
 
@@ -118,7 +121,7 @@ class XMLwrapper : private MiscFuncs
         // returns "true" if all went ok or "false" on errors
         bool checkfileinformation(const string& filename);
         bool slowinfosearch(char *xmldata);
-        
+
     private:
         char *doloadfile(const string& filename);
 

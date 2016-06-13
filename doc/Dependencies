@@ -2,7 +2,7 @@ Packages known to be needed to build in debian jessie.
 Some of these will pull in other ones.
 
     automake
-    build-essential
+    build-essential * we now require C++11
     cmake-curses-gui
     dssi-dev
     fluid
