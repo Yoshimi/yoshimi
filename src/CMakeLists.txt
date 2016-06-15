@@ -26,7 +26,7 @@ if (POLICY CMP0046)
 endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
-set (YOSHIMI_VERSION "1.4.0")
+set (YOSHIMI_VERSION "1.4.0.1")
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
