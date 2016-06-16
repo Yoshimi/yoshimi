@@ -732,7 +732,7 @@ void SynthEngine::commandFetch(float value, unsigned char type, unsigned char co
      * while testing, this simply sends everything to commandSend but eventually it will
      * partially do the decding and direction via ring buffers for actualy control.
      */
-    //commandSend(value, type, control, part, kit, engine, insert, insertParam);
+    commandSend(value, type, control, part, kit, engine, insert, insertParam);
     return;
 }
 

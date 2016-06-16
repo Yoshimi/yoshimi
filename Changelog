@@ -1,7 +1,13 @@
-yoshimi 1.4.0.1
+yoshimi 1.4.x
 
 2016-6-17 Will
-Bugfix: missing format string in VectorUI :(
+* Added format test to CMakeLists.txt - commented out on pushes.
+* Reinstated identification of controls.
+
+yoshimi 1.4.0.1
+
+2016-6-16 Will
+* Bugfix: missing format string in VectorUI :(
 
 yoshimi 1.4.0
 
