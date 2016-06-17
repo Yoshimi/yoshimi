@@ -27,9 +27,10 @@ endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
-add_definitions(-Werror=format-security)
+#add_definitions(-Wall)
+#add_definitions(-Werror=format-security)
 
-# ^^^ comment this out on pushes ^^^
+# ^^^ comment these two out on pushes ^^^
 
 set (YOSHIMI_VERSION "1.4.0 M")
 
