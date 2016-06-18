@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-6-18 Will
+* Implemented missing 'home' function in formant filter controls.
+* Minor adjustments to formant filter GUI layout.
+
 2016-6-17 Will
 * Added format test to CMakeLists.txt - commented out on pushes.
 * Reinstated identification of controls.
