@@ -176,9 +176,9 @@ The file extension we use is .xvy but this will be added automatically.
 
 As of Yoshimi V 1.4.0 there is also GUI access to vector control. This is currently accessed via the Yoshim drop-down menu (but we may later move it to its own button). This opens a new 'Vectors' window.
 
-Initially most of this is deactivated, but the base channel can already be set to the incomming channel (and part 'column') you want to respond to.
+Initially most of this is deactivated, but the base channel can already be set to the incoming channel (and part 'column') you want to respond to.
 
-As soon as you set an incoming X CC, the rest of the X controls become active, as well as the Y CC spinner. Also, Yoshimi will be set for 32 parts if it is currently 16, and the requred ones will be enabled and checked to ensure that are set to the base channel.
+As soon as you set an incoming X CC, the rest of the X controls become active, as well as the Y CC spinner. Also, Yoshimi will be set for 32 parts if it is currently 16, and the required ones will be enabled and checked to ensure they are set to the base channel.
 
 The two instrument panels behave in the same way as the main parts one, in that clicking on this brings up the instrument selection window.
 
@@ -186,7 +186,7 @@ The previously mentioned features are laid out fairly obviously as drop-down cho
 
 Setting the incoming Y CC is similar. In this case it will set 64 parts if it was a lower figure.
 
-All changes made are immediately effective, however, disabling them will not disable the underlying instruments, nor will it lower the number of avaiable parts. This is done to protect other elements that may have already been been set up.
+All changes made are immediately effective, however, disabling them will not disable the underlying instruments, nor will it lower the number of available parts. This is done to protect other elements that may have already been been set up.
 
 The options menu allows you to load and save complete vector sets, and 'save' will double check that you have a valid set! Vectors appear in the saved histories file, so you can re-fetch a previously managed one.
 

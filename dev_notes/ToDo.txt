@@ -1,4 +1,9 @@
 
+Add gui alerts for no audio and no midi
+
+Add start with default saved state button to settings.
+
+
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
 
@@ -25,6 +30,8 @@ Ampitude LFO depth should be in %
 Frequency LFO depth should be in cents.
 
 Consider filter settings too.
+
+Make LFOs active on sounding notes. Not easy!
 
 
 RPNs (channel based)

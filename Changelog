@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-6-25 Will
+* Created new quick guide as ODF in doc directory.
+* Updated notes.
+* No code changes.
+
 2016-6-18 Will
 * Implemented missing 'home' function in formant filter controls.
 * Minor adjustments to formant filter GUI layout.

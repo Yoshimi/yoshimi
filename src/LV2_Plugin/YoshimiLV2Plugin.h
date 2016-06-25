@@ -46,7 +46,7 @@ private:
    SynthEngine *_synth;
    uint32_t _sampleRate;
    uint32_t _bufferSize;
-   std::string _bundlePath;   
+   std::string _bundlePath;
    LV2_URID_Map _uridMap;
    LV2_Atom_Sequence *_midiDataPort;
    LV2_URID _midi_event_id;
@@ -74,7 +74,7 @@ private:
    void processMidiMessage(const uint8_t *msg);
    void *midiThread(void);
    void *idleThread(void);
-   std::vector <LV2_Program_Descriptor> flatbankprgs;   
+   std::vector <LV2_Program_Descriptor> flatbankprgs;
 public:
    YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
    virtual ~YoshimiLV2Plugin();
@@ -112,7 +112,7 @@ public:
    void selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program);
 
    static void *static_midiThread(void *arg);
-   static void *static_idleThread(void *arg);   
+   static void *static_idleThread(void *arg);
 
    static LV2_State_Status static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
    static LV2_State_Status static_StateRestore(LV2_Handle instance, LV2_State_Retrieve_Function retrieve, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);
@@ -137,7 +137,7 @@ class YoshimiLV2PluginUI: public LV2_External_UI_Widget
 {
 private:
     YoshimiLV2Plugin *_plugin;
-    LV2_External_UI_Host uiHost;    
+    LV2_External_UI_Host uiHost;
     MasterUI *_masterUI;
     LV2UI_Controller _controller;
     struct _externalUI
