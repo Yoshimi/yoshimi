@@ -1,12 +1,11 @@
 
-Add gui alerts for no audio and no midi
-
 Add start with default saved state button to settings.
 
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
 
+Find out why first time start up doesn't set a default current directory - and put it right!
 
 Change root/bank/instrument lists to single file for all instances.
 
@@ -48,8 +47,6 @@ Maybe a NRPN variation of this for global fine tuning.
 Review tooltips.
 
 Consider enabling and disabling tooltips.
-
-Consider scroll wheel control of sliders.
 
 Improve Copy & Paste functionality.
 

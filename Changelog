@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-6-26 Will
+* Added GUI warnings when audio or midi not availalble.
+* Corrected and improved new user guide.
+
 2016-6-25 Will
 * Created new quick guide as ODF in doc directory.
 * Updated notes.

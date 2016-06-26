@@ -281,6 +281,10 @@ bool mainCreateNewInstance(unsigned int forceId)
         {
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
         }
+        if (synth->getRuntime().audioEngine < 1)
+            fl_alert("Yoshimi can't find an available sound system. Running with no Audio");
+        if (synth->getRuntime().midiEngine < 1)
+            fl_alert("Yoshimi can't find an input system. Running with no MIDI");
     }
 
     synth->getRuntime().StartupReport(musicClient);
