@@ -31,22 +31,45 @@ InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
     // quite incomplete - we don't know what will develop yet!
+    if (!(sendbuf = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+    {
+        synth->getRuntime().Log("InteChange failed to create send ringbuffer");
+    }
 }
 
 
 InterChange::~InterChange()
 {
+    if (sendbuf)
+        jack_ringbuffer_free(sendbuf);
 }
 
 
 void InterChange::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
 {
-    /*
-     * while testing, this simply sends everything to commandSend but eventually it will
-     * partially do the decding and direction via ring buffers for actualy control.
-     */
-    commandSend(value, type, control, part, kit, engine, insert, insertParam);
+    CommandBlock putData;
+    putData.data.value = value;
+    putData.data.type = type;
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = insertParam;
+    if (jack_ringbuffer_write_space(sendbuf) >= sizeof(commandSize))
+        jack_ringbuffer_write(sendbuf, (char*) putData.bytes, sizeof(commandSize));
     return;
+}
+
+
+void InterChange::mediate()
+{
+    CommandBlock getData;
+    int toread = commandSize;
+    char *point = (char*) &getData.bytes;
+    for (size_t i = 0; i < commandSize; ++i)
+        jack_ringbuffer_read(sendbuf, point, toread);
+    commandSend(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter);
 }
 
 

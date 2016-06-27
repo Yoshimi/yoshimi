@@ -22,6 +22,8 @@
 #ifndef INTERCH_H
 #define INTERCH_H
 
+#include <jack/ringbuffer.h>
+
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
@@ -39,6 +41,26 @@ class InterChange : private MiscFuncs
 
         void commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam);
 
+        void mediate();
+
+        jack_ringbuffer_t *sendbuf;
+
+        union CommandBlock{
+            struct{
+                float value;
+                unsigned char type;
+                unsigned char control;
+                unsigned char part;
+                unsigned char kit;
+                unsigned char engine;
+                unsigned char insert;
+                unsigned char parameter;
+            } data;
+            unsigned char bytes [sizeof(data)];
+        };
+        CommandBlock commandData;
+        size_t commandSize = sizeof(commandData);
+
     private:
         void commandVector(float value, unsigned char type, unsigned char control);
         void commandMain(float value, unsigned char type, unsigned char control);
@@ -54,6 +76,7 @@ class InterChange : private MiscFuncs
         void commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
         void commandSysIns(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char engine, unsigned char insert);
         void commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
+
 
 
         SynthEngine *synth;

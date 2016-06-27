@@ -1777,6 +1777,11 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         p_buffersize_f = p_buffersize;
     }
 
+    while (jack_ringbuffer_read_space(interchange.sendbuf) >= sizeof(interchange.commandSize))
+    {
+        interchange.mediate();
+    }
+
     int npart;
 
     memset(mainL, 0, p_bufferbytes);
