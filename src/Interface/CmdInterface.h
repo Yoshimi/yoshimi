@@ -20,9 +20,13 @@
 #ifndef CMDINTERFACE_H
 #define CMDINTERFACE_H
 #include <string>
-#include <Misc/MiscFuncs.h>
-#include <Misc/SynthEngine.h>
-#include <Effects/EffectMgr.h>
+
+using namespace std;
+
+#include "Misc/MiscFuncs.h"
+#include "Misc/SynthEngine.h"
+#include "Interface/InterChange.h"
+#include "Effects/EffectMgr.h"
 
 extern map<SynthEngine *, MusicClient *> synthInstances;
 

@@ -27,8 +27,8 @@ endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
-#add_definitions(-Wall)
-#add_definitions(-Werror=format-security)
+add_definitions(-Wall)
+add_definitions(-Werror=format-security)
 
 # ^^^ comment these two out on pushes ^^^
 
@@ -281,7 +281,12 @@ set (Effects_sources
 
 set (Misc_sources
     Misc/ConfBuild.cpp  Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp
-    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp   Misc/CmdInterface.cpp
+    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+)
+
+set (Interface_Sources
+    Interface/CmdInterface.cpp
+    Interface/InterChange.cpp
 )
 
 set (Params_sources
@@ -436,6 +441,7 @@ if (HasJackLatency)
 endif (HasJackLatency)
 
 set (ProgSources
+    ${Interface_Sources}
     ${Misc_sources}
     ${Params_sources}
     ${Synth_sources}

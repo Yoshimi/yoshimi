@@ -34,11 +34,15 @@
 #include <map>
 #include <list>
 #include <sstream>
-#include <Misc/SynthEngine.h>
-#include <Misc/MiscFuncs.h>
-#include <Misc/Bank.h>
 
-#include <Misc/CmdInterface.h>
+using namespace std;
+
+#include "Misc/SynthEngine.h"
+#include "Misc/MiscFuncs.h"
+#include "Misc/Bank.h"
+
+#include "Interface/InterChange.h"
+#include "Interface/CmdInterface.h"
 
 using namespace std;
 
@@ -1982,6 +1986,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
             replyString = "save";
             reply = what_msg;
         }
+    else if (matchnMove(6, point, "direct"))
+    {
+        float value = string2float(point);
+        point = skipChars(point);
+        int type = (string2int(point) & 0x40) | 0x80;
+        point = skipChars(point);
+        int control = string2int(point);
+        point = skipChars(point);
+        int part = string2int(point);
+        synth->interchange.commandFetch(value, type, control, part);
+    }
     else
       reply = unrecognised_msg;
 

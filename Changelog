@@ -1,5 +1,12 @@
 yoshimi 1.4.x
 
+2016-6-27 Will
+* Created new Interface directory.
+* Created new InterChange file in Interface directory.
+* Moved GUI ID files from SynthEngine to InterChange.
+* Moved CmdInterface to Interface directory.
+* Implemented direct CLI access to some part controls.
+
 2016-6-26 Will
 * Added GUI warnings when audio or midi not availalble.
 * Corrected and improved new user guide.

@@ -44,7 +44,7 @@ using namespace std;
 
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <Misc/CmdInterface.h>
+#include <Interface/CmdInterface.h>
 
 //extern void cmdIfaceCommandLoop();
 
