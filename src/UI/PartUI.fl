@@ -206,7 +206,7 @@ send_data(17, o->value(), true, n, 0xff)}
     else
         adeditbutton->deactivate();
     synth->getGuiMaster()->partui->copylabeltopanel();
-    send_data(8, o->value(), true, n, 1)}
+    send_data(8, o->value(), true, n, 0)}
           private xywh {400 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
@@ -218,7 +218,7 @@ send_data(17, o->value(), true, n, 0xff)}
     else
         subeditbutton->deactivate();
     synth->getGuiMaster()->partui->copylabeltopanel();
-    send_data(8, o->value(), true, n, 2)}
+    send_data(8, o->value(), true, n, 1)}
           private xywh {470 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
@@ -249,7 +249,7 @@ if ((Fl::event_button() == 3))
     else
         padeditbutton->deactivate();
     synth->getGuiMaster()->partui->copylabeltopanel();
-    send_data(8, o->value(), true, n, 3)}
+    send_data(8, o->value(), true, n, 2)}
           private xywh {540 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
@@ -1080,7 +1080,7 @@ send_data(57, o->value());}
         addbox->color(BASE_COLOUR);
     else
         addbox->color(ADD_COLOUR);
-    send_data(8, o->value(), true, 0xff, 1);}
+    send_data(8, o->value(), true, 0xff, 0);}
             tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
@@ -1117,7 +1117,7 @@ if ((Fl::event_button() == 3))
         subbox->color(BASE_COLOUR);
     else
         subbox->color(SUB_COLOUR);
-    send_data(8, o->value(), true, 0xff, 2);}
+    send_data(8, o->value(), true, 0xff, 1);}
             tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
@@ -1154,7 +1154,7 @@ if ((Fl::event_button() == 3))
                             padbox->color(BASE_COLOUR);
                         else
                             padbox->color(PAD_COLOUR);
-                        send_data(8, o->value(), true, 0xff, 3);}
+                        send_data(8, o->value(), true, 0xff, 2);}
             tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }

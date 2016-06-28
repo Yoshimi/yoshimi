@@ -26,15 +26,14 @@ using namespace std;
 #include "Interface/InterChange.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
+#include  "Params/Controller.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
     // quite incomplete - we don't know what will develop yet!
     if (!(sendbuf = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
-    {
         synth->getRuntime().Log("InteChange failed to create send ringbuffer");
-    }
 }
 
 
@@ -56,8 +55,8 @@ void InterChange::commandFetch(float value, unsigned char type, unsigned char co
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = insertParam;
-    if (jack_ringbuffer_write_space(sendbuf) >= sizeof(commandSize))
-        jack_ringbuffer_write(sendbuf, (char*) putData.bytes, sizeof(commandSize));
+    if (jack_ringbuffer_write_space(sendbuf) >= commandSize)
+        jack_ringbuffer_write(sendbuf, (char*) putData.bytes, commandSize);
     return;
 }
 
@@ -69,6 +68,7 @@ void InterChange::mediate()
     char *point = (char*) &getData.bytes;
     for (size_t i = 0; i < commandSize; ++i)
         jack_ringbuffer_read(sendbuf, point, toread);
+
     commandSend(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter);
 }
 
@@ -272,27 +272,51 @@ void InterChange::commandMain(float value, unsigned char type, unsigned char con
     {
         case 0:
             contstr = "Volume";
+            if (type & 0x40)
+                synth->setPvolume(value);
+            else
+                actual = to_string(synth->Pvolume);
             break;
 
         case 14:
             contstr = "Part Number";
+            if (type & 0x40)
+                synth->getRuntime().currentPart = value;
+            else
+                actual = to_string(synth->getRuntime().currentPart);
             break;
         case 15:
             contstr = "Available Parts";
+            if ((type & 0x40) && (value == 16 || value == 32 || value == 64))
+                synth->getRuntime().NumAvailableParts = value;
+            else
+                actual = to_string(synth->getRuntime().NumAvailableParts);
             break;
 
         case 32:
             contstr = "Detune";
+            if (type & 0x40)
+                synth->microtonal.Pglobalfinedetune = value;
+            else
+                actual = to_string(synth->microtonal.Pglobalfinedetune);
             break;
         case 35:
             contstr = "Key Shift";
+            if (type & 0x40)
+                synth->setPkeyshift(value + 64);
+            else
+                actual = to_string(synth->Pkeyshift - 64);
             break;
 
         case 96:
             contstr = "Reset All";
+            if (type & 0x40)
+                synth->resetAll();
             break;
         case 128:
             contstr = "Stop";
+            if (type & 0x40)
+                synth->allStop();
             break;
     }
     synth->getRuntime().Log("Main " + contstr + " value " + actual);
@@ -328,15 +352,15 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
     }
     else
     {
-        switch (engine) // needs aligning with other engine numbers
+        switch (engine)
         {
-            case 1:
+            case 0:
                 name = "AddSynth ";
                 break;
-            case 2:
+            case 1:
                 name = "SubSynth ";
                 break;
-            case 3:
+            case 2:
                 name = "PadSynth ";
                 break;
         }
@@ -375,51 +399,112 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             break;
         case 5:
             contstr = "Midi";
+            if (type & 0x40)
+                synth->part[part]->Prcvchn = value;
+            else
+                actual = to_string(synth->part[part]->Prcvchn);
             break;
         case 6:
             contstr = "Mode";
+            if (type & 0x40)
+                synth->SetPartKeyMode(part, value);
+            else
+                actual = to_string(synth->ReadPartKeyMode(part));
             break;
         case 7:
             contstr = "Portamento";
+            if (type & 0x40)
+                synth->part[part]->ctl->portamento.portamento = value;
+            else
+                actual = to_string(synth->part[part]->ctl->portamento.portamento);
             break;
         case 8:
             contstr = "Enable";
+            if (type & 0x40)
+                synth->partonoffLock(part, value);
+            else
+                actual = synth->partonoffRead(part);
             break;
         case 9:
             contstr = "Mute";
+            if (type & 0x40)
+                synth->part[part]->kit[kit].Pmuted = value;
+            else
+                actual = synth->part[part]->kit[kit].Pmuted;
             break;
 
         case 16:
             contstr = "Min Note";
+            if (type & 0x40)
+                synth->part[part]->Pminkey = value;
+            else
+                actual = synth->part[part]->Pminkey;
             break;
         case 17:
             contstr = "Max Note";
+            if (type & 0x40)
+                synth->part[part]->Pmaxkey = value;
+            else
+                actual = synth->part[part]->Pmaxkey;
             break;
         case 18:
             contstr = "Min To Last";
+            if ((type & 0x40) && synth->part[part]->lastnote >= 0)
+                synth->part[part]->Pminkey = synth->part[part]->lastnote;
+            else
+                actual = synth->part[part]->Pminkey;
             break;
         case 19:
             contstr = "Max To Last";
+            if ((type & 0x40) && synth->part[part]->lastnote >= 0)
+                synth->part[part]->Pmaxkey = synth->part[part]->lastnote;
+            else
+                actual = synth->part[part]->Pmaxkey;
             break;
 
         case 33:
             contstr = "Key Limit";
+            if (type & 0x40)
+                synth->part[part]->setkeylimit(value);
+            else
+                actual = synth->part[part]->Pkeylimit;
             break;
         case 35:
             contstr = "Key Shift";
+            if (type & 0x40)
+                synth->part[part]->Pkeyshift = value + 64;
+            else
+                actual = synth->part[part]->Pkeyshift - 64;
+            break;
             break;
 
         case 40:
             contstr = "Effect Send 0";
+            if (type & 0x40)
+                synth->setPsysefxvol(part,0, value);
+            else
+                actual = synth->Psysefxvol[0][part];
             break;
         case 41:
             contstr = "Effect Send 1";
+            if (type & 0x40)
+                synth->setPsysefxvol(part,1, value);
+            else
+                actual = synth->Psysefxvol[1][part];
             break;
         case 42:
             contstr = "Effect Send 2";
+            if (type & 0x40)
+                synth->setPsysefxvol(part,2, value);
+            else
+                actual = synth->Psysefxvol[2][part];
             break;
         case 43:
             contstr = "Effect Send 3";
+            if (type & 0x40)
+                synth->setPsysefxvol(part,3, value);
+            else
+                actual = synth->Psysefxvol[3][part];
             break;
 
         case 48:

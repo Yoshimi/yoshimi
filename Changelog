@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-6-28 Will
+* Adjusted some GUI engine numbers so they all match.
+* Implimented direct access to main and basic part controls.
+* Bugfix: Ring buffer count was wrong.
+
 2016-6-27 Will
 * Created new Interface directory.
 * Created new InterChange file in Interface directory.

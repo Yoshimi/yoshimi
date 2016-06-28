@@ -1990,12 +1990,35 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         float value = string2float(point);
         point = skipChars(point);
-        int type = (string2int(point) & 0x40) | 0x80;
+        unsigned char type = (string2int127(point) & 0x40) | 0x80;
         point = skipChars(point);
-        int control = string2int(point);
+        unsigned char control = string2int(point);
         point = skipChars(point);
-        int part = string2int(point);
-        synth->interchange.commandFetch(value, type, control, part);
+        unsigned char part = string2int(point);
+        point = skipChars(point);
+        unsigned char kit = 0xff;
+        unsigned char engine = 0xff;
+        unsigned char insert = 0xff;
+        unsigned char param = 0xff;
+        if (point[0] != 0)
+        {
+            kit = string2int(point);
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                engine = string2int(point);
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    insert = string2int(point);
+                    point = skipChars(point);
+                    if (point[0] != 0)
+                        param = string2int(point);
+                }
+            }
+        }
+        synth->interchange.commandFetch(value, type, control, part, kit, engine, insert, param);
+        reply = done_msg;
     }
     else
       reply = unrecognised_msg;

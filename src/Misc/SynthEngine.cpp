@@ -178,6 +178,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     fadeStep = 10.0f / samplerate; // 100mS fade;
     int found = 0;
 
+    if (!interchange.sendbuf)
+        goto bail_out;
+
     if (!pthread_mutex_init(&processMutex, NULL))
         processLock = &processMutex;
     else
