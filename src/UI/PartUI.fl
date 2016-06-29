@@ -114,7 +114,7 @@ class PartKitItem {: {public Fl_Group}
   Function {make_window()} {private
   } {
     Fl_Window partkititem {
-      private xywh {566 138 670 30} type Double hide
+      private xywh {726 127 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
@@ -228,7 +228,7 @@ send_data(17, o->value(), true, n, 0xff)}
                         part->kit[n].Psendtoparteffect = o->value() - 1;
                     else
                         part->kit[n].Psendtoparteffect = 127;
-                    send_data(64, o->value(), true, n, 0xff)}
+                    send_data(24, o->value(), true, n, 0xff)}
           xywh {615 0 45 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {o->add("OFF"); char nrstr[10]; for(int i = 0; i < NUM_PART_EFX; i++) {sprintf(nrstr,"FX%d",i+1);o->add(nrstr);};}
           code1 {o->value(part->kit[n].Psendtoparteffect+1);if (part->kit[n].Psendtoparteffect==127) o->value(0);}
@@ -592,7 +592,7 @@ send_data(33, o->value());}
             minkcounter->do_callback();
             maxkcounter->value(127);
             maxkcounter->do_callback();
-            send_data(96, o->value());}
+            send_data(20, o->value());}
         tooltip {reset the minimum key to 0 and maximum key to 127} xywh {127 130 20 14} box PLASTIC_UP_BOX color 22 labelsize 10
       }
     }

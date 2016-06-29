@@ -327,8 +327,9 @@ void InterChange::commandMain(float value, unsigned char type, unsigned char con
 
 void InterChange::commandPart(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine)
 {
+    bool kitType = (kit >= 0x20 && kit < 0x40);
     string kitnum;
-    if (kit < 0xff)
+    if (kitType)
         kitnum = "  Kit " + to_string(kit & 0x1f) + " ";
     else
         kitnum = "  ";
@@ -416,46 +417,175 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             break;
         case 8:
             contstr = "Enable";
-            if (write)
-                synth->partonoffLock(part, (char) value);
+            if (kitType)
+            {
+                switch(engine)
+                {
+                    case 0:
+                        if (write)
+                            synth->part[part]->kit[kit & 0x1f].Padenabled = (char) value;
+                        else
+                            value = synth->part[part]->kit[kit & 0x1f].Padenabled;
+                        break;
+                    case 1:
+                        if (write)
+                            synth->part[part]->kit[kit & 0x1f].Psubenabled = (char) value;
+                        else
+                            value = synth->part[part]->kit[kit & 0x1f].Psubenabled;
+                        break;
+                    case 2:
+                        if (write)
+                            synth->part[part]->kit[kit & 0x1f].Ppadenabled = (char) value;
+                        else
+                            value = synth->part[part]->kit[kit & 0x1f].Ppadenabled;
+                        break;
+                    default:
+                        if (write)
+                            synth->part[part]->setkititemstatus(kit & 0x1f, (char) value);
+                        else
+                            value = synth->partonoffRead(part);
+                        break;
+                }
+            }
             else
-                value = synth->partonoffRead(part);
+            {
+                 switch(engine)
+                {
+                    case 0:
+                        if (write)
+                            synth->part[part]->kit[0].Padenabled = (char) value;
+                        else
+                            value = synth->part[part]->kit[0].Padenabled;
+                        break;
+                    case 1:
+                        if (write)
+                            synth->part[part]->kit[0].Psubenabled = (char) value;
+                        else
+                            value = synth->part[part]->kit[0].Psubenabled;
+                        break;
+                    case 2:
+                        if (write)
+                            synth->part[part]->kit[0].Ppadenabled = (char) value;
+                        else
+                            value = synth->part[part]->kit[0].Ppadenabled;
+                        break;
+                        break;
+                    default:
+                        if (write)
+                            synth->partonoffLock(part, (char) value);
+                        else
+                            value = synth->partonoffRead(part);
+                }
+            }
             break;
         case 9:
-            contstr = "Mute";
-            if (write)
-                synth->part[part]->kit[kit].Pmuted = (char) value;
-            else
-                value = synth->part[part]->kit[kit].Pmuted;
+            if (kitType)
+            {
+                contstr = "Mute";
+                if (write)
+                    synth->part[part]->kit[kit & 0x1f].Pmuted = (char) value;
+                else
+                    value = synth->part[part]->kit[kit & 0x1f].Pmuted;
+            }
             break;
 
         case 16:
             contstr = "Min Note";
-            if (write)
-                synth->part[part]->Pminkey = (char) value;
+            if (kitType)
+            {
+                if (write)
+                    synth->part[part]->kit[kit & 0x1f].Pminkey = (char) value;
+                else
+                    value = synth->part[part]->kit[kit & 0x1f].Pminkey;
+            }
             else
-                value = synth->part[part]->Pminkey;
+            {
+                if (write)
+                    synth->part[part]->Pminkey = (char) value;
+                else
+                    value = synth->part[part]->Pminkey;
+            }
             break;
         case 17:
             contstr = "Max Note";
-            if (write)
-                synth->part[part]->Pmaxkey = (char) value;
+            if (kitType)
+            {
+                if (write)
+                    synth->part[part]->kit[kit & 0x1f].Pmaxkey = (char) value;
+                else
+                    value = synth->part[part]->kit[kit & 0x1f].Pmaxkey;
+            }
             else
-                value = synth->part[part]->Pmaxkey;
+            {
+                if (write)
+                    synth->part[part]->Pmaxkey = (char) value;
+                else
+                    value = synth->part[part]->Pmaxkey;
+            }
             break;
         case 18:
             contstr = "Min To Last";
-            if ((write) && synth->part[part]->lastnote >= 0)
-                synth->part[part]->Pminkey = synth->part[part]->lastnote;
+            if (kitType)
+            {
+                if ((write) && synth->part[part]->lastnote >= 0)
+                    synth->part[part]->kit[kit & 0x1f].Pminkey = synth->part[part]->lastnote;
+                else
+                    value = synth->part[part]->kit[kit & 0x1f].Pminkey;
+            }
             else
-                value = synth->part[part]->Pminkey;
+            {
+                if ((write) && synth->part[part]->lastnote >= 0)
+                    synth->part[part]->Pminkey = synth->part[part]->lastnote;
+                else
+                    value = synth->part[part]->Pminkey;
+            }
             break;
         case 19:
             contstr = "Max To Last";
-            if ((write) && synth->part[part]->lastnote >= 0)
-                synth->part[part]->Pmaxkey = synth->part[part]->lastnote;
+            if (kitType)
+            {
+                if ((write) && synth->part[part]->lastnote >= 0)
+                    synth->part[part]->kit[kit & 0x1f].Pmaxkey = synth->part[part]->lastnote;
+                else
+                    value = synth->part[part]->kit[kit & 0x1f].Pmaxkey;
+            }
             else
-                value = synth->part[part]->Pmaxkey;
+            {
+                if ((write) && synth->part[part]->lastnote >= 0)
+                    synth->part[part]->Pmaxkey = synth->part[part]->lastnote;
+                else
+                    value = synth->part[part]->Pmaxkey;
+            }
+            break;
+        case 20:
+            contstr = "Reset Key Range";
+            if (kitType)
+            {
+                if (write)
+                {
+                    synth->part[part]->kit[kit & 0x1f].Pminkey = 0;
+                    synth->part[part]->kit[kit & 0x1f].Pmaxkey = 127;
+                }
+            }
+            else
+            {
+                if (write)
+                {
+                    synth->part[part]->Pminkey = 0;
+                    synth->part[part]->Pmaxkey = 127;
+                }
+            }
+            break;
+
+        case 24:
+            if (kitType)
+            {
+                contstr = "Effect Number";
+                if (write)
+                    synth->part[part]->kit[kit & 0x1f].Psendtoparteffect = (char) value;
+                else
+                    value = synth->part[part]->kit[kit & 0x1f].Psendtoparteffect;
+            }
             break;
 
         case 33:
@@ -524,23 +654,6 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
                 synth->part[part]->Pkitmode = (char) value;
             else
                 value = synth->part[part]->Pkitmode;
-            break;
-
-        case 64:
-            contstr = "Effect Number";
-            if (write)
-                synth->part[part]->kit[kit].Psendtoparteffect = (char) value;
-            else
-                value = synth->part[part]->kit[kit].Psendtoparteffect;
-            break;
-
-        case 96:
-            contstr = "Reset Key Range";
-            if (write)
-            {
-                synth->part[part]->Pminkey = 0;
-                synth->part[part]->Pmaxkey = 127;
-            }
             break;
 
         case 120:
