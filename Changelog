@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-6-29 Will
+* Implimented direct access to part controllers and up to Kits.
+* Updated docs.
+
 2016-6-28 Will
 * Adjusted some GUI engine numbers so they all match.
 * Implimented direct access to main and basic part controls.

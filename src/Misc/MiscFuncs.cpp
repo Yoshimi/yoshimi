@@ -357,6 +357,16 @@ unsigned int MiscFuncs::nearestPowerOf2(unsigned int x, unsigned int min, unsign
 }
 
 
+float MiscFuncs::limitsF(float value, float min, float max)
+{
+    if (value > max)
+        value = max;
+    else if (value < min)
+        value = min;
+    return value;
+}
+
+
 unsigned int MiscFuncs::bitFindHigh(unsigned int value)
 {
     unsigned int bit = 0;

@@ -61,6 +61,8 @@ class MiscFuncs
         bool matchnMove(int num, char *&pnt, const char *word);
 
         unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max);
+        float limitsF(float value, float min, float max);
+
         unsigned int bitFindHigh(unsigned int value);
         void bitSet(unsigned int& value, unsigned int bit);
         void bitClear(unsigned int& value, unsigned int bit);
