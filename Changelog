@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-7-1 Will
+* Small format change in GUI access reports.
+* doc updates, including new file /dev_notes/Direct_Access.txt
+
 2016-6-29 Will
 * Implimented direct access to part controllers and up to Kits.
 * Updated docs.

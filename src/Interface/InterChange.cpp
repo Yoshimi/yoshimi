@@ -82,7 +82,14 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
     {
         if (!(type &0x80))
             isf = "f";
-        synth->getRuntime().Log("\nButton " + asString((int) type & 7) + "\nPart " + asString((int) part) + "\nKit " + asString((int) kit) + "\nEngine " + asString((int) engine) + "\nInsert " + asString((int) insert) + "  Insert Param " + asString((int) insertParam) + "\nControl " + asString((int) control) + "  Value " + asString(value) + isf);
+        synth->getRuntime().Log("\n  Value " + asString(value) + isf
+                            + "\n  Button " + asString((int) type & 7)
+                            + "\n  Control " + asString((int) control)
+                            + "\n  Part " + asString((int) part)
+                            + "\n  Kit " + asString((int) kit)
+                            + "\n  Engine " + asString((int) engine)
+                            + "\n  Insert " + asString((int) insert)
+                            + "\n  Parameter " + asString((int) insertParam));
         return;
     }
     if (part == 0xc0)
