@@ -313,7 +313,7 @@ class VirKeyboard {selected
       label {Yoshimi Virtual Keyboard}
       callback {relaseallkeys();
 virkeyboardwindow->hide();}
-      xywh {21 265 650 130} type Double hide
+      xywh {1016 130 650 130} type Double hide
     } {
       Fl_Box virkeys {
         label Keyboard
@@ -364,7 +364,7 @@ virkeyboardwindow->hide();}
       Fl_Value_Output ctlval {
         label Cval
         callback {o->value(oldcontrol);}
-        xywh {630 12 15 15} box ENGRAVED_BOX labelsize 8 align 1 textsize 7
+        xywh {628 12 18 15} box ENGRAVED_BOX labelsize 8 align 1 textsize 7
         code0 {o->value(oldcontrol);}
       }
       Fl_Slider {} {
@@ -380,7 +380,7 @@ virkeyboardwindow->hide();}
 	int ctl = midictl;
         synth->SetController(virkeys->midich, ctl, oldcontrol);
         virkeys->take_focus();}
-        tooltip {Controller value} xywh {630 25 15 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
+        tooltip {Controller value} xywh {628 25 18 96} type {Vert Fill} box ENGRAVED_BOX color 229 labelsize 8 align 5 maximum 127 step 1 value 64
         code0 {o->value(127 - oldcontrol);}
         class mwheel_slider
       }
@@ -455,26 +455,6 @@ virkeyboardwindow->hide();}
           xywh {110 110 100 20} labelfont 1 labelsize 10
         }
       }
-      Fl_Roller pitchwheelroller {
-        label Pwh
-        callback {//
-        int old = o->value();
-        if (Fl::event_button() == 3)
-        {
-            old = 0;
-            o->value(old);
-            o->damage();
-        }
-	synth->SetController(virkeys->midich, C_pitchwheel, - old);
-        virkeys->take_focus();}
-        tooltip {Pitch Wheel} xywh {5 10 20 95} box PLASTIC_UP_BOX labelsize 8 align 1 when 3 minimum -8192 maximum 8192 step 64
-      }
-      Fl_Button {} {
-        label R
-        callback {pitchwheelroller->value(0);
-            pitchwheelroller->do_callback();}
-        tooltip {Reset Pitch Bend} xywh {5 110 20 15} box THIN_UP_BOX labelfont 1
-      }
       Fl_Dial {} {
         label Vrnd
         callback {virkeys->rndvelocity=(int) o->value();}
@@ -491,6 +471,21 @@ virkeyboardwindow->hide();}
             virkeys->take_focus();}
         xywh {45 106 36 17} labelsize 9 align 1 maximum 16 textsize 10
         code0 {o->value(virkeys->midich + 1);}
+      }
+      Fl_Slider pitchwheel {
+        label Pwh
+        callback {//
+        int old = o->value();
+        if (Fl::event_button() == 3)
+        {
+            old = 0;
+            o->value(old);
+            o->damage();
+        }
+	synth->SetController(virkeys->midich, C_pitchwheel, - old);
+        virkeys->take_focus();}
+        xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8192 step 1
+        class mwheel_slider
       }
     }
   }
