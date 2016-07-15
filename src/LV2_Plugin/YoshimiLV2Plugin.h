@@ -38,6 +38,7 @@
 #include <jack/ringbuffer.h>
 
 #include "Misc/SynthEngine.h"
+#include "Interface/InterChange.h"
 #include "MusicIO/MusicIO.h"
 
 class YoshimiLV2Plugin : public MusicIO

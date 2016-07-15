@@ -19,7 +19,9 @@
 
 #include "YoshimiLV2Plugin.h"
 #include "Misc/Config.h"
+#include "Misc/ConfBuild.cpp"
 #include "Misc/SynthEngine.h"
+#include "Interface/InterChange.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"

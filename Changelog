@@ -1,5 +1,8 @@
 yoshimi 1.4.x
 
+2016-7-15 Will
+* Bugfix: hadn't included new Interface files in LV2 :(
+
 2016-7-14 Will
 * Changed virtual keyboard roller to slider.
 
