@@ -13,7 +13,8 @@ Controllers
 Kit edit window
 
 The remaining ones will display as if they had been written to, but won't
-actually ghange anything.
+actually change anything.
+
 This matches the results from using the middle mouse button in the GUI.
 A way to find out the correct sequence is to click on a control with any
 button *except* the middle one. trailing '255's can be ommitted.
@@ -33,9 +34,10 @@ control = the number representing the control being changed.
 
 part = the number of the part being changed.
 
-All the above are mandatory. The following must also be entered in sequence.
+All the above are mandatory. The following must also be entered in sequence
+when needed.
 
-kit = a part's kit number (if enabled), also used elsewhere.
+kit = a part's kit number (if enabled otherwise zero), also used elsewhere.
 
 engine = the synth engine being adjusted.
 

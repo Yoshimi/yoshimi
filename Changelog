@@ -1,5 +1,8 @@
 yoshimi 1.4.x
 
+2016-7-20
+* Minor doc corrections - no code changes.
+
 2016-7-15 Will
 * Bugfix: hadn't included new Interface files in LV2 :(
 
