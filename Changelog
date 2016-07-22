@@ -1,6 +1,9 @@
 yoshimi 1.4.x
 
-2016-7-20
+2016-7-22 Will
+* Started implementing direct access to SubSynth controls.
+
+2016-7-20 Will
 * Minor doc corrections - no code changes.
 
 2016-7-15 Will
