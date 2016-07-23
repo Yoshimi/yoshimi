@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-7-23 Will
+* Completed Subsynth controls (not the inserts).
+* Corrected doc errors :(
+
 2016-7-22 Will
 * Started implementing direct access to SubSynth controls.
 

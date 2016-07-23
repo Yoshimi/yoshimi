@@ -45,14 +45,14 @@ InterChange::~InterChange()
 }
 
 
-void InterChange::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
+void InterChange::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char insertParam)
 {
     CommandBlock putData;
     putData.data.value = value;
     putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;
-    putData.data.kit = kit;
+    putData.data.kit = kititem;
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = insertParam;
@@ -74,7 +74,7 @@ void InterChange::mediate()
 }
 
 
-void InterChange::commandSend(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
+void InterChange::commandSend(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char insertParam)
 {
     bool isGui = type & 0x20;
     char button = type & 0x1f;
@@ -87,7 +87,7 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
                             + "\n  Button " + asString((int) type & 7)
                             + "\n  Control " + asString((int) control)
                             + "\n  Part " + asString((int) npart)
-                            + "\n  Kit " + asString((int) kit)
+                            + "\n  Kit " + asString((int) kititem)
                             + "\n  Engine " + asString((int) engine)
                             + "\n  Insert " + asString((int) insert)
                             + "\n  Parameter " + asString((int) insertParam));
@@ -97,43 +97,43 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         commandVector(value, type, control);
     else if (npart == 0xf0)
         commandMain(value, type, control);
-    else if ((npart == 0xf1 || npart == 0xf2) && kit == 0xff)
+    else if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
         commandSysIns(value, type, control, npart, engine, insert);
-    else if (kit == 0xff || (kit & 0x20))
-        commandPart(value, type, control, npart, kit, engine);
-    else if (kit >= 0x80)
+    else if (kititem == 0xff || (kititem & 0x20))
+        commandPart(value, type, control, npart, kititem, engine);
+    else if (kititem >= 0x80)
     {
         if (insert < 0xff)
-            commandFilter(value, type, control, npart, kit, engine, insert);
+            commandFilter(value, type, control, npart, kititem, engine, insert);
         else
-            commandEffects(value, type, control, npart, kit, engine);
+            commandEffects(value, type, control, npart, kititem, engine);
     }
     else if (engine == 2)
     {
         switch(insert)
         {
             case 0xff:
-                commandPad(value, type, control, npart, kit);
+                commandPad(value, type, control, npart, kititem);
                 break;
             case 0:
-                commandLFO(value, type, control, npart, kit, engine, insert, insertParam);
+                commandLFO(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kit, engine, insert);
+                commandFilter(value, type, control, npart, kititem, engine, insert);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kit, engine, insert, insertParam);
+                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
             case 5:
             case 6:
             case 7:
-                commandOscillator(value, type, control, npart, kit, engine, insert);
+                commandOscillator(value, type, control, npart, kititem, engine, insert);
                 break;
             case 8:
             case 9:
-                commandResonance(value, type, control, npart, kit, engine, insert);
+                commandResonance(value, type, control, npart, kititem, engine, insert);
                 break;
         }
     }
@@ -144,15 +144,15 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
             case 0xff:
             case 6:
             case 7:
-                commandSub(value, type, control, npart, kit, insert);
+                commandSub(value, type, control, npart, kititem, insert);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kit, engine, insert);
+                commandFilter(value, type, control, npart, kititem, engine, insert);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kit, engine, insert, insertParam);
+                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
         }
     }
@@ -161,23 +161,23 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         switch (insert)
         {
             case 0xff:
-                commandAddVoice(value, type, control, npart, kit, engine);
+                commandAddVoice(value, type, control, npart, kititem, engine);
                 break;
             case 0:
-                commandLFO(value, type, control, npart, kit, engine, insert, insertParam);
+                commandLFO(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kit, engine, insert);
+                commandFilter(value, type, control, npart, kititem, engine, insert);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kit, engine, insert, insertParam);
+                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
             case 5:
             case 6:
             case 7:
-                commandOscillator(value, type, control, npart, kit, engine, insert);
+                commandOscillator(value, type, control, npart, kititem, engine, insert);
                 break;
         }
     }
@@ -186,21 +186,21 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         switch (insert)
         {
             case 0xff:
-                commandAdd(value, type, control, npart, kit);
+                commandAdd(value, type, control, npart, kititem);
                 break;
             case 0:
-                commandLFO(value, type, control, npart, kit, engine, insert, insertParam);
+                commandLFO(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kit, engine, insert);
+                commandFilter(value, type, control, npart, kititem, engine, insert);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kit, engine, insert, insertParam);
+                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
                 break;
             case 8:
-                commandResonance(value, type, control, npart, kit, engine, insert);
+                commandResonance(value, type, control, npart, kititem, engine, insert);
                 break;
         }
     }
@@ -335,16 +335,16 @@ void InterChange::commandMain(float value, unsigned char type, unsigned char con
 }
 
 
-void InterChange::commandPart(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine)
+void InterChange::commandPart(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine)
 {
     bool write = (type & 0x40) > 0;
-    bool kitType = (kit >= 0x20 && kit < 0x40);
+    bool kitType = (kititem >= 0x20 && kititem < 0x40);
     Part *part;
     part = synth->part[npart];
 
     string kitnum;
     if (kitType)
-        kitnum = "  Kit " + to_string(kit & 0x1f) + " ";
+        kitnum = "  Kit " + to_string(kititem & 0x1f) + " ";
     else
         kitnum = "  ";
 
@@ -436,25 +436,25 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
                 {
                     case 0:
                         if (write)
-                            part->kit[kit & 0x1f].Padenabled = (char) value;
+                            part->kit[kititem & 0x1f].Padenabled = (char) value;
                         else
-                            value = part->kit[kit & 0x1f].Padenabled;
+                            value = part->kit[kititem & 0x1f].Padenabled;
                         break;
                     case 1:
                         if (write)
-                            part->kit[kit & 0x1f].Psubenabled = (char) value;
+                            part->kit[kititem & 0x1f].Psubenabled = (char) value;
                         else
-                            value = part->kit[kit & 0x1f].Psubenabled;
+                            value = part->kit[kititem & 0x1f].Psubenabled;
                         break;
                     case 2:
                         if (write)
-                            part->kit[kit & 0x1f].Ppadenabled = (char) value;
+                            part->kit[kititem & 0x1f].Ppadenabled = (char) value;
                         else
-                            value = part->kit[kit & 0x1f].Ppadenabled;
+                            value = part->kit[kititem & 0x1f].Ppadenabled;
                         break;
                     default:
                         if (write)
-                            part->setkititemstatus(kit & 0x1f, (char) value);
+                            part->setkititemstatus(kititem & 0x1f, (char) value);
                         else
                             value = synth->partonoffRead(npart);
                         break;
@@ -496,9 +496,9 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             {
                 contstr = "Mute";
                 if (write)
-                    part->kit[kit & 0x1f].Pmuted = (char) value;
+                    part->kit[kititem & 0x1f].Pmuted = (char) value;
                 else
-                    value = part->kit[kit & 0x1f].Pmuted;
+                    value = part->kit[kititem & 0x1f].Pmuted;
             }
             break;
 
@@ -507,9 +507,9 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             if (kitType)
             {
                 if (write)
-                    part->kit[kit & 0x1f].Pminkey = (char) value;
+                    part->kit[kititem & 0x1f].Pminkey = (char) value;
                 else
-                    value = part->kit[kit & 0x1f].Pminkey;
+                    value = part->kit[kititem & 0x1f].Pminkey;
             }
             else
             {
@@ -524,9 +524,9 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             if (kitType)
             {
                 if (write)
-                    part->kit[kit & 0x1f].Pmaxkey = (char) value;
+                    part->kit[kititem & 0x1f].Pmaxkey = (char) value;
                 else
-                    value = part->kit[kit & 0x1f].Pmaxkey;
+                    value = part->kit[kititem & 0x1f].Pmaxkey;
             }
             else
             {
@@ -541,9 +541,9 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
-                    part->kit[kit & 0x1f].Pminkey = part->lastnote;
+                    part->kit[kititem & 0x1f].Pminkey = part->lastnote;
                 else
-                    value = part->kit[kit & 0x1f].Pminkey;
+                    value = part->kit[kititem & 0x1f].Pminkey;
             }
             else
             {
@@ -558,9 +558,9 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
-                    part->kit[kit & 0x1f].Pmaxkey = part->lastnote;
+                    part->kit[kititem & 0x1f].Pmaxkey = part->lastnote;
                 else
-                    value = part->kit[kit & 0x1f].Pmaxkey;
+                    value = part->kit[kititem & 0x1f].Pmaxkey;
             }
             else
             {
@@ -576,8 +576,8 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             {
                 if (write)
                 {
-                    part->kit[kit & 0x1f].Pminkey = 0;
-                    part->kit[kit & 0x1f].Pmaxkey = 127;
+                    part->kit[kititem & 0x1f].Pminkey = 0;
+                    part->kit[kititem & 0x1f].Pmaxkey = 127;
                 }
             }
             else
@@ -595,9 +595,9 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
             {
                 contstr = "Effect Number";
                 if (write)
-                    part->kit[kit & 0x1f].Psendtoparteffect = (char) value;
+                    part->kit[kititem & 0x1f].Psendtoparteffect = (char) value;
                 else
-                    value = part->kit[kit & 0x1f].Psendtoparteffect;
+                    value = part->kit[kititem & 0x1f].Psendtoparteffect;
             }
             break;
 
@@ -858,7 +858,7 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
 }
 
 
-void InterChange::commandAdd(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit)
+void InterChange::commandAdd(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem)
 {
     string actual;
     if (type & 0x80)
@@ -949,11 +949,11 @@ void InterChange::commandAdd(float value, unsigned char type, unsigned char cont
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + "  AddSynth " + name + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth " + name + contstr + " value " + actual);
 }
 
 
-void InterChange::commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit,unsigned char engine)
+void InterChange::commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem,unsigned char engine)
 {
     string actual;
     if (type & 0x80)
@@ -1138,28 +1138,28 @@ void InterChange::commandAddVoice(float value, unsigned char type, unsigned char
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + "  AddSynth Voice " + to_string(engine & 0x1f) + name + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth Voice " + to_string(engine & 0x1f) + name + contstr + " value " + actual);
 }
 
 
-void InterChange::commandSub(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char insert)
+void InterChange::commandSub(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char insert)
 {
     bool write = (type & 0x40) > 0;
     Part *part;
     part = synth->part[npart];
     SUBnoteParameters *pars;
-    pars = part->kit[kit].subpars;
+    pars = part->kit[kititem].subpars;
 
-    if (kit != 0)
+    if (kititem != 0)
     {
         if (!part->Pkitmode)
         {
             synth->getRuntime().Log("Not in kit mode");
             return;
         }
-        else if (!part->kit[kit].Penabled)
+        else if (!part->kit[kititem].Penabled)
         {
-            synth->getRuntime().Log("Kit item " + to_string(kit) + " not enabled");
+            synth->getRuntime().Log("Kit item " + to_string(kititem) + " not enabled");
             return;
         }
     }
@@ -1176,7 +1176,7 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
             pars->Phmag[control] = value;
         else
             value = pars->Phmag[control];
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + "  Subsynth Harmonic " + to_string(control) + " Amplitude value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + " Amplitude value " + actual);
         return;
     }
 
@@ -1186,7 +1186,7 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
             pars->Phrelbw[control] = value;
         else
             value = pars->Phrelbw[control];
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + "  Subsynth Harmonic " + to_string(control) + " Bandwidth value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + " Bandwidth value " + actual);
         return;
     }
 
@@ -1211,6 +1211,7 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
     }
 
     string contstr = "";
+    int k; // temp variable for detune
     switch (control)
     {
         case 0:
@@ -1222,6 +1223,10 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
             break;
         case 1:
             contstr = "Vel Sens";
+            if (write)
+                pars->PAmpVelocityScaleFunction = value;
+            else
+                value = pars->PAmpVelocityScaleFunction;
             break;
         case 2:
             contstr = "Panning";
@@ -1230,65 +1235,187 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
             else
                 value = pars->PPanning;
             break;
+
         case 16:
-            contstr = "Bandwidth";
+            contstr = "";
+            if (write)
+                pars->Pbandwidth = value;
+            else
+                value = pars->Pbandwidth;
             break;
         case 17:
             contstr = "Band Scale";
+            if (write)
+                pars->Pbwscale = value + 64;
+            else
+                value = pars->Pbwscale - 64;
             break;
         case 18:
             contstr = "Env Enab";
+            if (write)
+                pars->PBandWidthEnvelopeEnabled = (value != 0);
+            else
+                value = pars->PBandWidthEnvelopeEnabled;
             break;
+
         case 32:
             contstr = "Detune";
+            if (write)
+                pars->PDetune = value + 8192;
+            else
+                value = pars->PDetune - 8192;
             break;
         case 33:
             contstr = "Eq T";
+            if (write)
+                pars->PfixedfreqET = value;
+            else
+                value = pars->PfixedfreqET;
             break;
         case 34:
             contstr = "440Hz";
+            if (write)
+                pars->Pfixedfreq = (value != 0);
+            else
+                value = pars->Pfixedfreq;
             break;
         case 35:
             contstr = "Octave";
+            if (write)
+            {
+                k = value;
+                if (k < 0)
+                    k += 16;
+                pars->PCoarseDetune = k * 1024 + pars->PCoarseDetune % 1024;
+            }
+            else
+            {
+                k = pars->PCoarseDetune / 1024;
+                if (k >= 8)
+                    k -= 16;
+                value = k;
+            }
             break;
         case 36:
             contstr = "Det type";
+            if (write)
+                pars->PDetuneType = (int)value + 1;
+            else
+                value = pars->PDetuneType;
             break;
         case 37:
             contstr = "Coarse Det";
+            if (write)
+            {
+                k = value;
+                if (k < 0)
+                    k += 1024;
+                pars->PCoarseDetune = k + (pars->PCoarseDetune / 1024) * 1024;
+            }
+            else
+            {
+                k = pars->PCoarseDetune % 1024;
+                if (k >= 512)
+                    k -= 1024;
+                value = k;
+            }
             break;
         case 38:
-            contstr = "Env Ena";
+            contstr = "Bend";
+            if (write)
+                pars->PBendAdjust = value;
+            else
+                value = pars->PBendAdjust;
             break;
+        case 39:
+            contstr = "Offset";
+            if (write)
+                pars->PBendAdjust = value;
+            else
+                value = pars->PBendAdjust;
+            break;
+        case 40:
+            contstr = "Env Enab";
+            if (write)
+                pars->PFreqEnvelopeEnabled = (value != 0);
+            else
+                value = pars->PFreqEnvelopeEnabled;
+            break;
+
         case 48:
             contstr = "Par 1";
+            if (write)
+                pars->POvertoneSpread.par1 = value;
+            else
+                value = pars->POvertoneSpread.par1;
             break;
         case 49:
             contstr = "Par 2";
+            if (write)
+                pars->POvertoneSpread.par2 = value;
+            else
+                value = pars->POvertoneSpread.par2;
             break;
         case 50:
             contstr = "Force H";
+            if (write)
+                pars->POvertoneSpread.par3 = value;
+            else
+                value = pars->POvertoneSpread.par3;
             break;
         case 51:
             contstr = "Position";
+            if (write)
+                pars->POvertoneSpread.type =  (int)value;
+            else
+                value = pars->POvertoneSpread.type;
             break;
+
         case 64:
             contstr = "Enable";
+            if (write)
+                pars->PGlobalFilterEnabled = (value != 0);
+            else
+                value = pars->PGlobalFilterEnabled;
             break;
+
         case 80:
             contstr = "Filt Stages";
+            if (write)
+                pars->Pnumstages = (int)value;
+            else
+                value = pars->Pnumstages;
             break;
         case 81:
             contstr = "Mag Type";
+            if (write)
+                pars->Phmagtype = (int)value;
             break;
         case 82:
             contstr = "Start";
+            if (write)
+                pars->Pstart = (int)value;
+            else
+                value = pars->Pstart;
             break;
+
         case 96:
             contstr = "Clear Harmonics";
+            if (write)
+            {
+                for (int i = 0; i < MAX_SUB_HARMONICS; i++)
+                {
+                    pars->Phmag[i] = 0;
+                    pars->Phrelbw[i] = 64;
+                }
+                pars->Phmag[0] = 127;
+            }
             break;
+
         case 112:
             contstr = "Stereo";
+            if (write)
+                pars->Pstereo = (value != 0);
             break;
     }
 
@@ -1297,11 +1424,11 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
     else
         actual = to_string(value);
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + "  SubSynth " + name + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  SubSynth " + name + contstr + " value " + actual);
 }
 
 
-void InterChange::commandPad(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit)
+void InterChange::commandPad(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem)
 {
     string actual;
     if (type & 0x80)
@@ -1465,11 +1592,11 @@ void InterChange::commandPad(float value, unsigned char type, unsigned char cont
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + "  PadSynth " + name + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  PadSynth " + name + contstr + " value " + actual);
 }
 
 
-void InterChange::commandOscillator(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine, unsigned char insert)
+void InterChange::commandOscillator(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert)
 {
     string actual;
     if (type & 0x80)
@@ -1489,12 +1616,12 @@ void InterChange::commandOscillator(float value, unsigned char type, unsigned ch
 
     if (insert == 6)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + actual);
         return;
     }
     else if(insert == 7)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + eng_name + " Harmonic " + to_string(control) + " Phase value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Phase value " + actual);
         return;
     }
 
@@ -1632,12 +1759,12 @@ void InterChange::commandOscillator(float value, unsigned char type, unsigned ch
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + eng_name + name + contstr + "  value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + name + contstr + "  value " + actual);
 
 }
 
 
-void InterChange::commandResonance(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine, unsigned char insert)
+void InterChange::commandResonance(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert)
 {
     string actual;
     if (type & 0x80)
@@ -1653,7 +1780,7 @@ void InterChange::commandResonance(float value, unsigned char type, unsigned cha
 
     if (insert == 9)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name + " Resonance Point " + to_string(control) + "  value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + actual);
         return;
     }
 
@@ -1697,11 +1824,11 @@ void InterChange::commandResonance(float value, unsigned char type, unsigned cha
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name + " Resonance " + contstr + "  value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + actual);
 }
 
 
-void InterChange::commandLFO(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter)
+void InterChange::commandLFO(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter)
 {
     string actual;
     if (type & 0x80)
@@ -1763,11 +1890,11 @@ void InterChange::commandLFO(float value, unsigned char type, unsigned char cont
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name + lfo + " LFO  " + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
 }
 
 
-void InterChange::commandFilter(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine, unsigned char insert)
+void InterChange::commandFilter(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert)
 {
     string actual;
     if (type & 0x80)
@@ -1776,10 +1903,10 @@ void InterChange::commandFilter(float value, unsigned char type, unsigned char c
         actual = to_string(value);
 
     string name;
-    if (kit >= 0x80)
+    if (kititem >= 0x80)
     {
         string efftype;
-        switch (kit & 0xf)
+        switch (kititem & 0xf)
         {
             case 0:
                 efftype = " NO Effect";
@@ -1911,11 +2038,11 @@ void InterChange::commandFilter(float value, unsigned char type, unsigned char c
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name + " Filter  " + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + contstr + " value " + actual);
 }
 
 
-void InterChange::commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter)
+void InterChange::commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter)
 {
     string actual;
     if (type & 0x80)
@@ -1955,12 +2082,12 @@ void InterChange::commandEnvelope(float value, unsigned char type, unsigned char
 
     if (insert == 3)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name  + env + " Env Freemode Control " + to_string(control) + "  X value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Control " + to_string(control) + "  X value " + actual);
         return;
     }
     if (insert == 4)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name  + env + " Env Freemode Control " +  to_string(control) + "  Y value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Control " +  to_string(control) + "  Y value " + actual);
         return;
     }
 
@@ -2027,7 +2154,7 @@ void InterChange::commandEnvelope(float value, unsigned char type, unsigned char
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kit) + name  + env + " Env  " + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env  " + contstr + " value " + actual);
 }
 
 
@@ -2074,7 +2201,7 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
 }
 
 
-void InterChange::commandEffects(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kit, unsigned char engine)
+void InterChange::commandEffects(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine)
 {
     string actual;
     if (type & 0x80)
@@ -2092,7 +2219,7 @@ void InterChange::commandEffects(float value, unsigned char type, unsigned char 
     name += " Effect " + to_string(engine);
 
     string efftype;
-    switch (kit & 0xf)
+    switch (kititem & 0xf)
     {
         case 0:
             efftype = " NO Effect";

@@ -11,6 +11,8 @@ Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
 
+Make modilator oscillator waveform mirror the *actual* one.
+
 Startup state load doesn't set buffersize correctly - partially resolved.
     size is ignored if loaded when already running (which is reasonable).
 

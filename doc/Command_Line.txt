@@ -41,7 +41,7 @@ yoshimi part 4 off FX 0 REver-0 >
 
 Sets the part's effect 0 to type 'reverb'
 
-Even thogh the part is disabled you can still set up its chnaraxcteristics. Also, notice the two capitals in reverb, these remind you of the minimum abbreviation.
+Even thogh the part is disabled you can still set up its characteristics. Also, notice the two capitals in reverb, these remind you of the minimum abbreviation.
 
 Many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
 
@@ -54,7 +54,7 @@ yoshimi part 4 off FX 0 REver-3 >
 
 Currently the presets are shown only numerically in the prompt.
 
-from the top leveve, settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
+From the top level, settings that follow in a direct line through several levels can be made all at once and you will be left at the appropriate level:
 
 "s p 5 ef 2 ty re"
 yoshimi part 5 off FX 2 REver-0 >
@@ -78,12 +78,12 @@ yoshimi part 4 off FX 2 REver-3 >
 " ..s vol 70"
 yoshimi part 4 off>
 
-part 4 volume is now at 70, and you are once again at part level, not part FX level.
+Part 4 volume is now at 70, and you are once again at part level, not part FX level.
 
 
 The help menus and lists are also partially context sensitive. This should help avoid clutter and confusion.
 
-As well as an immediate history Yoshimi maintains a command history file, so provided you make a normal command line exit your last commands will be available on your next run.
+As well as an immediate history, Yoshimi maintains a command history file, so provided you make a normal command line exit your last commands will be available on your next run.
 
 
 Originally this file contained the currently implemented commands, but as this is very much a moving target, it is simpler to just ask you to run Yoshimi and type "?"
