@@ -28,6 +28,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Params/Controller.h"
 #include "Params/SUBnoteParameters.h"
+#include "Effects/EffectMgr.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
@@ -83,14 +84,14 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
     {
         if (!(type &0x80))
             isf = "f";
-        synth->getRuntime().Log("\n  Value " + asString(value) + isf
-                            + "\n  Button " + asString((int) type & 7)
-                            + "\n  Control " + asString((int) control)
-                            + "\n  Part " + asString((int) npart)
-                            + "\n  Kit " + asString((int) kititem)
-                            + "\n  Engine " + asString((int) engine)
-                            + "\n  Insert " + asString((int) insert)
-                            + "\n  Parameter " + asString((int) insertParam));
+        synth->getRuntime().Log("\n  Value " + to_string(value) + isf
+                            + "\n  Button " + to_string((int) type & 7)
+                            + "\n  Control " + to_string((int) control)
+                            + "\n  Part " + to_string((int) npart)
+                            + "\n  Kit " + to_string((int) kititem)
+                            + "\n  Engine " + to_string((int) engine)
+                            + "\n  Insert " + to_string((int) insert)
+                            + "\n  Parameter " + to_string((int) insertParam));
         return;
     }
     if (npart == 0xc0)
@@ -286,7 +287,10 @@ void InterChange::commandMain(float value, unsigned char type, unsigned char con
         case 14:
             contstr = "Part Number";
             if (write)
+            {
                 synth->getRuntime().currentPart = value;
+                synth->getRuntime().partEffNum = 0; // must always be zero on part change
+            }
             else
                 value = synth->getRuntime().currentPart;
             break;
@@ -348,19 +352,17 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
     else
         kitnum = "  ";
 
-    string name;
+    string name = "";
     if (control >= 0x80)
     {
-        if (control >= 0xe0)
-            name = "";
-        else
+        if (control < 0xe0)
         {
             name = "Controller ";
             if (control >= 0xa0)
                 name += "Portamento ";
         }
     }
-    else
+    else if (kititem < 0xff)
     {
         switch (engine)
         {
@@ -376,6 +378,7 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
         }
     }
 
+    int effNum = synth->getRuntime().partEffNum;
     string contstr = "";
     switch (control)
     {
@@ -667,6 +670,38 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
                 part->Pkitmode = (char) value;
             else
                 value = part->Pkitmode;
+            break;
+
+        case 64:
+            contstr = "Effect Number";
+            if (write)
+                synth->getRuntime().partEffNum = (int)value;
+            else
+                value = effNum;
+            break;
+        case 65:
+            contstr = "Effect " + to_string(effNum) + " Type";
+            if (write)
+                part->partefx[effNum]->changeeffect((int)value);
+            else
+                value = part->partefx[effNum]->geteffect();
+            break;
+        case 66:
+            contstr = "Effect " + to_string(effNum) + " Destination";
+            if (write)
+            {
+                part->Pefxroute[effNum] = (int)value;
+                part->partefx[effNum]->setdryonly((int)value == 2);
+            }
+            else
+                value = part->Pefxroute[effNum];
+            break;
+        case 67:
+            contstr = "Bypass Effect "+ to_string(effNum);
+            if (write)
+                part->Pefxbypass[effNum] = (value != 0);
+            else
+                value = part->Pefxbypass[effNum];
             break;
 
         case 120:
@@ -1165,28 +1200,32 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
     }
 
     string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
 
-    if (insert == 6)
-    {
-        if (write)
-            pars->Phmag[control] = value;
-        else
-            value = pars->Phmag[control];
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + " Amplitude value " + actual);
-        return;
-    }
 
-    if (insert == 7)
+    if (insert == 6 || insert == 7)
     {
-        if (write)
-            pars->Phrelbw[control] = value;
+        string Htype;
+        if (insert == 6)
+        {
+            if (write)
+                pars->Phmag[control] = value;
+            else
+                value = pars->Phmag[control];
+            Htype = " Amplitude";
+        }
         else
-            value = pars->Phrelbw[control];
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + " Bandwidth value " + actual);
+        {
+            if (write)
+                pars->Phrelbw[control] = value;
+            else
+                value = pars->Phrelbw[control];
+            Htype = " Bandwidth";
+        }
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + Htype + "  value " + actual);
         return;
     }
 

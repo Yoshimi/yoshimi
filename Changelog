@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-7-24 Will
+* Bugfix: Direct access reading harmonic values returned the wrong result.
+* Added missing direct access part controls. Dunno how I missed them :(
+* Updated docs.
+
 2016-7-23 Will
 * Completed Subsynth controls (not the inserts).
 * Corrected doc errors :(
