@@ -91,7 +91,7 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 } 
 
-class VUMeter {: {public Fl_Box, private MiscFuncs}
+class VUMeter {selected : {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -392,7 +392,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   Function {handle(int event)} {return_type int
   } {
     code {//
-	if (event == FL_PUSH || event == FL_DRAG)
+	if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
         {
             synth->setPsysefxsend(neff1,neff2,value());
             synth->commandFetch(value(), (Fl::event_button() | 0x20 | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
@@ -407,7 +407,7 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 } 
 
-class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
+class Panellistitem {: {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {private
   } {

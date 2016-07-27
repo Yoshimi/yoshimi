@@ -2199,17 +2199,20 @@ void InterChange::commandEnvelope(float value, unsigned char type, unsigned char
 
 void InterChange::commandSysIns(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char engine, unsigned char insert)
 {
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
+    bool write = true;//(type & 0x40) > 0;
+    bool isSysEff = (npart == 0xf1);
+    int effnum;
     string name;
-    if (npart == 0xf1)
+    if (isSysEff)
+    {
         name = "System ";
+        effnum = synth->getRuntime().sysEffNum;
+    }
     else
+    {
         name = "Insert ";
+        effnum = synth->getRuntime().insEffNum;
+    }
 
     string contstr;
     string second;
@@ -2220,23 +2223,67 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
         {
             case 0:
                 contstr = "Number ";
+                if (write)
+                {
+                    effnum = (int) value;
+                    if (isSysEff)
+                        synth->getRuntime().sysEffNum = effnum;
+                    else
+                        synth->getRuntime().insEffNum = effnum;
+                }
+                else
+                {
+                    if (isSysEff)
+                        value = synth->getRuntime().sysEffNum;
+                    else
+                        value = synth->getRuntime().insEffNum;
+                    value = effnum;
+                }
                 break;
             case 1:
-                contstr = to_string(engine) + " Type ";
+                contstr = to_string(effnum) + " Type ";
+                if (write)
+                {
+                    if (isSysEff)
+                        synth->sysefx[effnum]->changeeffect((int)value);
+                    else
+                        synth->insefx[effnum]->changeeffect((int)value);
+                }
+                else
+                {
+                    if (isSysEff)
+                        value = synth->sysefx[effnum]->geteffect();
+                    else
+                        value = synth->insefx[effnum]->geteffect();
+                }
                 break;
-            case 2:
-                contstr = to_string(engine) + " To ";
+            case 2: // insert only
+                contstr = to_string(effnum) + " To ";
+                if (write)
+                    synth->Pinsparts[effnum] = (int)value;
+                else
+                    value = synth->Pinsparts[effnum];
                 break;
         }
-        contstr = "Effect " + contstr + actual;
+        contstr = "Effect " + contstr;
     }
-    else
+    else // system only
     {
         contstr = "From Effect " + to_string(engine);
-        second = " To Effect " + to_string(control)  + "  Value " + actual;
+        second = " To Effect " + to_string(control)  + "  Value ";
+        if (write)
+            synth->setPsysefxsend(engine, control, value);
+        else
+            value = synth->Psysefxsend[engine][control];
     }
 
-    synth->getRuntime().Log(name  + contstr + second);
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log(name  + contstr + second + actual);
 }
 
 

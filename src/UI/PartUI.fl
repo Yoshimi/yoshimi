@@ -836,7 +836,7 @@ send_data(128, o->value());}
     }
     Fl_Window partfx {
       label {Part's Insert Effects}
-      xywh {127 442 390 160} type Double hide
+      xywh {134 114 390 160} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Insert Effects").c_str());}
     } {
       Fl_Spinner inseffnocounter {
@@ -850,7 +850,7 @@ send_data(128, o->value());}
                 x = 1;
             bypasseff->value(part->Pefxbypass[ninseff]);
             sendtochoice->value(x);
-            send_data(64, o->value() - 1, true, 0xff, o->value() - 1);}
+            send_data(64, o->value() - 1);}
         tooltip {Effect No.} xywh {35 8 35 19} labelsize 12 maximum 3 textsize 11
         code1 {o->value(ninseff+1);}
       }
@@ -860,7 +860,7 @@ send_data(128, o->value());}
             part->partefx[ninseff]->changeeffect(o->value());
             synth->actionLock(unlock);
             inseffectui->refresh(part->partefx[ninseff], npart, ninseff);
-            send_data(65, o->value(), true, 0xff, ninseff);}
+            send_data(65, o->value());}
         tooltip {Effect Type} xywh {104 7 95 22} box UP_BOX down_box BORDER_BOX labelsize 11
         code0 {o->value(part->partefx[ninseff]->geteffect());}
       } {
@@ -926,7 +926,7 @@ if ((Fl::event_button() == 3))
                 part->partefx[ninseff]->setdryonly(true);
             else
                 part->partefx[ninseff]->setdryonly(false);
-            send_data(66, o->value(), true, 0xff, ninseff);}
+            send_data(66, o->value());}
         xywh {244 7 90 22} down_box BORDER_BOX labelfont 1 labelsize 11
         code0 {int x=part->Pefxroute[ninseff]; if (x==127) x=1;}
         code1 {o->value(x);}
@@ -947,7 +947,7 @@ if ((Fl::event_button() == 3))
       Fl_Check_Button bypasseff {
         label Bypass
         callback {part->Pefxbypass[ninseff]=((o->value())!=0);
-send_data(67, o->value(), true, 0xff, ninseff);}
+send_data(67, o->value());}
         tooltip {if the effect is not used (is bypassed)} xywh {55 135 20 22} down_box DOWN_BOX labelsize 12 align 4
         code0 {int x=part->Pefxbypass[ninseff];o->value(x);}
       }

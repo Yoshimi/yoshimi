@@ -855,7 +855,7 @@ send_data(0, o->value(),false);}
         } {}
       }
       Fl_Group {} {
-        xywh {3 427 380 36} box DOWN_BOX labelsize 12
+        xywh {3 427 380 36} box DOWN_BOX color 43 labelsize 12
       } {
         Fl_Box vumeter {
           label {VU-Meter}
