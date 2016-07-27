@@ -2199,7 +2199,7 @@ void InterChange::commandEnvelope(float value, unsigned char type, unsigned char
 
 void InterChange::commandSysIns(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char engine, unsigned char insert)
 {
-    bool write = true;//(type & 0x40) > 0;
+    bool write = (type & 0x40) > 0;
     bool isSysEff = (npart == 0xf1);
     int effnum;
     string name;
@@ -2234,9 +2234,9 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
                 else
                 {
                     if (isSysEff)
-                        value = synth->getRuntime().sysEffNum;
+                        effnum = synth->getRuntime().sysEffNum;
                     else
-                        value = synth->getRuntime().insEffNum;
+                        effnum = synth->getRuntime().insEffNum;
                     value = effnum;
                 }
                 break;
