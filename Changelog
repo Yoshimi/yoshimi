@@ -1,5 +1,11 @@
 yoshimi 1.4.x
 
+2016-7-28 Will
+* Implimented direct access to effect inserts, but not the actual filter
+  (sub) insert in dynfilter.
+* Added 'Effect_Inserts' file to dev_notes.
+* Updated other direct access docs.
+
 2016-7-27 Will
 * Bugfix: System effect sends wasn't reporting scroll wheel use.
 * Added system and insertion base effect controls to direct access.

@@ -5,6 +5,8 @@ Currently It doesn't update the GUI, and there is minimal error checking.
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions
 and "GUI_Interpretations.txt" for further explanations.
 
+Also, see "Effect_Inserts" for the actual effect controllers.
+
 Sections currently in place and tested:
 
 Top level controls
@@ -12,6 +14,7 @@ Main part controls
 Controllers
 Kit edit window
 Subsynth Editor
+Effects
 
 The remaining ones will display as if they had been written to, but won't
 actually change anything.

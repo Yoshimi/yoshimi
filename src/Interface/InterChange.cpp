@@ -107,7 +107,7 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         if (insert < 0xff)
             commandFilter(value, type, control, npart, kititem, engine, insert);
         else
-            commandEffects(value, type, control, npart, kititem, engine);
+            commandEffects(value, type, control, npart, kititem &0xf);
     }
     else if (engine == 2)
     {
@@ -1944,35 +1944,35 @@ void InterChange::commandFilter(float value, unsigned char type, unsigned char c
     string name;
     if (kititem >= 0x80)
     {
-        string efftype;
+        string effname;
         switch (kititem & 0xf)
         {
             case 0:
-                efftype = " NO Effect";
+                effname = " NO Effect";
                 break;
             case 1:
-                efftype = " Reverb";
+                effname = " Reverb";
                 break;
             case 2:
-                efftype = " Echo";
+                effname = " Echo";
                 break;
             case 3:
-                efftype = " Chorus";
+                effname = " Chorus";
                 break;
             case 4:
-                efftype = " Phaser";
+                effname = " Phaser";
                 break;
             case 5:
-                efftype = " AlienWah";
+                effname = " AlienWah";
                 break;
             case 6:
-                efftype = " Distortion";
+                effname = " Distortion";
                 break;
             case 7:
-                efftype = " EQ";
+                effname = " EQ";
                 break;
             case 8:
-                efftype = " DynFilter";
+                effname = " DynFilter";
                 break;
         }
 
@@ -1982,7 +1982,7 @@ void InterChange::commandFilter(float value, unsigned char type, unsigned char c
             name = "Insert";
         else name = "Part " + to_string(npart);
         name += " Effect " + to_string(engine); // this is the effect number
-        synth->getRuntime().Log(name + efftype + " ~ Filter Parameter " + to_string(control) + "  Value " + actual);
+        synth->getRuntime().Log(name + effname + " ~ Filter Parameter " + to_string(control) + "  Value " + actual);
     return;
     }
 
@@ -2287,56 +2287,85 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
 }
 
 
-void InterChange::commandEffects(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine)
+void InterChange::commandEffects(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem)
 {
+    bool write = (type & 0x40) > 0;
+    EffectMgr *eff;
+    int effnum;
+    string name;
+    if (npart == 0xf1)
+    {
+        effnum = synth->getRuntime().sysEffNum;
+        eff = synth->sysefx[effnum];
+        name = "System";
+    }
+    else if (npart == 0xf2)
+    {
+        effnum = synth->getRuntime().sysEffNum;
+        eff = synth->insefx[effnum];
+        name = "Insert";
+    }
+    else
+    {
+        effnum = synth->getRuntime().partEffNum;
+        eff = synth->part[npart]->partefx[effnum];
+        name = "Part " + to_string(npart);
+    }
+    name += " Effect " + to_string(effnum);
+
+    string effname;
+    switch (kititem)
+    {
+        case 0:
+            effname = " NO Effect"; // shouldn't get here!
+            break;
+        case 1:
+            effname = " Reverb";
+            break;
+        case 2:
+            effname = " Echo";
+            break;
+        case 3:
+            effname = " Chorus";
+            break;
+        case 4:
+            effname = " Phaser";
+            break;
+        case 5:
+            effname = " AlienWah";
+            break;
+        case 6:
+            effname = " Distortion";
+            break;
+        case 7:
+            effname = " EQ";
+            break;
+        case 8:
+            effname = " DynFilter";
+            break;
+    }
+
+    string contstr = "  Control " + to_string(control);
+    if (write)
+    {
+        if (control == 16)
+            	eff->changepreset((int)value);
+        else
+             eff->seteffectpar(control,(int)value);
+    }
+    else
+    {
+        if (control == 16)
+            value = eff->getpreset();
+        else
+            value = eff->geteffectpar(control);
+    }
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
     else
         actual = to_string(value);
 
-    string name;
-    if (npart == 0xf1)
-        name = "System";
-    else if (npart == 0xf2)
-        name = "Insert";
-    else
-        name = "Part " + to_string(npart);
-    name += " Effect " + to_string(engine);
-
-    string efftype;
-    switch (kititem & 0xf)
-    {
-        case 0:
-            efftype = " NO Effect";
-            break;
-        case 1:
-            efftype = " Reverb";
-            break;
-        case 2:
-            efftype = " Echo";
-            break;
-        case 3:
-            efftype = " Chorus";
-            break;
-        case 4:
-            efftype = " Phaser";
-            break;
-        case 5:
-            efftype = " AlienWah";
-            break;
-        case 6:
-            efftype = " Distortion";
-            break;
-        case 7:
-            efftype = " EQ";
-            break;
-        case 8:
-            efftype = " DynFilter";
-            break;
-    }
-
-    string contstr = "  Control " + to_string(control);
-
-    synth->getRuntime().Log(name + efftype + contstr + "  Value " + actual);
+    synth->getRuntime().Log(name + effname + contstr + "  Value " + actual);
 }
