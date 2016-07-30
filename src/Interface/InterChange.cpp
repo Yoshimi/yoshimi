@@ -71,12 +71,21 @@ void InterChange::mediate()
     for (size_t i = 0; i < commandSize; ++i)
         jack_ringbuffer_read(sendbuf, point, toread);
 
-    commandSend(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter);
+    commandSend(&getData);
 }
 
 
-void InterChange::commandSend(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char insertParam)
+void InterChange::commandSend(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char insertParam = getData->data.parameter;
+
     bool isGui = type & 0x20;
     char button = type & 0x1f;
     string isf;
@@ -95,46 +104,46 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         return;
     }
     if (npart == 0xc0)
-        commandVector(value, type, control);
+        commandVector(getData);
     else if (npart == 0xf0)
-        commandMain(value, type, control);
+        commandMain(getData);
     else if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
-        commandSysIns(value, type, control, npart, engine, insert);
+        commandSysIns(getData);
     else if (kititem == 0xff || (kititem & 0x20))
-        commandPart(value, type, control, npart, kititem, engine);
+        commandPart(getData);
     else if (kititem >= 0x80)
     {
         if (insert < 0xff)
-            commandFilter(value, type, control, npart, kititem, engine, insert);
+            commandFilter(getData);
         else
-            commandEffects(value, type, control, npart, kititem &0xf);
+            commandEffects(getData);
     }
     else if (engine == 2)
     {
         switch(insert)
         {
             case 0xff:
-                commandPad(value, type, control, npart, kititem);
+                commandPad(getData);
                 break;
             case 0:
-                commandLFO(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandLFO(getData);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kititem, engine, insert);
+                commandFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandEnvelope(getData);
                 break;
             case 5:
             case 6:
             case 7:
-                commandOscillator(value, type, control, npart, kititem, engine, insert);
+                commandOscillator(getData);
                 break;
             case 8:
             case 9:
-                commandResonance(value, type, control, npart, kititem, engine, insert);
+                commandResonance(getData);
                 break;
         }
     }
@@ -145,15 +154,15 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
             case 0xff:
             case 6:
             case 7:
-                commandSub(value, type, control, npart, kititem, insert);
+                commandSub(getData);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kititem, engine, insert);
+                commandFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandEnvelope(getData);
                 break;
         }
     }
@@ -162,23 +171,23 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         switch (insert)
         {
             case 0xff:
-                commandAddVoice(value, type, control, npart, kititem, engine);
+                commandAddVoice(getData);
                 break;
             case 0:
-                commandLFO(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandLFO(getData);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kititem, engine, insert);
+                commandFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandEnvelope(getData);
                 break;
             case 5:
             case 6:
             case 7:
-                commandOscillator(value, type, control, npart, kititem, engine, insert);
+                commandOscillator(getData);
                 break;
         }
     }
@@ -187,21 +196,21 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
         switch (insert)
         {
             case 0xff:
-                commandAdd(value, type, control, npart, kititem);
+                commandAdd(getData);
                 break;
             case 0:
-                commandLFO(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandLFO(getData);
                 break;
             case 1:
-                commandFilter(value, type, control, npart, kititem, engine, insert);
+                commandFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                commandEnvelope(value, type, control, npart, kititem, engine, insert, insertParam);
+                commandEnvelope(getData);
                 break;
             case 8:
-                commandResonance(value, type, control, npart, kititem, engine, insert);
+                commandResonance(getData);
                 break;
         }
     }
@@ -209,8 +218,12 @@ void InterChange::commandSend(float value, unsigned char type, unsigned char con
 }
 
 
-void InterChange::commandVector(float value, unsigned char type, unsigned char control)
+void InterChange::commandVector(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -270,8 +283,12 @@ void InterChange::commandVector(float value, unsigned char type, unsigned char c
 }
 
 
-void InterChange::commandMain(float value, unsigned char type, unsigned char control)
+void InterChange::commandMain(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+
     bool write = (type & 0x40) > 0;
     string contstr = "";
     switch (control)
@@ -287,10 +304,7 @@ void InterChange::commandMain(float value, unsigned char type, unsigned char con
         case 14:
             contstr = "Part Number";
             if (write)
-            {
                 synth->getRuntime().currentPart = value;
-                synth->getRuntime().partEffNum = 0; // must always be zero on part change
-            }
             else
                 value = synth->getRuntime().currentPart;
             break;
@@ -339,10 +353,19 @@ void InterChange::commandMain(float value, unsigned char type, unsigned char con
 }
 
 
-void InterChange::commandPart(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine)
+void InterChange::commandPart(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char effNum = engine;
+
     bool write = (type & 0x40) > 0;
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
+
     Part *part;
     part = synth->part[npart];
 
@@ -378,7 +401,6 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
         }
     }
 
-    int effNum = synth->getRuntime().partEffNum;
     string contstr = "";
     switch (control)
     {
@@ -468,18 +490,21 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
                  switch(engine)
                 {
                     case 0:
+                        contstr = "AddSynth " + contstr;
                         if (write)
                             part->kit[0].Padenabled = (char) value;
                         else
                             value = part->kit[0].Padenabled;
                         break;
                     case 1:
+                        contstr = "SubSynth " + contstr;
                         if (write)
                             part->kit[0].Psubenabled = (char) value;
                         else
                             value = part->kit[0].Psubenabled;
                         break;
                     case 2:
+                        contstr = "PadSynth " + contstr;
                         if (write)
                             part->kit[0].Ppadenabled = (char) value;
                         else
@@ -674,11 +699,6 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
 
         case 64:
             contstr = "Effect Number";
-            if (write)
-                synth->getRuntime().partEffNum = (int)value;
-            else
-                value = effNum;
-            break;
         case 65:
             contstr = "Effect " + to_string(effNum) + " Type";
             if (write)
@@ -893,8 +913,14 @@ void InterChange::commandPart(float value, unsigned char type, unsigned char con
 }
 
 
-void InterChange::commandAdd(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem)
+void InterChange::commandAdd(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -988,8 +1014,15 @@ void InterChange::commandAdd(float value, unsigned char type, unsigned char cont
 }
 
 
-void InterChange::commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem,unsigned char engine)
+void InterChange::commandAddVoice(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -1177,8 +1210,15 @@ void InterChange::commandAddVoice(float value, unsigned char type, unsigned char
 }
 
 
-void InterChange::commandSub(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char insert)
+void InterChange::commandSub(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char insert = getData->data.insert;
+
     bool write = (type & 0x40) > 0;
     Part *part;
     part = synth->part[npart];
@@ -1467,8 +1507,13 @@ void InterChange::commandSub(float value, unsigned char type, unsigned char cont
 }
 
 
-void InterChange::commandPad(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem)
+void InterChange::commandPad(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -1635,8 +1680,16 @@ void InterChange::commandPad(float value, unsigned char type, unsigned char cont
 }
 
 
-void InterChange::commandOscillator(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert)
+void InterChange::commandOscillator(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -1803,8 +1856,16 @@ void InterChange::commandOscillator(float value, unsigned char type, unsigned ch
 }
 
 
-void InterChange::commandResonance(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert)
+void InterChange::commandResonance(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -1867,8 +1928,16 @@ void InterChange::commandResonance(float value, unsigned char type, unsigned cha
 }
 
 
-void InterChange::commandLFO(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter)
+void InterChange::commandLFO(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insertParam = getData->data.parameter;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -1884,7 +1953,7 @@ void InterChange::commandLFO(float value, unsigned char type, unsigned char cont
         name = "  AddSynth Voice " + to_string(engine & 0x3f);
 
     string lfo;
-    switch (parameter)
+    switch (insertParam)
     {
         case 0:
             lfo = "  Amp";
@@ -1933,8 +2002,15 @@ void InterChange::commandLFO(float value, unsigned char type, unsigned char cont
 }
 
 
-void InterChange::commandFilter(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert)
+void InterChange::commandFilter(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -2081,8 +2157,17 @@ void InterChange::commandFilter(float value, unsigned char type, unsigned char c
 }
 
 
-void InterChange::commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter)
+void InterChange::commandEnvelope(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char insertParam = getData->data.parameter;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -2105,7 +2190,7 @@ void InterChange::commandEnvelope(float value, unsigned char type, unsigned char
     }
 
     string env;
-    switch(parameter)
+    switch(insertParam)
     {
         case 0:
             env = "  Amp";
@@ -2197,22 +2282,23 @@ void InterChange::commandEnvelope(float value, unsigned char type, unsigned char
 }
 
 
-void InterChange::commandSysIns(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char engine, unsigned char insert)
+void InterChange::commandSysIns(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char effnum = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
     bool write = (type & 0x40) > 0;
     bool isSysEff = (npart == 0xf1);
-    int effnum;
+
     string name;
     if (isSysEff)
-    {
         name = "System ";
-        effnum = synth->getRuntime().sysEffNum;
-    }
     else
-    {
         name = "Insert ";
-        effnum = synth->getRuntime().insEffNum;
-    }
 
     string contstr;
     string second;
@@ -2223,22 +2309,6 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
         {
             case 0:
                 contstr = "Number ";
-                if (write)
-                {
-                    effnum = (int) value;
-                    if (isSysEff)
-                        synth->getRuntime().sysEffNum = effnum;
-                    else
-                        synth->getRuntime().insEffNum = effnum;
-                }
-                else
-                {
-                    if (isSysEff)
-                        effnum = synth->getRuntime().sysEffNum;
-                    else
-                        effnum = synth->getRuntime().insEffNum;
-                    value = effnum;
-                }
                 break;
             case 1:
                 contstr = to_string(effnum) + " Type ";
@@ -2269,12 +2339,12 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
     }
     else // system only
     {
-        contstr = "From Effect " + to_string(engine);
+        contstr = "From Effect " + to_string(effnum);
         second = " To Effect " + to_string(control)  + "  Value ";
         if (write)
-            synth->setPsysefxsend(engine, control, value);
+            synth->setPsysefxsend(effnum, control, value);
         else
-            value = synth->Psysefxsend[engine][control];
+            value = synth->Psysefxsend[effnum][control];
     }
 
     string actual;
@@ -2287,27 +2357,31 @@ void InterChange::commandSysIns(float value, unsigned char type, unsigned char c
 }
 
 
-void InterChange::commandEffects(float value, unsigned char type, unsigned char control, unsigned char npart, unsigned char kititem)
+void InterChange::commandEffects(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit & 0x1f;
+    unsigned char effnum = getData->data.engine;
+
     bool write = (type & 0x40) > 0;
     EffectMgr *eff;
-    int effnum;
+
     string name;
     if (npart == 0xf1)
     {
-        effnum = synth->getRuntime().sysEffNum;
         eff = synth->sysefx[effnum];
         name = "System";
     }
     else if (npart == 0xf2)
     {
-        effnum = synth->getRuntime().sysEffNum;
         eff = synth->insefx[effnum];
         name = "Insert";
     }
     else
     {
-        effnum = synth->getRuntime().partEffNum;
         eff = synth->part[npart]->partefx[effnum];
         name = "Part " + to_string(npart);
     }

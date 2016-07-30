@@ -2027,7 +2027,7 @@ send_data(8, o->value(), 7);}
     code {//
 type += 1; // temp fix for wrong start value :(
 
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, type | 0x80);} {}
+synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, type | 0x80, neff);} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {eff=eff_;

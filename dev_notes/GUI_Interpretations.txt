@@ -29,7 +29,7 @@ is main volume, key shift etc.
 
 If part is < 0x40 and kit is 0xff it's the general part level controls, otherwise it's the kit level controls.
 
-If kit >= 0x20 it's the engine enable controls.
+If kit >= 0x20 but less than 0x80 it's the engine enable controls.
     (kit number ORed with 0x20)
 
 Vector Control
@@ -75,6 +75,7 @@ inserts
 5   oscillator (for add voice & pad harmonics)
 6   oscillator harmonic amplitude (for add voice & pad)
     harmonic amplitude (sub)
+
 7   oscillator harmonic phase (add, pad)
     harmonc bandwidth (sub)
 

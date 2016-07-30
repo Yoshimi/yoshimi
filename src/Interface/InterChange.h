@@ -37,14 +37,6 @@ class InterChange : private MiscFuncs
         InterChange(SynthEngine *_synth);
         ~InterChange();
 
-        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
-
-        void commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam);
-
-        void mediate();
-
-        jack_ringbuffer_t *sendbuf;
-
         union CommandBlock{
             struct{
                 float value;
@@ -61,23 +53,28 @@ class InterChange : private MiscFuncs
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
 
+        jack_ringbuffer_t *sendbuf;
+
+        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+
+        void mediate();
+        void commandSend(CommandBlock *getData);
+
     private:
-        void commandVector(float value, unsigned char type, unsigned char control);
-        void commandMain(float value, unsigned char type, unsigned char control);
-        void commandPart(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
-        void commandAdd(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
-        void commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
-        void commandSub(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char insert);
-        void commandPad(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
-        void commandOscillator(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
-        void commandResonance(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
-        void commandLFO(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
-        void commandFilter(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
-        void commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
-        void commandSysIns(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char engine, unsigned char insert);
-        void commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
-
-
+        void commandVector(CommandBlock *getData);
+        void commandMain(CommandBlock *getData);
+        void commandPart(CommandBlock *getData);
+        void commandAdd(CommandBlock *getData);
+        void commandAddVoice(CommandBlock *getData);
+        void commandSub(CommandBlock *getData);
+        void commandPad(CommandBlock *getData);
+        void commandOscillator(CommandBlock *getData);
+        void commandResonance(CommandBlock *getData);
+        void commandLFO(CommandBlock *getData);
+        void commandFilter(CommandBlock *getData);
+        void commandEnvelope(CommandBlock *getData);
+        void commandSysIns(CommandBlock *getData);
+        void commandEffects(CommandBlock *getData);
 
         SynthEngine *synth;
 };

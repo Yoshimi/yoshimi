@@ -142,9 +142,6 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
-        int           partEffNum;
-        int           sysEffNum;
-        int           insEffNum;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;

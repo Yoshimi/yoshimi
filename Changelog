@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-7-30 Will
+* Optimised parameter handling in direct access.
+* Updated docs.
+
 2016-7-28 Will
 * Implimented direct access to effect inserts, but not the actual filter
   (sub) insert in dynfilter.

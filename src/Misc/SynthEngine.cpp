@@ -732,11 +732,9 @@ int SynthEngine::ReadBank(void)
 
 void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
 {
-    /*
-     * while testing, this simply sends everything to commandSend but eventually it will
-     * partially do the decding and direction via ring buffers for actualy control.
-     */
-    interchange.commandSend(value, type, control, part, kit, engine, insert, insertParam);
+    //while testing, this simply sends everything to commandFetch
+
+    interchange.commandFetch(value, type, control, part, kit, engine, insert, insertParam);
     return;
 }
 
