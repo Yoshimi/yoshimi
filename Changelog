@@ -1,5 +1,8 @@
 yoshimi 1.4.x
 
+2016-7-31 Will
+* Updated docs - no code changes.
+
 2016-7-30 Will
 * Optimised parameter handling in direct access.
 * Updated docs.
