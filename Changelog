@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-8-2 Will
+* Applied gentoo build patches.
+  (doesn't seem to make any difference to other distros)
+
 2016-7-31 Will
 * Updated docs - no code changes.
 

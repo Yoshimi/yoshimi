@@ -221,6 +221,8 @@ find_library(Readline_LIBRARY
     HINTS ${Readline_ROOT_DIR}/lib
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_search_module(NCURSES REQUIRED ncurses)
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
   set(READLINE_FOUND TRUE)
 else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
@@ -471,8 +473,8 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
+    ${NCURSES_LIBRARIES}
     ${Readline_LIBRARY}
-    ncurses
     z
     dl
 )

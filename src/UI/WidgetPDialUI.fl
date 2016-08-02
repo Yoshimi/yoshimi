@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {WidgetPDial.h} {not_in_source in_header
-} 
+}
 
 comment {WidgetPDial.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,20 +29,20 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
     \#include "Misc/MiscFuncs.h"} {public global
-} 
+}
 
 decl {\#include <FL/fl_draw.H>
     \#include <FL/Fl_Tooltip.H>
     \#include <FL/Fl_Group.H>
     \#include <FL/x.H>
-    \#include <cairo/cairo.h>
-    \#include <cairo/cairo-xlib.h>} {private global
-} 
+    \#include <cairo.h>
+    \#include <cairo-xlib.h>} {private global
+}
 
 class TipWin {: {public Fl_Menu_Window, MiscFuncs}
 } {
@@ -106,7 +106,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
   decl {string text;} {private local
   }
-} 
+}
 
 class WidgetPDial {: {public Fl_Dial}
 } {
@@ -132,7 +132,7 @@ class WidgetPDial {: {public Fl_Dial}
     code {double dragsize, v, min = minimum(), max = maximum();
         int my;
         int mx;
-        
+
         switch (event)
         {
             case FL_PUSH:
@@ -327,4 +327,4 @@ class WidgetPDial {: {public Fl_Dial}
   }
   decl {float home;} {private local
   }
-} 
+}
