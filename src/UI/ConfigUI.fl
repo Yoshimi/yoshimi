@@ -198,7 +198,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Counter compression {
-            label {XML compression level}
+            label {XML Compression Level}
             callback {//
 		unsigned int tmp = synth->getRuntime().GzipCompression;
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
@@ -234,23 +234,23 @@ else
             xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
           Fl_Check_Button {} {
-            label {Hide Non Fatal Errors}
+            label {Hide Secondary Messages}
             callback {if (synth->getRuntime().hideErrors != o->value())
 {
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {334 219 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
-            label {Log XML headers}
+            label {Log XML Headers}
             callback {if (synth->getRuntime().logXMLheaders != o->value())
 {
     synth->getRuntime().logXMLheaders = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {322 239 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {132 239 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
           Fl_Check_Button {} {
@@ -260,8 +260,18 @@ else
     synth->getRuntime().showSplash = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {143 239 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {132 219 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
+          }
+          Fl_Check_Button {} {
+            label {* Start With Default State}
+            callback {if (synth->getRuntime().loadDefaultState != o->value())
+{
+    synth->getRuntime().loadDefaultState = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {334 239 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().loadDefaultState);}
           }
         }
         Fl_Group jackTab {

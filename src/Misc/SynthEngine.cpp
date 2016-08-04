@@ -781,6 +781,10 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
 {
     bool loadOK = false;
     int enablestate;
+
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+
     sem_wait (&partlock);
 
     if (Runtime.enable_part_on_voice_load)
@@ -793,9 +797,17 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
         partonoffWrite(npart, enablestate); // must be here to update gui
         loadOK = true;
         // show file instead of program if we got here from Instruments -> Load External...
+        gettimeofday(&tv2, NULL);
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+        }
+        int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
         Runtime.Log("Loaded " +
-                    ((pgm == -1) ? fname : asString(pgm) + " \"" + bank.getname(pgm) + "\"")
-                    + " to Part " + asString(npart));
+                    ((pgm == -1) ? fname : to_string(pgm) + " \"" + bank.getname(pgm) + "\"")
+                    + " to Part " + to_string(npart));
+        Runtime.Log("Time (mS) " + to_string(actual), 2);
         if (Runtime.showGui && guiMaster && guiMaster->partui
                             && guiMaster->partui->instrumentlabel
                             && guiMaster->partui->part)

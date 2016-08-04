@@ -122,6 +122,7 @@ class Config : public MiscFuncs
         string        nameTag;
 
         unsigned int  GzipCompression;
+        bool          loadDefaultState;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;

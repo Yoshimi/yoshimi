@@ -111,6 +111,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
     GzipCompression(3),
+    loadDefaultState(false),
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
@@ -212,6 +213,11 @@ bool Config::Setup(int argc, char **argv)
     Buffersize = nearestPowerOf2(Buffersize, 16, 1024);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
+    if (loadDefaultState && !restoreState)
+    {
+        StateFile = ConfigDir + "/yoshimi.state";
+        restoreState = true;
+    }
     if (restoreState)
     {
         char * fp;
@@ -548,6 +554,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         configChanged = true; // give the user the choice
     }
 
+    loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
 
     // engines
@@ -618,13 +625,15 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("oscil_size", Oscilsize);
 
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)
+    {
         if (presetsDirlist[i].size())
         {
             xmltree->beginbranch("PRESETSROOT",i);
             xmltree->addparstr("presets_root", presetsDirlist[i]);
             xmltree->endbranch();
         }
-
+    }
+    xmltree->addpar("defaultState", loadDefaultState);
     xmltree->addpar("interpolation", Interpolation);
 
     xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
@@ -694,7 +703,11 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     }
     ok = extractConfigData(xml); // this needs improving
     if (!startup && ok)
+    {
         ok = extractRuntimeData(xml) && synth->getfromXML(xml);
+        if (ok)
+            synth->getRuntime().stateChanged = true;
+    }
 
 end_game:
     if (xml)

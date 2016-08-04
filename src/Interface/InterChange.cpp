@@ -28,6 +28,10 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Params/Controller.h"
 #include "Params/SUBnoteParameters.h"
+#include "Params/PADnoteParameters.h"
+#include "Params/LFOParams.h"
+#include "Params/FilterParams.h"
+#include "Params/EnvelopeParams.h"
 #include "Effects/EffectMgr.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
@@ -1938,12 +1942,6 @@ void InterChange::commandLFO(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insertParam = getData->data.parameter;
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
     string name;
     if (engine == 0)
         name = "  AddSynth";
@@ -1998,6 +1996,12 @@ void InterChange::commandLFO(CommandBlock *getData)
             break;
     }
 
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
 }
 
@@ -2012,10 +2016,6 @@ void InterChange::commandFilter(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
 
     string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
 
     string name;
     if (kititem >= 0x80)
@@ -2058,6 +2058,11 @@ void InterChange::commandFilter(CommandBlock *getData)
             name = "Insert";
         else name = "Part " + to_string(npart);
         name += " Effect " + to_string(engine); // this is the effect number
+
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
         synth->getRuntime().Log(name + effname + " ~ Filter Parameter " + to_string(control) + "  Value " + actual);
     return;
     }
@@ -2070,6 +2075,8 @@ void InterChange::commandFilter(CommandBlock *getData)
         name = "  PadSynth";
     else if (engine >= 0x80)
         name = "  Adsynth Voice " + to_string(engine & 0x3f);
+
+ //   cout << "Test " << pars->Pvolume << endl;
 
     string contstr;
     switch (control)
@@ -2153,6 +2160,10 @@ void InterChange::commandFilter(CommandBlock *getData)
             break;
     }
 
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + contstr + " value " + actual);
 }
 
