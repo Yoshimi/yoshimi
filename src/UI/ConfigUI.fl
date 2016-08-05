@@ -57,7 +57,7 @@ class ConfigUI {selected : {private MiscFuncs}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
       Fl_Tabs {} {
-        xywh {5 5 385 297}
+        xywh {5 5 385 298}
       } {
         Fl_Group {} {
           label {Main settings}
@@ -230,18 +230,53 @@ else
             }
           }
           Fl_Box {} {
-            label {* These settings changes require a restart}
+            label {* Changing these settings requires a restart}
             xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
+        }
+        Fl_Group {} {
+          label Switches
+          xywh {5 25 382 277} hide
+        } {
           Fl_Check_Button {} {
-            label {Hide Secondary Messages}
+            label {* Start With Default State}
+            callback {if (synth->getRuntime().loadDefaultState != o->value())
+{
+    synth->getRuntime().loadDefaultState = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().loadDefaultState);}
+          }
+          Fl_Check_Button {} {
+            label {Hide Non Fatal Errors}
             callback {if (synth->getRuntime().hideErrors != o->value())
 {
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {334 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
+          }
+          Fl_Check_Button {} {
+            label {Show Splash Screen}
+            callback {if (synth->getRuntime().showSplash != o->value())
+{
+    synth->getRuntime().showSplash = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showSplash);}
+          }
+          Fl_Check_Button {} {
+            label {Log Load times}
+            callback {if (synth->getRuntime().showTimes != o->value())
+{
+    synth->getRuntime().showTimes = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showTimes);}
           }
           Fl_Check_Button {} {
             label {Log XML Headers}
@@ -250,28 +285,12 @@ else
     synth->getRuntime().logXMLheaders = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {132 239 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
           }
-          Fl_Check_Button {} {
-            label {Show Splash}
-            callback {if (synth->getRuntime().showSplash != o->value())
-{
-    synth->getRuntime().showSplash = o->value();
-    synth->getRuntime().configChanged = true;
-}}
-            xywh {132 219 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().showSplash);}
-          }
-          Fl_Check_Button {} {
-            label {* Start With Default State}
-            callback {if (synth->getRuntime().loadDefaultState != o->value())
-{
-    synth->getRuntime().loadDefaultState = o->value();
-    synth->getRuntime().configChanged = true;
-}}
-            xywh {334 239 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().loadDefaultState);}
+          Fl_Box {} {
+            label {* Changing this setting requires a restart}
+            xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group jackTab {
@@ -337,7 +356,7 @@ if (o->value() != tmp)
             code0 {o->value(synth->getRuntime().connectJackaudio);}
           }
           Fl_Box {} {
-            label {Settings changes require a restart}
+            label {Changing settings requires a restart}
             xywh {60 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
@@ -439,7 +458,7 @@ synth->getRuntime().configChanged = true;}
                 }}
           }
           Fl_Box {} {
-            label {Settings changes require a restart}
+            label {Changing settings requires a restart}
             xywh {52 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }

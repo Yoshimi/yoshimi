@@ -118,6 +118,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     EnableProgChange(1), // default will be inverted
     toConsole(0),
     hideErrors(0),
+    showTimes(0),
     logXMLheaders(0),
     configChanged(false),
     rtprio(50),
@@ -231,8 +232,8 @@ bool Config::Setup(int argc, char **argv)
         if (! isRegFile(StateFile))
         {
             no_state1: delete (fp);
-            no_state0: Log("Invalid state file specified for restore " + StateFile);
-            return false;
+            no_state0: Log("Invalid state file specified for restore " + StateFile, 2);
+            return true;
         }
         Log(StateFile);
         restoreSessionData(StateFile, true);
@@ -525,6 +526,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
+    showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
 
@@ -617,6 +619,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("single_row_panel", single_row_panel);
     xmltree->addpar("reports_destination", toConsole);
     xmltree->addpar("hide_system_errors", hideErrors);
+    xmltree->addpar("report_load_times", showTimes);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 

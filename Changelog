@@ -1,6 +1,12 @@
 yoshimi 1.4.x
 
 2016-8-4 Will
+* Bugfix: At startup all enabled parts were registering direct O/P
+  when not actualy directed to part/both.
+* Load time reporting now has its own switch.
+* Added 'switches' tab to Config window and moved them from 'Main'.
+
+2016-8-4 Will
 * Added load time (mS) to instrument load message.
 * New feature: Auto-load default state.
 

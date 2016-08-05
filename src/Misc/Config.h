@@ -131,6 +131,7 @@ class Config : public MiscFuncs
         int           EnableProgChange;
         bool          toConsole;
         bool          hideErrors;
+        bool          showTimes;
         bool          logXMLheaders;
         bool          configChanged;
         int           rtprio;
