@@ -1,11 +1,11 @@
 
-Add start with default saved state button to settings.
-
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
 
 Find out why first time start up doesn't set a default current directory - and put it right!
+
+Find out why loading a state or patch set at startup sometimes corrupts the stderr output even when messages are directed to the GUI.
 
 Change root/bank/instrument lists to single file for all instances.
 

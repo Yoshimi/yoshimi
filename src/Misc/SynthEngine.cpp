@@ -677,6 +677,8 @@ void SynthEngine::SetBankRoot(int rootnum)
 {
     string name;
     int currentRoot;
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
     if (bank.setCurrentRootID(rootnum))
     {
         if (Runtime.showGui)
@@ -685,10 +687,25 @@ void SynthEngine::SetBankRoot(int rootnum)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
         currentRoot = bank.getCurrentRootID();
+        name = asString(currentRoot) + " " + bank.getRootPath(currentRoot);
         if (rootnum != currentRoot)
-            name = "Cant find ID " + asString(rootnum) + ". Current root is ";
-        else name = "Root set to ";
-        Runtime.Log(name + asString(currentRoot) + " " + bank.getRootPath(currentRoot));
+            name = "Cant find ID " + asString(rootnum) + ". Current root is " + name;
+        else
+        {
+            if (Runtime.showTimes)
+            {
+                gettimeofday(&tv2, NULL);
+                if (tv1.tv_usec > tv2.tv_usec)
+                {
+                    tv2.tv_sec--;
+                    tv2.tv_usec += 1000000;
+                }
+                int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+                name += ("  Time " + to_string(actual) + "uS");
+            }
+            name = "Root set to " + name;
+        }
+        Runtime.Log(name);
     }
     else
         Runtime.Log("No match for root ID " + asString(rootnum));
@@ -709,13 +726,27 @@ void SynthEngine::SetBank(int banknum)
     */
 
     //new implementation uses only 1 call :)
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
     if (bank.setCurrentBankID(banknum, true))
     {
+        string name = "Bank set to " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname;
+        if (Runtime.showTimes)
+        {
+            gettimeofday(&tv2, NULL);
+            if (tv1.tv_usec > tv2.tv_usec)
+            {
+                tv2.tv_sec--;
+                tv2.tv_usec += 1000000;
+            }
+            int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+            name += ("  Time " + to_string(actual) + "uS");
+        }
+        Runtime.Log(name);
         if (Runtime.showGui)
         {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RefreshCurBank, 0);
         }
-        Runtime.Log("Bank set to " + asString(banknum) + " " + bank.roots [bank.currentRootID].banks [banknum].dirname);
     }
     else
     {

@@ -27,7 +27,9 @@
 using namespace std;
 
 #include "Misc/MiscFuncs.h"
-
+#include "Params/LFOParams.h"
+#include "Params/FilterParams.h"
+#include "Params/EnvelopeParams.h"
 
 class SynthEngine;
 
@@ -72,6 +74,7 @@ class InterChange : private MiscFuncs
         void commandResonance(CommandBlock *getData);
         void commandLFO(CommandBlock *getData);
         void commandFilter(CommandBlock *getData);
+        float filterReadWrite(CommandBlock *getData, FilterParams *pars);
         void commandEnvelope(CommandBlock *getData);
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);

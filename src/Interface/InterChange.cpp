@@ -27,6 +27,7 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
 #include "Params/Controller.h"
+#include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
 #include "Params/PADnoteParameters.h"
 #include "Params/LFOParams.h"
@@ -2015,6 +2016,9 @@ void InterChange::commandFilter(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
+    Part *part;
+    part = synth->part[npart];
+
     string actual;
 
     string name;
@@ -2068,13 +2072,25 @@ void InterChange::commandFilter(CommandBlock *getData)
     }
 
     if (engine == 0)
+    {
         name = "  AddSynth";
+        value = filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter);
+    }
     else if (engine == 1)
+    {
         name = "  SubSynth";
+        value = filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter);
+    }
     else if (engine == 2)
+    {
         name = "  PadSynth";
+        value = filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter);
+    }
     else if (engine >= 0x80)
+    {
         name = "  Adsynth Voice " + to_string(engine & 0x3f);
+        value = filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter);
+    }
 
  //   cout << "Test " << pars->Pvolume << endl;
 
@@ -2165,6 +2181,24 @@ void InterChange::commandFilter(CommandBlock *getData)
     else
         actual = to_string(value);
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + contstr + " value " + actual);
+}
+
+
+float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars)
+{
+    bool write = (getData->data.type & 0x40) > 0;
+    float val = getData->data.value;
+    switch (getData->data.control)
+    {
+        case 0:
+            if (write)
+                pars->Pfreq = val;
+            else
+                val = pars->Pfreq;
+            cout << "Freq " << (int) pars->Pfreq << endl;
+            break;
+    }
+    return val;
 }
 
 
