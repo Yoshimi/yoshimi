@@ -215,6 +215,7 @@ void InterChange::commandSend(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
             case 8:
+            case 9:
                 commandResonance(getData);
                 break;
         }

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
-} 
+}
 
 comment {OscilgenUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -30,55 +30,58 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is a derivative of the ZynAddSubFX original, modified October 2009 -
 January 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include "ResonanceUI.h"} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Slider.H>} {public local
-} 
+}
 
 decl {\#include <cmath>} {private local
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-} 
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
-} 
+}
 
 decl {\#include "LFOUI.h"} {public local
-} 
+}
 
 decl {\#include "FilterUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Synth/OscilGen.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class OscilSpectrum {: {public Fl_Box, MiscFuncs}
 } {
@@ -175,7 +178,7 @@ oscbase = oscbase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PSlider {: {public mwheel_slider}
 } {
@@ -205,7 +208,7 @@ if (!Fl::event_inside(X,Y,W,H)) {
 
 return(1);} {}
   }
-} 
+}
 
 class Oscilloscope {: {public Fl_Box}
 } {
@@ -309,7 +312,7 @@ phase=phase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class Oscilharmonic {: {public Fl_Group}
 } {
@@ -419,7 +422,7 @@ cbwidget=NULL;} {}
   }
   Function {send_data(int insert, int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, insert);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, insert);} {}
   }
   Function {init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {synth = _synth;
@@ -463,7 +466,7 @@ if (oscil->Phmag[n]==64) mag->selection_color(0);
   }
   decl {int engine;} {private local
   }
-} 
+}
 
 class OscilEditor {selected : {public PresetsUI_}
 } {
@@ -1245,7 +1248,7 @@ send_data (97, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 5);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 5);} {}
   }
   Function {OscilEditor(OscilGen *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {synth = _synth;
@@ -1339,4 +1342,4 @@ if (cbwidget!=NULL) {
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}

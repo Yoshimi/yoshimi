@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
-} 
+}
 
 comment {PartUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,14 +29,15 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified August 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-} 
+}
 
-decl {\#include "EffUI.h"
+decl {\#include "UI/MiscGui.h"
+    \#include "EffUI.h"
     \#include "BankUI.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
@@ -44,14 +45,14 @@ decl {\#include "EffUI.h"
     \#include "WidgetMWSliderUI.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-} 
+}
 
 decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
@@ -79,7 +80,7 @@ send_data(neff, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control + 0x28, npart);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control + 0x28, npart);} {}
   }
   Function {init(int npart_, int neff_, SynthEngine *_synth)} {} {
     code {//
@@ -100,14 +101,14 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PartUI_ {} {
   Function {showparameters(int kititem,int engine)} {return_type virtual
   } {
     code {;} {}
   }
-} 
+}
 
 class PartKitItem {: {public Fl_Group}
 } {
@@ -289,7 +290,7 @@ if ((Fl::event_button() == 3))
   }
   Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem | 0x20, engine);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine);} {}
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;part=NULL;} {}
@@ -361,7 +362,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
@@ -1304,7 +1305,7 @@ send_data(48, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine);} {}
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -1552,4 +1553,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool partKitOn;} {public local
   }
-} 
+}

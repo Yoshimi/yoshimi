@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {SubNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,34 +29,37 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified September 2014
 } {in_source in_header
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-} 
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
-} 
+}
 
 decl {\#include "FilterUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"} {public local
-} 
+}
 
 decl {\#include "Params/SUBnoteParameters.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class SUBnoteharmonic {: {public Fl_Group}
 } {
@@ -129,7 +132,7 @@ else
   }
   Function {send_data(int insert, int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 1, insert);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, 1, insert);} {}
   }
   Function {init(SUBnoteParameters *pars_, int n_, int npart_, int kititem_)} {} {
     code {pars=pars_;
@@ -161,7 +164,7 @@ hide();
   }
   decl {int kititem;} {private local
   }
-} 
+}
 
 class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
@@ -682,7 +685,7 @@ send_data (50, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 1);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, 1);} {}
   }
   Function {SUBnoteUI(SUBnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {pars = parameters;
@@ -707,4 +710,4 @@ make_window();} {}
   }
   decl {int kititem;} {private local
   }
-} 
+}

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
-} 
+}
 
 comment {LFOUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,37 +29,40 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {selected in_source in_header
-} 
+}
 
 decl {\#include <iostream>} {public local
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Params/LFOParams.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class LFOUI {: {public Fl_Group, PresetsUI_}
 } {
@@ -205,7 +208,7 @@ LFOtype->value(pars->PLFOtype);} {}
   }
   Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 0, type);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 0, type);} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {pars=lfopars_;
@@ -235,4 +238,4 @@ lfoparamswindow->label(this->label());} {}
   }
   decl {int engine;} {private local
   }
-} 
+}

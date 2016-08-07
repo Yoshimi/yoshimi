@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {ResonanceUI.h} {not_in_source in_header
-} 
+}
 
 comment {ResonanceUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,40 +29,43 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified January 2010
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Value_Output.H>} {public local
-} 
+}
 
 decl {\#include <cmath>} {private local
-} 
+}
 
 decl {\#include <iostream>} {private local
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Synth/Resonance.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 class ResonanceGraph {: {public Fl_Box}
 } {
@@ -73,7 +76,7 @@ applybutton=NULL;} {}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 9);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 9);} {}
   }
   Function {init(Resonance *respar_, Fl_Value_Output *khzvalue_, Fl_Value_Output *dbvalue_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -268,7 +271,7 @@ this->applybutton=applybutton;} {}
   }
   decl {Fl_Widget *cbwidget,*applybutton;} {private local
   }
-} 
+}
 
 class ResonanceUI {: PresetsUI_
 } {
@@ -476,7 +479,7 @@ send_data(21, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 8);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 8);} {}
   }
   Function {ResonanceUI(Resonance *respar_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -546,4 +549,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool ADvsPAD;} {private local
   }
-} 
+}

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {WidgetPDial.h} {not_in_source in_header
-}
+} 
 
 comment {WidgetPDial.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,12 +29,12 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
     \#include "Misc/MiscFuncs.h"} {public global
-}
+} 
 
 decl {\#include <FL/fl_draw.H>
     \#include <FL/Fl_Tooltip.H>
@@ -42,7 +42,7 @@ decl {\#include <FL/fl_draw.H>
     \#include <FL/x.H>
     \#include <cairo.h>
     \#include <cairo-xlib.h>} {private global
-}
+} 
 
 class TipWin {: {public Fl_Menu_Window, MiscFuncs}
 } {
@@ -106,9 +106,9 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
   decl {string text;} {private local
   }
-}
+} 
 
-class WidgetPDial {: {public Fl_Dial}
+class WidgetPDial {selected : {public Fl_Dial}
 } {
   Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
     code {//
@@ -144,6 +144,9 @@ class WidgetPDial {: {public Fl_Dial}
                          do_callback();
                     return 1;
         	}
+        	if (this->when() != 0) // only effects knobs  need this
+                         do_callback();
+
                 oldvalue = value();
             case FL_DRAG:
                  if(!pos)
@@ -220,8 +223,7 @@ class WidgetPDial {: {public Fl_Dial}
                  return 1;
                  break;
         }
-        return 0;} {selected
-    }
+        return 0;} {}
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {
@@ -327,4 +329,4 @@ class WidgetPDial {: {public Fl_Dial}
   }
   decl {float home;} {private local
   }
-}
+} 

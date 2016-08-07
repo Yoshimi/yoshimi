@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-8-7 Will
+* Created src/UI/MiscGui.h to become only link between synth & GUI.
+* Bugfix: Effects 'home' on right click had failed.
+* Bugfix: AddSynth resonance wasn't showing on GUI button 2.
+
 2016-8-6 Will
 * Started actual direct control of filters.
 * Added root and bank load times but in uS!

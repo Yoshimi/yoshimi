@@ -837,8 +837,8 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
             gettimeofday(&tv2, NULL);
             if (tv1.tv_usec > tv2.tv_usec)
             {
-                    tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
+                tv2.tv_sec--;
+                tv2.tv_usec += 1000000;
             }
             int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
             loaded += ("  Time " + to_string(actual) + "mS");

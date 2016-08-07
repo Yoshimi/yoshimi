@@ -289,6 +289,7 @@ set (Misc_sources
 set (Interface_Sources
     Interface/CmdInterface.cpp
     Interface/InterChange.cpp
+    UI/MiscGui.cpp
 )
 
 set (Params_sources

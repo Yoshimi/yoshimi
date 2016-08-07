@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,66 +29,69 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {\#include <iostream>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "ADnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "EffUI.h"} {public local
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public local
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "PartUI.h"} {public local
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 decl {\#include "VectorUI.h"} {public local
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public local
-} 
+}
 
 decl {\#include "MasterMiscUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-} 
+}
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1067,7 +1070,8 @@ updatepanel();}
       }
     }
   }
-  Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {open
+  } {
     code {//
 if (kititem == 0xff)
     kititem = 0xf0;
@@ -1079,7 +1083,8 @@ else if (kititem == 0xf2)
 else
     eng = 0xff;
 
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, kititem, 0xff, eng);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {selected
+    }
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -1922,4 +1927,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {bool NewWindows;} {private local
   }
-} 
+}
