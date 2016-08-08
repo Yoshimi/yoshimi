@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-8-8 Will
+* Defined direct commands for 'set default' and 'MIDI learn'.
+* Activated CLI ID.
+* Updated docs.
+
 2016-8-7 Will
 * Created src/UI/MiscGui.h to become only link between synth & GUI.
 * Bugfix: Effects 'home' on right click had failed.

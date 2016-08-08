@@ -18,6 +18,8 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 */
+
+#include <FL/x.H>
 #include <iostream>
 #include "Misc/SynthEngine.h"
 #include "MiscGui.h"
@@ -26,7 +28,19 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter)
 {
-    // cout << "Type " << type & 0x20 << "\n";
+    // cout << "Type " << type & 0x20 << endl;
+    if ((type & 3) == 3)
+    { // value type is now irrelevant
+        if(Fl::event_state(FL_CTRL) != 0)
+            type = 3;
+            // identifying this for button 3 as MIDI learn
+        else
+            type = 0;
+            // identifying this for button 3 as set default
+    }
+    else if((type & 7) > 2)
+        type = 1 | (type & (1 << 7));
+        // change scroll wheel to button 1
 
     // 0x20 = from GUI
     synth->commandFetch(value, type | 0x20, control, part, kititem, engine, insert, parameter);

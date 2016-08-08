@@ -93,12 +93,22 @@ void InterChange::commandSend(CommandBlock *getData)
 
     bool isGui = type & 0x20;
     char button = type & 0x1f;
-    string isf;
+    string isValue;
+    if (type & 0x10)
+        synth->getRuntime().Log("From CLI");
     if (isGui && button != 2)
     {
-        if (!(type &0x80))
-            isf = "f";
-        synth->getRuntime().Log("\n  Value " + to_string(value) + isf
+        if ((type & 3) == 0)
+            isValue = "Request set default";
+        else if ((type & 3) == 3)
+            isValue = "Request MIDI learn";
+        else
+        {
+            isValue = "\n  Value " + to_string(value);
+            if (!(type &0x80))
+                isValue +=  "f";
+        }
+        synth->getRuntime().Log(isValue
                             + "\n  Button " + to_string((int) type & 7)
                             + "\n  Control " + to_string((int) control)
                             + "\n  Part " + to_string((int) npart)

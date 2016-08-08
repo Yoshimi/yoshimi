@@ -19,7 +19,7 @@ Reverb
 
 
 Echo
-0   Voume
+0   Volume
 1   Panning
 2   Delay
 3   L/R delay
@@ -27,7 +27,7 @@ Echo
 5   Feedback
 6   Damping
 
-16 Preset number (0/8)
+16 Preset number (0-8)
 
 
 Chorus
@@ -94,7 +94,7 @@ Distortion
 7   Low pass filter
 8   High pass filter
 9   Stereo (0/1)
-10  Prefilter - before dostortion (0-1)
+10  Prefilter - before distortion (0-1)
 
 16  Preset number (0-5)
 

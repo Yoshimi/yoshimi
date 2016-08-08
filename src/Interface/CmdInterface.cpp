@@ -1990,7 +1990,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         float value = string2float(point);
         point = skipChars(point);
-        unsigned char type = (string2int127(point) & 0x40) | 0x80;
+        unsigned char type = (string2int127(point) & 0x40) | 0x91;
+        // fix as: not MIDI learn, from CLI, integer
         point = skipChars(point);
         unsigned char control = string2int(point);
         point = skipChars(point);
