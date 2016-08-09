@@ -311,9 +311,10 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
                     }
                     if (ch == '-')
                     {
-                        int instnum = string2int(candidate.substr(0, 4));
+                        int instnum = string2int(candidate.substr(0, chk));
                         // remove "NNNN-" and .xiz extension for instrument name
-                        string instname = candidate.substr(5, candidate.size() - xizext.size() - 5);
+                        // modified for numbered instruments with < 4 digits
+                        string instname = candidate.substr(chk + 1, candidate.size() - xizext.size() - chk - 1);
                         addtobank(rootID, banknum, instnum - 1, candidate, instname);
                     }
                     else

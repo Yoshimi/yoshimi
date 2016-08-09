@@ -1,5 +1,12 @@
 yoshimi 1.4.x
 
+2016-8-9 Will
+* Slow program load no longer freezes GUI
+* Bugfix: Very obscure! Made some program load ops fail if number was
+  less than 4 digits and there was a space in the name where the first
+  character would otherwise be.
+* Updated LV2 for new MiscGui files.
+
 2016-8-8 Will
 * Defined direct commands for 'set default' and 'MIDI learn'.
 * Activated CLI ID.

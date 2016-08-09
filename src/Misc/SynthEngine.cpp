@@ -424,6 +424,9 @@ void *SynthEngine::RBPthread(void)
                     case 3:
                         SetProgram(block.data[1], block.data[2]);
                         break;
+                    case 4:
+                        SetProgram(block.data[1], (block.data[2] + 128));
+                        break;
                 }
             }
             else
