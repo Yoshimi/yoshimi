@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-}
+} 
 
 comment {MasterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,69 +29,69 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <string>} {public local
-}
+} 
 
 decl {\#include <iostream>} {public local
-}
+} 
 
 decl {using namespace std;} {public local
-}
+} 
 
 decl {\#include "UI/MiscGui.h"} {public local
-}
+} 
 
 decl {\#include "ADnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "SUBnoteUI.h"} {public local
-}
+} 
 
 decl {\#include "EffUI.h"} {public local
-}
+} 
 
 decl {\#include "VirKeyboardUI.h"} {public local
-}
+} 
 
 decl {\#include "ConfigUI.h"} {public local
-}
+} 
 
 decl {\#include "BankUI.h"} {public local
-}
+} 
 
 decl {\#include "PartUI.h"} {public local
-}
+} 
 
 decl {\#include "MicrotonalUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "ParametersUI.h"} {public local
-}
+} 
 
 decl {\#include "VectorUI.h"} {public local
-}
+} 
 
 decl {\#include "ConsoleUI.h"} {public local
-}
+} 
 
 decl {\#include "MasterMiscUI.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-}
+} 
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -320,14 +320,9 @@ mainCreateNewInstance(forceId);}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-				// pgm = -1 here because it's not from a bank
-				int result = synth->SetProgramToPart(npart, -1, string(filename));
+	        synth->writeRBP(5, npart,miscMsgPush(filename));
                 npartcounter->do_callback();
-                updatepanel();
-                if (result == 0)
-                    fl_alert("Failed to load instrument file");
-                else if (result == 3)
-                    fl_alert("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save.");}
+                updatepanel();}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1070,8 +1065,7 @@ updatepanel();}
       }
     }
   }
-  Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {open
-  } {
+  Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
 if (kititem == 0xff)
     kititem = 0xf0;
@@ -1083,8 +1077,7 @@ else if (kititem == 0xf2)
 else
     eng = 0xff;
 
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {selected
-    }
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -1510,6 +1503,9 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
         bankui-> rescan_for_banks(false);
     }} {}
   }
+  Function {ShowAlert(int num)} {} {
+    code {fl_alert("%s", miscMsgPop(num).c_str());} {}
+  }
   Function {getSynth()} {return_type {SynthEngine *}
   } {
     code {return synth;} {}
@@ -1927,4 +1923,4 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
   }
   decl {bool NewWindows;} {private local
   }
-}
+} 

@@ -22,8 +22,11 @@
 
 #include <cmath>
 #include <string>
+#include <list>
 
 using namespace std;
+
+static list<string> miscList;
 
 class MiscFuncs
 {
@@ -59,6 +62,9 @@ class MiscFuncs
         char *skipChars(char *buf);
         int matchWord(int numChars, char *point, const char *word);
         bool matchnMove(int num, char *&pnt, const char *word);
+
+        int miscMsgPush(string text);
+        string miscMsgPop(int pos);
 
         unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max);
         float limitsF(float value, float min, float max);

@@ -1,5 +1,11 @@
 yoshimi 1.4.x
 
+2016-8-10 Will
+* Implemented simple internal text messaging system.
+* Added autoload state to CLI and NRPNs.
+* Added instrument load time to CLI and NRPNs.
+* Updated docs.
+
 2016-8-9 Will
 * Slow program load no longer freezes GUI
 * Bugfix: Very obscure! Made some program load ops fail if number was

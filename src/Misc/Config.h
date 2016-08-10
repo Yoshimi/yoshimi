@@ -225,6 +225,7 @@ public:
         UpdateBankRootDirs,
         RescanForBanks,
         RefreshCurBank,
+        GuiAlert,
         UNDEFINED = 9999
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver

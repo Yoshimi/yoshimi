@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2016, Will Godfrey 
+Copyright 2014 -2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified September 2014
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <cmath>} {public local
@@ -46,7 +46,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -238,7 +238,7 @@ else
           label Switches
           xywh {5 25 382 277} hide
         } {
-          Fl_Check_Button {} {
+          Fl_Check_Button autoState {
             label {* Start With Default State}
             callback {if (synth->getRuntime().loadDefaultState != o->value())
 {
@@ -248,7 +248,7 @@ else
             xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
             callback {if (synth->getRuntime().hideErrors != o->value())
 {
@@ -268,7 +268,7 @@ else
             xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button times {
             label {Log Load times}
             callback {if (synth->getRuntime().showTimes != o->value())
 {
@@ -906,6 +906,11 @@ presets->hide();}
                 Epcheck->value(1);
             }
             Epend->hide();
+            break;
+        case 5 : // Switches
+            autoState->value(synth->getRuntime().loadDefaultState > 0);
+            times->value(synth->getRuntime().showTimes > 0);
+            nonFatal->value(synth->getRuntime().hideErrors);
             break;
     }} {}
   }

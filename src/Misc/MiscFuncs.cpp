@@ -24,7 +24,9 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sstream>
+#include <iostream>
 #include <string.h>
+#include <mutex>
 
 using namespace std;
 
@@ -337,6 +339,68 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  if (found)
      pnt = skipChars(pnt);
  return found;
+}
+
+
+/*
+ * These two functions provide a transparent text messaging system.
+ * Calling functions only need to recognise integers and strings.
+ *
+ * Push extends the list if there are no empty slots. It will also
+ * block while writing, but should be very quick.
+ *
+ * Pop is destructive. No two functions should ever have been given
+ * the same ID, but if they do, the second will get an empty string.
+ */
+int MiscFuncs::miscMsgPush(string text)
+{
+    mutex mtx;
+    int idx = 0;
+    list<string>::iterator it = miscList.begin();
+
+    mtx.lock();
+    while(it != miscList.end())
+    {
+        if ( *it == "")
+        {
+            *it = text;
+            mtx.unlock();
+            return idx;
+        }
+        ++ it;
+        ++ idx;
+    }
+    if (miscList.size() >= 255)
+    {
+        mtx.unlock();
+        cout << "List too big :(" << endl;
+        return -1;
+    }
+
+    miscList.push_back(text);
+    mtx.unlock();
+    return idx;
+}
+
+
+string MiscFuncs::miscMsgPop(int pos)
+{
+    string text = "";
+    int idx = 0;
+    list<string>::iterator it = miscList.begin();
+
+    while(it != miscList.end())
+    {
+        if (idx == pos)
+        {
+            swap(text, *it);
+            break;
+        }
+        ++ it;
+        ++ idx;
+    }
+
+    return text;
 }
 
 

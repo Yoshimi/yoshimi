@@ -29,7 +29,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/Fl_Button.H>} {public local
@@ -175,7 +175,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     draw_box(value() ? (down_box() ? down_box() : fl_down(box())) : box(), x(), y(), w(), h(), (Fl_Color) BASE_COLOUR);
 
     //draw_backdrop();
-    
+
     Fl_Color col = value() ? selection_color() : color();
     if (labeltype() == FL_NORMAL_LABEL && value())
     {
@@ -186,7 +186,7 @@ class BankSlot {: {public Fl_Button, BankProcess_}
     }
     else
         draw_label();
- 
+
     if (Fl::focus() == this) draw_focus();} {}
   }
 } 
@@ -266,7 +266,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -278,7 +278,7 @@ class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
     int n = o->value();
     if (n < 0)
         return;
-    const Fl_Menu_Item &item = o->menu()[n]; 
+    const Fl_Menu_Item &item = o->menu()[n];
     int nbank = reinterpret_cast<long>(item.user_data());
     const BankEntry &bankEntry = bank->getBank(nbank);
     if (!bank->setCurrentBankID(nbank))
@@ -451,7 +451,7 @@ removeselection();}
     } {
       Fl_Button {} {
         label Roots
-        callback {// 
+        callback {//
     pathwindow->show();
     if ((Fl::event_button() == 3))
        rootuiwindow->hide();}
@@ -580,7 +580,7 @@ if (tmp)
 {
     selectedRootID = reinterpret_cast<long>(o->data(tmp));
 }
-    
+
 changeIDbutton->value(recoverID());
 oldrootID = changeIDbutton->value();
 Pend->hide();}
@@ -723,13 +723,10 @@ fnr = &RootProcess_::rootprocess;
         if ((what == 1 || what == 3) && mode == 1 && !bank->emptyslot(slot))
         {
             // Reads from slot
-	    //synth->SetProgramToPart(*npart, slot, bank->getfilename(slot));
             if (slot < 128)
                 synth->writeRBP(3, *npart, slot);
 	    else
                 synth->writeRBP(4, *npart, slot - 128);
-            // next line would have set file name not internal instrument name
-            //synth->part[*npart]->Pname = thisname;
             if (what == 3)
                 bankuiwindow->hide();
             cbwig->do_callback();
@@ -840,7 +837,7 @@ fnr = &RootProcess_::rootprocess;
     unsigned int slot = this->slot;
     string thisname = bank->getBankName(slot);
 
-    
+
         if ((what == 1 || what == 3) && mode == 1 && !thisname.empty())
         {
             // Selects from slot
@@ -899,7 +896,7 @@ fnr = &RootProcess_::rootprocess;
                 setrootread();
                 return;
             }
-                
+
             if (!bank->newIDbank(dirname, (unsigned int)slot))
             {
                 setrootread();
@@ -1025,12 +1022,12 @@ fnr = &RootProcess_::rootprocess;
             {
                 banklist->value(n);
             }
-        }   
+        }
     }
     refreshmainwindow();} {}
   }
   Function {set_bank_slot()} {} {
-    code {// 
+    code {//
   size_t curID = bank->getCurrentBankID();
  const Fl_Menu_Item *curItem = 0;
     for(int i = 0; i < banklist->size(); i++)

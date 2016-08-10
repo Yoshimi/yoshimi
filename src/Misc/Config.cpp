@@ -1346,6 +1346,17 @@ void GuiThreadMsg::processGuiMessages()
             }
             break;
 
+        case GuiThreadMsg::GuiAlert:
+            if(msg->data)
+            {
+                SynthEngine *synth = ((SynthEngine *)msg->data);
+                MasterUI *guiMaster = synth->getGuiMaster(false);
+                if(guiMaster)
+                {
+                    guiMaster->ShowAlert(msg->index);
+                }
+            }
+
         default:
             break;
         }

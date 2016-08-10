@@ -424,8 +424,13 @@ void *SynthEngine::RBPthread(void)
                     case 3:
                         SetProgram(block.data[1], block.data[2]);
                         break;
+
                     case 4:
                         SetProgram(block.data[1], (block.data[2] + 128));
+                        break;
+
+                    case 5:
+                        SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
                 }
             }
@@ -854,7 +859,16 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     }
     else
         partonoffWrite(npart, enablestate); // also here to restore failed load state.
+
     sem_post (&partlock);
+    if (Runtime.showGui && guiMaster)
+    {
+        if (!loadOK)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Failed to load " + fname));
+        else if (part[npart]->Pname == "Simple Sound")
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save."));
+    }
+
     return loadOK;
 }
 
@@ -1298,6 +1312,15 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
     }
     else
         msg_buf.push_back("  Reports sent to stderr");
+    if (Runtime.loadDefaultState)
+        msg_buf.push_back("  Autostate on");
+    else
+        msg_buf.push_back("  Autostate off");
+
+    if (Runtime.showTimes)
+        msg_buf.push_back("  Times on");
+    else
+        msg_buf.push_back("  Times off");
 }
 
 
@@ -1365,6 +1388,29 @@ void SynthEngine::SetSystemValue(int type, int value)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
             break;
+
+        case 101:
+            if (value > 63)
+                Runtime.loadDefaultState = true;
+            else
+                Runtime.loadDefaultState = false;
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+            break;
+
+        case 102:
+            if (value > 63)
+                Runtime.showTimes = true;
+            else
+                Runtime.showTimes = false;
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+            break;
+
+        case 103:
+            if (value > 63)
+                Runtime.hideErrors = true;
+            else
+                Runtime.hideErrors = false;
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
 
         case 108: // list vector parameters
             ListVectors(msg);

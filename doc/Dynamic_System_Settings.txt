@@ -16,6 +16,12 @@ MSB
 
 100 LSB > 63        Send reports to Reports window, otherwise to stderr.
 
+101 LSB > 63        Autoload default state on startup.
+
+102 LSB > 63        Ad times to instrument load message.
+
+103 LSB > 63        Hide non-fatal report messages.
+
 108 LSB x  [13824]  List settings of all vectors.
 
 109 LSB x  [13843]  List the following:

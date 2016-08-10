@@ -107,6 +107,7 @@ string toplist [] = {
     "AVailable <n>",              "available parts (16, 32, 64)",
     "Volume <n>",                 "master volume",
     "SHift <n>",                  "master key shift semitones (0 no shift)",
+    "TIMes [s]",                  "time display on instrument load message (ENable / other",
     "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
     "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
     "Alsa Midi <s>",              "* name of alsa MIDI source",
@@ -114,6 +115,7 @@ string toplist [] = {
     "Jack Midi <s>",              "* name of jack MIDI source",
     "Jack Server <s>",            "* jack server name",
     "Jack AUto <s>",              "* (0 off, other on)",
+    "AUTostate [s]",              "* autoload default state at start (ENable / other)",
     "end"
 };
 
@@ -907,7 +909,7 @@ int CmdInterface::commandPart(bool justSet)
         }
         if (point[0] != 0) // force part not channel number
         {
-            synth->SetProgram(npart | 0x80, string2int(point));
+            synth->writeRBP(3, npart | 0x80, string2int(point));
             reply = done_msg;
         }
         else
@@ -1176,12 +1178,12 @@ int CmdInterface::commandReadnSet()
             synth->SetSystemValue(100, 0);
         else if (matchnMove(2, point, "show"))
         {
-            Runtime.hideErrors = false;
+            synth->SetSystemValue(103, 0);
             Runtime.Log("Showing all errors");
         }
         else if (matchnMove(1, point, "hide"))
         {
-            Runtime.hideErrors = true;
+            synth->SetSystemValue(103, 127);
             Runtime.Log("Hiding non-fatal errors");
         }
         else
@@ -1190,6 +1192,26 @@ int CmdInterface::commandReadnSet()
             Runtime.hideErrors = false;
             Runtime.Log("Showing all errors");
         }
+        reply = done_msg;
+        Runtime.configChanged = true;
+    }
+
+    else if (matchnMove(3, point, "autostate"))
+    {
+        if (matchnMove(2, point, "enable"))
+            synth->SetSystemValue(101, 127);
+        else
+            synth->SetSystemValue(101, 0);
+        reply = done_msg;
+        Runtime.configChanged = true;
+    }
+
+    else if (matchnMove(3, point, "times"))
+    {
+        if (matchnMove(2, point, "enable"))
+            synth->SetSystemValue(102, 127);
+        else
+            synth->SetSystemValue(102, 0);
         reply = done_msg;
         Runtime.configChanged = true;
     }
@@ -1895,7 +1917,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             if (point[0] == 0)
                 reply = name_msg;
-            else if (synth->SetProgramToPart(npart, -1, (string) point))
+            else
+                synth->writeRBP(5, npart, miscMsgPush((string) point));
                 reply = done_msg;
         }
         else
