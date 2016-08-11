@@ -91,6 +91,13 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
 
+    if (insert < 0xff)
+        insert &= 0x1f;
+    /*
+     * This is necessary to ensure filter sequence position doesn't
+     * mess up the following switches.
+     */
+
     bool isGui = type & 0x20;
     char button = type & 0x1f;
     string isValue;
@@ -1233,7 +1240,7 @@ void InterChange::commandSub(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    unsigned char insert = getData->data.insert;
+    unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
 
     bool write = (type & 0x40) > 0;
     Part *part;
@@ -1704,7 +1711,7 @@ void InterChange::commandOscillator(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+    unsigned char insert = getData->data.insert &0x1f; // ensure no stray filter
 
     string actual;
     if (type & 0x80)
@@ -1880,7 +1887,7 @@ void InterChange::commandResonance(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+    unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
 
     string actual;
     if (type & 0x80)
@@ -2027,6 +2034,11 @@ void InterChange::commandFilter(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
+    int nseqpos = getData->data.insert >> 5;
+    int nformant = getData->data.parameter & 0x1f;
+    int nvowel = getData->data.parameter >> 5;
+
+
     Part *part;
     part = synth->part[npart];
 
@@ -2114,14 +2126,14 @@ void InterChange::commandFilter(CommandBlock *getData)
         case 1:
             contstr = "Q";
             break;
+        case 2:
+            contstr = "FreqTr";
+            break;
         case 3:
             contstr = "VsensA";
             break;
         case 4:
             contstr = "Vsens";
-            break;
-        case 2:
-            contstr = "FreqTr";
             break;
         case 5:
             contstr = "gain";
@@ -2136,7 +2148,7 @@ void InterChange::commandFilter(CommandBlock *getData)
             contstr = "An Type";
             break;
         case 9:
-            contstr = "St Type";
+            contstr = "SV Type";
             break;
 
         case 16:
@@ -2186,12 +2198,16 @@ void InterChange::commandFilter(CommandBlock *getData)
             contstr = "Neg Input";
             break;
     }
-
+    string extra = "";
+    if (control >= 18 && control <= 20)
+        extra = "Formant " + to_string(nformant) + "  Vowel " + to_string(nvowel) + "  ";
+    else if (control == 37)
+        extra = "Seq Pos " + to_string(nseqpos) + "  ";
     if (type & 0x80)
         actual = to_string((int)round(value));
     else
         actual = to_string(value);
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + extra + contstr + " value " + actual);
 }
 
 
@@ -2199,6 +2215,11 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars)
 {
     bool write = (getData->data.type & 0x40) > 0;
     float val = getData->data.value;
+
+    int nseqpos = getData->data.insert >> 5;
+    int nformant = getData->data.parameter & 0x1f;
+    int nvowel = getData->data.parameter >> 5;
+
     switch (getData->data.control)
     {
         case 0:
@@ -2207,6 +2228,202 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars)
             else
                 val = pars->Pfreq;
             cout << "Freq " << (int) pars->Pfreq << endl;
+            break;
+        case 1:
+            if (write)
+                pars->Pq = val;
+            else
+                val = pars->Pq;
+            break;
+        case 2:
+            if (write)
+                pars->Pfreqtrack = val;
+            else
+                val = pars->Pfreqtrack;
+            break;
+        case 3: // velsensA ?
+            //if (write)
+            //    ;
+            //else
+            //    ;
+            break;
+        case 4: // velsense ?
+            //if (write)
+            //    ;
+            //else
+            //    ;
+            break;
+        case 5:
+            if (write)
+                pars->Pgain = val;
+            else
+                val = pars->Pgain;
+            break;
+        case 6:
+            if (write)
+                pars->Pstages = val;
+            else
+                val = pars->Pstages;
+            break;
+        case 7:
+            if (write)
+            {
+                if (pars->Pcategory != val)
+                {
+                    pars->Pgain = 64;
+                    pars->Ptype = 0;
+                    pars->changed=true;
+                    pars->Pcategory = val;
+                }
+            }
+            else
+                val = pars->Pcategory;
+            break;
+        case 8:
+            if (write)
+            {
+                pars->Ptype = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Ptype;
+            break;
+        case 9:
+            if (write)
+            {
+                pars->Ptype = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Ptype;;
+            break;
+
+        case 16:
+            if (write)
+            {
+                pars->Pformantslowness = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pformantslowness;
+            break;
+        case 17:
+            if (write)
+            {
+                pars->Pvowelclearness = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pvowelclearness;
+            break;
+        case 18:
+            if (write)
+            {
+                pars->Pvowels[nvowel].formants[nformant].freq = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pvowels[nvowel].formants[nformant].freq;
+            break;
+        case 19:
+            if (write)
+            {
+                pars->Pvowels[nvowel].formants[nformant].q = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pvowels[nvowel].formants[nformant].q;
+            break;
+        case 20:
+            if (write)
+            {
+                pars->Pvowels[nvowel].formants[nformant].amp = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pvowels[nvowel].formants[nformant].amp;
+            break;
+        case 21:
+            if (write)
+            {
+                pars->Psequencestretch = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Psequencestretch;
+            break;
+        case 22:
+            if (write)
+            {
+                pars->Pcenterfreq = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pcenterfreq;
+            break;
+        case 23:
+            if (write)
+            {
+                pars->Poctavesfreq = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Poctavesfreq;
+            break;
+
+        case 32:
+            if (write)
+            {
+                pars->Pnumformants = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Pnumformants;
+            break;
+        case 33: // this is local to the source
+            //if (write)
+            //    ;
+            //else
+            //    ;
+            break;
+        case 34: // this is local to the source
+            //if (write)
+            //    ;
+            //else
+            //    ;
+            break;
+        case 35:
+            if (write)
+            {
+                pars->Psequencesize = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Psequencesize;
+            break;
+        case 36: // this is local to the source
+            //if (write)
+            //    ;
+            //else
+            //    ;
+            break;
+        case 37:
+            if (write)
+            {
+                pars->Psequence[nseqpos].nvowel = val;
+                pars->changed=true;
+            }
+            else
+                val = pars->Psequence[nseqpos].nvowel;
+            break;
+        case 38:
+            if (write)
+            {
+                pars->Psequencereversed = (val != 0);
+                pars->changed=true;
+            }
+            else
+                val = pars->Psequencereversed;
             break;
     }
     return val;
@@ -2221,7 +2438,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
+    unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
     unsigned char insertParam = getData->data.parameter;
 
     string actual;

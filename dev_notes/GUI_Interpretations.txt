@@ -77,7 +77,7 @@ engine
 >= 0x80 addsynth voice
 
 
-inserts
+inserts & 0x1f
 0   lfo
 1   filter
 2   envelope base
@@ -96,6 +96,9 @@ inserts
 
 16  System effect sends
 
+inserts >> 5
+    filter sequence position
+
 
 insert param
     type
@@ -112,3 +115,7 @@ insert param
 
        envelope free mode
             0 to 39 = point number
+
+    formant filter
+            & 0x1f for formant number
+            >> 5   for vowel number

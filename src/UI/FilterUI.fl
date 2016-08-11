@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
-}
+} 
 
 comment {FilterUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,43 +29,43 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
-}
+} 
 
 decl {\#include "UI/MiscGui.h"} {public local
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Group.H>} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>} {public local
-}
+} 
 
 decl {\#include <FL/fl_draw.H>} {public local
-}
+} 
 
 decl {\#include <FL/fl_ask.H>} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "Params/FilterParams.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-}
+} 
 
 class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 } {
@@ -193,7 +193,7 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   }
   decl {float *graphpoints;} {private local
   }
-}
+} 
 
 class FilterUI {selected : {public Fl_Group,PresetsUI_}
 } {
@@ -399,7 +399,7 @@ send_data(6, o->value());}
   Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
-      xywh {507 67 700 205} type Double labelfont 1 labelsize 12 hide
+      xywh {507 67 700 205} type Double labelfont 1 labelsize 12 visible
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -664,7 +664,13 @@ send_data(17, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 1);} {}
+int insert = 1;
+int parameter = 255;
+if (control >= 32)
+    insert = insert | (nseqpos << 5);
+if (control >= 16 && control < 32)
+    parameter = nformant | (nvowel << 5);
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, insert, parameter);} {}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -740,4 +746,4 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
   }
   decl {int engine;} {private local
   }
-}
+} 
