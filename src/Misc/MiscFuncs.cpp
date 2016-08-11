@@ -350,7 +350,11 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  * block while writing, but should be very quick.
  *
  * Pop is destructive. No two functions should ever have been given
- * the same ID, but if they do, the second will get an empty string.
+ * the same 'live' ID, but if they do, the second one will get an
+ * empty string.
+ *
+ * Normally a message will clear before the next one arrives so the
+ * message numbers should remain very low even over multiple instances.
  */
 int MiscFuncs::miscMsgPush(string text)
 {
@@ -365,6 +369,7 @@ int MiscFuncs::miscMsgPush(string text)
         {
             *it = text;
             mtx.unlock();
+            //cout << "Msg No. " << idx << endl;
             return idx;
         }
         ++ it;

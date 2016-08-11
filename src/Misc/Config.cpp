@@ -517,7 +517,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     if (!xml->enterbranch("CONFIGURATION"))
     {
         Log("extractConfigData, no CONFIGURATION branch");
-        return false;
+        Log("Running with defaults");
+        return true;
     }
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     showGui = xml->getpar("enable_gui", showGui, 0, 1);

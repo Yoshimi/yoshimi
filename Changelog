@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-8-11 Will
+* Bugfix: CLI wasn't loading upper set instruments (128+).
+* Tidied up NRPN vector control.
+* Added more error messages to 'non fatal' category.
+
 2016-8-10 Will
 * Implemented simple internal text messaging system.
 * Added autoload state to CLI and NRPNs.

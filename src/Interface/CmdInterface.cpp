@@ -909,7 +909,11 @@ int CmdInterface::commandPart(bool justSet)
         }
         if (point[0] != 0) // force part not channel number
         {
-            synth->writeRBP(3, npart | 0x80, string2int(point));
+            tmp = string2int(point);
+            if (tmp < 128)
+                synth->writeRBP(3, npart | 0x80, tmp); // lower set
+            else
+                synth->writeRBP(4, npart | 0x80, tmp - 128); // upper set
             reply = done_msg;
         }
         else

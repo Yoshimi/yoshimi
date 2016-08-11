@@ -421,15 +421,15 @@ void *SynthEngine::RBPthread(void)
                         SetBank(block.data[1]);
                         break;
 
-                    case 3:
+                    case 3: // lower set
                         SetProgram(block.data[1], block.data[2]);
                         break;
 
-                    case 4:
+                    case 4: // upper set
                         SetProgram(block.data[1], (block.data[2] + 128));
                         break;
 
-                    case 5:
+                    case 5: // file name from miscMsg
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
                 }
@@ -438,7 +438,7 @@ void *SynthEngine::RBPthread(void)
                 Runtime.Log("Unable to read data from Root/bank/Program");
         }
         else
-            usleep(100); // yes it's a hack but is totally reliable
+            usleep(100); // yes it's a hack but seems reliable
     }
     return NULL;
 }
@@ -1729,27 +1729,20 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             }
             break;
 
-        /*
-         * If this came from the command line thread
-         * we don't need to worry about blocking
-         * with these program changes as it is only
-         * the command line thread that's blocked.
-         * The MIDI NRPN thread deals with them separately.
-         */
         case 4:
-            SetProgram(chan | 0x80, par);
+            writeRBP(3, chan | 0x80, par);
             break;
 
         case 5:
-            SetProgram(chan | 0x90, par);
+            writeRBP(3, chan | 0x90, par);
             break;
 
         case 6:
-            SetProgram(chan | 0xa0, par);
+            writeRBP(3, chan | 0xa0, par);
             break;
 
         case 7:
-            SetProgram(chan | 0xb0, par);
+            writeRBP(3, chan | 0xb0, par);
             break;
 
         case 8:
@@ -2288,7 +2281,7 @@ bool SynthEngine::installBanks(int instance)
     xml->loadXMLfile(bankname);
     if (!xml->enterbranch(branch))
     {
-        Runtime. Log("extractConfigData, no " + branch + " branch");
+        Runtime.Log("extractConfigData, no " + branch + " branch");
         return false;
     }
     bank.parseConfigFile(xml);
