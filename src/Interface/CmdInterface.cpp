@@ -1923,7 +1923,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
                 synth->writeRBP(5, npart, miscMsgPush((string) point));
-                reply = done_msg;
+            reply = done_msg;
         }
         else
         {

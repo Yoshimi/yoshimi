@@ -74,7 +74,7 @@ class InterChange : private MiscFuncs
         void commandResonance(CommandBlock *getData);
         void commandLFO(CommandBlock *getData);
         void commandFilter(CommandBlock *getData);
-        float filterReadWrite(CommandBlock *getData, FilterParams *pars);
+        float filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
         void commandEnvelope(CommandBlock *getData);
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);

@@ -399,7 +399,7 @@ send_data(6, o->value());}
   Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
-      xywh {507 67 700 205} type Double labelfont 1 labelsize 12 visible
+      xywh {507 67 700 205} type Double labelfont 1 labelsize 12 hide
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -664,13 +664,12 @@ send_data(17, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-int insert = 1;
 int parameter = 255;
-if (control >= 32)
-    insert = insert | (nseqpos << 5);
-if (control >= 16 && control < 32)
+if (control == 37)
+    parameter = nseqpos;
+else if (control >= 18 && control <= 20)
     parameter = nformant | (nvowel << 5);
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, insert, parameter);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 1, parameter);} {}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//

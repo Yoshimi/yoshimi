@@ -2034,7 +2034,7 @@ void InterChange::commandFilter(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
-    int nseqpos = getData->data.insert >> 5;
+    int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter & 0x1f;
     int nvowel = getData->data.parameter >> 5;
 
@@ -2097,22 +2097,30 @@ void InterChange::commandFilter(CommandBlock *getData)
     if (engine == 0)
     {
         name = "  AddSynth";
-        value = filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter);
+        value = filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter
+                    , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScale
+                    , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScaleFunction);
     }
     else if (engine == 1)
     {
         name = "  SubSynth";
-        value = filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter);
+        value = filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter
+                    , &part->kit[kititem].subpars->PGlobalFilterVelocityScale
+                    , &part->kit[kititem].subpars->PGlobalFilterVelocityScaleFunction);
     }
     else if (engine == 2)
     {
         name = "  PadSynth";
-        value = filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter);
+        value = filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
+                    , &part->kit[kititem].padpars->PFilterVelocityScale
+                    , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
     else if (engine >= 0x80)
     {
         name = "  Adsynth Voice " + to_string(engine & 0x3f);
-        value = filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter);
+        value = filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter
+                    , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScale
+                    , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScaleFunction);
     }
 
  //   cout << "Test " << pars->Pvolume << endl;
@@ -2200,7 +2208,7 @@ void InterChange::commandFilter(CommandBlock *getData)
     }
     string extra = "";
     if (control >= 18 && control <= 20)
-        extra = "Formant " + to_string(nformant) + "  Vowel " + to_string(nvowel) + "  ";
+        extra ="Vowel " + to_string(nvowel) +  "  Formant " + to_string(nformant) + "  ";
     else if (control == 37)
         extra = "Seq Pos " + to_string(nseqpos) + "  ";
     if (type & 0x80)
@@ -2211,12 +2219,12 @@ void InterChange::commandFilter(CommandBlock *getData)
 }
 
 
-float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars)
+float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns)
 {
     bool write = (getData->data.type & 0x40) > 0;
     float val = getData->data.value;
 
-    int nseqpos = getData->data.insert >> 5;
+    int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter & 0x1f;
     int nvowel = getData->data.parameter >> 5;
 
@@ -2227,7 +2235,6 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars)
                 pars->Pfreq = val;
             else
                 val = pars->Pfreq;
-            cout << "Freq " << (int) pars->Pfreq << endl;
             break;
         case 1:
             if (write)
@@ -2241,18 +2248,23 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars)
             else
                 val = pars->Pfreqtrack;
             break;
-        case 3: // velsensA ?
-            //if (write)
-            //    ;
-            //else
-            //    ;
+        case 3:
+            if (velsnsamp != NULL)
+            {
+                if (write)
+                    *velsnsamp = (unsigned char) val;
+                else
+                    val = *velsnsamp;
+            }
             break;
-        case 4: // velsense ?
-            //if (write)
-            //    ;
-            //else
-            //    ;
-            break;
+        case 4:
+            if (velsns != NULL)
+            {
+                if (write)
+                    *velsns = (unsigned char) val;
+                else
+                    val = *velsns;
+            }
         case 5:
             if (write)
                 pars->Pgain = val;

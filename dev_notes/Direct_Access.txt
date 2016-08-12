@@ -15,6 +15,7 @@ Controllers
 Kit edit window
 Subsynth Editor
 Effects
+Filters (part)
 
 The remaining ones will display as if they had been written to, but won't
 actually change anything.
@@ -37,7 +38,7 @@ direct = the actual command name, must be typed in full.
 
 value = the value that will be set, may be negative.
 
-type = a subset of the command type 0 for read and 64 for write.
+type = a subset of the command type: 0 for read and 64 for write.
 
 control = the number representing the control being changed.
 
