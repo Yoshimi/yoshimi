@@ -66,7 +66,7 @@ Effects 'kit' numbers offset by 0x80.
 7   EQ
 8   Dynfilter
 
-These can't be inserts, as Dynefilter has Filter as an insert!
+These can't be inserts, as Dynfilter has Filter as an insert!
 
 
 engine
@@ -80,6 +80,8 @@ engine
 inserts & 0x1f
 0   lfo
 1   filter
+        Use engine number 0x88 To access the filter component of the
+        DyneFilter effect
 2   envelope base
 3   envelope graph X
 4   envelope graph Y

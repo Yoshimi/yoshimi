@@ -15,7 +15,7 @@ Controllers
 Kit edit window
 Subsynth Editor
 Effects
-Filters (part)
+Filters
 
 The remaining ones will display as if they had been written to, but won't
 actually change anything.
@@ -47,10 +47,11 @@ part = the number of the part being changed.
 All the above are mandatory. The following must also be entered in sequence
 when needed.
 
-kit = a part's kit number (if enabled otherwise zero), also used elsewhere.
+kit = a part's kit number (if enabled otherwise zero).
+      also used for effects.
 
 engine = the synth engine being adjusted.
 
-insert = harmonics, LFOs, filters, effects etc.
+insert = harmonics, LFOs, filters etc.
 
 parameter = subtype associated with some inserts.

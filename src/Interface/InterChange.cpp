@@ -135,10 +135,7 @@ void InterChange::commandSend(CommandBlock *getData)
         commandPart(getData);
     else if (kititem >= 0x80)
     {
-        if (insert < 0xff)
-            commandFilter(getData);
-        else
-            commandEffects(getData);
+        commandEffects(getData);
     }
     else if (engine == 2)
     {
@@ -2043,56 +2040,7 @@ void InterChange::commandFilter(CommandBlock *getData)
     part = synth->part[npart];
 
     string actual;
-
     string name;
-    if (kititem >= 0x80)
-    {
-        string effname;
-        switch (kititem & 0xf)
-        {
-            case 0:
-                effname = " NO Effect";
-                break;
-            case 1:
-                effname = " Reverb";
-                break;
-            case 2:
-                effname = " Echo";
-                break;
-            case 3:
-                effname = " Chorus";
-                break;
-            case 4:
-                effname = " Phaser";
-                break;
-            case 5:
-                effname = " AlienWah";
-                break;
-            case 6:
-                effname = " Distortion";
-                break;
-            case 7:
-                effname = " EQ";
-                break;
-            case 8:
-                effname = " DynFilter";
-                break;
-        }
-
-        if (npart == 0xf1)
-            name = "System";
-        else if (npart == 0xf2)
-            name = "Insert";
-        else name = "Part " + to_string(npart);
-        name += " Effect " + to_string(engine); // this is the effect number
-
-        if (type & 0x80)
-            actual = to_string((int)round(value));
-        else
-            actual = to_string(value);
-        synth->getRuntime().Log(name + effname + " ~ Filter Parameter " + to_string(control) + "  Value " + actual);
-    return;
-    }
 
     if (engine == 0)
     {
@@ -2122,8 +2070,6 @@ void InterChange::commandFilter(CommandBlock *getData)
                     , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScale
                     , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScaleFunction);
     }
-
- //   cout << "Test " << pars->Pvolume << endl;
 
     string contstr;
     switch (control)
@@ -2655,6 +2601,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     EffectMgr *eff;
 
     string name;
+    string actual;
     if (npart == 0xf1)
     {
         eff = synth->sysefx[effnum];
@@ -2670,6 +2617,27 @@ void InterChange::commandEffects(CommandBlock *getData)
         eff = synth->part[npart]->partefx[effnum];
         name = "Part " + to_string(npart);
     }
+
+    if (kititem == 8 && getData->data.insert < 0xff)
+    {
+        value = filterReadWrite(getData, eff->filterpars,NULL,NULL);
+
+        if (npart == 0xf1)
+            name = "System";
+        else if (npart == 0xf2)
+            name = "Insert";
+        else name = "Part " + to_string(npart);
+        name += " Effect " + to_string(effnum);
+
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
+        synth->getRuntime().Log(name + " DynFilter ~ Filter Parameter " + to_string(control) + "  Value " + actual);
+
+        return;
+    }
+
     name += " Effect " + to_string(effnum);
 
     string effname;
@@ -2720,7 +2688,6 @@ void InterChange::commandEffects(CommandBlock *getData)
             value = eff->geteffectpar(control);
     }
 
-    string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
     else

@@ -3,6 +3,8 @@ yoshimi 1.4.x
 2016-8-12 Will
 * Inproved direct access to filters - Only dynfilter to do now!.
 * Updated docs.
+* Completed direct filter implementation.
+* Updated docs (again).
 
 2016-8-11 Will
 * Bugfix: CLI wasn't loading upper set instruments (128+).
