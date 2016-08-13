@@ -121,7 +121,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     showTimes(0),
     logXMLheaders(0),
     configChanged(false),
-    rtprio(50),
+    rtprio(4), // was 50 but LV2 doesn't set it.
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
     midi_upper_voice_C(128),
@@ -811,7 +811,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char priodec, bool create_detached)
+                         bool schedfifo, char priodec, bool create_detached, string name)
 {
     pthread_attr_t attr;
     int chk;
@@ -849,12 +849,14 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                     int prio = rtprio;
                     if (priodec)
                         prio -= priodec;
-                    prio_params.sched_priority = (prio > 0) ? prio : 0;
+                    if (prio < 1)
+                        prio = 1;
+                    Log(name + " priority is " + to_string(prio), 2);
+                    prio_params.sched_priority = prio;
                     if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
                     {
                         Log("Failed to set thread priority attribute ("
-                                    + asString(chk) + ")  "
-                                    + string(strerror(errno)), 1);
+                                    + asString(chk) + ")  ", 3);
                         schedfifo = false;
                         continue;
                     }

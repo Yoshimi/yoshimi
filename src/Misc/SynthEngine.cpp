@@ -177,7 +177,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade;
     int found = 0;
-
     if (!interchange.sendbuf)
         goto bail_out;
 
@@ -324,7 +323,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
 
-    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 7, false))
+    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 7, false, "RBP"))
     {
         Runtime.Log("Failed to start RBP thread");
         goto bail_out;

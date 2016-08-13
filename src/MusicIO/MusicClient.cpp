@@ -210,7 +210,7 @@ bool MusicClient::Start()
         {
             return true;
         }
-        bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, false);
+        bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, false, "Timer?");
     }
 
     if(midiIO)

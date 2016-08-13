@@ -546,6 +546,12 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 }
 
 
+/* The following routines now *always* use the ring buffer.
+ * This is necessary to handle extremely large instrument patches
+ * and maintain root/bank/instrument sequence.
+ * RT thread priority has been adjusted to ensure optimimum results.
+ */
+
 //bank change and root dir change change share the same thread
 //to make changes consistent
 void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place, bool setRootDir)
@@ -558,10 +564,9 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
     else
         if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
             return; // still nothing to do!
-
-    if (in_place)
+    /*if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
-    else
+    else*/
     {
         if (setRootDir)
             synth->writeRBP(1 ,bank_or_root_num,0);
@@ -582,9 +587,9 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         return;
     if (synth->getRuntime().EnableProgChange)
     {
-        if (in_place)
-            synth->SetProgram(ch, prg);
-        else
+        //if (in_place)
+            //synth->SetProgram(ch, prg);
+        //else
             synth->writeRBP(3, ch ,prg);
     }
 }
