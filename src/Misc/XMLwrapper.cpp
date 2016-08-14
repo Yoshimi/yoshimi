@@ -93,6 +93,12 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
             addpar("max_instrument_effects", NUM_PART_EFX);
 
             addpar("max_addsynth_voices", NUM_VOICES);
+            if (synth->getRuntime().xmlType == XML_STATE || synth->getRuntime().xmlType == XML_CONFIG)
+            {
+                addpar("sample_rate", synth->getRuntime().Samplerate);
+                addpar("sound_buffer_size", synth->getRuntime().Buffersize);
+                addpar("oscil_size", synth->getRuntime().Oscilsize);
+            }
         endbranch();
     }
 }

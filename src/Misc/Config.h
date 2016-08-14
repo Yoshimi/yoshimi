@@ -175,6 +175,7 @@ class Config : public MiscFuncs
         void loadCmdArgs(int argc, char **argv);
         bool loadConfig(void);
         void defaultPresets(void);
+        bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
         bool extractRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);

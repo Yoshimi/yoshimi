@@ -237,17 +237,13 @@ bool Config::Setup(int argc, char **argv)
         }
         Log(StateFile);
         restoreSessionData(StateFile, true);
-        /* This needs improving!
-         * There is a single state file that contains both startup config
+        /* There is a single state file that contains both startup config
          * data that must be set early, and runtime data that must be set
          * after synth has been initialised.
          *
-         * Currently we open it here and fetch just the startup data, then
-         * reopen it in synth and fetch all the data (including the startup
-         * again).
-         *
-         * This is further complicated because the same functions are
-         * being used by jack session.
+         * We open it here and fetch just the essential BASE_PARAMETERS;
+         * buffer size, oscillator size, sample rate. We then reopen it
+         * in synth and fetch the remaining settings from CONFIG.
          */
     }
     return true;
@@ -473,7 +469,9 @@ bool Config::loadConfig(void)
                     return false;
                 }
             }
-            isok = extractConfigData(xml);
+            isok = extractBaseParameters(xml);
+            if (isok)
+                isok = extractConfigData(xml);
             if (isok)
                 Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
@@ -507,6 +505,25 @@ void Config::defaultPresets(void)
 }
 
 
+bool Config::extractBaseParameters(XMLwrapper *xml)
+{
+    if (!xml)
+    {
+        Log("extractConfigData on NULL");
+        return false;
+    }
+    if (!xml->enterbranch("BASE_PARAMETERS"))
+    {
+        Log("extractConfigData, no BASE_PARAMETERS branch");
+        return false;
+    }
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
+    xml->exitbranch(); // BaseParameters
+    return true;
+}
+
 bool Config::extractConfigData(XMLwrapper *xml)
 {
     if (!xml)
@@ -524,16 +541,17 @@ bool Config::extractConfigData(XMLwrapper *xml)
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
     showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
     showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+    if (showGui == 0 && showCLI == 0)
+    {
+        showGui = 1;
+        showCLI = 1; // sanity check!
+    }
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
     showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
-
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
 
     // get preset dirs
     int count = 0;
@@ -624,10 +642,6 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
-    xmltree->addpar("sample_rate", Samplerate);
-    xmltree->addpar("sound_buffer_size", Buffersize);
-    xmltree->addpar("oscil_size", Oscilsize);
-
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)
     {
         if (presetsDirlist[i].size())
@@ -705,12 +719,17 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         Log("Failed to load xml file " + sessionfile);
         goto end_game;
     }
-    ok = extractConfigData(xml); // this needs improving
-    if (!startup && ok)
+    if (startup)
+        ok = extractBaseParameters(xml);
+    else
     {
-        ok = extractRuntimeData(xml) && synth->getfromXML(xml);
+        ok = extractConfigData(xml); // this needs improving
         if (ok)
-            synth->getRuntime().stateChanged = true;
+        {
+            ok = extractRuntimeData(xml) && synth->getfromXML(xml);
+            if (ok)
+                synth->getRuntime().stateChanged = true;
+        }
     }
 
 end_game:

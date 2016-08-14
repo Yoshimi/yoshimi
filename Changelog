@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-8-14 Will
+* Moved buffer size, oscillator size, sample rate into
+  config BASE_PARAMETERS.
+
 2016-8-13 Will
 * Moved LV2 root/bank/program change into ringbuffer and adjusted RT
   priorites for best results when loading *huge* instrument patches.
