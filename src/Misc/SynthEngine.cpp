@@ -2515,15 +2515,36 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
         return false;
     }
     xml->loadXMLfile(file);
+
+    if (extractVectorData(baseChan, true, xml))
+    {
+        int lastPart = NUM_MIDI_PARTS;
+        if (Runtime.nrpndata.vectorYaxis[baseChan] >= 0x7f)
+            lastPart = NUM_MIDI_CHANNELS * 2;
+        for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
+        {
+            if (!xml->enterbranch("PART", npart))
+                continue;
+            part[npart + baseChan]->getfromXML(xml);
+            part[npart + baseChan]->Prcvchn = baseChan;
+            xml->exitbranch();
+        }
+    }
+    xml->endbranch(); // VECTOR
+    addHistory(file, 5);
+    delete xml;
+    return true;
+}
+
+
+bool SynthEngine::extractVectorData(unsigned char baseChan, bool full, XMLwrapper *xml)
+{
     if (!xml->enterbranch("VECTOR"))
     {
-        Runtime. Log("Extract Data, no VECTOR branch");
+        if (full)
+            Runtime. Log("Extract Data, no VECTOR branch");
         return false;
     }
-    addHistory(file, 5);
-
-    // start insert here. need 'baseChan' and 'full'
-    // baseChan must be 0xff if from patch set.
 
     int lastPart = NUM_MIDI_PARTS;
     int tmp;
@@ -2545,10 +2566,7 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 
     tmp = xml->getpar255("Y_sweep_CC", 0xff);
     if (tmp >= 0x0e && tmp  < 0x7f)
-    {
         Runtime.nrpndata.vectorYaxis[baseChan] = tmp;
-        partonoffWrite(baseChan + NUM_MIDI_CHANNELS * 2, 1);
-    }
     else
     {
         lastPart = NUM_MIDI_CHANNELS * 2;
@@ -2602,25 +2620,14 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
     if (Runtime.NumAvailableParts < lastPart)
         Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
 
-    // finish insert here
-
-    if (full)
+    for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
     {
-        for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
-        {
-            if (!xml->enterbranch("PART", npart))
-                continue;
-            part[npart + baseChan]->getfromXML(xml);
-            part[npart + baseChan]->Prcvchn = baseChan;
-            xml->exitbranch();
-            if (partonoffRead(npart + baseChan) && (part[npart + baseChan]->Paudiodest & 2))
-                GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + baseChan);
-        }
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
-    // need to ensure thread safety here.
+        partonoffWrite(npart + baseChan, 1);
+        if (part[npart + baseChan]->Paudiodest & 2)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + baseChan);
     }
-    xml->exitbranch();
-    delete xml;
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
+
     return true;
 }
 
@@ -2655,6 +2662,23 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
         Runtime.Log("Save Vector failed xmltree allocation");
         return false;
     }
+
+    insertVectorData(baseChan, true, xml);
+
+    if (xml->saveXMLfile(file))
+        addHistory(file, 5);
+    else
+    {
+        Runtime.Log("Failed to save data to " + file);
+        ok = false;
+    }
+    delete xml;
+    return ok;
+}
+
+
+bool SynthEngine::insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml)
+{
     int lastPart = NUM_MIDI_PARTS;
     int x_feat = Runtime.nrpndata.vectorXfeatures[baseChan];
     int y_feat = Runtime.nrpndata.vectorYfeatures[baseChan];
@@ -2699,16 +2723,8 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
                 xml->endbranch();
             }
         }
-        if (xml->saveXMLfile(file))
-            addHistory(file, 5);
-        else
-        {
-            Runtime.Log("Failed to save data to " + file);
-            ok = false;
-        }
         xml->endbranch();
-    delete xml;
-    return ok;
+    return true;
 }
 
 
@@ -2769,6 +2785,8 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     }
     xml->endbranch(); // INSERTION_EFFECTS
     actionLock(unlock);
+    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+        insertVectorData(i, false, xml);
     xml->endbranch(); // MASTER
 }
 
@@ -2914,6 +2932,8 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
         }
         xml->exitbranch();
     }
+    for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+        extractVectorData(i, false, xml);
     xml->exitbranch(); // MASTER
     return true;
 }

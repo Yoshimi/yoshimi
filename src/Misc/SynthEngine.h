@@ -84,7 +84,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadHistory(void);
         bool saveHistory(void);
         bool loadVector(unsigned char baseChan, string name, bool full);
+        bool extractVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
         bool saveVector(unsigned char baseChan, string name, bool full);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
 
         bool getfromXML(XMLwrapper *xml);
 

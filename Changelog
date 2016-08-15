@@ -3,7 +3,7 @@ yoshimi 1.4.x
 2016-8-15 Will
 * Removed redundant (duplicated) part number settings.
 * Improved vector control consistency.
-
+* Vector data now stored in patch sets and saved state.
 
 2016-8-14 Will
 * Moved buffer size, oscillator size, sample rate into
