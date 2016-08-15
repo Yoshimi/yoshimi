@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-8-15 Will
+* Removed redundant (duplicated) part number settings.
+* Improved vector control consistency.
+
+
 2016-8-14 Will
 * Moved buffer size, oscillator size, sample rate into
   config BASE_PARAMETERS.

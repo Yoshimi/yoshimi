@@ -2521,13 +2521,42 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
         return false;
     }
     addHistory(file, 5);
+
+    // start insert here. need 'baseChan' and 'full'
+    // baseChan must be 0xff if from patch set.
+
     int lastPart = NUM_MIDI_PARTS;
+    int tmp;
     if (baseChan >= NUM_MIDI_CHANNELS)
         baseChan = xml->getpar255("Source_channel", 0);
-    Runtime.nrpndata.vectorXaxis[baseChan] = xml->getpar255("X_sweep_CC", 0xff);
-    if (Runtime.nrpndata.vectorXaxis[baseChan] < 0x7f)
-        Runtime.nrpndata.vectorEnabled[baseChan] = true;;
-    Runtime.nrpndata.vectorYaxis[baseChan] = xml->getpar255("Y_sweep_CC", 0xff);
+    tmp = xml->getpar255("X_sweep_CC", 0xff);
+    if (tmp >= 0x0e && tmp  < 0x7f)
+    {
+        Runtime.nrpndata.vectorXaxis[baseChan] = tmp;
+        Runtime.nrpndata.vectorEnabled[baseChan] = true;
+    }
+    else
+    {
+        Runtime.nrpndata.vectorXaxis[baseChan] = 0x7f;
+        Runtime.nrpndata.vectorEnabled[baseChan] = false;
+    }
+
+    // should exit here if not enabled
+
+    tmp = xml->getpar255("Y_sweep_CC", 0xff);
+    if (tmp >= 0x0e && tmp  < 0x7f)
+    {
+        Runtime.nrpndata.vectorYaxis[baseChan] = tmp;
+        partonoffWrite(baseChan + NUM_MIDI_CHANNELS * 2, 1);
+    }
+    else
+    {
+        lastPart = NUM_MIDI_CHANNELS * 2;
+        Runtime.nrpndata.vectorYaxis[baseChan] = 0x7f;
+        partonoffWrite(baseChan + NUM_MIDI_CHANNELS * 2, 0);
+        partonoffWrite(baseChan + NUM_MIDI_CHANNELS * 3, 0);
+        // disable these - not in current vector definition
+    }
 
     int x_feat = 0;
     int y_feat = 0;
@@ -2548,11 +2577,7 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
     Runtime.nrpndata.vectorXcc2[baseChan] = xml->getpar255("X_CCout_2", 10);
     Runtime.nrpndata.vectorXcc4[baseChan] = xml->getpar255("X_CCout_4", 74);
     Runtime.nrpndata.vectorXcc8[baseChan] = xml->getpar255("X_CCout_8", 1);
-    if (Runtime.nrpndata.vectorYaxis[baseChan] > 0x7f)
-    {
-        lastPart /= 2;
-    }
-    else
+    if (lastPart == NUM_MIDI_PARTS)
     {
         if (xml->getparbool("Y_feature_1", false))
             y_feat |= 1;
@@ -2574,10 +2599,13 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
     }
     Runtime.nrpndata.vectorXfeatures[baseChan] = x_feat;
     Runtime.nrpndata.vectorYfeatures[baseChan] = y_feat;
+    if (Runtime.NumAvailableParts < lastPart)
+        Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
+
+    // finish insert here
 
     if (full)
     {
-        Runtime.NumAvailableParts = xml->getpar255("current_midi_parts", Runtime.NumAvailableParts);
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
             if (!xml->enterbranch("PART", npart))
@@ -2811,15 +2839,6 @@ bool SynthEngine::loadXML(string filename)
 
 bool SynthEngine::getfromXML(XMLwrapper *xml)
 {
-
-    if (!xml->enterbranch("BASE_PARAMETERS"))
-    {
-        Runtime.Log("SynthEngine getfromXML, no BASE branch");
-        Runtime.NumAvailableParts = NUM_MIDI_CHANNELS; // set default to be safe
-        return false;
-    }
-    Runtime.NumAvailableParts = xml->getpar("max_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS); // for backwards compatibility
-    xml->exitbranch();
     if (!xml->enterbranch("MASTER"))
     {
         Runtime.Log("SynthEngine getfromXML, no MASTER branch");

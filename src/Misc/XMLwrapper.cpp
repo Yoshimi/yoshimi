@@ -85,7 +85,7 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     if (synth->getRuntime().xmlType <= XML_CONFIG)
     {
         beginbranch("BASE_PARAMETERS");
-            addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
+            addpar("max_midi_parts", NUM_MIDI_CHANNELS);
             addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
 
             addpar("max_system_effects", NUM_SYS_EFX);
