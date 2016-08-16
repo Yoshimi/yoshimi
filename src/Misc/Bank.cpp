@@ -303,13 +303,8 @@ bool Bank::loadbank(size_t rootID, size_t banknum)
 
                     // sorry Cal. They insisted :(
 
-                    int chk = 0;
-                    char ch = candidate.at(chk);
-                    while (ch >= '0' and ch <= '9' and chk < 4){
-                        chk += 1;
-                        ch = candidate.at(chk);
-                    }
-                    if (ch == '-')
+                    int chk = findSplitPoint(candidate);
+                    if (chk > 0)
                     {
                         int instnum = string2int(candidate.substr(0, chk));
                         // remove "NNNN-" and .xiz extension for instrument name

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
-}
+} 
 
 comment {PartUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,12 +29,12 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified August 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-}
+} 
 
 decl {\#include "UI/MiscGui.h"
     \#include "EffUI.h"
@@ -45,14 +45,14 @@ decl {\#include "UI/MiscGui.h"
     \#include "WidgetMWSliderUI.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-}
+} 
 
 decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
@@ -101,14 +101,14 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control + 0x
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PartUI_ {} {
   Function {showparameters(int kititem,int engine)} {return_type virtual
   } {
     code {;} {}
   }
-}
+} 
 
 class PartKitItem {: {public Fl_Group}
 } {
@@ -362,7 +362,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
@@ -397,8 +397,15 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
     {
         tmp = fl_input("Instrument name:", part->Pname.c_str());
         if (tmp != NULL and not string(tmp).empty())
-            part->Pname = string(tmp);
-        copylabeltopanel();
+        {
+            if (string(tmp) == "Simple Sound")
+                fl_alert("Can't use name of default sound");
+            else
+            {
+                part->Pname = string(tmp);
+                copylabeltopanel();
+            }
+        }
     }}
           tooltip {Left mouse button: choose/save/.. from/to bank, Right button: instrument name} xywh {134 7 192 20} box THIN_DOWN_FRAME labelfont 1 labelsize 12 align 16
           code0 {setinstrumentlabel();}
@@ -1553,4 +1560,4 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
   }
   decl {bool partKitOn;} {public local
   }
-}
+} 

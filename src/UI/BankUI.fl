@@ -29,7 +29,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of original ZynAddSubFX code, modified November 2010
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Button.H>} {public local
@@ -266,7 +266,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -739,7 +739,9 @@ fnr = &RootProcess_::rootprocess;
             const char *newname = fl_input("Instrument name:", thisname.c_str());
             if (newname)
             {
-                if (strlen(newname) > 3)
+                if (string(newname) == "Simple Sound")
+                    fl_alert("Can't use name of default sound");
+                else if (strlen(newname) > 3)
                 {
                     if (!bank->setname(slot, string(newname), -1))
                     {

@@ -55,6 +55,7 @@ class MiscFuncs
         void legit_filename(string& fname);
         void legit_pathname(string& fname);
         string findleafname(string name);
+        int findSplitPoint(string name);
         string setExtension(string fname, string ext);
         string localPath(string leaf);
 

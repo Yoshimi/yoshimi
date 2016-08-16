@@ -126,7 +126,6 @@ class Config : public MiscFuncs
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
-        bool          SimpleCheck;
         int           xmlType;
         int           EnableProgChange;
         bool          toConsole;

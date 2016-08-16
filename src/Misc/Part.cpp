@@ -1243,7 +1243,6 @@ bool Part::saveXML(string filename)
 
 int Part::loadXMLinstrument(string filename)
 {
-    synth->getRuntime().SimpleCheck = false;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
@@ -1263,12 +1262,14 @@ int Part::loadXMLinstrument(string filename)
         return 0;
     }
     defaultsinstrument();
+    Pname = findleafname(filename); // in case there's no internal
+    int chk = findSplitPoint(Pname);
+    if (chk > 0)
+        Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
     getfromXMLinstrument(xml);
     applyparameters();
     xml->exitbranch();
     delete xml;
-    if (synth->getRuntime().SimpleCheck)
-        return 3;
     return 1;
 }
 
@@ -1283,13 +1284,15 @@ void Part::applyparameters(void)
 
 void Part::getfromXMLinstrument(XMLwrapper *xml)
 {
+    string tempname;
     if (xml->enterbranch("INFO"))
     {
-        Pname = xml->getparstr("name");
-        if (Pname < "!")
+        tempname = xml->getparstr("name");
+        //synth->getRuntime().Log("name <" + tempname + ">");
+        if (tempname > "!")
+            Pname = tempname;
+        if (Pname <= "!" || Pname == "Simple Sound")
             Pname = "No Title";
-        else if (Pname == "Simple Sound") // there should be a better way to do this!
-            synth->getRuntime().SimpleCheck = true;
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
@@ -1401,6 +1404,7 @@ void Part::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("INSTRUMENT"))
     {
+        Pname = ""; // clear out any previous name
         getfromXMLinstrument(xml);
         xml->exitbranch();
         applyparameters();

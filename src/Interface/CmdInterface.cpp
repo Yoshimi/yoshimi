@@ -1106,19 +1106,22 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(2, point, "name"))
     {
-        string name = "Part name set to ";
+        string name;
         if (isRead)
         {
-            name += synth->part[npart]->Pname;
+            name = "Part name set to " + synth->part[npart]->Pname;
         }
         else
         {
-            if (strlen(point) < 3)
+            name = (string) point;
+            if (name.size() < 3)
                 name = "Name too short";
+            else if ( name == "Simple Sound")
+                name = "Cant use name of default sound";
             else
             {
-                name += (string) point;
-                synth->part[npart]->Pname = point;
+                synth->part[npart]->Pname = name;
+                name = "Set part name to " + name;
                 partFlag = true;
             }
         }
@@ -1910,9 +1913,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 int loadResult = synth->loadPatchSetAndUpdate((string) point);
-                if (loadResult == 3)
-                    Runtime.Log("At least one instrument is named 'Simple Sound'. This should be changed before resave");
-                else if  (loadResult == 1)
+                if  (loadResult == 1)
                     Runtime.Log((string) point + " loaded");
                 reply = done_msg;
             }

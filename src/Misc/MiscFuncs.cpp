@@ -237,6 +237,21 @@ string MiscFuncs::findleafname(string name)
 }
 
 
+int MiscFuncs::findSplitPoint(string name)
+{
+    int chk = 0;
+    char ch = name.at(chk);
+    while (ch >= '0' and ch <= '9' and chk < 4)
+    {
+        chk += 1;
+        ch = name.at(chk);
+    }
+    if (ch != '-')
+        chk = 0;
+    return chk;
+}
+
+
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {
