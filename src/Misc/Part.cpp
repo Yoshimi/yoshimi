@@ -1190,8 +1190,8 @@ void Part::add2XML(XMLwrapper *xml)
 {
     // parameters
     xml->addparbool("enabled", Penabled);
-    if (!Penabled && xml->minimal)
-        return;
+    //if (!Penabled && xml->minimal)
+        //return;
 
     xml->addpar("volume", Pvolume);
     xml->addpar("panning", Ppanning);

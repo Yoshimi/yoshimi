@@ -4,6 +4,7 @@ yoshimi 1.4.x
 * Loading untitled instruments now uses the filename.
 * Loading "Simple Sound" changes the name to "No Title".
 * User prevented from changing name *to* "Simple Sound".
+* BugFix: xml minimal had been set for patch set saves.
 
 2016-8-15 Will
 * Removed redundant (duplicated) part number settings.
