@@ -270,7 +270,14 @@ if ((Fl::event_button() == 3))
                 if (o->value() == 0)
                 {
                     partkititemgroup->deactivate();
+                    mutedcheck->value(0);
                     labelbutton->copy_label("");
+                    minkcounter->value(0);
+                    maxkcounter->value(127);
+                    adcheck->value(0);
+                    subcheck->value(0);
+                    padcheck->value(0);
+                    sendtoeffect->value(1);
                 }
                 else
                     partkititemgroup->activate();
@@ -343,7 +350,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
       n = n_;
       npart = npart_;
       partui = partui_;
-      make_window();;
+      make_window();
       end();} {}
   }
   Function {~PartKitItem()} {} {

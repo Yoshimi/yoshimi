@@ -1077,7 +1077,12 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     bool resetallnotes = false;
     if (!Penabled_)
     {
+        kit[kititem].Pmuted = 0;
+        kit[kititem].Padenabled = 0;
+        kit[kititem].Psubenabled = 0;
+        kit[kititem].Ppadenabled = 0;
         kit[kititem].Pname.clear();
+        kit[kititem].Psendtoparteffect = 0;
         if (kit[kititem].adpars)
         {
             delete kit[kititem].adpars;
@@ -1308,7 +1313,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     {
         Pkitmode = xml->getpar127("kit_mode", Pkitmode);
         Pdrummode = xml->getparbool("drum_mode", Pdrummode);
-        setkititemstatus(0, 0);
+        //setkititemstatus(0, 0); // does odd things :(
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (!xml->enterbranch("INSTRUMENT_KIT_ITEM", i))

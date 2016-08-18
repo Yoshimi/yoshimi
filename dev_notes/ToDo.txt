@@ -1,4 +1,9 @@
 
+Part kit list doesn't correctly update when loading new instruments - need to switch parts back and forth. Patch sets OK.
+
+Make add voice & add/pad oscillator windows show kit number & name.
+
+Investigate graded XML->minimal.
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
@@ -15,8 +20,6 @@ Startup state load doesn't set buffersize correctly - partially resolved.
     size is ignored if loaded when already running (which is reasonable).
 
 Allow headless compilation.
-
-Make add/pad windows show kit number.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
 

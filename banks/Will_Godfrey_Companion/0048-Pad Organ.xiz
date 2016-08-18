@@ -3,7 +3,7 @@
 <!DOCTYPE ZynAddSubFX-data>
 <ZynAddSubFX-data version-major="2" version-minor="5"
 ZynAddSubFX-author="Nasca Octavian Paul"
-Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="1" Yoshimi-minor="3">
+Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="1" Yoshimi-minor="4">
 <INFORMATION>
 <par_bool name="ADDsynth_used" value="no" />
 <par_bool name="SUBsynth_used" value="no" />
@@ -23,7 +23,7 @@ Yoshimi-author="Alan Ernest Calvert" Yoshimi-major="1" Yoshimi-minor="3">
 <string name="author">Will J Godfrey
 GPL V 2 or later</string>
 <string name="comments"></string>
-<par name="type" value="3" />
+<par name="type" value="11" />
 </INFO>
 <INSTRUMENT_KIT>
 <par name="kit_mode" value="0" />
@@ -141,7 +141,7 @@ GPL V 2 or later</string>
 <par name="R_val" value="64" />
 </AMPLITUDE_ENVELOPE>
 <AMPLITUDE_LFO>
-<par_real name="freq" value="0.62992" />
+<par_real name="freq" value="0.629918" />
 <par name="intensity" value="0" />
 <par name="start_phase" value="64" />
 <par name="lfo_type" value="0" />
@@ -176,7 +176,7 @@ GPL V 2 or later</string>
 <par name="R_val" value="64" />
 </FREQUENCY_ENVELOPE>
 <FREQUENCY_LFO>
-<par_real name="freq" value="0.55118" />
+<par_real name="freq" value="0.551178" />
 <par name="intensity" value="0" />
 <par name="start_phase" value="64" />
 <par name="lfo_type" value="0" />
@@ -215,7 +215,7 @@ GPL V 2 or later</string>
 <par name="R_val" value="64" />
 </FILTER_ENVELOPE>
 <FILTER_LFO>
-<par_real name="freq" value="0.67992" />
+<par_real name="freq" value="0.679918" />
 <par name="intensity" value="0" />
 <par name="start_phase" value="64" />
 <par name="lfo_type" value="0" />

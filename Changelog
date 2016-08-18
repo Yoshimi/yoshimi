@@ -1,10 +1,16 @@
 yoshimi 1.4.x
 
+2016-8-18 Will
+* Bugfix: If part kit items were enabled but the whole kit was 'off'
+  the items were correctly saved, but not reloaded.
+* Added 'Pad Kit' to 'Will_Godfrey_Companion'.
+* Added missing copyright notice to some instrument patches.
+
 2016-8-16 Will
 * Loading untitled instruments now uses the filename.
 * Loading "Simple Sound" changes the name to "No Title".
 * User prevented from changing name *to* "Simple Sound".
-* BugFix: xml minimal had been set for patch set saves.
+* Bugfix: xml minimal had been set for patch set saves.
 
 2016-8-15 Will
 * Removed redundant (duplicated) part number settings.
