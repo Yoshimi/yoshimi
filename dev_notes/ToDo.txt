@@ -1,6 +1,8 @@
 
 Part kit list doesn't correctly update when loading new instruments - need to switch parts back and forth. Patch sets OK.
 
+Similar problem sometimes with the instrument info window :(
+
 Make add voice & add/pad oscillator windows show kit number & name.
 
 Investigate graded XML->minimal.
