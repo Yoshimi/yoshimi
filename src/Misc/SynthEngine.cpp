@@ -819,6 +819,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
 {
     bool loadOK = false;
     int enablestate;
+    string loaded;
 
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -835,7 +836,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
         partonoffWrite(npart, enablestate); // must be here to update gui
         loadOK = true;
         // show file instead of program if we got here from Instruments -> Load External...
-        string loaded = "Loaded " +
+        loaded = "Loaded " +
                     ((pgm == -1) ? fname : to_string(pgm)
                     + " \"" + bank.getname(pgm) + "\"")
                     + " to Part " + to_string(npart);
@@ -850,24 +851,21 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
             int actual = ((tv2.tv_sec - tv1.tv_sec) *1000 + (tv2.tv_usec - tv1.tv_usec)/ 1000.0f) + 0.5f;
             loaded += ("  Time " + to_string(actual) + "mS");
         }
-        Runtime.Log(loaded);
-        if (Runtime.showGui && guiMaster && guiMaster->partui
-                            && guiMaster->partui->instrumentlabel
-                            && guiMaster->partui->part)
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
     else
         partonoffWrite(npart, enablestate); // also here to restore failed load state.
 
     sem_post (&partlock);
-    if (Runtime.showGui && guiMaster)
-    {
-        if (!loadOK)
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Failed to load " + fname));
-        else if (part[npart]->Pname == "Simple Sound")
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save."));
-    }
 
+    if (!loadOK)
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Failed to load " + fname));
+    else
+    {
+        if (part[npart]->Pname == "Simple Sound")
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save."));
+        Runtime.Log(loaded);
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
+    }
     return loadOK;
 }
 

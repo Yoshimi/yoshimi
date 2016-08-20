@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-8-20 Will
+* Bugfix: Part change was calling for gui update before loading had
+  completed :(
+
 2016-8-18 Will
 * Bugfix: If part kit items were enabled but the whole kit was 'off'
   the items were correctly saved, but not reloaded.

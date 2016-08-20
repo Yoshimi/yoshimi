@@ -320,9 +320,7 @@ mainCreateNewInstance(forceId);}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-	        synth->writeRBP(5, npart,miscMsgPush(filename));
-                npartcounter->do_callback();
-                updatepanel();}
+	        synth->writeRBP(5, npart,miscMsgPush(filename));}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1135,6 +1133,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
         npartcounter->do_callback();
         return;
     }
+
     if (synth->partonoffRead(npart))
         partui->partgroupui->activate();
     else
@@ -1168,6 +1167,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
     code {//
     if (_npart != npart)
         return;
+
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
         partui->midich->value(partui->part->Prcvchn + 1);
@@ -1178,7 +1178,8 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
          partui->midich->textcolor(FL_WHITE);
          partui->midich->redraw();
     }
-    updatepart();} {}
+    npartcounter->do_callback();
+    updatepanel();} {}
   }
   Function {updateeffects(int data)} {} {
     code {//
