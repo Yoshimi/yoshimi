@@ -269,7 +269,7 @@ void Config::flushLog(void)
 }
 
 
-bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
+/*bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
 {
     bool bRet = false;
     if(showGui)
@@ -282,7 +282,7 @@ bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning,
         cerr << endl << "----- WARNING! -----" << cmdLineWarning << endl << "----- ^^^^^^^^ -----" << endl;
     }
     return bRet;
-}
+}*/
 
 
 string Config::testCCvalue(int cc)

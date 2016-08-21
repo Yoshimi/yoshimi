@@ -1,5 +1,10 @@
 yoshimi 1.4.x
 
+2016-8-21 Will
+* Commented out Config::showQuestionOrCmdWarning(
+  never seems to be called.
+* More doc updates and clarifications.
+
 2016-8-20 Will
 * Bugfix: Part change was calling for gui update before loading had
   completed :(

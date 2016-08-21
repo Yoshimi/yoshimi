@@ -13,9 +13,9 @@ Reverb
 9   Damping
 10  Reverb type (0-2)
 11  Room size
-12  bandwidth (0-12)
+12  bandwidth
 
-16  Preset number
+16  Preset number (0-12)
 
 
 Echo

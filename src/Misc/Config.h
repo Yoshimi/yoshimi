@@ -79,7 +79,7 @@ class Config : public MiscFuncs
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                          bool schedfifo, char lowprio, bool create_detached = true, string name = "");
 
-        bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
+        //bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
