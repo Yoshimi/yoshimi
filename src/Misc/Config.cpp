@@ -87,14 +87,17 @@ static struct argp_option cmd_options[] = {
     { 0, }
 };
 
+unsigned int Config::Samplerate = 48000;
+unsigned int Config::Buffersize = 256;
+unsigned int Config::Oscilsize = 512;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
-    Samplerate(48000),
-    Buffersize(256),
-    Oscilsize(512),
+    //Samplerate(48000),
+    //Buffersize(256),
+    //Oscilsize(512),
     runSynth(true),
     showGui(true),
     showSplash(true),
@@ -507,6 +510,9 @@ void Config::defaultPresets(void)
 
 bool Config::extractBaseParameters(XMLwrapper *xml)
 {
+    if (synth->getUniqueId() != 0)
+        return true;
+
     if (!xml)
     {
         Log("extractConfigData on NULL");

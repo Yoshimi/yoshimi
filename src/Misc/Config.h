@@ -38,6 +38,14 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
 
+/*static struct{
+    int sample;
+    int rate;
+    int osc;
+} */
+
+//static int baseParams[4] __attribute__((used));
+
 class XMLwrapper;
 class BodyDisposal;
 
@@ -96,9 +104,9 @@ class Config : public MiscFuncs
         bool          restoreJackSession;
         string        jackSessionFile;
 
-        unsigned int  Samplerate;
-        unsigned int  Buffersize;
-        unsigned int  Oscilsize;
+        static unsigned int  Samplerate;
+        static unsigned int  Buffersize;
+        static unsigned int  Oscilsize;
 
         bool          runSynth;
         bool          showGui;

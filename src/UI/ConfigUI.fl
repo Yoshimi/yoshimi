@@ -22,7 +22,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified September 2014
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <cmath>} {public local
@@ -46,7 +46,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class ConfigUI {: {private MiscFuncs}
+class ConfigUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -56,7 +56,7 @@ class ConfigUI {: {private MiscFuncs}
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
@@ -75,6 +75,7 @@ class ConfigUI {: {private MiscFuncs}
     }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
+            code1 {if (synth->getUniqueId() != 0) o->deactivate();}
           } {
             MenuItem {} {
               label 256
@@ -117,6 +118,7 @@ class ConfigUI {: {private MiscFuncs}
     }}
             tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
+            code1 {if (synth->getUniqueId() != 0) o->deactivate();}
           } {
             MenuItem {} {
               label 16
@@ -456,6 +458,7 @@ synth->getRuntime().configChanged = true;}
                     case 48000:
                     default: o->set_checked(3); break;
                 }}
+            code1 {if (synth->getUniqueId() != 0) o->deactivate();}
           }
           Fl_Box {} {
             label {Changing settings requires a restart}

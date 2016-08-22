@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-8-22 Will
+* Sample rate, buffer size, oscillator size now settable by first
+  instance only (but visible to others).
+
 2016-8-21 Will
 * Commented out Config::showQuestionOrCmdWarning(
   never seems to be called.
