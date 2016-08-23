@@ -84,22 +84,29 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
 
     if (synth->getRuntime().xmlType <= XML_CONFIG)
     {
-        beginbranch("BASE_PARAMETERS");
-            addpar("max_midi_parts", NUM_MIDI_CHANNELS);
-            addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
-
-            addpar("max_system_effects", NUM_SYS_EFX);
-            addpar("max_insertion_effects", NUM_INS_EFX);
-            addpar("max_instrument_effects", NUM_PART_EFX);
-
-            addpar("max_addsynth_voices", NUM_VOICES);
-            if (synth->getRuntime().xmlType == XML_STATE || synth->getRuntime().xmlType == XML_CONFIG)
-            {
+        if(synth->getRuntime().xmlType != XML_STATE && synth->getRuntime().xmlType != XML_CONFIG)
+        {
+            beginbranch("BASE_PARAMETERS");
+                addpar("max_midi_parts", NUM_MIDI_CHANNELS);
+                addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
+                addpar("max_system_effects", NUM_SYS_EFX);
+                addpar("max_insertion_effects", NUM_INS_EFX);
+                addpar("max_instrument_effects", NUM_PART_EFX);
+                addpar("max_addsynth_voices", NUM_VOICES);
+            endbranch();
+        }
+        else if (synth->getUniqueId() == 0)
+        {
+            beginbranch("BASE_PARAMETERS");
                 addpar("sample_rate", synth->getRuntime().Samplerate);
                 addpar("sound_buffer_size", synth->getRuntime().Buffersize);
                 addpar("oscil_size", synth->getRuntime().Oscilsize);
-            }
-        endbranch();
+                addpar("gzip_compression", synth->getRuntime().GzipCompression);
+                addpar("enable_gui", synth->getRuntime().showGui);
+                addpar("enable_splash", synth->getRuntime().showSplash);
+                addpar("enable_CLI", synth->getRuntime().showCLI);
+            endbranch();
+        }
     }
 }
 

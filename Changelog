@@ -1,5 +1,11 @@
 yoshimi 1.4.x
 
+2016-8-23 Will
+* Separated out instance settings from main config file.
+* Added GUI and CLI enable/disable to 'Switches'.
+* Pushed gzip, splash, GUI enable & CLI enable into base params.
+* Base params now hidden in secondary instances.
+
 2016-8-22 Will
 * Sample rate, buffer size, oscillator size now settable by first
   instance only (but visible to others).

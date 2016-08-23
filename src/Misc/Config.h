@@ -38,14 +38,6 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
 
-/*static struct{
-    int sample;
-    int rate;
-    int osc;
-} */
-
-//static int baseParams[4] __attribute__((used));
-
 class XMLwrapper;
 class BodyDisposal;
 
@@ -107,11 +99,13 @@ class Config : public MiscFuncs
         static unsigned int  Samplerate;
         static unsigned int  Buffersize;
         static unsigned int  Oscilsize;
+        static unsigned int  GzipCompression;
+        static bool          showGui;
+        static bool          showSplash;
+        static bool          showCLI;
 
         bool          runSynth;
-        bool          showGui;
-        bool          showSplash;
-        bool          showCLI;
+
         int           VirKeybLayout;
 
         audio_drivers audioEngine;
@@ -129,7 +123,6 @@ class Config : public MiscFuncs
         string        alsaMidiDevice;
         string        nameTag;
 
-        unsigned int  GzipCompression;
         bool          loadDefaultState;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];

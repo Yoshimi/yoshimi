@@ -90,6 +90,10 @@ static struct argp_option cmd_options[] = {
 unsigned int Config::Samplerate = 48000;
 unsigned int Config::Buffersize = 256;
 unsigned int Config::Oscilsize = 512;
+unsigned int Config::GzipCompression = 3;
+bool         Config::showGui = true;
+bool         Config::showSplash = true;
+bool         Config::showCLI = true;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
@@ -99,9 +103,9 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     //Buffersize(256),
     //Oscilsize(512),
     runSynth(true),
-    showGui(true),
-    showSplash(true),
-    showCLI(true),
+    //showGui(true),
+    //showSplash(true),
+    //showCLI(true),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -113,7 +117,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     connectJackaudio(true),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
-    GzipCompression(3),
+    //GzipCompression(3),
     loadDefaultState(false),
     Interpolation(0),
     checksynthengines(1),
@@ -446,9 +450,14 @@ bool Config::loadConfig(void)
         if ((chk = system(cmd.c_str())) < 0)
             Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
-    ConfigFile = ConfigDir + yoshimi + string(".config");
+    ConfigFile = ConfigDir + yoshimi;
     StateFile = ConfigDir + yoshimi + string(".state");
+    if (synth->getUniqueId() == 0)
+        ConfigFile += ".config";
+    else
+        ConfigFile += ".instance";
     string resConfigFile = ConfigFile;
+
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
@@ -526,6 +535,15 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
     Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
     Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
+    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
+    showGui = xml->getpar("enable_gui", showGui, 0, 1);
+    showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
+    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
+    if (showGui == 0 && showCLI == 0)
+    {
+        showGui = 1;
+        showCLI = 1; // sanity check!
+    }
     xml->exitbranch(); // BaseParameters
     return true;
 }
@@ -543,7 +561,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Log("Running with defaults");
         return true;
     }
-    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
+    /*GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     showGui = xml->getpar("enable_gui", showGui, 0, 1);
     showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
     showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
@@ -551,7 +569,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     {
         showGui = 1;
         showCLI = 1; // sanity check!
-    }
+    }*/
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
@@ -637,10 +655,10 @@ void Config::saveConfig(void)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
-    xmltree->addpar("gzip_compression", GzipCompression);
-    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
-    xmltree->addpar("enable_splash", synth->getRuntime().showSplash);
-    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
+    //xmltree->addpar("gzip_compression", GzipCompression);
+    //xmltree->addpar("enable_gui", synth->getRuntime().showGui);
+    //xmltree->addpar("enable_splash", synth->getRuntime().showSplash);
+    //xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
     xmltree->addpar("single_row_panel", single_row_panel);
     xmltree->addpar("reports_destination", toConsole);
     xmltree->addpar("hide_system_errors", hideErrors);
