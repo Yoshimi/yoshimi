@@ -1,5 +1,9 @@
 yoshimi 1.4.x
 
+2016-8-24 Will
+* Moved current root and current bank to instance config files.
+* GUI button numbers no longer shown in direct access.
+
 2016-8-23 Will
 * Separated out instance settings from main config file.
 * Added GUI and CLI enable/disable to 'Switches'.

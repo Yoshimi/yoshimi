@@ -62,6 +62,7 @@ class Config : public MiscFuncs
         string testCCvalue(int cc);
         string masterCCtest(int cc);
         void saveConfig(void);
+        bool loadConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
         bool loadState(const string statefile)
@@ -135,6 +136,8 @@ class Config : public MiscFuncs
         bool          logXMLheaders;
         bool          configChanged;
         int           rtprio;
+        int           tempRoot;
+        int           tempBank;
         int           midi_bank_root;
         int           midi_bank_C;
         int           midi_upper_voice_C;
@@ -173,7 +176,6 @@ class Config : public MiscFuncs
 
     private:
         void loadCmdArgs(int argc, char **argv);
-        bool loadConfig(void);
         void defaultPresets(void);
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);

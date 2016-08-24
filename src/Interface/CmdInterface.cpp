@@ -1603,6 +1603,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
             replyString = "All data will be lost. Still exit";
         if (query(replyString, false))
         {
+            Runtime.configChanged = false;
+            // this seems backwards but it *always* saves.
+            // seeing configChanged makes it reload the old settings first.
             Runtime.runSynth = false;
             return true;
         }

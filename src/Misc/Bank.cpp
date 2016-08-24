@@ -51,9 +51,9 @@ Bank::Bank(SynthEngine *_synth) :
     force_bank_dir_file(".bankdir"), // if this file exists in a directory, the
                                     // directory is considered a bank, even if
                                     // it doesn't contain an instrument file
-    synth(_synth),
-    currentRootID(0),
-    currentBankID(0)
+    synth(_synth)
+    //currentRootID(0),
+    //currentBankID(0)
 {
     roots.clear();
     //addDefaultRootDirs();
@@ -974,9 +974,6 @@ void Bank::parseConfigFile(XMLwrapper *xml)
 {
     roots.clear();
     hints.clear();
-    size_t tmp_root = xml->getpar("root_current_ID", 0, 0, 127);
-    size_t tmp_bank = xml->getpar("bank_current_ID", 0, 0, 127);
-
     string nodename = "BANKROOT";
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
     {
@@ -1011,17 +1008,11 @@ void Bank::parseConfigFile(XMLwrapper *xml)
     }
 
     rescanforbanks();
-
-    setCurrentRootID(tmp_root); // done this way so loading full set
-    setCurrentBankID(tmp_bank); // doesn't change it - need to investigate!
 }
 
 
 void Bank::saveToConfigFile(XMLwrapper *xml)
 {
-    xml->addpar(string("root_current_ID"), currentRootID);
-    xml->addpar(string("bank_current_ID"), currentBankID);
-
     for (size_t i = 0; i < MAX_BANK_ROOT_DIRS; i++)
     {
         if (roots.count(i) > 0 && !roots [i].path.empty())

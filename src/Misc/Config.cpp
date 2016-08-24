@@ -625,6 +625,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     //misc
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
+    tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
+    tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
 
     xml->exitbranch(); // CONFIGURATION
     return true;
@@ -695,6 +697,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
     xmltree->addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xmltree->addpar("check_pad_synth", checksynthengines);
+    xmltree->addpar(string("root_current_ID"), synth->ReadBankRoot());
+    xmltree->addpar(string("bank_current_ID"), synth->ReadBank());
     xmltree->endbranch(); // CONFIGURATION
 }
 

@@ -2279,6 +2279,8 @@ bool SynthEngine::installBanks(int instance)
     bank.parseConfigFile(xml);
     xml->exitbranch();
     delete xml;
+    SetBankRoot(Runtime.tempRoot);
+    SetBank(Runtime.tempBank);
     return true;
 }
 

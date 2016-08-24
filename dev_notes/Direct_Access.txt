@@ -27,7 +27,8 @@ It is expected that any alternative input system will store its own copies of
 such intermediate information so that they remain fully independent.
 
 An alternative way to find out the correct command sequence is to click on a
-control with any button *except* the middle one. trailing '255's can be ommitted.
+control with any button *except* the middle one. Trailing '255's can be ommitted
+if there are no following parameters set.
 
 
 The format is:
