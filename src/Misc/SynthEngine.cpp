@@ -328,6 +328,10 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.Log("Failed to start RBP thread");
         goto bail_out;
     }
+
+    // we seem to need this here only for first time startup :(
+    bank.setCurrentBankID(Runtime.tempBank);
+
     return true;
 
 

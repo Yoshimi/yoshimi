@@ -51,9 +51,9 @@ Bank::Bank(SynthEngine *_synth) :
     force_bank_dir_file(".bankdir"), // if this file exists in a directory, the
                                     // directory is considered a bank, even if
                                     // it doesn't contain an instrument file
-    synth(_synth)
-    //currentRootID(0),
-    //currentBankID(0)
+    synth(_synth),
+    currentRootID(0),
+    currentBankID(0)
 {
     roots.clear();
     //addDefaultRootDirs();

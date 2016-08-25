@@ -1,4 +1,9 @@
-yoshimi 1.4.x
+yoshimi 1.4.1 rc1
+
+2016-8-25 Will
+* First time startup now correctly sets current bank.
+* Updated short guide.
+* Set version to 1.4.1 rc1
 
 2016-8-24 Will
 * Moved current root and current bank to instance config files.
