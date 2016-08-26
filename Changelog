@@ -1,4 +1,10 @@
-yoshimi 1.4.1 rc1
+yoshimi 1.4.1 rc2
+
+2016-8-26 Will
+* Bugfix: GUI was being disabled on close with multiple instances.
+* Corrected settings messages for higher instances.
+* Revised shortform NRPNs for channel select.
+* Implemented channel select setup via GUI.
 
 2016-8-25 Will
 * First time startup now correctly sets current bank.

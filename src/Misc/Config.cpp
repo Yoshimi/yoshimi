@@ -138,6 +138,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
+    channelSwitchType(0),
+    channelSwitchValue(128),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -407,6 +409,8 @@ string Config::masterCCtest(int cc)
                     result = "bank root change";
                 else if (cc == midi_upper_voice_C)
                     result = "extended program change";
+                else if (cc == channelSwitchValue)
+                    result = "channel switcher";
             }
         }
     }
@@ -536,13 +540,13 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
     Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
-    if (showGui == 0 && showCLI == 0)
+    showGui = xml->getparbool("enable_gui", showGui);
+    showSplash = xml->getparbool("enable_splash", showSplash);
+    showCLI = xml->getparbool("enable_CLI", showCLI);
+    if (!showGui && !showCLI)
     {
-        showGui = 1;
-        showCLI = 1; // sanity check!
+        showGui = true;
+        showCLI = true; // sanity check!
     }
     xml->exitbranch(); // BaseParameters
     return true;
@@ -561,15 +565,6 @@ bool Config::extractConfigData(XMLwrapper *xml)
         Log("Running with defaults");
         return true;
     }
-    /*GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
-    if (showGui == 0 && showCLI == 0)
-    {
-        showGui = 1;
-        showCLI = 1; // sanity check!
-    }*/
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
@@ -657,10 +652,6 @@ void Config::saveConfig(void)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
-    //xmltree->addpar("gzip_compression", GzipCompression);
-    //xmltree->addpar("enable_gui", synth->getRuntime().showGui);
-    //xmltree->addpar("enable_splash", synth->getRuntime().showSplash);
-    //xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
     xmltree->addpar("single_row_panel", single_row_panel);
     xmltree->addpar("reports_destination", toConsole);
     xmltree->addpar("hide_system_errors", hideErrors);

@@ -527,6 +527,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
     }
+    else if (type == Runtime.channelSwitchValue)
+    {
+        SetSystemValue(128, par);
+    }
     else
     { // bank change doesn't directly affect parts.
         int npart;
@@ -1551,22 +1555,23 @@ void SynthEngine::SetSystemValue(int type, int value)
             Runtime.Log("Settings saved");
             break;
 
-        case 128: // shortform NRPN channel switch
-
-            if (value >= NUM_MIDI_PARTS) // single row
+        case 128: // channel switch
+            if (Runtime.channelSwitchType == 1) // single row
             {
-                int start = value & 0xc;
-                value &= 0x3f;
-                for (int i = start; i < start + 4; ++i)
+                if (value >= NUM_MIDI_CHANNELS)
+                    return; // out of range
+                for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
                 {
                     if (i != value)
-                        part[i]->Prcvchn = start | NUM_MIDI_CHANNELS;
+                        part[i]->Prcvchn = NUM_MIDI_CHANNELS;
                     else
-                        part[i]->Prcvchn = start;
+                        part[i]->Prcvchn = 0;
                 }
             }
-            else // columns
+            else if (Runtime.channelSwitchType == 2) // columns
             {
+                if (value >= NUM_MIDI_PARTS)
+                    return; // out of range
                 int chan = value & 0xf;
                 for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
                 {
@@ -1576,6 +1581,8 @@ void SynthEngine::SetSystemValue(int type, int value)
                        part[i]->Prcvchn = chan;
                 }
             }
+            else
+                return; // unrecognised
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             break;
     }
@@ -3012,7 +3019,7 @@ void SynthEngine::closeGui()
     {
         delete guiMaster;
         guiMaster = NULL;
-        Runtime.showGui = false;
+        //Runtime.showGui = false;
     }
 }
 

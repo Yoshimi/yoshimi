@@ -102,9 +102,9 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
                 addpar("sound_buffer_size", synth->getRuntime().Buffersize);
                 addpar("oscil_size", synth->getRuntime().Oscilsize);
                 addpar("gzip_compression", synth->getRuntime().GzipCompression);
-                addpar("enable_gui", synth->getRuntime().showGui);
-                addpar("enable_splash", synth->getRuntime().showSplash);
-                addpar("enable_CLI", synth->getRuntime().showCLI);
+                addparbool("enable_gui", synth->getRuntime().showGui);
+                addparbool("enable_splash", synth->getRuntime().showSplash);
+                addparbool("enable_CLI", synth->getRuntime().showCLI);
             endbranch();
         }
     }
