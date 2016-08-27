@@ -139,7 +139,8 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
     channelSwitchType(0),
-    channelSwitchValue(128),
+    channelSwitchCC(128),
+    channelSwitchValue(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -185,6 +186,7 @@ bool Config::Setup(int argc, char **argv)
         synth->loadHistory();
         return true;
     }
+
     switch (audioEngine)
     {
         case alsa_audio:
@@ -409,7 +411,7 @@ string Config::masterCCtest(int cc)
                     result = "bank root change";
                 else if (cc == midi_upper_voice_C)
                     result = "extended program change";
-                else if (cc == channelSwitchValue)
+                else if (cc == channelSwitchCC)
                     result = "channel switcher";
             }
         }
@@ -707,7 +709,7 @@ void Config::saveSessionData(string savefile)
         return;
     }
     addConfigXML(xmltree);
-    addRuntimeXML(xmltree);
+//    addRuntimeXML(xmltree);
     synth->add2XML(xmltree);
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
@@ -745,7 +747,8 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         ok = extractConfigData(xml); // this needs improving
         if (ok)
         {
-            ok = extractRuntimeData(xml) && synth->getfromXML(xml);
+//            ok = extractRuntimeData(xml) && synth->getfromXML(xml);
+            ok = synth->getfromXML(xml);
             if (ok)
                 synth->getRuntime().stateChanged = true;
         }
@@ -758,7 +761,7 @@ end_game:
 }
 
 
-bool Config::extractRuntimeData(XMLwrapper *xml)
+/*bool Config::extractRuntimeData(XMLwrapper *xml)
 {
     if (!xml->enterbranch("RUNTIME"))
     {
@@ -780,7 +783,7 @@ void Config::addRuntimeXML(XMLwrapper *xml)
     xml->addparstr("name_tag", nameTag);
     xml->addparstr("current_xmz", CurrentXMZ);
     xml->endbranch();
-}
+}*/
 
 
 void Config::Log(string msg, char tostderr)
@@ -1196,6 +1199,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
 
         case 'S':
+            settings->configChanged = true;
             settings->restoreState = true;
             if (arg)
                 settings->StateFile = string(arg);

@@ -475,6 +475,10 @@ void SynthEngine::defaults(void)
     }
     microtonal.defaults();
     Runtime.currentPart = 0;
+    Runtime.channelSwitchType = 0;
+    Runtime.channelSwitchCC = 128;
+    Runtime.channelSwitchValue = 0;
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
     //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
     ShutUp();
@@ -526,43 +530,42 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
     if (type == Runtime.midi_bank_C)
     {
         SetBank(par); //shouldn't get here. Banks are set directly via SetBank method from MusicIO class
+        return;
     }
-    else if (type == Runtime.channelSwitchValue)
+    if (type == Runtime.channelSwitchCC)
     {
         SetSystemValue(128, par);
+        return;
     }
-    else
-    { // bank change doesn't directly affect parts.
-        int npart;
-        if (chan < NUM_MIDI_CHANNELS)
-        {
-            for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
-            {   // Send the controller to all part assigned to the channel
-                if (chan == part[npart]->Prcvchn && partonoffRead(npart))
-                {
-                    part[npart]->SetController(type, par);
-                    if (type == 7 || type == 10) // currently only volume and pan
-                        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
-                }
-            }
-        }
-        else
-        {
-            npart = chan & 0x7f;
-            if (npart < Runtime.NumAvailableParts)
+    int npart;
+    if (chan < NUM_MIDI_CHANNELS)
+    {
+        for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
+        {   // Send the controller to all part assigned to the channel
+            if (chan == part[npart]->Prcvchn && partonoffRead(npart))
             {
                 part[npart]->SetController(type, par);
                 if (type == 7 || type == 10) // currently only volume and pan
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
             }
         }
-        if (type == C_allsoundsoff)
-        {   // cleanup insertion/system FX
-            for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
-                sysefx[nefx]->cleanup();
-            for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
-                insefx[nefx]->cleanup();
+    }
+    else
+    {
+        npart = chan & 0x7f;
+        if (npart < Runtime.NumAvailableParts)
+        {
+            part[npart]->SetController(type, par);
+            if (type == 7 || type == 10) // currently only volume and pan
+                GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
         }
+    }
+    if (type == C_allsoundsoff)
+    {   // cleanup insertion/system FX
+        for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
+            sysefx[nefx]->cleanup();
+        for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+            insefx[nefx]->cleanup();
     }
 }
 
@@ -1560,12 +1563,30 @@ void SynthEngine::SetSystemValue(int type, int value)
             {
                 if (value >= NUM_MIDI_CHANNELS)
                     return; // out of range
-                for (int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+                Runtime.channelSwitchValue = value;
+                for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
                 {
-                    if (i != value)
-                        part[i]->Prcvchn = NUM_MIDI_CHANNELS;
+                    bool isVector = Runtime.nrpndata.vectorEnabled[ch];
+                    if (ch != value)
+                    {
+                        part[ch]->Prcvchn = NUM_MIDI_CHANNELS;
+                        if (isVector)
+                        {
+                            part[ch + NUM_MIDI_CHANNELS]->Prcvchn = NUM_MIDI_CHANNELS;
+                            part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = NUM_MIDI_CHANNELS;
+                            part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = NUM_MIDI_CHANNELS;
+                        }
+                    }
                     else
-                        part[i]->Prcvchn = 0;
+                    {
+                        part[ch]->Prcvchn = 0;
+                        if (isVector)
+                        {
+                            part[ch + NUM_MIDI_CHANNELS]->Prcvchn = 0;
+                            part[ch + NUM_MIDI_CHANNELS * 2]->Prcvchn = 0;
+                            part[ch + NUM_MIDI_CHANNELS * 3]->Prcvchn = 0;
+                        }
+                    }
                 }
             }
             else if (Runtime.channelSwitchType == 2) // columns

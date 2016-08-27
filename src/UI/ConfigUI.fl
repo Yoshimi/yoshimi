@@ -729,14 +729,14 @@ synth->getRuntime().configChanged = true;}
             label {Channel switch CC}
             callback {CSpend->show();}
             xywh {235 230 50 18} labelsize 12 minimum 0 maximum 127 value 115 textsize 12
-            code0 {CSvalue = synth->getRuntime().channelSwitchValue;}
-            code1 {if (CSvalue < 128) o->value(CSvalue); else o->value(115);}
+            code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
+            code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
           }
           Fl_Button CSpend {
             label Pending
             callback {//
     int candidate = CSspinner->value();
-    if (candidate == CSvalue)
+    if (candidate == CS_CC)
     {
         o->hide();
         return;
@@ -747,16 +747,16 @@ synth->getRuntime().configChanged = true;}
     if (!name.empty())
     {
         fl_alert("In use for %s",name.c_str());
-        if (CSvalue < 128)
+        if (CS_CC < 128)
         {
-        CSspinner->value(CSvalue);
+        CSspinner->value(CS_CC);
         CSspinner->redraw();
         }
     }
     else
     {
-        synth->getRuntime().channelSwitchValue = candidate;
-        CSvalue = candidate;
+        synth->getRuntime().channelSwitchCC = candidate;
+        CS_CC = candidate;
         o->hide();
     }}
             tooltip {Click to set} xywh {300 230 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
@@ -766,7 +766,8 @@ synth->getRuntime().configChanged = true;}
             callback {//
     if (o->value() == 0)
     {
-        synth->getRuntime().channelSwitchValue = 128;
+        CS_CC = 128;
+        synth->getRuntime().channelSwitchCC = CS_CC;
         CSspinner->value(115);
         CSspinner->deactivate();
         CSpend->hide();
@@ -775,6 +776,7 @@ synth->getRuntime().configChanged = true;}
     {
         synth->getRuntime().channelSwitchType = o->value();
         CSspinner->activate();
+        CSpend->show();
     }}
             tooltip {Select 1 of 16 parts or 1 of parts in columns} xywh {235 210 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {o->value(synth->getRuntime().channelSwitchType);}
@@ -1028,19 +1030,20 @@ presets->hide();}
             }
             Epend->hide();
             
-            tmp = synth->getRuntime().channelSwitchValue;
+            tmp = synth->getRuntime().channelSwitchCC;
             if (tmp > 127)
             {
-                CSspinner->value(115);
+            	CS_CC = 115;
                 CSspinner->deactivate();
                 channelswitch->value(0);
             }
             else
             {
-                CSspinner->value(tmp);
+                CS_CC = tmp;
                 CSspinner->activate();
-                Epcheck->value(1);
+                channelswitch->value(tmp);
             }
+            CSspinner->value(CS_CC);
             CSpend->hide();
             break;
 
@@ -1063,7 +1066,7 @@ presets->hide();}
   }
   decl {int EPCvalue;} {private local
   }
-  decl {int CSvalue;} {private local
+  decl {int CS_CC;} {private local
   }
   decl {int BankRootvalue;} {private local
   }

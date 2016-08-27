@@ -93,7 +93,7 @@ class Config : public MiscFuncs
         bool          restoreState;
         bool          stateChanged;
         string        StateFile;
-        string        CurrentXMZ;
+//        string        CurrentXMZ;
         bool          restoreJackSession;
         string        jackSessionFile;
 
@@ -148,6 +148,7 @@ class Config : public MiscFuncs
         int           NumAvailableParts;
         int           currentPart;
         unsigned char channelSwitchType;
+        unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
         unsigned char nrpnL;
         unsigned char nrpnH;
@@ -181,9 +182,9 @@ class Config : public MiscFuncs
         void defaultPresets(void);
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
-        bool extractRuntimeData(XMLwrapper *xml);
+//        bool extractRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
-        void addRuntimeXML(XMLwrapper *xml);
+//        void addRuntimeXML(XMLwrapper *xml);
         void saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);

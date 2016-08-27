@@ -225,7 +225,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                     if (param > 0x77) // disable it
                     {
                         synth->getRuntime().channelSwitchType = 0;
-                        synth->getRuntime().channelSwitchValue = 0x80;
+                        synth->getRuntime().channelSwitchCC = 0x80;
                     }
                     else
                     {
@@ -233,7 +233,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                             synth->getRuntime().channelSwitchType = 1; // row
                         else
                             synth->getRuntime().channelSwitchType = 2; // column
-                    synth->getRuntime().channelSwitchValue = param;
+                    synth->getRuntime().channelSwitchCC = param;
                     }
                     return;
                 }
@@ -341,6 +341,9 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
     int swap1;
     int swap2;
     unsigned char type;
+
+    if (synth->getRuntime().channelSwitchType == 1)
+        ch = synth->getRuntime().channelSwitchValue; // force vectors to obey channel switcher
 
     if (ctrl == synth->getRuntime().nrpndata.vectorXaxis[ch])
     {

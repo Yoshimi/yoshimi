@@ -1,10 +1,19 @@
 yoshimi 1.4.1 rc2
 
+2016-8-27 Will
+* Bugfix: If Startup had to change MIDI or audio engines it didn't
+  set configChanged, so change was made permanent without warning.
+* Commented out unused code in Config.
+* Bugfix: 'Reset' wasn't clearing channel switcher GUI.
+* Made channel switcher and vectors play nice - mostly!
+* Set version to 1.4.1 rc3
+
 2016-8-26 Will
 * Bugfix: GUI was being disabled on close with multiple instances.
 * Corrected settings messages for higher instances.
 * Revised shortform NRPNs for channel select.
 * Implemented channel select setup via GUI.
+* Set version to 1.4.1 rc2
 
 2016-8-25 Will
 * First time startup now correctly sets current bank.
