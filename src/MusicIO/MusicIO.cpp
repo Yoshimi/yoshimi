@@ -312,9 +312,15 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                 return;
             }
         }
-        if (synth->getRuntime().nrpndata.vectorEnabled[ch] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+        unsigned char vecChan;
+        if (synth->getRuntime().channelSwitchType == 1)
+            vecChan = synth->getRuntime().channelSwitchValue;
+            // force vectors to obey channel switcher
+        else
+            vecChan = ch;
+        if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
         { // vector control is direct to parts
-            if (nrpnRunVector(ch, ctrl, param))
+            if (nrpnRunVector(vecChan, ctrl, param))
                 return; // **** test this it may be wrong!
         }
         // pick up a drop-through if CC doesn't match the above
@@ -341,9 +347,6 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
     int swap1;
     int swap2;
     unsigned char type;
-
-    if (synth->getRuntime().channelSwitchType == 1)
-        ch = synth->getRuntime().channelSwitchValue; // force vectors to obey channel switcher
 
     if (ctrl == synth->getRuntime().nrpndata.vectorXaxis[ch])
     {

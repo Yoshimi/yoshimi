@@ -1,4 +1,9 @@
-yoshimi 1.4.1 rc2
+yoshimi 1.4.1 rc3
+
+2016-8-28 Will
+* Bugfix: Parts failed to load from Bank window if part MIDI
+  number was not the same as the part number (MOD 16).
+* Vectors now fully obey channel switcher in 'Row' mode.
 
 2016-8-27 Will
 * Bugfix: If Startup had to change MIDI or audio engines it didn't

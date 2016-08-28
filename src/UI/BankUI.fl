@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of original ZynAddSubFX code, modified November 2010
+This file is derivative of original ZynAddSubFX code, modified August 2016
 } {in_source in_header
 } 
 
@@ -53,7 +53,8 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class BankProcess_ {} {
+class BankProcess_ {selected
+} {
   Function {process(void)} {return_type {virtual void}
   } {
     code {;} {}
@@ -266,7 +267,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -724,9 +725,9 @@ fnr = &RootProcess_::rootprocess;
         {
             // Reads from slot
             if (slot < 128)
-                synth->writeRBP(3, *npart, slot);
+                synth->writeRBP(3, (*npart) | 0x80, slot);
 	    else
-                synth->writeRBP(4, *npart, slot - 128);
+                synth->writeRBP(4, (*npart) | 0x80, slot - 128);
             if (what == 3)
                 bankuiwindow->hide();
             cbwig->do_callback();
