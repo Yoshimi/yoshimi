@@ -56,7 +56,7 @@ class ConfigUI {selected : {private MiscFuncs}
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
@@ -1044,6 +1044,7 @@ presets->hide();}
                 channelswitch->value(tmp);
             }
             CSspinner->value(CS_CC);
+            channelswitch->value(synth->getRuntime().channelSwitchType);
             CSpend->hide();
             break;
 

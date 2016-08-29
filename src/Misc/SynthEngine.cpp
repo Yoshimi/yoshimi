@@ -323,7 +323,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     }
 
 
-    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, true, 7, false, "RBP"))
+    if (!Runtime.startThread(&RBPthreadHandle, _RBPthread, this, false, 0, false, "RBP"))
     {
         Runtime.Log("Failed to start RBP thread");
         goto bail_out;
@@ -441,7 +441,7 @@ void *SynthEngine::RBPthread(void)
                 Runtime.Log("Unable to read data from Root/bank/Program");
         }
         else
-            usleep(100); // yes it's a hack but seems reliable
+            usleep(250); // yes it's a hack but seems reliable
     }
     return NULL;
 }
@@ -781,13 +781,19 @@ int SynthEngine::ReadBank(void)
 
 void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
 {
-    //while testing, this simply sends everything to commandFetch
+    // while testing, this simply sends everything to Interchange
 
     interchange.commandFetch(value, type, control, part, kit, engine, insert, insertParam);
     return;
 }
 
 
+/*
+ * If we want to change a *specific* part regardless of what MIDI chanel it
+ * is listening to we use 0 - 63 ORed with 128
+ *
+ * Values 0 - 15 will change 'standard' parts listening to that channel
+ */
 void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 {
     bool partOK = true;
@@ -804,7 +810,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
                 // we don't want upper parts (16 - 63) activiated!
                 if (chan == part[npart]->Prcvchn)
                 {
-                    // all listening parts must succeed
+                    // ensure all listening parts succeed
                     if (!SetProgramToPart(npart, pgm, fname))
                     {
                         partOK = false;

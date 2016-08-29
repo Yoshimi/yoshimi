@@ -128,7 +128,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     showTimes(0),
     logXMLheaders(0),
     configChanged(false),
-    rtprio(4), // was 50 but LV2 doesn't set it.
+    rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
     midi_upper_voice_C(128),
@@ -152,7 +152,11 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     synth(_synth),
     bRuntimeSetupCompleted(false)
 {
-    if(!synth->getIsLV2Plugin())
+    if(synth->getIsLV2Plugin())
+    {
+        rtprio = 4; // To force internal threads below LV2 host
+    }
+    else
         fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
                                // toward zero.
@@ -887,9 +891,7 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                         continue;
                     }
                     sched_param prio_params;
-                    int prio = rtprio;
-                    if (priodec)
-                        prio -= priodec;
+                    int prio = rtprio - priodec;
                     if (prio < 1)
                         prio = 1;
                     Log(name + " priority is " + to_string(prio), 2);

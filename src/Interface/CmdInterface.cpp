@@ -85,6 +85,7 @@ string basics[] = {
     "  Root <n>",                   "de-list root path ID",
     "  Bank <n>",                   "delete bank ID (and all contents) from current root",
     "Set / Read",                   "set or read all main parameters",
+    "  SWitcher [{CC}n] [s]",      "define CC n to set single part in group (Row / Column)",
     "  REPorts [s]",                "destination (Gui/Stderr)",
     "  ",                           "  non-fatal (SHow/Hide)",
     "  Root <n>",                   "current root path to ID",
@@ -1162,7 +1163,63 @@ int CmdInterface::commandReadnSet()
         }
         return done_msg;
     }
+    else if(matchnMove(2, point, "Switcher"))
+    {
+        if (isRead)
+        {
+            name = "Switcher CC is ";
+            if (Runtime.channelSwitchType == 0)
+                name += "disabled";
+            else
+            {
+                name += to_string((int) Runtime.channelSwitchCC);
+                if (Runtime.channelSwitchType == 1)
+                    name += " Row type";
+                else
+                    name += " Column type";
+            }
+            Runtime.Log(name);
+            reply = done_msg;
+        }
+        else
+        {
+            int value = string2int(point);
+            if (value > 0)
+            {
+                name = Runtime.masterCCtest(value);
+                if (name > "")
+                {
+                    Runtime.Log("Already used by " + name);
+                    return done_msg;
+                }
+            point = skipChars(point);
+            }
+            Runtime.channelSwitchValue = 0;
+            name = "Set switcher CC as ";
+            if (value && matchnMove(1, point, "row"))
+            {
+                Runtime.channelSwitchType = 1;
+                Runtime.channelSwitchCC = value;
+                name += (to_string(value) + " Row type");
 
+            }
+            else if (value && matchnMove(1, point, "column"))
+            {
+                Runtime.channelSwitchType = 2;
+                Runtime.channelSwitchCC = value;
+                name += (to_string(value) + " Column type");
+            }
+            else
+            {
+                Runtime.channelSwitchType = 0;
+                Runtime.channelSwitchCC = 128;
+                name += "disabled";
+            }
+            Runtime.Log(name);
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 4);
+            reply = done_msg;
+        }
+    }
     else if (matchnMove(3, point, "reports"))
     {
         if (isRead)

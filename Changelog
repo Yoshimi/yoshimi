@@ -1,4 +1,11 @@
-yoshimi 1.4.1 rc3
+yoshimi 1.4.1 rc4
+
+2016-8-29 Will
+* Changed priority settings so that adjustment is specific to LV2.
+* Pushed program loads out of RT prio completely.
+* Added CLI to channel switcher control.
+* Updated docs.
+* Set version to 1.4.1 rc4
 
 2016-8-28 Will
 * Bugfix: Parts failed to load from Bank window if part MIDI
