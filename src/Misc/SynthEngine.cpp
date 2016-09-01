@@ -478,7 +478,8 @@ void SynthEngine::defaults(void)
     Runtime.channelSwitchType = 0;
     Runtime.channelSwitchCC = 128;
     Runtime.channelSwitchValue = 0;
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
+    if (guiMaster) // no gui on first call
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 4);
     //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
     ShutUp();

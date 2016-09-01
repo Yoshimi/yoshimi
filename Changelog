@@ -1,4 +1,9 @@
-yoshimi 1.4.1 rc4
+yoshimi 1.4.1 rc5
+
+2016-9-11 Will
+* Bugfix: threadmessage was issued at startup (SynthEngine defaults)
+  before threadmessage fully initialsed.
+* Set version to 1.4.1 rc5
 
 2016-8-29 Will
 * Changed priority settings so that adjustment is specific to LV2.
