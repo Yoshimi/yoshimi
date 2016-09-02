@@ -1,6 +1,9 @@
 Need to investigate Config::showQuestionOrCmdWarning(
 Doesn't seem to be called, so temporarily commented out.
 
+Investigate possible root/bank corruption when working from command line
+only happened once so far :(
+
 Find out why LV2 only stores/retrieves patch sets (not state)
 
 Make add voice & add/pad oscillator windows show kit number & name.
@@ -9,8 +12,6 @@ Investigate graded XML->minimal.
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
-
-Find out why loading a state or patch set at startup sometimes corrupts the stderr output even when messages are directed to the GUI.
 
 Change root/bank/instrument lists to single file for all instances.
 
@@ -21,7 +22,8 @@ Startup state load doesn't set buffersize correctly - partially resolved.
 
 Allow headless compilation.
 
-Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
+Make attempt to start second independent instance open a new one in running
+yoshimi instead - saves memory and more consistent.
 
 Add scales control to CLI.
 

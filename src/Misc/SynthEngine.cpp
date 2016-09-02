@@ -901,10 +901,7 @@ void SynthEngine::SetPartChan(unsigned char npart, unsigned char nchan)
          * as will using the GUI controls.
          */
         part[npart]->Prcvchn =  nchan;
-        if (Runtime.showGui && guiMaster && guiMaster->partui
-                            && guiMaster->partui->instrumentlabel
-                            && guiMaster->partui->part)
-            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePartProgram, npart);
     }
 }
 

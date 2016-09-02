@@ -218,8 +218,7 @@ private:
 public:
     enum
     {
-        NewSynthEngine = 0,
-        UpdateMaster,
+        UpdateMaster = 0,
         UpdateConfig,
         UpdatePaths,
         UpdatePanel,
@@ -227,11 +226,12 @@ public:
         UpdatePanelItem,
         UpdatePartProgram,
         UpdateEffects,
-        RegisterAudioPort,
         UpdateBankRootDirs,
         RescanForBanks,
         RefreshCurBank,
         GuiAlert,
+        RegisterAudioPort,
+        NewSynthEngine,
         UNDEFINED = 9999
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver

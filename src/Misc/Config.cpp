@@ -152,7 +152,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     synth(_synth),
     bRuntimeSetupCompleted(false)
 {
-    if(synth->getIsLV2Plugin())
+    if (synth->getIsLV2Plugin())
     {
         rtprio = 4; // To force internal threads below LV2 host
     }
@@ -178,7 +178,7 @@ bool Config::Setup(int argc, char **argv)
     if (!loadConfig())
         return false;
 
-    if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
+    if (synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
     {
         /*
          * These are needed here now, as for stand-alone they have
@@ -287,7 +287,7 @@ void Config::flushLog(void)
 /*bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
 {
     bool bRet = false;
-    if(showGui)
+    if (showGui)
     {
         bRet = fl_choice("%s, ok?", "No", "Yes", "Cancel", guiQuestion.c_str());
     }
@@ -485,7 +485,7 @@ bool Config::loadConfig(void)
         {
             if (!xml->loadXMLfile(resConfigFile))
             {
-                if((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
+                if ((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
                 {
                     Log("loadConfig loadXMLfile failed");
                     return false;
@@ -866,11 +866,11 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
     {
         if (!(chk = pthread_attr_init(&attr)))
         {
-            if(create_detached)
+            if (create_detached)
             {
                chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
             }
-            if(!chk)
+            if (!chk)
             {
                 if (schedfifo)
                 {
@@ -1049,7 +1049,7 @@ int Config::SSEcapability(void)
 
 void Config::AntiDenormals(bool set_daz_ftz)
 {
-    if(synth->getIsLV2Plugin())
+    if (synth->getIsLV2Plugin())
     {
         return;// no need to set floating point rules for lv2 - host should control it.
     }
@@ -1245,167 +1245,105 @@ void Config::loadCmdArgs(int argc, char **argv)
 void GuiThreadMsg::processGuiMessages()
 {
     GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
-    if(msg)
+    if (msg)
     {
-        switch(msg->type)
+        SynthEngine *synth = ((SynthEngine *)msg->data);
+
+        if (msg->type == RegisterAudioPort)
         {
-        case GuiThreadMsg::NewSynthEngine:
+            // This is unique not using guiMaster
+             mainRegisterAudioPort(synth, msg->index);
+             delete msg;
+             return;
+        }
+        MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
+        if (msg->type == GuiThreadMsg::NewSynthEngine)
         {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster();
-            if(!guiMaster)
+            // This *defines* guiMaster
+            if (!guiMaster)
                 cerr << "Error starting Main UI!" << endl;
             else
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
-            break;
         }
-
-        case GuiThreadMsg::UpdateMaster:
+        else if (guiMaster)
         {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->refresh_master_ui();
-            break;
-        }
-
-        case GuiThreadMsg::UpdateConfig:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->configui->update_config(msg->index);
-            break;
-        }
-
-        case GuiThreadMsg::UpdatePaths:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->updatepaths(msg->index);
-            break;
-        }
-
-        case GuiThreadMsg::UpdatePanel:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->updatepanel();
-            break;
-        }
-
-        case GuiThreadMsg::UpdatePart:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
+            switch(msg->type)
             {
-                guiMaster->updatepart();
-                guiMaster->updatepanel();
-            }
-            break;
-        }
 
-        case GuiThreadMsg::UpdatePanelItem:
-            if(msg->index < NUM_MIDI_PARTS && msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->updatelistitem(msg->index);
+                case GuiThreadMsg::UpdateMaster:
+                    guiMaster->refresh_master_ui();
+                    break;
+
+                case GuiThreadMsg::UpdateConfig:
+                    if (guiMaster->configui)
+                        guiMaster->configui->update_config(msg->index);
+                    break;
+
+                case GuiThreadMsg::UpdatePaths:
+                    guiMaster->updatepaths(msg->index);
+                    break;
+
+                case GuiThreadMsg::UpdatePanel:
+                    guiMaster->updatepanel();
+                    break;
+
+                case GuiThreadMsg::UpdatePart:
                     guiMaster->updatepart();
-                }
-            }
-            break;
+                    guiMaster->updatepanel();
+                    break;
 
-        case GuiThreadMsg::UpdatePartProgram:
-            if(msg->index < NUM_MIDI_PARTS && msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->updatelistitem(msg->index);
-                    guiMaster->updatepartprogram(msg->index);
-                }
-            }
-            break;
-
-        case GuiThreadMsg::UpdateEffects:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                    guiMaster->updateeffects(msg->index);
-            }
-            break;
-
-        case GuiThreadMsg::RegisterAudioPort:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                mainRegisterAudioPort(synth, msg->index);
-            }
-            break;
-
-        case GuiThreadMsg::UpdateBankRootDirs:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                    guiMaster->updateBankRootDirs();
-            }
-            break;
-
-        case GuiThreadMsg::RescanForBanks:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster && guiMaster->bankui)
-                {
-                    guiMaster->bankui->rescan_for_banks(false);
-                }
-            }
-            break;
-
-        case GuiThreadMsg::RefreshCurBank:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster && guiMaster->bankui)
-                {
-                    if (msg->index == 1)
+                case GuiThreadMsg::UpdatePanelItem:
+                    if ( msg->data && msg->index < NUM_MIDI_PARTS)
                     {
-                        // special case for first synth statup
-                        guiMaster->bankui->readbankcfg();
-                        guiMaster->bankui->rescan_for_banks(false);
+                        guiMaster->updatelistitem(msg->index);
+                        guiMaster->updatepart();
                     }
-                    guiMaster->bankui->set_bank_slot();
-                    guiMaster->bankui->refreshmainwindow();
-                }
-            }
-            break;
+                    break;
 
-        case GuiThreadMsg::GuiAlert:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->ShowAlert(msg->index);
-                }
-            }
+                case GuiThreadMsg::UpdatePartProgram:
+                    if (msg->data && msg->index < NUM_MIDI_PARTS)
+                    {
+                        guiMaster->updatelistitem(msg->index);
+                        guiMaster->updatepartprogram(msg->index);
+                    }
+                    break;
 
-        default:
-            break;
+                case GuiThreadMsg::UpdateEffects:
+                    if (msg->data)
+                        guiMaster->updateeffects(msg->index);
+                    break;
+
+                case GuiThreadMsg::UpdateBankRootDirs:
+                    if (msg->data)
+                        guiMaster->updateBankRootDirs();
+                    break;
+
+                case GuiThreadMsg::RescanForBanks:
+                    if (msg->data && guiMaster->bankui)
+                        guiMaster->bankui->rescan_for_banks(false);
+                    break;
+
+                case GuiThreadMsg::RefreshCurBank:
+                    if (msg->data && guiMaster->bankui)
+                    {
+                        if (msg->index == 1)
+                        {
+                            // special case for first synth startup
+                            guiMaster->bankui->readbankcfg();
+                            guiMaster->bankui->rescan_for_banks(false);
+                        }
+                        guiMaster->bankui->set_bank_slot();
+                        guiMaster->bankui->refreshmainwindow();
+                    }
+                    break;
+
+                case GuiThreadMsg::GuiAlert:
+                    if (msg->data)
+                        guiMaster->ShowAlert(msg->index);
+
+                default:
+                    break;
+            }
         }
         delete msg;
     }

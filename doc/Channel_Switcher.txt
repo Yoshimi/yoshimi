@@ -18,7 +18,7 @@ An extra twist is that if you have any vectors defined these will behave correct
 
 For the column based form set MSB to 66 and LSB to the controller you want to use.
 
-So, if your part number is, say 35, your base channel is 3. Uising your controller to send this will set part 35 to receive channel 3 and parts 3, 19 & 51 to 19, so they will only accept note off commands from channel 3.
+So, if your part number is, say 35, your base channel is 3. Using your controller to send this will set part 35 to receive channel 3 and parts 3, 19 & 51 to unavailable channel 19, so they will only accept note off commands from channel 3.
 
 Although this only gives you a selection of 4 parts, this is *per* *channel* so if your processor is powerful enough you can utilise all 64 possible parts.
 

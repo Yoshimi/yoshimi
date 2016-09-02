@@ -1,8 +1,15 @@
-yoshimi 1.4.1 rc5
+yoshimi 1.4.1 rc6
 
-2016-9-11 Will
+2016-9-2 Will
+* Rationalised max & min key limits to remove overlap - and silence!
+* Removed redundant threadmessage tests.
+* Minor optimizations to threadmessage process.
+* Reporting GUI commands now a build option.
+* Set version to 1.4.1 rc6
+
+2016-9-1 Will
 * Bugfix: threadmessage was issued at startup (SynthEngine defaults)
-  before threadmessage fully initialsed.
+  before threadmessage routine fully initialsed.
 * Set version to 1.4.1 rc5
 
 2016-8-29 Will

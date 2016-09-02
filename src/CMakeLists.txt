@@ -32,7 +32,7 @@ add_definitions(-Werror=format-security)
 
 # ^^^ comment these two out on pushes ^^^
 
-set (YOSHIMI_VERSION "1.4.1 rc5")
+set (YOSHIMI_VERSION "1.4.1 rc6")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -74,6 +74,8 @@ endif (HasJackSession)
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
+
+option (EnableGuiReports "Enable GUI control reports" OFF)
 
 #option to build lv2 plugin
 option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
@@ -400,6 +402,9 @@ add_definitions (-DFF_MAX_SEQUENCE=8)
 add_definitions (-DMAX_PHASER_STAGES=12)
 add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
+if (EnableGuiReports)
+    add_definitions (-DENABLE_REPORTS)
+endif (EnableGuiReports)
 #if (${DefaultAudio} STREQUAL "jack")
 #    message(STATUS "Default audio driver is Jack")
     add_definitions(-DDEFAULT_AUDIO=jack_audio)
