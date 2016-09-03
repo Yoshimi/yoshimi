@@ -472,7 +472,7 @@ send_data(4, o->value());}
           callback {//
                     part->setVolume(o->value());
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-                        synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
+                        synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
                     send_data(0, o->value());}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}

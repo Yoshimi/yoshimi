@@ -79,8 +79,6 @@ class Config : public MiscFuncs
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                          bool schedfifo, char lowprio, bool create_detached = true, string name = "");
-
-        //bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
@@ -93,7 +91,6 @@ class Config : public MiscFuncs
         bool          restoreState;
         bool          stateChanged;
         string        StateFile;
-//        string        CurrentXMZ;
         bool          restoreJackSession;
         string        jackSessionFile;
 
@@ -182,9 +179,7 @@ class Config : public MiscFuncs
         void defaultPresets(void);
         bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
-//        bool extractRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
-//        void addRuntimeXML(XMLwrapper *xml);
         void saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);

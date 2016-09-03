@@ -1,6 +1,3 @@
-Need to investigate Config::showQuestionOrCmdWarning(
-Doesn't seem to be called, so temporarily commented out.
-
 Investigate possible root/bank corruption when working from command line
 only happened once so far :(
 

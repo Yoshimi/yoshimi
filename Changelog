@@ -1,4 +1,11 @@
-yoshimi 1.4.1 rc6
+yoshimi 1.4.1 rc7
+
+2016-9-3
+* Regression: Part volume knob sent mixer slider in opposite direction.
+* removed redundant code from Config.
+* Removed Tests directory.
+  There are much more sophisitcated test files now!
+* Set version to 1.4.1 rc6
 
 2016-9-2 Will
 * Rationalised max & min key limits to remove overlap - and silence!
@@ -8,7 +15,7 @@ yoshimi 1.4.1 rc6
 * Set version to 1.4.1 rc6
 
 2016-9-1 Will
-* Bugfix: threadmessage was issued at startup (SynthEngine defaults)
+* Bugfix: Threadmessage was issued at startup (SynthEngine defaults)
   before threadmessage routine fully initialsed.
 * Set version to 1.4.1 rc5
 

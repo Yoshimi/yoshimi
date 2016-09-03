@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified January 2015
+    This file is derivative of ZynAddSubFX original code, last modified September 2016
 */
 
 #include <iostream>
@@ -99,13 +99,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
-    //Samplerate(48000),
-    //Buffersize(256),
-    //Oscilsize(512),
     runSynth(true),
-    //showGui(true),
-    //showSplash(true),
-    //showCLI(true),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -117,7 +111,6 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     connectJackaudio(true),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
-    //GzipCompression(3),
     loadDefaultState(false),
     Interpolation(0),
     checksynthengines(1),
@@ -282,22 +275,6 @@ void Config::flushLog(void)
         }
     }
 }
-
-
-/*bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
-{
-    bool bRet = false;
-    if (showGui)
-    {
-        bRet = fl_choice("%s, ok?", "No", "Yes", "Cancel", guiQuestion.c_str());
-    }
-    else
-    {
-        bRet = bForceCmdLinePositive;//force positive answer if gui is not used (default behavior)
-        cerr << endl << "----- WARNING! -----" << cmdLineWarning << endl << "----- ^^^^^^^^ -----" << endl;
-    }
-    return bRet;
-}*/
 
 
 string Config::testCCvalue(int cc)
@@ -713,7 +690,6 @@ void Config::saveSessionData(string savefile)
         return;
     }
     addConfigXML(xmltree);
-//    addRuntimeXML(xmltree);
     synth->add2XML(xmltree);
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
@@ -748,10 +724,9 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         ok = extractBaseParameters(xml);
     else
     {
-        ok = extractConfigData(xml); // this needs improving
+        ok = extractConfigData(xml); // this still needs improving
         if (ok)
         {
-//            ok = extractRuntimeData(xml) && synth->getfromXML(xml);
             ok = synth->getfromXML(xml);
             if (ok)
                 synth->getRuntime().stateChanged = true;
@@ -763,31 +738,6 @@ end_game:
         delete xml;
     return ok;
 }
-
-
-/*bool Config::extractRuntimeData(XMLwrapper *xml)
-{
-    if (!xml->enterbranch("RUNTIME"))
-    {
-        Log("Config extractRuntimeData, no RUNTIME branch", 1);
-        return false;
-    }
-// need to put current root and bank here
-    nameTag = xml->getparstr("name_tag");
-    CurrentXMZ = xml->getparstr("current_xmz");
-    xml->exitbranch();
-    return true;
-}
-
-
-void Config::addRuntimeXML(XMLwrapper *xml)
-{
-    xml->beginbranch("RUNTIME");
-// need to put current root and bank here
-    xml->addparstr("name_tag", nameTag);
-    xml->addparstr("current_xmz", CurrentXMZ);
-    xml->endbranch();
-}*/
 
 
 void Config::Log(string msg, char tostderr)
