@@ -1,5 +1,3 @@
-Investigate possible root/bank corruption when working from command line
-only happened once so far :(
 
 Find out why LV2 only stores/retrieves patch sets (not state)
 

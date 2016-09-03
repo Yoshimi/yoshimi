@@ -2,10 +2,11 @@ yoshimi 1.4.1 rc7
 
 2016-9-3
 * Regression: Part volume knob sent mixer slider in opposite direction.
-* removed redundant code from Config.
+* Removed redundant code from Config.
 * Removed Tests directory.
-  There are much more sophisitcated test files now!
-* Set version to 1.4.1 rc6
+  There are much more sophisticated test files now!
+* Set version to 1.4.1 rc7
+* Bugfix: Listing banks from CLI was enabling all possible ones :(
 
 2016-9-2 Will
 * Rationalised max & min key limits to remove overlap - and silence!

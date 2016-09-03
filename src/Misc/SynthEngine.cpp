@@ -1074,7 +1074,7 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
         msg_buf.push_back("    " + label);
         for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
         {
-            if (!bank.roots [rootNum].banks [idx].dirname.empty())
+            if (bank.roots [rootNum].banks.count(idx))
                 msg_buf.push_back("    ID " + asString(idx) + "    "
                                 + bank.roots [rootNum].banks [idx].dirname);
         }
