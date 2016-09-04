@@ -2135,6 +2135,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     if (read_history(hist_filename.c_str()) != 0) // reading failed
     {
         perror(hist_filename.c_str());
+        ofstream outfile (hist_filename.c_str()); // create an empty file
     }
     cCmd = NULL;
     bool exit = false;

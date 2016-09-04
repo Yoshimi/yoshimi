@@ -1,4 +1,10 @@
-yoshimi 1.4.1 rc7
+yoshimi 1.4.1
+
+2016-9-5 Will
+* Changed three instrument patches to the Gzip compressed form.
+* If readline can't read its history file an empty one is created.
+* Finalised all code and docs for release.
+* Set version 1.4.1
 
 2016-9-4 Will
 * Added two new sounds to Will_Godfrey_Companion,
