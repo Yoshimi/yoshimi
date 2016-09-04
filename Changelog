@@ -1,6 +1,12 @@
 yoshimi 1.4.1 rc7
 
-2016-9-3
+2016-9-4 Will
+* Added two new sounds to Will_Godfrey_Companion,
+  Thin Trem Pipe & Pulse Reed.
+* Updated docs for next release.
+* No code changes.
+
+2016-9-3 Will
 * Regression: Part volume knob sent mixer slider in opposite direction.
 * Removed redundant code from Config.
 * Removed Tests directory.

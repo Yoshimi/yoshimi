@@ -1,3 +1,19 @@
+V 1.4.1
+Lyrebird
+
+First of all, we have a new quick guide that's in Yoshimi's 'doc' directory. It's just something to help new users get started.
+
+We've always logged warnings if it wasn't possible to run either audio or MIDI, but now we also give a GUI alert.
+
+From this version onward it is possible to autoload a default state on startup, so you see Yoshimi already configured exactly as you like, with patches loaded and part destinations set.
+
+To make it easier to position patch changes in a running MIDI file, there is a new option to report the time these take to load.
+
+Vector control settings are now stored in patch set and state files.
+
+We implemented a simpler way to perform channel switching so the 'current' MIDI instrument can seem to be changed instantly, retaining the note tails of the previous one.
+
+
 V 1.4.0
 Diamond Dove
 
@@ -71,35 +87,3 @@ Yoshim is now verified as being able to use 192000 Hz sample rate in both ALSA a
 There have been a few minor GUI corrections and additions to the doc folder.
 
 Many non-fatal system error messages can now be surpressed. this is particularly relevant for CLI use. This will be extended over time.
-
-
-V1.3.8
-
-We have our first code name: The Swan
-
-MIDI program changes have always been pretty clean from the time Cal first introduced them, but now GUI changes are just as clean. While it is generally best to change a program when the part is silent, even if a part is sounding there is usually barely a click. There is no interference at all with any other sounding parts.
-
-Sometimes MIDI CCs don't seem to give the results you expect. Well, there is now a setting that will report all incoming CCs so you can discover what Yoshimi actually sees (which may not be what you were expecting).
-
-At the request of one of our users, we have now implemented CC2, Breath Control.
-
-The 'Humanise' feature has had more interest so it's been upgraded. It's now a slider and it's setting can be saved in patch sets. It provides a tiny per-note random detune to an *entire* part (all engines in all kits), but only to that part.
-
-Audio & Midi preferences have been improved. If you set (say) ALSA MIDI and JACK audio, either from the GUI or the command line, the setting can be saved and will be reinstated on the next run. These settings are per-instance so if you have multiple sound cards you can make full use of them.
-
-Barring major system failures, there are now no circumstances where Yoshimi will fail to start.
-
-There is greater control of your working environment. You can have just the GUI, just a CLI or both, and these settings can be saved. If you try to disable both you will get a polite warning and will be left with just the CLI.
-
-The CLI can now access almost all top level controls as well as the 'main page' part ones and can select any effect and effect preset, but can't yet deal with the individual effects controls. It can be used to set up Vector Control much more quickly and easily than using NRPNs.
-
-It is also context sensitive, which along with careful choice of command names and abreviations allows very fast access with minimal typing.
-
-Yoshimi's parser is case insensitive to commands (but not filenames etc.) and accepts the shortest unambiguous abbreviation. However it is quite pedantic, and expects spelling to be correct regardless of length. Apart from the 'back' commands, it is word-based so spaces are significant.
-
-The CLI prompt always shows what level you are on, and the help lists are also partly context sensitive so you don't get a lot of irrelevent clutter.
-
-There is more, and a lot more to come!
-
-
-While doing all this work, we've alse ensured that Yoshimi instrument patches are still fully compatible with Zyn ones, and have now ported across the new refinements with thanks.

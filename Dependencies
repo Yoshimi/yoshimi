@@ -14,8 +14,8 @@ Some of these will pull in other ones.
     libjack-jackd2-dev
     libjpeg-dev
     libmxml-dev
-    libncurses5-dev * new dependency
-    libreadline-dev * new dependency
+    libncurses5-dev
+    libreadline-dev
     libxft-dev
     libxinerama-dev
     libxml2-dev
