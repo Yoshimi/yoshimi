@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {FilterUI.h} {selected not_in_source in_header
+comment {FilterUI.h} {not_in_source in_header
 } 
 
 comment {FilterUI.cc} {in_source not_in_header
@@ -31,11 +31,14 @@ This file is derivative of ZynAddSubFX original code, modified March 2011
 } {in_source in_header
 } 
 
+decl {\#include "UI/MiscGui.h"} {public local
+} 
+
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Group.H>} {public local
 } 
@@ -192,7 +195,7 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   }
 } 
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -396,7 +399,7 @@ send_data(6, o->value());}
   Function {make_formant_window()} {} {
     Fl_Window formantparswindow {
       label {Formant Filter Parameters}
-      xywh {552 743 700 205} type Double labelfont 1 labelsize 12 hide
+      xywh {507 67 700 205} type Double labelfont 1 labelsize 12 hide
     } {
       Fl_Group {} {
         xywh {485 47 105 113} box THIN_UP_BOX
@@ -431,6 +434,7 @@ formantfiltergraph->redraw();
 pars->changed = true;
 send_data(18, o->value());}
             tooltip {Formant frequency} xywh {495 115 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            code0 {o->init(-1);}
             class WidgetPDial
           }
           Fl_Dial formant_q_dial {
@@ -440,6 +444,7 @@ formantfiltergraph->redraw();
 pars->changed=true;
 send_data(19, o->value());}
             tooltip {Formant's Q} xywh {525 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            code0 {o->init(64);}
             class WidgetPDial
           }
           Fl_Dial formant_amp_dial {
@@ -449,12 +454,13 @@ formantfiltergraph->redraw();
 pars->changed = true;
 send_data(20, o->value());}
             tooltip {Formant amplitude} xywh {555 115 24 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+            code0 {o->init(127);}
             class WidgetPDial
           }
         }
       }
       Fl_Group {} {
-        xywh {590 47 100 113} box THIN_UP_BOX
+        xywh {590 47 102 113} box THIN_UP_BOX
       } {
         Fl_Counter {} {
           label {Seq.Size}
@@ -498,7 +504,8 @@ send_data(38, o->value());}
 pars->changed=true;
 send_data(21, o->value());}
           tooltip {Sequence Stretch} xywh {595 130 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->value(pars->Psequencestretch);}
+          code0 {o->init(40);}
+          code1 {o->value(pars->Psequencestretch);}
           class WidgetPDial
         }
       }
@@ -518,38 +525,47 @@ send_data(32, o->value());}
         callback {pars->Pformantslowness=(int) o->value();pars->changed=true;
 send_data(16, o->value());}
         tooltip {Formant's Slowness (Morphing)} xywh {565 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
-        code0 {o->value(pars->Pformantslowness);}
+        code0 {o->init(64);}
+        code1 {o->value(pars->Pformantslowness);}
         class WidgetPDial
       }
       Fl_Value_Output centerfreqvo {
         label {C.f.}
         callback {o->value(pars->getcenterfreq()/1000.0);}
-        tooltip {Center Frequency (kHz)} xywh {510 164 42 18} labelsize 12 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 11
+        tooltip {Center Frequency (kHz)} xywh {512 164 35 16} box THIN_DOWN_BOX labelsize 12 when 3 minimum 1 maximum 10 value 1 textfont 1 textsize 11
         code0 {o->step(0.01, 1);}
         code1 {o->value(pars->getcenterfreq()/1000.0);}
       }
       Fl_Value_Output octavesfreqvo {
         label {Oct.}
         callback {o->value(pars->getoctavesfreq());}
-        tooltip {No. of octaves} xywh {510 182 42 18} labelsize 12 when 3 minimum 1 maximum 127 step 1 value 5 textfont 1 textsize 11
+        tooltip {No. of octaves} xywh {512 185 35 15} box THIN_DOWN_BOX labelsize 12 when 3 minimum 1 maximum 127 step 1 value 5 textfont 1 textsize 11
         code0 {o->value(pars->getoctavesfreq());}
       }
       Fl_Slider cfknob {
-        callback {pars->Pcenterfreq = (int)o->value();
+        callback {if (Fl::event_button() == 3)
+    o->value(64);
+
+pars->Pcenterfreq = (int)o->value();
 centerfreqvo->do_callback();
 formantfiltergraph->redraw();
 pars->changed = true;
+
 send_data(22, o->value());}
-        xywh {556 167 84 15} type {Horz Knob} box FLAT_BOX maximum 127
+        xywh {547 164 89 15} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
         code0 {o->value(pars->Pcenterfreq);}
         class mwheel_slider_rev
       }
       Fl_Slider octknob {
-        callback {pars->Poctavesfreq=(int)o->value();
+        callback {if (Fl::event_button() == 3)
+    o->value(64);
+
+pars->Poctavesfreq=(int)o->value();
 octavesfreqvo->do_callback();
 formantfiltergraph->redraw();
+
 send_data(23, o->value());}
-        xywh {556 185 84 15} type {Horz Knob} box FLAT_BOX maximum 127
+        xywh {547 185 90 16} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
         code0 {o->value(pars->Poctavesfreq);}
         class mwheel_slider_rev
       }
@@ -563,13 +579,14 @@ send_data(23, o->value());}
         callback {pars->Pvowelclearness=(int) o->value();pars->changed = true;
 send_data(17, o->value());}
         tooltip {Vowel "clearness" (how the mixed vowels are avoided)} xywh {600 15 25 25} box ROUND_UP_BOX labelfont 1 labelsize 10 align 1 maximum 127 step 1
-        code0 {o->value(pars->Pvowelclearness);}
+        code0 {o->init(64);}
+        code1 {o->value(pars->Pvowelclearness);}
         class WidgetPDial
       }
       Fl_Button {} {
         label Close
         callback {formantparswindow->hide();}
-        xywh {645 170 50 25} box THIN_UP_BOX labelsize 13
+        xywh {643 170 50 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label C
@@ -647,7 +664,12 @@ send_data(17, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 1);} {}
+int parameter = 255;
+if (control == 37)
+    parameter = nseqpos;
+else if (control >= 18 && control <= 20)
+    parameter = nformant | (nvowel << 5);
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 1, parameter);} {}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//

@@ -1,0 +1,58 @@
+This is an experimental test feature only accessible from the command line.
+
+Currently It doesn't update the GUI, and there is minimal error checking.
+
+Refer to "Yoshimi Control Numbers.ods" for control numbers and actions
+and "GUI_Interpretations.txt" for further explanations.
+
+Also, see "Effect_Inserts" for the actual effect controllers.
+
+Sections currently in place and tested:
+
+Top level controls
+Main part controls
+Controllers
+Kit edit window
+Subsynth Editor
+Effects
+Filters
+
+The remaining ones will display as if they had been written to, but won't
+actually change anything.
+
+This matches the results from using the middle mouse button in the GUI. commands
+that are purely within the GUI,e.g window changes are not implemented at all.
+Some such as part number changes are (currently) recognised but not acted on.
+It is expected that any alternative input system will store its own copies of
+such intermediate information so that they remain fully independent.
+
+An alternative way to find out the correct command sequence is to click on a
+control with any button *except* the middle one. Trailing '255's can be ommitted
+if there are no following parameters set.
+
+
+The format is:
+
+direct {value} {type} {control} {part} {kit} {engine} {insert} {parameter}
+
+direct = the actual command name, must be typed in full.
+
+value = the value that will be set, may be negative.
+
+type = a subset of the command type: 0 for read and 64 for write.
+
+control = the number representing the control being changed.
+
+part = the number of the part being changed.
+
+All the above are mandatory. The following must also be entered in sequence
+when needed.
+
+kit = a part's kit number (if enabled otherwise zero).
+      also used for effects.
+
+engine = the synth engine being adjusted.
+
+insert = harmonics, LFOs, filters etc.
+
+parameter = subtype associated with some inserts.

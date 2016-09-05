@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {ADNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,17 +29,18 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
     \#include "Params/ADnoteParameters.h"
     \#include "Misc/SynthEngine.h"
+    \#include "UI/MiscGui.h"
     \#include "WidgetPDialUI.h"
     \#include "WidgetMWSliderUI.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "Misc/MiscFuncs.h"
@@ -48,10 +49,10 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
@@ -70,14 +71,14 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
    			 o->value(100);
 pars->VoicePar[nvoice].PVolume = lrint(o->value());
 
-synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 0, npart, kititem, 0x80 + nvoice);}
+collect_data(synth, o->value(), (Fl::event_button() | (1 << 7)), 0, npart, kititem, 0x80 + nvoice);}
           tooltip Volume xywh {90 5 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
           class mwheel_val_slider_rev
         }
         Fl_Check_Button voiceresonanceenabled {
           callback {pars->VoicePar[nvoice].Presonance = lrint(o->value());
-synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 130, npart, kititem, 0x80 + nvoice);}
+collect_data(synth, o->value(), (Fl::event_button() | (1 << 7)), 130, npart, kititem, 0x80 + nvoice);}
           tooltip {Resonance On/Off} xywh {245 7 15 17} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 align 4
           code0 {o->value(pars->VoicePar[nvoice].Presonance);}
         }
@@ -86,7 +87,7 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 130, npa
     o->value(40);
 pars->VoicePar[nvoice].FreqLfo->Pintensity = lrint(o->value());
 
-synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 1, npart, kititem, 0x80 + nvoice, 0, 1);}
+collect_data(synth, o->value(), (Fl::event_button() | (1 << 7)), 1, npart, kititem, 0x80 + nvoice, 0, 1);}
           tooltip {Frequency LFO amount} xywh {500 5 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
           class mwheel_val_slider_rev
@@ -94,7 +95,7 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 1, npart
         Fl_Dial voicepanning {
           callback {pars->setVoicePan(nvoice, lrint(o->value()));
 
-synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 2, npart, kititem, 0x80 + nvoice);}
+collect_data(synth, o->value(), (Fl::event_button() | (1 << 7)), 2, npart, kititem, 0x80 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {215 5 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PPanning);}
           code1 {o->init(64);}
@@ -144,8 +145,8 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 2, npart
                   o->value(0);
               pars->VoicePar[nvoice].PDetune = lrint(o->value()) + 8192;
               detunevalueoutput->do_callback();
-              
-              synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 32, npart, kititem, 0x80 + nvoice);}
+
+              collect_data(synth, o->value(), (Fl::event_button() | (1 << 7)), 32, npart, kititem, 0x80 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {310 5 185 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
           class mwheel_slider_rev
@@ -160,8 +161,8 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 2, npart
             else
                 voicelistitemgroup->activate();
             o->redraw();
-            
-            synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 129, npart, kititem, 0x80 + nvoice);}
+
+            collect_data(synth, o->value(), (Fl::event_button() | (1 << 7)), 129, npart, kititem, 0x80 + nvoice);}
         private xywh {30 5 20 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {char tmp[10]; snprintf(tmp, 10, "%d", nvoice + 1); o->label(strdup(tmp));}
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
@@ -222,7 +223,7 @@ synth->commandFetch(o->value(), (Fl::event_button() | 0x20 | (1 << 7)), 2, npart
   }
   decl {int kititem;} {private local
   }
-} 
+}
 
 class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
@@ -1134,7 +1135,7 @@ o->show();}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, nvoice | 0x80);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, nvoice | 0x80);} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
@@ -1173,7 +1174,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
@@ -1569,7 +1570,7 @@ if ((Fl::event_button() == 3))
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 0);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, 0);} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
@@ -1645,4 +1646,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int kititem;} {private local
   }
-} 
+}

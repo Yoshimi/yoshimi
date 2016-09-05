@@ -10,7 +10,7 @@ K6
 
 Go into Yoshimi->Settings->Alsa and in Alsa Audio Device enter (say) hw:PCH
 
-This ensures you will always connect to this card at startup regardless of the order this and other ones.
+This ensures you will always connect to this card at startup regardless of the order of this and other ones.
 
 Another benefit of doing this is that ALSA will now use Yoshimi's internal buffer size, otherwise it will force Yoshimi to accept its default size.
 

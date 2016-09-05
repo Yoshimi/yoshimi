@@ -1,0 +1,126 @@
+This is a simple list of all the effect inserts (as seen by direct access),
+their control numbers and actions. These apply regardless of whether the
+effect is in System effects, Insertion effects, or individual part effects.
+
+Reverb
+0   Volume
+1   Panning
+2   Time (durationon effect)
+3   Delay
+4   Delay feedback
+5   {reserved}
+6   {reserved}
+7   Low pass filter
+8   High pass filter
+9   Damping
+10  Reverb type (0-2)
+11  Room size
+12  bandwidth
+
+16  Preset number (0-12)
+
+
+Echo
+0   Volume
+1   Panning
+2   Delay
+3   L/R delay
+4   L/R crosover
+5   Feedback
+6   Damping
+
+16 Preset number (0-8)
+
+
+Chorus
+0   Volume
+1   Panning
+2   LFO frequency
+3   LFO randomness
+4   LFO type (0-1)
+5   L/R phase shift
+6   LFO depth
+7   Delay
+8   Feedback
+9   L/R crossover
+10  {reserved}
+11  Subtract output (0-1)
+
+16  Preset number (0-9)
+
+
+Phaser
+0   Volume
+1   Panning
+2   LFO frequency
+3   LFO randomness
+4   LFO type (0-1)
+5   L/R phase shift
+6   LFO depth
+7   Feedback
+8   Stages (0-11)
+9   L/R crossover
+10  Subtract output
+11  Phase
+12  Hypersine (0-1)
+13  Distortion (0-1)
+14  Analog (0-1)
+
+16  Preset number (0-11)
+
+
+AlienWah
+0   Volume
+1   Panning
+2   LFO frequency
+3   LFO randomness
+4   LFO type (0-1)
+5   L/R phase shift
+6   LFO depth
+7   Feedback
+8   Delay (0-100)
+9   L/R crossover
+10  Phase
+
+16  Preset number (0-3)
+
+
+Distortion
+0   Volume
+1   Panning
+2   L/R mix
+3   Drive
+4   Output level
+5   Type (0-13)
+6   Nagative (0-1)
+7   Low pass filter
+8   High pass filter
+9   Stereo (0/1)
+10  Prefilter - before distortion (0-1)
+
+16  Preset number (0-5)
+
+
+EQ
+0   Gain
+1   Band number (0-6)
+2   Band frequency
+3   Band gain
+4   Band Q
+5   Band additional stages (0-4)
+6   Type (0-9)
+
+
+DynFilter
+0   Volume
+1   Panning
+2   LFO frequency
+3   LFO randomness
+4   LFO type (0-1)
+5   L/R phase shift
+6   LFO depth
+7   Filter vs amplitute
+8   Invert (0-1)
+9   Rate that amplitude changes filter
+
+16  Preset number (0-4)

@@ -62,6 +62,7 @@ class Config : public MiscFuncs
         string testCCvalue(int cc);
         string masterCCtest(int cc);
         void saveConfig(void);
+        bool loadConfig(void);
         void saveState() { saveSessionData(StateFile); }
         void saveState(const string statefile)  { saveSessionData(statefile); }
         bool loadState(const string statefile)
@@ -77,9 +78,7 @@ class Config : public MiscFuncs
         void signalCheck(void);
         void setRtprio(int prio);
         bool startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char lowprio, bool create_detached = true);
-
-        bool showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive);
+                         bool schedfifo, char lowprio, bool create_detached = true, string name = "");
         string programCmd(void) { return programcommand; }
 
         bool isRuntimeSetupCompleted() {return bRuntimeSetupCompleted;}
@@ -92,18 +91,19 @@ class Config : public MiscFuncs
         bool          restoreState;
         bool          stateChanged;
         string        StateFile;
-        string        CurrentXMZ;
         bool          restoreJackSession;
         string        jackSessionFile;
 
-        unsigned int  Samplerate;
-        unsigned int  Buffersize;
-        unsigned int  Oscilsize;
+        static unsigned int  Samplerate;
+        static unsigned int  Buffersize;
+        static unsigned int  Oscilsize;
+        static unsigned int  GzipCompression;
+        static bool          showGui;
+        static bool          showSplash;
+        static bool          showCLI;
 
         bool          runSynth;
-        bool          showGui;
-        bool          showSplash;
-        bool          showCLI;
+
         int           VirKeybLayout;
 
         audio_drivers audioEngine;
@@ -121,18 +121,20 @@ class Config : public MiscFuncs
         string        alsaMidiDevice;
         string        nameTag;
 
-        unsigned int  GzipCompression;
+        bool          loadDefaultState;
         int           Interpolation;
         string        presetsDirlist[MAX_PRESETS];
         int           checksynthengines;
-        bool          SimpleCheck;
         int           xmlType;
         int           EnableProgChange;
         bool          toConsole;
         bool          hideErrors;
+        bool          showTimes;
         bool          logXMLheaders;
         bool          configChanged;
         int           rtprio;
+        int           tempRoot;
+        int           tempBank;
         int           midi_bank_root;
         int           midi_bank_C;
         int           midi_upper_voice_C;
@@ -142,6 +144,9 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
+        unsigned char channelSwitchType;
+        unsigned char channelSwitchCC;
+        unsigned char channelSwitchValue;
         unsigned char nrpnL;
         unsigned char nrpnH;
         unsigned char dataL;
@@ -171,12 +176,10 @@ class Config : public MiscFuncs
 
     private:
         void loadCmdArgs(int argc, char **argv);
-        bool loadConfig(void);
         void defaultPresets(void);
+        bool extractBaseParameters(XMLwrapper *xml);
         bool extractConfigData(XMLwrapper *xml);
-        bool extractRuntimeData(XMLwrapper *xml);
         void addConfigXML(XMLwrapper *xml);
-        void addRuntimeXML(XMLwrapper *xml);
         void saveSessionData(string savefile);
         bool restoreSessionData(string sessionfile, bool startup);
         int SSEcapability(void);
@@ -210,8 +213,7 @@ private:
 public:
     enum
     {
-        NewSynthEngine = 0,
-        UpdateMaster,
+        UpdateMaster = 0,
         UpdateConfig,
         UpdatePaths,
         UpdatePanel,
@@ -219,10 +221,12 @@ public:
         UpdatePanelItem,
         UpdatePartProgram,
         UpdateEffects,
-        RegisterAudioPort,
         UpdateBankRootDirs,
         RescanForBanks,
         RefreshCurBank,
+        GuiAlert,
+        RegisterAudioPort,
+        NewSynthEngine,
         UNDEFINED = 9999
     };
     void *data; //custom data, must be static or handled by called, does nod freed by receiver

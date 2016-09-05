@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {PADNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified April 2011
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -37,20 +37,21 @@ decl {\#include <FL/Fl_Box.H>
     \#include <FL/fl_draw.H>
     \#include "Params/PADnoteParameters.h"
     \#include "Misc/MiscFuncs.h"
+    \#include "UI/MiscGui.h"
     \#include "PresetsUI.h"
     \#include "WidgetPDialUI.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
@@ -130,7 +131,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
   decl {PADnoteParameters *pars;} {public local
   }
-} 
+}
 
 class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
 } {
@@ -232,7 +233,7 @@ this->pars=pars;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
@@ -1162,7 +1163,7 @@ pars->export2wav(filename);}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, 2);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, 2);} {}
   }
   Function {PADnoteUI(PADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//
@@ -1291,4 +1292,4 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
   }
   decl {int kititem;} {private local
   }
-} 
+}

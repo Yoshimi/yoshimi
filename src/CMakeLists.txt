@@ -26,7 +26,14 @@ if (POLICY CMP0046)
 endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
-set (YOSHIMI_VERSION "1.4.0.1")
+
+add_definitions(-Wall)
+add_definitions(-Werror=format-security)
+
+# ^^^ comment these two out on release pushes ^^^
+
+set (YOSHIMI_VERSION "1.4.1 M")
+
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -67,6 +74,8 @@ endif (HasJackSession)
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
+
+option (EnableGuiReports "Enable GUI control reports" OFF)
 
 #option to build lv2 plugin
 option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
@@ -214,6 +223,8 @@ find_library(Readline_LIBRARY
     HINTS ${Readline_ROOT_DIR}/lib
 )
 
+find_package(PkgConfig REQUIRED)
+pkg_search_module(NCURSES REQUIRED ncurses)
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
   set(READLINE_FOUND TRUE)
 else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
@@ -274,7 +285,13 @@ set (Effects_sources
 
 set (Misc_sources
     Misc/ConfBuild.cpp  Misc/Config.cpp  Misc/SynthEngine.cpp  Misc/Bank.cpp
-    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp   Misc/CmdInterface.cpp
+    Misc/Microtonal.cpp   Misc/Part.cpp  Misc/XMLwrapper.cpp  Misc/MiscFuncs.cpp   Misc/WavFile.cpp
+)
+
+set (Interface_Sources
+    Interface/CmdInterface.cpp
+    Interface/InterChange.cpp
+    UI/MiscGui.cpp
 )
 
 set (Params_sources
@@ -303,7 +320,7 @@ set (FltkUI_names
     "EffUI"  "BankUI"  "PartUI"
     "MicrotonalUI"  "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "WidgetMWSliderUI" "WidgetMWRollerUI"
+    "WidgetMWSliderUI"
 )
 
 # workaround fltk_wrap_ui breakage
@@ -385,6 +402,9 @@ add_definitions (-DFF_MAX_SEQUENCE=8)
 add_definitions (-DMAX_PHASER_STAGES=12)
 add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
+if (EnableGuiReports)
+    add_definitions (-DENABLE_REPORTS)
+endif (EnableGuiReports)
 #if (${DefaultAudio} STREQUAL "jack")
 #    message(STATUS "Default audio driver is Jack")
     add_definitions(-DDEFAULT_AUDIO=jack_audio)
@@ -429,6 +449,7 @@ if (HasJackLatency)
 endif (HasJackLatency)
 
 set (ProgSources
+    ${Interface_Sources}
     ${Misc_sources}
     ${Params_sources}
     ${Synth_sources}
@@ -458,8 +479,8 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
+    ${NCURSES_LIBRARIES}
     ${Readline_LIBRARY}
-    ncurses
     z
     dl
 )

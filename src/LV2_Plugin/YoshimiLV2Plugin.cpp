@@ -19,7 +19,9 @@
 
 #include "YoshimiLV2Plugin.h"
 #include "Misc/Config.h"
+#include "Misc/ConfBuild.cpp"
 #include "Misc/SynthEngine.h"
+#include "Interface/InterChange.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
@@ -464,13 +466,13 @@ bool YoshimiLV2Plugin::init()
 
     _synth->getRuntime().runSynth = true;
 
-    if (!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false))
+    if (!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false, "LV2 midi"))
     {
         synth->getRuntime().Log("Failed to start midi thread");
         return false;
     }
 
-    if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false))
+    if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false, "LV2 idle"))
     {
         synth->getRuntime().Log("Failed to start idle thread");
         return false;

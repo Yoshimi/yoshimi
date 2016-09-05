@@ -38,7 +38,7 @@ using namespace std;
 #include "Misc/Microtonal.h"
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
-
+#include "Interface/InterChange.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
@@ -58,6 +58,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         unsigned int uniqueId;
         bool isLV2Plugin;
         Bank bank;
+    public:
+        InterChange interchange;
+    private:
         Config Runtime;
         PresetsStore presetsstore;
     public:
@@ -81,7 +84,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadHistory(void);
         bool saveHistory(void);
         bool loadVector(unsigned char baseChan, string name, bool full);
+        bool extractVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
         bool saveVector(unsigned char baseChan, string name, bool full);
+        bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
 
         bool getfromXML(XMLwrapper *xml);
 
@@ -99,21 +104,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int ReadBank(void);
 
         void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
-        void commandSend(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
-        void commandVector(float value, unsigned char type, unsigned char control);
-        void commandMain(float value, unsigned char type, unsigned char control);
-        void commandPart(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
-        void commandAdd(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
-        void commandAddVoice(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
-        void commandSub(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char insert);
-        void commandPad(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit);
-        void commandOscillator(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
-        void commandResonance(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
-        void commandLFO(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
-        void commandFilter(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert);
-        void commandEnvelope(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter);
-        void commandSysIns(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char engine, unsigned char insert);
-        void commandEffects(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine);
 
         void SetProgram(unsigned char chan, unsigned short pgm);
         bool SetProgramToPart(int npart, int pgm, string fname);

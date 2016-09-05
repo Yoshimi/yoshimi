@@ -44,7 +44,7 @@ using namespace std;
 
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <Misc/CmdInterface.h>
+#include <Interface/CmdInterface.h>
 
 //extern void cmdIfaceCommandLoop();
 
@@ -182,6 +182,15 @@ static void *mainGuiThread(void *arg)
             _synth->getRuntime().deadObjects->disposeBodies();
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
+                if (_synth->getRuntime().configChanged)
+                {
+                    size_t tmpRoot = _synth->ReadBankRoot();
+                    size_t tmpBank = _synth->ReadBank();
+                    _synth->getRuntime().loadConfig(); // restore old settings
+                    _synth->SetBankRoot(tmpRoot);
+                    _synth->SetBank(tmpBank); // but keep current root and bank
+                }
+                _synth->getRuntime().saveConfig();
                 int tmpID =  _synth->getUniqueId();
                 if (_client)
                 {
@@ -229,6 +238,15 @@ static void *mainGuiThread(void *arg)
         else
             usleep(33333);
     }
+    if (firstSynth->getRuntime().configChanged)
+    {
+        size_t tmpRoot = firstSynth->ReadBankRoot();
+        size_t tmpBank = firstSynth->ReadBank();
+        firstSynth->getRuntime().loadConfig(); // restore old settings
+        firstSynth->SetBankRoot(tmpRoot);
+        firstSynth->SetBank(tmpBank); // but keep current root and bank
+    }
+    firstSynth->getRuntime().saveConfig();
     firstSynth->saveHistory();
     firstSynth->saveBanks(0);
     return NULL;
@@ -281,6 +299,10 @@ bool mainCreateNewInstance(unsigned int forceId)
         {
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::NewSynthEngine, 0);
         }
+        if (synth->getRuntime().audioEngine < 1)
+            fl_alert("Yoshimi can't find an available sound system. Running with no Audio");
+        if (synth->getRuntime().midiEngine < 1)
+            fl_alert("Yoshimi can't find an input system. Running with no MIDI");
     }
 
     synth->getRuntime().StartupReport(musicClient);

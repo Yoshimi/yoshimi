@@ -1077,7 +1077,12 @@ void Part::setkititemstatus(int kititem, int Penabled_)
     bool resetallnotes = false;
     if (!Penabled_)
     {
+        kit[kititem].Pmuted = 0;
+        kit[kititem].Padenabled = 0;
+        kit[kititem].Psubenabled = 0;
+        kit[kititem].Ppadenabled = 0;
         kit[kititem].Pname.clear();
+        kit[kititem].Psendtoparteffect = 0;
         if (kit[kititem].adpars)
         {
             delete kit[kititem].adpars;
@@ -1190,8 +1195,8 @@ void Part::add2XML(XMLwrapper *xml)
 {
     // parameters
     xml->addparbool("enabled", Penabled);
-    if (!Penabled && xml->minimal)
-        return;
+    //if (!Penabled && xml->minimal)
+        //return;
 
     xml->addpar("volume", Pvolume);
     xml->addpar("panning", Ppanning);
@@ -1243,7 +1248,6 @@ bool Part::saveXML(string filename)
 
 int Part::loadXMLinstrument(string filename)
 {
-    synth->getRuntime().SimpleCheck = false;
     XMLwrapper *xml = new XMLwrapper(synth);
     if (!xml)
     {
@@ -1263,12 +1267,14 @@ int Part::loadXMLinstrument(string filename)
         return 0;
     }
     defaultsinstrument();
+    Pname = findleafname(filename); // in case there's no internal
+    int chk = findSplitPoint(Pname);
+    if (chk > 0)
+        Pname = Pname.substr(chk + 1, Pname.size() - chk - 1);
     getfromXMLinstrument(xml);
     applyparameters();
     xml->exitbranch();
     delete xml;
-    if (synth->getRuntime().SimpleCheck)
-        return 3;
     return 1;
 }
 
@@ -1283,13 +1289,15 @@ void Part::applyparameters(void)
 
 void Part::getfromXMLinstrument(XMLwrapper *xml)
 {
+    string tempname;
     if (xml->enterbranch("INFO"))
     {
-        Pname = xml->getparstr("name");
-        if (Pname < "!")
+        tempname = xml->getparstr("name");
+        //synth->getRuntime().Log("name <" + tempname + ">");
+        if (tempname > "!")
+            Pname = tempname;
+        if (Pname <= "!" || Pname == "Simple Sound")
             Pname = "No Title";
-        else if (Pname == "Simple Sound") // there should be a better way to do this!
-            synth->getRuntime().SimpleCheck = true;
         info.Pauthor = xml->getparstr("author");
         info.Pcomments = xml->getparstr("comments");
         info.Ptype = xml->getpar("type", info.Ptype, 0, 16);
@@ -1305,7 +1313,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     {
         Pkitmode = xml->getpar127("kit_mode", Pkitmode);
         Pdrummode = xml->getparbool("drum_mode", Pdrummode);
-        setkititemstatus(0, 0);
+        //setkititemstatus(0, 0); // does odd things :(
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)
         {
             if (!xml->enterbranch("INSTRUMENT_KIT_ITEM", i))
@@ -1401,6 +1409,7 @@ void Part::getfromXML(XMLwrapper *xml)
 
     if (xml->enterbranch("INSTRUMENT"))
     {
+        Pname = ""; // clear out any previous name
         getfromXMLinstrument(xml);
         xml->exitbranch();
         applyparameters();

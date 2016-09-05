@@ -52,6 +52,8 @@ MusicClient *MusicClient::newMusicClient(SynthEngine *_synth)
         {
             if(client->Open()) //found working client combination
             {
+                if (it != clSet.begin())
+                    _synth->getRuntime().configChanged = true;
                 _synth->getRuntime().runSynth = true; //reset to true
                 _synth->getRuntime().audioEngine = it->audioDrv;
                 _synth->getRuntime().midiEngine = it->midiDrv;
@@ -210,7 +212,7 @@ bool MusicClient::Start()
         {
             return true;
         }
-        bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, false);
+        bAudio = synth->getRuntime().startThread(&timerThreadId, MusicClient::timerThread_fn, this, false, 0, false, "Timer?");
     }
 
     if(midiIO)

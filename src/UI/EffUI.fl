@@ -37,6 +37,9 @@ decl {\#include <string>} {public local
 decl {\#include <iostream>} {public local
 } 
 
+decl {\#include "UI/MiscGui.h"} {public local
+} 
+
 decl {\#include "WidgetPDialUI.h"} {public local
 } 
 
@@ -1641,14 +1644,14 @@ send_data(6, o->value(), 5);}
       Fl_Check_Button distp9 {
         label {St.}
         callback {eff->seteffectpar(9,(int) o->value());
-send_data(7, o->value(), 5);}
+send_data(9, o->value(), 5);}
         tooltip Stereo xywh {355 60 15 15} down_box DOWN_BOX labelsize 11 align 2
       }
       Fl_Check_Button distp10 {
         label PF
         callback {eff->seteffectpar(10,(int) o->value());
 send_data(10, o->value(), 5);}
-        tooltip {Applies the filters(before or after) the distorsion} xywh {355 44 15 15} down_box DOWN_BOX labelsize 11 align 1
+        tooltip {Applies the filters(before or after) the distortion} xywh {355 44 15 15} down_box DOWN_BOX labelsize 11 align 1
       }
     }
   }
@@ -2027,7 +2030,7 @@ send_data(8, o->value(), 7);}
     code {//
 type += 1; // temp fix for wrong start value :(
 
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, type | 0x80, neff);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, type | 0x80, neff);} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {eff=eff_;

@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {Envelope.h} {selected not_in_source in_header
-} 
+}
 
 comment {Envelope.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,34 +29,37 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2009
 } {in_source in_header
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include "Params/EnvelopeParams.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class EnvelopeFreeEdit {: {public Fl_Box}
 } {
@@ -66,7 +69,7 @@ pair=NULL;} {}
   }
   Function {send_data(int param, int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, param, type);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, param, type);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {//
@@ -114,7 +117,7 @@ for (int i=0;i<env->Penvpoints;i++)
    if (distance<nearestval)
    {
      nearestpoint=i;
-     nearestval=distance;  
+     nearestval=distance;
    };
 };
 return(nearestpoint);} {}
@@ -122,7 +125,7 @@ return(nearestpoint);} {}
   Function {draw()} {private
   } {
     code {int ox=x(),oy=y(),lx=w(),ly=h();
-if (env->Pfreemode==0) 
+if (env->Pfreemode==0)
     env->converttofree();
 int npoints=env->Penvpoints;
 
@@ -184,8 +187,8 @@ if (currentpoint<=0)
    fl_color(alb);
    for (int i=1;i<npoints;i++)
        time+=env->getdt(i);
-} 
-else 
+}
+else
 {
    fl_color(255,0,0);
    time=env->getdt(currentpoint);
@@ -269,7 +272,7 @@ return(1);} {}
   }
   decl {int type;} {private local
   }
-} 
+}
 
 class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 } {
@@ -819,7 +822,7 @@ send_data(type, 24, o->value());}
   }
   Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, npart, kititem, engine, 2, type);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 2, type);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {//
@@ -953,7 +956,7 @@ if (env->Pfreemode==0)
 		e2rval->value(env->PR_val);
 		e2envstretch->value(env->Penvstretch);
 		e2forcedrelease->value(env->Pforcedrelease);
-         break; 
+         break;
          case(4):
 		e3aval->value(env->PA_val);
 		e3adt->value(env->PA_dt);
@@ -963,7 +966,7 @@ if (env->Pfreemode==0)
 		e3rval->value(env->PR_val);
 		e3envstretch->value(env->Penvstretch);
 		e3forcedrelease->value(env->Pforcedrelease);
-         break; 
+         break;
          case(5):
 		e4aval->value(env->PA_val);
 		e4adt->value(env->PA_dt);
@@ -973,7 +976,7 @@ if (env->Pfreemode==0)
 		e4forcedrelease->value(env->Pforcedrelease);
          break;
          default:
-         break; 
+         break;
    };
 }
 else
@@ -998,15 +1001,15 @@ if (env->Pfreemode==0)
          break;
          case(3):
            envwindow=envASR;
-         break; 
+         break;
          case(4):
            envwindow=envADSRfilter;
-         break; 
+         break;
          case(5):
           envwindow=envASRbw;
          break;
          default:
-         break; 
+         break;
    }
 }
 else
@@ -1032,4 +1035,4 @@ envwindow->show();} {}
   }
   decl {int type;} {private local
   }
-} 
+}

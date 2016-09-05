@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {Copyright 2016, Will Godfrey
 
@@ -19,25 +19,28 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified September 2014
 } {in_source in_header
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {private global
-} 
+}
+
+decl {\#include "UI/MiscGui.h"} {public local
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 class VectorUI {selected : {private MiscFuncs}
 } {
@@ -496,7 +499,7 @@ send_data(32, o->value());}
   }
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, 0xc0);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, 0xc0);} {}
   }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
@@ -794,4 +797,4 @@ Ycontrol->damage();} {}
   }
   decl {string loadlabel [NUM_MIDI_CHANNELS];} {private local
   }
-} 
+}

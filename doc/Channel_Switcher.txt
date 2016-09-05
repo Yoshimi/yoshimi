@@ -1,0 +1,30 @@
+This enables you to seem to instantly change just one part only to a specific channel while alowing others that were on that channel to only accept a note-off. The command takes two forms.
+
+In the first form all 16 normally accessible parts will be changed to channel 1 but only one at a time is active, the others have their channel number set as 17 to only accept note-off.
+
+The value of this is that, as you are not actually switching parts on and off, there are no clicks and no messed up note release tails, yet with a pretty standard MIDI controller you can instantly switch between 16 totally different sounds *while* *actually* *playing*.
+
+The second form is more directed to post recording automation where (using all 64 parts) you have a base channel number and a group of 4 parts that reference it. Again, only one part at a time is active, the others have their channel number set to only accept note-off.
+
+Yet you can have up to four parts responding to just one channel, and it can be any of the 16 available MIDI channels.
+
+You will, of course, need to load up and activate all your wanted instruments patches - either manually or via root/bank & program change commands in your MIDI file.
+
+
+For the first form (single row) set MSB to 65 and LSB to the controller you want to use to perform the actual changes. Sending values 0 to 15 on that controller will enable that numered part for recieving new notes while all the others will only see note-offs.
+
+An extra twist is that if you have any vectors defined these will behave correctly when that particular base channel is selected.
+
+
+For the column based form set MSB to 66 and LSB to the controller you want to use.
+
+So, if your part number is, say 35, your base channel is 3. Using your controller to send this will set part 35 to receive channel 3 and parts 3, 19 & 51 to unavailable channel 19, so they will only accept note off commands from channel 3.
+
+Although this only gives you a selection of 4 parts, this is *per* *channel* so if your processor is powerful enough you can utilise all 64 possible parts.
+
+
+You can only have one of these two forms at a time. They can be set in the GUI "Yoshimi->Settings->MIDI" or from both the CLI and via shortform NRPNs.
+
+
+Note:
+NRPN and CLI channel numbers start from zero, but will be displayed on the GUI starting from 1.

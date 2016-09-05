@@ -22,8 +22,11 @@
 
 #include <cmath>
 #include <string>
+#include <list>
 
 using namespace std;
+
+static list<string> miscList;
 
 class MiscFuncs
 {
@@ -52,6 +55,7 @@ class MiscFuncs
         void legit_filename(string& fname);
         void legit_pathname(string& fname);
         string findleafname(string name);
+        int findSplitPoint(string name);
         string setExtension(string fname, string ext);
         string localPath(string leaf);
 
@@ -60,7 +64,12 @@ class MiscFuncs
         int matchWord(int numChars, char *point, const char *word);
         bool matchnMove(int num, char *&pnt, const char *word);
 
+        int miscMsgPush(string text);
+        string miscMsgPop(int pos);
+
         unsigned int nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max);
+        float limitsF(float value, float min, float max);
+
         unsigned int bitFindHigh(unsigned int value);
         void bitSet(unsigned int& value, unsigned int bit);
         void bitClear(unsigned int& value, unsigned int bit);

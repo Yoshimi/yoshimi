@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2016, Will Godfrey 
+Copyright 2014 -2016, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified September 2014
+This file is derivative of ZynAddSubFX original code, modified August 2016
 } {in_source in_header
 } 
 
@@ -52,12 +52,12 @@ class ConfigUI {selected : {private MiscFuncs}
     Fl_Window configwindow {
       label {Yoshimi Settings}
       callback {o->hide();}
-      xywh {645 95 390 330} type Double hide
+      xywh {141 187 390 330} type Double hide
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {
-        xywh {5 5 385 297}
+      Fl_Tabs {} {open
+        xywh {5 5 385 298}
       } {
         Fl_Group {} {
           label {Main settings}
@@ -75,6 +75,7 @@ class ConfigUI {selected : {private MiscFuncs}
     }}
             tooltip {ADSynth Oscillator Size (samples)} xywh {250 45 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Oscilsize / 256.0f - 1.0f) / logf(2.0f)) + 1);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
           } {
             MenuItem {} {
               label 256
@@ -117,6 +118,7 @@ class ConfigUI {selected : {private MiscFuncs}
     }}
             tooltip {Number of samples} xywh {249 75 100 20} down_box BORDER_BOX labelsize 12 textsize 11
             code0 {o->value( (int)(logf(synth->getRuntime().Buffersize / 16.0f - 1.0f) / logf(2.0f)) + 1);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
           } {
             MenuItem {} {
               label 16
@@ -198,7 +200,7 @@ class ConfigUI {selected : {private MiscFuncs}
             }
           }
           Fl_Counter compression {
-            label {XML compression level}
+            label {XML Compression Level}
             callback {//
 		unsigned int tmp = synth->getRuntime().GzipCompression;
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
@@ -206,6 +208,7 @@ class ConfigUI {selected : {private MiscFuncs}
 			synth->getRuntime().configChanged = true;}
             tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
           Fl_Choice reports {
             label {Send reports to:}
@@ -229,39 +232,113 @@ else
               xywh {0 0 34 20} labelsize 12
             }
           }
-          Fl_Box {} {
-            label {* These settings changes require a restart}
+          Fl_Box settingsNote {
+            label {* Changing these settings requires a restart}
             xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
+            code0 {if (synth->getUniqueId() != 0) o->hide();}
           }
-          Fl_Check_Button {} {
+        }
+        Fl_Group {} {
+          label Switches
+          xywh {5 25 382 277} hide
+        } {
+          Fl_Check_Button autoState {
+            label {* Start With Default State}
+            callback {if (synth->getRuntime().loadDefaultState != o->value())
+{
+    synth->getRuntime().loadDefaultState = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().loadDefaultState);}
+          }
+          Fl_Check_Button nonFatal {
             label {Hide Non Fatal Errors}
             callback {if (synth->getRuntime().hideErrors != o->value())
 {
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {322 219 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
-            label {Log XML headers}
-            callback {if (synth->getRuntime().logXMLheaders != o->value())
-{
-    synth->getRuntime().logXMLheaders = o->value();
-    synth->getRuntime().configChanged = true;
-}}
-            xywh {322 239 27 25} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().logXMLheaders);}
-          }
-          Fl_Check_Button {} {
-            label {Show Splash}
+            label {Show Splash Screen}
             callback {if (synth->getRuntime().showSplash != o->value())
 {
     synth->getRuntime().showSplash = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {143 239 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
+          }
+          Fl_Check_Button times {
+            label {Log Load times}
+            callback {if (synth->getRuntime().showTimes != o->value())
+{
+    synth->getRuntime().showTimes = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showTimes);}
+          }
+          Fl_Check_Button {} {
+            label {Log XML Headers}
+            callback {if (synth->getRuntime().logXMLheaders != o->value())
+{
+    synth->getRuntime().logXMLheaders = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().logXMLheaders);}
+          }
+          Fl_Check_Button {} {
+            label {Enable GUI}
+            callback {int tmp = o->value();
+if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
+{
+    fl_alert("You can't disable both interfaces!");
+    o->value(1);
+    return;
+}
+
+if (tmp == 0 && fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", "Yes", "No", NULL))
+{
+    o->value(1);
+    return;
+}
+
+if (synth->getRuntime().showGui != tmp)
+{
+    synth->getRuntime().showGui = tmp;
+    synth->getRuntime().configChanged = true;
+}}
+            tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showGui);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
+          }
+          Fl_Check_Button {} {
+            label {Enable CLI}
+            callback {if (o->value() == 0 &&  synth->getRuntime().showGui == 0)
+{
+    fl_alert("You can't disable both interfaces!");
+    o->value(1);
+    return;
+}
+
+if (synth->getRuntime().showCLI != o->value())
+{
+    synth->getRuntime().showCLI = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            tooltip {Enable starting with interactive command line interface} xywh {270 220 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showCLI);}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
+          }
+          Fl_Box {} {
+            label {* Changing this setting requires a restart}
+            xywh {43 276 287 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
         Fl_Group jackTab {
@@ -327,7 +404,7 @@ if (o->value() != tmp)
             code0 {o->value(synth->getRuntime().connectJackaudio);}
           }
           Fl_Box {} {
-            label {Settings changes require a restart}
+            label {Changing settings requires a restart}
             xywh {60 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
@@ -427,9 +504,10 @@ synth->getRuntime().configChanged = true;}
                     case 48000:
                     default: o->set_checked(3); break;
                 }}
+            code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
           Fl_Box {} {
-            label {Settings changes require a restart}
+            label {Changing settings requires a restart}
             xywh {52 276 267 17} labelfont 1 labelsize 11 labelcolor 38 align 128
           }
         }
@@ -466,7 +544,7 @@ synth->getRuntime().configChanged = true;}
           Fl_Spinner BankRoot {
             label {Bank Root Change}
             callback {Rpend->show();}
-            xywh {235 60 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+            xywh {235 50 50 18} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
             code0 {BankRootvalue = synth->getRuntime().midi_bank_root;}
             code1 {if (BankRootvalue < 128) o->value(BankRootvalue); else o->value(0);}
           }
@@ -496,7 +574,7 @@ synth->getRuntime().configChanged = true;}
         o->hide();
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {Click to set} xywh {300 60 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+            tooltip {Click to set} xywh {300 50 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button rootcheck {
             label {Enable Bank Root Change}
@@ -517,7 +595,7 @@ synth->getRuntime().configChanged = true;}
     }
     BankRoot->redraw();
     synth->getRuntime().configChanged = true;}
-            xywh {234 40 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 30 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_bank_root < 128));}
             code1 {if (o->value() == 0) BankRoot->deactivate();}
           }
@@ -550,7 +628,7 @@ synth->getRuntime().configChanged = true;}
     }
     if (synth->getRuntime().midi_bank_C == tmp)
         synth->getRuntime().configChanged = true;}
-            tooltip {CC0 = msb, CC32 = lsb} xywh {235 100 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
+            tooltip {CC0 = msb, CC32 = lsb} xywh {235 80 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
             code0 {if (synth->getRuntime().midi_bank_C == 32) o->value(0); else if (synth->getRuntime().midi_bank_C == 0) o->value(1); else o->value(2);}
             code1 {oldBank = o->value();}
           } {
@@ -574,7 +652,7 @@ synth->getRuntime().configChanged = true;}
 		synth->getRuntime().EnableProgChange = o->value();
 		if (synth->getRuntime().EnableProgChange != tmp)
 			synth->getRuntime().configChanged = true;}
-            tooltip {MIDI program change enable/disable} xywh {234 130 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
+            tooltip {MIDI program change enable/disable} xywh {234 110 18 18} down_box DOWN_BOX value 1 labelsize 12 align 4
             code0 {o->value(synth->getRuntime().EnableProgChange);}
           }
           Fl_Check_Button progpartenable {
@@ -584,13 +662,13 @@ synth->getRuntime().configChanged = true;}
 		synth->getRuntime().enable_part_on_voice_load = o->value();
 		if (synth->getRuntime().enable_part_on_voice_load != tmp)
 			synth->getRuntime().configChanged = true;}
-            tooltip {Part enabled if MIDI program changed} xywh {234 150 18 18} down_box DOWN_BOX labelsize 12 align 4
+            tooltip {Part enabled if MIDI program changed} xywh {234 130 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().enable_part_on_voice_load);}
           }
           Fl_Spinner EPCspinner {
             label {Extended Program Change}
             callback {Epend->show();}
-            xywh {235 200 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
+            xywh {235 180 50 18} labelsize 12 minimum 0 maximum 127 value 110 textsize 12
             code0 {EPCvalue = synth->getRuntime().midi_upper_voice_C;}
             code1 {if (EPCvalue < 128) o->value(EPCvalue); else o->value(110);}
           }
@@ -622,23 +700,7 @@ synth->getRuntime().configChanged = true;}
         o->hide();
         synth->getRuntime().configChanged = true;
     }}
-            tooltip {Click to set} xywh {300 200 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
-          }
-          Fl_Check_Button {} {
-            label {Ignore Reset all CCs}
-            callback {if (synth->getRuntime().ignoreResetCCs != o->value())
-{
-    synth->getRuntime().ignoreResetCCs = o->value();
-    synth->getRuntime().configChanged = true;
-}}
-            xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().ignoreResetCCs);}
-          }
-          Fl_Check_Button midiMon {
-            label {Log incoming CCs}
-            callback {synth->getRuntime().monitorCCin = o->value();}
-            xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().monitorCCin);}
+            tooltip {Click to set} xywh {300 180 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
           }
           Fl_Check_Button Epcheck {
             label {Enable Extended Program Change}
@@ -659,9 +721,95 @@ synth->getRuntime().configChanged = true;}
     }
     EPCspinner->redraw();
     synth->getRuntime().configChanged = true;}
-            xywh {234 180 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 160 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
+          }
+          Fl_Spinner CSspinner {
+            label {Channel switch CC}
+            callback {CSpend->show();}
+            xywh {235 230 50 18} labelsize 12 minimum 0 maximum 127 value 115 textsize 12
+            code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
+            code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
+          }
+          Fl_Button CSpend {
+            label Pending
+            callback {//
+    int candidate = CSspinner->value();
+    if (candidate == CS_CC)
+    {
+        o->hide();
+        return;
+    }
+
+
+    string name = synth->getRuntime().testCCvalue(candidate);
+    if (!name.empty())
+    {
+        fl_alert("In use for %s",name.c_str());
+        if (CS_CC < 128)
+        {
+        CSspinner->value(CS_CC);
+        CSspinner->redraw();
+        }
+    }
+    else
+    {
+        synth->getRuntime().channelSwitchCC = candidate;
+        CS_CC = candidate;
+        o->hide();
+    }}
+            tooltip {Click to set} xywh {300 230 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+          }
+          Fl_Choice channelswitch {
+            label {Channel Switch}
+            callback {//
+    if (o->value() == 0)
+    {
+        CS_CC = 128;
+        synth->getRuntime().channelSwitchCC = CS_CC;
+        CSspinner->value(115);
+        CSspinner->deactivate();
+        CSpend->hide();
+    }
+    else
+    {
+        synth->getRuntime().channelSwitchType = o->value();
+        CSspinner->activate();
+        CSpend->show();
+    }}
+            tooltip {Select 1 of 16 parts or 1 of parts in columns} xywh {235 210 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
+            code0 {o->value(synth->getRuntime().channelSwitchType);}
+            code1 {if (o->value() == 0) CSspinner->deactivate(); else CSspinner->activate();}
+          } {
+            MenuItem switchoff {
+              label Off
+              xywh {10 10 34 20} labelsize 12
+            }
+            MenuItem switchrow {
+              label Row
+              xywh {10 10 34 20} labelsize 12
+            }
+            MenuItem switchcolumn {
+              label Col
+              xywh {10 10 34 20} labelsize 12
+            }
+          }
+          Fl_Check_Button {} {
+            label {Ignore Reset all CCs}
+            callback {if (synth->getRuntime().ignoreResetCCs != o->value())
+{
+    synth->getRuntime().ignoreResetCCs = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {234 260 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().ignoreResetCCs);}
+          }
+          Fl_Check_Button midiMon {
+            label {Log incoming CCs}
+            callback {synth->getRuntime().monitorCCin = o->value();}
+            xywh {234 280 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().monitorCCin);}
           }
         }
       }
@@ -795,6 +943,7 @@ presets->hide();}
         case 1 : //Main
             reports->value(synth->getRuntime().toConsole);
             break;
+
         case 2 : // Jack
             jackSource->value(synth->getRuntime().jackMidiDevice.c_str());
             if (synth->getRuntime().midiEngine == jack_midi)
@@ -809,6 +958,7 @@ presets->hide();}
                 alsaAudio->value(0);
             }
             break;
+
         case 3 : // Alsa
             {
             alsaSource->value(synth->getRuntime().alsaMidiDevice.c_str());
@@ -833,6 +983,7 @@ presets->hide();}
             }
             }
             break;
+
         case 4 : // MIDI
             tmp = synth->getRuntime().midi_bank_root;
             if (tmp == 128)
@@ -863,6 +1014,7 @@ presets->hide();}
             }
 	    progenable->value(synth->getRuntime().EnableProgChange);
 	    progpartenable->value(synth->getRuntime().enable_part_on_voice_load);
+
 	    tmp = synth->getRuntime().midi_upper_voice_C;
             if (tmp == 128)
             {
@@ -877,6 +1029,29 @@ presets->hide();}
                 Epcheck->value(1);
             }
             Epend->hide();
+            
+            tmp = synth->getRuntime().channelSwitchCC;
+            if (tmp > 127)
+            {
+            	CS_CC = 115;
+                CSspinner->deactivate();
+                channelswitch->value(0);
+            }
+            else
+            {
+                CS_CC = tmp;
+                CSspinner->activate();
+                channelswitch->value(tmp);
+            }
+            CSspinner->value(CS_CC);
+            channelswitch->value(synth->getRuntime().channelSwitchType);
+            CSpend->hide();
+            break;
+
+        case 5 : // Switches
+            autoState->value(synth->getRuntime().loadDefaultState > 0);
+            times->value(synth->getRuntime().showTimes > 0);
+            nonFatal->value(synth->getRuntime().hideErrors);
             break;
     }} {}
   }
@@ -891,6 +1066,8 @@ presets->hide();}
   decl {long selectedRootID;} {private local
   }
   decl {int EPCvalue;} {private local
+  }
+  decl {int CS_CC;} {private local
   }
   decl {int BankRootvalue;} {private local
   }

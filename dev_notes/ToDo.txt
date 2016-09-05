@@ -1,7 +1,12 @@
 
+Find out why LV2 only stores/retrieves patch sets (not state)
+
+Make add voice & add/pad oscillator windows show kit number & name.
+
+Investigate graded XML->minimal.
+
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
-
 
 Change root/bank/instrument lists to single file for all instances.
 
@@ -12,9 +17,8 @@ Startup state load doesn't set buffersize correctly - partially resolved.
 
 Allow headless compilation.
 
-Make add/pad windows show kit number.
-
-Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
+Make attempt to start second independent instance open a new one in running
+yoshimi instead - saves memory and more consistent.
 
 Add scales control to CLI.
 
@@ -25,6 +29,8 @@ Ampitude LFO depth should be in %
 Frequency LFO depth should be in cents.
 
 Consider filter settings too.
+
+Make LFOs active on sounding notes. Not easy!
 
 
 RPNs (channel based)
@@ -41,8 +47,6 @@ Maybe a NRPN variation of this for global fine tuning.
 Review tooltips.
 
 Consider enabling and disabling tooltips.
-
-Consider scroll wheel control of sliders.
 
 Improve Copy & Paste functionality.
 

@@ -36,11 +36,13 @@ file (GLOB yoshimi_effects_files
     ../Effects/Phaser.h  ../Effects/Reverb.h  ../Effects/EQ.h
     ../Effects/Distorsion.h  ../Effects/DynamicFilter.h)
 file (GLOB yoshimi_misc_files
-    ../Misc/Config.cpp ../Misc/Config.h
+    ../Misc/Config.cpp ../Misc/Config.h ../ConfBuild.cpp
     ../Misc/SynthEngine.cpp  ../Misc/Bank.cpp  ../Misc/Microtonal.cpp
     ../Misc/Part.cpp  ../Misc/XMLwrapper.cpp  ../Misc/MiscFuncs.cpp ../Misc/WavFile.cpp
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
     ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h)
+file (GLOB yoshimi_interface_files
+    ../Interface/InterChange.cpp ../Interface/InterChange.h ../UI/MiscGui.cpp ../UI/MiscGui.h)
 file (GLOB yoshimi_params_files
     ../Params/ADnoteParameters.cpp  ../Params/EnvelopeParams.cpp
     ../Params/FilterParams.cpp  ../Params/LFOParams.cpp
@@ -72,7 +74,7 @@ set (FltkUI_names
     "EffUI"  "BankUI"  "PartUI"
     "MicrotonalUI"  "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "WidgetMWSliderUI" "WidgetMWRollerUI"
+    "WidgetMWSliderUI"
 )
 
 # workaround fltk_wrap_ui breakage
@@ -101,6 +103,7 @@ add_library (yoshimi_lv2 MODULE
             ${yoshimi_dsp_files}
             ${yoshimi_effects_files}
             ${yoshimi_misc_files}
+            ${yoshimi_interface_files}
             ${yoshimi_params_files}
             ${yoshimi_synth_files}
             ${yoshimi_musicio_files}

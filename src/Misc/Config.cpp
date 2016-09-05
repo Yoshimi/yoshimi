@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified January 2015
+    This file is derivative of ZynAddSubFX original code, last modified September 2016
 */
 
 #include <iostream>
@@ -87,18 +87,19 @@ static struct argp_option cmd_options[] = {
     { 0, }
 };
 
+unsigned int Config::Samplerate = 48000;
+unsigned int Config::Buffersize = 256;
+unsigned int Config::Oscilsize = 512;
+unsigned int Config::GzipCompression = 3;
+bool         Config::showGui = true;
+bool         Config::showSplash = true;
+bool         Config::showCLI = true;
 
 Config::Config(SynthEngine *_synth, int argc, char **argv) :
     restoreState(false),
     stateChanged(false),
     restoreJackSession(false),
-    Samplerate(48000),
-    Buffersize(256),
-    Oscilsize(512),
     runSynth(true),
-    showGui(true),
-    showSplash(true),
-    showCLI(true),
     VirKeybLayout(1),
     audioEngine(DEFAULT_AUDIO),
     midiEngine(DEFAULT_MIDI),
@@ -110,16 +111,17 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     connectJackaudio(true),
     alsaAudioDevice("default"),
     alsaMidiDevice("default"),
-    GzipCompression(3),
+    loadDefaultState(false),
     Interpolation(0),
     checksynthengines(1),
     xmlType(0),
     EnableProgChange(1), // default will be inverted
     toConsole(0),
     hideErrors(0),
+    showTimes(0),
     logXMLheaders(0),
     configChanged(false),
-    rtprio(50),
+    rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
     midi_bank_C(32),
     midi_upper_voice_C(128),
@@ -129,6 +131,9 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
+    channelSwitchType(0),
+    channelSwitchCC(128),
+    channelSwitchValue(0),
     nrpnL(127),
     nrpnH(127),
     nrpnActive(false),
@@ -140,7 +145,11 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     synth(_synth),
     bRuntimeSetupCompleted(false)
 {
-    if(!synth->getIsLV2Plugin())
+    if (synth->getIsLV2Plugin())
+    {
+        rtprio = 4; // To force internal threads below LV2 host
+    }
+    else
         fesetround(FE_TOWARDZERO); // Special thanks to Lars Luthman for conquering
                                // the heffalump. We need lrintf() to round
                                // toward zero.
@@ -162,7 +171,7 @@ bool Config::Setup(int argc, char **argv)
     if (!loadConfig())
         return false;
 
-    if(synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
+    if (synth->getIsLV2Plugin()) //skip further setup for lv2 plugin instance.
     {
         /*
          * These are needed here now, as for stand-alone they have
@@ -174,6 +183,7 @@ bool Config::Setup(int argc, char **argv)
         synth->loadHistory();
         return true;
     }
+
     switch (audioEngine)
     {
         case alsa_audio:
@@ -212,6 +222,11 @@ bool Config::Setup(int argc, char **argv)
     Buffersize = nearestPowerOf2(Buffersize, 16, 1024);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
+    if (loadDefaultState && !restoreState)
+    {
+        StateFile = ConfigDir + "/yoshimi.state";
+        restoreState = true;
+    }
     if (restoreState)
     {
         char * fp;
@@ -225,22 +240,18 @@ bool Config::Setup(int argc, char **argv)
         if (! isRegFile(StateFile))
         {
             no_state1: delete (fp);
-            no_state0: Log("Invalid state file specified for restore " + StateFile);
-            return false;
+            no_state0: Log("Invalid state file specified for restore " + StateFile, 2);
+            return true;
         }
         Log(StateFile);
         restoreSessionData(StateFile, true);
-        /* This needs improving!
-         * There is a single state file that contains both startup config
+        /* There is a single state file that contains both startup config
          * data that must be set early, and runtime data that must be set
          * after synth has been initialised.
          *
-         * Currently we open it here and fetch just the startup data, then
-         * reopen it in synth and fetch all the data (including the startup
-         * again).
-         *
-         * This is further complicated because the same functions are
-         * being used by jack session.
+         * We open it here and fetch just the essential BASE_PARAMETERS;
+         * buffer size, oscillator size, sample rate. We then reopen it
+         * in synth and fetch the remaining settings from CONFIG.
          */
     }
     return true;
@@ -263,22 +274,6 @@ void Config::flushLog(void)
             LogList.pop_front();
         }
     }
-}
-
-
-bool Config::showQuestionOrCmdWarning(string guiQuestion, string cmdLineWarning, bool bForceCmdLinePositive)
-{
-    bool bRet = false;
-    if(showGui)
-    {
-        bRet = fl_choice("%s, ok?", "No", "Yes", "Cancel", guiQuestion.c_str());
-    }
-    else
-    {
-        bRet = bForceCmdLinePositive;//force positive answer if gui is not used (default behavior)
-        cerr << endl << "----- WARNING! -----" << cmdLineWarning << endl << "----- ^^^^^^^^ -----" << endl;
-    }
-    return bRet;
 }
 
 
@@ -397,6 +392,8 @@ string Config::masterCCtest(int cc)
                     result = "bank root change";
                 else if (cc == midi_upper_voice_C)
                     result = "extended program change";
+                else if (cc == channelSwitchCC)
+                    result = "channel switcher";
             }
         }
     }
@@ -440,9 +437,14 @@ bool Config::loadConfig(void)
         if ((chk = system(cmd.c_str())) < 0)
             Log("Create preset directory " + presetDir + " failed, status " + asString(chk));
     }
-    ConfigFile = ConfigDir + yoshimi + string(".config");
+    ConfigFile = ConfigDir + yoshimi;
     StateFile = ConfigDir + yoshimi + string(".state");
+    if (synth->getUniqueId() == 0)
+        ConfigFile += ".config";
+    else
+        ConfigFile += ".instance";
     string resConfigFile = ConfigFile;
+
 
     bool isok = true;
     if (!isRegFile(resConfigFile) && !isRegFile(ConfigFile))
@@ -460,13 +462,15 @@ bool Config::loadConfig(void)
         {
             if (!xml->loadXMLfile(resConfigFile))
             {
-                if((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
+                if ((synth->getUniqueId() > 0) && (!xml->loadXMLfile(ConfigFile)))
                 {
                     Log("loadConfig loadXMLfile failed");
                     return false;
                 }
             }
-            isok = extractConfigData(xml);
+            isok = extractBaseParameters(xml);
+            if (isok)
+                isok = extractConfigData(xml);
             if (isok)
                 Oscilsize = (int)truncf(powf(2.0f, ceil(log (Oscilsize - 1.0f) / logf(2.0))));
             delete xml;
@@ -500,6 +504,37 @@ void Config::defaultPresets(void)
 }
 
 
+bool Config::extractBaseParameters(XMLwrapper *xml)
+{
+    if (synth->getUniqueId() != 0)
+        return true;
+
+    if (!xml)
+    {
+        Log("extractConfigData on NULL");
+        return false;
+    }
+    if (!xml->enterbranch("BASE_PARAMETERS"))
+    {
+        Log("extractConfigData, no BASE_PARAMETERS branch");
+        return false;
+    }
+    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
+    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
+    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
+    showGui = xml->getparbool("enable_gui", showGui);
+    showSplash = xml->getparbool("enable_splash", showSplash);
+    showCLI = xml->getparbool("enable_CLI", showCLI);
+    if (!showGui && !showCLI)
+    {
+        showGui = true;
+        showCLI = true; // sanity check!
+    }
+    xml->exitbranch(); // BaseParameters
+    return true;
+}
+
 bool Config::extractConfigData(XMLwrapper *xml)
 {
     if (!xml)
@@ -510,21 +545,15 @@ bool Config::extractConfigData(XMLwrapper *xml)
     if (!xml->enterbranch("CONFIGURATION"))
     {
         Log("extractConfigData, no CONFIGURATION branch");
-        return false;
+        Log("Running with defaults");
+        return true;
     }
-    GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
-    showGui = xml->getpar("enable_gui", showGui, 0, 1);
-    showSplash = xml->getpar("enable_splash", showSplash, 0, 1);
-    showCLI = xml->getpar("enable_CLI", showCLI, 0, 1);
     single_row_panel = xml->getpar("single_row_panel", single_row_panel, 0, 1);
     toConsole = xml->getpar("reports_destination", toConsole, 0, 1);
     hideErrors = xml->getpar("hide_system_errors", hideErrors, 0, 1);
+    showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
-
-    Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
-    Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
 
     // get preset dirs
     int count = 0;
@@ -548,6 +577,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
         configChanged = true; // give the user the choice
     }
 
+    loadDefaultState = xml->getpar("defaultState", loadDefaultState, 0, 1);
     Interpolation = xml->getpar("interpolation", Interpolation, 0, 1);
 
     // engines
@@ -573,6 +603,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
 
     //misc
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
+    tempRoot = xml->getpar("root_current_ID", 0, 0, 127);
+    tempBank = xml->getpar("bank_current_ID", 0, 0, 127);
 
     xml->exitbranch(); // CONFIGURATION
     return true;
@@ -603,28 +635,23 @@ void Config::saveConfig(void)
 void Config::addConfigXML(XMLwrapper *xmltree)
 {
     xmltree->beginbranch("CONFIGURATION");
-    xmltree->addpar("gzip_compression", GzipCompression);
-    xmltree->addpar("enable_gui", synth->getRuntime().showGui);
-    xmltree->addpar("enable_splash", synth->getRuntime().showSplash);
-    xmltree->addpar("enable_CLI", synth->getRuntime().showCLI);
     xmltree->addpar("single_row_panel", single_row_panel);
     xmltree->addpar("reports_destination", toConsole);
     xmltree->addpar("hide_system_errors", hideErrors);
+    xmltree->addpar("report_load_times", showTimes);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
 
-    xmltree->addpar("sample_rate", Samplerate);
-    xmltree->addpar("sound_buffer_size", Buffersize);
-    xmltree->addpar("oscil_size", Oscilsize);
-
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)
+    {
         if (presetsDirlist[i].size())
         {
             xmltree->beginbranch("PRESETSROOT",i);
             xmltree->addparstr("presets_root", presetsDirlist[i]);
             xmltree->endbranch();
         }
-
+    }
+    xmltree->addpar("defaultState", loadDefaultState);
     xmltree->addpar("interpolation", Interpolation);
 
     xmltree->addpar("audio_engine", synth->getRuntime().audioEngine);
@@ -644,6 +671,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
     xmltree->addpar("ignore_reset_all_CCs",ignoreResetCCs);
     xmltree->addpar("check_pad_synth", checksynthengines);
+    xmltree->addpar(string("root_current_ID"), synth->ReadBankRoot());
+    xmltree->addpar(string("bank_current_ID"), synth->ReadBank());
     xmltree->endbranch(); // CONFIGURATION
 }
 
@@ -661,7 +690,6 @@ void Config::saveSessionData(string savefile)
         return;
     }
     addConfigXML(xmltree);
-    addRuntimeXML(xmltree);
     synth->add2XML(xmltree);
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
@@ -692,39 +720,23 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         Log("Failed to load xml file " + sessionfile);
         goto end_game;
     }
-    ok = extractConfigData(xml); // this needs improving
-    if (!startup && ok)
-        ok = extractRuntimeData(xml) && synth->getfromXML(xml);
+    if (startup)
+        ok = extractBaseParameters(xml);
+    else
+    {
+        ok = extractConfigData(xml); // this still needs improving
+        if (ok)
+        {
+            ok = synth->getfromXML(xml);
+            if (ok)
+                synth->getRuntime().stateChanged = true;
+        }
+    }
 
 end_game:
     if (xml)
         delete xml;
     return ok;
-}
-
-
-bool Config::extractRuntimeData(XMLwrapper *xml)
-{
-    if (!xml->enterbranch("RUNTIME"))
-    {
-        Log("Config extractRuntimeData, no RUNTIME branch", 1);
-        return false;
-    }
-// need to put current root and bank here
-    nameTag = xml->getparstr("name_tag");
-    CurrentXMZ = xml->getparstr("current_xmz");
-    xml->exitbranch();
-    return true;
-}
-
-
-void Config::addRuntimeXML(XMLwrapper *xml)
-{
-    xml->beginbranch("RUNTIME");
-// need to put current root and bank here
-    xml->addparstr("name_tag", nameTag);
-    xml->addparstr("current_xmz", CurrentXMZ);
-    xml->endbranch();
 }
 
 
@@ -794,7 +806,7 @@ void Config::setRtprio(int prio)
 
 // general thread start service
 bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
-                         bool schedfifo, char priodec, bool create_detached)
+                         bool schedfifo, char priodec, bool create_detached, string name)
 {
     pthread_attr_t attr;
     int chk;
@@ -804,11 +816,11 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
     {
         if (!(chk = pthread_attr_init(&attr)))
         {
-            if(create_detached)
+            if (create_detached)
             {
                chk = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
             }
-            if(!chk)
+            if (!chk)
             {
                 if (schedfifo)
                 {
@@ -829,15 +841,15 @@ bool Config::startThread(pthread_t *pth, void *(*thread_fn)(void*), void *arg,
                         continue;
                     }
                     sched_param prio_params;
-                    int prio = rtprio;
-                    if (priodec)
-                        prio -= priodec;
-                    prio_params.sched_priority = (prio > 0) ? prio : 0;
+                    int prio = rtprio - priodec;
+                    if (prio < 1)
+                        prio = 1;
+                    Log(name + " priority is " + to_string(prio), 2);
+                    prio_params.sched_priority = prio;
                     if ((chk = pthread_attr_setschedparam(&attr, &prio_params)))
                     {
                         Log("Failed to set thread priority attribute ("
-                                    + asString(chk) + ")  "
-                                    + string(strerror(errno)), 1);
+                                    + asString(chk) + ")  ", 3);
                         schedfifo = false;
                         continue;
                     }
@@ -987,7 +999,7 @@ int Config::SSEcapability(void)
 
 void Config::AntiDenormals(bool set_daz_ftz)
 {
-    if(synth->getIsLV2Plugin())
+    if (synth->getIsLV2Plugin())
     {
         return;// no need to set floating point rules for lv2 - host should control it.
     }
@@ -1139,6 +1151,7 @@ static error_t parse_cmds (int key, char *arg, struct argp_state *state)
             break;
 
         case 'S':
+            settings->configChanged = true;
             settings->restoreState = true;
             if (arg)
                 settings->StateFile = string(arg);
@@ -1182,156 +1195,105 @@ void Config::loadCmdArgs(int argc, char **argv)
 void GuiThreadMsg::processGuiMessages()
 {
     GuiThreadMsg *msg = (GuiThreadMsg *)Fl::thread_message();
-    if(msg)
+    if (msg)
     {
-        switch(msg->type)
+        SynthEngine *synth = ((SynthEngine *)msg->data);
+
+        if (msg->type == RegisterAudioPort)
         {
-        case GuiThreadMsg::NewSynthEngine:
+            // This is unique not using guiMaster
+             mainRegisterAudioPort(synth, msg->index);
+             delete msg;
+             return;
+        }
+        MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
+        if (msg->type == GuiThreadMsg::NewSynthEngine)
         {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster();
-            if(!guiMaster)
+            // This *defines* guiMaster
+            if (!guiMaster)
                 cerr << "Error starting Main UI!" << endl;
             else
                 guiMaster->Init(guiMaster->getSynth()->getWindowTitle().c_str());
-            break;
         }
-
-        case GuiThreadMsg::UpdateMaster:
+        else if (guiMaster)
         {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->refresh_master_ui();
-            break;
-        }
-
-        case GuiThreadMsg::UpdateConfig:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->configui->update_config(msg->index);
-            break;
-        }
-
-        case GuiThreadMsg::UpdatePaths:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->updatepaths(msg->index);
-            break;
-        }
-
-        case GuiThreadMsg::UpdatePanel:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
-                guiMaster->updatepanel();
-            break;
-        }
-
-        case GuiThreadMsg::UpdatePart:
-        {
-            SynthEngine *synth = ((SynthEngine *)msg->data);
-            MasterUI *guiMaster = synth->getGuiMaster(false);
-            if(guiMaster)
+            switch(msg->type)
             {
-                guiMaster->updatepart();
-                guiMaster->updatepanel();
-            }
-            break;
-        }
 
-        case GuiThreadMsg::UpdatePanelItem:
-            if(msg->index < NUM_MIDI_PARTS && msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->updatelistitem(msg->index);
+                case GuiThreadMsg::UpdateMaster:
+                    guiMaster->refresh_master_ui();
+                    break;
+
+                case GuiThreadMsg::UpdateConfig:
+                    if (guiMaster->configui)
+                        guiMaster->configui->update_config(msg->index);
+                    break;
+
+                case GuiThreadMsg::UpdatePaths:
+                    guiMaster->updatepaths(msg->index);
+                    break;
+
+                case GuiThreadMsg::UpdatePanel:
+                    guiMaster->updatepanel();
+                    break;
+
+                case GuiThreadMsg::UpdatePart:
                     guiMaster->updatepart();
-                }
-            }
-            break;
+                    guiMaster->updatepanel();
+                    break;
 
-        case GuiThreadMsg::UpdatePartProgram:
-            if(msg->index < NUM_MIDI_PARTS && msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                {
-                    guiMaster->updatelistitem(msg->index);
-                    guiMaster->updatepartprogram(msg->index);
-                }
-            }
-            break;
-
-        case GuiThreadMsg::UpdateEffects:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                    guiMaster->updateeffects(msg->index);
-            }
-            break;
-
-        case GuiThreadMsg::RegisterAudioPort:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                mainRegisterAudioPort(synth, msg->index);
-            }
-            break;
-
-        case GuiThreadMsg::UpdateBankRootDirs:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster)
-                    guiMaster->updateBankRootDirs();
-            }
-            break;
-
-        case GuiThreadMsg::RescanForBanks:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster && guiMaster->bankui)
-                {
-                    guiMaster->bankui->rescan_for_banks(false);
-                }
-            }
-            break;
-
-        case GuiThreadMsg::RefreshCurBank:
-            if(msg->data)
-            {
-                SynthEngine *synth = ((SynthEngine *)msg->data);
-                MasterUI *guiMaster = synth->getGuiMaster(false);
-                if(guiMaster && guiMaster->bankui)
-                {
-                    if (msg->index == 1)
+                case GuiThreadMsg::UpdatePanelItem:
+                    if ( msg->data && msg->index < NUM_MIDI_PARTS)
                     {
-                        // special case for first synth statup
-                        guiMaster->bankui->readbankcfg();
-                        guiMaster->bankui->rescan_for_banks(false);
+                        guiMaster->updatelistitem(msg->index);
+                        guiMaster->updatepart();
                     }
-                    guiMaster->bankui->set_bank_slot();
-                    guiMaster->bankui->refreshmainwindow();
-                }
-            }
-            break;
+                    break;
 
-        default:
-            break;
+                case GuiThreadMsg::UpdatePartProgram:
+                    if (msg->data && msg->index < NUM_MIDI_PARTS)
+                    {
+                        guiMaster->updatelistitem(msg->index);
+                        guiMaster->updatepartprogram(msg->index);
+                    }
+                    break;
+
+                case GuiThreadMsg::UpdateEffects:
+                    if (msg->data)
+                        guiMaster->updateeffects(msg->index);
+                    break;
+
+                case GuiThreadMsg::UpdateBankRootDirs:
+                    if (msg->data)
+                        guiMaster->updateBankRootDirs();
+                    break;
+
+                case GuiThreadMsg::RescanForBanks:
+                    if (msg->data && guiMaster->bankui)
+                        guiMaster->bankui->rescan_for_banks(false);
+                    break;
+
+                case GuiThreadMsg::RefreshCurBank:
+                    if (msg->data && guiMaster->bankui)
+                    {
+                        if (msg->index == 1)
+                        {
+                            // special case for first synth startup
+                            guiMaster->bankui->readbankcfg();
+                            guiMaster->bankui->rescan_for_banks(false);
+                        }
+                        guiMaster->bankui->set_bank_slot();
+                        guiMaster->bankui->refreshmainwindow();
+                    }
+                    break;
+
+                case GuiThreadMsg::GuiAlert:
+                    if (msg->data)
+                        guiMaster->ShowAlert(msg->index);
+
+                default:
+                    break;
+            }
         }
         delete msg;
     }

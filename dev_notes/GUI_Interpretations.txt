@@ -1,22 +1,37 @@
 
-data to send from gui
+data sent from gui
 
+float           value       (mandatory)
 unsigned char   type        (mandatory)
+unsigned char   controller  (mandatory)
 unsigned char   part        (mandatory)
 unsigned char   kit
 unsigned char   engine
 unsigned char   insert
 unsigned char   insert param
-unsigned char   controller  (mandatory)
-float           value       (mandatory)
-string          name - not using this yet
+
+string          name - not using this yet - will be handled separately.
 
 
 Type bits
-0-4 event button (action to take)
-5   source is GUI (else bits 0-4 = source & action)
-6   read/write data value
+0-1 event                       (tests for GUI, but see below)
+2   source is return from synth (not yet)
+3   source is MIDI              (not yet)
+4   source is CLI
+5   source is GUI
+6   write data value (read othewise)
 7   round to int (will be sent as float)
+
+bits 0 + 1 = 0 from anything other than synth = set default.
+bits 0 + 1 = 3 from anything other than synth = MIDI learn request.
+
+On return from synth
+0   success if zero
+1   undefined
+2   always 1
+3-7 as sent
+
+bits 3-5 may later be combined for new input sources.
 
 Unused chars are set to 0xff as a general test.
 
@@ -24,10 +39,10 @@ e.g.
 If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it
 is main volume, key shift etc.
 
-If part is < 0x40 and kit is 0xff it's the general part level controls, otherwise it's the kit level controls.
+If part is < 0x40 and kit is 0xff it's the general part level controls.
 
-If kit >= 0x20 it's the engine enable controls.
-    (kit number ORed with 0x20)
+If part is < 0x40 and kit >= 0x20 but less than 0x80 it's the engine enable
+controls. (kit number ORed with 0x20)
 
 Vector Control
 This uses part number 0xc0
@@ -51,7 +66,7 @@ Effects 'kit' numbers offset by 0x80.
 7   EQ
 8   Dynfilter
 
-These can't be inserts, as Dynefilter has Filter as an insert!
+These can't be inserts, as Dynfilter has Filter as an insert!
 
 
 engine
@@ -62,9 +77,11 @@ engine
 >= 0x80 addsynth voice
 
 
-inserts
+inserts & 0x1f
 0   lfo
 1   filter
+        Use engine number 0x88 To access the filter component of the
+        DyneFilter effect
 2   envelope base
 3   envelope graph X
 4   envelope graph Y
@@ -72,6 +89,7 @@ inserts
 5   oscillator (for add voice & pad harmonics)
 6   oscillator harmonic amplitude (for add voice & pad)
     harmonic amplitude (sub)
+
 7   oscillator harmonic phase (add, pad)
     harmonc bandwidth (sub)
 
@@ -92,6 +110,14 @@ insert param
             0 = Amplitude
             1 = Frequency
             2 = Filter
+            3 = Bandwidth (SubSynth only)
 
        envelope free mode
             0 to 39 = point number
+
+        formant filter
+            for controls 18 - 20
+                >> 5   for vowel number
+                & 0x1f for formant number
+            for control 37
+                filter sequence position

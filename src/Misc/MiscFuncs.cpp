@@ -24,7 +24,9 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sstream>
+#include <iostream>
 #include <string.h>
+#include <mutex>
 
 using namespace std;
 
@@ -235,6 +237,21 @@ string MiscFuncs::findleafname(string name)
 }
 
 
+int MiscFuncs::findSplitPoint(string name)
+{
+    int chk = 0;
+    char ch = name.at(chk);
+    while (ch >= '0' and ch <= '9' and chk < 4)
+    {
+        chk += 1;
+        ch = name.at(chk);
+    }
+    if (ch != '-')
+        chk = 0;
+    return chk;
+}
+
+
 // adds or replaces wrong extension with the right one.
 string MiscFuncs::setExtension(string fname, string ext)
 {
@@ -340,6 +357,73 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
 }
 
 
+/*
+ * These two functions provide a transparent text messaging system.
+ * Calling functions only need to recognise integers and strings.
+ *
+ * Push extends the list if there are no empty slots. It will also
+ * block while writing, but should be very quick.
+ *
+ * Pop is destructive. No two functions should ever have been given
+ * the same 'live' ID, but if they do, the second one will get an
+ * empty string.
+ *
+ * Normally a message will clear before the next one arrives so the
+ * message numbers should remain very low even over multiple instances.
+ */
+int MiscFuncs::miscMsgPush(string text)
+{
+    mutex mtx;
+    int idx = 0;
+    list<string>::iterator it = miscList.begin();
+
+    mtx.lock();
+    while(it != miscList.end())
+    {
+        if ( *it == "")
+        {
+            *it = text;
+            mtx.unlock();
+            //cout << "Msg No. " << idx << endl;
+            return idx;
+        }
+        ++ it;
+        ++ idx;
+    }
+    if (miscList.size() >= 255)
+    {
+        mtx.unlock();
+        cout << "List too big :(" << endl;
+        return -1;
+    }
+
+    miscList.push_back(text);
+    mtx.unlock();
+    return idx;
+}
+
+
+string MiscFuncs::miscMsgPop(int pos)
+{
+    string text = "";
+    int idx = 0;
+    list<string>::iterator it = miscList.begin();
+
+    while(it != miscList.end())
+    {
+        if (idx == pos)
+        {
+            swap(text, *it);
+            break;
+        }
+        ++ it;
+        ++ idx;
+    }
+
+    return text;
+}
+
+
 // no more than 32 bit please!
 unsigned int MiscFuncs::nearestPowerOf2(unsigned int x, unsigned int min, unsigned int max)
 {
@@ -354,6 +438,16 @@ unsigned int MiscFuncs::nearestPowerOf2(unsigned int x, unsigned int min, unsign
     x |= x >> 8;
     x |= x >> 16;
     return ++x;
+}
+
+
+float MiscFuncs::limitsF(float value, float min, float max)
+{
+    if (value > max)
+        value = max;
+    else if (value < min)
+        value = min;
+    return value;
 }
 
 

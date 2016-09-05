@@ -84,16 +84,29 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
 
     if (synth->getRuntime().xmlType <= XML_CONFIG)
     {
-        beginbranch("BASE_PARAMETERS");
-            addpar("max_midi_parts", synth->getRuntime().NumAvailableParts);
-            addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
-
-            addpar("max_system_effects", NUM_SYS_EFX);
-            addpar("max_insertion_effects", NUM_INS_EFX);
-            addpar("max_instrument_effects", NUM_PART_EFX);
-
-            addpar("max_addsynth_voices", NUM_VOICES);
-        endbranch();
+        if(synth->getRuntime().xmlType != XML_STATE && synth->getRuntime().xmlType != XML_CONFIG)
+        {
+            beginbranch("BASE_PARAMETERS");
+                addpar("max_midi_parts", NUM_MIDI_CHANNELS);
+                addpar("max_kit_items_per_instrument", NUM_KIT_ITEMS);
+                addpar("max_system_effects", NUM_SYS_EFX);
+                addpar("max_insertion_effects", NUM_INS_EFX);
+                addpar("max_instrument_effects", NUM_PART_EFX);
+                addpar("max_addsynth_voices", NUM_VOICES);
+            endbranch();
+        }
+        else if (synth->getUniqueId() == 0)
+        {
+            beginbranch("BASE_PARAMETERS");
+                addpar("sample_rate", synth->getRuntime().Samplerate);
+                addpar("sound_buffer_size", synth->getRuntime().Buffersize);
+                addpar("oscil_size", synth->getRuntime().Oscilsize);
+                addpar("gzip_compression", synth->getRuntime().GzipCompression);
+                addparbool("enable_gui", synth->getRuntime().showGui);
+                addparbool("enable_splash", synth->getRuntime().showSplash);
+                addparbool("enable_CLI", synth->getRuntime().showCLI);
+            endbranch();
+        }
     }
 }
 
@@ -264,7 +277,7 @@ bool XMLwrapper::saveXMLfile(const string& filename)
         FILE *xmlfile = fopen(filename.c_str(), "w");
         if (!xmlfile)
         {
-            synth->getRuntime().Log("XML: Failed to open xml file " + filename + " for save");
+            synth->getRuntime().Log("XML: Failed to open xml file " + filename + " for save", 2);
             return false;
         }
         fputs(xmldata, xmlfile);
@@ -412,14 +425,14 @@ bool XMLwrapper::loadXMLfile(const string& filename)
     const char *xmldata = doloadfile(filename);
     if (xmldata == NULL)
     {
-        synth->getRuntime().Log("XML: Could not load xml file: " + filename);
+        synth->getRuntime().Log("XML: Could not load xml file: " + filename, 2);
          return false;
     }
     root = tree = mxmlLoadString(NULL, xmldata, MXML_OPAQUE_CALLBACK);
     delete [] xmldata;
     if (!tree)
     {
-        synth->getRuntime().Log("XML: File " + filename + " is not XML");
+        synth->getRuntime().Log("XML: File " + filename + " is not XML", 2);
         return false;
     }
     root = mxmlFindElement(tree, tree, "ZynAddSubFX-data", NULL, NULL, MXML_DESCEND);
@@ -431,7 +444,7 @@ bool XMLwrapper::loadXMLfile(const string& filename)
 
     if (!root)
     {
-        synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context");
+        synth->getRuntime().Log("XML: File " + filename + " doesn't contain valid data in this context", 2);
         return false;
     }
     node = root;
@@ -470,7 +483,7 @@ char *XMLwrapper::doloadfile(const string& filename)
     if (!gzf)
     {
         synth->getRuntime().Log("XML: Failed to open xml file " + filename + " for load, errno: "
-                    + asString(errno) + "  " + string(strerror(errno)));
+                    + asString(errno) + "  " + string(strerror(errno)), 2);
         return NULL;
     }
     const int bufSize = 4096;
@@ -490,9 +503,9 @@ char *XMLwrapper::doloadfile(const string& filename)
         else if (this_read < 0)
         {
             int errnum;
-            synth->getRuntime().Log("XML: Read error in zlib: " + string(gzerror(gzf, &errnum)));
+            synth->getRuntime().Log("XML: Read error in zlib: " + string(gzerror(gzf, &errnum)), 2);
             if (errnum == Z_ERRNO)
-                synth->getRuntime().Log("XML: Filesystem error: " + string(strerror(errno)));
+                synth->getRuntime().Log("XML: Filesystem error: " + string(strerror(errno)), 2);
             quit = true;
         }
         else if (total_bytes > 0)
@@ -676,7 +689,7 @@ void XMLwrapper::push(mxml_node_t *node)
 {
     if (stackpos >= STACKSIZE - 1)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack");
+        synth->getRuntime().Log("XML: Not good, XMLwrapper push on a full parentstack", 2);
         return;
     }
     stackpos++;
@@ -688,7 +701,7 @@ mxml_node_t *XMLwrapper::pop(void)
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack");
+        synth->getRuntime().Log("XML: Not good, XMLwrapper pop on empty parentstack", 2);
         return root;
     }
     mxml_node_t *node = parentstack[stackpos];
@@ -702,7 +715,7 @@ mxml_node_t *XMLwrapper::peek(void)
 {
     if (stackpos <= 0)
     {
-        synth->getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack");
+        synth->getRuntime().Log("XML: Not good, XMLwrapper peek on an empty parentstack", 2);
         return root;
     }
     return parentstack[stackpos];

@@ -34,11 +34,15 @@
 #include <map>
 #include <list>
 #include <sstream>
-#include <Misc/SynthEngine.h>
-#include <Misc/MiscFuncs.h>
-#include <Misc/Bank.h>
 
-#include <Misc/CmdInterface.h>
+using namespace std;
+
+#include "Misc/SynthEngine.h"
+#include "Misc/MiscFuncs.h"
+#include "Misc/Bank.h"
+
+#include "Interface/InterChange.h"
+#include "Interface/CmdInterface.h"
 
 using namespace std;
 
@@ -81,6 +85,7 @@ string basics[] = {
     "  Root <n>",                   "de-list root path ID",
     "  Bank <n>",                   "delete bank ID (and all contents) from current root",
     "Set / Read",                   "set or read all main parameters",
+    "  SWitcher [{CC}n] [s]",      "define CC n to set single part in group (Row / Column)",
     "  REPorts [s]",                "destination (Gui/Stderr)",
     "  ",                           "  non-fatal (SHow/Hide)",
     "  Root <n>",                   "current root path to ID",
@@ -103,6 +108,7 @@ string toplist [] = {
     "AVailable <n>",              "available parts (16, 32, 64)",
     "Volume <n>",                 "master volume",
     "SHift <n>",                  "master key shift semitones (0 no shift)",
+    "TIMes [s]",                  "time display on instrument load message (ENable / other",
     "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
     "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
     "Alsa Midi <s>",              "* name of alsa MIDI source",
@@ -110,6 +116,7 @@ string toplist [] = {
     "Jack Midi <s>",              "* name of jack MIDI source",
     "Jack Server <s>",            "* jack server name",
     "Jack AUto <s>",              "* (0 off, other on)",
+    "AUTostate [s]",              "* autoload default state at start (ENable / other)",
     "end"
 };
 
@@ -903,7 +910,11 @@ int CmdInterface::commandPart(bool justSet)
         }
         if (point[0] != 0) // force part not channel number
         {
-            synth->SetProgram(npart | 0x80, string2int(point));
+            tmp = string2int(point);
+            if (tmp < 128)
+                synth->writeRBP(3, npart | 0x80, tmp); // lower set
+            else
+                synth->writeRBP(4, npart | 0x80, tmp - 128); // upper set
             reply = done_msg;
         }
         else
@@ -1096,19 +1107,22 @@ int CmdInterface::commandPart(bool justSet)
     }
     else if (matchnMove(2, point, "name"))
     {
-        string name = "Part name set to ";
+        string name;
         if (isRead)
         {
-            name += synth->part[npart]->Pname;
+            name = "Part name set to " + synth->part[npart]->Pname;
         }
         else
         {
-            if (strlen(point) < 3)
+            name = (string) point;
+            if (name.size() < 3)
                 name = "Name too short";
+            else if ( name == "Simple Sound")
+                name = "Cant use name of default sound";
             else
             {
-                name += (string) point;
-                synth->part[npart]->Pname = point;
+                synth->part[npart]->Pname = name;
+                name = "Set part name to " + name;
                 partFlag = true;
             }
         }
@@ -1149,7 +1163,63 @@ int CmdInterface::commandReadnSet()
         }
         return done_msg;
     }
+    else if(matchnMove(2, point, "Switcher"))
+    {
+        if (isRead)
+        {
+            name = "Switcher CC is ";
+            if (Runtime.channelSwitchType == 0)
+                name += "disabled";
+            else
+            {
+                name += to_string((int) Runtime.channelSwitchCC);
+                if (Runtime.channelSwitchType == 1)
+                    name += " Row type";
+                else
+                    name += " Column type";
+            }
+            Runtime.Log(name);
+            reply = done_msg;
+        }
+        else
+        {
+            int value = string2int(point);
+            if (value > 0)
+            {
+                name = Runtime.masterCCtest(value);
+                if (name > "")
+                {
+                    Runtime.Log("Already used by " + name);
+                    return done_msg;
+                }
+            point = skipChars(point);
+            }
+            Runtime.channelSwitchValue = 0;
+            name = "Set switcher CC as ";
+            if (value && matchnMove(1, point, "row"))
+            {
+                Runtime.channelSwitchType = 1;
+                Runtime.channelSwitchCC = value;
+                name += (to_string(value) + " Row type");
 
+            }
+            else if (value && matchnMove(1, point, "column"))
+            {
+                Runtime.channelSwitchType = 2;
+                Runtime.channelSwitchCC = value;
+                name += (to_string(value) + " Column type");
+            }
+            else
+            {
+                Runtime.channelSwitchType = 0;
+                Runtime.channelSwitchCC = 128;
+                name += "disabled";
+            }
+            Runtime.Log(name);
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 4);
+            reply = done_msg;
+        }
+    }
     else if (matchnMove(3, point, "reports"))
     {
         if (isRead)
@@ -1172,12 +1242,12 @@ int CmdInterface::commandReadnSet()
             synth->SetSystemValue(100, 0);
         else if (matchnMove(2, point, "show"))
         {
-            Runtime.hideErrors = false;
+            synth->SetSystemValue(103, 0);
             Runtime.Log("Showing all errors");
         }
         else if (matchnMove(1, point, "hide"))
         {
-            Runtime.hideErrors = true;
+            synth->SetSystemValue(103, 127);
             Runtime.Log("Hiding non-fatal errors");
         }
         else
@@ -1186,6 +1256,26 @@ int CmdInterface::commandReadnSet()
             Runtime.hideErrors = false;
             Runtime.Log("Showing all errors");
         }
+        reply = done_msg;
+        Runtime.configChanged = true;
+    }
+
+    else if (matchnMove(3, point, "autostate"))
+    {
+        if (matchnMove(2, point, "enable"))
+            synth->SetSystemValue(101, 127);
+        else
+            synth->SetSystemValue(101, 0);
+        reply = done_msg;
+        Runtime.configChanged = true;
+    }
+
+    else if (matchnMove(3, point, "times"))
+    {
+        if (matchnMove(2, point, "enable"))
+            synth->SetSystemValue(102, 127);
+        else
+            synth->SetSystemValue(102, 0);
         reply = done_msg;
         Runtime.configChanged = true;
     }
@@ -1570,6 +1660,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
             replyString = "All data will be lost. Still exit";
         if (query(replyString, false))
         {
+            Runtime.configChanged = false;
+            // this seems backwards but it *always* saves.
+            // seeing configChanged makes it reload the old settings first.
             Runtime.runSynth = false;
             return true;
         }
@@ -1880,9 +1973,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 int loadResult = synth->loadPatchSetAndUpdate((string) point);
-                if (loadResult == 3)
-                    Runtime.Log("At least one instrument is named 'Simple Sound'. This should be changed before resave");
-                else if  (loadResult == 1)
+                if  (loadResult == 1)
                     Runtime.Log((string) point + " loaded");
                 reply = done_msg;
             }
@@ -1891,8 +1982,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             if (point[0] == 0)
                 reply = name_msg;
-            else if (synth->SetProgramToPart(npart, -1, (string) point))
-                reply = done_msg;
+            else
+                synth->writeRBP(5, npart, miscMsgPush((string) point));
+            reply = done_msg;
         }
         else
         {
@@ -1982,6 +2074,41 @@ bool CmdInterface::cmdIfaceProcessCommand()
             replyString = "save";
             reply = what_msg;
         }
+    else if (matchnMove(6, point, "direct"))
+    {
+        float value = string2float(point);
+        point = skipChars(point);
+        unsigned char type = (string2int127(point) & 0x40) | 0x91;
+        // fix as: not MIDI learn, from CLI, integer
+        point = skipChars(point);
+        unsigned char control = string2int(point);
+        point = skipChars(point);
+        unsigned char part = string2int(point);
+        point = skipChars(point);
+        unsigned char kit = 0xff;
+        unsigned char engine = 0xff;
+        unsigned char insert = 0xff;
+        unsigned char param = 0xff;
+        if (point[0] != 0)
+        {
+            kit = string2int(point);
+            point = skipChars(point);
+            if (point[0] != 0)
+            {
+                engine = string2int(point);
+                point = skipChars(point);
+                if (point[0] != 0)
+                {
+                    insert = string2int(point);
+                    point = skipChars(point);
+                    if (point[0] != 0)
+                        param = string2int(point);
+                }
+            }
+        }
+        synth->interchange.commandFetch(value, type, control, part, kit, engine, insert, param);
+        reply = done_msg;
+    }
     else
       reply = unrecognised_msg;
 
@@ -2008,6 +2135,7 @@ void CmdInterface::cmdIfaceCommandLoop()
     if (read_history(hist_filename.c_str()) != 0) // reading failed
     {
         perror(hist_filename.c_str());
+        ofstream outfile (hist_filename.c_str()); // create an empty file
     }
     cCmd = NULL;
     bool exit = false;

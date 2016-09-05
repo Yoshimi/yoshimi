@@ -40,6 +40,9 @@ decl {\#include <iostream>} {public local
 decl {using namespace std;} {public local
 } 
 
+decl {\#include "UI/MiscGui.h"} {public local
+} 
+
 decl {\#include "ADnoteUI.h"} {public local
 } 
 
@@ -234,7 +237,9 @@ class MasterUI {selected : {private MiscFuncs}
         switch (r)
         {
             case 0:
-                synth->getRuntime().saveConfig();
+                synth->getRuntime().configChanged = false;
+                // this seems backwards but it *always* saves.
+                // seeing configChanged makes it reload the old settings first.
                 synth->guiClosed(true);
                 break;
             case 2:
@@ -246,16 +251,15 @@ class MasterUI {selected : {private MiscFuncs}
     }
     else
     {
-//        synth->getRuntime().saveConfig();
         synth->guiClosed(true);
     }}
-      xywh {11 99 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {7 120 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Menu_Bar mastermenu {
         xywh {-7 0 400 25} labelsize 13
       } {
         Submenu {} {
-          label {&Yoshimi}
+          label {&Yoshimi} open
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem {} {
@@ -317,14 +321,7 @@ mainCreateNewInstance(forceId);}
                 filename = fl_file_chooser("Load:", "({*.xiz})", NULL, 0);
                 if (filename == NULL)
                     return;
-				// pgm = -1 here because it's not from a bank
-				int result = synth->SetProgramToPart(npart, -1, string(filename));
-                npartcounter->do_callback();
-                updatepanel();
-                if (result == 0)
-                    fl_alert("Failed to load instrument file");
-                else if (result == 3)
-                    fl_alert("Instrument is called 'Simple Sound', Yoshimi's basic sound name. You should change this if you wish to re-save.");}
+	        synth->writeRBP(5, npart,miscMsgPush(filename));}
             tooltip {Load an instrument (.xiz) file} xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -855,7 +852,7 @@ send_data(0, o->value(),false);}
         } {}
       }
       Fl_Group {} {
-        xywh {3 427 380 36} box DOWN_BOX labelsize 12
+        xywh {3 427 380 36} box DOWN_BOX color 43 labelsize 12
       } {
         Fl_Box vumeter {
           label {VU-Meter}
@@ -1079,7 +1076,7 @@ else if (kititem == 0xf2)
 else
     eng = 0xff;
 
-synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), control, kititem, 0xff, eng);} {}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {}
   }
   Function {updatesendwindow()} {} {
     code {//
@@ -1137,6 +1134,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         npartcounter->do_callback();
         return;
     }
+
     if (synth->partonoffRead(npart))
         partui->partgroupui->activate();
     else
@@ -1170,6 +1168,7 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
     code {//
     if (_npart != npart)
         return;
+
     if (partui->part->Prcvchn <  NUM_MIDI_CHANNELS)
     {
         partui->midich->value(partui->part->Prcvchn + 1);
@@ -1180,7 +1179,8 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
          partui->midich->textcolor(FL_WHITE);
          partui->midich->redraw();
     }
-    updatepart();} {}
+    npartcounter->do_callback();
+    updatepanel();} {}
   }
   Function {updateeffects(int data)} {} {
     code {//
@@ -1292,8 +1292,6 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
                  synth->addHistory(fname, 2);
             RecentParams->activate();
             microtonalui->apply();
-            if(result > 1)
-            	fl_alert("At least one instrument is called 'Simple Sound', the name of Yoshimi's basic sound. You should change this if you wish to re-save.");
         }
         else
         {
@@ -1504,6 +1502,9 @@ synth->commandFetch(value, (Fl::event_button() | 0x20 | (isInteger << 7)), contr
         bankui->readbankcfg();
         bankui-> rescan_for_banks(false);
     }} {}
+  }
+  Function {ShowAlert(int num)} {} {
+    code {fl_alert("%s", miscMsgPop(num).c_str());} {}
   }
   Function {getSynth()} {return_type {SynthEngine *}
   } {

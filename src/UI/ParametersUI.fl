@@ -43,7 +43,7 @@ class ParametersUI {selected
     Fl_Window Recent {
       label {Recent Parameters}
       callback {o->hide()}
-      xywh {917 745 220 180} type Double labelfont 13 labelsize 12 align 0 hide
+      xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Browser BrowseRecent {
         callback {//
@@ -80,7 +80,7 @@ class ParametersUI {selected
                 break;
         }
     }}
-        xywh {0 0 220 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
+        xywh {0 0 250 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
         code0 {const int colwidths[] = { 150, 330, 0 };
           o->column_widths(colwidths);
           o->column_char('	');}

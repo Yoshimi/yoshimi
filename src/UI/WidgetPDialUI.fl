@@ -40,8 +40,8 @@ decl {\#include <FL/fl_draw.H>
     \#include <FL/Fl_Tooltip.H>
     \#include <FL/Fl_Group.H>
     \#include <FL/x.H>
-    \#include <cairo/cairo.h>
-    \#include <cairo/cairo-xlib.h>} {private global
+    \#include <cairo.h>
+    \#include <cairo-xlib.h>} {private global
 } 
 
 class TipWin {: {public Fl_Menu_Window, MiscFuncs}
@@ -108,7 +108,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
 } 
 
-class WidgetPDial {: {public Fl_Dial}
+class WidgetPDial {selected : {public Fl_Dial}
 } {
   Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
     code {//
@@ -132,7 +132,7 @@ class WidgetPDial {: {public Fl_Dial}
     code {double dragsize, v, min = minimum(), max = maximum();
         int my;
         int mx;
-        
+
         switch (event)
         {
             case FL_PUSH:
@@ -144,6 +144,9 @@ class WidgetPDial {: {public Fl_Dial}
                          do_callback();
                     return 1;
         	}
+        	if (this->when() != 0) // only effects knobs  need this
+                         do_callback();
+
                 oldvalue = value();
             case FL_DRAG:
                  if(!pos)
@@ -220,8 +223,7 @@ class WidgetPDial {: {public Fl_Dial}
                  return 1;
                  break;
         }
-        return 0;} {selected
-    }
+        return 0;} {}
   }
   Function {drawgradient(int cx,int cy,int sx,double m1,double m2)} {return_type void
   } {

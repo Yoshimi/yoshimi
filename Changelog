@@ -1,7 +1,263 @@
-yoshimi 1.4.0.1
+yoshimi 1.4.x
+
+2016-9-5 Will
+* Setup for next master version.
+
+yoshimi 1.4.1
+
+2016-9-5 Will
+* Changed three instrument patches to the Gzip compressed form.
+* If readline can't read its history file an empty one is created.
+* Finalised all code and docs for release.
+* Set version 1.4.1
+
+2016-9-4 Will
+* Added two new sounds to Will_Godfrey_Companion,
+  Thin Trem Pipe & Pulse Reed.
+* Updated docs for next release.
+* No code changes.
+
+2016-9-3 Will
+* Regression: Part volume knob sent mixer slider in opposite direction.
+* Removed redundant code from Config.
+* Removed Tests directory.
+  There are much more sophisticated test files now!
+* Set version to 1.4.1 rc7
+* Bugfix: Listing banks from CLI was enabling all possible ones :(
+
+2016-9-2 Will
+* Rationalised max & min key limits to remove overlap - and silence!
+* Removed redundant threadmessage tests.
+* Minor optimizations to threadmessage process.
+* Reporting GUI commands now a build option.
+* Set version to 1.4.1 rc6
+
+2016-9-1 Will
+* Bugfix: Threadmessage was issued at startup (SynthEngine defaults)
+  before threadmessage routine fully initialsed.
+* Set version to 1.4.1 rc5
+
+2016-8-29 Will
+* Changed priority settings so that adjustment is specific to LV2.
+* Pushed program loads out of RT prio completely.
+* Added CLI to channel switcher control.
+* Updated docs.
+* Set version to 1.4.1 rc4
+
+2016-8-28 Will
+* Bugfix: Parts failed to load from Bank window if part MIDI
+  number was not the same as the part number (MOD 16).
+* Vectors now fully obey channel switcher in 'Row' mode.
+
+2016-8-27 Will
+* Bugfix: If Startup had to change MIDI or audio engines it didn't
+  set configChanged, so change was made permanent without warning.
+* Commented out unused code in Config.
+* Bugfix: 'Reset' wasn't clearing channel switcher GUI.
+* Made channel switcher and vectors play nice - mostly!
+* Set version to 1.4.1 rc3
+
+2016-8-26 Will
+* Bugfix: GUI was being disabled on close with multiple instances.
+* Corrected settings messages for higher instances.
+* Revised shortform NRPNs for channel select.
+* Implemented channel select setup via GUI.
+* Set version to 1.4.1 rc2
+
+2016-8-25 Will
+* First time startup now correctly sets current bank.
+* Updated short guide.
+* Set version to 1.4.1 rc1
+
+2016-8-24 Will
+* Moved current root and current bank to instance config files.
+* GUI button numbers no longer shown in direct access.
+
+2016-8-23 Will
+* Separated out instance settings from main config file.
+* Added GUI and CLI enable/disable to 'Switches'.
+* Pushed gzip, splash, GUI enable & CLI enable into base params.
+* Base params now hidden in secondary instances.
+
+2016-8-22 Will
+* Sample rate, buffer size, oscillator size now settable by first
+  instance only (but visible to others).
+
+2016-8-21 Will
+* Commented out Config::showQuestionOrCmdWarning(
+  never seems to be called.
+* More doc updates and clarifications.
+
+2016-8-20 Will
+* Bugfix: Part change was calling for gui update before loading had
+  completed :(
+
+2016-8-18 Will
+* Bugfix: If part kit items were enabled but the whole kit was 'off'
+  the items were correctly saved, but not reloaded.
+* Added 'Pad Kit' to 'Will_Godfrey_Companion'.
+* Added missing copyright notice to some instrument patches.
+
+2016-8-16 Will
+* Loading untitled instruments now uses the filename.
+* Loading "Simple Sound" changes the name to "No Title".
+* User prevented from changing name *to* "Simple Sound".
+* Bugfix: xml minimal had been set for patch set saves.
+
+2016-8-15 Will
+* Removed redundant (duplicated) part number settings.
+* Improved vector control consistency.
+* Vector data now stored in patch sets and saved state.
+
+2016-8-14 Will
+* Moved buffer size, oscillator size, sample rate into
+  config BASE_PARAMETERS.
+
+2016-8-13 Will
+* Moved LV2 root/bank/program change into ringbuffer and adjusted RT
+  priorites for best results when loading *huge* instrument patches.
+
+2016-8-12 Will
+* Inproved direct access to filters - Only dynfilter to do now!.
+* Updated docs.
+* Completed direct filter implementation.
+* Updated docs (again).
+
+2016-8-11 Will
+* Bugfix: CLI wasn't loading upper set instruments (128+).
+* Tidied up NRPN vector control.
+* Added more error messages to 'non fatal' category.
+* Implemented most of the direct access for filters.
+* Updated docs.
+
+2016-8-10 Will
+* Implemented simple internal text messaging system.
+* Added autoload state to CLI and NRPNs.
+* Added instrument load time to CLI and NRPNs.
+* Updated docs.
+
+2016-8-9 Will
+* Slow program load no longer freezes GUI
+* Bugfix: Very obscure! Made some program load ops fail if number was
+  less than 4 digits and there was a space in the name where the first
+  character would otherwise be.
+* Updated LV2 for new MiscGui files.
+
+2016-8-8 Will
+* Defined direct commands for 'set default' and 'MIDI learn'.
+* Activated CLI ID.
+* Updated docs.
+
+2016-8-7 Will
+* Created src/UI/MiscGui.h to become only link between synth & GUI.
+* Bugfix: Effects 'home' on right click had failed.
+* Bugfix: AddSynth resonance wasn't showing on GUI button 2.
+
+2016-8-6 Will
+* Started actual direct control of filters.
+* Added root and bank load times but in uS!
+* minor doc updates.
+
+2016-8-4 Will
+* Bugfix: At startup all enabled parts were registering direct O/P
+  when not actualy directed to part/both.
+* Load time reporting now has its own switch.
+* Added 'Switches' tab to Config window and moved them from 'Main'.
+
+2016-8-4 Will
+* Added load time (mS) to instrument load message.
+* New feature: Auto-load default state.
+
+2016-8-2 Will
+* Applied gentoo build patches.
+  (doesn't seem to make any difference to other distros)
+
+2016-7-31 Will
+* Updated docs - no code changes.
+
+2016-7-30 Will
+* Optimised parameter handling in direct access.
+* Updated docs.
+
+2016-7-28 Will
+* Implimented direct access to effect inserts, but not the actual filter
+  (sub) insert in dynfilter.
+* Added 'Effect_Inserts' file to dev_notes.
+* Updated other direct access docs.
+
+2016-7-27 Will
+* Bugfix: System effect sends wasn't reporting scroll wheel use.
+* Added system and insertion base effect controls to direct access.
+* Updated docs.
+
+2016-7-24 Will
+* Bugfix: Direct access reading harmonic values returned the wrong result.
+* Added missing direct access part controls. Dunno how I missed them :(
+* Updated docs.
+
+2016-7-23 Will
+* Completed Subsynth controls (not the inserts).
+* Corrected doc errors :(
+
+2016-7-22 Will
+* Started implementing direct access to SubSynth controls.
+
+2016-7-20 Will
+* Minor doc corrections - no code changes.
+
+2016-7-15 Will
+* Bugfix: hadn't included new Interface files in LV2 :(
+
+2016-7-14 Will
+* Changed virtual keyboard roller to slider.
+
+2016-7-5 Will
+* Small doc updates - no code changes.
+
+2016-7-1 Will
+* Small format change in GUI access reports.
+* doc updates, including new file /dev_notes/Direct_Access.txt
+
+2016-6-29 Will
+* Implimented direct access to part controllers and up to Kits.
+* Updated docs.
+* Completed kit level direct access.
+* Revised some control values.
+
+2016-6-28 Will
+* Adjusted some GUI engine numbers so they all match.
+* Implimented direct access to main and basic part controls.
+* Bugfix: Ring buffer count was wrong.
+
+2016-6-27 Will
+* Created new Interface directory.
+* Created new InterChange file in Interface directory.
+* Moved GUI ID files from SynthEngine to InterChange.
+* Moved CmdInterface to Interface directory.
+* Implemented direct CLI access to some part controls.
+* Implemented ring buffer between interchange and final sound.
+
+2016-6-26 Will
+* Added GUI warnings when audio or midi not availalble.
+* Corrected and improved new user guide.
+
+2016-6-25 Will
+* Created new quick guide as ODF in doc directory.
+* Updated notes.
+* No code changes.
+
+2016-6-18 Will
+* Implemented missing 'home' function in formant filter controls.
+* Minor adjustments to formant filter GUI layout.
 
 2016-6-17 Will
-Bugfix: missing format string in VectorUI :(
+* Added format test to CMakeLists.txt - commented out on pushes.
+* Reinstated identification of controls.
+
+yoshimi 1.4.0.1
+
+2016-6-16 Will
+* Bugfix: missing format string in VectorUI :(
 
 yoshimi 1.4.0
 

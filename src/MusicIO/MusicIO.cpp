@@ -220,9 +220,21 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnL != param)
             {
                 synth->getRuntime().nrpnL = param;
-                if (synth->getRuntime().nrpnH == 0x41) // shortform
-                {
-                    synth->SetSystemValue(0x80, param);
+                if (synth->getRuntime().nrpnH == 0x41 || synth->getRuntime().nrpnH == 0x42)
+                { // shortform
+                    if (param > 0x77) // disable it
+                    {
+                        synth->getRuntime().channelSwitchType = 0;
+                        synth->getRuntime().channelSwitchCC = 0x80;
+                    }
+                    else
+                    {
+                        if (synth->getRuntime().nrpnH == 0x41)
+                            synth->getRuntime().channelSwitchType = 1; // row
+                        else
+                            synth->getRuntime().channelSwitchType = 2; // column
+                    synth->getRuntime().channelSwitchCC = param;
+                    }
                     return;
                 }
                 //synth->getRuntime().Log("Set nrpn LSB to " + asString(param));
@@ -300,9 +312,15 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                 return;
             }
         }
-        if (synth->getRuntime().nrpndata.vectorEnabled[ch] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+        unsigned char vecChan;
+        if (synth->getRuntime().channelSwitchType == 1)
+            vecChan = synth->getRuntime().channelSwitchValue;
+            // force vectors to obey channel switcher
+        else
+            vecChan = ch;
+        if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
         { // vector control is direct to parts
-            if (nrpnRunVector(ch, ctrl, param))
+            if (nrpnRunVector(vecChan, ctrl, param))
                 return; // **** test this it may be wrong!
         }
         // pick up a drop-through if CC doesn't match the above
@@ -546,6 +564,12 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 }
 
 
+/* The following routines now *always* use the ring buffer.
+ * This is necessary to handle extremely large instrument patches
+ * and maintain root/bank/instrument sequence.
+ * RT thread priority has been adjusted to ensure optimimum results.
+ */
+
 //bank change and root dir change change share the same thread
 //to make changes consistent
 void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place, bool setRootDir)
@@ -558,10 +582,9 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
     else
         if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
             return; // still nothing to do!
-
-    if (in_place)
+    /*if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
-    else
+    else*/
     {
         if (setRootDir)
             synth->writeRBP(1 ,bank_or_root_num,0);
@@ -582,9 +605,9 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         return;
     if (synth->getRuntime().EnableProgChange)
     {
-        if (in_place)
-            synth->SetProgram(ch, prg);
-        else
+        //if (in_place)
+            //synth->SetProgram(ch, prg);
+        //else
             synth->writeRBP(3, ch ,prg);
     }
 }
