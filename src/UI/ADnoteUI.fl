@@ -267,7 +267,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                         voiceFMfreqenvgroup->activate();
                     o->redraw();
                     send_data(104, o->value());}
-                tooltip {Forced Relase} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                tooltip {Forced Release} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
               }
               Fl_Counter {} {
@@ -382,7 +382,7 @@ send_data(81, o->value());}
                         voiceFMampenvgroup->activate();
                     o->redraw();
                     send_data(88, o->value());}
-                tooltip {Forced Relase} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                tooltip {Forced Release} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
               }
               Fl_Value_Slider {} {
@@ -543,7 +543,7 @@ send_data(82, o->value());}
                       voicefreqenvgroup->activate();
                   o->redraw();
                   send_data(40, o->value());}
-              tooltip {Forced Relase} xywh {15 300 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+              tooltip {Forced Release} xywh {15 300 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqEnvelopeEnabled);}
             }
             Fl_Group voicefreqlfogroup {
@@ -563,7 +563,7 @@ send_data(82, o->value());}
                       voicefreqlfogroup->activate();
                   o->redraw();
                   send_data(41, o->value());}
-              tooltip {Forced Relase} xywh {220 300 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+              tooltip {Forced Release} xywh {220 300 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqLfoEnabled);}
             }
             Fl_Counter {} {
@@ -935,7 +935,7 @@ send_data(1, o->value());}
                     voiceampenvgroup->activate();
                 o->redraw();
                 send_data(8, o->value());}
-            tooltip {Forced Relase} xywh {15 110 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Forced Release} xywh {15 110 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpEnvelopeEnabled);}
           }
           Fl_Group voiceamplfogroup {
@@ -955,7 +955,7 @@ send_data(1, o->value());}
                     voiceamplfogroup->activate();
                 o->redraw();
                 send_data(9, o->value());}
-            tooltip {Forced Relase} xywh {15 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Forced Release} xywh {15 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
           }
           Fl_Check_Button {} {
@@ -994,7 +994,7 @@ send_data(4, o->value());}
                     voicefilterenvgroup->activate();
                 o->redraw();
                 send_data(72, o->value());}
-            tooltip {Forced Relase} xywh {255 110 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Forced Release} xywh {255 110 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PFilterEnvelopeEnabled);}
           }
           Fl_Group voicefilterlfogroup {
@@ -1014,7 +1014,7 @@ send_data(4, o->value());}
                     voicefilterlfogroup->activate();
                 o->redraw();
                 send_data(73, o->value());}
-            tooltip {Forced Relase} xywh {255 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Forced Release} xywh {255 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PFilterLfoEnabled);}
           }
         }

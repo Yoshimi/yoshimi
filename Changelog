@@ -1,4 +1,9 @@
-yoshimi 1.4.x
+yoshimi 1.4.1 M
+
+2016-9-8 Will
+* Applied spelling patch from Jaromír Mikeš
+* Added warning to dev_notes/Direct_Access.txt
+* Now identifies SubSynth bandwidth envelope.
 
 2016-9-5 Will
 * Setup for next master version.

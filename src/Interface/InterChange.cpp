@@ -2431,6 +2431,9 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         case 2:
             env = "  Filt";
             break;
+        case 3:
+            env = "  B.Width";
+            break;
     }
 
 

@@ -372,7 +372,7 @@ send_data(type, 32, o->value());}
         label frcR
         callback {env->Pforcedrelease=(int)o->value();
 send_data(type, 48, o->value());}
-        tooltip {Forced Relase} xywh {410 165 40 15} down_box DOWN_BOX labelsize 10
+        tooltip {Forced Release} xywh {410 165 40 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
       }
@@ -475,7 +475,7 @@ send_data(type, 4, o->value());}
           label frcR
           callback {env->Pforcedrelease=(int)o->value();
 send_data(type, 16, o->value());}
-          tooltip {Forced Relase} xywh {180 35 20 15} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced Release} xywh {180 35 20 15} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Dial e1envstretch {
@@ -679,7 +679,7 @@ send_data(type, 7, o->value());}
           label frcR
           callback {env->Pforcedrelease=(int)o->value();
 send_data(type, 16, o->value());}
-          tooltip {Forced Relase} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced Release} xywh {250 30 15 20} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Button {} {
