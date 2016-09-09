@@ -6,6 +6,7 @@ yoshimi 1.4.1 M
 * Updated docs.
 * Implemented LFO direct controls.
 * Direct access now recognises floating point 'value'.
+* Updated docs.
 
 2016-9-8 Will
 * Applied spelling patch from Jaromír Mikeš
