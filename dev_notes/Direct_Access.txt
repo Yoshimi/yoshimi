@@ -5,7 +5,7 @@ This is an experimental test feature only accessible from the command line.
 There are virtually no error checks on this so you can easily crash Yoshimi
 with out of range values!
 
-Currently It doesn't update the GUI, and there is minimal error checking.
+Currently it doesn't update the GUI.
 
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions
 and "GUI_Interpretations.txt" for further explanations.
@@ -21,12 +21,14 @@ Kit edit window
 Subsynth Editor
 Effects
 Filters
+Envelopes (not free mode)
 
 The remaining ones will display as if they had been written to, but won't
 actually change anything.
 
-This matches the results from using the middle mouse button in the GUI. commands
-that are purely within the GUI,e.g window changes are not implemented at all.
+This matches the results from using the middle mouse button in the GUI
+(assuming it was enabled at build time). Commands that are purely within the
+GUI,e.g window changes are not implemented at all.
 Some such as part number changes are (currently) recognised but not acted on.
 It is expected that any alternative input system will store its own copies of
 such intermediate information so that they remain fully independent.
@@ -38,7 +40,7 @@ if there are no following parameters set.
 
 The format is:
 
-direct {value} {type} {control} {part} {kit} {engine} {insert} {parameter}
+direct {value} {type} {control} {part} {kit} {engine} {insert} {parameter} {par2}
 
 direct = the actual command name, must be typed in full.
 
@@ -61,3 +63,6 @@ engine = the synth engine being adjusted.
 insert = harmonics, LFOs, filters etc.
 
 parameter = subtype associated with some inserts.
+
+par2 = an offset for some parameters.
+

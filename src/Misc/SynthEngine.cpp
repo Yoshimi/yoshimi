@@ -780,11 +780,11 @@ int SynthEngine::ReadBank(void)
 }
 
 
-void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
+void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam, unsigned char insertPar2)
 {
     // while testing, this simply sends everything to Interchange
 
-    interchange.commandFetch(value, type, control, part, kit, engine, insert, insertParam);
+    interchange.commandFetch(value, type, control, part, kit, engine, insert, insertParam, insertPar2);
     return;
 }
 

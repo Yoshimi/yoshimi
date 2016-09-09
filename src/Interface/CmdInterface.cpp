@@ -2089,6 +2089,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         unsigned char engine = 0xff;
         unsigned char insert = 0xff;
         unsigned char param = 0xff;
+        unsigned char par2 = 0xff;
         if (point[0] != 0)
         {
             kit = string2int(point);
@@ -2102,11 +2103,16 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     insert = string2int(point);
                     point = skipChars(point);
                     if (point[0] != 0)
+                    {
                         param = string2int(point);
+                        point = skipChars(point);
+                        if (point[0] != 0)
+                            par2 = string2int(point);
+                    }
                 }
             }
         }
-        synth->interchange.commandFetch(value, type, control, part, kit, engine, insert, param);
+        synth->interchange.commandFetch(value, type, control, part, kit, engine, insert, param, par2);
         reply = done_msg;
     }
     else

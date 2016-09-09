@@ -41,7 +41,7 @@ yoshimi part 4 off FX 0 REver-0 >
 
 Sets the part's effect 0 to type 'reverb'
 
-Even thogh the part is disabled you can still set up its characteristics. Also, notice the two capitals in reverb, these remind you of the minimum abbreviation.
+Even though the part is disabled you can still set up its characteristics. Also, notice the two capitals in reverb, these remind you of the minimum abbreviation.
 
 Many settings are optional and if you omit them, either a default, or last used, value will be assumed. Also names are truncated to 5 characters so the prompt line doesn't get unmanageably long.
 

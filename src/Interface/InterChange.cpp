@@ -51,7 +51,7 @@ InterChange::~InterChange()
 }
 
 
-void InterChange::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char insertParam)
+void InterChange::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char insertParam, unsigned char insertPar2)
 {
     CommandBlock putData;
     putData.data.value = value;
@@ -62,6 +62,7 @@ void InterChange::commandFetch(float value, unsigned char type, unsigned char co
     putData.data.engine = engine;
     putData.data.insert = insert;
     putData.data.parameter = insertParam;
+    putData.data.par2 = insertPar2;
     if (jack_ringbuffer_write_space(sendbuf) >= commandSize)
         jack_ringbuffer_write(sendbuf, (char*) putData.bytes, commandSize);
     return;
@@ -90,13 +91,7 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-
-    if (insert < 0xff)
-        insert &= 0x1f;
-    /*
-     * This is necessary to ensure filter sequence position doesn't
-     * mess up the following switches.
-     */
+    unsigned char insertPar2 = getData->data.par2;
 
     bool isGui = type & 0x20;
     char button = type & 3;
@@ -121,7 +116,8 @@ void InterChange::commandSend(CommandBlock *getData)
                             + "\n  Kit " + to_string((int) kititem)
                             + "\n  Engine " + to_string((int) engine)
                             + "\n  Insert " + to_string((int) insert)
-                            + "\n  Parameter " + to_string((int) insertParam));
+                            + "\n  Parameter " + to_string((int) insertParam)
+                            + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
     }
     if (npart == 0xc0)
@@ -1707,7 +1703,7 @@ void InterChange::commandOscillator(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert &0x1f; // ensure no stray filter
+    unsigned char insert = getData->data.insert;
 
     string actual;
     if (type & 0x80)
@@ -1883,7 +1879,7 @@ void InterChange::commandResonance(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
+    unsigned char insert = getData->data.insert;
 
     string actual;
     if (type & 0x80)
@@ -2031,9 +2027,8 @@ void InterChange::commandFilter(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
 
     int nseqpos = getData->data.parameter;
-    int nformant = getData->data.parameter & 0x1f;
-    int nvowel = getData->data.parameter >> 5;
-
+    int nformant = getData->data.parameter;
+    int nvowel = getData->data.par2;
 
     Part *part;
     part = synth->part[npart];
@@ -2170,8 +2165,8 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, un
     float val = getData->data.value;
 
     int nseqpos = getData->data.parameter;
-    int nformant = getData->data.parameter & 0x1f;
-    int nvowel = getData->data.parameter >> 5;
+    int nformant = getData->data.parameter;
+    int nvowel = getData->data.par2;
 
     switch (getData->data.control)
     {
@@ -2395,31 +2390,118 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
+    unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
+    unsigned char insertPar2 = getData->data.par2;
+
+    Part *part;
+    part = synth->part[npart];
 
     string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
+    string env;
     string name;
     if (engine == 0)
+    {
         name = "  AddSynth";
+        switch (insertParam)
+        {
+            case 0:
+                env = "  Amp";
+                value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpEnvelope);
+                break;
+            case 1:
+                env = "  Freq";
+                value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqEnvelope);
+                break;
+            case 2:
+                value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterEnvelope);
+                env = "  Filt";
+                break;
+        }
+    }
     else if (engine == 1)
+    {
         name = "  SubSynth";
+        switch (insertParam)
+        {
+            case 0:
+                env = "  Amp";
+                value = envelopeReadWrite(getData, part->kit[kititem].subpars->AmpEnvelope);
+                break;
+            case 1:
+                env = "  Freq";
+                value = envelopeReadWrite(getData, part->kit[kititem].subpars->FreqEnvelope);
+                break;
+            case 2:
+                value = envelopeReadWrite(getData, part->kit[kititem].subpars->GlobalFilterEnvelope);
+                env = "  Filt";
+                break;
+            case 3:
+                value = envelopeReadWrite(getData, part->kit[kititem].subpars->BandWidthEnvelope);
+                env = "  B.Width";
+                break;
+        }
+    }
     else if (engine == 2)
+    {
         name = "  PadSynth";
+        switch (insertParam)
+        {
+            case 0:
+                env = "  Amp";
+                value = envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
+                break;
+            case 1:
+                env = "  Freq";
+                value = envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
+                break;
+            case 2:
+                value = envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
+                env = "  Filt";
+                break;
+        }
+    }
     else if (engine >= 0x80)
     {
         name = "  Adsynth Voice ";
+        int nvoice = engine & 0x3f;
+        name += to_string(nvoice);
         if (engine >= 0xC0)
+        {
             name += "Modulator ";
-        name += to_string(engine & 0x3f);
+            switch (insertParam)
+            {
+                case 0:
+                    env = "  Amp";
+                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMAmpEnvelope);
+                    break;
+                case 1:
+                    env = "  Freq";
+                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMFreqEnvelope);
+                    break;
+            }
+        }
+        else
+        {
+            switch (insertParam)
+            {
+                case 0:
+                    env = "  Amp";
+                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpEnvelope);
+                    break;
+                case 1:
+                    env = "  Freq";
+                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqEnvelope);
+                    break;
+                case 2:
+                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterEnvelope);
+                    env = "  Filt";
+                    break;
+            }
+        }
     }
 
-    string env;
+
     switch(insertParam)
     {
         case 0:
@@ -2436,15 +2518,15 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             break;
     }
 
-
-    if (insert == 3)
-    {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Control " + to_string(control) + "  X value " + actual);
-        return;
-    }
     if (insert == 4)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Control " +  to_string(control) + "  Y value " + actual);
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
+
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(insertPar2) +
+        "  Y value " + actual);
         return;
     }
 
@@ -2511,7 +2593,134 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             break;
     }
 
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env  " + contstr + " value " + actual);
+}
+
+
+float InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
+{
+    bool write = (getData->data.type & 0x40) > 0;
+    float val = getData->data.value;
+    //unsigned char point = getData->data.control;
+    unsigned char insert = getData->data.insert;
+    //unsigned char Xincrement = getData->data.par2;
+
+    if (insert == 4)
+    {
+        // todo
+        return val;
+    }
+    switch (getData->data.control)
+    {
+        case 0:
+            if (write)
+                pars->PA_val = val;
+            else
+                val = pars->PA_val;
+            break;
+        case 1:
+            if (write)
+                pars->PA_dt = val;
+            else
+                val = pars->PA_dt;
+            break;
+        case 2:
+            if (write)
+                pars->PD_val = val;
+            else
+                val = pars->PD_val;
+            break;
+        case 3:
+            if (write)
+                pars->PD_dt = val;
+            else
+                val = pars->PD_dt;
+            break;
+        case 4:
+            if (write)
+                pars->PS_val = val;
+            else
+                val = pars->PS_val;
+            break;
+        case 5:
+            if (write)
+                pars->PR_dt = val;
+            else
+                val = pars->PR_dt;
+            break;
+        case 6:
+            if (write)
+                pars->PR_val = val;
+            else
+                val = pars->PR_val;
+            break;
+        case 7:
+        case 39:
+            if (write)
+                pars->Penvstretch = val;
+            else
+                val = pars->Penvstretch;
+            break;
+
+        case 16:
+        case 48:
+            if (write)
+                pars->Pforcedrelease = (val != 0);
+            else
+                val = pars->Pforcedrelease;
+            break;
+        case 17:
+        case 49:
+            if (write)
+                pars->Plinearenvelope = (val != 0);
+            else
+                val = pars->Plinearenvelope;
+            break;
+
+        case 24: // this is local to the source
+            //contstr = "Edit";
+            break;
+
+        case 32:
+            if (write)
+            {
+                if (val != 0)
+                {
+                    pars->Pfreemode = 1;
+                    // more to do here
+                }
+                else
+                {
+                    pars->Pfreemode = 0;
+                    // and here
+                }
+            }
+            else
+                val = pars->Pfreemode;
+            //contstr = "Freemode";
+            break;
+        case 33:
+            if (write && pars->Penvpoints < MAX_ENVELOPE_POINTS)
+            ; //contstr = "Add Point";
+            break;
+        case 34:
+            if (write)
+            ;//contstr = "Del Point";
+            break;
+        case 35:
+            if (write)
+                pars->Penvsustain = val;
+            else
+                val = pars->Penvsustain;
+            //contstr = "Sust";
+            break;
+    }
+    return val;
 }
 
 

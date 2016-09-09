@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-9-9 Will
+* Revised direct access, now needs 8 unsigned chars.
+* Implemented envelope direct controls (not free mode yet).
+* Updated docs.
+
 2016-9-8 Will
 * Applied spelling patch from Jaromír Mikeš
 * Added warning to dev_notes/Direct_Access.txt

@@ -52,7 +52,7 @@ First time start up has been improved slightly, and you will definitely have 'Ar
 
 Startup with GUI or CLI can now be set within the GUI whereas before it could only be done from the CLI. You are prevented from disabling them both! You are also warned that if you disable the GUI then next time you start you will have to do so from the CLI!
 
-The 'master' and 'instance' configuration files have now been seperated out. The mater settings are now 'invisible' in the later instance GUIs. This prevents possible ambiguity.
+The 'master' and 'instance' configuration files have now been seperated out, and  the master settings are now 'invisible' in the later instance GUIs. This prevents possible ambiguity.
 
 
 

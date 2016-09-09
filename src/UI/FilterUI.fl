@@ -665,11 +665,15 @@ send_data(17, o->value());}
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
 int parameter = 255;
+int par2 = 255;
 if (control == 37)
     parameter = nseqpos;
 else if (control >= 18 && control <= 20)
-    parameter = nformant | (nvowel << 5);
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 1, parameter);} {}
+{
+    parameter = nformant;
+    par2 = nvowel;
+}
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 1, parameter, par2);} {}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//

@@ -9,6 +9,7 @@ unsigned char   kit
 unsigned char   engine
 unsigned char   insert
 unsigned char   insert param
+unsigned char   insert par2
 
 string          name - not using this yet - will be handled separately.
 
@@ -77,14 +78,13 @@ engine
 >= 0x80 addsynth voice
 
 
-inserts & 0x1f
+inserts
 0   lfo
 1   filter
         Use engine number 0x88 To access the filter component of the
         DyneFilter effect
 2   envelope base
-3   envelope graph X
-4   envelope graph Y
+4   envelope graph X/Y
 
 5   oscillator (for add voice & pad harmonics)
 6   oscillator harmonic amplitude (for add voice & pad)
@@ -117,7 +117,10 @@ insert param
 
         formant filter
             for controls 18 - 20
-                >> 5   for vowel number
-                & 0x1f for formant number
+                formant number
+                par2 for vowel number
             for control 37
                 filter sequence position
+
+insert par2
+    used for offsets to some parameters
