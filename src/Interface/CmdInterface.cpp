@@ -2077,8 +2077,11 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (matchnMove(6, point, "direct"))
     {
         float value = string2float(point);
+        unsigned char type = 0x11;
+        if (strchr(point, '.') == NULL)
+            type |= 0x80;
         point = skipChars(point);
-        unsigned char type = (string2int127(point) & 0x40) | 0x91;
+        type |= (string2int127(point) & 0x40);
         // fix as: not MIDI learn, from CLI, integer
         point = skipChars(point);
         unsigned char control = string2int(point);

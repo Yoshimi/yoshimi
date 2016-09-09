@@ -4,6 +4,8 @@ yoshimi 1.4.1 M
 * Revised direct access, now needs 8 unsigned chars.
 * Implemented envelope direct controls (not free mode yet).
 * Updated docs.
+* Implemented LFO direct controls.
+* Direct access now recognises floating point 'value'.
 
 2016-9-8 Will
 * Applied spelling patch from Jaromír Mikeš

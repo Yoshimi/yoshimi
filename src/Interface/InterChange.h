@@ -74,6 +74,7 @@ class InterChange : private MiscFuncs
         void commandOscillator(CommandBlock *getData);
         void commandResonance(CommandBlock *getData);
         void commandLFO(CommandBlock *getData);
+        float lfoReadWrite(CommandBlock *getData, LFOParams *pars);
         void commandFilter(CommandBlock *getData);
         float filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
         void commandEnvelope(CommandBlock *getData);

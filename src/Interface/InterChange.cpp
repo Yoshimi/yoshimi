@@ -1953,15 +1953,62 @@ void InterChange::commandLFO(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insertParam = getData->data.parameter;
 
-    string name;
-    if (engine == 0)
-        name = "  AddSynth";
-    else if (engine == 2)
-        name = "  PadSynth";
-    else if (engine >= 0x80)
-        name = "  AddSynth Voice " + to_string(engine & 0x3f);
+    Part *part;
+    part = synth->part[npart];
 
+    string name;
     string lfo;
+
+    if (engine == 0)
+    {
+    name = "  AddSynth";
+       switch (insertParam)
+        {
+            case 0:
+                value = lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpLfo);
+                break;
+            case 1:
+                value = lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqLfo);
+                break;
+            case 2:
+                value = lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterLfo);
+                break;
+        }
+    }
+    else if (engine == 2)
+    {
+        name = "  PadSynth";
+        switch (insertParam)
+        {
+            case 0:
+                value = lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
+                break;
+            case 1:
+                value = lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
+                break;
+            case 2:
+                value = lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
+                break;
+        }
+    }
+    else if (engine >= 0x80)
+    {
+        int nvoice = engine & 0x3f;
+        name = "  AddSynth Voice " + to_string(nvoice);
+        switch (insertParam)
+        {
+            case 0:
+                value = lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpLfo);
+                break;
+            case 1:
+                value = lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqLfo);
+                break;
+            case 2:
+                value = lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterLfo);
+                break;
+        }
+    }
+
     switch (insertParam)
     {
         case 0:
@@ -2014,6 +2061,72 @@ void InterChange::commandLFO(CommandBlock *getData)
         actual = to_string(value);
 
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
+}
+
+
+float InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
+{
+    bool write = (getData->data.type & 0x40) > 0;
+    float val = getData->data.value;
+
+    switch (getData->data.control)
+    {
+        case 0:
+            if (write)
+                pars->Pfreq = val;
+            else
+                val = pars->Pfreq;
+            break;
+        case 1:
+            if (write)
+                pars->Pintensity = val;
+            else
+                val = pars->Pintensity;
+            break;
+        case 2:
+            if (write)
+                pars->Pdelay = val;
+            else
+                val = pars->Pdelay;
+            break;
+        case 3:
+            if (write)
+                pars->Pstartphase = val;
+            else
+                val = pars->Pstartphase;
+            break;
+        case 4:
+            if (write)
+                pars->Prandomness = val;
+            else
+                val = pars->Prandomness;
+            break;
+        case 5:
+            if (write)
+                pars->PLFOtype = (int)val;
+            else
+                val = pars->PLFOtype;
+            break;
+        case 6:
+            if (write)
+                pars->Pcontinous = (val != 0);
+            else
+                val = pars->Pcontinous;
+            break;
+        case 7:
+            if (write)
+                pars->Pfreqrand = val;
+            else
+                val = pars->Pfreqrand;
+            break;
+        case 8:
+            if (write)
+                pars->Pstretch = val;
+            else
+                val = pars->Pstretch;
+            break;
+    }
+    return val;
 }
 
 
@@ -2406,16 +2519,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                env = "  Amp";
                 value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpEnvelope);
                 break;
             case 1:
-                env = "  Freq";
                 value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqEnvelope);
                 break;
             case 2:
                 value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterEnvelope);
-                env = "  Filt";
                 break;
         }
     }
@@ -2425,20 +2535,16 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                env = "  Amp";
                 value = envelopeReadWrite(getData, part->kit[kititem].subpars->AmpEnvelope);
                 break;
             case 1:
-                env = "  Freq";
                 value = envelopeReadWrite(getData, part->kit[kititem].subpars->FreqEnvelope);
                 break;
             case 2:
                 value = envelopeReadWrite(getData, part->kit[kititem].subpars->GlobalFilterEnvelope);
-                env = "  Filt";
                 break;
             case 3:
                 value = envelopeReadWrite(getData, part->kit[kititem].subpars->BandWidthEnvelope);
-                env = "  B.Width";
                 break;
         }
     }
@@ -2448,16 +2554,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                env = "  Amp";
                 value = envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
                 break;
             case 1:
-                env = "  Freq";
                 value = envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
                 break;
             case 2:
                 value = envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
-                env = "  Filt";
                 break;
         }
     }
@@ -2472,11 +2575,9 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             switch (insertParam)
             {
                 case 0:
-                    env = "  Amp";
                     value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMAmpEnvelope);
                     break;
                 case 1:
-                    env = "  Freq";
                     value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMFreqEnvelope);
                     break;
             }
@@ -2486,16 +2587,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             switch (insertParam)
             {
                 case 0:
-                    env = "  Amp";
                     value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpEnvelope);
                     break;
                 case 1:
-                    env = "  Freq";
                     value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqEnvelope);
                     break;
                 case 2:
                     value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterEnvelope);
-                    env = "  Filt";
                     break;
             }
         }
