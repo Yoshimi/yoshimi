@@ -2497,20 +2497,17 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, un
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+    int value = (int)getData->data.value;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
 
     Part *part;
     part = synth->part[npart];
 
-    string actual;
     string env;
     string name;
     if (engine == 0)
@@ -2616,15 +2613,21 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             break;
     }
 
+    if (insert == 3)
+    {
+        string action;
+        if (control >= 0x40)
+            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + "  X increment " + to_string(value >> 8) +
+        "  Y value " + to_string(value & 0xff));
+        else
+            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + "  Remaining 0-" + to_string(value >> 8));
+        return;
+    }
+
     if (insert == 4)
     {
-        if (type & 0x80)
-            actual = to_string((int)round(value));
-        else
-            actual = to_string(value);
-
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(insertPar2) +
-        "  Y value " + actual);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(value >> 8) +
+        "  Y value " + to_string(value & 0xff));
         return;
     }
 
@@ -2670,49 +2673,99 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         case 32:
             contstr = "Freemode";
             break;
-        case 33:
-            contstr = "Add Point";
-            break;
         case 34:
-            contstr = "Del Point";
+            contstr = "Points";
+            value = (value >> 8);
             break;
         case 35:
             contstr = "Sust";
             break;
-        case 39:
-            contstr = "Stretch";
-            break;
-
-        case 48:
-            contstr = "frcR";
-            break;
-        case 49:
-            contstr = "L";
-            break;
     }
 
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env  " + contstr + " value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env  " + contstr + " value " + to_string(value));
 }
 
 
-float InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
+int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
     bool write = (getData->data.type & 0x40) > 0;
-    float val = getData->data.value;
-    //unsigned char point = getData->data.control;
+    int val = (int) getData->data.value; // these are all integers or bool
+    bool isGui = getData->data.type & 0x20;
+    unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
-    //unsigned char Xincrement = getData->data.par2;
+    unsigned char Xincrement = getData->data.par2;
+
+    int envpoints = pars->Penvpoints;
+    bool isAddpoint = false;
+    if (point >= 0x40)
+    {
+        isAddpoint = true;
+        point &= 0x3f;
+    }
+
+    if (insert == 3) // here be dragons :(
+    {
+        if (!pars->Pfreemode)
+            return 0xffff;
+
+        // isGui is a temporary test till actual Gui writing enabled
+        if (isGui)
+        {
+            return val | (Xincrement << 8);
+        }
+
+        if (!write || point == 0 || point >= envpoints)
+            return 0xff | (envpoints << 8);
+
+        if (isAddpoint && envpoints < MAX_ENVELOPE_POINTS)
+        {
+            pars->Penvpoints += 1;
+            for (int i = envpoints; i >= point; -- i)
+            {
+                pars->Penvdt[i + 1] = pars->Penvdt[i];
+                pars->Penvval[i + 1] = pars->Penvval[i];
+            }
+            if (point <= pars->Penvsustain)
+                ++ pars->Penvsustain;
+            pars->Penvdt[point] = Xincrement;
+            pars->Penvval[point] = val;
+            return val | (Xincrement << 8);
+        }
+        else if (envpoints >= 3)
+        {
+            envpoints -= 1;
+            for (int i = point; i < envpoints; ++ i)
+            {
+                pars->Penvdt[i] = pars->Penvdt[i + 1];
+                pars->Penvval[i] = pars->Penvval[i + 1];
+            }
+            if (point < pars->Penvsustain)
+                -- pars->Penvsustain;
+            pars->Penvpoints = envpoints;
+        }
+        return 0xff | (envpoints << 8);
+    }
 
     if (insert == 4)
     {
-        // todo
-        return val;
+        if (!pars->Pfreemode || point >= envpoints)
+            return 0xffff;
+        if (write)
+        {
+            pars->Penvval[point] = val;
+            if (point == 0)
+                Xincrement = 0;
+            else
+                pars->Penvdt[point] = Xincrement;
+        }
+        else
+        {
+            val = pars->Penvval[point];
+            Xincrement = pars->Penvdt[point];
+        }
+        return val | (Xincrement << 8);
     }
+
     switch (getData->data.control)
     {
         case 0:
@@ -2758,7 +2811,6 @@ float InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars
                 val = pars->PR_val;
             break;
         case 7:
-        case 39:
             if (write)
                 pars->Penvstretch = val;
             else
@@ -2766,14 +2818,12 @@ float InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars
             break;
 
         case 16:
-        case 48:
             if (write)
                 pars->Pforcedrelease = (val != 0);
             else
                 val = pars->Pforcedrelease;
             break;
         case 17:
-        case 49:
             if (write)
                 pars->Plinearenvelope = (val != 0);
             else
@@ -2781,41 +2831,31 @@ float InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars
             break;
 
         case 24: // this is local to the source
-            //contstr = "Edit";
             break;
 
         case 32:
             if (write)
             {
                 if (val != 0)
-                {
                     pars->Pfreemode = 1;
-                    // more to do here
-                }
                 else
-                {
                     pars->Pfreemode = 0;
-                    // and here
-                }
             }
             else
                 val = pars->Pfreemode;
             //contstr = "Freemode";
             break;
-        case 33:
-            if (write && pars->Penvpoints < MAX_ENVELOPE_POINTS)
-            ; //contstr = "Add Point";
-            break;
         case 34:
-            if (write)
-            ;//contstr = "Del Point";
+            if (!pars->Pfreemode)
+                val = 0xff00;
+            else
+                val = envpoints << 8;
             break;
         case 35:
             if (write)
                 pars->Penvsustain = val;
             else
                 val = pars->Penvsustain;
-            //contstr = "Sust";
             break;
     }
     return val;

@@ -78,7 +78,7 @@ class InterChange : private MiscFuncs
         void commandFilter(CommandBlock *getData);
         float filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
         void commandEnvelope(CommandBlock *getData);
-        float envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
+        int envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);
 

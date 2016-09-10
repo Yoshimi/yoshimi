@@ -306,7 +306,6 @@ delete (freemodeeditwindow);} {}
         label {Add point}
         callback {int curpoint=freeedit->lastpoint;
 if (curpoint<0) return;
-//if (curpoint>=env->Penvpoints-1) return;
 if (env->Penvpoints>=MAX_ENVELOPE_POINTS) return;
 
 for (int i=env->Penvpoints;i>=curpoint+1;i--){
@@ -327,7 +326,7 @@ envfree->redraw();
 
 sustaincounter->value(env->Penvsustain);
 sustaincounter->maximum(env->Penvpoints-2);
-send_data(type, 33, o->value());}
+send_data(type, curpoint | 64, env->Penvval[curpoint], true, env->Penvdt[curpoint]);}
         xywh {115 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -354,7 +353,7 @@ envfree->redraw();
 
 sustaincounter->value(env->Penvsustain);
 sustaincounter->maximum(env->Penvpoints-2);
-send_data(type, 34, o->value());}
+send_data(type, curpoint, 0, true, env->Penvpoints - 1);}
         xywh {200 155 80 20} box THIN_UP_BOX labelsize 11
         code0 {if (env->Pfreemode==0) o->hide();}
       }
@@ -370,7 +369,7 @@ send_data(type, 32, o->value());}
       Fl_Check_Button forcedreleasecheck {
         label frcR
         callback {env->Pforcedrelease=(int)o->value();
-send_data(type, 48, o->value());}
+send_data(type, 16, o->value());}
         tooltip {Forced Release} xywh {410 165 40 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Pforcedrelease);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -378,7 +377,7 @@ send_data(type, 48, o->value());}
       Fl_Dial envstretchdial {
         label {Str.}
         callback {env->Penvstretch=(int)o->value();
-send_data(type, 39, o->value());}
+send_data(type, 7, o->value());}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -393,7 +392,7 @@ send_data(type, 39, o->value());}
       Fl_Check_Button linearenvelopecheck {
         label L
         callback {env->Plinearenvelope=(int)o->value();
-send_data(type, 49, o->value());}
+send_data(type, 17, o->value());}
         tooltip {Linear Envelope} xywh {410 151 30 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(env->Plinearenvelope);}
         code1 {if ((env->Pfreemode==0)||(env->Envmode>2)) o->hide();}
@@ -819,9 +818,12 @@ send_data(type, 24, o->value());}
       }
     }
   }
-  Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
+  Function {send_data(int type, int control, float value, bool isInteger = true, int par2 = 255)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 2, type);} {}
+int insert = 2;
+if (par2 != 255)
+  insert = 3;
+collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, insert, type, par2);} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int type_)} {} {
     code {//
