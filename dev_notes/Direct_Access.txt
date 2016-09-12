@@ -22,7 +22,7 @@ Subsynth Editor
 Effects
 LFOs
 Filters
-Envelopes (not free mode)
+Envelopes
 
 The remaining ones will display as if they had been written to, but won't
 actually change anything.
@@ -30,7 +30,7 @@ actually change anything.
 This matches the results from using the middle mouse button in the GUI
 (assuming it was enabled at build time). Commands that are purely within the
 GUI,e.g window changes are not implemented at all.
-Some such as part number changes are (currently) recognised but not acted on.
+Some, such as part number changes are (currently) recognised but not acted on.
 It is expected that any alternative input system will store its own copies of
 such intermediate information so that they remain fully independent.
 
@@ -49,7 +49,7 @@ value = the value that will be set, may be negative.
 
 type = a subset of the command type: 0 for read and 64 for write.
 
-control = the number representing the control being changed.
+control = the number representing the control being changed or queried.
 
 part = the number of the part being changed.
 

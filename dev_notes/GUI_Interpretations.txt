@@ -84,7 +84,8 @@ inserts
         Use engine number 0x88 To access the filter component of the
         DyneFilter effect
 2   envelope base
-4   envelope graph X/Y
+3   envelope freemode graph point add/delete
+4   envelope freemode graph X/Y
 
 5   oscillator (for add voice & pad harmonics)
 6   oscillator harmonic amplitude (for add voice & pad)
