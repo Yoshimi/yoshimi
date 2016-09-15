@@ -80,6 +80,7 @@ cpx=0;
 lastpoint=-1;
 synth = env->getSynthEngine();
 npart = npart_;
+kititem = kititem_;
 engine = engine_;
 type = type_;} {}
   }

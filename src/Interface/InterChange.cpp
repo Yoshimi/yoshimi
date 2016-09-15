@@ -1957,7 +1957,6 @@ void InterChange::commandResonance(CommandBlock *getData)
 
 void InterChange::commandLFO(CommandBlock *getData)
 {
-    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1977,13 +1976,13 @@ void InterChange::commandLFO(CommandBlock *getData)
        switch (insertParam)
         {
             case 0:
-                value = lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpLfo);
+                lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpLfo);
                 break;
             case 1:
-                value = lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqLfo);
+                lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqLfo);
                 break;
             case 2:
-                value = lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterLfo);
+                lfoReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterLfo);
                 break;
         }
     }
@@ -1993,13 +1992,13 @@ void InterChange::commandLFO(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                value = lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->AmpLfo);
                 break;
             case 1:
-                value = lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->FreqLfo);
                 break;
             case 2:
-                value = lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
+                lfoReadWrite(getData, part->kit[kititem].padpars->FilterLfo);
                 break;
         }
     }
@@ -2010,13 +2009,13 @@ void InterChange::commandLFO(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                value = lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpLfo);
+                lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpLfo);
                 break;
             case 1:
-                value = lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqLfo);
+                lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqLfo);
                 break;
             case 2:
-                value = lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterLfo);
+                lfoReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterLfo);
                 break;
         }
     }
@@ -2065,7 +2064,7 @@ void InterChange::commandLFO(CommandBlock *getData)
             contstr = "Stretch";
             break;
     }
-
+    float value = getData->data.value;
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
@@ -2076,7 +2075,7 @@ void InterChange::commandLFO(CommandBlock *getData)
 }
 
 
-float InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
+void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 {
     bool write = (getData->data.type & 0x40) > 0;
     float val = getData->data.value;
@@ -2138,13 +2137,13 @@ float InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
                 val = pars->Pstretch;
             break;
     }
-    return val;
+    if (!write)
+        getData->data.value = val;
 }
 
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
-    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2164,28 +2163,28 @@ void InterChange::commandFilter(CommandBlock *getData)
     if (engine == 0)
     {
         name = "  AddSynth";
-        value = filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter
+        filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScale
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScaleFunction);
     }
     else if (engine == 1)
     {
         name = "  SubSynth";
-        value = filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter
+        filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScale
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScaleFunction);
     }
     else if (engine == 2)
     {
         name = "  PadSynth";
-        value = filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
+        filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
                     , &part->kit[kititem].padpars->PFilterVelocityScale
                     , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
     else if (engine >= 0x80)
     {
         name = "  Adsynth Voice " + to_string(engine & 0x3f);
-        value = filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter
+        filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter
                     , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScale
                     , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScaleFunction);
     }
@@ -2276,6 +2275,8 @@ void InterChange::commandFilter(CommandBlock *getData)
         extra ="Vowel " + to_string(nvowel) +  "  Formant " + to_string(nformant) + "  ";
     else if (control == 37)
         extra = "Seq Pos " + to_string(nseqpos) + "  ";
+
+    float value = getData->data.value;
     if (type & 0x80)
         actual = to_string((int)round(value));
     else
@@ -2284,7 +2285,7 @@ void InterChange::commandFilter(CommandBlock *getData)
 }
 
 
-float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns)
+void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns)
 {
     bool write = (getData->data.type & 0x40) > 0;
     float val = getData->data.value;
@@ -2458,16 +2459,8 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, un
                 val = pars->Pnumformants;
             break;
         case 33: // this is local to the source
-            //if (write)
-            //    ;
-            //else
-            //    ;
             break;
         case 34: // this is local to the source
-            //if (write)
-            //    ;
-            //else
-            //    ;
             break;
         case 35:
             if (write)
@@ -2479,10 +2472,6 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, un
                 val = pars->Psequencesize;
             break;
         case 36: // this is local to the source
-            //if (write)
-            //    ;
-            //else
-            //    ;
             break;
         case 37:
             if (write)
@@ -2503,13 +2492,15 @@ float InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, un
                 val = pars->Psequencereversed;
             break;
     }
-    return val;
+    if (!write)
+        getData->data.value = val;
 }
 
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
     int value = (int)getData->data.value;
+    bool write = (getData->data.type & 0x40) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -2528,13 +2519,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.AmpEnvelope);
                 break;
             case 1:
-                value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FreqEnvelope);
                 break;
             case 2:
-                value = envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].adpars->GlobalPar.FilterEnvelope);
                 break;
         }
     }
@@ -2544,16 +2535,16 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                value = envelopeReadWrite(getData, part->kit[kititem].subpars->AmpEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].subpars->AmpEnvelope);
                 break;
             case 1:
-                value = envelopeReadWrite(getData, part->kit[kititem].subpars->FreqEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].subpars->FreqEnvelope);
                 break;
             case 2:
-                value = envelopeReadWrite(getData, part->kit[kititem].subpars->GlobalFilterEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].subpars->GlobalFilterEnvelope);
                 break;
             case 3:
-                value = envelopeReadWrite(getData, part->kit[kititem].subpars->BandWidthEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].subpars->BandWidthEnvelope);
                 break;
         }
     }
@@ -2563,13 +2554,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         switch (insertParam)
         {
             case 0:
-                value = envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->AmpEnvelope);
                 break;
             case 1:
-                value = envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->FreqEnvelope);
                 break;
             case 2:
-                value = envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
+                envelopeReadWrite(getData, part->kit[kititem].padpars->FilterEnvelope);
                 break;
         }
     }
@@ -2584,10 +2575,10 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             switch (insertParam)
             {
                 case 0:
-                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMAmpEnvelope);
+                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMAmpEnvelope);
                     break;
                 case 1:
-                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMFreqEnvelope);
+                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FMFreqEnvelope);
                     break;
             }
         }
@@ -2596,13 +2587,13 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             switch (insertParam)
             {
                 case 0:
-                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpEnvelope);
+                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].AmpEnvelope);
                     break;
                 case 1:
-                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqEnvelope);
+                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FreqEnvelope);
                     break;
                 case 2:
-                    value = envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterEnvelope);
+                    envelopeReadWrite(getData, part->kit[kititem].adpars->VoicePar[nvoice].FilterEnvelope);
                     break;
             }
         }
@@ -2625,21 +2616,28 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             break;
     }
 
+    value = getData->data.value;
+    int par2 = getData->data.par2;
     if (insert == 3)
     {
+        if (!write)
+        {
+            synth->getRuntime().Log("Freemode add/remove is write only. Current points " + to_string(par2));
+            return;
+        }
         string action;
         if (control >= 0x40)
-            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + "  X increment " + to_string(value >> 8) +
-        "  Y value " + to_string(value & 0xff));
+            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + "  X increment " + to_string(par2) +
+        "  Y value " + to_string(value));
         else
-            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + "  Remaining 0-" + to_string(value >> 8));
+            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + "  Remaining " + to_string(par2));
         return;
     }
 
     if (insert == 4)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(value >> 8) +
-        "  Y value " + to_string(value & 0xff));
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(par2) +
+        "  Y value " + to_string(value));
         return;
     }
 
@@ -2687,7 +2685,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             break;
         case 34:
             contstr = "Points";
-            value = (value >> 8);
+            value = par2;//(value >> 8);
             break;
         case 35:
             contstr = "Sust";
@@ -2698,10 +2696,10 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 }
 
 
-int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
+void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
-    bool write = (getData->data.type & 0x40) > 0;
     int val = (int) getData->data.value; // these are all integers or bool
+    bool write = (getData->data.type & 0x40) > 0;
     bool isGui = getData->data.type & 0x20;
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
@@ -2718,16 +2716,25 @@ int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
     if (insert == 3) // here be dragons :(
     {
         if (!pars->Pfreemode)
-            return 0xffff;
+        {
+            getData->data.value = 0xff;
+            getData->data.par2 = 0xff;
+            return;
+        }
 
         // isGui is a temporary test till actual Gui writing enabled
         if (isGui)
         {
-            return val | (Xincrement << 8);
+            write = false;
+            //return;
         }
 
         if (!write || point == 0 || point >= envpoints)
-            return 0xff | (envpoints << 8);
+        {
+            getData->data.value = 0xff;
+            getData->data.par2 = envpoints;
+            return;
+        }
 
         if (isAddpoint && envpoints < MAX_ENVELOPE_POINTS)
         {
@@ -2741,9 +2748,15 @@ int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 ++ pars->Penvsustain;
             pars->Penvdt[point] = Xincrement;
             pars->Penvval[point] = val;
-            return val | (Xincrement << 8);
+            getData->data.value = val;
+            getData->data.par2 = Xincrement;
+            return;
         }
-        else if (envpoints >= 3)
+        else if (envpoints < 4)
+        {
+            getData->data.par2 = 0xff;
+        }
+        else
         {
             envpoints -= 1;
             for (int i = point; i < envpoints; ++ i)
@@ -2754,14 +2767,21 @@ int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             if (point < pars->Penvsustain)
                 -- pars->Penvsustain;
             pars->Penvpoints = envpoints;
+            getData->data.par2 = envpoints;
         }
-        return 0xff | (envpoints << 8);
+        getData->data.value = 0xff;
+
+        return;
     }
 
     if (insert == 4)
     {
         if (!pars->Pfreemode || point >= envpoints)
-            return 0xffff;
+        {
+            getData->data.value = 0xff;
+            getData->data.par2 = 0xff;
+            return;
+        }
         if (write)
         {
             pars->Penvval[point] = val;
@@ -2775,7 +2795,9 @@ int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             val = pars->Penvval[point];
             Xincrement = pars->Penvdt[point];
         }
-        return val | (Xincrement << 8);
+        getData->data.value = val;
+        getData->data.par2 = Xincrement;
+        return;
     }
 
     switch (getData->data.control)
@@ -2859,9 +2881,13 @@ int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             break;
         case 34:
             if (!pars->Pfreemode)
-                val = 0xff00;
+            {
+                val = 0xff;
+                Xincrement = 0xff;
+            }
             else
-                val = envpoints << 8;
+                Xincrement = envpoints;
+                //val = envpoints << 8;
             break;
         case 35:
             if (write)
@@ -2870,7 +2896,9 @@ int InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
                 val = pars->Penvsustain;
             break;
     }
-    return val;
+    getData->data.value = val;
+    getData->data.par2 = Xincrement;
+    return;
 }
 
 
@@ -2981,8 +3009,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (kititem == 8 && getData->data.insert < 0xff)
     {
-        value = filterReadWrite(getData, eff->filterpars,NULL,NULL);
-
+        filterReadWrite(getData, eff->filterpars,NULL,NULL);
         if (npart == 0xf1)
             name = "System";
         else if (npart == 0xf2)
@@ -2990,6 +3017,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         else name = "Part " + to_string(npart);
         name += " Effect " + to_string(effnum);
 
+        if (!write)
+            value = getData->data.value;
         if (type & 0x80)
             actual = to_string((int)round(value));
         else
@@ -3048,7 +3077,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         else
             value = eff->geteffectpar(control);
     }
-
+    if (write)
+        getData->data.value = value;
     if (type & 0x80)
         actual = to_string((int)round(value));
     else

@@ -1,8 +1,10 @@
 yoshimi 1.4.1 M
 
 2016-9-15 Will
-* Bugfix: directs access wasn't updating SubSynth overtones.
+* Bugfix: direct access wasn't updating SubSynth overtones.
 * Replaced HTML version of control numbers with text version.
+* Bugfix: GUI wasn't sending kit number on envelope freemode.
+* Optimised some direct access code.
 
 2016-9-11 Will
 * Further updates to docs
