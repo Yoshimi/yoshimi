@@ -1,5 +1,9 @@
 yoshimi 1.4.1 M
 
+2016-9-15 Will
+* Bugfix: directs access wasn't updating SubSynth overtones.
+* Replaced HTML version of control numbers with text version.
+
 2016-9-11 Will
 * Further updates to docs
 * New HTML copy of "Yoshimi Control Numbers".

@@ -1439,28 +1439,40 @@ void InterChange::commandSub(CommandBlock *getData)
         case 48:
             contstr = "Par 1";
             if (write)
+            {
                 pars->POvertoneSpread.par1 = value;
+                pars->updateFrequencyMultipliers();
+            }
             else
                 value = pars->POvertoneSpread.par1;
             break;
         case 49:
             contstr = "Par 2";
             if (write)
+            {
                 pars->POvertoneSpread.par2 = value;
+                pars->updateFrequencyMultipliers();
+            }
             else
                 value = pars->POvertoneSpread.par2;
             break;
         case 50:
             contstr = "Force H";
             if (write)
+            {
                 pars->POvertoneSpread.par3 = value;
+                pars->updateFrequencyMultipliers();
+            }
             else
                 value = pars->POvertoneSpread.par3;
             break;
         case 51:
             contstr = "Position";
             if (write)
+            {
                 pars->POvertoneSpread.type =  (int)value;
+                pars->updateFrequencyMultipliers();
+            }
             else
                 value = pars->POvertoneSpread.type;
             break;
