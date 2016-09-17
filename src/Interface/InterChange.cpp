@@ -34,6 +34,7 @@ using namespace std;
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
 #include "Effects/EffectMgr.h"
+#include "Synth/Resonance.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
@@ -81,6 +82,16 @@ void InterChange::mediate()
 }
 
 
+void InterChange::setpadparams(int point)
+{
+    int npart = point & 0xff;
+    int kititem = point >> 8;
+    synth->partonoffLock(npart, 0);
+    synth->part[npart]->kit[kititem].padpars->applyparameters(true);
+    synth->partonoffLock(npart, 1);
+}
+
+
 void InterChange::commandSend(CommandBlock *getData)
 {
     float value = getData->data.value;
@@ -121,18 +132,35 @@ void InterChange::commandSend(CommandBlock *getData)
         return;
     }
     if (npart == 0xc0)
+    {
         commandVector(getData);
-    else if (npart == 0xf0)
+        return;
+    }
+    if (npart == 0xf0)
+    {
         commandMain(getData);
-    else if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
+        return;
+    }
+    if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
+    {
         commandSysIns(getData);
-    else if (kititem == 0xff || (kititem & 0x20))
+        return;
+    }
+    if (kititem == 0xff || (kititem & 0x20))
+    {
         commandPart(getData);
-    else if (kititem >= 0x80)
+        return;
+    }
+    if (kititem >= 0x80)
     {
         commandEffects(getData);
+        return;
     }
-    else if (engine == 2)
+
+    Part *part;
+    part = synth->part[npart];
+
+    if (engine == 2)
     {
         switch(insert)
         {
@@ -157,11 +185,13 @@ void InterChange::commandSend(CommandBlock *getData)
                 break;
             case 8:
             case 9:
-                commandResonance(getData);
+                commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
+        return;
     }
-    else if (engine == 1)
+
+    if (engine == 1)
     {
         switch (insert)
         {
@@ -179,8 +209,10 @@ void InterChange::commandSend(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
         }
+        return;
     }
-    else if (engine >= 0x80)
+
+    if (engine >= 0x80)
     {
         switch (insert)
         {
@@ -204,8 +236,10 @@ void InterChange::commandSend(CommandBlock *getData)
                 commandOscillator(getData);
                 break;
         }
+        return;
     }
-    else if (engine == 0)
+
+    if (engine == 0)
     {
         switch (insert)
         {
@@ -225,7 +259,7 @@ void InterChange::commandSend(CommandBlock *getData)
                 break;
             case 8:
             case 9:
-                commandResonance(getData);
+                commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
                 break;
         }
     }
@@ -1865,7 +1899,9 @@ void InterChange::commandPad(CommandBlock *getData)
         case 104:
             contstr = "Apply Changes";
             if (write)
-                pars->applyparameters(false);
+            {
+                GuiThreadMsg::sendMessage(synth,GuiThreadMsg::ApplyPadParams,  npart | (kititem << 8));
+            }
             break;
 
         case 112:
@@ -2100,7 +2136,7 @@ void InterChange::commandOscillator(CommandBlock *getData)
 }
 
 
-void InterChange::commandResonance(CommandBlock *getData)
+void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
@@ -2109,22 +2145,31 @@ void InterChange::commandResonance(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    bool write = (type & 0x40) > 0;
 
     string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
+    if (write)
+        respar->setpoint(control, (int) value);
     else
-        actual = to_string(value);
+        value = respar->Prespoints[control];
 
     string name;
+    string isPad = "";
     if (engine == 0)
         name = "  AddSynth";
     else
+    {
         name = "  PadSynth";
+        isPad = " - Need to Apply";
+    }
 
     if (insert == 9)
     {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + actual);
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + actual + isPad);
         return;
     }
 
@@ -2133,42 +2178,76 @@ void InterChange::commandResonance(CommandBlock *getData)
     {
         case 0:
             contstr = "Max dB";
+            if (write)
+                respar->PmaxdB = (int) value;
+            else
+                value = respar->PmaxdB;
             break;
         case 1:
             contstr = "Centre Freq";
+            if (write)
+                respar->Pcenterfreq = (int) value;
+            else
+                value = respar->Pcenterfreq;
             break;
         case 2:
             contstr = "Octaves";
+            if (write)
+                respar->Poctavesfreq = (int) value;
+            else
+                value = respar->Poctavesfreq;
             break;
 
         case 8:
             contstr = "Enable";
+            if (write)
+                respar->Penabled = (value != 0);
+            else
+                value = respar->Penabled;
             break;
 
         case 10:
             contstr = "Random";
+            if (write)
+                respar->randomize( (int) value);
             break;
 
         case 20:
             contstr = "Interpolate Peaks";
+            if (write)
+                respar->interpolatepeaks((value != 0));
             break;
         case 21:
             contstr = "Protect Fundamental";
+            if (write)
+                respar->Pprotectthefundamental = (value != 0);
+            else
+                value = respar->Pprotectthefundamental;
             break;
 
         case 96:
             contstr = "Clear";
+            if (write)
+                for (int i = 0; i < MAX_RESONANCE_POINTS; ++ i)
+                    respar->setpoint(i, 64);
             break;
         case 97:
             contstr = "Smooth";
+            if (write)
+                respar->smooth();
             break;
 
         case 104:
             contstr = "Apply Changes";
+            if (write && engine == 2)
+                GuiThreadMsg::sendMessage(synth,GuiThreadMsg::ApplyPadParams,  npart | (kititem << 8));
             break;
     }
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + actual);
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + actual + isPad);
 }
 
 

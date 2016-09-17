@@ -225,6 +225,7 @@ public:
         RescanForBanks,
         RefreshCurBank,
         GuiAlert,
+        ApplyPadParams,
         RegisterAudioPort,
         NewSynthEngine,
         UNDEFINED = 9999

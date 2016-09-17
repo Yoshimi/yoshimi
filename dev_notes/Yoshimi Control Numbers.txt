@@ -313,17 +313,17 @@ n : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 :  : 6 : 255 : 255 : Point (control)
 n : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 :  : 7 : 255 : 255 : Point (control) phase
 
 Resonance window
-n : 1 to 90 : 0 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Max dB
-n : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Centre frequency
-n : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Octave
-n : any : 8 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Enable resonance
-n : 0 to 2 : 10 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Randomisation type (all three buttons)
-n : 0/1 : 20 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Interpolate peaks (both buttons)
-n : 0/1 : 21 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Protect fundamental
-n : any : 96 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Clear graph
-n : any : 97 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Smooth graph
+Y : 1 to 90 : 0 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Max dB
+Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Centre frequency
+Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Octave
+Y : any : 8 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Enable resonance
+Y : 0 to 2 : 10 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Randomisation type (all three buttons)
+Y : 0/1 : 20 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Interpolate peaks (both buttons)
+Y : 0/1 : 21 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Protect fundamental
+Y : any : 96 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Clear graph
+Y : any : 97 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Smooth graph
 Graph Insert
-n : 0 to 127 : 0 to 255 : 0 to 63 : 0 to 15 : 0 or 2 : 9 : 255 : 255 : Point (control) amplitude
+Y : 0 to 127 : 0 to 255 : 0 to 63 : 0 to 15 : 0 or 2 : 9 : 255 : 255 : Point (control) amplitude
 
 LFO insert
  :  :  :  :  : See Note > :  :  :  : Engine is 0 for AddSynth main

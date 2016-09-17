@@ -1206,6 +1206,13 @@ void GuiThreadMsg::processGuiMessages()
              delete msg;
              return;
         }
+        if (msg->type == ApplyPadParams)
+        {
+            // Well, not completely unique :)
+            synth->interchange.setpadparams(msg->index);
+            delete msg;
+            return;
+        }
         MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
         if (msg->type == GuiThreadMsg::NewSynthEngine)
         {

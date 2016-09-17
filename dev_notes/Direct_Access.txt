@@ -19,6 +19,8 @@ Main part controls
 Controllers
 Kit edit window
 Subsynth Editor
+Padsynth Editor
+Resonance
 Effects
 LFOs
 Filters

@@ -2,8 +2,9 @@ yoshimi 1.4.1 M
 
 2016-9-17 Will
 * CLI now strips trailing spaces.
-* Implemented PadSynth direc access base controls.
+* Implemented PadSynth direct access base controls.
 * Updated docs.
+* Implemented Resonance direct access.
 
 2016-9-15 Will
 * Bugfix: direct access wasn't updating SubSynth overtones.

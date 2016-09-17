@@ -30,6 +30,7 @@ using namespace std;
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
+#include "Synth/Resonance.h"
 
 class SynthEngine;
 
@@ -61,6 +62,7 @@ class InterChange : private MiscFuncs
         void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff, unsigned char insertPar2 = 0xff);
 
         void mediate();
+        void setpadparams(int point);
         void commandSend(CommandBlock *getData);
 
     private:
@@ -72,7 +74,7 @@ class InterChange : private MiscFuncs
         void commandSub(CommandBlock *getData);
         void commandPad(CommandBlock *getData);
         void commandOscillator(CommandBlock *getData);
-        void commandResonance(CommandBlock *getData);
+        void commandResonance(CommandBlock *getData, Resonance *respar);
         void commandLFO(CommandBlock *getData);
         void lfoReadWrite(CommandBlock *getData, LFOParams *pars);
         void commandFilter(CommandBlock *getData);
