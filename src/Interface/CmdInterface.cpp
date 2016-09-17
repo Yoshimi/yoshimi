@@ -1648,8 +1648,16 @@ bool CmdInterface::cmdIfaceProcessCommand()
     int ID;
     int reply = todo_msg;
     int tmp;
+
     point = cCmd;
     point = skipSpace(point); // just to be sure
+    tmp = strlen(cCmd) - 1;
+    while (point[tmp] < '!' && tmp > 0)
+    {
+        point[tmp] = 0; // also trailing spaces
+        -- tmp;
+    }
+
     list<string> msg;
 
     if (matchnMove(2, point, "exit"))

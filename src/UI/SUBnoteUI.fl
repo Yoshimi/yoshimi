@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
-}
+} 
 
 comment {SubNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,39 +27,39 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified September 2014
+This file is derivative of ZynAddSubFX original code, modified September 2016
 } {in_source in_header
-}
+} 
 
 decl {\#include "UI/MiscGui.h"} {public local
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include "EnvelopeUI.h"} {public local
-}
+} 
 
 decl {\#include "FilterUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthHelper.h"} {public local
-}
+} 
 
 decl {\#include "Params/SUBnoteParameters.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class SUBnoteharmonic {: {public Fl_Group}
 } {
@@ -164,14 +164,14 @@ hide();
   }
   decl {int kititem;} {private local
   }
-}
+} 
 
 class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {591 431 735 475} type Double hide
+      xywh {610 511 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
@@ -364,7 +364,7 @@ send_data (82, o->value());}
         o->value(0);
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
-    send_data (32, o->value() + 8192);}
+    send_data (32, o->value());}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
           class mwheel_slider_rev
@@ -710,4 +710,4 @@ make_window();} {}
   }
   decl {int kititem;} {private local
   }
-}
+} 

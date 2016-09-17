@@ -1541,32 +1541,56 @@ void InterChange::commandPad(CommandBlock *getData)
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
+    bool write = (type & 0x40) > 0;
+    Part *part;
+    part = synth->part[npart];
+    PADnoteParameters *pars;
+    pars = part->kit[kititem].padpars;
 
     string name = "";
     switch (control & 0x70)
     {
         case 0:
             name = " Amplitude ";
+            if (write)
+                ;
+            else
+                ;
             break;
         case 16:
             name = " Bandwidth ";
+            if (write)
+                ;
+            else
+                ;
             break;
         case 32:
             name = " Frequency ";
+            if (write)
+                ;
+            else
+                ;
             break;
         case 48:
             name = " Overtones ";
+            if (write)
+                ;
+            else
+                ;
             break;
         case 64:
             name = " Harmonic Base ";
+            if (write)
+                ;
+            else
+                ;
             break;
         case 80:
             name = " Harmonic Samples ";
+            if (write)
+                ;
+            else
+                ;
             break;
     }
 
@@ -1575,134 +1599,327 @@ void InterChange::commandPad(CommandBlock *getData)
     {
         case 0:
             contstr = "Volume";
+            if (write)
+                pars->PVolume = value;
+            else
+                value = pars->PVolume;
             break;
         case 1:
             contstr = "Vel Sens";
+            if (write)
+                pars->PAmpVelocityScaleFunction = value;
+            else
+                value = pars->PAmpVelocityScaleFunction;
             break;
         case 2:
             contstr = "Panning";
+            if (write)
+                pars->setPan(value);
+            else
+                value = pars->PPanning;
             break;
 
         case 16:
             contstr = "Bandwidth";
+            if (write)
+                pars->setPbandwidth((int) value);
+            else
+                value = pars->Pbandwidth;
             break;
         case 17:
             contstr = "Band Scale";
+            if (write)
+                pars->Pbwscale = (int) value;
+            else
+                value = pars->Pbwscale;
             break;
         case 19:
             contstr = "Spect Mode";
+            if (write)
+                pars->Pmode = (int) value;
+            else
+                value = pars->Pmode;
             break;
 
         case 32:
             contstr = "Detune";
+            if (write)
+                pars->PDetune = (int) value + 8192;
+            else
+                value = pars->PDetune - 8192;
             break;
         case 33:
             contstr = "Eq T";
+            if (write)
+                pars->PfixedfreqET = (int) value;
+            else
+                value = pars->PfixedfreqET;
             break;
         case 34:
             contstr = "440Hz";
+            if (write)
+                pars->Pfixedfreq = (value != 0);
+            else
+                value = pars->Pfixedfreq;
             break;
         case 35:
             contstr = "Octave";
+            if (write)
+            {
+                int tmp = value;
+                if (tmp < 0)
+                    tmp += 16;
+                pars->PCoarseDetune = tmp * 1024 + pars->PCoarseDetune % 1024;
+            }
+            else
+            {
+                int tmp = pars->PCoarseDetune / 1024;
+                if (tmp >= 8)
+                    tmp -= 16;
+                value = tmp;
+            }
             break;
         case 36:
             contstr = "Det type";
+            if (write)
+                 pars->PDetuneType = (int) value + 1;
+            else
+                value =  pars->PDetuneType - 1;
             break;
         case 37:
             contstr = "Coarse Det";
+            if (write)
+            {
+                int tmp = value;
+                if (tmp < 0)
+                    tmp += 1024;
+                 pars->PCoarseDetune = tmp + (pars->PCoarseDetune / 1024) * 1024;
+            }
+            else
+            {
+                int tmp = pars->PCoarseDetune % 1024;
+                if (tmp >= 512)
+                    tmp -= 1024;
+                value = tmp;
+            }
             break;
+
         case 38:
-            contstr = "Env Ena";
+            contstr = "Bend Adj";
+            if (write)
+                pars->PBendAdjust = lrint(value);
+            else
+                value = pars->PBendAdjust;
+            break;
+        case 39:
+            contstr = "Offset Hz";
+            if (write)
+                pars->POffsetHz = lrint(value);
+            else
+                value = pars->POffsetHz;
             break;
 
         case 48:
-            contstr = "Par 1";
+            contstr = "Overt Par 1";
+            if (write)
+                pars->Phrpos.par1 = (int) value;
+            else
+                value = pars->Phrpos.par1;
             break;
         case 49:
-            contstr = "Par 2";
+            contstr = "Overt Par 2";
+            if (write)
+                pars->Phrpos.par2 = (int) value;
+            else
+                value = pars->Phrpos.par2;
             break;
         case 50:
             contstr = "Force H";
+            if (write)
+                pars->Phrpos.par3 = (int) value;
+            else
+                value = pars->Phrpos.par3;
             break;
         case 51:
             contstr = "Position";
+            if (write)
+                pars->Phrpos.type = (int) value;
+            else
+                value = pars->Phrpos.type;
             break;
 
         case 64:
             contstr = "Width";
+            if (write)
+                pars->Php.base.par1 = (int) value;
+            else
+                value = pars->Php.base.par1;
             break;
         case 65:
             contstr = "Freq Mult";
+            if (write)
+                pars->Php.freqmult = (int) value;
+            else
+                value = pars->Php.freqmult;
             break;
         case 66:
             contstr = "Str";
+            if (write)
+                pars->Php.modulator.par1 = (int) value;
+            else
+                value = pars->Php.modulator.par1;
             break;
         case 67:
             contstr = "S freq";
+            if (write)
+                pars->Php.modulator.freq = (int) value;
+            else
+                value = pars->Php.modulator.freq;
             break;
         case 68:
             contstr = "Size";
+            if (write)
+                pars->Php.width = (int) value;
+            else
+                value = pars->Php.width;
             break;
         case 69:
             contstr = "Type";
+            if (write)
+                pars->Php.base.type = value;
+            else
+                value = pars->Php.base.type;
             break;
         case 70:
             contstr = "Halves";
+            if (write)
+                 pars->Php.onehalf = value;
+            else
+                value = pars->Php.onehalf;
             break;
         case 71:
-            contstr = "Par 1";
+            contstr = "Amp Par 1";
+            if (write)
+                pars->Php.amp.par1 = (int) value;
+            else
+                value = pars->Php.amp.par1;
             break;
         case 72:
-            contstr = "Par 2";
+            contstr = "Amp Par 2";
+            if (write)
+                pars->Php.amp.par2 = (int) value;
+            else
+                value = pars->Php.amp.par2;
             break;
         case 73:
             contstr = "Amp Mult";
+            if (write)
+                pars->Php.amp.type = value;
+            else
+                value = pars->Php.amp.type;
             break;
         case 74:
             contstr = "Amp Mode";
+            if (write)
+                pars->Php.amp.mode = value;
+            else
+                value = pars->Php.amp.mode;
             break;
         case 75:
             contstr = "Autoscale";
+            if (write)
+                pars->Php.autoscale = (value != 0);
+            else
+                value = pars->Php.autoscale;
             break;
 
         case 80:
             contstr = "Base";
+            if (write)
+                pars->Pquality.basenote = (int) value;
+            else
+                value = pars->Pquality.basenote;
             break;
         case 81:
             contstr = "samp/Oct";
+            if (write)
+                pars->Pquality.smpoct = (int) value;
+            else
+                value = pars->Pquality.smpoct;
             break;
         case 82:
             contstr = "Num Oct";
+            if (write)
+                pars->Pquality.oct = (int) value;
+            else
+                value = pars->Pquality.oct;
             break;
         case 83:
-            contstr = "Size";
+            contstr = "Samp Size";
+            if (write)
+                pars->Pquality.samplesize = (int) value;
+            else
+                value = pars->Pquality.samplesize;
             break;
 
         case 104:
             contstr = "Apply Changes";
+            if (write)
+                pars->applyparameters(false);
             break;
 
         case 112:
             contstr = "Stereo";
+            if (write)
+                pars->PStereo = (value != 0);
+            else
+                ;
             break;
 
         case 120:
             contstr = "De Pop";
+            if (write)
+                pars->Fadein_adjustment = (int) value;
+            else
+                value = pars->Fadein_adjustment;
             break;
         case 121:
             contstr = "Punch Strngth";
+            if (write)
+                pars->PPunchStrength = (int) value;
+            else
+                value = pars->PPunchStrength;
             break;
         case 122:
             contstr = "Punch Time";
+            if (write)
+                pars->PPunchTime = (int) value;
+            else
+                value = pars->PPunchTime;
             break;
         case 123:
             contstr = "Punch Strtch";
+            if (write)
+                pars->PPunchStretch = (int) value;
+            else
+                value = pars->PPunchStretch;
             break;
         case 124:
             contstr = "Punch Vel";
+            if (write)
+                pars->PPunchVelocitySensing = (int) value;
+            else
+                value = pars->PPunchVelocitySensing;
             break;
     }
 
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+    if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
+        actual += " - Need to Apply";
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  PadSynth " + name + contstr + " value " + actual);
 }
 

@@ -112,7 +112,7 @@ n : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Volume
 n : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Velocity sensitivity
 n : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Panning
 
-n : 0 to 16363 : 32 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Detune frequency
+n : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Detune frequency
 n : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Octave
 n : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
 n : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Coarse detune
@@ -187,7 +187,7 @@ Y : 0 to 127 : 16 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bandwidth
 Y : 0 to 127 : 17 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bandwidth scale
 Y : 0/1 : 18 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable bandwidth envelope
 
-Y : 0 to 16383 : 32 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune frequency
+Y : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune frequency
 Y : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Equal temper variation
 Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Set voice base frequency to 440Hz
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Octave
@@ -213,55 +213,55 @@ Y : 0 to 127 : 0 to 63 : 0 to 63 : 0 to 15 : 1 : 6 : 255 : 255 : Point (control)
 Y : 0 to 127 : 0 to 63 : 0 to 63 : 0 to 15 : 1 : 7 : 255 : 255 : Point (control) bandwidth
 
 PadSynth Window
-n : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Volume
-n : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Velocity sensitivity
-n : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Panning
+Y : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Volume
+Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Velocity sensitivity
+Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Panning
 
-n : 0 to 1000 : 16 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth
-n : 0 to 6 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
+Y : 0 to 1000 : 16 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth
+Y : 0 to 6 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
 
-n : 0 to 2 : 19 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Spectrum mode – Bandwidth, Discrete, Continuous
+Y : 0 to 2 : 19 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Spectrum mode – Bandwidth, Discrete, Continuous
 
-n : 0 to 16383 : 32 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune frequency
-n : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Equal temper variation
-n : 0/1 : 34 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Set voice base frequency to 440Hz
-n : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Octave
-n : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
-n : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Coarse detune
-n : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bend Adjust
-n : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Offset Hz
+Y : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune frequency
+Y : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Equal temper variation
+Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Set voice base frequency to 440Hz
+Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Octave
+Y : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
+Y : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Coarse detune
+Y : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bend Adjust
+Y : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Offset Hz
 
-n : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 1
-n : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 2
-n : 0 to 255 : 50 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 3
-n : 0 to 6 : 51 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone position – Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power
+Y : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 1
+Y : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 2
+Y : 0 to 255 : 50 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 3
+Y : 0 to 6 : 51 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone position – Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power
 
-n : 0 to 127 : 64 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Base width
-n : 0 to 127 : 65 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Frequency multiplier
-n : 0 to 127 : 66 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Modulator stretch
-n : 0 to 127 : 67 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Modulator frequency
-n : 0 to 127 : 68 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Size
-n : 0 to 2 : 69 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Base type – Gauss, Square, Double Exp
-n : 0 to 2 : 70 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Harmonic sidebands - Full, Upper half, Lower half
-n : 0 to 127 : 71 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp. mode parameter 1 (spectral width)
-n : 0 to 127 : 72 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp. Mode parameter 2 (spectral amplitude)
-n : 0 to 3 : 73 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp multiplier – Off, Gauss, Sine, Flat
-n : 0 to 3 : 74 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp mode – Sum, Multiply, Divide 1, Divide 2
-n : 0/1 : 75 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Autoscale
+Y : 0 to 127 : 64 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Base width
+Y : 0 to 127 : 65 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Frequency multiplier
+Y : 0 to 127 : 66 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Modulator stretch
+Y : 0 to 127 : 67 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Modulator frequency
+Y : 0 to 127 : 68 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Size
+Y : 0 to 2 : 69 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Base type – Gauss, Square, Double Exp
+Y : 0 to 2 : 70 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Harmonic sidebands - Full, Upper half, Lower half
+Y : 0 to 127 : 71 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp. mode parameter 1 (spectral width)
+Y : 0 to 127 : 72 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp. Mode parameter 2 (spectral amplitude)
+Y : 0 to 3 : 73 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp multiplier – Off, Gauss, Sine, Flat
+Y : 0 to 3 : 74 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp mode – Sum, Multiply, Divide 1, Divide 2
+Y : 0/1 : 75 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Autoscale
 
-n : 0 to 8 : 80 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Harmonic base – C-2, G-2, C-3, G-3, C-4, G-4, C-5, G-5, G-6
+Y : 0 to 8 : 80 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Harmonic base – C-2, G-2, C-3, G-3, C-4, G-4, C-5, G-5, G-6
 
-n : 0 to 6 : 81 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Samples per octave – 0.5, 1, 2, 3, 4, 6, 12
-n : 0 to 7 : 82 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Number of octaves – 1, 2, 3, 4, 5, 6, 7, 8
-n : 0 to 6 : 83 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Sample size – 16k, 32k, 64k, 128k, 256k, 512k, 1M
-n : any : 104 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Apply changes
-n : 0/1 : 112 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Stereo
+Y : 0 to 6 : 81 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Samples per octave – 0.5, 1, 2, 3, 4, 6, 12
+Y : 0 to 7 : 82 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Number of octaves – 1, 2, 3, 4, 5, 6, 7, 8
+Y : 0 to 6 : 83 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Sample size – 16k, 32k, 64k, 128k, 256k, 512k, 1M
+Y : any : 104 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Apply changes
+Y : 0/1 : 112 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Stereo
 
-n : 0 to 127 : 120 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : De Pop
-n : 0 to 127 : 121 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch strength
-n : 0 to 127 : 122 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch duration
-n : 0 to 127 : 123 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch Stretch
-n : 0 to 127 : 124 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch velocity sensing
+Y : 0 to 127 : 120 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : De Pop
+Y : 0 to 127 : 121 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch strength
+Y : 0 to 127 : 122 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch duration
+Y : 0 to 127 : 123 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch Stretch
+Y : 0 to 127 : 124 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Punch velocity sensing
 
 Oscillators window
  :  :  :  :  : See Note > :  :  :  : Engine is 128 + (0 to 7) for AddSynth voice

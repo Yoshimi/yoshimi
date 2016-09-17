@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-}
+} 
 
 comment {PADNoteUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,9 +27,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified April 2011
+This file is derivative of ZynAddSubFX original code, modified September 2016
 } {in_source in_header
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -43,15 +43,15 @@ decl {\#include <FL/Fl_Box.H>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
@@ -131,7 +131,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
   decl {PADnoteParameters *pars;} {public local
   }
-}
+} 
 
 class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
 } {
@@ -233,7 +233,7 @@ this->pars=pars;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
@@ -905,7 +905,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         o->value(0);
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
-    send_data(32, o->value() + 8192);}
+    send_data(32, o->value());}
               tooltip {Fine Detune (cents)} xywh {57 305 388 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
               class mwheel_slider_rev
@@ -1292,4 +1292,4 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
   }
   decl {int kititem;} {private local
   }
-}
+} 
