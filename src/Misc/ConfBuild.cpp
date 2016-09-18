@@ -3,4 +3,4 @@
 
 */
 
-#define BUILD_NUMBER 823
+#define BUILD_NUMBER 824
