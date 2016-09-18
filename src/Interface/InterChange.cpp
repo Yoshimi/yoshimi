@@ -563,7 +563,6 @@ void InterChange::commandPart(CommandBlock *getData)
                         else
                             value = part->kit[0].Ppadenabled;
                         break;
-                        break;
                     default:
                         if (write)
                             synth->partonoffLock(npart, (char) value);
@@ -695,7 +694,6 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Pkeyshift = (char) value + 64;
             else
                 value = part->Pkeyshift - 64;
-            break;
             break;
 
         case 40:
@@ -1942,7 +1940,7 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
-    float value = getData->data.value;
+    int value = (int) getData->data.value; // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1951,13 +1949,17 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
-    string actual;
+    string isPad = "";
     string eng_name;
     if (engine == 2)
+    {
         eng_name = "  Padsysnth";
+        if (control != 104)
+            isPad = " - Need to Apply";
+    }
     else
     {
-        eng_name = "  Addsynth Voice " + to_string( engine & 0x3f);
+        eng_name = "  Addsynth Voice " + to_string(engine & 0x3f);
         if (engine & 0x40)
             eng_name += " Modulator";
     }
@@ -1966,28 +1968,28 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     {
         if (write)
         {
-            oscil->Phmag[control] = (int) value;
-            if ((int) value == 64)
+            oscil->Phmag[control] = value;
+            if (value == 64)
                 oscil->Phphase[control] = 64;
             oscil->prepare();
         }
         else
             value = oscil->Phmag[control];
 
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + to_string((int) value));
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + to_string(value) + isPad);
         return;
     }
     else if(insert == 7)
     {
         if (write)
         {
-            oscil->Phphase[control] = (int) value;
+            oscil->Phphase[control] = value;
             oscil->prepare();
         }
         else
             value = oscil->Phphase[control];
 
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Phase value " + to_string((int) value));
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Phase value " + to_string(value) + isPad);
         return;
     }
 
@@ -2014,28 +2016,28 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 0:
             contstr = " Random";
             if (write)
-                oscil->Prand = (int) value + 64;
+                oscil->Prand = value + 64;
             else
                 value = oscil->Prand - 64;
             break;
         case 1:
             contstr = " Mag Type";
             if (write)
-                oscil->Phmagtype = (int) value;
+                oscil->Phmagtype = value;
             else
                 value = oscil->Phmagtype;
             break;
         case 2:
             contstr = " Harm Rnd";
             if (write)
-                oscil->Pamprandpower = (int) value;
+                oscil->Pamprandpower = value;
             else
                 value = oscil->Pamprandpower;
             break;
         case 3:
             contstr = " Harm Rnd Type";
             if (write)
-                oscil->Pamprandtype = (int) value;
+                oscil->Pamprandtype = value;
             else
                 value = oscil->Pamprandtype;
             break;
@@ -2043,72 +2045,77 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 16:
             contstr = " Par";
             if (write)
-                oscil->Pbasefuncpar = (int) value + 64;
+                oscil->Pbasefuncpar = value + 64;
             else
                 value = oscil->Pbasefuncpar - 64;
             break;
         case 17:
             contstr = " Type";
             if (write)
-                oscil->Pcurrentbasefunc = (int) value;
+                oscil->Pcurrentbasefunc = value;
             else
                 value = oscil->Pcurrentbasefunc;
             break;
         case 18:
             contstr = " Mod Par 1";
             if (write)
-                oscil->Pbasefuncmodulationpar1 = (int) value;
+                oscil->Pbasefuncmodulationpar1 = value;
             else
                 value = oscil->Pbasefuncmodulationpar1;
             break;
         case 19:
             contstr = " Mod Par 2";
             if (write)
-                oscil->Pbasefuncmodulationpar2 = (int) value;
+                oscil->Pbasefuncmodulationpar2 = value;
             else
                 value = oscil->Pbasefuncmodulationpar2;
             break;
         case 20:
             contstr = " Mod Par 3";
             if (write)
-                oscil->Pbasefuncmodulationpar3 = (int) value;
+                oscil->Pbasefuncmodulationpar3 = value;
             else
                 value = oscil->Pbasefuncmodulationpar3;
             break;
         case 21:
             contstr = " Mod Type";
             if (write)
-                oscil->Pbasefuncmodulation = (int) value;
+                oscil->Pbasefuncmodulation = value;
             else
                 value = oscil->Pbasefuncmodulation;
             break;
 
-        case 32:
-            contstr = " Osc Autoclear";
-            if (write)
-                ;
-            else
-                ;
+        case 32: // this is local to the source
             break;
         case 33:
             contstr = " Osc As Base";
             if (write)
-                ;
-            else
-                ;
+            {
+                oscil->useasbase();
+                if (value != 0)
+                {
+                    for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
+                    {
+                        oscil->Phmag[i]=64;
+                        oscil->Phphase[i]=64;
+                    }
+                    oscil->Phmag[0]=127;
+                    oscil->Pharmonicshift=0;
+                }
+            }
             break;
 
         case 34:
             contstr = " Waveshape Par";
             if (write)
-                oscil->Pwaveshaping = (int) value + 64;
+                oscil->Pwaveshaping = value + 64;
             else
                 value = oscil->Pwaveshaping;
             break;
         case 35:
             contstr = " Waveshape Type";
             if (write)
-                oscil->Pwaveshapingfunction = (int) value;
+                oscil->Pwaveshapingfunction = value;
             else
                 value = oscil->Pwaveshapingfunction;
             break;
@@ -2116,14 +2123,14 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 36:
             contstr = " Osc Filt Par 1";
             if (write)
-                oscil->Pfilterpar1 = (int) value;
+                oscil->Pfilterpar1 = value;
             else
                 value = oscil->Pfilterpar1;
             break;
         case 37:
             contstr = " Osc Filt Par 2";
             if (write)
-                oscil->Pfilterpar1 = (int) value;
+                oscil->Pfilterpar1 = value;
             else
                 value = oscil->Pfilterpar1;
             break;
@@ -2137,7 +2144,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 39:
             contstr = " Osc Filt Type";
             if (write)
-                oscil->Pfiltertype = (int) value;
+                oscil->Pfiltertype = value;
             else
                 value = oscil->Pfiltertype;
             break;
@@ -2145,28 +2152,28 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 40:
             contstr = " Osc Mod Par 1";
             if (write)
-                oscil->Pmodulationpar1 = (int) value;
+                oscil->Pmodulationpar1 = value;
             else
                 value = oscil->Pmodulationpar1;
             break;
         case 41:
             contstr = " Osc Mod Par 2";
             if (write)
-                oscil->Pmodulationpar2 = (int) value;
+                oscil->Pmodulationpar2 = value;
             else
                 value = oscil->Pmodulationpar2;
             break;
         case 42:
             contstr = " Osc Mod Par 3";
             if (write)
-                oscil->Pmodulationpar3 = (int) value;
+                oscil->Pmodulationpar3 = value;
             else
                 value = oscil->Pmodulationpar3;
             break;
         case 43:
             contstr = " Osc Mod Type";
             if (write)
-                oscil->Pmodulation = (int) value;
+                oscil->Pmodulation = value;
             else
                 value = oscil->Pmodulation;
             break;
@@ -2174,14 +2181,14 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 44:
             contstr = " Osc Spect Par";
             if (write)
-                oscil->Psapar = (int) value;
+                oscil->Psapar = value;
             else
                 value = oscil->Psapar;
             break;
         case 45:
             contstr = " Osc Spect Type";
             if (write)
-                oscil->Psatype = (int) value;
+                oscil->Psatype = value;
             else
                 value = oscil->Psatype;
             break;
@@ -2189,7 +2196,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 64:
             contstr = " Shift";
             if (write)
-                oscil->Pharmonicshift = (int) value;
+                oscil->Pharmonicshift = value;
             else
                 value = oscil->Pharmonicshift;
             break;
@@ -2209,28 +2216,28 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 67:
             contstr = " Adapt Param";
             if (write)
-                oscil->Padaptiveharmonicspar = (int) value;
+                oscil->Padaptiveharmonicspar = value;
             else
                 value = oscil->Padaptiveharmonicspar;
             break;
         case 68:
             contstr = " Adapt Base Freq";
             if (write)
-                oscil->Padaptiveharmonicsbasefreq = (int) value;
+                oscil->Padaptiveharmonicsbasefreq = value;
             else
                 value = oscil->Padaptiveharmonicsbasefreq;
             break;
         case 69:
             contstr = " Adapt Power";
             if (write)
-                oscil->Padaptiveharmonicspower = (int) value;
+                oscil->Padaptiveharmonicspower = value;
             else
                 value = oscil->Padaptiveharmonicspower;
             break;
         case 70:
             contstr = " Adapt Type";
             if (write)
-                oscil->Padaptiveharmonics = (int) value;
+                oscil->Padaptiveharmonics = value;
             else
                 value = oscil->Padaptiveharmonics;
             break;
@@ -2238,9 +2245,15 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 96:
             contstr = " Clear Harmonics";
             if (write)
-                ;
-            else
-                ;
+            {
+                for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
+                {
+                    oscil->Phmag[i]=64;
+                    oscil->Phphase[i]=64;
+                }
+                oscil->Phmag[0]=127;
+                oscil->prepare();
+            }
             break;
         case 97:
             contstr = " Conv To Sine";
@@ -2255,18 +2268,14 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
     }
 
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + name + contstr + "  value " + actual);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + name + contstr + "  value " + to_string(value) + isPad);
 
 }
 
 
 void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
-    float value = getData->data.value;
+    int value = (int) getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -2274,12 +2283,6 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
-
-    string actual;
-    if (write)
-        respar->setpoint(control, (int) value);
-    else
-        value = respar->Prespoints[control];
 
     string name;
     string isPad = "";
@@ -2294,11 +2297,12 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
     if (insert == 9)
     {
-        if (type & 0x80)
-            actual = to_string((int)round(value));
+        if (write)
+            respar->setpoint(control, value);
         else
-            actual = to_string(value);
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + actual + isPad);
+            value = respar->Prespoints[control];
+
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + to_string(value) + isPad);
         return;
     }
 
@@ -2308,21 +2312,21 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         case 0:
             contstr = "Max dB";
             if (write)
-                respar->PmaxdB = (int) value;
+                respar->PmaxdB = value;
             else
                 value = respar->PmaxdB;
             break;
         case 1:
             contstr = "Centre Freq";
             if (write)
-                respar->Pcenterfreq = (int) value;
+                respar->Pcenterfreq = value;
             else
                 value = respar->Pcenterfreq;
             break;
         case 2:
             contstr = "Octaves";
             if (write)
-                respar->Poctavesfreq = (int) value;
+                respar->Poctavesfreq = value;
             else
                 value = respar->Poctavesfreq;
             break;
@@ -2338,7 +2342,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         case 10:
             contstr = "Random";
             if (write)
-                respar->randomize( (int) value);
+                respar->randomize(value);
             break;
 
         case 20:
@@ -2372,11 +2376,8 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
                 GuiThreadMsg::sendMessage(synth,GuiThreadMsg::ApplyPadParams,  npart | (kititem << 8));
             break;
     }
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + actual + isPad);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + to_string(value) + isPad);
 }
 
 

@@ -1,8 +1,10 @@
 yoshimi 1.4.1 M
 
 2016-9-18 Will
-* Implemented most of oscillator direct access.
+* Implemented Oscillator direct access.
 * Updated and corrected docs.
+* Small correction to Resonance.
+* Minor code optimisations.
 
 2016-9-17 Will
 * CLI now strips trailing spaces.

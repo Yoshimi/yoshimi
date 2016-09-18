@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {OscilgenUI.h} {not_in_source in_header
-}
+} 
 
 comment {OscilgenUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,61 +27,60 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2009 -
-January 2010
+This file is a derivative of the ZynAddSubFX original, modified September 2016
 } {in_source in_header
-}
+} 
 
 decl {\#include "ResonanceUI.h"} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Group.H>} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Slider.H>} {public local
-}
+} 
 
 decl {\#include <cmath>} {private local
-}
+} 
 
 decl {\#include "UI/MiscGui.h"} {public local
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-}
+} 
 
 decl {\#include "EnvelopeUI.h"} {public local
-}
+} 
 
 decl {\#include "LFOUI.h"} {public local
-}
+} 
 
 decl {\#include "FilterUI.h"} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "Synth/OscilGen.h"} {public local
-}
+} 
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-}
+} 
 
 decl {\#include "Misc/Config.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 class OscilSpectrum {: {public Fl_Box, MiscFuncs}
 } {
@@ -178,7 +177,7 @@ oscbase = oscbase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class PSlider {: {public mwheel_slider}
 } {
@@ -208,7 +207,7 @@ if (!Fl::event_inside(X,Y,W,H)) {
 
 return(1);} {}
   }
-}
+} 
 
 class Oscilloscope {: {public Fl_Box}
 } {
@@ -312,7 +311,7 @@ phase=phase_;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 
 
 class Oscilharmonic {: {public Fl_Group}
 } {
@@ -466,7 +465,7 @@ if (oscil->Phmag[n]==64) mag->selection_color(0);
   }
   decl {int engine;} {private local
   }
-}
+} 
 
 class OscilEditor {selected : {public PresetsUI_}
 } {
@@ -760,7 +759,9 @@ send_data (1, o->value());}
       Fl_Button {} {
         label {Use as base}
         callback {oscil->useasbase();
+int clearfirst = 0;
 if (autoclearbutton->value()){
+   clearfirst = 1;
    for (int i=0;i<MAX_AD_HARMONICS;i++){
       h[i]->mag->value(64);
       oscil->Phmag[i]=64;
@@ -791,7 +792,7 @@ synth->actionLock(unlock);
 
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (33, o->value());}
+send_data (33, clearfirst);}
         tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
@@ -1342,4 +1343,4 @@ if (cbwidget!=NULL) {
   }
   decl {SynthEngine *synth;} {private local
   }
-}
+} 

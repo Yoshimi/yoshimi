@@ -281,8 +281,8 @@ Y : 0 to 127 : 18 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulat
 Y : 0 to 127 : 19 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation parameter 2
 Y : 0 to 127 : 20 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation parameter 3
 Y : 0 to 3 : 21 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation type – None, Rev, Sine, Pow
-n : 0/1 : 32 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Autoclear when base function
-n : any : 33 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Use as base function
+n : 0/1 : 32 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Autoclear when base function - not used
+Y : 0/1 : 33 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Use as base function - if value is 1 assume autoclear set
 Y : -64 to 63 : 34 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Waveshape parameter
 Y : 0 to 14 : 35 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Waveshape – None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt,
  :  :  :  :  :  :  :  :  : Clip, Asym2, Pow2, Sgm
