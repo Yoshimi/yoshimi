@@ -1,5 +1,9 @@
 yoshimi 1.4.1 M
 
+2016-9-19 Will
+* TEMPORARY fix: pad apply parameters wasn't working headless.
+  Should probably use a list, not single integer.
+
 2016-9-18 Will
 * Implemented Oscillator direct access.
 * Updated and corrected docs.

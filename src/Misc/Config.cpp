@@ -131,6 +131,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
+    padApply(0xffff),
     channelSwitchType(0),
     channelSwitchCC(128),
     channelSwitchValue(0),
@@ -1205,13 +1206,6 @@ void GuiThreadMsg::processGuiMessages()
              mainRegisterAudioPort(synth, msg->index);
              delete msg;
              return;
-        }
-        if (msg->type == ApplyPadParams)
-        {
-            // Well, not completely unique :)
-            synth->interchange.setpadparams(msg->index);
-            delete msg;
-            return;
         }
         MasterUI *guiMaster = synth->getGuiMaster((msg->type == GuiThreadMsg::NewSynthEngine));
         if (msg->type == GuiThreadMsg::NewSynthEngine)

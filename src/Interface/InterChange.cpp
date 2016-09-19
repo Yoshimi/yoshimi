@@ -88,7 +88,7 @@ void InterChange::setpadparams(int point)
     int npart = point & 0xff;
     int kititem = point >> 8;
     synth->partonoffLock(npart, 0);
-    synth->part[npart]->kit[kititem].padpars->applyparameters(true);
+    synth->part[npart]->kit[kititem].padpars->applyparameters(false);
     synth->partonoffLock(npart, 1);
 }
 
@@ -1877,9 +1877,7 @@ void InterChange::commandPad(CommandBlock *getData)
         case 104:
             contstr = "Apply Changes";
             if (write)
-            {
-                GuiThreadMsg::sendMessage(synth,GuiThreadMsg::ApplyPadParams,  npart | (kititem << 8));
-            }
+                synth->getRuntime().padApply = npart | (kititem << 8);
             break;
 
         case 112:
@@ -2264,7 +2262,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 104:
             contstr = " Apply Changes";
             if (write && engine == 2)
-                GuiThreadMsg::sendMessage(synth,GuiThreadMsg::ApplyPadParams,  npart | (kititem << 8));
+                synth->getRuntime().padApply = npart | (kititem << 8);
             break;
     }
 
@@ -2373,7 +2371,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         case 104:
             contstr = "Apply Changes";
             if (write && engine == 2)
-                GuiThreadMsg::sendMessage(synth,GuiThreadMsg::ApplyPadParams,  npart | (kititem << 8));
+                synth->getRuntime().padApply = npart | (kititem << 8);
             break;
     }
 
