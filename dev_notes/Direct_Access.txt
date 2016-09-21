@@ -10,7 +10,8 @@ Currently it doesn't update the GUI.
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions
 and "GUI_Interpretations.txt" for further explanations.
 
-Also, see "Effect_Inserts" for the actual effect controllers.
+Also, see "Effect_Inserts" for the actual effect controllers and Envelope_Inserts
+for the enveople controler ranges.
 
 Sections currently in place and tested:
 
@@ -18,8 +19,11 @@ Top level controls
 Main part controls
 Controllers
 Kit edit window
+AddSynth Editor
+AddSynth Voice Editor
 Subsynth Editor
 Padsynth Editor
+Oscillator
 Resonance
 Effects
 LFOs
@@ -49,7 +53,8 @@ direct = the actual command name, must be typed in full.
 
 value = the value that will be set, may be negative.
 
-type = a subset of the command type: 0 for read and 64 for write.
+type = a subset of the command type: 0 for read and 64 for write. Sending 1 will
+just echo the bytes you sent.
 
 control = the number representing the control being changed or queried.
 

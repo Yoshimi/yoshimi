@@ -180,9 +180,10 @@ static void *mainGuiThread(void *arg)
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
             _synth->getRuntime().deadObjects->disposeBodies();
-            if (_synth->getRuntime().padApply < 0xffff)
+            unsigned int padApply = _synth->getRuntime().padApply;
+            if (padApply < 0xffff)
             {
-                _synth->interchange.setpadparams(_synth->getRuntime().padApply);
+                _synth->interchange.setpadparams(padApply);
                 _synth->getRuntime().padApply = 0xffff;
             }
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)

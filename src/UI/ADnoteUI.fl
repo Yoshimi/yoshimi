@@ -230,7 +230,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {40 319 770 580} type Double hide
+      xywh {626 159 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -780,17 +780,15 @@ send_data(56, o->value());}
               callback {int tmp = lrint(o->value());
 pars->VoicePar[nvoice].Unison_size = tmp;
 int colr = FL_BLACK;
-int i = -1;
-while(true)
+int i = 0;
+while(pars->ADnote_unison_sizes[i] != 0)
 {
-  i++;
-  if (pars->ADnote_unison_sizes[i] == 0)
-    break;
   if (pars->ADnote_unison_sizes[i] == tmp)
   {
    colr = FL_RED;
     break;
   }
+  ++ i;
 }
 o->labelcolor(colr);
 unisongroup->redraw();
@@ -1191,7 +1189,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         xywh {5 255 525 115} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelsize 11 align 17
       } {
         Fl_Group freqenv {
-          label {ADSynth Global - Frequency Envelope} open
+          label {ADSynth Global - Frequency Envelope}
           xywh {10 295 205 70} box FLAT_BOX color 51 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.FreqEnvelope, npart, kititem, 0, 1);}
           class EnvelopeUI
@@ -1222,7 +1220,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
           code3 {o->lstep(10);}
         }
         Fl_Group freqlfo {
-          label {Frequency LFO     } open
+          label {Frequency LFO     }
           xywh {215 295 230 70} box FLAT_BOX color 47 labelsize 12 align 144
           code0 {o->init(pars->GlobalPar.FreqLfo, npart, kititem, 0, 1);}
           class LFOUI
@@ -1250,7 +1248,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
           callback {//
     pars->GlobalPar.PDetuneType = lrint(o->value()) + 1;
     detunevalueoutput->do_callback();
-    send_data(36, o->value() + 1);} open
+    send_data(36, o->value() + 1);}
           xywh {450 315 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {//
               o->add("L35cents");

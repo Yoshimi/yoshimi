@@ -20,6 +20,7 @@
 */
 
 #include <iostream>
+#include <bitset>
 
 using namespace std;
 
@@ -106,11 +107,12 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char insertPar2 = getData->data.par2;
 
     bool isGui = type & 0x20;
+    bool isCli = type & 0x10;
     char button = type & 3;
     string isValue;
-    if (type & 0x10)
+    if (isCli)
         synth->getRuntime().Log("From CLI");
-    if (isGui && button != 2)
+    if ((isGui && button != 2) || (isCli && button == 1))
     {
         if (button == 0)
             isValue = "Request set default";
@@ -122,6 +124,9 @@ void InterChange::commandSend(CommandBlock *getData)
             if (!(type & 0x80))
                 isValue +=  "f";
         }
+        isValue +="\n  Type ";
+        for (int i = 7; i > -1; -- i)
+            isValue += to_string((type >> i) & 1);
         synth->getRuntime().Log(isValue
                             + "\n  Control " + to_string((int) control)
                             + "\n  Part " + to_string((int) npart)
@@ -213,7 +218,7 @@ void InterChange::commandSend(CommandBlock *getData)
         return;
     }
 
-    if (engine >= 0x80)
+    if (engine & 0x80)
     {
         switch (insert)
         {
@@ -234,7 +239,7 @@ void InterChange::commandSend(CommandBlock *getData)
             case 5:
             case 6:
             case 7:
-                if (engine >= 0xC0)
+                if (engine & 0xC0)
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].FMSmp);
                 else
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].OscilSmp);
@@ -972,11 +977,11 @@ void InterChange::commandAdd(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
+    bool write = (type & 0x40) > 0;
+    Part *part;
+    part = synth->part[npart];
+    ADnoteParameters *pars;
+    pars = part->kit[kititem].adpars;
 
     string name = "";
     switch (control & 0x70)
@@ -990,76 +995,148 @@ void InterChange::commandAdd(CommandBlock *getData)
     }
 
     string contstr = "";
+    int k; // temp variable for detune
     switch (control)
     {
         case 0:
             contstr = "Volume";
+            if (write)
+                pars->GlobalPar.PVolume = lrint(value);
+            else
+                value = pars->GlobalPar.PVolume;
             break;
         case 1:
             contstr = "Vel Sens";
+            if (write)
+                pars->GlobalPar.PAmpVelocityScaleFunction = lrint(value);
+            else
+                value = pars->GlobalPar.PAmpVelocityScaleFunction;
             break;
         case 2:
             contstr = "Panning";
+            if (write)
+                pars->setGlobalPan(lrint(value));
+            else
+                value = pars->GlobalPar.PPanning;
             break;
 
         case 32:
             contstr = "Detune";
+            if (write)
+                pars->GlobalPar.PDetune = lrint(value) + 8192;
+            else
+                value = pars->GlobalPar.PDetune - 8192;
             break;
-        case 33:
-            contstr = "Eq T";
-            break;
-        case 34:
-            contstr = "440Hz";
-            break;
+
         case 35:
             contstr = "Octave";
+            if (write)
+            {
+                k = value;
+                if (k < 0)
+                    k += 16;
+                pars->GlobalPar.PCoarseDetune = k * 1024 + pars->GlobalPar.PCoarseDetune % 1024;
+            }
+            else
+            {
+                k = pars->GlobalPar.PCoarseDetune / 1024;
+                if (k >= 8)
+                    k -= 16;
+                value = k;
+            }
             break;
         case 36:
             contstr = "Det type";
+            if (write)
+                pars->GlobalPar.PDetuneType = lrint(value);
+            else
+                value = pars->GlobalPar.PDetuneType;
             break;
         case 37:
             contstr = "Coarse Det";
+            if (write)
+            {
+                k = value;
+                if (k < 0)
+                    k += 1024;
+                pars->GlobalPar.PCoarseDetune = k + (pars->GlobalPar.PCoarseDetune / 1024) * 1024;
+            }
+            else
+            {
+                k = pars->GlobalPar.PCoarseDetune % 1024;
+                if (k >= 512)
+                    k -= 1024;
+                value = k;
+            }
             break;
         case 39:
             contstr = "Rel B Wdth";
-            break;
-
-        case 48:
-            contstr = "Par 1";
-            break;
-        case 49:
-            contstr = "Par 2";
-            break;
-        case 50:
-            contstr = "Force H";
-            break;
-        case 51:
-            contstr = "Position";
+            if (write)
+            {
+                pars->GlobalPar.PBandwidth = lrint(value);
+                 pars->getBandwidthDetuneMultiplier();
+            }
+            else
+                value = pars->GlobalPar.PBandwidth;
             break;
 
         case 112:
             contstr = "Stereo";
+            if (write)
+                pars->GlobalPar.PStereo = (value != 0);
+            else
+                value = pars->GlobalPar.PStereo;
             break;
         case 113:
             contstr = "Rnd Grp";
+            if (write)
+                pars->GlobalPar.Hrandgrouping = (value != 0);
+            else
+                value = pars->GlobalPar.Hrandgrouping;
             break;
 
         case 120:
             contstr = "De Pop";
+            if (write)
+                pars->GlobalPar.Fadein_adjustment = lrint(value);
+            else
+                value = pars->GlobalPar.Fadein_adjustment;
             break;
         case 121:
             contstr = "Punch Strngth";
+            if (write)
+                pars->GlobalPar.PPunchStrength = lrint(value);
+            else
+                value = pars->GlobalPar.PPunchStrength;
             break;
         case 122:
             contstr = "Punch Time";
+            if (write)
+                pars->GlobalPar.PPunchTime = lrint(value);
+            else
+                value = pars->GlobalPar.PPunchTime;
             break;
         case 123:
             contstr = "Punch Strtch";
+            if (write)
+                pars->GlobalPar.PPunchStretch = lrint(value);
+            else
+                value = pars->GlobalPar.PPunchStretch;
             break;
         case 124:
             contstr = "Punch Vel";
+            if (write)
+                pars->GlobalPar.PPunchVelocitySensing = lrint(value);
+            else
+                value = pars->GlobalPar.PPunchVelocitySensing;
             break;
     }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
 
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth " + name + contstr + " value " + actual);
 }
@@ -1073,15 +1150,16 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    int nvoice = engine & 0x1f;
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
+    bool write = (type & 0x40) > 0;
+    Part *part;
+    part = synth->part[npart];
+    ADnoteParameters *pars;
+    pars = part->kit[kititem].adpars;
 
     string name = "";
-    switch (control & 0xF0)
+    switch (control & 0xf0)
     {
         case 0:
             name = " Amplitude ";
@@ -1110,154 +1188,385 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     }
 
     string contstr = "";
+    int k; // temp variable for detune
     switch (control)
     {
         case 0:
             contstr = "Volume";
+            if (write)
+                pars->VoicePar[nvoice].PVolume = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PVolume;
             break;
         case 1:
             contstr = "Vel Sens";
+            if (write)
+                pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PAmpVelocityScaleFunction;
             break;
         case 2:
             contstr = "Panning";
+            if (write)
+                 pars->setVoicePan(nvoice, lrint(value));
+            else
+                value = pars->VoicePar[nvoice].PPanning;
             break;
         case 4:
             contstr = "Minus";
+            if (write)
+                pars->VoicePar[nvoice].PVolumeminus = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].PVolumeminus;
             break;
         case 8:
             contstr = "Enable Env";
+            if (write)
+                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PAmpEnvelopeEnabled;
             break;
         case 9:
             contstr = "Enable LFO";
+            if (write)
+                pars->VoicePar[nvoice].PAmpLfoEnabled = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].PAmpLfoEnabled;
             break;
 
         case 16:
             contstr = "Type";
+            if (write)
+                pars->VoicePar[nvoice].PFMEnabled = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFMEnabled;
             break;
         case 17:
             contstr = "Extern Mod";
+            if (write)
+                pars->VoicePar[nvoice].PFMVoice = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFMVoice;
             break;
 
         case 32:
             contstr = "Detune";
+            if (write)
+                pars->VoicePar[nvoice].PDetune = lrint(value) + 8192;
+            else
+                value = pars->VoicePar[nvoice].PDetune-8192;
             break;
         case 33:
             contstr = "Eq T";
+            if (write)
+                pars->VoicePar[nvoice].PfixedfreqET = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PfixedfreqET;
             break;
         case 34:
             contstr = "440Hz";
+            if (write)
+                 pars->VoicePar[nvoice].Pfixedfreq = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
         case 35:
             contstr = "Octave";
+            if (write)
+            {
+                k = value;
+                if (k < 0)
+                    k += 16;
+                pars->VoicePar[nvoice].PCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PCoarseDetune % 1024;
+            }
+            else
+            {
+                k = pars->VoicePar[nvoice].PCoarseDetune / 1024;
+                if (k >= 8)
+                    k -= 16;
+                value = k;
+            }
             break;
         case 36:
             contstr = "Det type";
+            if (write)
+                pars->VoicePar[nvoice].PDetuneType = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PDetuneType;
             break;
         case 37:
             contstr = "Coarse Det";
+            if (write)
+            {
+                k = value;
+                if (k < 0)
+                    k += 1024;
+                pars->VoicePar[nvoice].PCoarseDetune = k + (pars->VoicePar[nvoice].PCoarseDetune / 1024) * 1024;
+            }
+            else
+            {
+                k = pars->VoicePar[nvoice].PCoarseDetune % 1024;
+                if (k >= 512)
+                    k -= 1024;
+                value = k;
+            }
             break;
         case 40:
             contstr = "Enable Env";
+            if (write)
+                pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFreqEnvelopeEnabled;
             break;
         case 41:
             contstr = "Enable LFO";
+            if (write)
+                pars->VoicePar[nvoice].PFreqLfoEnabled = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFreqLfoEnabled;
             break;
 
         case 48:
             contstr = "Freq Spread";
+            if (write)
+                pars->VoicePar[nvoice].Unison_frequency_spread = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
         case 49:
             contstr = "Phase Rnd";
+            if (write)
+                pars->VoicePar[nvoice].Unison_phase_randomness = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Unison_phase_randomness;
             break;
         case 50:
             contstr = "Stereo";
+            if (write)
+                pars->VoicePar[nvoice].Unison_stereo_spread = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Unison_stereo_spread;
             break;
         case 51:
             contstr = "Vibrato";
+            if (write)
+                pars->VoicePar[nvoice].Unison_vibratto = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Unison_vibratto;
             break;
         case 52:
             contstr = "Vib Speed";
+            if (write)
+                pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Unison_vibratto_speed;
             break;
         case 53:
             contstr = "Size";
+            if (write)
+            {
+                if (value < 2)
+                    value = 2;
+                pars->VoicePar[nvoice].Unison_size = lrint(value);
+            }
+            else
+                value = pars->VoicePar[nvoice].Unison_size;
             break;
         case 54:
             contstr = "Invert";
+            if (write)
+                pars->VoicePar[nvoice].Unison_invert_phase = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
         case 56:
             contstr = "Enable";
+            if (write)
+                pars->VoicePar[nvoice].Unison_size = (value != 0) + 1;
+            else
+                value = (pars->VoicePar[nvoice].Unison_size > 1);
             break;
 
         case 64:
             contstr = "Bypass Global";
+            if (write)
+                pars->VoicePar[nvoice].Pfilterbypass = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].Pfilterbypass;
             break;
         case 68:
             contstr = "Enable";
+            if (write)
+                 pars->VoicePar[nvoice].PFilterEnabled =  (value != 0);
+            else
+                value = pars->VoicePar[nvoice].PFilterEnabled;
             break;
         case 72:
             contstr = "Enable Env";
+            if (write)
+                pars->VoicePar[nvoice].PFilterEnvelopeEnabled= (value != 0);
+            else
+                value = pars->VoicePar[nvoice].PFilterEnvelopeEnabled;
             break;
         case 73:
             contstr = "Enable LFO";
+            if (write)
+                pars->VoicePar[nvoice].PFilterLfoEnabled= (value != 0);
+            else
+                value = pars->VoicePar[nvoice].PFilterLfoEnabled;
             break;
 
         case 80:
             contstr = "Volume";
+            if (write)
+                pars->VoicePar[nvoice].PFMVolume = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFMVolume;
             break;
         case 81:
             contstr = "V Sense";
+            if (write)
+                pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFMVelocityScaleFunction;
             break;
         case 82:
             contstr = "F Damp";
+            if (write)
+                pars->VoicePar[nvoice].PFMVolumeDamp = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFMVolumeDamp;
             break;
         case 88:
             contstr = "Enable Env";
+            if (write)
+                pars->VoicePar[nvoice].PFMVolumeDamp = (value != 0);
+            else
+                value =  pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled;
             break;
 
         case 96:
             contstr = "Detune";
+            if (write)
+                pars->VoicePar[nvoice].PFMDetune = (int) value + 8192;
+            else
+                value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
         case 99:
             contstr = "Octave";
+            if (write)
+                ;
+            else
+                ;
             break;
         case 100:
             contstr = "Det type";
+            if (write)
+            {
+                k = lrint(value);
+                if (k < 0)
+                    k += 16;
+                pars->VoicePar[nvoice].PFMCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PFMCoarseDetune % 1024;
+            }
+            else
+            {
+                k = pars->VoicePar[nvoice].PFMCoarseDetune / 1024;
+                if (k >= 8)
+                    k -= 16;
+                value = k;
+            }
             break;
         case 101:
             contstr = "Coarse Det";
+            if (write)
+            {
+                int k = lrint(value);
+                if (k < 0)
+                    k += 1024;
+                pars->VoicePar[nvoice].PFMCoarseDetune = k + (pars->VoicePar[nvoice].PFMCoarseDetune / 1024) * 1024;
+            }
+            else
+            {
+                k = pars->VoicePar[nvoice].PFMCoarseDetune % 1024;
+                if (k >= 512)
+                    k-= 1024;
+                value = k;
+            }
             break;
         case 104:
             contstr = "Enable Env";
+            if (write)
+                pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled;
             break;
 
         case 112:
             contstr = " Phase";
+            if (write)
+                pars->VoicePar[nvoice].PFMoscilphase = 64 - lrint(value);
+            else
+                value = 64 - pars->VoicePar[nvoice].PFMoscilphase;
             break;
         case 113:
             contstr = " Source";
+            if (write)
+                pars->VoicePar[nvoice].PextFMoscil = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PextFMoscil;
             break;
 
         case 128:
             contstr = " Delay";
+            if (write)
+                pars->VoicePar[nvoice].PDelay = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].PDelay;
             break;
         case 129:
             contstr = " Enable";
+            if (write)
+                pars->VoicePar[nvoice].Enabled = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].Enabled;
             break;
         case 130:
             contstr = " Resonance Enable";
+            if (write)
+                pars->VoicePar[nvoice].Presonance = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].Presonance;
             break;
         case 136:
             contstr = " Osc Phase";
+            if (write)
+                pars->VoicePar[nvoice].Poscilphase =64 - lrint(value);
+            else
+                value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
         case 137:
             contstr = " Osc Source";
+            if (write)
+                pars->VoicePar[nvoice].Pextoscil = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Pextoscil;
             break;
         case 138:
             contstr = " Sound type";
+            if (write)
+                pars->VoicePar[nvoice].Type = lrint(value);
+            else
+                value = pars->VoicePar[nvoice].Type;
             break;
     }
 
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth Voice " + to_string(engine & 0x1f) + name + contstr + " value " + actual);
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth Voice " + to_string(nvoice) + name + contstr + " value " + actual);
 }
 
 

@@ -29,7 +29,6 @@ SynthEngine *synth;
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
 #ifdef ENABLE_REPORTS
-    // cout << "Type " << type & 0x20 << endl;
     if ((type & 3) == 3)
     { // value type is now irrelevant
         if(Fl::event_state(FL_CTRL) != 0)
