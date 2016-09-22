@@ -108,7 +108,7 @@ static void *mainGuiThread(void *arg)
         FILE *f = fopen(fname, "wb");
         if (f)
         {
-            fwrite(yoshimi_logo_png, sizeof(yoshimi_logo_png), 1, f);
+            fwrite(splash_screen_png, sizeof(splash_screen_png), 1, f);
             fclose(f);
         }
     }
@@ -116,7 +116,7 @@ static void *mainGuiThread(void *arg)
     if (fname)
     unlink(fname);
 #else
-    Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
+    Fl_PNG_Image pix("splash_screen_png", splash_screen_png, sizeof(splash_screen_png));
 #endif
 
     const int textHeight = 20;
@@ -132,7 +132,8 @@ static void *mainGuiThread(void *arg)
     boxLb.align(FL_ALIGN_CENTER);
     boxLb.labelsize(textHeight);
     boxLb.labeltype(FL_NORMAL_LABEL);
-    boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
+    boxLb.labelcolor(FL_WHITE);
+    boxLb.labelfont(FL_HELVETICA | FL_BOLD);
     string startup = YOSHIMI_VERSION;
     startup = "Yoshimi " + startup + " is starting";
     boxLb.label(startup.c_str());
