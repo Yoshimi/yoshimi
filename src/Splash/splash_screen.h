@@ -5360,6 +5360,10 @@ static const unsigned char yoshimi_logo_png[] = {
     0x4e,0x44,0xae,0x42,0x60,0x82
 };
 
+  const int splashWidth = 480;
+  const int splashHeight = 320;
+
+
 #ifdef __cplusplus
 }
 #endif

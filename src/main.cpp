@@ -40,7 +40,7 @@ using namespace std;
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Shared_Image.H>
 #include <FL/Fl_PNG_Image.H>
-#include "yoshimi-logo.h"
+#include "Splash/splash_screen.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -119,8 +119,6 @@ static void *mainGuiThread(void *arg)
     Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
 #endif
 
-    const int splashWidth = 411;
-    const int splashHeight = 311;
     const int textHeight = 20;
     const int textBorder = 15;
 
