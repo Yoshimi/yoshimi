@@ -193,8 +193,8 @@ Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Set voice base frequenc
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Octave
 Y : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
 Y : 0 to 127 : 37 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Coarse detune
-Y : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bend Adjust
-Y : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Offset Hz
+
+Y : 0/1 : 38 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bend Adjust
 
 Y : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 1
 Y : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 2

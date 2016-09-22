@@ -1760,19 +1760,13 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
         case 38:
-            contstr = "Bend";
+            contstr = "Freq Enab";
             if (write)
-                pars->PBendAdjust = value;
+                pars->PFreqEnvelopeEnabled = (value != 0);
             else
-                value = pars->PBendAdjust;
+                value = pars->PFreqEnvelopeEnabled;
             break;
-        case 39:
-            contstr = "Offset";
-            if (write)
-                pars->PBendAdjust = value;
-            else
-                value = pars->PBendAdjust;
-            break;
+
         case 40:
             contstr = "Env Enab";
             if (write)

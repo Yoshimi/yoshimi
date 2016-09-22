@@ -1,9 +1,13 @@
 yoshimi 1.4.1 M
 
+2016-9-22 Will
+* Bugfix: direct access SubSynth Freq Env En was quite wrong :(
+* Updated docs.
+
 2016-9-21 Will
 * Implemented direct access for AddSynth (not fully tested).
 * Setting direct access type bit 0 now only echos byte stream.
-* Updated docs
+* Updated docs.
 
 2016-9-19 Will
 * TEMPORARY fix: pad apply parameters wasn't working headless.
