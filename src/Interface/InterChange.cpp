@@ -218,7 +218,7 @@ void InterChange::commandSend(CommandBlock *getData)
         return;
     }
 
-    if (engine & 0x80)
+    if (engine >= 0x80)
     {
         switch (insert)
         {
@@ -239,7 +239,7 @@ void InterChange::commandSend(CommandBlock *getData)
             case 5:
             case 6:
             case 7:
-                if (engine & 0xC0)
+                if (engine >= 0xC0)
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].FMSmp);
                 else
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].OscilSmp);
@@ -1758,13 +1758,6 @@ void InterChange::commandSub(CommandBlock *getData)
                     k -= 1024;
                 value = k;
             }
-            break;
-        case 38:
-            contstr = "Freq Enab";
-            if (write)
-                pars->PFreqEnvelopeEnabled = (value != 0);
-            else
-                value = pars->PFreqEnvelopeEnabled;
             break;
 
         case 40:

@@ -1,6 +1,8 @@
 
 Find out why LV2 only stores/retrieves patch sets (not state)
 
+Consider expanding state files to include all instances.
+
 Make add voice & add/pad oscillator windows show kit number & name.
 
 Investigate graded XML->minimal.

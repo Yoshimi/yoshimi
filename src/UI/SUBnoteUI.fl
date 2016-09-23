@@ -329,7 +329,7 @@ send_data (82, o->value());}
         freqenvelopegroup->activate();
     o->show();
     freqsettingsui->redraw();
-    send_data (38, o->value());}
+    send_data (40, o->value());}
           xywh {445 68 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
           code0 {o->value(pars->PFreqEnvelopeEnabled);}
         }
