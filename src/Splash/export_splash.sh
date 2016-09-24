@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Convert splash_screen.svg to a static header with a hex of the rendered png
+# Generates a png hex and associated parameters used to build the splash screen.
 # Not part of the build process - should only be used after modifications to the splash screen
 
-printf "Splash screen export\n"
+printf "Splash screen export"
 
 MISSING_DEP=false;
 
@@ -14,10 +14,10 @@ function depCheck {
     fi
 };
 
-# Requires inkscape (pref. v 0.91 or higher), xxd and sed
+# Requires inkscape (pref. v 0.91 or higher), hexdump and sed
 
 depCheck "inkscape";
-depCheck "xxd";
+depCheck "hexdump";
 depCheck "sed";
 
 if [[ "$MISSING_DEP" = true ]]; then
@@ -26,46 +26,30 @@ if [[ "$MISSING_DEP" = true ]]; then
 fi
 
 FN="splash_screen"
-TMP="$FN"_tmp
 
-# Extract width and height values from the svg - reliant on the xml formatting
-WIDTH=$(sed -n -E '1,/\w*width=/ {/width/ s/.*width="(.*)"/\1/p;}' "$FN".svg)
-HEIGHT=$(sed -n -E '1,/\w*height=/ {/height/ s/.*height="(.*)"/\1/p;}' "$FN".svg)
+# Extract width and height values from the svg - somehwat reliant on inkscapes svg formatting
+WIDTH=$(sed -n -E '1,/\s*width=/ {/width/ s/.*width="(.*)"/\1/p;}' "$FN".svg)
+HEIGHT=$(sed -n -E '1,/\s*height=/ {/height/ s/.*height="(.*)"/\1/p;}' "$FN".svg)
+
+printf " - Width x Height = ""$WIDTH""x""$HEIGHT\n"
 
 # export png
 inkscape --export-png="$FN".png --export-area-page "$FN".svg > /dev/null &&\
 
 printf "png exported\n" &&\
 
-# probably redundant declaration guard
-printf \
-"#ifdef __cplusplus
-extern \"C\" {
-#endif
-
-" > "$TMP" && \
-
-# splash dimension variables
-printf \
-"static const int splashWidth=$WIDTH;
-static const int splashHeight=$HEIGHT;
-
-static const " >> "$TMP" && \
-
 # hex array generation
-xxd -i "$FN".png >>  "$TMP" && \
+hexdump -ve '1 1 "0x%02x,"' "$FN".png > SplashPngHex && \
 
-# closing declaration guard
-printf \
-"
-#ifdef __cplusplus
-}
-#endif
-" >> "$TMP" && \
+printf "hex data updated\n" &&\
 
-mv "$TMP" "$FN".h &&\
+#update width/height values
+sed -i -E \
+       -e 's/(Width\s*=\s*)([0-9]*)/\1'"$WIDTH"'/' \
+       -e 's/(Height\s*=\s*)([0-9]*)/\1'"$HEIGHT"'/' \
+       -e 's/(Length\s*=\s*)([0-9]*)/\1'"$(du -b $FN.png | cut -f 1)"'/' ../Misc/Splash.cpp &&\
 
-printf "header created\n"
+printf "parameter values updated\n"
 
 # unconditional cleanup
-rm -f "$TMP" "$FN".png && printf "cleaning up temp files\n"
+rm -f "$FN".png && printf "cleaning up\n"

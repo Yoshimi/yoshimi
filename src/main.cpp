@@ -25,6 +25,7 @@
 using namespace std;
 
 #include "Misc/Config.h"
+#include "Misc/Splash.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
@@ -40,7 +41,6 @@ using namespace std;
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Shared_Image.H>
 #include <FL/Fl_PNG_Image.H>
-#include "Splash/splash_screen.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -108,7 +108,7 @@ static void *mainGuiThread(void *arg)
         FILE *f = fopen(fname, "wb");
         if (f)
         {
-            fwrite(splash_screen_png, sizeof(splash_screen_png), 1, f);
+            fwrite(splashPngData, splashPngLength, 1, f);
             fclose(f);
         }
     }
@@ -116,7 +116,7 @@ static void *mainGuiThread(void *arg)
     if (fname)
     unlink(fname);
 #else
-    Fl_PNG_Image pix("splash_screen_png", splash_screen_png, sizeof(splash_screen_png));
+    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
 #endif
 
     const int textHeight = 20;
