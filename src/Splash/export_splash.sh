@@ -9,7 +9,7 @@ MISSING_DEP=false;
 
 function depCheck {
     if ! type "$1" >/dev/null 2>&1; then
-	printf "Could not find $1!\n"
+	printf "\nCould not find $1!\n"
 	MISSING_DEP=true;
     fi
 };
@@ -21,7 +21,7 @@ depCheck "hexdump";
 depCheck "sed";
 
 if [[ "$MISSING_DEP" = true ]]; then
-    printf "One or more dependencies missing!"
+    printf "\nOne or more dependencies missing!"
     exit 1;
 fi
 
