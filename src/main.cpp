@@ -132,8 +132,9 @@ static void *mainGuiThread(void *arg)
     boxLb.align(FL_ALIGN_CENTER);
     boxLb.labelsize(textHeight);
     boxLb.labeltype(FL_NORMAL_LABEL);
-    boxLb.labelcolor(FL_WHITE);
-    boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+    //boxLb.labelcolor(FL_WHITE);
+    //boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+    boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
     string startup = YOSHIMI_VERSION;
     startup = "Yoshimi " + startup + " is starting";
     boxLb.label(startup.c_str());
