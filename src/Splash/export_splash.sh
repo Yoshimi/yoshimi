@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Generates a png hex and associated parameters used to build the splash screen.
 # Not part of the build process - should only be used after modifications to the splash screen
@@ -7,7 +7,7 @@ printf "Splash screen export"
 
 MISSING_DEP=false;
 
-function depCheck {
+depCheck() {
     if ! type "$1" >/dev/null 2>&1; then
 	printf "\nCould not find $1!\n"
 	MISSING_DEP=true;
@@ -20,7 +20,7 @@ depCheck "inkscape";
 depCheck "hexdump";
 depCheck "sed";
 
-if [[ "$MISSING_DEP" = true ]]; then
+if [ "$MISSING_DEP" = true ]; then
     printf "\nOne or more dependencies missing!"
     exit 1;
 fi

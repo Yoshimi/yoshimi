@@ -1,14 +1,19 @@
 yoshimi 1.4.1 M
 
+2016-9-26 Will
+* Bugfix: AddSynth Mod Amp Env enable now works.
+* Applied Jespers batch to make scripts bash/dash compatible.
+* Corrected and updated docs.
+
 2016-9-25 Will
 * Temporarily reverted actual splash screen to original.
 
 2016-9-24 Will
-* merged splash updates from Jesper.
+* Merged splash updates from Jesper.
 
 2016-9-23 Will
 * Removed duplicate enable Freq Filter command.
-* Bugfix: All Adsynth osc commands were going to the modulator.
+* Bugfix: All AddSynth osc commands were going to the modulator.
 * Upgraded and tested build instructions.
 * Updated docs.
 

@@ -1440,7 +1440,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
         case 88:
             contstr = "Enable Env";
             if (write)
-                pars->VoicePar[nvoice].PFMVolumeDamp = (value != 0);
+                pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = (value != 0);
             else
                 value =  pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled;
             break;
@@ -3291,7 +3291,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
         name += to_string(nvoice);
         if (engine >= 0xC0)
         {
-            name += "Modulator ";
+            name += " Modulator";
             switch (insertParam)
             {
                 case 0:

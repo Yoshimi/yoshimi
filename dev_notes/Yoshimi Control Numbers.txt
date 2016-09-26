@@ -1,4 +1,4 @@
-Y/n : Range : Control : Part : Kit : Engine : Insert : Parameter : Par 2 : Function/Description
+Y/n : Range : Control : Part : Kit : Engine : Insert : Parameter : Par 2 : Function / Description
 
 Y : 0 to 127 : 0 : 240 : 255 : 255 : 255 : 255 : 255 : Volume
 Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
@@ -51,10 +51,10 @@ Y : 0 to 127 : 41 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effec
 Y : 0 to 127 : 42 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 2
 Y : 0 to 127 : 43 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 3
 
-Y : 0 to 2 : 64 : 0 to 63 : 255 : effect num : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
-Y : 0 to 8 : 65 : 0 to 63 : 255 : effect num : 255 : 255 : 255 : Set effect type
-Y : 0 to 2 : 66 : 0 to 63 : 255 : effect num : 255 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
-Y : 0/1 : 67 : 0 to 63 : 255 : effect num : 255 : 255 : 255 : Bypass effect
+Y : 0 to 2 : 64 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+Y : 0 to 8 : 65 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect type
+Y : 0 to 2 : 66 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
+Y : 0/1 : 67 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Bypass effect
 
 Y : 1, 2, 3 : 120 : 0 to 63 : 255 : 255 : 255 : 255 :  : Audio destination
 
@@ -91,9 +91,7 @@ Y : 0/1 : 8 : 0 to 63 : 255 : 2 : 255 : 255 : 255 : Enable PadSynth
 Y : 0 to 50 : 48 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Humanise
 
 Kit edit window
-
  :  :  :  : See note -> :  :  :  :  : For controls 8 to 24 kit number is OR’d with 32
-
 Y : 0/1 : 8 : 0 to 63 : 1 to 15 : 255 : 255 : 255 : 255 : Kit item enable
 Y : 0/1 : 9 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item mute
 Y : 0 to 126 : 16 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum note
@@ -158,6 +156,10 @@ Y : 0 to 127 : 52 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Uniso
 Y : 2 to 50 : 53 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison size
 Y : 0 to 5 : 54 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison phase invert – None, Random, 50%, 33%, 25%, 20%
 Y : 0/1 : 56 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison enable
+
+Y : 0/1 : 68 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter
+Y : 0/1 : 72 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter envelope
+Y : 0/1 : 73 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter LFO
 
 Y : 0 to 127 : 80 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator amplitude
 Y : 0 to 127 : 81 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator velocity sensitivity
@@ -267,50 +269,49 @@ Oscillators window
  :  :  :  :  : See Note > :  :  :  : Engine is 128 + (0 to 7) for AddSynth voice
  :  :  :  :  :  :  :  :  : Engine is 192 + (0 to 7) for AddSynth voice modulator
  :  :  :  :  :  :  :  :  : Engine is 2 for PadSynth
+Y : -64 to 63 : 0 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Phase randomness
+Y : 0 to 4 : 1 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Mag type – Linear, -40dB, -60dB, -80dB, -100dB
+Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Spectrum adjust
+Y : 0 to 2 : 3 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Harmonic amplitude randomness – None, Power, Sine
 
-Y : -64 to 63 : 0 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Phase randomness
-Y : 0 to 4 : 1 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Mag type – Linear, -40dB, -60dB, -80dB, -100dB
-Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Spectrum adjust
-Y : 0 to 2 : 3 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Harmonic amplitude randomness – None, Power, Sine
-
-Y : -64 to 63 : 16 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function parameter
-Y : 0 to 15 : 17 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function – Sine, Triangle, Pulse, Saw, Power, Gauss, Diode, AbsSine,
+Y : -64 to 63 : 16 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function parameter
+Y : 0 to 15 : 17 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function – Sine, Triangle, Pulse, Saw, Power, Gauss, Diode, AbsSine,
  :  :  :  :  :  :  :  :  : PulseSine, StrchSine, Chirp, AbsStrSine, Chebyshev, Sqr, Spike, Circle
 
-Y : 0 to 127 : 18 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation parameter 1
-Y : 0 to 127 : 19 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation parameter 2
-Y : 0 to 127 : 20 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation parameter 3
-Y : 0 to 3 : 21 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Base function modulation type – None, Rev, Sine, Pow
-Y : 0/1 : 32 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Autoclear when base function - not used
-Y : 0/1 : 33 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Use as base function - if value is 1 assume autoclear set
-Y : -64 to 63 : 34 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Waveshape parameter
-Y : 0 to 14 : 35 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Waveshape – None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt,
+Y : 0 to 127 : 18 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function modulation parameter 1
+Y : 0 to 127 : 19 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function modulation parameter 2
+Y : 0 to 127 : 20 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function modulation parameter 3
+Y : 0 to 3 : 21 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function modulation type – None, Rev, Sine, Pow
+n : 0/1 : 32 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Autoclear when base function – not used
+Y : 0/1 : 33 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Use as base function – if value is 1 assume autoclear set
+Y : -64 to 63 : 34 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Waveshape parameter
+Y : 0 to 14 : 35 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Waveshape – None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt,
  :  :  :  :  :  :  :  :  : Clip, Asym2, Pow2, Sgm
 
-Y : 0 to 127 : 36 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Filter parameter 1
-Y : 0 to 127 : 37 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Filter parameter 2
-Y : 0/1 : 38 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Apply filter before waveshape
-Y : 0 to 13 : 39 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Filter type – None, LP, HP1a, HP1b, BP1, BS1, LP2, HP2, BP2, BS2, Cos, Sin, Lsh, S
-Y : 0 to 127 : 40 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Modulation parameter 1
-Y : 0 to 127 : 41 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Modulation parameter 2
-Y : 0 to 127 : 42 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Modulation parameter 3
-Y : 0 to 3 : 43 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Modulation type – None, Rev, Sine, Pow
-Y : 0 to 127 : 44 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Spectrum adjust parameter
-Y : 0 to 3 : 45 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Spectrum adjust – None, Pow, ThrsD, ThrsU
+Y : 0 to 127 : 36 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Filter parameter 1
+Y : 0 to 127 : 37 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Filter parameter 2
+Y : 0/1 : 38 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Apply filter before waveshape
+Y : 0 to 13 : 39 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Filter type – None, LP, HP1a, HP1b, BP1, BS1, LP2, HP2, BP2, BS2, Cos, Sin, Lsh, S
+Y : 0 to 127 : 40 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Modulation parameter 1
+Y : 0 to 127 : 41 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Modulation parameter 2
+Y : 0 to 127 : 42 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Modulation parameter 3
+Y : 0 to 3 : 43 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Modulation type – None, Rev, Sine, Pow
+Y : 0 to 127 : 44 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Spectrum adjust parameter
+Y : 0 to 3 : 45 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Spectrum adjust – None, Pow, ThrsD, ThrsU
 
-Y : -64 to 64 : 64 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Harmonic shift
-Y : any : 65 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Clear harmonic shift
-Y : 0/1 : 66 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Apply harmonic shift before waveshape and filter
-Y : 0-100 : 67 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Adaptive harmonics parameter
-Y : 0 to 255 : 68 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Adaptive harmonics base frequency
-Y : 0 to 200 : 69 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Adaptive harmonics power
-Y : 0 to 8 : 70 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Adaptive harmonics type – Off, On, 2xSub, 2xAdd, 3xSub,3xAdd, 4xSub, 4xAdd
+Y : -64 to 64 : 64 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Harmonic shift
+Y : any : 65 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Clear harmonic shift
+Y : 0/1 : 66 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Apply harmonic shift before waveshape and filter
+Y : 0-100 : 67 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics parameter
+Y : 0 to 255 : 68 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics base frequency
+Y : 0 to 200 : 69 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics power
+Y : 0 to 8 : 70 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics type – Off, On, 2xSub, 2xAdd, 3xSub,3xAdd, 4xSub, 4xAdd
 
-Y : any : 96 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Clear harmonics
-Y : any : 97 : 0 to 63 : 0 to 15 :  : 5 : 255 : 255 : Convert to sine
+Y : any : 96 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Clear harmonics
+Y : any : 97 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Convert to sine
 Harmonics insert
-Y : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 :  : 6 : 255 : 255 : Point (control) amplitude
-Y : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 :  : 7 : 255 : 255 : Point (control) phase
+Y : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 6 : 255 : 255 : Point (control) amplitude
+Y : 0 to 127 : 0 to 127 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 7 : 255 : 255 : Point (control) phase
 
 Resonance window
 Y : 1 to 90 : 0 : 0 to 63 : 0 to 15 : 0 or 2 : 8 : 255 : 255 : Max dB
@@ -330,24 +331,22 @@ LFO insert
  :  :  :  :  :  :  :  :  : Engine is 128 + (0 to 7) for AddSynth voice
  :  :  :  :  :  :  :  :  : Engine is 192 + (0 to 7) for AddSynth voice modulator
  :  :  :  :  :  :  :  :  : Engine is 2 for PadSynth
-
+ :  :  :  :  :  :  :  :  :
  :  :  :  :  :  :  : See Note > :  : Parameter 0 is Amplitude LFO
  :  :  :  :  :  :  :  :  : Parameter 1 is Frequency LFO
  :  :  :  :  :  :  :  :  : Parameter 2 is Filter LFO
-
-Y : 0.0 to 1.0 : 0 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Frequency
-Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Depth
-Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Delay
-Y : 0 to 127 : 3 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Start
-Y : 0 to 127 : 4 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Amplitude randomness
-Y : 0 to 6 : 5 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Type – Sine, Tri, Sqr, R.up, R.dn, E1dn, E2dn
-Y : 0/1 : 6 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Continuous
-Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Frequency randomness
-Y : 0 to 127 : 8 : 0 to 63 : 0 to 15 :  : 0 :  : 255 : Stretch
+Y : 0.0 to 1.0 : 0 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Frequency
+Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Depth
+Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Delay
+Y : 0 to 127 : 3 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Start
+Y : 0 to 127 : 4 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Amplitude randomness
+Y : 0 to 6 : 5 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Type – Sine, Tri, Sqr, R.up, R.dn, E1dn, E2dn
+Y : 0/1 : 6 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Continuous
+Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Frequency randomness
+Y : 0 to 127 : 8 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 0 : 0 to 2 : 255 : Stretch
 
 Filter parameters insert
  :  :  :  :  : See Note -> :  :  :  : This must be 136 for the filter component of DynFilter
-
 Y : 0 to 127 : 0 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Centre frequency
 Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Q
 Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Frequency tracking
@@ -381,30 +380,29 @@ Envelope insert
  :  :  :  :  :  :  :  :  : Parameter 1 is Frequency envelope
  :  :  :  :  :  :  :  :  : Parameter 2 is Filter envelope
  :  :  :  :  :  :  :  :  : Parameter 3 is Bandwidth envelope (SubSynth only)
-
-Y : 0 to 127 : 0 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Attack value
-Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Attack time
-Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Decay value
-Y : 0 to 127 : 3 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Decay time
-Y : 0 to 127 : 4 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Sustain value
-Y : 0 to 127 : 5 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Release time
-Y : 0 to 127 : 6 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Release value
-Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Stretch
-Y : 0/1 : 16 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Forced release
-Y : 0/1 : 17 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Envelope is Linear
-Y : 0/1 : 32 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Enable freemode
+Y : 0 to 127 : 0 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Attack value
+Y : 0 to 127 : 1 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Attack time
+Y : 0 to 127 : 2 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Decay value
+Y : 0 to 127 : 3 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Decay time
+Y : 0 to 127 : 4 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Sustain value
+Y : 0 to 127 : 5 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Release time
+Y : 0 to 127 : 6 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Release value
+Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Stretch
+Y : 0/1 : 16 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Forced release
+Y : 0/1 : 17 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Envelope is Linear
+Y : 0/1 : 32 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Enable freemode
 Freemode
-Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Stretch
-Y : 0/1 : 16 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Forced release
-Y : 0/1 : 17 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Envelope is Linear
+Y : 0 to 127 : 7 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Stretch
+Y : 0/1 : 16 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Forced release
+Y : 0/1 : 17 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Envelope is Linear
 Graph points
-Y : any : 34 : 0 to 63 : 0 to 15 : All : 2 :  : any : Returns ‘Par 2’ number of defined points
-Y : 0-39 : 35 : 0 to 63 : 0 to 15 : All : 2 :  : 255 : Sustain position – limited by number of defined points
- :  :  :  :  :  :  :  :  :
- :  : See Note > :  :  :  :  :  :  : For the next three: 'Control’ is the point number
-Y : 0 to 127 : 64 + (0 to 39) : 0 to 63 : 0 to 15 : All : 3 :  : 0 to 127 : Add point - ‘Par 2’ is X incremental value, ‘Value’ is Y value
-Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 :  : any : Delete point - Returns ‘Par 2’ number of points remaining
-Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 4 :  : 0 to 127 : Adjust - ‘Par 2’ is X incremental value, ‘Value’ is Y value
+Y : any : 34 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : any : Returns ‘Par 2’ number of defined points
+Y : 0-39 : 35 : 0 to 63 : 0 to 15 : All : 2 : 0 to 3 : 255 : Sustain position – limited by number of defined points
+
+ :  : See Note > :  :  :  :  :  :  : For the next three :  'Control’ is the point number
+Y : 0 to 127 : 64 + (0 to 39) : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : 0 to 127 : Add point - ‘Par 2’ is X incremental value, ‘Value’ is Y value
+Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : any : Delete point - Returns ‘Par 2’ number of points remaining
+Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 4 : 0 to 3 : 0 to 127 : Adjust - ‘Par 2’ is X incremental value, ‘Value’ is Y value
 
 Insertion Effect Selector
 Y : 0 to 7 : 0 : 242 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
@@ -421,9 +419,7 @@ Effect Inserts
  :  :  : See note > :  :  :  :  :  : For system effects part number is 241
  :  :  :  :  :  :  :  :  : For insertion effects part number is 242
  :  :  :  :  :  :  :  :  : Normal part effects are numbers 0 to 63
-
  :  :  :  : See note -> :  :  :  :  : Kit numbers are 128 + (0 to 8) for actual effect types.
  :  :  :  :  :  :  :  :  : 0 is no effect
-
-Y :  : 0 to 15 :  :  : effect number : 255 : 255 : 255 : Depends on actual effect
+Y :  : 0 to 15 : 0 to 63, 241, 242 : 128 : effect number : 255 : 255 : 255 : Depends on actual effect
  :  :  :  :  :  :  :  :  : See ‘Effect_Inserts.txt’ for all control ranges.
