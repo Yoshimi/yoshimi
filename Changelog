@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-9-28 Will
+* Added more info to /dev_notes and /doc.
+* Added three new instruments to "Companion"
+* No code changes.
+
 2016-9-26 Will
 * Bugfix: AddSynth Mod Amp Env enable now works.
 * Applied Jespers batch to make scripts bash/dash compatible.
