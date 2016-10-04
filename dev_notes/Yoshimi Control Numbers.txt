@@ -9,24 +9,24 @@ Y : any : 96 : 240 : 255 : 255 : 255 : 255 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 
 Vector control window
-n : 0 to 15 : 0 : 192 : 255 : 255 : 255 : 255 : 255 : Base channel
-n : 0 to 4 : 1 : 192 : 255 : 255 : 255 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
+n : 0 to 15 : 0 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Base channel
+n : 0 to 4 : 1 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
 
-n : 0, 14 to 119 : 16 : 192 : 255 : 255 : 255 : 255 : 255 : X controller
-n : any : 17 : 192 : 255 : 255 : 255 : 255 : 255 : X left instrument
-n : any : 18 : 192 : 255 : 255 : 255 : 255 : 255 : X right instrument
-n : 0/1 : 19 : 192 : 255 : 255 : 255 : 255 : 255 : X feature 0
-n : 0/1 : 20 : 192 : 255 : 255 : 255 : 255 : 255 : X feature 1
-n : 0/1 : 21 : 192 : 255 : 255 : 255 : 255 : 255 : X feature 2
-n : 0/1 : 22 : 192 : 255 : 255 : 255 : 255 : 255 : X feature 3
+n : 0, 14 to 119 : 16 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X controller
+n : any : 17 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X left instrument
+n : any : 18 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X right instrument
+n : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0
+n : 0/1 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1
+n : 0/1 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2
+n : 0/1 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3
 
-n : 0, 14 to 119 : 32 : 192 : 255 : 255 : 255 : 255 : 255 : Y controller
-n : any : 33 : 192 : 255 : 255 : 255 : 255 : 255 : Y up instrument
-n : any : 34 : 192 : 255 : 255 : 255 : 255 : 255 : Y down instrument
-n : 0/1 : 35 : 192 : 255 : 255 : 255 : 255 : 255 : Y feature 0
-n : 0/1 : 36 : 192 : 255 : 255 : 255 : 255 : 255 : Y feature 1
-n : 0/1 : 37 : 192 : 255 : 255 : 255 : 255 : 255 : Y feature 2
-n : 0/1 : 38 : 192 : 255 : 255 : 255 : 255 : 255 : Y feature 3
+n : 0, 14 to 119 : 32 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y controller
+n : any : 33 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y up instrument
+n : any : 34 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y down instrument
+n : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0
+n : 0/1 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1
+n : 0/1 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2
+n : 0/1 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3
 
 Main part controls
 Y : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume

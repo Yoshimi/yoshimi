@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-10-4 Will
+* Started implementing direct access to Vectors
+
 2016-9-28 Will
 * Added more info to /dev_notes and /doc.
 * Added three new instruments to "Companion"

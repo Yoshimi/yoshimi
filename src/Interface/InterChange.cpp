@@ -137,7 +137,7 @@ void InterChange::commandSend(CommandBlock *getData)
                             + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
     }
-    if (npart == 0xc0)
+    if (npart >= 0xc0 && npart < 0xd0)
     {
         commandVector(getData);
         return;
@@ -281,62 +281,120 @@ void InterChange::commandVector(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    unsigned int chan = getData->data.part & 0xf;
 
+    bool write = (type & 0x40) > 0;
+    
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Base Channel"; // local to source
+            break;
+        case 1:
+            contstr = "Options";
+            if (write)
+                ;
+            else
+                ;
+            break;
+
+        case 16:
+            contstr = "Controller";
+            if (write)
+                synth->vectorSet(0, chan, value);
+            else
+                ;
+            break;
+        case 17:
+            contstr = "Left Instrument";
+            if (write && !synth->vectorInit(4, chan, value))
+                synth->vectorSet(4, chan, value);
+            else
+                ;
+            break;
+        case 18:
+            contstr = "Right Instrument";
+            if (write && !synth->vectorInit(5, chan, value))
+                synth->vectorSet(5, chan, value);
+            else
+                ;
+            break;
+        case 19:
+        case 35:
+            contstr = "Feature 0";
+            if (write)
+                ;
+            else
+                ;
+            break;
+        case 20:
+        case 36:
+            contstr = "Feature 1";
+            if (write)
+                ;
+            else
+                ;
+            break;
+        case 21:
+        case 37:
+            contstr = "Feature 2 ";
+            if (write)
+                ;
+            else
+                ;
+            break;
+        case 22:
+        case 38:
+            contstr = "Feature 3";
+            if (write)
+                ;
+            else
+                ;
+            break;
+            
+        case 32:
+            contstr = "Controller";
+            if (write)
+                synth->vectorSet(1, chan, value);
+            else
+                ;
+            break;
+        case 33:
+            contstr = "Up Instrument";
+            if (write && !synth->vectorInit(7, chan, value))
+                synth->vectorSet(7, chan, value);
+            else
+                ;
+            break;
+        case 34:
+            contstr = "Down Instrument";
+            if (write)
+                ;
+            else
+                ;
+            break;
+            
+            case 127:
+            contstr = "Disable";
+            if (write)
+                synth->vectorSet(127, chan, value);
+            break;
+    }
+    
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
     else
         actual = to_string(value);
-
-    string contstr = "";
-    switch (control)
-    {
-        case 0:
-            contstr = "Base Channel";
-            break;
-        case 1:
-            contstr = "Options";
-            break;
-
-        case 16:
-        case 32:
-            contstr = "Controller";
-            break;
-        case 17:
-            contstr = "Left Instrument";
-            break;
-        case 18:
-            contstr = "Right Instrument";
-            break;
-        case 19:
-        case 35:
-            contstr = "Feature 0";
-            break;
-        case 20:
-        case 36:
-            contstr = "Feature 1";
-            break;
-        case 21:
-        case 37:
-            contstr = "Feature 2 ";
-            break;
-        case 22:
-        case 38:
-            contstr = "Feature 3";
-            break;
-        case 33:
-            contstr = "Up Instrument";
-            break;
-        case 34:
-            contstr = "Down Instrument";
-            break;
-    }
-    string name = "Vector ";
-    if (control >= 32)
-        name += "Y ";
-
+    
+    string name = "Vector Chan " + to_string(chan);
+    if (control == 127)
+        name += "  all ";
+    else if (control >= 32)
+        name += "  Y ";
     else if(control >= 16)
-        name += "X ";
+        name += "  X ";
     synth->getRuntime().Log(name + contstr + " value " + actual);
 }
 
