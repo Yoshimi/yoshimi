@@ -278,13 +278,23 @@ void InterChange::commandSend(CommandBlock *getData)
 
 void InterChange::commandVector(CommandBlock *getData)
 {
-    float value = getData->data.value;
+    int value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.part & 0xf;
+    unsigned int bank = getData->data.kit;
+    unsigned int root = getData->data.engine;
 
     bool write = (type & 0x40) > 0;
-    
+
+    if (write && (control == 17 || control == 18 || control == 33 || control == 34))
+    {
+        if (root < 0x80)
+            synth->writeRBP(1, root, 0);
+        if (bank < 0x80)
+            synth->writeRBP(2, bank, 0);
+    }
+
     string contstr = "";
     switch (control)
     {
@@ -302,26 +312,31 @@ void InterChange::commandVector(CommandBlock *getData)
         case 16:
             contstr = "Controller";
             if (write)
-                synth->vectorSet(0, chan, value);
+            {
+                if (value >= 14)
+                {
+                    if (!synth->vectorInit(0, chan, value))
+                        synth->vectorSet(0, chan, value);
+                }
+            }
             else
                 ;
             break;
         case 17:
             contstr = "Left Instrument";
-            if (write && !synth->vectorInit(4, chan, value))
+            if (write)
                 synth->vectorSet(4, chan, value);
             else
                 ;
             break;
         case 18:
             contstr = "Right Instrument";
-            if (write && !synth->vectorInit(5, chan, value))
+            if (write)
                 synth->vectorSet(5, chan, value);
             else
                 ;
             break;
         case 19:
-        case 35:
             contstr = "Feature 0";
             if (write)
                 ;
@@ -329,7 +344,6 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 20:
-        case 36:
             contstr = "Feature 1";
             if (write)
                 ;
@@ -337,7 +351,6 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 21:
-        case 37:
             contstr = "Feature 2 ";
             if (write)
                 ;
@@ -345,6 +358,61 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 22:
+            contstr = "Feature 3";
+            if (write)
+                ;
+            else
+                ;
+            break;
+
+        case 32:
+            contstr = "Controller";
+            if (write)
+            {
+                if (value >= 14)
+                {
+                    if (!synth->vectorInit(1, chan, value))
+                        synth->vectorSet(1, chan, value);
+                }
+            }
+            else
+                ;
+            break;
+        case 33:
+            contstr = "Up Instrument";
+            if (write)
+                synth->vectorSet(6, chan, value);
+            else
+                ;
+            break;
+        case 34:
+            contstr = "Down Instrument";
+            if (write)
+                synth->vectorSet(7, chan, value);
+            else
+                ;
+            break;
+        case 35:
+            contstr = "Feature 0";
+            if (write)
+                ;
+            else
+                ;
+            break;
+        case 36:
+            contstr = "Feature 1";
+            if (write)
+                ;
+            else
+                ;
+            break;
+        case 37:
+            contstr = "Feature 2";
+            if (write)
+                ;
+            else
+                ;
+            break;
         case 38:
             contstr = "Feature 3";
             if (write)
@@ -352,42 +420,14 @@ void InterChange::commandVector(CommandBlock *getData)
             else
                 ;
             break;
-            
-        case 32:
-            contstr = "Controller";
-            if (write)
-                synth->vectorSet(1, chan, value);
-            else
-                ;
-            break;
-        case 33:
-            contstr = "Up Instrument";
-            if (write && !synth->vectorInit(7, chan, value))
-                synth->vectorSet(7, chan, value);
-            else
-                ;
-            break;
-        case 34:
-            contstr = "Down Instrument";
-            if (write)
-                ;
-            else
-                ;
-            break;
-            
-            case 127:
+
+        case 127:
             contstr = "Disable";
             if (write)
                 synth->vectorSet(127, chan, value);
             break;
     }
-    
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    
+
     string name = "Vector Chan " + to_string(chan);
     if (control == 127)
         name += "  all ";
@@ -395,7 +435,7 @@ void InterChange::commandVector(CommandBlock *getData)
         name += "  Y ";
     else if(control >= 16)
         name += "  X ";
-    synth->getRuntime().Log(name + contstr + " value " + actual);
+    synth->getRuntime().Log(name + contstr + " value " + to_string(value));
 }
 
 

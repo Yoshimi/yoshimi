@@ -9,24 +9,27 @@ Y : any : 96 : 240 : 255 : 255 : 255 : 255 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 
 Vector control window
-n : 0 to 15 : 0 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Base channel
+ :  :  : Base Channel
+n : 0 to 15 : 0 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Was Base channel Now does nothing
 n : 0 to 4 : 1 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Options - Load, Save, Recent, Clear Chan, Clear All
 
-n : 0, 14 to 119 : 16 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X controller
-n : any : 17 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X left instrument
-n : any : 18 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X right instrument
-n : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0
-n : 0/1 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1
-n : 0/1 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2
-n : 0/1 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3
+Y : 0, 14 to 119 : 16 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X controller
+Y : any : 17 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : any : 18 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+n : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0 - off, on
+n : 0 to 2 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1 - off, on, reverse
+n : 0 to 2 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2 - off, on, reverse
+n : 0 to 2 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3 - off, on, reverse
 
-n : 0, 14 to 119 : 32 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y controller
-n : any : 33 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y up instrument
-n : any : 34 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y down instrument
-n : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0
-n : 0/1 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1
-n : 0/1 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2
-n : 0/1 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3
+Y : 0, 14 to 119 : 32 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y controller
+Y : any : 33 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y up instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+Y : any : 34 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y down instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
+n : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0 - off, on
+n : 0 to 2 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1 - off, on, reverse
+n : 0 to 2 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2 - off, on, reverse
+n : 0 to 2 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3 - off, on, reverse
+
+Y : any : 127 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : disable this base channel
 
 Main part controls
 Y : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume
@@ -91,16 +94,15 @@ Y : 0/1 : 8 : 0 to 63 : 255 : 2 : 255 : 255 : 255 : Enable PadSynth
 Y : 0 to 50 : 48 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Humanise
 
 Kit edit window
- :  :  :  : See note -> :  :  :  :  : For controls 8 to 24 kit number is OR’d with 32
-Y : 0/1 : 8 : 0 to 63 : 1 to 15 : 255 : 255 : 255 : 255 : Kit item enable
-Y : 0/1 : 9 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item mute
-Y : 0 to 126 : 16 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum note
-Y : 1 to 127 : 17 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item maximum note
-Y : any : 18 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum to last key press
-Y : any : 19 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item maximum to last key press
-Y : any : 20 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item clear key limits
+Y : 0/1 : 32 + 8 : 0 to 63 : 1 to 15 : 255 : 255 : 255 : 255 : Kit item enable
+Y : 0/1 : 32 + 9 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item mute
+Y : 0 to 126 : 32 + 16 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum note
+Y : 1 to 127 : 32 + 17 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item maximum note
+Y : any : 32 + 18 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum to last key press
+Y : any : 32 + 19 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item maximum to last key press
+Y : any : 32 + 20 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Kit item clear key limits
 
-Y : 1 to 3, 127 : 24 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Effect number to use – Off, 1, 2, 3 (off = 127)
+Y : 1 to 3, 127 : 32 + 24 : 0 to 63 : 0 to 15 : 255 : 255 : 255 : 255 : Effect number to use – Off, 1, 2, 3 (off = 127)
 
 Y : 0/1 : 57 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Drum mode
 Y : 0 to 2 : 58 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Mode – Off, Multi, Single

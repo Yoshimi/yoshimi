@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified March 2011
+This file is derivative of ZynAddSubFX original code, modified October 2016
 } {in_source in_header
 } 
 
@@ -539,8 +539,9 @@ send_data(16, o->value());}
       Fl_Value_Output octavesfreqvo {
         label {Oct.}
         callback {o->value(pars->getoctavesfreq());}
-        tooltip {No. of octaves} xywh {512 185 35 15} box THIN_DOWN_BOX labelsize 12 when 3 minimum 1 maximum 127 step 1 value 5 textfont 1 textsize 11
-        code0 {o->value(pars->getoctavesfreq());}
+        tooltip {No. of octaves} xywh {512 185 35 16} box THIN_DOWN_BOX labelsize 12 when 3 minimum 1 maximum 127 value 5 textfont 1 textsize 11
+        code0 {o->step(0.01, 1);}
+        code1 {o->value(pars->getoctavesfreq());}
       }
       Fl_Slider cfknob {
         callback {if (Fl::event_button() == 3)
@@ -552,7 +553,7 @@ formantfiltergraph->redraw();
 pars->changed = true;
 
 send_data(22, o->value());}
-        xywh {547 164 89 15} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
+        xywh {547 164 89 16} type {Horz Knob} box THIN_DOWN_BOX maximum 127 step 1
         code0 {o->value(pars->Pcenterfreq);}
         class mwheel_slider_rev
       }
