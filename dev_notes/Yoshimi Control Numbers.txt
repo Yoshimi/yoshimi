@@ -16,20 +16,18 @@ n : 0 to 4 : 1 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Options - Load,
 Y : 0, 14 to 119 : 16 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X controller
 Y : any : 17 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X left instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
 Y : any : 18 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X right instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-n : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0 - off, on
-n : 0 to 2 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1 - off, on, reverse
-n : 0 to 2 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2 - off, on, reverse
-n : 0 to 2 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3 - off, on, reverse
+Y : 0/1 : 19 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 0 - off, on
+Y : 0 to 2 : 20 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 1 - off, on, reverse
+Y : 0 to 2 : 21 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 2 - off, on, reverse
+Y : 0 to 2 : 22 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : X feature 3 - off, on, reverse
 
 Y : 0, 14 to 119 : 32 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y controller
 Y : any : 33 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y up instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
 Y : any : 34 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y down instrument - kit = 255, current, else bank ID. engine = 255, current, else root ID
-n : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0 - off, on
-n : 0 to 2 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1 - off, on, reverse
-n : 0 to 2 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2 - off, on, reverse
-n : 0 to 2 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3 - off, on, reverse
-
-Y : any : 127 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : disable this base channel
+Y : 0/1 : 35 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 0 - off, on
+Y : 0 to 2 : 36 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 1 - off, on, reverse
+Y : 0 to 2 : 37 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 2 - off, on, reverse
+Y : 0 to 2 : 38 : 192 + (0 to 15) : 255 : 255 : 255 : 255 : 255 : Y feature 3 - off, on, reverse
 
 Main part controls
 Y : 0 to 127 : 0 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Volume

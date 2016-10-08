@@ -29,6 +29,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
+#include "UI/MiscGui.h"
 #include "Synth/BodyDisposal.h"
 #include <map>
 #include <list>
@@ -240,6 +241,7 @@ static void *mainGuiThread(void *arg)
                 splashMessages.pop_front();
             }
             GuiThreadMsg::processGuiMessages();
+            //read_updates();
         }
         else
             usleep(33333);

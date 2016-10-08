@@ -1643,6 +1643,21 @@ bool CmdInterface::cmdIfaceProcessCommand()
     synth = itSynth->first;
     Config &Runtime = synth->getRuntime();
 
+
+    /* some message tests
+    int a = miscMsgPush("The first test ");
+    int b = miscMsgPush("The second test ");
+    int c = miscMsgPush("Another test ");
+
+    Runtime.Log(miscMsgPop(b) + to_string(b));
+    Runtime.Log(miscMsgPop(a) + to_string(a));
+    b = miscMsgPush("Short ");
+    a = miscMsgPush("A much longer one than all the others ");
+    Runtime.Log(miscMsgPop(c) + to_string(c));
+    Runtime.Log(miscMsgPop(a) + to_string(a));
+    Runtime.Log(miscMsgPop(b) + to_string(b));
+    */
+
     replyString = "";
     npart = Runtime.currentPart;
     int ID;

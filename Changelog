@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-10-8 Will
+* Direct vector access almost complete.
+* Updated docs.
+
+
 2016-10-7 Will
 * Small corrections to GUI.
 * More work on direct Vector access.

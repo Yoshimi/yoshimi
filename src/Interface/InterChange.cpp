@@ -286,15 +286,22 @@ void InterChange::commandVector(CommandBlock *getData)
     unsigned int root = getData->data.engine;
 
     bool write = (type & 0x40) > 0;
+    unsigned int features;
 
-    if (write && (control == 17 || control == 18 || control == 33 || control == 34))
+    if (write)
     {
-        if (root < 0x80)
-            synth->writeRBP(1, root, 0);
-        if (bank < 0x80)
-            synth->writeRBP(2, bank, 0);
+        if (control == 17 || control == 18 || control == 33 || control == 34)
+        {
+            if (root < 0x80)
+                synth->writeRBP(1, root, 0);
+            if (bank < 0x80)
+                synth->writeRBP(2, bank, 0);
+        }
+        else if (control >= 19 && control <= 22)
+            features = synth->getRuntime().nrpndata.vectorXfeatures[chan];
+        else if (control >= 35 && control <= 38)
+            features = synth->getRuntime().nrpndata.vectorYfeatures[chan];
     }
-
     string contstr = "";
     switch (control)
     {
@@ -304,9 +311,26 @@ void InterChange::commandVector(CommandBlock *getData)
         case 1:
             contstr = "Options";
             if (write)
-                ;
-            else
-                ;
+            {
+                switch (value)
+                {
+                    case 0:
+                        //synth->partonoffWrite(chan, 0);
+                        break;
+                    case 1:
+                        //synth->partonoffWrite(chan, 1);
+                        break;
+                    case 2:  // local to source
+                        break;
+                    case 3:
+                        synth->vectorSet(127, chan, 0);
+                        break;
+                    case 4:
+                        for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ ch)
+                            synth->vectorSet(127, ch, 0);
+                        break;
+                }
+            }
             break;
 
         case 16:
@@ -337,30 +361,64 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 19:
+        case 35:
             contstr = "Feature 0";
             if (write)
-                ;
+                if (value == 0)
+                    bitClear(features, 0);
+                else
+                    bitSet(features, 0);
             else
                 ;
             break;
         case 20:
+        case 36:
             contstr = "Feature 1";
             if (write)
-                ;
+            {
+                bitClear(features, 1);
+                bitClear(features, 4);
+                if (value > 0)
+                {
+                    bitSet(features, 1);
+                    if (value == 2)
+                        bitSet(features, 4);
+                }
+            }
             else
                 ;
             break;
         case 21:
+        case 37:
             contstr = "Feature 2 ";
             if (write)
-                ;
+            {
+                bitClear(features, 2);
+                bitClear(features, 5);
+                if (value > 0)
+                {
+                    bitSet(features, 2);
+                    if (value == 2)
+                        bitSet(features, 5);
+                }
+            }
             else
                 ;
             break;
         case 22:
+        case 38:
             contstr = "Feature 3";
             if (write)
-                ;
+            {
+                bitClear(features, 3);
+                bitClear(features, 6);
+                if (value > 0)
+                {
+                    bitSet(features, 3);
+                    if (value == 2)
+                        bitSet(features, 6);
+                }
+            }
             else
                 ;
             break;
@@ -392,40 +450,14 @@ void InterChange::commandVector(CommandBlock *getData)
             else
                 ;
             break;
-        case 35:
-            contstr = "Feature 0";
-            if (write)
-                ;
-            else
-                ;
-            break;
-        case 36:
-            contstr = "Feature 1";
-            if (write)
-                ;
-            else
-                ;
-            break;
-        case 37:
-            contstr = "Feature 2";
-            if (write)
-                ;
-            else
-                ;
-            break;
-        case 38:
-            contstr = "Feature 3";
-            if (write)
-                ;
-            else
-                ;
-            break;
+    }
 
-        case 127:
-            contstr = "Disable";
-            if (write)
-                synth->vectorSet(127, chan, value);
-            break;
+    if (write)
+    {
+        if (control >= 19 && control <= 22)
+            synth->getRuntime().nrpndata.vectorXfeatures[chan] = features;
+        else if (control >= 35 && control <= 38)
+            synth->getRuntime().nrpndata.vectorYfeatures[chan] = features;
     }
 
     string name = "Vector Chan " + to_string(chan);

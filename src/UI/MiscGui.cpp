@@ -46,3 +46,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     synth->commandFetch(value, type | 0x20, control, part, kititem, engine, insert, parameter, par2);
 #endif
 }
+
+void read_updates()
+{
+    cout << "Reading" << endl;
+}

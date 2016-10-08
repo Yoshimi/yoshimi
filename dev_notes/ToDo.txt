@@ -1,4 +1,6 @@
 
+CLI doesn't manage global detune, but direct access does.
+
 Find out why LV2 only stores/retrieves patch sets (not state)
 
 Consider expanding state files to include all instances.
