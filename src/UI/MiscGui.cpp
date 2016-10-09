@@ -42,8 +42,20 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
         type = 1 | (type & (1 << 7));
         // change scroll wheel to button 1
 
-    // 0x20 = from GUI
-    synth->commandFetch(value, type | 0x20, control, part, kititem, engine, insert, parameter, par2);
+    CommandBlock putData;
+    size_t commandSize = sizeof(putData);
+    putData.data.value = value;
+    putData.data.type = type | 0x20; // 0x20 = from GUI
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kititem;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
+        jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
+
 #endif
 }
 

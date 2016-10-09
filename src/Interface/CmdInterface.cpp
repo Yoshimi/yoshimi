@@ -1644,7 +1644,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     Config &Runtime = synth->getRuntime();
 
 
-    /* some message tests
+    /*some message tests
     int a = miscMsgPush("The first test ");
     int b = miscMsgPush("The second test ");
     int c = miscMsgPush("Another test ");
@@ -2138,7 +2138,21 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
             }
         }
-        synth->interchange.commandFetch(value, type, control, part, kit, engine, insert, param, par2);
+
+        CommandBlock putData;
+        size_t commandSize = sizeof(putData);
+        putData.data.value = value;
+        putData.data.type = type;
+        putData.data.control = control;
+        putData.data.part = part;
+        putData.data.kit = kit;
+        putData.data.engine = engine;
+        putData.data.insert = insert;
+        putData.data.parameter = param;
+        putData.data.par2 = par2;
+        if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+            jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
+
         reply = done_msg;
     }
     else

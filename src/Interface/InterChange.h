@@ -58,9 +58,8 @@ class InterChange : private MiscFuncs
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
 
-        jack_ringbuffer_t *sendbuf;
-
-        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff, unsigned char insertPar2 = 0xff);
+        jack_ringbuffer_t *fromCLI;
+        jack_ringbuffer_t *fromGUI;
 
         void mediate();
         void setpadparams(int point);

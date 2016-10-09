@@ -42,45 +42,57 @@ InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
     // quite incomplete - we don't know what will develop yet!
-    if (!(sendbuf = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
-        synth->getRuntime().Log("InteChange failed to create send ringbuffer");
+    if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+        synth->getRuntime().Log("InteChange failed to create from CLI ringbuffer");
+
+    if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+        synth->getRuntime().Log("InteChange failed to create from GUI ringbuffer");
 }
 
 
 InterChange::~InterChange()
 {
-    if (sendbuf)
-        jack_ringbuffer_free(sendbuf);
-}
-
-
-void InterChange::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char insertParam, unsigned char insertPar2)
-{
-    CommandBlock putData;
-    putData.data.value = value;
-    putData.data.type = type;
-    putData.data.control = control;
-    putData.data.part = part;
-    putData.data.kit = kititem;
-    putData.data.engine = engine;
-    putData.data.insert = insert;
-    putData.data.parameter = insertParam;
-    putData.data.par2 = insertPar2;
-    if (jack_ringbuffer_write_space(sendbuf) >= commandSize)
-        jack_ringbuffer_write(sendbuf, (char*) putData.bytes, commandSize);
-    return;
+    if (fromCLI)
+        jack_ringbuffer_free(fromCLI);
+    if (fromGUI)
+        jack_ringbuffer_free(fromGUI);
 }
 
 
 void InterChange::mediate()
 {
     CommandBlock getData;
-    int toread = commandSize;
-    char *point = (char*) &getData.bytes;
-    for (size_t i = 0; i < commandSize; ++i)
-        jack_ringbuffer_read(sendbuf, point, toread);
-
-    commandSend(&getData);
+    bool more;
+    unsigned int size;
+    int toread;
+    char *point;
+    do
+    {
+        more = false;
+        size = jack_ringbuffer_read_space(fromCLI);
+        if (size >= sizeof(commandSize))
+        {
+            if (size > sizeof(commandSize))
+                more = true;
+            toread = commandSize;
+            point = (char*) &getData.bytes;
+            for (size_t i = 0; i < commandSize; ++i)
+                jack_ringbuffer_read(fromCLI, point, toread);
+            commandSend(&getData);
+        }
+        size = jack_ringbuffer_read_space(fromGUI);
+        if (size >= sizeof(commandSize))
+        {
+            if (size > sizeof(commandSize))
+                more = true;
+            toread = commandSize;
+            point = (char*) &getData.bytes;
+            for (size_t i = 0; i < commandSize; ++i)
+                jack_ringbuffer_read(fromGUI, point, toread);
+            commandSend(&getData);
+        }
+    }
+    while (more);
 }
 
 

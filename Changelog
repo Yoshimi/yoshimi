@@ -1,5 +1,11 @@
 yoshimi 1.4.1 M
 
+2016-10-9 Will
+* Gave direct access CLI & GUI independent 'from' ring buffers.
+* Improved direct access data transfers.
+* Small correction to Vector GUI.
+* Improved simple message system.
+
 2016-10-8 Will
 * Direct vector access almost complete.
 * Updated docs.

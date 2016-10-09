@@ -358,7 +358,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
 
 
 /*
- * These two functions provide a transparent text messaging system.
+ * These functions provide a transparent text messaging system.
  * Calling functions only need to recognise integers and strings.
  *
  * Push extends the list if there are no empty slots.
@@ -372,6 +372,12 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  * Normally a message will clear before the next one arrives so the
  * message numbers should remain very low even over multiple instances.
  */
+void MiscFuncs::miscMsgInit()
+{
+    for (int i = 0; i < 256; ++i)
+        miscList.push_back("");
+}
+
 int MiscFuncs::miscMsgPush(string _text)
 {
     mutex mtx;
@@ -393,14 +399,8 @@ int MiscFuncs::miscMsgPush(string _text)
     }
     if (it == miscList.end())
     {
-        if (miscList.size() >= 255)
-        {
-            mtx.unlock();
-            cout << "List too big :(" << endl;
-            idx = -1;
-        }
-        else
-            miscList.push_back(text);
+        cout << "List full :(" << endl;
+        idx = -1;;
     }
 
     int result = idx; // in case of a new entry before return

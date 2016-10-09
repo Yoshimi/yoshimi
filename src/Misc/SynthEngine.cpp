@@ -177,7 +177,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade;
     int found = 0;
-    if (!interchange.sendbuf)
+    if (!interchange.fromCLI)
+        goto bail_out;
+    if (!interchange.fromGUI)
         goto bail_out;
 
     if (!pthread_mutex_init(&processMutex, NULL))
@@ -777,15 +779,6 @@ void SynthEngine::SetBank(int banknum)
 int SynthEngine::ReadBank(void)
 {
     return bank.currentBankID;
-}
-
-
-void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam, unsigned char insertPar2)
-{
-    // while testing, this simply sends everything to Interchange
-
-    interchange.commandFetch(value, type, control, part, kit, engine, insert, insertParam, insertPar2);
-    return;
 }
 
 
@@ -1901,10 +1894,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         p_buffersize_f = p_buffersize;
     }
 
-    while (jack_ringbuffer_read_space(interchange.sendbuf) >= sizeof(interchange.commandSize))
-    {
-        interchange.mediate();
-    }
+    interchange.mediate();
 
     int npart;
 

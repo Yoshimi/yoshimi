@@ -431,6 +431,8 @@ bool Config::loadConfig(void)
 
     if (synth->getUniqueId() > 0)
         yoshimi += ("-" + asString(synth->getUniqueId()));
+    else
+        miscMsgInit(); // sneaked it in here so it's early
     string presetDir = ConfigDir + "/presets";
     if (!isDirectory(presetDir))
     {

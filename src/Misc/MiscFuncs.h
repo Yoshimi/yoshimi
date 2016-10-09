@@ -64,6 +64,7 @@ class MiscFuncs
         int matchWord(int numChars, char *point, const char *word);
         bool matchnMove(int num, char *&pnt, const char *word);
 
+        void miscMsgInit(void);
         int miscMsgPush(string text);
         string miscMsgPop(int pos);
 
