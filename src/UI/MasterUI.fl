@@ -91,7 +91,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1077,6 +1077,27 @@ else
     eng = 0xff;
 
 collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
+    code {//
+    printf("Hello, World!\\n");
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.part;
+    
+    switch(control)
+    {
+    	case 0:
+    	    mastervolumedial->value(value);
+    	    break;
+    	case 32:
+    	        globalfinedetune->value(value);
+    	    break;
+    }
+    Fl::check();} {selected
+    }
   }
   Function {updatesendwindow()} {} {
     code {//

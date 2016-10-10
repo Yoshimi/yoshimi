@@ -2100,7 +2100,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (matchnMove(6, point, "direct"))
     {
         float value = string2float(point);
-        unsigned char type = 0x10;
+        unsigned char type = 0x10; // 0x10 = from CLI
         if (strchr(point, '.') == NULL)
             type |= 0x80;
         point = skipChars(point);

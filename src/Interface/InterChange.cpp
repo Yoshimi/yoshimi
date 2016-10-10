@@ -43,19 +43,41 @@ InterChange::InterChange(SynthEngine *_synth) :
 {
     // quite incomplete - we don't know what will develop yet!
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
-        synth->getRuntime().Log("InteChange failed to create from CLI ringbuffer");
+    {
+        fromCLI = NULL;
+        synth->getRuntime().Log("InteChange failed to create 'fromCLI' ringbuffer");
+    }
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
-        synth->getRuntime().Log("InteChange failed to create from GUI ringbuffer");
+    {
+        fromGUI = NULL;
+        synth->getRuntime().Log("InteChange failed to create 'fromGUI' ringbuffer");
+    }
+    if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+    {
+        toGUI = NULL;
+        synth->getRuntime().Log("InteChange failed to create 'toGUI' ringbuffer");
+    }
 }
 
 
 InterChange::~InterChange()
 {
     if (fromCLI)
+    {
         jack_ringbuffer_free(fromCLI);
+        fromCLI = NULL;
+    }
     if (fromGUI)
+    {
         jack_ringbuffer_free(fromGUI);
+        fromGUI = NULL;
+    }
+    if (toGUI)
+    {
+        jack_ringbuffer_free(toGUI);
+        toGUI = NULL;
+    }
 }
 
 
@@ -70,29 +92,46 @@ void InterChange::mediate()
     {
         more = false;
         size = jack_ringbuffer_read_space(fromCLI);
-        if (size >= sizeof(commandSize))
+        if (size >= commandSize)
         {
-            if (size > sizeof(commandSize))
+            if (size > commandSize)
                 more = true;
             toread = commandSize;
             point = (char*) &getData.bytes;
             for (size_t i = 0; i < commandSize; ++i)
                 jack_ringbuffer_read(fromCLI, point, toread);
             commandSend(&getData);
+            returns(&getData);
         }
         size = jack_ringbuffer_read_space(fromGUI);
-        if (size >= sizeof(commandSize))
+        if (size >= commandSize)
         {
-            if (size > sizeof(commandSize))
+            if (size > commandSize)
                 more = true;
             toread = commandSize;
             point = (char*) &getData.bytes;
             for (size_t i = 0; i < commandSize; ++i)
                 jack_ringbuffer_read(fromGUI, point, toread);
             commandSend(&getData);
+            returns(&getData);
         }
     }
     while (more);
+}
+
+
+void InterChange::returns(CommandBlock *getData)
+{
+    unsigned char type = getData->data.type;
+    //bool isGui = type & 0x20;
+    bool isCli = type & 0x10;
+    if (isCli)
+    {
+        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+        {
+            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+        }
+    }
 }
 
 
@@ -543,12 +582,14 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
     }
 
+    if (write)
+        getData->data.value = value;
+
     string actual;
     if (type & 0x80)
         actual = to_string((int)round(value));
     else
         actual = to_string(value);
-
     synth->getRuntime().Log("Main " + contstr + " value " + actual);
 }
 

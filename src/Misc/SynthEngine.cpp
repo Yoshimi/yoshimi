@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, last modified March 2016
+    This file is derivative of original ZynAddSubFX code, last modified October 2016
 */
 
 #include<stdio.h>

@@ -23,6 +23,7 @@
 #include <iostream>
 #include "Misc/SynthEngine.h"
 #include "MiscGui.h"
+#include "MasterUI.h"
 
 SynthEngine *synth;
 
@@ -59,7 +60,22 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 #endif
 }
 
-void read_updates()
+
+void read_updates(SynthEngine *synth)
 {
-    cout << "Reading" << endl;
+    CommandBlock getData;
+    size_t commandSize = sizeof(getData);
+
+    while(jack_ringbuffer_read_space(synth->interchange.toGUI) >= commandSize)
+    {
+        int toread = commandSize;
+        char *point = (char*) &getData.bytes;
+        for (size_t i = 0; i < commandSize; ++i)
+        {
+            jack_ringbuffer_read(synth->interchange.toGUI, point, toread);
+        }
+        unsigned char npart = getData.data.part;
+        if (npart == 0xf0)
+            synth->getGuiMaster()->returns_update(&getData);
+    }
 }

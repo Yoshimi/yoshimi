@@ -60,8 +60,10 @@ class InterChange : private MiscFuncs
 
         jack_ringbuffer_t *fromCLI;
         jack_ringbuffer_t *fromGUI;
+        jack_ringbuffer_t *toGUI;
 
         void mediate();
+        void returns(CommandBlock *getData);
         void setpadparams(int point);
         void commandSend(CommandBlock *getData);
 

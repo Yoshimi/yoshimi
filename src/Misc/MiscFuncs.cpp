@@ -361,8 +361,6 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  * These functions provide a transparent text messaging system.
  * Calling functions only need to recognise integers and strings.
  *
- * Push extends the list if there are no empty slots.
- *
  * Pop is destructive. No two functions should ever have been given
  * the same 'live' ID, but if they do, the second one will get an
  * empty string.
@@ -400,7 +398,7 @@ int MiscFuncs::miscMsgPush(string _text)
     if (it == miscList.end())
     {
         cout << "List full :(" << endl;
-        idx = -1;;
+        idx = -1;
     }
 
     int result = idx; // in case of a new entry before return

@@ -241,7 +241,6 @@ static void *mainGuiThread(void *arg)
                 splashMessages.pop_front();
             }
             GuiThreadMsg::processGuiMessages();
-            //read_updates();
         }
         else
             usleep(33333);
