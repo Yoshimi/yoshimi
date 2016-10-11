@@ -42,7 +42,7 @@ InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
     // quite incomplete - we don't know what will develop yet!
-    if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+    if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
         fromCLI = NULL;
         synth->getRuntime().Log("InteChange failed to create 'fromCLI' ringbuffer");
@@ -125,11 +125,15 @@ void InterChange::returns(CommandBlock *getData)
     unsigned char type = getData->data.type;
     //bool isGui = type & 0x20;
     bool isCli = type & 0x10;
-    if (isCli)
+    bool write = (type & 0x40) > 0;
+    if (synth->guiMaster)
     {
-        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+        if (isCli && write)
         {
+            if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+            {
             jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+            }
         }
     }
 }
@@ -582,7 +586,7 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
     }
 
-    if (write)
+    if (!write)
         getData->data.value = value;
 
     string actual;
@@ -1141,6 +1145,9 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->SetController(0x79,0); // C_resetallcontrollers
             break;
     }
+
+    if (!write)
+        getData->data.value = value;
 
     string actual;
     if (type & 0x80)

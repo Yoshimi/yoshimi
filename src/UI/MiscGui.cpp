@@ -74,8 +74,28 @@ void read_updates(SynthEngine *synth)
         {
             jack_ringbuffer_read(synth->interchange.toGUI, point, toread);
         }
-        unsigned char npart = getData.data.part;
-        if (npart == 0xf0)
-            synth->getGuiMaster()->returns_update(&getData);
+        decode_updates(synth, &getData);
+    }
+}
+
+
+void decode_updates(SynthEngine *synth, CommandBlock *getData)
+{
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    //unsigned char engine = getData->data.engine;
+    //unsigned char insert = getData->data.insert;
+    //unsigned char insertParam = getData->data.parameter;
+    //unsigned char insertPar2 = getData->data.par2;
+
+    if (npart == 0xf0)
+    {
+        synth->getGuiMaster()->returns_update(getData);
+        return;
+    }
+    if (kititem == 0xff || (kititem & 0x20))
+    {
+        synth->getGuiMaster()->partui->returns_update(getData);
+        return;
     }
 }

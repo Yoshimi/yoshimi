@@ -250,8 +250,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
-
-        MasterUI *guiMaster;
+    public:
+        MasterUI *guiMaster; // need to read this in InterChange::returns
+    private:
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
 

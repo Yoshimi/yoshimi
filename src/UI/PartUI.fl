@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified September 2016
+This file is derivative of ZynAddSubFX original code, modified October 2016
 } {in_source in_header
 } 
 
@@ -384,7 +384,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {open : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -1339,6 +1339,31 @@ send_data(48, o->value());}
   Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
 collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.part;
+    
+    switch(control)
+    {
+    	case 0:
+    	    partvol->value(value);
+    	    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+            	synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - partvol->value()));
+    	    break;
+    	case 2:
+    	        partpan->value(value);
+    	        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+                	synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, partpan->value());
+
+    	    break;
+    }
+    Fl::check();} {selected
+    }
   }
   Function {PartUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//

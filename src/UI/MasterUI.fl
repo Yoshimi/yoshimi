@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2014
+This file is a derivative of the ZynAddSubFX original, modified October 2016
 } {in_source in_header
 } 
 
@@ -1081,7 +1081,6 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
   Function {returns_update(CommandBlock *getData)} {open
   } {
     code {//
-    printf("Hello, World!\\n");
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;

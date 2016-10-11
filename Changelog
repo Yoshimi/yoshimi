@@ -1,6 +1,9 @@
 yoshimi 1.4.1 M
 
 2016-10-11 Will
+* Proved direct gui updates correct for main & part controls :)
+
+2016-10-10 Will
 * Ringbuffer size corrections.
 * Docs punctuation corrections.
 * Started to implement direct access -> gui updates.
