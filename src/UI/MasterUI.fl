@@ -28,6 +28,8 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2016
+
+
 } {in_source in_header
 } 
 
@@ -91,7 +93,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -844,7 +846,7 @@ send_data(0, o->value(),false);}
       Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {
+        Fl_Group partui {open
           xywh {3 255 376 166} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
@@ -1078,25 +1080,68 @@ else
 
 collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    //unsigned char npart = getData->data.part;
+    unsigned char npart = getData->data.part;
+    int nval = (int) value; 
     
     switch(control)
     {
     	case 0:
     	    mastervolumedial->value(value);
     	    break;
-    	case 32:
-    	        globalfinedetune->value(value);
+    	    
+        case 14:	    	    
+    	    partuigroup->remove(partui);
+            delete partui;
+            partui = new PartUI(0, 0, 765, 525);
+            partuigroup->add(partui);
+            partui->init(synth->part[nval], nval, bankui);
+            partui->redraw();
+            npart = nval;
+            npartcounter->value(nval + 1);
+            npartcounter->redraw();
+            updatepanel();
+            break;
+            
+        case 15:
+            updatepart();
+            updatepanel();
+            setinspartlist();
+            break;
+        
+        case 32:
+    	    globalfinedetune->value(value);
     	    break;
+    	
+    	case 35:
+            break;
+            
+	case 96:
+	    delete microtonalui;
+            setMasterLabel("");
+            npartcounter->value(1);
+            refresh_master_ui();
+            updatepanel();
+            break;
+            
+        case 128:
+            virkeyboard->relaseallkeys();
+            vumeter->init(-1, synth);
+            for(int i = 0; i < NUM_MIDI_CHANNELS; ++i)
+            {
+              	if(panelwindow)
+              	{
+	         if(panellistitem[i]->partVUMeter)
+	             panellistitem[i]->partVUMeter->resetPart();
+              	 }
+            }
+            break;
     }
-    Fl::check();} {selected
-    }
+    Fl::check();} {}
   }
   Function {updatesendwindow()} {} {
     code {//

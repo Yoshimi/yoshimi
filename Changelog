@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-10-12 Will
+* Completed direct gui main controls.
+* Starting to populate direct gui part level controls.
+* Updated docs.
+
 2016-10-11 Will
 * Proved direct gui updates correct for main & part controls :)
 

@@ -35,10 +35,10 @@ actually change anything.
 
 This matches the results from using the middle mouse button in the GUI
 (assuming it was enabled at build time). Commands that are purely within the
-GUI,e.g window changes are not implemented at all.
-Some, such as part number changes are (currently) recognised but not acted on.
-It is expected that any alternative input system will store its own copies of
-such intermediate information so that they remain fully independent.
+Only a few GUI,e.g window changes are currently implemented.
+Some, are recognised but not acted on. It is expected that any alternative
+input system will store its own copies of such intermediate information so
+that they remain fully independent.
 
 An alternative way to find out the correct command sequence is to click on a
 control with any button *except* the middle one. Trailing '255's can be

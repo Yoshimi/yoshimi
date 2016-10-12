@@ -1346,7 +1346,8 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    //unsigned char npart = getData->data.part;
+    unsigned char npart = getData->data.part;
+    int tmp;
     
     switch(control)
     {
@@ -1355,12 +1356,55 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     	    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
             	synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - partvol->value()));
     	    break;
+    	
+    	case 1:
+    	    velocitysense->value(value);
+    	    break;
+ 
     	case 2:
     	        partpan->value(value);
     	        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                 	synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, partpan->value());
 
     	    break;
+
+    	case 4:
+    	    velocityoffset->value(value);
+    	    break;
+ 
+    	case 5:
+    	    tmp = (int) value;
+    	    if (tmp < NUM_MIDI_CHANNELS)
+    	        midich->textcolor(FL_BLACK);
+    	    else
+    	        midich->textcolor(FL_WHITE);
+    	    if (tmp > 15)
+		tmp &= 15;
+            midich->value(tmp + 1);
+            if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+                    synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+   
+    	        
+    	        
+    	    break;
+ 
+    	case 6:
+    	    keymode->value((int) value);
+    	    break;
+ 
+    	case 7:
+    	    enportamento->value((int) value);
+    	    break;
+ 
+    	case 8:
+    	    partGroupEnable->value((int) value);
+    	    if (!partGroupEnable->value())
+                partgroupui->deactivate();
+            else
+                partgroupui->activate();
+            synth->getGuiMaster()->updatepanel();
+    	    break;
+ 
     }
     Fl::check();} {selected
     }
