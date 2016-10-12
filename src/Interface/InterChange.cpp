@@ -808,38 +808,34 @@ void InterChange::commandPart(CommandBlock *getData)
                     value = part->Pmaxkey;
             }
             break;
-        case 18:
+        case 18: // always return actual value
             contstr = "Min To Last";
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
                     part->kit[kititem & 0x1f].Pminkey = part->lastnote;
-                else
-                    value = part->kit[kititem & 0x1f].Pminkey;
+                value = part->kit[kititem & 0x1f].Pminkey;
             }
             else
             {
                 if ((write) && part->lastnote >= 0)
                     part->Pminkey = part->lastnote;
-                else
-                    value = part->Pminkey;
+                value = part->Pminkey;
             }
             break;
-        case 19:
+        case 19: // always return actual value
             contstr = "Max To Last";
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
                     part->kit[kititem & 0x1f].Pmaxkey = part->lastnote;
-                else
-                    value = part->kit[kititem & 0x1f].Pmaxkey;
+                value = part->kit[kititem & 0x1f].Pmaxkey;
             }
             else
             {
                 if ((write) && part->lastnote >= 0)
                     part->Pmaxkey = part->lastnote;
-                else
-                    value = part->Pmaxkey;
+                value = part->Pmaxkey;
             }
             break;
         case 20:
@@ -1146,7 +1142,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
     }
 
-    if (!write)
+    if (!write || control == 18 || control == 19)
         getData->data.value = value;
 
     string actual;

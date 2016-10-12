@@ -4,6 +4,7 @@ yoshimi 1.4.1 M
 * Completed direct gui main controls.
 * Starting to populate direct gui part level controls.
 * Updated docs.
+* Direct gui Add, Sub, Pad vol/vsense/pan controls done.
 
 2016-10-11 Will
 * Proved direct gui updates correct for main & part controls :)

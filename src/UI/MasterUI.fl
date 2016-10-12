@@ -1085,7 +1085,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
+    //unsigned char npart = getData->data.part;
     int nval = (int) value; 
     
     switch(control)
@@ -1118,6 +1118,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
     	    break;
     	
     	case 35:
+    	    masterkeyshift->value(value);
             break;
             
 	case 96:

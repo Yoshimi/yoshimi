@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified September 2016
+This file is derivative of ZynAddSubFX original code, modified October 2016
 } {in_source in_header
 } 
 
@@ -1569,6 +1569,31 @@ if ((Fl::event_button() == 3))
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
 collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, 0);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.part;
+    //int tmp;
+    
+    switch(control)
+    {
+    	case 0:
+    	    globalvolume->value(value);
+    	    break;
+    	
+    	case 1:
+    	    vsns->value(value);
+    	    break;
+ 
+    	case 2:
+    	    globalpan->value(value);
+    	    break;
+
+    }
+    Fl::check();} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//

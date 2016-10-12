@@ -83,19 +83,52 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
-    //unsigned char engine = getData->data.engine;
+    unsigned char engine = getData->data.engine;
     //unsigned char insert = getData->data.insert;
     //unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
+    if (npart >= 0xc0 && npart < 0xd0)
+    {
+        return; // todo
+    }
     if (npart == 0xf0)
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
+    }
+    if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
+    {
+        return; // todo
     }
     if (kititem == 0xff || (kititem & 0x20))
     {
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
+    if (kititem >= 0x80)
+    {
+        return; // todo
+    }
+
+    if (engine == 2 && synth->getGuiMaster()->partui->padnoteui)
+    {
+        synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
+        return;
+    }
+    if (engine == 1 && synth->getGuiMaster()->partui->subnoteui)
+    {
+        synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
+        return;
+    }
+    if (engine >= 0x80)
+    {
+        return; // todo
+    }
+    if (engine == 0 && synth->getGuiMaster()->partui->adnoteui)
+    {
+        synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
+        return;
+    }
+
 }
