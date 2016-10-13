@@ -636,12 +636,21 @@ send_data(33, o->value());}
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Controllers").c_str());}
       code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
     } {
-      Fl_Check_Button expr {
-        label Expr
-        callback {part->ctl->expression.receive = o->value();
-send_data(135, o->value());}
-        tooltip {Expression enable} xywh {175 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
-        code0 {o->value(part->ctl->expression.receive);}
+      Fl_Dial volrng {
+        label {Vol Rng}
+        callback {part->ctl->setvolume((char)o->value());
+send_data(128, o->value());}
+        tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
+        code0 {o->value(part->ctl->volume.data);}
+        code1 {o->init(96);}
+        class WidgetPDial
+      }
+      Fl_Check_Button vol {
+        label Vol
+        callback {part->ctl->volume.receive = o->value();
+send_data(129, o->value());}
+        tooltip {Volume enable} xywh {175 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        code0 {o->value(part->ctl->volume.receive);}
       }
       Fl_Dial panwidth {
         label PanWdth
@@ -649,33 +658,6 @@ send_data(135, o->value());}
 send_data(130, o->value());}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
-        code1 {o->init(64);}
-        class WidgetPDial
-      }
-      Fl_Dial fltcut {
-        label FltCut
-        callback {part->ctl->filtercutoff.depth = o->value();
-send_data(140, o->value());}
-        tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
-        code0 {o->value(part->ctl->filtercutoff.depth);}
-        code1 {o->init(64);}
-        class WidgetPDial
-      }
-      Fl_Dial filtq {
-        label FltQ
-        callback {part->ctl->filterq.depth = o->value();
-send_data(139, o->value());}
-        tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
-        code0 {o->value(part->ctl->filterq.depth);}
-        code1 {o->init(64);}
-        class WidgetPDial
-      }
-      Fl_Dial bwdpth {
-        label BwDpth
-        callback {part->ctl->bandwidth.depth = o->value();
-send_data(133, o->value());}
-        tooltip {BandWidth depth} xywh {125 10 30 30} labelsize 10 maximum 127 step 1
-        code0 {o->value(part->ctl->bandwidth.depth);}
         code1 {o->init(64);}
         class WidgetPDial
       }
@@ -688,13 +670,35 @@ send_data(131, o->value());}
         code1 {o->init(80);}
         class WidgetPDial
       }
-      Fl_Counter pwheelbrng {
-        label {PWheelB.Rng (cents)}
-        callback {part->ctl->pitchwheel.bendrange = o->value();
-send_data(138, o->value());}
-        tooltip {Pitch Wheel Bend Range (cents)} xywh {165 15 110 20} labelsize 10 align 1 minimum -6400 maximum 6400 step 1
-        code0 {o->value(part->ctl->pitchwheel.bendrange);}
-        code1 {o->lstep(100);}
+      Fl_Check_Button expmwh {
+        label {Exp MWh}
+        callback {part->ctl->modwheel.exponential = o->value();
+send_data(132, o->value());}
+        tooltip {Exponential modulation wheel} xywh {10 15 40 25} down_box DOWN_BOX labelsize 10 align 148
+        code0 {o->value(part->ctl->modwheel.exponential);}
+      }
+      Fl_Dial bwdpth {
+        label BwDpth
+        callback {part->ctl->bandwidth.depth = o->value();
+send_data(133, o->value());}
+        tooltip {BandWidth depth} xywh {125 10 30 30} labelsize 10 maximum 127 step 1
+        code0 {o->value(part->ctl->bandwidth.depth);}
+        code1 {o->init(64);}
+        class WidgetPDial
+      }
+      Fl_Check_Button expbw {
+        label {Exp BW}
+        callback {part->ctl->bandwidth.exponential = o->value();
+send_data(134, o->value());}
+        tooltip {Exponential BandWidth Controller} xywh {85 15 35 25} down_box DOWN_BOX labelsize 10 align 148
+        code0 {o->value(part->ctl->bandwidth.exponential);}
+      }
+      Fl_Check_Button expr {
+        label Expr
+        callback {part->ctl->expression.receive = o->value();
+send_data(135, o->value());}
+        tooltip {Expression enable} xywh {175 55 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+        code0 {o->value(part->ctl->expression.receive);}
       }
       Fl_Check_Button fmamp {
         label FMamp
@@ -702,13 +706,6 @@ send_data(138, o->value());}
 send_data(136, o->value());}
         tooltip {FM amplitude enable} xywh {225 55 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->fmamp.receive);}
-      }
-      Fl_Check_Button vol {
-        label Vol
-        callback {part->ctl->volume.receive = o->value();
-send_data(129, o->value());}
-        tooltip {Volume enable} xywh {175 80 45 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
-        code0 {o->value(part->ctl->volume.receive);}
       }
       Fl_Check_Button sustain {
         label Sustain
@@ -723,6 +720,32 @@ send_data(129, o->value());}
         tooltip {Sustain pedal enable} xywh {225 80 60 20} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
         code0 {o->value(part->ctl->sustain.receive);}
       }
+      Fl_Counter pwheelbrng {
+        label {PWheelB.Rng (cents)}
+        callback {part->ctl->pitchwheel.bendrange = o->value();
+send_data(138, o->value());}
+        tooltip {Pitch Wheel Bend Range (cents)} xywh {165 15 110 20} labelsize 10 align 1 minimum -6400 maximum 6400 step 1
+        code0 {o->value(part->ctl->pitchwheel.bendrange);}
+        code1 {o->lstep(100);}
+      }
+      Fl_Dial filtq {
+        label FltQ
+        callback {part->ctl->filterq.depth = o->value();
+send_data(139, o->value());}
+        tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
+        code0 {o->value(part->ctl->filterq.depth);}
+        code1 {o->init(64);}
+        class WidgetPDial
+      }
+      Fl_Dial fltcut {
+        label FltCut
+        callback {part->ctl->filtercutoff.depth = o->value();
+send_data(140, o->value());}
+        tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
+        code0 {o->value(part->ctl->filtercutoff.depth);}
+        code1 {o->init(64);}
+        class WidgetPDial
+      }
       Fl_Button {} {
         label Close
         callback {ctlwindow->hide();}
@@ -735,15 +758,35 @@ send_data(224, o->value());}
         xywh {5 105 210 20} box THIN_UP_BOX
       }
       Fl_Group {} {
+        label Resonance
+        xywh {290 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10
+      } {
+        Fl_Dial cfdpth {
+          label CFdpth
+          callback {part->ctl->resonancecenter.depth = o->value();
+send_data(144, o->value());}
+          tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
+          code0 {o->value(part->ctl->resonancecenter.depth);}
+          code1 {o->init(64);}
+          class WidgetPDial
+        }
+        Fl_Dial rbwdpth {
+          label BWdpth
+          callback {part->ctl->resonancebandwidth.depth = o->value();
+send_data(145, o->value());}
+          tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
+          code0 {o->value(part->ctl->resonancebandwidth.depth);}
+          code1 {o->init(64);}
+          class WidgetPDial
+        }
+      }
+      Fl_Group {} {
         label Portamento
         xywh {340 15 160 85} box ENGRAVED_FRAME labelfont 1 labelsize 10
       } {
-        Fl_Check_Button rcv {
-          label Rcv
-          callback {part->ctl->portamento.receive = o->value();
-send_data(168, o->value());}
-          tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
-          code0 {o->value(part->ctl->portamento.receive);}
+        Fl_Box {} {
+          label {x100 cnt.}
+          xywh {400 50 55 15} labelsize 10 align 16
         }
         Fl_Dial prtime {
           label time
@@ -751,6 +794,17 @@ send_data(168, o->value());}
 send_data(160, o->value());}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
+          code1 {o->init(64);}
+          class WidgetPDial
+        }
+        Fl_Dial timedu {
+          label {t.dn/up}
+          callback {//
+              int x = o->value();
+              part->ctl->portamento.updowntimestretch = x;
+              send_data(161, o->value());}
+          tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
+          code0 {o->value(part->ctl->portamento.updowntimestretch);}
           code1 {o->init(64);}
           class WidgetPDial
         }
@@ -767,21 +821,6 @@ send_data(162, o->value());}
 send_data(163, o->value());}
           tooltip {Threshold type (min/max)} xywh {425 68 15 15} down_box DOWN_BOX labelsize 10 align 2
           code0 {o->value(part->ctl->portamento.pitchthreshtype);}
-        }
-        Fl_Box {} {
-          label {x100 cnt.}
-          xywh {400 50 55 15} labelsize 10 align 16
-        }
-        Fl_Dial timedu {
-          label {t.dn/up}
-          callback {//
-              int x = o->value();
-              part->ctl->portamento.updowntimestretch = x;
-              send_data(161, o->value());}
-          tooltip {Portamento time stretch (up/down)} xywh {375 60 25 25} labelsize 10 maximum 127 step 1
-          code0 {o->value(part->ctl->portamento.updowntimestretch);}
-          code1 {o->init(64);}
-          class WidgetPDial
         }
         Fl_Dial propta {
           label {Prp.Rate}
@@ -800,6 +839,13 @@ send_data(166, o->value());}
           code0 {o->value(part->ctl->portamento.propDepth);}
           code1 {o->init(90);}
           class WidgetPDial
+        }
+        Fl_Check_Button rcv {
+          label Rcv
+          callback {part->ctl->portamento.receive = o->value();
+send_data(168, o->value());}
+          tooltip {Receive Portamento Controllers} xywh {345 20 40 18} box THIN_UP_BOX down_box DOWN_BOX labelsize 10
+          code0 {o->value(part->ctl->portamento.receive);}
         }
         Fl_Check_Button proprt {
           label {Proprt.}
@@ -820,52 +866,6 @@ send_data(164, o->value());}
           code1 {if(o->value()){propta->activate();proptb->activate();}}
           code2 {else {propta->deactivate();proptb->deactivate();}}
         }
-      }
-      Fl_Group {} {
-        label Resonance open
-        xywh {290 15 45 85} box ENGRAVED_BOX labelfont 1 labelsize 10
-      } {
-        Fl_Dial rbwdpth {
-          label BWdpth
-          callback {part->ctl->resonancebandwidth.depth = o->value();
-send_data(145, o->value());}
-          tooltip {BandWidth controller depth} xywh {300 60 25 25} labelsize 10 maximum 127 step 1
-          code0 {o->value(part->ctl->resonancebandwidth.depth);}
-          code1 {o->init(64);}
-          class WidgetPDial
-        }
-        Fl_Dial cfdpth {
-          label CFdpth
-          callback {part->ctl->resonancecenter.depth = o->value();
-send_data(144, o->value());}
-          tooltip {Center Frequency controller Depth} xywh {300 20 25 25} labelsize 10 maximum 127 step 1
-          code0 {o->value(part->ctl->resonancecenter.depth);}
-          code1 {o->init(64);}
-          class WidgetPDial
-        }
-      }
-      Fl_Check_Button expmwh {
-        label {Exp MWh}
-        callback {part->ctl->modwheel.exponential = o->value();
-send_data(132, o->value());}
-        tooltip {Exponential modulation wheel} xywh {10 15 40 25} down_box DOWN_BOX labelsize 10 align 148
-        code0 {o->value(part->ctl->modwheel.exponential);}
-      }
-      Fl_Check_Button expbw {
-        label {Exp BW}
-        callback {part->ctl->bandwidth.exponential = o->value();
-send_data(134, o->value());}
-        tooltip {Exponential BandWidth Controller} xywh {85 15 35 25} down_box DOWN_BOX labelsize 10 align 148
-        code0 {o->value(part->ctl->bandwidth.exponential);}
-      }
-      Fl_Dial volrng {
-        label {Vol Rng}
-        callback {part->ctl->setvolume((char)o->value());
-send_data(128, o->value());}
-        tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
-        code0 {o->value(part->ctl->volume.data);}
-        code1 {o->init(96);}
-        class WidgetPDial
       }
     }
     Fl_Window partfx {
@@ -1346,6 +1346,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
+    unsigned char engine = getData->data.engine;
     int tmp;
     
     switch(control)
@@ -1392,12 +1393,57 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     	    break;
  
     	case 8:
-    	    partGroupEnable->value((int) value);
-    	    if (!partGroupEnable->value())
-                partgroupui->deactivate();
-            else
-                partgroupui->activate();
-            synth->getGuiMaster()->updatepanel();
+    	    if (engine == 0)
+    	    {
+    	    	adsynenabledcheck->value(value != 0);
+    	    	if (adsynenabledcheck->value())
+    	    	{
+    	    	    adeditbutton->activate();
+    	    	    addbox->color(ADD_COLOUR);
+    	    	}
+    	    	else
+    	    	{
+    	    	    adeditbutton->deactivate();
+    	    	    addbox->color(BASE_COLOUR);
+    	    	}
+    	    }
+    	    else if (engine == 1)
+    	    {
+    	        subsynenabledcheck->value(value != 0);
+    	        if (subsynenabledcheck->value())
+    	    	{
+    	    	    subeditbutton->activate();
+    	    	    subbox->color(SUB_COLOUR);
+    	    	}
+    	    	else
+    	    	{
+    	    	    subeditbutton->deactivate();
+    	    	    subbox->color(BASE_COLOUR);
+    	    	}
+    	    }
+    	    else if (engine == 2)
+    	    {
+    	        padsynenabledcheck->value(value != 0);
+    	        if (padsynenabledcheck->value())
+    	    	{
+    	    	    padeditbutton->activate();
+    	    	    padbox->color(PAD_COLOUR);
+    	    	}
+    	    	else
+    	    	{
+    	    	    padeditbutton->deactivate();
+    	    	    padbox->color(BASE_COLOUR);
+    	    	}
+    	    }
+    	    else
+    	    {
+    	        partGroupEnable->value((int) value);
+    	        if (!partGroupEnable->value())
+                    partgroupui->deactivate();
+                else
+                    partgroupui->activate();
+                synth->getGuiMaster()->updatepanel();
+            }
     	    break;
 
         case 16:
@@ -1423,9 +1469,121 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
             partkeyshift->value((int) value);
             break;
  
+        case 48:
+            humanise->value((int) value);
+            break;
+ 
         case 120:
             synth->getGuiMaster()->updatelistitem(npart);
             break;
+
+// controllers
+        case 128:
+            volrng->value((int) value);
+            break;
+
+        case 129:
+            vol->value((int) value);
+            break;
+
+        case 130:
+            panwidth->value((int) value);
+            break;
+
+        case 131:
+            modwh->value((int) value);
+            break;
+
+        case 132:
+            expmwh->value((int) value);
+            break;
+
+        case 133:
+            bwdpth->value((int) value);
+            break;
+
+        case 134:
+            expbw->value((int) value);
+            break;
+
+        case 135:
+            expr->value((int) value);
+            break;
+
+        case 136:
+            fmamp->value((int) value);
+            break;
+
+        case 137:
+            sustain->value((int) value);
+            break;
+
+        case 138:
+            pwheelbrng->value((int) value);
+            break;
+
+        case 139:
+            filtq->value((int) value);
+            break;
+
+        case 140:
+            fltcut->value((int) value);
+            break;
+
+        case 144:
+            cfdpth->value((int) value);
+            break;
+
+        case 145:
+            rbwdpth->value((int) value);
+            break;
+
+        case 160:
+            prtime->value((int) value);
+            break;
+
+        case 161:
+            timedu->value((int) value);
+            break;
+
+        case 162:
+            thresh->value((int) value);
+            break;
+
+        case 163:
+            thtype->value((int) value);
+            break;
+
+        case 164:
+            proprt->value((int) value);
+            if(value != 0)
+            {
+                propta->activate();
+                proptb->activate();
+            }
+            else
+            {
+                propta->deactivate();
+                proptb->deactivate();
+            }
+            break;
+
+        case 165:
+            propta->value((int) value);
+            break;
+
+        case 166:
+            proptb->value((int) value);
+            break;
+
+        case 168:
+            rcv->value((int) value);
+            break;
+
+        case 224:
+            updatecontrollers();
+            break;
+
  
     }
     Fl::check();} {}

@@ -1,5 +1,9 @@
 yoshimi 1.4.1 M
 
+2016-10-13 Will
+* Direct gui part base controls mostly done.
+* Doc updates.
+
 2016-10-12 Will
 * Completed direct gui main controls.
 * Starting to populate direct gui part level controls.

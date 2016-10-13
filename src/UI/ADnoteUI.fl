@@ -884,7 +884,7 @@ send_data(0, o->value());}
             code1 {o->init(100);}
             class WidgetPDial
           }
-          Fl_Dial {} {
+          Fl_Dial voicevsns {
             label {Vel Sens}
             callback {pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(o->value());
 send_data(1, o->value());}
@@ -1134,6 +1134,31 @@ o->show();}
   Function {send_data(int control, float value, bool isInteger = true)} {} {
     code {//
 collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, nvoice | 0x80);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.part;
+    //int tmp;
+    
+    switch(control)
+    {
+    	case 0:
+    	    voicevolume->value(value);
+    	    break;
+    	
+    	case 1:
+    	    voicevsns->value(value);
+    	    break;
+ 
+    	case 2:
+    	    voicepan->value(value);
+    	    break;
+
+    }
+    Fl::check();} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//

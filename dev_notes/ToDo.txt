@@ -1,4 +1,6 @@
 
+LV2: internal sound banks do not appear to be exposed as LV2 presets
+
 CLI doesn't manage global detune, but direct access does.
 
 Find out why LV2 only stores/retrieves patch sets (not state)
