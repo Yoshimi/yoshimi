@@ -5,6 +5,8 @@ Y : 0 to 63 : 14 : 240 : 255 : 255 : 255 : 255 : 255 : Part number
 Y : 16, 32, 64 : 15 : 240 : 255 : 255 : 255 : 255 : 255 : Number of available parts
 Y : 0 to 127 : 32 : 240 : 255 : 255 : 255 : 255 : 255 : Detune frequency
 Y : -36 to 36 : 35 : 240 : 255 : 255 : 255 : 255 : 255 : Key shift
+Y : 0 to 2 : 48 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Type
+Y : 14 to 119 : 49 : 240 : 255 : 255 : 255 : 255 : 255 : Channel Switcher Incoming CC
 Y : any : 96 : 240 : 255 : 255 : 255 : 255 : 255 : Reset (clear all)
 Y : any : 128 : 240 : 255 : 255 : 255 : 255 : 255 : Stop
 

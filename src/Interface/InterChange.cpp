@@ -574,6 +574,21 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->Pkeyshift - 64;
             break;
 
+        case 48:
+            contstr = "Chan Switch Type";
+            if (write)
+                synth->getRuntime().channelSwitchType = value;
+            else
+                value = synth->getRuntime().channelSwitchType;
+            break;
+        case 49:
+            contstr = "Chan Switch CC";
+            if (write)
+                synth->getRuntime().channelSwitchCC = value;
+            else
+                value = synth->getRuntime().channelSwitchCC;
+            break;
+
         case 96:
             contstr = "Reset All";
             if (write)

@@ -1018,7 +1018,7 @@ ZynAddSubFX}
             Panelbox1->hide();
             synth->getRuntime().single_row_panel = 1;
             updatepanel();}
-        xywh {283 645 116 25} box THIN_UP_BOX labelsize 13
+        xywh {356 645 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Button {} {
         label {Change to 2 x 8}
@@ -1033,7 +1033,7 @@ ZynAddSubFX}
         callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
 Panelsmallgroups->value(o->value());
 updatepanel();}
-        xywh {48 645 86 25} down_box BORDER_BOX
+        xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
           label {1 to 16}
@@ -1057,7 +1057,7 @@ updatepanel();}
         callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
 Panelgroups->value(o->value());
 updatepanel();}
-        xywh {48 645 86 25} down_box BORDER_BOX
+        xywh {12 653 86 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
       } {
         MenuItem {} {
           label {1 to 16}
@@ -1066,6 +1066,78 @@ updatepanel();}
         MenuItem {} {
           label {17 to 32}
           xywh {10 10 34 20}
+        }
+      }
+      Fl_Spinner CSspinner {
+        label CC
+        callback {CSpend->show();}
+        xywh {216 653 50 18} labelsize 12 align 1 minimum 0 maximum 127 value 115 textsize 12
+        code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
+        code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
+      }
+      Fl_Button CSpend {
+        label Pending
+        callback {//
+    int candidate = CSspinner->value();
+    if (candidate == CS_CC)
+    {
+        o->hide();
+        return;
+    }
+
+
+    string name = synth->getRuntime().testCCvalue(candidate);
+    if (!name.empty())
+    {
+        fl_alert("In use for %s",name.c_str());
+        if (CS_CC < 128)
+        {
+        CSspinner->value(CS_CC);
+        CSspinner->redraw();
+        }
+    }
+    else
+    {
+        synth->getRuntime().channelSwitchCC = candidate;
+        CS_CC = candidate;
+        o->hide();
+    }
+    send_data(49, CSspinner->value());}
+        tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
+      }
+      Fl_Choice channelswitch {
+        label {Channel Switch}
+        callback {//
+    if (o->value() == 0)
+    {
+        CS_CC = 128;
+        synth->getRuntime().channelSwitchCC = CS_CC;
+        CSspinner->value(115);
+        CSspinner->hide();
+        CSpend->hide();
+    }
+    else
+    {
+        synth->getRuntime().channelSwitchType = o->value();
+        CSspinner->show();
+        CSpend->show();
+    }
+    send_data(48, o->value());}
+        tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 653 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
+        code0 {o->value(synth->getRuntime().channelSwitchType);}
+        code1 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
+      } {
+        MenuItem switchoff {
+          label Off
+          xywh {40 40 34 20} labelsize 12
+        }
+        MenuItem switchrow {
+          label Row
+          xywh {40 40 34 20} labelsize 12
+        }
+        MenuItem switchcolumn {
+          label Col
+          xywh {40 40 34 20} labelsize 12
         }
       }
     }
@@ -1124,6 +1196,11 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
     	case 35:
     	    masterkeyshift->value(value);
             break;
+
+        case 48:
+        case 49:
+            updatepanel();
+            break;
             
 	case 96:
 	    delete microtonalui;
@@ -1174,16 +1251,22 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
         	panelwindow->size(1085,345);
 	        Panelpack2->position(544,10);
 	        Panelclose->position(1018,314);
-	        Panelgroups->position(48,314);
-	        Panelsmallgroups->position(48,314);
+	        Panelgroups->position(12,323);
+	        Panelsmallgroups->position(12,323);
+	        channelswitch->position(130,323);
+	        CSspinner->position(216,323);
+	        CSpend->position(276,321);
         }
         else
         {
 	        panelwindow->size(550,675);
 	        Panelpack2->position(8,325);
 	        Panelclose->position(482,645);
-	        Panelgroups->position(48,645);
-	        Panelsmallgroups->position(48,645);
+	        Panelgroups->position(12,653);
+	        Panelsmallgroups->position(12,653);
+	        channelswitch->position(130,653);
+	        CSspinner->position(216,653);
+	        CSpend->position(276,651);
         }
 
         if (partmax == 64)
@@ -1194,6 +1277,19 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
             Panelsmallgroups->show();
         else
             Panelsmallgroups->hide();
+        channelswitch->value(synth->getRuntime().channelSwitchType);
+        if (synth->getRuntime().channelSwitchType > 0)
+        {
+            CSspinner->value(synth->getRuntime().channelSwitchCC);
+            CSspinner->show();
+        }
+        else
+        {
+            CSspinner->value(115);
+            synth->getRuntime().channelSwitchCC = 128;
+            CSspinner->hide();
+        }
+        CSpend->hide();
         panelwindow->changed();} {}
   }
   Function {updatepart()} {} {
@@ -1888,6 +1984,8 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
   decl {int instance;} {private local
   }
   decl {int panelgroup;} {public local
+  }
+  decl {int CS_CC;} {private local
   }
   decl {char word [20];} {private local
   }

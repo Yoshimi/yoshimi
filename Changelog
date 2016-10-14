@@ -4,6 +4,9 @@ yoshimi 1.4.1 M
 * Moved vectors entry to its own button.
 * Rearanged icons.
 * Added channel switcher to 'Patch Sets' files.
+* Moved Channel switcher GUI control from config to Mixer Panel.
+* Added channel switcher controls to direct access.
+* Updated docs.
 
 2016-10-13 Will
 * Direct gui part base controls mostly done.
