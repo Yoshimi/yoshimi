@@ -121,9 +121,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
         return;
     }
-    if (engine >= 0x80)
+    if (engine >= 0x80 && synth->getGuiMaster()->partui->adnoteui->advoice)
     {
-        return; // todo - this could be complicated :(
+        synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
+        return;
     }
     if (engine == 0 && synth->getGuiMaster()->partui->adnoteui)
     {

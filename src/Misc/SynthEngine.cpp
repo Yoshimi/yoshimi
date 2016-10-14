@@ -2756,6 +2756,8 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
+    xml->addpar("channel_switch_type", Runtime.channelSwitchType);
+    xml->addpar("channel_switch_CC", Runtime.channelSwitchCC);
 
     xml->beginbranch("MICROTONAL");
     microtonal.add2XML(xml);
@@ -2886,6 +2888,8 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 2);
+    Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
 
     part[0]->Penabled = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)

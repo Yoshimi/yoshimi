@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-10-14 Will
+* Moved vectors entry to its own button.
+* Rearanged icons.
+* Added channel switcher to 'Patch Sets' files.
+
 2016-10-13 Will
 * Direct gui part base controls mostly done.
 * Doc updates.
