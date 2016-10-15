@@ -577,14 +577,21 @@ void InterChange::commandMain(CommandBlock *getData)
         case 48:
             contstr = "Chan Switch Type";
             if (write)
+            {
                 synth->getRuntime().channelSwitchType = value;
+                if (value == 0)
+                    synth->getRuntime().channelSwitchCC = 128;
+            }
             else
                 value = synth->getRuntime().channelSwitchType;
             break;
         case 49:
             contstr = "Chan Switch CC";
             if (write)
-                synth->getRuntime().channelSwitchCC = value;
+            {
+                if (synth->getRuntime().channelSwitchType > 0)
+                    synth->getRuntime().channelSwitchCC = value;
+            }
             else
                 value = synth->getRuntime().channelSwitchCC;
             break;

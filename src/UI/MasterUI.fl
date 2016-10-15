@@ -552,6 +552,13 @@ paramsui->Show(4);}
           class WidgetPDial
         }
         Fl_Button {} {
+          label Reset
+          callback {//
+    do_new_master();
+    send_data(96, o->value());}
+          tooltip {Clear all dynamic settings} xywh {15 60 75 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+        }
+        Fl_Button {} {
           label {Stop!}
           callback {//
               virkeyboard->relaseallkeys();
@@ -568,7 +575,7 @@ paramsui->Show(4);}
               }
               synth->allStop();
               send_data(128, o->value());}
-          tooltip {Cease all sound immediately!} xywh {15 32 75 20} box PLASTIC_UP_BOX color 88 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {15 32 75 20} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -591,24 +598,17 @@ send_data(0, o->value(),false);}
                 panelwindow->show();}
           tooltip {Mixer Panel Window} xywh {100 32 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
-        Fl_Button {} {
-          label Reset
-          callback {//
-    do_new_master();
-    send_data(96, o->value());}
-          tooltip {Clear all dynamic settings} xywh {15 60 75 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+        Fl_Button Reports {
+          label Reports
+          callback {yoshiLog->Show();}
+          xywh {192 60 75 20} box PLASTIC_UP_BOX color 228 labelsize 11
+          code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
         }
         Fl_Button vectors {
           label Vectors
           callback {//
 	vectorui->Show();}
           tooltip {Mixer Panel Window} xywh {192 32 75 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
-        }
-        Fl_Button Reports {
-          label Reports
-          callback {yoshiLog->Show();}
-          xywh {192 60 75 20} box PLASTIC_UP_BOX color 228 labelsize 11
-          code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
         }
       }
       Fl_Tabs sysinsgroup {
@@ -950,7 +950,7 @@ ZynAddSubFX}
       }
     }
     Fl_Window syseffsendwindow {
-      label {System Effects Send}
+      label {Sys Send}
       xywh {4 20 120 250} type Double labelfont 13 labelsize 13 hide
     } {
       Fl_Scroll {} {open
@@ -1029,7 +1029,7 @@ ZynAddSubFX}
         xywh {821 314 116 25} box THIN_UP_BOX labelsize 13
       }
       Fl_Choice Panelgroups {
-        label Parts
+        label {Part Group}
         callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
 Panelsmallgroups->value(o->value());
 updatepanel();}
@@ -1053,7 +1053,7 @@ updatepanel();}
         }
       }
       Fl_Choice Panelsmallgroups {
-        label Parts
+        label {Part Group}
         callback {panelgroup = o->value() * NUM_MIDI_CHANNELS;
 Panelgroups->value(o->value());
 updatepanel();}
@@ -1106,8 +1106,9 @@ updatepanel();}
         tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
       }
       Fl_Choice channelswitch {
-        label {Channel Switch}
+        label Solo
         callback {//
+    synth->getRuntime().channelSwitchType = o->value();
     if (o->value() == 0)
     {
         CS_CC = 128;
@@ -1118,9 +1119,9 @@ updatepanel();}
     }
     else
     {
-        synth->getRuntime().channelSwitchType = o->value();
         CSspinner->show();
-        CSpend->show();
+        if(CS_CC == 128)
+        	CSpend->show();
     }
     send_data(48, o->value());}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 653 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
@@ -1277,19 +1278,29 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
             Panelsmallgroups->show();
         else
             Panelsmallgroups->hide();
+
+        int oldswitch = channelswitch->value();
         channelswitch->value(synth->getRuntime().channelSwitchType);
         if (synth->getRuntime().channelSwitchType > 0)
         {
-            CSspinner->value(synth->getRuntime().channelSwitchCC);
+            if (oldswitch == 0)
+            {
+                CSspinner->value(115);
+                CSpend->show();
+            }
+            else
+            {
+                CSspinner->value(synth->getRuntime().channelSwitchCC);
+                CSpend->hide();
+            }
             CSspinner->show();
         }
         else
         {
-            CSspinner->value(115);
             synth->getRuntime().channelSwitchCC = 128;
             CSspinner->hide();
+            CSpend->hide();
         }
-        CSpend->hide();
         panelwindow->changed();} {}
   }
   Function {updatepart()} {} {
