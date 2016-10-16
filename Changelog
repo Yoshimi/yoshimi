@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-10-16 Will
+* Completed direct gui system/insert effects.
+* More done on direct gui part.
+* Gui tooltip correction.
+
 2016-10-15 Will
 * Changed GUI channel switcher name to 'Solo'.
 * Corrected GUI anomalies with channel switcher.

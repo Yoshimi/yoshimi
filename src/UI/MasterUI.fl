@@ -608,7 +608,7 @@ send_data(0, o->value(),false);}
           label Vectors
           callback {//
 	vectorui->Show();}
-          tooltip {Mixer Panel Window} xywh {192 32 75 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Vector Setup Window} xywh {192 32 75 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
       Fl_Tabs sysinsgroup {
@@ -1162,8 +1162,46 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    //unsigned char npart = getData->data.part;
+    unsigned char npart = getData->data.part;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
     int nval = (int) value; 
+    
+    if (npart == 0xf1)
+    {
+        if (insert == 16)
+        {
+            syseffsend[engine][control]->value(value);
+        }
+        else
+        {
+            if (control == 1 && nsyseff == engine)
+            {
+                sysefftype->value((int) value);
+                syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff); // needs improving
+            }
+        }
+        Fl::check();
+        return;
+    }
+    else if (npart == 0xf2 && ninseff == engine)
+    {
+        if (control == 1)
+        {
+            insefftype->value((int) value);
+            inseffectui->refresh(synth->insefx[nsyseff], 0xf1, ninseff); // needs improving
+        }
+        else if (control == 2)
+        {
+            inseffpart->value((int) value + 2);
+            if (value == -1)
+                insefftype->deactivate();
+            else
+                insefftype->activate();
+        }
+        Fl::check();
+        return;
+    }
     
     switch(control)
     {

@@ -92,14 +92,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         return; // todo
     }
-    if (npart == 0xf0)
+    if (npart >= 0xf0)
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
-    }
-    if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
-    {
-        return; // todo
     }
     if (kititem == 0xff || (kititem & 0x20))
     {

@@ -1348,7 +1348,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     unsigned char npart = getData->data.part;
     unsigned char engine = getData->data.engine;
     int tmp;
-    
+    bool sameEff = (engine == (inseffnocounter->value() - 1)); 
     switch(control)
     {
     	case 0:
@@ -1468,11 +1468,38 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
         case 35:
             partkeyshift->value((int) value);
             break;
- 
+
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+            // can't work this one out :(
+            break;
+
         case 48:
             humanise->value((int) value);
             break;
- 
+
+        case 65:
+            if (sameEff)
+            {
+            	tmp = (int) value;
+            	insefftype->value(tmp);
+            	part->partefx[tmp]->geteffect();
+            	inseffectui->refresh(part->partefx[tmp], npart, tmp);
+            }
+            break;
+
+        case 66:
+            if (sameEff)
+                sendtochoice->value((int) value);
+            break;
+
+        case 67:
+            if (sameEff)
+                bypasseff->value(value != 0);
+            break;
+
         case 120:
             synth->getGuiMaster()->updatelistitem(npart);
             break;
