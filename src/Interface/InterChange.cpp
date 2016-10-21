@@ -946,7 +946,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case 57:
             contstr = "Drum Mode";
             if (write)
-                part->Pdrummode = (char) value;
+                part->Pdrummode = (value != 0);
             else
                 value = part->Pdrummode;
             break;
@@ -1223,7 +1223,7 @@ void InterChange::commandAdd(CommandBlock *getData)
         case 2:
             contstr = "Panning";
             if (write)
-                pars->setGlobalPan(lrint(value));
+                pars->setGlobalPan((int) value);
             else
                 value = pars->GlobalPar.PPanning;
             break;

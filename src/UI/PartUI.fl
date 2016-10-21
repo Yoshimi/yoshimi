@@ -1049,10 +1049,10 @@ if ((Fl::event_button() == 3))
         callback {//
     part->Pkitmode = o->value();
     partKitOn = o->value() > 0;
-    if (part->Pkitmode == 0)
-        kitlist->deactivate();
-    else
+    if (partKitOn)
         kitlist->activate();
+    else
+        kitlist->deactivate();
     send_data(58, o->value());}
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 70 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {o->value(part->Pkitmode);}
@@ -1071,7 +1071,7 @@ if ((Fl::event_button() == 3))
           xywh {20 20 100 20} labelfont 1 labelsize 11
         }
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button drumMode {
         label {Drum mode}
         callback {part->Pdrummode = o->value();
 send_data(57, o->value());}
@@ -1474,6 +1474,19 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
         case 42:
         case 43:
             // can't work this one out :(
+            break;
+
+        case 57:
+            drumMode->value(value != 0);
+            break;
+
+        case 58:
+            kitMode->value((char) value);
+            partKitOn =  kitMode->value() > 0;
+            if (partKitOn > 0)
+                kitlist->activate();
+            else
+                kitlist->deactivate();
             break;
 
         case 48:

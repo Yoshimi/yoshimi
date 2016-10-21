@@ -171,9 +171,9 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {610 511 735 475} type Double hide
+      xywh {610 511 735 475} type Double
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
-      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
+      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);} visible
     } {
       Fl_Scroll {} {
         xywh {5 140 434 330} type HORIZONTAL box THIN_UP_BOX
@@ -693,8 +693,21 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
-    //int tmp;
+    unsigned char insert = getData->data.insert;
     
+    if (insert == 6)
+    {
+        h[control]->mag->value((int) value);
+        Fl::check();
+        return;
+    }
+    if (insert == 7)
+    {
+        h[control]->bw->value((int) value);
+        Fl::check();
+        return;
+    }
+
     switch(control)
     {
     	case 0:
@@ -707,6 +720,96 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
  
     	case 2:
     	    pan->value(value);
+    	    randompan->value(value == 0);
+    	    break;
+
+    	case 16:
+    	    bandwidth->value(value);
+    	    break;
+
+    	case 17:
+    	    bwidthscale->value(value);
+    	    break;
+
+    	case 18:
+    	    bwee->value(value != 0);
+    	    break;
+
+    	case 32:
+    	    detune->value(value);
+    	    detunevalueoutput->do_callback();
+    	    break;
+
+    	case 33:
+    	    fixedfreqetdial->value(value);
+    	    break;
+
+    	case 34:
+    	    hz440->value(value != 0);
+    	    break;
+
+    	case 35:
+    	    octave->value(value);
+    	    break;
+
+    	case 36:
+    	    detunetype->value(value);
+    	    break;
+
+    	case 37:
+    	    coarsedet->value(value);
+    	    break;
+
+    	case 40:
+    	    freqee->value(value);
+    	    break;
+
+    	case 48:
+    	    spreadpar1->value((unsigned int) value);
+    	    break;
+
+    	case 49:
+    	    spreadpar2->value((unsigned int) value);
+    	    break;
+
+    	case 50:
+    	    spreadpar3->value((unsigned int) value);
+    	    break;
+
+    	case 51:
+    	    spreadtype->value((int) value);
+    	    break;
+
+    	case 64:
+    	    filtere->value(value != 0);
+    	    break;
+
+    	case 80:
+    	    filterstages->value((int) value);
+    	    break;
+
+    	case 81:
+    	    magtype->value((int) value);
+    	    break;
+
+    	case 82:
+    	    start->value((int) value);
+    	    break;
+
+    	case 96:
+    	    for (int i = 0; i < MAX_SUB_HARMONICS; i++)
+            {
+                h[i]->mag->value(127);
+                h[i]->mag->selection_color(0);
+                h[i]->bw->value(64);
+                h[i]->bw->selection_color(0);
+            }
+            h[0]->mag->selection_color(222);
+            h[0]->mag->value(0);
+    	    break;
+
+    	case 112:
+    	    stereo->value(value != 0);
     	    break;
 
     }

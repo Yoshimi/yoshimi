@@ -253,7 +253,7 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         xywh {0 0 535 405}
       } {
         Fl_Group harmonicstructuregroup {
-          label {Harmonic Structure}
+          label {Harmonic Structure} open
           xywh {0 20 535 375} box ENGRAVED_FRAME labelsize 12
         } {
           Fl_Group bwprofilegroup {
@@ -1185,6 +1185,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
  
     	case 2:
     	    pan->value(value);
+    	    randompan->value(value == 0);
     	    break;
 
     }

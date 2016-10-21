@@ -1282,7 +1282,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
               o->add("E1200cents");}
           code1 {o->value(pars->GlobalPar.PDetuneType-1);}
         } {}
-        Fl_Dial {} {
+        Fl_Dial relBwidth {
           label relBW
           callback {//
     pars->GlobalPar.PBandwidth = lrint(o->value());
@@ -1601,7 +1601,6 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
-    //int tmp;
     
     switch(control)
     {
@@ -1615,7 +1614,58 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
  
     	case 2:
     	    globalpan->value(value);
+    	    globalrandompan->value(value == 0);
+            amplitudegrp->changed();
     	    break;
+
+        case 32:
+            freq->value(value);
+            detunevalueoutput->do_callback();
+            break;
+
+        case 35:
+            octave->value((int) value);
+            break;
+
+        case 36:
+            detunetype->value((int) value);
+            break;
+
+        case 37:
+            coarsedet->value((int) value);
+            break;
+
+        case 39:
+            relBwidth->value(value);
+            break;
+
+        case 112:
+            stereo->value(value != 0);
+            break;
+
+        case 113:
+            rndgrp->value(value != 0);
+            break;
+
+        case 120:
+            depop->value(value);
+            break;
+
+        case 121:
+            pstr->value(value);
+            break;
+
+        case 122:
+            pt->value(value);
+            break;
+
+        case 123:
+            pstc->value(value);
+            break;
+
+        case 124:
+            pvel->value(value);
+            break;
 
     }
     Fl::check();} {}

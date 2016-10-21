@@ -1,5 +1,11 @@
 yoshimi 1.4.1 M
 
+2016-10-21 Will
+* direct -> gui part kit mode & drum mode done.
+* direct -> gui addsynth main completed.
+* direct -> gui subsynth completed.
+* Updated docs
+
 2016-10-16 Will
 * Completed direct gui system/insert effects.
 * More done on direct gui part.
