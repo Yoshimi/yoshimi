@@ -220,7 +220,8 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
             if (synth->getRuntime().nrpnL != param)
             {
                 synth->getRuntime().nrpnL = param;
-                if (synth->getRuntime().nrpnH == 0x41 || synth->getRuntime().nrpnH == 0x42)
+                unsigned char type = synth->getRuntime().nrpnH;
+                if (type >= 0x41 && type <= 0x43)
                 { // shortform
                     if (param > 0x77) // disable it
                     {
@@ -229,11 +230,8 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                     }
                     else
                     {
-                        if (synth->getRuntime().nrpnH == 0x41)
-                            synth->getRuntime().channelSwitchType = 1; // row
-                        else
-                            synth->getRuntime().channelSwitchType = 2; // column
-                    synth->getRuntime().channelSwitchCC = param;
+                        synth->getRuntime().channelSwitchType = type & 3; // row/column/loop
+                        synth->getRuntime().channelSwitchCC = param;
                     }
                     return;
                 }

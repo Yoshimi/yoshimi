@@ -18,6 +18,8 @@ For the first form (single row) set MSB to 65 and LSB to the controller you want
 
 An extra twist is that if you have any vectors defined these will behave correctly when that particular base channel is selected.
 
+There is a variation of this whereby sending any value at all on the designated controller will simply increment the active part number, looping round back through zero when it reaches 16. For this you need the MSB to be set to 67.
+
 
 For the column based form set MSB to 66 and LSB to the controller you want to use.
 

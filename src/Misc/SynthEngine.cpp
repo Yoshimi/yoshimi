@@ -1556,10 +1556,16 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
 
         case 128: // channel switch
-            if (Runtime.channelSwitchType == 1) // single row
+            if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
             {
-                if (value >= NUM_MIDI_CHANNELS)
-                    return; // out of range
+                if (Runtime.channelSwitchType == 1)
+                {
+                    if (value >= NUM_MIDI_CHANNELS)
+                        return; // out of range
+                }
+                else
+                    value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
+
                 Runtime.channelSwitchValue = value;
                 for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
                 {

@@ -1,10 +1,14 @@
 yoshimi 1.4.1 M
 
+2016-10-22 Will
+* Added Loop mode to Solo feature.
+* Updated docs.
+
 2016-10-21 Will
 * direct -> gui part kit mode & drum mode done.
 * direct -> gui addsynth main completed.
 * direct -> gui subsynth completed.
-* Updated docs
+* Updated docs.
 
 2016-10-16 Will
 * Completed direct gui system/insert effects.

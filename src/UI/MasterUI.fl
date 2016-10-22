@@ -1140,6 +1140,10 @@ updatepanel();}
           label Col
           xywh {40 40 34 20} labelsize 12
         }
+        MenuItem switchloop {
+          label Loop
+          xywh {0 0 34 20} labelsize 12
+        }
       }
     }
   }

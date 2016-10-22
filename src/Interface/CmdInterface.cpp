@@ -1175,8 +1175,10 @@ int CmdInterface::commandReadnSet()
                 name += to_string((int) Runtime.channelSwitchCC);
                 if (Runtime.channelSwitchType == 1)
                     name += " Row type";
-                else
+                else if (Runtime.channelSwitchType == 1)
                     name += " Column type";
+                else
+                    name += " Loop type";
             }
             Runtime.Log(name);
             reply = done_msg;
@@ -1208,6 +1210,12 @@ int CmdInterface::commandReadnSet()
                 Runtime.channelSwitchType = 2;
                 Runtime.channelSwitchCC = value;
                 name += (to_string(value) + " Column type");
+            }
+            else if (value && matchnMove(2, point, "loop"))
+            {
+                Runtime.channelSwitchType = 2;
+                Runtime.channelSwitchCC = value;
+                name += (to_string(value) + " Loop type");
             }
             else
             {
