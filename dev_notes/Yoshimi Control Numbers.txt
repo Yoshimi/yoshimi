@@ -254,11 +254,12 @@ Y : 0 to 3 : 74 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Amp mode – Sum, Mu
 Y : 0/1 : 75 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Autoscale
 
 Y : 0 to 8 : 80 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Harmonic base – C-2, G-2, C-3, G-3, C-4, G-4, C-5, G-5, G-6
-
 Y : 0 to 6 : 81 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Samples per octave – 0.5, 1, 2, 3, 4, 6, 12
 Y : 0 to 7 : 82 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Number of octaves – 1, 2, 3, 4, 5, 6, 7, 8
 Y : 0 to 6 : 83 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Sample size – 16k, 32k, 64k, 128k, 256k, 512k, 1M
+
 Y : any : 104 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Apply changes
+
 Y : 0/1 : 112 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Stereo
 
 Y : 0 to 127 : 120 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : De Pop

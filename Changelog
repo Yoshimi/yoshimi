@@ -2,6 +2,7 @@ yoshimi 1.4.1 M
 
 2016-10-22 Will
 * Added Loop mode to Solo feature.
+* direct -> gui padsynth completed.
 * Updated docs.
 
 2016-10-21 Will
