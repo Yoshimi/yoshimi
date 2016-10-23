@@ -1236,6 +1236,10 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
 
     	case 34:
     	    hz440->value(value != 0);
+    	    if (value == 0)
+                fixedfreqetdial->deactivate();
+            else
+                fixedfreqetdial->activate();
     	    break;
 
     	case 35:

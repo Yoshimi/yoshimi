@@ -230,7 +230,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {626 159 770 580} type Double hide
+      xywh {626 24 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -257,7 +257,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 code1 {if (pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
               } {}
-              Fl_Check_Button {} {
+              Fl_Check_Button ModFreqEn {
                 label Enable
                 callback {//
                     pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(o->value());
@@ -270,7 +270,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 tooltip {Forced Release} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
               }
-              Fl_Counter {} {
+              Fl_Counter ModCoarseDetune {
                 label {Coarse Det.}
                 callback {//
                     int k = lrint(o->value());
@@ -284,7 +284,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 code2 {o->value(k);}
                 code3 {o->lstep(10);}
               }
-              Fl_Counter {} {
+              Fl_Counter ModOctave {
                 label Octave
                 callback {//
                     int k = lrint(o->value());
@@ -304,7 +304,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 code0 {o->step(0.01, 1);}
                 code1 {o->value(getDetune((pars->VoicePar[nvoice].PFMDetuneType == 0) ? (pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PFMDetuneType), 0, pars->VoicePar[nvoice].PFMDetune));}
               }
-              Fl_Slider {} {
+              Fl_Slider ModDetune {
                 callback {//
                     if (Fl::event_button() == 3)
     			o->value(0);
@@ -315,7 +315,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 code0 {o->value(pars->VoicePar[nvoice].PFMDetune-8192);}
                 class mwheel_slider_rev
               }
-              Fl_Choice {} {
+              Fl_Choice ModDetuneType {
                 label {Detune Type}
                 callback {//
                     pars->VoicePar[nvoice].PFMDetuneType = lrint(o->value());
@@ -345,7 +345,7 @@ else
               label {Mod AMPLITUDE}
               xywh {535 55 220 149} box THIN_UP_BOX labelfont 1 labelsize 11 align 17
             } {
-              Fl_Value_Slider {} {
+              Fl_Value_Slider ModVolume {
                 label Vol
                 callback {if (Fl::event_button() == 3)
     o->value(90);
@@ -355,7 +355,7 @@ send_data(80, o->value());}
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolume);}
                 class mwheel_val_slider_rev
               }
-              Fl_Value_Slider {} {
+              Fl_Value_Slider ModVsense {
                 label {V.Sns}
                 callback {if (Fl::event_button() == 3)
     o->value(64);
@@ -372,7 +372,7 @@ send_data(81, o->value());}
                 code1 {if (pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
               } {}
-              Fl_Check_Button {} {
+              Fl_Check_Button ModEn {
                 label Enable
                 callback {//
                     pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrint(o->value());
@@ -385,7 +385,7 @@ send_data(81, o->value());}
                 tooltip {Forced Release} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
               }
-              Fl_Value_Slider {} {
+              Fl_Value_Slider ModFdamp {
                 label {F.Damp}
                 callback {if (Fl::event_button() == 3)
     o->value(0);
@@ -461,7 +461,7 @@ send_data(82, o->value());}
                 code3 {o->value(pars->VoicePar[nvoice].PextFMoscil + 1);}
               } {}
             }
-            Fl_Choice {} {
+            Fl_Choice ExtMod {
               label {External Mod.}
               callback {//
                   pars->VoicePar[nvoice].PFMVoice = lrint(o->value()) - 1;
@@ -484,7 +484,7 @@ send_data(82, o->value());}
               code3 {if (lrint(o->value())) {modoscil->deactivate(); modfrequency->deactivate();}}
             } {}
           }
-          Fl_Choice {} {
+          Fl_Choice ModType {
             label {Type:}
             callback {//
                 pars->VoicePar[nvoice].PFMEnabled = lrint(o->value());
@@ -533,7 +533,7 @@ send_data(82, o->value());}
               code1 {if (pars->VoicePar[nvoice].PFreqEnvelopeEnabled==0) o->deactivate();}
               class EnvelopeUI
             } {}
-            Fl_Check_Button {} {
+            Fl_Check_Button FreqEn {
               label Enable
               callback {//
                   pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(o->value());
@@ -553,7 +553,7 @@ send_data(82, o->value());}
               code1 {if (pars->VoicePar[nvoice].PFreqLfoEnabled==0) o->deactivate();}
               class LFOUI
             } {}
-            Fl_Check_Button {} {
+            Fl_Check_Button FreqLfoEn {
               label Enable
               callback {//
                   pars->VoicePar[nvoice].PFreqLfoEnabled = lrint(o->value());
@@ -566,7 +566,7 @@ send_data(82, o->value());}
               tooltip {Forced Release} xywh {220 300 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqLfoEnabled);}
             }
-            Fl_Counter {} {
+            Fl_Counter Octave {
               label Octave
               callback {//
                   int k = lrint(o->value());
@@ -579,7 +579,7 @@ send_data(82, o->value());}
               code1 {if (k >= 8) k -= 16;}
               code2 {o->value(k);}
             }
-            Fl_Counter {} {
+            Fl_Counter CoarseDetune {
               label {Coarse Det.}
               callback {//
                   int k = lrint(o->value());
@@ -600,7 +600,7 @@ send_data(82, o->value());}
               code0 {o->step(0.01, 1);}
               code1 {o->value(getDetune((pars->VoicePar[nvoice].PDetuneType==0)?(pars->GlobalPar.PDetuneType) : (pars->VoicePar[nvoice].PDetuneType),0,pars->VoicePar[nvoice].PDetune)*pars->getBandwidthDetuneMultiplier());}
             }
-            Fl_Slider {} {
+            Fl_Slider Detune {
               callback {//
                   if (Fl::event_button() == 3)
    			 o->value(0);
@@ -635,7 +635,7 @@ send_data(33, o->value());}
               code2 {o->init(0);}
               class WidgetPDial
             }
-            Fl_Choice {} {
+            Fl_Choice FreqDetunetype {
               label {Detune Type}
               callback {pars->VoicePar[nvoice].PDetuneType = lrint(o->value()); detunevalueoutput->do_callback();
 send_data(36, o->value());}
@@ -691,7 +691,7 @@ send_data(39, o->value());}
             label {Voice Oscillator}
             xywh {5 375 75 35} labelfont 1 labelsize 12 align 128
           }
-          Fl_Slider {} {
+          Fl_Slider VoiceOscPhase {
             label Phase
             callback {//
                 if (Fl::event_button() == 3)
@@ -708,14 +708,14 @@ send_data(39, o->value());}
           Fl_Box {} {
             xywh {200 5 45 35} box THIN_UP_FRAME
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button ResonanceEn {
             label Reson
             callback {pars->VoicePar[nvoice].Presonance = lrint(o->value());
 send_data(130, o->value());}
             tooltip {Resonance On/Off} xywh {215 20 17 19} down_box DOWN_BOX labelfont 1 labelsize 11 align 1
             code0 {o->value(pars->VoicePar[nvoice].Presonance);}
           }
-          Fl_Choice {} {
+          Fl_Choice UseOsc {
             label {Use Oscil.}
             callback {//
                 pars->VoicePar[nvoice].Pextoscil = lrint(o->value()) - 1;
@@ -737,7 +737,7 @@ send_data(130, o->value());}
             code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Ext.%2d", i + 1); o->add(tmp);};}
             code3 {o->value(pars->VoicePar[nvoice].Pextoscil + 1);}
           } {}
-          Fl_Check_Button {} {
+          Fl_Check_Button UnisonEn {
             label Unison
             callback {int colr = FL_BLACK;
 if (o->value() == 0)
@@ -798,7 +798,7 @@ send_data(53, o->value());}
               code1 {if (tmp < 2) tmp = 2;}
               code2 {o->value(tmp);}
             }
-            Fl_Dial {} {
+            Fl_Dial UnisonStereo {
               label Stereo
               callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrint(o->value());
 send_data(50, o->value());}
@@ -807,7 +807,7 @@ send_data(50, o->value());}
               code1 {o->init(64);}
               class WidgetPDial
             }
-            Fl_Dial {} {
+            Fl_Dial UnisonVib {
               label {Vib.}
               callback {pars->VoicePar[nvoice].Unison_vibratto = lrint(o->value());
 send_data(51, o->value());}
@@ -816,7 +816,7 @@ send_data(51, o->value());}
               code1 {o->init(64);}
               class WidgetPDial
             }
-            Fl_Choice {} {
+            Fl_Choice UnisonInvert {
               label Invert
               callback {pars->VoicePar[nvoice].Unison_invert_phase = lrint(o->value());
 send_data(54, o->value());}
@@ -832,7 +832,7 @@ send_data(54, o->value());}
                   }}
               code1 {o->value(pars->VoicePar[nvoice].Unison_invert_phase);}
             } {}
-            Fl_Slider {} {
+            Fl_Slider UnisonFreqSpread {
               label {Frequency Spread}
               callback {//
                   if (Fl::event_button() == 3)
@@ -851,7 +851,7 @@ send_data(54, o->value());}
               code0 {o->step(0.1, 1);}
               code1 {o->value(pars->getUnisonFrequencySpreadCents(nvoice));}
             }
-            Fl_Dial {} {
+            Fl_Dial UnisonVspeed {
               label {V.speed}
               callback {pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(o->value());
 send_data(52, o->value());}
@@ -860,7 +860,7 @@ send_data(52, o->value());}
               code1 {o->init(64);}
               class WidgetPDial
             }
-            Fl_Dial {} {
+            Fl_Dial UnisonPhRnd {
               label {Ph.rnd}
               callback {pars->VoicePar[nvoice].Unison_phase_randomness=lrint(o->value());
 send_data(49, o->value());}
@@ -923,7 +923,7 @@ send_data(1, o->value());}
             tooltip {Voice random panning On/Off} xywh {196 91 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
             code0 {o->value(pars->randomVoicePan(nvoice));}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button AmpEnvEn {
             label Enable
             callback {//
                 pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(o->value());
@@ -943,7 +943,7 @@ send_data(1, o->value());}
             code1 {if (pars->VoicePar[nvoice].PAmpLfoEnabled==0) o->deactivate();}
             class LFOUI
           } {}
-          Fl_Check_Button {} {
+          Fl_Check_Button AmpLfoEn {
             label Enable
             callback {//
                 pars->VoicePar[nvoice].PAmpLfoEnabled = lrint(o->value());
@@ -956,7 +956,7 @@ send_data(1, o->value());}
             tooltip {Forced Release} xywh {15 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
           }
-          Fl_Check_Button {} {
+          Fl_Check_Button VolumeMinus {
             label Minus
             callback {pars->VoicePar[nvoice].PVolumeminus = lrint(o->value());
 send_data(4, o->value());}
@@ -982,7 +982,7 @@ send_data(4, o->value());}
             code1 {if (pars->VoicePar[nvoice].PFilterEnvelopeEnabled==0) o->deactivate();}
             class EnvelopeUI
           } {}
-          Fl_Check_Button {} {
+          Fl_Check_Button FilterEnvEn {
             label Enable
             callback {//
                 pars->VoicePar[nvoice].PFilterEnvelopeEnabled = lrint(o->value());
@@ -1002,7 +1002,7 @@ send_data(4, o->value());}
             code1 {if (pars->VoicePar[nvoice].PFilterLfoEnabled==0) o->deactivate();}
             class LFOUI
           } {}
-          Fl_Check_Button {} {
+          Fl_Check_Button FilterLfoEn {
             label Enable
             callback {//
                 pars->VoicePar[nvoice].PFilterLfoEnabled = lrint(o->value());
@@ -1022,7 +1022,7 @@ send_data(4, o->value());}
           code0 {//
               char tmp[2]; tmp[0] = nvoice + 49; tmp[1] = 0; o->copy_label(tmp);}
         } {}
-        Fl_Choice {} {
+        Fl_Choice SoundType {
           callback {int x = lrint(o->value());
               pars->VoicePar[nvoice].Type = x;
               if (!x)
@@ -1050,10 +1050,10 @@ send_data(4, o->value());}
             xywh {25 25 100 20} labelfont 1 labelsize 11 labelcolor 5
           }
         }
-        Fl_Group {} {
+        Fl_Group {} {open
           xywh {106 5 95 35} box THIN_UP_BOX
         } {
-          Fl_Value_Slider {} {
+          Fl_Value_Slider Delay {
             label Delay
             callback {if (Fl::event_button() == 3)
     o->value(0);
@@ -1072,7 +1072,7 @@ send_data(64, o->value());}
           xywh {416 16 14 14} down_box DOWN_BOX labelfont 1 labelsize 10 align 8
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
-        Fl_Check_Button {} {
+        Fl_Check_Button FilterEn {
           label Enable
           callback {//
               pars->VoicePar[nvoice].PFilterEnabled = lrint(o->value());
@@ -1141,7 +1141,8 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
-    //int tmp;
+    unsigned char voice = getData->data.engine & 0x1f;
+    int tmp;
     
     switch(control)
     {
@@ -1157,6 +1158,241 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     	    voicepan->value(value);
     	    break;
 
+    	case 4:
+    	    VolumeMinus->value(value != 0);
+    	    break;
+
+    	case 8:
+    	    AmpEnvEn->value(value != 0);
+    	    if (value == 0)
+                    voiceampenvgroup->deactivate();
+                else
+                    voiceampenvgroup->activate();
+                //o->redraw();
+
+    	    break;
+
+    	case 9:
+    	    AmpLfoEn->value(value != 0);
+    	    if (value == 0)
+                    voiceamplfogroup->deactivate();
+                else
+                    voiceamplfogroup->activate();
+                //o->redraw();
+
+    	    break;
+
+    	case 16:
+    	    ModType->value((int)value);
+    	    if (value == 0)
+                    voiceFMparametersgroup->deactivate();
+                else
+                    voiceFMparametersgroup->activate();
+    	    break;
+
+    	case 17:
+    	    ExtMod->value((int)value);
+    	    if (value > 0)
+                  {
+                      modoscil->deactivate();
+                      modfrequency->deactivate();
+                  }
+                  else
+                  {
+                      modoscil->activate();
+                      modfrequency->activate();
+                  }
+                  voiceFMparametersgroup->redraw();
+    	    break;
+
+    	case 32:
+    	    Detune->value(value);
+    	    detunevalueoutput->do_callback();
+
+    	    break;
+
+    	case 33:
+    	    fixedfreqetdial->value(value);
+    	    if (value == 0) fixedfreqetdial->deactivate();
+    	    break;
+
+    	case 34:
+    	    Freq440->value(value != 0);
+    	    if (value == 0 && Mod440->value() == 0)
+                fixedfreqetdial->deactivate();
+            else
+                fixedfreqetdial->activate();
+    	    break;
+
+    	case 35:
+    	    Octave->value((int) value);
+    	    break;
+
+    	case 36:
+    	   FreqDetunetype->value((int) value);
+    	    break;
+
+    	case 37:
+    	    CoarseDetune->value((int) value);
+    	    break;
+
+    	case 38:
+    	    bend->value(value);
+    	    break;
+
+    	case 39:
+    	    offset->value(value);
+    	    break;
+
+    	case 40:
+    	    FreqEn->value(value != 0);
+    	    if (value == 0)
+                voicefreqenvgroup->deactivate();
+            else
+                voicefreqenvgroup->activate();
+    	    break;
+
+    	case 41:
+    	    FreqLfoEn->value(value != 0);
+    	     if (value == 0)
+                 voicefreqlfogroup->deactivate();
+             else
+                 voicefreqlfogroup->activate();
+    	    break;
+
+    	case 48:
+    	    UnisonFreqSpread->value(value);
+    	    break;
+
+    	case 49:
+    	    UnisonPhRnd->value(value);
+    	    break;
+
+    	case 50:
+    	    UnisonStereo->value(value);
+    	    break;
+
+    	case 51:
+    	    UnisonVib->value(value);
+    	    break;
+
+    	case 52:
+    	    UnisonVspeed->value(value);
+    	    break;
+
+    	case 53:
+    	    {
+    	        tmp = (int) value;
+    	        unisonsize->value(tmp);
+                int colr = FL_BLACK;
+                int i = 0;
+                while(pars->ADnote_unison_sizes[i] != 0)
+                {
+                    if (pars->ADnote_unison_sizes[i] == tmp)
+                    {
+                        colr = FL_RED;
+                        break;
+                    }
+                    ++ i;
+                }
+                unisonsize->labelcolor(colr);
+                unisongroup->redraw();
+    	    }
+    	    break;
+
+    	case 54:
+    	    UnisonInvert->value(value);
+    	    break;
+
+    	case 56:
+    	    tmp = (int) value;
+    	    UnisonEn->value(tmp);
+    	    if (tmp == 0)
+    	    {
+    	        unisonsize->value(2);
+                unisongroup->deactivate();
+            }
+            else
+            {
+                tmp = lrint(unisonsize->value());
+                unisongroup->activate();
+                int colr = FL_BLACK;
+                int i = -1;
+                while (true)
+                {
+                    ++i;
+                    if (pars->ADnote_unison_sizes[i] == 0)
+                        break;
+                    if (pars->ADnote_unison_sizes[i] == tmp)
+                    {
+                        colr = FL_RED;
+                        break;
+                    }
+                }
+                unisonsize->labelcolor(colr);
+                unisongroup->redraw();
+            }
+    	    break;
+
+    	case 68:
+    	    FilterEn->value(value != 0);
+    	    break;
+
+    	case 72:
+    	    FilterEnvEn->value(value != 0);
+    	    break;
+
+    	case 73:
+    	    FilterLfoEn->value(value != 0);
+    	    break;
+
+    	case 80:
+    	    ;//->value(value);
+    	    break;
+
+
+
+
+
+    	case 128:
+    	    Delay->value(value);
+    	    break;
+
+    	case 129:
+    	    voiceonbutton->value(value != 0);
+    	    break;
+
+    	case 130:
+    	    ResonanceEn->value(value != 0);
+    	    break;
+
+    	case 136:
+    	    tmp = (int)value;
+    	    VoiceOscPhase->value(tmp);
+    	    osc->phase = 64 - tmp;
+            voiceoscil->redraw();
+
+    	    break;
+
+    	case 137:
+    	    tmp = int(value);
+    	    UseOsc->value(tmp + 1);
+    	    if (tmp < 0)
+    	        tmp = voice;
+    	    osc->init(pars->VoicePar[tmp].OscilSmp, synth);
+            changevoiceoscilbutton->labelcolor(FL_BLUE);
+            osc->redraw();
+    	    break;
+
+    	case 138:
+    	    tmp = (int) value;
+    	    SoundType->value(tmp);
+    	    if (!tmp)
+                voicemodegroup->activate();
+            else
+                voicemodegroup->deactivate();
+            noiselabel->do_callback();
+    	    break;
     }
     Fl::check();} {}
   }

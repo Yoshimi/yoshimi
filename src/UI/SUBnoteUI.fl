@@ -171,9 +171,9 @@ class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {610 511 735 475} type Double
+      xywh {610 511 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
-      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);} visible
+      code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
       Fl_Scroll {} {
         xywh {5 140 434 330} type HORIZONTAL box THIN_UP_BOX
@@ -746,6 +746,10 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
 
     	case 34:
     	    hz440->value(value != 0);
+    	    if (value == 0)
+                fixedfreqetdial->deactivate();
+            else
+                fixedfreqetdial->activate();
     	    break;
 
     	case 35:

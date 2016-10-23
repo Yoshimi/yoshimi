@@ -179,7 +179,7 @@ Y : 0 to 127 : 128 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Dela
 Y : 0/1 : 129 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice enable
 Y : 0/1 : 130 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Resonance enable (for this voice)
 Y : -64 to 63 : 136 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice oscillator phase
-Y :  : 137 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External voice oscillator (from lower numbered voices)
+Y : -1 to 6 : 137 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External voice oscillator (from lower numbered voices) - off = -1
 Y : 0 to 2 : 138 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Sound type – Oscillator, White noise, Pink noise
 
 SubSynth window

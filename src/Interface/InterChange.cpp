@@ -1452,7 +1452,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
         case 17:
             contstr = "Extern Mod";
             if (write)
-                pars->VoicePar[nvoice].PFMVoice = lrint(value);
+                pars->VoicePar[nvoice].PFMVoice = lrint(value) - 1;
             else
                 value = pars->VoicePar[nvoice].PFMVoice;
             break;
@@ -1590,7 +1590,11 @@ void InterChange::commandAddVoice(CommandBlock *getData)
         case 56:
             contstr = "Enable";
             if (write)
-                pars->VoicePar[nvoice].Unison_size = (value != 0) + 1;
+            {
+                k = (value != 0) + 1;
+                if (pars->VoicePar[nvoice].Unison_size < 2 || k == 1)
+                    pars->VoicePar[nvoice].Unison_size = k;
+            }
             else
                 value = (pars->VoicePar[nvoice].Unison_size > 1);
             break;

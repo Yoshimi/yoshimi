@@ -1,5 +1,9 @@
 yoshimi 1.4.1 M
 
+2016-10-23 Will
+* Bugfix: direct -> gui 440Hz wasn't corerect for sub/pad.
+* direct -> gui addsynthvoice done appart from modulators.
+
 2016-10-22 Will
 * Added Loop mode to Solo feature.
 * direct -> gui padsynth completed.
