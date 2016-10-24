@@ -336,7 +336,8 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 if (o->value() == 0 && lrint(Freq440->value() == 0))
     fixedfreqetdial->deactivate();
 else
-    fixedfreqetdial->activate();}
+    fixedfreqetdial->activate();
+send_data(98, o->value());}
                 tooltip {Set the modulator base frequency to 440Hz} xywh {683 242 55 15} down_box DOWN_BOX labelfont 1 labelsize 11
                 code0 {o->value(pars->VoicePar[nvoice].PFMFixedFreq);}
               }
@@ -372,7 +373,7 @@ send_data(81, o->value());}
                 code1 {if (pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled==0) o->deactivate();}
                 class EnvelopeUI
               } {}
-              Fl_Check_Button ModEn {
+              Fl_Check_Button ModAmpEn {
                 label Enable
                 callback {//
                     pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrint(o->value());
@@ -425,7 +426,7 @@ send_data(82, o->value());}
                 xywh {704 368 43 12} box THIN_UP_BOX labelfont 1 labelsize 9
                 code0 {if (pars->VoicePar[nvoice].PextFMoscil>=0) o->labelcolor(FL_BLUE);}
               }
-              Fl_Slider {} {
+              Fl_Slider ModPhase {
                 label Phase
                 callback {//
                     if (Fl::event_button() == 3)
@@ -439,7 +440,7 @@ send_data(82, o->value());}
                 code0 {o->value(64-pars->VoicePar[nvoice].PFMoscilphase);}
                 class mwheel_slider_rev
               }
-              Fl_Choice {} {
+              Fl_Choice ExtModOsc {
                 label Use
                 callback {//
                     pars->VoicePar[nvoice].PextFMoscil = lrint(o->value()) - 1;
@@ -454,7 +455,7 @@ send_data(82, o->value());}
                         changeFMoscilbutton->labelcolor(FL_BLACK);
                     }
                     voiceFMparametersgroup->redraw();
-                    send_data(113, o->value());}
+                    send_data(113, o->value() - 1);}
                 xywh {560 395 75 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
                 code0 {o->add("Internal");}
                 code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtM.%2d", i + 1); o->add(tmp);};}
@@ -476,7 +477,7 @@ send_data(82, o->value());}
                       modfrequency->activate();
                   }
                   voiceFMparametersgroup->redraw();
-                  send_data(17, o->value());}
+                  send_data(17, o->value() - 1);}
               xywh {635 32 85 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("OFF");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtMod.%2d", i + 1); o->add(tmp);};}
@@ -731,7 +732,7 @@ send_data(130, o->value());}
 
                 voiceparametersgroup->redraw();
                 voiceonbutton->redraw();
-                send_data(137, o->value());}
+                send_data(137, o->value() - 1);}
             xywh {5 455 65 15} down_box BORDER_BOX labelsize 10 align 1 textfont 1 textsize 10
             code0 {o->add("Internal");}
             code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "Ext.%2d", i + 1); o->add(tmp);};}
@@ -1050,7 +1051,7 @@ send_data(4, o->value());}
             xywh {25 25 100 20} labelfont 1 labelsize 11 labelcolor 5
           }
         }
-        Fl_Group {} {open
+        Fl_Group {} {
           xywh {106 5 95 35} box THIN_UP_BOX
         } {
           Fl_Value_Slider Delay {
@@ -1191,8 +1192,9 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     	    break;
 
     	case 17:
-    	    ExtMod->value((int)value);
-    	    if (value > 0)
+    	    tmp = (int) value;
+    	    ExtMod->value(tmp + 1);
+    	    if (tmp >= 0)
                   {
                       modoscil->deactivate();
                       modfrequency->deactivate();
@@ -1347,12 +1349,77 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     	    break;
 
     	case 80:
-    	    ;//->value(value);
+    	    ModVolume->value(value);
     	    break;
 
+    	case 81:
+    	    ModVsense->value(value);
+    	    break;
 
+    	case 82:
+    	    ModFdamp->value(value);
+    	    break;
 
+    	case 88:
+    	    ModAmpEn->value(value != 0);
+    	    if (value == 0)
+                voiceFMampenvgroup->deactivate();
+            else
+                voiceFMampenvgroup->activate();
+    	    break;
 
+    	case 96:
+    	    ModDetune->value(value);
+    	    fmdetunevalueoutput->do_callback();
+    	    break;
+
+        case 98:
+            tmp = (value != 0);
+            Mod440->value(tmp);
+            if (tmp == 0 && lrint(Freq440->value() == 0))
+                fixedfreqetdial->deactivate();
+            else
+                fixedfreqetdial->activate();
+
+    	case 99:
+    	    ModOctave->value((int) value);
+    	    break;
+
+    	case 100:
+    	    ModDetuneType->value((int) value);
+    	    break;
+
+    	case 101:
+    	    ModCoarseDetune->value((int) value);
+    	    break;
+
+    	case 104:
+    	    ModFreqEn->value(value != 0);
+    	    if (value == 0)
+                voiceFMfreqenvgroup->deactivate();
+            else
+                voiceFMfreqenvgroup->activate();
+    	    break;
+
+    	case 112:
+    	    ModPhase->value(value);
+    	    oscFM->phase = 64 - lrint(value);
+            fmoscil->redraw();
+    	    break;
+
+    	case 113:
+    	    tmp = int(value);
+    	    ExtModOsc->value(tmp + 1);
+    	    if (tmp < 0)
+    	    {
+    	        tmp = voice;
+    	        changeFMoscilbutton->labelcolor(FL_BLACK);
+    	    }
+    	    else
+    	        changeFMoscilbutton->labelcolor(FL_BLUE);
+            oscFM->init(pars->VoicePar[tmp].FMSmp, synth);
+            voiceFMparametersgroup->redraw();
+    	    break;
 
     	case 128:
     	    Delay->value(value);
@@ -1378,9 +1445,13 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     	    tmp = int(value);
     	    UseOsc->value(tmp + 1);
     	    if (tmp < 0)
+    	    {
     	        tmp = voice;
+    	        changevoiceoscilbutton->labelcolor(FL_BLACK);
+    	    }
+    	    else
+    	        changevoiceoscilbutton->labelcolor(FL_BLUE);
     	    osc->init(pars->VoicePar[tmp].OscilSmp, synth);
-            changevoiceoscilbutton->labelcolor(FL_BLUE);
             osc->redraw();
     	    break;
 

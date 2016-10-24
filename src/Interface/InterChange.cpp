@@ -1452,7 +1452,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
         case 17:
             contstr = "Extern Mod";
             if (write)
-                pars->VoicePar[nvoice].PFMVoice = lrint(value) - 1;
+                pars->VoicePar[nvoice].PFMVoice = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PFMVoice;
             break;
@@ -1664,15 +1664,14 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             else
                 value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
+        case 98:
+            contstr = "440Hz";
+            if (write)
+                pars->VoicePar[nvoice].PFMFixedFreq = (value != 0);
+            else
+                value = pars->VoicePar[nvoice].PFMFixedFreq;
         case 99:
             contstr = "Octave";
-            if (write)
-                ;
-            else
-                ;
-            break;
-        case 100:
-            contstr = "Det type";
             if (write)
             {
                 k = lrint(value);
@@ -1687,6 +1686,13 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                     k -= 16;
                 value = k;
             }
+            break;
+        case 100:
+            contstr = "Det type";
+            if (write)
+                pars->VoicePar[nvoice].PFMDetuneType = (int) value;
+            else
+                value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
         case 101:
             contstr = "Coarse Det";
