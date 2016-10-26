@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <bitset>
+#include <unistd.h>
 
 using namespace std;
 
@@ -41,23 +42,60 @@ using namespace std;
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
-    // quite incomplete - we don't know what will develop yet!
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
         fromCLI = NULL;
-        synth->getRuntime().Log("InteChange failed to create 'fromCLI' ringbuffer");
+        synth->getRuntime().Log("InterChange failed to create 'fromCLI' ringbuffer");
+    }
+
+    if (!(toCLI = jack_ringbuffer_create(sizeof(commandSize) * 512)))
+    {
+        toCLI = NULL;
+        synth->getRuntime().Log("InterChange failed to create 'toCLI' ringbuffer");
     }
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         fromGUI = NULL;
-        synth->getRuntime().Log("InteChange failed to create 'fromGUI' ringbuffer");
+        synth->getRuntime().Log("InterChange failed to create 'fromGUI' ringbuffer");
     }
     if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         toGUI = NULL;
-        synth->getRuntime().Log("InteChange failed to create 'toGUI' ringbuffer");
+        synth->getRuntime().Log("InterChange failed to create 'toGUI' ringbuffer");
     }
+
+    if (!synth->getRuntime().startThread(&CLIresolvethreadHandle, _CLIresolvethread, this, false, 0, false, "CLI"))
+    {
+        synth->getRuntime().Log("Failed to start CLI resolve thread");
+    }
+}
+
+
+void *InterChange::_CLIresolvethread(void *arg)
+{
+    return static_cast<InterChange*>(arg)->CLIresolvethread();
+}
+
+
+void *InterChange::CLIresolvethread(void)
+{
+    CommandBlock getData;
+    int toread;
+    char *point;
+    while(synth->getRuntime().runSynth)
+    {
+        while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
+        {
+            toread = commandSize;
+            point = (char*) &getData.bytes;
+            for (size_t i = 0; i < commandSize; ++i)
+                jack_ringbuffer_read(toCLI, point, toread);
+            resolveReplies(&getData);
+        }
+        usleep(20000);
+    }
+    return NULL;
 }
 
 
@@ -67,6 +105,11 @@ InterChange::~InterChange()
     {
         jack_ringbuffer_free(fromCLI);
         fromCLI = NULL;
+    }
+    if (toCLI)
+    {
+        jack_ringbuffer_free(toCLI);
+        toCLI = NULL;
     }
     if (fromGUI)
     {
@@ -78,6 +121,571 @@ InterChange::~InterChange()
         jack_ringbuffer_free(toGUI);
         toGUI = NULL;
     }
+}
+
+
+void InterChange::resolveReplies(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char insertParam = getData->data.parameter;
+    unsigned char insertPar2 = getData->data.par2;
+
+    bool isGui = type & 0x20;
+    bool isCli = type & 0x10;
+    char button = type & 3;
+    string isValue;
+    if (isGui)
+        synth->getRuntime().Log("From GUI");
+    if ((isGui && button != 2) || (isCli && button == 1))
+    {
+        if (button == 0)
+            isValue = "Request set default";
+        else if (button == 3)
+            isValue = "Request MIDI learn";
+        else
+        {
+            isValue = "\n  Value " + to_string(value);
+            if (!(type & 0x80))
+                isValue +=  "f";
+        }
+        isValue +="\n  Type ";
+        for (int i = 7; i > -1; -- i)
+            isValue += to_string((type >> i) & 1);
+        synth->getRuntime().Log(isValue
+                            + "\n  Control " + to_string((int) control)
+                            + "\n  Part " + to_string((int) npart)
+                            + "\n  Kit " + to_string((int) kititem)
+                            + "\n  Engine " + to_string((int) engine)
+                            + "\n  Insert " + to_string((int) insert)
+                            + "\n  Parameter " + to_string((int) insertParam)
+                            + "\n  2nd Parameter " + to_string((int) insertPar2));
+        return;
+    }
+    if (npart >= 0xc0 && npart < 0xd0)
+    {
+        resolveVector(getData);
+        return;
+    }
+    if (npart == 0xf0)
+    {
+        resolveMain(getData);
+        return;
+    }
+    if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
+    {
+        resolveSysIns(getData);
+        return;
+    }
+    if (kititem == 0xff || (kititem & 0x20))
+    {
+        resolvePart(getData);
+        return;
+    }
+    if (kititem >= 0x80)
+    {
+        resolveEffects(getData);
+        return;
+    }
+}
+
+void InterChange::resolveVector(CommandBlock *getData)
+{
+    int value = getData->data.value;
+    unsigned char control = getData->data.control;
+    unsigned int chan = getData->data.part & 0xf;
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Base Channel"; // local to source
+            break;
+        case 1:
+            contstr = "Options";
+            break;
+
+        case 16:
+            contstr = "Controller";
+            break;
+        case 17:
+            contstr = "Left Instrument";
+            break;
+        case 18:
+            contstr = "Right Instrument";
+            break;
+        case 19:
+        case 35:
+            contstr = "Feature 0";
+            break;
+        case 20:
+        case 36:
+            contstr = "Feature 1";
+            break;
+        case 21:
+        case 37:
+            contstr = "Feature 2 ";
+            break;
+        case 22:
+        case 38:
+            contstr = "Feature 3";
+            break;
+
+        case 32:
+            contstr = "Controller";
+            break;
+        case 33:
+            contstr = "Up Instrument";
+            break;
+        case 34:
+            contstr = "Down Instrument";
+            break;
+    }
+
+    string name = "Vector Chan " + to_string(chan);
+    if (control == 127)
+        name += "  all ";
+    else if (control >= 32)
+        name += "  Y ";
+    else if(control >= 16)
+        name += "  X ";
+
+    synth->getRuntime().Log(name + contstr + " value " + to_string(value));
+}
+
+
+void InterChange::resolveMain(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+
+        case 14:
+            contstr = "Part Number";
+            break;
+        case 15:
+            contstr = "Available Parts";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 35:
+            contstr = "Key Shift";
+            break;
+
+        case 48:
+            contstr = "Chan Switch Type";
+            break;
+        case 49:
+            contstr = "Chan Switch CC";
+            break;
+
+        case 96:
+            contstr = "Reset All";
+            break;
+        case 128:
+            contstr = "Stop";
+            break;
+    }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+    synth->getRuntime().Log("Main " + contstr + " value " + actual);
+}
+
+
+void InterChange::resolvePart(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char effNum = engine;
+
+    bool kitType = (kititem >= 0x20 && kititem < 0x40);
+
+    string kitnum;
+    if (kitType)
+        kitnum = "  Kit " + to_string(kititem & 0x1f) + " ";
+    else
+        kitnum = "  ";
+
+    string name = "";
+    if (control >= 0x80)
+    {
+        if (control < 0xe0)
+        {
+            name = "Controller ";
+            if (control >= 0xa0)
+                name += "Portamento ";
+        }
+    }
+    else if (kititem < 0xff)
+    {
+        switch (engine)
+        {
+            case 0:
+                name = "AddSynth ";
+                break;
+            case 1:
+                name = "SubSynth ";
+                break;
+            case 2:
+                name = "PadSynth ";
+                break;
+        }
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 4:
+            contstr = "Vel Offset";
+            break;
+        case 5:
+            contstr = "Midi";
+            break;
+        case 6:
+            contstr = "Mode";
+            break;
+        case 7:
+            contstr = "Portamento";
+            break;
+        case 8:
+            contstr = "Enable";
+            if (!kitType)
+            {
+                switch(engine)
+                {
+                    case 0:
+                        contstr = "AddSynth " + contstr;
+                        break;
+                    case 1:
+                        contstr = "SubSynth " + contstr;
+                        break;
+                    case 2:
+                        contstr = "PadSynth " + contstr;
+                        break;
+                }
+            }
+            break;
+        case 9:
+            if (kitType)
+                contstr = "Mute";
+            break;
+
+        case 16:
+            contstr = "Min Note";
+            break;
+        case 17:
+            contstr = "Max Note";
+            break;
+        case 18: // always return actual value
+            contstr = "Min To Last";
+            break;
+        case 19: // always return actual value
+            contstr = "Max To Last";
+            break;
+        case 20:
+            contstr = "Reset Key Range";
+            break;
+
+        case 24:
+            if (kitType)
+                contstr = "Effect Number";
+            break;
+
+        case 33:
+            contstr = "Key Limit";
+            break;
+        case 35:
+            contstr = "Key Shift";
+            break;
+
+        case 40:
+            contstr = "Effect Send 0";
+            break;
+        case 41:
+            contstr = "Effect Send 1";
+            break;
+        case 42:
+            contstr = "Effect Send 2";
+            break;
+        case 43:
+            contstr = "Effect Send 3";
+            break;
+
+        case 48:
+            contstr = "Humanise";
+            break;
+
+        case 57:
+            contstr = "Drum Mode";
+            break;
+        case 58:
+            contstr = "Kit Mode";
+            break;
+
+        case 64: // local to source
+            contstr = "Effect Number";
+            break;
+        case 65:
+            contstr = "Effect " + to_string(effNum) + " Type";
+            break;
+        case 66:
+            contstr = "Effect " + to_string(effNum) + " Destination";
+            break;
+        case 67:
+            contstr = "Bypass Effect "+ to_string(effNum);
+            break;
+
+        case 120:
+            contstr = "Audio destination";
+            break;
+
+        case 128:
+            contstr = "Vol Range"; // not the *actual* volume
+            break;
+        case 129:
+            contstr = "Vol Enable";
+            break;
+        case 130:
+            contstr = "Pan Width";
+            break;
+        case 131:
+            contstr = "Mod Wheel Depth";
+            break;
+        case 132:
+            contstr = "Exp Mod Wheel";
+            break;
+        case 133:
+            contstr = "Bandwidth depth";
+            break;
+        case 134:
+            contstr = "Exp Bandwidth";
+            break;
+        case 135:
+            contstr = "Expression Enable";
+            break;
+        case 136:
+            contstr = "FM Amp Enable";
+            break;
+        case 137:
+            contstr = "Sustain Ped Enable";
+            break;
+        case 138:
+            contstr = "Pitch Wheel Range";
+            break;
+        case 139:
+            contstr = "Filter Q Depth";
+            break;
+        case 140:
+            contstr = "Filter Cutoff Depth";
+            break;
+
+        case 144:
+            contstr = "Res Cent Freq Depth";
+            break;
+        case 145:
+            contstr = "Res Band Depth";
+            break;
+
+        case 160:
+            contstr = "Time";
+            break;
+        case 161:
+            contstr = "Tme Stretch";
+            break;
+        case 162:
+            contstr = "Threshold";
+            break;
+        case 163:
+            contstr = "Threshold Type";
+            break;
+        case 164:
+            contstr = "Prop Enable";
+            break;
+        case 165:
+            contstr = "Prop Rate";
+            break;
+        case 166:
+            contstr = "Prop depth";
+            break;
+        case 168:
+            contstr = "Enable";
+            break;
+
+        case 224:
+            contstr = "Clear controllers";
+            break;
+    }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + kitnum + name + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveSysIns(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char effnum = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
+    bool isSysEff = (npart == 0xf1);
+
+    string name;
+    if (isSysEff)
+        name = "System ";
+    else
+        name = "Insert ";
+
+    string contstr;
+    string second;
+    if (insert == 0xff)
+    {
+        second = "";
+        switch (control)
+        {
+            case 0:
+                contstr = "Number ";
+                break;
+            case 1:
+                contstr = to_string(effnum) + " Type ";
+                break;
+            case 2: // insert only
+                contstr = to_string(effnum) + " To ";
+        }
+        contstr = "Effect " + contstr;
+    }
+    else // system only
+    {
+        contstr = "From Effect " + to_string(effnum);
+        second = " To Effect " + to_string(control)  + "  Value ";
+    }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log(name  + contstr + second + actual);
+}
+
+
+void InterChange::resolveEffects(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit & 0x1f;
+    unsigned char effnum = getData->data.engine;
+
+    string name;
+    string actual;
+    if (npart == 0xf1)
+        name = "System";
+    else if (npart == 0xf2)
+        name = "Insert";
+    else
+        name = "Part " + to_string(npart);
+
+    if (kititem == 8 && getData->data.insert < 0xff)
+    {
+        if (npart == 0xf1)
+            name = "System";
+        else if (npart == 0xf2)
+            name = "Insert";
+        else name = "Part " + to_string(npart);
+        name += " Effect " + to_string(effnum);
+
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
+        synth->getRuntime().Log(name + " DynFilter ~ Filter Parameter " + to_string(control) + "  Value " + actual);
+
+        return;
+    }
+
+    name += " Effect " + to_string(effnum);
+
+    string effname;
+    switch (kititem)
+    {
+        case 0:
+            effname = " NO Effect"; // shouldn't get here!
+            break;
+        case 1:
+            effname = " Reverb";
+            break;
+        case 2:
+            effname = " Echo";
+            break;
+        case 3:
+            effname = " Chorus";
+            break;
+        case 4:
+            effname = " Phaser";
+            break;
+        case 5:
+            effname = " AlienWah";
+            break;
+        case 6:
+            effname = " Distortion";
+            break;
+        case 7:
+            effname = " EQ";
+            break;
+        case 8:
+            effname = " DynFilter";
+            break;
+    }
+
+    string contstr = "  Control " + to_string(control);
+
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log(name + effname + contstr + "  Value " + actual);
 }
 
 
@@ -136,6 +744,11 @@ void InterChange::returns(CommandBlock *getData)
             }
         }
     }
+
+    if (jack_ringbuffer_write_space(toCLI) >= commandSize)
+    {
+        jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
+    }
 }
 
 
@@ -151,47 +764,19 @@ void InterChange::setpadparams(int point)
 
 void InterChange::commandSend(CommandBlock *getData)
 {
-    float value = getData->data.value;
     unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
 
     bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     char button = type & 3;
-    string isValue;
-    if (isCli)
-        synth->getRuntime().Log("From CLI");
+
     if ((isGui && button != 2) || (isCli && button == 1))
-    {
-        if (button == 0)
-            isValue = "Request set default";
-        else if (button == 3)
-            isValue = "Request MIDI learn";
-        else
-        {
-            isValue = "\n  Value " + to_string(value);
-            if (!(type & 0x80))
-                isValue +=  "f";
-        }
-        isValue +="\n  Type ";
-        for (int i = 7; i > -1; -- i)
-            isValue += to_string((type >> i) & 1);
-        synth->getRuntime().Log(isValue
-                            + "\n  Control " + to_string((int) control)
-                            + "\n  Part " + to_string((int) npart)
-                            + "\n  Kit " + to_string((int) kititem)
-                            + "\n  Engine " + to_string((int) engine)
-                            + "\n  Insert " + to_string((int) insert)
-                            + "\n  Parameter " + to_string((int) insertParam)
-                            + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
-    }
+
     if (npart >= 0xc0 && npart < 0xd0)
     {
         commandVector(getData);
@@ -357,14 +942,12 @@ void InterChange::commandVector(CommandBlock *getData)
         else if (control >= 35 && control <= 38)
             features = synth->getRuntime().nrpndata.vectorYfeatures[chan];
     }
-    string contstr = "";
+
     switch (control)
     {
         case 0:
-            contstr = "Base Channel"; // local to source
             break;
         case 1:
-            contstr = "Options";
             if (write)
             {
                 switch (value)
@@ -389,7 +972,6 @@ void InterChange::commandVector(CommandBlock *getData)
             break;
 
         case 16:
-            contstr = "Controller";
             if (write)
             {
                 if (value >= 14)
@@ -402,14 +984,12 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 17:
-            contstr = "Left Instrument";
             if (write)
                 synth->vectorSet(4, chan, value);
             else
                 ;
             break;
         case 18:
-            contstr = "Right Instrument";
             if (write)
                 synth->vectorSet(5, chan, value);
             else
@@ -417,7 +997,6 @@ void InterChange::commandVector(CommandBlock *getData)
             break;
         case 19:
         case 35:
-            contstr = "Feature 0";
             if (write)
                 if (value == 0)
                     bitClear(features, 0);
@@ -428,7 +1007,6 @@ void InterChange::commandVector(CommandBlock *getData)
             break;
         case 20:
         case 36:
-            contstr = "Feature 1";
             if (write)
             {
                 bitClear(features, 1);
@@ -445,7 +1023,6 @@ void InterChange::commandVector(CommandBlock *getData)
             break;
         case 21:
         case 37:
-            contstr = "Feature 2 ";
             if (write)
             {
                 bitClear(features, 2);
@@ -462,7 +1039,6 @@ void InterChange::commandVector(CommandBlock *getData)
             break;
         case 22:
         case 38:
-            contstr = "Feature 3";
             if (write)
             {
                 bitClear(features, 3);
@@ -479,7 +1055,6 @@ void InterChange::commandVector(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Controller";
             if (write)
             {
                 if (value >= 14)
@@ -492,14 +1067,12 @@ void InterChange::commandVector(CommandBlock *getData)
                 ;
             break;
         case 33:
-            contstr = "Up Instrument";
             if (write)
                 synth->vectorSet(6, chan, value);
             else
                 ;
             break;
         case 34:
-            contstr = "Down Instrument";
             if (write)
                 synth->vectorSet(7, chan, value);
             else
@@ -514,15 +1087,6 @@ void InterChange::commandVector(CommandBlock *getData)
         else if (control >= 35 && control <= 38)
             synth->getRuntime().nrpndata.vectorYfeatures[chan] = features;
     }
-
-    string name = "Vector Chan " + to_string(chan);
-    if (control == 127)
-        name += "  all ";
-    else if (control >= 32)
-        name += "  Y ";
-    else if(control >= 16)
-        name += "  X ";
-    synth->getRuntime().Log(name + contstr + " value " + to_string(value));
 }
 
 
@@ -533,11 +1097,9 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char control = getData->data.control;
 
     bool write = (type & 0x40) > 0;
-    string contstr = "";
     switch (control)
     {
         case 0:
-            contstr = "Volume";
             if (write)
                 synth->setPvolume(value);
             else
@@ -545,14 +1107,12 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 14:
-            contstr = "Part Number";
             if (write)
                 synth->getRuntime().currentPart = value;
             else
                 value = synth->getRuntime().currentPart;
             break;
         case 15:
-            contstr = "Available Parts";
             if ((write) && (value == 16 || value == 32 || value == 64))
                 synth->getRuntime().NumAvailableParts = value;
             else
@@ -560,14 +1120,12 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Detune";
             if (write)
                 synth->microtonal.Pglobalfinedetune = value;
             else
                 value = synth->microtonal.Pglobalfinedetune;
             break;
         case 35:
-            contstr = "Key Shift";
             if (write)
                 synth->setPkeyshift(value + 64);
             else
@@ -575,7 +1133,6 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Chan Switch Type";
             if (write)
             {
                 synth->getRuntime().channelSwitchType = value;
@@ -586,7 +1143,6 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().channelSwitchType;
             break;
         case 49:
-            contstr = "Chan Switch CC";
             if (write)
             {
                 if (synth->getRuntime().channelSwitchType > 0)
@@ -597,12 +1153,10 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
 
         case 96:
-            contstr = "Reset All";
             if (write)
                 synth->resetAll();
             break;
         case 128:
-            contstr = "Stop";
             if (write)
                 synth->allStop();
             break;
@@ -610,13 +1164,6 @@ void InterChange::commandMain(CommandBlock *getData)
 
     if (!write)
         getData->data.value = value;
-
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    synth->getRuntime().Log("Main " + contstr + " value " + actual);
 }
 
 
@@ -636,92 +1183,52 @@ void InterChange::commandPart(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    string kitnum;
-    if (kitType)
-        kitnum = "  Kit " + to_string(kititem & 0x1f) + " ";
-    else
-        kitnum = "  ";
-
-    string name = "";
-    if (control >= 0x80)
-    {
-        if (control < 0xe0)
-        {
-            name = "Controller ";
-            if (control >= 0xa0)
-                name += "Portamento ";
-        }
-    }
-    else if (kititem < 0xff)
-    {
-        switch (engine)
-        {
-            case 0:
-                name = "AddSynth ";
-                break;
-            case 1:
-                name = "SubSynth ";
-                break;
-            case 2:
-                name = "PadSynth ";
-                break;
-        }
-    }
-
     string contstr = "";
     switch (control)
     {
         case 0:
-            contstr = "Volume";
             if (write)
                 part->setVolume(value);
             else
                 value = part->Pvolume;
             break;
         case 1:
-            contstr = "Vel Sens";
             if (write)
                 part->Pvelsns = value;
             else
                 value = part->Pvelsns;
             break;
         case 2:
-            contstr = "Panning";
             if (write)
                 part->SetController(C_panning, value);
             else
                 value = part->Ppanning;
             break;
         case 4:
-            contstr = "Vel Offset";
             if (write)
                 part->Pveloffs = value;
             else
                 value = part->Pveloffs;
             break;
         case 5:
-            contstr = "Midi";
             if (write)
                 part->Prcvchn = (char) value;
             else
                 value = part->Prcvchn;
             break;
         case 6:
-            contstr = "Mode";
             if (write)
                 synth->SetPartKeyMode(npart, (char) value);
             else
                 value = synth->ReadPartKeyMode(npart);
             break;
         case 7:
-            contstr = "Portamento";
             if (write)
                 part->ctl->portamento.portamento = (char) value;
             else
                 value = part->ctl->portamento.portamento;
             break;
         case 8:
-            contstr = "Enable";
             if (kitType)
             {
                 switch(engine)
@@ -757,21 +1264,18 @@ void InterChange::commandPart(CommandBlock *getData)
                  switch(engine)
                 {
                     case 0:
-                        contstr = "AddSynth " + contstr;
                         if (write)
                             part->kit[0].Padenabled = (char) value;
                         else
                             value = part->kit[0].Padenabled;
                         break;
                     case 1:
-                        contstr = "SubSynth " + contstr;
                         if (write)
                             part->kit[0].Psubenabled = (char) value;
                         else
                             value = part->kit[0].Psubenabled;
                         break;
                     case 2:
-                        contstr = "PadSynth " + contstr;
                         if (write)
                             part->kit[0].Ppadenabled = (char) value;
                         else
@@ -788,7 +1292,6 @@ void InterChange::commandPart(CommandBlock *getData)
         case 9:
             if (kitType)
             {
-                contstr = "Mute";
                 if (write)
                     part->kit[kititem & 0x1f].Pmuted = (char) value;
                 else
@@ -797,7 +1300,6 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 16:
-            contstr = "Min Note";
             if (kitType)
             {
                 if (write)
@@ -814,7 +1316,6 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case 17:
-            contstr = "Max Note";
             if (kitType)
             {
                 if (write)
@@ -831,7 +1332,6 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case 18: // always return actual value
-            contstr = "Min To Last";
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
@@ -846,7 +1346,6 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case 19: // always return actual value
-            contstr = "Max To Last";
             if (kitType)
             {
                 if ((write) && part->lastnote >= 0)
@@ -861,7 +1360,6 @@ void InterChange::commandPart(CommandBlock *getData)
             }
             break;
         case 20:
-            contstr = "Reset Key Range";
             if (kitType)
             {
                 if (write)
@@ -883,7 +1381,6 @@ void InterChange::commandPart(CommandBlock *getData)
         case 24:
             if (kitType)
             {
-                contstr = "Effect Number";
                 if (write)
                     part->kit[kititem & 0x1f].Psendtoparteffect = (char) value;
                 else
@@ -892,14 +1389,12 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 33:
-            contstr = "Key Limit";
             if (write)
                 part->setkeylimit((char) value);
             else
                 value = part->Pkeylimit;
             break;
         case 35:
-            contstr = "Key Shift";
             if (write)
                 part->Pkeyshift = (char) value + 64;
             else
@@ -907,28 +1402,24 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 40:
-            contstr = "Effect Send 0";
             if (write)
                 synth->setPsysefxvol(npart,0, value);
             else
                 value = synth->Psysefxvol[0][npart];
             break;
         case 41:
-            contstr = "Effect Send 1";
             if (write)
                 synth->setPsysefxvol(npart,1, value);
             else
                 value = synth->Psysefxvol[1][npart];
             break;
         case 42:
-            contstr = "Effect Send 2";
             if (write)
                 synth->setPsysefxvol(npart,2, value);
             else
                 value = synth->Psysefxvol[2][npart];
             break;
         case 43:
-            contstr = "Effect Send 3";
             if (write)
                 synth->setPsysefxvol(npart,3, value);
             else
@@ -936,7 +1427,6 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Humanise";
             if (write)
                 part->Pfrand = value;
             else
@@ -944,31 +1434,27 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 57:
-            contstr = "Drum Mode";
             if (write)
                 part->Pdrummode = (value != 0);
             else
                 value = part->Pdrummode;
             break;
         case 58:
-            contstr = "Kit Mode";
             if (write)
                 part->Pkitmode = (char) value;
             else
                 value = part->Pkitmode;
             break;
 
-        case 64:
-            contstr = "Effect Number";
+        case 64: // local to source
+            break;
         case 65:
-            contstr = "Effect " + to_string(effNum) + " Type";
             if (write)
                 part->partefx[effNum]->changeeffect((int)value);
             else
                 value = part->partefx[effNum]->geteffect();
             break;
         case 66:
-            contstr = "Effect " + to_string(effNum) + " Destination";
             if (write)
             {
                 part->Pefxroute[effNum] = (int)value;
@@ -978,7 +1464,6 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->Pefxroute[effNum];
             break;
         case 67:
-            contstr = "Bypass Effect "+ to_string(effNum);
             if (write)
                 part->Pefxbypass[effNum] = (value != 0);
             else
@@ -986,7 +1471,6 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 120:
-            contstr = "Audio destination";
             if (write)
                 part->Paudiodest = (char) value;
             else
@@ -994,91 +1478,78 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 128:
-            contstr = "Vol Range";
             if (write)
                 part->ctl->setvolume((char) value); // not the *actual* volume
             else
                 value = part->ctl->volume.data;
             break;
         case 129:
-            contstr = "Vol Enable";
             if (write)
                 part->ctl->volume.receive = (char) value;
             else
                 value = part->ctl->volume.receive;
             break;
         case 130:
-            contstr = "Pan Width";
             if (write)
                 part->ctl->setPanDepth((char) value);
             else
                 value = part->ctl->panning.depth;
             break;
         case 131:
-            contstr = "Mod Wheel Depth";
             if (write)
                 part->ctl->modwheel.depth = value;
             else
                 value = part->ctl->modwheel.depth;
             break;
         case 132:
-            contstr = "Exp Mod Wheel";
             if (write)
                 part->ctl->modwheel.exponential = (char) value;
             else
                 value = part->ctl->modwheel.exponential;
             break;
         case 133:
-            contstr = "Bandwidth depth";
             if (write)
                 part->ctl->bandwidth.depth = value;
             else
                 value = part->ctl->bandwidth.depth;
             break;
         case 134:
-            contstr = "Exp Bandwidth";
             if (write)
                 part->ctl->bandwidth.exponential = (char) value;
             else
                 value = part->ctl->bandwidth.exponential;
             break;
         case 135:
-            contstr = "Expression Enable";
             if (write)
                 part->ctl->expression.receive = (char) value;
             else
                 value = part->ctl->expression.receive;
             break;
         case 136:
-            contstr = "FM Amp Enable";
             if (write)
                 part->ctl->fmamp.receive = (char) value;
             else
                 value = part->ctl->fmamp.receive;
             break;
         case 137:
-            contstr = "Sustain Ped Enable";
             if (write)
                 part->ctl->sustain.receive = (char) value;
             else
                 value = part->ctl->sustain.receive;
             break;
         case 138:
-            contstr = "Pitch Wheel Range";
             if (write)
                 part->ctl->pitchwheel.bendrange = value;
             else
                 value = part->ctl->pitchwheel.bendrange;
             break;
         case 139:
-            contstr = "Filter Q Depth";
             if (write)
                 part->ctl->filterq.depth = value;
             else
                 value = part->ctl->filterq.depth;
             break;
         case 140:
-            contstr = "Filter Cutoff Depth";
             if (write)
                 part->ctl->filtercutoff.depth = value;
             else
@@ -1086,14 +1557,12 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 144:
-            contstr = "Res Cent Freq Depth";
             if (write)
                 part->ctl->resonancecenter.depth = value;
             else
                 value = part->ctl->resonancecenter.depth;
             break;
         case 145:
-            contstr = "Res Band Depth";
             if (write)
                 part->ctl->resonancebandwidth.depth = value;
             else
@@ -1101,56 +1570,48 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 160:
-            contstr = "Time";
             if (write)
                 part->ctl->portamento.time = value;
             else
                 value = part->ctl->portamento.time;
             break;
         case 161:
-            contstr = "Tme Stretch";
             if (write)
                 part->ctl->portamento.updowntimestretch = value;
             else
                 value = part->ctl->portamento.updowntimestretch;
             break;
         case 162:
-            contstr = "Threshold";
             if (write)
                 part->ctl->portamento.pitchthresh = value;
             else
                 value = part->ctl->portamento.pitchthresh;
             break;
         case 163:
-            contstr = "Threshold Type";
             if (write)
                 part->ctl->portamento.pitchthreshtype = (char) value;
             else
                 value = part->ctl->portamento.pitchthreshtype;
             break;
         case 164:
-            contstr = "Prop Enable";
             if (write)
                 part->ctl->portamento.proportional = (char) value;
             else
                 value = part->ctl->portamento.proportional;
             break;
         case 165:
-            contstr = "Prop Rate";
             if (write)
                 part->ctl->portamento.propRate = value;
             else
                 value = part->ctl->portamento.propRate;
             break;
         case 166:
-            contstr = "Prop depth";
             if (write)
                 part->ctl->portamento.propDepth = value;
             else
                 value = part->ctl->portamento.propDepth;
             break;
         case 168:
-            contstr = "Enable";
             if (write)
                 part->ctl->portamento.receive = (char) value;
             else
@@ -1158,7 +1619,6 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 224:
-            contstr = "Clear controllers";
             if (write)
                 part->SetController(0x79,0); // C_resetallcontrollers
             break;
@@ -1166,14 +1626,6 @@ void InterChange::commandPart(CommandBlock *getData)
 
     if (!write || control == 18 || control == 19)
         getData->data.value = value;
-
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log("Part " + to_string(npart) + kitnum + name + contstr + " value " + actual);
 }
 
 
@@ -3852,24 +4304,13 @@ void InterChange::commandSysIns(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     bool isSysEff = (npart == 0xf1);
 
-    string name;
-    if (isSysEff)
-        name = "System ";
-    else
-        name = "Insert ";
-
-    string contstr;
-    string second;
     if (insert == 0xff)
     {
-        second = "";
         switch (control)
         {
             case 0:
-                contstr = "Number ";
                 break;
             case 1:
-                contstr = to_string(effnum) + " Type ";
                 if (write)
                 {
                     if (isSysEff)
@@ -3886,32 +4327,23 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 }
                 break;
             case 2: // insert only
-                contstr = to_string(effnum) + " To ";
                 if (write)
                     synth->Pinsparts[effnum] = (int)value;
                 else
                     value = synth->Pinsparts[effnum];
                 break;
         }
-        contstr = "Effect " + contstr;
     }
     else // system only
     {
-        contstr = "From Effect " + to_string(effnum);
-        second = " To Effect " + to_string(control)  + "  Value ";
         if (write)
             synth->setPsysefxsend(effnum, control, value);
         else
             value = synth->Psysefxsend[effnum][control];
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log(name  + contstr + second + actual);
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -3919,7 +4351,6 @@ void InterChange::commandEffects(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit & 0x1f;
     unsigned char effnum = getData->data.engine;
@@ -3927,100 +4358,18 @@ void InterChange::commandEffects(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     EffectMgr *eff;
 
-    string name;
-    string actual;
     if (npart == 0xf1)
-    {
         eff = synth->sysefx[effnum];
-        name = "System";
-    }
+
     else if (npart == 0xf2)
-    {
         eff = synth->insefx[effnum];
-        name = "Insert";
-    }
     else
-    {
         eff = synth->part[npart]->partefx[effnum];
-        name = "Part " + to_string(npart);
-    }
 
     if (kititem == 8 && getData->data.insert < 0xff)
-    {
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
-        if (npart == 0xf1)
-            name = "System";
-        else if (npart == 0xf2)
-            name = "Insert";
-        else name = "Part " + to_string(npart);
-        name += " Effect " + to_string(effnum);
 
-        if (!write)
-            value = getData->data.value;
-        if (type & 0x80)
-            actual = to_string((int)round(value));
-        else
-            actual = to_string(value);
-        synth->getRuntime().Log(name + " DynFilter ~ Filter Parameter " + to_string(control) + "  Value " + actual);
 
-        return;
-    }
-
-    name += " Effect " + to_string(effnum);
-
-    string effname;
-    switch (kititem)
-    {
-        case 0:
-            effname = " NO Effect"; // shouldn't get here!
-            break;
-        case 1:
-            effname = " Reverb";
-            break;
-        case 2:
-            effname = " Echo";
-            break;
-        case 3:
-            effname = " Chorus";
-            break;
-        case 4:
-            effname = " Phaser";
-            break;
-        case 5:
-            effname = " AlienWah";
-            break;
-        case 6:
-            effname = " Distortion";
-            break;
-        case 7:
-            effname = " EQ";
-            break;
-        case 8:
-            effname = " DynFilter";
-            break;
-    }
-
-    string contstr = "  Control " + to_string(control);
-    if (write)
-    {
-        if (control == 16)
-            	eff->changepreset((int)value);
-        else
-             eff->seteffectpar(control,(int)value);
-    }
-    else
-    {
-        if (control == 16)
-            value = eff->getpreset();
-        else
-            value = eff->geteffectpar(control);
-    }
-    if (write)
+    if (!write)
         getData->data.value = value;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log(name + effname + contstr + "  Value " + actual);
 }

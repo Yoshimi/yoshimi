@@ -59,15 +59,32 @@ class InterChange : private MiscFuncs
         size_t commandSize = sizeof(commandData);
 
         jack_ringbuffer_t *fromCLI;
+        jack_ringbuffer_t *toCLI;
         jack_ringbuffer_t *fromGUI;
         jack_ringbuffer_t *toGUI;
 
         void mediate();
         void returns(CommandBlock *getData);
         void setpadparams(int point);
-        void commandSend(CommandBlock *getData);
 
     private:
+        void *CLIresolvethread(void);
+        static void *_CLIresolvethread(void *arg);
+        pthread_t  CLIresolvethreadHandle;
+
+        void resolveReplies(CommandBlock *getData);
+        void resolveVector(CommandBlock *getData);
+        void resolveMain(CommandBlock *getData);
+        void resolvePart(CommandBlock *getData);
+        void resolveAdd(CommandBlock *getData);
+        void resolveAddVoice(CommandBlock *getData);
+        void resolveSub(CommandBlock *getData);
+        void resolvePad(CommandBlock *getData);
+
+        void resolveSysIns(CommandBlock *getData);
+        void resolveEffects(CommandBlock *getData);
+
+        void commandSend(CommandBlock *getData);
         void commandVector(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
         void commandPart(CommandBlock *getData);

@@ -2252,6 +2252,7 @@ void CmdInterface::cmdIfaceCommandLoop()
         else
             usleep(20000);
     }
+
     if (write_history(hist_filename.c_str()) != 0) // writing of history file failed
     {
         perror(hist_filename.c_str());

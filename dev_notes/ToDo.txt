@@ -1,4 +1,6 @@
 
+Make default bank root ids start higher than zero, and also not try to change if an invalid ID is given.
+
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
 CLI doesn't manage global detune, but direct access does.
