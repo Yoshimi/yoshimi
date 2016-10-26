@@ -1,4 +1,8 @@
 
+Idea!
+set up map for min,max, type, default for all controls. Map filled by associated code sections as they are initialised.
+
+
 Make default bank root ids start higher than zero, and also not try to change if an invalid ID is given.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets

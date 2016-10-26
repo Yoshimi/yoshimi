@@ -1,5 +1,5 @@
 /*
-    InterChange.h - General communications
+    InterChange.cpp - General communications
 
     Copyright 2016 Will Godfrey
 
@@ -192,7 +192,115 @@ void InterChange::resolveReplies(CommandBlock *getData)
         resolveEffects(getData);
         return;
     }
+
+    if (engine == 2)
+    {
+        switch(insert)
+        {
+            case 0xff:
+                resolvePad(getData);
+                break;
+            case 0:
+                //resolveLFO(getData);
+                break;
+            case 1:
+                //resolveFilter(getData);
+                break;
+            case 2:
+            case 3:
+            case 4:
+                //resolveEnvelope(getData);
+                break;
+            case 5:
+            case 6:
+            case 7:
+                //resolveOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                break;
+            case 8:
+            case 9:
+                //resolveResonance(getData, part->kit[kititem].padpars->resonance);
+                break;
+        }
+        return;
+    }
+
+    if (engine == 1)
+    {
+        switch (insert)
+        {
+            case 0xff:
+            case 6:
+            case 7:
+                resolveSub(getData);
+                break;
+            case 1:
+                //resolveFilter(getData);
+                break;
+            case 2:
+            case 3:
+            case 4:
+                //resolveEnvelope(getData);
+                break;
+        }
+        return;
+    }
+
+    if (engine >= 0x80)
+    {
+        switch (insert)
+        {
+            case 0xff:
+                resolveAddVoice(getData);
+                break;
+            case 0:
+                //resolveLFO(getData);
+                break;
+            case 1:
+                //resolveFilter(getData);
+                break;
+            case 2:
+            case 3:
+            case 4:
+                //resolveEnvelope(getData);
+                break;
+            case 5:
+            case 6:
+            case 7:
+                //if (engine >= 0xC0)
+                    //resolveOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].FMSmp);
+                //else
+                    //resolveOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].OscilSmp);
+                break;
+        }
+        return;
+    }
+
+    if (engine == 0)
+    {
+        switch (insert)
+        {
+            case 0xff:
+                resolveAdd(getData);
+                break;
+            case 0:
+                //resolveLFO(getData);
+                break;
+            case 1:
+                //resolveFilter(getData);
+                break;
+            case 2:
+            case 3:
+            case 4:
+                //resolveEnvelope(getData);
+                break;
+            case 8:
+            case 9:
+                //resolveResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
+                break;
+        }
+    }
 }
+
 
 void InterChange::resolveVector(CommandBlock *getData)
 {
@@ -554,6 +662,607 @@ void InterChange::resolvePart(CommandBlock *getData)
         actual = to_string(value);
 
     synth->getRuntime().Log("Part " + to_string(npart) + kitnum + name + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveAdd(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+    }
+
+    string contstr = "";
+
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+        case 39:
+            contstr = "Rel B Wdth";
+            break;
+
+        case 112:
+            contstr = "Stereo";
+            break;
+        case 113:
+            contstr = "Rnd Grp";
+            break;
+
+        case 120:
+            contstr = "De Pop";
+            break;
+        case 121:
+            contstr = "Punch Strngth";
+            break;
+        case 122:
+            contstr = "Punch Time";
+            break;
+        case 123:
+            contstr = "Punch Strtch";
+            break;
+        case 124:
+            contstr = "Punch Vel";
+            break;
+    }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth " + name + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveAddVoice(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    int nvoice = engine & 0x1f;
+
+    string name = "";
+    switch (control & 0xf0)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 16:
+            name = " Modulator ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+        case 48:
+            name = " Unison ";
+            break;
+        case 64:
+            name = " Filter ";
+            break;
+        case 80:
+            name = " Modulator Amp ";
+            break;
+        case 96:
+            name = " Modulator Freq ";
+            break;
+        case 112:
+            name = " Modulator Osc ";
+            break;
+    }
+
+    string contstr = "";
+
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+        case 4:
+            contstr = "Minus";
+            break;
+        case 8:
+            contstr = "Enable Env";
+            break;
+        case 9:
+            contstr = "Enable LFO";
+            break;
+
+        case 16:
+            contstr = "Type";
+            break;
+        case 17:
+            contstr = "Extern Mod";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+        case 40:
+            contstr = "Enable Env";
+            break;
+        case 41:
+            contstr = "Enable LFO";
+            break;
+
+        case 48:
+            contstr = "Freq Spread";
+            break;
+        case 49:
+            contstr = "Phase Rnd";
+            break;
+        case 50:
+            contstr = "Stereo";
+            break;
+        case 51:
+            contstr = "Vibrato";
+            break;
+        case 52:
+            contstr = "Vib Speed";
+            break;
+        case 53:
+            contstr = "Size";
+            break;
+        case 54:
+            contstr = "Invert";
+            break;
+        case 56:
+            contstr = "Enable";
+            break;
+
+        case 64:
+            contstr = "Bypass Global";
+            break;
+        case 68:
+            contstr = "Enable";
+            break;
+        case 72:
+            contstr = "Enable Env";
+            break;
+        case 73:
+            contstr = "Enable LFO";
+            break;
+
+        case 80:
+            contstr = "Volume";
+            break;
+        case 81:
+            contstr = "V Sense";
+            break;
+        case 82:
+            contstr = "F Damp";
+            break;
+        case 88:
+            contstr = "Enable Env";
+            break;
+
+        case 96:
+            break;
+        case 98:
+            contstr = "440Hz";
+        case 99:
+            contstr = "Octave";
+            break;
+        case 100:
+            contstr = "Det type";
+            break;
+        case 101:
+            contstr = "Coarse Det";
+            break;
+        case 104:
+            contstr = "Enable Env";
+            break;
+
+        case 112:
+            contstr = " Phase";
+            break;
+        case 113:
+            contstr = " Source";
+            break;
+
+        case 128:
+            contstr = " Delay";
+            break;
+        case 129:
+            contstr = " Enable";
+            break;
+        case 130:
+            contstr = " Resonance Enable";
+            break;
+        case 136:
+            contstr = " Osc Phase";
+            break;
+        case 137:
+            contstr = " Osc Source";
+            break;
+        case 138:
+            contstr = " Sound type";
+            break;
+    }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth Voice " + to_string(nvoice) + name + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveSub(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char insert = getData->data.insert;
+
+    string actual;
+
+    if (insert == 6 || insert == 7)
+    {
+        string Htype;
+        if (insert == 6)
+            Htype = " Amplitude";
+        else
+            Htype = " Bandwidth";
+
+        if (type & 0x80)
+            actual = to_string((int)round(value));
+        else
+            actual = to_string(value);
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + Htype + "  value " + actual);
+        return;
+    }
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 16:
+            name = " Bandwidth ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+        case 48:
+            name = " Overtones ";
+            break;
+        case 64:
+            name = " Filter ";
+            break;
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+
+        case 16:
+            contstr = "";
+            break;
+        case 17:
+            contstr = "Band Scale";
+            break;
+        case 18:
+            contstr = "Env Enab";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+
+        case 40:
+            contstr = "Env Enab";
+            break;
+
+        case 48:
+            contstr = "Par 1";
+            break;
+        case 49:
+            contstr = "Par 2";
+            break;
+        case 50:
+            contstr = "Force H";
+            break;
+        case 51:
+            contstr = "Position";
+            break;
+
+        case 64:
+            contstr = "Enable";
+            break;
+
+        case 80:
+            contstr = "Filt Stages";
+            break;
+        case 81:
+            contstr = "Mag Type";
+            break;
+        case 82:
+            contstr = "Start";
+            break;
+
+        case 96:
+            contstr = "Clear Harmonics";
+            break;
+
+        case 112:
+            contstr = "Stereo";
+            break;
+    }
+
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  SubSynth " + name + contstr + " value " + actual);
+}
+
+
+void InterChange::resolvePad(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    bool write = (type & 0x40) > 0;
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Amplitude ";
+            break;
+        case 16:
+            name = " Bandwidth ";
+            break;
+        case 32:
+            name = " Frequency ";
+            break;
+        case 48:
+            name = " Overtones ";
+            break;
+        case 64:
+            name = " Harmonic Base ";
+            break;
+        case 80:
+            name = " Harmonic Samples ";
+            break;
+    }
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "Volume";
+            break;
+        case 1:
+            contstr = "Vel Sens";
+            break;
+        case 2:
+            contstr = "Panning";
+            break;
+
+        case 16:
+            contstr = "Bandwidth";
+            break;
+        case 17:
+            contstr = "Band Scale";
+            break;
+        case 19:
+            contstr = "Spect Mode";
+            break;
+
+        case 32:
+            contstr = "Detune";
+            break;
+        case 33:
+            contstr = "Eq T";
+            break;
+        case 34:
+            contstr = "440Hz";
+            break;
+        case 35:
+            contstr = "Octave";
+            break;
+        case 36:
+            contstr = "Det type";
+            break;
+        case 37:
+            contstr = "Coarse Det";
+            break;
+
+        case 38:
+            contstr = "Bend Adj";
+            break;
+        case 39:
+            contstr = "Offset Hz";
+            break;
+
+        case 48:
+            contstr = "Overt Par 1";
+            break;
+        case 49:
+            contstr = "Overt Par 2";
+            break;
+        case 50:
+            contstr = "Force H";
+            break;
+        case 51:
+            contstr = "Position";
+            break;
+
+        case 64:
+            contstr = "Width";
+            break;
+        case 65:
+            contstr = "Freq Mult";
+            break;
+        case 66:
+            contstr = "Str";
+            break;
+        case 67:
+            contstr = "S freq";
+            break;
+        case 68:
+            contstr = "Size";
+            break;
+        case 69:
+            contstr = "Type";
+            break;
+        case 70:
+            contstr = "Halves";
+            break;
+        case 71:
+            contstr = "Amp Par 1";
+            break;
+        case 72:
+            contstr = "Amp Par 2";
+            break;
+        case 73:
+            contstr = "Amp Mult";
+            break;
+        case 74:
+            contstr = "Amp Mode";
+            break;
+        case 75:
+            contstr = "Autoscale";
+            break;
+
+        case 80:
+            contstr = "Base";
+            break;
+        case 81:
+            contstr = "samp/Oct";
+            break;
+        case 82:
+            contstr = "Num Oct";
+            break;
+        case 83:
+            break;
+
+        case 104:
+            contstr = "Apply Changes";
+            break;
+
+        case 112:
+            contstr = "Stereo";
+            break;
+
+        case 120:
+            contstr = "De Pop";
+            break;
+        case 121:
+            contstr = "Punch Strngth";
+            break;
+        case 122:
+            contstr = "Punch Time";
+            break;
+        case 123:
+            contstr = "Punch Strtch";
+            break;
+        case 124:
+            contstr = "Punch Vel";
+            break;
+    }
+
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+    if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
+        actual += " - Need to Apply";
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  PadSynth " + name + contstr + " value " + actual);
 }
 
 
@@ -1643,37 +2352,22 @@ void InterChange::commandAdd(CommandBlock *getData)
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
 
-    string name = "";
-    switch (control & 0x70)
-    {
-        case 0:
-            name = " Amplitude ";
-            break;
-        case 32:
-            name = " Frequency ";
-            break;
-    }
-
-    string contstr = "";
     int k; // temp variable for detune
     switch (control)
     {
         case 0:
-            contstr = "Volume";
             if (write)
                 pars->GlobalPar.PVolume = lrint(value);
             else
                 value = pars->GlobalPar.PVolume;
             break;
         case 1:
-            contstr = "Vel Sens";
             if (write)
                 pars->GlobalPar.PAmpVelocityScaleFunction = lrint(value);
             else
                 value = pars->GlobalPar.PAmpVelocityScaleFunction;
             break;
         case 2:
-            contstr = "Panning";
             if (write)
                 pars->setGlobalPan((int) value);
             else
@@ -1681,7 +2375,6 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Detune";
             if (write)
                 pars->GlobalPar.PDetune = lrint(value) + 8192;
             else
@@ -1689,7 +2382,6 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
 
         case 35:
-            contstr = "Octave";
             if (write)
             {
                 k = value;
@@ -1706,14 +2398,12 @@ void InterChange::commandAdd(CommandBlock *getData)
             }
             break;
         case 36:
-            contstr = "Det type";
             if (write)
                 pars->GlobalPar.PDetuneType = lrint(value);
             else
                 value = pars->GlobalPar.PDetuneType;
             break;
         case 37:
-            contstr = "Coarse Det";
             if (write)
             {
                 k = value;
@@ -1730,7 +2420,6 @@ void InterChange::commandAdd(CommandBlock *getData)
             }
             break;
         case 39:
-            contstr = "Rel B Wdth";
             if (write)
             {
                 pars->GlobalPar.PBandwidth = lrint(value);
@@ -1741,14 +2430,12 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
 
         case 112:
-            contstr = "Stereo";
             if (write)
                 pars->GlobalPar.PStereo = (value != 0);
             else
                 value = pars->GlobalPar.PStereo;
             break;
         case 113:
-            contstr = "Rnd Grp";
             if (write)
                 pars->GlobalPar.Hrandgrouping = (value != 0);
             else
@@ -1756,49 +2443,38 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
 
         case 120:
-            contstr = "De Pop";
             if (write)
                 pars->GlobalPar.Fadein_adjustment = lrint(value);
             else
                 value = pars->GlobalPar.Fadein_adjustment;
             break;
         case 121:
-            contstr = "Punch Strngth";
             if (write)
                 pars->GlobalPar.PPunchStrength = lrint(value);
             else
                 value = pars->GlobalPar.PPunchStrength;
             break;
         case 122:
-            contstr = "Punch Time";
             if (write)
                 pars->GlobalPar.PPunchTime = lrint(value);
             else
                 value = pars->GlobalPar.PPunchTime;
             break;
         case 123:
-            contstr = "Punch Strtch";
             if (write)
                 pars->GlobalPar.PPunchStretch = lrint(value);
             else
                 value = pars->GlobalPar.PPunchStretch;
             break;
         case 124:
-            contstr = "Punch Vel";
             if (write)
                 pars->GlobalPar.PPunchVelocitySensing = lrint(value);
             else
                 value = pars->GlobalPar.PPunchVelocitySensing;
             break;
     }
-
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth " + name + contstr + " value " + actual);
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -1818,76 +2494,40 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     ADnoteParameters *pars;
     pars = part->kit[kititem].adpars;
 
-    string name = "";
-    switch (control & 0xf0)
-    {
-        case 0:
-            name = " Amplitude ";
-            break;
-        case 16:
-            name = " Modulator ";
-            break;
-        case 32:
-            name = " Frequency ";
-            break;
-        case 48:
-            name = " Unison ";
-            break;
-        case 64:
-            name = " Filter ";
-            break;
-        case 80:
-            name = " Modulator Amp ";
-            break;
-        case 96:
-            name = " Modulator Freq ";
-            break;
-        case 112:
-            name = " Modulator Osc ";
-            break;
-    }
-
-    string contstr = "";
     int k; // temp variable for detune
     switch (control)
     {
         case 0:
-            contstr = "Volume";
             if (write)
                 pars->VoicePar[nvoice].PVolume = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PVolume;
             break;
         case 1:
-            contstr = "Vel Sens";
             if (write)
                 pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PAmpVelocityScaleFunction;
             break;
         case 2:
-            contstr = "Panning";
             if (write)
                  pars->setVoicePan(nvoice, lrint(value));
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
         case 4:
-            contstr = "Minus";
             if (write)
                 pars->VoicePar[nvoice].PVolumeminus = (value != 0);
             else
                 value = pars->VoicePar[nvoice].PVolumeminus;
             break;
         case 8:
-            contstr = "Enable Env";
             if (write)
                 pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PAmpEnvelopeEnabled;
             break;
         case 9:
-            contstr = "Enable LFO";
             if (write)
                 pars->VoicePar[nvoice].PAmpLfoEnabled = (value != 0);
             else
@@ -1895,14 +2535,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 16:
-            contstr = "Type";
             if (write)
                 pars->VoicePar[nvoice].PFMEnabled = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
         case 17:
-            contstr = "Extern Mod";
             if (write)
                 pars->VoicePar[nvoice].PFMVoice = lrint(value);
             else
@@ -1910,28 +2548,24 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Detune";
             if (write)
                 pars->VoicePar[nvoice].PDetune = lrint(value) + 8192;
             else
                 value = pars->VoicePar[nvoice].PDetune-8192;
             break;
         case 33:
-            contstr = "Eq T";
             if (write)
                 pars->VoicePar[nvoice].PfixedfreqET = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PfixedfreqET;
             break;
         case 34:
-            contstr = "440Hz";
             if (write)
                  pars->VoicePar[nvoice].Pfixedfreq = (value != 0);
             else
                 value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
         case 35:
-            contstr = "Octave";
             if (write)
             {
                 k = value;
@@ -1948,14 +2582,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         case 36:
-            contstr = "Det type";
             if (write)
                 pars->VoicePar[nvoice].PDetuneType = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PDetuneType;
             break;
         case 37:
-            contstr = "Coarse Det";
             if (write)
             {
                 k = value;
@@ -1972,14 +2604,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         case 40:
-            contstr = "Enable Env";
             if (write)
                 pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PFreqEnvelopeEnabled;
             break;
         case 41:
-            contstr = "Enable LFO";
             if (write)
                 pars->VoicePar[nvoice].PFreqLfoEnabled = lrint(value);
             else
@@ -1987,42 +2617,36 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Freq Spread";
             if (write)
                 pars->VoicePar[nvoice].Unison_frequency_spread = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
         case 49:
-            contstr = "Phase Rnd";
             if (write)
                 pars->VoicePar[nvoice].Unison_phase_randomness = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Unison_phase_randomness;
             break;
         case 50:
-            contstr = "Stereo";
             if (write)
                 pars->VoicePar[nvoice].Unison_stereo_spread = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Unison_stereo_spread;
             break;
         case 51:
-            contstr = "Vibrato";
             if (write)
                 pars->VoicePar[nvoice].Unison_vibratto = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto;
             break;
         case 52:
-            contstr = "Vib Speed";
             if (write)
                 pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto_speed;
             break;
         case 53:
-            contstr = "Size";
             if (write)
             {
                 if (value < 2)
@@ -2033,14 +2657,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 value = pars->VoicePar[nvoice].Unison_size;
             break;
         case 54:
-            contstr = "Invert";
             if (write)
                 pars->VoicePar[nvoice].Unison_invert_phase = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
         case 56:
-            contstr = "Enable";
             if (write)
             {
                 k = (value != 0) + 1;
@@ -2052,28 +2674,24 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 64:
-            contstr = "Bypass Global";
             if (write)
                 pars->VoicePar[nvoice].Pfilterbypass = (value != 0);
             else
                 value = pars->VoicePar[nvoice].Pfilterbypass;
             break;
         case 68:
-            contstr = "Enable";
             if (write)
                  pars->VoicePar[nvoice].PFilterEnabled =  (value != 0);
             else
                 value = pars->VoicePar[nvoice].PFilterEnabled;
             break;
         case 72:
-            contstr = "Enable Env";
             if (write)
                 pars->VoicePar[nvoice].PFilterEnvelopeEnabled= (value != 0);
             else
                 value = pars->VoicePar[nvoice].PFilterEnvelopeEnabled;
             break;
         case 73:
-            contstr = "Enable LFO";
             if (write)
                 pars->VoicePar[nvoice].PFilterLfoEnabled= (value != 0);
             else
@@ -2081,28 +2699,24 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 80:
-            contstr = "Volume";
             if (write)
                 pars->VoicePar[nvoice].PFMVolume = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PFMVolume;
             break;
         case 81:
-            contstr = "V Sense";
             if (write)
                 pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PFMVelocityScaleFunction;
             break;
         case 82:
-            contstr = "F Damp";
             if (write)
                 pars->VoicePar[nvoice].PFMVolumeDamp = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PFMVolumeDamp;
             break;
         case 88:
-            contstr = "Enable Env";
             if (write)
                 pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = (value != 0);
             else
@@ -2110,20 +2724,17 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 96:
-            contstr = "Detune";
             if (write)
                 pars->VoicePar[nvoice].PFMDetune = (int) value + 8192;
             else
                 value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
         case 98:
-            contstr = "440Hz";
             if (write)
                 pars->VoicePar[nvoice].PFMFixedFreq = (value != 0);
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
         case 99:
-            contstr = "Octave";
             if (write)
             {
                 k = lrint(value);
@@ -2140,14 +2751,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         case 100:
-            contstr = "Det type";
             if (write)
                 pars->VoicePar[nvoice].PFMDetuneType = (int) value;
             else
                 value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
         case 101:
-            contstr = "Coarse Det";
             if (write)
             {
                 int k = lrint(value);
@@ -2164,7 +2773,6 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             }
             break;
         case 104:
-            contstr = "Enable Env";
             if (write)
                 pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(value);
             else
@@ -2172,14 +2780,12 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 112:
-            contstr = " Phase";
             if (write)
                 pars->VoicePar[nvoice].PFMoscilphase = 64 - lrint(value);
             else
                 value = 64 - pars->VoicePar[nvoice].PFMoscilphase;
             break;
         case 113:
-            contstr = " Source";
             if (write)
                 pars->VoicePar[nvoice].PextFMoscil = lrint(value);
             else
@@ -2187,42 +2793,36 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
 
         case 128:
-            contstr = " Delay";
             if (write)
                 pars->VoicePar[nvoice].PDelay = lrint(value);
             else
                 value = pars->VoicePar[nvoice].PDelay;
             break;
         case 129:
-            contstr = " Enable";
             if (write)
                 pars->VoicePar[nvoice].Enabled = (value != 0);
             else
                 value = pars->VoicePar[nvoice].Enabled;
             break;
         case 130:
-            contstr = " Resonance Enable";
             if (write)
                 pars->VoicePar[nvoice].Presonance = (value != 0);
             else
                 value = pars->VoicePar[nvoice].Presonance;
             break;
         case 136:
-            contstr = " Osc Phase";
             if (write)
                 pars->VoicePar[nvoice].Poscilphase =64 - lrint(value);
             else
                 value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
         case 137:
-            contstr = " Osc Source";
             if (write)
                 pars->VoicePar[nvoice].Pextoscil = lrint(value);
             else
                 value = pars->VoicePar[nvoice].Pextoscil;
             break;
         case 138:
-            contstr = " Sound type";
             if (write)
                 pars->VoicePar[nvoice].Type = lrint(value);
             else
@@ -2230,13 +2830,8 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  AddSynth Voice " + to_string(nvoice) + name + contstr + " value " + actual);
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -2255,33 +2850,14 @@ void InterChange::commandSub(CommandBlock *getData)
     SUBnoteParameters *pars;
     pars = part->kit[kititem].subpars;
 
-    if (kititem != 0)
-    {
-        if (!part->Pkitmode)
-        {
-            synth->getRuntime().Log("Not in kit mode");
-            return;
-        }
-        else if (!part->kit[kititem].Penabled)
-        {
-            synth->getRuntime().Log("Kit item " + to_string(kititem) + " not enabled");
-            return;
-        }
-    }
-
-    string actual;
-
-
     if (insert == 6 || insert == 7)
     {
-        string Htype;
         if (insert == 6)
         {
             if (write)
                 pars->Phmag[control] = value;
             else
                 value = pars->Phmag[control];
-            Htype = " Amplitude";
         }
         else
         {
@@ -2289,56 +2865,29 @@ void InterChange::commandSub(CommandBlock *getData)
                 pars->Phrelbw[control] = value;
             else
                 value = pars->Phrelbw[control];
-            Htype = " Bandwidth";
         }
-        if (type & 0x80)
-            actual = to_string((int)round(value));
-        else
-            actual = to_string(value);
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  Subsynth Harmonic " + to_string(control) + Htype + "  value " + actual);
+
+        if (!write)
+            getData->data.value = value;
         return;
     }
 
-    string name = "";
-    switch (control & 0x70)
-    {
-        case 0:
-            name = " Amplitude ";
-            break;
-        case 16:
-            name = " Bandwidth ";
-            break;
-        case 32:
-            name = " Frequency ";
-            break;
-        case 48:
-            name = " Overtones ";
-            break;
-        case 64:
-            name = " Filter ";
-            break;
-    }
-
-    string contstr = "";
     int k; // temp variable for detune
     switch (control)
     {
         case 0:
-            contstr = "Volume";
             if (write)
                 pars->PVolume = value;
             else
                 value = pars->PVolume;
             break;
         case 1:
-            contstr = "Vel Sens";
             if (write)
                 pars->PAmpVelocityScaleFunction = value;
             else
                 value = pars->PAmpVelocityScaleFunction;
             break;
         case 2:
-            contstr = "Panning";
             if (write)
                 pars->setPan(value);
             else
@@ -2346,21 +2895,18 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 16:
-            contstr = "";
             if (write)
                 pars->Pbandwidth = value;
             else
                 value = pars->Pbandwidth;
             break;
         case 17:
-            contstr = "Band Scale";
             if (write)
                 pars->Pbwscale = value + 64;
             else
                 value = pars->Pbwscale - 64;
             break;
         case 18:
-            contstr = "Env Enab";
             if (write)
                 pars->PBandWidthEnvelopeEnabled = (value != 0);
             else
@@ -2368,28 +2914,24 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Detune";
             if (write)
                 pars->PDetune = value + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
         case 33:
-            contstr = "Eq T";
             if (write)
                 pars->PfixedfreqET = value;
             else
                 value = pars->PfixedfreqET;
             break;
         case 34:
-            contstr = "440Hz";
             if (write)
                 pars->Pfixedfreq = (value != 0);
             else
                 value = pars->Pfixedfreq;
             break;
         case 35:
-            contstr = "Octave";
             if (write)
             {
                 k = value;
@@ -2406,14 +2948,12 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
         case 36:
-            contstr = "Det type";
             if (write)
                 pars->PDetuneType = (int)value + 1;
             else
                 value = pars->PDetuneType;
             break;
         case 37:
-            contstr = "Coarse Det";
             if (write)
             {
                 k = value;
@@ -2431,7 +2971,6 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 40:
-            contstr = "Env Enab";
             if (write)
                 pars->PFreqEnvelopeEnabled = (value != 0);
             else
@@ -2439,7 +2978,6 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Par 1";
             if (write)
             {
                 pars->POvertoneSpread.par1 = value;
@@ -2449,7 +2987,6 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->POvertoneSpread.par1;
             break;
         case 49:
-            contstr = "Par 2";
             if (write)
             {
                 pars->POvertoneSpread.par2 = value;
@@ -2459,7 +2996,6 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->POvertoneSpread.par2;
             break;
         case 50:
-            contstr = "Force H";
             if (write)
             {
                 pars->POvertoneSpread.par3 = value;
@@ -2469,7 +3005,6 @@ void InterChange::commandSub(CommandBlock *getData)
                 value = pars->POvertoneSpread.par3;
             break;
         case 51:
-            contstr = "Position";
             if (write)
             {
                 pars->POvertoneSpread.type =  (int)value;
@@ -2480,7 +3015,6 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 64:
-            contstr = "Enable";
             if (write)
                 pars->PGlobalFilterEnabled = (value != 0);
             else
@@ -2488,19 +3022,16 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 80:
-            contstr = "Filt Stages";
             if (write)
                 pars->Pnumstages = (int)value;
             else
                 value = pars->Pnumstages;
             break;
         case 81:
-            contstr = "Mag Type";
             if (write)
                 pars->Phmagtype = (int)value;
             break;
         case 82:
-            contstr = "Start";
             if (write)
                 pars->Pstart = (int)value;
             else
@@ -2508,7 +3039,6 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 96:
-            contstr = "Clear Harmonics";
             if (write)
             {
                 for (int i = 0; i < MAX_SUB_HARMONICS; i++)
@@ -2521,18 +3051,13 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
 
         case 112:
-            contstr = "Stereo";
             if (write)
                 pars->Pstereo = (value != 0);
             break;
     }
 
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  SubSynth " + name + contstr + " value " + actual);
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -2549,48 +3074,22 @@ void InterChange::commandPad(CommandBlock *getData)
     PADnoteParameters *pars;
     pars = part->kit[kititem].padpars;
 
-    string name = "";
-    switch (control & 0x70)
-    {
-        case 0:
-            name = " Amplitude ";
-            break;
-        case 16:
-            name = " Bandwidth ";
-            break;
-        case 32:
-            name = " Frequency ";
-            break;
-        case 48:
-            name = " Overtones ";
-            break;
-        case 64:
-            name = " Harmonic Base ";
-            break;
-        case 80:
-            name = " Harmonic Samples ";
-            break;
-    }
-
-    string contstr = "";
     switch (control)
     {
         case 0:
-            contstr = "Volume";
+
             if (write)
                 pars->PVolume = value;
             else
                 value = pars->PVolume;
             break;
         case 1:
-            contstr = "Vel Sens";
             if (write)
                 pars->PAmpVelocityScaleFunction = value;
             else
                 value = pars->PAmpVelocityScaleFunction;
             break;
         case 2:
-            contstr = "Panning";
             if (write)
                 pars->setPan(value);
             else
@@ -2598,21 +3097,18 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 16:
-            contstr = "Bandwidth";
             if (write)
                 pars->setPbandwidth((int) value);
             else
                 value = pars->Pbandwidth;
             break;
         case 17:
-            contstr = "Band Scale";
             if (write)
                 pars->Pbwscale = (int) value;
             else
                 value = pars->Pbwscale;
             break;
         case 19:
-            contstr = "Spect Mode";
             if (write)
                 pars->Pmode = (int) value;
             else
@@ -2620,28 +3116,24 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 32:
-            contstr = "Detune";
             if (write)
                 pars->PDetune = (int) value + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
         case 33:
-            contstr = "Eq T";
             if (write)
                 pars->PfixedfreqET = (int) value;
             else
                 value = pars->PfixedfreqET;
             break;
         case 34:
-            contstr = "440Hz";
             if (write)
                 pars->Pfixedfreq = (value != 0);
             else
                 value = pars->Pfixedfreq;
             break;
         case 35:
-            contstr = "Octave";
             if (write)
             {
                 int tmp = value;
@@ -2658,14 +3150,12 @@ void InterChange::commandPad(CommandBlock *getData)
             }
             break;
         case 36:
-            contstr = "Det type";
             if (write)
                  pars->PDetuneType = (int) value + 1;
             else
                 value =  pars->PDetuneType - 1;
             break;
         case 37:
-            contstr = "Coarse Det";
             if (write)
             {
                 int tmp = value;
@@ -2683,14 +3173,12 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 38:
-            contstr = "Bend Adj";
             if (write)
                 pars->PBendAdjust = lrint(value);
             else
                 value = pars->PBendAdjust;
             break;
         case 39:
-            contstr = "Offset Hz";
             if (write)
                 pars->POffsetHz = lrint(value);
             else
@@ -2698,28 +3186,24 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Overt Par 1";
             if (write)
                 pars->Phrpos.par1 = (int) value;
             else
                 value = pars->Phrpos.par1;
             break;
         case 49:
-            contstr = "Overt Par 2";
             if (write)
                 pars->Phrpos.par2 = (int) value;
             else
                 value = pars->Phrpos.par2;
             break;
         case 50:
-            contstr = "Force H";
             if (write)
                 pars->Phrpos.par3 = (int) value;
             else
                 value = pars->Phrpos.par3;
             break;
         case 51:
-            contstr = "Position";
             if (write)
                 pars->Phrpos.type = (int) value;
             else
@@ -2727,84 +3211,72 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 64:
-            contstr = "Width";
             if (write)
                 pars->Php.base.par1 = (int) value;
             else
                 value = pars->Php.base.par1;
             break;
-        case 65:
-            contstr = "Freq Mult";
+        case 65:;
             if (write)
                 pars->Php.freqmult = (int) value;
             else
                 value = pars->Php.freqmult;
             break;
         case 66:
-            contstr = "Str";
             if (write)
                 pars->Php.modulator.par1 = (int) value;
             else
                 value = pars->Php.modulator.par1;
             break;
         case 67:
-            contstr = "S freq";
             if (write)
                 pars->Php.modulator.freq = (int) value;
             else
                 value = pars->Php.modulator.freq;
             break;
         case 68:
-            contstr = "Size";
             if (write)
                 pars->Php.width = (int) value;
             else
                 value = pars->Php.width;
             break;
         case 69:
-            contstr = "Type";
             if (write)
                 pars->Php.base.type = value;
             else
                 value = pars->Php.base.type;
             break;
         case 70:
-            contstr = "Halves";
             if (write)
                  pars->Php.onehalf = value;
             else
                 value = pars->Php.onehalf;
             break;
         case 71:
-            contstr = "Amp Par 1";
             if (write)
                 pars->Php.amp.par1 = (int) value;
             else
                 value = pars->Php.amp.par1;
             break;
         case 72:
-            contstr = "Amp Par 2";
             if (write)
                 pars->Php.amp.par2 = (int) value;
             else
                 value = pars->Php.amp.par2;
             break;
         case 73:
-            contstr = "Amp Mult";
             if (write)
                 pars->Php.amp.type = value;
             else
                 value = pars->Php.amp.type;
             break;
         case 74:
-            contstr = "Amp Mode";
             if (write)
                 pars->Php.amp.mode = value;
             else
                 value = pars->Php.amp.mode;
             break;
         case 75:
-            contstr = "Autoscale";
             if (write)
                 pars->Php.autoscale = (value != 0);
             else
@@ -2812,28 +3284,24 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 80:
-            contstr = "Base";
             if (write)
                 pars->Pquality.basenote = (int) value;
             else
                 value = pars->Pquality.basenote;
             break;
         case 81:
-            contstr = "samp/Oct";
             if (write)
                 pars->Pquality.smpoct = (int) value;
             else
                 value = pars->Pquality.smpoct;
             break;
         case 82:
-            contstr = "Num Oct";
             if (write)
                 pars->Pquality.oct = (int) value;
             else
                 value = pars->Pquality.oct;
             break;
         case 83:
-            contstr = "Samp Size";
             if (write)
                 pars->Pquality.samplesize = (int) value;
             else
@@ -2841,13 +3309,11 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 104:
-            contstr = "Apply Changes";
             if (write)
                 synth->getRuntime().padApply = npart | (kititem << 8);
             break;
 
         case 112:
-            contstr = "Stereo";
             if (write)
                 pars->PStereo = (value != 0);
             else
@@ -2855,35 +3321,30 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
 
         case 120:
-            contstr = "De Pop";
             if (write)
                 pars->Fadein_adjustment = (int) value;
             else
                 value = pars->Fadein_adjustment;
             break;
         case 121:
-            contstr = "Punch Strngth";
             if (write)
                 pars->PPunchStrength = (int) value;
             else
                 value = pars->PPunchStrength;
             break;
         case 122:
-            contstr = "Punch Time";
             if (write)
                 pars->PPunchTime = (int) value;
             else
                 value = pars->PPunchTime;
             break;
         case 123:
-            contstr = "Punch Strtch";
             if (write)
                 pars->PPunchStretch = (int) value;
             else
                 value = pars->PPunchStretch;
             break;
         case 124:
-            contstr = "Punch Vel";
             if (write)
                 pars->PPunchVelocitySensing = (int) value;
             else
@@ -2891,14 +3352,8 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
-        actual += " - Need to Apply";
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  PadSynth " + name + contstr + " value " + actual);
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -3527,6 +3982,7 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
                 val = pars->Pstretch;
             break;
     }
+
     if (!write)
         getData->data.value = val;
 }
@@ -3882,6 +4338,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 val = pars->Psequencereversed;
             break;
     }
+
     if (!write)
         getData->data.value = val;
 }
