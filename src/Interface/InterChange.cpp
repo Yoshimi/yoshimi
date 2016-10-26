@@ -201,24 +201,24 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 resolvePad(getData);
                 break;
             case 0:
-                //resolveLFO(getData);
+                resolveLFO(getData);
                 break;
             case 1:
-                //resolveFilter(getData);
+                resolveFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                //resolveEnvelope(getData);
+                resolveEnvelope(getData);
                 break;
             case 5:
             case 6:
             case 7:
-                //resolveOscillator(getData,  part->kit[kititem].padpars->oscilgen);
+                resolveOscillator(getData);
                 break;
             case 8:
             case 9:
-                //resolveResonance(getData, part->kit[kititem].padpars->resonance);
+                resolveResonance(getData);
                 break;
         }
         return;
@@ -234,12 +234,12 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 resolveSub(getData);
                 break;
             case 1:
-                //resolveFilter(getData);
+                resolveFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                //resolveEnvelope(getData);
+                resolveEnvelope(getData);
                 break;
         }
         return;
@@ -253,23 +253,23 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 resolveAddVoice(getData);
                 break;
             case 0:
-                //resolveLFO(getData);
+                resolveLFO(getData);
                 break;
             case 1:
-                //resolveFilter(getData);
+                resolveFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                //resolveEnvelope(getData);
+                resolveEnvelope(getData);
                 break;
             case 5:
             case 6:
             case 7:
-                //if (engine >= 0xC0)
-                    //resolveOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].FMSmp);
-                //else
-                    //resolveOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].OscilSmp);
+                if (engine >= 0xC0)
+                    resolveOscillator(getData);
+                else
+                    resolveOscillator(getData);
                 break;
         }
         return;
@@ -283,19 +283,19 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 resolveAdd(getData);
                 break;
             case 0:
-                //resolveLFO(getData);
+                resolveLFO(getData);
                 break;
             case 1:
-                //resolveFilter(getData);
+                resolveFilter(getData);
                 break;
             case 2:
             case 3:
             case 4:
-                //resolveEnvelope(getData);
+                resolveEnvelope(getData);
                 break;
             case 8:
             case 9:
-                //resolveResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
+                resolveResonance(getData);
                 break;
         }
     }
@@ -1263,6 +1263,572 @@ void InterChange::resolvePad(CommandBlock *getData)
     if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
         actual += " - Need to Apply";
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + "  PadSynth " + name + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveOscillator(CommandBlock *getData)
+{
+    int value = (int) getData->data.value; // no floats here!
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
+    string isPad = "";
+    string eng_name;
+    if (engine == 2)
+    {
+        eng_name = "  Padsysnth";
+        if (control != 104)
+            isPad = " - Need to Apply";
+    }
+    else
+    {
+        eng_name = "  Addsynth Voice " + to_string(engine & 0x3f);
+        if (engine & 0x40)
+            eng_name += " Modulator";
+    }
+
+    if (insert == 6)
+    {
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + to_string(value) + isPad);
+        return;
+    }
+    else if(insert == 7)
+    {
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Phase value " + to_string(value) + isPad);
+        return;
+    }
+
+    string name = "";
+    switch (control & 0x70)
+    {
+        case 0:
+            name = " Oscillator";
+            break;
+        case 16:
+            name = " Base Funct";
+            break;
+        case 32:
+            name = " Base Mods";
+            break;
+        case 64:
+            name = " Harm Mods";
+            break;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = " Random";
+            break;
+        case 1:
+            contstr = " Mag Type";
+            break;
+        case 2:
+            contstr = " Harm Rnd";
+            break;
+        case 3:
+            contstr = " Harm Rnd Type";
+            break;
+
+        case 16:
+            contstr = " Par";
+            break;
+        case 17:
+            contstr = " Type";
+            break;
+        case 18:
+            contstr = " Mod Par 1";
+            break;
+        case 19:
+            contstr = " Mod Par 2";
+            break;
+        case 20:
+            contstr = " Mod Par 3";
+            break;
+        case 21:
+            contstr = " Mod Type";
+            break;
+
+        case 32: // this is local to the source
+            break;
+        case 33:
+            contstr = " Osc As Base";
+            break;
+
+        case 34:
+            contstr = " Waveshape Par";
+            break;
+        case 35:
+            contstr = " Waveshape Type";
+            break;
+
+        case 36:
+            contstr = " Osc Filt Par 1";
+            break;
+        case 37:
+            contstr = " Osc Filt Par 2";
+            break;
+        case 38:
+            contstr = " Osc Filt B4 Waveshape";
+            break;
+        case 39:
+            contstr = " Osc Filt Type";
+            break;
+
+        case 40:
+            contstr = " Osc Mod Par 1";
+            break;
+        case 41:
+            contstr = " Osc Mod Par 2";
+            break;
+        case 42:
+            contstr = " Osc Mod Par 3";
+            break;
+        case 43:
+            contstr = " Osc Mod Type";
+            break;
+
+        case 44:
+            contstr = " Osc Spect Par";
+            break;
+        case 45:
+            contstr = " Osc Spect Type";
+            break;
+
+        case 64:
+            contstr = " Shift";
+            break;
+        case 65:
+            contstr = " Reset";
+            break;
+        case 66:
+            contstr = " B4 Waveshape & Filt";
+            break;
+
+        case 67:
+            contstr = " Adapt Param";
+            break;
+        case 68:
+            contstr = " Adapt Base Freq";
+            break;
+        case 69:
+            contstr = " Adapt Power";
+            break;
+        case 70:
+            contstr = " Adapt Type";
+            break;
+
+        case 96:
+            contstr = " Clear Harmonics";
+            break;
+        case 97:
+            contstr = " Conv To Sine";
+            break;
+
+        case 104:
+            contstr = " Apply Changes";
+            break;
+    }
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + name + contstr + "  value " + to_string(value) + isPad);
+}
+
+
+void InterChange::resolveResonance(CommandBlock *getData)
+{
+    int value = (int) getData->data.value; // no floats here
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    bool write = (type & 0x40) > 0;
+
+    string name;
+    string isPad = "";
+    if (engine == 2)
+        name = "  PadSynth";
+    else
+        name = "  AddSynth";
+
+    if (insert == 9)
+    {
+        if (write == true && engine == 2)
+            isPad = " - Need to Apply";
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + to_string(value) + isPad);
+        return;
+    }
+
+    if (write == true && engine == 2 && control != 104)
+        isPad = " - Need to Apply";
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "Max dB";
+            break;
+        case 1:
+            contstr = "Centre Freq";
+            break;
+        case 2:
+            contstr = "Octaves";
+            break;
+
+        case 8:
+            contstr = "Enable";
+            break;
+
+        case 10:
+            contstr = "Random";
+            break;
+
+        case 20:
+            contstr = "Interpolate Peaks";
+            break;
+        case 21:
+            contstr = "Protect Fundamental";
+            break;
+
+        case 96:
+            contstr = "Clear";
+            break;
+        case 97:
+            contstr = "Smooth";
+            break;
+
+        case 104:
+            contstr = "Apply Changes";
+            break;
+    }
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + to_string(value) + isPad);
+}
+
+
+void InterChange::resolveLFO(CommandBlock *getData)
+{
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insertParam = getData->data.parameter;
+
+    string name;
+    string lfo;
+
+    if (engine == 0)
+        name = "  AddSynth";
+    else if (engine == 2)
+        name = "  PadSynth";
+    else if (engine >= 0x80)
+    {
+        int nvoice = engine & 0x3f;
+        name = "  AddSynth Voice " + to_string(nvoice);
+    }
+
+    switch (insertParam)
+    {
+        case 0:
+            lfo = "  Amp";
+            break;
+        case 1:
+            lfo = "  Freq";
+            break;
+        case 2:
+            lfo = "  Filt";
+            break;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "Freq";
+            break;
+        case 1:
+            contstr = "Depth";
+            break;
+        case 2:
+            contstr = "Delay";
+            break;
+        case 3:
+            contstr = "Start";
+            break;
+        case 4:
+            contstr = "AmpRand";
+            break;
+        case 5:
+            contstr = "Type";
+            break;
+        case 6:
+            contstr = "Cont";
+            break;
+        case 7:
+            contstr = "FreqRand";
+            break;
+        case 8:
+            contstr = "Stretch";
+            break;
+    }
+    float value = getData->data.value;
+    string actual;
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveFilter(CommandBlock *getData)
+{
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+
+    int nseqpos = getData->data.parameter;
+    int nformant = getData->data.parameter;
+    int nvowel = getData->data.par2;
+
+
+    string actual;
+    string name;
+
+    if (engine == 0)
+        name = "  AddSynth";
+    else if (engine == 1)
+        name = "  SubSynth";
+    else if (engine == 2)
+        name = "  PadSynth";
+    else if (engine >= 0x80)
+        name = "  Adsynth Voice " + to_string(engine & 0x3f);
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "C_Freq";
+            break;
+        case 1:
+            contstr = "Q";
+            break;
+        case 2:
+            contstr = "FreqTr";
+            break;
+        case 3:
+            contstr = "VsensA";
+            break;
+        case 4:
+            contstr = "Vsens";
+            break;
+        case 5:
+            contstr = "gain";
+            break;
+        case 6:
+            contstr = "Stages";
+            break;
+        case 7:
+            contstr = "Filt Type";
+            break;
+        case 8:
+            contstr = "An Type";
+            break;
+        case 9:
+            contstr = "SV Type";
+            break;
+
+        case 16:
+            contstr = "Form Fr Sl";
+            break;
+        case 17:
+            contstr = "Form Vw Cl";
+            break;
+        case 18:
+            contstr = "Form Freq";
+            break;
+        case 19:
+            contstr = "Form Q";
+            break;
+        case 20:
+            contstr = "Form Amp";
+            break;
+        case 21:
+            contstr = "Form Stretch";
+            break;
+        case 22:
+            contstr = "Form Cent Freq";
+            break;
+        case 23:
+            contstr = "Form Octave";
+            break;
+
+        case 32:
+            contstr = "Formants";
+            break;
+        case 33:
+            contstr = "Vowel Num";
+            break;
+        case 34:
+            contstr = "Formant Num";
+            break;
+        case 35:
+            contstr = "Seq Size";
+            break;
+        case 36:
+            contstr = "Seq Pos";
+            break;
+        case 37:
+            contstr = "Seq Vowel";
+            break;
+        case 38:
+            contstr = "Neg Input";
+            break;
+    }
+    string extra = "";
+    if (control >= 18 && control <= 20)
+        extra ="Vowel " + to_string(nvowel) +  "  Formant " + to_string(nformant) + "  ";
+    else if (control == 37)
+        extra = "Seq Pos " + to_string(nseqpos) + "  ";
+
+    if (type & 0x80)
+        actual = to_string((int)round(value));
+    else
+        actual = to_string(value);
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + extra + contstr + " value " + actual);
+}
+
+
+void InterChange::resolveEnvelope(CommandBlock *getData)
+{
+    int value = (int)getData->data.value;
+    bool write = (getData->data.type & 0x40) > 0;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char insertParam = getData->data.parameter;
+    int par2 = getData->data.par2;
+
+    string env;
+    string name;
+    if (engine == 0)
+        name = "  AddSynth";
+    else if (engine == 1)
+        name = "  SubSynth";
+
+    else if (engine == 2)
+        name = "  PadSynth";
+    else if (engine >= 0x80)
+    {
+        name = "  Adsynth Voice ";
+        int nvoice = engine & 0x3f;
+        name += to_string(nvoice);
+        if (engine >= 0xC0)
+            name += " Modulator";
+    }
+
+    switch(insertParam)
+    {
+        case 0:
+            env = "  Amp";
+            break;
+        case 1:
+            env = "  Freq";
+            break;
+        case 2:
+            env = "  Filt";
+            break;
+        case 3:
+            env = "  B.Width";
+            break;
+    }
+
+    if (insert == 3)
+    {
+        if (!write)
+        {
+            synth->getRuntime().Log("Freemode add/remove is write only. Current points " + to_string(par2));
+            return;
+        }
+        string action;
+        if (control >= 0x40)
+            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + "  X increment " + to_string(par2) +
+        "  Y value " + to_string(value));
+        else
+            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + "  Remaining " + to_string(par2));
+        return;
+    }
+
+    if (insert == 4)
+    {
+        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(par2) +
+        "  Y value " + to_string(value));
+        return;
+    }
+
+    string contstr;
+    switch (control)
+    {
+        case 0:
+            contstr = "A val";
+            break;
+        case 1:
+            contstr = "A dt";
+            break;
+        case 2:
+            contstr = "D val";
+            break;
+        case 3:
+            contstr = "D dt";
+            break;
+        case 4:
+            contstr = "S val";
+            break;
+        case 5:
+            contstr = "R dt";
+            break;
+        case 6:
+            contstr = "R val";
+            break;
+        case 7:
+            contstr = "Stretch";
+            break;
+
+        case 16:
+            contstr = "frcR";
+            break;
+        case 17:
+            contstr = "L";
+            break;
+
+        case 24:
+            contstr = "Edit";
+            break;
+
+        case 32:
+            contstr = "Freemode";
+            break;
+        case 34:
+            contstr = "Points";
+            value = par2;
+            break;
+        case 35:
+            contstr = "Sust";
+            break;
+    }
+
+    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env  " + contstr + " value " + to_string(value));
 }
 
 
@@ -3368,21 +3934,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
-    string isPad = "";
-    string eng_name;
-    if (engine == 2)
-    {
-        eng_name = "  Padsysnth";
-        if (control != 104)
-            isPad = " - Need to Apply";
-    }
-    else
-    {
-        eng_name = "  Addsynth Voice " + to_string(engine & 0x3f);
-        if (engine & 0x40)
-            eng_name += " Modulator";
-    }
-
     if (insert == 6)
     {
         if (write)
@@ -3393,9 +3944,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             oscil->prepare();
         }
         else
-            value = oscil->Phmag[control];
-
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Amplitude value " + to_string(value) + isPad);
+            getData->data.value = oscil->Phmag[control];
         return;
     }
     else if(insert == 7)
@@ -3406,55 +3955,32 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             oscil->prepare();
         }
         else
-            value = oscil->Phphase[control];
-
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string(control) + " Phase value " + to_string(value) + isPad);
+            getData->data.value = oscil->Phphase[control];
         return;
-    }
-
-    string name = "";
-    switch (control & 0x70)
-    {
-        case 0:
-            name = " Oscillator";
-            break;
-        case 16:
-            name = " Base Funct";
-            break;
-        case 32:
-            name = " Base Mods";
-            break;
-        case 64:
-            name = " Harm Mods";
-            break;
     }
 
     string contstr;
     switch (control)
     {
         case 0:
-            contstr = " Random";
             if (write)
                 oscil->Prand = value + 64;
             else
                 value = oscil->Prand - 64;
             break;
         case 1:
-            contstr = " Mag Type";
             if (write)
                 oscil->Phmagtype = value;
             else
                 value = oscil->Phmagtype;
             break;
         case 2:
-            contstr = " Harm Rnd";
             if (write)
                 oscil->Pamprandpower = value;
             else
                 value = oscil->Pamprandpower;
             break;
         case 3:
-            contstr = " Harm Rnd Type";
             if (write)
                 oscil->Pamprandtype = value;
             else
@@ -3462,42 +3988,36 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 16:
-            contstr = " Par";
             if (write)
                 oscil->Pbasefuncpar = value + 64;
             else
                 value = oscil->Pbasefuncpar - 64;
             break;
         case 17:
-            contstr = " Type";
             if (write)
                 oscil->Pcurrentbasefunc = value;
             else
                 value = oscil->Pcurrentbasefunc;
             break;
         case 18:
-            contstr = " Mod Par 1";
             if (write)
                 oscil->Pbasefuncmodulationpar1 = value;
             else
                 value = oscil->Pbasefuncmodulationpar1;
             break;
         case 19:
-            contstr = " Mod Par 2";
             if (write)
                 oscil->Pbasefuncmodulationpar2 = value;
             else
                 value = oscil->Pbasefuncmodulationpar2;
             break;
         case 20:
-            contstr = " Mod Par 3";
             if (write)
                 oscil->Pbasefuncmodulationpar3 = value;
             else
                 value = oscil->Pbasefuncmodulationpar3;
             break;
         case 21:
-            contstr = " Mod Type";
             if (write)
                 oscil->Pbasefuncmodulation = value;
             else
@@ -3507,7 +4027,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         case 32: // this is local to the source
             break;
         case 33:
-            contstr = " Osc As Base";
             if (write)
             {
                 oscil->useasbase();
@@ -3525,14 +4044,12 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 34:
-            contstr = " Waveshape Par";
             if (write)
                 oscil->Pwaveshaping = value + 64;
             else
                 value = oscil->Pwaveshaping;
             break;
         case 35:
-            contstr = " Waveshape Type";
             if (write)
                 oscil->Pwaveshapingfunction = value;
             else
@@ -3540,28 +4057,24 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 36:
-            contstr = " Osc Filt Par 1";
             if (write)
                 oscil->Pfilterpar1 = value;
             else
                 value = oscil->Pfilterpar1;
             break;
         case 37:
-            contstr = " Osc Filt Par 2";
             if (write)
                 oscil->Pfilterpar1 = value;
             else
                 value = oscil->Pfilterpar1;
             break;
         case 38:
-            contstr = " Osc Filt B4 Waveshape";
             if (write)
                 oscil->Pfilterbeforews =  (value != 0);
             else
                 value = oscil->Pfilterbeforews;
             break;
         case 39:
-            contstr = " Osc Filt Type";
             if (write)
                 oscil->Pfiltertype = value;
             else
@@ -3569,28 +4082,24 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 40:
-            contstr = " Osc Mod Par 1";
             if (write)
                 oscil->Pmodulationpar1 = value;
             else
                 value = oscil->Pmodulationpar1;
             break;
         case 41:
-            contstr = " Osc Mod Par 2";
             if (write)
                 oscil->Pmodulationpar2 = value;
             else
                 value = oscil->Pmodulationpar2;
             break;
         case 42:
-            contstr = " Osc Mod Par 3";
             if (write)
                 oscil->Pmodulationpar3 = value;
             else
                 value = oscil->Pmodulationpar3;
             break;
         case 43:
-            contstr = " Osc Mod Type";
             if (write)
                 oscil->Pmodulation = value;
             else
@@ -3598,14 +4107,12 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 44:
-            contstr = " Osc Spect Par";
             if (write)
                 oscil->Psapar = value;
             else
                 value = oscil->Psapar;
             break;
         case 45:
-            contstr = " Osc Spect Type";
             if (write)
                 oscil->Psatype = value;
             else
@@ -3613,19 +4120,16 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 64:
-            contstr = " Shift";
             if (write)
                 oscil->Pharmonicshift = value;
             else
                 value = oscil->Pharmonicshift;
             break;
         case 65:
-            contstr = " Reset";
             if (write)
                 oscil->Pharmonicshift = 0;
             break;
         case 66:
-            contstr = " B4 Waveshape & Filt";
             if (write)
                 oscil->Pharmonicshiftfirst = (value != 0);
             else
@@ -3633,28 +4137,24 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 67:
-            contstr = " Adapt Param";
             if (write)
                 oscil->Padaptiveharmonicspar = value;
             else
                 value = oscil->Padaptiveharmonicspar;
             break;
         case 68:
-            contstr = " Adapt Base Freq";
             if (write)
                 oscil->Padaptiveharmonicsbasefreq = value;
             else
                 value = oscil->Padaptiveharmonicsbasefreq;
             break;
         case 69:
-            contstr = " Adapt Power";
             if (write)
                 oscil->Padaptiveharmonicspower = value;
             else
                 value = oscil->Padaptiveharmonicspower;
             break;
         case 70:
-            contstr = " Adapt Type";
             if (write)
                 oscil->Padaptiveharmonics = value;
             else
@@ -3662,7 +4162,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
 
         case 96:
-            contstr = " Clear Harmonics";
             if (write)
             {
                 for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
@@ -3675,20 +4174,17 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             }
             break;
         case 97:
-            contstr = " Conv To Sine";
             if (write)
                 oscil->convert2sine(0);
             break;
 
         case 104:
-            contstr = " Apply Changes";
             if (write && engine == 2)
                 synth->getRuntime().padApply = npart | (kititem << 8);
             break;
     }
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + name + contstr + "  value " + to_string(value) + isPad);
-
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -3703,25 +4199,14 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
-    string name;
-    string isPad = "";
-    if (engine == 0)
-        name = "  AddSynth";
-    else
-    {
-        name = "  PadSynth";
-        if (control != 104)
-            isPad = " - Need to Apply";
-    }
-
     if (insert == 9)
     {
         if (write)
             respar->setpoint(control, value);
         else
             value = respar->Prespoints[control];
-
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + "  value " + to_string(value) + isPad);
+        if (!write)
+            getData->data.value = value;
         return;
     }
 
@@ -3729,21 +4214,18 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     switch (control)
     {
         case 0:
-            contstr = "Max dB";
             if (write)
                 respar->PmaxdB = value;
             else
                 value = respar->PmaxdB;
             break;
         case 1:
-            contstr = "Centre Freq";
             if (write)
                 respar->Pcenterfreq = value;
             else
                 value = respar->Pcenterfreq;
             break;
         case 2:
-            contstr = "Octaves";
             if (write)
                 respar->Poctavesfreq = value;
             else
@@ -3751,7 +4233,6 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
             break;
 
         case 8:
-            contstr = "Enable";
             if (write)
                 respar->Penabled = (value != 0);
             else
@@ -3759,18 +4240,15 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
             break;
 
         case 10:
-            contstr = "Random";
             if (write)
                 respar->randomize(value);
             break;
 
         case 20:
-            contstr = "Interpolate Peaks";
             if (write)
                 respar->interpolatepeaks((value != 0));
             break;
         case 21:
-            contstr = "Protect Fundamental";
             if (write)
                 respar->Pprotectthefundamental = (value != 0);
             else
@@ -3778,32 +4256,27 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
             break;
 
         case 96:
-            contstr = "Clear";
             if (write)
                 for (int i = 0; i < MAX_RESONANCE_POINTS; ++ i)
                     respar->setpoint(i, 64);
             break;
         case 97:
-            contstr = "Smooth";
             if (write)
                 respar->smooth();
             break;
 
         case 104:
-            contstr = "Apply Changes";
             if (write && engine == 2)
                 synth->getRuntime().padApply = npart | (kititem << 8);
             break;
     }
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Resonance " + contstr + "  value " + to_string(value) + isPad);
+    if (!write)
+        getData->data.value = value;
 }
 
 
 void InterChange::commandLFO(CommandBlock *getData)
 {
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -3812,12 +4285,8 @@ void InterChange::commandLFO(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    string name;
-    string lfo;
-
     if (engine == 0)
     {
-    name = "  AddSynth";
        switch (insertParam)
         {
             case 0:
@@ -3833,7 +4302,6 @@ void InterChange::commandLFO(CommandBlock *getData)
     }
     else if (engine == 2)
     {
-        name = "  PadSynth";
         switch (insertParam)
         {
             case 0:
@@ -3850,7 +4318,6 @@ void InterChange::commandLFO(CommandBlock *getData)
     else if (engine >= 0x80)
     {
         int nvoice = engine & 0x3f;
-        name = "  AddSynth Voice " + to_string(nvoice);
         switch (insertParam)
         {
             case 0:
@@ -3864,59 +4331,6 @@ void InterChange::commandLFO(CommandBlock *getData)
                 break;
         }
     }
-
-    switch (insertParam)
-    {
-        case 0:
-            lfo = "  Amp";
-            break;
-        case 1:
-            lfo = "  Freq";
-            break;
-        case 2:
-            lfo = "  Filt";
-            break;
-    }
-
-    string contstr;
-    switch (control)
-    {
-        case 0:
-            contstr = "Freq";
-            break;
-        case 1:
-            contstr = "Depth";
-            break;
-        case 2:
-            contstr = "Delay";
-            break;
-        case 3:
-            contstr = "Start";
-            break;
-        case 4:
-            contstr = "AmpRand";
-            break;
-        case 5:
-            contstr = "Type";
-            break;
-        case 6:
-            contstr = "Cont";
-            break;
-        case 7:
-            contstr = "FreqRand";
-            break;
-        case 8:
-            contstr = "Stretch";
-            break;
-    }
-    float value = getData->data.value;
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + lfo + " LFO  " + contstr + " value " + actual);
 }
 
 
@@ -3990,144 +4404,37 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
-    unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
 
-    int nseqpos = getData->data.parameter;
-    int nformant = getData->data.parameter;
-    int nvowel = getData->data.par2;
-
     Part *part;
     part = synth->part[npart];
 
-    string actual;
-    string name;
-
     if (engine == 0)
     {
-        name = "  AddSynth";
         filterReadWrite(getData, part->kit[kititem].adpars->GlobalPar.GlobalFilter
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScale
                     , &part->kit[kititem].adpars->GlobalPar.PFilterVelocityScaleFunction);
     }
     else if (engine == 1)
     {
-        name = "  SubSynth";
         filterReadWrite(getData, part->kit[kititem].subpars->GlobalFilter
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScale
                     , &part->kit[kititem].subpars->PGlobalFilterVelocityScaleFunction);
     }
     else if (engine == 2)
     {
-        name = "  PadSynth";
         filterReadWrite(getData, part->kit[kititem].padpars->GlobalFilter
                     , &part->kit[kititem].padpars->PFilterVelocityScale
                     , &part->kit[kititem].padpars->PFilterVelocityScaleFunction);
     }
     else if (engine >= 0x80)
     {
-        name = "  Adsynth Voice " + to_string(engine & 0x3f);
         filterReadWrite(getData, part->kit[kititem].adpars->VoicePar[engine & 0x1f].VoiceFilter
                     , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScale
                     , &part->kit[kititem].adpars->VoicePar[engine & 0x1f].PFilterVelocityScaleFunction);
     }
-
-    string contstr;
-    switch (control)
-    {
-        case 0:
-            contstr = "C_Freq";
-            break;
-        case 1:
-            contstr = "Q";
-            break;
-        case 2:
-            contstr = "FreqTr";
-            break;
-        case 3:
-            contstr = "VsensA";
-            break;
-        case 4:
-            contstr = "Vsens";
-            break;
-        case 5:
-            contstr = "gain";
-            break;
-        case 6:
-            contstr = "Stages";
-            break;
-        case 7:
-            contstr = "Filt Type";
-            break;
-        case 8:
-            contstr = "An Type";
-            break;
-        case 9:
-            contstr = "SV Type";
-            break;
-
-        case 16:
-            contstr = "Form Fr Sl";
-            break;
-        case 17:
-            contstr = "Form Vw Cl";
-            break;
-        case 18:
-            contstr = "Form Freq";
-            break;
-        case 19:
-            contstr = "Form Q";
-            break;
-        case 20:
-            contstr = "Form Amp";
-            break;
-        case 21:
-            contstr = "Form Stretch";
-            break;
-        case 22:
-            contstr = "Form Cent Freq";
-            break;
-        case 23:
-            contstr = "Form Octave";
-            break;
-
-        case 32:
-            contstr = "Formants";
-            break;
-        case 33:
-            contstr = "Vowel Num";
-            break;
-        case 34:
-            contstr = "Formant Num";
-            break;
-        case 35:
-            contstr = "Seq Size";
-            break;
-        case 36:
-            contstr = "Seq Pos";
-            break;
-        case 37:
-            contstr = "Seq Vowel";
-            break;
-        case 38:
-            contstr = "Neg Input";
-            break;
-    }
-    string extra = "";
-    if (control >= 18 && control <= 20)
-        extra ="Vowel " + to_string(nvowel) +  "  Formant " + to_string(nformant) + "  ";
-    else if (control == 37)
-        extra = "Seq Pos " + to_string(nseqpos) + "  ";
-
-    float value = getData->data.value;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name + " Filter  " + extra + contstr + " value " + actual);
 }
 
 
@@ -4346,13 +4653,9 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
-    int value = (int)getData->data.value;
-    bool write = (getData->data.type & 0x40) > 0;
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    unsigned char insert = getData->data.insert;
     unsigned char insertParam = getData->data.parameter;
 
     Part *part;
@@ -4362,7 +4665,6 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     string name;
     if (engine == 0)
     {
-        name = "  AddSynth";
         switch (insertParam)
         {
             case 0:
@@ -4378,7 +4680,6 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     }
     else if (engine == 1)
     {
-        name = "  SubSynth";
         switch (insertParam)
         {
             case 0:
@@ -4397,7 +4698,6 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     }
     else if (engine == 2)
     {
-        name = "  PadSynth";
         switch (insertParam)
         {
             case 0:
@@ -4413,12 +4713,9 @@ void InterChange::commandEnvelope(CommandBlock *getData)
     }
     else if (engine >= 0x80)
     {
-        name = "  Adsynth Voice ";
         int nvoice = engine & 0x3f;
-        name += to_string(nvoice);
         if (engine >= 0xC0)
         {
-            name += " Modulator";
             switch (insertParam)
             {
                 case 0:
@@ -4445,101 +4742,6 @@ void InterChange::commandEnvelope(CommandBlock *getData)
             }
         }
     }
-
-
-    switch(insertParam)
-    {
-        case 0:
-            env = "  Amp";
-            break;
-        case 1:
-            env = "  Freq";
-            break;
-        case 2:
-            env = "  Filt";
-            break;
-        case 3:
-            env = "  B.Width";
-            break;
-    }
-
-    value = getData->data.value;
-    int par2 = getData->data.par2;
-    if (insert == 3)
-    {
-        if (!write)
-        {
-            synth->getRuntime().Log("Freemode add/remove is write only. Current points " + to_string(par2));
-            return;
-        }
-        string action;
-        if (control >= 0x40)
-            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + "  X increment " + to_string(par2) +
-        "  Y value " + to_string(value));
-        else
-            synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + "  Remaining " + to_string(par2));
-        return;
-    }
-
-    if (insert == 4)
-    {
-        synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + "  X increment " + to_string(par2) +
-        "  Y value " + to_string(value));
-        return;
-    }
-
-    string contstr;
-    switch (control)
-    {
-        case 0:
-            contstr = "A val";
-            break;
-        case 1:
-            contstr = "A dt";
-            break;
-        case 2:
-            contstr = "D val";
-            break;
-        case 3:
-            contstr = "D dt";
-            break;
-        case 4:
-            contstr = "S val";
-            break;
-        case 5:
-            contstr = "R dt";
-            break;
-        case 6:
-            contstr = "R val";
-            break;
-        case 7:
-            contstr = "Stretch";
-            break;
-
-        case 16:
-            contstr = "frcR";
-            break;
-        case 17:
-            contstr = "L";
-            break;
-
-        case 24:
-            contstr = "Edit";
-            break;
-
-        case 32:
-            contstr = "Freemode";
-            break;
-        case 34:
-            contstr = "Points";
-            value = par2;//(value >> 8);
-            break;
-        case 35:
-            contstr = "Sust";
-            break;
-    }
-
-    synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + name  + env + " Env  " + contstr + " value " + to_string(value));
 }
 
 

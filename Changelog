@@ -3,6 +3,7 @@ yoshimi 1.4.1 M
 2016-10-26 Will
 * Started separating out CLI replies from main direct entries.
 * Completed separation up to voice level.
+* All done!
 
 2016-10-24 Will
 * Implemented mising direat modulator 440Hz switch.

@@ -80,7 +80,11 @@ class InterChange : private MiscFuncs
         void resolveAddVoice(CommandBlock *getData);
         void resolveSub(CommandBlock *getData);
         void resolvePad(CommandBlock *getData);
-
+        void resolveOscillator(CommandBlock *getData);
+        void resolveResonance(CommandBlock *getData);
+        void resolveLFO(CommandBlock *getData);
+        void resolveFilter(CommandBlock *getData);
+        void resolveEnvelope(CommandBlock *getData);
         void resolveSysIns(CommandBlock *getData);
         void resolveEffects(CommandBlock *getData);
 
