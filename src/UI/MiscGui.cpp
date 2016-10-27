@@ -88,43 +88,50 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     //unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
-    if (npart >= 0xc0 && npart < 0xd0)
+    if (npart >= 0xc0 && npart < 0xd0) // vector
     {
         return; // todo
     }
-    if (npart >= 0xf0)
+    if (npart >= 0xf0) // main / sys / ins
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
-    if (kititem == 0xff || (kititem & 0x20))
+    if (kititem == 0xff || (kititem & 0x20)) // part
     {
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
-    if (kititem >= 0x80)
+    if (kititem >= 0x80) // effects
     {
         return; // todo
     }
 
-    if (engine == 2 && synth->getGuiMaster()->partui->padnoteui)
+    if (engine == 2) // padsynth
     {
-        synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
+        if(synth->getGuiMaster()->partui->padnoteui)
+            synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
         return;
     }
-    if (engine == 1 && synth->getGuiMaster()->partui->subnoteui)
+    if (engine == 1) // subsynth
     {
-        synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
+        if (synth->getGuiMaster()->partui->subnoteui)
+            synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
         return;
     }
-    if (engine >= 0x80 && synth->getGuiMaster()->partui->adnoteui->advoice)
+    if (engine >= 0x80) // addsynth voice / modulator
     {
-        synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
+        if (synth->getGuiMaster()->partui->adnoteui)
+        {
+            if (synth->getGuiMaster()->partui->adnoteui->advoice)
+                synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
+        }
         return;
     }
-    if (engine == 0 && synth->getGuiMaster()->partui->adnoteui)
+    if (engine == 0) // addsynth base
     {
-        synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
+        if (synth->getGuiMaster()->partui->adnoteui)
+            synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
         return;
     }
 

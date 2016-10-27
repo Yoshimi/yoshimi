@@ -697,13 +697,13 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npa
     
     if (insert == 6)
     {
-        h[control]->mag->value((int) value);
+        h[control]->mag->value(127 - (int) value);
         Fl::check();
         return;
     }
     if (insert == 7)
     {
-        h[control]->bw->value((int) value);
+        h[control]->bw->value(127 - (int) value);
         Fl::check();
         return;
     }

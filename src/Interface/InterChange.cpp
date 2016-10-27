@@ -4047,7 +4047,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             if (write)
                 oscil->Pwaveshaping = value + 64;
             else
-                value = oscil->Pwaveshaping;
+                value = oscil->Pwaveshaping - 64;
             break;
         case 35:
             if (write)
