@@ -5,6 +5,7 @@ yoshimi 1.4.1 M
   Oscillator waveshape parameter read returned wrong result.
   Addsynth voice would crash if addsynth GUI not seen.
   Subsynth hamonics GUI slider move reversed.
+* Revised GUI data sending to allow reads as well as writes.
 
 2016-10-26 Will
 * Started separating out CLI replies from main direct entries.

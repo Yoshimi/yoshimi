@@ -474,7 +474,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         synth->part[npart + *plgroup]->setVolume(realvalue);
         synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
 
-        send_data(0, realvalue);}
+        send_data(0, realvalue, 0xc0);}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
           code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
           class mwheel_slider
@@ -484,7 +484,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
               synth->part[npart + *plgroup]->SetController(C_panning, o->value());
               synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
 
-              send_data(2, o->value());}
+              send_data(2, o->value(), 0xc0);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {o->init(64);}
@@ -510,7 +510,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
               synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
               o->textcolor(FL_BLACK);
 
-              send_data(5, tmp);}
+              send_data(5, tmp, 0xc0);}
           tooltip {receive from Midi channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -524,7 +524,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         Fl_Choice audiosend {
           callback {synth->SetPartDestination(npart + *plgroup, o->value() + 1);
 
-send_data(120, o->value());}
+send_data(120, o->value(), 0xc0);}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textsize 9
           code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
@@ -559,15 +559,15 @@ send_data(120, o->value());}
                 bankui->cbwig->do_callback();
             o->redraw();
 
-            send_data(8, o->value());}
+            send_data(8, o->value(), 0xc0);}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
         code0 {o->value(synth->part[npart + *plgroup]->Penabled);}
       }
     }
   }
-  Function {send_data(int control, float value, bool isInteger = true)} {} {
+  Function {send_data(int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, 0xff, 0xff);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0xff);} {}
   }
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {npart = 0;

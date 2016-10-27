@@ -2052,6 +2052,13 @@ void InterChange::commandSend(CommandBlock *getData)
     if ((isGui && button != 2) || (isCli && button == 1))
         return;
 
+#warning gui writes changed to reads
+    if (isGui)
+    {
+        type &= 0xbf;
+        getData->data.type = type;
+    }
+
     if (npart >= 0xc0 && npart < 0xd0)
     {
         commandVector(getData);
