@@ -2,6 +2,8 @@ yoshimi 1.4.1 M
 
 2016-10-28 Will
 * Separated key shift from main tuning.
+* oops - got that wrong :(
+* microtonal optimisation using a key map table - better!
 
 2016-10-27 Will
 * Direct access Bugfixes:

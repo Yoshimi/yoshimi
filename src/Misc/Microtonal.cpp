@@ -24,6 +24,7 @@
 */
 
 #include <cmath>
+#include <iostream>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -66,9 +67,13 @@ void Microtonal::defaults(void)
     Pglobalfinedetune = 64.0;
 }
 
+void Microtonal::setPartMaps(void)
+{
+    synth->setAllPartMaps();
+}
 
 // Get the frequency according to the note number
-float Microtonal::getNoteFreq(int note)
+float Microtonal::getNoteFreq(int note, int keyshift)
 {
     // in this function will appears many times things like this:
     // var=(a+b*100)%b
@@ -86,12 +91,20 @@ float Microtonal::getNoteFreq(int note)
     // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
 
     if (!Penabled)
-    {
-        return getFixedNoteFreq(note) * globalfinedetunerap;
-        //return getNoteFreq(note + keyshift) * globalfinedetunerap;
-    }
+        return getFixedNoteFreq(note + keyshift) * globalfinedetunerap;
+
 
     int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
+
+    // compute the keyshift
+    float rap_keyshift = 1.0f;
+    if (keyshift)
+    {
+        int kskey = (keyshift + octavesize * 100) % octavesize;
+        int ksoct = (keyshift + octavesize * 100) / octavesize - 100;
+        rap_keyshift  = (!kskey) ? 1.0f : (octave[kskey - 1].tuning);
+        rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
+    }
 
     // if the mapping is enabled
     if (Pmappingenabled)
@@ -144,7 +157,7 @@ float Microtonal::getNoteFreq(int note)
         freq *= globalfinedetunerap;
         if(scaleshift != 0)
             freq /= octave[scaleshift - 1].tuning;
-        return freq;// * rap_keyshift;
+        return freq * rap_keyshift;
     }
     else // if the mapping is disabled
     {
@@ -161,10 +174,9 @@ float Microtonal::getNoteFreq(int note)
             freq /= octave[scaleshift - 1].tuning;
 //	fprintf(stderr,"note=%d freq=%.3f cents=%d\n",note,freq,(int)floor(log(freq/PAfreq)/log(2.0)*1200.0+0.5));
         freq *= globalfinedetunerap;
-        return freq;// * rap_keyshift;
+        return freq * rap_keyshift;
     }
 }
-
 
 // Convert a line to tunings; returns -1 if it ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
@@ -647,6 +659,7 @@ bool Microtonal::loadXML(string filename)
         return false;
     }
     getfromXML(xml);
+    setPartMaps();
     xml->exitbranch();
     delete xml;
     return true;

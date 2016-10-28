@@ -2403,13 +2403,19 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 32:
             if (write)
+            {
                 synth->microtonal.Pglobalfinedetune = value;
+                synth->setAllPartMaps();
+            }
             else
                 value = synth->microtonal.Pglobalfinedetune;
             break;
         case 35:
             if (write)
+            {
                 synth->setPkeyshift(value + 64);
+                synth->setAllPartMaps();
+            }
             else
                 value = synth->Pkeyshift - 64;
             break;
@@ -2678,7 +2684,10 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 35:
             if (write)
+            {
                 part->Pkeyshift = (char) value + 64;
+                synth->setPartMap(npart);
+            }
             else
                 value = part->Pkeyshift - 64;
             break;

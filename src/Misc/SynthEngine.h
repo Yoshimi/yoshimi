@@ -134,6 +134,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partonoffWrite(int npart, int what);
         bool partonoffRead(int npart);
         sem_t partlock;
+        void setPartMap(int npart);
+        void setAllPartMaps(void);
 
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }

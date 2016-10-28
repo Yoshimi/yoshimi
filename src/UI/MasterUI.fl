@@ -418,7 +418,7 @@ paramsui->Show(2);}
           }
         }
         Submenu Scales {
-          label {&Scales}
+          label {&Scales} open
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
           code0 {o = o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(3);}
@@ -478,6 +478,7 @@ paramsui->Show(3);}
     {
         synth->actionLock(lockmute);
         synth->microtonal.defaults();
+        synth->setAllPartMaps();
         synth->actionLock(unlock);
         if (NULL != microtonalui)
             delete microtonalui;
@@ -544,6 +545,7 @@ paramsui->Show(4);}
           label Detune
           callback {//
               synth->microtonal.Pglobalfinedetune = o->value();
+              synth->setAllPartMaps();
               globalfinedetune->changed();
               send_data(32, o->value(), 0xc0);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
@@ -862,6 +864,7 @@ send_data(0, o->value(), 0x40);}
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {synth->setPkeyshift(o->value() + 64);
+synth->setAllPartMaps();
 send_data(35, o->value(), 0xc0);}
         tooltip {Shift pitch +/- N semitones} xywh {332 87 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}

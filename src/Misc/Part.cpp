@@ -133,6 +133,13 @@ void Part::defaults(void)
     setDestination(1);
     defaultsinstrument();
     ctl->defaults();
+    setNoteMap(0);
+}
+
+void Part::setNoteMap(int keyshift)
+{
+    for (int i = 0; i < 128; ++i)
+        PnoteMap[i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
 }
 
 
@@ -352,29 +359,28 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         vel = (vel < 0.0f) ? 0.0f : vel;
         vel = (vel > 1.0f) ? 1.0f : vel;
 
+        // compute the keyshift
+        //int partkeyshift = (int)Pkeyshift - 64;
+        //int keyshift = masterkeyshift + partkeyshift;
 
         // initialise note frequency
         float notebasefreq;
         if (!Pdrummode)
         {
-            if ((notebasefreq = microtonal->getNoteFreq(note)) < 0.0f)
+            //if ((notebasefreq = microtonal->getNoteFreq(note, keyshift)) < 0.0f)
+        if ((notebasefreq = PnoteMap[note]) < 0.0f)
                 return; // the key is not mapped
-
-            // compute the keyshift
-            int keyshift = masterkeyshift + ((int)Pkeyshift - 64);
-            if (keyshift)
-                notebasefreq *= microtonal->shiftKey(keyshift);
-
-            // Humanise
-            // cout << "\n" << notebasefreq << endl;
-            if (Pfrand >= 1) // otherwise 'off'
-                // this is an approximation to keep the math simple and is
-                // about 1 cent out at 50 cents
-                notebasefreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
-            // cout << notebasefreq << endl;
         }
         else
             notebasefreq = microtonal->getFixedNoteFreq(note);
+
+        // Humanise
+        // cout << "\n" << notebasefreq << endl;
+        if (!Pdrummode && Pfrand >= 1) // otherwise 'off'
+            // this is an approximation to keep the math simple and is
+            // about 1 cent out at 50 cents
+            notebasefreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
+        // cout << notebasefreq << endl;
 
         // Portamento
         if (oldfreq < 1.0f)

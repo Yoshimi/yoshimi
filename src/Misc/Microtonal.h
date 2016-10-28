@@ -44,9 +44,9 @@ class Microtonal : private MiscFuncs
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
         ~Microtonal() { }
         void defaults(void);
-        float getNoteFreq(int note);
+        void setPartMaps(void);
+        float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
-        float shiftKey(int keyshift);
 
         // Parameters
         unsigned char Pinvertupdown;
@@ -116,14 +116,5 @@ inline float Microtonal::getFixedNoteFreq(int note)
     return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
 }
 
-inline float Microtonal::shiftKey(int keyshift)
-{
-    float rap_keyshift = 1.0f;
-    int kskey = (keyshift + octavesize * 100) % octavesize;
-    int ksoct = (keyshift + octavesize * 100) / octavesize - 100;
-    rap_keyshift  = (!kskey) ? 1.0f : (octave[kskey - 1].tuning);
-    rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
-    return rap_keyshift;
-}
 
 #endif

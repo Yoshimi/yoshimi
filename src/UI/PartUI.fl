@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified October 2016
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/fl_ask.H>
@@ -384,7 +384,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -533,6 +533,7 @@ send_data(7, o->value(), 0xc0);}
       Fl_Spinner partkeyshift {
         label {Key Shift}
         callback {part->Pkeyshift= o->value()+64;
+part->setNoteMap(o->value());
 send_data(35, o->value(), 0xc0);}
         xywh {202 116 38 18} labelsize 10 minimum -36 maximum 36 textsize 11
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}

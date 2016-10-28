@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified October 2016
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
@@ -40,10 +40,11 @@ decl {\#include <FL/fl_ask.H>} {public local
 decl {\#include "Misc/Microtonal.h"} {public local
 } 
 
-class MicrotonalUI {} {
+class MicrotonalUI {selected
+} {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
-      label Scales open
+      label Scales
       xywh {99 164 405 450} type Double hide
     } {
       Fl_Group {} {
@@ -51,7 +52,9 @@ class MicrotonalUI {} {
       } {
         Fl_Check_Button {} {
           label {Invert keys}
-          callback {microtonal->Pinvertupdown = (int) o->value();
+          callback {//
+              microtonal->Pinvertupdown = (int) o->value();
+              microtonal->setPartMaps();
               if (microtonal->Pinvertupdown == 0)
                   centerinvertcounter->deactivate();
               else
@@ -61,7 +64,8 @@ class MicrotonalUI {} {
         }
         Fl_Counter centerinvertcounter {
           label Center
-          callback {microtonal->Pinvertupdowncenter=(int) o->value();}
+          callback {microtonal->Pinvertupdowncenter=(int) o->value();
+microtonal->setPartMaps();}
           xywh {319 13 80 20} labelfont 1 labelsize 11 align 130 minimum 0 maximum 127 step 1 textfont 1
           code0 {o->lstep(microtonal->getoctavesize());}
           code1 {o->value(microtonal->Pinvertupdowncenter);}
@@ -75,7 +79,7 @@ class MicrotonalUI {} {
         Fl_Button applybutton {
           label Retune
           callback {apply();}
-          tooltip {Retune the synth accorging to the inputs from "Tunnings" and "Keyboard Mappings"} xywh {8 413 107 28} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13
+          tooltip {Retune the synth according to the inputs from "Tunnings" and "Keyboard Mappings"} xywh {8 413 107 28} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13
         }
         Fl_Value_Output octavesizeoutput {
           label {nts./oct.}
@@ -164,8 +168,10 @@ class MicrotonalUI {} {
         }
         Fl_Check_Button mappingenabledbutton {
           label ON
-          callback {int x = (int) o->value();
+          callback {//
+              int x = (int) o->value();
               microtonal->Pmappingenabled = x;
+              microtonal->setPartMaps();
               if (x == 0)
                   keymappinggroup->deactivate();
               else
@@ -207,8 +213,10 @@ class MicrotonalUI {} {
       } {
         Fl_Counter anotecounter {
           label {"A" Note}
-          callback {microtonal->PAnote=(int) o->value();
-              if (microtonal->getNoteFreq(microtonal->PAnote) < 0.0)
+          callback {//
+              microtonal->PAnote=(int) o->value();
+              microtonal->setPartMaps();
+              if (microtonal->getNoteFreq(microtonal->PAnote, 0) < 0.0)
                   o->textcolor(FL_RED);
               else
                   o->textcolor(FL_BLACK);
@@ -219,7 +227,8 @@ class MicrotonalUI {} {
         }
         Fl_Value_Input afreqinput {
           label {"A" Freq.}
-          callback {microtonal->PAfreq=o->value();}
+          callback {microtonal->PAfreq=o->value();
+microtonal->setPartMaps();}
           tooltip {The freq. of "A" note (default=440.0)} xywh {118 17 45 20} labelfont 1 labelsize 10 align 1 minimum 1 maximum 20000 value 440 textfont 1 textsize 10
           code0 {o->step(0.001, 1);}
           code1 {o->value(microtonal->PAfreq);}
@@ -232,7 +241,9 @@ class MicrotonalUI {} {
       }
       Fl_Check_Button {} {
         label {Enable Microtonal}
-        callback {microtonal->Penabled = (int) o->value();
+        callback {//
+            microtonal->Penabled = (int) o->value();
+            microtonal->setPartMaps();
             if (microtonal->Penabled == 0)
                 microtonalgroup->deactivate();
             else
@@ -294,6 +305,7 @@ class MicrotonalUI {} {
     octavesizeoutput->do_callback();
 
     microtonal->texttomapping(mappinginput->value());
+    microtonal->setPartMaps();
     mapsizeoutput->do_callback();
     anotecounter->do_callback();
 

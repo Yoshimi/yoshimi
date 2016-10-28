@@ -476,6 +476,7 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    setAllPartMaps();
     Runtime.currentPart = 0;
     Runtime.channelSwitchType = 0;
     Runtime.channelSwitchCC = 128;
@@ -487,6 +488,18 @@ void SynthEngine::defaults(void)
     ShutUp();
 }
 
+
+void SynthEngine::setPartMap(int npart)
+{
+    part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
+}
+
+
+void SynthEngine::setAllPartMaps(void)
+{
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+        part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
+}
 
 // Note On Messages (velocity == 0 => NoteOff)
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
@@ -938,6 +951,7 @@ void SynthEngine::SetPartShift(unsigned char npart, unsigned char shift)
     else if(shift > MAX_KEY_SHIFT + 64)
         shift = MAX_KEY_SHIFT + 64;
     part[npart]->Pkeyshift = shift;
+    setPartMap(npart);
     Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(shift - 64));
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
 }
@@ -1346,6 +1360,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             else if (value < MIN_KEY_SHIFT + 64) // 3 octaves is enough for anybody :)
                 value = MIN_KEY_SHIFT + 64;
             setPkeyshift(value);
+            setAllPartMaps();
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             Runtime.Log("Master key shift set to " + asString(value - 64));
             break;
