@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2016, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified July 2014
+    This file is derivative of ZynAddSubFX original code, modified October 2016
 */
 
 #include <cstring>
@@ -352,27 +352,29 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         vel = (vel < 0.0f) ? 0.0f : vel;
         vel = (vel > 1.0f) ? 1.0f : vel;
 
-        // compute the keyshift
-        int partkeyshift = (int)Pkeyshift - 64;
-        int keyshift = masterkeyshift + partkeyshift;
 
         // initialise note frequency
         float notebasefreq;
         if (!Pdrummode)
         {
-            if ((notebasefreq = microtonal->getNoteFreq(note, keyshift)) < 0.0f)
+            if ((notebasefreq = microtonal->getNoteFreq(note)) < 0.0f)
                 return; // the key is not mapped
+
+            // compute the keyshift
+            int keyshift = masterkeyshift + ((int)Pkeyshift - 64);
+            if (keyshift)
+                notebasefreq *= microtonal->shiftKey(keyshift);
+
+            // Humanise
+            // cout << "\n" << notebasefreq << endl;
+            if (Pfrand >= 1) // otherwise 'off'
+                // this is an approximation to keep the math simple and is
+                // about 1 cent out at 50 cents
+                notebasefreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
+            // cout << notebasefreq << endl;
         }
         else
-            notebasefreq = microtonal->getNoteFreq(note);
-
-        // Humanise
-        // cout << "\n" << notebasefreq << endl;
-        if (!Pdrummode && Pfrand >= 1) // otherwise 'off'
-            // this is an approximation to keep the math simple and is
-            // about 1 cent out at 50 cents
-            notebasefreq *= (1.0f + ((synth->numRandom() - 0.5f) * Pfrand * 0.00115f));
-        // cout << notebasefreq << endl;
+            notebasefreq = microtonal->getFixedNoteFreq(note);
 
         // Portamento
         if (oldfreq < 1.0f)

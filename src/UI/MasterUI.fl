@@ -545,7 +545,7 @@ paramsui->Show(4);}
           callback {//
               synth->microtonal.Pglobalfinedetune = o->value();
               globalfinedetune->changed();
-              send_data(32, o->value());}
+              send_data(32, o->value(), 0xc0);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->value(synth->microtonal.Pglobalfinedetune);}
           code1 {o->init(64);}
@@ -555,7 +555,7 @@ paramsui->Show(4);}
           label Reset
           callback {//
     do_new_master();
-    send_data(96, o->value());}
+    send_data(96, o->value(), 0xc0);}
           tooltip {Clear all dynamic settings} xywh {15 60 75 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
@@ -574,13 +574,13 @@ paramsui->Show(4);}
               	}
               }
               synth->allStop();
-              send_data(128, o->value());}
+              send_data(128, o->value(), 0xc0);}
           tooltip {Cease all sound immediately!} xywh {15 32 75 20} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {synth->setPvolume(o->value());
-send_data(0, o->value(),false);}
+send_data(0, o->value(), 0x40);}
           tooltip {Master Volume} xywh {331 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->value(synth->Pvolume);}
           code1 {o->init(90);}
@@ -630,7 +630,7 @@ send_data(0, o->value(),false);}
               nsyseff = o->value() - 1;
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
               syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
-              send_data(0, o->value() - 1, true, 0xf1);}
+              send_data(0, o->value() - 1, 0xc0, 0xf1);}
             xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
@@ -643,7 +643,7 @@ send_data(0, o->value(),false);}
               synth->actionLock(unlock);
               syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
               showSysEfxUI();
-              send_data(1, o->value(), true, 0xf1);}
+              send_data(1, o->value(), 0xc0, 0xf1);}
             xywh {120 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
@@ -726,7 +726,7 @@ send_data(0, o->value(),false);}
                 inseffectui->deactivate();
                 inseffectuigroup->deactivate();
               }
-              send_data(0, o->value() - 1, true, 0xf2);}
+              send_data(0, o->value() - 1, 0xc0, 0xf2);}
             xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
@@ -739,7 +739,7 @@ send_data(0, o->value(),false);}
               synth->actionLock(unlock);
               inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
               showInsEfxUI();
-              send_data(1, o->value(), true, 0xf2);}
+              send_data(1, o->value(), 0xc0, 0xf2);}
             xywh {120 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
@@ -798,7 +798,7 @@ send_data(0, o->value(),false);}
                 inseffectui->activate();
               }
               synth->insefx[ninseff]->cleanup();
-              send_data(2, o->value() - 2, true, 0xf2);}
+              send_data(2, o->value() - 2, 0xc0, 0xf2);}
             xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
@@ -862,7 +862,7 @@ send_data(0, o->value(),false);}
       Fl_Spinner masterkeyshift {
         label {Key Shift}
         callback {synth->setPkeyshift(o->value() + 64);
-send_data(35, o->value());}
+send_data(35, o->value(), 0xc0);}
         tooltip {Shift pitch +/- N semitones} xywh {332 87 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -882,7 +882,7 @@ send_data(35, o->value());}
           npart = nval;
           updatepanel();
           maxparts->value(synth->getRuntime().NumAvailableParts);
-          send_data(14, o->value()-1);}
+          send_data(14, o->value()-1, 0xc0);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -903,7 +903,7 @@ synth->getRuntime().NumAvailableParts = tmp;
 updatepart();
 updatepanel();
 setinspartlist();
-send_data(15, o->value());}
+send_data(15, o->value(), 0xc0);}
         xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(synth->getRuntime().NumAvailableParts);}
       }
@@ -1102,7 +1102,7 @@ updatepanel();}
         CS_CC = candidate;
         o->hide();
     }
-    send_data(49, CSspinner->value());}
+    send_data(49, CSspinner->value(), 0xc0);}
         tooltip {Click to set} xywh {276 651 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
       }
       Fl_Choice channelswitch {
@@ -1123,7 +1123,7 @@ updatepanel();}
         if(CS_CC == 128)
         	CSpend->show();
     }
-    send_data(48, o->value());}
+    send_data(48, o->value(), 0xc0);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 653 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
         code0 {o->value(synth->getRuntime().channelSwitchType);}
         code1 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
@@ -1147,19 +1147,19 @@ updatepanel();}
       }
     }
   }
-  Function {send_data(int control, float value, bool isInteger = true, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff)} {} {
     code {//
-if (kititem == 0xff)
-    kititem = 0xf0;
+if (part == 0xff)
+    part = 0xf0;
 int eng;
-if (kititem == 0xf1)
+if (part == 0xf1)
     eng = nsyseff;
-else if (kititem == 0xf2)
+else if (part == 0xf2)
     eng = ninseff;
 else
     eng = 0xff;
 
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kititem, 0xff, eng);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1169,8 +1169,8 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
     unsigned char npart = getData->data.part;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    int nval = (int) value; 
-    
+    int nval = (int) value;
+
     if (npart == 0xf1)
     {
         if (insert == 16)
@@ -1206,14 +1206,14 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
         Fl::check();
         return;
     }
-    
+
     switch(control)
     {
     	case 0:
     	    mastervolumedial->value(value);
     	    break;
-    	    
-        case 14:	    	    
+
+        case 14:
     	    partuigroup->remove(partui);
             delete partui;
             partui = new PartUI(0, 0, 765, 525);
@@ -1225,17 +1225,17 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
             npartcounter->redraw();
             updatepanel();
             break;
-            
+
         case 15:
             updatepart();
             updatepanel();
             setinspartlist();
             break;
-        
+
         case 32:
     	    globalfinedetune->value(value);
     	    break;
-    	
+
     	case 35:
     	    masterkeyshift->value(value);
             break;
@@ -1244,7 +1244,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
         case 49:
             updatepanel();
             break;
-            
+
 	case 96:
 	    delete microtonalui;
             setMasterLabel("");
@@ -1252,7 +1252,7 @@ collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, kit
             refresh_master_ui();
             updatepanel();
             break;
-            
+
         case 128:
             virkeyboard->relaseallkeys();
             vumeter->init(-1, synth);

@@ -30,6 +30,7 @@ SynthEngine *synth;
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
 #ifdef ENABLE_REPORTS
+    int typetop = type & 0xc0;
     if ((type & 3) == 3)
     { // value type is now irrelevant
         if(Fl::event_state(FL_CTRL) != 0)
@@ -40,7 +41,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
             // identifying this for button 3 as set default
     }
     else if((type & 7) > 2)
-        type = 1 | (type & (1 << 7));
+        type = 1 | typetop;
         // change scroll wheel to button 1
 
     CommandBlock putData;

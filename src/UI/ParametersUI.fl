@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
 Copyright 2014 - 2016, Will Godfrey
@@ -8,7 +8,7 @@ Copyright 2014 - 2016, Will Godfrey
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either
-version 3 of the License, or (at your option) any later version.
+version 2 of the License, or (at your option) any later version.
 
 yoshimi is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,22 +20,22 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified September 2014
 } {in_source in_header
-} 
+}
 
 decl {\#include <set>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {private global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 class ParametersUI {selected
 } {
@@ -155,4 +155,4 @@ make_window();} {}
   }
   decl {int H_type;} {private local
   }
-} 
+}

@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2016 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified March 2011
+    This file is derivative of original ZynAddSubFX code, modified October 2016
 */
 
 #include <cmath>
@@ -67,7 +68,7 @@ void Microtonal::defaults(void)
 
 
 // Get the frequency according to the note number
-float Microtonal::getNoteFreq(int note, int keyshift)
+float Microtonal::getNoteFreq(int note)
 {
     // in this function will appears many times things like this:
     // var=(a+b*100)%b
@@ -86,20 +87,11 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 
     if (!Penabled)
     {
-        return getNoteFreq(note + keyshift) * globalfinedetunerap;
+        return getFixedNoteFreq(note) * globalfinedetunerap;
+        //return getNoteFreq(note + keyshift) * globalfinedetunerap;
     }
 
     int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
-
-    // compute the keyshift
-    float rap_keyshift = 1.0f;
-    if (keyshift)
-    {
-        int kskey = (keyshift + octavesize * 100) % octavesize;
-        int ksoct = (keyshift + octavesize * 100) / octavesize - 100;
-        rap_keyshift  = (!kskey) ? 1.0f : (octave[kskey - 1].tuning);
-        rap_keyshift *= powf(octave[octavesize - 1].tuning, ksoct);
-    }
 
     // if the mapping is enabled
     if (Pmappingenabled)
@@ -152,7 +144,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         freq *= globalfinedetunerap;
         if(scaleshift != 0)
             freq /= octave[scaleshift - 1].tuning;
-        return freq * rap_keyshift;
+        return freq;// * rap_keyshift;
     }
     else // if the mapping is disabled
     {
@@ -169,7 +161,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
             freq /= octave[scaleshift - 1].tuning;
 //	fprintf(stderr,"note=%d freq=%.3f cents=%d\n",note,freq,(int)floor(log(freq/PAfreq)/log(2.0)*1200.0+0.5));
         freq *= globalfinedetunerap;
-        return freq * rap_keyshift;
+        return freq;// * rap_keyshift;
     }
 }
 

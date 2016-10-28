@@ -1,10 +1,14 @@
 yoshimi 1.4.1 M
 
+2016-10-28 Will
+* Separated key shift from main tuning.
+
 2016-10-27 Will
 * Direct access Bugfixes:
   Oscillator waveshape parameter read returned wrong result.
   Addsynth voice would crash if addsynth GUI not seen.
   Subsynth hamonics GUI slider move reversed.
+* Revised GUI data sending to allow reads as well as writes.
 
 2016-10-26 Will
 * Started separating out CLI replies from main direct entries.

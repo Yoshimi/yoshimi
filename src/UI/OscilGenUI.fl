@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified September 2016
+This file is a derivative of the ZynAddSubFX original, modified October 2016
 } {in_source in_header
 } 
 
@@ -347,7 +347,7 @@ if (x==64)
 oscil->prepare();
 synth->actionLock(unlock);
 
-send_data(6, n, x);
+send_data(6, n, x, 0xc0);
 
 display->redraw();
 oldosc->redraw();
@@ -379,7 +379,7 @@ oscil->Phphase[n]=x;
 oscil->prepare();
 synth->actionLock(unlock);
 
-send_data(7, n, x);
+send_data(7, n, x, 0xc0);
 
 display->redraw();
 oldosc->redraw();
@@ -419,9 +419,9 @@ display=NULL;
 applybutton=NULL;
 cbwidget=NULL;} {}
   }
-  Function {send_data(int insert, int control, float value, bool isInteger = true)} {} {
+  Function {send_data(int insert, int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, insert);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
   }
   Function {init(OscilGen *oscil_,int n_,Fl_Group *display_,Fl_Widget *oldosc_,Fl_Widget *cbwidget_,Fl_Widget *applybutton_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {synth = _synth;
@@ -487,7 +487,7 @@ if (cbapplywidget!=NULL) {
 	cbapplywidget->color(FL_GRAY);
 	cbapplywidget->redraw();
 };
-send_data (104, o->value());}
+send_data (104, o->value(), 0xc0);}
         xywh {300 280 60 20} box THIN_UP_BOX labelfont 1
         code0 {if (!oscil->ADvsPAD) o->hide();}
       }
@@ -510,7 +510,7 @@ send_data (104, o->value());}
 oscil->Prand=(int)o->value()+64;
 oscildisplaygroup->redraw();
 oldosc->redraw();
-send_data (0, o->value());}
+send_data (0, o->value(), 0xc0);}
           tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
           class mwheel_val_slider_rev
@@ -527,7 +527,7 @@ send_data (0, o->value());}
           Fl_Choice hrndtype {
             label {H.rnd}
             callback {oscil->Pamprandtype=(int) o->value();
-send_data (3, o->value());}
+send_data (3, o->value(), 0xc0);}
             tooltip {Harmonic Amplitude Randomness} xywh {281 282 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
             MenuItem {} {
@@ -545,7 +545,7 @@ send_data (3, o->value());}
           }
           Fl_Dial hrnddial {
             callback {oscil->Pamprandpower=(int) o->value();
-send_data (2, o->value());}
+send_data (2, o->value(), 0xc0);}
             tooltip {Oscillator's spectrum adjust parameter} xywh {338 280 18 18} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -570,7 +570,7 @@ basefuncdisplaygroup->redraw();
 bfparval->value(oscil->Pbasefuncpar-64);
 
 redrawoscil();
-send_data (16, o->value());}
+send_data (16, o->value(), 0xc0);}
           tooltip {Base Function Parameter} xywh {520 280 20 20} minimum -64 maximum 63 step 1
           code0 {o->init(0);}
           class WidgetPDial
@@ -581,7 +581,7 @@ send_data (16, o->value());}
 
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (17, o->value());
+send_data (17, o->value(), 0xc0);
 
 if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodulation->deactivate();
       else basefuncmodulation->activate();}
@@ -677,7 +677,7 @@ if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodula
             callback {oscil->Pbasefuncmodulation=(int) o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (21, o->value());}
+send_data (21, o->value(), 0xc0);}
             tooltip {Base function modulation} xywh {599 281 50 15} down_box BORDER_BOX labelsize 10 textsize 10
           } {
             MenuItem {} {
@@ -701,7 +701,7 @@ send_data (21, o->value());}
             callback {oscil->Pbasefuncmodulationpar1=(int)o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (18, o->value());}
+send_data (18, o->value(), 0xc0);}
             tooltip {Oscillator's modulation parameter 1} xywh {654 280 17 17} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -710,7 +710,7 @@ send_data (18, o->value());}
             callback {oscil->Pbasefuncmodulationpar2=(int)o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (19, o->value());}
+send_data (19, o->value(), 0xc0);}
             tooltip {Oscillator's modulation parameter 2} xywh {676 280 17 17} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -719,7 +719,7 @@ send_data (19, o->value());}
             callback {oscil->Pbasefuncmodulationpar3=(int)o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (20, o->value());}
+send_data (20, o->value(), 0xc0);}
             tooltip {Oscillator's modulation parameter 3} xywh {698 280 17 17} maximum 127 step 1
             code0 {o->init(32);}
             class WidgetPDial
@@ -732,7 +732,7 @@ send_data (20, o->value());}
 basefuncdisplaygroup->redraw();
 
 redrawoscil();
-send_data (1, o->value());}
+send_data (1, o->value(), 0xc0);}
         xywh {70 280 65 20} down_box BORDER_BOX labelsize 11 textsize 11
       } {
         MenuItem {} {
@@ -792,7 +792,7 @@ synth->actionLock(unlock);
 
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (33, clearfirst);}
+send_data (33, clearfirst, 0xc0);}
         tooltip {Use this Oscillator as base function} xywh {5 313 85 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
@@ -834,7 +834,7 @@ synth->actionLock(lock);
 synth->actionLock(unlock);
 
 redrawoscil();
-send_data (96, o->value());}
+send_data (96, o->value(), 0xc0);}
         xywh {670 505 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group {} {
@@ -845,7 +845,7 @@ send_data (96, o->value());}
           callback {oscil->Pwaveshapingfunction=(int) o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (35, o->value());}
+send_data (35, o->value(), 0xc0);}
           tooltip {Waveshaping function} xywh {165 313 55 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -913,7 +913,7 @@ send_data (35, o->value());}
           callback {oscil->Pwaveshaping=(int)o->value()+64;
 wsparval->value(oscil->Pwaveshaping-64);
 redrawoscil();
-send_data (34, o->value());}
+send_data (34, o->value(), 0xc0);}
           tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
           code0 {o->init(0);}
           class WidgetPDial
@@ -924,7 +924,8 @@ send_data (34, o->value());}
       }
       Fl_Light_Button autoclearbutton {
         label {Clr.}
-        callback {send_data (32, o->value());}
+        callback {//
+        send_data (32, o->value(), 0xc0);}
         tooltip {Auto clear when using the oscillator as base function} xywh {95 313 35 20} box THIN_UP_BOX value 1 labelfont 1 labelsize 10
       }
       Fl_Group {} {
@@ -935,7 +936,7 @@ send_data (34, o->value());}
           callback {oscil->Pfiltertype=(int) o->value();
 
 redrawoscil();
-send_data (39, o->value());}
+send_data (39, o->value(), 0xc0);}
           tooltip {Oscillator's filter type} xywh {315 313 50 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -999,7 +1000,7 @@ send_data (39, o->value());}
           callback {oscil->Pfilterpar1=(int)o->value();
 
 redrawoscil();
-send_data (36, o->value());}
+send_data (36, o->value(), 0xc0);}
           tooltip {Oscillator's filter parameter1} xywh {367 313 20 20} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1009,14 +1010,14 @@ send_data (36, o->value());}
           callback {oscil->Pfilterbeforews=(int)o->value();
 
 redrawoscil();
-send_data (38, o->value());}
+send_data (38, o->value(), 0xc0);}
           tooltip {Apply the filter before the waveshaping} xywh {415 313 20 20} down_box DOWN_BOX labelsize 10 align 24
         }
         Fl_Dial filtervalue2 {
           callback {oscil->Pfilterpar2=(int)o->value();
 
 redrawoscil();
-send_data (37, o->value());}
+send_data (37, o->value(), 0xc0);}
           tooltip {Oscillator's filter parameter2} xywh {392 313 20 20} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1029,7 +1030,7 @@ send_data (37, o->value());}
           label {Sp.adj.}
           callback {oscil->Psatype=(int) o->value();
 redrawoscil();
-send_data (45, o->value());}
+send_data (45, o->value(), 0xc0);}
           tooltip {Oscillator's spectrum adjust} xywh {634 313 60 20} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -1052,7 +1053,7 @@ send_data (45, o->value());}
         Fl_Dial sadjpar {
           callback {oscil->Psapar=(int)o->value();
 redrawoscil();
-send_data (44, o->value());}
+send_data (44, o->value(), 0xc0);}
           tooltip {Oscillator's spectrum adjust parameter} xywh {699 313 20 20} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1065,14 +1066,14 @@ send_data (44, o->value());}
           label {Harmonic Shift}
           callback {oscil->Pharmonicshift=(int)o->value();
 redrawoscil();
-send_data (64, o->value());}
+send_data (64, o->value(), 0xc0);}
           xywh {670 365 55 15} type Simple labelsize 10 align 129 minimum -64 maximum 64 step 1 textfont 1 textsize 10
         }
         Fl_Check_Button harmonicshiftpre {
           label preH
           callback {oscil->Pharmonicshiftfirst=(int)o->value();
 redrawoscil();
-send_data (66, o->value());}
+send_data (66, o->value(), 0xc0);}
           tooltip {Apply the harmonic shift before the waveshaping and filtering} xywh {690 383 37 20} down_box DOWN_BOX labelsize 10 align 24
         }
         Fl_Button {} {
@@ -1080,7 +1081,7 @@ send_data (66, o->value());}
           callback {oscil->Pharmonicshift=0;
 harmonicshiftcounter->value(0);
 redrawoscil();
-send_data (65, o->value());}
+send_data (65, o->value(), 0xc0);}
           tooltip {Reset harmonic shift} xywh {679 389 9 9} box PLASTIC_ROUND_UP_BOX color 1 selection_color 1 labelsize 10 align 4
         }
       }
@@ -1091,7 +1092,7 @@ send_data (65, o->value());}
           label {Adpt.Harm.}
           callback {oscil->Padaptiveharmonics=(int) o->value();
 redrawoscil();
-send_data (70, o->value());}
+send_data (70, o->value(), 0xc0);}
           tooltip {The type of the addaptive harmonics} xywh {670 425 55 15} down_box BORDER_BOX labelsize 10 align 129 when 6 textsize 10
         } {
           MenuItem {} {
@@ -1135,7 +1136,7 @@ send_data (70, o->value());}
           label pow
           callback {oscil->Padaptiveharmonicspower=(int)o->value();
 redrawoscil();
-send_data (69, o->value());}
+send_data (69, o->value(), 0xc0);}
           tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 maximum 200 step 1
           code0 {o->init(100);}
           class WidgetPDial
@@ -1144,7 +1145,7 @@ send_data (69, o->value());}
           label baseF
           callback {oscil->Padaptiveharmonicsbasefreq=(int)o->value();
 redrawoscil();
-send_data (68, o->value());}
+send_data (68, o->value(), 0xc0);}
           tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 maximum 255 step 1
           code0 {o->init(128);}
           class WidgetPDial
@@ -1154,7 +1155,7 @@ send_data (68, o->value());}
     o->value(50);
 oscil->Padaptiveharmonicspar=(int)o->value();
 redrawoscil();
-send_data (67, o->value());}
+send_data (67, o->value(), 0xc0);}
           tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
           class mwheel_slider_rev
         }
@@ -1167,7 +1168,7 @@ send_data (67, o->value());}
           callback {oscil->Pmodulation=(int) o->value();
 
 redrawoscil();
-send_data (43, o->value());}
+send_data (43, o->value(), 0xc0);}
           tooltip modulation xywh {470 315 50 15} down_box BORDER_BOX labelsize 10 textsize 10
         } {
           MenuItem {} {
@@ -1191,7 +1192,7 @@ send_data (43, o->value());}
           callback {oscil->Pmodulationpar1=(int)o->value();
 
 redrawoscil();
-send_data (40, o->value());}
+send_data (40, o->value(), 0xc0);}
           tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1200,7 +1201,7 @@ send_data (40, o->value());}
           callback {oscil->Pmodulationpar2=(int)o->value();
 
 redrawoscil();
-send_data (41, o->value());}
+send_data (41, o->value(), 0xc0);}
           tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1208,7 +1209,7 @@ send_data (41, o->value());}
         Fl_Dial modpar3 {
           callback {oscil->Pmodulationpar3=(int)o->value();
 redrawoscil();
-send_data (42, o->value());}
+send_data (42, o->value(), 0xc0);}
           tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} maximum 127 step 1
           code0 {o->init(32);}
           class WidgetPDial
@@ -1224,7 +1225,7 @@ synth->actionLock(unlock);
 
 redrawoscil();
 refresh();
-send_data (97, o->value());}
+send_data (97, o->value(), 0xc0);}
         xywh {670 525 55 15} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
@@ -1247,9 +1248,9 @@ send_data (97, o->value());}
       }
     }
   }
-  Function {send_data(int control, float value, bool isInteger = true)} {} {
+  Function {send_data(int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 5);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 5);} {}
   }
   Function {OscilEditor(OscilGen *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {synth = _synth;
