@@ -15,6 +15,8 @@ In single mode, only Item 0 will sound in the note range 0 to 60 and Item 1 will
 
 In multi mode, only Item 0 will sound in the range 0 to 40, both items will sound from 41 to 60, and only Item 1 will sound from 61 to 127.
 
+There is now a new mode called 'Crossfade' described in detail in:
+/doc/Part_Kit_Crossfade.txt
 
 Drum mode:
 If this is set then microtonal tuning is ignored for this kit, otherwise it could make drum sounds very unpredictable!
