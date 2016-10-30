@@ -572,7 +572,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     vel = truevel; // always start with correct value
                     int range;
                     int position;
-                    if ((item) == 0) // crossfade lower item of pair
+                    if ((item & 1) == 0) // crossfade lower item of pair
                     {
                         if (kit[item].Pmaxkey > kit[item + 1].Pminkey && kit[item].Pmaxkey < kit[item + 1].Pmaxkey)
                         {
@@ -593,7 +593,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                             }
                         }
                     }
-                    else if ((item) == 1)// crossfade upper item of pair
+                    else if ((item & 1) == 1)// crossfade upper item of pair
                     {
 
                         if (kit[item - 1].Pmaxkey > kit[item ].Pminkey && kit[item - 1].Pmaxkey < kit[item ].Pmaxkey)
