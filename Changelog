@@ -2,6 +2,8 @@ yoshimi 1.4.1 M
 
 2016-10-30 Will
 * Implemented kit item crossfades (in pairs).
+* A couple of small bugfixes on the new crossfade.
+* Docs updated.
 
 2016-10-29 Will
 * Microtonal GUI now only needs 'Apply' button on text fields.
