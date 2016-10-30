@@ -710,19 +710,27 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
 void SynthEngine::SetBankRoot(int rootnum)
 {
     string name;
-    int currentRoot;
+    int foundRoot;
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
+    int originalRoot = bank.getCurrentRootID();
+    int originalBank = bank.getCurrentBankID();
     if (bank.setCurrentRootID(rootnum))
     {
+        foundRoot = bank.getCurrentRootID();
+        if (foundRoot != rootnum)
+        { // abort and recover old settings
+            bank.setCurrentRootID(originalRoot);
+            bank.setCurrentBankID(originalBank);
+            foundRoot = originalRoot;
+        }
         if (Runtime.showGui)
         {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
-        currentRoot = bank.getCurrentRootID();
-        name = asString(currentRoot) + " " + bank.getRootPath(currentRoot);
-        if (rootnum != currentRoot)
+        name = asString(foundRoot) + " " + bank.getRootPath(foundRoot);
+        if (rootnum != foundRoot)
             name = "Cant find ID " + asString(rootnum) + ". Current root is " + name;
         else
         {
@@ -1049,17 +1057,22 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 void SynthEngine::ListPaths(list<string>& msg_buf)
 {
     string label;
-    int idx;
+    string prefix;
+    unsigned int idx;
     msg_buf.push_back("Root Paths");
 
     for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
     {
         if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
         {
+            if (idx == bank.getCurrentRootID())
+                prefix = " *";
+            else
+                prefix = "  ";
             label = bank.roots [idx].path;
             if (label.at(label.size() - 1) == '/')
                 label = label.substr(0, label.size() - 1);
-            msg_buf.push_back("    ID " + asString(idx) + "     " + label);
+            msg_buf.push_back(prefix + " ID " + asString(idx) + "     " + label);
         }
     }
 }
@@ -1068,7 +1081,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
     string label;
-
+    string prefix;
     if (rootNum < 0 || rootNum >= MAX_BANK_ROOT_DIRS)
         rootNum = bank.currentRootID;
     if (bank.roots.count(rootNum) > 0
@@ -1079,11 +1092,17 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
             label = label.substr(0, label.size() - 1);
         msg_buf.push_back("Banks in Root ID " + asString(rootNum));
         msg_buf.push_back("    " + label);
-        for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+        for (unsigned int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
         {
             if (bank.roots [rootNum].banks.count(idx))
-                msg_buf.push_back("    ID " + asString(idx) + "    "
+            {
+                if (idx == bank.getCurrentBankID())
+                    prefix = " *";
+                else
+                    prefix = "  ";
+                msg_buf.push_back(prefix + " ID " + asString(idx) + "    "
                                 + bank.roots [rootNum].banks [idx].dirname);
+            }
         }
     }
     else

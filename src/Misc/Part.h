@@ -116,6 +116,7 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages
         unsigned char Pkitmode;    // if the kitmode is enabled
+        bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
 
         unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic

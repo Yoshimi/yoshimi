@@ -27,6 +27,7 @@
 #include <cstring>
 #include <cmath>
 #include <semaphore.h>
+#include <iostream>
 
 using namespace std;
 
@@ -152,6 +153,7 @@ void Part::defaultsinstrument(void)
     info.Pcomments.clear();
 
     Pkitmode = 0;
+    Pkitfade = false;
     Pdrummode = 0;
     Pfrand = 0;
 
@@ -359,16 +361,11 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         vel = (vel < 0.0f) ? 0.0f : vel;
         vel = (vel > 1.0f) ? 1.0f : vel;
 
-        // compute the keyshift
-        //int partkeyshift = (int)Pkeyshift - 64;
-        //int keyshift = masterkeyshift + partkeyshift;
-
         // initialise note frequency
         float notebasefreq;
         if (!Pdrummode)
         {
-            //if ((notebasefreq = microtonal->getNoteFreq(note, keyshift)) < 0.0f)
-        if ((notebasefreq = PnoteMap[note]) < 0.0f)
+            if ((notebasefreq = PnoteMap[note]) < 0.0f)
                 return; // the key is not mapped
         }
         else
@@ -560,13 +557,68 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
         }
         else
         { // init the notes for the "kit mode"
+            float truevel = vel; // we need this as cross fade modifies the value
             for (int item = 0; item < NUM_KIT_ITEMS; ++item)
             {
                 if (kit[item].Pmuted)
                     continue;
-                if (note < kit[item].Pminkey
-                    || note>kit[item].Pmaxkey)
+                if (note < kit[item].Pminkey || note>kit[item].Pmaxkey)
                     continue;
+
+
+                // experimental cross fade on multi
+                if (Pkitfade)
+                {
+                    vel = truevel; // always start with correct value
+                    int range;
+                    int position;
+                    if ((item) == 0) // crossfade lower item of pair
+                    {
+                        if (kit[item].Pmaxkey > kit[item + 1].Pminkey && kit[item].Pmaxkey < kit[item + 1].Pmaxkey)
+                        {
+                            if (note >= kit[item + 1].Pminkey)
+                            {
+                                range = kit[item].Pmaxkey - kit[item + 1].Pminkey;
+                                position = kit[item].Pmaxkey - note;
+                                vel = truevel * position / range;
+                            }
+                        }
+                        else if (kit[item + 1].Pmaxkey > kit[item].Pminkey && kit[item + 1].Pmaxkey < kit[item].Pmaxkey ) // eliminate equal state
+                        {
+                            if (note <= kit[item + 1].Pmaxkey)
+                            {
+                                range = kit[item + 1].Pmaxkey - kit[item].Pminkey;
+                                position = (note - kit[item].Pminkey);
+                                vel = truevel * position / range;
+                            }
+                        }
+                    }
+                    else if ((item) == 1)// crossfade upper item of pair
+                    {
+
+                        if (kit[item - 1].Pmaxkey > kit[item ].Pminkey && kit[item - 1].Pmaxkey < kit[item ].Pmaxkey)
+                        {
+                            if (note <= kit[item - 1].Pmaxkey)
+                            {
+                                range = kit[item - 1].Pmaxkey - kit[item].Pminkey;
+                                position = (note - kit[item].Pminkey);
+                                vel = truevel * position / range;
+                            }
+                        }
+                        else if (kit[item].Pmaxkey > kit[item - 1].Pminkey && kit[item].Pmaxkey < kit[item - 1].Pmaxkey) // eliminate equal state
+                        {
+                            if (note >= kit[item - 1].Pminkey)
+                            {
+                                range = kit[item].Pmaxkey - kit[item - 1].Pminkey;
+                                position = kit[item].Pmaxkey - note;
+                                vel = truevel * position / range;
+                            }
+                        }
+                    }
+                    // cout << item << "  " << vel << endl;
+                }
+                // end of cross fade
+
 
                 int ci = partnote[pos].itemsplaying; // ci=current item
 
@@ -1138,6 +1190,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 
     xml->beginbranch("INSTRUMENT_KIT");
     xml->addpar("kit_mode", Pkitmode);
+    xml->addparbool("kit_crossfade", Pkitfade);
     xml->addparbool("drum_mode", Pdrummode);
 
     for (int i = 0; i < NUM_KIT_ITEMS; ++i)
@@ -1320,6 +1373,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
     else
     {
         Pkitmode = xml->getpar127("kit_mode", Pkitmode);
+        Pkitfade = xml->getparbool("kit_crossfade", Pkitfade);
         Pdrummode = xml->getparbool("drum_mode", Pdrummode);
         //setkititemstatus(0, 0); // does odd things :(
         for (int i = 0; i < NUM_KIT_ITEMS; ++i)

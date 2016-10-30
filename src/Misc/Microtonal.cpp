@@ -390,7 +390,7 @@ int Microtonal::loadscl(string filename)
         octave[i].x1 = tmpoctave[i].x1;
         octave[i].x2 = tmpoctave[i].x2;
     }
-
+    setPartMaps();
     return 0;
 }
 

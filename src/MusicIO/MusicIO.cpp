@@ -565,7 +565,7 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 /* The following routines now *always* use the ring buffer.
  * This is necessary to handle extremely large instrument patches
  * and maintain root/bank/instrument sequence.
- * RT thread priority has been adjusted to ensure optimimum results.
+ * Thread priority has been adjusted to ensure optimimum results.
  */
 
 //bank change and root dir change change share the same thread

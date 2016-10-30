@@ -2732,7 +2732,18 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 58:
             if (write)
-                part->Pkitmode = (char) value;
+            {
+                if (value == 3)
+                {
+                    part->Pkitmode = 1;
+                    part->Pkitfade = true;
+                }
+                else
+                {
+                    part->Pkitfade = false;
+                    part->Pkitmode = (char) value;
+                }
+            }
             else
                 value = part->Pkitmode;
             break;

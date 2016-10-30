@@ -737,6 +737,12 @@ void Bank::addDefaultRootDirs()
         ++ i;
     }
     addRootDir(localPath("/banks"));
+
+    while ( i >= 0)
+    {
+        changeRootID(i, (i * 5) + 5);
+        -- i;
+    }
     rescanforbanks();
 }
 

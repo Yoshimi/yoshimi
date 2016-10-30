@@ -1,9 +1,18 @@
 yoshimi 1.4.1 M
 
+2016-10-30 Will
+* Implemented kit item crossfades (in pairs).
+
+2016-10-29 Will
+* Microtonal GUI now only needs 'Apply' button on text fields.
+* Setting an invalid root now leaves root and bank unchanged.
+* First time bank root IDs now start at 5 spaced 5 apart.
+* Added '*' to current root/bank in CLI lists.
+
 2016-10-28 Will
 * Separated key shift from main tuning.
-* oops - got that wrong :(
-* microtonal optimisation using a key map table - better!
+* Oops - got that wrong :(
+* Microtonal optimisation using a key map table - better!
 
 2016-10-27 Will
 * Direct access Bugfixes:
@@ -18,7 +27,7 @@ yoshimi 1.4.1 M
 * All done!
 
 2016-10-24 Will
-* Implemented mising direat modulator 440Hz switch.
+* Implemented mising direct modulator 440Hz switch.
 * Completed direct -> gui addsynthvoice.
 * Updated docs.
 
