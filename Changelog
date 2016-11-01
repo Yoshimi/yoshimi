@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-11-1 Will
+* Cmake fix: nucurses now compulsory, but ncursesw optional.
+
 2016-10-30 Will
 * Implemented kit item crossfades (in pairs).
 * A couple of small bugfixes on the new crossfade.

@@ -197,17 +197,12 @@ mark_as_advanced (FLTK_MATH_LIBRARY)
 
 
 # libncurses
-pkg_check_modules (LIBNCURSES ncurses)
-if (LIBNCURSES_FOUND)
-    message (STATUS "Found libncurses ${LIBNCURSES_VERSION}")
-else ()
-    pkg_check_modules (LIBNCURSES REQUIRED ncursesw)
-    if (LIBNCURSES_FOUND)
-        message (STATUS "Found libncursesw ${LIBNCURSES_VERSION}")
-    else()
-        message (FATAL_ERROR "libncurses required but not found")
-    endif ()
-endif ()
+find_package (Curses REQUIRED)
+if (CURSES_FOUND)
+    message(STATUS "Found libncurses")
+else (CURSES_FOUND)
+    message(FATAL_ERROR "libncurses required but not found")
+endif (CURSES_FOUND)
 
 find_path(Readline_ROOT_DIR
     NAMES include/readline/readline.h
@@ -224,15 +219,14 @@ find_library(Readline_LIBRARY
 )
 
 find_package(PkgConfig REQUIRED)
-pkg_search_module(NCURSES REQUIRED ncurses)
-if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
   set(READLINE_FOUND TRUE)
-else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
   FIND_LIBRARY(Readline_LIBRARY NAMES readline)
   include(FindPackageHandleStandardArgs)
   FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG Readline_INCLUDE_DIR Readline_LIBRARY )
   MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
-endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
+endif(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
 
 mark_as_advanced(
     Readline_ROOT_DIR
@@ -479,7 +473,7 @@ set(ExternLibraries
     ${LIBSNDFILE_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${LIBCAIRO_LIBRARIES}
-    ${NCURSES_LIBRARIES}
+    ${CURSES_LIBRARIES}
     ${Readline_LIBRARY}
     z
     dl
