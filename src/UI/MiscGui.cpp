@@ -85,7 +85,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    //unsigned char insert = getData->data.insert;
+    unsigned char insert = getData->data.insert;
     //unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
@@ -111,7 +111,12 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     if (engine == 2) // padsynth
     {
         if(synth->getGuiMaster()->partui->padnoteui)
-            synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
+        {
+            if (insert == 255)
+                synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
+            else if(synth->getGuiMaster()->partui->padnoteui->oscui)
+                synth->getGuiMaster()->partui->padnoteui->oscui->returns_update(getData);
+        }
         return;
     }
     if (engine == 1) // subsynth
@@ -125,7 +130,12 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         if (synth->getGuiMaster()->partui->adnoteui)
         {
             if (synth->getGuiMaster()->partui->adnoteui->advoice)
-                synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
+            {
+                if (insert == 255)
+                    synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
+                else if (synth->getGuiMaster()->partui->adnoteui->advoice->oscedit)
+                    synth->getGuiMaster()->partui->adnoteui->advoice->oscedit->returns_update(getData);
+            }
         }
         return;
     }

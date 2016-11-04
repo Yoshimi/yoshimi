@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified October 2016
+This file is derivative of ZynAddSubFX original code, modified November 2016
 } {in_source in_header
 } 
 
@@ -1145,6 +1145,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char voice = getData->data.engine & 0x1f;
     int tmp;
 
+    if (voice != nvoice)
+        return;
     switch(control)
     {
     	case 0:
@@ -1496,7 +1498,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {ADnoteParameters *pars;} {private local
   }
-  decl {OscilEditor *oscedit;} {private local
+  decl {OscilEditor *oscedit;} {public local
   }
   decl {Oscilloscope *osc;} {private local
   }

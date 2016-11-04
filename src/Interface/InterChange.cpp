@@ -1269,18 +1269,20 @@ void InterChange::resolvePad(CommandBlock *getData)
 void InterChange::resolveOscillator(CommandBlock *getData)
 {
     int value = (int) getData->data.value; // no floats here!
+    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+    bool write = (type & 0x40) > 0;
 
     string isPad = "";
     string eng_name;
     if (engine == 2)
     {
         eng_name = "  Padsysnth";
-        if (control != 104)
+        if (write && control != 104)
             isPad = " - Need to Apply";
     }
     else
@@ -4061,12 +4063,16 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
                 {
                     for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
                     {
-                        oscil->Phmag[i]=64;
-                        oscil->Phphase[i]=64;
+                        oscil->Phmag[i] = 64;
+                        oscil->Phphase[i] = 64;
                     }
-                    oscil->Phmag[0]=127;
-                    oscil->Pharmonicshift=0;
+                    oscil->Phmag[0] = 127;
+                    oscil->Pharmonicshift = 0;
+                    oscil->Pwaveshapingfunction = 0;
+                    oscil->Pfiltertype = 0;
+                    oscil->Psatype = 0;
                 }
+                oscil->prepare();
             }
             break;
 
@@ -4091,9 +4097,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case 37:
             if (write)
-                oscil->Pfilterpar1 = value;
+                oscil->Pfilterpar2 = value;
             else
-                value = oscil->Pfilterpar1;
+                value = oscil->Pfilterpar2;
             break;
         case 38:
             if (write)

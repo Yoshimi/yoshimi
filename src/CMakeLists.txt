@@ -196,12 +196,12 @@ mark_as_advanced (FLTK_FLUID_EXECUTABLE)
 mark_as_advanced (FLTK_MATH_LIBRARY)
 
 
-# libncurses
+# libncurses / libcursesw
 find_package (Curses REQUIRED)
 if (CURSES_FOUND)
-    message(STATUS "Found libncurses")
+    message(STATUS "Found libncurses or libncursesw")
 else (CURSES_FOUND)
-    message(FATAL_ERROR "libncurses required but not found")
+    message(FATAL_ERROR "libncurses or libncursesw required but not found")
 endif (CURSES_FOUND)
 
 find_path(Readline_ROOT_DIR

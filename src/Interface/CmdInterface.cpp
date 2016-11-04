@@ -2246,7 +2246,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                 else
                     prompt += "Y";
             }
-            prompt += " > ";
+            prompt += "> ";
             sprintf(welcomeBuffer,"%s",prompt.c_str());
         }
         else

@@ -309,7 +309,7 @@ Y : 0/1 : 66 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Apply harm
 Y : 0-100 : 67 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics parameter
 Y : 0 to 255 : 68 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics base frequency
 Y : 0 to 200 : 69 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics power
-Y : 0 to 8 : 70 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics type – Off, On, 2xSub, 2xAdd, 3xSub,3xAdd, 4xSub, 4xAdd
+Y : 0 to 8 : 70 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics type – Off, On, Square, 2xSub, 2xAdd, 3xSub,3xAdd, 4xSub, 4xAdd
 
 Y : any : 96 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Clear harmonics
 Y : any : 97 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Convert to sine

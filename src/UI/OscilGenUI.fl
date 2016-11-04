@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2016
+This file is a derivative of the ZynAddSubFX original, modified November 2016
 } {in_source in_header
 } 
 
@@ -442,8 +442,15 @@ harmonic->show();} {}
     code {mag->value(127-oscil->Phmag[n]);
 phase->value(oscil->Phphase[n]);
 
-if (oscil->Phmag[n]==64) mag->selection_color(0);
-    else mag->selection_color(222);} {}
+if (oscil->Phmag[n]==64)
+    mag->selection_color(0);
+else
+    mag->selection_color(222);
+
+if (oscil->Phphase[n]==64)
+    phase->selection_color(0);
+else
+    phase->selection_color(222);} {}
   }
   Function {~Oscilharmonic()} {} {
     code {harmonic->hide();
@@ -472,7 +479,7 @@ class OscilEditor {selected : {public PresetsUI_}
   Function {make_window()} {} {
     Fl_Window osceditUI {
       label {ADsynth Oscillator Editor}
-      xywh {538 209 735 595} type Double hide
+      xywh {15 221 735 595} type Double hide
       code0 {string tname;}
       code1 {if (engine == 2) tname = "PadSynth Harmonic Content"; else {tname = "AddSynth Voice " + to_string((engine & 0x3f) + 1);}}
       code2 {if (engine & 0x40) tname += " Modulation Oscillator"; else tname += " Oscillator";}
@@ -668,7 +675,7 @@ if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodula
         Fl_Value_Output bfparval {
           xywh {490 285 28 15} labelsize 12 align 20 minimum -63 maximum 63 step 1
         }
-        Fl_Group basefuncmodulation {
+        Fl_Group basefuncmodulation {open
           xywh {550 276 169 25} box ENGRAVED_BOX
           code0 {if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127)) basefuncmodulation->deactivate();}
         } {
@@ -807,7 +814,7 @@ if ((Fl::event_button() == 3))
 }}
         xywh {668 565 62 25} box THIN_UP_BOX
       }
-      Fl_Button {} {
+      Fl_Button clearHarm {
         label Clear
         callback {if (!fl_choice("Clear the harmonics settings?","No","Yes",NULL)) return;
 
@@ -1251,6 +1258,237 @@ send_data (97, o->value(), 0xc0);}
   Function {send_data(int control, float value, int type)} {} {
     code {//
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 5);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.part;
+    unsigned char eng = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    
+    if (eng != engine)
+        return;
+
+    int tmp;
+
+    bool set = true;
+    if (insert == 6)
+    {
+        h[control]->mag->value(127 - value);
+        if (value == 64)
+            h[control]->mag->selection_color(0);
+        else
+            h[control]->mag->selection_color(222);
+    }
+    
+    else if (insert == 7)
+    {
+    	h[control]->phase->value(127 - value);
+    	if (value == 64)
+    	    h[control]->phase->selection_color(0);
+        else
+            h[control]->phase->selection_color(222);
+    }
+    
+    else
+    {
+        switch (control)
+        {
+            case 0:
+                rndslider->value(value);
+                break;
+
+            case 1:
+                magtype->value(value);;
+                break;
+
+            case 2:
+                hrnddial->value(value);
+                break;
+
+            case 3:
+                hrndtype->value(value);
+                break;
+
+            case 16:
+                bfslider->value(value);
+                bfparval->value(value);
+                basefuncdisplaygroup->redraw();
+                break;
+
+            case 17:
+                bftype->value(value);
+                if ((oscil->Pcurrentbasefunc==0)||(oscil->Pcurrentbasefunc==127))
+                    basefuncmodulation->deactivate();
+                else
+                    basefuncmodulation->activate();
+                basefuncdisplaygroup->redraw();
+                break;
+
+            case 18:
+                bfmodpar1->value(value);
+                break;
+
+            case 19:
+                bfmodpar2->value(value);
+                break;
+
+            case 20:
+                bfmodpar3->value(value);
+                break;
+
+            case 21:
+                bfmodtype->value(value);
+                break;
+
+            case 33:
+                tmp = (value != 0);
+                autoclearbutton->value(tmp);
+                if (tmp)
+                {
+                    for (int i = 0; i<MAX_AD_HARMONICS; ++i)
+                    {
+                        h[i]->mag->value(64);;
+                        h[i]->phase->value(64);
+                    }
+                    h[0]->mag->value(127);
+                    harmonicshiftcounter->value(0);
+                    h[0]->mag->value(0);
+                    wshbutton->value(0);
+                    fltbutton->value(0);
+                    sabutton->value(0);
+                                    }
+                for (int i = 0; i<MAX_AD_HARMONICS; ++i)
+                {
+                    if (h[i]->mag->value() == 64)
+                        h[i]->mag->selection_color(0);
+                    else
+                        h[i]->mag->selection_color(222);
+                    
+                    if (h[i]->phase->value() == 64)
+                        h[i]->phase->selection_color(0);
+                    else
+                        h[i]->phase->selection_color(222);
+                }
+                basefuncdisplaygroup->redraw();
+                break;
+
+            case 34:
+                wshpar->value(value);
+                wsparval->value(value);
+                break;
+
+            case 35:
+                wshbutton->value(value);
+                break;
+
+            case 36:
+                filtervalue1->value(value);
+                break;
+
+            case 37:
+                filtervalue2->value(value);
+                break;
+
+            case 38:
+                filterpref->value(value != 0);
+                break;
+
+            case 39:
+                fltbutton->value((int)value);
+                break;
+
+            case 40:
+                modpar1->value(value);
+                break;
+
+            case 41:
+                modpar2->value(value);
+                break;
+
+            case 42:
+                modpar3->value(value);
+                break;
+
+            case 43:
+                modtype->value((int)value);
+                break;
+
+            case 44:
+                sadjpar->value(value);
+                break;
+
+            case 45:
+                sabutton->value((int)value);
+                break;
+
+            case 64:
+                harmonicshiftcounter->value((int)value);
+                break;
+
+            case 65:
+                harmonicshiftcounter->value(0);
+                break;
+
+            case 66:
+                harmonicshiftpre->value(value != 0);
+                break;
+
+            case 67:
+                adhrpar->value(value);
+                break;
+
+            case 68:
+                adhrbf->value(value);
+                break;
+
+            case 69:
+                adhrpow->value(value);
+                break;
+
+            case 70:
+                adhrtype->value((int)value);
+                break;
+
+            case 96:
+                
+                
+                
+                for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+                {
+                    h[i]->mag->value(64);
+                    h[i]->mag->selection_color(0);
+                    h[i]->phase->value(64);
+                    h[i]->phase->selection_color(0);
+                }
+                h[0]->mag->value(0);
+                h[0]->mag->selection_color(222);
+                break;
+
+            case 97:
+                basefuncdisplaygroup->redraw();
+                for (int i = 0; i < MAX_AD_HARMONICS; ++i)
+                    h[i]->refresh();
+                break;
+
+            default:
+                set = false;
+        }
+    }
+    
+    if (set)
+    {
+        oscildisplaygroup->redraw();
+        oldosc->redraw();
+        if (eng == 2)
+        {
+            applybutton->color(FL_RED);
+            applybutton->redraw();
+        }
+        Fl::check();
+    }} {}
   }
   Function {OscilEditor(OscilGen *oscil_, Fl_Widget *oldosc_, Fl_Widget *cbwidget_, Fl_Widget *cbapplywidget_, SynthEngine *_synth, int npart_, int kititem_, int engine_)} {} {
     code {synth = _synth;
