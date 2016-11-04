@@ -1282,7 +1282,7 @@ void InterChange::resolveOscillator(CommandBlock *getData)
     if (engine == 2)
     {
         eng_name = "  Padsysnth";
-        if (write && control != 104)
+        if (write)
             isPad = " - Need to Apply";
     }
     else
@@ -1430,10 +1430,6 @@ void InterChange::resolveOscillator(CommandBlock *getData)
         case 97:
             contstr = " Conv To Sine";
             break;
-
-        case 104:
-            contstr = " Apply Changes";
-            break;
     }
 
     synth->getRuntime().Log("Part " + to_string(npart) + "  Kit " + to_string(kititem) + eng_name + name + contstr + "  value " + to_string(value) + isPad);
@@ -1454,7 +1450,11 @@ void InterChange::resolveResonance(CommandBlock *getData)
     string name;
     string isPad = "";
     if (engine == 2)
+    {
         name = "  PadSynth";
+        if (write)
+            isPad = " - Need to Apply";
+    }
     else
         name = "  AddSynth";
 
@@ -1501,10 +1501,6 @@ void InterChange::resolveResonance(CommandBlock *getData)
             break;
         case 97:
             contstr = "Smooth";
-            break;
-
-        case 104:
-            contstr = "Apply Changes";
             break;
     }
 
@@ -3957,9 +3953,9 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     int value = (int) getData->data.value; // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
+//    unsigned char npart = getData->data.part;
+//    unsigned char kititem = getData->data.kit;
+//    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
@@ -4210,11 +4206,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             if (write)
                 oscil->convert2sine(0);
             break;
-
-        case 104:
-            if (write && engine == 2)
-                synth->getRuntime().padApply = npart | (kititem << 8);
-            break;
     }
     if (!write)
         getData->data.value = value;
@@ -4226,9 +4217,9 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     int value = (int) getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
+//    unsigned char npart = getData->data.part;
+//    unsigned char kititem = getData->data.kit;
+//    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
@@ -4296,11 +4287,6 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         case 97:
             if (write)
                 respar->smooth();
-            break;
-
-        case 104:
-            if (write && engine == 2)
-                synth->getRuntime().padApply = npart | (kititem << 8);
             break;
     }
     if (!write)

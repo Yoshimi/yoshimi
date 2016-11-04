@@ -112,38 +112,78 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         if(synth->getGuiMaster()->partui->padnoteui)
         {
-            if (insert == 255)
-                synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
-            else if(synth->getGuiMaster()->partui->padnoteui->oscui)
-                synth->getGuiMaster()->partui->padnoteui->oscui->returns_update(getData);
+            switch (insert)
+            {
+                case 0xff:
+                    synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
+                    break;
+                case 5:
+                case 6:
+                case 7:
+                    if(synth->getGuiMaster()->partui->padnoteui->oscui)
+                        synth->getGuiMaster()->partui->padnoteui->oscui->returns_update(getData);
+                    break;
+                case 8:
+                case 9:
+                    if(synth->getGuiMaster()->partui->padnoteui->resui)
+                        synth->getGuiMaster()->partui->padnoteui->resui->returns_update(getData);
+                    break;
+            }
         }
         return;
     }
+
     if (engine == 1) // subsynth
     {
         if (synth->getGuiMaster()->partui->subnoteui)
-            synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
+            switch (insert)
+            {
+                case 0xff:
+                case 6:
+                case 7:
+                    synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
+                    break;
+            }
         return;
     }
+
     if (engine >= 0x80) // addsynth voice / modulator
     {
         if (synth->getGuiMaster()->partui->adnoteui)
         {
             if (synth->getGuiMaster()->partui->adnoteui->advoice)
             {
-                if (insert == 255)
-                    synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
-                else if (synth->getGuiMaster()->partui->adnoteui->advoice->oscedit)
-                    synth->getGuiMaster()->partui->adnoteui->advoice->oscedit->returns_update(getData);
+                switch (insert)
+                {
+                    case 0xff:
+                        synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
+                        break;
+                    case 5:
+                    case 6:
+                    case 7:
+                        if (synth->getGuiMaster()->partui->adnoteui->advoice->oscedit)
+                            synth->getGuiMaster()->partui->adnoteui->advoice->oscedit->returns_update(getData);
+                        break;
+                }
             }
         }
         return;
     }
+
     if (engine == 0) // addsynth base
     {
         if (synth->getGuiMaster()->partui->adnoteui)
-            synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
+            switch (insert)
+            {
+                case 0xff:
+                    synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
+                    break;
+                case 8:
+                case 9:
+                    if (synth->getGuiMaster()->partui->adnoteui->resui)
+                        synth->getGuiMaster()->partui->adnoteui->resui->returns_update(getData);
+                    break;
+            }
         return;
     }
-
 }

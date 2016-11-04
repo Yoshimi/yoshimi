@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2016
+This file is a derivative of the ZynAddSubFX original, modified November 2016
 } {in_source in_header
 } 
 
@@ -479,7 +479,83 @@ send_data(21, o->value(), 0xc0);}
   }
   Function {send_data(int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 8);} {}
+int insert;
+if (control == 104)
+    insert = 0xff;
+else
+    insert = 8;
+collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.part;
+    unsigned char eng = getData->data.engine;
+    unsigned char insert = getData->data.engine;
+
+    if (eng != engine)
+        return;
+
+    bool set = true;
+    if (insert == 9)
+        ;
+        
+    else
+    {
+        switch(control)
+        {
+            case 0:
+    	        maxdb->value(value);
+    	        maxdbvo->value(value);
+    	        break;
+
+    	    case 1:
+    	        centerfreq->value(value);
+    	        centerfreqvo->value(value/1000.0);
+                break;
+
+    	    case 2:
+    	        octavesfreq->value(value);
+    	        octavesfreqvo->value(0.25 + 10.0 * value / 127.0); // was getoctavesfreq
+    	        break;
+
+            case 8:
+                enabled->value(value != 0);
+                break;
+
+            case 10:
+                resonancewindow->redraw();
+                break;
+
+            case 20:
+                resonancewindow->redraw();
+                break;
+
+            case 21:
+                p1st->value(value != 0);
+                break;
+
+            case 96:
+                resonancewindow->redraw();
+                break;
+
+            case 97:
+                resonancewindow->redraw();
+                break;
+            
+            default:
+                set = false;
+        }
+    }
+    
+    if (set)
+    {
+        if (eng == 2)
+            redrawPADnoteApply();
+        Fl::check();
+    }} {}
   }
   Function {ResonanceUI(Resonance *respar_, int npart_, int kititem_, int engine_)} {} {
     code {//

@@ -1,9 +1,11 @@
 yoshimi 1.4.1 M
 
 2016-11-4 Will
-* direct -> gui oscllator done.
+* Direct -> gui oscllator done.
 * Bugfixes: some oscillator direct access errors :(
-* updated docs.
+* Updated docs.
+* Direct -> gui resonance mostly done (not points).
+* Minor direct access optimisations.
 
 2016-11-1 Will
 * Cmake fix: nucurses now compulsory, but ncursesw optional.
