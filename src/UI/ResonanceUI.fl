@@ -493,15 +493,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
     unsigned char eng = getData->data.engine;
-    unsigned char insert = getData->data.engine;
+    unsigned char insert = getData->data.insert;
 
     if (eng != engine)
         return;
 
     bool set = true;
     if (insert == 9)
-        ;
-        
+    {
+        rg->draw();
+        rg->redraw();
+        }
     else
     {
         switch(control)

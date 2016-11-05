@@ -56,13 +56,13 @@ decl {\#include "MasterUI.h"} {private global
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open
   } {
     Fl_Window syseffsend {
-      private xywh {916 904 150 50} type Double hide
+      xywh {916 904 150 50} type Double hide
       class Fl_Group
     } {
-      Fl_Dial {} {
+      Fl_Dial sysend {
         label 01
         callback {synth->setPsysefxvol(npart,neff, o->value());
 send_data(neff, o->value(), 0xc0);}
@@ -112,14 +112,13 @@ class PartUI_ {} {
 
 class PartKitItem {: {public Fl_Group}
 } {
-  Function {make_window()} {private
-  } {
+  Function {make_window()} {} {
     Fl_Window partkititem {
-      private xywh {726 127 670 30} type Double hide
+      xywh {726 127 670 30} type Double hide
       class Fl_Group
     } {
       Fl_Group partkititemgroup {
-        private xywh {55 0 605 20} box FLAT_BOX
+        xywh {55 0 605 20} box FLAT_BOX
         code0 {if (part->kit[n].Penabled==0) o->deactivate();}
       } {
         Fl_Counter minkcounter {
@@ -197,7 +196,7 @@ if ((Fl::event_button() == 3))
         Fl_Check_Button mutedcheck {
           callback {part->kit[n].Pmuted=(int)o->value();
 send_data(9, o->value(), 0xc0, n, 0xff)}
-          private xywh {60 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {60 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Pmuted);}
         }
         Fl_Button labelbutton {
@@ -221,7 +220,7 @@ send_data(9, o->value(), 0xc0, n, 0xff)}
         adeditbutton->deactivate();
     synth->getGuiMaster()->partui->copylabeltopanel();
     send_data(8, o->value(), 0xc0, n, 0)}
-          private xywh {400 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {400 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
         Fl_Check_Button subcheck {
@@ -233,7 +232,7 @@ send_data(9, o->value(), 0xc0, n, 0xff)}
         subeditbutton->deactivate();
     synth->getGuiMaster()->partui->copylabeltopanel();
     send_data(8, o->value(), 0xc0, n, 1)}
-          private xywh {470 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {470 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
         Fl_Choice sendtoeffect {
@@ -264,7 +263,7 @@ if ((Fl::event_button() == 3))
         padeditbutton->deactivate();
     synth->getGuiMaster()->partui->copylabeltopanel();
     send_data(8, o->value(), 0xc0, n, 2)}
-          private xywh {540 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {540 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
       }
@@ -281,17 +280,7 @@ if ((Fl::event_button() == 3))
                 synth->actionLock(unlock);
 
                 if (o->value() == 0)
-                {
-                    partkititemgroup->deactivate();
-                    mutedcheck->value(0);
-                    labelbutton->copy_label("");
-                    minkcounter->value(0);
-                    maxkcounter->value(127);
-                    adcheck->value(0);
-                    subcheck->value(0);
-                    padcheck->value(0);
-                    sendtoeffect->value(1);
-                }
+                    clearLine();
                 else
                     partkititemgroup->activate();
                 o->redraw();
@@ -300,7 +289,7 @@ if ((Fl::event_button() == 3))
             else
                 o->value(1);
             send_data(8, o->value(), 0xc0, n, 0xff)}
-        private xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
+        xywh {30 0 20 15} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {snprintf(label,10,"%d",n+1);o->label(label);}
         code1 {o->value(part->kit[n].Penabled);}
         code2 {if (n==0) o->hide();}
@@ -314,6 +303,21 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {PartKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;part=NULL;} {}
+  }
+  Function {clearLine()} {} {
+    code {//
+    partkititemgroup->deactivate();
+    mutedcheck->value(0);
+    labelbutton->copy_label("");
+    minkcounter->value(0);
+    maxkcounter->value(127);
+    adcheck->value(0);
+    adeditbutton->deactivate();
+    subcheck->value(0);
+    subeditbutton->deactivate();
+    padcheck->value(0);
+    padeditbutton->deactivate();
+    sendtoeffect->value(1);} {}
   }
   Function {refresh()} {} {
     code {//
@@ -1359,9 +1363,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     int tmp;
     bool sameEff = (engine == (inseffnocounter->value() - 1));
+    bool kitType = (kititem >= 0x20 && kititem < 0x40);
+    kititem &= 0x1f;
     switch(control)
     {
     	case 0:
@@ -1406,72 +1413,131 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 8:
-    	    if (engine == 0)
+    	{
+    	    tmp = (value != 0);
+    	    if (kitType)
     	    {
-    	    	adsynenabledcheck->value(value != 0);
-    	    	if (adsynenabledcheck->value())
-    	    	{
-    	    	    adeditbutton->activate();
-    	    	    addbox->color(ADD_COLOUR);
-    	    	}
-    	    	else
-    	    	{
-    	    	    adeditbutton->deactivate();
-    	    	    addbox->color(BASE_COLOUR);
-    	    	}
-    	    }
-    	    else if (engine == 1)
-    	    {
-    	        subsynenabledcheck->value(value != 0);
-    	        if (subsynenabledcheck->value())
-    	    	{
-    	    	    subeditbutton->activate();
-    	    	    subbox->color(SUB_COLOUR);
-    	    	}
-    	    	else
-    	    	{
-    	    	    subeditbutton->deactivate();
-    	    	    subbox->color(BASE_COLOUR);
-    	    	}
-    	    }
-    	    else if (engine == 2)
-    	    {
-    	        padsynenabledcheck->value(value != 0);
-    	        if (padsynenabledcheck->value())
-    	    	{
-    	    	    padeditbutton->activate();
-    	    	    padbox->color(PAD_COLOUR);
-    	    	}
-    	    	else
-    	    	{
-    	    	    padeditbutton->deactivate();
-    	    	    padbox->color(BASE_COLOUR);
-    	    	}
+    	        switch(engine)
+    	        {
+    	            case 0:
+    	        	partkititem[kititem]->adcheck->value(tmp);
+    	        	if (tmp)
+    	        	    partkititem[kititem]->adeditbutton->activate();
+    	        	else
+    	        	    partkititem[kititem]->adeditbutton->deactivate();
+    	        	break;
+    	            case 1:
+    	                partkititem[kititem]->subcheck->value(tmp);
+    	                if (tmp)
+    	        	    partkititem[kititem]->subeditbutton->activate();
+    	        	else
+    	        	    partkititem[kititem]->subeditbutton->deactivate();
+    	                break;
+    	            case 2:
+    	                partkititem[kititem]->padcheck->value(tmp);
+    	                if (tmp)
+    	        	    partkititem[kititem]->padeditbutton->activate();
+    	        	else
+    	        	    partkititem[kititem]->padeditbutton->deactivate();
+    	                break;
+    	            default:
+    	                partkititem[kititem]->enabledcheck->value(tmp);
+    	                if (tmp)
+    	                    partkititem[kititem]->partkititemgroup->activate();
+                        else
+    	                    partkititem[kititem]->clearLine();
+    	                break;
+    	        }
     	    }
     	    else
     	    {
-    	        partGroupEnable->value((int) value);
-    	        if (!partGroupEnable->value())
-                    partgroupui->deactivate();
-                else
-                    partgroupui->activate();
-                synth->getGuiMaster()->updatepanel();
+    	        switch(engine)
+    	        {
+    	            case 0:
+    	                adsynenabledcheck->value(tmp);
+    	        	if (tmp)
+    	        	{
+    	        	    adeditbutton->activate();
+    	        	    addbox->color(ADD_COLOUR);
+    	        	}
+    	        	else
+    	        	{
+    	        	    adeditbutton->deactivate();
+    	        	    addbox->color(BASE_COLOUR);
+    	        	}
+    	        	break;
+    	            case 1:
+    	                subsynenabledcheck->value(tmp);
+    	                if (tmp)
+    	        	{
+    	        	    subeditbutton->activate();
+    	        	    subbox->color(SUB_COLOUR);
+    	        	}
+    	        	else
+    	        	{
+    	        	    subeditbutton->deactivate();
+    	        	    subbox->color(BASE_COLOUR);
+    	        	}
+    	                break;
+    	           case 2:
+    	                padsynenabledcheck->value(tmp);
+    	                if (tmp)
+    	        	{
+    	        	    padeditbutton->activate();
+    	        	    padbox->color(PAD_COLOUR);
+    	        	}
+    	        	else
+    	        	{
+    	        	    padeditbutton->deactivate();
+    	        	    padbox->color(BASE_COLOUR);
+    	        	}
+    	        	break;
+    	            default:
+    	                partGroupEnable->value(tmp);
+    	                if (tmp)
+                            partgroupui->activate();
+                        else
+                            partgroupui->deactivate();
+                        synth->getGuiMaster()->updatepanel();
+                        break;
+                }
             }
     	    break;
-
+        }
+        case 9:
+            partkititem[kititem]->mutedcheck->value(value != 0);
+            break;
         case 16:
-        case 18:
-            minkcounter->value((int) value);
+        case 18: // this will have been modifed for last key press
+            if (kitType)
+               partkititem[kititem]->minkcounter->value((int) value);
+            else
+                minkcounter->value((int) value);
             break;
 
         case 17:
-        case 19:
-            maxkcounter->value((int) value);
+        case 19: // this will have been modifed for last key press
+            if (kitType)
+                partkititem[kititem]->maxkcounter->value((int) value);
+            else
+                maxkcounter->value((int) value);
             break;
 
         case 20:
-            minkcounter->value(0);
-            maxkcounter->value(127);
+            if (kitType)
+            {
+                partkititem[kititem]->minkcounter->value(0);
+                partkititem[kititem]->maxkcounter->value(127);
+            }
+            else
+            {
+                minkcounter->value(0);
+                maxkcounter->value(127);
+            }
+            break;
+
+        case 24:
+            partkititem[kititem]->sendtoeffect->value((int)value);
             break;
 
         case 33:
@@ -1486,7 +1552,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         case 41:
         case 42:
         case 43:
-            // can't work this one out :(
+            psyef[control - 40]->sysend->value(value);
             break;
 
         case 57:
