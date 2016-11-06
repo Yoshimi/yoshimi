@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, last modified October 2016
+    This file is derivative of original ZynAddSubFX code, last modified November 2016
 */
 
 #include<stdio.h>
@@ -1894,14 +1894,21 @@ void SynthEngine::partonoffWrite(int npart, int what)
     if (npart >= Runtime.NumAvailableParts)
         return;
 
-    if (what)
+    unsigned char tmp = part[npart]->Penabled;
+    if (what == 3)
+        what = (tmp!= 0); // recover inhibited state
+
+    if (what == 1) // always enable
     {
         VUpeak.values.parts[npart] = 1e-9f;
         part[npart]->Penabled = 1;
     }
-    else
-    {   // disabled part
-        part[npart]->Penabled = 0;
+    else if ((what & 1) == 0)
+    {
+        if (what == 0) // always disable
+            part[npart]->Penabled = 0;
+        else if (tmp & 1)
+            part[npart]->Penabled = 2; // just inhibit
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
@@ -1913,7 +1920,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
 
 bool SynthEngine::partonoffRead(int npart)
 {
-    return (part[npart]->Penabled != 0);
+    return (part[npart]->Penabled == 1);
 }
 
 

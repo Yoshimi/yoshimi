@@ -86,7 +86,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    //unsigned char insertParam = getData->data.parameter;
+    unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
     if (npart >= 0xc0 && npart < 0xd0) // vector
@@ -116,6 +116,23 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             {
                 case 0xff:
                     synth->getGuiMaster()->partui->padnoteui->returns_update(getData);
+                    break;
+                case 0:
+                    switch(insertParam)
+                    {
+                        case 0:
+                            if (synth->getGuiMaster()->partui->padnoteui->amplfo)
+                                synth->getGuiMaster()->partui->padnoteui->amplfo->returns_update(getData);
+                            break;
+                        case 1:
+                            if (synth->getGuiMaster()->partui->padnoteui->freqlfo)
+                                synth->getGuiMaster()->partui->padnoteui->freqlfo->returns_update(getData);
+                            break;
+                        case 2:
+                            if (synth->getGuiMaster()->partui->padnoteui->filterlfo)
+                                synth->getGuiMaster()->partui->padnoteui->filterlfo->returns_update(getData);
+                            break;
+                    }
                     break;
                 case 5:
                 case 6:
@@ -158,6 +175,23 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case 0xff:
                         synth->getGuiMaster()->partui->adnoteui->advoice->returns_update(getData);
                         break;
+                    case 0:
+                        switch(insertParam)
+                        {
+                            case 0:
+                                if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup)
+                                synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup->returns_update(getData);
+                                break;
+                            case 1:
+                                if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup)
+                                synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->returns_update(getData);
+                                break;
+                            case 2:
+                                if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup)
+                                synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup->returns_update(getData);
+                                break;
+                        }
+                        break;
                     case 5:
                     case 6:
                     case 7:
@@ -177,6 +211,23 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             {
                 case 0xff:
                     synth->getGuiMaster()->partui->adnoteui->returns_update(getData);
+                    break;
+                case 0:
+                    switch(insertParam)
+                    {
+                        case 0:
+                            if (synth->getGuiMaster()->partui->adnoteui->amplfo)
+                                synth->getGuiMaster()->partui->adnoteui->amplfo->returns_update(getData);
+                            break;
+                        case 1:
+                            if (synth->getGuiMaster()->partui->adnoteui->freqlfo)
+                                synth->getGuiMaster()->partui->adnoteui->freqlfo->returns_update(getData);
+                            break;
+                        case 2:
+                            if (synth->getGuiMaster()->partui->adnoteui->filterlfo)
+                                synth->getGuiMaster()->partui->adnoteui->filterlfo->returns_update(getData);
+                            break;
+                    }
                     break;
                 case 8:
                 case 9:

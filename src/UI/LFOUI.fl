@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2016
+This file is a derivative of the ZynAddSubFX original, modified November 2016
 } {in_source in_header
 } 
 
@@ -209,6 +209,57 @@ LFOtype->value(pars->PLFOtype);} {}
   Function {send_data(int group, int control, float value, int type)} {} {
     code {//
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 0, group);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char part = getData->data.part;
+    unsigned char eng = getData->data.engine;;
+    
+    if (part != npart || (eng >= 128 && eng != engine))
+        return;
+
+    switch(control)
+    {
+    	case 0:
+    	    freq->value(value);
+    	    break;
+
+    	case 1:
+    	    intensity->value(value);
+    	    break;
+
+    	case 2:
+    	    delay->value(value);
+    	    break;
+
+    	case 3:
+    	    startphase->value(value);
+    	    break;
+
+    	case 4:
+    	    randomness->value(value);
+    	    break;
+
+    	case 5:
+    	    LFOtype->value((int)value);
+    	    break;
+
+    	case 6:
+    	    continous->value(value != 0);
+    	    break;
+
+    	case 7:
+    	    freqrand->value(value);
+    	    break;
+
+    	case 8:
+    	    stretch->value(value);
+    	    break;
+    }
+    Fl::check();} {}
   }
   Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {pars=lfopars_;

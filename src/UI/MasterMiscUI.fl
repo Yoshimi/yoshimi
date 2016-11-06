@@ -421,7 +421,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
     } {
       Fl_Group panellistitemgroup {
         private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
-        code0 {if (synth->partonoffRead(npart)==0) o->deactivate();}
+        code0 {if (synth->part[npart + *plgroup]->Penabled != 1) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
@@ -547,7 +547,7 @@ send_data(120, o->value(), 0xc0);}
         callback {synth->actionLock(lockmute);
             synth->partonoffWrite(npart + *plgroup, o->value());
             synth->actionLock(unlock);
-            if (o->value() == 0)
+            if (o->value() != 1)
                 panellistitemgroup->deactivate();
             else
             {
@@ -561,7 +561,7 @@ send_data(120, o->value(), 0xc0);}
 
             send_data(8, o->value(), 0xc0);}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
-        code0 {o->value(synth->part[npart + *plgroup]->Penabled);}
+        code0 {o->value(synth->part[npart + *plgroup]->Penabled == 1);}
       }
     }
   }
@@ -588,7 +588,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0x
 
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
 
-    partenabled->value(synth->part [setpart]->Penabled);
+    partenabled->value(synth->part [setpart]->Penabled == 1);
 
     setPartLabel(findengines(setpart));
 
@@ -615,7 +615,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0x
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());
 
-    if (synth->part[setpart]->Penabled != 0)
+    if (synth->part[setpart]->Penabled == 1)
         panellistitemgroup->activate();
     else
         panellistitemgroup->deactivate();} {}

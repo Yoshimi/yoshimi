@@ -1,10 +1,18 @@
 yoshimi 1.4.1 M
 
+2016-11-6 Will
+* Enhanced part onoff control for internal routines.
+    0 = off
+    1 = on
+    2 = inhibit and store last
+    3 = restore last
+* Direct -> gui LFOs done.
+
 2016-11-5 Will
 * Direct -> gui part kits done.
 * Direct -> gui part system sends done.
 * Direct -> gui resonance graph done.
-* corrected errors in docs.
+* Corrected errors in docs.
 
 2016-11-4 Will
 * Direct -> gui oscllator done.

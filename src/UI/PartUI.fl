@@ -119,7 +119,7 @@ class PartKitItem {: {public Fl_Group}
     } {
       Fl_Group partkititemgroup {
         xywh {55 0 605 20} box FLAT_BOX
-        code0 {if (part->kit[n].Penabled==0) o->deactivate();}
+        code0 {if (part->kit[n].Penabled == 0) o->deactivate();}
       } {
         Fl_Counter minkcounter {
           callback {int tmp = o->value();
@@ -321,8 +321,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {refresh()} {} {
     code {//
-        enabledcheck->value(part->kit[n].Penabled);
-        if (!part->kit[n].Penabled)
+        enabledcheck->value(part->kit[n].Penabled == 1);
+        if (part->kit[n].Penabled != 1)
             partkititemgroup->deactivate();
         else
             partkititemgroup->activate();
@@ -397,7 +397,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
     } {
       Fl_Group partgroupui {
         xywh {0 0 377 166}
-        code0 {if (part->Penabled==0) o->deactivate();}
+        code0 {if (part->Penabled != 1) o->deactivate();}
       } {
         Fl_Box instrumentaddbox {
           xywh {136 9 63 16} box FLAT_BOX deactivate
@@ -491,14 +491,14 @@ send_data(4, o->value(), 0xc0);}
         label Enabled
         callback {//
         synth->partonoffLock(npart, o->value());
-        if (!part->Penabled)
+        if (part->Penabled != 1)
             partgroupui->deactivate();
         else
             partgroupui->activate();
         synth->getGuiMaster()->updatepanel();
         send_data(8, o->value(), 0xc0);}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
-        code0 {o->value(part->Penabled);}
+        code0 {o->value(part->Penabled == 1);}
       }
       Fl_Spinner midich {
         label Midi
@@ -1414,7 +1414,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 8:
     	{
-    	    tmp = (value != 0);
+    	    tmp = (value == 1);
     	    if (kitType)
     	    {
     	        switch(engine)
@@ -1493,6 +1493,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	        	}
     	        	break;
     	            default:
+    	                tmp = synth->partonoffRead(npart);
     	                partGroupEnable->value(tmp);
     	                if (tmp)
                             partgroupui->activate();

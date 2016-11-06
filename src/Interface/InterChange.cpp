@@ -2569,7 +2569,7 @@ void InterChange::commandPart(CommandBlock *getData)
                         break;
                     default:
                         if (write)
-                            synth->partonoffLock(npart, (char) value);
+                            synth->partonoffWrite(npart, (char) value);
                         else
                             value = synth->partonoffRead(npart);
                 }
