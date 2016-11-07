@@ -570,8 +570,8 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                 if (Pkitfade)
                 {
                     vel = truevel; // always start with correct value
-                    int range;
-                    int position;
+                    int range = 0;
+                    float position;
                     if ((item & 1) == 0 && kit[item + 1].Penabled) // crossfade lower item of pair
                     {
                         if (kit[item].Pmaxkey > kit[item + 1].Pminkey && kit[item].Pmaxkey < kit[item + 1].Pmaxkey)
@@ -580,7 +580,6 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                             {
                                 range = kit[item].Pmaxkey - kit[item + 1].Pminkey;
                                 position = kit[item].Pmaxkey - note;
-                                vel = truevel * position / range;
                             }
                         }
                         else if (kit[item + 1].Pmaxkey > kit[item].Pminkey && kit[item + 1].Pmaxkey < kit[item].Pmaxkey ) // eliminate equal state
@@ -589,7 +588,6 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                             {
                                 range = kit[item + 1].Pmaxkey - kit[item].Pminkey;
                                 position = (note - kit[item].Pminkey);
-                                vel = truevel * position / range;
                             }
                         }
                     }
@@ -602,7 +600,6 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                             {
                                 range = kit[item - 1].Pmaxkey - kit[item].Pminkey;
                                 position = (note - kit[item].Pminkey);
-                                vel = truevel * position / range;
                             }
                         }
                         else if (kit[item].Pmaxkey > kit[item - 1].Pminkey && kit[item].Pmaxkey < kit[item - 1].Pmaxkey) // eliminate equal state
@@ -611,11 +608,14 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                             {
                                 range = kit[item].Pmaxkey - kit[item - 1].Pminkey;
                                 position = kit[item].Pmaxkey - note;
-                                vel = truevel * position / range;
                             }
                         }
                     }
-                    // cout << item << "  " << vel << endl;
+                    if (range)
+                    {
+                        vel = truevel * (position / range)* (position / range);
+                        //cout << item << "  " << vel << endl;
+                    }
                 }
                 // end of cross fade
 
