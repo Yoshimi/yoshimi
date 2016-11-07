@@ -77,6 +77,8 @@ option (BuildForDebug "Include gdb debugging support" OFF)
 
 option (EnableGuiReports "Enable GUI control reports" OFF)
 
+option (ReportNoteOnTimes "Report Note-On Times" OFF)
+
 #option to build lv2 plugin
 option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
@@ -399,6 +401,10 @@ add_definitions (-DMAX_ALIENWAH_DELAY=100)
 if (EnableGuiReports)
     add_definitions (-DENABLE_REPORTS)
 endif (EnableGuiReports)
+
+if (ReportNoteOnTimes)
+    add_definitions (-DREPORT_NOTEON)
+endif (ReportNoteOnTimes)
 #if (${DefaultAudio} STREQUAL "jack")
 #    message(STATUS "Default audio driver is Jack")
     add_definitions(-DDEFAULT_AUDIO=jack_audio)

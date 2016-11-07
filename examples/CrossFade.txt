@@ -1,5 +1,5 @@
 
-CorssFade.xiz is an instument incorprating the new crossfade feature in kits.
+CrossFade.xiz is an instrument incorporating the new crossfade feature in kits.
 
 As well as appearing to blend three different sounds, the middle and upper ones have independent effcts, and the lower and upper ones are panned slightly left and right.
 

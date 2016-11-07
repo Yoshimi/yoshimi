@@ -5,6 +5,8 @@ yoshimi 1.4.1 M
 * More docs.
 * Added 'CrossFade.xiz' instrument to 'examples' files.
   Included 'CrossFade.txt' description.
+* Added compiler switch for Note-On time reporting.
+  Needs 'Log Load times' checked in settings.
 
 2016-11-6 Will
 * Enhanced part onoff control for internal routines.

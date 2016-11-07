@@ -504,6 +504,10 @@ void SynthEngine::setAllPartMaps(void)
 // Note On Messages (velocity == 0 => NoteOff)
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
 {
+#ifdef REPORT_NOTEON
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+#endif
     if (!velocity)
         this->NoteOff(chan, note);
     else if (!isMuted())
@@ -521,6 +525,19 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
             }
         }
+#ifdef REPORT_NOTEON
+    if (Runtime.showTimes)
+    {
+        gettimeofday(&tv2, NULL);
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+            }
+        int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+        Runtime.Log("Note time " + to_string(actual) + "uS");
+    }
+#endif
 }
 
 
