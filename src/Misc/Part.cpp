@@ -140,7 +140,10 @@ void Part::defaults(void)
 void Part::setNoteMap(int keyshift)
 {
     for (int i = 0; i < 128; ++i)
-        PnoteMap[i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+        if (Pdrummode)
+            PnoteMap[i] = microtonal->getFixedNoteFreq(i);
+        else
+            PnoteMap[i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
 }
 
 
@@ -363,13 +366,8 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
 
         // initialise note frequency
         float notebasefreq;
-        if (!Pdrummode)
-        {
-            if ((notebasefreq = PnoteMap[note]) < 0.0f)
-                return; // the key is not mapped
-        }
-        else
-            notebasefreq = microtonal->getFixedNoteFreq(note);
+        if ((notebasefreq = PnoteMap[note]) < 0.0f)
+            return; // the key is not mapped
 
         // Humanise
         // cout << "\n" << notebasefreq << endl;

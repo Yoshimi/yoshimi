@@ -1091,6 +1091,7 @@ if ((Fl::event_button() == 3))
       Fl_Check_Button drumMode {
         label {Drum mode}
         callback {part->Pdrummode = o->value();
+part->setNoteMap(o->value());
 send_data(57, o->value(), 0xc0);}
         tooltip {Disables microtonal tuning} xywh {285 350 70 15} down_box DOWN_BOX labelsize 10
         code0 {o->value(part->Pdrummode);}

@@ -4,8 +4,9 @@ yoshimi 1.4.1 M
 * Finalised CMake ncurses correction from Giovanni.
 * Add more explanatory detail to earliar changes made to
   Bank/Program change in MusicIO.cpp
-* Re-instated 'in place' for jack frewheeling. Wasn't in use
+* Re-instated 'in place' for jack freewheeling. Wasn't in use
   when program load issue arose :(
+* Small optimisation to drum mode note base frequency.
 
 2016-11-7 Will
 * Improved crossfade dynamics.
