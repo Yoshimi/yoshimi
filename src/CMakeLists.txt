@@ -199,6 +199,7 @@ mark_as_advanced (FLTK_MATH_LIBRARY)
 
 
 # libncurses / libcursesw
+set(CURSES_NEED_NCURSES TRUE)
 find_package (Curses REQUIRED)
 if (CURSES_FOUND)
     message(STATUS "Found libncurses or libncursesw")
@@ -220,7 +221,7 @@ find_library(Readline_LIBRARY
     HINTS ${Readline_ROOT_DIR}/lib
 )
 
-find_package(PkgConfig REQUIRED)
+#find_package(PkgConfig REQUIRED)
 if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)
   set(READLINE_FOUND TRUE)
 else(Readline_INCLUDE_DIR AND Readline_LIBRARY AND CURSES_LIBRARY)

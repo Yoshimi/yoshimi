@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-11-11 Will
+* Finalised CMake ncurses correction from Giovanni.
+* Add more explanatory detail to earliar changes made to
+  Bank/Program change in MusicIO.cpp
+
 2016-11-7 Will
 * Improved crossfade dynamics.
 * More docs.
