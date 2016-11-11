@@ -580,13 +580,9 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
     else
         if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
             return; // still nothing to do!
-
-    /* see note below on program change
-
     if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
     else
-    */
     {
         if (setRootDir)
             synth->writeRBP(1 ,bank_or_root_num,0);
@@ -607,17 +603,16 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         return;
     if (synth->getRuntime().EnableProgChange)
     {
-        /*
-         * The following had to be changed as very large pad instruments can take
-         * many seconds to process. Changing an instrument is not actually part of
-         * the audio process and should always be done well ahead of any notes
-         * being wanted on that part.
-
         if (in_place)
+        {
+            //synth->getRuntime().Log("Freewheeling");
             synth->SetProgram(ch, prg);
+        }
         else
-        */
+        {
+            //synth->getRuntime().Log("Normal");
             synth->writeRBP(3, ch ,prg);
+        }
     }
 }
 
