@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-11-12 Will
+* Bugfix: direct filter gain was changed by wrong control.
+* Started direct -> gui filter control.
+* Updated docs.
+
 2016-11-11 Will
 * Finalised CMake ncurses correction from Giovanni.
 * Add more explanatory detail to earliar changes made to

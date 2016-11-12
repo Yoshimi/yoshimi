@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code, modified November 2016
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -230,9 +230,9 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {626 24 770 580} type Double hide
+      xywh {626 24 770 580} type Double
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
-      class Fl_Group
+      class Fl_Group visible
     } {
       Fl_Group voiceparametersgroup {
         xywh {0 0 765 580} box THIN_UP_BOX color 48
@@ -970,7 +970,7 @@ send_data(4, o->value(), 0xc0);}
           xywh {245 5 285 245} box THIN_UP_FRAME labelfont 1 labelsize 11 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
-          Fl_Group {} {
+          Fl_Group voicefilter {
             label {ADsynth Voice - Filter}
             xywh {250 30 275 75} box FLAT_BOX color 50 align 144
             code0 {o->init(pars->VoicePar[nvoice].VoiceFilter,&pars->VoicePar[nvoice].PFilterVelocityScale, &pars->VoicePar[nvoice].PFilterVelocityScaleFunction, npart, kititem, 128 + nvoice);}
@@ -1508,7 +1508,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {

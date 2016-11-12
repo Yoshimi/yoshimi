@@ -359,7 +359,8 @@ Y : 0 to 127 : 4 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Velocity sense func
 Y : 0 to 127 : 5 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Gain/damping
 Y : 0 to 4 : 6 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Stages – 1x, 2x, 3x, 4x, 5x
 Y : 0 to 2 : 7 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Category – Analog, Formant, StVarF
-Y : 0 to 8 : 8 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Type – LPF1, HPF1, LPF2, HPF2, BPF2, NF2, PkF2, LSh2, HSh2
+Y : 0 to 8 : 8 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Analog Type – LPF1, HPF1, LPF2, HPF2, BPF2, NF2, PkF2, LSh2, HSh2
+Y : 0 to 3 : 9 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Analog Type – LPF, HPF, BPF, NF
 Formant editor
 Y : 0 to 127 : 16 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Slowness
 Y : 0 to 127 : 17 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Clearness

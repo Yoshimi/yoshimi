@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified October 2016
+This file is derivative of ZynAddSubFX original code, modified November 2016
 } {in_source in_header
 } 
 
@@ -675,6 +675,68 @@ else if (control >= 18 && control <= 20)
     par2 = nvowel;
 }
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 1, parameter, par2);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char part = getData->data.part;
+    unsigned char eng = getData->data.engine;
+    //unsigned char insert = getData->data.insert;
+    //unsigned char par = getData->data.parameter;
+    //unsigned char par2 = getData->data.par2;
+
+    
+    if (part != npart || (eng >= 128 && eng != engine))
+        return;
+
+    switch(control)
+    {
+    	case 0:
+    	    cfreqdial->value(value);
+    	    break;
+
+    	case 1:
+    	    qdial->value(value);
+    	    formantfiltergraph->redraw();
+    	    break;
+
+    	case 2:
+    	    freqtrdial->value(value);
+    	    break;
+
+    	case 3:
+    	    vsnsadial->value(value);
+    	    break;
+
+    	case 4:
+    	    vsnsdial->value(value);
+    	    break;
+
+    	case 5:
+    	    gaindial->value(value);
+    	    formantfiltergraph->redraw();
+    	    break;
+
+    	case 6:
+    	    stcounter->value((int)value);
+    	    break;
+
+    	case 7:
+    	    filtertype->value((int)value);
+    	    refresh();
+    	    break;
+
+    	case 8:
+    	    analogfiltertypechoice->value((int)value);
+    	    break;
+
+    	case 9:
+    	    svfiltertypechoice->value((int)value);
+    	    break;
+    }
+    Fl::check();} {}
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//

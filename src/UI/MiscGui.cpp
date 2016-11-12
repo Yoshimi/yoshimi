@@ -134,6 +134,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                             break;
                     }
                     break;
+                case 1:
+                    if (synth->getGuiMaster()->partui->padnoteui->filterui)
+                        synth->getGuiMaster()->partui->padnoteui->filterui->returns_update(getData);
+                    break;
+
                 case 5:
                 case 6:
                 case 7:
@@ -156,6 +161,12 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             switch (insert)
             {
                 case 0xff:
+                case 1:
+                    if (synth->getGuiMaster()->partui->subnoteui->filterui)
+                        synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
+                    break;
+
+
                 case 6:
                 case 7:
                     synth->getGuiMaster()->partui->subnoteui->returns_update(getData);
@@ -192,6 +203,10 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                                 break;
                         }
                         break;
+                    case 1:
+                        if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter)
+                            synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
+                    break;
                     case 5:
                     case 6:
                     case 7:
@@ -229,6 +244,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                             break;
                     }
                     break;
+                case 1:
+                    if (synth->getGuiMaster()->partui->adnoteui->filterui)
+                        synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
+                    break;
+
                 case 8:
                 case 9:
                     if (synth->getGuiMaster()->partui->adnoteui->resui)

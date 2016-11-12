@@ -2724,7 +2724,10 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 57:
             if (write)
+            {
                 part->Pdrummode = (value != 0);
+                synth->setPartMap(npart);
+            }
             else
                 value = part->Pdrummode;
             break;
@@ -4503,6 +4506,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 else
                     val = *velsns;
             }
+            break;
         case 5:
             if (write)
                 pars->Pgain = val;
