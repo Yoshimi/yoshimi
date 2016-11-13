@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-11-13
+* Direct -> gui filter done (not dynfilter).
+* Direct -> gui envelope basics done (not freemode).
+* Updated and corrected docs.
+
 2016-11-12 Will
 * Bugfix: direct filter gain was changed by wrong control.
 * Started direct -> gui filter control.

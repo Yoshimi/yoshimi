@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2016
+This file is a derivative of the ZynAddSubFX original, modified November 2016
 } {in_source in_header
 } 
 
@@ -423,8 +423,8 @@ send_data(group, 35, o->value(), 0xc0);}
   }
   Function {make_ADSR_window()} {} {
     Fl_Window envADSR {
-      xywh {1185 87 205 70} type Double color 50 labelfont 1 hide
-      class Fl_Group
+      xywh {1185 87 205 70} type Double color 50 labelfont 1
+      class Fl_Group visible
     } {
       Fl_Group {} {
         label {Amplitude Env}
@@ -825,6 +825,156 @@ int insert = 2;
 if (par2 != 255)
   insert = 3;
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, par2);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char part = getData->data.part;
+    unsigned char eng = getData->data.engine;
+    //unsigned char insert = getData->data.insert;
+    unsigned char par = getData->data.parameter;
+    
+    if (part != npart || (eng >= 128 && eng != engine))
+        return;
+
+    switch(control)
+    {
+    	case 0:
+    	    switch (par)
+    	    {
+    	        case 1:
+    	            e2aval->value(value);
+    	            break;
+    	        case 2:
+    	            e3aval->value(value);
+    	            break;
+    	        case 3:
+    	            e4aval->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 1:
+    	    switch (par)
+    	    {
+    	        case 0:
+    	            e1adt->value(value);
+    	            break;
+    	        case 1:
+    	            e2adt->value(value);
+    	            break;
+    	        case 2:
+    	            e3adt->value(value);
+    	            break;
+    	        case 3:
+    	            e4adt->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 2:
+    	    if (par == 2)
+    	        e3dval->value(value);
+            break;
+
+    	case 3:
+    	    switch (par)
+    	    {
+    	        case 0:
+    	            e1ddt->value(value);
+    	            break;
+    	        case 2:
+    	            e3ddt->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 4:
+    	    if (par == 0)
+    	        e1sval->value(value);
+    	    break;
+
+    	case 5:
+    	    switch (par)
+    	    {
+    	        case 0:
+    	            e1rdt->value(value);
+    	            break;
+    	        case 1:
+    	            e2rdt->value(value);
+    	            break;
+    	        case 2:
+    	            e3rdt->value(value);
+    	            break;
+    	        case 3:
+    	            e4rdt->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 6:
+    	    switch (par)
+    	    {
+    	        case 1:
+    	            e2rval->value(value);
+    	            break;
+    	        case 2:
+    	            e3rval->value(value);
+    	            break;
+    	        case 3:
+    	            e4rval->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 7:
+    	    switch (par)
+    	    {
+    	        case 0:
+    	            e1envstretch->value(value);
+    	            break;
+    	        case 1:
+    	            e2envstretch->value(value);
+    	            break;
+    	        case 2:
+    	            e3envstretch->value(value);
+    	            break;
+    	        case 3:
+    	            e4envstretch->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 16:
+    	    switch (par)
+    	    {
+    	        case 0:
+    	            e1forcedrelease->value(value != 0);
+    	            break;
+    	        case 1:
+    	            e2forcedrelease->value(value != 0);
+    	            break;
+    	        case 2:
+    	            e3forcedrelease->value(value != 0);
+    	            break;
+    	        case 3:
+    	            e4forcedrelease->value(value != 0);
+    	            break;
+    	    }
+    	    break;
+
+    	case 17:
+    	    if (par == 0)
+    	        e1linearenvelope->value(value != 0);
+    	    break;
+
+    	case 32:
+    	    ;
+    	    break;
+    }
+    Fl::check();} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//

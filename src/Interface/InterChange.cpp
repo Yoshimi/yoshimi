@@ -1686,7 +1686,7 @@ void InterChange::resolveFilter(CommandBlock *getData)
             contstr = "Seq Pos";
             break;
         case 37:
-            contstr = "Seq Vowel";
+            contstr = "Vowel";
             break;
         case 38:
             contstr = "Neg Input";

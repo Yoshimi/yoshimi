@@ -138,6 +138,23 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     if (synth->getGuiMaster()->partui->padnoteui->filterui)
                         synth->getGuiMaster()->partui->padnoteui->filterui->returns_update(getData);
                     break;
+                case 2:
+                    switch(insertParam)
+                    {
+                        case 0:
+                            if (synth->getGuiMaster()->partui->padnoteui->ampenv)
+                                synth->getGuiMaster()->partui->padnoteui->ampenv->returns_update(getData);
+                            break;
+                        case 1:
+                            if (synth->getGuiMaster()->partui->padnoteui->freqenv)
+                                synth->getGuiMaster()->partui->padnoteui->freqenv->returns_update(getData);
+                            break;
+                        case 2:
+                            if (synth->getGuiMaster()->partui->padnoteui->filterenv)
+                                synth->getGuiMaster()->partui->padnoteui->filterenv->returns_update(getData);
+                            break;
+                    }
+                    break;
 
                 case 5:
                 case 6:
@@ -165,7 +182,27 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     if (synth->getGuiMaster()->partui->subnoteui->filterui)
                         synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
                     break;
-
+                case 2:
+                    switch(insertParam)
+                    {
+                        case 0:
+                            if (synth->getGuiMaster()->partui->subnoteui->ampenv)
+                                synth->getGuiMaster()->partui->subnoteui->ampenv->returns_update(getData);
+                            break;
+                        case 1:
+                            if (synth->getGuiMaster()->partui->subnoteui->freqenvelopegroup)
+                                synth->getGuiMaster()->partui->subnoteui->freqenvelopegroup->returns_update(getData);
+                            break;
+                        case 2:
+                            if (synth->getGuiMaster()->partui->subnoteui->filterenv)
+                                synth->getGuiMaster()->partui->subnoteui->filterenv->returns_update(getData);
+                            break;
+                        case 3:
+                            if (synth->getGuiMaster()->partui->subnoteui->bandwidthenvelopegroup)
+                                synth->getGuiMaster()->partui->subnoteui->bandwidthenvelopegroup->returns_update(getData);
+                            break;
+                    }
+                    break;
 
                 case 6:
                 case 7:
@@ -206,7 +243,19 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     case 1:
                         if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter)
                             synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
-                    break;
+                        break;
+                    case 2:
+                        switch(insertParam)
+                        {
+                            case 0:
+                                break;
+                            case 1:
+                                break;
+                            case 2:
+                                break;
+                        }
+                        break;
+
                     case 5:
                     case 6:
                     case 7:
@@ -247,6 +296,17 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                 case 1:
                     if (synth->getGuiMaster()->partui->adnoteui->filterui)
                         synth->getGuiMaster()->partui->adnoteui->filterui->returns_update(getData);
+                    break;
+                case 2:
+                    switch(insertParam)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                    }
                     break;
 
                 case 8:

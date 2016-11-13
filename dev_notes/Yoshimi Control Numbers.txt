@@ -54,7 +54,7 @@ Y : 0 to 127 : 41 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effec
 Y : 0 to 127 : 42 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 2
 Y : 0 to 127 : 43 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Part to system effects 3
 
-Y : 0 to 2 : 64 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+n : 0 to 2 : 64 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
 Y : 0 to 8 : 65 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect type
 Y : 0 to 2 : 66 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
 Y : 0/1 : 67 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Bypass effect
@@ -373,11 +373,11 @@ Y : 0 to 127 : 22 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Centre frequency
 Y : 0 to 127 : 23 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Octave
 
 Y : 1 to 12 : 32 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Number of formants
-Y : 0 to 5 : 33 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Vowel number
-Y : 0 to 11 : 34 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Formant number
+n : 0 to 5 : 33 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Vowel number - does nothing
+n : 0 to 11 : 34 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Formant number - does nothing
 Y : 1 to 7 : 35 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Sequence size
-Y : 0 to 6 : 36 : 0 to 63 : 0 to 15 : All : 1 : size : 255 : Sequence position (sequence size)
-Y : 0 to 5 : 37 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Vowel
+n : 0 to 6 : 36 : 0 to 63 : 0 to 15 : All : 1 : 0 to size : 255 : Sequence position - does nothing
+Y : 0 to 5 : 37 : 0 to 63 : 0 to 15 : All : 1 : 0 to size : 255 : Vowel position in sequence
 Y : 0/1 : 38 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Negate input (from LFOs, envelopes etc.)
 
 Envelope insert
@@ -410,12 +410,12 @@ Y : any : 0 to 39 : 0 to 63 : 0 to 15 : All : 3 : 0 to 3 : any : Delete point - 
 Y : 0 to 127 : 0 to 39 : 0 to 63 : 0 to 15 : All : 4 : 0 to 3 : 0 to 127 : Adjust - ‘Par 2’ is X incremental value, ‘Value’ is Y value
 
 Insertion Effect Selector
-Y : 0 to 7 : 0 : 242 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+n : 0 to 7 : 0 : 242 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
 Y : 0 to 8 : 1 : 242 : 255 : effect number : 255 : 255 : 255 : Set effect type
 Y : -2 to 63 : 2 : 242 : 255 : effect number : 255 : 255 : 255 : set effect destination (Master out - 2, Off - 1, Part 0 to 63)
 
 System Effect Selector
-Y : 0 to 3 : 0 : 241 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
+n : 0 to 3 : 0 : 241 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
 Y : 0 to 8 : 1 : 241 : 255 : effect number : 255 : 255 : 255 : Set effect type
 Sends
 Y : 0 to 127 : 1 to 3 : 241 : 255 : 0 to 2 : 16 : 255 : 255 : To (control) effect, from (engine) effect

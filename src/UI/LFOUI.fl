@@ -216,7 +216,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
-    unsigned char eng = getData->data.engine;;
+    unsigned char eng = getData->data.engine;
     
     if (part != npart || (eng >= 128 && eng != engine))
         return;
