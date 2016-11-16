@@ -33,7 +33,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     int typetop = type & 0xc0;
     if ((type & 3) == 3)
     { // value type is now irrelevant
-        if(Fl::event_state(FL_CTRL) != 0)
+        if(Fl::event_state(FL_CTRL) != 0 && (type & 8))
             type = 3;
             // identifying this for button 3 as MIDI learn
         else

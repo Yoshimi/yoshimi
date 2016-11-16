@@ -35,6 +35,8 @@ On return from synth
 
 bits 3-5 may later be combined for new input sources.
 
+Within the GUI when sending, bit 3 is used to indicate that a particular control is MIDIlearnable. This is cleared before the data gets pushed into the ring buffer.
+
 Unused chars are set to 0xff as a general test.
 
 e.g.

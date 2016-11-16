@@ -123,7 +123,7 @@ for (int i=0;i<env->Penvpoints;i++)
 };
 return(nearestpoint);} {}
   }
-  Function {draw()} {private
+  Function {draw()} {open private
   } {
     code {int ox=x(),oy=y(),lx=w(),ly=h();
 if (env->Pfreemode==0)
@@ -274,7 +274,7 @@ return(1);} {}
   }
 } 
 
-class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -423,8 +423,8 @@ send_data(group, 35, o->value(), 0xc0);}
   }
   Function {make_ADSR_window()} {} {
     Fl_Window envADSR {
-      xywh {1185 87 205 70} type Double color 50 labelfont 1
-      class Fl_Group visible
+      xywh {1185 87 205 70} type Double color 50 labelfont 1 hide
+      class Fl_Group
     } {
       Fl_Group {} {
         label {Amplitude Env}
@@ -826,18 +826,25 @@ if (par2 != 255)
   insert = 3;
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;
-    //unsigned char insert = getData->data.insert;
+    unsigned char insert = getData->data.insert;
     unsigned char par = getData->data.parameter;
-    
+
     if (part != npart || (eng >= 128 && eng != engine))
         return;
+
+    if (insert ==3 && insert == 4)
+    {
+        Fl::check();
+        return;
+    }
 
     switch(control)
     {
@@ -971,10 +978,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 32:
-    	    ;
+    	    freemodebutton->value(value != 0); // not working :(
+    	    reinit();
+            freeedit->lastpoint=-1;
+            freeedit->redraw();
+            freemodebutton->value(value != 0);
     	    break;
     }
-    Fl::check();} {}
+    Fl::check();} {selected
+    }
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//

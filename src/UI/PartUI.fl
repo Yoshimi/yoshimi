@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified October 2016
+This file is derivative of ZynAddSubFX original code, modified November 2016
 } {in_source in_header
 } 
 
@@ -395,7 +395,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
       xywh {955 51 375 165} type Double hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 377 166}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -443,7 +443,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
           label {Velocity
 Sense}
           callback {part->Pvelsns = o->value();
-send_data(1, o->value(), 0xc0);}
+send_data(1, o->value(), 0xc8);}
           xywh {198 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvelsns);}
           code1 {o->init(64);}
@@ -453,7 +453,7 @@ send_data(1, o->value(), 0xc0);}
           label {Velocity
 Offset}
           callback {part->Pveloffs = o->value();
-send_data(4, o->value(), 0xc0);}
+send_data(4, o->value(), 0xc8);}
           xywh {244 43 27 27} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pveloffs);}
           code1 {o->init(64);}
@@ -465,7 +465,7 @@ send_data(4, o->value(), 0xc0);}
                     part->SetController(C_panning, o->value());
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                         synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
-                    send_data(2, o->value(), 0xc0);}
+                    send_data(2, o->value(), 0xc8);}
           xywh {290 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Ppanning);}
           code1 {o->init(64);}
@@ -477,7 +477,7 @@ send_data(4, o->value(), 0xc0);}
                     part->setVolume(o->value());
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                         synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
-                    send_data(0, o->value(), 0xc0);}
+                    send_data(0, o->value(), 0xc8);}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(part->Pvolume);}
           code1 {o->init(96);}

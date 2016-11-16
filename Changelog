@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-11-16 Will
+* Added 'CoolSound' demo vectcor definition file to examples.
+* Small change to ID GUI controls as MIDI-learnable.
+* Updated docs.
+
 2016-11-13
 * Direct -> gui filter done (not dynfilter).
 * Direct -> gui envelope basics done (not freemode).

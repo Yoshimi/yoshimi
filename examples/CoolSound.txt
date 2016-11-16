@@ -1,0 +1,4 @@
+
+CoolSound.xvy is a vector definition file that can be loaded into Yoshimi via the 'Options' menu in the Vector Control window.
+
+It will set up everything needed for a two axis MIDI controller using incoming CCs of 14 and 15 (although these can be changed to suit your controller.
