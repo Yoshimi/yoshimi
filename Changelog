@@ -1,7 +1,11 @@
 yoshimi 1.4.1 M
 
+2016-11-18 Will
+* Started midi learn. Basic entries in place - not active.
+  LV2 behaviour not tested yet.
+
 2016-11-16 Will
-* Added 'CoolSound' demo vectcor definition file to examples.
+* Added 'CoolSound' demo vector definition file to examples.
 * Small change to ID GUI controls as MIDI-learnable.
 * Updated docs.
 

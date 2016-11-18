@@ -73,20 +73,20 @@ class InterChange : private MiscFuncs
         pthread_t  CLIresolvethreadHandle;
 
         void resolveReplies(CommandBlock *getData);
-        void resolveVector(CommandBlock *getData);
-        void resolveMain(CommandBlock *getData);
-        void resolvePart(CommandBlock *getData);
-        void resolveAdd(CommandBlock *getData);
-        void resolveAddVoice(CommandBlock *getData);
-        void resolveSub(CommandBlock *getData);
-        void resolvePad(CommandBlock *getData);
-        void resolveOscillator(CommandBlock *getData);
-        void resolveResonance(CommandBlock *getData);
-        void resolveLFO(CommandBlock *getData);
-        void resolveFilter(CommandBlock *getData);
-        void resolveEnvelope(CommandBlock *getData);
-        void resolveSysIns(CommandBlock *getData);
-        void resolveEffects(CommandBlock *getData);
+        string resolveVector(CommandBlock *getData);
+        string resolveMain(CommandBlock *getData);
+        string resolvePart(CommandBlock *getData);
+        string resolveAdd(CommandBlock *getData);
+        string resolveAddVoice(CommandBlock *getData);
+        string resolveSub(CommandBlock *getData);
+        string resolvePad(CommandBlock *getData);
+        string resolveOscillator(CommandBlock *getData);
+        string resolveResonance(CommandBlock *getData);
+        string resolveLFO(CommandBlock *getData);
+        string resolveFilter(CommandBlock *getData);
+        string resolveEnvelope(CommandBlock *getData);
+        string resolveSysIns(CommandBlock *getData);
+        string resolveEffects(CommandBlock *getData);
 
         void commandSend(CommandBlock *getData);
         void commandVector(CommandBlock *getData);

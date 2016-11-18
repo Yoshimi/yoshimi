@@ -288,6 +288,7 @@ set (Misc_sources
 set (Interface_Sources
     Interface/CmdInterface.cpp
     Interface/InterChange.cpp
+    Interface/MidiLearn.cpp
     UI/MiscGui.cpp
 )
 

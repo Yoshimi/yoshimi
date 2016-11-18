@@ -81,6 +81,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     isLV2Plugin(_isLV2Plugin),
     bank(this),
     interchange(this),
+    midilearn(this),
     Runtime(this, argc, argv),
     presetsstore(this),
     shutup(false),

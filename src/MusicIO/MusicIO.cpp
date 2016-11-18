@@ -206,14 +206,25 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     }
 
     if (ctrl == synth->getRuntime().midi_bank_root)
+    {
         setMidiBankOrRootDir(param, in_place, true);
-    else if (ctrl == synth->getRuntime().midi_bank_C)
+        return;
+    }
+
+    if (ctrl == synth->getRuntime().midi_bank_C)
+    {
         setMidiBankOrRootDir(param, in_place);
-    else if (ctrl == synth->getRuntime().midi_upper_voice_C)
+        return;
+    }
+
+    if (ctrl == synth->getRuntime().midi_upper_voice_C)
+    {
         // it's really an upper set program change
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
+        return;
+    }
 
-    else if (ctrl == C_nrpnL || ctrl == C_nrpnH)
+    if (ctrl == C_nrpnL || ctrl == C_nrpnH)
     {
         if (ctrl == C_nrpnL)
         {
@@ -259,81 +270,98 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         synth->getRuntime().dataH = 0x80; //  so these are now invalid
         synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
 //        synth->getRuntime().Log("Status nrpn " + asString(synth->getRuntime().nrpnActive));
+        return;
     }
-    else
+
+    if (synth->getRuntime().nrpnActive)
     {
-        if (synth->getRuntime().nrpnActive)
-        {
-            if (ctrl == C_dataI || ctrl == C_dataD)
-            { // translate these to C_dataL and C_dataH
-                int dHigh = synth->getRuntime().dataH;
-                int dLow = synth->getRuntime().dataL;
+        if (ctrl == C_dataI || ctrl == C_dataD)
+        { // translate these to C_dataL and C_dataH
+            int dHigh = synth->getRuntime().dataH;
+            int dLow = synth->getRuntime().dataL;
 
-                bool msbPar = (param >= 0x40);
-                param &= 0x3f;
-                if (ctrl == C_dataI)
-                {
-                    if (msbPar)
-                    {
-                        dHigh &= 0x7f; // clear disabled state
-                        param += dHigh;
-                        ctrl = C_dataH; // change controller type
-                    }
-                    else
-                    {
-                        dLow &= 0x7f; // clear disabled state
-                        param += dLow;
-                        ctrl = C_dataL; // change controller type
-                    }
-                    if (param > 0x7f)
-                        param = 0x7f;
-                }
-                else{ // data decrement
-                    if (msbPar)
-                    {
-                        param = dHigh - param;
-                        ctrl = C_dataH; // change controller type
-                    }
-                    else
-                    {
-                        param = dLow - param;
-                        ctrl = C_dataL; // change controller type
-                    }
-                    if (param < 0)
-                        param = 0;
-                }
-            }
-
-            if (ctrl == C_dataL || ctrl == C_dataH)
+            bool msbPar = (param >= 0x40);
+            param &= 0x3f;
+            if (ctrl == C_dataI)
             {
-                nrpnProcessData(ch, ctrl, param);
-                return;
+                if (msbPar)
+                {
+                    dHigh &= 0x7f; // clear disabled state
+                    param += dHigh;
+                    ctrl = C_dataH; // change controller type
+                }
+                else
+                {
+                    dLow &= 0x7f; // clear disabled state
+                    param += dLow;
+                    ctrl = C_dataL; // change controller type
+                }
+                if (param > 0x7f)
+                    param = 0x7f;
+            }
+            else
+            { // data decrement
+                if (msbPar)
+                {
+                    param = dHigh - param;
+                    ctrl = C_dataH; // change controller type
+                }
+                else
+                {
+                    param = dLow - param;
+                    ctrl = C_dataL; // change controller type
+                }
+                if (param < 0)
+                    param = 0;
             }
         }
-        unsigned char vecChan;
-        if (synth->getRuntime().channelSwitchType == 1)
-            vecChan = synth->getRuntime().channelSwitchValue;
-            // force vectors to obey channel switcher
-        else
-            vecChan = ch;
-        if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
-        { // vector control is direct to parts
-            if (nrpnRunVector(vecChan, ctrl, param))
-                return; // **** test this it may be wrong!
-        }
-        // pick up a drop-through if CC doesn't match the above
-        if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
+
+        if (ctrl == C_dataL || ctrl == C_dataH)
         {
-            //synth->getRuntime().Log("Reset controllers ignored");
+            nrpnProcessData(ch, ctrl, param);
             return;
         }
-        if (ctrl == C_breath)
-        {
-            synth->SetController(ch, C_volume, param);
-            ctrl = C_filtercutoff;
-        }
-        synth->SetController(ch, ctrl, param);
     }
+
+    unsigned char vecChan;
+    if (synth->getRuntime().channelSwitchType == 1)
+        vecChan = synth->getRuntime().channelSwitchValue;
+        // force vectors to obey channel switcher
+    else
+        vecChan = ch;
+    if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+    { // vector control is direct to parts
+        if (nrpnRunVector(vecChan, ctrl, param))
+            return; // **** test this it may be wrong!
+    }
+    // pick up a drop-through if CC doesn't match the above
+    if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
+    {
+        //synth->getRuntime().Log("Reset controllers ignored");
+        return;
+    }
+
+    /* insert midi learn access here
+     * pass 'in_place' so entire operation can be done in MidiLearn.cpp
+     * return -2 if blocking further calls
+     *
+     * if (findMidiLearn(ctrl, ch, in_place) == -2)
+     *     return;
+     */
+    if (synth->midilearn.runMidiLearn(param, ctrl, ch, in_place))
+    {
+        //cout << "Blocked" << endl;
+        return;
+    }
+
+    if (ctrl == C_breath)
+    {
+        synth->SetController(ch, C_volume, param);
+        ctrl = C_filtercutoff;
+    }
+
+    // do what's left!
+    synth->SetController(ch, ctrl, param);
 }
 
 

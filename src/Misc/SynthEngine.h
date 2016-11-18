@@ -39,6 +39,7 @@ using namespace std;
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
 #include "Interface/InterChange.h"
+#include "Interface/MidiLearn.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
@@ -60,6 +61,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank bank;
     public:
         InterChange interchange;
+        MidiLearn midilearn;
     private:
         Config Runtime;
         PresetsStore presetsstore;
