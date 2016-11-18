@@ -27,8 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified October 2016
-} {in_source in_header
+This file is derivative of ZynAddSubFX original code, modified November 2016
+} {selected in_source in_header
 } 
 
 decl {\#include "UI/MiscGui.h"} {public local
@@ -81,7 +81,7 @@ else
 }
 pars->Phmag[n]=x;
 
-send_data(6, n, x, 0xc0);
+send_data(6, n, x, 0xc8);
 
 if (pars->Phmag[n]==0)
     o->selection_color(0);
@@ -100,7 +100,7 @@ else
     o->value(x);
 pars->Phrelbw[n]=x;
 
-send_data(7, n, x, 0xc0);
+send_data(7, n, x, 0xc8);
 
 if (pars->Phrelbw[n]==64)
     o->selection_color(0);
@@ -166,12 +166,12 @@ hide();
   }
 } 
 
-class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
+class SUBnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {610 511 735 475} type Double hide
+      xywh {19 114 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
@@ -204,7 +204,7 @@ if ((Fl::event_button() == 3))
         Fl_Dial vol {
           label Volume
           callback {pars->PVolume = (int)o->value();
-send_data (0, o->value(), 0xc0);}
+send_data (0, o->value(), 0xc8);}
           tooltip Volume xywh {40 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PVolume);}
           code1 {o->init(96);}
@@ -213,7 +213,7 @@ send_data (0, o->value(), 0xc0);}
         Fl_Dial vsns {
           label {Veloc Sens}
           callback {pars->PAmpVelocityScaleFunction = (int) o->value();
-send_data (1, o->value(), 0xc0);}
+send_data (1, o->value(), 0xc8);}
           tooltip {Velocity sensing} xywh {101 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code1 {o->init(90);}
@@ -224,7 +224,7 @@ send_data (1, o->value(), 0xc0);}
           callback {//
     pars->setPan((char)o->value());
     randompan->value(pars->randomPan());
-    send_data (2, o->value(), 0xc0);}
+    send_data (2, o->value(), 0xc8);}
           tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->PPanning);}
           code1 {o->init(64);}
@@ -392,7 +392,7 @@ send_data (82, o->value(), 0xc0);}
         Fl_Dial fixedfreqetdial {
           label {Eq.T.}
           callback {pars->PfixedfreqET=(int) o->value();
-send_data (33, o->value(), 0xc0);}
+send_data (33, o->value(), 0xc8);}
           tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {675 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
@@ -412,7 +412,7 @@ send_data (33, o->value(), 0xc0);}
         Fl_Dial bend {
           label Bend
           callback {pars->PBendAdjust = lrint(o->value());
-send_data(38, o->value(), 0xc0);}
+send_data(38, o->value(), 0xc8);}
           tooltip {How the frequency varies according to the pitch wheel} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
           code1 {o->init(88);}
@@ -421,7 +421,7 @@ send_data(38, o->value(), 0xc0);}
         Fl_Dial offset {
           label Offset
           callback {pars->POffsetHz = lrint(o->value());
-send_data(39, o->value(), 0xc0);}
+send_data(39, o->value(), 0xc8);}
           tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
           code1 {o->init(64);}
@@ -484,7 +484,7 @@ send_data (112, o->value(), 0xc0);}
           callback {if (Fl::event_button() == 3)
     o->value(40);
 pars->Pbandwidth=(int) o->value();
-send_data (16, o->value(), 0xc0);}
+send_data (16, o->value(), 0xc8);}
           xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->Pbandwidth);}
           class mwheel_val_slider_rev

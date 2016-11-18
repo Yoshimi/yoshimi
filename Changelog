@@ -3,6 +3,8 @@ yoshimi 1.4.1 M
 2016-11-18 Will
 * Started midi learn. Basic entries in place - not active.
   LV2 behaviour not tested yet.
+* Bugfix: Vector window wasn't updated on part change.
+* Many controls now midi learnable - can't be deleted.
 
 2016-11-16 Will
 * Added 'CoolSound' demo vector definition file to examples.

@@ -347,7 +347,7 @@ if (x==64)
 oscil->prepare();
 synth->actionLock(unlock);
 
-send_data(6, n, x, 0xc0);
+send_data(6, n, x, 0xc8);
 
 display->redraw();
 oldosc->redraw();
@@ -379,7 +379,7 @@ oscil->Phphase[n]=x;
 oscil->prepare();
 synth->actionLock(unlock);
 
-send_data(7, n, x, 0xc0);
+send_data(7, n, x, 0xc8);
 
 display->redraw();
 oldosc->redraw();
@@ -552,7 +552,7 @@ send_data (3, o->value(), 0xc0);}
           }
           Fl_Dial hrnddial {
             callback {oscil->Pamprandpower=(int) o->value();
-send_data (2, o->value(), 0xc0);}
+send_data (2, o->value(), 0xc8);}
             tooltip {Oscillator's spectrum adjust parameter} xywh {338 280 18 18} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -708,7 +708,7 @@ send_data (21, o->value(), 0xc0);}
             callback {oscil->Pbasefuncmodulationpar1=(int)o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (18, o->value(), 0xc0);}
+send_data (18, o->value(), 0xc8);}
             tooltip {Oscillator's modulation parameter 1} xywh {654 280 17 17} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -717,7 +717,7 @@ send_data (18, o->value(), 0xc0);}
             callback {oscil->Pbasefuncmodulationpar2=(int)o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (19, o->value(), 0xc0);}
+send_data (19, o->value(), 0xc8);}
             tooltip {Oscillator's modulation parameter 2} xywh {676 280 17 17} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
@@ -726,7 +726,7 @@ send_data (19, o->value(), 0xc0);}
             callback {oscil->Pbasefuncmodulationpar3=(int)o->value();
 basefuncdisplaygroup->redraw();
 redrawoscil();
-send_data (20, o->value(), 0xc0);}
+send_data (20, o->value(), 0xc8);}
             tooltip {Oscillator's modulation parameter 3} xywh {698 280 17 17} maximum 127 step 1
             code0 {o->init(32);}
             class WidgetPDial
@@ -1007,7 +1007,7 @@ send_data (39, o->value(), 0xc0);}
           callback {oscil->Pfilterpar1=(int)o->value();
 
 redrawoscil();
-send_data (36, o->value(), 0xc0);}
+send_data (36, o->value(), 0xc8);}
           tooltip {Oscillator's filter parameter1} xywh {367 313 20 20} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1024,7 +1024,7 @@ send_data (38, o->value(), 0xc0);}
           callback {oscil->Pfilterpar2=(int)o->value();
 
 redrawoscil();
-send_data (37, o->value(), 0xc0);}
+send_data (37, o->value(), 0xc8);}
           tooltip {Oscillator's filter parameter2} xywh {392 313 20 20} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1060,7 +1060,7 @@ send_data (45, o->value(), 0xc0);}
         Fl_Dial sadjpar {
           callback {oscil->Psapar=(int)o->value();
 redrawoscil();
-send_data (44, o->value(), 0xc0);}
+send_data (44, o->value(), 0xc8);}
           tooltip {Oscillator's spectrum adjust parameter} xywh {699 313 20 20} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1199,7 +1199,7 @@ send_data (43, o->value(), 0xc0);}
           callback {oscil->Pmodulationpar1=(int)o->value();
 
 redrawoscil();
-send_data (40, o->value(), 0xc0);}
+send_data (40, o->value(), 0xc8);}
           tooltip {Oscillator's modulation parameter 1} xywh {524 314 18 18} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1208,7 +1208,7 @@ send_data (40, o->value(), 0xc0);}
           callback {oscil->Pmodulationpar2=(int)o->value();
 
 redrawoscil();
-send_data (41, o->value(), 0xc0);}
+send_data (41, o->value(), 0xc8);}
           tooltip {Oscillator's modulation parameter 2} xywh {546 314 18 18} maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial
@@ -1216,7 +1216,7 @@ send_data (41, o->value(), 0xc0);}
         Fl_Dial modpar3 {
           callback {oscil->Pmodulationpar3=(int)o->value();
 redrawoscil();
-send_data (42, o->value(), 0xc0);}
+send_data (42, o->value(), 0xc8);}
           tooltip {Oscillator's modulation parameter 3} xywh {569 314 18 18} maximum 127 step 1
           code0 {o->init(32);}
           class WidgetPDial

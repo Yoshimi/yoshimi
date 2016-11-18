@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <list>
 #include <string>
+#include <unistd.h>
 
 using namespace std;
 
@@ -33,7 +34,7 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 
 MidiLearn::MidiLearn(SynthEngine *_synth) :
-    learning(true),
+    learning(false),
     synth(_synth)
 {
  //init
@@ -45,6 +46,7 @@ MidiLearn::~MidiLearn()
 {
     //close
 }
+
 
 void MidiLearn::setTransferBlock(unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, string name)
 {
@@ -61,16 +63,101 @@ void MidiLearn::setTransferBlock(unsigned char type, unsigned char control, unsi
     cout << "Learning" << endl;
 }
 
+
 bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, bool in_place)
 {
     if (learning)
     {
         insert(CC, chan);
-        return true;
+        return false;
     }
     //cout << "here" << endl;
-    return false;
+    bool stop = false;
+    int lastpos = -1;
+    LearnBlock foundEntry;
+    while (lastpos != -2)
+    {
+        lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
+        //cout << "found " << lastpos << "  stop " << stop << endl;
+        if (!stop && lastpos != -2)
+        {
+            //cout << "where?" << endl;
+            CommandBlock putData;
+            unsigned int writesize = sizeof(putData);
+            putData.data.value = value;
+            putData.data.type = 0x48;// write from midi
+            putData.data.control = foundEntry.data.control;
+            putData.data.part = foundEntry.data.part;
+            putData.data.kit = foundEntry.data.kit;
+            putData.data.engine = foundEntry.data.engine;
+            putData.data.insert = foundEntry.data.insert;
+            putData.data.parameter = foundEntry.data.parameter;
+            putData.data.par2 = foundEntry.data.par2;
+            char *point = (char*)&putData;
+            unsigned int towrite = writesize;
+            unsigned int wrote = 0;
+            unsigned int found;
+            unsigned int tries = 0;
+            //cout << (int)putData.data.control << endl;
+            //cout << sizeof(putData) << endl;
+            if (jack_ringbuffer_write_space(synth->interchange.fromMIDI) >= writesize)
+            {
+                while (towrite && tries < 3)
+                {
+                    found = jack_ringbuffer_write(synth->interchange.fromMIDI, point, towrite);
+                wrote += found;
+                point += found;
+                towrite -= found;
+                ++tries;
+                }
+                if (towrite)
+                    cout << "Unable to write data to fromMidi buffer" << endl;
+            }
+            else
+                cout << "fromMidi buffer full!" << endl;
+            if (lastpos == -1)
+                stop = true;
+        }
+    }
+    return stop;
 }
+
+/*
+ * This will only be called by incoming midi. It is the only function that
+ * needs to be quick
+ */
+int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show)
+{
+    int newpos = 0;
+    list<LearnBlock>::iterator it = midi_list.begin();
+
+    while (newpos <= lastpos && it != midi_list.end())
+    {
+        ++ it;
+        ++ newpos;
+    }
+    if (it == midi_list.end())
+        return -2;
+
+    while (CC >= it->CC && it != midi_list.end())
+    {
+        if ((it->chan >= 16 || chan == it->chan) && CC == it->CC)
+        {
+            if (show)
+                cout << "Found line " << it->name << "  at " << newpos << endl; // a test!
+            block->chan = it->chan;
+            block->CC = it->CC;
+            block->data = it->data;
+            if (it->status & 1)
+                return -1; // don't allow any more of this CC and channel;
+            return newpos;
+        }
+        ++ it;
+        ++ newpos;
+    }
+    return -2;
+}
+
 
 void MidiLearn::insert(unsigned char CC, unsigned char chan)
 {

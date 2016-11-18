@@ -47,28 +47,45 @@ InterChange::InterChange(SynthEngine *_synth) :
         fromCLI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromCLI' ringbuffer");
     }
+    else
+         jack_ringbuffer_reset(fromCLI);
 
     if (!(toCLI = jack_ringbuffer_create(sizeof(commandSize) * 512)))
     {
         toCLI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'toCLI' ringbuffer");
     }
+    else
+        jack_ringbuffer_reset(toCLI);
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         fromGUI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromGUI' ringbuffer");
     }
+    else
+        jack_ringbuffer_reset(fromGUI);
     if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         toGUI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'toGUI' ringbuffer");
     }
+    else
+        jack_ringbuffer_reset(toGUI);
+
+    if (!(fromMIDI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
+    {
+        fromMIDI = NULL;
+        synth->getRuntime().Log("InterChange failed to create 'fromMIDI' ringbuffer");
+    }
+    else
+         jack_ringbuffer_reset(fromMIDI);
 
     if (!synth->getRuntime().startThread(&CLIresolvethreadHandle, _CLIresolvethread, this, false, 0, false, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
     }
+    readyToSend = true;
 }
 
 
@@ -85,6 +102,7 @@ void *InterChange::CLIresolvethread(void)
     char *point;
     while(synth->getRuntime().runSynth)
     {
+        usleep(10000);
         while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
         {
             toread = commandSize;
@@ -93,7 +111,6 @@ void *InterChange::CLIresolvethread(void)
                 jack_ringbuffer_read(toCLI, point, toread);
             resolveReplies(&getData);
         }
-        usleep(20000);
     }
     return NULL;
 }
@@ -120,6 +137,11 @@ InterChange::~InterChange()
     {
         jack_ringbuffer_free(toGUI);
         toGUI = NULL;
+    }
+    if (fromMIDI)
+    {
+        jack_ringbuffer_free(fromMIDI);
+        fromGUI = NULL;
     }
 }
 
@@ -1954,36 +1976,55 @@ string InterChange::resolveEffects(CommandBlock *getData)
 void InterChange::mediate()
 {
     CommandBlock getData;
+    size_t commandSize = sizeof(getData);
     bool more;
-    unsigned int size;
+    size_t size;
     int toread;
     char *point;
     do
     {
         more = false;
         size = jack_ringbuffer_read_space(fromCLI);
-        if (size >= commandSize)
+        if (size >= commandSize && readyToSend)
         {
+            readyToSend = false;
             if (size > commandSize)
                 more = true;
             toread = commandSize;
             point = (char*) &getData.bytes;
-            for (size_t i = 0; i < commandSize; ++i)
-                jack_ringbuffer_read(fromCLI, point, toread);
+            jack_ringbuffer_read(fromCLI, point, toread);
             commandSend(&getData);
             returns(&getData);
+            readyToSend = true;
         }
+
         size = jack_ringbuffer_read_space(fromGUI);
-        if (size >= commandSize)
+        if (size >= commandSize && readyToSend)
         {
+            readyToSend = false;
             if (size > commandSize)
                 more = true;
             toread = commandSize;
             point = (char*) &getData.bytes;
-            for (size_t i = 0; i < commandSize; ++i)
-                jack_ringbuffer_read(fromGUI, point, toread);
+            jack_ringbuffer_read(fromGUI, point, toread);
             commandSend(&getData);
             returns(&getData);
+            readyToSend = true;
+        }
+
+        size = jack_ringbuffer_read_space(fromMIDI);
+        if (size >= commandSize && readyToSend)
+        {
+            readyToSend = false;
+            if (size > commandSize)
+                more = true;
+            toread = commandSize;
+            point = (char*) &getData.bytes;
+            jack_ringbuffer_read(fromMIDI, point, toread);
+            cout << (int)getData.data.control << endl;
+            commandSend(&getData);
+            returns(&getData);
+            readyToSend = true;
         }
     }
     while (more);
@@ -1995,10 +2036,11 @@ void InterChange::returns(CommandBlock *getData)
     unsigned char type = getData->data.type;
     //bool isGui = type & 0x20;
     bool isCli = type & 0x10;
+    bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
     if (synth->guiMaster)
     {
-        if (isCli && write)
+        if ((isMidi || isCli) && write)
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
             {

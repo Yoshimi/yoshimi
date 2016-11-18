@@ -77,7 +77,7 @@ hide();
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
-      xywh {1126 445 230 70} type Double color 50 labelfont 1 labelsize 12 hide
+      xywh {133 20 230 70} type Double color 50 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
@@ -96,7 +96,7 @@ send_data(group, 0, o->value(), 0x40);}
         Fl_Dial intensity {
           label Depth
           callback {pars->Pintensity=(int)o->value();
-send_data(group, 1, o->value(), 0xc0);}
+send_data(group, 1, o->value(), 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
           class WidgetPDial
@@ -104,7 +104,7 @@ send_data(group, 1, o->value(), 0xc0);}
         Fl_Dial delay {
           label Delay
           callback {pars->Pdelay=(int)o->value();
-send_data(group, 2, o->value(), 0xc0);}
+send_data(group, 2, o->value(), 0xc8);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (engine >= 0x80 && group == 0) o->init(30); else o->init(0);}
           class WidgetPDial
@@ -112,7 +112,7 @@ send_data(group, 2, o->value(), 0xc0);}
         Fl_Dial startphase {
           label Start
           callback {pars->Pstartphase=(int)o->value();
-send_data(group, 3, o->value(), 0xc0);}
+send_data(group, 3, o->value(), 0xc8);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (engine >= 0x80 && group == 1) o->init(0); else o->init(64);}
           class WidgetPDial
@@ -120,7 +120,7 @@ send_data(group, 3, o->value(), 0xc0);}
         Fl_Dial randomness {
           label {A.R.}
           callback {pars->Prandomness=(int)o->value();
-send_data(group, 4, o->value(), 0xc0);}
+send_data(group, 4, o->value(), 0xc8);}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
           class WidgetPDial
@@ -169,7 +169,7 @@ send_data(group, 6, o->value(), 0xc0);}
         Fl_Dial freqrand {
           label {F.R.}
           callback {pars->Pfreqrand=(int)o->value();
-send_data(group, 7, o->value(), 0xc0);}
+send_data(group, 7, o->value(), 0xc8);}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
           class WidgetPDial
@@ -177,7 +177,7 @@ send_data(group, 7, o->value(), 0xc0);}
         Fl_Dial stretch {
           label {Str.}
           callback {pars->Pstretch=(int)o->value();
-send_data(group, 8, o->value(), 0xc0);}
+send_data(group, 8, o->value(), 0xc8);}
           tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(64);}
           class WidgetPDial

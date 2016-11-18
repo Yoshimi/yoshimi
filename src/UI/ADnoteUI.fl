@@ -230,11 +230,11 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {626 24 770 580} type Double
+      xywh {4 39 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
-      class Fl_Group visible
+      class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {
+      Fl_Group voiceparametersgroup {open
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
@@ -351,7 +351,7 @@ send_data(98, o->value(), 0xc0);}
                 callback {if (Fl::event_button() == 3)
     o->value(90);
 pars->VoicePar[nvoice].PFMVolume = lrint(o->value());
-send_data(80, o->value(), 0xc0);}
+send_data(80, o->value(), 0xc8);}
                 tooltip Volume xywh {540 70 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVolume);}
                 class mwheel_val_slider_rev
@@ -361,7 +361,7 @@ send_data(80, o->value(), 0xc0);}
                 callback {if (Fl::event_button() == 3)
     o->value(64);
 pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(o->value());
-send_data(81, o->value(), 0xc0);}
+send_data(81, o->value(), 0xc8);}
                 tooltip {Velocity Sensing Function - rightmost/max to disable)} xywh {540 90 160 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 maximum 127 step 1
                 code0 {o->value(pars->VoicePar[nvoice].PFMVelocityScaleFunction);}
                 class mwheel_val_slider_rev
@@ -629,7 +629,7 @@ send_data(82, o->value(), 0xc0);}
             Fl_Dial fixedfreqetdial {
               label {Eq.T.}
               callback {pars->VoicePar[nvoice].PfixedfreqET = lrint(o->value());
-send_data(33, o->value(), 0xc0);}
+send_data(33, o->value(), 0xc8);}
               tooltip {How the frequency varies according to the keyboard (leftmost for fixed frequency)} xywh {400 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PfixedfreqET);}
               code1 {if (pars->VoicePar[nvoice].Pfixedfreq==0) o->deactivate();}
@@ -647,7 +647,7 @@ send_data(36, o->value(), 0xc0);}
             Fl_Dial bend {
               label Bend
               callback {pars->VoicePar[nvoice].PBendAdjust = lrint(o->value());
-send_data(38, o->value(), 0xc0);}
+send_data(38, o->value(), 0xc8);}
               tooltip {How the frequency varies according to the pitch wheel} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PBendAdjust);}
               code1 {o->init(88);}
@@ -656,7 +656,7 @@ send_data(38, o->value(), 0xc0);}
             Fl_Dial offset {
               label Offset
               callback {pars->VoicePar[nvoice].POffsetHz = lrint(o->value());
-send_data(39, o->value(), 0xc0);}
+send_data(39, o->value(), 0xc8);}
               tooltip {Offset of the frequency in Hz.} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
               code1 {o->init(64);}
@@ -802,7 +802,7 @@ send_data(53, o->value(), 0xc0);}
             Fl_Dial UnisonStereo {
               label Stereo
               callback {pars->VoicePar[nvoice].Unison_stereo_spread = lrint(o->value());
-send_data(50, o->value(), 0xc0);}
+send_data(50, o->value(), 0xc8);}
               tooltip {Stereo Spread} xywh {349 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_stereo_spread);}
               code1 {o->init(64);}
@@ -811,7 +811,7 @@ send_data(50, o->value(), 0xc0);}
             Fl_Dial UnisonVib {
               label {Vib.}
               callback {pars->VoicePar[nvoice].Unison_vibratto = lrint(o->value());
-send_data(51, o->value(), 0xc0);}
+send_data(51, o->value(), 0xc8);}
               tooltip Vibratto xywh {384 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto);}
               code1 {o->init(64);}
@@ -840,7 +840,7 @@ send_data(54, o->value(), 0xc0);}
                       o->value(60);
                   pars->VoicePar[nvoice].Unison_frequency_spread = lrint(o->value());
                   unisonspreadoutput->do_callback();
-                  send_data(48, o->value(), 0xc0);}
+                  send_data(48, o->value(), 0xc8);}
               tooltip {Frequency Spread of the Unison} xywh {185 545 120 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 9 maximum 127 step 1 value 64
               code0 {o->value(pars->VoicePar[nvoice].Unison_frequency_spread);}
               class mwheel_slider_rev
@@ -855,7 +855,7 @@ send_data(54, o->value(), 0xc0);}
             Fl_Dial UnisonVspeed {
               label {V.speed}
               callback {pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(o->value());
-send_data(52, o->value(), 0xc0);}
+send_data(52, o->value(), 0xc8);}
               tooltip {Vibratto Average Speed} xywh {420 540 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_vibratto_speed);}
               code1 {o->init(64);}
@@ -864,7 +864,7 @@ send_data(52, o->value(), 0xc0);}
             Fl_Dial UnisonPhRnd {
               label {Ph.rnd}
               callback {pars->VoicePar[nvoice].Unison_phase_randomness=lrint(o->value());
-send_data(49, o->value(), 0xc0);}
+send_data(49, o->value(), 0xc8);}
               tooltip {Phase randomness} xywh {315 540 25 25} box ROUND_UP_BOX labelsize 10 align 9 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].Unison_phase_randomness);}
               code1 {o->init(127);}
@@ -879,7 +879,7 @@ send_data(49, o->value(), 0xc0);}
           Fl_Dial voicevolume {
             label Volume
             callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());
-send_data(0, o->value(), 0xc0);}
+send_data(0, o->value(), 0xc8);}
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PVolume);}
             code1 {o->init(100);}
@@ -888,7 +888,7 @@ send_data(0, o->value(), 0xc0);}
           Fl_Dial voicevsns {
             label {Vel Sens}
             callback {pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(o->value());
-send_data(1, o->value(), 0xc0);}
+send_data(1, o->value(), 0xc8);}
             tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {107 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
             code1 {o->init(127);}
@@ -906,7 +906,7 @@ send_data(1, o->value(), 0xc0);}
             callback {//
                  pars->setVoicePan(nvoice, lrint(o->value()));
                  voicerandompan->value(pars->randomVoicePan(nvoice));
-                 send_data(2, o->value(), 0xc0);}
+                 send_data(2, o->value(), 0xc8);}
             tooltip {Voice panning - leftmost/zero gives random panning} xywh {174 56 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PPanning);}
             code1 {o->init(64);}
@@ -1514,7 +1514,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
-      xywh {753 20 535 405} type Double hide
+      xywh {10 20 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
     } {
@@ -1600,7 +1600,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
     {
         voicelistitem[i]->refreshlist();
     }
-    send_data(39, o->value(), 0xc0);}
+    send_data(39, o->value(), 0xc8);}
           tooltip {Bandwidth - how the relative fine detune of the voice are changed} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
           code1 {o->init(64);}
@@ -1608,13 +1608,13 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         }
       }
       Fl_Group amplitudegrp {
-        label AMPLITUDE
+        label AMPLITUDE open
         xywh {5 5 240 250} box THIN_UP_FRAME labeltype EMBOSSED_LABEL labelsize 11 align 17
       } {
         Fl_Dial globalvolume {
           label Volume
           callback {pars->GlobalPar.PVolume = lrint(o->value());
-send_data(0, o->value(), 0xc0);}
+send_data(0, o->value(), 0xc8);}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PVolume);}
           code1 {o->init(90);}
@@ -1623,7 +1623,7 @@ send_data(0, o->value(), 0xc0);}
         Fl_Dial vsns {
           label {Vel Sens}
           callback {pars->GlobalPar.PAmpVelocityScaleFunction = lrint(o->value());
-send_data(1, o->value(), 0xc0);}
+send_data(1, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           code1 {o->init(64);}
@@ -1635,7 +1635,7 @@ send_data(1, o->value(), 0xc0);}
     pars->setGlobalPan(lrint(o->value()));
     globalrandompan->value(pars->randomGlobalPan());
     amplitudegrp->changed();
-    send_data(2, o->value(), 0xc0);}
+    send_data(2, o->value(), 0xc8);}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPanning);}
           code1 {o->init(64);}
@@ -1656,7 +1656,7 @@ send_data(1, o->value(), 0xc0);}
         Fl_Dial depop {
           label {D.Pop}
           callback {pars->GlobalPar.Fadein_adjustment = lrint(o->value());
-send_data(120, o->value(), 0xc0);}
+send_data(120, o->value(), 0xc8);}
           tooltip {Pop Suppression} xywh {85 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
           code1 {o->init(20);}
@@ -1665,7 +1665,7 @@ send_data(120, o->value(), 0xc0);}
         Fl_Dial pstr {
           label {P.Str.}
           callback {pars->GlobalPar.PPunchStrength = lrint(o->value());
-send_data(121, o->value(), 0xc0);}
+send_data(121, o->value(), 0xc8);}
           tooltip {Punch Strength} xywh {125 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStrength);}
           code1 {o->init(0);}
@@ -1674,7 +1674,7 @@ send_data(121, o->value(), 0xc0);}
         Fl_Dial pt {
           label {P.t.}
           callback {pars->GlobalPar.PPunchTime = lrint(o->value());
-send_data(122, o->value(), 0xc0);}
+send_data(122, o->value(), 0xc8);}
           tooltip {Punch Time (duration)} xywh {155 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchTime);}
           code1 {o->init(60);}
@@ -1683,7 +1683,7 @@ send_data(122, o->value(), 0xc0);}
         Fl_Dial pstc {
           label {P.Stc.}
           callback {pars->GlobalPar.PPunchStretch = lrint(o->value());
-send_data(123, o->value(), 0xc0);}
+send_data(123, o->value(), 0xc8);}
           tooltip {Punch Stretch} xywh {185 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStretch);}
           code1 {o->init(64);}
@@ -1692,7 +1692,7 @@ send_data(123, o->value(), 0xc0);}
         Fl_Dial pvel {
           label {P.Vel.}
           callback {pars->GlobalPar.PPunchVelocitySensing = lrint(o->value());
-send_data(124, o->value(), 0xc0);}
+send_data(124, o->value(), 0xc8);}
           tooltip {Punch Velocity Sensing} xywh {215 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
           code1 {o->init(72);}

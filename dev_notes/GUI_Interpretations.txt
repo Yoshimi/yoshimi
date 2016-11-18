@@ -17,7 +17,7 @@ string          name - not using this yet - will be handled separately.
 Type bits
 0-1 event (see below)
 2   source is return from synth (not yet)
-3   source is MIDI              (not yet)
+3   source is MIDI
 4   source is CLI
 5   source is GUI
 6   write data value (read othewise)

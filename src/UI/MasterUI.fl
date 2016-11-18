@@ -27,10 +27,10 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2016
+This file is a derivative of the ZynAddSubFX original, modified November 2016
 
 
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -93,7 +93,7 @@ decl {\#include "Misc/MiscFuncs.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -547,7 +547,7 @@ paramsui->Show(4);}
               synth->microtonal.Pglobalfinedetune = o->value();
               synth->setAllPartMaps();
               globalfinedetune->changed();
-              send_data(32, o->value(), 0xc0);}
+              send_data(32, o->value(), 0xc8);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->value(synth->microtonal.Pglobalfinedetune);}
           code1 {o->init(64);}
@@ -582,7 +582,7 @@ paramsui->Show(4);}
         Fl_Dial mastervolumedial {
           label Volume
           callback {synth->setPvolume(o->value());
-send_data(0, o->value(), 0x40);}
+send_data(0, o->value(), 0x48);}
           tooltip {Master Volume} xywh {331 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->value(synth->Pvolume);}
           code1 {o->init(90);}
@@ -1388,6 +1388,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {updatepartprogram(int _npart)} {} {
     code {//
+    if (vectorui)
+        vectorui->setInstrumentLabel(_npart);
     if (_npart != npart)
         return;
 

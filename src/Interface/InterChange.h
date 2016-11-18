@@ -53,7 +53,7 @@ class InterChange : private MiscFuncs
                 unsigned char parameter;
                 unsigned char par2;
             } data;
-            unsigned char bytes [sizeof(data)];
+            char bytes [sizeof(data)];
         };
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
@@ -62,6 +62,7 @@ class InterChange : private MiscFuncs
         jack_ringbuffer_t *toCLI;
         jack_ringbuffer_t *fromGUI;
         jack_ringbuffer_t *toGUI;
+        jack_ringbuffer_t *fromMIDI;
 
         void mediate();
         void returns(CommandBlock *getData);
@@ -107,6 +108,7 @@ class InterChange : private MiscFuncs
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);
 
+        bool readyToSend;
         SynthEngine *synth;
 };
 
