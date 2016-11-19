@@ -84,13 +84,14 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
             continue;
         if (!stop && lastpos != -2)
         {
-            int minIn = foundEntry.min_in;
+            /*int minIn = foundEntry.min_in;
             int maxIn = foundEntry.max_in;
-            if (minIn > maxIn)
+            if (minIn < maxIn)
             {
                 value = 127 - value;
                 swap(minIn, maxIn);
             }
+            cout << minIn << "  " << maxIn << endl;
             if ((maxIn - minIn) != 127)
             {
                 if (status & 2) // compress
@@ -105,7 +106,7 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
                     else if (value > maxIn)
                         value = maxIn;
                 }
-            }
+            }*/
 
             //cout << "where?" << endl;
             CommandBlock putData;

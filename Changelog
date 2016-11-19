@@ -3,6 +3,7 @@ yoshimi 1.4.1 M
 2016-11-19 Will
 * Made a few corrections and extensions to midi learn.
 * Started documenting this.
+* Bugfix: reverted change that had killed midi learn :(
 
 2016-11-18 Will
 * Started midi learn. Basic entries in place - not active.
