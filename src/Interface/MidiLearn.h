@@ -85,6 +85,7 @@ class MidiLearn : private MiscFuncs
 
         bool runMidiLearn(float value, unsigned char CC, unsigned char chan, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show);
+        bool remove(int itemNumber);
 
     private:
         list<LearnBlock> midi_list;

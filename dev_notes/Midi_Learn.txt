@@ -1,6 +1,10 @@
-To learn, hold CTRL while right-clicking on any GUI control.
-Operate physical control to learn.
+The learn process comes after NRPNs and vectors, but before all other controllers.
+
+To learn, hold CTRL while right-clicking on any GUI control then operate physical control.
+
 Along with parameters, a text string will be provided with precise details of this complete action.
+
+Editing will be available eventually. Also the GUI will flicker the colour of the respective control line's number when it sees incomming control messages. It will be black when muted and flash between white and green when active.
 
 Control capabilites:
 
@@ -8,13 +12,13 @@ Incoming CC and channel tracked (in that order).
 
 Multiple actions on the same CC/channel pair.
 
-Range limiting or compression.
+Range limiting or compression. (not yet).
 
-Blocking of all later actions on the same CC.channel pair.
+Blocking of all later actions on the same CC.channel pair (not yet).
 
-Muting of this action.
+Muting of this action (not yet).
 
 Status bits:
 0   block
-1   comress (otherwise limit)
+1   compress (otherwise limit)
 2   mute

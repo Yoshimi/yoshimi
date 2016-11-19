@@ -341,16 +341,16 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         return;
     }
 
-    /* insert midi learn access here
-     * pass 'in_place' so entire operation can be done in MidiLearn.cpp
-     * return -2 if blocking further calls
+    /* set / run midi learn
+     * pass 'in_place' so entire operation can be done
+     * in MidiLearn.cpp
+     * return true if blocking further calls
      *
-     * if (findMidiLearn(ctrl, ch, in_place) == -2)
-     *     return;
+     * need to work out some kind of loop-back so optional
+     * vector control CCs can be picked up.
      */
     if (synth->midilearn.runMidiLearn(param, ctrl, ch, in_place))
     {
-        //cout << "Blocked" << endl;
         return;
     }
 

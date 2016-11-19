@@ -1,0 +1,316 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0303 
+header_name {.h} 
+code_name {.cc}
+comment {MidiLearnUI.h} {selected not_in_source in_header
+} 
+
+comment {MidiLearnUI.cc} {in_source not_in_header
+} 
+
+comment {Copyright (C) 2016, Will Godfrey
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+} {in_source in_header
+} 
+
+decl {\#include <FL/fl_ask.H>
+    \#include "Misc/Config.h"
+    \#include "Misc/SynthEngine.h"} {private global
+} 
+
+decl {\#include "UI/MiscGui.h"
+    \#include "EffUI.h"
+    \#include "BankUI.h"
+    \#include "ADnoteUI.h"
+    \#include "SUBnoteUI.h"
+    \#include "PADnoteUI.h"
+    \#include "WidgetMWSliderUI.h"
+    \#include "Params/Controller.h"
+    \#include "Misc/MiscFuncs.h"} {public global
+} 
+
+decl {\#include "Misc/MidiLearn.h"
+    \#define MAX_INFO_TEXT_SIZE 256} {public local
+} 
+
+decl {\#include "MasterUI.h"} {private global
+} 
+
+class MidiLearnUI_ {open
+} {
+  Function {showparameters(int kititem,int engine)} {return_type virtual
+  } {
+    code {;} {}
+  }
+} 
+
+class MidiLearnKitItem {open : {public Fl_Group}
+} {
+  Function {make_window()} {open
+  } {
+    Fl_Window midilearnkititem {open
+      xywh {101 214 730 30} type Double
+      class Fl_Group visible
+    } {
+      Fl_Group midilearnkititemgroup {open
+        xywh {55 -5 605 25} box FLAT_BOX
+      } {
+        Fl_Counter CCcounter {
+          callback {send_data(16, tmp, 0xc0, n, 0xff)}
+          xywh {55 0 55 15} type Simple minimum 0 maximum 128 step 1
+        }
+        Fl_Counter chancounter {
+          callback {send_data(17, tmp, 0xc0, n, 0xff)}
+          xywh {125 0 55 15} type Simple minimum 0 maximum 128 step 1
+        }
+        Fl_Button labelbutton {
+          label {Part 63 kit 15 Addsynth Voice 8 Harmonic Amplitude}
+          callback {//}
+          xywh {411 0 313 15} box DOWN_BOX down_box FLAT_BOX color 7 labelfont 1 labelsize 10 align 84 deactivate
+        }
+        Fl_Check_Button compresscheck {
+          callback {//
+
+    send_data(8, o->value(), 0xc0, n, 0)}
+          xywh {340 0 15 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+        }
+        Fl_Check_Button blockcheck {
+          callback {//
+    send_data(8, o->value(), 0xc0, n, 1)}
+          xywh {377 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+        }
+        Fl_Counter minval {
+          callback {send_data(17, tmp, 0xc0, n, 0xff)}
+          xywh {195 0 55 15} type Simple minimum 0 maximum 128 step 1
+        }
+        Fl_Counter maxval {
+          callback {send_data(17, tmp, 0xc0, n, 0xff)}
+          xywh {265 0 55 15} type Simple minimum 0 maximum 128 step 1
+        }
+      }
+      Fl_Check_Button enabledcheck {
+        label 01
+        callback {//
+            send_data(8, o->value(), 0xc0, n, 0xff)}
+        xywh {30 0 15 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+      }
+    }
+  }
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+    code {//
+//collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine);
+;} {}
+  }
+  Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+    code {n=0;midilearn=NULL;} {}
+  }
+  Function {clearLine()} {} {
+    code {//
+    ;} {}
+  }
+  Function {refresh()} {} {
+    code {//
+        /*enabledcheck->value(midilearn->kit[n].Penabled == 1);
+        mutedcheck->value(midilearn->kit[n].Pmuted);
+        labelbutton->label(midilearn->kit[n].Pname.c_str());
+        minkcounter->value(midilearn->kit[n].Pminkey);
+        maxkcounter->value(midilearn->kit[n].Pmaxkey);
+        
+        if (midilearn->kit[n].Psendtomidilearneffect == 127)
+            sendtoeffect->value(0);*/
+        this->redraw();} {
+      callback {//
+          int answer = 1;
+            if (!o->value())
+                answer = fl_choice("Delete the item?", "No", "Yes", NULL);
+            if (answer)
+            {
+                synth->actionLock(lockmute);
+                midilearn->setkititemstatus(n, o->value());
+                synth->actionLock(unlock);
+
+                if (!o->value())
+                    midilearnkititemgroup->deactivate();
+                else
+                    midilearnkititemgroup->activate();
+                o->redraw();
+                midilearnui->showparameters(n, -1); // use to delete the ui, if it is not to item 0
+            }
+            else
+                o->value(1);}
+    }
+  }
+  Function {init(MidiLearnUI_ *midilearnui_)} {} {
+    code {//
+      synth = midilearn_->getSynthEngine();
+      midilearn =  midilearn_;
+      make_window();
+      end();} {}
+  }
+  Function {~MidiLearnKitItem()} {} {
+    code {midilearnkititem->hide();
+delete(midilearnkititem);} {}
+  }
+  decl {MidiLearn *midilearn;} {public local
+  }
+  decl {int n;} {private local
+  }
+  decl {int nmidilearn;} {private local
+  }
+  decl {char label[50];} {private local
+  }
+  decl {MidiLearnUI_ *midilearnui;} {private local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
+} 
+
+class MidiLearnUI {open : {public Fl_Group, MidiLearnUI_, private MiscFuncs}
+} {
+  Function {make_window()} {open
+  } {
+    Fl_Window instrumentkitlist {
+      label {Instrument Kit} open
+      xywh {99 272 735 375} type Double
+      code0 {o->copy_label(synth->getGuiMaster()->setMidiLearnWindowTitle("Midi Control List").c_str());} visible
+    } {
+      Fl_Button {} {
+        label Close
+        callback {instrumentkitlist->hide();}
+        xywh {569 348 63 20} box THIN_UP_BOX
+      }
+      Fl_Scroll kitlist {
+        xywh {0 15 735 330} type VERTICAL box THIN_UP_BOX
+      } {
+        Fl_Pack {} {
+          xywh {0 20 735 320}
+          code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){midilearnkititem[i]=new MidiLearnKitItem(0,0,670,20,"");midilearnkititem[i]->init(midilearn, i, npart, this);}}
+        } {}
+      }
+      Fl_Box {} {
+        label Mute
+        xywh {20 0 25 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label CC
+        xywh {65 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Chan
+        xywh {135 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Block
+        xywh {371 0 50 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Limit
+        xywh {316 0 60 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Choice options {
+        label Options
+        callback {//
+;}
+        tooltip {Single = only 1st item in defined note range sounds} xywh {15 348 71 19} down_box BORDER_BOX labelsize 11 align 8 textfont 1 textsize 11
+      } {
+        MenuItem load {
+          label Load
+          xywh {0 0 100 20} labelfont 1 labelsize 11
+        }
+        MenuItem save {
+          label Save
+          xywh {10 10 100 20} labelfont 1 labelsize 11
+        }
+        MenuItem recent {
+          label Recent
+          xywh {20 20 100 20} labelfont 1 labelsize 11
+        }
+        MenuItem clear {
+          label Clear
+          xywh {20 30 100 20} labelfont 1 labelsize 11
+        }
+      }
+      Fl_Box {} {
+        label Name
+        xywh {536 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Min
+        xywh {205 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Max
+        xywh {275 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+    }
+  }
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+    code {//
+collect_data(synth, value, (Fl::event_button() | type), control, 255, 255, 255);
+;} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    //float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    //unsigned char npart = getData->data.midilearn;
+    //unsigned char kititem = getData->data.kit;
+    //unsigned char engine = getData->data.engine;;
+
+    switch(control)
+    {
+    	case 0:
+    	    break;
+    }
+    Fl::check();} {}
+  }
+  Function {MidiLearnUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+    code {//
+        midilearn = NULL;} {}
+  }
+  Function {init(MidiLearn *midilearn_)} {} {
+    code {//
+	synth = midilearn_->getSynthEngine();
+        make_window();
+        end();} {}
+  }
+  Function {~MidiLearnUI()} {} {
+    code {if (adnoteui)
+            delete adnoteui;
+        if (subnoteui)
+            delete subnoteui;
+        if (padnoteui)
+            delete padnoteui;
+        midilearngroup->hide();
+        // delete(midilearngroup);
+        ctlwindow->hide();
+        delete ctlwindow;
+        midilearnfx->hide();
+        delete midilearnfx;
+        instrumentkitlist->hide();
+        delete instrumentkitlist;
+        instrumenteditwindow->hide();
+        delete instrumenteditwindow;} {}
+  }
+  decl {MidiLearn *midilearn;} {public local
+  }
+  decl {int lastkititem;} {public local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
+} 
