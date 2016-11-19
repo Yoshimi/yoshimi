@@ -60,7 +60,7 @@ void MidiLearn::setTransferBlock(unsigned char type, unsigned char control, unsi
     learnTransferBlock.par2 = par2;
     learnedName = name;
     learning = true;
-    cout << "Learning" << endl;
+    synth->getRuntime().Log("Learning");
 }
 
 
@@ -79,8 +79,34 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
     {
         lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
         //cout << "found " << lastpos << "  stop " << stop << endl;
+        int status = foundEntry.status;
+        if (status & 4)
+            continue;
         if (!stop && lastpos != -2)
         {
+            int minIn = foundEntry.min_in;
+            int maxIn = foundEntry.max_in;
+            if (minIn > maxIn)
+            {
+                value = 127 - value;
+                swap(minIn, maxIn);
+            }
+            if ((maxIn - minIn) != 127)
+            {
+                if (status & 2) // compress
+                {
+                    int range = maxIn - minIn;
+                    value = (value * range / 127) + minIn;
+                }
+                else // limit
+                {
+                    if (value < minIn)
+                        value = minIn;
+                    else if (value > maxIn)
+                        value = maxIn;
+                }
+            }
+
             //cout << "where?" << endl;
             CommandBlock putData;
             unsigned int writesize = sizeof(putData);
@@ -111,10 +137,10 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
                 ++tries;
                 }
                 if (towrite)
-                    cout << "Unable to write data to fromMidi buffer" << endl;
+                    synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
             }
             else
-                cout << "fromMidi buffer full!" << endl;
+                synth->getRuntime().Log("fromMidi buffer full!", 2);
             if (lastpos == -1)
                 stop = true;
         }
@@ -144,7 +170,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
         if ((it->chan >= 16 || chan == it->chan) && CC == it->CC)
         {
             if (show)
-                cout << "Found line " << it->name << "  at " << newpos << endl; // a test!
+                synth->getRuntime().Log("Found line " + it->name + "  at " + to_string(newpos)); // a test!
             block->chan = it->chan;
             block->CC = it->CC;
             block->data = it->data;
@@ -188,11 +214,11 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
     else
         midi_list.insert(it, entry);
 
-    cout << "Learned " <<endl;
+    synth->getRuntime().Log("Learned ");
     it = midi_list.begin();
     while (it != midi_list.end())
     {
-        cout << " CC " << (int)it->CC << "  Chan " << (int)it->chan << "  "<< it->name << endl;
+        synth->getRuntime().Log("CC " + to_string((int)it->CC) + "  Chan " + to_string((int)it->chan) + "  " + it->name);
         ++ it;
     }
     learning = false;

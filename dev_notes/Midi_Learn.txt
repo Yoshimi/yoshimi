@@ -1,0 +1,20 @@
+To learn, hold CTRL while right-clicking on any GUI control.
+Operate physical control to learn.
+Along with parameters, a text string will be provided with precise details of this complete action.
+
+Control capabilites:
+
+Incoming CC and channel tracked (in that order).
+
+Multiple actions on the same CC/channel pair.
+
+Range limiting or compression.
+
+Blocking of all later actions on the same CC.channel pair.
+
+Muting of this action.
+
+Status bits:
+0   block
+1   comress (otherwise limit)
+2   mute

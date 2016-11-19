@@ -2021,7 +2021,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            cout << (int)getData.data.control << endl;
+            //cout << (int)getData.data.control << endl;
             commandSend(&getData);
             returns(&getData);
             readyToSend = true;
