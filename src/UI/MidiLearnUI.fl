@@ -50,10 +50,10 @@ class MidiLearnKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnkititem {
-      xywh {41 569 740 30} type Double
-      class Fl_Group visible
+      xywh {40 553 740 30} type Double hide
+      class Fl_Group
     } {
-      Fl_Group midilearnkititemgroup {open
+      Fl_Group midilearnkititemgroup {
         xywh {49 -5 678 23} box FLAT_BOX
       } {
         Fl_Counter CCcounter {
@@ -205,15 +205,18 @@ this->redraw();} {
                 o->value(1);}
     }
   }
-  Function {~MidiLearnKitItem()} {} {
+  Function {~MidiLearnKitItem()} {open
+  } {
     code {midilearnkititem->hide();
 delete(midilearnkititem);} {}
   }
-  Function {init(int n_)} {} {
+  Function {init(int n_)} {open
+  } {
     code {//
 n = n_;
-    make_window();
-    end();} {}
+make_window();
+show();
+end();} {}
   }
   decl {int n;} {private local
   }
@@ -223,26 +226,26 @@ n = n_;
   }
 } 
 
-class MidiLearnUI {selected : {private MiscFuncs}
+class MidiLearnUI {open : {private MiscFuncs}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window midilearnwindow {
-      label {Midi Learn}
-      xywh {145 145 755 285} type Double hide
-      code0 {;}
+      label {Midi Learn} open
+      xywh {49 118 755 285} type Double
+      code0 {;} visible
     } {
       Fl_Button {} {
         label Close
         callback {midilearnwindow->hide();}
         xywh {684 262 63 20} box THIN_UP_BOX
       }
-      Fl_Scroll kitlist {
-        xywh {0 15 750 245} type VERTICAL box THIN_UP_BOX
-      } {
-        Fl_Pack {} {
-          xywh {0 20 745 235}
-          code0 {for (int i=0;i<NUM_KIT_ITEMS;i++){midilearnkititem[i]=new MidiLearnKitItem(0,0,740,20,"");midilearnkititem[i]->init(i);}}
-        } {}
+      Fl_Scroll kitlist {open
+        xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
+      } {}
+      Fl_Box none {
+        label {No Entries}
+        xywh {290 131 206 44} labelsize 32
       }
       Fl_Box {} {
         label Mute
@@ -299,6 +302,32 @@ class MidiLearnUI {selected : {private MiscFuncs}
         label Max
         xywh {275 0 40 15} labelfont 1 labelsize 11 align 18
       }
+      Fl_Button test {
+        label {Add Them!}
+        callback {none->hide();
+if (num >24)
+    return;
+for (int i = num; i < (num + 4); ++ i)
+{
+    if (!midilearnkititem[i])
+    {
+        midilearnkititem[i]=new MidiLearnKitItem(0, 0,740,20,"");
+        midilearnkititem[i]->init(i);
+        kitlist->add(midilearnkititem[i]);
+        midilearnkititem[i]->position(0, 20 + i * 20);
+        midilearnkititem[i]->CCcounter->value(i+14);
+    }
+}
+if (num == 0)
+    test->copy_label("Add More");
+if (num < 15)
+    num += 4;
+else
+    test->copy_label("Enough!");
+    
+kitlist->redraw();} selected
+        xywh {347 262 99 22} color 247 labelsize 12
+      }
     }
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
@@ -322,10 +351,14 @@ collect_data(synth, value, (Fl::event_button() | type), control, 255, 255, 255);
     }
     Fl::check();} {}
   }
-  Function {MidiLearnUI(SynthEngine *_synth)} {} {
+  Function {MidiLearnUI(SynthEngine *_synth)} {open
+  } {
     code {//
 synth = _synth;
-make_window();} {}
+for (int i = 0; i < 255; ++i)
+    midilearnkititem[i] = NULL;
+make_window();
+num = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
     code {;} {}
@@ -342,6 +375,8 @@ midilearnwindow->hide();} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-  decl {MidiLearnKitItem *midilearnkititem[NUM_KIT_ITEMS];} {private local
+  decl {MidiLearnKitItem *midilearnkititem[256];} {private local
+  }
+  decl {int num;} {private local
   }
 } 

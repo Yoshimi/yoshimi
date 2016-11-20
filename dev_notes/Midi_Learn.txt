@@ -12,11 +12,11 @@ Incoming CC and channel tracked (in that order).
 
 Multiple actions on the same CC/channel pair.
 
-Range limiting or compression. (not yet).
+Range limiting or compression.
 
-Blocking of all later actions on the same CC.channel pair (not yet).
+Blocking of all later actions on the same CC.channel pair.
 
-Muting of this action (not yet).
+Muting of this action.
 
 Status bits:
 0   block
@@ -24,10 +24,27 @@ Status bits:
 2   mute
 
 
-When sending internal control messages to the GUI instead of passing on midi actions, the part number will be 255 - a value that is never used in the rest of the system.
+When sending internal control messages to the GUI (instead of passing on midi actions) the part number will be 200 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
-This will be used for updating the list and and fillng in/altering line entries. The gui will never do these directly, but will request them using the same part number.
+This will be used for updating the list and and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
 
 Name strings will be passed across using the simple message system. These will NOT be editable in the GUI.
 
 These transfers will be done outside the RT threads.
+
+Normally the data will be sent as a complete instruction for one line.
+
+data structure:
+value       line number (used as an integer)
+type        status - this is a command unique to midilearn
+
+control     text message number - this may be a problem with large learn sets
+
+part        200
+kit         line number
+engine      CC
+insert      channel
+parameter   min_in
+par2        max_in
+
+We may end up limiting the gui to 'viewing groups' of 256 or even 128, it would solve a *lot* of problems!
