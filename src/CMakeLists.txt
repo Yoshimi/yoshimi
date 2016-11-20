@@ -311,14 +311,14 @@ set (MusicIO_sources
 )
 
 set (FltkUI_names
-    "WidgetPDialUI"  "PresetsUI"  "EnvelopeUI"
-    "LFOUI"  "FilterUI"  "VirKeyboardUI"
-    "ConfigUI"  "SUBnoteUI"  "ResonanceUI"
-    "OscilGenUI"  "ADnoteUI"  "PADnoteUI"
-    "EffUI"  "BankUI"  "PartUI"
-    "MicrotonalUI"  "MasterUI" "MasterMiscUI"
+    "WidgetPDialUI" "PresetsUI" "EnvelopeUI"
+    "LFOUI" "FilterUI" "VirKeyboardUI"
+    "ConfigUI" "SUBnoteUI" "ResonanceUI"
+    "OscilGenUI" "ADnoteUI" "PADnoteUI"
+    "EffUI" "BankUI" "PartUI"
+    "MicrotonalUI" "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "WidgetMWSliderUI"
+    "MidiLearnUI" "WidgetMWSliderUI"
 )
 
 # workaround fltk_wrap_ui breakage

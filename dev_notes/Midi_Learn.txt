@@ -22,3 +22,12 @@ Status bits:
 0   block
 1   compress (otherwise limit)
 2   mute
+
+
+When sending internal control messages to the GUI instead of passing on midi actions, the part number will be 255 - a value that is never used in the rest of the system.
+
+This will be used for updating the list and and fillng in/altering line entries. The gui will never do these directly, but will request them using the same part number.
+
+Name strings will be passed across using the simple message system. These will NOT be editable in the GUI.
+
+These transfers will be done outside the RT threads.

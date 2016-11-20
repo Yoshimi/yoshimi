@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-11-20 Will
+* Midi learn window now accessible but non-functional.
+
 2016-11-19 Will
 * Made a few corrections and extensions to midi learn.
 * Started documenting this.

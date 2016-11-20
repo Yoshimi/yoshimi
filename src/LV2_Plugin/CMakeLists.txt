@@ -76,7 +76,7 @@ set (FltkUI_names
     "EffUI"  "BankUI"  "PartUI"
     "MicrotonalUI"  "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "WidgetMWSliderUI"
+    "MidiLearnUI" "WidgetMWSliderUI"
 )
 
 # workaround fltk_wrap_ui breakage

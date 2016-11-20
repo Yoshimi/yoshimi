@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is a derivative of the ZynAddSubFX original, modified November 2016
 
 
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -90,10 +90,13 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 } 
 
+decl {\#include "MidiLearnUI.h"} {public local
+} 
+
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -160,6 +163,12 @@ class MasterUI {: {private MiscFuncs}
         vectorui->Hide();
         delete vectorui;
       }
+      if (midilearnui)
+      {
+        midilearnui->Hide();
+        delete midilearnui;
+      }
+
       if (yoshiLog)
       {
         yoshiLog->Hide();
@@ -184,6 +193,7 @@ class MasterUI {: {private MiscFuncs}
       presetsui = new PresetsUI(synth);
       paramsui = new ParametersUI(synth);
       vectorui = new VectorUI(synth, bankui, paramsui);
+      midilearnui = new MidiLearnUI(synth);
       yoshiLog = new ConsoleUI();
 
       make_window();
@@ -298,6 +308,11 @@ mainCreateNewInstance(forceId);}
             label {&Settings...}
             callback {configui->Show();}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
+          }
+          MenuItem {} {
+            label {&Midi Learn}
+            callback {midilearnui->Show();}
+            xywh {0 0 34 20}
           }
           MenuItem {} {
             label {E&xit}
@@ -418,7 +433,7 @@ paramsui->Show(2);}
           }
         }
         Submenu Scales {
-          label {&Scales} open
+          label {&Scales}
           tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
           code0 {o = o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(3);}
@@ -2012,6 +2027,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   decl {ParametersUI *paramsui;} {private local
   }
   decl {VectorUI *vectorui;} {public local
+  }
+  decl {MidiLearnUI *midilearnui;} {public local
   }
   decl {BankUI *bankui;} {public local
   }
