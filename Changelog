@@ -4,6 +4,7 @@ yoshimi 1.4.1 M
 * Midi learn window now accessible but non-functional.
 * Midi learn Gui now has some internal test structure.
 * Updated docs.
+* Resolved issue with learned controls not all updating :)
 
 2016-11-19 Will
 * Made a few corrections and extensions to midi learn.

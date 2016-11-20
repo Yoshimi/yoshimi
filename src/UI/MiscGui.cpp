@@ -79,10 +79,7 @@ void read_updates(SynthEngine *synth)
     {
         int toread = commandSize;
         char *point = (char*) &getData.bytes;
-        for (size_t i = 0; i < commandSize; ++i)
-        {
-            jack_ringbuffer_read(synth->interchange.toGUI, point, toread);
-        }
+        jack_ringbuffer_read(synth->interchange.toGUI, point, toread);
         decode_updates(synth, &getData);
     }
 }
