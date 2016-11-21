@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-11-21 Will
+* partially set up routing for midi learn messages.
+* BugFix: Wrong ID for kits allowed part messages to drop
+  through causing a segfault.
+
 2016-11-20 Will
 * Midi learn window now accessible but non-functional.
 * Midi learn Gui now has some internal test structure.

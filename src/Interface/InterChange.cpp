@@ -200,7 +200,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         commandName = resolveSysIns(getData);
     }
-    else if (kititem == 0xff || (kititem & 0x20))
+    else if (kititem == 0xff || (kititem & 0x3f))
     {
         commandName = resolvePart(getData);
     }
@@ -2019,7 +2019,8 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
             //cout << (int)getData.data.control << endl;
-            commandSend(&getData);
+            if(getData.data.part != 0xc8) // special midi-learn message
+                commandSend(&getData);
             returns(&getData);
             readyToSend = true;
         }
@@ -2031,6 +2032,15 @@ void InterChange::mediate()
 void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    Part *part;
+    part = synth->part[npart];
+    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+        return; // attempt to access non existant kititem
+
     //bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     bool isMidi = type & 8;
@@ -2040,9 +2050,9 @@ void InterChange::returns(CommandBlock *getData)
         if ((isMidi || isCli) && write)
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
-            {
-            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
-            }
+                jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+            if (getData->data.part == 0xc8) // special midi-learn message
+                return;
         }
     }
 
@@ -2100,7 +2110,7 @@ void InterChange::commandSend(CommandBlock *getData)
         commandSysIns(getData);
         return;
     }
-    if (kititem == 0xff || (kititem & 0x20))
+    if (kititem == 0xff || (kititem & 0x3f))
     {
         commandPart(getData);
         return;
@@ -2497,7 +2507,9 @@ void InterChange::commandPart(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    string contstr = "";
+    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+        return; // attempt to access non existant kititem
+
     switch (control)
     {
         case 0:
@@ -2569,7 +2581,7 @@ void InterChange::commandPart(CommandBlock *getData)
                         if (write)
                             part->setkititemstatus(kititem & 0x1f, (char) value);
                         else
-                            value = synth->partonoffRead(npart);
+                            value = part->kit[kititem & 0x1f].Penabled;
                         break;
                 }
             }
@@ -4015,7 +4027,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
         return;
     }
 
-    string contstr;
     switch (control)
     {
         case 0:
@@ -4265,7 +4276,6 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
         return;
     }
 
-    string contstr;
     switch (control)
     {
         case 0:
@@ -4977,7 +4987,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             }
             else
                 val = pars->Pfreemode;
-            //contstr = "Freemode";
             break;
         case 34:
             if (!pars->Pfreemode)
@@ -4987,7 +4996,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             }
             else
                 Xincrement = envpoints;
-                //val = envpoints << 8;
             break;
         case 35:
             if (write)
