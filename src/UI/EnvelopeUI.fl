@@ -274,7 +274,7 @@ return(1);} {}
   }
 } 
 
-class EnvelopeUI {open : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -378,7 +378,7 @@ send_data(group, 16, o->value(), 0xc0);}
       Fl_Dial envstretchdial {
         label {Str.}
         callback {env->Penvstretch=(int)o->value();
-send_data(group, 7, o->value(), 0xc0);}
+send_data(group, 7, o->value(), 0xc8);}
         tooltip {Envelope stretch (on lower notes make the envelope longer)} xywh {380 153 25 25} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
@@ -434,7 +434,7 @@ send_data(group, 35, o->value(), 0xc0);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 1, o->value(), 0xc0);}
+send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           code1 {if (engine >= 0xc0) o->init(80); else o->init(0);}
@@ -444,7 +444,7 @@ send_data(group, 1, o->value(), 0xc0);}
           label {D.dt}
           callback {env->PD_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 3, o->value(), 0xc0);}
+send_data(group, 3, o->value(), 0xc8);}
           tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_dt);}
           code1 {if (engine >= 0xc0) o->init(90); else if (engine >= 0x80) o->init(100); else o->init(40);}
@@ -454,7 +454,7 @@ send_data(group, 3, o->value(), 0xc0);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 5, o->value(), 0xc0);}
+send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           code1 {if (engine >= 0x80) o->init(100); else o->init(25);}
@@ -464,7 +464,7 @@ send_data(group, 5, o->value(), 0xc0);}
           label {S.val}
           callback {env->PS_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 4, o->value(), 0xc0);}
+send_data(group, 4, o->value(), 0xc8);}
           tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PS_val);}
           code1 {o->init(127);}
@@ -480,7 +480,7 @@ send_data(group, 16, o->value(), 0xc0);}
         Fl_Dial e1envstretch {
           label Stretch
           callback {env->Penvstretch=(int)o->value();
-send_data(group, 7, o->value(), 0xc0);}
+send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
@@ -525,7 +525,7 @@ send_data(group, 17, o->value(), 0xc0);}
           label {A.val}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 0, o->value(), 0xc0);}
+send_data(group, 0, o->value(), 0xc8);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {if (engine >= 0xc0) o->init(20); else if (engine >= 0x80 || engine == 1) o->init(30); else o->init(64);}
@@ -535,7 +535,7 @@ send_data(group, 0, o->value(), 0xc0);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 1, o->value(), 0xc0);}
+send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           code1 {if (engine >= 0xc0) o->init(90); else if (engine >= 0x80) o->init(40); else o->init(50);}
@@ -545,7 +545,7 @@ send_data(group, 1, o->value(), 0xc0);}
           label {R.val}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 6, o->value(), 0xc0);}
+send_data(group, 6, o->value(), 0xc8);}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {if (engine >= 0xc0) o->init(40); else o->init(64);}
@@ -555,7 +555,7 @@ send_data(group, 6, o->value(), 0xc0);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 5, o->value(), 0xc0);}
+send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           code1 {if (engine >= 0xc0) o->init(80); else o->init(60);}
@@ -564,7 +564,7 @@ send_data(group, 5, o->value(), 0xc0);}
         Fl_Dial e2envstretch {
           label Stretch
           callback {env->Penvstretch=(int)o->value();
-send_data(group, 7, o->value(), 0xc0);}
+send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {if (engine == 1) o->init(64); else o->init(0);}
@@ -609,7 +609,7 @@ send_data(group, 24, o->value(), 0xc0);}
           label {A.val}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 0, o->value(), 0xc0);}
+send_data(group, 0, o->value(), 0xc8);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {if (engine < 0x80) o->init(64); else o->init(90);}
@@ -619,7 +619,7 @@ send_data(group, 0, o->value(), 0xc0);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 1, o->value(), 0xc0);}
+send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           code1 {if (engine < 0x80) o->init(40); else o->init(70);}
@@ -629,7 +629,7 @@ send_data(group, 1, o->value(), 0xc0);}
           label {D.val}
           callback {env->PD_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 2, o->value(), 0xc0);}
+send_data(group, 2, o->value(), 0xc8);}
           tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_val);}
           code1 {if (engine < 0x80) o->init(64); else o->init(40);}
@@ -639,7 +639,7 @@ send_data(group, 2, o->value(), 0xc0);}
           label {D.dt}
           callback {env->PD_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 3, o->value(), 0xc0);}
+send_data(group, 3, o->value(), 0xc8);}
           tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_dt);}
           code1 {o->init(70);}
@@ -649,7 +649,7 @@ send_data(group, 3, o->value(), 0xc0);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 5, o->value(), 0xc0);}
+send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           code1 {if (engine < 0x80) o->init(60); else o->init(10);}
@@ -659,7 +659,7 @@ send_data(group, 5, o->value(), 0xc0);}
           label {R.val}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 6, o->value(), 0xc0);}
+send_data(group, 6, o->value(), 0xc8);}
           tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {if (engine < 0x80) o->init(64); else o->init(40);}
@@ -668,7 +668,7 @@ send_data(group, 6, o->value(), 0xc0);}
         Fl_Dial e3envstretch {
           label Stretch
           callback {env->Penvstretch=(int)o->value();
-send_data(group, 7, o->value(), 0xc0);}
+send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(0);}
@@ -713,7 +713,7 @@ send_data(group, 24, o->value(), 0xc0);}
           label {A.val}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 0, o->value(), 0xc0);}
+send_data(group, 0, o->value(), 0xc8);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->init(100);}
@@ -723,7 +723,7 @@ send_data(group, 0, o->value(), 0xc0);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 1, o->value(), 0xc0);}
+send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
           code1 {o->init(70);}
@@ -733,7 +733,7 @@ send_data(group, 1, o->value(), 0xc0);}
           label {R.val}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
-send_data(group, 6, o->value(), 0xc0);}
+send_data(group, 6, o->value(), 0xc8);}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->init(64);}
@@ -743,7 +743,7 @@ send_data(group, 6, o->value(), 0xc0);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
-send_data(group, 5, o->value(), 0xc0);}
+send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
           code1 {o->init(60);}
@@ -752,7 +752,7 @@ send_data(group, 5, o->value(), 0xc0);}
         Fl_Dial e4envstretch {
           label Stretch
           callback {env->Penvstretch=(int)o->value();
-send_data(group, 7, o->value(), 0xc0);}
+send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
@@ -826,8 +826,7 @@ if (par2 != 255)
   insert = 3;
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, group, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
@@ -985,8 +984,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             freemodebutton->value(value != 0);
     	    break;
     }
-    Fl::check();} {selected
-    }
+    Fl::check();} {}
   }
   Function {init(EnvelopeParams *env_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {//

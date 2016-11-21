@@ -85,7 +85,6 @@ InterChange::InterChange(SynthEngine *_synth) :
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
     }
-    readyToSend = true;
 }
 
 
@@ -200,13 +199,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         commandName = resolveSysIns(getData);
     }
-    else if (kititem == 0xff || (kititem & 0x3f))
-    {
-        commandName = resolvePart(getData);
-    }
     else if (kititem >= 0x80)
     {
         commandName = resolveEffects(getData);
+    }
+    else if (kititem == 0xff || (kititem & 0x3f))
+    {
+        commandName = resolvePart(getData);
     }
 
     else if (engine == 2)
@@ -1982,9 +1981,8 @@ void InterChange::mediate()
     {
         more = false;
         size = jack_ringbuffer_read_space(fromCLI);
-        if (size >= commandSize && readyToSend)
+        if (size >= commandSize)
         {
-            readyToSend = false;
             if (size > commandSize)
                 more = true;
             toread = commandSize;
@@ -1992,27 +1990,25 @@ void InterChange::mediate()
             jack_ringbuffer_read(fromCLI, point, toread);
             commandSend(&getData);
             returns(&getData);
-            readyToSend = true;
         }
 
         size = jack_ringbuffer_read_space(fromGUI);
-        if (size >= commandSize && readyToSend)
+        if (size >= commandSize)
         {
-            readyToSend = false;
             if (size > commandSize)
                 more = true;
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
+            #warning gui writes changed to reads
+            getData.data.type = getData.data.type & 0xbf;
             commandSend(&getData);
             returns(&getData);
-            readyToSend = true;
         }
 
         size = jack_ringbuffer_read_space(fromMIDI);
-        if (size >= commandSize && readyToSend)
+        if (size >= commandSize)
         {
-            readyToSend = false;
             if (size > commandSize)
                 more = true;
             toread = commandSize;
@@ -2022,7 +2018,6 @@ void InterChange::mediate()
             if(getData.data.part != 0xc8) // special midi-learn message
                 commandSend(&getData);
             returns(&getData);
-            readyToSend = true;
         }
     }
     while (more);
@@ -2032,14 +2027,6 @@ void InterChange::mediate()
 void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;
-    Part *part;
-    part = synth->part[npart];
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
-        return; // attempt to access non existant kititem
 
     //bool isGui = type & 0x20;
     bool isCli = type & 0x10;
@@ -2088,13 +2075,6 @@ void InterChange::commandSend(CommandBlock *getData)
     if ((isGui && button != 2) || (isCli && button == 1))
         return;
 
-#warning gui writes changed to reads
-    if (isGui)
-    {
-        type &= 0xbf; // changed here
-        getData->data.type = type;
-    }
-
     if (npart >= 0xc0 && npart < 0xd0)
     {
         commandVector(getData);
@@ -2110,14 +2090,14 @@ void InterChange::commandSend(CommandBlock *getData)
         commandSysIns(getData);
         return;
     }
-    if (kititem == 0xff || (kititem & 0x3f))
-    {
-        commandPart(getData);
-        return;
-    }
     if (kititem >= 0x80)
     {
         commandEffects(getData);
+        return;
+    }
+    if (kititem == 0xff || (kititem & 0x3f))
+    {
+        commandPart(getData);
         return;
     }
 
@@ -5021,7 +5001,6 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
     bool write = (type & 0x40) > 0;
     bool isSysEff = (npart == 0xf1);
-
     if (insert == 0xff)
     {
         switch (control)

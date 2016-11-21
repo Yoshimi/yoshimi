@@ -108,7 +108,6 @@ class InterChange : private MiscFuncs
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);
 
-        bool readyToSend;
         SynthEngine *synth;
 };
 

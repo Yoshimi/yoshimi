@@ -30,6 +30,7 @@ SynthEngine *synth;
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
 #ifdef ENABLE_REPORTS
+    //cout << "here again" << (int) value << endl;
     int typetop = type & 0xc0;
     if ((type & 3) == 3)
     { // value type is now irrelevant
@@ -65,7 +66,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.par2 = par2;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
-
 #endif
 }
 
