@@ -63,6 +63,7 @@ string basics[] = {
     "  Parts",                      "parts with instruments installed",
     "  Vectors",                    "settings for all enabled vectors",
     "  Settings",                   "dynamic settings",
+    "  MLearn",                     "midi learned controls",
     "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors)",
     "  Effects [s]",                "effect types ('all' include preset numbers and names)",
     "LOad",                         "load patch files",
@@ -1780,6 +1781,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
         }
+        else if (matchnMove(2, point, "mlearn"))
+            synth->midilearn.listAll();
         else if (matchnMove(1, point, "history"))
         {
             reply = done_msg;
@@ -2112,8 +2115,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
         if (strchr(point, '.') == NULL)
             type |= 0x80;
         point = skipChars(point);
-        type |= (string2int127(point) & 0x41);
-        // fix as: not MIDI learn, from CLI, integer
+        type |= (string2int127(point) & 0x43);
+        // Fix as from CLI, integer
+        // Allow 'pretend' and MIDI learn
         point = skipChars(point);
         unsigned char control = string2int(point);
         point = skipChars(point);

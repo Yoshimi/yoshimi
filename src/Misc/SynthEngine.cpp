@@ -1456,9 +1456,16 @@ void SynthEngine::SetSystemValue(int type, int value)
 
         case 102:
             if (value > 63)
+            {
                 Runtime.showTimes = true;
+                label = "Enabled";
+            }
             else
+            {
                 Runtime.showTimes = false;
+                label = "Disabled";
+            }
+            Runtime.Log("Part load time " + label);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
             break;
 

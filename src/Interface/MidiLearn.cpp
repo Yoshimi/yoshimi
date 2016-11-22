@@ -192,6 +192,20 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
 }
 
 
+void MidiLearn::listAll()
+{
+    list<LearnBlock>::iterator it = midi_list.begin();
+    int lineNo = 0;
+    synth->getRuntime().Log("Midi learned:");
+    while (it != midi_list.end())
+    {
+        synth->getRuntime().Log("Line " + to_string(lineNo) + "  CC " + to_string((int)it->CC) + "  Chan " + to_string((int)it->chan) + "  " + it->name);
+        ++ it;
+        ++ lineNo;
+    }
+}
+
+
 bool MidiLearn::remove(int itemNumber)
 {
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -239,12 +253,7 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
         midi_list.insert(it, entry);
 
     synth->getRuntime().Log("Learned ");
-    it = midi_list.begin();
-    while (it != midi_list.end())
-    {
-        synth->getRuntime().Log("CC " + to_string((int)it->CC) + "  Chan " + to_string((int)it->chan) + "  " + it->name);
-        ++ it;
-    }
+    synth->getRuntime().Log("CC " + to_string((int)entry.CC) + "  Chan " + to_string((int)entry.chan) + "  " + entry.name);
     learning = false;
 }
 

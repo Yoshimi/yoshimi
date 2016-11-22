@@ -101,7 +101,6 @@ void *InterChange::CLIresolvethread(void)
     char *point;
     while(synth->getRuntime().runSynth)
     {
-        usleep(10000);
         while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
         {
             toread = commandSize;
@@ -109,6 +108,7 @@ void *InterChange::CLIresolvethread(void)
             jack_ringbuffer_read(toCLI, point, toread);
             resolveReplies(&getData);
         }
+        usleep(10000);
     }
     return NULL;
 }
@@ -148,19 +148,22 @@ void InterChange::resolveReplies(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
-    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    unsigned char insertParam = getData->data.parameter;
-    unsigned char insertPar2 = getData->data.par2;
 
-    bool isGui = type & 0x20;
     bool isCli = type & 0x10;
+    bool isGui = type & 0x20;
     char button = type & 3;
     string isValue;
     string commandName;
+#ifdef ENABLE_REPORTS
+    unsigned char control = getData->data.control;
+    unsigned char insertParam = getData->data.parameter;
+    unsigned char insertPar2 = getData->data.par2;
+
+    bool isMidi = type & 8;
 
     if (isGui)
         synth->getRuntime().Log("From GUI");
@@ -187,6 +190,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
                             + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
     }
+#endif
     if (npart >= 0xc0 && npart < 0xd0)
     {
         commandName = resolveVector(getData);
@@ -199,7 +203,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         commandName = resolveSysIns(getData);
     }
-    else if (kititem >= 0x80)
+    else if (kititem >= 0x80 && kititem != 0xff)
     {
         commandName = resolveEffects(getData);
     }
@@ -311,12 +315,17 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 break;
         }
     }
-    if (isGui && button == 3)
+    if ((isGui || isCli) && button == 3)
     {
         synth->midilearn.setTransferBlock(getData->data.type, getData->data.control, getData->data.part, getData->data.kit, getData->data.engine, getData->data.insert, getData->data.parameter, getData->data.par2, commandName);
     }
-    else
+#ifdef ENABLE_REPORTS
+    else if(!isMidi || synth->getRuntime().showTimes)
         synth->getRuntime().Log(commandName);
+#else
+    else if(!isGui && synth->getRuntime().showTimes)
+        synth->getRuntime().Log(commandName);
+#endif
 }
 
 
@@ -2090,7 +2099,7 @@ void InterChange::commandSend(CommandBlock *getData)
         commandSysIns(getData);
         return;
     }
-    if (kititem >= 0x80)
+    if (kititem >= 0x80 && kititem != 0xff)
     {
         commandEffects(getData);
         return;

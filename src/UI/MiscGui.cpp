@@ -29,7 +29,7 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-#ifdef ENABLE_REPORTS
+//#ifdef ENABLE_REPORTS
     //cout << "here again" << (int) value << endl;
     int typetop = type & 0xc0;
     if ((type & 3) == 3)
@@ -66,7 +66,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.par2 = par2;
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
-#endif
+//#endif
 }
 
 
@@ -103,16 +103,16 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
-    if (kititem == 0xff || (kititem & 0x20)) // part
-    {
-        synth->getGuiMaster()->partui->returns_update(getData);
-        return;
-    }
-    if (kititem >= 0x80) // effects
+    if (kititem >= 0x80 && kititem != 0xff) // effects
     {
         return; // todo
     }
 
+    if (kititem == 0xff || (kititem & 0x3f)) // part
+    {
+        synth->getGuiMaster()->partui->returns_update(getData);
+        return;
+    }
     if (engine == 2) // padsynth
     {
         if(synth->getGuiMaster()->partui->padnoteui)
@@ -233,15 +233,15 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                         {
                             case 0:
                                 if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup)
-                                synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup->returns_update(getData);
+                                    synth->getGuiMaster()->partui->adnoteui->advoice->voiceamplfogroup->returns_update(getData);
                                 break;
                             case 1:
                                 if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup)
-                                synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->returns_update(getData);
+                                    synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqlfogroup->returns_update(getData);
                                 break;
                             case 2:
                                 if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup)
-                                synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup->returns_update(getData);
+                                    synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterlfogroup->returns_update(getData);
                                 break;
                         }
                         break;
@@ -250,17 +250,37 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                             synth->getGuiMaster()->partui->adnoteui->advoice->voicefilter->returns_update(getData);
                         break;
                     case 2:
-                        switch(insertParam)
+                        if (engine >= 0xC0)
+                            switch(insertParam)
+                            {
+                                case 0:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMampenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMampenvgroup->returns_update(getData);
+                                    break;
+                                case 1:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voiceFMfreqenvgroup->returns_update(getData);
+                                    break;
+                            }
+                        else
                         {
-                            case 0:
-                                break;
-                            case 1:
-                                break;
-                            case 2:
-                                break;
-                        }
+                            switch(insertParam)
+                            {
+                                case 0:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voiceampenvgroup->returns_update(getData);
+                                    break;
+                                case 1:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voicefreqenvgroup->returns_update(getData);
+                                    break;
+                                case 2:
+                                    if (synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup)
+                                        synth->getGuiMaster()->partui->adnoteui->advoice->voicefilterenvgroup->returns_update(getData);
+                                    break;
+                            }
                         break;
-
+                        }
                     case 5:
                     case 6:
                     case 7:
@@ -306,10 +326,16 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     switch(insertParam)
                     {
                         case 0:
+                            if (synth->getGuiMaster()->partui->adnoteui->ampenv)
+                                synth->getGuiMaster()->partui->adnoteui->ampenv->returns_update(getData);
                             break;
                         case 1:
+                            if (synth->getGuiMaster()->partui->adnoteui->freqenv)
+                                synth->getGuiMaster()->partui->adnoteui->freqenv->returns_update(getData);
                             break;
                         case 2:
+                            if (synth->getGuiMaster()->partui->adnoteui->filterenv)
+                                synth->getGuiMaster()->partui->adnoteui->filterenv->returns_update(getData);
                             break;
                     }
                     break;

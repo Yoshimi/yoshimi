@@ -1,5 +1,12 @@
 yoshimi 1.4.1 M
 
+2016-11-22 Will
+* Enabled midi-learn from CLI direct access.
+* Normal CLI can also list current learned lines.
+* Implemented (forgotten) AddSynth direct -> gui envelopes
+  but still not freemode.
+* Updated docs.
+
 2016-11-21 Will
 * Partially set up routing for midi learn messages.
 * BugFix: Wrong ID for kits allowed part messages to drop
