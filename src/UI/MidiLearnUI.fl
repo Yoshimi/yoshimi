@@ -32,6 +32,9 @@ decl {\#include <FL/fl_ask.H>
     \#include "Misc/SynthEngine.h"} {private global
 } 
 
+decl {\# include "Misc/MiscFuncs.h"} {private local
+} 
+
 decl {\#include "UI/MiscGui.h"
     \#include "EffUI.h"
     \#include "BankUI.h"
@@ -151,9 +154,12 @@ class MidiLearnKitItem {: {public Fl_Group}
           callback {//send_data(17, tmp, 0xc0, n, 0xff)}
           tooltip {Maximim value to pass on} xywh {265 0 55 15} type Simple minimum 0 maximum 127 step 1 value 127
         }
-        Fl_Box {} {
-          label {Part 63 kit 15 Add Voice 8 Harmonic  123 Amplitude}
-          xywh {410 0 315 15} box THIN_DOWN_BOX color 247 selection_color 255 labelfont 1 labelsize 10 align 64
+        Fl_Button commandName {
+          label text
+          xywh {401 0 315 15} box FLAT_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
+        }
+        Fl_Text_Display {} {
+          xywh {401 0 315 15} color 247 selection_color 247 labelfont 1 labelsize 10 align 65 textsize 10
         }
       }
       Fl_Check_Button mutecheck {
@@ -205,13 +211,11 @@ this->redraw();} {
                 o->value(1);}
     }
   }
-  Function {~MidiLearnKitItem()} {open
-  } {
+  Function {~MidiLearnKitItem()} {} {
     code {midilearnkititem->hide();
 delete(midilearnkititem);} {}
   }
-  Function {init(int n_)} {open
-  } {
+  Function {init(int n_)} {} {
     code {//
 n = n_;
 make_window();
@@ -226,14 +230,13 @@ end();} {}
   }
 } 
 
-class MidiLearnUI {open : {private MiscFuncs}
+class MidiLearnUI {selected : {private MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window midilearnwindow {
-      label {Midi Learn} open
-      xywh {49 118 755 285} type Double
-      code0 {;} visible
+      label {Midi Learn}
+      xywh {49 118 755 285} type Double hide
+      code0 {;}
     } {
       Fl_Button {} {
         label Close
@@ -302,32 +305,6 @@ class MidiLearnUI {open : {private MiscFuncs}
         label Max
         xywh {275 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Button test {
-        label {Add Them!}
-        callback {none->hide();
-if (num >24)
-    return;
-for (int i = num; i < (num + 4); ++ i)
-{
-    if (!midilearnkititem[i])
-    {
-        midilearnkititem[i]=new MidiLearnKitItem(0, 0,740,20,"");
-        midilearnkititem[i]->init(i);
-        kitlist->add(midilearnkititem[i]);
-        midilearnkititem[i]->position(0, 20 + i * 20);
-        midilearnkititem[i]->CCcounter->value(i+14);
-    }
-}
-if (num == 0)
-    test->copy_label("Add More");
-if (num < 15)
-    num += 4;
-else
-    test->copy_label("Enough!");
-    
-kitlist->redraw();} selected
-        xywh {347 262 99 22} color 247 labelsize 12
-      }
     }
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
@@ -348,14 +325,41 @@ collect_data(synth, value, (Fl::event_button() | type), control, 255, 255, 255);
     {
     	case 0:
     	    break;
+        case 16:
+            addLine(getData);
+            break;
+    	    
     }
     Fl::check();} {}
   }
-  Function {MidiLearnUI(SynthEngine *_synth)} {open
-  } {
+  Function {addLine(CommandBlock *getData)} {} {
+    code {//
+int lineNo = ((int)getData->data.value);
+int status = getData->data.type;
+if (midilearnkititem[lineNo])
+    delete midilearnkititem[lineNo];
+
+string name = miscMsgPop(getData->data.par2);
+cout << name << endl;
+none->hide();
+midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,740,20,"");
+midilearnkititem[lineNo]->init(lineNo);
+kitlist->add(midilearnkititem[lineNo]);
+
+midilearnkititem[lineNo]->position(0, 20 + lineNo*20);
+midilearnkititem[lineNo]->mutecheck->value(status & 4);
+midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
+midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
+midilearnkititem[lineNo]->minval->value(getData->data.insert);
+midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
+midilearnkititem[lineNo]->compresscheck->value(status & 2);
+midilearnkititem[lineNo]->blockcheck->value(status & 1);
+midilearnkititem[lineNo]->commandName->copy_label(name.c_str());} {}
+  }
+  Function {MidiLearnUI(SynthEngine *_synth)} {} {
     code {//
 synth = _synth;
-for (int i = 0; i < 255; ++i)
+for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
     midilearnkititem[i] = NULL;
 make_window();
 num = 0;} {}
@@ -375,7 +379,7 @@ midilearnwindow->hide();} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-  decl {MidiLearnKitItem *midilearnkititem[256];} {private local
+  decl {MidiLearnKitItem *midilearnkititem[MIDI_LEARN_BLOCK];} {private local
   }
   decl {int num;} {private local
   }

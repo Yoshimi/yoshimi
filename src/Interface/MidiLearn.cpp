@@ -71,7 +71,6 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
         insert(CC, chan);
         return true; // block while learning
     }
-    //cout << "here" << endl;
 
     int lastpos = -1;
     LearnBlock foundEntry;
@@ -225,6 +224,17 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::insert(unsigned char CC, unsigned char chan)
 {
+    /*
+     * This will eventually be part of a paging system of
+     * 128 lines for the Gui.
+     */
+    if (midi_list.size() >= MIDI_LEARN_BLOCK)
+    {
+        GuiThreadMsg::sendMessage(synth,GuiThreadMsg::GuiAlert,miscMsgPush("Midi Learn full!"));
+        synth->getRuntime().Log("Midi Learn full!");
+        learning = false;
+        return;
+    }
     list<LearnBlock>::iterator it;
     LearnBlock entry;
     entry.chan = chan;
@@ -239,13 +249,19 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
     entry.data = learnTransferBlock;
 
     it = midi_list.begin();
-
+    int lineNo = 0;
     if (midi_list.size() > 0)
     {
         while(CC >= it->CC && it != midi_list.end()) // CC is priority
+        {
             ++it;
+            ++lineNo;
+        }
         while(CC == it->CC && chan >= it->chan && it != midi_list.end())
+        {
             ++it;
+            ++lineNo;
+        }
     }
     if (it == midi_list.end())
         midi_list.push_back(entry);
@@ -254,6 +270,57 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
 
     synth->getRuntime().Log("Learned ");
     synth->getRuntime().Log("CC " + to_string((int)entry.CC) + "  Chan " + to_string((int)entry.chan) + "  " + entry.name);
+    updateGui();
     learning = false;
 }
 
+
+void MidiLearn::updateGui()
+{
+    CommandBlock putData;
+    unsigned int writesize = sizeof(putData);
+    //char *point = (char*)&putData;
+    unsigned int towrite ;
+    unsigned int wrote;
+    unsigned int found;
+    unsigned int tries;
+    list<LearnBlock>::iterator it;
+    it = midi_list.begin();
+    int lineNo = 0;
+    while (it != midi_list.end())
+    {
+        putData.data.value = lineNo;
+        putData.data.type = 2;// default status
+        putData.data.control = 16;
+        putData.data.part = 0xd8;
+        putData.data.kit = it->CC;
+        putData.data.engine = it->chan;
+        putData.data.insert = it->min_in;
+        putData.data.parameter = it->max_in;
+        putData.data.par2 = miscMsgPush(it->name);
+
+usleep(100);
+        char *point = (char*)&putData;
+        towrite = writesize;
+        wrote = 0;
+        found = 0;
+        tries = 0;
+        if (jack_ringbuffer_write_space(synth->interchange.toGUI) >= writesize)
+        {
+            while (towrite && tries < 3)
+            {
+                found = jack_ringbuffer_write(synth->interchange.toGUI, point, towrite);
+                wrote += found;
+                point += found;
+                towrite -= found;
+                ++tries;
+            }
+            if (towrite)
+                synth->getRuntime().Log("Unable to write data to toGui buffer", 2);
+        }
+        else
+            synth->getRuntime().Log("toGui buffer full!", 2);
+        ++it;
+        ++lineNo;
+    }
+}

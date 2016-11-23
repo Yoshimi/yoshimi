@@ -98,6 +98,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         return; // todo
     }
+    if (npart == 0xd8)
+    {
+        synth->getGuiMaster()->midilearnui->returns_update(getData);
+        return;
+    }
     if (npart >= 0xf0) // main / sys / ins
     {
         synth->getGuiMaster()->returns_update(getData);
@@ -113,6 +118,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
+
+
     if (engine == 2) // padsynth
     {
         if(synth->getGuiMaster()->partui->padnoteui)

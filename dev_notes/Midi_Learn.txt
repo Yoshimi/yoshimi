@@ -24,7 +24,7 @@ Status bits:
 2   mute
 
 
-When sending internal control messages to the GUI (instead of passing on midi actions) the part number will be 200 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
+When sending internal control messages to the GUI (instead of passing on midi actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
 This will be used for updating the list and and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
 
@@ -36,15 +36,31 @@ Normally the data will be sent as a complete instruction for one line.
 
 data structure:
 value       line number (used as an integer)
-type        status - this is a command unique to midilearn
+type        status - this is unique to midilearn
+control     normal use
+part        216
+kit         CC
+engine      channel
+insert      min_in
+parameter   max_in
+par2        text message number
 
-control     text message number - this may be a problem with large learn sets
+The gui will be restricted to 'viewing groups' of 128 lines, it solves a *lot* of problems!
 
-part        200
-kit         line number
-engine      CC
-insert      channel
-parameter   min_in
-par2        max_in
+Only one line at a time can be edited. As soon as one is started all the other in the gui are deactivated and 'pending' is set.
 
-We may end up limiting the gui to 'viewing groups' of 256 or even 128, it would solve a *lot* of problems!
+Possible control numbers:
+These redraw a line in place.
+0   set status (mute, limit, block)
+1   set min_in
+2   set max-in
+
+These will move a line, so a complete redraw is intitalsed.
+ 8  delete line
+16  write line
+
+To avoid unnecessary redraws these two use the 'pending' method
+17  set CC
+18  set channel
+
+

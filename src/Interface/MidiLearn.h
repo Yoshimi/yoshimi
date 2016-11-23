@@ -94,6 +94,7 @@ class MidiLearn : private MiscFuncs
 
         void insert(unsigned char CC, unsigned char chan);
         SynthEngine *synth;
+        void updateGui(void);
 };
 
 #endif

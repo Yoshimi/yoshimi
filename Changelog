@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2010-11-23 Will
+* Adding new learned lines now fully updates to the Gui.
+* Removed test button.
+* Number of lines temporarily limited to 128.
+
 2016-11-22 Will
 * Enabled midi-learn from CLI direct access.
 * Normal CLI can also list current learned lines.

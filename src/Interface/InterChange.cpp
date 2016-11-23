@@ -315,23 +315,31 @@ void InterChange::resolveReplies(CommandBlock *getData)
                 break;
         }
     }
+
+    string actual = " Value ";
+    if (type & 0x80)
+        actual += to_string((int)round(value));
+    else
+        actual += to_string(value);
+
     if ((isGui || isCli) && button == 3)
     {
         synth->midilearn.setTransferBlock(getData->data.type, getData->data.control, getData->data.part, getData->data.kit, getData->data.engine, getData->data.insert, getData->data.parameter, getData->data.par2, commandName);
+        return;
     }
 #ifdef ENABLE_REPORTS
     else if(!isMidi || synth->getRuntime().showTimes)
-        synth->getRuntime().Log(commandName);
+        synth->getRuntime().Log(commandName + actual);
 #else
     else if(!isGui && synth->getRuntime().showTimes)
-        synth->getRuntime().Log(commandName);
+        synth->getRuntime().Log(commandName + actual);
 #endif
 }
 
 
 string InterChange::resolveVector(CommandBlock *getData)
 {
-    int value = getData->data.value;
+//    int value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.part & 0xf;
 
@@ -390,14 +398,14 @@ string InterChange::resolveVector(CommandBlock *getData)
     else if(control >= 16)
         name += " X ";
 
-    return (name + contstr + " value " + to_string(value));
+    return (name + contstr);
 }
 
 
 string InterChange::resolveMain(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+//    float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
 
     string contstr = "";
@@ -436,19 +444,15 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    return ("Main " + contstr + " value " + actual);
+
+    return ("Main " + contstr);
 }
 
 
 string InterChange::resolvePart(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+ //   float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -682,20 +686,14 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    return ("Part " + to_string(npart) + kitnum + name + contstr + " value " + actual);
+    return ("Part " + to_string(npart) + kitnum + name + contstr);
 }
 
 
 string InterChange::resolveAdd(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+ //   float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -767,20 +765,14 @@ string InterChange::resolveAdd(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " AddSynth " + name + contstr + " value " + actual);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " AddSynth " + name + contstr);
 }
 
 
 string InterChange::resolveAddVoice(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+//    float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -966,26 +958,18 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " Add Voice " + to_string(nvoice) + name + contstr + " value " + actual);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " Add Voice " + to_string(nvoice) + name + contstr);
 }
 
 
 string InterChange::resolveSub(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+//    float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char insert = getData->data.insert;
-
-    string actual;
 
     if (insert == 6 || insert == 7)
     {
@@ -995,11 +979,7 @@ string InterChange::resolveSub(CommandBlock *getData)
         else
             Htype = " Bandwidth";
 
-        if (type & 0x80)
-            actual = to_string((int)round(value));
-        else
-            actual = to_string(value);
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth Harmonic " + to_string(control) + Htype + " value " + actual);
+        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth Harmonic " + to_string(control) + Htype);
     }
 
     string name = "";
@@ -1104,18 +1084,13 @@ string InterChange::resolveSub(CommandBlock *getData)
             break;
     }
 
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth " + name + contstr + " value " + actual);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth " + name + contstr);
 }
 
 
 string InterChange::resolvePad(CommandBlock *getData)
 {
-    float value = getData->data.value;
+//    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1281,20 +1256,17 @@ string InterChange::resolvePad(CommandBlock *getData)
             break;
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
+    string isPad = "";
+
     if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
-        actual += " - Need to Apply";
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " PadSynth " + name + contstr + " value " + actual);
+        isPad += " - Need to Apply";
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " PadSynth " + name + contstr + isPad);
 }
 
 
 string InterChange::resolveOscillator(CommandBlock *getData)
 {
-    int value = (int) getData->data.value; // no floats here!
+//    int value = (int) getData->data.value; // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1320,11 +1292,11 @@ string InterChange::resolveOscillator(CommandBlock *getData)
 
     if (insert == 6)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Amplitude value " + to_string(value) + isPad);
+        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Amplitude" + isPad);
     }
     else if(insert == 7)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Phase value " + to_string(value) + isPad);
+        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Phase" + isPad);
     }
 
     string name = "";
@@ -1456,13 +1428,13 @@ string InterChange::resolveOscillator(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + name + contstr + " value " + to_string(value) + isPad);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + name + contstr + isPad);
 }
 
 
 string InterChange::resolveResonance(CommandBlock *getData)
 {
-    int value = (int) getData->data.value; // no floats here
+ //   int value = (int) getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1486,7 +1458,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
     {
         if (write == true && engine == 2)
             isPad = " - Need to Apply";
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + " value " + to_string(value) + isPad);
+        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + isPad);
     }
 
     if (write == true && engine == 2 && control != 104)
@@ -1527,13 +1499,13 @@ string InterChange::resolveResonance(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance " + contstr + " value " + to_string(value) + isPad);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance " + contstr + isPad);
 }
 
 
 string InterChange::resolveLFO(CommandBlock *getData)
 {
-    unsigned char type = getData->data.type;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1597,21 +1569,16 @@ string InterChange::resolveLFO(CommandBlock *getData)
             contstr = "Stretch";
             break;
     }
-    float value = getData->data.value;
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
+//    float value = getData->data.value;
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + lfo + " LFO " + contstr + " value " + actual);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + lfo + " LFO " + contstr);
 }
 
 
 string InterChange::resolveFilter(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+//    float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1621,8 +1588,6 @@ string InterChange::resolveFilter(CommandBlock *getData)
     int nformant = getData->data.parameter;
     int nvowel = getData->data.par2;
 
-
-    string actual;
     string name;
 
     if (engine == 0)
@@ -1721,17 +1686,13 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (control == 37)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
 
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Filter " + extra + contstr + " value " + actual);
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Filter " + extra + contstr);
 }
 
 
 string InterChange::resolveEnvelope(CommandBlock *getData)
 {
-    int value = (int)getData->data.value;
+ //   int value = (int)getData->data.value;
     bool write = (getData->data.type & 0x40) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1783,14 +1744,14 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         }
         string action;
         if (control >= 0x40)
-            return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + " X increment " + to_string(par2) + " Y value " + to_string(value));
+            return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + " X increment " + to_string(par2) + " Y");
         else
             return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + " Remaining " + to_string(par2));
     }
 
     if (insert == 4)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + " X increment " + to_string(par2) + " Y value " + to_string(value));
+        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + " X increment " + to_string(par2) + " Y");
     }
 
     string contstr;
@@ -1837,21 +1798,21 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
         case 34:
             contstr = "Points";
-            value = par2;
+            contstr += to_string((int) par2);
             break;
         case 35:
             contstr = "Sust";
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env " + contstr + " value " + to_string(value));
+    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env " + contstr);
 }
 
 
 string InterChange::resolveSysIns(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+//    float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char effnum = getData->data.engine;
@@ -1886,23 +1847,17 @@ string InterChange::resolveSysIns(CommandBlock *getData)
     else // system only
     {
         contstr = "From Effect " + to_string(effnum);
-        second = " To Effect " + to_string(control)  + " Value ";
+        second = " To Effect " + to_string(control);
     }
 
-    string actual;
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    return (name  + contstr + second + actual);
+    return (name  + contstr + second);
 }
 
 
 string InterChange::resolveEffects(CommandBlock *getData)
 {
-    float value = getData->data.value;
-    unsigned char type = getData->data.type;
+ //   float value = getData->data.value;
+//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit & 0x1f;
@@ -1926,11 +1881,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         else name = "Part " + to_string(npart);
         name += " Effect " + to_string(effnum);
 
-        if (type & 0x80)
-            actual = to_string((int)round(value));
-        else
-            actual = to_string(value);
-        return (name + " DynFilter ~ Filter Parameter " + to_string(control) + " Value " + actual);
+        return (name + " DynFilter ~ Filter Parameter " + to_string(control));
     }
 
     name += " Effect " + to_string(effnum);
@@ -1969,12 +1920,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
 
     string contstr = " Control " + to_string(control);
 
-    if (type & 0x80)
-        actual = to_string((int)round(value));
-    else
-        actual = to_string(value);
-
-    return (name + effname + contstr + " Value " + actual);
+    return (name + effname + contstr);
 }
 
 
@@ -2023,10 +1969,12 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            //cout << (int)getData.data.control << endl;
-            if(getData.data.part != 0xc8) // special midi-learn message
+            cout << (int)getData.data.control << endl;
+            if(getData.data.part != 0xd8) // special midi-learn message
+            {
                 commandSend(&getData);
-            returns(&getData);
+                returns(&getData);
+            }
         }
     }
     while (more);
@@ -2047,8 +1995,6 @@ void InterChange::returns(CommandBlock *getData)
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
-            if (getData->data.part == 0xc8) // special midi-learn message
-                return;
         }
     }
 
