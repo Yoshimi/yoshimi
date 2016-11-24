@@ -20,7 +20,7 @@ Muting of this action.
 
 Status bits:
 0   block
-1   compress (otherwise limit)
+1   limit (otherwise compress)
 2   mute
 
 

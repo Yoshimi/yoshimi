@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {MidiLearnUI.h} {not_in_source in_header
+comment {MidiLearnUI.h} {selected not_in_source in_header
 } 
 
 comment {MidiLearnUI.cc} {in_source not_in_header
@@ -55,15 +55,14 @@ decl {\#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
-class MidiLearnKitItem {open : {public Fl_Group}
+class MidiLearnKitItem {: {public Fl_Group}
 } {
-  Function {make_window()} {open
-  } {
-    Fl_Window midilearnkititem {open
+  Function {make_window()} {} {
+    Fl_Window midilearnkititem {
       xywh {40 553 740 30} type Double hide
       class Fl_Group
     } {
-      Fl_Group midilearnkititemgroup {open
+      Fl_Group midilearnkititemgroup {
         xywh {49 -5 678 23} box FLAT_BOX
       } {
         Fl_Counter CCcounter {
@@ -180,8 +179,7 @@ send_data(o->value()*4);}
       }
     }
   }
-  Function {send_data(int control)} {open
-  } {
+  Function {send_data(int control)} {} {
     code {//
 int type = 0;
 if (blockcheck->value() != 0)
@@ -193,8 +191,7 @@ if (compresscheck->value() != 0)
 if (control == 4)
     type = 4;
 
-collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {selected
-    }
+collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -219,7 +216,7 @@ end();} {}
   }
 } 
 
-class MidiLearnUI {open : {private MiscFuncs}
+class MidiLearnUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
@@ -316,7 +313,7 @@ class MidiLearnUI {open : {private MiscFuncs}
         case 16:
             addLine(getData);
             break;
-    	    
+
     }
     Fl::check();} {}
   }
@@ -328,7 +325,6 @@ if (midilearnkititem[lineNo])
     delete midilearnkititem[lineNo];
 
 string name = miscMsgPop(getData->data.par2);
-cout << name << endl;
 none->hide();
 midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,740,20,"");
 midilearnkititem[lineNo]->init(synth, lineNo);

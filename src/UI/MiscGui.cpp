@@ -53,8 +53,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
             type = 1 | typetop;
             // change scroll wheel to button 1
     }
-    else
-        cout << (int) type << endl;
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;
@@ -69,7 +67,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
-//#endif
 }
 
 
