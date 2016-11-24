@@ -148,10 +148,14 @@ void InterChange::resolveReplies(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
+
+    Part *part;
+    part = synth->part[npart];
 
     bool isCli = type & 0x10;
     bool isGui = type & 0x20;
@@ -159,7 +163,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
     string isValue;
     string commandName;
 #ifdef ENABLE_REPORTS
-    unsigned char control = getData->data.control;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
 
@@ -207,7 +210,11 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         commandName = resolveEffects(getData);
     }
-    else if (kititem == 0xff || (kititem & 0x3f))
+
+    else if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+        return; // attempt to access non existant kititem
+
+    else if (kititem == 0xff || (kititem & 0x20))
     {
         commandName = resolvePart(getData);
     }
@@ -331,7 +338,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if(!isMidi || synth->getRuntime().monitorCCin)
         synth->getRuntime().Log(commandName + actual);
 #else
-    else if(!isGui && synth->getRuntime().monitorCCin)
+    else if(!isGui && button == 2)
         synth->getRuntime().Log(commandName + actual);
 #endif
 }
@@ -2000,7 +2007,7 @@ void InterChange::returns(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     if (synth->guiMaster)
     {
-        if ((isMidi || isCli) && write)
+        if (isMidi || (isCli && write))
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
@@ -2027,6 +2034,7 @@ void InterChange::setpadparams(int point)
 void InterChange::commandSend(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -2059,14 +2067,18 @@ void InterChange::commandSend(CommandBlock *getData)
         commandEffects(getData);
         return;
     }
-    if (kititem == 0xff || (kititem & 0x3f))
+
+    Part *part;
+    part = synth->part[npart];
+
+    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+        return; // attempt to access non existant kititem
+
+    if (kititem == 0xff || (kititem & 0x20))
     {
         commandPart(getData);
         return;
     }
-
-    Part *part;
-    part = synth->part[npart];
 
     if (engine == 2)
     {
@@ -2450,9 +2462,6 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
-
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
-        return; // attempt to access non existant kititem
 
     switch (control)
     {

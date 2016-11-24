@@ -87,6 +87,7 @@ void read_updates(SynthEngine *synth)
 
 void decode_updates(SynthEngine *synth, CommandBlock *getData)
 {
+    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -108,12 +109,19 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
+
     if (kititem >= 0x80 && kititem != 0xff) // effects
     {
         return; // todo
     }
 
-    if (kititem == 0xff || (kititem & 0x3f)) // part
+    Part *part;
+    part = synth->part[npart];
+
+    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+        return; // attempt to access non existant kititem
+
+    if (kititem == 0xff || (kititem & 0x20)) // part
     {
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
@@ -189,7 +197,6 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         if (synth->getGuiMaster()->partui->subnoteui)
             switch (insert)
             {
-                case 0xff:
                 case 1:
                     if (synth->getGuiMaster()->partui->subnoteui->filterui)
                         synth->getGuiMaster()->partui->subnoteui->filterui->returns_update(getData);
@@ -215,7 +222,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                             break;
                     }
                     break;
-
+                case 0xff:
                 case 6:
                 case 7:
                     synth->getGuiMaster()->partui->subnoteui->returns_update(getData);

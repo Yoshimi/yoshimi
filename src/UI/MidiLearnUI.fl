@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {MidiLearnUI.h} {selected not_in_source in_header
+comment {MidiLearnUI.h} {not_in_source in_header
 } 
 
 comment {MidiLearnUI.cc} {in_source not_in_header
@@ -216,12 +216,12 @@ end();} {}
   }
 } 
 
-class MidiLearnUI {: {private MiscFuncs}
+class MidiLearnUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
       label {Midi Learn}
-      xywh {49 118 755 285} type Double hide
+      tooltip {Editor for all learned controllers. Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {49 118 755 285} type Double hide
       code0 {;}
     } {
       Fl_Button {} {
@@ -230,7 +230,7 @@ class MidiLearnUI {: {private MiscFuncs}
         xywh {684 262 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {open
-        xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
+        tooltip {Editor for all learned controllers. Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
       } {}
       Fl_Box none {
         label {No Entries}
