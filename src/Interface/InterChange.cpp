@@ -162,14 +162,15 @@ void InterChange::resolveReplies(CommandBlock *getData)
     char button = type & 3;
     string isValue;
     string commandName;
-#ifdef ENABLE_REPORTS
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
 
     bool isMidi = type & 8;
 
+#ifdef ENABLE_REPORTS
     if (isGui)
         synth->getRuntime().Log("From GUI");
+#endif
     if ((isGui && button < 2) || (isCli && button == 1))
     {
         if (button == 0)
@@ -183,6 +184,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         isValue +="\n  Type ";
         for (int i = 7; i > -1; -- i)
             isValue += to_string((type >> i) & 1);
+#ifdef ENABLE_REPORTS
         synth->getRuntime().Log(isValue
                             + "\n  Control " + to_string((int) control)
                             + "\n  Part " + to_string((int) npart)
@@ -192,8 +194,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
                             + "\n  Parameter " + to_string((int) insertParam)
                             + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
-    }
 #endif
+    }
     if (npart >= 0xc0 && npart < 0xd0)
     {
         commandName = resolveVector(getData);

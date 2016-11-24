@@ -2,9 +2,7 @@ The learn process comes after NRPNs and vectors, but before all other controller
 
 To learn, hold CTRL while right-clicking on any GUI control then operate physical control.
 
-Along with parameters, a text string will be provided with precise details of this complete action.
-
-Editing will be available eventually. Also the GUI will flicker the colour of the respective control line's number when it sees incomming control messages. It will be black when muted and flash between white and green when active.
+Along with parameters, a text string is provided with precise details of this complete action.
 
 Control capabilites:
 
@@ -28,11 +26,12 @@ When sending internal control messages to the GUI (instead of passing on midi ac
 
 This will be used for updating the list and and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
 
-Name strings will be passed across using the simple message system. These will NOT be editable in the GUI.
+Name strings are passed across using the simple message system. These are not editable in the GUI.
 
-These transfers will be done outside the RT threads.
+These transfers are done outside the RT threads.
 
 Normally the data will be sent as a complete instruction for one line.
+
 
 data structure:
 value       line number (used as an integer)
@@ -47,7 +46,6 @@ par2        text message number
 
 The gui will be restricted to 'viewing groups' of 128 lines, it solves a *lot* of problems!
 
-Only one line at a time can be edited. As soon as one is started all the other in the gui are deactivated and 'pending' is set.
 
 Possible control numbers:
 These redraw a line in place.
@@ -55,11 +53,9 @@ These redraw a line in place.
 1   set min_in
 2   set max-in
 
-These will move a line, so a complete redraw is intitalsed.
+These move a line, so a complete redraw is intitalsed.
  8  delete line
 16  write line
-
-To avoid unnecessary redraws these two use the 'pending' method
 17  set CC
 18  set channel
 

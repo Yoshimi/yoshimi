@@ -1,0 +1,26 @@
+This now quite fully (but not completely) implemented.
+
+To learn, hold CTRL while right-clicking on any GUI control. You will get a message if the control is not learnable.
+
+After that, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control.
+
+If you now use the 'Yoshimi' drop-down menu and click on 'Midi Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
+
+Editor settings available:
+
+Incoming CC.
+
+Incoming channel number.
+
+Minimum & Maximum incoming values (if Min is greater than Max it reverses the control direction).
+
+The range can either be in the style of a limiter or as compression.
+
+Blocking of all later actions on the same CC/channel pair (including system ones).
+
+Muting of this action.
+
+To come:
+Saving and loading.
+Deleting learned lines.
+Paging of the display so you don't end up scrolling through a massive list.

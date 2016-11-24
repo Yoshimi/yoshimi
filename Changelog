@@ -6,6 +6,7 @@ yoshimi 1.4.1 M
 * Bugfix: Odd control combinations segfaulted - cured.
 * Bugfix: Curing old bug in direct access that segaulted on
   invalid kit access stopped all access to kits. Now done.
+* Doc updates.
 
 2016-11-23 Will
 * Adding new learned lines now fully updates to the Gui.
