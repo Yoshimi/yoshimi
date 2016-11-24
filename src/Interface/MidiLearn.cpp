@@ -162,7 +162,15 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
     if (it == midi_list.end())
         return -3;
 
-    while (CC >= it->CC && it != midi_list.end())
+    while ((CC != it->CC || (it->chan != 16 && chan != it->chan)) &&  it != midi_list.end())
+    {
+        ++ it;
+        ++ newpos;
+    }
+    if (it == midi_list.end())
+        return -3;
+
+    while (CC == it->CC && it != midi_list.end())
     {
         if ((it->chan >= 16 || chan == it->chan) && CC == it->CC)
         {

@@ -3,6 +3,7 @@ yoshimi 1.4.1 M
 2016-11-24 Will
 * Enabled all midi-learn editors except CC and channel.
 * All midi-learn editors now working :)
+* Bugfix: Odd control combinations segfaulted - cured.
 
 2016-11-23 Will
 * Adding new learned lines now fully updates to the Gui.

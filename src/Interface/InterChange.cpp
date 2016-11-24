@@ -328,10 +328,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 #ifdef ENABLE_REPORTS
-    else if(!isMidi || synth->getRuntime().showTimes)
+    else if(!isMidi || synth->getRuntime().monitorCCin)
         synth->getRuntime().Log(commandName + actual);
 #else
-    else if(!isGui && synth->getRuntime().showTimes)
+    else if(!isGui && synth->getRuntime().monitorCCin)
         synth->getRuntime().Log(commandName + actual);
 #endif
 }
