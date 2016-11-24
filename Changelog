@@ -1,6 +1,9 @@
 yoshimi 1.4.1 M
 
-2010-11-23 Will
+2016-11-24 Will
+* Enabled all midi-learn editors except CC and channel.
+
+2016-11-23 Will
 * Adding new learned lines now fully updates to the Gui.
 * Removed test button.
 * Number of lines temporarily limited to 128.

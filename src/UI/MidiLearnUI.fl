@@ -32,6 +32,15 @@ decl {\#include <FL/fl_ask.H>
     \#include "Misc/SynthEngine.h"} {private global
 } 
 
+decl {using namespace std;} {public local
+} 
+
+decl {\#include "MasterUI.h"} {private global
+} 
+
+decl {\#include "Misc/SynthEngine.h"} {private local
+} 
+
 decl {\# include "Misc/MiscFuncs.h"} {private local
 } 
 
@@ -46,24 +55,23 @@ decl {\#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
-decl {\#include "MasterUI.h"} {private global
-} 
-
-class MidiLearnKitItem {: {public Fl_Group}
+class MidiLearnKitItem {open : {public Fl_Group}
 } {
-  Function {make_window()} {} {
-    Fl_Window midilearnkititem {
+  Function {make_window()} {open
+  } {
+    Fl_Window midilearnkititem {open
       xywh {40 553 740 30} type Double hide
       class Fl_Group
     } {
-      Fl_Group midilearnkititemgroup {
+      Fl_Group midilearnkititemgroup {open
         xywh {49 -5 678 23} box FLAT_BOX
       } {
         Fl_Counter CCcounter {
-          callback {//send_data(16, tmp, 0xc0, n, 0xff)}
+          callback {send_data(16);}
           tooltip {Continuous Controller to recognise} xywh {55 0 55 15} type Simple minimum 0 maximum 119 step 1 value 14
         }
         Fl_Choice channelchoice {
+          callback {send_data(16);}
           tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX
         } {
           MenuItem {} {
@@ -136,22 +144,19 @@ class MidiLearnKitItem {: {public Fl_Group}
           }
         }
         Fl_Check_Button compresscheck {
-          callback {//
-
-    //send_data(8, o->value(), 0xc0, n, 0)}
+          callback {send_data(o->value()*2);}
           tooltip {Limit or compress incomming value} xywh {340 0 15 15} down_box DOWN_BOX value 1 labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
-          callback {//
-    //send_data(8, o->value(), 0xc0, n, 1)}
+          callback {send_data(0);}
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {377 0 20 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Counter minval {
-          callback {//send_data(17, tmp, 0xc0, n, 0xff)}
+          callback {send_data(0);}
           tooltip {Minimum value to pass on} xywh {195 0 55 15} type Simple minimum 0 maximum 127 step 1
         }
         Fl_Counter maxval {
-          callback {//send_data(17, tmp, 0xc0, n, 0xff)}
+          callback {send_data(0);}
           tooltip {Maximim value to pass on} xywh {265 0 55 15} type Simple minimum 0 maximum 127 step 1 value 127
         }
         Fl_Button commandName {
@@ -169,54 +174,38 @@ if (o->value())
     midilearnkititemgroup->deactivate();
 else
     midilearnkititemgroup->activate();
-            //send_data(8, o->value(), 0xc0, n, 0xff)}
+send_data(o->value()*4);}
         tooltip {Completely ignore this line} xywh {30 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control)} {open
+  } {
     code {//
-//collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine);
-;} {}
+int type = 0;
+if (blockcheck->value() != 0)
+    type = 1;
+
+if (compresscheck->value() != 0)
+    type |= 2;
+
+if (control == 4)
+    type = 4;
+
+collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {selected
+    }
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
-  }
-  Function {clearLine()} {} {
-    code {//
-    ;} {}
-  }
-  Function {refresh()} {} {
-    code {//
-this->redraw();} {
-      callback {//
-          int answer = 1;
-            if (!o->value())
-                answer = fl_choice("Delete the item?", "No", "Yes", NULL);
-            if (answer)
-            {
-                synth->actionLock(lockmute);
-                midilearn->setkititemstatus(n, o->value());
-                synth->actionLock(unlock);
-
-                if (!o->value())
-                    midilearnkititemgroup->deactivate();
-                else
-                    midilearnkititemgroup->activate();
-                o->redraw();
-                midilearnui->showparameters(n, -1); // use to delete the ui, if it is not to item 0
-            }
-            else
-                o->value(1);}
-    }
   }
   Function {~MidiLearnKitItem()} {} {
     code {midilearnkititem->hide();
 delete(midilearnkititem);} {}
   }
-  Function {init(int n_)} {} {
+  Function {init(SynthEngine *synth_, int n_)} {} {
     code {//
+synth = synth_;
 n = n_;
 make_window();
 show();
@@ -230,7 +219,7 @@ end();} {}
   }
 } 
 
-class MidiLearnUI {selected : {private MiscFuncs}
+class MidiLearnUI {open : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
@@ -273,7 +262,7 @@ class MidiLearnUI {selected : {private MiscFuncs}
       Fl_Choice options {
         label Options
         callback {//
-;}
+//send_data(0,0,0,0,0);}
         tooltip {Load a complete learned set} xywh {15 262 71 19} down_box BORDER_BOX labelsize 11 align 8 textfont 1 textsize 11
       } {
         MenuItem load {
@@ -309,8 +298,7 @@ class MidiLearnUI {selected : {private MiscFuncs}
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, 255, 255, 255);
-;} {}
+//collect_data(synth, value, type, control, 216, 255, 255);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -343,7 +331,7 @@ string name = miscMsgPop(getData->data.par2);
 cout << name << endl;
 none->hide();
 midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,740,20,"");
-midilearnkititem[lineNo]->init(lineNo);
+midilearnkititem[lineNo]->init(synth, lineNo);
 kitlist->add(midilearnkititem[lineNo]);
 
 midilearnkititem[lineNo]->position(0, 20 + lineNo*20);
@@ -354,7 +342,9 @@ midilearnkititem[lineNo]->minval->value(getData->data.insert);
 midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
 midilearnkititem[lineNo]->compresscheck->value(status & 2);
 midilearnkititem[lineNo]->blockcheck->value(status & 1);
-midilearnkititem[lineNo]->commandName->copy_label(name.c_str());} {}
+midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
+if (status & 4)
+    midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();} {}
   }
   Function {MidiLearnUI(SynthEngine *_synth)} {} {
     code {//

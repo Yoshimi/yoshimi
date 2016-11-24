@@ -29,30 +29,32 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-//#ifdef ENABLE_REPORTS
-    //cout << "here again" << (int) value << endl;
-    int typetop = type & 0xc0;
-    if ((type & 3) == 3)
-    { // value type is now irrelevant
-        if(Fl::event_state(FL_CTRL) != 0)
-        {
-            if (type & 8)
-                type = 3;
-            // identifying this for button 3 as MIDI learn
-            else
+    if (part != 0xd8)
+    {
+        int typetop = type & 0xc0;
+        if ((type & 3) == 3)
+        { // value type is now irrelevant
+            if(Fl::event_state(FL_CTRL) != 0)
             {
-                type = 0;
-                fl_alert("Can't MIDI-learn this control");
+                if (type & 8)
+                    type = 3;
+                // identifying this for button 3 as MIDI learn
+                else
+                {
+                    type = 0;
+                    fl_alert("Can't MIDI-learn this control");
+                }
             }
+            else
+                type = 0;
+                // identifying this for button 3 as set default
         }
-        else
-            type = 0;
-            // identifying this for button 3 as set default
+        else if((type & 7) > 2)
+            type = 1 | typetop;
+            // change scroll wheel to button 1
     }
-    else if((type & 7) > 2)
-        type = 1 | typetop;
-        // change scroll wheel to button 1
-
+    else
+        cout << (int) type << endl;
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;
@@ -64,6 +66,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
     putData.data.insert = insert;
     putData.data.parameter = parameter;
     putData.data.par2 = par2;
+
     if (jack_ringbuffer_write_space(synth->interchange.fromGUI) >= commandSize)
         jack_ringbuffer_write(synth->interchange.fromGUI, (char*) putData.bytes, commandSize);
 //#endif

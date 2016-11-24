@@ -77,12 +77,12 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
     while (lastpos != -2)
     {
         lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
-        //cout << "found " << lastpos << endl;
+        if (lastpos == -3)
+            return false;
+
         int status = foundEntry.status;
-        if (status & 4)
+        if (status == 4)
             continue;
-        //cout << "CC " << (int)foundEntry.CC << "  chan " << (int)foundEntry.chan << endl;
-        //cout << "Min " << (int)foundEntry.min_in << "  Max " << (int)foundEntry.max_in << endl;
         if (lastpos != -2)
         {
             int minIn = foundEntry.min_in;
@@ -93,22 +93,18 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
                 swap(minIn, maxIn);
             }
 
-            if ((maxIn - minIn) != 127)
+            if (status & 2) // compress
             {
-                if (status & 2) // compress
-                {
-                    int range = maxIn - minIn;
-                    value = (value * range / 127) + minIn;
-                }
-                else // limit
-                {
-                    if (value < minIn)
-                        value = minIn;
-                    else if (value > maxIn)
-                        value = maxIn;
-                }
+                int range = maxIn - minIn;
+                value = (value * range / 127) + minIn;
             }
-
+            else // limit
+            {
+                if (value < minIn)
+                    value = minIn;
+                else if (value > maxIn)
+                    value = maxIn;
+            }
 
             CommandBlock putData;
             unsigned int writesize = sizeof(putData);
@@ -138,10 +134,11 @@ bool MidiLearn::runMidiLearn(float value, unsigned char CC, unsigned char chan, 
                 ++tries;
                 }
                 if (towrite)
-                    synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
+                        synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
             }
             else
                 synth->getRuntime().Log("fromMidi buffer full!", 2);
+
             if (lastpos == -1)
                 return true;
         }
@@ -164,7 +161,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
         ++ newpos;
     }
     if (it == midi_list.end())
-        return -2;
+        return -3;
 
     while (CC >= it->CC && it != midi_list.end())
     {
@@ -222,6 +219,39 @@ bool MidiLearn::remove(int itemNumber)
     return false;
 }
 
+
+void MidiLearn::changeLine(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+{
+    /*LearnBlock entry;
+    entry.chan = chan;
+    entry.CC = CC;
+    entry.min_in = insert;
+    entry.max_in = parameter;
+    entry.status = type;*/
+    //entry.min_out = 0;
+    //entry.max_out = 127;
+    //entry.name = learnedName;
+    list<LearnBlock>::iterator it = midi_list.begin();
+    if (control == 16)
+    {
+        //remove(value);
+    }
+    else
+    {
+        it = midi_list.begin();
+        int lineNo = 0;
+        while(lineNo < value && it != midi_list.end())
+        {
+            ++ it;
+            ++lineNo;
+        }
+    }
+    it->min_in = insert;
+    it->max_in = parameter;
+    it->status = type & 0x1f;
+}
+
+
 void MidiLearn::insert(unsigned char CC, unsigned char chan)
 {
     /*
@@ -241,7 +271,7 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
     entry.CC = CC;
     entry.min_in = 0;
     entry.max_in = 127;
-    entry.status = 0;
+    entry.status = 2;// default status
     entry.min_out = 0;
     entry.max_out = 127;
     entry.name = learnedName;
@@ -280,7 +310,7 @@ void MidiLearn::updateGui()
     CommandBlock putData;
     unsigned int writesize = sizeof(putData);
     //char *point = (char*)&putData;
-    unsigned int towrite ;
+    unsigned int towrite;
     unsigned int wrote;
     unsigned int found;
     unsigned int tries;
@@ -290,7 +320,7 @@ void MidiLearn::updateGui()
     while (it != midi_list.end())
     {
         putData.data.value = lineNo;
-        putData.data.type = 2;// default status
+        putData.data.type = it->status;
         putData.data.control = 16;
         putData.data.part = 0xd8;
         putData.data.kit = it->CC;
@@ -299,7 +329,6 @@ void MidiLearn::updateGui()
         putData.data.parameter = it->max_in;
         putData.data.par2 = miscMsgPush(it->name);
 
-usleep(100);
         char *point = (char*)&putData;
         towrite = writesize;
         wrote = 0;

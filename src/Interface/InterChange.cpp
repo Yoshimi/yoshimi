@@ -1943,8 +1943,13 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromCLI, point, toread);
-            commandSend(&getData);
-            returns(&getData);
+            if(getData.data.part != 0xd8) // special midi-learn message
+            {
+                commandSend(&getData);
+                returns(&getData);
+            }
+            else
+                synth->midilearn.changeLine(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
         }
 
         size = jack_ringbuffer_read_space(fromGUI);
@@ -1957,8 +1962,13 @@ void InterChange::mediate()
             jack_ringbuffer_read(fromGUI, point, toread);
             #warning gui writes changed to reads
             getData.data.type = getData.data.type & 0xbf;
-            commandSend(&getData);
-            returns(&getData);
+            if(getData.data.part != 0xd8) // special midi-learn message
+            {
+                commandSend(&getData);
+                returns(&getData);
+            }
+            else
+                synth->midilearn.changeLine(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
         }
 
         size = jack_ringbuffer_read_space(fromMIDI);
@@ -1969,7 +1979,6 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            cout << (int)getData.data.control << endl;
             if(getData.data.part != 0xd8) // special midi-learn message
             {
                 commandSend(&getData);
