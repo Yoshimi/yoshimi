@@ -160,10 +160,8 @@ class MidiLearnKitItem {: {public Fl_Group}
         }
         Fl_Button commandName {
           label text
-          xywh {401 0 315 15} box FLAT_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
-        }
-        Fl_Text_Display {} {
-          xywh {401 0 315 15} color 247 selection_color 247 labelfont 1 labelsize 10 align 65 textsize 10
+          callback {send_data(8);}
+          tooltip {To delete, hold CTRL and click here.} xywh {401 0 315 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
         }
       }
       Fl_Check_Button mutecheck {
@@ -181,6 +179,14 @@ send_data(o->value()*4);}
   }
   Function {send_data(int control)} {} {
     code {//
+if (control == 8)
+{
+    if(Fl::event_state(FL_CTRL) == 0)
+        return;
+    if (fl_choice("Remove line. %d %s?", "Yes", "No", NULL, n + 1, commandName->label()))
+        return;
+    midilearnkititem->hide();
+}
 int type = 0;
 if (blockcheck->value() != 0)
     type = 1;
@@ -218,7 +224,8 @@ end();} {}
 
 class MidiLearnUI {selected : {private MiscFuncs}
 } {
-  Function {make_window()} {} {
+  Function {make_window()} {open
+  } {
     Fl_Window midilearnwindow {
       label {Midi Learn}
       tooltip {Editor for all learned controllers. Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {49 118 755 285} type Double hide
@@ -313,16 +320,23 @@ class MidiLearnUI {selected : {private MiscFuncs}
         case 16:
             addLine(getData);
             break;
-
     }
+
+            
     Fl::check();} {}
   }
   Function {addLine(CommandBlock *getData)} {} {
     code {//
 int lineNo = ((int)getData->data.value);
 int status = getData->data.type;
+if (midilearnkititem[lineNo + 1])
+    midilearnkititem[lineNo + 1]->hide();
+
 if (midilearnkititem[lineNo])
+{
+    midilearnkititem[lineNo]->hide();
     delete midilearnkititem[lineNo];
+}
 
 string name = miscMsgPop(getData->data.par2);
 none->hide();

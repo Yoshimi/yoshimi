@@ -241,6 +241,12 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
     }
     if (lineNo != value)
         return;
+    if (control == 8)
+    {
+        remove(value);
+        updateGui();
+        return;
+    }
 
     if (control == 16)
     {
@@ -280,10 +286,7 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
         updateGui();
         return;
     }
-    else
-    {
 
-    }
     it->min_in = insert;
     it->max_in = parameter;
     it->status = type & 0x1f;

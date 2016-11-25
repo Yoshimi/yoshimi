@@ -59,4 +59,6 @@ These move a line, so a complete redraw is intitalsed.
 17  set CC
 18  set channel
 
+20  send list size
+
 
