@@ -35,7 +35,7 @@ class SynthEngine;
 class FilterParams : public Presets, private MiscFuncs
 {
     public:
-        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, SynthEngine *_synth);
+        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, unsigned char Pdoublefreqtrack_, SynthEngine *_synth);
         ~FilterParams() { }
 
         void add2XML(XMLwrapper *xml);
@@ -73,6 +73,7 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Pstages;    // filter stages+1
         unsigned char Pfreqtrack; // how the filter frequency is changing
                                   // according the note frequency
+        unsigned char Pdoublefreqtrack;  // double range for freq tracking
         unsigned char Pgain;      // filter's output gain
 
         // Formant filter parameters
@@ -107,6 +108,7 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Dtype;
         unsigned char Dfreq;
         unsigned char Dq;
+        unsigned char Ddoublefreqtrack;
 };
 
 #endif

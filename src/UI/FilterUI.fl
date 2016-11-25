@@ -394,6 +394,12 @@ send_data(6, o->value(), 0xc0);}
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
         xywh {203 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
+      Fl_Check_Button doublefreqtrack {
+        label x2
+        callback {pars->Pdoublefreqtrack=(int)o->value();
+send_data(10, o->value(), 0xc0);}
+        tooltip {Set frequency tracking range to 200%} xywh {244 20 15 15} down_box DOWN_BOX labelsize 10
+      }
     }
   }
   Function {make_formant_window()} {} {
@@ -632,6 +638,7 @@ send_data(17, o->value(), 0xc8);}
 
         filtertype->value(pars->Pcategory);
         cfreqdial->value(pars->Pfreq);
+        doublefreqtrack->value(pars->Pdoublefreqtrack);
         qdial->value(pars->Pq);
         freqtrdial->value(pars->Pfreqtrack);
         gaindial->value(pars->Pgain);
@@ -745,6 +752,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	case 9:
     	    svfiltertypechoice->value((int)value);
     	    break;
+
+        case 10:
+            doublefreqtrack->value(value != 0);
+            break;
 
     	case 16:
     	    frsldial->value(value);
