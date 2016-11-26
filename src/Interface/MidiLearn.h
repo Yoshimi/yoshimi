@@ -39,20 +39,6 @@ class MidiLearn : private MiscFuncs
         MidiLearn(SynthEngine *_synth);
         ~MidiLearn();
 
-        union CommandBlock{
-            struct{
-                float value;
-                unsigned char type;
-                unsigned char control;
-                unsigned char part;
-                unsigned char kit;
-                unsigned char engine;
-                unsigned char insert;
-                unsigned char parameter;
-                unsigned char par2;
-            } data;
-            unsigned char bytes [sizeof(data)];
-        };
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
 
@@ -81,7 +67,7 @@ class MidiLearn : private MiscFuncs
         bool learning;
         string learnedName;
 
-        void setTransferBlock(unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, string name);
+        void setTransferBlock(CommandBlock *getData, string name);
 
         bool runMidiLearn(float value, unsigned char CC, unsigned char chan, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show);

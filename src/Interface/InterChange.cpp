@@ -333,7 +333,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     if ((isGui || isCli) && button == 3)
     {
-        synth->midilearn.setTransferBlock(getData->data.type, getData->data.control, getData->data.part, getData->data.kit, getData->data.engine, getData->data.insert, getData->data.parameter, getData->data.par2, commandName);
+        synth->midilearn.setTransferBlock(getData, commandName);
         return;
     }
 #ifdef ENABLE_REPORTS

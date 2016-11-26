@@ -67,21 +67,6 @@ class CmdInterface : private MiscFuncs
         unsigned int level;
         string replyString;
         bool isRead;
-
-        union CommandBlock{
-            struct{
-                float value;
-                unsigned char type;
-                unsigned char control;
-                unsigned char part;
-                unsigned char kit;
-                unsigned char engine;
-                unsigned char insert;
-                unsigned char parameter;
-                unsigned char par2;
-            } data;
-            unsigned char bytes [sizeof(data)];
-        };
 };
 
 #endif

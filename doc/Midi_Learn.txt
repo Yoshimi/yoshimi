@@ -20,7 +20,7 @@ Blocking of all later actions on the same CC/channel pair (including system ones
 
 Muting of this action.
 
-You can delete any exisiting line by holding down the 'CTRL' key and tyhen clcking on the 'Control Function' text for that line. You will then be presented with a confirmation message giving the line number and the text as a reminder.
+You can delete any existing line by holding down the 'CTRL' key and then clicking on the 'Control Function' text for that line. You will then be presented with a confirmation message giving the line number and the text as a reminder.
 
 Adding or deleting lines, or changing either CC or channel numbers will re-order the others.
 

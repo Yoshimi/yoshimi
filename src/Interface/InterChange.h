@@ -41,20 +41,6 @@ class InterChange : private MiscFuncs
         InterChange(SynthEngine *_synth);
         ~InterChange();
 
-        union CommandBlock{
-            struct{
-                float value;
-                unsigned char type;
-                unsigned char control;
-                unsigned char part;
-                unsigned char kit;
-                unsigned char engine;
-                unsigned char insert;
-                unsigned char parameter;
-                unsigned char par2;
-            } data;
-            char bytes [sizeof(data)];
-        };
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
 

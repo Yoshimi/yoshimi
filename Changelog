@@ -1,6 +1,9 @@
 yoshimi 1.4.1 M
 
 2016-11-26 Will
+* Small midi-learn / Interchange optimisations.
+
+2016-11-26 Will
 * Implemented the 'delete' function in midi-learn.
 * More doc updates!
 

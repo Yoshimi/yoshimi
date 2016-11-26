@@ -48,16 +48,19 @@ MidiLearn::~MidiLearn()
 }
 
 
-void MidiLearn::setTransferBlock(unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2, string name)
+void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
+
 {
-    learnTransferBlock.type = type;
-    learnTransferBlock.control = control;
-    learnTransferBlock.part = part;
-    learnTransferBlock.kit = kit;
-    learnTransferBlock.engine = engine;
-    learnTransferBlock.insert = insert;
-    learnTransferBlock.parameter = parameter;
-    learnTransferBlock.par2 = par2;
+    learnTransferBlock.type = getData->data.type;
+    learnTransferBlock.control = getData->data.control;
+    learnTransferBlock.part = getData->data.part;
+    learnTransferBlock.kit = getData->data.kit;
+    learnTransferBlock.engine = getData->data.engine;
+    learnTransferBlock.insert = getData->data.insert;
+    learnTransferBlock.parameter = getData->data.parameter;
+    learnTransferBlock.par2 = getData->data.par2;
+
+
     learnedName = name;
     learning = true;
     synth->getRuntime().Log("Learning");
