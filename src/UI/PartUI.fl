@@ -5,7 +5,7 @@ code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
 } 
 
-comment {PartUI.cc} {selected in_source not_in_header
+comment {PartUI.cc} {in_source not_in_header
 } 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -387,7 +387,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -1734,9 +1734,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         subnoteui = NULL;
         padnoteui = NULL;
         lastkititem = -1;} {}
-  }
-  Function {partEffSendActive()} {} {
-    code {//} {}
   }
   Function {updatecontrollers()} {} {
     code {//

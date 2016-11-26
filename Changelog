@@ -2,11 +2,13 @@ yoshimi 1.4.1 M
 
 2016-11-26 Will
 * Small midi-learn / Interchange optimisations.
-* Direct access global fine detune now goes through ring buffe  to stop Xruns - particulalrly with midi-learn.
+* Direct access global fine detune now goes through ring buffer
+  to stop Xruns - particularly with midi-learn.
 * Enabled midi-learn of part effect sends.
 * BugFix: reinstated direct control of effects.
   GUI not updated :(
 * Enabled midi-learn of effects.
+* Effects GUI now updated for all except some dynfilter knobs.
 
 2016-11-25 Will
 * Implemented the 'delete' function in midi-learn.

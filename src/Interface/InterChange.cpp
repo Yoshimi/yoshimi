@@ -2003,13 +2003,13 @@ void InterChange::returns(CommandBlock *getData)
 {
     unsigned char type = getData->data.type;
 
-    //bool isGui = type & 0x20;
+    bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
     if (synth->guiMaster)
     {
-        if (isMidi || (isCli && write))
+        if (!isGui && (isMidi || (isCli && write)))
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);

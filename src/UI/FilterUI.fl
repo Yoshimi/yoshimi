@@ -195,7 +195,7 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   }
 } 
 
-class FilterUI {selected : {public Fl_Group,PresetsUI_}
+class FilterUI {open : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -676,7 +676,8 @@ else if (control >= 18 && control <= 20)
 }
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 1, parameter, par2);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
@@ -688,8 +689,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char par2 = getData->data.par2;
 
     
-    if (part != npart || (eng >= 128 && eng != engine))
+    if (part != npart || ((eng >= 128 && eng != 136) && eng != engine))
         return;
+    if (eng == 0x88)
+    {
+    	if (control == 7)
+    	;
+    	else if (control == 9)
+    	;
+    	//cout << "cont " << (int)control << endl;
+       return;
+    }
 
     switch(control)
     {
@@ -803,7 +813,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             neginput->value(value != 0);
             break;
     }
-    Fl::check();} {}
+    Fl::check();} {selected
+    }
   }
   Function {init(FilterParams *filterpars_,unsigned char *velsnsamp_,unsigned char *velsns_, int npart_, int kititem_, int engine_)} {} {
     code {//
@@ -852,7 +863,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         refresh();} {}
   }
   Function {use_for_dynamic_filter()} {} {
-    code {freqtrdial->deactivate();
+    code {//
+	freqtrdial->deactivate();
         gaindial->when(0);
 
         cfknob->when(FL_WHEN_RELEASE);

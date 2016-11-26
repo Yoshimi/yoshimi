@@ -4,6 +4,8 @@ set up map for min,max, type, default for all controls. Map filled by associated
 
 Send global and part keyshifts through ring buffer (like global fine detune).
 
+Sort out direct access dynfilter->filter (and two enclosed controls). All work but don't update gui.
+
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
 CLI doesn't manage global detune, but direct access does.

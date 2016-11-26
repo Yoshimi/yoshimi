@@ -201,7 +201,7 @@ eff = eff_;
   }
 } 
 
-class EffUI {selected : {public Fl_Group,public PresetsUI_}
+class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
   Function {EffUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {//
@@ -226,7 +226,7 @@ class EffUI {selected : {public Fl_Group,public PresetsUI_}
         }} {}
   }
   Function {make_null_window()} {} {
-    Fl_Window effnullwindow {
+    Fl_Window effnullwindow {selected
       xywh {915 700 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
@@ -2030,6 +2030,260 @@ send_data(8, o->value(), 8, 0xc0);}
     code {//
 //type = 0xc0; //temp!
 collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 0x80, neff);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char efftype = getData->data.kit & 0x7f;
+    //unsigned char effnum = getData->data.engine;
+    
+    //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
+    switch(efftype)
+    {
+    	case 0: // no effect
+    	    break;
+
+    	case 1:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            revp0->value(value);
+    	            break;
+    	        case 1:
+    	            revp1->value(value);
+    	            break;
+    	        case 2:
+    	            revp2->value(value);
+    	            break;
+    	        case 3:
+    	            revp3->value(value);
+    	            break;
+    	        case 4:
+    	            revp4->value(value);
+    	            break;
+    	        case 6:
+    	            revp6->value(value);
+    	            break;
+    	        case 7:
+    	            revp7->value(value);
+    	            break;
+    	        case 8:
+    	            revp8->value(value);
+    	            break;
+    	        case 9:
+    	            revp9->value(value);
+    	            break;
+    	        case 11:
+    	            revp11->value(value);
+    	            break;
+    	        case 12:
+    	            revp12->value(value);
+    	            break;
+    	        
+    	    }
+    	    break;
+
+    	case 2:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            echop0->value(value);
+    	            break;
+    	        case 1:
+    	            echop1->value(value);
+    	            break;
+    	        case 2:
+    	            echop2->value(value);
+    	            break;
+    	        case 3:
+    	            echop3->value(value);
+    	            break;
+    	        case 4:
+    	            echop4->value(value);
+    	            break;
+    	        case 5:
+    	            echop5->value(value);
+    	            break;
+    	        case 6:
+    	            echop6->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 3:
+            switch (control)
+    	    {
+    	        case 0:
+    	            chorusp0->value(value);
+    	            break;
+    	        case 1:
+    	            chorusp1->value(value);
+    	            break;
+    	        case 2:
+    	            chorusp2->value(value);
+    	            break;
+    	        case 3:
+    	            chorusp3->value(value);
+    	            break;
+    	        case 5:
+    	            chorusp5->value(value);
+    	            break;
+    	        case 6:
+    	            chorusp6->value(value);
+    	            break;
+    	        case 7:
+    	            chorusp7->value(value);
+    	            break;
+    	        case 8:
+    	            chorusp8->value(value);
+    	            break;
+    	        case 9:
+    	            chorusp9->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 4:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            phaserp0->value(value);
+    	            break;
+    	        case 1:
+    	            phaserp1->value(value);
+    	            break;
+    	        case 2:
+    	            phaserp2->value(value);
+    	            break;
+    	        case 3:
+    	            phaserp3->value(value);
+    	            break;
+    	        case 5:
+    	            phaserp5->value(value);
+    	            break;
+    	        case 6:
+    	            phaserp6->value(value);
+    	            break;
+    	        case 7:
+    	           phaserp7->value(value);
+    	            break;
+    	        case 9:
+    	            phaserp9->value(value);
+    	            break;
+    	        case 11:
+    	            phaserp11->value(value);
+    	            break;
+    	        case 13:
+    	            phaserp13->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 5:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            awp0->value(value);
+    	            break;
+    	        case 1:
+    	            awp1->value(value);
+    	            break;
+    	        case 2:
+    	            awp2->value(value);
+    	            break;
+    	        case 3:
+    	            awp3->value(value);
+    	            break;
+    	        case 5:
+    	            awp5->value(value);
+    	            break;
+    	        case 6:
+    	            awp6->value(value);
+    	            break;
+    	        case 7:
+    	            awp7->value(value);
+    	            break;
+    	        case 9:
+    	            awp9->value(value);
+    	            break;
+    	        case 10:
+    	            awp10->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 6:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            distp0->value(value);
+    	            break;
+    	        case 1:
+    	            distp1->value(value);
+    	            break;
+    	        case 2:
+    	            distp2->value(value);
+    	            break;
+    	        case 3:
+    	            distp3->value(value);
+    	            break;
+    	        case 4:
+    	            distp4->value(value);
+    	            break;
+    	        case 7:
+    	            distp7->value(value);
+    	            break;
+    	        case 8:
+    	            distp8->value(value);
+    	            break;
+    	    }
+    	    break;
+
+    	case 7:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            eqp0->value(value);
+    	            break;
+    	        case 2:
+    	            freqdial->value(value);
+    	            break;
+    	        case 3:
+    	            gaindial->value(value);
+    	            break;
+    	        case 4:
+    	            qdial->value(value);
+    	            break;
+    	    };
+    	    break;
+
+    	case 8:
+    	    switch (control)
+    	    {
+    	        case 0:
+    	            dfp0->value(value);
+    	            break;
+    	        case 1:
+    	            dfp1->value(value);
+    	            break;
+    	        case 2:
+    	            dfp2->value(value);
+    	            break;
+    	        case 3:
+    	            dfp3->value(value);
+    	            break;
+    	        case 5:
+    	            dfp5->value(value);
+    	            break;
+    	        case 6:
+    	            dfp6->value(value);
+    	            break;
+    	    }
+    	    break;
+    }
+    Fl::check();} {}
   }
   Function {init(EffectMgr *eff_, int npart_, int neff_)} {} {
     code {eff=eff_;

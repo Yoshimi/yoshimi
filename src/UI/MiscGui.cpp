@@ -104,19 +104,26 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
     }
+
+    Part *part;
+    part = synth->part[npart];
+
+    if (kititem >= 0x80 && kititem != 0xff) // effects
+    {
+        if (npart == 0xf1)
+            synth->getGuiMaster()->syseffectui->returns_update(getData);
+        else if (npart == 0xf2)
+            synth->getGuiMaster()->inseffectui->returns_update(getData);
+        else if (npart < 0x40)
+            synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
+        return;
+    }
+
     if (npart >= 0xf0) // main / sys / ins
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
-
-    if (kititem >= 0x80 && kititem != 0xff) // effects
-    {
-        return; // todo
-    }
-
-    Part *part;
-    part = synth->part[npart];
 
     if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
         return; // attempt to access non existant kititem
