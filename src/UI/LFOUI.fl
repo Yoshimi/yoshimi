@@ -87,6 +87,11 @@ hide();
         Fl_Dial freq {
           label {Freq.}
           callback {pars->Pfreq=o->value();
+float lfofreq = (powf(2.0f, o->value() * 10.0f) - 1.0f) / 12.0f;
+ostringstream oss;
+oss.precision(3);
+oss << lfofreq << " Hz";
+o->show_custom_value(string(oss.str()));
 send_data(group, 0, o->value(), 0x40);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           code0 {if (engine < 0x80){if (group == 1) o->init(0.551f); else o->init(0.63f);}}

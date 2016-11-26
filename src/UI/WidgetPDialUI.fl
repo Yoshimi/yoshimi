@@ -77,6 +77,19 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
         size(W, H);
         redraw();} {}
   }
+  Function {customValue(string s)} {return_type void
+  } {
+    code {tip.clear();
+        tip = s;
+        textmode = false;
+        // Recalc size of window
+        fl_font(labelfont(), labelsize());
+        int W = 0, H = h();
+        fl_measure(tip.c_str(), W, H, 0);
+        W += 8;
+        size(W, H);
+        redraw();} {}
+  }
   Function {setText(string c)} {return_type void
   } {
     code {text = c;
@@ -119,7 +132,8 @@ class WidgetPDial {selected : {public Fl_Dial}
         Fl_Group::current(save);
         oldvalue = 0.0;
         pos = false;
-        textset = false;} {}
+        textset = false;
+        showplainvalue = true;} {}
   }
   Function {init(float home_ = -1)} {} {
     code {home = home_;} {}
@@ -307,7 +321,7 @@ class WidgetPDial {selected : {public Fl_Dial}
   }
   Function {value_cb2()} {return_type void
   } {
-    code {tipwin->value(value());} {}
+    code {if (showplainvalue) tipwin->value(value());} {}
   }
   Function {value_cb(Fl_Widget*, void*data)} {return_type {static void}
   } {
@@ -319,6 +333,11 @@ class WidgetPDial {selected : {public Fl_Dial}
     code {tipwin->setText(c);
         textset = true;} {}
   }
+  Function {show_custom_value(string s)} {return_type void
+  } {
+    code {tipwin->customValue(s);
+          showplainvalue = false;} {}
+  }
   decl {bool textset;} {private local
   }
   decl {bool pos;} {private local
@@ -328,5 +347,7 @@ class WidgetPDial {selected : {public Fl_Dial}
   decl {TipWin *tipwin;} {private local
   }
   decl {float home;} {private local
+  }
+  decl {bool showplainvalue;} {private local
   }
 } 
