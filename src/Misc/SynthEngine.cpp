@@ -438,6 +438,10 @@ void *SynthEngine::RBPthread(void)
                     case 5: // file name from miscMsg
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
+
+                    case 10: // global fine detune
+                        microtonal.Pglobalfinedetune = block.data[1];
+                        setAllPartMaps();
                 }
             }
             else

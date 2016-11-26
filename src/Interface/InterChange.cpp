@@ -2397,10 +2397,7 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 32:
             if (write)
-            {
-                synth->microtonal.Pglobalfinedetune = value;
-                synth->setAllPartMaps();
-            }
+                synth->writeRBP(10, (int) value, 0); // global fine detune
             else
                 value = synth->microtonal.Pglobalfinedetune;
             break;
