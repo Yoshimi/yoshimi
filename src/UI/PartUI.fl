@@ -5,7 +5,7 @@ code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
 } 
 
-comment {PartUI.cc} {in_source not_in_header
+comment {PartUI.cc} {selected in_source not_in_header
 } 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -56,8 +56,7 @@ decl {\#include "MasterUI.h"} {private global
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window syseffsend {
       xywh {916 904 150 50} type Double hide
       class Fl_Group
@@ -65,7 +64,7 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
       Fl_Dial sysend {
         label 01
         callback {synth->setPsysefxvol(npart,neff, o->value());
-send_data(neff, o->value(), 0xc0);}
+send_data(neff, o->value(), 0xc8);}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 align 130 maximum 127 step 1
         code0 {o->size(25,25);}
         code1 {o->value(synth->Psysefxvol[neff][npart]);}
@@ -388,14 +387,14 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {955 51 375 165} type Double hide
+      xywh {975 52 375 165} type Double hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 377 166}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -492,9 +491,15 @@ send_data(4, o->value(), 0xc8);}
         callback {//
         synth->partonoffLock(npart, o->value());
         if (part->Penabled != 1)
+        {
             partgroupui->deactivate();
+            toSysEfx->deactivate();
+        }
         else
+        {
             partgroupui->activate();
+            toSysEfx->activate();
+        }
         synth->getGuiMaster()->updatepanel();
         send_data(8, o->value(), 0xc0);}
         xywh {62 59 20 20} down_box DOWN_BOX labelsize 11 align 4
@@ -555,6 +560,14 @@ send_data(33, o->value(), 0xc0);}
         label {System Effect Sends
 }
         xywh {248 114 127 52} labelsize 11
+        code0 {if (part->Penabled != 1)
+        {
+            toSysEfx->deactivate();
+        }
+        else
+        {
+           toSysEfx->activate();
+        }}
       } {
         Fl_Pack {} {
           label {To Sys Efx} open
@@ -1360,12 +1373,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
+    int oldpart = npart;
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    
+    if (npart != oldpart)
+    return;
+    
     int tmp;
     bool sameEff = (engine == (inseffnocounter->value() - 1));
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
@@ -1716,6 +1734,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         subnoteui = NULL;
         padnoteui = NULL;
         lastkititem = -1;} {}
+  }
+  Function {partEffSendActive()} {} {
+    code {//} {}
   }
   Function {updatecontrollers()} {} {
     code {//

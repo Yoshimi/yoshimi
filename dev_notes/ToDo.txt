@@ -2,6 +2,7 @@
 Idea!
 set up map for min,max, type, default for all controls. Map filled by associated code sections as they are initialised.
 
+Send global and part keyshifts through ring buffer (like global fine detune).
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 

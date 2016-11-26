@@ -5020,6 +5020,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 {
     float value = getData->data.value;
     unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit & 0x1f;
     unsigned char effnum = getData->data.engine;
@@ -5036,9 +5037,25 @@ void InterChange::commandEffects(CommandBlock *getData)
         eff = synth->part[npart]->partefx[effnum];
 
     if (kititem == 8 && getData->data.insert < 0xff)
+    {
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
+        return;
+    }
 
-
+    if (write)
+    {
+        if (control == 16)
+            	eff->changepreset((int)value);
+        else
+             eff->seteffectpar(control,(int)value);
+    }
+    else
+    {
+        if (control == 16)
+            value = eff->getpreset();
+        else
+            value = eff->geteffectpar(control);
+    }
     if (!write)
         getData->data.value = value;
 }
