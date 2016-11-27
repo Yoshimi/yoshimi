@@ -31,6 +31,9 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
+decl {\#include <sstream>} {public local
+}
+
 decl {\#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
     \#include "Misc/MiscFuncs.h"} {public global
@@ -333,9 +336,13 @@ class WidgetPDial {selected : {public Fl_Dial}
     code {tipwin->setText(c);
         textset = true;} {}
   }
-  Function {show_custom_value(string s)} {return_type void
+  Function {show_custom_value_units(float v, string u, int prec=0)} {return_type void
   } {
-    code {tipwin->customValue(s);
+    code {ostringstream oss;
+          oss.setf(std::ios_base::fixed);
+          oss.precision(prec);
+          oss << v << " " << u;
+          tipwin->customValue(string(oss.str()));
           showplainvalue = false;} {}
   }
   decl {bool textset;} {private local

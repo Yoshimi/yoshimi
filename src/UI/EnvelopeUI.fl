@@ -434,6 +434,7 @@ send_data(group, 35, o->value(), 0xc0);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
@@ -444,6 +445,7 @@ send_data(group, 1, o->value(), 0xc8);}
           label {D.dt}
           callback {env->PD_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 3, o->value(), 0xc8);}
           tooltip {Decay time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_dt);}
@@ -454,6 +456,7 @@ send_data(group, 3, o->value(), 0xc8);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
@@ -535,6 +538,7 @@ send_data(group, 0, o->value(), 0xc8);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
@@ -555,6 +559,7 @@ send_data(group, 6, o->value(), 0xc8);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
@@ -619,6 +624,7 @@ send_data(group, 0, o->value(), 0xc8);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
@@ -639,6 +645,7 @@ send_data(group, 2, o->value(), 0xc8);}
           label {D.dt}
           callback {env->PD_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 3, o->value(), 0xc8);}
           tooltip {decay time} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_dt);}
@@ -649,6 +656,7 @@ send_data(group, 3, o->value(), 0xc8);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {145 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
@@ -723,6 +731,7 @@ send_data(group, 0, o->value(), 0xc8);}
           label {A.dt}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 1, o->value(), 0xc8);}
           tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_dt);}
@@ -743,6 +752,7 @@ send_data(group, 6, o->value(), 0xc8);}
           label {R.dt}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
+show_dt_value(o);
 send_data(group, 5, o->value(), 0xc8);}
           tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_dt);}
@@ -1182,6 +1192,20 @@ else
 envwindow->resize(this->x(),this->y(),this->w(),this->h());
 
 envwindow->show();} {}
+  }
+  Function {show_dt_value(WidgetPDial *o)} {} {
+    code {
+// unfortunately converttofree() is not called in time for us to be able
+// to use env->getdt(), so we have to compute ourselves
+float dt = (powf(2.0f, ((int)o->value()) / 127.0f * 12.0f) - 1.0f) * 10.0f;
+if (dt<100.0f)
+   o->show_custom_value_units(dt,"ms",1);
+else if (dt<1000.0f)
+   o->show_custom_value_units(dt,"ms");
+else if(dt<10000.0f)
+   o->show_custom_value_units(dt/1000.0f,"s",2);
+else
+   o->show_custom_value_units(dt/1000.0f,"s",1);} {}
   }
   decl {EnvelopeParams *env;} {private local
   }
