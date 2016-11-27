@@ -3,6 +3,7 @@ yoshimi 1.4.1 M
 2016-11-27 Will
 * midi-learn menu changed to buttons.
 * midi-learn clear all implemented.
+* Running learned controls can now go 'in_place' for LV2.
 
 2016-11-26 Will
 * Small midi-learn / Interchange optimisations.

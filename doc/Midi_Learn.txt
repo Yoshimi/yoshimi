@@ -26,6 +26,8 @@ The same CC/controller can be used to change several different internal Yoshimi 
 
 Adding or deleting lines, or changing either CC or channel numbers will re-order the others.
 
+Finally, you can clear the entire learned list.
+
 To come:
 Saving and loading.
 Paging of the display so you don't end up scrolling through a massive list.

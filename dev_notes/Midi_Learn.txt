@@ -53,7 +53,7 @@ These redraw a line in place.
 1   set min_in
 2   set max-in
 
-These move a line, so a complete redraw is intitalsed.
+These move a line, so a complete redraw is inititalsed.
  8  delete line
 16  write line
 17  set CC
@@ -62,5 +62,7 @@ These move a line, so a complete redraw is intitalsed.
 20  send list size
 
 96  clear all
+
+The gui now always does a redraw (except 20), but 0 to 2 and 96 don't do a list re-order first.
 
 

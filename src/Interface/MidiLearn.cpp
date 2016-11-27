@@ -126,22 +126,29 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         unsigned int found;
         unsigned int tries = 0;
 
-        if (jack_ringbuffer_write_space(synth->interchange.fromMIDI) >= writesize)
+        if (in_place)
         {
-            while (towrite && tries < 3)
-            {
-                found = jack_ringbuffer_write(synth->interchange.fromMIDI, point, towrite);
-                wrote += found;
-                point += found;
-                towrite -= found;
-                ++tries;
-            }
-            if (towrite)
-                    synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
+            synth->interchange.commandSend(&putData);
+            synth->interchange.returns(&putData);
         }
         else
-            synth->getRuntime().Log("fromMidi buffer full!", 2);
-
+        {
+            if (jack_ringbuffer_write_space(synth->interchange.fromMIDI) >= writesize)
+            {
+                while (towrite && tries < 3)
+                {
+                    found = jack_ringbuffer_write(synth->interchange.fromMIDI, point, towrite);
+                    wrote += found;
+                    point += found;
+                    towrite -= found;
+                    ++tries;
+                }
+                if (towrite)
+                        synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
+            }
+            else
+                synth->getRuntime().Log("fromMidi buffer full!", 2);
+        }
         if (lastpos == -1)
             return true;
     }

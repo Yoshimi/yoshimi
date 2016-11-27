@@ -53,13 +53,14 @@ class InterChange : private MiscFuncs
         void mediate();
         void returns(CommandBlock *getData);
         void setpadparams(int point);
+        void commandSend(CommandBlock *getData);
+        void resolveReplies(CommandBlock *getData);
 
     private:
         void *CLIresolvethread(void);
         static void *_CLIresolvethread(void *arg);
         pthread_t  CLIresolvethreadHandle;
 
-        void resolveReplies(CommandBlock *getData);
         string resolveVector(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
         string resolvePart(CommandBlock *getData);
@@ -75,7 +76,6 @@ class InterChange : private MiscFuncs
         string resolveSysIns(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
 
-        void commandSend(CommandBlock *getData);
         void commandVector(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
         void commandPart(CommandBlock *getData);
