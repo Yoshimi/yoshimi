@@ -61,4 +61,6 @@ These move a line, so a complete redraw is intitalsed.
 
 20  send list size
 
+96  clear all
+
 

@@ -232,6 +232,12 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::changeLine(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    if (control == 96)
+    {
+        midi_list.clear();
+        updateGui();
+        return;
+    }
     LearnBlock entry;
     int lineNo = 0;
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -282,10 +288,12 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
                 ++lineNo;
             }
         }
+        // cout << "Orig " << (int)value << "  New " << (int)lineNo << endl;
         if (it == midi_list.end())
             midi_list.push_back(entry);
         else
             midi_list.insert(it, entry);
+        // sort order not quite correct for some channel changes
         updateGui();
         return;
     }
@@ -353,26 +361,51 @@ void MidiLearn::updateGui()
 {
     CommandBlock putData;
     unsigned int writesize = sizeof(putData);
-    //char *point = (char*)&putData;
+    char *point = (char*)&putData;
     unsigned int towrite;
     unsigned int wrote;
     unsigned int found;
     unsigned int tries;
+    int lineNo = 0;
+    putData.data.part = 0xd8;
+    putData.data.control = 96;
+    putData.data.par2 = 0xff;
+    putData.data.value = lineNo;
+    towrite = writesize;
+    wrote = 0;
+    found = 0;
+    tries = 0;
+    if (jack_ringbuffer_write_space(synth->interchange.toGUI) >= writesize)
+    {
+        while (towrite && tries < 3)
+        {
+            found = jack_ringbuffer_write(synth->interchange.toGUI,point, towrite);
+            wrote += found;
+            point += found;
+            towrite -= found;
+            ++tries;
+        }
+        if (towrite)
+            synth->getRuntime().Log("Unable to write data to toGui buffer", 2);
+    }
+    else
+        synth->getRuntime().Log("toGui buffer full!", 2);
+
+
+
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
-    int lineNo = 0;
     while (it != midi_list.end())
     {
+        putData.data.part = 0xd8;
         putData.data.value = lineNo;
         putData.data.type = it->status;
         putData.data.control = 16;
-        putData.data.part = 0xd8;
         putData.data.kit = it->CC;
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
         putData.data.par2 = miscMsgPush(it->name);
-
         char *point = (char*)&putData;
         towrite = writesize;
         wrote = 0;

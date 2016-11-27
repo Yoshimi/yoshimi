@@ -22,6 +22,8 @@ Muting of this action.
 
 You can delete any existing line by holding down the 'CTRL' key and then clicking on the 'Control Function' text for that line. You will then be presented with a confirmation message giving the line number and the text as a reminder.
 
+The same CC/controller can be used to change several different internal Yoshimi controls. e.g. you can have a part's volume being changed while another part is having an effect level changed.
+
 Adding or deleting lines, or changing either CC or channel numbers will re-order the others.
 
 To come:
