@@ -27,7 +27,7 @@
 #include "Effects/DynamicFilter.h"
 
 DynamicFilter::DynamicFilter(bool insertion_, float *efxoutl_, float *efxoutr_, SynthEngine *_synth) :
-    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, _synth), 0),
+    Effect(insertion_, efxoutl_, efxoutr_, new FilterParams(0, 64, 64, 0, _synth), 0),
     lfo(_synth),
     Pvolume(110),
     Pdepth(0),

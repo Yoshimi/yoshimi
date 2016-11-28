@@ -54,7 +54,7 @@ PADnoteParameters::PADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) : Pr
     AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
 
-    GlobalFilter = new FilterParams(2, 94, 40, synth);
+    GlobalFilter = new FilterParams(2, 94, 40, 0, synth);
     FilterEnvelope = new EnvelopeParams(0, 1, synth);
     FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);

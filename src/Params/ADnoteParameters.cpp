@@ -50,7 +50,7 @@ ADnoteParameters::ADnoteParameters(FFTwrapper *fft_, SynthEngine *_synth) :
     GlobalPar.AmpEnvelope->ADSRinit_dB(0, 40, 127, 25);
     GlobalPar.AmpLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 1, synth);
 
-    GlobalPar.GlobalFilter = new FilterParams(2, 94, 40, synth);
+    GlobalPar.GlobalFilter = new FilterParams(2, 94, 40, 0, synth);
     GlobalPar.FilterEnvelope = new EnvelopeParams(0, 1, synth);
     GlobalPar.FilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     GlobalPar.FilterLfo = new LFOParams(80, 0, 64, 0, 0, 0, 0, 2, synth);
@@ -189,7 +189,7 @@ void ADnoteParameters::enableVoice(int nvoice)
     VoicePar[nvoice].FreqEnvelope->ASRinit(30, 40, 64, 60);
     VoicePar[nvoice].FreqLfo = new LFOParams(50, 40, 0, 0, 0, 0, 0, 0, synth);
 
-    VoicePar[nvoice].VoiceFilter = new FilterParams(2, 50, 60, synth);
+    VoicePar[nvoice].VoiceFilter = new FilterParams(2, 50, 60, 0, synth);
     VoicePar[nvoice].FilterEnvelope = new EnvelopeParams(0, 0, synth);
     VoicePar[nvoice].FilterEnvelope->ADSRinit_filter(90, 70, 40, 70, 10, 40);
     VoicePar[nvoice].FilterLfo = new LFOParams(50, 20, 64, 0, 0, 0, 0, 2, synth);
