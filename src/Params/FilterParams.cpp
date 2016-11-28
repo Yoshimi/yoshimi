@@ -139,9 +139,17 @@ float FilterParams::getq(void)
 
 float FilterParams::getfreqtracking(float notefreq)
 {
-    if (Pdoublefreqtrack != 0) {
-        return logf(notefreq / 440.0f) * (Pfreqtrack - 64.0f) / (32.0f * LOG_2);
-    } else {
+    if (Pdoublefreqtrack != 0)
+    {
+        // In this setting freq.tracking's range is: 0% to 198%
+        // 100% for value 64
+        return logf(notefreq / 440.0f) * Pfreqtrack / (64.0f * LOG_2);
+    }
+    else
+    {
+        // In this original setting freq.tracking's range is: -100% to +98%
+        // It does not reach up to 100% because the maximum value of
+        // Pfreqtrack is 127. Pfreqtrack==128 would give 100%
         return logf(notefreq / 440.0f) * (Pfreqtrack - 64.0f) / (64.0f * LOG_2);
     }
 }

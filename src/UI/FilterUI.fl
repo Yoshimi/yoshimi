@@ -395,10 +395,10 @@ send_data(6, o->value(), 0xc0);}
         xywh {203 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Check_Button doublefreqtrack {
-        label x2
+        label {0/+}
         callback {pars->Pdoublefreqtrack=(int)o->value();
 send_data(10, o->value(), 0xc0);}
-        tooltip {Set frequency tracking range to 200%} xywh {244 20 15 15} down_box DOWN_BOX labelsize 10
+        tooltip {Set frequency tracking range to 0%-200%} xywh {244 20 15 15} down_box DOWN_BOX labelsize 9
       }
     }
   }
