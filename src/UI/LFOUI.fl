@@ -109,6 +109,8 @@ send_data(group, 1, o->value(), 0xc8);}
         Fl_Dial delay {
           label Delay
           callback {pars->Pdelay=(int)o->value();
+float delayTime = ((int)o->value()) / 127.0f * 4.0f + 0.005f;
+o->show_custom_value_units(delayTime,"s",2);
 send_data(group, 2, o->value(), 0xc8);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (engine >= 0x80 && group == 0) o->init(30); else o->init(0);}

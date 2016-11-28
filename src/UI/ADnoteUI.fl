@@ -94,7 +94,7 @@ collect_data(synth, o->value(), (Fl::event_button() | 0xc0), 1, npart, kititem, 
         }
         Fl_Dial voicepanning {
           callback {pars->setVoicePan(nvoice, lrint(o->value()));
-
+o->show_panning_value();
 collect_data(synth, o->value(), (Fl::event_button() | 0xc0), 2, npart, kititem, 0x80 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {215 5 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PPanning);}
@@ -880,6 +880,7 @@ send_data(49, o->value(), 0xc8);}
           Fl_Dial voicevolume {
             label Volume
             callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());
+o->show_custom_value_units(-60.0f*(1.0f-lrint(o->value())/127.0f),"dB",1);
 send_data(0, o->value(), 0xc8);}
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PVolume);}
@@ -907,6 +908,7 @@ send_data(1, o->value(), 0xc8);}
             callback {//
                  pars->setVoicePan(nvoice, lrint(o->value()));
                  voicerandompan->value(pars->randomVoicePan(nvoice));
+                 o->show_panning_value();
                  send_data(2, o->value(), 0xc8);}
             tooltip {Voice panning - leftmost/zero gives random panning} xywh {174 56 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PPanning);}
@@ -1615,6 +1617,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial globalvolume {
           label Volume
           callback {pars->GlobalPar.PVolume = lrint(o->value());
+          o->show_custom_value_units(-60.0f*(1.0f-lrint(o->value())/96.0f),"dB",1);
 send_data(0, o->value(), 0xc8);}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PVolume);}
@@ -1636,6 +1639,7 @@ send_data(1, o->value(), 0xc8);}
     pars->setGlobalPan(lrint(o->value()));
     globalrandompan->value(pars->randomGlobalPan());
     amplitudegrp->changed();
+    o->show_panning_value();
     send_data(2, o->value(), 0xc8);}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPanning);}

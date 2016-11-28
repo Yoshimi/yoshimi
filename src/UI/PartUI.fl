@@ -462,6 +462,7 @@ send_data(4, o->value(), 0xc8);}
           label Pan
           callback {//
                     part->SetController(C_panning, o->value());
+                    o->show_panning_value(false);
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                         synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
                     send_data(2, o->value(), 0xc8);}
@@ -474,6 +475,7 @@ send_data(4, o->value(), 0xc8);}
           label Volume
           callback {//
                     part->setVolume(o->value());
+                    o->show_custom_value_units((o->value()-96.0f)/96.0f*40.0f,"dB",1);
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                         synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
                     send_data(0, o->value(), 0xc8);}

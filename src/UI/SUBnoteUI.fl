@@ -204,6 +204,7 @@ if ((Fl::event_button() == 3))
         Fl_Dial vol {
           label Volume
           callback {pars->PVolume = (int)o->value();
+o->show_custom_value_units(-60.0f*(1.0f-(int)o->value()/96.0f),"dB",1);
 send_data (0, o->value(), 0xc8);}
           tooltip Volume xywh {40 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PVolume);}
@@ -224,6 +225,7 @@ send_data (1, o->value(), 0xc8);}
           callback {//
     pars->setPan((char)o->value());
     randompan->value(pars->randomPan());
+    o->show_panning_value();
     send_data (2, o->value(), 0xc8);}
           tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->value(pars->PPanning);}

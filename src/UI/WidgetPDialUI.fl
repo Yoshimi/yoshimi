@@ -336,6 +336,11 @@ class WidgetPDial {selected : {public Fl_Dial}
     code {tipwin->setText(c);
         textset = true;} {}
   }
+  Function {show_custom_value(string v)} {return_type void
+  } {
+    code {tipwin->customValue(v);
+          showplainvalue = false;} {}
+  }
   Function {show_custom_value_units(float v, string u, int prec=0)} {return_type void
   } {
     code {ostringstream oss;
@@ -344,6 +349,23 @@ class WidgetPDial {selected : {public Fl_Dial}
           oss << v << " " << u;
           tipwin->customValue(string(oss.str()));
           showplainvalue = false;} {}
+  }
+  Function {show_percent_value()} {} {
+    code {
+    float pc = (value() - minimum()) / (maximum() - minimum()) * 100.0f;
+    show_custom_value_units(pc, "%", 1);
+  }
+  Function {show_panning_value(bool hasRandom=true)} {} {
+    code {int val = lrint(value());
+          if(hasRandom && val==0)
+              show_custom_value("random");
+          else if(val==64)
+              show_custom_value("centered");
+          else if(val<64)
+              show_custom_value_units((64.0f - val)
+                               / (hasRandom ? 63.0f : 64.0f)*100.0f,"% left");
+          else
+              show_custom_value_units((val - 64.0f)/63.0f*100.0f,"% right");
   }
   decl {bool textset;} {private local
   }

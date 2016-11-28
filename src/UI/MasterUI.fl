@@ -598,6 +598,8 @@ paramsui->Show(4);}
         Fl_Dial mastervolumedial {
           label Volume
           callback {synth->setPvolume(o->value());
+float dBval = (o->value()-96.0f)/96.0f*40.0f;
+o->show_custom_value_units(dBval, "dB", 1);
 send_data(0, o->value(), 0x48);}
           tooltip {Master Volume} xywh {331 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->value(synth->Pvolume);}

@@ -467,6 +467,7 @@ send_data(group, 5, o->value(), 0xc8);}
           label {S.val}
           callback {env->PS_val=(int)o->value();
 freeedit->redraw();
+o->show_percent_value();
 send_data(group, 4, o->value(), 0xc8);}
           tooltip {Sustain value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PS_val);}
