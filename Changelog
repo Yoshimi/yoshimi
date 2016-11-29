@@ -1,5 +1,12 @@
 yoshimi 1.4.1 M
 
+2016-11-29 Will
+* Corrected anomaly when changing midi-learn channel numbers.
+* Changed 'doublefreqtrack' to 'freqtrackoffset'.
+
+2016-11-28 Merge from : Jörn
+* Added button to filter tracking, offsetting range for 0 200%.
+
 2016-11-27 Will
 * midi-learn menu changed to buttons.
 * midi-learn clear all implemented.

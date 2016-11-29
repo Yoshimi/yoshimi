@@ -30,13 +30,13 @@ using namespace std;
 #include "Misc/SynthEngine.h"
 #include "Params/FilterParams.h"
 
-FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, unsigned char Pdoublefreqtrack_, SynthEngine *_synth) :
+FilterParams::FilterParams(unsigned char Ptype_, unsigned char Pfreq_, unsigned  char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth) :
     Presets(_synth),
     changed(false),
     Dtype(Ptype_),
     Dfreq(Pfreq_),
     Dq(Pq_),
-    Ddoublefreqtrack(Pdoublefreqtrack_)
+    Dfreqtrackoffset(Pfreqtrackoffset_)
 {
     setpresettype("Pfilter");
     defaults();
@@ -51,7 +51,7 @@ void FilterParams::defaults(void)
 
     Pstages = 0;
     Pfreqtrack = 64;
-    Pdoublefreqtrack = Ddoublefreqtrack;
+    Pfreqtrackoffset = Dfreqtrackoffset;
     Pgain = 64;
     Pcategory = 0;
 
@@ -139,7 +139,7 @@ float FilterParams::getq(void)
 
 float FilterParams::getfreqtracking(float notefreq)
 {
-    if (Pdoublefreqtrack != 0)
+    if (Pfreqtrackoffset != 0)
     {
         // In this setting freq.tracking's range is: 0% to 198%
         // 100% for value 64
@@ -292,7 +292,7 @@ void FilterParams::add2XML(XMLwrapper *xml)
     xml->addpar("q",Pq);
     xml->addpar("stages",Pstages);
     xml->addpar("freq_track",Pfreqtrack);
-    xml->addparbool("doublefreqtrack",Pdoublefreqtrack);
+    xml->addparbool("freqtrackoffset",Pfreqtrackoffset);
     xml->addpar("gain",Pgain);
 
     //formant filter parameters
@@ -351,7 +351,7 @@ void FilterParams::getfromXML(XMLwrapper *xml)
     Pq = xml->getpar127("q",Pq);
     Pstages = xml->getpar127("stages",Pstages);
     Pfreqtrack = xml->getpar127("freq_track",Pfreqtrack);
-    Pdoublefreqtrack = xml->getparbool("doublefreqtrack", Pdoublefreqtrack);
+    Pfreqtrackoffset = xml->getparbool("freqtrackoffset", Pfreqtrackoffset);
     Pgain = xml->getpar127("gain",Pgain);
 
     // formant filter parameters

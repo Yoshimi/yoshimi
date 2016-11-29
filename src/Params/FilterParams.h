@@ -35,7 +35,7 @@ class SynthEngine;
 class FilterParams : public Presets, private MiscFuncs
 {
     public:
-        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, unsigned char Pdoublefreqtrack_, SynthEngine *_synth);
+        FilterParams(unsigned char Ptype_, unsigned char Pfreq, unsigned char Pq_, unsigned char Pfreqtrackoffset_, SynthEngine *_synth);
         ~FilterParams() { }
 
         void add2XML(XMLwrapper *xml);
@@ -61,7 +61,7 @@ class FilterParams : public Presets, private MiscFuncs
 
         float getformantfreq(unsigned char freq) // Transforms a parameter to
             { return getfreqx(freq / 127.0f); }  // the real value
-        float getformantamp(unsigned char amp) 
+        float getformantamp(unsigned char amp)
             { return powf(0.1f, (1.0f - amp / 127.0f) * 4.0f); }
         float getformantq(unsigned char q)
             { return powf(25.0f, (q - 32.0f) / 64.0f); }
@@ -73,7 +73,7 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Pstages;    // filter stages+1
         unsigned char Pfreqtrack; // how the filter frequency is changing
                                   // according the note frequency
-        unsigned char Pdoublefreqtrack;  // double range for freq tracking
+        unsigned char Pfreqtrackoffset;  // Shift range for freq tracking
         unsigned char Pgain;      // filter's output gain
 
         // Formant filter parameters
@@ -108,7 +108,7 @@ class FilterParams : public Presets, private MiscFuncs
         unsigned char Dtype;
         unsigned char Dfreq;
         unsigned char Dq;
-        unsigned char Ddoublefreqtrack;
+        unsigned char Dfreqtrackoffset;
 };
 
 #endif

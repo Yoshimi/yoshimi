@@ -283,24 +283,24 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
         it = midi_list.begin();
         int lineNo = 0;
         if (midi_list.size() > 0)
-        {
-            while(CC >= it->CC && it != midi_list.end()) // CC is priority
-            {
+        { // CC is priority
+            while(CC > it->CC && it != midi_list.end())
+            { // find start of group
                 ++it;
                 ++lineNo;
             }
             while(CC == it->CC && chan >= it->chan && it != midi_list.end())
-            {
+            { // insert at end of same channel
                 ++it;
                 ++lineNo;
             }
         }
         // cout << "Orig " << (int)value << "  New " << (int)lineNo << endl;
+
         if (it == midi_list.end())
             midi_list.push_back(entry);
         else
             midi_list.insert(it, entry);
-        // sort order not quite correct for some channel changes
         updateGui();
         return;
     }
@@ -340,14 +340,14 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
     it = midi_list.begin();
     int lineNo = 0;
     if (midi_list.size() > 0)
-    {
-        while(CC >= it->CC && it != midi_list.end()) // CC is priority
-        {
+    { // CC is priority
+        while(CC > it->CC && it != midi_list.end()) // CC is priority
+        { // find start of group
             ++it;
             ++lineNo;
         }
         while(CC == it->CC && chan >= it->chan && it != midi_list.end())
-        {
+        { // insert at end of same channel
             ++it;
             ++lineNo;
         }
@@ -373,11 +373,11 @@ void MidiLearn::updateGui()
     unsigned int wrote;
     unsigned int found;
     unsigned int tries;
-    int lineNo = 0;
+
     putData.data.part = 0xd8;
     putData.data.control = 96;
     putData.data.par2 = 0xff;
-    putData.data.value = lineNo;
+    putData.data.value = 0;
     towrite = writesize;
     wrote = 0;
     found = 0;
@@ -399,7 +399,7 @@ void MidiLearn::updateGui()
         synth->getRuntime().Log("toGui buffer full!", 2);
 
 
-
+    int lineNo = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
     while (it != midi_list.end())

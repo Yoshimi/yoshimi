@@ -4543,9 +4543,9 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 10:
             if (write)
-                pars->Pdoublefreqtrack = (val != 0);
+                pars->Pfreqtrackoffset = (val != 0);
             else
-                val = pars->Pdoublefreqtrack;
+                val = pars->Pfreqtrackoffset;
             break;
 
         case 16:
