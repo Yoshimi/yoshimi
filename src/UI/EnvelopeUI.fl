@@ -530,6 +530,7 @@ send_data(group, 17, o->value(), 0xc0);}
           label {A.val}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
+show_freq_value(o);
 send_data(group, 0, o->value(), 0xc8);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
@@ -551,6 +552,7 @@ send_data(group, 1, o->value(), 0xc8);}
           label {R.val}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
+show_freq_value(o);
 send_data(group, 6, o->value(), 0xc8);}
           tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
@@ -616,6 +618,7 @@ send_data(group, 24, o->value(), 0xc0);}
           label {A.val}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
+show_filter_value(o);
 send_data(group, 0, o->value(), 0xc8);}
           tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
@@ -637,6 +640,7 @@ send_data(group, 1, o->value(), 0xc8);}
           label {D.val}
           callback {env->PD_val=(int)o->value();
 freeedit->redraw();
+show_filter_value(o);
 send_data(group, 2, o->value(), 0xc8);}
           tooltip {decay value} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PD_val);}
@@ -669,6 +673,7 @@ send_data(group, 5, o->value(), 0xc8);}
           label {R.val}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
+show_filter_value(o);
 send_data(group, 6, o->value(), 0xc8);}
           tooltip {Release value} xywh {180 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
@@ -1208,6 +1213,26 @@ else if(dt<10000.0f)
    o->show_custom_value_units(dt/1000.0f,"s",2);
 else
    o->show_custom_value_units(dt/1000.0f,"s",1);} {}
+  }
+  Function {show_freq_value(WidgetPDial *o)} {} {
+    code {float cents=(powf(2.0f, 6.0f * fabsf((int)o->value() - 64.0f) / 64.0f)
+                        -1.0f) * 100.0f;
+          if((int)o->value()<64) cents = -cents;
+          if(fabsf(cents) < 10)
+              o->show_custom_value_units(cents,"cents",2);
+          else if(fabsf(cents) < 100)
+              o->show_custom_value_units(cents,"cents",1);
+          else
+              o->show_custom_value_units(cents,"cents");} {}
+  }
+  Function {show_filter_value(WidgetPDial *o)} {} {
+    code {float cents=((int)o->value() - 64.0f) / 64.0f * 7200.0f; // 6 octaves
+          if(fabsf(cents) < 10)
+              o->show_custom_value_units(cents,"cents",2);
+          else if(fabsf(cents) < 100)
+              o->show_custom_value_units(cents,"cents",1);
+          else
+              o->show_custom_value_units(cents,"cents");} {}
   }
   decl {EnvelopeParams *env;} {private local
   }

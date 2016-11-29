@@ -353,7 +353,7 @@ class WidgetPDial {selected : {public Fl_Dial}
   Function {show_percent_value()} {} {
     code {
     float pc = (value() - minimum()) / (maximum() - minimum()) * 100.0f;
-    show_custom_value_units(pc, "%", 1);
+    show_custom_value_units(pc, "%", 1); } {}
   }
   Function {show_panning_value(bool hasRandom=true)} {} {
     code {int val = lrint(value());
@@ -365,7 +365,7 @@ class WidgetPDial {selected : {public Fl_Dial}
               show_custom_value_units((64.0f - val)
                                / (hasRandom ? 63.0f : 64.0f)*100.0f,"% left");
           else
-              show_custom_value_units((val - 64.0f)/63.0f*100.0f,"% right");
+              show_custom_value_units((val - 64.0f)/63.0f*100.0f,"% right");} {}
   }
   decl {bool textset;} {private local
   }

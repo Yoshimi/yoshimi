@@ -101,6 +101,32 @@ send_data(group, 0, o->value(), 0x40);}
         Fl_Dial intensity {
           label Depth
           callback {pars->Pintensity=(int)o->value();
+// show LFO depth according to modulation target
+float val;
+switch(pars->fel)
+{
+        case 0: // frequency lfo
+             val=powf(2.0f,(int)o->value()/127.0f*11.0f)-1.0f;
+             if (val < 10.0f)
+                 o->show_custom_value_units(val,"cents",2);
+             else if(val < 100.0f)
+                 o->show_custom_value_units(val,"cents",1);
+             else
+                 o->show_custom_value_units(val,"cents");
+             break;
+        case 1: // amplitude lfo
+             o->show_percent_value();
+             break;
+        case 2: // filter lfo
+             val=(int)o->value() / 127.0f * 4800.0f; // 4 octaves
+             if (val < 10.0f)
+                 o->show_custom_value_units(val,"cents",2);
+             else if(val < 100.0f)
+                 o->show_custom_value_units(val,"cents",1);
+             else
+                 o->show_custom_value_units(val,"cents");
+             break;
+}
 send_data(group, 1, o->value(), 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
@@ -119,6 +145,11 @@ send_data(group, 2, o->value(), 0xc8);}
         Fl_Dial startphase {
           label Start
           callback {pars->Pstartphase=(int)o->value();
+          if((int)o->value() == 0)
+              o->show_custom_value("random");
+          else
+              o->show_custom_value_units(((int)o->value()-64.0f) / 127.0f
+                                         * 360.0f, "°");
 send_data(group, 3, o->value(), 0xc8);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (engine >= 0x80 && group == 1) o->init(0); else o->init(64);}

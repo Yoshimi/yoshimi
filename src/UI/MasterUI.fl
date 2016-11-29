@@ -563,6 +563,7 @@ paramsui->Show(4);}
               synth->microtonal.Pglobalfinedetune = o->value();
               synth->setAllPartMaps();
               globalfinedetune->changed();
+              o->show_custom_value_units((o->value()-64),"cents",1);
               send_data(32, o->value(), 0xc8);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->value(synth->microtonal.Pglobalfinedetune);}
