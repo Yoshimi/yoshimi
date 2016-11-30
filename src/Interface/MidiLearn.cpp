@@ -31,6 +31,7 @@ using namespace std;
 #include "Interface/MidiLearn.h"
 #include "Interface/InterChange.h"
 #include "Misc/MiscFuncs.h"
+#include "Misc/XMLwrapper.h"
 #include "Misc/SynthEngine.h"
 
 MidiLearn::MidiLearn(SynthEngine *_synth) :
@@ -245,6 +246,11 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
         updateGui();
         return;
     }
+    else if (control == 245)
+    {
+        saveList("/home/will/testmidi");
+        return;
+    }
     LearnBlock entry;
     int lineNo = 0;
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -436,4 +442,72 @@ void MidiLearn::updateGui()
         ++it;
         ++lineNo;
     }
+}
+
+
+bool MidiLearn::saveList(string name)
+{
+    if (name.empty())
+    {
+        synth->getRuntime().Log("No filename");
+        return false;
+    }
+
+    if (midi_list.size() == 0)
+    {
+        synth->getRuntime().Log("No Midi Learn list");
+        return false;
+    }
+
+    string file = setExtension(name, "xly");
+    legit_pathname(file);
+
+    synth->getRuntime().xmlType = XML_MIDILEARN;
+    XMLwrapper *xml = new XMLwrapper(synth);
+    if (!xml)
+    {
+        synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
+        return false;
+    }
+    bool ok = true;
+    int ID = 0;
+    list<LearnBlock>::iterator it;
+    it = midi_list.begin();
+
+        while (it != midi_list.end())
+        {
+            xml->beginbranch("MIDILINE", ID);
+            xml->addparbool("Mute", (it->status & 4) > 0);
+                xml->addpar("Midi_Controller", it->CC);
+                xml->addpar("Midi_Channel", it->chan);
+                xml->addpar("Midi_Min", it->min_in);
+                xml->addpar("Midi_Max", it->max_in);
+                xml->addparbool("Limit", (it->status & 2) > 0);
+                xml->addparbool("Block", (it->status & 1) > 0);
+                xml->addpar("Convert_Min", it->min_out);
+                xml->addpar("Convert_Max", it->max_out);
+                xml->beginbranch("COMMAND");
+                    xml->addpar("Type", it->data.type);
+                    xml->addpar("Control", it->data.control);
+                    xml->addpar("Part", it->data.part);
+                    xml->addpar("Kit_Item", it->data.kit);
+                    xml->addpar("Engine", it->data.engine);
+                    xml->addpar("Insert", it->data.insert);
+                    xml->addpar("Parameter", it->data.parameter);
+                    xml->addpar("Secondary_Parameter", it->data.par2);
+                    xml->endbranch();
+            xml->endbranch();
+            ++it;
+            ++ID;
+        }
+
+    if (xml->saveXMLfile(file))
+        ;//addHistory(file, 6);
+    else
+    {
+        synth->getRuntime().Log("Failed to save data to " + file);
+        ok = false;
+    }
+    delete xml;
+    return ok;
 }

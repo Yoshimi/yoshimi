@@ -1607,7 +1607,6 @@ string InterChange::resolveFilter(CommandBlock *getData)
         name = " PadSynth";
     else if (engine >= 0x80)
         name = " Adsynth Voice " + to_string(engine & 0x3f);
-
     string contstr;
     switch (control)
     {
@@ -1618,7 +1617,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
             contstr = "Q";
             break;
         case 2:
-            contstr = "FreqTr";
+            contstr = "FreqTrk";
             break;
         case 3:
             contstr = "VsensA";
@@ -1641,7 +1640,9 @@ string InterChange::resolveFilter(CommandBlock *getData)
         case 9:
             contstr = "SV Type";
             break;
-
+        case 10:
+            contstr = "Fre Trk Offs";
+            break;
         case 16:
             contstr = "Form Fr Sl";
             break;
@@ -4524,14 +4525,6 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
                 val = pars->Pcategory;
             break;
         case 8:
-            if (write)
-            {
-                pars->Ptype = val;
-                pars->changed=true;
-            }
-            else
-                val = pars->Ptype;
-            break;
         case 9:
             if (write)
             {

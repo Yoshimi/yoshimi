@@ -274,12 +274,13 @@ class MidiLearnUI {selected : {private MiscFuncs}
         label Max
         xywh {275 0 40 15} labelfont 1 labelsize 11 align 18
       }
-      Fl_Button {} {
+      Fl_Button load {
         label Load
         xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
-      Fl_Button {} {
+      Fl_Button save {
         label Save
+        callback {send_data(245,0,0);}
         xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button clear {
@@ -332,6 +333,7 @@ int status = getData->data.type;
 string name = miscMsgPop(getData->data.par2);
 none->hide();
 clear->activate();
+save->activate();
 midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,740,20,"");
 midilearnkititem[lineNo]->init(synth, lineNo);
 kitlist->add(midilearnkititem[lineNo]);
@@ -375,7 +377,11 @@ kitlist->clear();
 for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
     midilearnkititem[i] = NULL;
 if (empty)
+{
     none->show();
+    clear->deactivate();
+    save->deactivate();
+}
 kitlist->redraw();
 kitlist->show();} {}
   }

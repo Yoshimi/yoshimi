@@ -383,6 +383,7 @@ add_definitions (-DXML_CONFIG=6)
 add_definitions (-DXML_BANK=7)
 add_definitions (-DXML_HISTORY=8)
 add_definitions (-DXML_VECTOR=9)
+add_definitions (-DXML_MIDILEARN=10)
 
 # these were previously (pointlessly) user configurable
 add_definitions (-DNUM_VOICES=8)
@@ -393,7 +394,7 @@ add_definitions (-DNUM_PART_EFX=3)
 add_definitions (-DNUM_KIT_ITEMS=16)
 add_definitions (-DVELOCITY_MAX_SCALE=8.0f)
 add_definitions (-DFADEIN_ADJUSTMENT_SCALE=20)
-add_definitions (-DMAX_EQ_BANDS=8) # MAX_EQ_BANDS must be less than 20")
+add_definitions (-DMAX_EQ_BANDS=8) # MAX_EQ_BANDS must be less than 20
 add_definitions (-DMAX_FILTER_STAGES=5)
 add_definitions (-DFF_MAX_VOWELS=6)
 add_definitions (-DFF_MAX_FORMANTS=12)

@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-11-30 Will
+* First draft of midi-learn saving.
+
 2016-11-29 Will
 * Corrected anomaly when changing midi-learn channel numbers.
 * Changed 'doublefreqtrack' to 'freqtrackoffset'.

@@ -31,6 +31,8 @@ using namespace std;
 #include "Misc/MiscFuncs.h"
 #include "Interface/InterChange.h"
 
+class XMLwrapper;
+
 class SynthEngine;
 
 class MidiLearn : private MiscFuncs
@@ -38,7 +40,10 @@ class MidiLearn : private MiscFuncs
     public:
         MidiLearn(SynthEngine *_synth);
         ~MidiLearn();
-
+        bool saveXML(string filename); // true for load ok, otherwise false
+        int loadXMLinstrument(string filename);
+        void add2XML(XMLwrapper *xml);
+        void getfromXML(XMLwrapper *xml);
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
 
@@ -74,6 +79,7 @@ class MidiLearn : private MiscFuncs
         void listAll(void);
         bool remove(int itemNumber);
         void changeLine(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
+        bool saveList(string name);
 
     private:
         list<LearnBlock> midi_list;
