@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {Copyright 2011, Alan Calvert
 Copyright 2014 - 2016, Will Godfrey
@@ -20,29 +20,29 @@ along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
 Modified September 2014
 } {in_source in_header
-}
+} 
 
 decl {\#include <set>} {public local
-}
+} 
 
 decl {using namespace std;} {public local
-}
+} 
 
 decl {\#include "Misc/Config.h"} {private global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-}
+} 
 
 class ParametersUI {selected
 } {
   Function {make_window(void)} {} {
     Fl_Window Recent {
       label {Recent Parameters}
-      callback {o->hide()}
+      callback {o->hide()} open
       xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Browser BrowseRecent {
@@ -61,6 +61,9 @@ class ParametersUI {selected
                 {
                     case 3:
                         synth->getGuiMaster()->do_load_scale(fle);
+                        break;
+                    case 6:
+                    	//synth->getGuiMaster()->midilearnui->loadMid(fle);
                         break;
                     case 5:
                     	synth->getGuiMaster()->vectorui->loadVector(fle);
@@ -111,7 +114,10 @@ make_window();} {}
     switch (H_type)
     {
         case 3:
-            Recent->label("Recent Scales");
+            Recent->label("Recent Midi Learn Lists");
+            break;
+        case 6:
+            Recent->label("Recent Vectors");
             break;
         case 5:
             Recent->label("Recent Vectors");
@@ -155,4 +161,4 @@ make_window();} {}
   }
   decl {int H_type;} {private local
   }
-}
+} 

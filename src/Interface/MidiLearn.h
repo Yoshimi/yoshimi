@@ -80,6 +80,8 @@ class MidiLearn : private MiscFuncs
         bool remove(int itemNumber);
         void changeLine(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         bool saveList(string name);
+        bool loadList(string name);
+
 
     private:
         list<LearnBlock> midi_list;

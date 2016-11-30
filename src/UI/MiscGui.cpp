@@ -19,7 +19,7 @@
 
 */
 
-#include <FL/x.H>
+#include <FL/Fl.H>
 #include <iostream>
 #include "Misc/SynthEngine.h"
 #include "MiscGui.h"
@@ -41,8 +41,14 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 // identifying this for button 3 as MIDI learn
                 else
                 {
-                    type = 0;
-                    fl_alert("Can't MIDI-learn this control");
+                    synth->getRuntime().Log("Can't MIDI-learn this control");
+                    /* can't use fl_alert here.
+                     * For some reason it goes into a loop on spin boxes
+                     * and runs menus up to their max value.
+                     *
+                     * fl_alert("Can't MIDI-learn this control");
+                     */
+                    return;
                 }
             }
             else

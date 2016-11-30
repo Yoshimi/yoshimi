@@ -74,6 +74,7 @@ static vector<string> ParamsHistory;
 static vector<string> ScaleHistory;
 static vector<string> StateHistory;
 static vector<string> VectorHistory;
+static vector<string> MidiLearnHistory;
 
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
@@ -2441,7 +2442,9 @@ void SynthEngine::addHistory(string name, int group)
 
 vector<string> * SynthEngine::getHistory(int group)
 {
-    if (group == 5)
+    if (group == 6)
+        return &MidiLearnHistory;
+    else if (group == 5)
         return &VectorHistory;
     else if (group == 4)
         return &StateHistory;
@@ -2476,7 +2479,7 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = 2; count < 6; ++count)
+    for (int count = 2; count < 7; ++count)
     {
         switch (count)
         {
@@ -2494,6 +2497,10 @@ bool SynthEngine::loadHistory()
                 break;
             case 5:
                 type = "XMZ_VECTOR";
+                extension = "xvy_file";
+                break;
+            case 6:
+                type = "XMZ_MIDILEARN";
                 extension = "xvy_file";
                 break;
         }
@@ -2537,7 +2544,7 @@ bool SynthEngine::saveHistory()
         int x;
         string type;
         string extension;
-        for (int count = 2; count < 6; ++count)
+        for (int count = 2; count < 7; ++count)
         {
             switch (count)
             {
@@ -2555,6 +2562,10 @@ bool SynthEngine::saveHistory()
                     break;
                 case 5:
                     type = "XMZ_VECTOR";
+                    extension = "xvy_file";
+                    break;
+                case 6:
+                    type = "XMZ_MIDILEARN";
                     extension = "xvy_file";
                     break;
             }

@@ -2,6 +2,10 @@ yoshimi 1.4.1 M
 
 2016-11-30 Will
 * First draft of midi-learn saving.
+* Bugfix: Had to remove fltk midi-learn warning.
+  It goes into a loop on spinboxes :(
+* midi-learn load and save both working with default name
+  "testmidi" in /home/{user}.
 
 2016-11-29 Will
 * Corrected anomaly when changing midi-learn channel numbers.

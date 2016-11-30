@@ -276,7 +276,8 @@ class MidiLearnUI {selected : {private MiscFuncs}
       }
       Fl_Button load {
         label Load
-        xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+        callback {send_data(241,0,0);}
+        xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
       }
       Fl_Button save {
         label Save

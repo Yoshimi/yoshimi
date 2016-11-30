@@ -60,9 +60,9 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
     learnTransferBlock.insert = getData->data.insert;
     learnTransferBlock.parameter = getData->data.parameter;
     learnTransferBlock.par2 = getData->data.par2;
-
-
     learnedName = name;
+    if (getData->data.type & 8)
+        return;
     learning = true;
     synth->getRuntime().Log("Learning");
 }
@@ -246,9 +246,15 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
         updateGui();
         return;
     }
+    else if (control == 241)
+    {
+        loadList(string(getenv("HOME")) + "/testmidi");
+        updateGui();
+        return;
+    }
     else if (control == 245)
     {
-        saveList("/home/will/testmidi");
+        saveList(string(getenv("HOME")) + "/testmidi");
         return;
     }
     LearnBlock entry;
@@ -473,10 +479,10 @@ bool MidiLearn::saveList(string name)
     int ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
-
+    xml->beginbranch("MIDILEARN");
         while (it != midi_list.end())
         {
-            xml->beginbranch("MIDILINE", ID);
+            xml->beginbranch("LINE", ID);
             xml->addparbool("Mute", (it->status & 4) > 0);
                 xml->addpar("Midi_Controller", it->CC);
                 xml->addpar("Midi_Channel", it->chan);
@@ -500,9 +506,10 @@ bool MidiLearn::saveList(string name)
             ++it;
             ++ID;
         }
+        xml->endbranch();
 
     if (xml->saveXMLfile(file))
-        ;//addHistory(file, 6);
+        synth->addHistory(file, 6);
     else
     {
         synth->getRuntime().Log("Failed to save data to " + file);
@@ -510,4 +517,90 @@ bool MidiLearn::saveList(string name)
     }
     delete xml;
     return ok;
+}
+
+
+bool MidiLearn::loadList(string name)
+{
+    if (name.empty())
+    {
+        synth->getRuntime().Log("No filename");
+        return false;
+    }
+    string file = setExtension(name, "xly");
+    legit_pathname(file);
+    if (!isRegFile(file))
+    {
+        synth->getRuntime().Log("Can't find " + file);
+        return false;
+    }
+    XMLwrapper *xml = new XMLwrapper(synth);
+    if (!xml)
+    {
+        synth->getRuntime().Log("Load Midi Learn failed XMLwrapper allocation");
+        return false;
+    }
+    xml->loadXMLfile(file);
+
+    if (!xml->enterbranch("MIDILEARN"))
+    {
+        synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
+        return false;
+    }
+    LearnBlock entry;
+    CommandBlock real;
+    midi_list.clear();
+    int ID = 0;
+    int status;
+    while (true)
+    {
+        status = 0;
+        if (!xml->enterbranch("LINE", ID))
+            break;
+        else
+        {
+
+            if (xml->getparbool("Mute",0))
+                status |= 4;
+            entry.CC = xml->getpar127("Midi_Controller", 0);
+            entry.chan = xml->getpar127("Midi_Channel", 0);
+            entry.min_in = xml->getpar127("Midi_Min", 0);
+            entry.max_in = xml->getpar127("Midi_Max", 127);
+            if (xml->getparbool("Limit",0))
+                status |= 2;
+            if (xml->getparbool("Block",0))
+                status |= 1;
+            entry.min_out = xml->getpar("Convert_Min", 0, 0, 127);
+            entry.max_out = xml->getpar("Convert_Max", 0, 0, 127);
+            xml->enterbranch("COMMAND");
+                entry.data.type = xml->getpar255("Type", 0); // ??
+                real.data.control = entry.data.control = xml->getpar255("Control", 0);
+                real.data.part = entry.data.part = xml->getpar255("Part", 0);
+                real.data.kit = entry.data.kit = xml->getpar255("Kit_Item", 0);
+                real.data.engine = entry.data.engine = xml->getpar255("Engine", 0);
+                real.data.insert = entry.data.insert = xml->getpar255("Insert", 0);
+                real.data.parameter = entry.data.parameter = xml->getpar255("Parameter", 0);
+                real.data.par2 = entry.data.par2 = xml->getpar255("Secondary_Parameter", 0);
+                xml->exitbranch();
+            xml->exitbranch();
+            entry.status = status;
+            real.data.value = 0;
+            real.data.type = 0x1b;
+            /*
+             * Need to modify resolveReplies so that we can
+             * get just the name without this loopback.
+             */
+            synth->interchange.resolveReplies(&real);
+            entry.name = learnedName;
+            midi_list.push_back(entry);
+            ++ ID;
+        }
+    }
+
+    xml->endbranch(); // MIDILEARN
+    synth->addHistory(file, 6);
+    delete xml;
+    return true;
+
+
 }
