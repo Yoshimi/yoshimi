@@ -462,26 +462,26 @@ send_data(4, o->value(), 0xc8);}
           label Pan
           callback {//
                     part->SetController(C_panning, o->value());
-                    o->show_panning_value(false);
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                         synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
                     send_data(2, o->value(), 0xc8);}
           xywh {290 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(part->Ppanning);}
-          code1 {o->init(64);}
+          code0 {o->setValueType(VC_PanningStd);}
+          code1 {o->value(part->Ppanning);}
+          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial partvol {
           label Volume
           callback {//
                     part->setVolume(o->value());
-                    o->show_custom_value_units((o->value()-96.0f)/96.0f*40.0f,"dB",1);
                     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
                         synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
                     send_data(0, o->value(), 0xc8);}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(part->Pvolume);}
-          code1 {o->init(96);}
+          code0 {o->setValueType(VC_PartVolume);}
+          code1 {o->value(part->Pvolume);}
+          code2 {o->init(96);}
           class WidgetPDial
         }
         Fl_Box {} {

@@ -24,6 +24,8 @@
 #include "Misc/SynthEngine.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
+#include "Params/LFOParams.h"
+#include "Params/FilterParams.h"
 
 SynthEngine *synth;
 
@@ -374,5 +376,185 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
             }
         return;
+    }
+}
+
+string convert_value(ValueType type, float val)
+{
+    float f;
+    int i;
+    switch(type)
+    {
+    case VC_plainValue:
+        return(custom_value_units(val,""));
+
+    case VC_percent127:
+        return(custom_value_units(val / 127.0f * 100.0f,"%",1));
+
+    case VC_GlobalFineDetune:
+        return(custom_value_units((val-64),"cents",1));
+
+    case VC_MasterVolume:
+        return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+    case VC_LFOfreq:
+        f = (powf(2.0f, val * 10.0f) - 1.0f) / 12.0f;
+        if(f<10.0f)
+            return(custom_value_units(f,"Hz", 3));
+        else
+            return(custom_value_units(f,"Hz", 2));
+
+    case VC_LFOdepth0: // frequency LFO
+        f=powf(2.0f,(int)val/127.0f*11.0f)-1.0f;
+        if (f < 10.0f)
+            return(custom_value_units(f,"cents",2));
+        else if(f < 100.0f)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+    case VC_LFOdepth1: // amplitude LFO
+        return(custom_value_units(val / 127.0f * 100.0f,"%",1));
+    case VC_LFOdepth2: // filter LFO
+        f=(int)val / 127.0f * 4800.0f; // 4 octaves
+        if (f < 10.0f)
+            return(custom_value_units(f,"cents",2));
+        else if(f < 100.0f)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+
+    case VC_LFOdelay:
+        f = ((int)val) / 127.0f * 4.0f + 0.005f;
+        return(custom_value_units(f,"s",2));
+
+    case VC_LFOstartphase:
+        if((int)val == 0)
+            return("random");
+        else
+            return(custom_value_units(((int)val - 64.0f) / 127.0f
+                                      * 360.0f, "°"));
+    case VC_EnvelopeDT:
+        // unfortunately converttofree() is not called in time for us to be able
+        // to use env->getdt(), so we have to compute ourselves
+        f = (powf(2.0f, ((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
+        if (f<100.0f)
+            return(custom_value_units(f,"ms",1));
+        else if (f<1000.0f)
+            return(custom_value_units(f,"ms"));
+        else if(f<10000.0f)
+            return(custom_value_units(f/1000.0f,"s",2));
+        else
+            return(custom_value_units(f/1000.0f,"s",1));
+
+    case VC_EnvelopeFreqVal:
+        f=(powf(2.0f, 6.0f * fabsf((int)val - 64.0f) / 64.0f) -1.0f) * 100.0f;
+        if((int)val<64) f = -f;
+        if(fabsf(f) < 10)
+            return(custom_value_units(f,"cents",2));
+        else if(fabsf(f) < 100)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+
+    case VC_EnvelopeFilterVal:
+        f=((int)val - 64.0f) / 64.0f * 7200.0f; // 6 octaves
+        if(fabsf(f) < 10)
+            return(custom_value_units(f,"cents",2));
+        else if(fabsf(f) < 100)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+
+    case VC_EnvelopeAmpSusVal:
+        return(custom_value_units((1.0f - (int)val / 127.0f) * MIN_ENVELOPE_DB,
+                                  "dB", 1));
+
+    case VC_FilterFreq0:
+    case VC_FilterFreq2:
+        f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+        if (f < 100.0f)
+            return(custom_value_units(f,"Hz",1));
+        else if(f < 1000.0f)
+            return(custom_value_units(f,"Hz"));
+        else
+            return(custom_value_units(f/1000.0f,"kHz",2));
+
+    case VC_FilterFreq1: // ToDo
+        return(custom_value_units(val,""));
+
+    case VC_FilterFreqTrack0:
+        f = (val - 64.0f) / 64.0f * 100.0f;
+        return(custom_value_units(f, "%", 1));
+    case VC_FilterFreqTrack1:
+        f = val /64.0f * 100.0f;
+        return(custom_value_units(f, "%", 1));
+
+    case VC_InstrumentVolume:
+        return(custom_value_units(-60.0f*(1.0f-(int)val/96.0f),"dB",1));
+
+    case VC_ADDVoiceVolume:
+        return(custom_value_units(-60.0f*(1.0f-lrint(val)/127.0f),"dB",1));
+
+    case VC_PartVolume:
+        return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+    case VC_PanningRandom:
+        i = lrint(val);
+        if(i==0)
+            return("random");
+        else if(i==64)
+            return("centered");
+        else if(i<64)
+            return(custom_value_units((64.0f - i) / 63.0f * 100.0f,"% left"));
+        else
+            return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
+    case VC_PanningStd:
+        i = lrint(val);
+        if(i==64)
+            return("centered");
+        else if(i<64)
+            return(custom_value_units((64.0f - i) / 64.0f * 100.0f,"% left"));
+        else
+            return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
+    }
+}
+
+string custom_value_units(float v, string u, int prec)
+{
+    ostringstream oss;
+    oss.setf(std::ios_base::fixed);
+    oss.precision(prec);
+    oss << v << " " << u;
+    return(string(oss.str()));
+}
+
+ValueType getLFOdepthType(LFOParams *pars)
+{
+    switch(pars->fel)
+    {
+    case 0: return(VC_LFOdepth0);
+    case 1: return(VC_LFOdepth1);
+    case 2: return(VC_LFOdepth2);
+    }
+    return(VC_plainValue);
+}
+
+ValueType getFilterFreqType(FilterParams *pars)
+{
+    switch(pars->Pcategory)
+    {
+    case 0: return(VC_FilterFreq0);
+    case 1: return(VC_FilterFreq1);
+    case 2: return(VC_FilterFreq2);
+    }
+    return(VC_plainValue);
+}
+
+ValueType getFilterFreqTrackType(FilterParams *pars)
+{
+    switch(pars->Pfreqtrackoffset)
+    {
+    case 0: return(VC_FilterFreqTrack0);
+    default: return(VC_FilterFreqTrack1);
     }
 }

@@ -24,9 +24,43 @@
 
 #include "Misc/SynthEngine.h"
 
+enum ValueType {
+    VC_plainValue,
+    VC_percent127,
+    VC_GlobalFineDetune,
+    VC_MasterVolume,
+    VC_LFOfreq,
+    VC_LFOdepth0,  // freq   LFO
+    VC_LFOdepth1,  // ampl   LFO
+    VC_LFOdepth2,  // filter LFO
+    VC_LFOdelay,
+    VC_LFOstartphase,
+    VC_EnvelopeDT,
+    VC_EnvelopeFreqVal,
+    VC_EnvelopeFilterVal,
+    VC_EnvelopeAmpSusVal,
+    VC_FilterFreq0,
+    VC_FilterFreq1,
+    VC_FilterFreq2,
+    VC_FilterFreqTrack0,
+    VC_FilterFreqTrack1,
+    VC_InstrumentVolume,
+    VC_ADDVoiceVolume,
+    VC_PartVolume,
+    VC_PanningRandom,
+    VC_PanningStd
+};
+
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
 
 void read_updates(SynthEngine *synth);
 void decode_updates(SynthEngine *synth, CommandBlock *getData);
+
+string convert_value(ValueType type, float val);
+
+string custom_value_units(float v, string u, int prec=0);
+ValueType getLFOdepthType(LFOParams *pars);
+ValueType getFilterFreqType(FilterParams *pars);
+ValueType getFilterFreqTrackType(FilterParams *pars);
 
 #endif

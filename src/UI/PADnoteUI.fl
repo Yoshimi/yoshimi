@@ -976,11 +976,11 @@ send_data(39, o->value(), 0xc8);}
             Fl_Dial volume {
               label Volume
               callback {pars->PVolume=(int)o->value();
-o->show_custom_value_units(-60.0f*(1.0f-(int)o->value()/96.0f),"dB",1);
 send_data(0, o->value(), 0xc8);}
               tooltip Volume xywh {24 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-              code0 {o->value(pars->PVolume);}
-              code1 {o->init(90);}
+              code0 {o->setValueType(VC_InstrumentVolume);}
+              code1 {o->value(pars->PVolume);}
+              code2 {o->init(90);}
               class WidgetPDial
             }
             Fl_Dial vsns {
@@ -997,11 +997,11 @@ send_data(1, o->value(), 0xc8);}
               callback {//
     pars->setPan((char)o->value());
     randompan->value(pars->randomPan());
-    o->show_panning_value();
     send_data(2, o->value(), 0xc8);}
               tooltip {Panning - leftmost/zero is Random} xywh {175 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
-              code0 {o->value(pars->PPanning);}
-              code1 {o->init(64);}
+              code0 {o->setValueType(VC_PanningRandom);}
+              code1 {o->value(pars->PPanning);}
+              code2 {o->init(64);}
               class WidgetPDial
             }
             Fl_Light_Button randompan {

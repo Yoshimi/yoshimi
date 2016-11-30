@@ -31,11 +31,9 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 } {in_source in_header
 } 
 
-decl {\#include <sstream>} {public local
-}
-
 decl {\#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
+    \#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
@@ -51,7 +49,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
 } {
   Function {TipWin():Fl_Menu_Window(1,1)} {} {
     code {tip.clear();
-        tip = string("X.XX");
+        //tip = string("X.XX");
         set_override();
         end();} {}
   }
@@ -61,7 +59,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
         fl_color(FL_BLACK);
         fl_font(labelfont(), labelsize());
         if(textmode)
-            fl_draw(text.c_str(), 3, 3, w()-6, h()-6,
+            fl_draw(textWithValue.c_str(), 3, 3, w()-6, h()-6,
                     Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_WRAP));
         else
             fl_draw(tip.c_str(), 3, 3, w()-6, h()-6,
@@ -72,55 +70,50 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
     code {tip.clear();
         tip = asString(f);
         textmode = false;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = w(), H = h();
-        fl_measure(tip.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
   }
   Function {customValue(string s)} {return_type void
   } {
     code {tip.clear();
         tip = s;
         textmode = false;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = 0, H = h();
-        fl_measure(tip.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
   }
   Function {setText(string c)} {return_type void
   } {
     code {text = c;
         textmode = true;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = w(), H = h();
-        fl_measure(text.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
   }
   Function {setTextmode()} {return_type void
   } {
     code {textmode=true;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = w(), H = h();
-        fl_measure(text.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
+  }
+  Function {updateToolTips()} {return_type void
+  } {
+     code {// combine tooltip text and value to show both
+     textWithValue = text;
+     textWithValue+="\\n";
+     textWithValue+=tip;
+     // Recalc size of window
+     fl_font(labelfont(), labelsize());
+     int W = 260, H = h();
+     if (textmode == true) // show tip and value
+        fl_measure(textWithValue.c_str(), W, H, 0);
+     else // show value only
+        fl_measure(tip.c_str(), W, H, 0);
+     W += 8;
+     size(W, H);
+     redraw();} {}
   }
   decl {string tip;} {private local
   }
   decl {bool textmode;} {private local
   }
   decl {string text;} {private local
+  }
+  decl {string textWithValue;} {private local
   }
 } 
 
@@ -135,8 +128,8 @@ class WidgetPDial {selected : {public Fl_Dial}
         Fl_Group::current(save);
         oldvalue = 0.0;
         pos = false;
-        textset = false;
-        showplainvalue = true;} {}
+        valueType = VC_plainValue;
+        textset = false;} {}
   }
   Function {init(float home_ = -1)} {} {
     code {home = home_;} {}
@@ -171,10 +164,6 @@ class WidgetPDial {selected : {public Fl_Dial}
                      tipwin->position(Fl::event_x_root(), Fl::event_y_root() + 20);
                      pos = true;
                  }
-                 if (step() >= 1)
-                     tipwin->value((int)value());
-                 else
-                     tipwin->value(value());
                  tipwin->show();
                  my = -((Fl::event_y() - y()) * 2 - h());
                  mx = ((Fl::event_x() - x()) * 2 - w());
@@ -205,7 +194,6 @@ class WidgetPDial {selected : {public Fl_Dial}
                 if(Fl::event_state(FL_CTRL) != 0)
                     dragsize *= 10;
                 value(limit(value() + my / dragsize * (max - min), min, max));
-                tipwin->value(value());
                 tipwin->show();
                 value_damage();
                 if(this->when() != 0)
@@ -322,9 +310,24 @@ class WidgetPDial {selected : {public Fl_Dial}
         else
             fl_color(160 - (160 - r) / 3, 160 - (160 - b) / 3, 160 - (160 - b) / 3);} {}
   }
+  Function {setValueType(ValueType type_)} {return_type void
+  } {
+    code {valueType = type_;
+          tipwin->customValue(convert_value(valueType,value()));} {}
+  }
+  Function {value(double v)} {return_type int
+  } {
+    code {int ret = Fl_Valuator::value(v);
+          tipwin->customValue(convert_value(valueType,v));
+          return(ret);} {}
+  }
+  Function {value()} {return_type double
+  } {
+    code {return Fl_Valuator::value();} {}
+  }
   Function {value_cb2()} {return_type void
   } {
-    code {if (showplainvalue) tipwin->value(value());} {}
+    code {if (valueType == VC_plainValue) tipwin->value(value());} {}
   }
   Function {value_cb(Fl_Widget*, void*data)} {return_type {static void}
   } {
@@ -336,37 +339,6 @@ class WidgetPDial {selected : {public Fl_Dial}
     code {tipwin->setText(c);
         textset = true;} {}
   }
-  Function {show_custom_value(string v)} {return_type void
-  } {
-    code {tipwin->customValue(v);
-          showplainvalue = false;} {}
-  }
-  Function {show_custom_value_units(float v, string u, int prec=0)} {return_type void
-  } {
-    code {ostringstream oss;
-          oss.setf(std::ios_base::fixed);
-          oss.precision(prec);
-          oss << v << " " << u;
-          tipwin->customValue(string(oss.str()));
-          showplainvalue = false;} {}
-  }
-  Function {show_percent_value()} {} {
-    code {
-    float pc = (value() - minimum()) / (maximum() - minimum()) * 100.0f;
-    show_custom_value_units(pc, "%", 1); } {}
-  }
-  Function {show_panning_value(bool hasRandom=true)} {} {
-    code {int val = lrint(value());
-          if(hasRandom && val==0)
-              show_custom_value("random");
-          else if(val==64)
-              show_custom_value("centered");
-          else if(val<64)
-              show_custom_value_units((64.0f - val)
-                               / (hasRandom ? 63.0f : 64.0f)*100.0f,"% left");
-          else
-              show_custom_value_units((val - 64.0f)/63.0f*100.0f,"% right");} {}
-  }
   decl {bool textset;} {private local
   }
   decl {bool pos;} {private local
@@ -377,6 +349,6 @@ class WidgetPDial {selected : {public Fl_Dial}
   }
   decl {float home;} {private local
   }
-  decl {bool showplainvalue;} {private local
+  decl {ValueType valueType;} {private local
   }
 } 
