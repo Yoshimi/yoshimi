@@ -383,13 +383,14 @@ string convert_value(ValueType type, float val)
 {
     float f;
     int i;
+    string s;
     switch(type)
     {
-    case VC_plainValue:
-        return(custom_value_units(val,""));
-
     case VC_percent127:
-        return(custom_value_units(val / 127.0f * 100.0f,"%",1));
+        return(custom_value_units(val / 127.0f * 100.0f+0.05f,"%",1));
+
+    case VC_percent255:
+        return(custom_value_units(val / 255.0f * 100.0f+0.05f,"%",1));
 
     case VC_GlobalFineDetune:
         return(custom_value_units((val-64),"cents",1));
@@ -413,7 +414,7 @@ string convert_value(ValueType type, float val)
         else
             return(custom_value_units(f,"cents"));
     case VC_LFOdepth1: // amplitude LFO
-        return(custom_value_units(val / 127.0f * 100.0f,"%",1));
+        return(custom_value_units(val / 127.0f * 200.0f,"%",1));
     case VC_LFOdepth2: // filter LFO
         f=(int)val / 127.0f * 4800.0f; // 4 octaves
         if (f < 10.0f)
@@ -482,12 +483,35 @@ string convert_value(ValueType type, float val)
     case VC_FilterFreq1: // ToDo
         return(custom_value_units(val,""));
 
+    case VC_FilterQ:
+    case VC_FilterQAnalogUnused:
+        s.clear();
+        s += "Q= ";
+        f = expf(powf((int)val / 127.0f, 2.0f) * logf(1000.0f)) - 0.9f;
+        if (f<1.0f)
+            s += custom_value_units(f+0.00005f, "", 4);
+        else if (f<10.0f)
+            s += custom_value_units(f+0.005f, "", 2);
+        else if (f<100.0f)
+            s += custom_value_units(f+0.05f, "", 1);
+        else
+            s += custom_value_units(f+0.5f, "");
+        if (type == VC_FilterQAnalogUnused)
+            s += "(This filter does not use Q)";
+        return(s);
+
     case VC_FilterFreqTrack0:
+        s.clear();
+        s += "standard range is -100 .. +98%\n";
         f = (val - 64.0f) / 64.0f * 100.0f;
-        return(custom_value_units(f, "%", 1));
+        s += custom_value_units(f, "%", 1);
+        return(s);
     case VC_FilterFreqTrack1:
+        s.clear();
+        s += "0/+ checked: range is 0 .. 198%\n";
         f = val /64.0f * 100.0f;
-        return(custom_value_units(f, "%", 1));
+        s += custom_value_units(f, "%", 1);
+        return(s);
 
     case VC_InstrumentVolume:
         return(custom_value_units(-60.0f*(1.0f-(int)val/96.0f),"dB",1));
@@ -516,6 +540,73 @@ string convert_value(ValueType type, float val)
             return(custom_value_units((64.0f - i) / 64.0f * 100.0f,"% left"));
         else
             return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
+
+    case VC_EnvStretch:
+        s.clear();
+        f = powf(2.0f,(int)val/64.0f);
+        s += custom_value_units((int)val/127.0f*100.0f+0.05f,"%",1);
+        if ((int)val!=0)
+        {
+            s += ", ( x";
+            s += custom_value_units(f+0.005f,"/octave down)",2);
+        }
+        return s;
+
+    case VC_LFOStretch:
+        s.clear();
+        i = val;
+        i = (i == 0) ? 1 : (i); // val == 0 is not allowed
+        f = powf(2.0f,(i-64.0)/63.0f);
+        s += custom_value_units((i-64.0f)/63.0f*100.0f,"%");
+        if (i != 64)
+        {
+            s += ", ( x";
+            s += custom_value_units(f+((f<0) ? (-0.005f) : (0.005f)),
+                                    "/octave up)",2);
+        }
+        return s;
+
+    case VC_FreqOffsetHz:
+        f = ((int)val-64.0f)/64.0f;
+        f = 15.0f*(f * sqrtf(fabsf(f)));
+        return(custom_value_units(f+((f<0) ? (-0.005f) : (0.005f)),"Hz",2));
+
+    case VC_FilterGain:
+        f = ((int)val / 64.0f -1.0f) * 30.0f; // -30..30dB
+        f += (f<0) ? -0.05 : 0.05;
+        return(custom_value_units(f, "dB", 1));
+
+    case VC_AmpVelocitySense:
+        i = val;
+        s.clear();
+        if (i==127)
+        {
+            s += "Velocity sensing disabled.";
+            return(s);
+        }
+        f = powf(8.0f, (64.0f - (float)i) / 64.0f);
+        // Max dB range for vel=1 compared to vel=127
+        s += "Velocity Dynamic Range ";
+        f = -20.0f * logf(powf((1.0f / 127.0f), f)) / log(10.0f);
+        if (f < 100.0f)
+            s += custom_value_units(f,"dB",1);
+        else
+            s += custom_value_units(f,"dB");
+        s += "\nVelocity/2 = ";
+        s += custom_value_units(f/-6.989f,"dB",1); // 6.989 is log2(127)
+        return(s);
+
+    case VC_BandWidth:
+        f = powf((int)val / 1000.0f, 1.1f);
+        f = powf(10.0f, f * 4.0f) * 0.25f;
+        if (f<10.0f)
+            return(custom_value_units(f,"cents",2));
+        else
+            return(custom_value_units(f,"cents",1));
+
+    case VC_plainValue:
+    default:
+        return(custom_value_units(val,""));
     }
 }
 

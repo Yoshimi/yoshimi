@@ -210,8 +210,8 @@ class WidgetPDial {selected : {public Fl_Dial}
                      if(textset)
                      {
                          tipwin->setTextmode();
-                         tipwin->show();
                      }
+                     tipwin->show();
                      return 1;
                  }
                  break;

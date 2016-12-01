@@ -127,6 +127,7 @@ send_data(group, 3, o->value(), 0xc8);}
 send_data(group, 4, o->value(), 0xc8);}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
+          code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
         Fl_Choice LFOtype {
@@ -176,14 +177,16 @@ send_data(group, 6, o->value(), 0xc0);}
 send_data(group, 7, o->value(), 0xc8);}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
+          code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
         Fl_Dial stretch {
           label {Str.}
           callback {pars->Pstretch=(int)o->value();
 send_data(group, 8, o->value(), 0xc8);}
-          tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {LFO frequency stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(64);}
+          code1 {o->setValueType(VC_LFOStretch);}
           class WidgetPDial
         }
         Fl_Button {} {

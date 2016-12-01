@@ -383,6 +383,7 @@ send_data(group, 7, o->value(), 0xc8);}
         code0 {o->value(env->Penvstretch);}
         code1 {if (env->Pfreemode==0) o->hide();}
         code2 {if (group == 0 || ( engine == 1 && group == 1)) o->init(64); else o->init(0);}
+        code3 {o->setValueType(VC_EnvStretch);}
         class WidgetPDial
       }
       Fl_Button {} {
@@ -488,6 +489,7 @@ send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -576,6 +578,7 @@ send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {if (engine == 1) o->init(64); else o->init(0);}
+          code2 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
         }
         Fl_Check_Button e2forcedrelease {
@@ -686,6 +689,7 @@ send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {215 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(0);}
+          code2 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
         }
         Fl_Check_Button e3forcedrelease {
@@ -772,6 +776,7 @@ send_data(group, 7, o->value(), 0xc8);}
           tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_EnvStretch);}
           class WidgetPDial
         }
         Fl_Check_Button e4forcedrelease {

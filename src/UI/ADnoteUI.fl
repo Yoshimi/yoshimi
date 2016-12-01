@@ -661,6 +661,7 @@ send_data(39, o->value(), 0xc8);}
               tooltip {Offset of the frequency in Hz.} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
               code1 {o->init(64);}
+              code2 {o->setValueType(VC_FreqOffsetHz);}
               class WidgetPDial
             }
           }
@@ -894,6 +895,7 @@ send_data(1, o->value(), 0xc8);}
             tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {107 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
             code1 {o->init(127);}
+            code2 {o->setValueType(VC_AmpVelocitySense);}
             class WidgetPDial
           }
           Fl_Group voiceampenvgroup {
@@ -1631,6 +1633,7 @@ send_data(1, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial globalpan {

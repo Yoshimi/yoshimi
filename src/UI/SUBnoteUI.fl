@@ -218,6 +218,7 @@ send_data (1, o->value(), 0xc8);}
           tooltip {Velocity sensing} xywh {101 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code1 {o->init(90);}
+          code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial pan {
@@ -427,6 +428,7 @@ send_data(39, o->value(), 0xc8);}
           tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_FreqOffsetHz);}
           class WidgetPDial
         }
       }
@@ -617,6 +619,7 @@ send_data (50, o->value(), 0xc0);}
           xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->init(0);}
+          code2 {o->setValueType(VC_percent255);}
           class WidgetPDial
         }
       }

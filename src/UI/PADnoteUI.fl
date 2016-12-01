@@ -500,6 +500,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
             code0 {o->value(pars->Pbandwidth);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
             code2 {o->init(500);}
+            code3 {o->setValueType(VC_BandWidth);}
             class WidgetPDial
           }
           Fl_Value_Output bwcents {
@@ -585,6 +586,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
               xywh {495 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
               code1 {o->init(0);}
+              code2 {o->setValueType(VC_percent255);}
               class WidgetPDial
             }
           }
@@ -966,6 +968,7 @@ send_data(39, o->value(), 0xc8);}
               tooltip {Offset of the frequency in Hz.} xywh {140 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->POffsetHz);}
               code1 {o->init(64);}
+              code2 {o->setValueType(VC_FreqOffsetHz);}
               class WidgetPDial
             }
           }
@@ -990,6 +993,7 @@ send_data(1, o->value(), 0xc8);}
               tooltip {Velocity Sensing Function (rightmost to disable)} xywh {102 42 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
               code0 {o->value(pars->PAmpVelocityScaleFunction);}
               code1 {o->init(64);}
+              code2 {o->setValueType(VC_AmpVelocitySense);}
               class WidgetPDial
             }
             Fl_Dial pan {

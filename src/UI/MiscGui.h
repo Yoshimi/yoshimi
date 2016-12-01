@@ -27,6 +27,7 @@
 enum ValueType {
     VC_plainValue,
     VC_percent127,
+    VC_percent255,
     VC_GlobalFineDetune,
     VC_MasterVolume,
     VC_LFOfreq,
@@ -44,11 +45,19 @@ enum ValueType {
     VC_FilterFreq2,
     VC_FilterFreqTrack0,
     VC_FilterFreqTrack1,
+    VC_FilterQ,
     VC_InstrumentVolume,
     VC_ADDVoiceVolume,
     VC_PartVolume,
     VC_PanningRandom,
-    VC_PanningStd
+    VC_PanningStd,
+    VC_EnvStretch,
+    VC_LFOStretch,
+    VC_FreqOffsetHz,
+    VC_FilterGain,
+    VC_AmpVelocitySense,
+    VC_FilterQAnalogUnused,
+    VC_BandWidth
 };
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
