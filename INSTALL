@@ -27,9 +27,13 @@ Now there should be a directory:
 
    /path/to/workDir/yoshimi-1.4.1
 
-This has a build directory inside. Move into this directory:
+If this has a build directory inside, move into this directory:
 
     cd yoshimi-1.4.1/build
+
+Otherwise create it first with:
+
+    mkdir yoshimi-1.4.1/build
 
 "/path/to/workDir/yoshimi-1.4.1/" is the source code directory.
 "/path/to/workDir/yoshimi/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
@@ -62,7 +66,7 @@ Yoshimi builds with both Jack and Alsa audio and midi options.  Jack is the defa
 
 ---- Instrument banks ----
 
-Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On startup, it also looks to the standard zynaddsubfx bank directories, and deals politely with any duplications that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
+Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks to the standard zynaddsubfx bank directories includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
 
 
 ---- Help ----
