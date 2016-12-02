@@ -1,5 +1,9 @@
 yoshimi 1.4.1 M
 
+2016-12-2 Merge from : Jörn
+* Extensive tooltip upgrade dynamically giving real values.
+* Some code style consistency adjustments.
+
 2016-11-30 Will
 * First draft of midi-learn saving.
 * Bugfix: Had to remove fltk midi-learn warning.
