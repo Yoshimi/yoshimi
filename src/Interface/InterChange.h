@@ -55,6 +55,7 @@ class InterChange : private MiscFuncs
         void setpadparams(int point);
         void commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
+        void returnLimits(CommandBlock *getData);
 
     private:
         void *CLIresolvethread(void);

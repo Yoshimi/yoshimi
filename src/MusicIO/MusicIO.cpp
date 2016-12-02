@@ -162,7 +162,10 @@ int MusicIO::getMidiController(unsigned char b)
             break;
 
         default: // an unrecognised controller!
-            ctl = C_NULL;
+            if (b > 119)
+                ctl = C_NULL;
+            else // this is now needed for midi-learn
+                ctl = b;
             break;
     }
     return ctl;
@@ -171,6 +174,7 @@ int MusicIO::getMidiController(unsigned char b)
 
 void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
+    synth->getRuntime().Log("CC" + to_string((int) ctrl));
     int nLow;
     int nHigh;
     if (synth->getRuntime().monitorCCin)

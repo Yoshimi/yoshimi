@@ -20,6 +20,7 @@
 */
 
 #include <iostream>
+#include <cfloat>
 #include <bitset>
 #include <unistd.h>
 
@@ -2002,6 +2003,9 @@ void InterChange::mediate()
 
 void InterChange::returns(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    if (value == FLT_MAX)
+        return; // need to sort this out later
     unsigned char type = getData->data.type;
 
     bool isGui = type & 0x20;
@@ -2036,6 +2040,12 @@ void InterChange::setpadparams(int point)
 
 void InterChange::commandSend(CommandBlock *getData)
 {
+    float value = getData->data.value;
+    if (value == FLT_MAX)
+    {
+        returnLimits(getData);
+        return;
+    }
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -5057,4 +5067,9 @@ void InterChange::commandEffects(CommandBlock *getData)
     }
     if (!write)
         getData->data.value = value;
+}
+
+void InterChange::returnLimits(CommandBlock *getData)
+{
+    cout << "Nothing here yet!" << endl;
 }

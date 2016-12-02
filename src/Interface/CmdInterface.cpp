@@ -25,6 +25,7 @@
 #include <pwd.h>
 #include <cstdio>
 #include <cerrno>
+#include <cfloat>
 #include <sys/types.h>
 #include <ncurses.h>
 #include <readline/readline.h>
@@ -2110,10 +2111,16 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     else if (matchnMove(6, point, "direct"))
     {
-        float value = string2float(point);
+        float value;
         unsigned char type = 0x10; // 0x10 = from CLI
-        if (strchr(point, '.') == NULL)
-            type |= 0x80;
+        if (matchnMove(3, point, "lim"))
+            value = FLT_MAX;
+        else
+        {
+            value = string2float(point);
+            if (strchr(point, '.') == NULL)
+                type |= 0x80;
+        }
         point = skipChars(point);
         type |= (string2int127(point) & 0x43);
         // Fix as from CLI, integer
