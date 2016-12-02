@@ -46,6 +46,8 @@ enum ValueType {
     VC_FilterFreqTrack0,
     VC_FilterFreqTrack1,
     VC_FilterQ,
+    VC_FilterVelocityAmp,
+    VC_FilterVelocitySense,
     VC_InstrumentVolume,
     VC_ADDVoiceVolume,
     VC_PartVolume,
@@ -68,6 +70,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData);
 string convert_value(ValueType type, float val);
 
 string custom_value_units(float v, string u, int prec=0);
+int  custom_graph_size(ValueType vt);
+void custom_graphics(ValueType vt, float val,int W,int H);
 ValueType getLFOdepthType(LFOParams *pars);
 ValueType getFilterFreqType(FilterParams *pars);
 ValueType getFilterFreqTrackType(FilterParams *pars);

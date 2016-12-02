@@ -353,6 +353,7 @@ send_data(2, o->value(), 0xc8);}
 send_data(3, o->value(), 0xc8);}
           tooltip {Velocity sensing amount of the Filter} xywh {145 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
+          code1 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
@@ -361,6 +362,7 @@ send_data(3, o->value(), 0xc8);}
 send_data(4, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function of the Filter} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(127); else o->init(64);}
+          code1 {o->setValueType(VC_FilterVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial gaindial {

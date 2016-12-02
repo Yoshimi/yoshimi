@@ -500,6 +500,12 @@ string convert_value(ValueType type, float val)
             s += "(This filter does not use Q)";
         return(s);
 
+    case VC_FilterVelocityAmp:
+        f = (int)val / 127.0 * -6.0;
+        f = powf(2.0f,f + log(1000.0f)/log(2.0f)); // getrealfreq
+        f = log(f/1000.0f)/log(powf(2.0f,1.0f/12.0f))*100.0f; // in cents
+        return(custom_value_units(f-0.5, "cents"));
+
     case VC_FilterFreqTrack0:
         s.clear();
         s += "standard range is -100 .. +98%\n";
@@ -604,9 +610,75 @@ string convert_value(ValueType type, float val)
         else
             return(custom_value_units(f,"cents",1));
 
+    case VC_FilterVelocitySense: // this is also shown graphically
+        if((int)val==127)
+            return("off");
+        else
+            return(custom_value_units(val,""));
+        break;
+
     case VC_plainValue:
     default:
         return(custom_value_units(val,""));
+    }
+}
+
+int custom_graph_size(ValueType vt)
+{
+    switch(vt)
+    {
+    case VC_FilterVelocitySense:
+        return(48);
+    default:
+        return(0);
+    }
+}
+
+void custom_graphics(ValueType vt, float val,int W,int H)
+{
+    int size,x0,y0,i;
+    float x,y,p;
+
+    switch(vt)
+    {
+    case VC_FilterVelocitySense:
+        size=42;
+        x0 = W-(size+2);
+        y0 = H-(size+2);
+
+        fl_color(215);
+        fl_rectf(x0,y0,size,size);
+        fl_color(FL_BLUE);
+
+        p = powf(8.0f,(64.0f-(int)val)/64.0f);
+        y0 = H-3;
+
+        fl_begin_line();
+
+        size--;
+        if ((int)val == 127)
+        {   // in this case velF will always return 1.0
+            y = 1.0f * size;
+            for(i=0;i<=size;i++)
+            {
+                x = (float)i / (float)size;
+                fl_vertex((float)x0+i,(float)y0-y);
+            }
+        }
+        else
+        {
+            for(i=0;i<=size;i++) {
+                x = (float)i / (float)size;
+                y = powf(x,p) * size;
+                fl_vertex((float)x0+i,(float)y0-y);
+            }
+        }
+        fl_end_line();
+
+        break;
+
+    default:
+        break;
     }
 }
 
