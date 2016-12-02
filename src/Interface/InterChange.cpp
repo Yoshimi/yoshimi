@@ -5071,5 +5071,22 @@ void InterChange::commandEffects(CommandBlock *getData)
 
 void InterChange::returnLimits(CommandBlock *getData)
 {
+    // value is preserved so we know it's a limits test
+    // type is preseved so we know the source
+    // control is use as a midi learn enable and other bits
+
+
+    //default values
+    getData->limits.min = 0;
+    getData->limits.max = 127;
+    getData->limits.def = 64;
+    /*cout << "Type " << (int) getData->data.type << endl;
+    cout << "Control " << (int) getData->data.control << endl;
+    cout << "Part " << (int) getData->data.part << endl;
+    cout << "Kit " << (int) getData->data.kit << endl;
+    cout << "Engine " << (int) getData->data.engine << endl;
+    cout << "Insert " << (int) getData->data.insert << endl;
+    cout << "Param " << (int) getData->data.parameter << endl;
+    cout << "Par 2 " << (int) getData->data.par2 << endl;*/
     cout << "Nothing here yet!" << endl;
 }

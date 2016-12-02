@@ -85,7 +85,8 @@ class MidiLearn : private MiscFuncs
 
     private:
         list<LearnBlock> midi_list;
-        Control learnTransferBlock;
+        //Control learnTransferBlock;
+        CommandBlock learnTransferBlock;
 
         void insert(unsigned char CC, unsigned char chan);
         SynthEngine *synth;

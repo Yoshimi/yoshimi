@@ -174,7 +174,6 @@ int MusicIO::getMidiController(unsigned char b)
 
 void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
-    synth->getRuntime().Log("CC" + to_string((int) ctrl));
     int nLow;
     int nHigh;
     if (synth->getRuntime().monitorCCin)

@@ -52,6 +52,7 @@ MidiLearn::~MidiLearn()
 void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
 
 {
+    /*
     learnTransferBlock.type = getData->data.type;
     learnTransferBlock.control = getData->data.control;
     learnTransferBlock.part = getData->data.part;
@@ -60,6 +61,8 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
     learnTransferBlock.insert = getData->data.insert;
     learnTransferBlock.parameter = getData->data.parameter;
     learnTransferBlock.par2 = getData->data.par2;
+    */
+    learnTransferBlock = *getData;
     learnedName = name;
     if (getData->data.type & 8)
         return;
@@ -109,6 +112,20 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
             int range = maxIn - minIn;
             value = (value * range / 127) + minIn;
         }
+
+        int minOut = foundEntry.min_out;
+        int maxOut = foundEntry.max_out;
+        if (maxOut - minOut != 127) // its a range change
+        {
+            value = value / 127;
+            value = minOut +((maxOut - minOut) * value);
+        }
+        else if (minOut != 0) // it's just a shift
+        {
+            value += minOut;
+        }
+
+        //cout << "Min " << minOut << "  Max " << maxOut << endl;
 
         CommandBlock putData;
         unsigned int writesize = sizeof(putData);
@@ -338,16 +355,31 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
     }
     list<LearnBlock>::iterator it;
     LearnBlock entry;
+
+     /*
+      * this has to be first as the transfer block be corrupted when
+      * we call for the limits of this control
+      */
+    //entry.data = learnTransferBlock.data;
+    entry.data.type = learnTransferBlock.data.type;
+    entry.data.control = learnTransferBlock.data.control;
+    entry.data.part = learnTransferBlock.data.part;
+    entry.data.kit = learnTransferBlock.data.kit;
+    entry.data.engine = learnTransferBlock.data.engine;
+    entry.data.insert = learnTransferBlock.data.insert;
+    entry.data.parameter = learnTransferBlock.data.parameter;
+    entry.data.par2 = learnTransferBlock.data.par2;
+
+    synth->interchange.returnLimits(&learnTransferBlock);
     entry.chan = chan;
     entry.CC = CC;
     entry.min_in = 0;
     entry.max_in = 127;
     entry.status = 0;// default status
-    entry.min_out = 0;
-    entry.max_out = 127;
+    entry.min_out = learnTransferBlock.limits.min;
+    entry.max_out = learnTransferBlock.limits.max;
     entry.name = learnedName;
 
-    entry.data = learnTransferBlock;
 
     it = midi_list.begin();
     int lineNo = 0;

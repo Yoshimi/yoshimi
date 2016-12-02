@@ -103,6 +103,14 @@ union CommandBlock{
         unsigned char parameter;
         unsigned char par2;
     } data;
+    struct{
+        float value;
+        unsigned char type;
+        unsigned char control;
+        short int min;
+        short int max;
+        short int def;
+    } limits;
     char bytes [sizeof(data)];
 };
 

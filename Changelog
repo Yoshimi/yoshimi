@@ -5,6 +5,7 @@ yoshimi 1.4.1 M
   This will return min, max, default for any control.
 * Bugfix: LV2 was trapping unknown CCs instead of allowing
   them to be passed on to midi-learn!
+* More work on limits.
 
 2016-12-2 Merge from : Jörn
 * Extensive tooltip upgrade dynamically giving real values.
