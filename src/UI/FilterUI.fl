@@ -227,8 +227,7 @@ pars=NULL;
           callback {pars->Ptype=(int)o->value();
 pars->changed=true;
 // set type for Q
-if (o->value()<2) qdial->setValueType(VC_FilterQAnalogUnused);
-else qdial->setValueType(VC_FilterQ);
+updateVCforQ();
 send_data(8, o->value(), 0xc0);}
           tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code1 {o->value(pars->Ptype);}
@@ -299,6 +298,8 @@ send_data(9, o->value(), 0xc0);}
           label Category
           callback {switchcategory((int)o->value());
 pars->changed=true;
+// set type for Q
+updateVCforQ();
 send_data(7, o->value(), 0xc0);}
           tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {10 20 60 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code0 {o->value(pars->Pcategory);}
@@ -334,7 +335,7 @@ send_data(1, o->value(), 0xc8);}
           tooltip {Filter resonance or bandwidth} xywh {110 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
           code1 {if (kititem == 0x88) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
-          code2 {o->setValueType(VC_FilterQ);}
+          code2 {updateVCforQ();}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
@@ -897,6 +898,22 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         formant_q_dial->when(0);
         formant_amp_dial->when(0);
         strchdial->when(0);} {}
+  }
+  Function {updateVCforQ()} {return_type void
+  } {
+    code {
+       switch (filtertype->value())
+       {
+          case 0:
+             if (analogfiltertypechoice->value()<2)
+                qdial->setValueType(VC_FilterQAnalogUnused);
+             else
+                qdial->setValueType(VC_FilterQ);
+             break;
+          case 1:
+          case 2:
+             qdial->setValueType(VC_FilterQ);
+       }} {}
   }
   decl {FilterParams *pars;} {private local
   }
