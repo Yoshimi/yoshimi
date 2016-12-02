@@ -24,6 +24,8 @@
 #include "Misc/SynthEngine.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
+#include "Params/LFOParams.h"
+#include "Params/FilterParams.h"
 
 SynthEngine *synth;
 
@@ -374,5 +376,348 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
                     break;
             }
         return;
+    }
+}
+
+string convert_value(ValueType type, float val)
+{
+    float f;
+    int i;
+    string s;
+    switch(type)
+    {
+    case VC_percent127:
+        return(custom_value_units(val / 127.0f * 100.0f+0.05f,"%",1));
+
+    case VC_percent255:
+        return(custom_value_units(val / 255.0f * 100.0f+0.05f,"%",1));
+
+    case VC_GlobalFineDetune:
+        return(custom_value_units((val-64),"cents",1));
+
+    case VC_MasterVolume:
+        return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+    case VC_LFOfreq:
+        f = (powf(2.0f, val * 10.0f) - 1.0f) / 12.0f;
+        if(f<10.0f)
+            return(custom_value_units(f,"Hz", 3));
+        else
+            return(custom_value_units(f,"Hz", 2));
+
+    case VC_LFOdepth0: // frequency LFO
+        f=powf(2.0f,(int)val/127.0f*11.0f)-1.0f;
+        if (f < 10.0f)
+            return(custom_value_units(f,"cents",2));
+        else if(f < 100.0f)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+    case VC_LFOdepth1: // amplitude LFO
+        return(custom_value_units(val / 127.0f * 200.0f,"%",1));
+    case VC_LFOdepth2: // filter LFO
+        f=(int)val / 127.0f * 4800.0f; // 4 octaves
+        if (f < 10.0f)
+            return(custom_value_units(f,"cents",2));
+        else if(f < 100.0f)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+
+    case VC_LFOdelay:
+        f = ((int)val) / 127.0f * 4.0f + 0.005f;
+        return(custom_value_units(f,"s",2));
+
+    case VC_LFOstartphase:
+        if((int)val == 0)
+            return("random");
+        else
+            return(custom_value_units(((int)val - 64.0f) / 127.0f
+                                      * 360.0f, "°"));
+    case VC_EnvelopeDT:
+        // unfortunately converttofree() is not called in time for us to be able
+        // to use env->getdt(), so we have to compute ourselves
+        f = (powf(2.0f, ((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
+        if (f<100.0f)
+            return(custom_value_units(f,"ms",1));
+        else if (f<1000.0f)
+            return(custom_value_units(f,"ms"));
+        else if(f<10000.0f)
+            return(custom_value_units(f/1000.0f,"s",2));
+        else
+            return(custom_value_units(f/1000.0f,"s",1));
+
+    case VC_EnvelopeFreqVal:
+        f=(powf(2.0f, 6.0f * fabsf((int)val - 64.0f) / 64.0f) -1.0f) * 100.0f;
+        if((int)val<64) f = -f;
+        if(fabsf(f) < 10)
+            return(custom_value_units(f,"cents",2));
+        else if(fabsf(f) < 100)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+
+    case VC_EnvelopeFilterVal:
+        f=((int)val - 64.0f) / 64.0f * 7200.0f; // 6 octaves
+        if(fabsf(f) < 10)
+            return(custom_value_units(f,"cents",2));
+        else if(fabsf(f) < 100)
+            return(custom_value_units(f,"cents",1));
+        else
+            return(custom_value_units(f,"cents"));
+
+    case VC_EnvelopeAmpSusVal:
+        return(custom_value_units((1.0f - (int)val / 127.0f) * MIN_ENVELOPE_DB,
+                                  "dB", 1));
+
+    case VC_FilterFreq0:
+    case VC_FilterFreq2:
+        f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+        if (f < 100.0f)
+            return(custom_value_units(f,"Hz",1));
+        else if(f < 1000.0f)
+            return(custom_value_units(f,"Hz"));
+        else
+            return(custom_value_units(f/1000.0f,"kHz",2));
+
+    case VC_FilterFreq1: // ToDo
+        return(custom_value_units(val,""));
+
+    case VC_FilterQ:
+    case VC_FilterQAnalogUnused:
+        s.clear();
+        s += "Q= ";
+        f = expf(powf((int)val / 127.0f, 2.0f) * logf(1000.0f)) - 0.9f;
+        if (f<1.0f)
+            s += custom_value_units(f+0.00005f, "", 4);
+        else if (f<10.0f)
+            s += custom_value_units(f+0.005f, "", 2);
+        else if (f<100.0f)
+            s += custom_value_units(f+0.05f, "", 1);
+        else
+            s += custom_value_units(f+0.5f, "");
+        if (type == VC_FilterQAnalogUnused)
+            s += "(This filter does not use Q)";
+        return(s);
+
+    case VC_FilterVelocityAmp:
+        f = (int)val / 127.0 * -6.0;
+        f = powf(2.0f,f + log(1000.0f)/log(2.0f)); // getrealfreq
+        f = log(f/1000.0f)/log(powf(2.0f,1.0f/12.0f))*100.0f; // in cents
+        return(custom_value_units(f-0.5, "cents"));
+
+    case VC_FilterFreqTrack0:
+        s.clear();
+        s += "standard range is -100 .. +98%\n";
+        f = (val - 64.0f) / 64.0f * 100.0f;
+        s += custom_value_units(f, "%", 1);
+        return(s);
+    case VC_FilterFreqTrack1:
+        s.clear();
+        s += "0/+ checked: range is 0 .. 198%\n";
+        f = val /64.0f * 100.0f;
+        s += custom_value_units(f, "%", 1);
+        return(s);
+
+    case VC_InstrumentVolume:
+        return(custom_value_units(-60.0f*(1.0f-(int)val/96.0f),"dB",1));
+
+    case VC_ADDVoiceVolume:
+        return(custom_value_units(-60.0f*(1.0f-lrint(val)/127.0f),"dB",1));
+
+    case VC_PartVolume:
+        return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+    case VC_PanningRandom:
+        i = lrint(val);
+        if(i==0)
+            return("random");
+        else if(i==64)
+            return("centered");
+        else if(i<64)
+            return(custom_value_units((64.0f - i) / 63.0f * 100.0f,"% left"));
+        else
+            return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
+    case VC_PanningStd:
+        i = lrint(val);
+        if(i==64)
+            return("centered");
+        else if(i<64)
+            return(custom_value_units((64.0f - i) / 64.0f * 100.0f,"% left"));
+        else
+            return(custom_value_units((i - 64.0f)/63.0f*100.0f,"% right"));
+
+    case VC_EnvStretch:
+        s.clear();
+        f = powf(2.0f,(int)val/64.0f);
+        s += custom_value_units((int)val/127.0f*100.0f+0.05f,"%",1);
+        if ((int)val!=0)
+        {
+            s += ", ( x";
+            s += custom_value_units(f+0.005f,"/octave down)",2);
+        }
+        return s;
+
+    case VC_LFOStretch:
+        s.clear();
+        i = val;
+        i = (i == 0) ? 1 : (i); // val == 0 is not allowed
+        f = powf(2.0f,(i-64.0)/63.0f);
+        s += custom_value_units((i-64.0f)/63.0f*100.0f,"%");
+        if (i != 64)
+        {
+            s += ", ( x";
+            s += custom_value_units(f+((f<0) ? (-0.005f) : (0.005f)),
+                                    "/octave up)",2);
+        }
+        return s;
+
+    case VC_FreqOffsetHz:
+        f = ((int)val-64.0f)/64.0f;
+        f = 15.0f*(f * sqrtf(fabsf(f)));
+        return(custom_value_units(f+((f<0) ? (-0.005f) : (0.005f)),"Hz",2));
+
+    case VC_FilterGain:
+        f = ((int)val / 64.0f -1.0f) * 30.0f; // -30..30dB
+        f += (f<0) ? -0.05 : 0.05;
+        return(custom_value_units(f, "dB", 1));
+
+    case VC_AmpVelocitySense:
+        i = val;
+        s.clear();
+        if (i==127)
+        {
+            s += "Velocity sensing disabled.";
+            return(s);
+        }
+        f = powf(8.0f, (64.0f - (float)i) / 64.0f);
+        // Max dB range for vel=1 compared to vel=127
+        s += "Velocity Dynamic Range ";
+        f = -20.0f * logf(powf((1.0f / 127.0f), f)) / log(10.0f);
+        if (f < 100.0f)
+            s += custom_value_units(f,"dB",1);
+        else
+            s += custom_value_units(f,"dB");
+        s += "\nVelocity/2 = ";
+        s += custom_value_units(f/-6.989f,"dB",1); // 6.989 is log2(127)
+        return(s);
+
+    case VC_BandWidth:
+        f = powf((int)val / 1000.0f, 1.1f);
+        f = powf(10.0f, f * 4.0f) * 0.25f;
+        if (f<10.0f)
+            return(custom_value_units(f,"cents",2));
+        else
+            return(custom_value_units(f,"cents",1));
+
+    case VC_FilterVelocitySense: // this is also shown graphically
+        if((int)val==127)
+            return("off");
+        else
+            return(custom_value_units(val,""));
+        break;
+
+    case VC_plainValue:
+    default:
+        return(custom_value_units(val,""));
+    }
+}
+
+int custom_graph_size(ValueType vt)
+{
+    switch(vt)
+    {
+    case VC_FilterVelocitySense:
+        return(48);
+    default:
+        return(0);
+    }
+}
+
+void custom_graphics(ValueType vt, float val,int W,int H)
+{
+    int size,x0,y0,i;
+    float x,y,p;
+
+    switch(vt)
+    {
+    case VC_FilterVelocitySense:
+        size=42;
+        x0 = W-(size+2);
+        y0 = H-(size+2);
+
+        fl_color(215);
+        fl_rectf(x0,y0,size,size);
+        fl_color(FL_BLUE);
+
+        p = powf(8.0f,(64.0f-(int)val)/64.0f);
+        y0 = H-3;
+
+        fl_begin_line();
+
+        size--;
+        if ((int)val == 127)
+        {   // in this case velF will always return 1.0
+            y = 1.0f * size;
+            for(i=0;i<=size;i++)
+            {
+                x = (float)i / (float)size;
+                fl_vertex((float)x0+i,(float)y0-y);
+            }
+        }
+        else
+        {
+            for(i=0;i<=size;i++) {
+                x = (float)i / (float)size;
+                y = powf(x,p) * size;
+                fl_vertex((float)x0+i,(float)y0-y);
+            }
+        }
+        fl_end_line();
+
+        break;
+
+    default:
+        break;
+    }
+}
+
+string custom_value_units(float v, string u, int prec)
+{
+    ostringstream oss;
+    oss.setf(std::ios_base::fixed);
+    oss.precision(prec);
+    oss << v << " " << u;
+    return(string(oss.str()));
+}
+
+ValueType getLFOdepthType(LFOParams *pars)
+{
+    switch(pars->fel)
+    {
+    case 0: return(VC_LFOdepth0);
+    case 1: return(VC_LFOdepth1);
+    case 2: return(VC_LFOdepth2);
+    }
+    return(VC_plainValue);
+}
+
+ValueType getFilterFreqType(FilterParams *pars)
+{
+    switch(pars->Pcategory)
+    {
+    case 0: return(VC_FilterFreq0);
+    case 1: return(VC_FilterFreq1);
+    case 2: return(VC_FilterFreq2);
+    }
+    return(VC_plainValue);
+}
+
+ValueType getFilterFreqTrackType(FilterParams *pars)
+{
+    switch(pars->Pfreqtrackoffset)
+    {
+    case 0: return(VC_FilterFreqTrack0);
+    default: return(VC_FilterFreqTrack1);
     }
 }

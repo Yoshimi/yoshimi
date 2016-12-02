@@ -461,6 +461,7 @@ virkeyboardwindow->hide();}
         tooltip {Velocity Randomness} xywh {221 106 20 21} box ROUND_UP_BOX labelsize 10 align 129 maximum 127 step 1
         code0 {o->value(virkeys->rndvelocity);}
         code1 {o->init(0);}
+        code2 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Spinner midichannel {

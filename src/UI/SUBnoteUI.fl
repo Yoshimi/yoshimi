@@ -206,8 +206,9 @@ if ((Fl::event_button() == 3))
           callback {pars->PVolume = (int)o->value();
 send_data (0, o->value(), 0xc8);}
           tooltip Volume xywh {40 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(pars->PVolume);}
-          code1 {o->init(96);}
+          code0 {o->setValueType(VC_InstrumentVolume);}
+          code1 {o->value(pars->PVolume);}
+          code2 {o->init(96);}
           class WidgetPDial
         }
         Fl_Dial vsns {
@@ -217,6 +218,7 @@ send_data (1, o->value(), 0xc8);}
           tooltip {Velocity sensing} xywh {101 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code1 {o->init(90);}
+          code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial pan {
@@ -226,8 +228,9 @@ send_data (1, o->value(), 0xc8);}
     randompan->value(pars->randomPan());
     send_data (2, o->value(), 0xc8);}
           tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
-          code0 {o->value(pars->PPanning);}
-          code1 {o->init(64);}
+          code0 {o->setValueType(VC_PanningRandom);}
+          code1 {o->value(pars->PPanning);}
+          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Light_Button randompan {
@@ -425,6 +428,7 @@ send_data(39, o->value(), 0xc8);}
           tooltip {Offset of the frequency in Hz.} xywh {558 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->POffsetHz);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_FreqOffsetHz);}
           class WidgetPDial
         }
       }
@@ -615,6 +619,7 @@ send_data (50, o->value(), 0xc0);}
           xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->init(0);}
+          code2 {o->setValueType(VC_percent255);}
           class WidgetPDial
         }
       }

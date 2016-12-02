@@ -565,8 +565,9 @@ paramsui->Show(4);}
               globalfinedetune->changed();
               send_data(32, o->value(), 0xc8);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
-          code0 {o->value(synth->microtonal.Pglobalfinedetune);}
-          code1 {o->init(64);}
+          code0 {o->setValueType(VC_GlobalFineDetune);}
+          code1 {o->value(synth->microtonal.Pglobalfinedetune);}
+          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -600,8 +601,9 @@ paramsui->Show(4);}
           callback {synth->setPvolume(o->value());
 send_data(0, o->value(), 0x48);}
           tooltip {Master Volume} xywh {331 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
-          code0 {o->value(synth->Pvolume);}
-          code1 {o->init(90);}
+          code0 {o->setValueType(VC_MasterVolume);}
+          code1 {o->value(synth->Pvolume);}
+          code2 {o->init(90);}
           class WidgetPDial
         }
         Fl_Button {} {
