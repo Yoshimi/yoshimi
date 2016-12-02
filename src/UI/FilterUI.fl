@@ -322,7 +322,7 @@ send_data(7, o->value(), 0xc0);}
           callback {pars->Pfreq=(int)o->value();
 send_data(0, o->value(), 0xc8);}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {75 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(getFilterFreqType(pars));}
+          code0 {o->setValueType(getFilterFreqType(filtertype->value()));}
           code1 {o->value(pars->Pfreq);}
           code2 {if (kititem == 0x88) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
           class WidgetPDial
@@ -343,7 +343,6 @@ send_data(1, o->value(), 0xc8);}
           callback {pars->Pfreqtrack=(int) o->value();
 send_data(2, o->value(), 0xc8);}
           tooltip {Filter frequency tracking} xywh {215 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(getFilterFreqTrackType(pars));}
           code1 {o->value(pars->Pfreqtrack);}
           code2 {o->init(64);}
           class WidgetPDial
@@ -407,7 +406,7 @@ send_data(6, o->value(), 0xc0);}
       Fl_Check_Button freqtrackoffset {
         label {0/+}
         callback {pars->Pfreqtrackoffset=(int)o->value();
-freqtrdial->setValueType(getFilterFreqTrackType(pars));
+freqtrdial->setValueType(getFilterFreqTrackType((int)o->value()));
 send_data(10, o->value(), 0xc0);}
         tooltip {Set frequency tracking range to 0%-200%} xywh {244 20 15 15} down_box DOWN_BOX labelsize 9
       }
@@ -650,6 +649,7 @@ send_data(17, o->value(), 0xc8);}
         filtertype->value(pars->Pcategory);
         cfreqdial->value(pars->Pfreq);
         freqtrackoffset->value(pars->Pfreqtrackoffset);
+        freqtrdial->setValueType(getFilterFreqTrackType(freqtrackoffset->value()));
         qdial->value(pars->Pq);
         freqtrdial->value(pars->Pfreqtrack);
         gaindial->value(pars->Pgain);
@@ -765,6 +765,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
         case 10:
             freqtrackoffset->value(value != 0);
+            freqtrdial->setValueType(getFilterFreqTrackType(value != 0));
             break;
 
     	case 16:
@@ -881,7 +882,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         }
         pars->Pcategory=newcat;
         // Adjust GUI value conversion
-        cfreqdial->setValueType(getFilterFreqType(pars));
+        cfreqdial->setValueType(getFilterFreqType(filtertype->value()));
         refresh();} {}
   }
   Function {use_for_dynamic_filter()} {} {
