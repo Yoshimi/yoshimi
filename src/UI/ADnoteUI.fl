@@ -94,11 +94,11 @@ collect_data(synth, o->value(), (Fl::event_button() | 0xc0), 1, npart, kititem, 
         }
         Fl_Dial voicepanning {
           callback {pars->setVoicePan(nvoice, lrint(o->value()));
-
 collect_data(synth, o->value(), (Fl::event_button() | 0xc0), 2, npart, kititem, 0x80 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {215 5 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
-          code0 {o->value(pars->VoicePar[nvoice].PPanning);}
-          code1 {o->init(64);}
+          code0 {o->setValueType(VC_PanningRandom);}
+          code1 {o->value(pars->VoicePar[nvoice].PPanning);}
+          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Group voiceoscil {open
@@ -661,6 +661,7 @@ send_data(39, o->value(), 0xc8);}
               tooltip {Offset of the frequency in Hz.} xywh {130 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].POffsetHz);}
               code1 {o->init(64);}
+              code2 {o->setValueType(VC_FreqOffsetHz);}
               class WidgetPDial
             }
           }
@@ -882,8 +883,9 @@ send_data(49, o->value(), 0xc8);}
             callback {pars->VoicePar[nvoice].PVolume = lrint(o->value());
 send_data(0, o->value(), 0xc8);}
             tooltip Volume xywh {42 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-            code0 {o->value(pars->VoicePar[nvoice].PVolume);}
-            code1 {o->init(100);}
+            code0 {o->setValueType(VC_ADDVoiceVolume);}
+            code1 {o->value(pars->VoicePar[nvoice].PVolume);}
+            code2 {o->init(100);}
             class WidgetPDial
           }
           Fl_Dial voicevsns {
@@ -893,6 +895,7 @@ send_data(1, o->value(), 0xc8);}
             tooltip {Velocity Sensing Function - rightmost/max disables)} xywh {107 56 34 34} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PAmpVelocityScaleFunction);}
             code1 {o->init(127);}
+            code2 {o->setValueType(VC_AmpVelocitySense);}
             class WidgetPDial
           }
           Fl_Group voiceampenvgroup {
@@ -909,8 +912,9 @@ send_data(1, o->value(), 0xc8);}
                  voicerandompan->value(pars->randomVoicePan(nvoice));
                  send_data(2, o->value(), 0xc8);}
             tooltip {Voice panning - leftmost/zero gives random panning} xywh {174 56 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
-            code0 {o->value(pars->VoicePar[nvoice].PPanning);}
-            code1 {o->init(64);}
+            code0 {o->setValueType(VC_PanningRandom);}
+            code1 {o->value(pars->VoicePar[nvoice].PPanning);}
+            code2 {o->init(64);}
             class WidgetPDial
           }
           Fl_Light_Button voicerandompan {
@@ -1617,8 +1621,9 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
           callback {pars->GlobalPar.PVolume = lrint(o->value());
 send_data(0, o->value(), 0xc8);}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PVolume);}
-          code1 {o->init(90);}
+          code0 {o->setValueType(VC_InstrumentVolume);}
+          code1 {o->value(pars->GlobalPar.PVolume);}
+          code2 {o->init(90);}
           class WidgetPDial
         }
         Fl_Dial vsns {
@@ -1628,6 +1633,7 @@ send_data(1, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_AmpVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial globalpan {
@@ -1638,8 +1644,9 @@ send_data(1, o->value(), 0xc8);}
     amplitudegrp->changed();
     send_data(2, o->value(), 0xc8);}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
-          code0 {o->value(pars->GlobalPar.PPanning);}
-          code1 {o->init(64);}
+          code0 {o->setValueType(VC_PanningRandom);}
+          code1 {o->value(pars->GlobalPar.PPanning);}
+          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Light_Button globalrandompan {

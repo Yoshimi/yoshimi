@@ -33,6 +33,7 @@ This file is a derivative of the ZynAddSubFX original, modified October 2010
 
 decl {\#include <FL/Fl_Dial.H>
     \#include <FL/Fl_Menu_Window.H>
+    \#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 
 
@@ -48,7 +49,7 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
 } {
   Function {TipWin():Fl_Menu_Window(1,1)} {} {
     code {tip.clear();
-        tip = string("X.XX");
+        graphicsType = VC_plainValue;
         set_override();
         end();} {}
   }
@@ -58,47 +59,70 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
         fl_color(FL_BLACK);
         fl_font(labelfont(), labelsize());
         if(textmode)
-            fl_draw(text.c_str(), 3, 3, w()-6, h()-6,
+            fl_draw(textWithValue.c_str(), 3, 3, w()-6, textH-6,
                     Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_WRAP));
         else
-            fl_draw(tip.c_str(), 3, 3, w()-6, h()-6,
-                    Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_WRAP));} {}
+            fl_draw(tip.c_str(), 3, 3, w()-6, textH-6,
+                    Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_WRAP));
+        if(graphicsType != VC_plainValue)
+            custom_graphics(graphicsType,Pvalue,w(),h());} {}
   }
   Function {value(float f)} {return_type void
   } {
+    code {Pvalue=f;} {}
+  }
+  Function {customValue(string s)} {return_type void
+  } {
     code {tip.clear();
-        tip = asString(f);
+        tip = s;
         textmode = false;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = w(), H = h();
-        fl_measure(tip.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
   }
   Function {setText(string c)} {return_type void
   } {
     code {text = c;
         textmode = true;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = w(), H = h();
-        fl_measure(text.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
   }
   Function {setTextmode()} {return_type void
   } {
     code {textmode=true;
-        // Recalc size of window
-        fl_font(labelfont(), labelsize());
-        int W = w(), H = h();
-        fl_measure(text.c_str(), W, H, 0);
-        W += 8;
-        size(W, H);
-        redraw();} {}
+        updateToolTips();} {}
+  }
+  Function {setGraphicsValueType(ValueType gv_)} {return_type void
+  } {
+    code {graphicsType = gv_;} {}
+  }
+  Function {updateToolTips()} {return_type void
+  } {
+     code {// combine tooltip text and value to show both
+     textWithValue = text;
+     textWithValue+="\\n";
+     textWithValue+=tip;
+     // Recalc size of window
+     fl_font(labelfont(), labelsize());
+     int W = 260, H = 0;
+     if (textmode == true)
+     {  // show tip and value
+        // make sure we have space for graphics if needed
+        int tipW = 260, tipH = 0;
+        fl_measure(text.c_str(), tipW, tipH, 0);
+        tipH += custom_graph_size(graphicsType);
+        fl_measure(textWithValue.c_str(), W, H, 0);
+        textH = H;
+        H = (tipH > H) ? (tipH) : (H);
+     }
+     else // show value only
+     {
+        fl_measure(tip.c_str(), W, H, 0);
+        int gH = custom_graph_size(graphicsType);
+        H = (gH > H) ? (gH) : (H);
+        textH = H;
+        W += gH;
+     }
+     W += 8;
+     size(W, H);
+     redraw();} {}
   }
   decl {string tip;} {private local
   }
@@ -106,19 +130,28 @@ class TipWin {: {public Fl_Menu_Window, MiscFuncs}
   }
   decl {string text;} {private local
   }
+  decl {string textWithValue;} {private local
+  }
+  decl {float Pvalue;} {private local
+  }
+  decl {ValueType graphicsType;} {private local
+  }
+  decl {int textH;} {private local
+  }
 } 
 
 class WidgetPDial {selected : {public Fl_Dial}
 } {
   Function {WidgetPDial(int x,int y, int w, int h, const char *label=0):Fl_Dial(x,y,w,h,label)} {} {
     code {//
-	callback(value_cb, (void*)this);
+	//callback(value_cb, (void*)this);
         Fl_Group *save = Fl_Group::current();
         tipwin = new TipWin();
         tipwin->hide();
         Fl_Group::current(save);
         oldvalue = 0.0;
         pos = false;
+        valueType = VC_plainValue;
         textset = false;} {}
   }
   Function {init(float home_ = -1)} {} {
@@ -154,10 +187,6 @@ class WidgetPDial {selected : {public Fl_Dial}
                      tipwin->position(Fl::event_x_root(), Fl::event_y_root() + 20);
                      pos = true;
                  }
-                 if (step() >= 1)
-                     tipwin->value((int)value());
-                 else
-                     tipwin->value(value());
                  tipwin->show();
                  my = -((Fl::event_y() - y()) * 2 - h());
                  mx = ((Fl::event_x() - x()) * 2 - w());
@@ -188,7 +217,6 @@ class WidgetPDial {selected : {public Fl_Dial}
                 if(Fl::event_state(FL_CTRL) != 0)
                     dragsize *= 10;
                 value(limit(value() + my / dragsize * (max - min), min, max));
-                tipwin->value(value());
                 tipwin->show();
                 value_damage();
                 if(this->when() != 0)
@@ -205,8 +233,8 @@ class WidgetPDial {selected : {public Fl_Dial}
                      if(textset)
                      {
                          tipwin->setTextmode();
-                         tipwin->show();
                      }
+                     tipwin->show();
                      return 1;
                  }
                  break;
@@ -305,9 +333,27 @@ class WidgetPDial {selected : {public Fl_Dial}
         else
             fl_color(160 - (160 - r) / 3, 160 - (160 - b) / 3, 160 - (160 - b) / 3);} {}
   }
+  Function {setValueType(ValueType type_)} {return_type void
+  } {
+    code {valueType = type_;
+          if(type_ == VC_FilterVelocitySense)
+              tipwin->setGraphicsValueType(type_);
+          tipwin->customValue(convert_value(valueType,value()));} {}
+  }
+  Function {value(double v)} {return_type int
+  } {
+    code {int ret = Fl_Valuator::value(v);
+          tipwin->value(v); // set value for graphics
+          tipwin->customValue(convert_value(valueType,v));
+          return(ret);} {}
+  }
+  Function {value()} {return_type double
+  } {
+    code {return Fl_Valuator::value();} {}
+  }
   Function {value_cb2()} {return_type void
   } {
-    code {tipwin->value(value());} {}
+    code {tipwin->customValue(convert_value(valueType,value()));} {}
   }
   Function {value_cb(Fl_Widget*, void*data)} {return_type {static void}
   } {
@@ -328,5 +374,7 @@ class WidgetPDial {selected : {public Fl_Dial}
   decl {TipWin *tipwin;} {private local
   }
   decl {float home;} {private local
+  }
+  decl {ValueType valueType;} {private local
   }
 } 

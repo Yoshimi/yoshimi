@@ -226,6 +226,9 @@ pars=NULL;
           label FilterType
           callback {pars->Ptype=(int)o->value();
 pars->changed=true;
+// set type for Q
+if (o->value()<2) qdial->setValueType(VC_FilterQAnalogUnused);
+else qdial->setValueType(VC_FilterQ);
 send_data(8, o->value(), 0xc0);}
           tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
           code1 {o->value(pars->Ptype);}
@@ -318,8 +321,9 @@ send_data(7, o->value(), 0xc0);}
           callback {pars->Pfreq=(int)o->value();
 send_data(0, o->value(), 0xc8);}
           tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {75 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(pars->Pfreq);}
-          code1 {if (kititem == 0x88) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
+          code0 {o->setValueType(getFilterFreqType(pars));}
+          code1 {o->value(pars->Pfreq);}
+          code2 {if (kititem == 0x88) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
           class WidgetPDial
         }
         Fl_Dial qdial {
@@ -330,15 +334,17 @@ send_data(1, o->value(), 0xc8);}
           tooltip {Filter resonance or bandwidth} xywh {110 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
           code1 {if (kititem == 0x88) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
+          code2 {o->setValueType(VC_FilterQ);}
           class WidgetPDial
         }
         Fl_Dial freqtrdial {
           label {freq.tr.}
           callback {pars->Pfreqtrack=(int) o->value();
 send_data(2, o->value(), 0xc8);}
-          tooltip {Filter frequency tracking (left is negative, middle is 0, and right is positive)} xywh {215 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->value(pars->Pfreqtrack);}
-          code1 {o->init(64);}
+          tooltip {Filter frequency tracking} xywh {215 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          code0 {o->setValueType(getFilterFreqTrackType(pars));}
+          code1 {o->value(pars->Pfreqtrack);}
+          code2 {o->init(64);}
           class WidgetPDial
         }
         Fl_Dial vsnsadial {
@@ -347,6 +353,7 @@ send_data(2, o->value(), 0xc8);}
 send_data(3, o->value(), 0xc8);}
           tooltip {Velocity sensing amount of the Filter} xywh {145 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
+          code1 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
         }
         Fl_Dial vsnsdial {
@@ -355,6 +362,7 @@ send_data(3, o->value(), 0xc8);}
 send_data(4, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function of the Filter} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(127); else o->init(64);}
+          code1 {o->setValueType(VC_FilterVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial gaindial {
@@ -366,6 +374,7 @@ send_data(5, o->value(), 0xc8);}
           tooltip {Filter output gain/damp} xywh {250 35 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_FilterGain);}
           class WidgetPDial
         }
         Fl_Choice stcounter {
@@ -397,6 +406,7 @@ send_data(6, o->value(), 0xc0);}
       Fl_Check_Button freqtrackoffset {
         label {0/+}
         callback {pars->Pfreqtrackoffset=(int)o->value();
+freqtrdial->setValueType(getFilterFreqTrackType(pars));
 send_data(10, o->value(), 0xc0);}
         tooltip {Set frequency tracking range to 0%-200%} xywh {244 20 15 15} down_box DOWN_BOX labelsize 9
       }
@@ -869,6 +879,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             svfiltertypechoice->do_callback();
         }
         pars->Pcategory=newcat;
+        // Adjust GUI value conversion
+        cfreqdial->setValueType(getFilterFreqType(pars));
         refresh();} {}
   }
   Function {use_for_dynamic_filter()} {} {
