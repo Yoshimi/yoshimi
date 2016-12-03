@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-12-3 Patch from : Alexander
+* Bugfix: state load wasn't setting keshifts.
+
 2016-12-2 Will
 * Started defining a standardised limits routine.
   This will return min, max, default for any control.

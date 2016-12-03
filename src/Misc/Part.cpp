@@ -1443,6 +1443,7 @@ void Part::getfromXML(XMLwrapper *xml)
     Pminkey = xml->getpar127("min_key", Pminkey);
     Pmaxkey = xml->getpar127("max_key", Pmaxkey);
     Pkeyshift = xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64);
+    setNoteMap(Pkeyshift - 64);
     Prcvchn = xml->getpar127("rcv_chn", Prcvchn);
 
     Pvelsns = xml->getpar127("velocity_sensing", Pvelsns);
