@@ -42,12 +42,12 @@ decl {\#include "BankUI.h"} {public local
 decl {\#include "ParametersUI.h"} {public local
 } 
 
-class VectorUI {: {private MiscFuncs}
+class VectorUI {selected : {private MiscFuncs}
 } {
   Function {make_window(void)} {} {
     Fl_Window vectorwindow {
       label {Yoshimi : Vectors}
-      callback {o->hide()} selected
+      callback {o->hide()}
       xywh {245 162 375 295} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Spinner setbasechan {
@@ -512,6 +512,7 @@ Xf = 0;
 Ycc = 0;
 Yf = 0;
 make_window();
+vectorwindow->copy_label(synth->makeUniqueName("Vectors").c_str());
 updateAll();} {}
   }
   Function {~VectorUI()} {} {

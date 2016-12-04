@@ -265,13 +265,13 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
     }
     else if (control == 241)
     {
-        loadList(string(getenv("HOME")) + "/testmidi");
+        loadList(string(miscMsgPop(par2)));
         updateGui();
         return;
     }
     else if (control == 245)
     {
-        saveList(string(getenv("HOME")) + "/testmidi");
+        saveList(string(miscMsgPop(par2)));
         return;
     }
     LearnBlock entry;

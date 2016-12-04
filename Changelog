@@ -1,7 +1,12 @@
 yoshimi 1.4.1 M
 
+2016-12-4 Will
+* Implemented full midi-learn load, save & recent.
+* Set windows of vectors and midi-learn to Yoshimi defaults.
+* Simplified hystory type selection on parameters window.
+
 2016-12-3 Patch from : Alexander
-* Bugfix: state load wasn't setting keshifts.
+* Bugfix: state load wasn't setting keyshifts.
 
 2016-12-2 Will
 * Started defining a standardised limits routine.

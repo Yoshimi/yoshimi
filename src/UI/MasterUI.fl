@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified November 2016
+This file is a derivative of the ZynAddSubFX original, modified December 2016
 
 
 } {in_source in_header
@@ -96,7 +96,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -239,8 +239,7 @@ class MasterUI {open : {private MiscFuncs}
       if (partfxO)
           partui->partfx->show();} {}
   }
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window masterwindow {
       label {Yoshimi meets ZynAddSubFX}
       callback {//
@@ -1168,8 +1167,7 @@ updatepanel();}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff)} {open
-  } {
+  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff)} {} {
     code {//
 if (part == 0xff)
     part = 0xf0;
@@ -1181,8 +1179,7 @@ else if (part == 0xf2)
 else
     eng = 0xff;
 
-collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng);} {selected
-    }
+collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -2029,7 +2026,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   decl {ConfigUI *configui;} {public local
   }
-  decl {ParametersUI *paramsui;} {private local
+  decl {ParametersUI *paramsui;} {public local
   }
   decl {VectorUI *vectorui;} {public local
   }

@@ -276,12 +276,20 @@ class MidiLearnUI {selected : {private MiscFuncs}
       }
       Fl_Button load {
         label Load
-        callback {send_data(241,0,0);}
+        callback {char *filename;
+filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+if (filename == NULL)
+    return;
+loadMidi(filename);}
         xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
       }
       Fl_Button save {
         label Save
-        callback {send_data(245,0,0);}
+        callback {char *filename;
+filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+if (filename == NULL)
+    return;
+send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));}
         xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button clear {
@@ -294,15 +302,17 @@ send_data(96,0,0);
 o->deactivate();}
         xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
-      Fl_Button {} {
+      Fl_Button recent {
         label Recent
-        xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+        callback {synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
+synth->getGuiMaster()->paramsui->Show(6);}
+        xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
       }
     }
   }
-  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
-collect_data(synth, value, type, control, 216, 255, 255);} {}
+collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -359,6 +369,7 @@ synth = _synth;
 for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
     midilearnkititem[i] = NULL;
 make_window();
+midilearnwindow->copy_label(synth->makeUniqueName("Midi Learn").c_str());
 num = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
@@ -385,6 +396,10 @@ if (empty)
 }
 kitlist->redraw();
 kitlist->show();} {}
+  }
+  Function {loadMidi(string file)} {} {
+    code {//
+send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));} {}
   }
   decl {int lastkititem;} {public local
   }
