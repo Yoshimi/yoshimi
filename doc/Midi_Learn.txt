@@ -26,8 +26,13 @@ The same CC/controller can be used to change several different internal Yoshimi 
 
 Adding or deleting lines, or changing either CC or channel numbers will re-order the others.
 
-Finally, you can clear the entire learned list.
+You can also clear the entire learned list.
+
+A complete list can be saved by clicking on the 'save' button and you will get the usual filer window.
+
+Loading sets follows the same practice. If a loaded set refers to Yoshimi controls at are disabled, or don't exist such controls will be ignored, but the 'block feature will still be active.
+
+Finaly, there is a button for loading a set from the recent history.
 
 To come:
-Saving and loading.
 Paging of the display so you don't end up scrolling through a massive list.

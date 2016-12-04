@@ -289,7 +289,8 @@ loadMidi(filename);}
 filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
 if (filename == NULL)
     return;
-send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));}
+send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
+recent->activate();}
         xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button clear {
@@ -307,6 +308,8 @@ o->deactivate();}
         callback {synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
 synth->getGuiMaster()->paramsui->Show(6);}
         xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+        code0 {vector<string> &listType = *synth->getHistory(6);}
+        code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }
   }
@@ -399,7 +402,8 @@ kitlist->show();} {}
   }
   Function {loadMidi(string file)} {} {
     code {//
-send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));} {}
+send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
+recent->activate();} {}
   }
   decl {int lastkititem;} {public local
   }

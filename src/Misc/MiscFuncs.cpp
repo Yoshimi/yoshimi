@@ -372,8 +372,9 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  */
 void MiscFuncs::miscMsgInit()
 {
-    for (int i = 0; i < 256; ++i)
+    for (int i = 0; i < 255; ++i)
         miscList.push_back("");
+    // we use 255 to denote an invalid entry
 }
 
 int MiscFuncs::miscMsgPush(string _text)

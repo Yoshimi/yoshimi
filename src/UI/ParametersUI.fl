@@ -47,6 +47,8 @@ class ParametersUI {selected
     } {
       Fl_Browser BrowseRecent {
         callback {//
+    if (o->value() == 0)
+        return;
     CloseRecent->hide();
     Loading->show();
     Fl::check();
