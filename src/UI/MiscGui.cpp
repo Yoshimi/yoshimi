@@ -468,9 +468,24 @@ string convert_value(ValueType type, float val)
             return(custom_value_units((1.0f - (int)val / 127.0f) * MIN_ENVELOPE_DB,
                                   "dB", 1));
 
-        case VC_FilterFreq0:
-        case VC_FilterFreq2:
+        case VC_FilterFreq0: // AnalogFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+            if (f < 100.0f)
+                return(custom_value_units(f,"Hz",1));
+            else if(f < 1000.0f)
+                return(custom_value_units(f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f,"kHz",2));
+        case VC_FilterFreq2: // SVFilter
+            f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+            // We have to adjust the freq because of this line
+            // in method SVFilter::computefiltercoefs() (file SVFilter.cpp)
+            //
+            //   par.f = freq / synth->samplerate_f * 4.0f;
+            //
+            // Using factor 4.0 instead of the usual 2.0*PI leads to a
+            // different effective cut-off freq, which we will be showing
+            f *= 4.0 / (2.0 * PI);
             if (f < 100.0f)
                 return(custom_value_units(f,"Hz",1));
             else if(f < 1000.0f)
