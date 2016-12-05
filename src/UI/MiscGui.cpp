@@ -640,7 +640,7 @@ string convert_value(ValueType type, float val)
 
         case VC_FXSysSend:
             if((int)val==0)
-                return("-∞ dB");
+                return("-inf dB");
             else
                 return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
 
@@ -655,6 +655,55 @@ string convert_value(ValueType type, float val)
             f = 20.0f * logf(f) / logf(10.0f);
             // Here we are finally
             return(custom_value_units(f,"dB",1));
+
+        case VC_FXEchoDelay:
+            s.clear();
+            // delay is 0 .. 1.5 sec
+            f = (int)val / 127.0f * 1.5f;
+            s += custom_value_units(f+0.005f,"s",2);
+            // also show bpm
+            f = 60.0f / f;
+            s += "  (";
+            s += custom_value_units(f+0.5f,"bpm)");
+            return(s);
+
+        case VC_FXEchoLRdel:
+            s.clear();
+            // ToDo: It would be nice to calculate the ratio between left
+            // and right. We would need to know the delay time however...
+            f = (powf(2.0f, fabsf((int)val-64.0f)/64.0f*9.0f)-1.0); // ms
+            if ((int)val < 64)
+            {
+                s+="left +"+custom_value_units(f+0.05,"ms",1)+" / ";
+                s+=custom_value_units(-f-0.05,"ms",1)+" right";
+            }
+            else
+            {
+                s+="left "+custom_value_units(-f-0.05,"ms",1)+" / ";
+                s+="+"+custom_value_units(f+0.05,"ms",1)+" right";
+            }
+            return(s);
+
+        case VC_FXEchoDW:
+            s.clear();
+            f = (int)val / 127.0f;
+            if(f < 0.5f)
+            {
+                f = f * 2.0f;
+                f *= f;  // for Reverb and Echo
+                f *= 1.414; // see VC_FXEchoVol for 0.707 * 2.0
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: -0 dB, Wet: "
+                    +custom_value_units(f,"dB",1);
+            }
+            else
+            {
+                f = (1.0f - f) * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: "
+                    +custom_value_units(f,"dB",1)+", Wet: +3.0 dB";
+            }
+            return(s);
 
         case VC_plainValue:
             return(custom_value_units(val,""));

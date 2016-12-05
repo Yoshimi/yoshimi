@@ -61,7 +61,10 @@ enum ValueType {
     VC_FilterQAnalogUnused,
     VC_BandWidth,
     VC_FXSysSend,
-    VC_FXEchoVol
+    VC_FXEchoVol,
+    VC_FXEchoDelay,
+    VC_FXEchoLRdel,
+    VC_FXEchoDW
 };
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
