@@ -357,8 +357,8 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
     LearnBlock entry;
 
      /*
-      * this has to be first as the transfer block be corrupted when
-      * we call for the limits of this control
+      * this has to be first as the transfer block will be corrupted
+      * when we call for the limits of this control
       */
     //entry.data = learnTransferBlock.data;
     entry.data.type = learnTransferBlock.data.type;

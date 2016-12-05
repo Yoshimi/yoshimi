@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code, modified December 2016
 */
 
 #include <iostream>
@@ -807,5 +807,26 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
             xml->exitbranch();
         }
         xml->exitbranch();
+    }
+}
+
+
+void ADnoteParameters::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    int engine = getData->data.engine;
+    switch (control)
+    {
+        case 32:
+        case 96: // only for advoice modulator
+            getData->limits.min = -8192;
+            getData->limits.max = 8191;
+            break;
+        case 82:
+        case 112:
+        case 136:
+            getData->limits.min = -64;
+            getData->limits.max = 63;
+            break;
     }
 }

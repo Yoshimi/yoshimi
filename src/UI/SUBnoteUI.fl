@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified November 2016
+This file is derivative of ZynAddSubFX original code, modified December 2016
 } {in_source in_header
 } 
 
@@ -367,7 +367,7 @@ send_data (82, o->value(), 0xc0);}
         o->value(0);
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
-    send_data (32, o->value(), 0xc0);}
+    send_data (32, o->value(), 0xc8);}
           tooltip {Fine Detune (cents)} xywh {491 47 234 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->PDetune-8192);}
           class mwheel_slider_rev
@@ -459,7 +459,7 @@ send_data (112, o->value(), 0xc0);}
         tooltip {Clear the harmonics} xywh {445 446 70 20} box THIN_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Group bandwidthsettingsui {
-        label BANDWIDTH open
+        label BANDWIDTH
         xywh {220 5 220 135} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Group bandwidthenvelopegroup {
@@ -595,7 +595,7 @@ send_data (51, o->value(), 0xc0);}
           label Par1
           callback {pars->POvertoneSpread.par1 = o->value();
 pars->updateFrequencyMultipliers();
-send_data (48, o->value(), 0xc0);}
+send_data (48, o->value(), 0xc8);}
           xywh {572 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           code1 {o->init(0);}
@@ -605,7 +605,7 @@ send_data (48, o->value(), 0xc0);}
           label Par2
           callback {pars->POvertoneSpread.par2 = o->value();
 pars->updateFrequencyMultipliers();
-send_data (49, o->value(), 0xc0);}
+send_data (49, o->value(), 0xc8);}
           xywh {626 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
           code1 {o->init(0);}
@@ -615,7 +615,7 @@ send_data (49, o->value(), 0xc0);}
           label ForceH
           callback {pars->POvertoneSpread.par3 = o->value();
 pars->updateFrequencyMultipliers();
-send_data (50, o->value(), 0xc0);}
+send_data (50, o->value(), 0xc8);}
           xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->init(0);}

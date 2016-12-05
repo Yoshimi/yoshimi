@@ -1,9 +1,13 @@
 yoshimi 1.4.1 M
 
+2016-12-5 Will
+* Bugfix: midi-learn scroll bar wasn't working.
+* Most sliders/rotary controls now available to midi-learn.
+
 2016-12-4 Will
-* Implemented full midi-learn load, save & recent.
+* Implemented full midi-learn save, load/recent.
 * Set windows of vectors and midi-learn to Yoshimi defaults.
-* Simplified hystory type selection in parameters window.
+* Simplified history type selection in parameters window.
 * Bugfix: segfault clicking empty parameters window :(
 * Updated docs.
 

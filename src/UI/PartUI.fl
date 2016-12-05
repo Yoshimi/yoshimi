@@ -27,8 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified November 2016
-} {in_source in_header
+This file is derivative of ZynAddSubFX original code, modified December 2016
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/fl_ask.H>
@@ -387,7 +387,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -1358,7 +1358,7 @@ if ((Fl::event_button() == 3))
         callback {if (Fl::event_button() == 3)
     o->value(0);
 part->Pfrand = o->value();
-send_data(48, o->value(), 0xc0);}
+send_data(48, o->value(), 0xc8);}
         tooltip {Random detune of whole part in cents} xywh {8 337 201 16} type {Horz Knob} box THIN_DOWN_BOX labelsize 12 align 8 maximum 50 step 1
         code0 {o->value(part->Pfrand);}
         class mwheel_val_slider_rev

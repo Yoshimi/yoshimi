@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified March 2011
+    This file is a derivative of a ZynAddSubFX original, modified December 2016
 */
 
 #include <cmath>
@@ -931,5 +931,26 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
         xml->exitbranch();
 
         xml->exitbranch();
+    }
+}
+
+
+void PADnoteParameters::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    switch (control)
+    {
+        case 16:
+            getData->limits.max = 1000;
+            break;
+        case 32:
+            getData->limits.min = -8192;
+            getData->limits.max = 8191;
+            break;
+        case 48:
+        case 49:
+        case 50:
+            getData->limits.max = 255;
+            break;
     }
 }

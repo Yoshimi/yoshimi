@@ -42,6 +42,7 @@ class SUBnoteParameters : public Presets
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
+        void getLimits(CommandBlock *getData);
         void updateFrequencyMultipliers(void);
 
         // Amplitude Parametrers

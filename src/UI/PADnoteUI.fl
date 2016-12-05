@@ -27,8 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified November 2016
-} {selected in_source in_header
+This file is derivative of ZynAddSubFX original code, modified December 2016
+} {in_source in_header
 } 
 
 decl {\#include <FL/Fl_Box.H>
@@ -235,7 +235,7 @@ this->pars=pars;} {}
   }
 } 
 
-class PADnoteUI {: {public PresetsUI_, private SynthHelper}
+class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window padnotewindow {
@@ -495,7 +495,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
             callback {//
       bwcents->value(pars->setPbandwidth((int) o->value()));
       cbwidget->do_callback();
-      send_data(16, o->value(), 0xc0);}
+      send_data(16, o->value(), 0xc8);}
             xywh {15 295 35 35} box ROUND_UP_BOX labelsize 10 maximum 1000 step 1
             code0 {o->value(pars->Pbandwidth);}
             code1 {if (pars->Pmode!=0) o->deactivate();}
@@ -558,7 +558,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
     pars->Phrpos.par1=(int) o->value();
     overtonepos->redraw();
     cbwidget->do_callback();
-    send_data(48, o->value(), 0xc0);}
+    send_data(48, o->value(), 0xc8);}
               xywh {425 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par1);}
               code1 {o->init(64);}
@@ -570,7 +570,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
     pars->Phrpos.par2=(int) o->value();
     overtonepos->redraw();
     cbwidget->do_callback();
-    send_data(49, o->value(), 0xc0);}
+    send_data(49, o->value(), 0xc8);}
               xywh {460 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par2);}
               code1 {o->init(64);}
@@ -582,7 +582,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
     pars->Phrpos.par3=(int) o->value();
     overtonepos->redraw();
     cbwidget->do_callback();
-    send_data(50, o->value(), 0xc0);}
+    send_data(50, o->value(), 0xc8);}
               xywh {495 310 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 255 step 1
               code0 {o->value(pars->Phrpos.par3);}
               code1 {o->init(0);}
@@ -907,7 +907,7 @@ class PADnoteUI {: {public PresetsUI_, private SynthHelper}
         o->value(0);
     pars->PDetune = (int)o->value() + 8192;
     detunevalueoutput->do_callback();
-    send_data(32, o->value(), 0xc0);}
+    send_data(32, o->value(), 0xc8);}
               tooltip {Fine Detune (cents)} xywh {57 305 388 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
               code0 {o->value(pars->PDetune-8192);}
               class mwheel_slider_rev

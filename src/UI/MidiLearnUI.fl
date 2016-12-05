@@ -234,9 +234,8 @@ class MidiLearnUI {selected : {private MiscFuncs}
         callback {midilearnwindow->hide();}
         xywh {684 262 63 20} box THIN_UP_BOX
       }
-      Fl_Scroll kitlist {open
+      Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers. Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
-        class Fl_Group
       } {}
       Fl_Box none {
         label {No Entries}
@@ -351,8 +350,7 @@ save->activate();
 midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,740,20,"");
 midilearnkititem[lineNo]->init(synth, lineNo);
 kitlist->add(midilearnkititem[lineNo]);
-if (midilearnkititem[lineNo + 1])
-    midilearnkititem[lineNo + 1]->hide();
+
 midilearnkititem[lineNo]->position(2, 21 + lineNo*20);
 midilearnkititem[lineNo]->mutecheck->value(status & 4);
 midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);

@@ -5075,11 +5075,67 @@ void InterChange::returnLimits(CommandBlock *getData)
     // type is preseved so we know the source
     // control is use as a midi learn enable and other bits
 
+    int control = getData->data.control;
+    int npart = getData->data.part;
+    int kititem = getData->data.kit;
+    int engine = getData->data.engine;
+    int insert = getData->data.insert;
+    int parameter = getData->data.parameter;
+    int par2 = getData->data.par2;
 
     //default values
     getData->limits.min = 0;
     getData->limits.max = 127;
-    getData->limits.def = 64;
+    getData->limits.def = 0;
+
+    if (npart < 0x40)
+    {
+        Part *part;
+        part = synth->part[npart];
+
+
+
+        if (kititem < 0x10)
+        {
+            if (insert == 0xff && parameter == 0xff && par2 == 0xff)
+            {
+                if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
+                {
+                    ADnoteParameters *adpars;
+                    adpars = part->kit[kititem].adpars;
+                    adpars->getLimits(getData);
+                }
+                else if (engine == 1)
+                {
+                    SUBnoteParameters *subpars;
+                    subpars = part->kit[kititem].subpars;
+                    subpars->getLimits(getData);
+                }
+                else if (engine == 2)
+                {
+                    PADnoteParameters *padpars;
+                    padpars = part->kit[kititem].padpars;
+                    padpars->getLimits(getData);
+                }
+            }
+            if (insert == 0 && parameter <= 2)
+            {
+                if (control == 0) // a cheat!
+                {
+                    getData->limits.max = 1;
+                    getData->limits.def = 0; // not rignt!
+                }
+            }
+        }
+        else if (kititem == 0xff)
+        {
+            if (control == 48)
+                getData->limits.max = 50;
+        }
+    }
+    else
+        cout << "Nothing here yet!" << endl;
+
     /*cout << "Type " << (int) getData->data.type << endl;
     cout << "Control " << (int) getData->data.control << endl;
     cout << "Part " << (int) getData->data.part << endl;
@@ -5088,5 +5144,4 @@ void InterChange::returnLimits(CommandBlock *getData)
     cout << "Insert " << (int) getData->data.insert << endl;
     cout << "Param " << (int) getData->data.parameter << endl;
     cout << "Par 2 " << (int) getData->data.par2 << endl;*/
-    cout << "Nothing here yet!" << endl;
 }
