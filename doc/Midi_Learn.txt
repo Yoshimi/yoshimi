@@ -1,6 +1,6 @@
-This now quite fully (but not completely) implemented.
+This now completely implemented.
 
-To learn, hold CTRL while right-clicking on any GUI control. You will get a message if the control is not learnable.
+To learn, hold CTRL while left-clicking on any GUI control. You will get a message in the console window (or CLI) if the control is not learnable.
 
 After that, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control.
 
@@ -18,7 +18,7 @@ The range can either be in the style of a limiter or as compression.
 
 Blocking of all later actions on the same CC/channel pair (including system ones).
 
-Muting of this action.
+Muting of this line - nullifying all of the above.
 
 You can delete any existing line by holding down the 'CTRL' key and then clicking on the 'Control Function' text for that line. You will then be presented with a confirmation message giving the line number and the text as a reminder.
 
@@ -26,11 +26,11 @@ The same CC/controller can be used to change several different internal Yoshimi 
 
 Adding or deleting lines, or changing either CC or channel numbers will re-order the others.
 
-You can also clear the entire learned list.
+There is a button at the bottom of the window for clearing the entire learned list.
 
-A complete list can be saved by clicking on the 'save' button and you will get the usual filer window.
+A complete list can be saved by clicking on the 'save' button and you will get the usual file choser window.
 
-Loading sets follows the same practice. If a loaded set refers to Yoshimi controls at are disabled, or don't exist such controls will be ignored, but the 'block feature will still be active.
+Loading sets follows the same practice. If a loaded set refers to Yoshimi controls that are disabled, or don't exist, such controls will be ignored. However the 'block feature will still be active unless the line is muted.
 
 Finaly, there is a button for loading a set from the recent history.
 
