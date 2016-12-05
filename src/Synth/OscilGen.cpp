@@ -20,10 +20,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified March 2011
+    This file is a derivative of a ZynAddSubFX original, modified December 2016
 */
 
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -1602,5 +1603,35 @@ void OscilGen::getfromXML(XMLwrapper *xml)
             if (basefuncFFTfreqs.s[i])
                 basefuncFFTfreqs.s[i] /= max;
         }
+    }
+}
+
+
+void OscilGen::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    int insert = getData->data.insert;
+    if (insert > 5)
+    {
+        ; // do harmonics stuff
+        return;
+    }
+    switch (control)
+    {
+        case 0:
+        case 16:
+        case 34:
+            getData->limits.min = -64;
+            getData->limits.max = 63;
+            break;
+        case 67:
+            getData->limits.max = 100;
+            break;
+        case 68:
+            getData->limits.max = 255;
+            break;
+        case 69:
+            getData->limits.max = 200;
+            break;
     }
 }

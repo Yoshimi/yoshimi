@@ -29,6 +29,9 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    if ( part == 0xf1 && insert == 16)
+        type |= 8; // this is a hack :(
+
     if (part != 0xd8)
     {
         int typetop = type & 0xc0;

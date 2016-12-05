@@ -50,18 +50,7 @@ MidiLearn::~MidiLearn()
 
 
 void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
-
 {
-    /*
-    learnTransferBlock.type = getData->data.type;
-    learnTransferBlock.control = getData->data.control;
-    learnTransferBlock.part = getData->data.part;
-    learnTransferBlock.kit = getData->data.kit;
-    learnTransferBlock.engine = getData->data.engine;
-    learnTransferBlock.insert = getData->data.insert;
-    learnTransferBlock.parameter = getData->data.parameter;
-    learnTransferBlock.par2 = getData->data.par2;
-    */
     learnTransferBlock = *getData;
     learnedName = name;
     if (getData->data.type & 8)
@@ -93,7 +82,6 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
 
         int minIn = foundEntry.min_in;
         int maxIn = foundEntry.max_in;
-        // cout << "min " << minIn << "  max " << maxIn << endl;
         if (minIn > maxIn)
         {
             value = 127 - value;
@@ -124,8 +112,6 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         {
             value += minOut;
         }
-
-        //cout << "Min " << minOut << "  Max " << maxOut << endl;
 
         CommandBlock putData;
         unsigned int writesize = sizeof(putData);
@@ -179,7 +165,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
  */
 int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show)
 {
-    int newpos = 0; // last comes in at -1 for the first call
+    int newpos = 0; // 'last' comes in at -1 for the first call
     list<LearnBlock>::iterator it = midi_list.begin();
 
     while (newpos <= lastpos && it != midi_list.end())
@@ -324,7 +310,6 @@ void MidiLearn::changeLine(int value, unsigned char type, unsigned char control,
                 ++lineNo;
             }
         }
-        // cout << "Orig " << (int)value << "  New " << (int)lineNo << endl;
 
         if (it == midi_list.end())
             midi_list.push_back(entry);
@@ -358,9 +343,9 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
 
      /*
       * this has to be first as the transfer block will be corrupted
-      * when we call for the limits of this control
+      * when we call for the limits of this control. Should be a better
+      * way to do this!
       */
-    //entry.data = learnTransferBlock.data;
     entry.data.type = learnTransferBlock.data.type;
     entry.data.control = learnTransferBlock.data.control;
     entry.data.part = learnTransferBlock.data.part;

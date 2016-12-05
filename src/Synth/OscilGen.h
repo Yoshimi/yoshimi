@@ -59,7 +59,7 @@ class OscilGen : public Presets, private WaveShapeSamples
         void add2XML(XMLwrapper *xml);
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
-
+        void getLimits(CommandBlock *getData);
         void convert2sine(int magtype);
 
         // Make a new random seed for Amplitude Randomness -

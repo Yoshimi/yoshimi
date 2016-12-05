@@ -27,8 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified November 2016
-} {in_source in_header
+This file is a derivative of the ZynAddSubFX original, modified December 2016
+} {selected in_source in_header
 } 
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -474,7 +474,7 @@ else
   }
 } 
 
-class OscilEditor {selected : {public PresetsUI_}
+class OscilEditor {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window osceditUI {
@@ -517,7 +517,7 @@ send_data (104, o->value(), 0xc0);}
 oscil->Prand=(int)o->value()+64;
 oscildisplaygroup->redraw();
 oldosc->redraw();
-send_data (0, o->value(), 0xc0);}
+send_data (0, o->value(), 0xc8);}
           tooltip {Oscilator Phase Randomness: smaller than 0 is "group", larger than 0 is for each harmonic} xywh {140 285 100 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
           code0 {if (oscil->ADvsPAD) o->hide();}
           class mwheel_val_slider_rev
@@ -577,7 +577,7 @@ basefuncdisplaygroup->redraw();
 bfparval->value(oscil->Pbasefuncpar-64);
 
 redrawoscil();
-send_data (16, o->value(), 0xc0);}
+send_data (16, o->value(), 0xc8);}
           tooltip {Base Function Parameter} xywh {520 280 20 20} minimum -64 maximum 63 step 1
           code0 {o->init(0);}
           class WidgetPDial
@@ -920,7 +920,7 @@ send_data (35, o->value(), 0xc0);}
           callback {oscil->Pwaveshaping=(int)o->value()+64;
 wsparval->value(oscil->Pwaveshaping-64);
 redrawoscil();
-send_data (34, o->value(), 0xc0);}
+send_data (34, o->value(), 0xc8);}
           tooltip {Waveshaping Parameter} xywh {260 313 20 20} minimum -64 maximum 63 step 1
           code0 {o->init(0);}
           class WidgetPDial
@@ -1143,7 +1143,7 @@ send_data (70, o->value(), 0xc0);}
           label pow
           callback {oscil->Padaptiveharmonicspower=(int)o->value();
 redrawoscil();
-send_data (69, o->value(), 0xc0);}
+send_data (69, o->value(), 0xc8);}
           tooltip {Adaptive harmonics power} xywh {700 460 25 25} labelsize 10 maximum 200 step 1
           code0 {o->init(100);}
           class WidgetPDial
@@ -1152,7 +1152,7 @@ send_data (69, o->value(), 0xc0);}
           label baseF
           callback {oscil->Padaptiveharmonicsbasefreq=(int)o->value();
 redrawoscil();
-send_data (68, o->value(), 0xc0);}
+send_data (68, o->value(), 0xc8);}
           tooltip {Adaptive harmonics base frequency} xywh {670 460 25 25} labelsize 10 maximum 255 step 1
           code0 {o->init(128);}
           class WidgetPDial
@@ -1162,7 +1162,7 @@ send_data (68, o->value(), 0xc0);}
     o->value(50);
 oscil->Padaptiveharmonicspar=(int)o->value();
 redrawoscil();
-send_data (67, o->value(), 0xc0);}
+send_data (67, o->value(), 0xc8);}
           tooltip {Adaptive harmonics parameter} xywh {667 444 60 13} type {Horz Knob} box THIN_DOWN_BOX maximum 100 step 1 value 50
           class mwheel_slider_rev
         }

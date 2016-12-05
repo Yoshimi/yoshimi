@@ -814,7 +814,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 void ADnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
-    int engine = getData->data.engine;
+    //int engine = getData->data.engine;
     switch (control)
     {
         case 32:

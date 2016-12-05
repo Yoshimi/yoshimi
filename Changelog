@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-12-5 Will
+* Small optimsation in crossfade.
+* Tidied up code in Interchange and MIdilearn.
+* All sliders/knobs mid-learnable except 'Controllers'.
+
 2016-12-5 Jörn
 * More tooltips updates.
 

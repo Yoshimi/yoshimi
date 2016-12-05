@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified October 2016
+    This file is derivative of ZynAddSubFX original code, modified December 2016
 */
 
 #include <cstring>
@@ -569,7 +569,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                 {
                     vel = truevel; // always start with correct value
                     int range = 0;
-                    float position;
+                    int position;
                     if ((item & 1) == 0 && kit[item + 1].Penabled) // crossfade lower item of pair
                     {
                         if (kit[item].Pmaxkey > kit[item + 1].Pminkey && kit[item].Pmaxkey < kit[item + 1].Pmaxkey)
@@ -611,7 +611,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
                     }
                     if (range)
                     {
-                        vel = truevel * (position / range)* (position / range);
+                        vel = truevel * ((float)position / range);
                         //cout << item << "  " << vel << endl;
                     }
                 }

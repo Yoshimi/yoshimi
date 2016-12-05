@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified November 2016
+This file is a derivative of the ZynAddSubFX original, modified December 2016
 } {in_source in_header
 } 
 
@@ -349,7 +349,7 @@ if ((Fl::event_button() == 3))
 	maxdbvo->value(o->value());
         respar->PmaxdB = (int) o->value();
         redrawPADnoteApply();
-        send_data(0, o->value(), 0xc0);}
+        send_data(0, o->value(), 0xc8);}
         xywh {77 282 98 18} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 8 minimum 1 maximum 90 step 1 value 20
         code0 {o->value(respar->PmaxdB);}
         class mwheel_slider_rev

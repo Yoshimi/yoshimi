@@ -973,7 +973,7 @@ ZynAddSubFX}
       label {Sys Send}
       xywh {4 20 120 250} type Double labelfont 13 labelsize 13 hide
     } {
-      Fl_Scroll {} {open
+      Fl_Scroll {} {
         xywh {10 45 107 170} box FLAT_BOX
         code0 {//
             for (int neff1 = 0; neff1 < NUM_SYS_EFX; neff1++)
@@ -1167,7 +1167,7 @@ updatepanel();}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff, int insert = 0xff)} {} {
     code {//
 if (part == 0xff)
     part = 0xf0;

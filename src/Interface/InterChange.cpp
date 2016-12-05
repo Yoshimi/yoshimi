@@ -349,7 +349,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
 string InterChange::resolveVector(CommandBlock *getData)
 {
-//    int value = getData->data.value;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.part & 0xf;
 
@@ -414,8 +413,6 @@ string InterChange::resolveVector(CommandBlock *getData)
 
 string InterChange::resolveMain(CommandBlock *getData)
 {
-//    float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
 
     string contstr = "";
@@ -461,8 +458,6 @@ string InterChange::resolveMain(CommandBlock *getData)
 
 string InterChange::resolvePart(CommandBlock *getData)
 {
- //   float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -702,8 +697,6 @@ string InterChange::resolvePart(CommandBlock *getData)
 
 string InterChange::resolveAdd(CommandBlock *getData)
 {
- //   float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -781,8 +774,6 @@ string InterChange::resolveAdd(CommandBlock *getData)
 
 string InterChange::resolveAddVoice(CommandBlock *getData)
 {
-//    float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -974,8 +965,6 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
 
 string InterChange::resolveSub(CommandBlock *getData)
 {
-//    float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1100,7 +1089,6 @@ string InterChange::resolveSub(CommandBlock *getData)
 
 string InterChange::resolvePad(CommandBlock *getData)
 {
-//    float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1276,7 +1264,6 @@ string InterChange::resolvePad(CommandBlock *getData)
 
 string InterChange::resolveOscillator(CommandBlock *getData)
 {
-//    int value = (int) getData->data.value; // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1444,7 +1431,6 @@ string InterChange::resolveOscillator(CommandBlock *getData)
 
 string InterChange::resolveResonance(CommandBlock *getData)
 {
- //   int value = (int) getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1515,7 +1501,6 @@ string InterChange::resolveResonance(CommandBlock *getData)
 
 string InterChange::resolveLFO(CommandBlock *getData)
 {
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1579,7 +1564,6 @@ string InterChange::resolveLFO(CommandBlock *getData)
             contstr = "Stretch";
             break;
     }
-//    float value = getData->data.value;
 
     return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + lfo + " LFO " + contstr);
 }
@@ -1587,8 +1571,6 @@ string InterChange::resolveLFO(CommandBlock *getData)
 
 string InterChange::resolveFilter(CommandBlock *getData)
 {
-//    float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
@@ -1703,7 +1685,6 @@ string InterChange::resolveFilter(CommandBlock *getData)
 
 string InterChange::resolveEnvelope(CommandBlock *getData)
 {
- //   int value = (int)getData->data.value;
     bool write = (getData->data.type & 0x40) > 0;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
@@ -1822,8 +1803,6 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
 
 string InterChange::resolveSysIns(CommandBlock *getData)
 {
-//    float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char effnum = getData->data.engine;
@@ -1867,8 +1846,6 @@ string InterChange::resolveSysIns(CommandBlock *getData)
 
 string InterChange::resolveEffects(CommandBlock *getData)
 {
- //   float value = getData->data.value;
-//    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit & 0x1f;
@@ -3959,9 +3936,6 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     int value = (int) getData->data.value; // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-//    unsigned char npart = getData->data.part;
-//    unsigned char kititem = getData->data.kit;
-//    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
@@ -4222,9 +4196,6 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     int value = (int) getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-//    unsigned char npart = getData->data.part;
-//    unsigned char kititem = getData->data.kit;
-//    unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool write = (type & 0x40) > 0;
 
@@ -4771,7 +4742,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
     int val = (int) getData->data.value; // these are all integers or bool
     bool write = (getData->data.type & 0x40) > 0;
-    bool isGui = getData->data.type & 0x20;
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
     unsigned char Xincrement = getData->data.par2;
@@ -4791,13 +4761,6 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
             getData->data.value = 0xff;
             getData->data.par2 = 0xff;
             return;
-        }
-
-        // isGui is a temporary test till actual Gui writing enabled
-        if (isGui)
-        {
-            write = false;
-            //return;
         }
 
         if (!write || point == 0 || point >= envpoints)
@@ -5118,30 +5081,34 @@ void InterChange::returnLimits(CommandBlock *getData)
                     padpars->getLimits(getData);
                 }
             }
-            if (insert == 0 && parameter <= 2)
+            else if (engine != 1 && insert >= 5 && insert <= 7)
+            {
+                    part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
+                    // we use this for limits as oscillator values identical
+            }
+            else if (engine != 1 && insert == 8) // resonance
             {
                 if (control == 0) // a cheat!
                 {
+                    getData->limits.min = 1;
+                    getData->limits.max = 90;
+                }
+            }
+            else if (insert == 0 && parameter <= 2) // LFO
+            {
+                if (control == 0) // another cheat!
+                {
                     getData->limits.max = 1;
-                    getData->limits.def = 0; // not rignt!
+                    getData->limits.def = 50; // default values are *100
                 }
             }
         }
         else if (kititem == 0xff)
         {
-            if (control == 48)
+            if (control == 48) // wot, again!
                 getData->limits.max = 50;
         }
     }
     else
-        cout << "Nothing here yet!" << endl;
-
-    /*cout << "Type " << (int) getData->data.type << endl;
-    cout << "Control " << (int) getData->data.control << endl;
-    cout << "Part " << (int) getData->data.part << endl;
-    cout << "Kit " << (int) getData->data.kit << endl;
-    cout << "Engine " << (int) getData->data.engine << endl;
-    cout << "Insert " << (int) getData->data.insert << endl;
-    cout << "Param " << (int) getData->data.parameter << endl;
-    cout << "Par 2 " << (int) getData->data.par2 << endl;*/
+        cout << "Using defaults" << endl;
 }
