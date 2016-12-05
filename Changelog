@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-12-5 Jörn
+* More tooltips updates.
+
 2016-12-5 Will
 * Bugfix: midi-learn scroll bar wasn't working.
 * Most sliders/rotary controls now available to midi-learn.
