@@ -638,6 +638,24 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(val,""));
             break;
 
+        case VC_FXSysSend:
+            if((int)val==0)
+                return("-∞ dB");
+            else
+                return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+        case VC_FXEchoVol:
+            // initial volume is set in Echo::setvolume like this
+            f = powf(0.01f, (1.0f - (int)val / 127.0f)) * 4.0f;
+            // in Echo::out this is multiplied by a panning value
+            // which is 0.707 for centered and by 2.0
+            // in EffectMgr::out it is multiplied by 2.0 once more
+            // so in the end we get
+            f *= 2.828f; // 0.707 * 4
+            f = 20.0f * logf(f) / logf(10.0f);
+            // Here we are finally
+            return(custom_value_units(f,"dB",1));
+
         case VC_plainValue:
             return(custom_value_units(val,""));
     }

@@ -983,6 +983,7 @@ ZynAddSubFX}
                     new SysEffSend(o->x()+(neff2 - 1) * 35, o->y() + 20 + neff1 * 52, 30, 30);
                 syseffsend[neff1][neff2]->label("aaa");
                 syseffsend[neff1][neff2]->init(neff1, neff2, synth);
+                syseffsend[neff1][neff2]->setValueType(VC_FXSysSend);
             }}
       } {}
       Fl_Button {} {

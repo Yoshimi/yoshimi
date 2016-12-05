@@ -583,6 +583,7 @@ else
 send_data(0, o->value(), 2, 0xc8);}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXEchoVol);}
         class WidgetPDial
       }
       Fl_Dial echop1 {
