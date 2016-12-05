@@ -99,7 +99,7 @@ send_data(group, 0, o->value(), 0x48);}
           callback {pars->Pintensity=(int)o->value();
 send_data(group, 1, o->value(), 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {o->setValueType(getLFOdepthType(pars));}
+          code0 {o->setValueType(getLFOdepthType(group));}
           code1 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
           class WidgetPDial
         }

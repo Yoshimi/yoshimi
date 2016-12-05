@@ -24,8 +24,6 @@
 #include "Misc/SynthEngine.h"
 #include "MiscGui.h"
 #include "MasterUI.h"
-#include "Params/LFOParams.h"
-#include "Params/FilterParams.h"
 
 SynthEngine *synth;
 
@@ -405,7 +403,7 @@ string convert_value(ValueType type, float val)
             else
                 return(custom_value_units(f,"Hz", 2));
 
-        case VC_LFOdepth0: // frequency LFO
+        case VC_LFOdepthFreq: // frequency LFO
             f=powf(2.0f,(int)val/127.0f*11.0f)-1.0f;
             if (f < 10.0f)
                 return(custom_value_units(f,"cents",2));
@@ -413,9 +411,9 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(f,"cents",1));
             else
                 return(custom_value_units(f,"cents"));
-        case VC_LFOdepth1: // amplitude LFO
+        case VC_LFOdepthAmp: // amplitude LFO
             return(custom_value_units(val / 127.0f * 200.0f,"%",1));
-        case VC_LFOdepth2: // filter LFO
+        case VC_LFOdepthFilter: // filter LFO
             f=(int)val / 127.0f * 4800.0f; // 4 octaves
             if (f < 10.0f)
                 return(custom_value_units(f,"cents",2));
@@ -470,9 +468,24 @@ string convert_value(ValueType type, float val)
             return(custom_value_units((1.0f - (int)val / 127.0f) * MIN_ENVELOPE_DB,
                                   "dB", 1));
 
-        case VC_FilterFreq0:
-        case VC_FilterFreq2:
+        case VC_FilterFreq0: // AnalogFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+            if (f < 100.0f)
+                return(custom_value_units(f,"Hz",1));
+            else if(f < 1000.0f)
+                return(custom_value_units(f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f,"kHz",2));
+        case VC_FilterFreq2: // SVFilter
+            f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
+            // We have to adjust the freq because of this line
+            // in method SVFilter::computefiltercoefs() (file SVFilter.cpp)
+            //
+            //   par.f = freq / synth->samplerate_f * 4.0f;
+            //
+            // Using factor 4.0 instead of the usual 2.0*PI leads to a
+            // different effective cut-off freq, which we will be showing
+            f *= 4.0 / (2.0 * PI);
             if (f < 100.0f)
                 return(custom_value_units(f,"Hz",1));
             else if(f < 1000.0f)
@@ -618,9 +631,10 @@ string convert_value(ValueType type, float val)
             break;
 
         case VC_plainValue:
-        default:
             return(custom_value_units(val,""));
     }
+    // avoid compiler warning
+    return(custom_value_units(val,""));
 }
 
 int custom_graph_size(ValueType vt)
@@ -690,20 +704,20 @@ string custom_value_units(float v, string u, int prec)
     return(string(oss.str()));
 }
 
-ValueType getLFOdepthType(LFOParams *pars)
+ValueType getLFOdepthType(int group)
 {
-    switch(pars->fel)
+    switch(group)
     {
-        case 0: return(VC_LFOdepth0);
-        case 1: return(VC_LFOdepth1);
-        case 2: return(VC_LFOdepth2);
+        case 0: return(VC_LFOdepthAmp);
+        case 1: return(VC_LFOdepthFreq);
+        case 2: return(VC_LFOdepthFilter);
     }
     return(VC_plainValue);
 }
 
-ValueType getFilterFreqType(FilterParams *pars)
+ValueType getFilterFreqType(int type)
 {
-    switch(pars->Pcategory)
+    switch(type)
     {
         case 0: return(VC_FilterFreq0);
         case 1: return(VC_FilterFreq1);
@@ -712,9 +726,9 @@ ValueType getFilterFreqType(FilterParams *pars)
     return(VC_plainValue);
 }
 
-ValueType getFilterFreqTrackType(FilterParams *pars)
+ValueType getFilterFreqTrackType(int offset)
 {
-    switch(pars->Pfreqtrackoffset)
+    switch(offset)
     {
         case 0: return(VC_FilterFreqTrack0);
         default: return(VC_FilterFreqTrack1);
