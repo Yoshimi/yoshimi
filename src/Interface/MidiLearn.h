@@ -76,9 +76,9 @@ class MidiLearn : private MiscFuncs
 
         bool runMidiLearn(float value, unsigned char CC, unsigned char chan, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show);
-        void listAll(void);
+        void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
-        void changeLine(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
+        void generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         bool saveList(string name);
         bool loadList(string name);
 

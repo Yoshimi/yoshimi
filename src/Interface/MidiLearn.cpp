@@ -209,14 +209,19 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
 }
 
 
-void MidiLearn::listAll()
+void MidiLearn::listAll(list<string>& msg_buf)
 {
     list<LearnBlock>::iterator it = midi_list.begin();
     int lineNo = 0;
-    synth->getRuntime().Log("Midi learned:");
+    if (midi_list.size() == 0)
+    {
+        msg_buf.push_back("No learned lines");
+        return;
+    }
+    msg_buf.push_back("Midi learned:");
     while (it != midi_list.end())
     {
-        synth->getRuntime().Log("Line " + to_string(lineNo) + "  CC " + to_string((int)it->CC) + "  Chan " + to_string((int)it->chan) + "  " + it->name);
+        msg_buf.push_back("Line " + to_string(lineNo) + "  CC " + to_string((int)it->CC) + "  Chan " + to_string((int)it->chan) + "  " + it->name);
         ++ it;
         ++ lineNo;
     }
@@ -241,7 +246,7 @@ bool MidiLearn::remove(int itemNumber)
 }
 
 
-void MidiLearn::changeLine(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     if (control == 96)
     {

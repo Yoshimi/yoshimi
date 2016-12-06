@@ -1385,7 +1385,7 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 }
 
 
-/* Provides a way of setting dynamic system variables
+/* Provides a way of setting/reading dynamic system variables
  * from sources other than the gui
  */
 void SynthEngine::SetSystemValue(int type, int value)
@@ -1480,6 +1480,11 @@ void SynthEngine::SetSystemValue(int type, int value)
             else
                 Runtime.hideErrors = false;
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+
+        case 107: // list midi learned lines
+            midilearn.listAll(msg);
+            cliOutput(msg, value);
+            break;
 
         case 108: // list vector parameters
             ListVectors(msg);

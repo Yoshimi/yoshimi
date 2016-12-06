@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-12-6 Will
+* Started implementing CLI access to midi-learn.
+  Also replaced 'changeLine(' with 'generalOpps(' as it
+  is more appropriate now.
+
 2016-12-5 Will
 * Small optimsation in crossfade.
 * Tidied up code in Interchange and MIdilearn.

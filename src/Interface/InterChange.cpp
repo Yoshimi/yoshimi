@@ -1937,7 +1937,7 @@ void InterChange::mediate()
                 returns(&getData);
             }
             else
-                synth->midilearn.changeLine(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+                synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
         }
 
         size = jack_ringbuffer_read_space(fromGUI);
@@ -1956,7 +1956,7 @@ void InterChange::mediate()
                 returns(&getData);
             }
             else
-                synth->midilearn.changeLine(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+                synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
         }
 
         size = jack_ringbuffer_read_space(fromMIDI);

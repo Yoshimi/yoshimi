@@ -65,7 +65,7 @@ string basics[] = {
     "  Vectors",                    "settings for all enabled vectors",
     "  Settings",                   "dynamic settings",
     "  MLearn",                     "midi learned controls",
-    "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors)",
+    "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "  Effects [s]",                "effect types ('all' include preset numbers and names)",
     "LOad",                         "load patch files",
     "  Instrument <s>",             "instrument to current part from named file",
@@ -299,7 +299,7 @@ void CmdInterface::historyList(int listnum)
 {
     list<string>msg;
     int start = 2;
-    int end = 5;
+    int end = 6;
     bool found = false;
 
     if (listnum != 0)
@@ -326,6 +326,9 @@ void CmdInterface::historyList(int listnum)
                     break;
                 case 5:
                     msg.push_back("Recent Vectors:");
+                    break;
+                case 6:
+                    msg.push_back("Recent MIDI learned:");
                     break;
             }
             for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
@@ -1653,21 +1656,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
     synth = itSynth->first;
     Config &Runtime = synth->getRuntime();
 
-
-    /*some message tests
-    int a = miscMsgPush("The first test ");
-    int b = miscMsgPush("The second test ");
-    int c = miscMsgPush("Another test ");
-
-    Runtime.Log(miscMsgPop(b) + to_string(b));
-    Runtime.Log(miscMsgPop(a) + to_string(a));
-    b = miscMsgPush("Short ");
-    a = miscMsgPush("A much longer one than all the others ");
-    Runtime.Log(miscMsgPop(c) + to_string(c));
-    Runtime.Log(miscMsgPop(a) + to_string(a));
-    Runtime.Log(miscMsgPop(b) + to_string(b));
-    */
-
     replyString = "";
     npart = Runtime.currentPart;
     int ID;
@@ -1783,7 +1771,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->cliOutput(msg, LINES);
         }
         else if (matchnMove(2, point, "mlearn"))
-            synth->midilearn.listAll();
+            synth->SetSystemValue(107, LINES);
         else if (matchnMove(1, point, "history"))
         {
             reply = done_msg;
@@ -1797,6 +1785,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 historyList(4);
             else if (matchnMove(1, point, "vectors"))
                 historyList(5);
+            else if (matchnMove(2, point, "mlearn"))
+                historyList(6);
             else
             {
                 replyString = "list history";
