@@ -1,6 +1,6 @@
 This now completely implemented.
 
-To learn, hold CTRL while left-clicking on any GUI control. You will get a message in the console window (or CLI) if the control is not learnable.
+To learn, hold CTRL while right-clicking on any GUI control. You will get a message in the console window (or CLI) if the control is not learnable.
 
 After that, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control.
 

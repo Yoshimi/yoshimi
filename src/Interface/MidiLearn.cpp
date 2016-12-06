@@ -54,7 +54,7 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
     learnTransferBlock = *getData;
     learnedName = name;
     if (getData->data.type & 8)
-        return;
+        return; // don't spam ourselves!
     learning = true;
     synth->getRuntime().Log("Learning");
 }
