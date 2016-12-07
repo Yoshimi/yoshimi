@@ -776,6 +776,64 @@ string convert_value(ValueType type, float val)
             else
                 return(custom_value_units(f+0.5,"cents"));
 
+        case VC_FXChorusVol:
+            f = ((int)val / 127.0f)*1.414f;
+            f = 20.0f * logf(f) / logf(10.0f);
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXlfofreq:
+            f = (powf(2.0f, (int)val / 127.0f * 10.0f) - 1.0f) * 0.03f;
+            if(f<10.0f)
+                return(custom_value_units(f,"Hz", 3));
+            else
+                return(custom_value_units(f,"Hz", 2));
+
+        case VC_FXChorusDepth:
+            f = powf(8.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
+            if(f<10.0f)
+                return(custom_value_units(f+0.005,"ms",2));
+            else
+                return(custom_value_units(f+0.05,"ms",1));
+
+        case VC_FXChorusDelay:
+            f = powf(10.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
+            if(f<1.0f)
+                return(custom_value_units(f+0.005,"ms",2));
+            else
+                return(custom_value_units(f+0.05,"ms",1));
+
+        case VC_FXChorusFb:
+            f = (((int)val - 64.0f) / 64.1f) * 100.0f;
+            return(custom_value_units(f,"%"));
+
+        case VC_FXChorusStereo:
+            f = ((int)val - 64.0f) / 127.0 * 360.0f;
+            if ((int)val == 64)
+                return("equal");
+            else if (f < 0.0f)
+                return("left +"+custom_value_units(-f,"°"));
+            else
+                return("right +"+custom_value_units(f,"°"));
+
+        case VC_FXdefaultDW:
+            s.clear();
+            f = (int)val / 127.0f;
+            if(f < 0.5f)
+            {
+                f = f * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: -0 dB, Wet: "
+                    +custom_value_units(f,"dB",1);
+            }
+            else
+            {
+                f = (1.0f - f) * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: "
+                    +custom_value_units(f,"dB",1)+", Wet: -0 dB";
+            }
+            return(s);
+
         case VC_plainValue:
             return(custom_value_units(val,""));
     }

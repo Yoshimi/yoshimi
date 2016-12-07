@@ -777,6 +777,7 @@ else
 send_data(0, o->value(), 3, 0xc8);}
         xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXChorusVol);}
         class WidgetPDial
       }
       Fl_Dial chorusp1 {
@@ -794,6 +795,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
       }
       Fl_Dial chorusp2 {
@@ -811,6 +813,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         tooltip {LFO Frequency} xywh {85 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXlfofreq);}
         class WidgetPDial
       }
       Fl_Dial chorusp3 {
@@ -828,6 +831,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         tooltip {LFO Randomness} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial chorusp5 {
@@ -845,6 +849,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         tooltip {L/R Phase Shift} xywh {200 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXChorusStereo);}
         class WidgetPDial
       }
       Fl_Dial chorusp6 {
@@ -862,6 +867,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         tooltip {LFO Depth} xywh {235 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXChorusDepth);}
         class WidgetPDial
       }
       Fl_Dial chorusp7 {
@@ -879,6 +885,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         xywh {270 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXChorusDelay);}
         class WidgetPDial
       }
       Fl_Dial chorusp8 {
@@ -896,6 +903,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         tooltip Feedback xywh {305 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXChorusFb);}
         class WidgetPDial
       }
       Fl_Dial chorusp9 {
@@ -913,6 +921,7 @@ else
 send_data(butt, o->value(), 3, 0xc8);}
         tooltip {Channel Routing} xywh {340 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Check_Button {} {
@@ -2398,7 +2407,10 @@ refresh(eff, npart, neff);} {}
                 chorusp->value(eff->getpreset());
                 chorusp0->value(eff->geteffectpar(0));
                 if (eff->insertion != 0)
+                {
                     chorusp0->label("D/W");
+                    chorusp0->setValueType(VC_FXdefaultDW);
+                }
                 chorusp1->value(eff->geteffectpar(1));
                 chorusp2->value(eff->geteffectpar(2));
                 chorusp3->value(eff->geteffectpar(3));
