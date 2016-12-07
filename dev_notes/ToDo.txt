@@ -1,7 +1,4 @@
 
-Idea!
-set up map for min,max, type, default for all controls. Map filled by associated code sections as they are initialised.
-
 Send global and part keyshifts through ring buffer (like global fine detune).
 
 Sort out direct access dynfilter->filter (and two enclosed controls). All work but don't update gui.
@@ -36,12 +33,6 @@ yoshimi instead - saves memory and more consistent.
 Add scales control to CLI.
 
 Make things like LFOs either floats or much higher resolution.
-
-LFO frequency should be stated in Hz.
-Ampitude LFO depth should be in %
-Frequency LFO depth should be in cents.
-
-Consider filter settings too.
 
 Make LFOs active on sounding notes. Not easy!
 

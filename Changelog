@@ -1,5 +1,10 @@
 yoshimi 1.4.1 M
 
+2016-12-7 Will
+* Added new file to dev_notes: System_Values.txt
+* Added list file leafname to midi-learn window title.
+* Updated docs.
+
 2016-12-6 Will
 * Started implementing CLI access to midi-learn.
   Also replaced 'changeLine(' with 'generalOpps(' as it

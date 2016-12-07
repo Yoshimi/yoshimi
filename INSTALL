@@ -42,11 +42,13 @@ Run ccmake:
 
    ccmake ../src
 
-Within ccmake, type 'c' (without the quotes) to generate a default configuration.  Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there are any missing pre-requisite libraries and/or softwares, it should prompt you with such info.  You can install such pre-requisite softwares and try these ccmake configuration steps again.
+Note the two dots!
+
+Within ccmake, type 'c' (without the quotes) to generate a default configuration.  Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there are any missing pre-requisite libraries and/or softwares (dependencies), it should prompt you with such info.  You can install such dependencies and try these ccmake configuration steps again.
 
 When ccmake configuration is complete, there should be a new option displayed: 'g' to generate (the make-related files) and exit.
 
-In other words, if you already have all pre-requisites in place, then when you run ccmake, just try 'c', then 'c' again, when 'g' appears as a choice, type 'g'.  The make-related files are created in the current directory, and ccmake is done.  You are now back at the command line.
+In other words, if you already have all dependencies in place, then when you run ccmake, just try 'c', then 'c' again, when 'g' appears as a choice, type 'g'.  The make-related files are created in the current directory, and ccmake is done.  You are now back at the command line.
 
 Next is to compile (build) the application:
 
@@ -66,7 +68,7 @@ Yoshimi builds with both Jack and Alsa audio and midi options.  Jack is the defa
 
 ---- Instrument banks ----
 
-Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks to the standard zynaddsubfx bank directories includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
+Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks to the standard zynaddsubfx bank directories and includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
 
 
 ---- Help ----

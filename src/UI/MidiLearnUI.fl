@@ -226,7 +226,9 @@ class MidiLearnUI {selected : {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
       label {Midi Learn}
-      tooltip {Editor for all learned controllers. Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {49 118 755 285} type Double hide
+      tooltip {Editor for all learned controllers.
+CTRL-right click on any knob/slider to learn.
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {49 118 755 285} type Double hide
       code0 {;}
     } {
       Fl_Button {} {
@@ -235,7 +237,9 @@ class MidiLearnUI {selected : {private MiscFuncs}
         xywh {684 262 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
-        tooltip {Editor for all learned controllers. Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
+        tooltip {Editor for all learned controllers.
+CTRL-Right click on knobs/sliders to learn.
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
       } {}
       Fl_Box none {
         label {No Entries}
@@ -280,7 +284,7 @@ filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
 if (filename == NULL)
     return;
 loadMidi(filename);}
-        xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Load complete learned list} xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
       }
       Fl_Button save {
         label Save
@@ -289,8 +293,9 @@ filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
 if (filename == NULL)
     return;
 send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
-recent->activate();}
-        xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+recent->activate();
+setWindowTitle(findleafname(filename));}
+        tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button clear {
         label Clear
@@ -299,14 +304,15 @@ if (fl_choice("Remove all entries", "Yes", "No", NULL))
     return;
 
 send_data(96,0,0);
-o->deactivate();}
-        xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+o->deactivate();
+setWindowTitle();}
+        tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
       }
       Fl_Button recent {
         label Recent
         callback {synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
 synth->getGuiMaster()->paramsui->Show(6);}
-        xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+        tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {vector<string> &listType = *synth->getHistory(6);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
@@ -370,7 +376,7 @@ synth = _synth;
 for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
     midilearnkititem[i] = NULL;
 make_window();
-midilearnwindow->copy_label(synth->makeUniqueName("Midi Learn").c_str());
+setWindowTitle();
 num = 0;} {}
   }
   Function {~MidiLearnUI()} {} {
@@ -401,7 +407,14 @@ kitlist->show();} {}
   Function {loadMidi(string file)} {} {
     code {//
 send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
-recent->activate();} {}
+recent->activate();
+setWindowTitle(findleafname(file));} {}
+  }
+  Function {setWindowTitle(string name = "")} {} {
+    code {//
+if (name > "")
+    name = " - " + name;
+midilearnwindow->copy_label(synth->makeUniqueName("Midi Learn" + name).c_str());} {}
   }
   decl {int lastkititem;} {public local
   }
