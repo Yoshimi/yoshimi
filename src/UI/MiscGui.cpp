@@ -395,8 +395,14 @@ string convert_value(ValueType type, float val)
         case VC_percent127:
             return(custom_value_units(val / 127.0f * 100.0f+0.05f,"%",1));
 
+        case VC_percent128:
+            return(custom_value_units(val / 128.0f * 100.0f+0.05f,"%",1));
+
         case VC_percent255:
             return(custom_value_units(val / 255.0f * 100.0f+0.05f,"%",1));
+
+        case VC_percent64_127:
+            return(custom_value_units((val-64) / 63.0f * 100.0f+0.05f,"%",1));
 
         case VC_GlobalFineDetune:
             return(custom_value_units((val-64),"cents",1));
@@ -657,15 +663,9 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(f,"dB",1));
 
         case VC_FXEchoDelay:
-            s.clear();
             // delay is 0 .. 1.5 sec
             f = (int)val / 127.0f * 1.5f;
-            s += custom_value_units(f+0.005f,"s",2);
-            // also show bpm
-            f = 60.0f / f;
-            s += "  (";
-            s += custom_value_units(f+0.5f,"bpm)");
-            return(s);
+            return(custom_value_units(f+0.005f,"s",2));
 
         case VC_FXEchoLRdel:
             s.clear();
@@ -704,6 +704,77 @@ string convert_value(ValueType type, float val)
                     +custom_value_units(f,"dB",1)+", Wet: +3.0 dB";
             }
             return(s);
+
+        case VC_FXReverbVol:
+            f = powf(0.01f, (1.0f - (int)val / 127.0f)) * 4.0f;
+            f = 20.0f * logf(f) / logf(10.0f);
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXReverbTime:
+            f = powf(60.0f, (int)val / 127.0f) - 0.97f; // s
+            if (f<10.0f)
+                return(custom_value_units(f+0.005,"s",2));
+            else
+                return(custom_value_units(f+0.05,"s",1));
+
+        case VC_FXReverbIDelay:
+            f = powf(50.0f * (int)val / 127.0f, 2.0f) - 1.0f; // ms
+            if ((int)f > 0)
+            {
+                if (f<1000.0f)
+                    return(custom_value_units(f+0.5f,"ms"));
+                else
+                    return(custom_value_units(f/1000.0+0.005f,"s",2));
+            }
+            else
+                return("0 ms");
+
+        case VC_FXReverbHighPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f;
+            if ((int)val == 0)
+                return("no high pass");
+            else if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
+
+        case VC_FXReverbLowPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+            if ((int)val == 127)
+                return("no low pass");
+            else if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
+
+        case VC_FXReverbDW:
+            s.clear();
+            f = (int)val / 127.0f;
+            if(f < 0.5f)
+            {
+                f = f * 2.0f;
+                f *= f;  // for Reverb and Echo
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: -0 dB, Wet: "
+                    +custom_value_units(f,"dB",1);
+            }
+            else
+            {
+                f = (1.0f - f) * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: "
+                    +custom_value_units(f,"dB",1)+", Wet: -0 dB";
+            }
+            return(s);
+
+        case VC_FXReverbBandwidth:
+            f = powf((int)val / 127.0f, 2.0f) * 200.0f; // cents
+            if(f<1.0f)
+                return(custom_value_units(f+0.005,"cents",2));
+            else if(f<100.0f)
+                return(custom_value_units(f+0.05,"cents",1));
+            else
+                return(custom_value_units(f+0.5,"cents"));
 
         case VC_plainValue:
             return(custom_value_units(val,""));

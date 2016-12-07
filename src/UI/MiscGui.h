@@ -27,7 +27,9 @@
 enum ValueType {
     VC_plainValue,
     VC_percent127,
+    VC_percent128,
     VC_percent255,
+    VC_percent64_127,
     VC_GlobalFineDetune,
     VC_MasterVolume,
     VC_LFOfreq,
@@ -64,7 +66,14 @@ enum ValueType {
     VC_FXEchoVol,
     VC_FXEchoDelay,
     VC_FXEchoLRdel,
-    VC_FXEchoDW
+    VC_FXEchoDW,
+    VC_FXReverbVol,
+    VC_FXReverbTime,
+    VC_FXReverbIDelay,
+    VC_FXReverbHighPass,
+    VC_FXReverbLowPass,
+    VC_FXReverbDW,
+    VC_FXReverbBandwidth
 };
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
