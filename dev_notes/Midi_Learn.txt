@@ -61,12 +61,15 @@ These move a line, so a complete redraw is inititalsed.
 
 20  send list size
 
+24 incoming activity
+
 96  clear all
 
-The gui now always does a redraw (except 20), but 0 to 2 and 96 don't do a list re-order first.
+The gui now always does a redraw (except 20), but 0 to 2, 24 and 96 don't do a list re-order first.
 
 
 
 
 0xf1 load list
+0xf2 load numbered item from recent history
 0xf5 save list

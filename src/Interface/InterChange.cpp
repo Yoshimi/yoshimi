@@ -1950,6 +1950,7 @@ void InterChange::mediate()
             jack_ringbuffer_read(fromGUI, point, toread);
             #warning gui writes changed to reads
             getData.data.type = getData.data.type & 0xbf;
+
             if(getData.data.part != 0xd8) // special midi-learn message
             {
                 commandSend(&getData);
@@ -1972,9 +1973,12 @@ void InterChange::mediate()
                 commandSend(&getData);
                 returns(&getData);
             }
+            else if (getData.data.part == 0xd8 && getData.data.control == 24)
+                if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+                jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
         }
     }
-    while (more);
+    while (more && synth->getRuntime().runSynth);
 }
 
 
@@ -1983,7 +1987,7 @@ void InterChange::returns(CommandBlock *getData)
     float value = getData->data.value;
     if (value == FLT_MAX)
         return; // need to sort this out later
-    unsigned char type = getData->data.type;
+    unsigned char type = getData->data.type | 4; // back from synth
 
     bool isGui = type & 0x20;
     bool isCli = type & 0x10;

@@ -6,6 +6,8 @@ After that, the first physical controller you move, or CC message you send will 
 
 If you now use the 'Yoshimi' drop-down menu and click on 'Midi Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
 
+There is also an 'activity' LED that flickers when the associated CC/channel is recieved.
+
 Editor settings available:
 
 Incoming CC.

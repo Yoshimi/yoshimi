@@ -52,6 +52,7 @@ class CmdInterface : private MiscFuncs
         int commandVector();
         int commandPart(bool justSet);
         int commandReadnSet();
+        int sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
         bool cmdIfaceProcessCommand();
         char *cCmd;
         char *point;

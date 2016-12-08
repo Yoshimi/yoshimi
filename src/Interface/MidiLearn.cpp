@@ -70,6 +70,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
 
     int lastpos = -1;
     LearnBlock foundEntry;
+    bool firstLine = true;
     while (lastpos != -2)
     {
         lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
@@ -114,7 +115,6 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         }
 
         CommandBlock putData;
-        unsigned int writesize = sizeof(putData);
         putData.data.value = value;
         putData.data.type = 0x48; // write command from midi
         putData.data.control = foundEntry.data.control;
@@ -124,34 +124,20 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         putData.data.insert = foundEntry.data.insert;
         putData.data.parameter = foundEntry.data.parameter;
         putData.data.par2 = foundEntry.data.par2;
-        char *point = (char*)&putData;
-        unsigned int towrite = writesize;
-        unsigned int wrote = 0;
-        unsigned int found;
-        unsigned int tries = 0;
-
-        if (in_place)
+        unsigned int putSize = sizeof(putData);
+        if (writeMidi(&putData, putSize, in_place))
         {
-            synth->interchange.commandSend(&putData);
-            synth->interchange.returns(&putData);
-        }
-        else
-        {
-            if (jack_ringbuffer_write_space(synth->interchange.fromMIDI) >= writesize)
+            if (firstLine && !in_place)
+            // we only want to send an activity once
+            // and it's not relevant to jack freewheeling
             {
-                while (towrite && tries < 3)
-                {
-                    found = jack_ringbuffer_write(synth->interchange.fromMIDI, point, towrite);
-                    wrote += found;
-                    point += found;
-                    towrite -= found;
-                    ++tries;
-                }
-                if (towrite)
-                        synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
+                firstLine = false;
+                putData.data.control = 24;
+                putData.data.part = 0xd8;
+                putData.data.kit = CC;
+                putData.data.engine = chan;
+                writeMidi(&putData, putSize, in_place);
             }
-            else
-                synth->getRuntime().Log("fromMidi buffer full!", 2);
         }
         if (lastpos == -1)
             return true;
@@ -159,9 +145,51 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
     return false;
 }
 
+
+bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place)
+{
+    char *point = (char*) putData;
+    unsigned int towrite = writesize;
+    unsigned int wrote = 0;
+    unsigned int found;
+    unsigned int tries = 0;
+    bool ok = true;
+    if (in_place)
+    {
+        synth->interchange.commandSend(putData);
+        synth->interchange.returns(putData);
+    }
+    else
+    {
+        if (jack_ringbuffer_write_space(synth->interchange.fromMIDI) >= writesize)
+        {
+            while (towrite && tries < 3)
+            {
+                found = jack_ringbuffer_write(synth->interchange.fromMIDI, point, towrite);
+                wrote += found;
+                point += found;
+                towrite -= found;
+                ++tries;
+            }
+            if (towrite)
+            {
+                ok = false;
+                    synth->getRuntime().Log("Unable to write data to fromMidi buffer", 2);
+            }
+        }
+        else
+        {
+            synth->getRuntime().Log("fromMidi buffer full!", 2);
+            ok = false;
+        }
+    }
+    return ok;
+}
+
+
 /*
  * This will only be called by incoming midi. It is the only function that
- * needs to be quick
+ * needs to be really quick
  */
 int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show)
 {
@@ -248,6 +276,7 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    string name;
     if (control == 96)
     {
         midi_list.clear();
@@ -256,15 +285,33 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     }
     else if (control == 241)
     {
-        loadList(string(miscMsgPop(par2)));
+        name = (miscMsgPop(par2));
+        loadList(name);
         updateGui();
         return;
     }
+    else if (control == 242)
+    {
+        int tmp = synth->SetSystemValue(106, kit);
+        if (tmp == -1)
+        {
+            synth->getRuntime().Log("No entry for number " + to_string(int(kit)));
+        }
+        else
+        {
+            name = miscMsgPop(tmp);
+            loadList(name);
+            synth->getRuntime().Log("Loaded " + name);
+            updateGui();
+        }
+    }
     else if (control == 245)
     {
-        saveList(string(miscMsgPop(par2)));
+        name = (miscMsgPop(par2));
+        saveList(name);
         return;
     }
+
     LearnBlock entry;
     int lineNo = 0;
     list<LearnBlock>::iterator it = midi_list.begin();

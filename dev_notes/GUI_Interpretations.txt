@@ -11,12 +11,12 @@ unsigned char   insert
 unsigned char   insert param
 unsigned char   insert par2
 
-string          name - not using this yet - will be handled separately.
+string          name - handled via simple message system.
 
 
 Type bits
 0-1 event (see below)
-2   source is return from synth (not yet)
+2   source is return from synth
 3   source is MIDI
 4   source is CLI
 5   source is GUI

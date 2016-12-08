@@ -112,7 +112,7 @@ YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Volume
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Panning
 
-Y : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Detune frequency
+YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Detune frequency
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Octave
 Y : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
 Y : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 0 : 255 : 255 : 255 : Coarse detune
@@ -138,7 +138,7 @@ Y : 0/1 : 9 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable ampl
 Y : 0 to 4 : 16 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator type – Off, Morph, Ring, PM, FM
 Y : -1 to 6 : 17 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator (from lower numbered voice modulators) - off = -1
 
-Y : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Detune frequency
+YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Detune frequency
 YL : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Equal temper variation
 Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Set voice base frequency to 440Hz
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Octave
@@ -165,21 +165,21 @@ Y : 0/1 : 73 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable fil
 
 YL : 0 to 127 : 80 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator amplitude
 YL : 0 to 127 : 81 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator velocity sensitivity
-Y : -64 to 63 : 82 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator HF damping
+YL : -64 to 63 : 82 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator HF damping
 Y : 0/1 : 88 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator amplitude envelope
-Y : -8192 to 8191 : 96 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune frequency
+YL : -8192 to 8191 : 96 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune frequency
 Y : 0/1 : 98 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Set modulator frequency to 440Hz
 Y : -8 to 7 : 99 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator octave
 Y : 0 to 4 : 100 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune type – Default, L35 cents, L10 cents, E100 cents, E1200 cents
 Y : -64 to 63 : 101 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator coarse detune
 Y : 0/1 : 104 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator frequency envelope
-Y : -64 to 63 : 112 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator oscillator phase
+YL : -64 to 63 : 112 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator oscillator phase
 Y : -1 to 6 : 113 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator oscillator (from lower numbered voices) - off = -1
 
 YL : 0 to 127 : 128 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Delay
 Y : 0/1 : 129 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice enable
 Y : 0/1 : 130 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Resonance enable (for this voice)
-Y : -64 to 63 : 136 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice oscillator phase
+YL : -64 to 63 : 136 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Voice oscillator phase
 Y : -1 to 6 : 137 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External voice oscillator (from lower numbered voices) - off = -1
 Y : 0 to 2 : 138 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Sound type – Oscillator, White noise, Pink noise
 
@@ -192,7 +192,7 @@ YL : 0 to 127 : 16 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bandwidth
 YL : 0 to 127 : 17 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bandwidth scale
 Y : 0/1 : 18 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable bandwidth envelope
 
-Y : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune frequency
+YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune frequency
 YL : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Equal temper variation
 Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Set voice base frequency to 440Hz
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Octave
@@ -201,9 +201,9 @@ Y : 0 to 127 : 37 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Coarse detune
 
 Y : 0/1 : 40 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable frequency envelope
 
-Y : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 1
-Y : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 2
-Y : 0 to 255 : 50 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 3
+YL : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 1
+YL : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 2
+YL : 0 to 255 : 50 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 3
 Y : 0 to 7 : 51 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone position – Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power, Shift.
 
 Y : 0/1 : 64 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable Filter
@@ -222,13 +222,13 @@ YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Volume
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Panning
 
-Y : 0 to 1000 : 16 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth
+YL : 0 to 1000 : 16 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth
 Y : 0 to 6 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
 
 Y : 0 to 2 : 19 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Spectrum mode – Bandwidth, Discrete, Continuous
 
-Y : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune frequency
-Y : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Equal temper variation
+YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune frequency
+YL : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Equal temper variation
 Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Set voice base frequency to 440Hz
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Octave
 Y : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
@@ -236,9 +236,9 @@ Y : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Coarse detune
 YL : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Pitch bend adjust
 YL : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bend offset Hz
 
-Y : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 1
-Y : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 2
-Y : 0 to 255 : 50 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 3
+YL : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 1
+YL : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 2
+YL : 0 to 255 : 50 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone parameter 3
 Y : 0 to 6 : 51 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Overtone position – Harmonic, ShiftU, ShiftL, PowerU, PowerL, Sine, Power
 
 YL : 0 to 127 : 64 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Base width
@@ -273,12 +273,12 @@ Oscillators window
  :  :  :  :  : See Note > :  :  :  : Engine is 128 + (0 to 7) for AddSynth voice
  :  :  :  :  :  :  :  :  : Engine is 192 + (0 to 7) for AddSynth voice modulator
  :  :  :  :  :  :  :  :  : Engine is 2 for PadSynth
-Y : -64 to 63 : 0 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Phase randomness
+YL : -64 to 63 : 0 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Phase randomness
 Y : 0 to 4 : 1 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Mag type – Linear, -40dB, -60dB, -80dB, -100dB
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Spectrum adjust
 Y : 0 to 2 : 3 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Harmonic amplitude randomness – None, Power, Sine
 
-Y : -64 to 63 : 16 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function parameter
+YL : -64 to 63 : 16 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function parameter
 Y : 0 to 15 : 17 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function – Sine, Triangle, Pulse, Saw, Power, Gauss, Diode, AbsSine,
  :  :  :  :  :  :  :  :  : PulseSine, StrchSine, Chirp, AbsStrSine, Chebyshev, Sqr, Spike, Circle
 
@@ -288,7 +288,7 @@ YL : 0 to 127 : 20 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base
 Y : 0 to 3 : 21 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Base function modulation type – None, Rev, Sine, Pow
 n : 0/1 : 32 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Autoclear when base function – not used
 Y : 0/1 : 33 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Use as base function – if value is 1 assume autoclear set
-Y : -64 to 63 : 34 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Waveshape parameter
+YL : -64 to 63 : 34 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Waveshape parameter
 Y : 0 to 14 : 35 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Waveshape – None, Atan, Asym1, Pow, Sine Qnts, Zigzag, Lmt, LmtU, LmtL, Ilmt,
  :  :  :  :  :  :  :  :  : Clip, Asym2, Pow2, Sgm
 
@@ -303,12 +303,12 @@ Y : 0 to 3 : 43 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Modulat
 YL : 0 to 127 : 44 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Spectrum adjust parameter
 Y : 0 to 3 : 45 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Spectrum adjust – None, Pow, ThrsD, ThrsU
 
-Y : -64 to 64 : 64 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Harmonic shift
+YL : -64 to 64 : 64 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Harmonic shift
 Y : any : 65 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Clear harmonic shift
 Y : 0/1 : 66 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Apply harmonic shift before waveshape and filter
-Y : 0-100 : 67 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics parameter
-Y : 0 to 255 : 68 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics base frequency
-Y : 0 to 200 : 69 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics power
+YL : 0-100 : 67 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics parameter
+YL : 0 to 255 : 68 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics base frequency
+YL : 0 to 200 : 69 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics power
 Y : 0 to 8 : 70 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Adaptive harmonics type – Off, On, Square, 2xSub, 2xAdd, 3xSub,3xAdd, 4xSub, 4xAdd
 
 Y : any : 96 : 0 to 63 : 0 to 15 : 0, 128+, 192+, 2 : 5 : 255 : 255 : Clear harmonics
@@ -363,11 +363,11 @@ Y : 0 to 8 : 8 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Analog Type – LPF1,
 Y : 0 to 3 : 9 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : StVarF Type – LPF, HPF, BPF, NF
 Y : 0/1 : 10 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Frequency tracking shift - 0 = -100% to + 100%, 1 = 0 to +200%
 Formant editor
-Y : 0 to 127 : 16 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Slowness
-Y : 0 to 127 : 17 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Clearness
-Y : 0 to 127 : 18 : 0 to 63 : 0 to 15 : All : 1 : formant num : vowel num : Frequency
-Y : 0 to 127 : 19 : 0 to 63 : 0 to 15 : All : 1 : formant num : vowel num : Q
-Y : 0 to 127 : 20 : 0 to 63 : 0 to 15 : All : 1 : formant num : vowel num : Amplitude
+YL : 0 to 127 : 16 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Slowness
+YL : 0 to 127 : 17 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Clearness
+YL : 0 to 127 : 18 : 0 to 63 : 0 to 15 : All : 1 : formant num : vowel num : Frequency
+YL : 0 to 127 : 19 : 0 to 63 : 0 to 15 : All : 1 : formant num : vowel num : Q
+YL : 0 to 127 : 20 : 0 to 63 : 0 to 15 : All : 1 : formant num : vowel num : Amplitude
 
 YL : 0 to 127 : 21 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Sequence stretch
 YL : 0 to 127 : 22 : 0 to 63 : 0 to 15 : All : 1 : 255 : 255 : Centre frequency
@@ -419,7 +419,7 @@ System Effect Selector
 n : 0 to 3 : 0 : 241 : 255 : effect number : 255 : 255 : 255 : Was ‘Set effects number’ now does nothing.
 Y : 0 to 8 : 1 : 241 : 255 : effect number : 255 : 255 : 255 : Set effect type
 Sends
-Y : 0 to 127 : 1 to 3 : 241 : 255 : 0 to 2 : 16 : 255 : 255 : To (control) effect, from (engine) effect
+YL : 0 to 127 : 1 to 3 : 241 : 255 : 0 to 2 : 16 : 255 : 255 : To (control) effect, from (engine) effect
 
 Effect Inserts
  :  :  : See note > :  :  :  :  :  : For system effects part number is 241

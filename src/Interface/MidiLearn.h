@@ -75,6 +75,7 @@ class MidiLearn : private MiscFuncs
         void setTransferBlock(CommandBlock *getData, string name);
 
         bool runMidiLearn(float value, unsigned char CC, unsigned char chan, bool in_place);
+        bool writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);

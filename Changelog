@@ -1,5 +1,11 @@
 yoshimi 1.4.1 M
 
+2016-12-8 Will
+* Implemented 'activity' LED for midi-learn.
+* CLI history lists now numbered.
+* Implemented CLI midi-learn load & save.
+* Updated docs.
+
 2016-12-7 Will
 * Added new file to dev_notes: System_Values.txt
 * Added list file leafname to midi-learn window title.

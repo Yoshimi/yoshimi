@@ -73,12 +73,14 @@ string basics[] = {
     "  STate <s>",                  "all system settings and patch sets from named file",
     "  SCale <s>",                  "scale settings from named file",
     "  VEctor [{Channel}n] <s>",    "vector on channel n from named file",
+    "  MLearn <s>",                 "midi learned list from named file",
     "SAve",                         "save various files",
     "  Instrument <s>",             "current part to named file",
     "  Patchset <s>",               "complete set of instruments to named file",
     "  STate <s>",                  "all system settings and patch sets to named file",
     "  SCale <s>",                  "current scale settings to named file",
     "  VEctor <{Channel}n> <s>",    "vector on channel n to named file",
+    "  MLearn <s>",                 "midi learned list to named file",
     "  Setup",                      "dynamic settings",
     "ADD",                          "add paths and files",
     "  Root <s>",                   "root path to list",
@@ -331,8 +333,9 @@ void CmdInterface::historyList(int listnum)
                     msg.push_back("Recent MIDI learned:");
                     break;
             }
-            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
-                msg.push_back("  " + *it);
+            int itemNo = 0;
+            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it, ++ itemNo)
+                msg.push_back(to_string(itemNo) + "  " + *it);
             found = true;
         }
     }
@@ -1939,7 +1942,22 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
     else if (matchnMove(2, point, "load"))
     {
-        if(matchnMove(2, point, "vector"))
+        if(matchnMove(2, point, "mlearn"))
+        {
+            //if (matchnMove(1, point, "@"))
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                if (isdigit(point[0]))
+                    sendDirect(0, 0, 0xf2, 0xd8, string2int(point));
+
+            }
+            else
+                sendDirect(0, 0, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+            reply = done_msg;
+        }
+        else if(matchnMove(2, point, "vector"))
         {
             string loadChan;
             if(matchnMove(1, point, "channel"))
@@ -2019,7 +2037,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
     }
 
     else if (matchnMove(2, point, "save"))
-        if(matchnMove(2, point, "vector"))
+        if(matchnMove(2, point, "mlearn"))
+        {
+            if (point[0] == 0)
+                reply = name_msg;
+            else
+            {
+                sendDirect(0, 0, 0xf5, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+                reply = done_msg;
+            }
+        }
+        else if(matchnMove(2, point, "vector"))
         {
             tmp = chan;
             if(matchnMove(1, point, "channel"))
@@ -2102,7 +2130,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (matchnMove(6, point, "direct"))
     {
         float value;
-        unsigned char type = 0x10; // 0x10 = from CLI
+        unsigned char type = 0;
         if (matchnMove(3, point, "lim"))
             value = FLT_MAX;
         else
@@ -2147,21 +2175,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
             }
         }
-
-        CommandBlock putData;
-        size_t commandSize = sizeof(putData);
-        putData.data.value = value;
-        putData.data.type = type;
-        putData.data.control = control;
-        putData.data.part = part;
-        putData.data.kit = kit;
-        putData.data.engine = engine;
-        putData.data.insert = insert;
-        putData.data.parameter = param;
-        putData.data.par2 = par2;
-        if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
-            jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
-
+        sendDirect(value, type, control, part, kit, engine, insert, param, par2);
         reply = done_msg;
     }
     else
@@ -2172,6 +2186,25 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (reply > done_msg)
         Runtime.Log(replies[reply]);
     return false;
+}
+
+
+int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+{
+    CommandBlock putData;
+    size_t commandSize = sizeof(putData);
+    putData.data.value = value;
+    putData.data.type = type | 0x10; // from command line
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+        jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
+    return 0; // no function for this yet
 }
 
 

@@ -1388,11 +1388,12 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 /* Provides a way of setting/reading dynamic system variables
  * from sources other than the gui
  */
-void SynthEngine::SetSystemValue(int type, int value)
+int SynthEngine::SetSystemValue(int type, int value)
 {
     list<string> msg;
     string label;
     label = "";
+    int pos;
 
     switch (type)
     {
@@ -1480,6 +1481,23 @@ void SynthEngine::SetSystemValue(int type, int value)
             else
                 Runtime.hideErrors = false;
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+
+        case 106:
+        {
+            pos = 0;
+            cout << "value " << int(value) << endl;
+            vector<string> &listtype = *getHistory(6);
+            vector<string>::iterator it = listtype.begin();
+            while (it != listtype.end() && pos != value)
+            {
+                ++ it;
+                ++ pos;
+            }
+            if (it == listtype.end())
+                return -1;
+            else
+                return miscMsgPush(*it);
+        }
 
         case 107: // list midi learned lines
             midilearn.listAll(msg);
@@ -1630,7 +1648,7 @@ void SynthEngine::SetSystemValue(int type, int value)
                 if (Runtime.channelSwitchType == 1)
                 {
                     if (value >= NUM_MIDI_CHANNELS)
-                        return; // out of range
+                        return 1; // out of range
                 }
                 else
                     value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
@@ -1664,7 +1682,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             else if (Runtime.channelSwitchType == 2) // columns
             {
                 if (value >= NUM_MIDI_PARTS)
-                    return; // out of range
+                    return 1; // out of range
                 int chan = value & 0xf;
                 for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
                 {
@@ -1675,10 +1693,11 @@ void SynthEngine::SetSystemValue(int type, int value)
                 }
             }
             else
-                return; // unrecognised
+                return 2; // unrecognised
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             break;
     }
+    return 0;
 }
 
 
