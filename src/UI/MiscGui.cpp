@@ -776,7 +776,7 @@ string convert_value(ValueType type, float val)
             else
                 return(custom_value_units(f+0.5,"cents"));
 
-        case VC_FXChorusVol:
+        case VC_FXdefaultVol:
             f = ((int)val / 127.0f)*1.414f;
             f = 20.0f * logf(f) / logf(10.0f);
             return(custom_value_units(f,"dB",1));
@@ -802,11 +802,11 @@ string convert_value(ValueType type, float val)
             else
                 return(custom_value_units(f+0.05,"ms",1));
 
-        case VC_FXChorusFb:
+        case VC_FXdefaultFb:
             f = (((int)val - 64.0f) / 64.1f) * 100.0f;
             return(custom_value_units(f,"%"));
 
-        case VC_FXChorusStereo:
+        case VC_FXlfoStereo:
             f = ((int)val - 64.0f) / 127.0 * 360.0f;
             if ((int)val == 64)
                 return("equal");
@@ -833,6 +833,37 @@ string convert_value(ValueType type, float val)
                     +custom_value_units(f,"dB",1)+", Wet: -0 dB";
             }
             return(s);
+
+        case VC_FXEQfreq:
+            f = 600.0f * powf(30.0f, ((int)val - 64.0f) / 64.0f);
+            if (f < 100.0f)
+                return(custom_value_units(f,"Hz",1));
+            else if(f < 1000.0f)
+                return(custom_value_units(f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f,"kHz",2));
+
+        case VC_FXEQq:
+            f = powf(30.0f, ((int)val - 64.0f) / 64.0f);
+            if (f<1.0f)
+                s += custom_value_units(f+0.00005f, "", 4);
+            else if (f<10.0f)
+                s += custom_value_units(f+0.005f, "", 2);
+            else
+                s += custom_value_units(f+0.05f, "", 1);
+            return(s);
+
+        case VC_FXEQgain:
+            f = 20.0f - 46.02f*(1.0f - ((int)val / 127.0f));
+            // simplification of
+            // powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
+            // by approximating 0.005^x ~= 10^(-2.301*x)    | log10(200)=2.301
+            // Max. error is below 0.01 which is less than displayed precision
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXEQfilterGain:
+            f = 30.0f * ((int)val - 64.0f) / 64.0f;
+            return(custom_value_units(f,"dB",1));
 
         case VC_plainValue:
             return(custom_value_units(val,""));

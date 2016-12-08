@@ -74,13 +74,17 @@ enum ValueType {
     VC_FXReverbLowPass,
     VC_FXReverbDW,
     VC_FXReverbBandwidth,
-    VC_FXChorusVol,
-    VC_FXChorusFb,
+    VC_FXdefaultVol,
+    VC_FXdefaultFb,
     VC_FXChorusDepth,
     VC_FXChorusDelay,
-    VC_FXChorusStereo,
+    VC_FXlfoStereo,
     VC_FXlfofreq,
-    VC_FXdefaultDW
+    VC_FXdefaultDW,
+    VC_FXEQfreq,
+    VC_FXEQq,
+    VC_FXEQgain,
+    VC_FXEQfilterGain
 };
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
