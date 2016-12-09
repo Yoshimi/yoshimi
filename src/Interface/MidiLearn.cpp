@@ -287,15 +287,16 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     {
         name = (miscMsgPop(par2));
         loadList(name);
+        synth->getRuntime().Log("Loaded " + name);
         updateGui();
         return;
     }
     else if (control == 242)
     {
-        int tmp = synth->SetSystemValue(106, kit);
+        int tmp = synth->SetSystemValue(106, par2);
         if (tmp == -1)
         {
-            synth->getRuntime().Log("No entry for number " + to_string(int(kit)));
+            synth->getRuntime().Log("No entry for number " + to_string(int(par2)));
         }
         else
         {
@@ -303,6 +304,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
             loadList(name);
             synth->getRuntime().Log("Loaded " + name);
             updateGui();
+            return;
         }
     }
     else if (control == 245)

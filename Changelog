@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-12-9 Will
+* Bugfix: CLI load midilearn from list had missing return.
+
 2016-12-8 Will
 * Implemented 'activity' LED for midi-learn.
 * CLI history lists now numbered.

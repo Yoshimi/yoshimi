@@ -1485,7 +1485,6 @@ int SynthEngine::SetSystemValue(int type, int value)
         case 106:
         {
             pos = 0;
-            cout << "value " << int(value) << endl;
             vector<string> &listtype = *getHistory(6);
             vector<string>::iterator it = listtype.begin();
             while (it != listtype.end() && pos != value)

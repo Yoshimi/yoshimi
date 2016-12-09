@@ -1944,13 +1944,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
     {
         if(matchnMove(2, point, "mlearn"))
         {
-            //if (matchnMove(1, point, "@"))
             if (point[0] == '@')
             {
                 point += 1;
                 point = skipSpace(point);
                 if (isdigit(point[0]))
-                    sendDirect(0, 0, 0xf2, 0xd8, string2int(point));
+                    sendDirect(0, 0, 0xf2, 0xd8, 0, 0, 0, 0, string2int(point));
 
             }
             else
