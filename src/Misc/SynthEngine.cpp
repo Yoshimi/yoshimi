@@ -1499,8 +1499,13 @@ int SynthEngine::SetSystemValue(int type, int value)
         }
 
         case 107: // list midi learned lines
-            midilearn.listAll(msg);
-            cliOutput(msg, value);
+            if (value <= 0)
+                midilearn.listLine(-value);
+            else
+            {
+                midilearn.listAll(msg);
+                cliOutput(msg, value);
+            }
             break;
 
         case 108: // list vector parameters

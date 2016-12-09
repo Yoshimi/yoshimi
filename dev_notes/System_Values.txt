@@ -21,6 +21,8 @@ Type:
 
 103     value > 63 = hide non-fatal error reports
 
+106     value = line number to find text of midi-learn history
+
 107     value = list size for list current midi learn list
 
 108     list all vector parameters
@@ -47,5 +49,5 @@ Type:
 
 119     save current settings
 
-128     value = part number for channel switch (depended on switch type)
+128     value = part number for channel switch (dependent on switch type)
 

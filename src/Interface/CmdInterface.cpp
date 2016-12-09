@@ -64,7 +64,7 @@ string basics[] = {
     "  Parts",                      "parts with instruments installed",
     "  Vectors",                    "settings for all enabled vectors",
     "  Settings",                   "dynamic settings",
-    "  MLearn",                     "midi learned controls",
+    "  MLearn [s<n>]",              "midi learned controls ('@' n for full details on one line)",
     "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "  Effects [s]",                "effect types ('all' include preset numbers and names)",
     "LOad",                         "load patch files",
@@ -85,9 +85,10 @@ string basics[] = {
     "ADD",                          "add paths and files",
     "  Root <s>",                   "root path to list",
     "  Bank <s>",                   "bank to current root",
-    "REMove",                       "remove paths and files",
+    "REMove",                       "remove paths, files and entries",
     "  Root <n>",                   "de-list root path ID",
     "  Bank <n>",                   "delete bank ID (and all contents) from current root",
+    "  MLearn <s> [n]",             "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",                   "set or read all main parameters",
     "  SWitcher [{CC}n] [s]",      "define CC n to set single part in group (Row / Column)",
     "  REPorts [s]",                "destination (Gui/Stderr)",
@@ -1774,7 +1775,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->cliOutput(msg, LINES);
         }
         else if (matchnMove(2, point, "mlearn"))
-            synth->SetSystemValue(107, LINES);
+            if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    if (isdigit(point[0]))
+                        synth->SetSystemValue(107, -string2int(point));
+                    else
+                        reply = value_msg;
+                }
+            else
+                synth->SetSystemValue(107, LINES);
         else if (matchnMove(1, point, "history"))
         {
             reply = done_msg;
@@ -1935,8 +1946,33 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else
         {
-            replyString = "remove";
-            reply = what_msg;
+            if (matchnMove(2, point, "mlearn"))
+            {
+                if (matchnMove(3, point, "all"))
+                {
+                    sendDirect(0, 0, 0x60, 0xd8);
+                    reply = done_msg;
+                }
+                else if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    if (isdigit(point[0]))
+                        sendDirect(string2int(point), 0, 8, 0xd8);
+                    else
+                        reply = value_msg;
+                }
+                else
+                {
+                    replyString = "remove";
+                    reply = what_msg;
+                }
+            }
+            else
+            {
+                replyString = "remove";
+                reply = what_msg;
+            }
         }
     }
 

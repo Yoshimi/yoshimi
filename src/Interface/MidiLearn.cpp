@@ -78,7 +78,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
             return false;
         float value = _value;
         int status = foundEntry.status;
-        if (status == 4)
+        if ((status & 4) == 4)
             continue;
 
         int minIn = foundEntry.min_in;
@@ -226,7 +226,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
             block->min_out = it->min_out;
             block->max_out = it->max_out;
             block->data = it->data;
-            if (it->status & 1)
+            if ((it->status & 5) == 1)
                 return -1; // don't allow any more of this CC and channel;
             return newpos;
         }
@@ -234,6 +234,48 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char
         ++ newpos;
     }
     return -2;
+}
+
+
+void MidiLearn::listLine(int lineNo)
+{
+    list<LearnBlock>::iterator it = midi_list.begin();
+    int found = 0;
+    if (midi_list.size() == 0)
+    {
+        synth->getRuntime().Log("No learned lines");
+        return;
+    }
+
+    while (it != midi_list.end() && found < lineNo)
+    {
+        ++ it;
+        ++ found;
+    }
+    if (it == midi_list.end())
+    {
+        synth->getRuntime().Log("No entry for number " + to_string(lineNo));
+        return;
+    }
+    else
+    {
+        int status = it->status;
+        string mute = "";
+        if (status & 4)
+            mute = "  muted";
+        string limit = "";
+        if (status & 2)
+            limit = "  limiting";
+        string block = "";
+        if (status & 1)
+            block = "  blocking";
+        synth->getRuntime().Log("Line " + to_string(lineNo) + mute
+                + "  CC " + to_string((int)it->CC)
+                + "  Chan " + to_string((int)it->chan)
+                + "  Min " + to_string((int)it->min_in)
+                + "  Max " + to_string((int)it->max_in)
+                + limit + block + "  " + it->name);
+    }
 }
 
 
@@ -276,11 +318,14 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+
+    // list controls
     string name;
     if (control == 96)
     {
         midi_list.clear();
         updateGui();
+        synth->getRuntime().Log("List cleared");
         return;
     }
     else if (control == 241)
@@ -314,6 +359,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         return;
     }
 
+    // line controls
     LearnBlock entry;
     int lineNo = 0;
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -324,19 +370,38 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         ++ it;
         ++lineNo;
     }
-    if (lineNo != value)
+
+    if (it == midi_list.end())
+    {
+        synth->getRuntime().Log("Line " + to_string(int(value)) + " not found");
         return;
+    }
+
+    if (insert == 0xff) // don't change
+        insert = it->min_in;
+    if (parameter == 0xff)
+        parameter = it->min_in;
+    if (type == 0xff)
+        type = it->status;
+
     if (control == 8)
     {
         remove(value);
         updateGui();
+        synth->getRuntime().Log("Removed line " + to_string(int(value)));
         return;
     }
 
     if (control == 16)
     {
-        entry.CC = kit;
-        entry.chan = engine;
+        if (kit < 0xff)
+            entry.CC = kit;
+        else
+            entry.CC = it->CC; // don't change
+        if (engine < 0xff)
+            entry.chan = engine;
+        else
+            entry.chan = it->chan;
         entry.min_in = insert;
         entry.max_in = parameter;
         entry.status = type;

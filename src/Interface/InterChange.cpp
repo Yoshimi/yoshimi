@@ -107,7 +107,10 @@ void *InterChange::CLIresolvethread(void)
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(toCLI, point, toread);
-            resolveReplies(&getData);
+            if(getData.data.part == 0xd8) // special midi-learn)
+                synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+            else
+                resolveReplies(&getData);
         }
         usleep(10000);
     }
@@ -1932,12 +1935,8 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromCLI, point, toread);
             if(getData.data.part != 0xd8) // special midi-learn message
-            {
                 commandSend(&getData);
-                returns(&getData);
-            }
-            else
-                synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+            returns(&getData);
         }
 
         size = jack_ringbuffer_read_space(fromGUI);

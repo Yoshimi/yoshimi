@@ -209,7 +209,7 @@ if (compresscheck->value() != 0)
     type |= 2;
 
 if (control == 4)
-    type = 4;
+    type |= 4;
 
 collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
   }
