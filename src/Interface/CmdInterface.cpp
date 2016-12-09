@@ -1642,6 +1642,65 @@ int CmdInterface::commandReadnSet()
         if (!isRead && reply == todo_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 2);
     }
+    else if (matchnMove(2, point, "mlearn"))
+    {
+        if (isRead)
+        {
+            Runtime.Log("Write only");
+            return done_msg;
+        }
+        if (point[0] == '@')
+            point +=1;
+        point = skipSpace(point);
+        if (!isdigit(point[0]))
+            return value_msg;
+        float value = string2int(point);
+        point = skipChars(point);
+        if (matchnMove(2, point, "cc"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0x10, 0xd8, string2int(point));
+            reply = done_msg;
+        }
+        else if (matchnMove(2, point, "channel"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0x10, 0xd8, 0xff, string2int(point));
+            reply = done_msg;
+        }
+        else if (matchnMove(2, point, "minimum"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0, 0xd8, 0xff, 0xff, string2int(point));
+            reply = done_msg;
+        }
+        else if (matchnMove(2, point, "maximum"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0, 0xd8, 0xff, 0xff, 0xff, string2int(point));
+        }
+        else if (matchnMove(2, point, "mute"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+        }
+        else if (matchnMove(2, point, "limit"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+        }
+        else if (matchnMove(2, point, "block"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+        }
+        else
+            reply = opp_msg;
+    }
     else
         reply = opp_msg;
     return reply;

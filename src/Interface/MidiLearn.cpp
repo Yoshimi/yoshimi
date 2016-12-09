@@ -380,7 +380,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (insert == 0xff) // don't change
         insert = it->min_in;
     if (parameter == 0xff)
-        parameter = it->min_in;
+        parameter = it->max_in;
     if (type == 0xff)
         type = it->status;
 
@@ -390,6 +390,14 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         updateGui();
         synth->getRuntime().Log("Removed line " + to_string(int(value)));
         return;
+    }
+
+    if (control == 0)
+    {
+        it->min_in = insert;
+        it->max_in = parameter;
+        it->status = type & 0x1f;
+        updateGui();
     }
 
     if (control == 16)
@@ -437,10 +445,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         updateGui();
         return;
     }
-
-    it->min_in = insert;
-    it->max_in = parameter;
-    it->status = type & 0x1f;
+    // there may be more later!
 }
 
 

@@ -5,6 +5,7 @@ yoshimi 1.4.1 M
 * Implemented CLI midi-learn line & list removal.
 * CLI can now list individual midi learn lines in detail.
 * Sent midi-learn general ops through ring buffer.
+* CLI can now change midi-learn CC, chan, min, max.
 
 2016-12-8 Will
 * Implemented 'activity' LED for midi-learn.
