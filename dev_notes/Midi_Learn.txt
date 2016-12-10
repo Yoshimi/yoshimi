@@ -47,11 +47,13 @@ par2        text message number
 The gui will be restricted to 'viewing groups' of 128 lines, it solves a *lot* of problems!
 
 
-Possible control numbers:
+Control numbers:
 These redraw a line in place.
-0   set status (mute, limit, block)
-1   set min_in
-2   set max-in
+0   block switch
+1   limit switch
+2   mute switch
+5   set min_in
+6   set max-in
 
 These move a line, so a complete redraw is inititalsed.
  8  delete line
@@ -65,9 +67,7 @@ These move a line, so a complete redraw is inititalsed.
 
 96  clear all
 
-The gui now always does a redraw (except 20), but 0 to 2, 24 and 96 don't do a list re-order first.
-
-
+The gui now always does a redraw (except 20), but 0 to 6, 24 and 96 don't do a list re-order first.
 
 
 0xf1 load list

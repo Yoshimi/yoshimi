@@ -158,7 +158,7 @@ else
           code1 {o->hide();}
         }
         Fl_Check_Button compresscheck {
-          callback {send_data(o->value()*2);}
+          callback {send_data(1);}
           tooltip {Limit or compress incomming value} xywh {340 0 15 15} down_box DOWN_BOX value 1 labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
@@ -166,11 +166,11 @@ else
           tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {377 0 20 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Counter minval {
-          callback {send_data(0);}
+          callback {send_data(5);}
           tooltip {Minimum value to pass on} xywh {195 0 55 15} type Simple minimum 0 maximum 127 step 1
         }
         Fl_Counter maxval {
-          callback {send_data(0);}
+          callback {send_data(6);}
           tooltip {Maximim value to pass on} xywh {265 0 55 15} type Simple minimum 0 maximum 127 step 1 value 127
         }
         Fl_Button commandName {
@@ -186,7 +186,7 @@ if (o->value())
     midilearnkititemgroup->deactivate();
 else
     midilearnkititemgroup->activate();
-send_data(o->value()*4);}
+send_data(2);}
         tooltip {Completely ignore this line} xywh {30 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
@@ -208,10 +208,11 @@ if (blockcheck->value() != 0)
 if (compresscheck->value() != 0)
     type |= 2;
 
-if (control == 4)
+if (mutecheck->value() != 0)
     type |= 4;
 
-collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
+collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {selected
+    }
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -236,7 +237,7 @@ end();} {}
   }
 } 
 
-class MidiLearnUI {selected : {private MiscFuncs}
+class MidiLearnUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {

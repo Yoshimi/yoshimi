@@ -1,5 +1,9 @@
 yoshimi 1.4.1 M
 
+2016-12-10 Will
+* Bugfix: CLI was trapping the wrong midi-learn control.
+* CLI now change midi-learn mute, limit, block switches.
+
 2016-12-9 Will
 * Bugfix: CLI load midi-learn from list had missing return.
 * Implemented CLI midi-learn line & list removal.

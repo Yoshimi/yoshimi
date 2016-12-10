@@ -383,6 +383,12 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         parameter = it->max_in;
     if (type == 0xff)
         type = it->status;
+    else
+    {
+        unsigned char mask = 0xff - (1 << control);
+        unsigned char temp = it->status & mask;
+        type = temp | type;
+    }
 
     if (control == 8)
     {
@@ -392,11 +398,11 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         return;
     }
 
-    if (control == 0)
+    if (control < 8)
     {
         it->min_in = insert;
         it->max_in = parameter;
-        it->status = type & 0x1f;
+        it->status = type & 0xf;
         updateGui();
     }
 

@@ -90,11 +90,13 @@ string basics[] = {
     "  Bank <n>",                   "delete bank ID (and all contents) from current root",
     "  MLearn <s> [n]",             "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",                   "set or read all main parameters",
-    "  SWitcher [{CC}n] [s]",      "define CC n to set single part in group (Row / Column)",
+    "  SWitcher [{CC}n] [s]",       "define CC n to set single part in group (Row / Column)",
     "  REPorts [s]",                "destination (Gui/Stderr)",
     "  ",                           "  non-fatal (SHow/Hide)",
     "  Root <n>",                   "current root path to ID",
     "  Bank <n>",                   "current bank to ID",
+    "  MLearn <n> <s> [s]",         "midi learned line n control",
+    "  ",                           "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
     "end"
 };
 
@@ -1656,11 +1658,13 @@ int CmdInterface::commandReadnSet()
             return value_msg;
         float value = string2int(point);
         point = skipChars(point);
+        tmp = 0;
         if (matchnMove(2, point, "cc"))
         {
             if (!isdigit(point[0]))
                 return value_msg;
             sendDirect(value, 0xff, 0x10, 0xd8, string2int(point));
+            Runtime.Log("Lines may be re-ordered");
             reply = done_msg;
         }
         else if (matchnMove(2, point, "channel"))
@@ -1668,6 +1672,7 @@ int CmdInterface::commandReadnSet()
             if (!isdigit(point[0]))
                 return value_msg;
             sendDirect(value, 0xff, 0x10, 0xd8, 0xff, string2int(point));
+            Runtime.Log("Lines may be re-ordered");
             reply = done_msg;
         }
         else if (matchnMove(2, point, "minimum"))
@@ -1685,18 +1690,21 @@ int CmdInterface::commandReadnSet()
         }
         else if (matchnMove(2, point, "mute"))
         {
-            if (!isdigit(point[0]))
-                return value_msg;
+            if (matchnMove(1, point, "enable"))
+                tmp = 4;
+            sendDirect(value, tmp, 2, 0xd8);
         }
         else if (matchnMove(2, point, "limit"))
         {
-            if (!isdigit(point[0]))
-                return value_msg;
+            if (matchnMove(1, point, "enable"))
+                tmp = 2;
+            sendDirect(value, tmp, 1, 0xd8);
         }
         else if (matchnMove(2, point, "block"))
         {
-            if (!isdigit(point[0]))
-                return value_msg;
+            if (matchnMove(1, point, "enable"))
+                tmp = 1;
+            sendDirect(value, tmp, 0, 0xd8);
         }
         else
             reply = opp_msg;
