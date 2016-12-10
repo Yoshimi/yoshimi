@@ -331,8 +331,8 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     else if (control == 241)
     {
         name = (miscMsgPop(par2));
-        loadList(name);
-        synth->getRuntime().Log("Loaded " + name);
+        if (loadList(name))
+            synth->getRuntime().Log("Loaded " + name);
         updateGui();
         return;
     }
@@ -346,8 +346,8 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         else
         {
             name = miscMsgPop(tmp);
-            loadList(name);
-            synth->getRuntime().Log("Loaded " + name);
+            if (loadList(name))
+                synth->getRuntime().Log("Loaded " + name);
             updateGui();
             return;
         }
@@ -355,7 +355,8 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     else if (control == 245)
     {
         name = (miscMsgPop(par2));
-        saveList(name);
+        if (saveList(name))
+            synth->getRuntime().Log("Saved " + name);
         return;
     }
 
@@ -748,6 +749,4 @@ bool MidiLearn::loadList(string name)
     synth->addHistory(file, 6);
     delete xml;
     return true;
-
-
 }
