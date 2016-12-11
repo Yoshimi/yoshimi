@@ -447,8 +447,8 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(((int)val - 64.0f) / 127.0f
                                       * 360.0f, "°"));
         case VC_EnvelopeDT:
-            // unfortunately converttofree() is not called in time for us to be able
-            // to use env->getdt(), so we have to compute ourselves
+            // unfortunately converttofree() is not called in time for us to
+            // be able to use env->getdt(), so we have to compute ourselves
             f = (powf(2.0f, ((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
             if (f<100.0f)
                 return(custom_value_units(f,"ms",1));
@@ -479,8 +479,8 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(f,"cents"));
 
         case VC_EnvelopeAmpSusVal:
-            return(custom_value_units((1.0f - (int)val / 127.0f) * MIN_ENVELOPE_DB,
-                                  "dB", 1));
+            return(custom_value_units((1.0f - (int)val / 127.0f)
+                                      * MIN_ENVELOPE_DB, "dB", 1));
 
         case VC_FilterFreq0: // AnalogFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
@@ -867,6 +867,28 @@ string convert_value(ValueType type, float val)
 
         case VC_plainValue:
             return(custom_value_units(val,""));
+
+        case VC_FXDistVol:
+            f = -40.0f * (1.0f - ((int)val / 127.0f)) + 15.05f;
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXDistLevel:
+            f = 60.0f * (int)val / 127.0f - 40.0f;
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXDistLowPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+            if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
+
+        case VC_FXDistHighPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(25000.0f)) + 20.0f;
+            if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
     }
     // avoid compiler warning
     return(custom_value_units(val,""));

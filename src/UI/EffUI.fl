@@ -1504,6 +1504,7 @@ else
 send_data(0, o->value(), 6, 0xc8);}
         tooltip {Effect Volume} xywh {10 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXDistVol);}
         class WidgetPDial
       }
       Fl_Dial distp1 {
@@ -1521,6 +1522,7 @@ else
 send_data(butt, o->value(), 6, 0xc8);}
         xywh {45 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_PanningStd);}
         class WidgetPDial
       }
       Fl_Dial distp2 {
@@ -1538,6 +1540,7 @@ else
 send_data(butt, o->value(), 6, 0xc8);}
         tooltip {L/R Mix} xywh {80 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial distp3 {
@@ -1555,6 +1558,7 @@ else
 send_data(butt, o->value(), 6, 0xc8);}
         tooltip {Input Amplification} xywh {120 40 30 30} box ROUND_UP_BOX labelsize 11 when 4 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_percent127);}
         class WidgetPDial
       }
       Fl_Dial distp4 {
@@ -1572,6 +1576,7 @@ else
 send_data(butt, o->value(), 6, 0xc8);}
         tooltip {Output Amplification} xywh {155 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXDistLevel);}
         class WidgetPDial
       }
       Fl_Dial distp7 {
@@ -1589,6 +1594,7 @@ else
 send_data(butt, o->value(), 6, 0xc8);}
         tooltip {Low Pass Filter} xywh {285 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXDistLowPass);}
         class WidgetPDial
       }
       Fl_Dial distp8 {
@@ -1606,6 +1612,7 @@ else
 send_data(butt, o->value(), 6, 0xc8);}
         tooltip {High Pass Filter} xywh {320 40 30 30} box ROUND_UP_BOX labelsize 11 maximum 127
         code0 {o->init(-1);}
+        code1 {o->setValueType(VC_FXDistHighPass);}
         class WidgetPDial
       }
       Fl_Choice distp5 {
@@ -2482,7 +2489,10 @@ refresh(eff, npart, neff);} {}
                 distp->value(eff->getpreset());
                 distp0->value(eff->geteffectpar(0));
                 if (eff->insertion != 0)
+                {
                     distp0->label("D/W");
+                    distp0->setValueType(VC_FXdefaultDW);
+                }
                 distp1->value(eff->geteffectpar(1));
                 distp2->value(eff->geteffectpar(2));
                 distp3->value(eff->geteffectpar(3));

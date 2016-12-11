@@ -84,7 +84,11 @@ enum ValueType {
     VC_FXEQfreq,
     VC_FXEQq,
     VC_FXEQgain,
-    VC_FXEQfilterGain
+    VC_FXEQfilterGain,
+    VC_FXDistVol,
+    VC_FXDistLevel,
+    VC_FXDistLowPass,
+    VC_FXDistHighPass
 };
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char parameter = 0xff, unsigned char par2 = 0xff);
