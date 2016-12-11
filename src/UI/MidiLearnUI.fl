@@ -59,11 +59,11 @@ class MidiLearnKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnkititem {
-      xywh {40 553 740 30} type Double hide
+      xywh {40 553 825 30} type Double hide
       class Fl_Group
     } {
       Fl_Group midilearnkititemgroup {
-        xywh {49 -4 678 23} box FLAT_BOX
+        xywh {49 -4 776 23} box FLAT_BOX
       } {
         Fl_Counter CCcounter {
           callback {send_data(16);}
@@ -176,7 +176,7 @@ else
         Fl_Button commandName {
           label text
           callback {send_data(8);}
-          tooltip {To delete, hold CTRL and click here.} xywh {401 0 315 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
+          tooltip {To delete, hold CTRL and click here.} xywh {401 0 399 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
         }
       }
       Fl_Check_Button mutecheck {
@@ -211,8 +211,7 @@ if (compresscheck->value() != 0)
 if (mutecheck->value() != 0)
     type |= 4;
 
-collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {selected
-    }
+collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -244,18 +243,18 @@ class MidiLearnUI {: {private MiscFuncs}
       label {Midi Learn}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {49 118 755 285} type Double hide
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {32 243 835 285} type Double hide
       code0 {;}
     } {
       Fl_Button {} {
         label Close
-        callback {midilearnwindow->hide();}
-        xywh {684 262 63 20} box THIN_UP_BOX
+        callback {midilearnwindow->hide();} selected
+        xywh {746 262 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
 CTRL-Right click on knobs/sliders to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 750 245} type VERTICAL box DOWN_FRAME
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 835 245} type VERTICAL box DOWN_FRAME
       } {}
       Fl_Box none {
         label {No Entries}
@@ -333,6 +332,20 @@ synth->getGuiMaster()->paramsui->Show(6);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
     }
+    Fl_Window message {
+      xywh {4 20 290 75} type Double labelsize 12 hide
+      code0 {o->position(0, 0);}
+    } {
+      Fl_Box words {
+        label {?}
+        xywh {5 11 280 59} color 55 selection_color 55 labelfont 1 align 149
+      }
+      Fl_Button {} {
+        label Close
+        callback {message->hide();}
+        xywh {211 47 70 20}
+      }
+    }
   }
   Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
@@ -343,7 +356,8 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
     int value = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
-    unsigned char engine = getData->data.engine;;
+    unsigned char engine = getData->data.engine;
+    unsigned char par2 = getData->data.par2;
 
     switch(control)
     {
@@ -354,6 +368,10 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             break;
         case 20: // not using this yet
             break;
+        case 21:
+            cout << "here" << endl;
+            words->copy_label(miscMsgPop(par2).c_str());
+            message->show();
         case 24:
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
             {
@@ -425,6 +443,7 @@ if (empty)
     none->show();
     clear->deactivate();
     save->deactivate();
+    message->hide();
 }
 kitlist->redraw();
 kitlist->show();} {}

@@ -112,7 +112,7 @@ void *InterChange::CLIresolvethread(void)
             else
                 resolveReplies(&getData);
         }
-        usleep(10000);
+        usleep(500);
     }
     return NULL;
 }

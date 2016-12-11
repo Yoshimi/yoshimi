@@ -29,12 +29,13 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    int typetop = type & 0xc0;
     if ( part == 0xf1 && insert == 16)
         type |= 8; // this is a hack :(
 
     if (part != 0xd8)
     {
-        int typetop = type & 0xc0;
+
         if ((type & 3) == 3)
         { // value type is now irrelevant
             if(Fl::event_state(FL_CTRL) != 0)
@@ -44,6 +45,8 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 // identifying this for button 3 as MIDI learn
                 else
                 {
+                    synth->getGuiMaster()->midilearnui->words->copy_label("Can't midi-learn this control");
+                    synth->getGuiMaster()->midilearnui->message->show();
                     synth->getRuntime().Log("Can't MIDI-learn this control");
                     /* can't use fl_alert here.
                      * For some reason it goes into a loop on spin boxes
@@ -61,7 +64,9 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
         else if((type & 7) > 2)
             type = 1 | typetop;
             // change scroll wheel to button 1
+
     }
+    type |= (typetop & 0x80);
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;

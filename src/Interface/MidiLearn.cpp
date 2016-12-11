@@ -57,6 +57,7 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
         return; // don't spam ourselves!
     learning = true;
     synth->getRuntime().Log("Learning");
+    updateGui(1);
 }
 
 
@@ -477,7 +478,7 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
       * when we call for the limits of this control. Should be a better
       * way to do this!
       */
-    entry.data.type = learnTransferBlock.data.type;
+    entry.data.type = learnTransferBlock.data.type & 0x80;
     entry.data.control = learnTransferBlock.data.control;
     entry.data.part = learnTransferBlock.data.part;
     entry.data.kit = learnTransferBlock.data.kit;
@@ -524,7 +525,7 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
 }
 
 
-void MidiLearn::updateGui()
+void MidiLearn::updateGui(int opp)
 {
     CommandBlock putData;
     unsigned int writesize = sizeof(putData);
@@ -535,8 +536,16 @@ void MidiLearn::updateGui()
     unsigned int tries;
 
     putData.data.part = 0xd8;
-    putData.data.control = 96;
-    putData.data.par2 = 0xff;
+    if (opp == 1)
+    {
+        putData.data.control = 21;
+        putData.data.par2 = miscMsgPush("Learning " + learnedName);
+    }
+    else
+    {
+        putData.data.control = 96;
+        putData.data.par2 = 0xff;
+    }
     putData.data.value = 0;
     towrite = writesize;
     wrote = 0;
@@ -558,6 +567,8 @@ void MidiLearn::updateGui()
     else
         synth->getRuntime().Log("toGui buffer full!", 2);
 
+    if (opp == 1) // sending back learn type to gui
+        return;
 
     int lineNo = 0;
     list<LearnBlock>::iterator it;

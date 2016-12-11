@@ -1,5 +1,8 @@
 yoshimi 1.4.1 M
 
+2016-12-11 Will
+* Implemented message window for midi learning.
+
 2016-12-10 Will
 * Bugfix: CLI was trapping the wrong midi-learn control.
 * CLI now change midi-learn mute, limit, block switches.
