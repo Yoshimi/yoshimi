@@ -1951,12 +1951,8 @@ void InterChange::mediate()
             getData.data.type = getData.data.type & 0xbf;
 
             if(getData.data.part != 0xd8) // special midi-learn message
-            {
                 commandSend(&getData);
-                returns(&getData);
-            }
-            else
-                synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
+            returns(&getData);
         }
 
         size = jack_ringbuffer_read_space(fromMIDI);
