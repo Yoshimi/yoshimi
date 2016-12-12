@@ -69,6 +69,7 @@ send_data(neff, o->value(), 0xc8);}
         code0 {o->size(25,25);}
         code1 {o->value(synth->Psysefxvol[neff][npart]);}
         code2 {o->copy_label(asString(neff + 1).c_str());}
+        code3 {o->setValueType(VC_FXSysSend);}
         class WidgetPDial
       }
     }

@@ -395,8 +395,14 @@ string convert_value(ValueType type, float val)
         case VC_percent127:
             return(custom_value_units(val / 127.0f * 100.0f+0.05f,"%",1));
 
+        case VC_percent128:
+            return(custom_value_units(val / 128.0f * 100.0f+0.05f,"%",1));
+
         case VC_percent255:
             return(custom_value_units(val / 255.0f * 100.0f+0.05f,"%",1));
+
+        case VC_percent64_127:
+            return(custom_value_units((val-64) / 63.0f * 100.0f+0.05f,"%",1));
 
         case VC_GlobalFineDetune:
             return(custom_value_units((val-64),"cents",1));
@@ -441,8 +447,8 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(((int)val - 64.0f) / 127.0f
                                       * 360.0f, "°"));
         case VC_EnvelopeDT:
-            // unfortunately converttofree() is not called in time for us to be able
-            // to use env->getdt(), so we have to compute ourselves
+            // unfortunately converttofree() is not called in time for us to
+            // be able to use env->getdt(), so we have to compute ourselves
             f = (powf(2.0f, ((int)val) / 127.0f * 12.0f) - 1.0f) * 10.0f;
             if (f<100.0f)
                 return(custom_value_units(f,"ms",1));
@@ -473,8 +479,8 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(f,"cents"));
 
         case VC_EnvelopeAmpSusVal:
-            return(custom_value_units((1.0f - (int)val / 127.0f) * MIN_ENVELOPE_DB,
-                                  "dB", 1));
+            return(custom_value_units((1.0f - (int)val / 127.0f)
+                                      * MIN_ENVELOPE_DB, "dB", 1));
 
         case VC_FilterFreq0: // AnalogFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
@@ -638,8 +644,251 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(val,""));
             break;
 
+        case VC_FXSysSend:
+            if((int)val==0)
+                return("-inf dB");
+            else
+                return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
+
+        case VC_FXEchoVol:
+            // initial volume is set in Echo::setvolume like this
+            f = powf(0.01f, (1.0f - (int)val / 127.0f)) * 4.0f;
+            // in Echo::out this is multiplied by a panning value
+            // which is 0.707 for centered and by 2.0
+            // in EffectMgr::out it is multiplied by 2.0 once more
+            // so in the end we get
+            f *= 2.828f; // 0.707 * 4
+            f = 20.0f * logf(f) / logf(10.0f);
+            // Here we are finally
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXEchoDelay:
+            // delay is 0 .. 1.5 sec
+            f = (int)val / 127.0f * 1.5f;
+            return(custom_value_units(f+0.005f,"s",2));
+
+        case VC_FXEchoLRdel:
+            s.clear();
+            // ToDo: It would be nice to calculate the ratio between left
+            // and right. We would need to know the delay time however...
+            f = (powf(2.0f, fabsf((int)val-64.0f)/64.0f*9.0f)-1.0); // ms
+            if ((int)val < 64)
+            {
+                s+="left +"+custom_value_units(f+0.05,"ms",1)+" / ";
+                s+=custom_value_units(-f-0.05,"ms",1)+" right";
+            }
+            else
+            {
+                s+="left "+custom_value_units(-f-0.05,"ms",1)+" / ";
+                s+="+"+custom_value_units(f+0.05,"ms",1)+" right";
+            }
+            return(s);
+
+        case VC_FXEchoDW:
+            s.clear();
+            f = (int)val / 127.0f;
+            if(f < 0.5f)
+            {
+                f = f * 2.0f;
+                f *= f;  // for Reverb and Echo
+                f *= 1.414; // see VC_FXEchoVol for 0.707 * 2.0
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: -0 dB, Wet: "
+                    +custom_value_units(f,"dB",1);
+            }
+            else
+            {
+                f = (1.0f - f) * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: "
+                    +custom_value_units(f,"dB",1)+", Wet: +3.0 dB";
+            }
+            return(s);
+
+        case VC_FXReverbVol:
+            f = powf(0.01f, (1.0f - (int)val / 127.0f)) * 4.0f;
+            f = 20.0f * logf(f) / logf(10.0f);
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXReverbTime:
+            f = powf(60.0f, (int)val / 127.0f) - 0.97f; // s
+            if (f<10.0f)
+                return(custom_value_units(f+0.005,"s",2));
+            else
+                return(custom_value_units(f+0.05,"s",1));
+
+        case VC_FXReverbIDelay:
+            f = powf(50.0f * (int)val / 127.0f, 2.0f) - 1.0f; // ms
+            if ((int)f > 0)
+            {
+                if (f<1000.0f)
+                    return(custom_value_units(f+0.5f,"ms"));
+                else
+                    return(custom_value_units(f/1000.0+0.005f,"s",2));
+            }
+            else
+                return("0 ms");
+
+        case VC_FXReverbHighPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(10000.0f)) + 20.0f;
+            if ((int)val == 0)
+                return("no high pass");
+            else if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
+
+        case VC_FXReverbLowPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+            if ((int)val == 127)
+                return("no low pass");
+            else if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
+
+        case VC_FXReverbDW:
+            s.clear();
+            f = (int)val / 127.0f;
+            if(f < 0.5f)
+            {
+                f = f * 2.0f;
+                f *= f;  // for Reverb and Echo
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: -0 dB, Wet: "
+                    +custom_value_units(f,"dB",1);
+            }
+            else
+            {
+                f = (1.0f - f) * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: "
+                    +custom_value_units(f,"dB",1)+", Wet: -0 dB";
+            }
+            return(s);
+
+        case VC_FXReverbBandwidth:
+            f = powf((int)val / 127.0f, 2.0f) * 200.0f; // cents
+            if(f<1.0f)
+                return(custom_value_units(f+0.005,"cents",2));
+            else if(f<100.0f)
+                return(custom_value_units(f+0.05,"cents",1));
+            else
+                return(custom_value_units(f+0.5,"cents"));
+
+        case VC_FXdefaultVol:
+            f = ((int)val / 127.0f)*1.414f;
+            f = 20.0f * logf(f) / logf(10.0f);
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXlfofreq:
+            f = (powf(2.0f, (int)val / 127.0f * 10.0f) - 1.0f) * 0.03f;
+            if(f<10.0f)
+                return(custom_value_units(f,"Hz", 3));
+            else
+                return(custom_value_units(f,"Hz", 2));
+
+        case VC_FXChorusDepth:
+            f = powf(8.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
+            if(f<10.0f)
+                return(custom_value_units(f+0.005,"ms",2));
+            else
+                return(custom_value_units(f+0.05,"ms",1));
+
+        case VC_FXChorusDelay:
+            f = powf(10.0f, ((int)val / 127.0f) * 2.0f) -1.0f; //ms
+            if(f<1.0f)
+                return(custom_value_units(f+0.005,"ms",2));
+            else
+                return(custom_value_units(f+0.05,"ms",1));
+
+        case VC_FXdefaultFb:
+            f = (((int)val - 64.0f) / 64.1f) * 100.0f;
+            return(custom_value_units(f,"%"));
+
+        case VC_FXlfoStereo:
+            f = ((int)val - 64.0f) / 127.0 * 360.0f;
+            if ((int)val == 64)
+                return("equal");
+            else if (f < 0.0f)
+                return("left +"+custom_value_units(-f,"°"));
+            else
+                return("right +"+custom_value_units(f,"°"));
+
+        case VC_FXdefaultDW:
+            s.clear();
+            f = (int)val / 127.0f;
+            if(f < 0.5f)
+            {
+                f = f * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: -0 dB, Wet: "
+                    +custom_value_units(f,"dB",1);
+            }
+            else
+            {
+                f = (1.0f - f) * 2.0f;
+                f = 20.0f * logf(f) / logf(10.0f);
+                s += "Dry: "
+                    +custom_value_units(f,"dB",1)+", Wet: -0 dB";
+            }
+            return(s);
+
+        case VC_FXEQfreq:
+            f = 600.0f * powf(30.0f, ((int)val - 64.0f) / 64.0f);
+            if (f < 100.0f)
+                return(custom_value_units(f,"Hz",1));
+            else if(f < 1000.0f)
+                return(custom_value_units(f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f,"kHz",2));
+
+        case VC_FXEQq:
+            f = powf(30.0f, ((int)val - 64.0f) / 64.0f);
+            if (f<1.0f)
+                s += custom_value_units(f+0.00005f, "", 4);
+            else if (f<10.0f)
+                s += custom_value_units(f+0.005f, "", 2);
+            else
+                s += custom_value_units(f+0.05f, "", 1);
+            return(s);
+
+        case VC_FXEQgain:
+            f = 20.0f - 46.02f*(1.0f - ((int)val / 127.0f));
+            // simplification of
+            // powf(0.005f, (1.0f - Pvolume / 127.0f)) * 10.0f;
+            // by approximating 0.005^x ~= 10^(-2.301*x)    | log10(200)=2.301
+            // Max. error is below 0.01 which is less than displayed precision
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXEQfilterGain:
+            f = 30.0f * ((int)val - 64.0f) / 64.0f;
+            return(custom_value_units(f,"dB",1));
+
         case VC_plainValue:
             return(custom_value_units(val,""));
+
+        case VC_FXDistVol:
+            f = -40.0f * (1.0f - ((int)val / 127.0f)) + 15.05f;
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXDistLevel:
+            f = 60.0f * (int)val / 127.0f - 40.0f;
+            return(custom_value_units(f,"dB",1));
+
+        case VC_FXDistLowPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(25000.0f)) + 40.0f;
+            if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
+
+        case VC_FXDistHighPass:
+            f = expf(powf((int)val / 127.0f, 0.5f) * logf(25000.0f)) + 20.0f;
+            if (f<1000.0f)
+                return(custom_value_units(f+0.5f,"Hz"));
+            else
+                return(custom_value_units(f/1000.0f+0.005f,"kHz",2));
     }
     // avoid compiler warning
     return(custom_value_units(val,""));
