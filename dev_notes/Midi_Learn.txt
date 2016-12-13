@@ -24,7 +24,7 @@ Status bits:
 
 When sending internal control messages to the GUI (instead of passing on midi actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
-This will be used for updating the list and and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
+This will be used for updating the list and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
 
 Name strings are passed across using the simple message system. These are not editable in the GUI.
 

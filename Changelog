@@ -1,6 +1,13 @@
-yoshimi 1.5.0 rc1
+yoshimi 1.5.0 rc3
 
-2016-12-5 Jörn
+2016-12-13 Will
+* Midi learn can now be cancelled.
+* Set Yoshimi (instance) in midi-learn messahge windows.
+* Corrected tooltip for oscillator harmonic randomness.
+* More doc updates.
+* Set version to 1.5.0 rc3
+
+2016-12-12 Jörn
 * More tooltips updates.
   Distortion
   Phaser
@@ -8,6 +15,7 @@ yoshimi 1.5.0 rc1
   Reverb
   Echo
   System sends
+* Set version to 1.5.0 rc2
 
 2016-12-12 Will
 * Doc updates.

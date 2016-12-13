@@ -236,19 +236,18 @@ end();} {}
   }
 } 
 
-class MidiLearnUI {: {private MiscFuncs}
+class MidiLearnUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
       label {Midi Learn}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {32 243 835 285} type Double hide
-      code0 {;}
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {37 379 835 285} type Double hide
     } {
       Fl_Button {} {
         label Close
-        callback {midilearnwindow->hide();} selected
+        callback {midilearnwindow->hide();}
         xywh {746 262 63 20} box THIN_UP_BOX
       }
       Fl_Scroll kitlist {
@@ -333,17 +332,24 @@ synth->getGuiMaster()->paramsui->Show(6);}
       }
     }
     Fl_Window message {
-      xywh {4 20 290 75} type Double labelsize 12 hide
+      xywh {4 20 290 85} type Double labelsize 12 hide
       code0 {o->position(0, 0);}
+      code1 {o->copy_label(synth->makeUniqueName("").c_str());}
     } {
       Fl_Box words {
         label {?}
-        xywh {5 11 280 59} color 55 selection_color 55 labelfont 1 align 149
+        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
       }
       Fl_Button {} {
         label Close
         callback {message->hide();}
-        xywh {211 47 70 20}
+        xywh {211 60 70 20}
+      }
+      Fl_Button cancel {
+        label Cancel
+        callback {send_data(255, 0, 3);
+o->hide();}
+        xywh {130 60 70 20} hide
       }
     }
   }
@@ -369,8 +375,8 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
         case 20: // not using this yet
             break;
         case 21:
-            cout << "here" << endl;
             words->copy_label(miscMsgPop(par2).c_str());
+            cancel->show();
             message->show();
         case 24:
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
@@ -385,6 +391,10 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
         case 96:
             clearAll(value == 0);
             break;
+        case 255:
+            cancel->hide();
+            words->copy_label("Learn cancelled");
+            message->show();
     }
     Fl::check();} {}
   }
@@ -443,6 +453,7 @@ if (empty)
     none->show();
     clear->deactivate();
     save->deactivate();
+    cancel->hide();
     message->hide();
 }
 kitlist->redraw();

@@ -57,7 +57,7 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
         return; // don't spam ourselves!
     learning = true;
     synth->getRuntime().Log("Learning");
-    updateGui(1);
+    updateGui(21);
 }
 
 
@@ -117,7 +117,8 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
 
         CommandBlock putData;
         putData.data.value = value;
-        putData.data.type = 0x48; // write command from midi
+        putData.data.type = 0x48 | (foundEntry.data.type & 0x80);
+        // write command from midi with original integer / float type
         putData.data.control = foundEntry.data.control;
         putData.data.part = foundEntry.data.part;
         putData.data.kit = foundEntry.data.kit;
@@ -329,7 +330,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         synth->getRuntime().Log("List cleared");
         return;
     }
-    else if (control == 241)
+    if (control == 241)
     {
         name = (miscMsgPop(par2));
         if (loadList(name))
@@ -337,7 +338,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         updateGui();
         return;
     }
-    else if (control == 242)
+    if (control == 242)
     {
         int tmp = synth->SetSystemValue(106, par2);
         if (tmp == -1)
@@ -350,14 +351,21 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
             if (loadList(name))
                 synth->getRuntime().Log("Loaded " + name);
             updateGui();
-            return;
         }
+        return;
     }
-    else if (control == 245)
+    if (control == 245)
     {
         name = (miscMsgPop(par2));
         if (saveList(name))
             synth->getRuntime().Log("Saved " + name);
+        return;
+    }
+    if (control == 255)
+    {
+        learning = false;
+        synth->getRuntime().Log("Midi Learn cancelled");
+        updateGui(control);
         return;
     }
 
@@ -536,10 +544,15 @@ void MidiLearn::updateGui(int opp)
     unsigned int tries;
 
     putData.data.part = 0xd8;
-    if (opp == 1)
+    if (opp == 21)
     {
         putData.data.control = 21;
         putData.data.par2 = miscMsgPush("Learning " + learnedName);
+    }
+    else if (opp == 255)
+    {
+        putData.data.control = 255;
+        putData.data.par2 = 0xff;
     }
     else
     {
@@ -567,7 +580,7 @@ void MidiLearn::updateGui(int opp)
     else
         synth->getRuntime().Log("toGui buffer full!", 2);
 
-    if (opp == 1) // sending back learn type to gui
+    if (opp >= 1) // sending back message gui
         return;
 
     int lineNo = 0;

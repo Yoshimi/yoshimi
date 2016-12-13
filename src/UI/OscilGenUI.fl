@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original, modified December 2016
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include "ResonanceUI.h"} {public local
@@ -474,7 +474,7 @@ else
   }
 } 
 
-class OscilEditor {: {public PresetsUI_}
+class OscilEditor {selected : {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window osceditUI {
@@ -553,7 +553,7 @@ send_data (3, o->value(), 0xc0);}
           Fl_Dial hrnddial {
             callback {oscil->Pamprandpower=(int) o->value();
 send_data (2, o->value(), 0xc8);}
-            tooltip {Oscillator's spectrum adjust parameter} xywh {338 280 18 18} maximum 127 step 1
+            tooltip {Oscillator's harmonic randomness parameter} xywh {338 280 18 18} maximum 127 step 1
             code0 {o->init(64);}
             class WidgetPDial
           }
