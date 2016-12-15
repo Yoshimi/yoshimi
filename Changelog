@@ -1,8 +1,13 @@
 yoshimi 1.5.0 rc3
 
+2016-12-15 Will
+* Changed virtual keyboard key map labels and tooltips.
+* More doc updates.
+* Set version to 1.5.0 rc4
+
 2016-12-13 Will
 * Midi learn can now be cancelled.
-* Set Yoshimi (instance) in midi-learn messahge windows.
+* Set Yoshimi (instance) in midi-learn message windows.
 * Corrected tooltip for oscillator harmonic randomness.
 * More doc updates.
 * Set version to 1.5.0 rc3

@@ -64,7 +64,7 @@ parameter = subtype associated with some inserts.
 par2 = an offset for some parameters.
 
 
-A variation of the above is when you set flt_max as the value. This will be interpeted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them in the form:
+A variation of the above is when you set flt_max as the value. This will be interpeted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them as short integers in the form:
 limits.min
 limits.max
 limits.def
@@ -74,5 +74,5 @@ min = 0
 max = 127
 def = 0
 
-def will return the default * 100. This is so that fractional values can be resolved. 0.5 comes up quite often.
+def will return the default * 100. This is so that fractional values can be resolved. 0.5 comes up quite often. No default values are very large, but may be negative.
 
