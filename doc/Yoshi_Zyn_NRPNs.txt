@@ -1,4 +1,4 @@
-Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX. As with all Yoshimi's NRPNs, the controls can be sent on any midi channel.
+Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX. As with all Yoshimi's NRPNs, the controls can be sent on any MIDI channel.
 
 The parameters are:
 

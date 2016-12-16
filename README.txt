@@ -14,7 +14,7 @@ Filter tracking could never quite reach 100% so if using it to get 'notes' from 
 
 Many of the controls now have active tooltips that show the current value when you hover over them. Also, many have real-world terms. dB, Hz, mS etc.
 
-Finally, we have a very full featured. It can be reached from the 'Yoshimi' drop-down menu, and tooltips will remind you of how it is used.
+Finally, we have very full featured MIDI learn capability. It can be reached from the 'Yoshimi' drop-down menu, and tooltips will remind you of how it is used.
 
 
 V 1.4.1

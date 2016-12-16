@@ -59,87 +59,91 @@ class MidiLearnKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnkititem {
-      xywh {40 553 825 30} type Double hide
+      xywh {66 719 825 20} type Double hide
       class Fl_Group
     } {
       Fl_Group midilearnkititemgroup {
         xywh {49 -4 776 23} box FLAT_BOX
       } {
-        Fl_Counter CCcounter {
+        Fl_Spinner CCcounter {
           callback {send_data(16);}
-          tooltip {Continuous Controller to recognise} xywh {55 0 55 15} type Simple minimum 0 maximum 119 step 1 value 14
+          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 119 value 14 textsize 12
+        }
+        Fl_Button {} {
+          callback {// does nothing - hides spinner arrows}
+          xywh {109 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Choice channelchoice {
           callback {send_data(16);}
-          tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX
+          tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
             label 1
-            xywh {0 0 26 15} labelfont 1 labelsize 11
+            xywh {0 0 26 15} labelsize 11
           }
           MenuItem {} {
             label 2
-            xywh {10 10 26 15} labelfont 1 labelsize 11
+            xywh {10 10 26 15} labelsize 11
           }
           MenuItem {} {
             label 3
-            xywh {20 20 26 15} labelfont 1 labelsize 11
+            xywh {20 20 26 15} labelsize 11
           }
           MenuItem {} {
             label 4
-            xywh {30 30 26 15} labelfont 1 labelsize 11
+            xywh {30 30 26 15} labelsize 11
           }
           MenuItem {} {
             label 5
-            xywh {40 40 26 15} labelfont 1 labelsize 11
+            xywh {40 40 26 15} labelsize 11
           }
           MenuItem {} {
             label 6
-            xywh {50 50 26 15} labelfont 1 labelsize 11
+            xywh {50 50 26 15} labelsize 11
           }
           MenuItem {} {
             label 7
-            xywh {60 60 26 15} labelfont 1 labelsize 11
+            xywh {60 60 26 15} labelsize 11
           }
           MenuItem {} {
             label 8
-            xywh {70 70 26 15} labelfont 1 labelsize 11
+            xywh {70 70 26 15} labelsize 11
           }
           MenuItem {} {
             label 9
-            xywh {80 80 26 15} labelfont 1 labelsize 11
+            xywh {80 80 26 15} labelsize 11
           }
           MenuItem {} {
             label 10
-            xywh {90 90 26 15} labelfont 1 labelsize 11
+            xywh {90 90 26 15} labelsize 11
           }
           MenuItem {} {
             label 11
-            xywh {100 100 26 15} labelfont 1 labelsize 11
+            xywh {100 100 26 15} labelsize 11
           }
           MenuItem {} {
             label 12
-            xywh {110 110 26 15} labelfont 1 labelsize 11
+            xywh {110 110 26 15} labelsize 11
           }
           MenuItem {} {
             label 13
-            xywh {120 120 26 15} labelfont 1 labelsize 11
+            xywh {120 120 26 15} labelsize 11
           }
           MenuItem {} {
             label 14
-            xywh {130 130 26 15} labelfont 1 labelsize 11
+            xywh {130 130 26 15} labelsize 11
           }
           MenuItem {} {
             label 15
-            xywh {140 140 26 15} labelfont 1 labelsize 11
+            xywh {140 140 26 15} labelsize 11
           }
           MenuItem {} {
             label 16
-            xywh {150 150 26 15} labelfont 1 labelsize 11
+            xywh {150 150 26 15} labelsize 11
           }
           MenuItem {} {
             label All
-            xywh {160 160 26 15} labelfont 1 labelsize 11
+            xywh {160 160 26 15} labelsize 11
           }
         }
         Fl_Button activity {
@@ -153,30 +157,38 @@ else
     o->value(1);
     o->hide();
 }}
-          xywh {180 0 8 15} color 63
+          xywh {185 0 8 15} color 63
           code0 {o->value(1);}
           code1 {o->hide();}
         }
         Fl_Check_Button compresscheck {
           callback {send_data(1);}
-          tooltip {Limit or compress incomming value} xywh {340 0 15 15} down_box DOWN_BOX value 1 labelfont 1 align 4
+          tooltip {Limit or compress incoming value} xywh {320 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
           callback {send_data(0);}
-          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {377 0 20 15} down_box DOWN_BOX labelfont 1 align 4
+          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {357 0 20 15} down_box DOWN_BOX labelfont 1 align 4
         }
-        Fl_Counter minval {
+        Fl_Spinner minval {
           callback {send_data(5);}
-          tooltip {Minimum value to pass on} xywh {195 0 55 15} type Simple minimum 0 maximum 127 step 1
+          tooltip {Minimum value to pass on} xywh {205 0 43 15} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
         }
-        Fl_Counter maxval {
+        Fl_Button {} {
+          callback {// does nothing - hides spinner arrows}
+          xywh {239 0 15 16} box FLAT_BOX down_box FLAT_BOX
+        }
+        Fl_Spinner maxval {
           callback {send_data(6);}
-          tooltip {Maximim value to pass on} xywh {265 0 55 15} type Simple minimum 0 maximum 127 step 1 value 127
+          tooltip {Maximim value to pass on} xywh {264 0 43 15} labelsize 12 minimum 0 maximum 127 value 127 textsize 12
+        }
+        Fl_Button {} {
+          callback {// does nothing - hides spinner arrows}
+          xywh {298 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Button commandName {
           label text
           callback {send_data(8);}
-          tooltip {To delete, hold CTRL and click here.} xywh {401 0 399 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
+          tooltip {To delete, hold CTRL and click here.} xywh {395 0 400 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
         }
       }
       Fl_Check_Button mutecheck {
@@ -187,7 +199,7 @@ if (o->value())
 else
     midilearnkititemgroup->activate();
 send_data(2);}
-        tooltip {Completely ignore this line} xywh {30 0 15 15} down_box DOWN_BOX labelfont 1 align 4
+        tooltip {Completely ignore this line} xywh {39 0 19 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
@@ -243,17 +255,12 @@ class MidiLearnUI {selected : {private MiscFuncs}
       label {Midi Learn}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {37 379 835 285} type Double hide
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {5 626 820 285} type Double hide
     } {
-      Fl_Button {} {
-        label Close
-        callback {midilearnwindow->hide();}
-        xywh {746 262 63 20} box THIN_UP_BOX
-      }
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
 CTRL-Right click on knobs/sliders to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 835 245} type VERTICAL box DOWN_FRAME
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 818 245} type VERTICAL box DOWN_FRAME
       } {}
       Fl_Box none {
         label {No Entries}
@@ -265,7 +272,7 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
       Fl_Box {} {
         label CC
-        xywh {65 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {75 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label Chan
@@ -273,23 +280,23 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
       Fl_Box {} {
         label Block
-        xywh {371 0 50 15} labelfont 1 labelsize 11 align 18
+        xywh {355 0 50 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label Limit
-        xywh {328 0 48 15} labelfont 1 labelsize 11 align 18
+        xywh {310 0 48 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label {Control Function}
-        xywh {525 0 131 15} labelfont 1 labelsize 11 align 18
+        xywh {530 0 130 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label Min
-        xywh {205 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {210 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label Max
-        xywh {275 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {265 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Button load {
         label Load
@@ -329,6 +336,11 @@ synth->getGuiMaster()->paramsui->Show(6);}
         tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
         code0 {vector<string> &listType = *synth->getHistory(6);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
+      }
+      Fl_Button {} {
+        label Close
+        callback {midilearnwindow->hide();}
+        xywh {730 262 63 20} box THIN_UP_BOX
       }
     }
     Fl_Window message {
@@ -406,7 +418,7 @@ string name = miscMsgPop(getData->data.par2);
 none->hide();
 clear->activate();
 save->activate();
-midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,740,20,"");
+midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,818,20,"");
 midilearnkititem[lineNo]->init(synth, lineNo);
 kitlist->add(midilearnkititem[lineNo]);
 
@@ -469,7 +481,7 @@ setWindowTitle(findleafname(file));} {}
     code {//
 if (name > "")
     name = " - " + name;
-midilearnwindow->copy_label(synth->makeUniqueName("Midi Learn" + name).c_str());} {}
+midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());} {}
   }
   decl {int lastkititem;} {public local
   }

@@ -16,7 +16,7 @@ Another benefit of doing this is that ALSA will now use Yoshimi's internal buffe
 
 You can also set the sample rate - bear in mind that not all cards can use all of these but 44100 and 48000 are almost always available.
 
-If you set a Midi Device as well (such as a keyboard) Yoshimi will try to find and connect to this at startup.
+If you set a MIDI device as well (such as a keyboard) Yoshimi will try to find and connect to this at startup.
 
-To find your midi devices try:
+To find your MIDI devices try:
 grep Client /proc/asound/seq/clients

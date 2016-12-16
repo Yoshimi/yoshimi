@@ -6,7 +6,7 @@ You will also get a message in the console window (or CLI).
 
 After that if you were learning, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control. The pop window will also disappear. and the console message will be "Learned" and a line underneath with exactly what contorol was caught.
 
-If you now use the 'Yoshimi' drop-down menu and click on 'Midi Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
+If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
 
 There is also an 'activity' LED that flickers when the associated CC/channel is recieved.
 

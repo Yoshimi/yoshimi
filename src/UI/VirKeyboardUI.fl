@@ -475,7 +475,7 @@ virkeyboardwindow->hide();}
         class WidgetPDial
       }
       Fl_Spinner midichannel {
-        label {Midi Channel}
+        label {MIDI Channel}
         callback {//
             relaseallkeys();
             virkeys->midich = lrint(o->value()) - 1;

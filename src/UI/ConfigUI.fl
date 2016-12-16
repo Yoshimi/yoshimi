@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified August 2016
+This file is derivative of ZynAddSubFX original code, modified December 2016
 } {in_source in_header
 } 
 
@@ -346,7 +346,7 @@ if (synth->getRuntime().showCLI != o->value())
           xywh {5 25 385 277} labelsize 12 hide
         } {
           Fl_Input jackSource {
-            label {Jack Midi Source}
+            label {Jack MIDI Source}
             callback {//
     string tmp = string(o->value());
     if (synth->getRuntime().jackMidiDevice != tmp)
@@ -413,7 +413,7 @@ if (o->value() != tmp)
           xywh {5 25 384 277} labelsize 12 hide
         } {
           Fl_Input alsaSource {
-            label {Alsa Midi Source}
+            label {Alsa MIDI Source}
             callback {//
     string tmp = string(o->value());
     if (synth->getRuntime().alsaMidiDevice != tmp)

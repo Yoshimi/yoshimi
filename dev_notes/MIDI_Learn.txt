@@ -22,7 +22,7 @@ Status bits:
 2   mute
 
 
-When sending internal control messages to the GUI (instead of passing on midi actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
+When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
 This will be used for updating the list and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
 
@@ -35,7 +35,7 @@ Normally the data will be sent as a complete instruction for one line.
 
 data structure:
 value       line number (used as an integer)
-type        status - this is unique to midilearn
+type        status - this is unique to MIDI learn
 control     normal use
 part        216
 kit         CC

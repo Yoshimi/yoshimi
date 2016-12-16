@@ -310,7 +310,7 @@ mainCreateNewInstance(forceId);}
             tooltip {View, change, save settings} xywh {25 25 100 20} labelsize 12
           }
           MenuItem {} {
-            label {&Midi Learn}
+            label {&MIDI Learn...}
             callback {midilearnui->Show();}
             xywh {0 0 34 20} labelsize 12
           }

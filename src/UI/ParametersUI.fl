@@ -69,7 +69,7 @@ class ParametersUI {selected
               	CloseRecent->hide();
                     	Loading->show();
             synth->addHistory(fle, 4);
-        case 2:	
+        case 2:
             synth->getGuiMaster()->do_load_master(false, fle.c_str());
             break;
     }
@@ -108,7 +108,7 @@ make_window();} {}
             Recent->label("Recent Scales");
             break;
         case 6:
-            Recent->label("Recent Midi Learn Lists");
+            Recent->label("Recent MIDI Learn Lists");
             break;
         case 5:
             Recent->label("Recent Vectors");
