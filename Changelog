@@ -1,4 +1,9 @@
-yoshimi 1.5.0 rc5
+yoshimi 1.5.0
+
+2016-12-17
+* Added warning for undefined kits in Midi learn.
+* Finalised all code and docs for release.
+* Set version 1.5.0
 
 2016-12-16
 * Changed Midi learn spinboxes to number entries.

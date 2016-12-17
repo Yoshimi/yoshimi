@@ -10,7 +10,7 @@ Channel switching has now matured to a 'Solo' feature accessed from the mixer pa
 
 Another new feature is one that has been asked for several times - a crossfade for overlapping note ranges in instrument kits.
 
-Filter tracking could never quite reach 100% so if using it to get 'notes' from noise it would go slightly out of tune. Well, now we have an extra check box that changes its range so that instead of -100% : 98.4% it will track 0% : 198.4%
+Filter tracking could never quite reach 100% so if using it to get 'notes' from noise it would go slightly out of tune. Well, now we have an extra check box that changes its range so that instead of -100% to 98.4% it will track 0% to 198.4%
 
 Many of the controls now have active tooltips that show the current value when you hover over them. Also, many have real-world terms. dB, Hz, mS etc.
 

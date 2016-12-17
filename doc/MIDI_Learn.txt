@@ -1,10 +1,10 @@
 This now completely implemented.
 
-To learn, hold CTRL while right-clicking on any GUI control. There will be a popup window detailing the control you selected, or a message say it's not learnable.
+To learn, hold CTRL while right-clicking on any GUI control. There will be a pop-up window detailing the control you selected, or a message saying it's not learnable.
 
 You will also get a message in the console window (or CLI).
 
-After that if you were learning, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control. The pop window will also disappear. and the console message will be "Learned" and a line underneath with exactly what contorol was caught.
+After that, if you were learning, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control. The pop-up window will also disappear. and the console message will be "Learned" and a line underneath with exactly what contorol was caught.
 
 If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
 

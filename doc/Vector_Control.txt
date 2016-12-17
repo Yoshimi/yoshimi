@@ -173,7 +173,7 @@ The file extension we use is .xvy but this will be added automatically.
 ###################################
 
 
-As of Yoshimi V 1.4.0 there is also GUI access to vector control. This has its opwn button at the top of the main window, which opens a new 'Vectors' window.
+As of Yoshimi V 1.4.0 there is also GUI access to vector control. This has its own button at the top of the main window, which opens a new 'Vectors' window.
 
 Initially most of this is deactivated, but the base channel can already be set to the incoming channel (and part 'column') you want to respond to.
 
