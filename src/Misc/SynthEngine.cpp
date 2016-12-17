@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, last modified March 2016
+    This file is derivative of original ZynAddSubFX code, last modified November 2016
 */
 
 #include<stdio.h>
@@ -74,6 +74,7 @@ static vector<string> ParamsHistory;
 static vector<string> ScaleHistory;
 static vector<string> StateHistory;
 static vector<string> VectorHistory;
+static vector<string> MidiLearnHistory;
 
 
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
@@ -81,6 +82,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     isLV2Plugin(_isLV2Plugin),
     bank(this),
     interchange(this),
+    midilearn(this),
     Runtime(this, argc, argv),
     presetsstore(this),
     shutup(false),
@@ -177,7 +179,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade;
     int found = 0;
-    if (!interchange.sendbuf)
+    if (!interchange.fromCLI)
+        goto bail_out;
+    if (!interchange.fromGUI)
         goto bail_out;
 
     if (!pthread_mutex_init(&processMutex, NULL))
@@ -435,6 +439,10 @@ void *SynthEngine::RBPthread(void)
                     case 5: // file name from miscMsg
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
+
+                    case 10: // global fine detune
+                        microtonal.Pglobalfinedetune = block.data[1];
+                        setAllPartMaps();
                 }
             }
             else
@@ -474,6 +482,7 @@ void SynthEngine::defaults(void)
             setPsysefxsend(nefx, nefxto, 0);
     }
     microtonal.defaults();
+    setAllPartMaps();
     Runtime.currentPart = 0;
     Runtime.channelSwitchType = 0;
     Runtime.channelSwitchCC = 128;
@@ -486,9 +495,25 @@ void SynthEngine::defaults(void)
 }
 
 
+void SynthEngine::setPartMap(int npart)
+{
+    part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
+}
+
+
+void SynthEngine::setAllPartMaps(void)
+{
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+        part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
+}
+
 // Note On Messages (velocity == 0 => NoteOff)
 void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char velocity)
 {
+#ifdef REPORT_NOTEON
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+#endif
     if (!velocity)
         this->NoteOff(chan, note);
     else if (!isMuted())
@@ -506,6 +531,19 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
                     VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
             }
         }
+#ifdef REPORT_NOTEON
+    if (Runtime.showTimes)
+    {
+        gettimeofday(&tv2, NULL);
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+            }
+        int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+        Runtime.Log("Note time " + to_string(actual) + "uS");
+    }
+#endif
 }
 
 
@@ -695,19 +733,27 @@ void SynthEngine::SetEffects(unsigned char category, unsigned char command, unsi
 void SynthEngine::SetBankRoot(int rootnum)
 {
     string name;
-    int currentRoot;
+    int foundRoot;
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
+    int originalRoot = bank.getCurrentRootID();
+    int originalBank = bank.getCurrentBankID();
     if (bank.setCurrentRootID(rootnum))
     {
+        foundRoot = bank.getCurrentRootID();
+        if (foundRoot != rootnum)
+        { // abort and recover old settings
+            bank.setCurrentRootID(originalRoot);
+            bank.setCurrentBankID(originalBank);
+            foundRoot = originalRoot;
+        }
         if (Runtime.showGui)
         {
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateBankRootDirs, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RescanForBanks, 0);
         }
-        currentRoot = bank.getCurrentRootID();
-        name = asString(currentRoot) + " " + bank.getRootPath(currentRoot);
-        if (rootnum != currentRoot)
+        name = asString(foundRoot) + " " + bank.getRootPath(foundRoot);
+        if (rootnum != foundRoot)
             name = "Cant find ID " + asString(rootnum) + ". Current root is " + name;
         else
         {
@@ -777,15 +823,6 @@ void SynthEngine::SetBank(int banknum)
 int SynthEngine::ReadBank(void)
 {
     return bank.currentBankID;
-}
-
-
-void SynthEngine::commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char insertParam)
-{
-    // while testing, this simply sends everything to Interchange
-
-    interchange.commandFetch(value, type, control, part, kit, engine, insert, insertParam);
-    return;
 }
 
 
@@ -945,6 +982,7 @@ void SynthEngine::SetPartShift(unsigned char npart, unsigned char shift)
     else if(shift > MAX_KEY_SHIFT + 64)
         shift = MAX_KEY_SHIFT + 64;
     part[npart]->Pkeyshift = shift;
+    setPartMap(npart);
     Runtime.Log("Part " +asString((int) npart) + "  key shift set to " + asString(shift - 64));
     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart, 0);
 }
@@ -1042,17 +1080,22 @@ void SynthEngine::cliOutput(list<string>& msg_buf, unsigned int lines)
 void SynthEngine::ListPaths(list<string>& msg_buf)
 {
     string label;
-    int idx;
+    string prefix;
+    unsigned int idx;
     msg_buf.push_back("Root Paths");
 
     for (idx = 0; idx < MAX_BANK_ROOT_DIRS; ++ idx)
     {
         if (bank.roots.count(idx) > 0 && !bank.roots [idx].path.empty())
         {
+            if (idx == bank.getCurrentRootID())
+                prefix = " *";
+            else
+                prefix = "  ";
             label = bank.roots [idx].path;
             if (label.at(label.size() - 1) == '/')
                 label = label.substr(0, label.size() - 1);
-            msg_buf.push_back("    ID " + asString(idx) + "     " + label);
+            msg_buf.push_back(prefix + " ID " + asString(idx) + "     " + label);
         }
     }
 }
@@ -1061,7 +1104,7 @@ void SynthEngine::ListPaths(list<string>& msg_buf)
 void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
 {
     string label;
-
+    string prefix;
     if (rootNum < 0 || rootNum >= MAX_BANK_ROOT_DIRS)
         rootNum = bank.currentRootID;
     if (bank.roots.count(rootNum) > 0
@@ -1072,11 +1115,17 @@ void SynthEngine::ListBanks(int rootNum, list<string>& msg_buf)
             label = label.substr(0, label.size() - 1);
         msg_buf.push_back("Banks in Root ID " + asString(rootNum));
         msg_buf.push_back("    " + label);
-        for (int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
+        for (unsigned int idx = 0; idx < MAX_BANKS_IN_ROOT; ++ idx)
         {
             if (bank.roots [rootNum].banks.count(idx))
-                msg_buf.push_back("    ID " + asString(idx) + "    "
+            {
+                if (idx == bank.getCurrentBankID())
+                    prefix = " *";
+                else
+                    prefix = "  ";
+                msg_buf.push_back(prefix + " ID " + asString(idx) + "    "
                                 + bank.roots [rootNum].banks [idx].dirname);
+            }
         }
     }
     else
@@ -1336,14 +1385,15 @@ void SynthEngine::ListSettings(list<string>& msg_buf)
 }
 
 
-/* Provides a way of setting dynamic system variables
+/* Provides a way of setting/reading dynamic system variables
  * from sources other than the gui
  */
-void SynthEngine::SetSystemValue(int type, int value)
+int SynthEngine::SetSystemValue(int type, int value)
 {
     list<string> msg;
     string label;
     label = "";
+    int pos;
 
     switch (type)
     {
@@ -1353,6 +1403,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             else if (value < MIN_KEY_SHIFT + 64) // 3 octaves is enough for anybody :)
                 value = MIN_KEY_SHIFT + 64;
             setPkeyshift(value);
+            setAllPartMaps();
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             Runtime.Log("Master key shift set to " + asString(value - 64));
             break;
@@ -1411,9 +1462,16 @@ void SynthEngine::SetSystemValue(int type, int value)
 
         case 102:
             if (value > 63)
+            {
                 Runtime.showTimes = true;
+                label = "Enabled";
+            }
             else
+            {
                 Runtime.showTimes = false;
+                label = "Disabled";
+            }
+            Runtime.Log("Part load time " + label);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
             break;
 
@@ -1423,6 +1481,32 @@ void SynthEngine::SetSystemValue(int type, int value)
             else
                 Runtime.hideErrors = false;
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 5);
+
+        case 106:
+        {
+            pos = 0;
+            vector<string> &listtype = *getHistory(6);
+            vector<string>::iterator it = listtype.begin();
+            while (it != listtype.end() && pos != value)
+            {
+                ++ it;
+                ++ pos;
+            }
+            if (it == listtype.end())
+                return -1;
+            else
+                return miscMsgPush(*it);
+        }
+
+        case 107: // list midi learned lines
+            if (value <= 0)
+                midilearn.listLine(-value);
+            else
+            {
+                midilearn.listAll(msg);
+                cliOutput(msg, value);
+            }
+            break;
 
         case 108: // list vector parameters
             ListVectors(msg);
@@ -1563,10 +1647,16 @@ void SynthEngine::SetSystemValue(int type, int value)
             break;
 
         case 128: // channel switch
-            if (Runtime.channelSwitchType == 1) // single row
+            if (Runtime.channelSwitchType == 1 || Runtime.channelSwitchType == 3) // single row / loop
             {
-                if (value >= NUM_MIDI_CHANNELS)
-                    return; // out of range
+                if (Runtime.channelSwitchType == 1)
+                {
+                    if (value >= NUM_MIDI_CHANNELS)
+                        return 1; // out of range
+                }
+                else
+                    value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
+
                 Runtime.channelSwitchValue = value;
                 for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
                 {
@@ -1596,7 +1686,7 @@ void SynthEngine::SetSystemValue(int type, int value)
             else if (Runtime.channelSwitchType == 2) // columns
             {
                 if (value >= NUM_MIDI_PARTS)
-                    return; // out of range
+                    return 1; // out of range
                 int chan = value & 0xf;
                 for (int i = chan; i < NUM_MIDI_PARTS; i += NUM_MIDI_CHANNELS)
                 {
@@ -1607,10 +1697,11 @@ void SynthEngine::SetSystemValue(int type, int value)
                 }
             }
             else
-                return; // unrecognised
+                return 2; // unrecognised
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
             break;
     }
+    return 0;
 }
 
 
@@ -1861,14 +1952,21 @@ void SynthEngine::partonoffWrite(int npart, int what)
     if (npart >= Runtime.NumAvailableParts)
         return;
 
-    if (what)
+    unsigned char tmp = part[npart]->Penabled;
+    if (what == 3)
+        what = (tmp!= 0); // recover inhibited state
+
+    if (what == 1) // always enable
     {
         VUpeak.values.parts[npart] = 1e-9f;
         part[npart]->Penabled = 1;
     }
-    else
-    {   // disabled part
-        part[npart]->Penabled = 0;
+    else if ((what & 1) == 0)
+    {
+        if (what == 0) // always disable
+            part[npart]->Penabled = 0;
+        else if (tmp & 1)
+            part[npart]->Penabled = 2; // just inhibit
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
             if (Pinsparts[nefx] == npart)
@@ -1880,7 +1978,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
 
 bool SynthEngine::partonoffRead(int npart)
 {
-    return (part[npart]->Penabled != 0);
+    return (part[npart]->Penabled == 1);
 }
 
 
@@ -1901,10 +1999,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         p_buffersize_f = p_buffersize;
     }
 
-    while (jack_ringbuffer_read_space(interchange.sendbuf) >= sizeof(interchange.commandSize))
-    {
-        interchange.mediate();
-    }
+    interchange.mediate();
 
     int npart;
 
@@ -2375,7 +2470,9 @@ void SynthEngine::addHistory(string name, int group)
 
 vector<string> * SynthEngine::getHistory(int group)
 {
-    if (group == 5)
+    if (group == 6)
+        return &MidiLearnHistory;
+    else if (group == 5)
         return &VectorHistory;
     else if (group == 4)
         return &StateHistory;
@@ -2410,7 +2507,7 @@ bool SynthEngine::loadHistory()
     string filetype;
     string type;
     string extension;
-    for (int count = 2; count < 6; ++count)
+    for (int count = 2; count < 7; ++count)
     {
         switch (count)
         {
@@ -2428,6 +2525,10 @@ bool SynthEngine::loadHistory()
                 break;
             case 5:
                 type = "XMZ_VECTOR";
+                extension = "xvy_file";
+                break;
+            case 6:
+                type = "XMZ_MIDILEARN";
                 extension = "xvy_file";
                 break;
         }
@@ -2471,7 +2572,7 @@ bool SynthEngine::saveHistory()
         int x;
         string type;
         string extension;
-        for (int count = 2; count < 6; ++count)
+        for (int count = 2; count < 7; ++count)
         {
             switch (count)
             {
@@ -2489,6 +2590,10 @@ bool SynthEngine::saveHistory()
                     break;
                 case 5:
                     type = "XMZ_VECTOR";
+                    extension = "xvy_file";
+                    break;
+                case 6:
+                    type = "XMZ_MIDILEARN";
                     extension = "xvy_file";
                     break;
             }
@@ -2766,6 +2871,8 @@ void SynthEngine::add2XML(XMLwrapper *xml)
     xml->addpar("current_midi_parts", Runtime.NumAvailableParts);
     xml->addpar("volume", Pvolume);
     xml->addpar("key_shift", Pkeyshift);
+    xml->addpar("channel_switch_type", Runtime.channelSwitchType);
+    xml->addpar("channel_switch_CC", Runtime.channelSwitchCC);
 
     xml->beginbranch("MICROTONAL");
     microtonal.add2XML(xml);
@@ -2896,6 +3003,8 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 2);
+    Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
 
     part[0]->Penabled = 0;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)

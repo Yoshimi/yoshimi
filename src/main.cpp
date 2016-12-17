@@ -25,9 +25,11 @@
 using namespace std;
 
 #include "Misc/Config.h"
+#include "Misc/Splash.h"
 #include "Misc/SynthEngine.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
+#include "UI/MiscGui.h"
 #include "Synth/BodyDisposal.h"
 #include <map>
 #include <list>
@@ -40,7 +42,6 @@ using namespace std;
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Shared_Image.H>
 #include <FL/Fl_PNG_Image.H>
-#include "yoshimi-logo.h"
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -108,7 +109,7 @@ static void *mainGuiThread(void *arg)
         FILE *f = fopen(fname, "wb");
         if (f)
         {
-            fwrite(yoshimi_logo_png, sizeof(yoshimi_logo_png), 1, f);
+            fwrite(splashPngData, splashPngLength, 1, f);
             fclose(f);
         }
     }
@@ -116,11 +117,9 @@ static void *mainGuiThread(void *arg)
     if (fname)
     unlink(fname);
 #else
-    Fl_PNG_Image pix("yoshimi_logo_png", yoshimi_logo_png, sizeof(yoshimi_logo_png));
+    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
 #endif
 
-    const int splashWidth = 411;
-    const int splashHeight = 311;
     const int textHeight = 20;
     const int textBorder = 15;
 
@@ -134,6 +133,8 @@ static void *mainGuiThread(void *arg)
     boxLb.align(FL_ALIGN_CENTER);
     boxLb.labelsize(textHeight);
     boxLb.labeltype(FL_NORMAL_LABEL);
+    //boxLb.labelcolor(FL_WHITE);
+    //boxLb.labelfont(FL_HELVETICA | FL_BOLD);
     boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
     string startup = YOSHIMI_VERSION;
     startup = "Yoshimi " + startup + " is starting";
@@ -180,6 +181,21 @@ static void *mainGuiThread(void *arg)
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
             _synth->getRuntime().deadObjects->disposeBodies();
+
+            /*
+             * Setting pad parameters can take very many seconds.
+             * This dodge is to force it to diable the part then
+             * make the change take place in a low priority thread.
+             * It needs to be improved!
+             */
+            unsigned int padApply = _synth->getRuntime().padApply;
+            if (padApply < 0xffff)
+            {
+                _synth->interchange.setpadparams(padApply);
+                _synth->getRuntime().padApply = 0xffff;
+            }
+            // end of pad dodge
+
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_synth->getRuntime().configChanged)

@@ -45,4 +45,4 @@ For more details of bank changes see Banks.txt
 
 Instruments inside banks should always have four digits followed by a hyphen. Otherwise the results can be rather uinpredicatable.
 
-Further details on NRPNs in Using_NRPNs.txt
+Further details on NRPNs are in Using_NRPNs.txt

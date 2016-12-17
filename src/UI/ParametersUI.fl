@@ -8,7 +8,7 @@ Copyright 2014 - 2016, Will Godfrey
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
 Public License as published by the Free Software Foundation, either
-version 3 of the License, or (at your option) any later version.
+version 2 of the License, or (at your option) any later version.
 
 yoshimi is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified September 2014
+Modified December 2016
 } {in_source in_header
 } 
 
@@ -47,39 +47,33 @@ class ParametersUI {selected
     } {
       Fl_Browser BrowseRecent {
         callback {//
-    if (o->value() > 0)
+    if (o->value() == 0)
+        return;
+    CloseRecent->hide();
+    Loading->show();
+    Fl::check();
+    vector<string> listType = *synth->getHistory(H_type);
+    string fle = listType.at(listType.size() - o->value());
+    switch(H_type)
     {
-        vector<string> listType = *synth->getHistory(H_type);
-        string fle;
-        switch (Fl::event_button())
-        {
-            case FL_LEFT_MOUSE:
-            {
-                CloseRecent->hide();
-                fle = listType.at(listType.size() - o->value());
-                switch(H_type)
-                {
-                    case 3:
-                        synth->getGuiMaster()->do_load_scale(fle);
-                        break;
-                    case 5:
-                    	synth->getGuiMaster()->vectorui->loadVector(fle);
-                        break;
-                    case 4:
-                        synth->addHistory(fle, 4);
-                    case 2:
-                    default:
-                        synth->getGuiMaster()->do_load_master(false, fle.c_str());
-                        break;
-                }
-                CloseRecent->show();
-                Recent->hide();
-                break;
-            }
-            default:
-                break;
-        }
-    }}
+        case 3:
+            synth->getGuiMaster()->do_load_scale(fle);
+            break;
+        case 6:
+            synth->getGuiMaster()->midilearnui->loadMidi(fle);
+            break;
+        case 5:
+            synth->getGuiMaster()->vectorui->loadVector(fle);
+            break;
+        case 4:
+              	CloseRecent->hide();
+                    	Loading->show();
+            synth->addHistory(fle, 4);
+        case 2:
+            synth->getGuiMaster()->do_load_master(false, fle.c_str());
+            break;
+    }
+    Recent->hide();}
         xywh {0 0 250 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
         code0 {const int colwidths[] = { 150, 330, 0 };
           o->column_widths(colwidths);
@@ -113,6 +107,9 @@ make_window();} {}
         case 3:
             Recent->label("Recent Scales");
             break;
+        case 6:
+            Recent->label("Recent MIDI Learn Lists");
+            break;
         case 5:
             Recent->label("Recent Vectors");
             break;
@@ -143,7 +140,9 @@ make_window();} {}
     }
 
     BrowseRecent->set_changed();
-    Recent->show();} {}
+    Recent->show();
+    Loading->hide();
+    CloseRecent->show();} {}
   }
   Function {Hide()} {} {
     code {Recent->hide();} {}

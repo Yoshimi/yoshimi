@@ -1,0 +1,13 @@
+This is not intended to be used within the realtime threads as both push and pop use mutex. However, they are very fast so you'd probably get away with it :)
+
+There are just two calls:
+
+int miscMsgPush( string )
+
+string miscMsgPop( int )
+
+These calls are accessible to all parts of Yoshimi and provide a simple asynchonous means of passing text between threads and functions via just the integer ID.
+
+Pushing a message will return the first available ID and Popping a message makes its ID available again.
+
+There is a maximum of 255 possible entries at any one time, but it's unlikely that limit will ever be reached.

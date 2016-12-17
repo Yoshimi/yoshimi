@@ -1,4 +1,4 @@
-Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX. As with all Yoshimi's NRPNs, the controls can be sent on any midi channel.
+Yoshimi now implements System and Insertion effects control in a manner compatible with ZynAddSubFX. As with all Yoshimi's NRPNs, the controls can be sent on any MIDI channel.
 
 The parameters are:
 
@@ -6,20 +6,17 @@ The parameters are:
 
 - NRPN LSB sets the number of the effect (first effect is 0)
 
-- Data entry MSB sets the parameter number of effect to change(see below)
-  A yoshimi extension is listed after the parameter descriptions.
-  
+- Data entry MSB sets the parameter number of effect to change(see below). A yoshimi extension is listed after the parameter descriptions.
+
 - Data entry LSB sets the parameter of the effect
 
-If the effect/parameter doesn't exists or is set to none, then the NRPN is
-ignored.
+If the effect/parameter doesn't exists or is set to none, then the NRPN is ignored.
 
 A full example is at the end of this file.
 
 
 
-WARNING: Changing of some of the effect parameters produces clicks when sounds
-passes thru these effects. Some parameters produce clicks when they are changed very fast.
+WARNING: Changing of some of the effect parameters produces clicks when sounds passes thru these effects. Some parameters produce clicks when they are changed very fast.
 
 Here are the effects parameter number (for Data entry coarse).
 The parameters that produces clicks have (AC) after their entry (Always Clicks).
@@ -113,11 +110,7 @@ EQ
 ~~
  0 - Gain (FC)
 
-All other settings of the EQ are shown in a different way.
-The N represent the band ("B." setting in the UI) and the first band is 0
-(and not 1), as it is shown in the UI.
-Change the "N" with the band you like.
-If you want to change a band that doesn't exist, the NRPN will be ignored.
+All other settings of the EQ are shown in a different way. The N represent the band ("B." setting in the UI) and the first band is 0 (and not 1), as it is shown in the UI. Change the "N" with the band you like. If you want to change a band that doesn't exist, the NRPN will be ignored.
 
 10+N*5 - Change the mode of the filter [0..9] (AC)
 11+N*5 - Band's filter frequency

@@ -1,0 +1,18 @@
+
+In 'Edit->Kit Edit' the part's kit edit 'Mode' menu has an extra entry called 'Crossfade'.
+
+When this is set, you get multi behaviour with overlapping key ranges but with a very smooth cross fade between sequential *pairs* of kit items. This follows the pattern 1+2, 3+4, etc. Each pair will not affect any other kit items.
+
+It doesn't matter which of the pair has the lower range, as long as there is a range overlap. The code is semi intelligent, and any that are not paired will exhibit normal multi behaviour. i.e. if one item in a pair is not enabled then the other one will exhibit normal multi behaviour and will not fade at all.
+
+An interesting effect is that if one of the pair is enabled, but muted or has no engines enabled, the other one still fades through the overlap range, so you can get sounds fading out (or fading in) with increasing pitch!
+
+If you want a fade to come in then go out again you need two sets of pairs, with a hard non-overlapped point in the middle.
+
+item 1 - min 0 max 60
+item 2 - min 40 max 80 (fades up)
+
+item 3 - min 81 max 100 (fades down)
+item 4 - min 90 max 127
+
+The feature is backward compatible, in that older versions of Yoshimi will see it as an ordinary multi - it uses a new variable stored in the instrument file that is simply ignored by earlier versions.

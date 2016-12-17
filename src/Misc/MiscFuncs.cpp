@@ -358,69 +358,77 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
 
 
 /*
- * These two functions provide a transparent text messaging system.
+ * These functions provide a transparent text messaging system.
  * Calling functions only need to recognise integers and strings.
- *
- * Push extends the list if there are no empty slots. It will also
- * block while writing, but should be very quick.
  *
  * Pop is destructive. No two functions should ever have been given
  * the same 'live' ID, but if they do, the second one will get an
  * empty string.
  *
+ * Both will block, but should be very quick;
+ *
  * Normally a message will clear before the next one arrives so the
  * message numbers should remain very low even over multiple instances.
  */
-int MiscFuncs::miscMsgPush(string text)
+void MiscFuncs::miscMsgInit()
+{
+    for (int i = 0; i < 255; ++i)
+        miscList.push_back("");
+    // we use 255 to denote an invalid entry
+}
+
+int MiscFuncs::miscMsgPush(string _text)
 {
     mutex mtx;
-    int idx = 0;
-    list<string>::iterator it = miscList.begin();
-
     mtx.lock();
+
+    string text = _text;
+    list<string>::iterator it = miscList.begin();
+    int idx = 0;
+
     while(it != miscList.end())
     {
         if ( *it == "")
         {
             *it = text;
-            mtx.unlock();
-            //cout << "Msg No. " << idx << endl;
-            return idx;
-        }
-        ++ it;
-        ++ idx;
-    }
-    if (miscList.size() >= 255)
-    {
-        mtx.unlock();
-        cout << "List too big :(" << endl;
-        return -1;
-    }
-
-    miscList.push_back(text);
-    mtx.unlock();
-    return idx;
-}
-
-
-string MiscFuncs::miscMsgPop(int pos)
-{
-    string text = "";
-    int idx = 0;
-    list<string>::iterator it = miscList.begin();
-
-    while(it != miscList.end())
-    {
-        if (idx == pos)
-        {
-            swap(text, *it);
             break;
         }
         ++ it;
         ++ idx;
     }
+    if (it == miscList.end())
+    {
+        cout << "List full :(" << endl;
+        idx = -1;
+    }
 
-    return text;
+    int result = idx; // in case of a new entry before return
+    mtx.unlock();
+    return result;
+}
+
+
+string MiscFuncs::miscMsgPop(int _pos)
+{
+    mutex mtx;
+    mtx.lock();
+
+    int pos = _pos;
+    list<string>::iterator it = miscList.begin();
+    int idx = 0;
+
+    while(it != miscList.end())
+    {
+        if (idx == pos)
+            break;
+        ++ it;
+        ++ idx;
+    }
+    string result = "";
+    if (idx == pos)
+        swap( result, *it); // in case of a new entry before return
+    mtx.unlock();
+    return result;
 }
 
 

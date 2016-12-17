@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified August 2016
+This file is derivative of ZynAddSubFX original code, modified December 2016
 } {in_source in_header
 } 
 
@@ -56,7 +56,7 @@ class ConfigUI {selected : {private MiscFuncs}
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {open
+      Fl_Tabs {} {
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
@@ -346,7 +346,7 @@ if (synth->getRuntime().showCLI != o->value())
           xywh {5 25 385 277} labelsize 12 hide
         } {
           Fl_Input jackSource {
-            label {Jack Midi Source}
+            label {Jack MIDI Source}
             callback {//
     string tmp = string(o->value());
     if (synth->getRuntime().jackMidiDevice != tmp)
@@ -413,7 +413,7 @@ if (o->value() != tmp)
           xywh {5 25 384 277} labelsize 12 hide
         } {
           Fl_Input alsaSource {
-            label {Alsa Midi Source}
+            label {Alsa MIDI Source}
             callback {//
     string tmp = string(o->value());
     if (synth->getRuntime().alsaMidiDevice != tmp)
@@ -725,76 +725,6 @@ synth->getRuntime().configChanged = true;}
             code0 {o->value((synth->getRuntime().midi_upper_voice_C < 128));}
             code1 {if (o->value() == 0) EPCspinner->deactivate();}
           }
-          Fl_Spinner CSspinner {
-            label {Channel switch CC}
-            callback {CSpend->show();}
-            xywh {235 230 50 18} labelsize 12 minimum 0 maximum 127 value 115 textsize 12
-            code0 {CS_CC = synth->getRuntime().channelSwitchCC;}
-            code1 {if (CS_CC < 128) o->value(CS_CC); else o->value(115);}
-          }
-          Fl_Button CSpend {
-            label Pending
-            callback {//
-    int candidate = CSspinner->value();
-    if (candidate == CS_CC)
-    {
-        o->hide();
-        return;
-    }
-
-
-    string name = synth->getRuntime().testCCvalue(candidate);
-    if (!name.empty())
-    {
-        fl_alert("In use for %s",name.c_str());
-        if (CS_CC < 128)
-        {
-        CSspinner->value(CS_CC);
-        CSspinner->redraw();
-        }
-    }
-    else
-    {
-        synth->getRuntime().channelSwitchCC = candidate;
-        CS_CC = candidate;
-        o->hide();
-    }}
-            tooltip {Click to set} xywh {300 230 70 20} box PLASTIC_UP_BOX color 90 labelsize 12 hide
-          }
-          Fl_Choice channelswitch {
-            label {Channel Switch}
-            callback {//
-    if (o->value() == 0)
-    {
-        CS_CC = 128;
-        synth->getRuntime().channelSwitchCC = CS_CC;
-        CSspinner->value(115);
-        CSspinner->deactivate();
-        CSpend->hide();
-    }
-    else
-    {
-        synth->getRuntime().channelSwitchType = o->value();
-        CSspinner->activate();
-        CSpend->show();
-    }}
-            tooltip {Select 1 of 16 parts or 1 of parts in columns} xywh {235 210 53 18} down_box BORDER_BOX labelsize 12 align 132 textsize 12
-            code0 {o->value(synth->getRuntime().channelSwitchType);}
-            code1 {if (o->value() == 0) CSspinner->deactivate(); else CSspinner->activate();}
-          } {
-            MenuItem switchoff {
-              label Off
-              xywh {10 10 34 20} labelsize 12
-            }
-            MenuItem switchrow {
-              label Row
-              xywh {10 10 34 20} labelsize 12
-            }
-            MenuItem switchcolumn {
-              label Col
-              xywh {10 10 34 20} labelsize 12
-            }
-          }
           Fl_Check_Button {} {
             label {Ignore Reset all CCs}
             callback {if (synth->getRuntime().ignoreResetCCs != o->value())
@@ -802,13 +732,13 @@ synth->getRuntime().configChanged = true;}
     synth->getRuntime().ignoreResetCCs = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {234 260 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 240 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
             label {Log incoming CCs}
             callback {synth->getRuntime().monitorCCin = o->value();}
-            xywh {234 280 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 260 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
           }
         }
@@ -1029,23 +959,6 @@ presets->hide();}
                 Epcheck->value(1);
             }
             Epend->hide();
-            
-            tmp = synth->getRuntime().channelSwitchCC;
-            if (tmp > 127)
-            {
-            	CS_CC = 115;
-                CSspinner->deactivate();
-                channelswitch->value(0);
-            }
-            else
-            {
-                CS_CC = tmp;
-                CSspinner->activate();
-                channelswitch->value(tmp);
-            }
-            CSspinner->value(CS_CC);
-            channelswitch->value(synth->getRuntime().channelSwitchType);
-            CSpend->hide();
             break;
 
         case 5 : // Switches
@@ -1066,8 +979,6 @@ presets->hide();}
   decl {long selectedRootID;} {private local
   }
   decl {int EPCvalue;} {private local
-  }
-  decl {int CS_CC;} {private local
   }
   decl {int BankRootvalue;} {private local
   }

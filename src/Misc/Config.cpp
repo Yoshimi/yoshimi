@@ -131,6 +131,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
+    padApply(0xffff),
     channelSwitchType(0),
     channelSwitchCC(128),
     channelSwitchValue(0),
@@ -430,6 +431,8 @@ bool Config::loadConfig(void)
 
     if (synth->getUniqueId() > 0)
         yoshimi += ("-" + asString(synth->getUniqueId()));
+    else
+        miscMsgInit(); // sneaked it in here so it's early
     string presetDir = ConfigDir + "/presets";
     if (!isDirectory(presetDir))
     {

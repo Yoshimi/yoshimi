@@ -187,6 +187,7 @@ class ADnoteParameters : public Presets
         void defaults(void);
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
+        void getLimits(CommandBlock *getData);
         float getBandwidthDetuneMultiplier(void);
         float getUnisonFrequencySpreadCents(int nvoice);
         void setGlobalPan(char pan);

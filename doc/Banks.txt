@@ -1,4 +1,4 @@
-You no longer have the concept of a default root directory, but a current one. This can by changed at any time without requiring a re-start, so there is no longer a need to display the (confusing) contents of all roots. Also, roots now have ID numbers associated with them, but no changes have been made to the actual directores to achieve this. Instead the IDs are stored in the config file. The same ID system is used for banks, again without making any file system changes.
+You no longer have the concept of a default root directory, but a current one. This can by changed at any time without requiring a re-start, so there is no longer a need to display the (confusing) contents of all roots. Also, roots now have ID numbers associated with them, but no changes have been made to the actual directores to achieve this. Instead the IDs are stored in a config file. The same ID system is used for banks, again without making any file system changes.
 
 At first run (and whenever new root directories are set) unknown roots and banks are given these IDs. Once set they will not change no matter how many more roots and banks are later added. You can however, manually change root directory IDs in the 'Bank Root Paths window' accessible from the 'Paths' item in the main window. Also, there is a new Banks window so that these can be set up, moved and renamed in exactly the same way as instruments can. With these IDs, roots and banks can be grouped/ordered by function instead of alphabetically. When using the GUI you will always know exactly which root and bank you fetch an instrument from.
 
@@ -12,18 +12,11 @@ Also, different instances have their own config files so that you can have (say)
 
 In doing all of this we have completely changed the way we manage the structure internally, resulting in much greater efficiency, at the cost of only a slightly slower startup. Swapping roots performs *no* file operations. Swapping banks only fetches the directory list of the newly selected bank. Changing an instrument doesn't have to search for a file, only load from its already known location.
 
-If you change a bank root path, either through the gui or via MIDI, it will
-always reset the current bank to the lowest numbered one it can find. This is
-because there may not be a bank in the new root with the same ID, and even if
-there is, there is no guarantee that it will have the same name or contents.
+If you change a bank root path, either through the gui or via MIDI, it will always reset the current bank to the lowest numbered one it can find. This is because there may not be a bank in the new root with the same ID, and even if there is, there is no guarantee that it will have the same name or contents.
 
-Also if an attempt is made to reload the same root, nothing will actually
-happen. The same is true of banks. Both of these are kept fully up-to-date so
-there would be no point.
+Also if an attempt is made to reload the same root, nothing will actually happen. The same is true of banks. Both of these are kept fully up-to-date so there would be no point.
 
-However, reloading the same *instrument* will be performed every time, as you
-may have changed what is currently loaded without saving it. This provides an
-effective 'restore' operation.
+However, reloading the same *instrument* will be performed every time, as you may have changed what is currently loaded without saving it. This provides an effective 'restore' operation.
 
 
 Finally, it is generally advisable to make root and bank changes on channel 1 so that you can more easily keep track of them. However they are not channel sensitive as they don't directly affect the sound, so you can set them in any convenient channel then perform individual program changes on the desired channels.

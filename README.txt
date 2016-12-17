@@ -1,3 +1,22 @@
+V 1.5.0 - The Robin
+
+Vector control now has its own dedicated button on the main window.
+
+Any attempt to set an invalid bank root will be ignored. The same was already true for banks themselves. Also, on first time startup, discovered roots will be given ID numbers starting from 5 and in steps of 5.
+
+If working from the command line, listing roots and banks will identify the current ones with a '*'.
+
+Channel switching has now matured to a 'Solo' feature accessed from the mixer panel.
+
+Another new feature is one that has been asked for several times - a crossfade for overlapping note ranges in instrument kits.
+
+Filter tracking could never quite reach 100% so if using it to get 'notes' from noise it would go slightly out of tune. Well, now we have an extra check box that changes its range so that instead of -100% to 98.4% it will track 0% to 198.4%
+
+Many of the controls now have active tooltips that show the current value when you hover over them. Also, many have real-world terms. dB, Hz, mS etc.
+
+Finally, we have very full featured MIDI learn capability. It can be reached from the 'Yoshimi' drop-down menu, and tooltips will remind you of how it is used.
+
+
 V 1.4.1
 Lyrebird
 
@@ -58,32 +77,3 @@ Actually, there are the usual bugfixes (ancient and modern) and we've also made 
 The compatibility work we did for V1.3.8 ensured the all-important instrument files were correct, but we didn't have time to implement all of the controls. These are now in place.
 
 Currently there is quite a lot of preparatory work under way but its not ready for prime time. It's still really proof of concept.
-
-
-V1.3.9
-
-Our new code name: Skylark
-
-A major part of our work on this release is attempting to future-proof our code. Many distros are moving to GCC version 6, and code that built quite happily with older compilers is now rejected by the much more critical requirements.
-
-While doing this, the very extensive testing also shook out some more obscure bugs which have of course been squashed.
-
-However, amongst other improvements, we've split out roots and banks from the main config file and also created a new histories file. The separation means that the different functions can be implemented, saved and loaded, at the most appropriate time. These files have yoshimi as the doctype as they are in no way relevant to ZynAddSubFX.
-
-The 'banks' file is saved every time roots, banks or instruments are changed, and again on a normal exit to catch current root and bank (which don't otherwise trigger a save).
-
-The 'history' file is only saved on exit.
-
-The 'config' file is only saved when you specifically call for it to be saved.
-
-As well as recent Patch Sets, we now record recent Scales and recent States. Scales in particular had been requested by one of our users who composes with very different scale settings.
-
-In the CLI prompt, when effects are being managed, the preset number is also shown at the prompt so you'll typically see something like:
-
-yoshimi part 2 FX 1 Rever-7 >
-
-Yoshim is now verified as being able to use 192000 Hz sample rate in both ALSA and Jack - if you have a suitable soundcard!
-
-There have been a few minor GUI corrections and additions to the doc folder.
-
-Many non-fatal system error messages can now be surpressed. this is particularly relevant for CLI use. This will be extended over time.

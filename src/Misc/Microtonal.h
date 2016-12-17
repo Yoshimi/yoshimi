@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2016 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified October 2016
 */
 
 #ifndef MICROTONAL_H
@@ -43,8 +44,9 @@ class Microtonal : private MiscFuncs
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
         ~Microtonal() { }
         void defaults(void);
-        float getNoteFreq(int note);
+        void setPartMaps(void);
         float getNoteFreq(int note, int keyshift);
+        float getFixedNoteFreq(int note);
 
         // Parameters
         unsigned char Pinvertupdown;
@@ -109,9 +111,10 @@ inline int Microtonal::getoctavesize(void)
     return ((Penabled != 0) ? octavesize : 12);
 }
 
-inline float Microtonal::getNoteFreq(int note)
+inline float Microtonal::getFixedNoteFreq(int note)
 {
     return powf(2.0f, (float)(note - PAnote) / 12.0f) * PAfreq;
 }
+
 
 #endif

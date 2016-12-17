@@ -1,0 +1,494 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0303 
+header_name {.h} 
+code_name {.cc}
+comment {MidiLearnUI.h} {not_in_source in_header
+} 
+
+comment {MidiLearnUI.cc} {in_source not_in_header
+} 
+
+comment {Copyright (C) 2016, Will Godfrey
+
+This file is part of yoshimi, which is free software: you can redistribute
+it and/or modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+yoshimi is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.   See the GNU General Public License (version 2 or
+later) for more details.
+
+You should have received a copy of the GNU General Public License along with
+yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
+Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+} {in_source in_header
+} 
+
+decl {\#include <FL/fl_ask.H>
+    \#include "Misc/Config.h"
+    \#include "Misc/SynthEngine.h"} {private global
+} 
+
+decl {using namespace std;} {public local
+} 
+
+decl {\#include "MasterUI.h"} {private global
+} 
+
+decl {\#include "Misc/SynthEngine.h"} {private local
+} 
+
+decl {\# include "Misc/MiscFuncs.h"} {private local
+} 
+
+decl {\#include "UI/MiscGui.h"
+    \#include "EffUI.h"
+    \#include "BankUI.h"
+    \#include "ADnoteUI.h"
+    \#include "SUBnoteUI.h"
+    \#include "PADnoteUI.h"
+    \#include "WidgetMWSliderUI.h"
+    \#include "Params/Controller.h"
+    \#include "Misc/MiscFuncs.h"} {public global
+} 
+
+class MidiLearnKitItem {: {public Fl_Group}
+} {
+  Function {make_window()} {} {
+    Fl_Window midilearnkititem {
+      xywh {66 719 825 20} type Double hide
+      class Fl_Group
+    } {
+      Fl_Group midilearnkititemgroup {
+        xywh {49 -4 776 23} box FLAT_BOX
+      } {
+        Fl_Spinner CCcounter {
+          callback {send_data(16);}
+          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 119 value 14 textsize 12
+        }
+        Fl_Button {} {
+          callback {// does nothing - hides spinner arrows}
+          xywh {109 0 15 16} box FLAT_BOX down_box FLAT_BOX
+        }
+        Fl_Choice channelchoice {
+          callback {send_data(16);}
+          tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX labelsize 12 textsize 12
+        } {
+          MenuItem {} {
+            label 1
+            xywh {0 0 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 2
+            xywh {10 10 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 3
+            xywh {20 20 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 4
+            xywh {30 30 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 5
+            xywh {40 40 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 6
+            xywh {50 50 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 7
+            xywh {60 60 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 8
+            xywh {70 70 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 9
+            xywh {80 80 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 10
+            xywh {90 90 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 11
+            xywh {100 100 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 12
+            xywh {110 110 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 13
+            xywh {120 120 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 14
+            xywh {130 130 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 15
+            xywh {140 140 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label 16
+            xywh {150 150 26 15} labelsize 11
+          }
+          MenuItem {} {
+            label All
+            xywh {160 160 26 15} labelsize 11
+          }
+        }
+        Fl_Button activity {
+          callback {if (o->value() != 0)
+{
+    o->value(0);
+    o->show();
+}
+else
+{
+    o->value(1);
+    o->hide();
+}}
+          xywh {185 0 8 15} color 63
+          code0 {o->value(1);}
+          code1 {o->hide();}
+        }
+        Fl_Check_Button compresscheck {
+          callback {send_data(1);}
+          tooltip {Limit or compress incoming value} xywh {320 0 15 15} down_box DOWN_BOX labelfont 1 align 4
+        }
+        Fl_Check_Button blockcheck {
+          callback {send_data(0);}
+          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {357 0 20 15} down_box DOWN_BOX labelfont 1 align 4
+        }
+        Fl_Spinner minval {
+          callback {send_data(5);}
+          tooltip {Minimum value to pass on} xywh {205 0 43 15} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+        }
+        Fl_Button {} {
+          callback {// does nothing - hides spinner arrows}
+          xywh {239 0 15 16} box FLAT_BOX down_box FLAT_BOX
+        }
+        Fl_Spinner maxval {
+          callback {send_data(6);}
+          tooltip {Maximim value to pass on} xywh {264 0 43 15} labelsize 12 minimum 0 maximum 127 value 127 textsize 12
+        }
+        Fl_Button {} {
+          callback {// does nothing - hides spinner arrows}
+          xywh {298 0 15 16} box FLAT_BOX down_box FLAT_BOX
+        }
+        Fl_Button commandName {
+          label text
+          callback {send_data(8);}
+          tooltip {To delete, hold CTRL and click here.} xywh {395 0 400 15} box THIN_DOWN_BOX color 247 selection_color 247 labelfont 1 labelsize 10 align 64
+        }
+      }
+      Fl_Check_Button mutecheck {
+        label 01
+        callback {//
+if (o->value())
+    midilearnkititemgroup->deactivate();
+else
+    midilearnkititemgroup->activate();
+send_data(2);}
+        tooltip {Completely ignore this line} xywh {39 0 19 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+        code0 {o->copy_label(to_string(n + 1).c_str());}
+      }
+    }
+  }
+  Function {send_data(int control)} {} {
+    code {//
+if (control == 8)
+{
+    if(Fl::event_state(FL_CTRL) == 0)
+        return;
+    if (fl_choice("Remove line. %d %s?", "Yes", "No", NULL, n + 1, commandName->label()))
+        return;
+}
+int type = 0;
+if (blockcheck->value() != 0)
+    type = 1;
+
+if (compresscheck->value() != 0)
+    type |= 2;
+
+if (mutecheck->value() != 0)
+    type |= 4;
+
+collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
+  }
+  Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
+    code {n=0;} {}
+  }
+  Function {~MidiLearnKitItem()} {} {
+    code {midilearnkititem->hide();
+delete(midilearnkititem);} {}
+  }
+  Function {init(SynthEngine *synth_, int n_)} {} {
+    code {//
+synth = synth_;
+n = n_;
+make_window();
+show();
+end();} {}
+  }
+  decl {int n;} {private local
+  }
+  decl {char label[50];} {private local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
+} 
+
+class MidiLearnUI {selected : {private MiscFuncs}
+} {
+  Function {make_window()} {} {
+    Fl_Window midilearnwindow {
+      label {Midi Learn}
+      tooltip {Editor for all learned controllers.
+CTRL-right click on any knob/slider to learn.
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {5 626 820 285} type Double hide
+    } {
+      Fl_Scroll kitlist {
+        tooltip {Editor for all learned controllers.
+CTRL-Right click on knobs/sliders to learn.
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {0 15 818 245} type VERTICAL box DOWN_FRAME
+      } {}
+      Fl_Box none {
+        label {No Entries}
+        xywh {290 131 206 44} labelsize 32
+      }
+      Fl_Box {} {
+        label Mute
+        xywh {18 0 41 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label CC
+        xywh {75 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Chan
+        xywh {135 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Block
+        xywh {355 0 50 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Limit
+        xywh {310 0 48 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label {Control Function}
+        xywh {530 0 130 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Min
+        xywh {210 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Box {} {
+        label Max
+        xywh {265 0 40 15} labelfont 1 labelsize 11 align 18
+      }
+      Fl_Button load {
+        label Load
+        callback {char *filename;
+filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+if (filename == NULL)
+    return;
+loadMidi(filename);}
+        tooltip {Load complete learned list} xywh {30 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+      }
+      Fl_Button save {
+        label Save
+        callback {char *filename;
+filename = fl_file_chooser("Load:", "({*.xly})", NULL, 0);
+if (filename == NULL)
+    return;
+send_data(245, 0, 0, 0, 0, 0, 0, miscMsgPush((string) filename));
+recent->activate();
+setWindowTitle(findleafname(filename));}
+        tooltip {Save complete learned list} xywh {130 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+      }
+      Fl_Button clear {
+        label Clear
+        callback {//
+if (fl_choice("Remove all entries", "Yes", "No", NULL))
+    return;
+
+send_data(96,0,0);
+o->deactivate();
+setWindowTitle();}
+        tooltip {Remove all entries} xywh {330 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12 deactivate
+      }
+      Fl_Button recent {
+        label Recent
+        callback {synth->getGuiMaster()->paramsui->Recent->position(midilearnwindow->x() + recent->x() - 80, midilearnwindow->y() + recent->y() - 187);
+synth->getGuiMaster()->paramsui->Show(6);}
+        tooltip {Load from recently seen list} xywh {230 264 70 18} down_box DOWN_BOX labelfont 1 labelsize 12
+        code0 {vector<string> &listType = *synth->getHistory(6);}
+        code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
+      }
+      Fl_Button {} {
+        label Close
+        callback {midilearnwindow->hide();}
+        xywh {730 262 63 20} box THIN_UP_BOX
+      }
+    }
+    Fl_Window message {
+      xywh {4 20 290 85} type Double labelsize 12 hide
+      code0 {o->position(0, 0);}
+      code1 {o->copy_label(synth->makeUniqueName("").c_str());}
+    } {
+      Fl_Box words {
+        label {?}
+        xywh {5 9 280 45} color 55 selection_color 55 labelfont 1 labelsize 12 align 149
+      }
+      Fl_Button {} {
+        label Close
+        callback {message->hide();}
+        xywh {211 60 70 20}
+      }
+      Fl_Button cancel {
+        label Cancel
+        callback {send_data(255, 0, 3);
+o->hide();}
+        xywh {130 60 70 20} hide
+      }
+    }
+  }
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
+    code {//
+collect_data(synth, value, type, control, 216, kititem, engine, insert, parameter, par2);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    int value = lrint(getData->data.value);
+    unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char par2 = getData->data.par2;
+
+    switch(control)
+    {
+        case 0:
+            break;
+        case 16:
+            addLine(getData);
+            break;
+        case 20: // not using this yet
+            break;
+        case 21:
+            words->copy_label(miscMsgPop(par2).c_str());
+            cancel->show();
+            message->show();
+        case 24:
+            for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
+            {
+                if (midilearnkititem[i] != NULL)
+                {
+                    if (midilearnkititem[i]->CCcounter->value() == kititem && midilearnkititem[i]->channelchoice->value() == engine)
+                        midilearnkititem[i]->activity->do_callback();
+                }
+            }
+            break;
+        case 96:
+            clearAll(value == 0);
+            break;
+        case 255:
+            cancel->hide();
+            words->copy_label("Learn cancelled");
+            message->show();
+    }
+    Fl::check();} {}
+  }
+  Function {addLine(CommandBlock *getData)} {} {
+    code {//
+int lineNo = ((int)getData->data.value);
+int status = getData->data.type;
+string name = miscMsgPop(getData->data.par2);
+none->hide();
+clear->activate();
+save->activate();
+midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,818,20,"");
+midilearnkititem[lineNo]->init(synth, lineNo);
+kitlist->add(midilearnkititem[lineNo]);
+
+midilearnkititem[lineNo]->position(2, 21 + lineNo*20);
+midilearnkititem[lineNo]->mutecheck->value(status & 4);
+midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
+midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
+midilearnkititem[lineNo]->minval->value(getData->data.insert);
+midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
+midilearnkititem[lineNo]->compresscheck->value(status & 2);
+midilearnkititem[lineNo]->blockcheck->value(status & 1);
+midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
+if (status & 4)
+    midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();
+midilearnwindow->redraw();} {}
+  }
+  Function {MidiLearnUI(SynthEngine *_synth)} {} {
+    code {//
+synth = _synth;
+for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
+    midilearnkititem[i] = NULL;
+make_window();
+setWindowTitle();
+num = 0;} {}
+  }
+  Function {~MidiLearnUI()} {} {
+    code {;} {}
+  }
+  Function {Show()} {} {
+    code {//
+midilearnwindow->show();} {}
+  }
+  Function {Hide()} {} {
+    code {//
+midilearnwindow->hide();} {}
+  }
+  Function {clearAll(bool empty)} {} {
+    code {//
+kitlist->clear();
+for (int i = 0; i < MIDI_LEARN_BLOCK; ++i)
+    midilearnkititem[i] = NULL;
+if (empty)
+{
+    none->show();
+    clear->deactivate();
+    save->deactivate();
+    cancel->hide();
+    message->hide();
+}
+kitlist->redraw();
+kitlist->show();} {}
+  }
+  Function {loadMidi(string file)} {} {
+    code {//
+send_data(241, 0, 0, 0, 0, 0, 0, miscMsgPush((string) file));
+recent->activate();
+setWindowTitle(findleafname(file));} {}
+  }
+  Function {setWindowTitle(string name = "")} {} {
+    code {//
+if (name > "")
+    name = " - " + name;
+midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());} {}
+  }
+  decl {int lastkititem;} {public local
+  }
+  decl {SynthEngine *synth;} {private local
+  }
+  decl {MidiLearnKitItem *midilearnkititem[MIDI_LEARN_BLOCK];} {private local
+  }
+  decl {int num;} {private local
+  }
+} 

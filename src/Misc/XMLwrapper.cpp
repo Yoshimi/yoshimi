@@ -352,6 +352,14 @@ char *XMLwrapper::getXMLdata()
             addparstr("XMLtype", "Recent Files");
             break;
 
+        case XML_VECTOR:
+            addparstr("XMLtype", "Vector Control");
+            break;
+
+        case XML_MIDILEARN:
+            addparstr("XMLtype", "Midi Learn");
+            break;
+
         default:
             addparstr("XMLtype", "Unknown");
             break;

@@ -9,20 +9,22 @@ unsigned char   kit
 unsigned char   engine
 unsigned char   insert
 unsigned char   insert param
+unsigned char   insert par2
 
-string          name - not using this yet - will be handled separately.
+string          name - handled via simple message system.
 
 
 Type bits
-0-1 event                       (tests for GUI, but see below)
-2   source is return from synth (not yet)
-3   source is MIDI              (not yet)
+0-1 event (see below)
+2   source is return from synth
+3   source is MIDI
 4   source is CLI
 5   source is GUI
 6   write data value (read othewise)
 7   round to int (will be sent as float)
 
 bits 0 + 1 = 0 from anything other than synth = set default.
+bits 0 + 1 = 1 temporarily just echo byte stream - no action.
 bits 0 + 1 = 3 from anything other than synth = MIDI learn request.
 
 On return from synth
@@ -33,26 +35,25 @@ On return from synth
 
 bits 3-5 may later be combined for new input sources.
 
+Within the GUI when sending, bit 3 is used to indicate that a particular control is MIDIlearnable.
+
 Unused chars are set to 0xff as a general test.
 
 e.g.
-If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it
-is main volume, key shift etc.
+If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it is main volume, key shift etc.
 
 If part is < 0x40 and kit is 0xff it's the general part level controls.
 
-If part is < 0x40 and kit >= 0x20 but less than 0x80 it's the engine enable
-controls. (kit number ORed with 0x20)
+If part is < 0x40 and kit >= 0x20 but less than 0x80 it's the engine enable controls. (kit number ORed with 0x20)
+
+Midi Learn
+This uses part number 0xd8
 
 Vector Control
 This uses part number 0xc0
 
 Effects and effect sources.
-In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects.
-For these and normal part effects, 'kit' ORed with 0x80 is used to denote the effect type (reverb echo etc.) and 'engine' is used to denote the
-number of the effect being worked on (the limit depends on the effect
-source). As 'kit' and 'engine' are not relevant for effects it is safe
-to use them here.
+In 'part' we use 0xf1 for system effects and 0xf2 for insertion effects. For these and normal part effects, 'kit' ORed with 0x80 is used to denote the effect type (reverb echo etc.) and 'engine' is used to denote the number of the effect being worked on (the limit depends on the effect source). As 'kit' and 'engine' are not relevant for effects it is safe to use them here.
 
 Effects 'kit' numbers offset by 0x80.
 
@@ -77,14 +78,14 @@ engine
 >= 0x80 addsynth voice
 
 
-inserts & 0x1f
+inserts
 0   lfo
 1   filter
         Use engine number 0x88 To access the filter component of the
         DyneFilter effect
 2   envelope base
-3   envelope graph X
-4   envelope graph Y
+3   envelope freemode graph point add/delete
+4   envelope freemode graph X/Y
 
 5   oscillator (for add voice & pad harmonics)
 6   oscillator harmonic amplitude (for add voice & pad)
@@ -117,7 +118,10 @@ insert param
 
         formant filter
             for controls 18 - 20
-                >> 5   for vowel number
-                & 0x1f for formant number
+                formant number
+                par2 for vowel number
             for control 37
                 filter sequence position
+
+insert par2
+    used for offsets to some parameters

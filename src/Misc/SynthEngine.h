@@ -39,6 +39,7 @@ using namespace std;
 #include "Misc/Bank.h"
 #include "Misc/SynthHelper.h"
 #include "Interface/InterChange.h"
+#include "Interface/MidiLearn.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
@@ -48,7 +49,7 @@ class EffectMgr;
 class Part;
 class XMLwrapper;
 class Controller;
-class CmdInterface;
+//class CmdInterface;
 
 class MasterUI;
 
@@ -60,6 +61,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank bank;
     public:
         InterChange interchange;
+        MidiLearn midilearn;
     private:
         Config Runtime;
         PresetsStore presetsstore;
@@ -102,9 +104,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void SetBank(int banknum);
         int ReadBankRoot(void);
         int ReadBank(void);
-
-        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
-
         void SetProgram(unsigned char chan, unsigned short pgm);
         bool SetProgramToPart(int npart, int pgm, string fname);
         void SetPartChan(unsigned char npart, unsigned char nchan);
@@ -122,7 +121,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void ListVectors(list<string>& msg_buf);
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
-        void SetSystemValue(int type, int value);
+        int SetSystemValue(int type, int value);
         void writeRBP(char type, char data0, char data1);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
@@ -137,6 +136,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void partonoffWrite(int npart, int what);
         bool partonoffRead(int npart);
         sem_t partlock;
+        void setPartMap(int npart);
+        void setAllPartMaps(void);
 
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
@@ -253,8 +254,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         struct random_data random_buf;
         int32_t random_result;
         float random_0_1;
-
-        MasterUI *guiMaster;
+    public:
+        MasterUI *guiMaster; // need to read this in InterChange::returns
+    private:
         void( *guiClosedCallback)(void*);
         void *guiCallbackArg;
 

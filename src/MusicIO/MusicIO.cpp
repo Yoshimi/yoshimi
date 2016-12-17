@@ -162,7 +162,10 @@ int MusicIO::getMidiController(unsigned char b)
             break;
 
         default: // an unrecognised controller!
-            ctl = C_NULL;
+            if (b > 119)
+                ctl = C_NULL;
+            else // this is now needed for midi-learn
+                ctl = b;
             break;
     }
     return ctl;
@@ -206,21 +209,33 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     }
 
     if (ctrl == synth->getRuntime().midi_bank_root)
+    {
         setMidiBankOrRootDir(param, in_place, true);
-    else if (ctrl == synth->getRuntime().midi_bank_C)
+        return;
+    }
+
+    if (ctrl == synth->getRuntime().midi_bank_C)
+    {
         setMidiBankOrRootDir(param, in_place);
-    else if (ctrl == synth->getRuntime().midi_upper_voice_C)
+        return;
+    }
+
+    if (ctrl == synth->getRuntime().midi_upper_voice_C)
+    {
         // it's really an upper set program change
         setMidiProgram(ch, (param & 0x1f) | 0x80, in_place);
+        return;
+    }
 
-    else if (ctrl == C_nrpnL || ctrl == C_nrpnH)
+    if (ctrl == C_nrpnL || ctrl == C_nrpnH)
     {
         if (ctrl == C_nrpnL)
         {
             if (synth->getRuntime().nrpnL != param)
             {
                 synth->getRuntime().nrpnL = param;
-                if (synth->getRuntime().nrpnH == 0x41 || synth->getRuntime().nrpnH == 0x42)
+                unsigned char type = synth->getRuntime().nrpnH;
+                if (type >= 0x41 && type <= 0x43)
                 { // shortform
                     if (param > 0x77) // disable it
                     {
@@ -229,11 +244,8 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
                     }
                     else
                     {
-                        if (synth->getRuntime().nrpnH == 0x41)
-                            synth->getRuntime().channelSwitchType = 1; // row
-                        else
-                            synth->getRuntime().channelSwitchType = 2; // column
-                    synth->getRuntime().channelSwitchCC = param;
+                        synth->getRuntime().channelSwitchType = type & 3; // row/column/loop
+                        synth->getRuntime().channelSwitchCC = param;
                     }
                     return;
                 }
@@ -261,81 +273,96 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         synth->getRuntime().dataH = 0x80; //  so these are now invalid
         synth->getRuntime().nrpnActive = (nLow < 0x7f && nHigh < 0x7f);
 //        synth->getRuntime().Log("Status nrpn " + asString(synth->getRuntime().nrpnActive));
+        return;
     }
-    else
+
+    if (synth->getRuntime().nrpnActive)
     {
-        if (synth->getRuntime().nrpnActive)
-        {
-            if (ctrl == C_dataI || ctrl == C_dataD)
-            { // translate these to C_dataL and C_dataH
-                int dHigh = synth->getRuntime().dataH;
-                int dLow = synth->getRuntime().dataL;
+        if (ctrl == C_dataI || ctrl == C_dataD)
+        { // translate these to C_dataL and C_dataH
+            int dHigh = synth->getRuntime().dataH;
+            int dLow = synth->getRuntime().dataL;
 
-                bool msbPar = (param >= 0x40);
-                param &= 0x3f;
-                if (ctrl == C_dataI)
-                {
-                    if (msbPar)
-                    {
-                        dHigh &= 0x7f; // clear disabled state
-                        param += dHigh;
-                        ctrl = C_dataH; // change controller type
-                    }
-                    else
-                    {
-                        dLow &= 0x7f; // clear disabled state
-                        param += dLow;
-                        ctrl = C_dataL; // change controller type
-                    }
-                    if (param > 0x7f)
-                        param = 0x7f;
-                }
-                else{ // data decrement
-                    if (msbPar)
-                    {
-                        param = dHigh - param;
-                        ctrl = C_dataH; // change controller type
-                    }
-                    else
-                    {
-                        param = dLow - param;
-                        ctrl = C_dataL; // change controller type
-                    }
-                    if (param < 0)
-                        param = 0;
-                }
-            }
-
-            if (ctrl == C_dataL || ctrl == C_dataH)
+            bool msbPar = (param >= 0x40);
+            param &= 0x3f;
+            if (ctrl == C_dataI)
             {
-                nrpnProcessData(ch, ctrl, param);
-                return;
+                if (msbPar)
+                {
+                    dHigh &= 0x7f; // clear disabled state
+                    param += dHigh;
+                    ctrl = C_dataH; // change controller type
+                }
+                else
+                {
+                    dLow &= 0x7f; // clear disabled state
+                    param += dLow;
+                    ctrl = C_dataL; // change controller type
+                }
+                if (param > 0x7f)
+                    param = 0x7f;
+            }
+            else
+            { // data decrement
+                if (msbPar)
+                {
+                    param = dHigh - param;
+                    ctrl = C_dataH; // change controller type
+                }
+                else
+                {
+                    param = dLow - param;
+                    ctrl = C_dataL; // change controller type
+                }
+                if (param < 0)
+                    param = 0;
             }
         }
-        unsigned char vecChan;
-        if (synth->getRuntime().channelSwitchType == 1)
-            vecChan = synth->getRuntime().channelSwitchValue;
-            // force vectors to obey channel switcher
-        else
-            vecChan = ch;
-        if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
-        { // vector control is direct to parts
-            if (nrpnRunVector(vecChan, ctrl, param))
-                return; // **** test this it may be wrong!
-        }
-        // pick up a drop-through if CC doesn't match the above
-        if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
+
+        if (ctrl == C_dataL || ctrl == C_dataH)
         {
-            //synth->getRuntime().Log("Reset controllers ignored");
+            nrpnProcessData(ch, ctrl, param);
             return;
         }
-        if (ctrl == C_breath)
-        {
-            synth->SetController(ch, C_volume, param);
-            ctrl = C_filtercutoff;
-        }
-        synth->SetController(ch, ctrl, param);
     }
+
+    unsigned char vecChan;
+    if (synth->getRuntime().channelSwitchType == 1)
+        vecChan = synth->getRuntime().channelSwitchValue;
+        // force vectors to obey channel switcher
+    else
+        vecChan = ch;
+    if (synth->getRuntime().nrpndata.vectorEnabled[vecChan] && synth->getRuntime().NumAvailableParts > NUM_MIDI_CHANNELS)
+    { // vector control is direct to parts
+        if (nrpnRunVector(vecChan, ctrl, param))
+            return; // **** test this it may be wrong!
+    }
+    // pick up a drop-through if CC doesn't match the above
+    if (ctrl == C_resetallcontrollers && synth->getRuntime().ignoreResetCCs == true)
+    {
+        //synth->getRuntime().Log("Reset controllers ignored");
+        return;
+    }
+
+    /* set / run midi learn
+     * pass 'in_place' so entire operation can be done
+     * in MidiLearn.cpp
+     * return true if blocking further calls
+     *
+     * need to work out some kind of loop-back so optional
+     * vector control CCs can be picked up.
+     */
+    if (synth->midilearn.runMidiLearn(param, ctrl, ch, in_place))
+        return;
+
+    if (ctrl == C_breath)
+    {
+        synth->SetController(ch, C_volume, param);
+        ctrl = C_filtercutoff;
+    }
+
+    // do what's left!
+    synth->SetController(ch, ctrl, param);
 }
 
 
@@ -567,7 +594,7 @@ void MusicIO:: nrpnSetVector(int dHigh, unsigned char chan,  int par)
 /* The following routines now *always* use the ring buffer.
  * This is necessary to handle extremely large instrument patches
  * and maintain root/bank/instrument sequence.
- * RT thread priority has been adjusted to ensure optimimum results.
+ * Thread priority has been adjusted to ensure optimimum results.
  */
 
 //bank change and root dir change change share the same thread
@@ -582,9 +609,9 @@ void MusicIO::setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place,
     else
         if (bank_or_root_num == synth->getBankRef().getCurrentBankID())
             return; // still nothing to do!
-    /*if (in_place)
+    if (in_place)
         setRootDir ? synth->SetBankRoot(bank_or_root_num) : synth->SetBank(bank_or_root_num);
-    else*/
+    else
     {
         if (setRootDir)
             synth->writeRBP(1 ,bank_or_root_num,0);
@@ -605,10 +632,16 @@ void MusicIO::setMidiProgram(unsigned char ch, int prg, bool in_place)
         return;
     if (synth->getRuntime().EnableProgChange)
     {
-        //if (in_place)
-            //synth->SetProgram(ch, prg);
-        //else
+        if (in_place)
+        {
+            //synth->getRuntime().Log("Freewheeling");
+            synth->SetProgram(ch, prg);
+        }
+        else
+        {
+            //synth->getRuntime().Log("Normal");
             synth->writeRBP(3, ch ,prg);
+        }
     }
 }
 

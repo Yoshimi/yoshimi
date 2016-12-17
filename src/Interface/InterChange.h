@@ -30,6 +30,8 @@ using namespace std;
 #include "Params/LFOParams.h"
 #include "Params/FilterParams.h"
 #include "Params/EnvelopeParams.h"
+#include "Synth/OscilGen.h"
+#include "Synth/Resonance.h"
 
 class SynthEngine;
 
@@ -39,30 +41,42 @@ class InterChange : private MiscFuncs
         InterChange(SynthEngine *_synth);
         ~InterChange();
 
-        union CommandBlock{
-            struct{
-                float value;
-                unsigned char type;
-                unsigned char control;
-                unsigned char part;
-                unsigned char kit;
-                unsigned char engine;
-                unsigned char insert;
-                unsigned char parameter;
-            } data;
-            unsigned char bytes [sizeof(data)];
-        };
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
 
-        jack_ringbuffer_t *sendbuf;
-
-        void commandFetch(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit = 0xff, unsigned char engine = 0xff, unsigned char insert = 0xff, unsigned char insertParam = 0xff);
+        jack_ringbuffer_t *fromCLI;
+        jack_ringbuffer_t *toCLI;
+        jack_ringbuffer_t *fromGUI;
+        jack_ringbuffer_t *toGUI;
+        jack_ringbuffer_t *fromMIDI;
 
         void mediate();
+        void returns(CommandBlock *getData);
+        void setpadparams(int point);
         void commandSend(CommandBlock *getData);
+        void resolveReplies(CommandBlock *getData);
+        void returnLimits(CommandBlock *getData);
 
     private:
+        void *CLIresolvethread(void);
+        static void *_CLIresolvethread(void *arg);
+        pthread_t  CLIresolvethreadHandle;
+
+        string resolveVector(CommandBlock *getData);
+        string resolveMain(CommandBlock *getData);
+        string resolvePart(CommandBlock *getData);
+        string resolveAdd(CommandBlock *getData);
+        string resolveAddVoice(CommandBlock *getData);
+        string resolveSub(CommandBlock *getData);
+        string resolvePad(CommandBlock *getData);
+        string resolveOscillator(CommandBlock *getData);
+        string resolveResonance(CommandBlock *getData);
+        string resolveLFO(CommandBlock *getData);
+        string resolveFilter(CommandBlock *getData);
+        string resolveEnvelope(CommandBlock *getData);
+        string resolveSysIns(CommandBlock *getData);
+        string resolveEffects(CommandBlock *getData);
+
         void commandVector(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
         void commandPart(CommandBlock *getData);
@@ -70,12 +84,14 @@ class InterChange : private MiscFuncs
         void commandAddVoice(CommandBlock *getData);
         void commandSub(CommandBlock *getData);
         void commandPad(CommandBlock *getData);
-        void commandOscillator(CommandBlock *getData);
-        void commandResonance(CommandBlock *getData);
+        void commandOscillator(CommandBlock *getData, OscilGen *oscil);
+        void commandResonance(CommandBlock *getData, Resonance *respar);
         void commandLFO(CommandBlock *getData);
+        void lfoReadWrite(CommandBlock *getData, LFOParams *pars);
         void commandFilter(CommandBlock *getData);
-        float filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
+        void filterReadWrite(CommandBlock *getData, FilterParams *pars, unsigned char *velsnsamp, unsigned char *velsns);
         void commandEnvelope(CommandBlock *getData);
+        void envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars);
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);
 

@@ -57,6 +57,7 @@ class Part : private MiscFuncs, SynthHelper
         inline float pannedVolLeft(void) { return volume * pangainL; }
         inline float pannedVolRight(void) { return volume * pangainR; }
         void defaults(void);
+        void setNoteMap(int keyshift);
         void defaultsinstrument(void);
         void applyparameters(void);
         void cleanup(void);
@@ -108,12 +109,14 @@ class Part : private MiscFuncs, SynthHelper
         unsigned char Pminkey;
         unsigned char Pmaxkey;
         unsigned char Pkeyshift;
+        float PnoteMap[128];
         unsigned char Prcvchn;
         char          Ppanning;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages
         unsigned char Pkitmode;    // if the kitmode is enabled
+        bool          Pkitfade;    // enables cross fading
         unsigned char Pdrummode;   // if all keys are mapped and the system is 12tET (used for drums)
 
         unsigned char Ppolymode;   // Part mode - 0 = monophonic , 1 = polyphonic

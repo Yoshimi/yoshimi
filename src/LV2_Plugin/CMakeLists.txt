@@ -42,7 +42,9 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
     ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h)
 file (GLOB yoshimi_interface_files
-    ../Interface/InterChange.cpp ../Interface/InterChange.h ../UI/MiscGui.cpp ../UI/MiscGui.h)
+    ../Interface/InterChange.cpp ../Interface/InterChange.h
+    ../Interface/MidiLearn.cpp ../Interface/MidiLearn.h
+    ../UI/MiscGui.cpp ../UI/MiscGui.h)
 file (GLOB yoshimi_params_files
     ../Params/ADnoteParameters.cpp  ../Params/EnvelopeParams.cpp
     ../Params/FilterParams.cpp  ../Params/LFOParams.cpp
@@ -74,7 +76,7 @@ set (FltkUI_names
     "EffUI"  "BankUI"  "PartUI"
     "MicrotonalUI"  "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "WidgetMWSliderUI"
+    "MidiLearnUI" "WidgetMWSliderUI"
 )
 
 # workaround fltk_wrap_ui breakage

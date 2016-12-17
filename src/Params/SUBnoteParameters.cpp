@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified October 2009
+    This file is a derivative of a ZynAddSubFX original, modified December 2016
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -34,7 +34,7 @@ SUBnoteParameters::SUBnoteParameters(SynthEngine *_synth) : Presets(_synth)
     BandWidthEnvelope = new EnvelopeParams(64, 0, synth);
     BandWidthEnvelope->ASRinit_bw(100, 70, 64, 60);
 
-    GlobalFilter = new FilterParams(2, 80, 40, synth);
+    GlobalFilter = new FilterParams(2, 80, 40, 0, synth);
     GlobalFilterEnvelope = new EnvelopeParams(0, 1, synth);
     GlobalFilterEnvelope->ADSRinit_filter(64, 40, 64, 70, 60, 64);
     defaults();
@@ -351,5 +351,23 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
             xml->exitbranch();
         }
         xml->exitbranch();
+    }
+}
+
+
+void SUBnoteParameters::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    switch (control)
+    {
+        case 32:
+            getData->limits.min = -8192;
+            getData->limits.max = 8191;
+            break;
+        case 48:
+        case 49:
+        case 50:
+            getData->limits.max = 255;
+            break;
     }
 }

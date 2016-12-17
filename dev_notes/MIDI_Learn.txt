@@ -1,0 +1,76 @@
+The learn process comes after NRPNs and vectors, but before all other controllers.
+
+To learn, hold CTRL while right-clicking on any GUI control then operate physical control.
+
+Along with parameters, a text string is provided with precise details of this complete action.
+
+Control capabilites:
+
+Incoming CC and channel tracked (in that order).
+
+Multiple actions on the same CC/channel pair.
+
+Range limiting or compression.
+
+Blocking of all later actions on the same CC.channel pair.
+
+Muting of this action.
+
+Status bits:
+0   block
+1   limit (otherwise compress)
+2   mute
+
+
+When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
+
+This will be used for updating the list and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
+
+Name strings are passed across using the simple message system. These are not editable in the GUI.
+
+These transfers are done outside the RT threads.
+
+Normally the data will be sent as a complete instruction for one line.
+
+
+data structure:
+value       line number (used as an integer)
+type        status - this is unique to MIDI learn
+control     normal use
+part        216
+kit         CC
+engine      channel
+insert      min_in
+parameter   max_in
+par2        text message number
+
+The gui will be restricted to 'viewing groups' of 128 lines, it solves a *lot* of problems!
+
+
+Control numbers:
+These redraw a line in place.
+0   block switch
+1   limit switch
+2   mute switch
+5   set min_in
+6   set max-in
+
+These move a line, so a complete redraw is inititalsed.
+ 8  delete line
+16  write line
+17  set CC
+18  set channel
+
+20  send list size
+21  send ID of learn type message
+
+24 incoming activity
+
+96  clear all
+
+The gui now always does a redraw (except 20 & 21), but 0 to 6, 24 and 96 don't do a list re-order first.
+
+
+0xf1 load list
+0xf2 load numbered item from recent history
+0xf5 save list

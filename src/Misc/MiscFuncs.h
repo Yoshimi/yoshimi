@@ -64,6 +64,7 @@ class MiscFuncs
         int matchWord(int numChars, char *point, const char *word);
         bool matchnMove(int num, char *&pnt, const char *word);
 
+        void miscMsgInit(void);
         int miscMsgPush(string text);
         string miscMsgPop(int pos);
 
@@ -89,5 +90,28 @@ T limit(T val, T min, T max)
 
 inline float MiscFuncs::dB2rap(float dB) { return exp10f((dB) / 20.0f); }
 inline float MiscFuncs::rap2dB(float rap) { return 20.0f * log10f(rap); }
+
+union CommandBlock{
+    struct{
+        float value;
+        unsigned char type;
+        unsigned char control;
+        unsigned char part;
+        unsigned char kit;
+        unsigned char engine;
+        unsigned char insert;
+        unsigned char parameter;
+        unsigned char par2;
+    } data;
+    struct{
+        float value;
+        unsigned char type;
+        unsigned char control;
+        short int min;
+        short int max;
+        short int def;
+    } limits;
+    char bytes [sizeof(data)];
+};
 
 #endif

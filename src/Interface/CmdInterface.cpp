@@ -25,6 +25,7 @@
 #include <pwd.h>
 #include <cstdio>
 #include <cerrno>
+#include <cfloat>
 #include <sys/types.h>
 #include <ncurses.h>
 #include <readline/readline.h>
@@ -63,7 +64,8 @@ string basics[] = {
     "  Parts",                      "parts with instruments installed",
     "  Vectors",                    "settings for all enabled vectors",
     "  Settings",                   "dynamic settings",
-    "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors)",
+    "  MLearn [s<n>]",              "midi learned controls ('@' n for full details on one line)",
+    "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "  Effects [s]",                "effect types ('all' include preset numbers and names)",
     "LOad",                         "load patch files",
     "  Instrument <s>",             "instrument to current part from named file",
@@ -71,25 +73,30 @@ string basics[] = {
     "  STate <s>",                  "all system settings and patch sets from named file",
     "  SCale <s>",                  "scale settings from named file",
     "  VEctor [{Channel}n] <s>",    "vector on channel n from named file",
+    "  MLearn <s>",                 "midi learned list from named file",
     "SAve",                         "save various files",
     "  Instrument <s>",             "current part to named file",
     "  Patchset <s>",               "complete set of instruments to named file",
     "  STate <s>",                  "all system settings and patch sets to named file",
     "  SCale <s>",                  "current scale settings to named file",
     "  VEctor <{Channel}n> <s>",    "vector on channel n to named file",
+    "  MLearn <s>",                 "midi learned list to named file",
     "  Setup",                      "dynamic settings",
     "ADD",                          "add paths and files",
     "  Root <s>",                   "root path to list",
     "  Bank <s>",                   "bank to current root",
-    "REMove",                       "remove paths and files",
+    "REMove",                       "remove paths, files and entries",
     "  Root <n>",                   "de-list root path ID",
     "  Bank <n>",                   "delete bank ID (and all contents) from current root",
+    "  MLearn <s> [n]",             "delete midi learned 'ALL' whole list, or '@'(n) line",
     "Set / Read",                   "set or read all main parameters",
-    "  SWitcher [{CC}n] [s]",      "define CC n to set single part in group (Row / Column)",
+    "  SWitcher [{CC}n] [s]",       "define CC n to set single part in group (Row / Column)",
     "  REPorts [s]",                "destination (Gui/Stderr)",
     "  ",                           "  non-fatal (SHow/Hide)",
     "  Root <n>",                   "current root path to ID",
     "  Bank <n>",                   "current bank to ID",
+    "  MLearn <n> <s> [s]",         "midi learned line n control",
+    "  ",                           "(MUte, CC, CHan, MIn, MAx, LImit, BLock) Enable {other}",
     "end"
 };
 
@@ -297,7 +304,7 @@ void CmdInterface::historyList(int listnum)
 {
     list<string>msg;
     int start = 2;
-    int end = 5;
+    int end = 6;
     bool found = false;
 
     if (listnum != 0)
@@ -325,9 +332,13 @@ void CmdInterface::historyList(int listnum)
                 case 5:
                     msg.push_back("Recent Vectors:");
                     break;
+                case 6:
+                    msg.push_back("Recent MIDI learned:");
+                    break;
             }
-            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it)
-                msg.push_back("  " + *it);
+            int itemNo = 0;
+            for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it, ++ itemNo)
+                msg.push_back(to_string(itemNo) + "  " + *it);
             found = true;
         }
     }
@@ -1175,8 +1186,10 @@ int CmdInterface::commandReadnSet()
                 name += to_string((int) Runtime.channelSwitchCC);
                 if (Runtime.channelSwitchType == 1)
                     name += " Row type";
-                else
+                else if (Runtime.channelSwitchType == 1)
                     name += " Column type";
+                else
+                    name += " Loop type";
             }
             Runtime.Log(name);
             reply = done_msg;
@@ -1208,6 +1221,12 @@ int CmdInterface::commandReadnSet()
                 Runtime.channelSwitchType = 2;
                 Runtime.channelSwitchCC = value;
                 name += (to_string(value) + " Column type");
+            }
+            else if (value && matchnMove(2, point, "loop"))
+            {
+                Runtime.channelSwitchType = 2;
+                Runtime.channelSwitchCC = value;
+                name += (to_string(value) + " Loop type");
             }
             else
             {
@@ -1625,6 +1644,71 @@ int CmdInterface::commandReadnSet()
         if (!isRead && reply == todo_msg)
             GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateConfig, 2);
     }
+    else if (matchnMove(2, point, "mlearn"))
+    {
+        if (isRead)
+        {
+            Runtime.Log("Write only");
+            return done_msg;
+        }
+        if (point[0] == '@')
+            point +=1;
+        point = skipSpace(point);
+        if (!isdigit(point[0]))
+            return value_msg;
+        float value = string2int(point);
+        point = skipChars(point);
+        tmp = 0;
+        if (matchnMove(2, point, "cc"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0x10, 0xd8, string2int(point));
+            Runtime.Log("Lines may be re-ordered");
+            reply = done_msg;
+        }
+        else if (matchnMove(2, point, "channel"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0x10, 0xd8, 0xff, string2int(point));
+            Runtime.Log("Lines may be re-ordered");
+            reply = done_msg;
+        }
+        else if (matchnMove(2, point, "minimum"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0, 0xd8, 0xff, 0xff, string2int(point));
+            reply = done_msg;
+        }
+        else if (matchnMove(2, point, "maximum"))
+        {
+            if (!isdigit(point[0]))
+                return value_msg;
+            sendDirect(value, 0xff, 0, 0xd8, 0xff, 0xff, 0xff, string2int(point));
+        }
+        else if (matchnMove(2, point, "mute"))
+        {
+            if (matchnMove(1, point, "enable"))
+                tmp = 4;
+            sendDirect(value, tmp, 2, 0xd8);
+        }
+        else if (matchnMove(2, point, "limit"))
+        {
+            if (matchnMove(1, point, "enable"))
+                tmp = 2;
+            sendDirect(value, tmp, 1, 0xd8);
+        }
+        else if (matchnMove(2, point, "block"))
+        {
+            if (matchnMove(1, point, "enable"))
+                tmp = 1;
+            sendDirect(value, tmp, 0, 0xd8);
+        }
+        else
+            reply = opp_msg;
+    }
     else
         reply = opp_msg;
     return reply;
@@ -1648,8 +1732,16 @@ bool CmdInterface::cmdIfaceProcessCommand()
     int ID;
     int reply = todo_msg;
     int tmp;
+
     point = cCmd;
     point = skipSpace(point); // just to be sure
+    tmp = strlen(cCmd) - 1;
+    while (point[tmp] < '!' && tmp > 0)
+    {
+        point[tmp] = 0; // also trailing spaces
+        -- tmp;
+    }
+
     list<string> msg;
 
     if (matchnMove(2, point, "exit"))
@@ -1749,6 +1841,18 @@ bool CmdInterface::cmdIfaceProcessCommand()
             synth->ListSettings(msg);
             synth->cliOutput(msg, LINES);
         }
+        else if (matchnMove(2, point, "mlearn"))
+            if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    if (isdigit(point[0]))
+                        synth->SetSystemValue(107, -string2int(point));
+                    else
+                        reply = value_msg;
+                }
+            else
+                synth->SetSystemValue(107, LINES);
         else if (matchnMove(1, point, "history"))
         {
             reply = done_msg;
@@ -1762,6 +1866,8 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 historyList(4);
             else if (matchnMove(1, point, "vectors"))
                 historyList(5);
+            else if (matchnMove(2, point, "mlearn"))
+                historyList(6);
             else
             {
                 replyString = "list history";
@@ -1907,14 +2013,53 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else
         {
-            replyString = "remove";
-            reply = what_msg;
+            if (matchnMove(2, point, "mlearn"))
+            {
+                if (matchnMove(3, point, "all"))
+                {
+                    sendDirect(0, 0, 0x60, 0xd8);
+                    reply = done_msg;
+                }
+                else if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    if (isdigit(point[0]))
+                        sendDirect(string2int(point), 0, 8, 0xd8);
+                    else
+                        reply = value_msg;
+                }
+                else
+                {
+                    replyString = "remove";
+                    reply = what_msg;
+                }
+            }
+            else
+            {
+                replyString = "remove";
+                reply = what_msg;
+            }
         }
     }
 
     else if (matchnMove(2, point, "load"))
     {
-        if(matchnMove(2, point, "vector"))
+        if(matchnMove(2, point, "mlearn"))
+        {
+            if (point[0] == '@')
+            {
+                point += 1;
+                point = skipSpace(point);
+                if (isdigit(point[0]))
+                    sendDirect(0, 0, 0xf2, 0xd8, 0, 0, 0, 0, string2int(point));
+
+            }
+            else
+                sendDirect(0, 0, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+            reply = done_msg;
+        }
+        else if(matchnMove(2, point, "vector"))
         {
             string loadChan;
             if(matchnMove(1, point, "channel"))
@@ -1994,7 +2139,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
     }
 
     else if (matchnMove(2, point, "save"))
-        if(matchnMove(2, point, "vector"))
+        if(matchnMove(2, point, "mlearn"))
+        {
+            if (point[0] == 0)
+                reply = name_msg;
+            else
+            {
+                sendDirect(0, 0, 0xf5, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+                reply = done_msg;
+            }
+        }
+        else if(matchnMove(2, point, "vector"))
         {
             tmp = chan;
             if(matchnMove(1, point, "channel"))
@@ -2076,10 +2231,20 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
     else if (matchnMove(6, point, "direct"))
     {
-        float value = string2float(point);
+        float value;
+        unsigned char type = 0;
+        if (matchnMove(3, point, "lim"))
+            value = FLT_MAX;
+        else
+        {
+            value = string2float(point);
+            if (strchr(point, '.') == NULL)
+                type |= 0x80;
+        }
         point = skipChars(point);
-        unsigned char type = (string2int127(point) & 0x40) | 0x91;
-        // fix as: not MIDI learn, from CLI, integer
+        type |= (string2int127(point) & 0x43);
+        // Fix as from CLI, integer
+        // Allow 'pretend' and MIDI learn
         point = skipChars(point);
         unsigned char control = string2int(point);
         point = skipChars(point);
@@ -2089,6 +2254,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         unsigned char engine = 0xff;
         unsigned char insert = 0xff;
         unsigned char param = 0xff;
+        unsigned char par2 = 0xff;
         if (point[0] != 0)
         {
             kit = string2int(point);
@@ -2102,11 +2268,16 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     insert = string2int(point);
                     point = skipChars(point);
                     if (point[0] != 0)
+                    {
                         param = string2int(point);
+                        point = skipChars(point);
+                        if (point[0] != 0)
+                            par2 = string2int(point);
+                    }
                 }
             }
         }
-        synth->interchange.commandFetch(value, type, control, part, kit, engine, insert, param);
+        sendDirect(value, type, control, part, kit, engine, insert, param, par2);
         reply = done_msg;
     }
     else
@@ -2117,6 +2288,25 @@ bool CmdInterface::cmdIfaceProcessCommand()
     else if (reply > done_msg)
         Runtime.Log(replies[reply]);
     return false;
+}
+
+
+int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+{
+    CommandBlock putData;
+    size_t commandSize = sizeof(putData);
+    putData.data.value = value;
+    putData.data.type = type | 0x10; // from command line
+    putData.data.control = control;
+    putData.data.part = part;
+    putData.data.kit = kit;
+    putData.data.engine = engine;
+    putData.data.insert = insert;
+    putData.data.parameter = parameter;
+    putData.data.par2 = par2;
+    if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
+        jack_ringbuffer_write(synth->interchange.fromCLI, (char*) putData.bytes, commandSize);
+    return 0; // no function for this yet
 }
 
 
@@ -2192,12 +2382,13 @@ void CmdInterface::cmdIfaceCommandLoop()
                 else
                     prompt += "Y";
             }
-            prompt += " > ";
+            prompt += "> ";
             sprintf(welcomeBuffer,"%s",prompt.c_str());
         }
         else
             usleep(20000);
     }
+
     if (write_history(hist_filename.c_str()) != 0) // writing of history file failed
     {
         perror(hist_filename.c_str());

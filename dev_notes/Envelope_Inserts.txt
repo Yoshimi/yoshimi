@@ -1,0 +1,57 @@
+This is a list of the direct access envelope inserts. There are 4 types of these, some only having a few of the controls. They are shown below with their controls. 'Par' is the parameter number that must be sent and 'Con' is the control number.
+
+Par     Con
+0   Amplitude
+        1   Attack time
+        3   Decay Time
+        4   Sustain Value
+        5   Release Time
+        7   Stretch
+        16  Forced Release
+        17  Linear
+        32  Enable Freemode
+
+1   Frequency
+        0   Attack Value
+        1   Attack Time
+        5   Release Time
+        6   Release Value
+        7   Stretch
+        16  Forced Release
+        32  Enable Freemode
+
+
+2   Filter
+        0   Attack Value
+        1   Attack Time
+        2   Decay Value
+        3   Decay Time
+        5   Release Time
+        6   Release Value
+        7   Stretch
+        16  Forced Release
+        32  Enable Freemode
+
+
+3   Bandwidth (only apples to SubSynth)
+        0   Attack Value
+        1   Attack Time
+        5   Release Time
+        6   Release Value
+        7   Stretch
+        16  Forced Release
+        32  Enable Freemode
+
+For all of these the insert value is 2.
+
+Refer to "Yoshimi Control Numbers.ods" for more detailed control layout.
+
+Freemode behaves quite differently and when enabled, the following controls are used instead, and are the same for all envelopes (although 'Stretch', 'Forced Release' and 'Linear Envelope' are as before).
+
+There is additional control number 34 that returns the number of defined graph points in 'Par 2', and control number 35 that detirmines which point on the graph is the release point (and can only be in the currently defined range).
+
+The axis graph controls are 'Add point' and 'Delete Point' Both of which have Insert value 3. Also, 'Change Point' has Insert value 4.
+
+All of these use 'Control' to define the graph point being accessed. For 'Add' and 'Change' 'Par 2' is the X axis increment and 'Value' is the Y axis value. When adding a point the control number is ORred with 64.
+
+Out of range or errors usually return X and/or Y as 0xff.

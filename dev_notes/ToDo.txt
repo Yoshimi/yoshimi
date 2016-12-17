@@ -1,9 +1,15 @@
 
+Send global and part keyshifts through ring buffer (like global fine detune).
+
+Sort out direct access dynfilter->filter (and two enclosed controls). All work but don't update gui.
+
+LV2: internal sound banks do not appear to be exposed as LV2 presets
+
+CLI doesn't manage global detune, but direct access does.
+
 Find out why LV2 only stores/retrieves patch sets (not state)
 
 Make add voice & add/pad oscillator windows show kit number & name.
-
-Investigate graded XML->minimal.
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
@@ -17,20 +23,16 @@ Startup state load doesn't set buffersize correctly - partially resolved.
 
 Allow headless compilation.
 
-Make attempt to start second independent instance open a new one in running
-yoshimi instead - saves memory and more consistent.
-
 Add scales control to CLI.
 
 Make things like LFOs either floats or much higher resolution.
 
-LFO frequency should be stated in Hz.
-Ampitude LFO depth should be in %
-Frequency LFO depth should be in cents.
-
-Consider filter settings too.
-
 Make LFOs active on sounding notes. Not easy!
+
+Consider enabling and disabling tooltips.
+
+Make attempt to start second independent instance open a new one in running
+yoshimi instead - saves memory and more consistent.
 
 
 RPNs (channel based)
@@ -42,11 +44,6 @@ RPNs (channel based)
 100,2 Coarse detune
 
 Maybe a NRPN variation of this for global fine tuning.
-
-
-Review tooltips.
-
-Consider enabling and disabling tooltips.
 
 Improve Copy & Paste functionality.
 

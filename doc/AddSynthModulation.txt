@@ -15,9 +15,6 @@ You can now use internal for this voice or select ext.m 1
 
 Change the internal one to, say Square
 
-Rinse and repeat for voice 3, and you will find you can use its internal or
-either of the two previous ones.
+Rinse and repeat for voice 3, and you will find you can use its internal or either of the two previous ones.
 
-Now the joker in the pack is that you can disable both the previous voices but
-*still* use their mod oscillators :)
 

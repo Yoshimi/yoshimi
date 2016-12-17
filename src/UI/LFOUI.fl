@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
-header_name {.h}
+version 1.0303 
+header_name {.h} 
 code_name {.cc}
 comment {LFOUI.h} {not_in_source in_header
-}
+} 
 
 comment {LFOUI.cc} {in_source not_in_header
-}
+} 
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,44 +27,44 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified October 2009
-} {selected in_source in_header
-}
+This file is a derivative of the ZynAddSubFX original, modified December 2016
+} {in_source in_header
+} 
 
 decl {\#include <iostream>} {public local
-}
+} 
 
 decl {\#include "UI/MiscGui.h"} {public local
-}
+} 
 
 decl {\#include "WidgetPDialUI.h"} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Group.H>} {public local
-}
+} 
 
 decl {\#include <FL/Fl_Box.H>} {public local
-}
+} 
 
 decl {\#include <FL/fl_draw.H>} {public local
-}
+} 
 
 decl {\#include <FL/fl_ask.H>} {public local
-}
+} 
 
 decl {\#include "PresetsUI.h"} {public local
-}
+} 
 
 decl {\#include "Params/LFOParams.h"} {public local
-}
+} 
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-}
+} 
 
 decl {\#include "MasterUI.h"} {private global
-}
+} 
 
-class LFOUI {: {public Fl_Group, PresetsUI_}
+class LFOUI {selected : {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -77,7 +77,7 @@ hide();
   }
   Function {make_window()} {} {
     Fl_Window lfoui {
-      xywh {1126 445 230 70} type Double color 50 labelfont 1 labelsize 12 hide
+      xywh {133 20 230 70} type Double color 50 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
@@ -87,48 +87,53 @@ hide();
         Fl_Dial freq {
           label {Freq.}
           callback {pars->Pfreq=o->value();
-send_data(type, 0, o->value(), false);}
+send_data(group, 0, o->value(), 0x48);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
-          code0 {if (engine < 0x80){if (type == 1) o->init(0.551f); else o->init(0.63f);}}
-          code1 {if (engine >= 0x80){if (type == 0) o->init(0.708f); else o->init(0.393f);}}
+          code0 {o->setValueType(VC_LFOfreq);}
+          code1 {if (engine < 0x80){if (group == 1) o->init(0.551f); else o->init(0.63f);}}
+          code2 {if (engine >= 0x80){if (group == 0) o->init(0.708f); else o->init(0.393f);}}
           class WidgetPDial
         }
         Fl_Dial intensity {
           label Depth
           callback {pars->Pintensity=(int)o->value();
-send_data(type, 1, o->value());}
+send_data(group, 1, o->value(), 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {if (engine < 0x80) o->init(0); else if (type == 0) o->init(32); else if (type == 1) o->init(40); else o->init(20);}
+          code0 {o->setValueType(getLFOdepthType(group));}
+          code1 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
           class WidgetPDial
         }
         Fl_Dial delay {
           label Delay
           callback {pars->Pdelay=(int)o->value();
-send_data(type, 2, o->value());}
+send_data(group, 2, o->value(), 0xc8);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {if (engine >= 0x80 && type == 0) o->init(30); else o->init(0);}
+          code0 {o->setValueType(VC_LFOdelay);}
+          code1 {if (engine >= 0x80 && group == 0) o->init(30); else o->init(0);}
           class WidgetPDial
         }
         Fl_Dial startphase {
           label Start
           callback {pars->Pstartphase=(int)o->value();
-send_data(type, 3, o->value());}
+send_data(group, 3, o->value(), 0xc8);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
-          code0 {if (engine >= 0x80 && type == 1) o->init(0); else o->init(64);}
+          code0 {o->setValueType(VC_LFOstartphase);}
+          code1 {if (engine >= 0x80 && group == 1) o->init(0); else o->init(64);}
           class WidgetPDial
         }
         Fl_Dial randomness {
           label {A.R.}
           callback {pars->Prandomness=(int)o->value();
-send_data(type, 4, o->value());}
+send_data(group, 4, o->value(), 0xc8);}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
+          code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
         Fl_Choice LFOtype {
           label Type
           callback {pars->PLFOtype=(int)o->value();
-send_data(type, 5, o->value());}
+send_data(group, 5, o->value(), 0xc0);}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
         } {
           MenuItem {} {
@@ -163,23 +168,25 @@ send_data(type, 5, o->value());}
         Fl_Check_Button continous {
           label {C.}
           callback {pars->Pcontinous=(int)o->value();
-send_data(type, 6, o->value());}
+send_data(group, 6, o->value(), 0xc0);}
           tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
           callback {pars->Pfreqrand=(int)o->value();
-send_data(type, 7, o->value());}
+send_data(group, 7, o->value(), 0xc8);}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
+          code1 {o->setValueType(VC_percent127);}
           class WidgetPDial
         }
         Fl_Dial stretch {
           label {Str.}
           callback {pars->Pstretch=(int)o->value();
-send_data(type, 8, o->value());}
-          tooltip {LFO stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+send_data(group, 8, o->value(), 0xc8);}
+          tooltip {LFO frequency stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(64);}
+          code1 {o->setValueType(VC_LFOStretch);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -206,17 +213,68 @@ randomness->value(pars->Prandomness);
 freqrand->value(pars->Pfreqrand);
 LFOtype->value(pars->PLFOtype);} {}
   }
-  Function {send_data(int type, int control, float value, bool isInteger = true)} {} {
+  Function {send_data(int group, int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | (isInteger << 7)), control, npart, kititem, engine, 0, type);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, 0, group);} {}
   }
-  Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int type_)} {} {
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+    float value = getData->data.value;
+    //unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char part = getData->data.part;
+    unsigned char eng = getData->data.engine;
+    
+    if (part != npart || (eng >= 128 && eng != engine))
+        return;
+
+    switch(control)
+    {
+    	case 0:
+    	    freq->value(value);
+    	    break;
+
+    	case 1:
+    	    intensity->value(value);
+    	    break;
+
+    	case 2:
+    	    delay->value(value);
+    	    break;
+
+    	case 3:
+    	    startphase->value(value);
+    	    break;
+
+    	case 4:
+    	    randomness->value(value);
+    	    break;
+
+    	case 5:
+    	    LFOtype->value((int)value);
+    	    break;
+
+    	case 6:
+    	    continous->value(value != 0);
+    	    break;
+
+    	case 7:
+    	    freqrand->value(value);
+    	    break;
+
+    	case 8:
+    	    stretch->value(value);
+    	    break;
+    }
+    Fl::check();} {}
+  }
+  Function {init(LFOParams *lfopars_, int npart_, int kititem_, int engine_, int group_)} {} {
     code {pars=lfopars_;
 synth = pars->getSynthEngine();
 npart = npart_;
 kititem = kititem_;
 engine = engine_;
-type = type_;
+group = group_;
 make_window();
 end();
 
@@ -234,8 +292,8 @@ lfoparamswindow->label(this->label());} {}
   }
   decl {int kititem;} {private local
   }
-  decl {int type;} {private local
+  decl {int group;} {private local
   }
   decl {int engine;} {private local
   }
-}
+} 

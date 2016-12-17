@@ -27,18 +27,12 @@ While using this, if you set 32 parts available, parts 17 - 31 can still be used
 
 
 The second form is column based and requires 64 parts to be set.
-This time you select 1 of 4, but per channel. This is much more suited to post
-recording automation, and potentially gives you 16 switchable channels. In this case rather than channel numbers you issue actual part numbers and the sofware will recognise the base channel it is on,
+This time you select 1 of 4, but per channel. This is much more suited to post recording automation, and potentially gives you 16 switchable channels. In this case rather than channel numbers you issue actual part numbers and the sofware will recognise the base channel it is on,
 
-If you want to use this to change parts on (say) actual channel 3 - (still counting
-from zero), send 3 with your defined CC to enable part 3 but disable parts
-19, 35, 51. Similarly sending 35 enables that part to respond to channel 3
-messages, disabling the others, which as above, will only then see note off.
+If you want to use this to change parts on (say) actual channel 3 - (still counting from zero), send 3 with your defined CC to enable part 3 but disable parts 19, 35, 51. Similarly sending 35 enables that part to respond to channel 3 messages, disabling the others, which as above, will only then see note off.
 
 
-To keep it all lightweight, you need to load and activate all the patches and
-parts you want, but that could be from a saved patch set. The channels are
-changed from the very first time you send the 'switch' CC.
+To keep it all lightweight, you need to load and activate all the patches and parts you want, but that could be from a saved patch set. The channels are changed from the very first time you send the 'switch' CC.
 
 If you want to look really clever the whole lot can be embedded in a MIDI file :)
 
@@ -52,7 +46,7 @@ First time start up has been improved slightly, and you will definitely have 'Ar
 
 Startup with GUI or CLI can now be set within the GUI whereas before it could only be done from the CLI. You are prevented from disabling them both! You are also warned that if you disable the GUI then next time you start you will have to do so from the CLI!
 
-The 'master' and 'instance' configuration files have now been seperated out. The mater settings are now 'invisible' in the later instance GUIs. This prevents possible ambiguity.
+The 'master' and 'instance' configuration files have now been seperated out, and  the master settings are now 'invisible' in the later instance GUIs. This prevents possible ambiguity.
 
 
 

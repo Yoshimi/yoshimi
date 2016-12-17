@@ -1,0 +1,36 @@
+V 1.5.0 - The Robin
+Still learning new songs and singing sweetly in the middle of winter.
+
+Vector control now has its own dedicated button on the main window. A little bit of shuffling meant that space could be created for it while actually making the window look neater, and the master controls more obvious!
+
+As a further protection against rogue sequencers making assupmtions, any attempt to set an invalid bank root will be ignored. The same was already true for banks themselves. Also, on first time startup, discovered roots will be given ID numbers starting from 5 and in steps of 5. This makes it a little easier to re-arrange them to your preference. We recommend that you don't have zero for either, as this is the usual assumed number.
+
+If working from the command line, listing roots and banks will identify the current ones with a '*'. Also, we forgot to mention at the last release that listing instruments, as well as showing the current bank and root you are listing from, will suffix each entry with A,S,P depending on the combination of AddSynth, SubSynth, Padsynth.
+
+Channel switching has now matured to a 'Solo' feature accessed from the mixer panel. When described to a sound engineer his response was "Of course it's a Solo. A bit unusual, but where else would you put it?"
+
+Another new feature is one that has been asked for several times - a crossfade for overlapping note ranges in instrument kits.
+
+Filter tracking could never quite reach 100% so if using it to get 'notes' from noise it would go slightly out of tune. Well, now we have an extra check box that changes its range so that instead of -100% : 98.4% it will track 0% : 198.4%
+
+These new features are the first that actually change instrument files. However, they are backwards compatible in that older versions of Yoshimi simply ignore them.
+
+
+Many of the controls now have active tooltips that show the current value when you hover over them, so you no longer have to click the control to see its value (and probably change it at the same time). Also, many have real-world terms. dB, Hz, mS etc.
+
+The biggie is MIDI learn. Yes it's finally here, and very full featured. It can be reached from the 'Yoshimi' drop-down menu, and tooltips will remind you of how it is used.
+
+More details on all of these can be found in the 'doc' directory.
+
+
+Under the hood:
+
+We've made a small, but useful improvement in note-on behaviour and a more significant one is in the planning stages. Note-on is when the greatest load is put on the processor.
+
+To build yoshimi fetch the tarball from either:
+    http://sourceforge.net/projects/yoshimi
+Or:
+    https://github.com/Yoshimi/yoshimi
+
+Our user list archive is at:
+    https://www.freelists.org/archive/yoshimi

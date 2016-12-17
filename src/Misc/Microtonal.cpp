@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2016 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,10 +20,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified March 2011
+    This file is derivative of original ZynAddSubFX code, modified October 2016
 */
 
 #include <cmath>
+#include <iostream>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -65,6 +67,10 @@ void Microtonal::defaults(void)
     Pglobalfinedetune = 64.0;
 }
 
+void Microtonal::setPartMaps(void)
+{
+    synth->setAllPartMaps();
+}
 
 // Get the frequency according to the note number
 float Microtonal::getNoteFreq(int note, int keyshift)
@@ -85,9 +91,8 @@ float Microtonal::getNoteFreq(int note, int keyshift)
     // was float globalfinedetunerap = powf(2.0f, (Pglobalfinedetune - 64.0f) / 1200.0f);
 
     if (!Penabled)
-    {
-        return getNoteFreq(note + keyshift) * globalfinedetunerap;
-    }
+        return getFixedNoteFreq(note + keyshift) * globalfinedetunerap;
+
 
     int scaleshift = (Pscaleshift - 64 + octavesize * 100) % octavesize;
 
@@ -172,7 +177,6 @@ float Microtonal::getNoteFreq(int note, int keyshift)
         return freq * rap_keyshift;
     }
 }
-
 
 // Convert a line to tunings; returns -1 if it ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
@@ -386,7 +390,7 @@ int Microtonal::loadscl(string filename)
         octave[i].x1 = tmpoctave[i].x1;
         octave[i].x2 = tmpoctave[i].x2;
     }
-
+    setPartMaps();
     return 0;
 }
 
@@ -655,6 +659,7 @@ bool Microtonal::loadXML(string filename)
         return false;
     }
     getfromXML(xml);
+    setPartMaps();
     xml->exitbranch();
     delete xml;
     return true;

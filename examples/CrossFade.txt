@@ -1,0 +1,8 @@
+
+CrossFade.xiz is an instrument incorporating the new crossfade feature in kits.
+
+As well as appearing to blend three different sounds, the middle and upper ones have independent effects, and the lower and upper ones are panned slightly left and right.
+
+If you open the virtual keyboard and use the mouse to run up and down the keys you get a very good idea of how the sound morphs.
+
+If you look at the part kit you will see that there are actually four kit items, two pairs that meet in the middle. This is what makes a central sound seem to both fade in, then fade out again.

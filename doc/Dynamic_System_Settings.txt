@@ -18,7 +18,7 @@ MSB
 
 101 LSB > 63        Autoload default state on startup.
 
-102 LSB > 63        Ad times to instrument load message.
+102 LSB > 63        Add times to instrument load message.
 
 103 LSB > 63        Hide non-fatal report messages.
 

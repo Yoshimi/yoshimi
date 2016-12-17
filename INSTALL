@@ -1,6 +1,8 @@
 ---- Installing yoshimi ----
 
-It's a CMake build. Simply cd to the src directory, then
+Before doing this, check the "Dependencies" file and make sure you have all of the entries in place.
+
+It's a CMake build.  Simply cd to the src directory, then
     ccmake .
     cmake .
     make
@@ -11,54 +13,62 @@ which builds an executable called yoshimi, installed by default in
 
 ---- Sample instructions to compile/build using ccmake on Linux , outside-source-tree -----
 
-This uses "yoshimi-1.3.8" as an example, should work fine with other versions.  If these instructions fail to work, perhaps new build instructions should be provided.
+This uses "yoshimi-1.4.1" as an example, should work fine with other versions.
 
-Here is to build/compile using ccmake, in separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
+Here is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
 Extract source code archive:
 
-   mkdir /path/to/workDir/
-   cd    /path/to/workDir/
-   tar -jxvf /path/to/yoshimi-1.3.8.tar.bz2
-   
-now there should be a directory for
+    mkdir /path/to/workDir
+    cd    /path/to/workDir
+    tar -jxvf /path/to/yoshimi-1.4.1.tar.bz2
 
-   /path/to/workDir/yoshimi-1.3.8/
+Now there should be a directory:
 
-create a separate directory for build, spaces in fileName and directoryName can be problematic, try to avoid it.
+   /path/to/workDir/yoshimi-1.4.1
 
-   mkdir /path/to/workDir/build.yoshimi-1.3.8/
-   cd /path/to/workDir/build.yoshimi-1.3.8/
-   ccmake /path/to/workDir/yoshimi-1.3.8/
-   
-"/path/to/workDir/yoshimi-1.3.8/" is the source code directory.
-"/path/to/workDir/build.yoshimi-1.3.8/" is now the current working directory, will have make-related files (when ccmake is done with configuring and generate the files).
-   
-Within ccmake, type 'c' (without the quotes) to generate a default configuration.  Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there is any missing pre-requisite libraries and/or softwares, it should prompt you with such info.  You can install such pre-requisite softwares and try this ccmake configuration steps again.
+If this has a build directory inside, move into this directory:
+
+    cd yoshimi-1.4.1/build
+
+Otherwise create it first with:
+
+    mkdir yoshimi-1.4.1/build
+
+"/path/to/workDir/yoshimi-1.4.1/" is the source code directory.
+"/path/to/workDir/yoshimi/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
+
+Run ccmake:
+
+   ccmake ../src
+
+Note the two dots!
+
+Within ccmake, type 'c' (without the quotes) to generate a default configuration.  Type 'c' again to actually apply the current configuration data (repeat multiple times if needed).  If there are any missing pre-requisite libraries and/or softwares (dependencies), it should prompt you with such info.  You can install such dependencies and try these ccmake configuration steps again.
 
 When ccmake configuration is complete, there should be a new option displayed: 'g' to generate (the make-related files) and exit.
 
-In other words, if you alreay have all pre-requisites in place, then when you run ccmake, just try 'c', then 'c' again, when 'g' appears as a choice, type 'g'.  The make-related files are created in the current directory, and ccmake is done.  You are now back at the command line.
+In other words, if you already have all dependencies in place, then when you run ccmake, just try 'c', then 'c' again, when 'g' appears as a choice, type 'g'.  The make-related files are created in the current directory, and ccmake is done.  You are now back at the command line.
 
 Next is to compile (build) the application:
 
    make
-   
-When compilation is completed successfully, install it with:
+
+When compilation is completed successfully, install it (as root) with:
 
    make install
-   
-Yoshimi will in fact run anywhere in userspace, which can be convenient as an alternative to installing it - especially when comparing different built versions. In this case banks and presets will remain in the yoshimi directory.
+
+Yoshimi will in fact run anywhere in userspace, which can be convenient as an alternative to installing it - especially when comparing different built versions.  In this case banks and presets will remain in the yoshimi directory.
 
 
 ---- Build and command line options ----
 
-Yoshimi builds with both Jack and Alsa audio and midi options. The default audio and midi options to be used are nominated in the ccmake configuration stage. These, and other options can be nominated at runtime via command line parameters.
+Yoshimi builds with both Jack and Alsa audio and midi options.  Jack is the default for both audio and midi.  However, if this is not available Yoshimi will try for Alsa.  These, and other options can be nominated at runtime via command line parameters, and via the Graphical User Interface.
 
 
 ---- Instrument banks ----
 
-Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/). On startup, it also looks to the standard zynaddsubfx bank directories, and deals politely with any duplications that may exist there. You can tune your choice of bank directories via Settings.
+Yoshimi installs its own copy of the instrument banks (installed by default in usr/local/share/yoshimi/banks/).  On first time startup, it also looks to the standard zynaddsubfx bank directories and includes any that may exist there.  You can tune your choice of bank directories via "Instruments" or "Paths".
 
 
 ---- Help ----

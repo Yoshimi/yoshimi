@@ -1,4 +1,421 @@
-yoshimi 1.4.x
+yoshimi 1.5.0
+
+2016-12-17
+* Added warning for undefined kits in Midi learn.
+* Finalised all code and docs for release.
+* Set version 1.5.0
+
+2016-12-16
+* Changed Midi learn spinboxes to number entries.
+* Adjusted Midi learn window dimensions.
+* Corrected tooltips, spellings and acromyms.
+* Set version to 1.5.0 rc5
+
+2016-12-15 Will
+* Changed virtual keyboard key map labels and tooltips.
+* More doc updates.
+* Set version to 1.5.0 rc4
+
+2016-12-13 Will
+* Midi learn can now be cancelled.
+* Set Yoshimi (instance) in midi-learn message windows.
+* Corrected tooltip for oscillator harmonic randomness.
+* More doc updates.
+* Set version to 1.5.0 rc3
+
+2016-12-12 Jörn
+* More tooltips updates.
+  Distortion
+  Phaser
+  Chorus
+  Reverb
+  Echo
+  System sends
+* Set version to 1.5.0 rc2
+
+2016-12-12 Will
+* Doc updates.
+
+2016-12-11 Will
+* Implemented message window for midi learning.
+* Corrected GUI access to midi-learn general opps.
+* Set version to 1.5.0 rc1
+
+2016-12-10 Will
+* Bugfix: CLI was trapping the wrong midi-learn control.
+* CLI now change midi-learn mute, limit, block switches.
+* Added load/save messages to midi-learn.
+
+2016-12-9 Will
+* Bugfix: CLI load midi-learn from list had missing return.
+* Implemented CLI midi-learn line & list removal.
+* CLI can now list individual midi learn lines in detail.
+* Sent midi-learn general ops through ring buffer.
+* CLI can now change midi-learn CC, chan, min, max.
+
+2016-12-8 Will
+* Implemented 'activity' LED for midi-learn.
+* CLI history lists now numbered.
+* Implemented CLI midi-learn load & save.
+* Updated docs.
+
+2016-12-7 Will
+* Added new file to dev_notes: System_Values.txt
+* Added list file leafname to midi-learn window title.
+* Updated docs.
+
+2016-12-6 Will
+* Started implementing CLI access to midi-learn.
+  Also replaced 'changeLine(' with 'generalOpps(' as it
+  is more appropriate now.
+
+2016-12-5 Will
+* Small optimsation in crossfade.
+* Tidied up code in Interchange and MIdilearn.
+* All sliders/knobs mid-learnable except 'Controllers'.
+
+2016-12-5 Jörn
+* More tooltips updates.
+
+2016-12-5 Will
+* Bugfix: midi-learn scroll bar wasn't working.
+* Most sliders/rotary controls now available to midi-learn.
+
+2016-12-4 Will
+* Implemented full midi-learn save, load/recent.
+* Set windows of vectors and midi-learn to Yoshimi defaults.
+* Simplified history type selection in parameters window.
+* Bugfix: segfault clicking empty parameters window :(
+* Updated docs.
+
+2016-12-3 Patch from : Alexander
+* Bugfix: state load wasn't setting keyshifts.
+
+2016-12-2 Will
+* Started defining a standardised limits routine.
+  This will return min, max, default for any control.
+* Bugfix: LV2 was trapping unknown CCs instead of allowing
+  them to be passed on to midi-learn!
+* More work on limits.
+
+2016-12-2 Merge from : Jörn
+* Extensive tooltip upgrade dynamically giving real values.
+* Some code style consistency adjustments.
+
+2016-11-30 Will
+* First draft of midi-learn saving.
+* Bugfix: Had to remove fltk midi-learn warning.
+  It goes into a loop on spinboxes :(
+* midi-learn load and save both working with default name
+  "testmidi" in /home/{user}.
+
+2016-11-29 Will
+* Corrected anomaly when changing midi-learn channel numbers.
+* Changed 'doublefreqtrack' to 'freqtrackoffset'.
+
+2016-11-28 Merge from : Jörn
+* Added button to filter tracking, offsetting range for 0 200%.
+
+2016-11-27 Will
+* midi-learn menu changed to buttons.
+* midi-learn clear all implemented.
+* Running learned controls can now go 'in_place' for LV2.
+
+2016-11-26 Will
+* Small midi-learn / Interchange optimisations.
+* Direct access global fine detune now goes through ring buffer
+  to stop Xruns - particularly with midi-learn.
+* Enabled midi-learn of part effect sends.
+* BugFix: reinstated direct control of effects.
+  GUI not updated :(
+* Enabled midi-learn of effects.
+* Effects GUI now updated for all except some dynfilter knobs.
+
+2016-11-25 Will
+* Implemented the 'delete' function in midi-learn.
+* More doc updates!
+
+2016-11-24 Will
+* Enabled all midi-learn editors except CC and channel.
+* All midi-learn editors now working :)
+* Bugfix: Odd control combinations segfaulted - cured.
+* Bugfix: Curing old bug in direct access that segaulted on
+  invalid kit access stopped all access to kits. Now done.
+* Doc updates.
+
+2016-11-23 Will
+* Adding new learned lines now fully updates to the Gui.
+* Removed test button.
+* Number of lines temporarily limited to 128.
+
+2016-11-22 Will
+* Enabled midi-learn from CLI direct access.
+* Normal CLI can also list current learned lines.
+* Implemented (forgotten) AddSynth direct -> gui envelopes
+  but still not freemode.
+* Updated docs.
+
+2016-11-21 Will
+* Partially set up routing for midi learn messages.
+* BugFix: Wrong ID for kits allowed part messages to drop
+  through causing a segfault.
+* Some optimisations in Interchange.cpp
+* Filters and envelopes can now be midi-learned but envelopes
+  don't update the GUI.
+
+2016-11-20 Will
+* Midi learn window now accessible but non-functional.
+* Midi learn Gui now has some internal test structure.
+* Updated docs.
+* Resolved issue with learned controls not all updating :)
+
+2016-11-19 Will
+* Made a few corrections and extensions to midi learn.
+* Started documenting this.
+* Bugfix: reverted change that had killed midi learn :(
+* More midi learn refinements.
+  Tested limits & status (but no interface yet).
+* Created potential GUI based on part kits.
+
+2016-11-18 Will
+* Started midi learn. Basic entries in place - not active.
+  LV2 behaviour not tested yet.
+* Bugfix: Vector window wasn't updated on part change.
+* Many controls now midi learnable - can't be deleted.
+
+2016-11-16 Will
+* Added 'CoolSound' demo vector definition file to examples.
+* Small change to ID GUI controls as MIDI-learnable.
+* Updated docs.
+
+2016-11-13
+* Direct -> gui filter done (not dynfilter).
+* Direct -> gui envelope basics done (not freemode).
+* Updated and corrected docs.
+
+2016-11-12 Will
+* Bugfix: direct filter gain was changed by wrong control.
+* Started direct -> gui filter control.
+* Updated docs.
+
+2016-11-11 Will
+* Finalised CMake ncurses correction from Giovanni.
+* Add more explanatory detail to earliar changes made to
+  Bank/Program change in MusicIO.cpp
+* Re-instated 'in place' for jack freewheeling. Wasn't in use
+  when program load issue arose :(
+* Small optimisation to drum mode note base frequency.
+
+2016-11-7 Will
+* Improved crossfade dynamics.
+* More docs.
+* Added 'CrossFade.xiz' instrument to 'examples' files.
+  Included 'CrossFade.txt' description.
+* Added compiler switch for Note-On time reporting.
+  Needs 'Log Load times' checked in settings.
+
+2016-11-6 Will
+* Enhanced part onoff control for internal routines.
+    0 = off
+    1 = on
+    2 = inhibit and store last
+    3 = restore last
+* Direct -> gui LFOs done.
+
+2016-11-5 Will
+* Direct -> gui part kits done.
+* Direct -> gui part system sends done.
+* Direct -> gui resonance graph done.
+* Corrected errors in docs.
+
+2016-11-4 Will
+* Direct -> gui oscllator done.
+* Bugfixes: some oscillator direct access errors :(
+* Updated docs.
+* Direct -> gui resonance mostly done (not points).
+* Minor direct access optimisations.
+
+2016-11-1 Will
+* Cmake fix: nucurses now compulsory, but ncursesw optional.
+
+2016-10-30 Will
+* Implemented kit item crossfades (in pairs).
+* A couple of small bugfixes on the new crossfade.
+* Docs updated.
+
+2016-10-29 Will
+* Microtonal GUI now only needs 'Apply' button on text fields.
+* Setting an invalid root now leaves root and bank unchanged.
+* First time bank root IDs now start at 5 spaced 5 apart.
+* Added '*' to current root/bank in CLI lists.
+
+2016-10-28 Will
+* Separated key shift from main tuning.
+* Oops - got that wrong :(
+* Microtonal optimisation using a key map table - better!
+
+2016-10-27 Will
+* Direct access Bugfixes:
+  Oscillator waveshape parameter read returned wrong result.
+  Addsynth voice would crash if addsynth GUI not seen.
+  Subsynth hamonics GUI slider move reversed.
+* Revised GUI data sending to allow reads as well as writes.
+
+2016-10-26 Will
+* Started separating out CLI replies from main direct entries.
+* Completed separation up to voice level.
+* All done!
+
+2016-10-24 Will
+* Implemented mising direct modulator 440Hz switch.
+* Completed direct -> gui addsynthvoice.
+* Updated docs.
+
+2016-10-23 Will
+* Bugfix: direct -> gui 440Hz wasn't correct for sub/pad.
+* direct -> gui addsynthvoice done apart from modulators.
+
+2016-10-22 Will
+* Added Loop mode to Solo feature.
+* direct -> gui padsynth completed.
+* Updated docs.
+
+2016-10-21 Will
+* direct -> gui part kit mode & drum mode done.
+* direct -> gui addsynth main completed.
+* direct -> gui subsynth completed.
+* Updated docs.
+
+2016-10-16 Will
+* Completed direct gui system/insert effects.
+* More done on direct gui part.
+* Gui tooltip correction.
+
+2016-10-15 Will
+* Changed GUI channel switcher name to 'Solo'.
+* Corrected GUI anomalies with channel switcher.
+* New Solo.txt in doc.
+
+2016-10-14 Will
+* Moved vectors entry to its own button.
+* Rearanged icons.
+* Added channel switcher to 'Patch Sets' files.
+* Moved Channel switcher GUI control from config to Mixer Panel.
+* Added channel switcher controls to direct access.
+* Updated docs.
+
+2016-10-13 Will
+* Direct gui part base controls mostly done.
+* Doc updates.
+
+2016-10-12 Will
+* Completed direct gui main controls.
+* Starting to populate direct gui part level controls.
+* Updated docs.
+* Direct gui Add, Sub, Pad vol/vsense/pan controls done.
+
+2016-10-11 Will
+* Proved direct gui updates correct for main & part controls :)
+
+2016-10-10 Will
+* Ringbuffer size corrections.
+* Docs punctuation corrections.
+* Started to implement direct access -> gui updates.
+
+2016-10-9 Will
+* Gave direct access CLI & GUI independent 'from' ring buffers.
+* Improved direct access data transfers.
+* Small correction to Vector GUI.
+* Improved simple message system.
+
+2016-10-8 Will
+* Direct vector access almost complete.
+* Updated docs.
+
+
+2016-10-7 Will
+* Small corrections to GUI.
+* More work on direct Vector access.
+* Updated docs.
+
+2016-10-4 Will
+* Started implementing direct access to Vectors.
+
+2016-9-28 Will
+* Added more info to /dev_notes and /doc.
+* Added three new instruments to "Companion"
+* No code changes.
+
+2016-9-26 Will
+* Bugfix: AddSynth Mod Amp Env enable now works.
+* Applied Jespers batch to make scripts bash/dash compatible.
+* Corrected and updated docs.
+
+2016-9-25 Will
+* Temporarily reverted actual splash screen to original.
+
+2016-9-24 Will
+* Merged splash updates from Jesper.
+
+2016-9-23 Will
+* Removed duplicate enable Freq Filter command.
+* Bugfix: All AddSynth osc commands were going to the modulator.
+* Upgraded and tested build instructions.
+* Updated docs.
+
+2016-9-22 Will
+* Bugfix: direct access SubSynth Freq Env En was quite wrong :(
+* Updated docs.
+
+2016-9-21 Will
+* Implemented direct access for AddSynth (not fully tested).
+* Setting direct access type bit 0 now only echos byte stream.
+* Updated docs.
+
+2016-9-19 Will
+* TEMPORARY fix: pad apply parameters wasn't working headless.
+  Should probably use a list, not single integer.
+
+2016-9-18 Will
+* Implemented Oscillator direct access.
+* Updated and corrected docs.
+* Small correction to Resonance.
+* Minor code optimisations.
+
+2016-9-17 Will
+* CLI now strips trailing spaces.
+* Implemented PadSynth direct access base controls.
+* Updated docs.
+* Implemented Resonance direct access.
+
+2016-9-15 Will
+* Bugfix: direct access wasn't updating SubSynth overtones.
+* Replaced HTML version of control numbers with text version.
+* Bugfix: GUI wasn't sending kit number on envelope freemode.
+* Optimised some direct access code.
+
+2016-9-11 Will
+* Further updates to docs
+* New HTML copy of "Yoshimi Control Numbers".
+* No code changes.
+
+2016-9-10 Will
+* Completed direct access envelope free mode. Oh what fun :(
+  Switching from fixed to free and back still to be finalised.
+* Revised docs.
+
+2016-9-9 Will
+* Revised direct access, now needs 8 unsigned chars.
+* Implemented envelope direct controls (not free mode yet).
+* Updated docs.
+* Implemented LFO direct controls.
+* Direct access now recognises floating point 'value'.
+* Updated docs.
+
+2016-9-8 Will
+* Applied spelling patch from Jaromír Mikeš
+* Added warning to dev_notes/Direct_Access.txt
+* Now identifies SubSynth bandwidth envelope.
 
 2016-9-5 Will
 * Setup for next master version.

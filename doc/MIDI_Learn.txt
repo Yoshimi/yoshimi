@@ -1,0 +1,42 @@
+This now completely implemented.
+
+To learn, hold CTRL while right-clicking on any GUI control. There will be a pop-up window detailing the control you selected, or a message saying it's not learnable.
+
+You will also get a message in the console window (or CLI).
+
+After that, if you were learning, the first physical controller you move, or CC message you send will be locked, and you'll see the GUI knob or slider move in sympathy with the physical control. The pop-up window will also disappear. and the console message will be "Learned" and a line underneath with exactly what contorol was caught.
+
+If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
+
+There is also an 'activity' LED that flickers when the associated CC/channel is recieved.
+
+Editor settings available:
+
+Incoming CC.
+
+Incoming channel number.
+
+Minimum & Maximum incoming values (if Min is greater than Max it reverses the control direction).
+
+The range can either be in the style of a limiter or as compression.
+
+Blocking of all later actions on the same CC/channel pair (including system ones).
+
+Muting of this line - nullifying all of the above.
+
+You can delete any existing line by holding down the 'CTRL' key and then clicking on the 'Control Function' text for that line. You will then be presented with a confirmation message giving the line number and the text as a reminder.
+
+The same CC/controller can be used to change several different internal Yoshimi controls. e.g. you can have a part's volume being changed while another part is having an effect level changed.
+
+Adding or deleting lines, or changing either CC or channel numbers will re-order the others.
+
+There is a button at the bottom of the window for clearing the entire learned list.
+
+A complete list can be saved by clicking on the 'save' button and you will get the usual file choser window.
+
+Loading sets follows the same practice. If a loaded set refers to Yoshimi controls that are disabled, or don't exist, such controls will be ignored. However the 'block feature will still be active unless the line is muted.
+
+Finaly, there is a button for loading a set from the recent history.
+
+To come:
+Paging of the display so you don't end up scrolling through a massive list.
