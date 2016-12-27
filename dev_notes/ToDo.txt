@@ -23,6 +23,8 @@ Startup state load doesn't set buffersize correctly - partially resolved.
 
 Allow headless compilation.
 
+Add ARM specific options to CmakeLists.txt
+
 Add scales control to CLI.
 
 Make things like LFOs either floats or much higher resolution.

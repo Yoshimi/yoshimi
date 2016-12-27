@@ -1,11 +1,15 @@
 yoshimi 1.5.0
 
-2016-12-17
+2016-12-27 Will
+* doc updates and corrections.
+* set version to 1.5.0 M - no code changes.
+
+2016-12-17 Will
 * Added warning for undefined kits in Midi learn.
 * Finalised all code and docs for release.
 * Set version 1.5.0
 
-2016-12-16
+2016-12-16 Will
 * Changed Midi learn spinboxes to number entries.
 * Adjusted Midi learn window dimensions.
 * Corrected tooltips, spellings and acromyms.
