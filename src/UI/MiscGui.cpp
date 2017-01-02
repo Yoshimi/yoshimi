@@ -45,7 +45,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 // identifying this for button 3 as MIDI learn
                 else
                 {
-                    synth->getGuiMaster()->midilearnui->words->copy_label("Can't midi-learn this control");
+                    synth->getGuiMaster()->midilearnui->words->copy_label("Can't learn this control");
                     synth->getGuiMaster()->midilearnui->message->show();
                     synth->getRuntime().Log("Can't MIDI-learn this control");
                     /* can't use fl_alert here.

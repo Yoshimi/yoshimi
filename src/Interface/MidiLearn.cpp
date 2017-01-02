@@ -78,6 +78,8 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         if (lastpos == -3)
             return false;
         float value = _value;
+        if (CC == 128)
+            value = (value / 128.0) + 64; // convert from 14 bit pitchbend
         int status = foundEntry.status;
         if ((status & 4) == 4)
             continue;
@@ -320,9 +322,6 @@ bool MidiLearn::remove(int itemNumber)
 
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-
-    // list controls
-    string name;
     if (control == 96)
     {
         midi_list.clear();
@@ -330,6 +329,8 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         synth->getRuntime().Log("List cleared");
         return;
     }
+
+    string name;
     if (control == 241)
     {
         name = (miscMsgPop(par2));
@@ -338,7 +339,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         updateGui();
         return;
     }
-    if (control == 242)
+    if (control == 242) // list controls
     {
         int tmp = synth->SetSystemValue(106, par2);
         if (tmp == -1)
@@ -389,15 +390,61 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
 
     if (insert == 0xff) // don't change
         insert = it->min_in;
+
     if (parameter == 0xff)
         parameter = it->max_in;
+
     if (type == 0xff)
         type = it->status;
-    else
+
+    if (kit == 255)
+        kit = it->CC;
+
+    if (engine == 255)
+        engine = it->chan;
+
+    if (control == 16)
     {
-        unsigned char mask = 0xff - (1 << control);
-        unsigned char temp = it->status & mask;
-        type = temp | type;
+        bool moveLine = true;
+        list<LearnBlock>::iterator nextit = it;
+        list<LearnBlock>::iterator lastit = it;
+        ++ nextit;
+        -- lastit;
+        if (it == midi_list.begin() && nextit->CC >= kit)
+        {
+            if (nextit->CC > kit || nextit->chan >= engine)
+                moveLine = false;
+        }
+        else if (nextit == midi_list.end() && lastit->CC <= kit)
+        {
+            if (lastit->CC < kit || lastit->chan <= engine)
+                moveLine = false;
+        }
+
+        // here be dragons :(
+        else if (kit > it->CC)
+        {
+            if (nextit->CC > kit)
+                moveLine = false;
+        }
+        else if (kit < it->CC)
+        {
+            if (lastit->CC < kit)
+                moveLine = false;
+        }
+        else if (engine > it->chan)
+        {
+            if (nextit->CC > kit || nextit->chan >= engine)
+                moveLine = false;
+        }
+        else if (engine < it->chan)
+        {
+            if (lastit->CC < kit || lastit->chan <= engine)
+                moveLine = false;
+        }
+
+        if (!moveLine)
+            control = 7; // change this as we're not moving the line
     }
 
     if (control == 8)
@@ -410,22 +457,29 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
 
     if (control < 8)
     {
+        CommandBlock putData;
+        memset(&putData.bytes, 255, sizeof(putData));
+        // need to work on this lot
+        putData.data.value = value;
+        putData.data.type = type;
+        putData.data.control = 7;
+        putData.data.kit = kit;
+        putData.data.engine = engine;
+        putData.data.insert = insert;
+        putData.data.parameter = parameter;
+        it->CC = kit;
+        it->chan = engine;
         it->min_in = insert;
         it->max_in = parameter;
-        it->status = type & 0xf;
-        updateGui();
+        it->status = type;
+        writeToGui(&putData);
+        return;
     }
 
     if (control == 16)
     {
-        if (kit < 0xff)
-            entry.CC = kit;
-        else
-            entry.CC = it->CC; // don't change
-        if (engine < 0xff)
-            entry.chan = engine;
-        else
-            entry.chan = it->chan;
+        entry.CC = kit;
+        entry.chan = engine;
         entry.min_in = insert;
         entry.max_in = parameter;
         entry.status = type;
@@ -533,17 +587,36 @@ void MidiLearn::insert(unsigned char CC, unsigned char chan)
 }
 
 
+void MidiLearn::writeToGui(CommandBlock *putData)
+{
+    putData->data.part = 0xd8;
+    unsigned int writesize = sizeof(*putData);
+    char *point = (char*)putData;
+    unsigned int towrite = writesize;
+    unsigned int wrote = 0;
+    unsigned int found = 0;
+    unsigned int tries = 0;
+    if (jack_ringbuffer_write_space(synth->interchange.toGUI) >= writesize)
+    {
+        while (towrite && tries < 3)
+        {
+            found = jack_ringbuffer_write(synth->interchange.toGUI, point, towrite);
+            wrote += found;
+            point += found;
+            towrite -= found;
+            ++tries;
+        }
+        if (towrite)
+            synth->getRuntime().Log("Unable to write data to toGui buffer", 2);
+    }
+    else
+        synth->getRuntime().Log("toGui buffer full!", 2);
+}
+
+
 void MidiLearn::updateGui(int opp)
 {
     CommandBlock putData;
-    unsigned int writesize = sizeof(putData);
-    char *point = (char*)&putData;
-    unsigned int towrite;
-    unsigned int wrote;
-    unsigned int found;
-    unsigned int tries;
-
-    putData.data.part = 0xd8;
     if (opp == 21)
     {
         putData.data.control = 21;
@@ -560,25 +633,7 @@ void MidiLearn::updateGui(int opp)
         putData.data.par2 = 0xff;
     }
     putData.data.value = 0;
-    towrite = writesize;
-    wrote = 0;
-    found = 0;
-    tries = 0;
-    if (jack_ringbuffer_write_space(synth->interchange.toGUI) >= writesize)
-    {
-        while (towrite && tries < 3)
-        {
-            found = jack_ringbuffer_write(synth->interchange.toGUI,point, towrite);
-            wrote += found;
-            point += found;
-            towrite -= found;
-            ++tries;
-        }
-        if (towrite)
-            synth->getRuntime().Log("Unable to write data to toGui buffer", 2);
-    }
-    else
-        synth->getRuntime().Log("toGui buffer full!", 2);
+    writeToGui(&putData);
 
     if (opp >= 1) // sending back message gui
         return;
@@ -588,7 +643,6 @@ void MidiLearn::updateGui(int opp)
     it = midi_list.begin();
     while (it != midi_list.end())
     {
-        putData.data.part = 0xd8;
         putData.data.value = lineNo;
         putData.data.type = it->status;
         putData.data.control = 16;
@@ -597,26 +651,7 @@ void MidiLearn::updateGui(int opp)
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
         putData.data.par2 = miscMsgPush(it->name);
-        char *point = (char*)&putData;
-        towrite = writesize;
-        wrote = 0;
-        found = 0;
-        tries = 0;
-        if (jack_ringbuffer_write_space(synth->interchange.toGUI) >= writesize)
-        {
-            while (towrite && tries < 3)
-            {
-                found = jack_ringbuffer_write(synth->interchange.toGUI, point, towrite);
-                wrote += found;
-                point += found;
-                towrite -= found;
-                ++tries;
-            }
-            if (towrite)
-                synth->getRuntime().Log("Unable to write data to toGui buffer", 2);
-        }
-        else
-            synth->getRuntime().Log("toGui buffer full!", 2);
+        writeToGui(&putData);
         ++it;
         ++lineNo;
     }

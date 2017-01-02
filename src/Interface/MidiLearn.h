@@ -67,7 +67,7 @@ class MidiLearn : private MiscFuncs
             int min_out; // defined programaticly
             int max_out; // defined programaticly
             Control data; // controller to learn
-            string name; // optional derived from controller text?
+            string name; // derived from controller text
         };
         bool learning;
 
@@ -91,6 +91,7 @@ class MidiLearn : private MiscFuncs
 
         void insert(unsigned char CC, unsigned char chan);
         SynthEngine *synth;
+        void writeToGui(CommandBlock *putData);
         void updateGui(int opp = 0);
 };
 

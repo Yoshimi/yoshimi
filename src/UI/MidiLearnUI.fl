@@ -67,7 +67,7 @@ class MidiLearnKitItem {: {public Fl_Group}
       } {
         Fl_Spinner CCcounter {
           callback {send_data(16);}
-          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 119 value 14 textsize 12
+          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 128 value 14 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
@@ -199,7 +199,7 @@ if (o->value())
 else
     midilearnkititemgroup->activate();
 send_data(2);}
-        tooltip {Completely ignore this line} xywh {39 0 19 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+        tooltip {Completely ignore this line} xywh {39 0 16 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
@@ -298,6 +298,11 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         label Max
         xywh {265 0 40 15} labelfont 1 labelsize 11 align 18
       }
+      Fl_Button {} {
+        label Close
+        callback {midilearnwindow->hide();}
+        xywh {730 262 63 20} box THIN_UP_BOX
+      }
       Fl_Button load {
         label Load
         callback {char *filename;
@@ -337,11 +342,6 @@ synth->getGuiMaster()->paramsui->Show(6);}
         code0 {vector<string> &listType = *synth->getHistory(6);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
-      Fl_Button {} {
-        label Close
-        callback {midilearnwindow->hide();}
-        xywh {730 262 63 20} box THIN_UP_BOX
-      }
     }
     Fl_Window message {
       xywh {4 20 290 85} type Double labelsize 12 hide
@@ -372,14 +372,33 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     int value = lrint(getData->data.value);
+    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
 
     switch(control)
     {
         case 0:
+            break;
+        case 7:
+            if(type < 255) // edit line in place
+            {
+                midilearnkititem[value]->blockcheck->value((type & 1) != 0);
+                midilearnkititem[value]->compresscheck->value((type & 2) != 0);
+                midilearnkititem[value]->mutecheck->value((type & 4) != 0);
+            }
+            if (kititem < 255)
+                midilearnkititem[value]->CCcounter->value(kititem);
+            if (engine < 255)
+                midilearnkititem[value]->channelchoice->value(engine);
+            if (insert < 255)
+                midilearnkititem[value]->minval->value(insert);
+            if (parameter < 255)
+                midilearnkititem[value]->maxval->value(parameter);
             break;
         case 16:
             addLine(getData);
@@ -395,7 +414,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             {
                 if (midilearnkititem[i] != NULL)
                 {
-                    if (midilearnkititem[i]->CCcounter->value() == kititem && midilearnkititem[i]->channelchoice->value() == engine)
+                    if (midilearnkititem[i]->mutecheck->value() == 0 && midilearnkititem[i]->CCcounter->value() == kititem && midilearnkititem[i]->channelchoice->value() == engine)
                         midilearnkititem[i]->activity->do_callback();
                 }
             }

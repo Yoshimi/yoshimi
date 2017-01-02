@@ -352,7 +352,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
      * need to work out some kind of loop-back so optional
      * vector control CCs can be picked up.
      */
-    if (synth->midilearn.runMidiLearn(param, ctrl, ch, in_place))
+    if (synth->midilearn.runMidiLearn(param, ctrl & 255, ch, in_place))
         return;
 
     if (ctrl == C_breath)
