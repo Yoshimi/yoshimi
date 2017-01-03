@@ -67,7 +67,7 @@ class MidiLearnKitItem {: {public Fl_Group}
       } {
         Fl_Spinner CCcounter {
           callback {send_data(16);}
-          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 128 value 14 textsize 12
+          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}

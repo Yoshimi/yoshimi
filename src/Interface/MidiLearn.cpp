@@ -61,7 +61,7 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
 }
 
 
-bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan, bool in_place)
+bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan, unsigned char category)
 {
     if (learning)
     {
@@ -78,8 +78,12 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         if (lastpos == -3)
             return false;
         float value = _value;
-        if (CC == 128)
-            value = (value / 128.0) + 64; // convert from 14 bit pitchbend
+        if (category & 2)
+        {
+            value = value / 128.0; // convert from 14 bit
+            if (CC == 128)
+                value += 64; // adjust for pitch bend
+        }
         int status = foundEntry.status;
         if ((status & 4) == 4)
             continue;
@@ -129,9 +133,9 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         putData.data.parameter = foundEntry.data.parameter;
         putData.data.par2 = foundEntry.data.par2;
         unsigned int putSize = sizeof(putData);
-        if (writeMidi(&putData, putSize, in_place))
+        if (writeMidi(&putData, putSize, category & 1))
         {
-            if (firstLine && !in_place)
+            if (firstLine && !(category & 1)) // not in_place
             // we only want to send an activity once
             // and it's not relevant to jack freewheeling
             {
@@ -140,7 +144,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
                 putData.data.part = 0xd8;
                 putData.data.kit = CC;
                 putData.data.engine = chan;
-                writeMidi(&putData, putSize, in_place);
+                writeMidi(&putData, putSize, category & 1);
             }
         }
         if (lastpos == -1)

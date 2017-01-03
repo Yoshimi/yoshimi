@@ -351,8 +351,12 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
      *
      * need to work out some kind of loop-back so optional
      * vector control CCs can be picked up.
+     *
+     * Some controller valuse are >= 640 so they will be ignored by
+     * later calls, but are passed as 128+ for this call.
+     * Pitch wheel is 640 and is 14 bit. It sets bit 1 of 'category'
      */
-    if (synth->midilearn.runMidiLearn(param, ctrl & 255, ch, in_place))
+    if (synth->midilearn.runMidiLearn(param, ctrl & 255, ch, in_place | ((ctrl == 640) << 1)))
         return;
 
     if (ctrl == C_breath)

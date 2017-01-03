@@ -218,7 +218,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     }
 
     else if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
-        commandName = "Kit item " + to_string(kititem) + " not enabled";
+        commandName = "Part " + to_string(int(npart)) + " Kit item " + to_string(int(kititem)) + " not enabled";
 
     else if (kititem == 0xff || (kititem & 0x20))
     {

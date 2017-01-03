@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified December 2016
+This file is a derivative of the ZynAddSubFX original, modified January 2017
 } {in_source in_header
 } 
 
@@ -64,7 +64,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class LFOUI {selected : {public Fl_Group, PresetsUI_}
+class LFOUI {: {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -76,12 +76,11 @@ hide();
 //delete (lfoui);} {}
   }
   Function {make_window()} {} {
-    Fl_Window lfoui {
-      xywh {133 20 230 70} type Double color 50 labelfont 1 labelsize 12 hide
+    Fl_Window lfoui {selected
+      xywh {228 588 230 70} type Double color 50 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group lfoparamswindow {
-        label LFO
         xywh {0 0 230 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial freq {
@@ -199,6 +198,10 @@ send_data(group, 8, o->value(), 0xc8);}
           callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
           xywh {162 10 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
         }
+        Fl_Box lfotype {
+          label LFO
+          xywh {58 5 100 11} labelfont 1 labelsize 10
+        }
       }
     }
   }
@@ -282,7 +285,7 @@ refresh();
 
 lfoui->resize(this->x(),this->y(),this->w(),this->h());
 
-lfoparamswindow->label(this->label());} {}
+lfotype->label(this->label());} {}
   }
   decl {LFOParams *pars;} {private local
   }
