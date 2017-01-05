@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-1-4 Will
+* Bank tag (.bankdir) now aways contains the Yoshimi
+  version number from when the most recent instrument
+  was saved to it, or when the bank was created.
+
 2017-1-3 Will
 * Added part number to invalid kititem  warning.
 * Midi now recognises channel aftertouch.
