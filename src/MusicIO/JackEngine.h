@@ -34,7 +34,7 @@ using namespace std;
 
 #include "MusicIO/MusicIO.h"
 
-extern list<string> splashMessages;
+//extern list<string> splashMessages;
 
 class SynthEngine;
 

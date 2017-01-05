@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
+This file is derivative of ZynAddSubFX original code, modified January 2017
 } {in_source in_header
 } 
 
@@ -587,7 +587,10 @@ send_data(33, o->value(), 0xc0);}
       }
       Fl_Button {} {
         label Controllers
-        callback {ctlwindow->show();}
+        callback {if (Fl::event_button() != 3)
+    ctlwindow->show();
+else
+    ctlmidi->show();}
         tooltip {Controller settings} xywh {25 82 135 25} box PLASTIC_UP_BOX color 228 labelsize 12
       }
       Fl_Spinner minkcounter {
@@ -888,6 +891,42 @@ send_data(164, o->value(), 0xc0);}
           code1 {if(o->value()){propta->activate();proptb->activate();}}
           code2 {else {propta->deactivate();proptb->deactivate();}}
         }
+      }
+    }
+    Fl_Window ctlmidi {
+      label {MIDI Controls}
+      xywh {259 191 365 60} type Double hide
+      code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("MIDI Controls").c_str());}
+      code1 {o->position(synth->getGuiMaster()->controllersX, synth->getGuiMaster()->controllersY);}
+    } {
+      Fl_Dial modulation {
+        label Modulation
+        callback {send_data(192, o->value(), 0xc8);}
+        tooltip {Modulation Wheel depth} xywh {30 10 30 30} labelsize 10 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial expression {
+        label Expression
+        callback {send_data(194, o->value(), 0xc8);}
+        tooltip {BandWidth depth} xywh {90 10 30 30} labelsize 10 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial filterq {
+        label {Filter Q}
+        callback {send_data(197, o->value(), 0xc8);}
+        tooltip {Filter Q depth} xywh {150 10 30 30} labelsize 10 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Dial filtercutoff {
+        label {Filter Cutoff}
+        callback {send_data(198, o->value(), 0xc8);}
+        tooltip {Filter Cutoff depth} xywh {210 10 30 30} labelsize 10 maximum 127 step 1
+        class WidgetPDial
+      }
+      Fl_Button {} {
+        label Close
+        callback {ctlmidi->hide();}
+        xywh {280 30 78 20} box THIN_UP_BOX
       }
     }
     Fl_Window partfx {
@@ -1723,11 +1762,22 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             rcv->value((int) value);
             break;
 
+        case 192:
+            modulation->value(value);
+            break;
+        case 194:
+            expression->value(value);
+            break;
+        case 197:
+            filterq->value(value);
+            break;
+        case 198:
+            filtercutoff->value(value);
+            break;
+
         case 224:
             updatecontrollers();
             break;
-
-
     }
     Fl::check();} {}
   }
@@ -1942,6 +1992,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         // delete(partgroup);
         ctlwindow->hide();
         delete ctlwindow;
+        ctlmidi->hide();
+        delete ctlmidi;
         partfx->hide();
         delete partfx;
         instrumentkitlist->hide();

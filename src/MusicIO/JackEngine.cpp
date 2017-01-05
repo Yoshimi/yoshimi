@@ -67,7 +67,7 @@ bool JackEngine::connectServer(string server)
     else
     {
         synth->getRuntime().Log("Failed to open jack client on server " + server);
-        splashMessages.push_back("Can't connect to jack :(");
+//        splashMessages.push_back("Can't connect to jack :(");
     }
     return false;
 }

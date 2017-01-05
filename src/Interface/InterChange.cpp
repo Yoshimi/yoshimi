@@ -478,12 +478,14 @@ string InterChange::resolvePart(CommandBlock *getData)
     string name = "";
     if (control >= 0x80)
     {
-        if (control < 0xe0)
+        if (control < 0xc0)
         {
             name = "Controller ";
             if (control >= 0xa0)
                 name += "Portamento ";
         }
+        else if (control < 0xe0)
+            name = "MIDI ";
     }
     else if (kititem < 0xff)
     {
@@ -687,6 +689,19 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 168:
             contstr = "Enable";
+            break;
+
+        case 192:
+            contstr = "Modulation";
+            break;
+        case 194:
+            contstr = "Expression";
+            break;
+        case 197:
+            contstr = "Filter Q";
+            break;
+        case 198:
+            contstr = "Filter Cutoff";
             break;
 
         case 224:
@@ -2898,6 +2913,33 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->ctl->portamento.receive = (char) value;
             else
                 value = part->ctl->portamento.receive;
+            break;
+
+        case 192:
+            if (write)
+                part->ctl->setmodwheel(value);
+            else
+                value = part->ctl->modwheel.data;
+            break;
+        case 194:
+            if (write)
+            {
+                part->SetController(C_expression, value);
+            }
+            else
+                value = part->ctl->expression.data;
+            break;
+        case 197:
+            if (write)
+                part->ctl->setfilterq(value);
+            else
+                value = part->ctl->filterq.data;
+            break;
+        case 198:
+            if (write)
+                part->ctl->setfiltercutoff(value);
+            else
+                value = part->ctl->filtercutoff.data;
             break;
 
         case 224:

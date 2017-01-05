@@ -1,5 +1,15 @@
 yoshimi 1.5.0 M
 
+2017-1-5 Will
+* Removed redundant startup messages from splash screen.
+* Exposed the following to Midi learn and direct access.
+  Modulation
+  Expression
+  Filter Q
+  Filter cutoff
+* Created new GUI window for these.
+* Updated docs.
+
 2017-1-4 Will
 * Bank tag (.bankdir) now aways contains the Yoshimi
   version number from when the most recent instrument

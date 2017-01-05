@@ -135,10 +135,10 @@ static void *mainGuiThread(void *arg)
     boxLb.labeltype(FL_NORMAL_LABEL);
     //boxLb.labelcolor(FL_WHITE);
     //boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-    boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
+    /*boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
     string startup = YOSHIMI_VERSION;
     startup = "Yoshimi " + startup + " is starting";
-    boxLb.label(startup.c_str());
+    boxLb.label(startup.c_str());*/
 
     winSplash.set_modal();
     winSplash.clear_border();
@@ -153,7 +153,7 @@ static void *mainGuiThread(void *arg)
 
     do
     {
-        if (bShowGui)
+        /*if (bShowGui)
         {
             Fl::wait(0.033333);
             while (!splashMessages.empty())
@@ -162,7 +162,7 @@ static void *mainGuiThread(void *arg)
                 splashMessages.pop_front();
             }
         }
-        else
+        else*/
             usleep(33333);
     }
     while (firstSynth == NULL); // just wait
@@ -244,11 +244,11 @@ static void *mainGuiThread(void *arg)
         if (bShowGui)
         {
             Fl::wait(0.033333);
-            while (!splashMessages.empty())
+            /*while (!splashMessages.empty())
             {
                 boxLb.copy_label(splashMessages.front().c_str());
                 splashMessages.pop_front();
-            }
+            }*/
             GuiThreadMsg::processGuiMessages();
         }
         else
@@ -461,8 +461,8 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    if (bShowGui && !bExitSuccess) // this could be done better!
-        sleep(2);
+    //if (bShowGui && !bExitSuccess) // this could be done better!
+        //sleep(2);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;

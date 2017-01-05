@@ -81,7 +81,7 @@ bool AlsaEngine::openAudio(void)
     return true;
 bail_out:
     Close();
-    splashMessages.push_back("Can't connect to alsa audio :(");
+//    splashMessages.push_back("Can't connect to alsa audio :(");
     return false;
 }
 
