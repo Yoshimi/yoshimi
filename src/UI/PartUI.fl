@@ -11,7 +11,7 @@ comment {PartUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2016, Will Godfrey
+Copyright 2014-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -1416,18 +1416,36 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
-    int oldpart = npart;
+    //int oldpart = npart;
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
+    unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     
-    if (npart != oldpart)
-    return;
+    int tmp = (int(value) & 15) + 1;
     
-    int tmp;
+    // these are specific to the mixer panel
+    if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
+    {
+        int displaypart = newpart % NUM_MIDI_CHANNELS;
+        if (control == 0)
+            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(127 - value);
+        else if (control == 2)
+            synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
+        else if (control == 5)
+        {
+            synth->getGuiMaster()->panellistitem[displaypart]->partrcv->value(int(value));
+            if (int(value) < NUM_MIDI_CHANNELS)
+                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_BLACK);
+            else
+                synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
+        }
+    }
+    if (npart != newpart)
+        return;
+
     bool sameEff = (engine == (inseffnocounter->value() - 1));
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
     kititem &= 0x1f;
@@ -1435,8 +1453,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     {
     	case 0:
     	    partvol->value(value);
-    	    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-            	synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - partvol->value()));
     	    break;
 
     	case 1:
@@ -1445,8 +1461,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 2:
     	        partpan->value(value);
-    	        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-                	synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, partpan->value());
     	    break;
 
     	case 4:
@@ -1454,16 +1468,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 5:
-    	    tmp = (int) value;
-    	    if (tmp < NUM_MIDI_CHANNELS)
+    	    if (int(value) < NUM_MIDI_CHANNELS)
     	        midich->textcolor(FL_BLACK);
     	    else
     	        midich->textcolor(FL_WHITE);
-    	    if (tmp > 15)
-		tmp &= 15;
-            midich->value(tmp + 1);
-            if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-                    synth->getGuiMaster()->setPanelPartMidiWidget(npart % NUM_MIDI_CHANNELS, tmp);
+            midich->value(tmp);
     	    break;
 
     	case 6:

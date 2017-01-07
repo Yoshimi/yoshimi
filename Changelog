@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-1-7 Will
+* Bugfix: Mixer GUI returning wrong part numbers if > 16.
+* Bugfix: Mixer GUI volume & pan controls not responding
+  to CLI when displaying different parts to main control.
+
 2017-1-5 Will
 * Removed redundant startup messages from splash screen.
 * Exposed the following to Midi learn and direct access.
