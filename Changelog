@@ -1,6 +1,7 @@
 yoshimi 1.5.0 M
 
 2017-1-7 Will
+* Bugfix: CLI direct access not setting audio destination.
 * Bugfix: Mixer GUI returning wrong part numbers if > 16.
 * Bugfix: Mixer GUI volume & pan controls not responding
   to CLI when displaying different parts to main control.

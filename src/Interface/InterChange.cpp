@@ -2768,8 +2768,13 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
 
         case 120:
-            if (write)
-                part->Paudiodest = (char) value;
+            if (synth->partonoffRead(npart) != 1)
+            {
+                getData->data.value = part->Paudiodest; // specific for this control
+                return;
+            }
+            else if (write)
+                synth->SetPartDestination(npart, int(value));
             else
                 value = part->Paudiodest;
             break;

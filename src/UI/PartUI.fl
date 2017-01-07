@@ -1442,6 +1442,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             else
                 synth->getGuiMaster()->panellistitem[displaypart]->partrcv->textcolor(FL_WHITE);
         }
+        else if(control == 120)
+        {
+            int send = int(value) - 1;
+            if (send < 0 or send > 2)
+            	send = 0;
+            synth->getGuiMaster()->panellistitem[displaypart]->audiosend->value(send);
+        }
     }
     if (npart != newpart)
         return;
@@ -1662,10 +1669,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         case 67:
             if (sameEff)
                 bypasseff->value(value != 0);
-            break;
-
-        case 120:
-            synth->getGuiMaster()->updatelistitem(npart);
             break;
 
 // controllers
