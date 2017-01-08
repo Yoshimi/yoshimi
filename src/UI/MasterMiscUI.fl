@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {MasterUI.h} {not_in_source in_header
+comment {MasterUI.h} {selected not_in_source in_header
 } 
 
 comment {MasterUI.cc} {in_source not_in_header
@@ -94,7 +94,7 @@ decl {\#define MIN_DB -48.0} {public local
 decl {\#define NO_DB -68.0} {public local
 } 
 
-class VUMeter {selected : {public Fl_Box, private MiscFuncs}
+class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
   Function {VUMeter(int x,int y, int w, int h, const char *label=0):Fl_Box(x,y,w,h,label)} {} {
     code {npart=-1;} {}
@@ -462,32 +462,32 @@ class Panellistitem {: {public Fl_Group, private MiscFuncs}
         }
         Fl_Slider partvolume {
           callback {//
-        int realvalue;
-	if (Fl::event_button() == 3)
-	{
-	    realvalue = 96;
-	    o->value(127-realvalue);
-	    o->redraw();
-	}
-	else
-	    realvalue = 127 - o->value();
-        synth->part[npart + *plgroup]->setVolume(realvalue);
-        synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
-
-        send_data(0, realvalue, 0xc8);}
+    int realvalue;
+    if (Fl::event_button() == 3)
+    {
+        realvalue = 96;
+        o->value(127-realvalue);
+        o->redraw();
+    }
+    else
+        realvalue = 127 - o->value();
+        //synth->part[npart + *plgroup]->setVolume(realvalue);
+        //synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
+    send_data(0, realvalue, 0xc8);}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
           code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
           class mwheel_slider
         }
         Fl_Dial partpanning {
           callback {//
-              synth->part[npart + *plgroup]->SetController(C_panning, o->value());
-              synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
-
-              send_data(2, o->value(), 0xc8);}
+              //synth->part[npart + *plgroup]->SetController(C_panning, o->value());
+              //synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
+if (Fl::event_button() == 3)
+     o->value(64);
+send_data(2, o->value(), 0xc8);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
-          code1 {o->init(64);}
+          code1 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -505,12 +505,12 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         }
         Fl_Choice partrcv {
           callback {//
-	      int tmp = o->value() & 0xf;
-              synth->part[npart + *plgroup]->Prcvchn = tmp;
-              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
-              o->textcolor(FL_BLACK);
+      int tmp = o->value() & 0xf;
+      //synth->part[npart + *plgroup]->Prcvchn = tmp;
+      //synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
+      o->textcolor(FL_BLACK);
 
-              send_data(5, tmp, 0xc0);}
+      send_data(5, tmp, 0xc0);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -522,9 +522,9 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
           code1 {o->value(synth->part[npart + *plgroup]->Prcvchn);}
         } {}
         Fl_Choice audiosend {
-          callback {synth->SetPartDestination(npart + *plgroup, o->value() + 1);
+          callback {//synth->SetPartDestination(npart + *plgroup, o->value() + 1);
 
-send_data(120, o->value(), 0xc0);}
+send_data(120, o->value() + 1, 0xc0);}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textsize 9
           code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
@@ -544,22 +544,22 @@ send_data(120, o->value(), 0xc0);}
       }
       Fl_Check_Button partenabled {
         label 01
-        callback {synth->actionLock(lockmute);
+        callback {/*synth->actionLock(lockmute);
             synth->partonoffWrite(npart + *plgroup, o->value());
-            synth->actionLock(unlock);
-            if (o->value() != 1)
-                panellistitemgroup->deactivate();
-            else
-            {
-                panellistitemgroup->activate();
-                if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
-                    bankui->cbwig->value(npart + 1 + *plgroup);
-            }
-            if ((int)bankui->cbwig->value() == (npart + 1 + *plgroup))
-                bankui->cbwig->do_callback();
-            o->redraw();
+            synth->actionLock(unlock);*/
+    if (o->value() != 1)
+        panellistitemgroup->deactivate();
+    else
+    {
+        panellistitemgroup->activate();
+        //if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
+           // bankui->cbwig->value(npart + 1 + *plgroup);
+    }
+    //if ((int)bankui->cbwig->value() == (npart + 1 + *plgroup))
+        //bankui->cbwig->do_callback();
+    //o->redraw();
 
-            send_data(8, o->value(), 0xc0);}
+    send_data(8, o->value(), 0xc0);}
         private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
         code0 {o->value(synth->part[npart + *plgroup]->Penabled == 1);}
       }

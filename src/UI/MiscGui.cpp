@@ -58,8 +58,11 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 }
             }
             else
-                type = 0;
+            {
+                //type = 0;
+                type = 0x40;
                 // identifying this for button 3 as set default
+            }
         }
         else if((type & 7) > 2)
             type = 1 | typetop;

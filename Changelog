@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-1-8 Will
+* Transferred main GUI part controls to new method.
+* Enabled GUI control of Modulation, Expression etc.
+* Updated 'Controllers' tooltip.
+
 2017-1-7 Will
 * Bugfix: CLI direct access not setting audio destination.
 * Bugfix: Mixer GUI returning wrong part numbers if > 16.

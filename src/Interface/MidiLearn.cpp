@@ -1,7 +1,7 @@
 /*
     MidiLearn.cpp
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public

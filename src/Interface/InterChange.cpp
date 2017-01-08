@@ -1,7 +1,7 @@
 /*
     InterChange.cpp - General communications
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -175,6 +175,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     if (isGui)
         synth->getRuntime().Log("From GUI");
 #endif
+
     if ((isGui && button < 2) || (isCli && button == 1))
     {
         if (button == 0)
@@ -1962,8 +1963,15 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
+
             #warning gui writes changed to reads
-            getData.data.type = getData.data.type & 0xbf;
+            // temp fixes!
+            bool partflag = (getData.data.kit == 0xff) | (getData.data.kit> 0x20 && getData.data.kit < 0x30);
+            if (getData.data.part >= 0x40 || partflag == false)
+                getData.data.type = getData.data.type & 0xbf;
+            else if ((getData.data.type & 3) == 0)
+                getData.data.type |= 1;
+            // end of fixes
 
             if(getData.data.part != 0xd8) // special midi-learn message
                 commandSend(&getData);
@@ -2044,11 +2052,12 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
-    bool isGui = type & 0x20;
+//    bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     char button = type & 3;
 
-    if ((isGui && button != 2) || (isCli && button == 1))
+    //if ((isGui && button != 2) || (isCli && button == 1))
+    if (isCli && button == 1)
         return;
 
     if (npart >= 0xc0 && npart < 0xd0)
@@ -2468,7 +2477,12 @@ void InterChange::commandPart(CommandBlock *getData)
     {
         case 0:
             if (write)
+            {
                 part->setVolume(value);
+                if (type & 0x20)
+                    getData->data.type = ((type & 0xcf) | 0x10);
+                    // fudge so that gui updates
+            }
             else
                 value = part->Pvolume;
             break;
@@ -2480,7 +2494,12 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 2:
             if (write)
+            {
                 part->SetController(C_panning, value);
+                if (type & 0x20)
+                    getData->data.type = ((type & 0xcf) | 0x10);
+                    // fudge so that gui updates
+            }
             else
                 value = part->Ppanning;
             break;
@@ -2492,7 +2511,12 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 5:
             if (write)
+            {
                 part->Prcvchn = (char) value;
+                if (type & 0x20)
+                    getData->data.type = ((type & 0xcf) | 0x10);
+                    // fudge so that gui updates
+            }
             else
                 value = part->Prcvchn;
             break;
@@ -2563,7 +2587,12 @@ void InterChange::commandPart(CommandBlock *getData)
                         break;
                     default:
                         if (write)
+                        {
                             synth->partonoffWrite(npart, (char) value);
+                            if (type & 0x20)
+                                getData->data.type = ((type & 0xcf) | 0x10);
+                                // fudge so that gui updates
+                        }
                         else
                             value = synth->partonoffRead(npart);
                 }
@@ -2949,7 +2978,12 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 224:
             if (write)
+            {
                 part->SetController(0x79,0); // C_resetallcontrollers
+                if (type & 0x20)
+                    getData->data.type = ((type & 0xcf) | 0x10);
+                    // fudge so that gui updates
+            }
             break;
     }
 
