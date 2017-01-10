@@ -213,6 +213,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         commandName = resolveSysIns(getData);
     }
+    else if (npart >= 0x40)
+        commandName = "Invalid part " + to_string(int(npart));
     else if (kititem >= 0x80 && kititem != 0xff)
     {
         commandName = resolveEffects(getData);
@@ -1966,7 +1968,7 @@ void InterChange::mediate()
 
             #warning gui writes changed to reads
             // temp fixes!
-            bool partflag = (getData.data.kit == 0xff) | (getData.data.kit> 0x20 && getData.data.kit < 0x30);
+            bool partflag = (getData.data.kit == 0xff) | (getData.data.kit >= 0x20 && getData.data.kit < 0x30);
             if (getData.data.part >= 0x40 || partflag == false)
                 getData.data.type = getData.data.type & 0xbf;
             else if ((getData.data.type & 3) == 0)
@@ -2051,7 +2053,6 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-
 //    bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     char button = type & 3;
@@ -2080,6 +2081,9 @@ void InterChange::commandSend(CommandBlock *getData)
         commandEffects(getData);
         return;
     }
+
+    if (npart >= 0x40)
+        return; // invalid part number
 
     Part *part;
     part = synth->part[npart];
@@ -2477,12 +2481,7 @@ void InterChange::commandPart(CommandBlock *getData)
     {
         case 0:
             if (write)
-            {
                 part->setVolume(value);
-                if (type & 0x20)
-                    getData->data.type = ((type & 0xcf) | 0x10);
-                    // fudge so that gui updates
-            }
             else
                 value = part->Pvolume;
             break;
@@ -2494,12 +2493,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 2:
             if (write)
-            {
                 part->SetController(C_panning, value);
-                if (type & 0x20)
-                    getData->data.type = ((type & 0xcf) | 0x10);
-                    // fudge so that gui updates
-            }
             else
                 value = part->Ppanning;
             break;
@@ -2511,12 +2505,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 5:
             if (write)
-            {
                 part->Prcvchn = (char) value;
-                if (type & 0x20)
-                    getData->data.type = ((type & 0xcf) | 0x10);
-                    // fudge so that gui updates
-            }
             else
                 value = part->Prcvchn;
             break;
@@ -2535,31 +2524,32 @@ void InterChange::commandPart(CommandBlock *getData)
         case 8:
             if (kitType)
             {
+                kititem &= 0x1f;
                 switch(engine)
                 {
                     case 0:
                         if (write)
-                            part->kit[kititem & 0x1f].Padenabled = (char) value;
+                            part->kit[kititem].Padenabled = (char) value;
                         else
-                            value = part->kit[kititem & 0x1f].Padenabled;
+                            value = part->kit[kititem].Padenabled;
                         break;
                     case 1:
                         if (write)
-                            part->kit[kititem & 0x1f].Psubenabled = (char) value;
+                            part->kit[kititem].Psubenabled = (char) value;
                         else
-                            value = part->kit[kititem & 0x1f].Psubenabled;
+                            value = part->kit[kititem].Psubenabled;
                         break;
                     case 2:
                         if (write)
-                            part->kit[kititem & 0x1f].Ppadenabled = (char) value;
+                            part->kit[kititem].Ppadenabled = (char) value;
                         else
-                            value = part->kit[kititem & 0x1f].Ppadenabled;
+                            value = part->kit[kititem].Ppadenabled;
                         break;
                     default:
                         if (write)
-                            part->setkititemstatus(kititem & 0x1f, (char) value);
+                            part->setkititemstatus(kititem, (char) value);
                         else
-                            value = part->kit[kititem & 0x1f].Penabled;
+                            value = part->kit[kititem].Penabled;
                         break;
                 }
             }
@@ -2587,12 +2577,7 @@ void InterChange::commandPart(CommandBlock *getData)
                         break;
                     default:
                         if (write)
-                        {
                             synth->partonoffWrite(npart, (char) value);
-                            if (type & 0x20)
-                                getData->data.type = ((type & 0xcf) | 0x10);
-                                // fudge so that gui updates
-                        }
                         else
                             value = synth->partonoffRead(npart);
                 }
@@ -2982,7 +2967,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->SetController(0x79,0); // C_resetallcontrollers
                 if (type & 0x20)
                     getData->data.type = ((type & 0xcf) | 0x10);
-                    // fudge so that gui updates
+                    // fudge so that gui updates *after* changes
             }
             break;
     }
@@ -5085,8 +5070,10 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     else if (npart == 0xf2)
         eff = synth->insefx[effnum];
-    else
+    else if (npart < 0x40)
         eff = synth->part[npart]->partefx[effnum];
+    else
+        return; //invalid part number
 
     if (kititem == 8 && getData->data.insert < 0xff)
     {

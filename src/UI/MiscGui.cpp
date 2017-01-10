@@ -142,6 +142,9 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
+    if (npart >= 0x40)
+        return; // invalid part number
+
     if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
         return; // attempt to access non existant kititem
 

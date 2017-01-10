@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-1-10 Will
+* Improved GUI part/mixer synchronisation.
+* Added error check for out of range part numbers.
+* Updated docs.
+
 2017-1-8 Will
 * Transferred main GUI part controls to new method.
 * Enabled GUI control of Modulation, Expression etc.

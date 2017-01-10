@@ -98,6 +98,7 @@ Y : 0/1 : 8 : 0 to 63 : 255 : 2 : 255 : 255 : 255 : Enable PadSynth
 Y : 0 to 50 : 48 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Humanise
 
 Kit edit window
+Y : 0/1 : 8 : 0 to 63 : 32 + 1 to 15 : 0 to 2 : 255 : 255 : 255 : Kit item engine enable - Addsynth, Subsynth, Padsynth
 Y : 0/1 : 8 : 0 to 63 : 32 + 1 to 15 : 255 : 255 : 255 : 255 : Kit item enable (can't disable kit item 0)
 Y : 0/1 : 9 : 0 to 63 : 32 + 0 to 15 : 255 : 255 : 255 : 255 : Kit item mute
 Y : 0 to 126 : 16 : 0 to 63 : 32 + 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum note

@@ -96,7 +96,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -264,7 +264,7 @@ class MasterUI {selected : {private MiscFuncs}
     else
     {
         synth->guiClosed(true);
-    }}
+    }} selected
       xywh {7 120 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
@@ -1694,6 +1694,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     if (partui->part->Pkitmode)
         extension += ", Kit ";
     return synth->makeUniqueName(prefix + extension);} {}
+  }
+  Function {setPartActive(int _npart, bool active)} {} {
+    code {//
+    if (_npart == npart)
+    {
+        partui->partGroupEnable->value(active);
+        if (active)
+            partui->partgroupui->activate();
+        else
+            partui->partgroupui->deactivate();
+    }} {}
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {
     code {//
