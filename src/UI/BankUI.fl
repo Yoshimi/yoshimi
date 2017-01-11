@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of original ZynAddSubFX code, modified August 2016
+This file is derivative of original ZynAddSubFX code, modified January 2017
 } {in_source in_header
 } 
 
@@ -53,8 +53,7 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class BankProcess_ {selected
-} {
+class BankProcess_ {} {
   Function {process(void)} {return_type {virtual void}
   } {
     code {;} {}
@@ -267,7 +266,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
   }
 } 
 
-class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
+class BankUI {selected : {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window bankuiwindow {
@@ -419,8 +418,7 @@ removeselection();}
           callback {//
     synth->getRuntime().checksynthengines = (int) o->value();
     rescan_for_banks(true);
-    synth->getGuiMaster()->partui->resetlabels();
-    synth->getGuiMaster()->updatepanel();
+    synth->getGuiMaster()->partui->checkEngines();
     synth->getRuntime().configChanged = true;}
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
           code0 {o->value(synth->getRuntime().checksynthengines);}

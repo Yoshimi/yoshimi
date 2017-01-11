@@ -208,10 +208,19 @@ if ((Fl::event_button() == 3))
         }
         Fl_Check_Button adcheck {
           callback {//
-    if (o->value())
+    int x = o->value();
+    if (x)
         adeditbutton->activate();
     else
         adeditbutton->deactivate();
+    if (n == 0)
+    {
+        synth->getGuiMaster()->partui->adsynenabledcheck->value(x);
+        if (x)
+            synth->getGuiMaster()->partui->adeditbutton->activate();
+        else
+            synth->getGuiMaster()->partui->adeditbutton->deactivate();
+    }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc0, n + 32, 0);}
           xywh {400 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
@@ -227,10 +236,19 @@ if ((Fl::event_button() == 3))
         }
         Fl_Check_Button subcheck {
           callback {//
-    if (o->value())
+    int x = o->value();
+    if (x)
         subeditbutton->activate();
     else
         subeditbutton->deactivate();
+    if (n == 0)
+    {
+        synth->getGuiMaster()->partui->subsynenabledcheck->value(x);
+        if (x)
+            synth->getGuiMaster()->partui->subeditbutton->activate();
+        else
+            synth->getGuiMaster()->partui->subeditbutton->deactivate();
+    }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc0, n + 32, 1);}
           xywh {470 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
@@ -246,10 +264,19 @@ if ((Fl::event_button() == 3))
         }
         Fl_Check_Button padcheck {
           callback {//
-    if (o->value())
+    int x = o->value();
+    if (x)
         padeditbutton->activate();
     else
         padeditbutton->deactivate();
+    if (n == 0)
+    {
+        synth->getGuiMaster()->partui->padsynenabledcheck->value(x);
+        if (x)
+            synth->getGuiMaster()->partui->padeditbutton->activate();
+        else
+            synth->getGuiMaster()->partui->padeditbutton->deactivate();
+    }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc0, n + 32, 2);}
           xywh {540 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
@@ -395,7 +422,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
       xywh {964 44 375 165} type Double hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {
+      Fl_Group partgroupui {open
         xywh {0 0 377 166}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -427,7 +454,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
             else
             {
                 part->Pname = string(tmp);
-                copylabeltopanel();
+                checkEngines();
             }
         }
     }}
@@ -1202,7 +1229,7 @@ send_data(57, o->value(), 0xc0);}
       Fl_Group {} {
         xywh {0 220 395 110} box ENGRAVED_FRAME
       } {
-        Fl_Group {} {
+        Fl_Group ADD {
           label ADDsynth
           xywh {5 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
@@ -1234,7 +1261,6 @@ send_data(57, o->value(), 0xc0);}
           Fl_Button adeditbutton {
             label Edit
             callback {showparameters(0,0);
-//copylabeltopanel();
 checkEngines();
 seteditname();
 if ((Fl::event_button() == 3))
@@ -1243,7 +1269,7 @@ if ((Fl::event_button() == 3))
             code0 {if (part->kit[0].Padenabled==0) o->deactivate();}
           }
         }
-        Fl_Group {} {
+        Fl_Group SUB {
           label SUBsynth
           xywh {105 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
@@ -1275,7 +1301,6 @@ if ((Fl::event_button() == 3))
           Fl_Button subeditbutton {
             label Edit
             callback {showparameters(0,1);
-//copylabeltopanel();
 checkEngines();
 seteditname();
 if ((Fl::event_button() == 3))
@@ -1284,7 +1309,7 @@ if ((Fl::event_button() == 3))
             code0 {if (part->kit[0].Psubenabled==0) o->deactivate();}
           }
         }
-        Fl_Group {} {
+        Fl_Group PAD {
           label PADsynth
           xywh {205 245 100 80} box ENGRAVED_FRAME labelfont 1
         } {
@@ -1316,7 +1341,6 @@ if ((Fl::event_button() == 3))
           Fl_Button padeditbutton {
             label Edit
             callback {showparameters(0,2);
-//copylabeltopanel();
 checkEngines();
 seteditname();
 if ((Fl::event_button() == 3))
@@ -1910,25 +1934,28 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     code {//
     engine = 0;
     string instrumentName = part->Pname.c_str();
-    if (!partKitOn)
+    if (synth->getRuntime().checksynthengines)
     {
-        engine |= adsynenabledcheck->value();
-        engine |= (subsynenabledcheck->value() << 1);
-        engine |= (padsynenabledcheck->value() << 2);
-    }
-    else
-    {
-    	for (int i = 0; i < NUM_KIT_ITEMS; ++i)
-    	{
-    	    if (partkititem[i]->enabledcheck->value())
-    	    { // nested so we don't access non existent
-    	        if (partkititem[i]->mutedcheck->value() == 0)
-    	        {
-    	            engine |= partkititem[i]->adcheck->value();
-    	            engine |= (partkititem[i]->subcheck->value() << 1);
-    	            engine |= (partkititem[i]->padcheck->value() << 2);
-    	        }
-    	    }
+        if (!partKitOn)
+        {
+            engine |= adsynenabledcheck->value();
+            engine |= (subsynenabledcheck->value() << 1);
+            engine |= (padsynenabledcheck->value() << 2);
+        }
+        else
+        {
+            for (int i = 0; i < NUM_KIT_ITEMS; ++i)
+            {
+                if (partkititem[i]->enabledcheck->value())
+                { // nested so we don't access non existent
+                    if (partkititem[i]->mutedcheck->value() == 0)
+                    {
+                        engine |= partkititem[i]->adcheck->value();
+                        engine |= (partkititem[i]->subcheck->value() << 1);
+                        engine |= (partkititem[i]->padcheck->value() << 2);
+                    }
+                }
+            }
         }
     }
     if (engine & 1) // addsynth
@@ -1962,11 +1989,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         instrumentpadbox->color(BASE_COLOUR);
     }
     
-    addbox->damage(1);
+    ADD->damage(1);
     instrumentaddbox->damage(1);
-    subbox->damage(1);
+    SUB->damage(1);
     instrumentsubbox->damage(1);
-    padbox->damage(1);
+    PAD->damage(1);
     instrumentpadbox->damage(1);
     instrumentlabel->copy_label(instrumentName.c_str());
     
@@ -1990,8 +2017,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         synth->getGuiMaster()->panellistitem[num]->partsub->damage(1);
         synth->getGuiMaster()->panellistitem[num]->partpad->damage(1);
         synth->getGuiMaster()->panellistitem[num]->partname->copy_label(instrumentName.c_str());
-    }
-        //synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->setPartLabel(engine);} {}
+    }} {}
   }
   Function {showparameters(int kititem, int engine)} {} {
     code {//
@@ -2006,8 +2032,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     checkEngines();
     if (part->Pname == "Simple Sound")
     {
-        part->Pname = "No Title";
-        instrumentlabel->copy_label(part->Pname.c_str());
+        string instrumentName = "No Title";
+        part->Pname = instrumentName;
+        instrumentlabel->copy_label(instrumentName.c_str());
+        if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+            synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->partname->copy_label(instrumentName.c_str());
     }
 
     if (kititem != lastkititem)
@@ -2066,7 +2095,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         padnoteui->padnotewindow->show();
     }} {}
   }
-  Function {find_engines()} {} {
+  Function {setinstrumentlabel()} {} {
     code {//
     engine = 0;
     if (synth->getRuntime().checksynthengines)
@@ -2080,14 +2109,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             if (part->kit[i].Ppadenabled)
                 engine |= 4;
         }
-    }} {}
-  }
-  Function {setinstrumentlabel()} {} {
-    code {//
-    find_engines();
-    instrumentaddbox->damage(1);
-    instrumentsubbox->damage(1);
-    instrumentpadbox->damage(1);
+    }
     if (engine & 1)
         instrumentaddbox->color(ADD_COLOUR);
     else
@@ -2102,31 +2124,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     else
         instrumentpadbox->color(BASE_COLOUR);
     instrumentlabel->copy_label(part->Pname.c_str());} {}
-  }
-  Function {copylabeltopanel()} {} {
-    code {//
-    setinstrumentlabel();
-    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-        synth->getGuiMaster()->setPanelPartLabel(npart, engine);} {}
-  }
-  Function {resetlabels()} {} {
-    code {//
-    setinstrumentlabel();
-    if (adsynenabledcheck->value() == 0 || engine == 0)
-        addbox->color(BASE_COLOUR);
-    else
-        addbox->color(ADD_COLOUR);
-    addbox->redraw();
-    if (subsynenabledcheck->value() == 0 || engine == 0)
-        subbox->color(BASE_COLOUR);
-    else
-        subbox->color(SUB_COLOUR);
-    subbox->redraw();
-    if (padsynenabledcheck->value() == 0 || engine == 0)
-        padbox->color(BASE_COLOUR);
-    else
-        padbox->color(PAD_COLOUR);
-    padbox->redraw();} {}
   }
   Function {seteditname()} {} {
     code {//

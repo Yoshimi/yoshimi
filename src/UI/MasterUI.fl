@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified December 2016
+This file is a derivative of the ZynAddSubFX original, modified January 2017
 
 
 } {in_source in_header
@@ -96,7 +96,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -264,7 +264,7 @@ class MasterUI {: {private MiscFuncs}
     else
     {
         synth->guiClosed(true);
-    }} selected
+    }}
       xywh {7 120 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
@@ -1402,7 +1402,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     maxparts->redraw();
     npartcounter->value(npart + 1);
     npartcounter->redraw();
-    partui->setinstrumentlabel();} {}
+    partui->checkEngines();} {}
   }
   Function {updatepartprogram(int _npart)} {} {
     code {//
