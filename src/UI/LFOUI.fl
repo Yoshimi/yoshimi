@@ -11,7 +11,7 @@ comment {LFOUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016, Will Godfrey
+Copyright 2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -64,7 +64,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 } 
 
-class LFOUI {: {public Fl_Group, PresetsUI_}
+class LFOUI {selected : {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -76,7 +76,7 @@ hide();
 //delete (lfoui);} {}
   }
   Function {make_window()} {} {
-    Fl_Window lfoui {selected
+    Fl_Window lfoui {
       xywh {228 588 230 70} type Double color 50 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
@@ -95,8 +95,13 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial intensity {
           label Depth
-          callback {pars->Pintensity=(int)o->value();
-send_data(group, 1, o->value(), 0xc8);}
+          callback {//
+    int depth = lrint(o->value());
+    pars->Pintensity = depth;
+    if (engine >= 0x80 && engine < 0x88 && group == 1) // special case
+        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelfofreq->value(depth);
+
+    send_data(group, 1, depth, 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
           code1 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
@@ -227,6 +232,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char control = getData->data.control;
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;
+    unsigned char par = getData->data.parameter;
     
     if (part != npart || (eng >= 128 && eng != engine))
         return;
@@ -239,6 +245,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 1:
     	    intensity->value(value);
+    	    if (engine >= 128 && engine < 136 && par == 1) // rather special !
+    	        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelfofreq->value(value);
     	    break;
 
     	case 2:

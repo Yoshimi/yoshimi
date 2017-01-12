@@ -47,12 +47,11 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 {
                     synth->getGuiMaster()->midilearnui->words->copy_label("Can't learn this control");
                     synth->getGuiMaster()->midilearnui->message->show();
+                    synth->getGuiMaster()->midilearnui->message->position(Fl::event_x_root() + 16, Fl::event_y_root());
                     synth->getRuntime().Log("Can't MIDI-learn this control");
                     /* can't use fl_alert here.
                      * For some reason it goes into a loop on spin boxes
                      * and runs menus up to their max value.
-                     *
-                     * fl_alert("Can't MIDI-learn this control");
                      */
                     return;
                 }

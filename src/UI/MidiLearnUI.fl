@@ -345,8 +345,7 @@ synth->getGuiMaster()->paramsui->Show(6);}
     }
     Fl_Window message {
       xywh {4 20 290 85} type Double labelsize 12 hide
-      code0 {o->position(0, 0);}
-      code1 {o->copy_label(synth->makeUniqueName("").c_str());}
+      code0 {o->copy_label(synth->makeUniqueName("").c_str());}
     } {
       Fl_Box words {
         label {?}
@@ -408,6 +407,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
         case 21:
             words->copy_label(miscMsgPop(par2).c_str());
             cancel->show();
+            message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             message->show();
         case 24:
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)

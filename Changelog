@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-1-12 Will
+* Improved reliability of window positioning.
+* Midi learn window now remembered.
+* Midi learn messages now placed by relative control.
+* AddSynth voice and voice list now fully in sync :)
+
 2017-1-11 Will
 * Improved GUI part label and colours sync.
 

@@ -1598,6 +1598,54 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                             partkititem[kititem]->clearLine();
                         break;
                 }
+                if (kititem == 0)
+                {
+                    switch(engine)
+                    {
+                        case 0:
+                            part->kit[npart].Padenabled = tmp;
+                            adsynenabledcheck->value(tmp);
+                            if (tmp)
+                            {
+                                adeditbutton->activate();
+                                addbox->color(ADD_COLOUR);
+                            }
+                            else
+                            {
+                                adeditbutton->deactivate();
+                                addbox->color(BASE_COLOUR);
+                            }
+                            break;
+                        case 1:
+                            part->kit[npart].Psubenabled = tmp;
+                            subsynenabledcheck->value(tmp);
+                            if (tmp)
+                            {
+                                subeditbutton->activate();
+                                subbox->color(SUB_COLOUR);
+                            }
+                            else
+                            {
+                                subeditbutton->deactivate();
+                                subbox->color(BASE_COLOUR);
+                            }
+                            break;
+                        case 2:
+                            part->kit[npart].Ppadenabled = tmp;
+                            padsynenabledcheck->value(tmp);
+                            if (tmp)
+                            {
+                                padeditbutton->activate();
+                                padbox->color(PAD_COLOUR);
+                            }
+                            else
+                            {
+                                padeditbutton->deactivate();
+                                padbox->color(BASE_COLOUR);
+                            }
+                            break;
+                    }
+                }
             }
             else
             {

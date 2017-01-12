@@ -230,6 +230,8 @@ class MasterUI {selected : {private MiscFuncs}
           configui->Show();
       if (yoshiLogO)
           yoshiLog->Show();
+      if (mlearnO)
+          midilearnui->Show();
       if (controllersO)
           partui->ctlwindow->show();
       if (inseditO)
@@ -1839,6 +1841,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                  yoshiLogY,
                  yoshiLogO);
     ok = getData(ok,
+                "MIDIlearn",
+                 mlearnX,
+                 mlearnY,
+                 mlearnO);
+    ok = getData(ok,
                 "controllers",
                  controllersX,
                  controllersY,
@@ -1888,7 +1895,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
     configui->configwindow->position(settingsX, settingsY);
     yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
+    midilearnui->midilearnwindow->position(mlearnX, mlearnY);
     partui->ctlwindow->position(controllersX, controllersY);
+    partui->ctlmidi->position(controllersX, controllersY);
     partui->instrumenteditwindow->position(inseditX, inseditY);
     partui->instrumentkitlist->position(kitlistX, kitlistY);
     partui->partfx->position(partfxX, partfxY);} {}
@@ -1937,8 +1946,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
              yoshiLog->logConsole->x(),
              yoshiLog->logConsole->y(),
              yoshiLog->logConsole->visible());
+    putData("MIDIlearn",
+             midilearnui->midilearnwindow->x(),
+             midilearnui->midilearnwindow->y(),
+             midilearnui->midilearnwindow->visible());
 
-    if (partui->ctlwindow->x()) // this works, visible() doesn't :(
+    if (partui->ctlwindow->x())
     	putData("controllers",
                  partui->ctlwindow->x(),
                  partui->ctlwindow->y(),
@@ -1990,13 +2003,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
              padNoteX,
              padNoteY,
              padNoteO);
-
     putData("ADDnote",
              addNoteX,
              addNoteY,
              addNoteO);
 
-    fclose(windows);} {}
+   fclose(windows);} {}
   }
   Function {getData(bool ok, string name, int& X, int& Y, int& O)} {return_type bool
   } {
@@ -2135,6 +2147,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   decl {int yoshiLogY;} {private local
   }
   decl {int yoshiLogO;} {private local
+  }
+  decl {int mlearnX;} {public local
+  }
+  decl {int mlearnY;} {public local
+  }
+  decl {int mlearnO;} {public local
   }
   decl {int controllersX;} {public local
   }
