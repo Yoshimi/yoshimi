@@ -575,25 +575,102 @@ void *AlsaEngine::_MidiThread(void *arg)
 }
 
 
+/*
+ * This next function needs a lot of work we shouldn't need
+ * to decode then re-encode the data in a different form
+ */
+
 void *AlsaEngine::MidiThread(void)
 {
     snd_seq_event_t *event;
-    unsigned char channel;
-    unsigned char note;
-    unsigned char velocity;
-    unsigned int ctrltype;
+    //unsigned char channel;
+    //unsigned char note;
+    //unsigned char velocity;
+    //unsigned int ctrltype;
     unsigned int par;
     int chk;
+    unsigned char par0, par1 = 0, par2 = 0;
     while (synth->getRuntime().runSynth)
     {
         while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)
         {
             if (!event)
                 continue;
-
+            par0 = event->data.control.channel;
+            par = 0;
             switch (event->type)
             {
                 case SND_SEQ_EVENT_NOTEON:
+                    par0 = event->data.note.channel;
+                    par0 |= 0x90;
+                    par1 = event->data.note.note;
+                    par2 = event->data.note.velocity;
+                    break;
+
+                case SND_SEQ_EVENT_NOTEOFF:
+                    par0 = event->data.note.channel;
+                    par0 |= 0x80;
+                    par1 = event->data.note.note;
+                    break;
+
+                case SND_SEQ_EVENT_KEYPRESS:
+                    par0 = event->data.note.channel;
+                    par0 |= 0xa0;
+                    par1 = C_keypressure;
+                    par2 = event->data.note.velocity;
+                    break;
+
+                case SND_SEQ_EVENT_CHANPRESS:
+                    par0 |= 0xd0;
+                    par1 = event->data.control.value;
+                    break;
+
+                case SND_SEQ_EVENT_PGMCHANGE:
+                    par0 |= 0xc0;
+                    par1 = event->data.control.value;
+                    break;
+
+                case SND_SEQ_EVENT_PITCHBEND:
+                    par0 |= 0xe0;
+                    par = event->data.control.value + 8192;
+                    par1 = par & 0x7f;
+                    par2 = par1 >> 7;
+                    break;
+
+                case SND_SEQ_EVENT_CONTROLLER:
+                    par0 |= 0xb0;
+                    par1 = event->data.control.param;
+                    par2 = event->data.control.value;
+                    break;
+
+                case SND_SEQ_EVENT_NONREGPARAM:
+                    par0 |= 0xb0; // splitting into separate CCs
+                    par = event->data.control.param;
+                    setMidi(par0, 99, par >> 7);
+                    setMidi(par0, 99, par & 0x7f);
+                    par = event->data.control.value;
+                    setMidi(par0, 6, par >> 7);
+                    par1 = 38;
+                    par2 = par & 0x7f;
+                    par = 0; // let last one through
+                    break;
+
+                /*case SND_SEQ_EVENT_RESET: // reset to power-on state
+                    channel = event->data.control.channel;
+                    ctrltype = C_resetallcontrollers;
+                    setMidiController(channel, ctrltype, 0);
+                    break;*/
+
+                case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
+                    synth->getRuntime().Log("Alsa midi port connected");
+                    par = 1;
+                    break;
+
+                case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
+                    synth->getRuntime().Log("Alsa midi port disconnected");
+                    par = 1;
+                    break;
+                /*case SND_SEQ_EVENT_NOTEON:
                     if (event->data.note.note)
                     {
                         channel = event->data.note.channel;
@@ -667,12 +744,15 @@ void *AlsaEngine::MidiThread(void)
                 case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
                     synth->getRuntime().Log("Alsa midi port disconnected");
                     break;
-
-                default:// commented out some progs spam us :(
+                */
+                default:
+                    par = 1;// commented out some progs spam us :(
                     /* synth->getRuntime().Log("Other non-handled midi event, type: "
                                 + asString((int)event->type));*/
                     break;
             }
+            if (!par)
+                setMidi(par0, par1, par2);
             snd_seq_free_event(event);
         }
 ;

@@ -462,18 +462,19 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     unsigned int idx;
     jack_midi_event_t jEvent;
     jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
-    unsigned char channel, note, velocity;
-    int ctrltype;
-    int par;
-    unsigned int ev;
+    //unsigned char channel, note, velocity;
+    //int ctrltype;
+    //int par;
+    //unsigned int ev;
     for(idx = 0; idx < eventCount; ++idx)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            par = 0;
+            //par = 0;
             if (jEvent.size < 1 || jEvent.size > 4)
                 continue; // no interest in zero sized or long events
-            channel = jEvent.buffer[0] & 0x0F;
+            setMidi(jEvent.buffer[0], jEvent.buffer[1], jEvent.buffer[2]);
+            /*channel = jEvent.buffer[0] & 0x0F;
             switch ((ev = jEvent.buffer[0] & 0xF0))
             {
                 case 0x01: // modulation wheel or lever
@@ -559,7 +560,7 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
                 default: // wot, more? commented out some progs spam us :(
                     synth->getRuntime().Log("other event: " + asString((int)ev), 1);
                     break;
-            }
+            }*/
         }
     }
     return true;

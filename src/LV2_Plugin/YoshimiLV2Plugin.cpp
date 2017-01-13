@@ -200,13 +200,14 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
 
 void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 {
-    unsigned char channel, note, velocity;
-    int ctrltype;
-    int par = 0;
-    unsigned int ev;
-    channel = msg[0] & 0x0F;
+    //unsigned char channel, note, velocity;
+    //int ctrltype;
+    //int par = 0;
+    //unsigned int ev;
+    //channel = msg[0] & 0x0F;
     bool in_place = _bFreeWheel ? ((*_bFreeWheel == 0) ? false : true) : false;
-    switch ((ev = msg[0] & 0xF0))
+    setMidi(msg[0], msg[1], msg[2], in_place);
+    /*switch ((ev = msg[0] & 0xF0))
     {
         case 0x01: // modulation wheel or lever
             ctrltype = C_modwheel;
@@ -292,7 +293,7 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
         default: // wot, more?
             //synth->getRuntime().Log("other event: " + asString((int)ev));
             break;
-    }
+    }*/
 
 }
 

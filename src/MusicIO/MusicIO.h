@@ -47,6 +47,7 @@ class MusicIO : virtual protected MiscFuncs
         bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
         int getMidiController(unsigned char b);
+        void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
         bool nrpnRunVector(unsigned char ch, int ctrl, int param);
         void nrpnProcessData(unsigned char chan, int type, int par);

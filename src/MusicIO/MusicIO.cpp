@@ -172,6 +172,102 @@ int MusicIO::getMidiController(unsigned char b)
 }
 
 
+void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
+{
+    unsigned char channel, note, velocity;
+    int ctrltype, par;
+    channel = par0 & 0x0F;
+    unsigned int ev;
+    par = 0;
+    switch ((ev = par0 & 0xF0))
+    {
+        case 0x01: // modulation wheel or lever
+            ctrltype = C_modwheel;
+            par = par2;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0x07: // channel volume (formerly main volume)
+            ctrltype = C_volume;
+            par = par2;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0x0B: // expression controller
+            ctrltype = C_expression;
+            par = par2;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0x78: // all sound off
+            ctrltype = C_allsoundsoff;
+            setMidiController(channel, ctrltype, 0);
+            break;
+
+        case 0x79: // reset all controllers
+            ctrltype = C_resetallcontrollers;
+            setMidiController(channel, ctrltype, 0);
+            break;
+
+        case 0x7B:  // all notes off
+            ctrltype = C_allnotesoff;
+            setMidiController(channel, ctrltype, 0);
+            break;
+
+        case 0x80: // note-off
+            note = par1;
+            setMidiNote(channel, note);
+            break;
+
+        case 0x90: // note-on
+            if ((note = par1)) // skip note == 0
+            {
+                velocity = par2;
+                setMidiNote(channel, note, velocity);
+            }
+            break;
+
+        case 0xA0: // key aftertouch
+            ctrltype = C_keypressure;
+            // need to work out how to use key values >> j Event.buffer[1]
+            par = par2;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0xB0: // controller
+            ctrltype = par1;//getMidiController(par1);
+            par = par2;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0xC0: // program change
+            ctrltype = C_programchange;
+            par = par1;
+            setMidiProgram(channel, par);
+            break;
+
+        case 0xD0: // channel aftertouch
+            ctrltype = C_channelpressure;
+            par = par1;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0xE0: // pitch bend
+            ctrltype = C_pitchwheel;
+            par = ((par2 << 7) | par1) - 8192;
+            setMidiController(channel, ctrltype, par);
+            break;
+
+        case 0xF0: // system exclusive
+            break;
+
+        default: // wot, more? commented out some progs spam us :(
+            synth->getRuntime().Log("other event: " + asString((int)ev), 1);
+            break;
+    }
+}
+
+
 void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_place)
 {
     int nLow;
