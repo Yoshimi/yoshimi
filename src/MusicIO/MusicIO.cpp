@@ -177,43 +177,10 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     unsigned char channel, note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;
-    unsigned int ev;
+    unsigned int ev = par0 & 0xF0;
     par = 0;
-    switch ((ev = par0 & 0xF0))
+    switch (ev)
     {
-        case 0x01: // modulation wheel or lever
-            ctrltype = C_modwheel;
-            par = par2;
-            setMidiController(channel, ctrltype, par);
-            break;
-
-        case 0x07: // channel volume (formerly main volume)
-            ctrltype = C_volume;
-            par = par2;
-            setMidiController(channel, ctrltype, par);
-            break;
-
-        case 0x0B: // expression controller
-            ctrltype = C_expression;
-            par = par2;
-            setMidiController(channel, ctrltype, par);
-            break;
-
-        case 0x78: // all sound off
-            ctrltype = C_allsoundsoff;
-            setMidiController(channel, ctrltype, 0);
-            break;
-
-        case 0x79: // reset all controllers
-            ctrltype = C_resetallcontrollers;
-            setMidiController(channel, ctrltype, 0);
-            break;
-
-        case 0x7B:  // all notes off
-            ctrltype = C_allnotesoff;
-            setMidiController(channel, ctrltype, 0);
-            break;
-
         case 0x80: // note-off
             note = par1;
             setMidiNote(channel, note);

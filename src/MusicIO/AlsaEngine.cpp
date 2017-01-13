@@ -589,6 +589,7 @@ void *AlsaEngine::MidiThread(void)
     //unsigned int ctrltype;
     unsigned int par;
     int chk;
+    bool sendit;
     unsigned char par0, par1 = 0, par2 = 0;
     while (synth->getRuntime().runSynth)
     {
@@ -596,6 +597,7 @@ void *AlsaEngine::MidiThread(void)
         {
             if (!event)
                 continue;
+            sendit = true;
             par0 = event->data.control.channel;
             par = 0;
             switch (event->type)
@@ -616,7 +618,7 @@ void *AlsaEngine::MidiThread(void)
                 case SND_SEQ_EVENT_KEYPRESS:
                     par0 = event->data.note.channel;
                     par0 |= 0xa0;
-                    par1 = C_keypressure;
+                    par1 = event->data.note.note;
                     par2 = event->data.note.velocity;
                     break;
 
@@ -634,7 +636,7 @@ void *AlsaEngine::MidiThread(void)
                     par0 |= 0xe0;
                     par = event->data.control.value + 8192;
                     par1 = par & 0x7f;
-                    par2 = par1 >> 7;
+                    par2 = par >> 7;
                     break;
 
                 case SND_SEQ_EVENT_CONTROLLER:
@@ -651,8 +653,7 @@ void *AlsaEngine::MidiThread(void)
                     par = event->data.control.value;
                     setMidi(par0, 6, par >> 7);
                     par1 = 38;
-                    par2 = par & 0x7f;
-                    par = 0; // let last one through
+                    par2 = par & 0x7f; // let last one through
                     break;
 
                 /*case SND_SEQ_EVENT_RESET: // reset to power-on state
@@ -663,12 +664,12 @@ void *AlsaEngine::MidiThread(void)
 
                 case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
                     synth->getRuntime().Log("Alsa midi port connected");
-                    par = 1;
+                    sendit = false;
                     break;
 
                 case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
                     synth->getRuntime().Log("Alsa midi port disconnected");
-                    par = 1;
+                    sendit = false;
                     break;
                 /*case SND_SEQ_EVENT_NOTEON:
                     if (event->data.note.note)
@@ -746,12 +747,12 @@ void *AlsaEngine::MidiThread(void)
                     break;
                 */
                 default:
-                    par = 1;// commented out some progs spam us :(
+                    sendit = false;// commented out some progs spam us :(
                     /* synth->getRuntime().Log("Other non-handled midi event, type: "
                                 + asString((int)event->type));*/
                     break;
             }
-            if (!par)
+            if (sendit)
                 setMidi(par0, par1, par2);
             snd_seq_free_event(event);
         }
