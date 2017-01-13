@@ -198,31 +198,31 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             ctrltype = C_keypressure;
             // need to work out how to use key values >> j Event.buffer[1]
             par = par2;
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xB0: // controller
             ctrltype = par1;//getMidiController(par1);
             par = par2;
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xC0: // program change
             ctrltype = C_programchange;
             par = par1;
-            setMidiProgram(channel, par);
+            setMidiProgram(channel, par, in_place);
             break;
 
         case 0xD0: // channel aftertouch
             ctrltype = C_channelpressure;
             par = par1;
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xE0: // pitch bend
             ctrltype = C_pitchwheel;
             par = ((par2 << 7) | par1) - 8192;
-            setMidiController(channel, ctrltype, par);
+            setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xF0: // system exclusive
