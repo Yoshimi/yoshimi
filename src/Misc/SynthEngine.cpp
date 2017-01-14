@@ -584,8 +584,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
             if (chan == part[npart]->Prcvchn && partonoffRead(npart))
             {
                 part[npart]->SetController(type, par);
-                if (type == 7 || type == 10) // currently only volume and pan
+                if (type == 7 || type == 10) // only a few
                     GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
+                else if (type == 1 || type == 11 || type == 71 || type == 74)
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateControllers, npart);
             }
         }
     }
@@ -595,8 +597,10 @@ void SynthEngine::SetController(unsigned char chan, int type, short int par)
         if (npart < Runtime.NumAvailableParts)
         {
             part[npart]->SetController(type, par);
-            if (type == 7 || type == 10) // currently only volume and pan
+            if (type == 7 || type == 10) // only a few
                 GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePanelItem, npart);
+            else if (type == 1 || type == 11 || type == 71 || type == 74)
+                    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateControllers, npart);
         }
     }
     if (type == C_allsoundsoff)

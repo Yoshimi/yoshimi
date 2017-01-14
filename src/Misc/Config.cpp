@@ -1266,6 +1266,11 @@ void GuiThreadMsg::processGuiMessages()
                         guiMaster->updateeffects(msg->index);
                     break;
 
+                case GuiThreadMsg::UpdateControllers:
+                    if (msg->data)
+                        guiMaster->updatecontrollers(msg->index);
+                    break;
+
                 case GuiThreadMsg::UpdateBankRootDirs:
                     if (msg->data)
                         guiMaster->updateBankRootDirs();

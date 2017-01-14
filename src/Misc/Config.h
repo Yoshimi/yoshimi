@@ -223,6 +223,7 @@ public:
         UpdatePartProgram,
         UpdateEffects,
         UpdateBankRootDirs,
+        UpdateControllers,
         RescanForBanks,
         RefreshCurBank,
         GuiAlert,

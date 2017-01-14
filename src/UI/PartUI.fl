@@ -415,10 +415,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
-    Fl_Window partgroup {
+    Fl_Window partgroup {selected
       xywh {964 44 375 165} type Double hide
       class Fl_Group
     } {
@@ -2176,6 +2176,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   Function {seteditname()} {} {
     code {//
     instrumenteditwindow->copy_label(synth->getGuiMaster()->setPartWindowTitle("Edit").c_str());} {}
+  }
+  Function {ctlmidirefresh()} {} {
+    code {//
+    modulation->value(part->ctl->modwheel.data);
+    expression->value(part->ctl->expression.data);
+    filterq->value(part->ctl->filterq.data);
+    filtercutoff->value(part->ctl->filtercutoff.data);} {}
   }
   Function {~PartUI()} {} {
     code {if (adnoteui)

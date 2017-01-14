@@ -1471,6 +1471,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         showSysEfxUI();
     }} {}
   }
+  Function {updatecontrollers(int _npart)} {} {
+    code {//
+    if (npart == _npart)
+        partui->ctlmidirefresh();} {}
+  }
   Function {setMasterLabel(string name)} {} {
     code {//
     string prefix;
