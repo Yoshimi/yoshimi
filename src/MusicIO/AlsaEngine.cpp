@@ -656,11 +656,9 @@ void *AlsaEngine::MidiThread(void)
                     par2 = par & 0x7f; // let last one through
                     break;
 
-                /*case SND_SEQ_EVENT_RESET: // reset to power-on state
-                    channel = event->data.control.channel;
-                    ctrltype = C_resetallcontrollers;
-                    setMidiController(channel, ctrltype, 0);
-                    break;*/
+                case SND_SEQ_EVENT_RESET: // reset to power-on state
+                    par0 = 0xff;
+                    break;
 
                 case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
                     synth->getRuntime().Log("Alsa midi port connected");

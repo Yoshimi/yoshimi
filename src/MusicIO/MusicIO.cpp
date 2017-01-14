@@ -162,7 +162,7 @@ int MusicIO::getMidiController(unsigned char b)
             break;
 
         default: // an unrecognised controller!
-            if (b > 119)
+            if (b > 129)
                 ctl = C_NULL;
             else // this is now needed for midi-learn
                 ctl = b;
@@ -183,26 +183,29 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
     {
         case 0x80: // note-off
             note = par1;
-            setMidiNote(channel, note);
+            setMidiNoteOff(channel, note);
             break;
 
         case 0x90: // note-on
-            if ((note = par1)) // skip note == 0
+            note = par1;
+            if (note)
             {
                 velocity = par2;
                 setMidiNote(channel, note, velocity);
             }
+            else
+                setMidiNoteOff(channel, note);
             break;
 
         case 0xA0: // key aftertouch
             ctrltype = C_keypressure;
-            // need to work out how to use key values >> j Event.buffer[1]
+            // need to work out how to use key numbers (par1)
             par = par2;
             setMidiController(channel, ctrltype, par, in_place);
             break;
 
         case 0xB0: // controller
-            ctrltype = par1;//getMidiController(par1);
+            ctrltype = par1; // getMidiController(par1);
             par = par2;
             setMidiController(channel, ctrltype, par, in_place);
             break;
@@ -225,11 +228,15 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             setMidiController(channel, ctrltype, par, in_place);
             break;
 
-        case 0xF0: // system exclusive
-            break;
-
-        default: // wot, more? commented out some progs spam us :(
-            synth->getRuntime().Log("other event: " + asString((int)ev), 1);
+        default: // wot, more?
+            if (par0 == 0xFF)
+            {
+                ctrltype = C_reset;
+                if (!in_place) // never want to get this when freewheeling!
+                    setMidiController(channel, ctrltype, 0);
+            }
+            else
+                synth->getRuntime().Log("other event: " + asString((int)ev), 1);
             break;
     }
 }
@@ -246,6 +253,10 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         {
             case C_NULL:
                 ctltype = "Ignored";
+                break;
+
+            case C_reset:
+                ctltype = "Master Reset";
                 break;
 
             case C_programchange:
@@ -270,7 +281,12 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         }
         synth->getRuntime().Log("Chan " + asString(((int) ch) + 1) + "   CC " + ctltype  + "   Value " + asString(param));
     }
-
+    if (ctrl == C_reset)
+    {
+        synth->resetAll();
+        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+        return;
+    }
     if (ctrl == synth->getRuntime().midi_bank_root)
     {
         setMidiBankOrRootDir(param, in_place, true);
@@ -720,7 +736,7 @@ void MusicIO::setMidiNote(unsigned char channel, unsigned char note,
 }
 
 
-void MusicIO::setMidiNote(unsigned char channel, unsigned char note)
+void MusicIO::setMidiNoteOff(unsigned char channel, unsigned char note)
 {
     synth->NoteOff(channel, note);
 }

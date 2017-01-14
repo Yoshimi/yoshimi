@@ -57,7 +57,7 @@ class MusicIO : virtual protected MiscFuncs
         //if setBank is false then set RootDir number else current bank number
         void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
         void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
-        void setMidiNote(unsigned char chan, unsigned char note);
+        void setMidiNoteOff(unsigned char chan, unsigned char note);
         void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
 
         float *zynLeft [NUM_MIDI_PARTS + 1];

@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-1-14 Will
+* Corrected Midi noteon velocity zero action and made
+  noteoff command more obvous!
+* Implemented Midi controlled system reset.
+
 2017-1-13 Will
 * First experiment unifying alsa/jack/lv2 Midi input.
 
