@@ -1,7 +1,9 @@
 [Desktop Entry]
 Name=Yoshimi
 Comment=Real Time Synthesizer
+Comment[fr]=Synthétiseur temps-réel
 GenericName=Synthesizer
+GenericName=Synthétiseur
 Type=Application
 Categories=Music;Midi;AudioVideo;X-Sound;Audio;X-Multitrack;X-Alsa;X-Jack;
 Keywords=music;synthesiser;softsynth;microtonal;multichannel;midi;alsa;jack;realtime;standalone;lv2;

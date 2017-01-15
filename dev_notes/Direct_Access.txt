@@ -1,4 +1,4 @@
-This is an experimental test feature only accessible from the command line.
+This is a test feature only accessible from the command line.
 
                             *** WARNING ***
 
@@ -8,14 +8,15 @@ It mostly updates the GUI too.
 
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions and "GUI_Interpretations.txt" for further explanations.
 
-Also, see "Effect_Inserts" for the actual effect controllers and Envelope_Inserts for the enveople controller ranges.
+Also, see "Effect_Inserts" for the actual effect controllers and "Envelope_Inserts" for the enveople controller ranges.
 
 Sections currently in place and tested:
 
 Top level controls
-Midi-learn
-Main part controls
-Controllers
+Midi-learn - used for all operations
+Main part controls - now used by GUI for writes
+Controllers Window
+MIDI CCs window - used for all except incoming real MIDI
 Kit edit window
 AddSynth Editor
 AddSynth Voice Editor
@@ -33,6 +34,8 @@ The remaining ones will display as if they had been written to, but won't actual
 This matches the results from using the middle mouse button in the GUI (assuming it was enabled at build time). Commands that are purely within the GUI,e.g window changes are recognised but not acted on. It is expected that any alternative input system will store its own copies of such intermediate information so that they remain fully independent.
 
 An alternative way to find out the correct command sequence is to click on a control with any button *except* the middle one. Trailing '255's can be ommitted if there are no following parameters set.
+
+In some situations par2 is used as a miscMSG ID for passing text values between threads but synchronised via the RT thread.
 
 
 The format is:

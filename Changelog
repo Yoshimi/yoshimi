@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-1-15 Will
+* Updated app-data file.
+* Added French translation to yoshimi.desktop.in
+  from Olivier.
+* More general doc updates/corrections.
+
 2017-1-14 Will
 * Corrected Midi noteon velocity zero action and made
   noteoff command more obvous!
