@@ -181,21 +181,6 @@ static void *mainGuiThread(void *arg)
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
             _synth->getRuntime().deadObjects->disposeBodies();
-
-            /*
-             * Setting pad parameters can take very many seconds.
-             * This dodge is to force it to diable the part then
-             * make the change take place in a low priority thread.
-             * It needs to be improved!
-             */
-            unsigned int padApply = _synth->getRuntime().padApply;
-            if (padApply < 0xffff)
-            {
-                _synth->interchange.setpadparams(padApply);
-                _synth->getRuntime().padApply = 0xffff;
-            }
-            // end of pad dodge
-
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_synth->getRuntime().configChanged)

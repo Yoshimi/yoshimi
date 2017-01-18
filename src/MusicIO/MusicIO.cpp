@@ -174,6 +174,8 @@ int MusicIO::getMidiController(unsigned char b)
 
 void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place)
 {
+    if (synth->isMuted())
+        return; // nobody listening!
     unsigned char channel, note, velocity;
     int ctrltype, par;
     channel = par0 & 0x0F;
@@ -198,8 +200,14 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
             break;
 
         case 0xA0: // key aftertouch
-            ctrltype = C_keypressure;
-            // need to work out how to use key numbers (par1)
+            ctrltype = C_channelpressure;
+            /*
+             * temporarily pretend it's a chanel aftertouch
+             * need to work out how to use key numbers (par1)
+             * for actual key pressure sensing.
+             *
+             * ctrltype = C_keypressure;
+             */
             par = par2;
             setMidiController(channel, ctrltype, par, in_place);
             break;
@@ -224,7 +232,7 @@ void MusicIO::setMidi(unsigned char par0, unsigned char par1, unsigned char par2
 
         case 0xE0: // pitch bend
             ctrltype = C_pitchwheel;
-            par = ((par2 << 7) | par1) - 8192;
+            par = (par2 << 7) | par1;
             setMidiController(channel, ctrltype, par, in_place);
             break;
 
@@ -423,9 +431,9 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         return;
     }
 
-    /* set / run midi learn
-     * pass 'in_place' so entire operation can be done
-     * in MidiLearn.cpp
+    /*
+     * set / run midi learn will pass 'in_place' so entire operation
+     * can be done in MidiLearn.cpp
      * return true if blocking further calls
      *
      * need to work out some kind of loop-back so optional
@@ -443,6 +451,13 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
         synth->SetController(ch, C_volume, param);
         ctrl = C_filtercutoff;
     }
+    else
+        /*
+         * This is done here instead of in 'setMidi' so MidiLearn
+         * handles all 14 bit values the same.
+         */
+        if (ctrl == C_pitchwheel)
+            param -= 8192;
 
     // do what's left!
     synth->SetController(ch, ctrl, param);

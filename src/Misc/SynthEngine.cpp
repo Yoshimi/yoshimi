@@ -2003,13 +2003,12 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         p_buffersize_f = p_buffersize;
     }
 
-    interchange.mediate();
-
-    int npart;
-
     memset(mainL, 0, p_bufferbytes);
     memset(mainR, 0, p_bufferbytes);
 
+    interchange.mediate();
+
+    int npart;
     if (isMuted())
     {
         for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)

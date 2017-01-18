@@ -1,5 +1,12 @@
 yoshimi 1.5.0 M
 
+2017-1-18 Will
+* Temporarily made key pressure do channel pressure.
+* Made minor improvement to pitch wheel handling.
+* Transferred master GUI controls to new method.
+* Improved direct CLI to GUI Pad params apply.
+* If audio thread muted incoming Midi now ignored.
+
 2017-1-15 Will
 * Updated app-data file.
 * Added French translation to yoshimi.desktop.in

@@ -39,10 +39,14 @@ using namespace std;
 #include "Effects/EffectMgr.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
+#include "MasterUI.h"
+
+
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
+    lowPriAct = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
         fromCLI = NULL;
@@ -113,6 +117,21 @@ void *InterChange::CLIresolvethread(void)
                 resolveReplies(&getData);
         }
         usleep(500);
+        /*
+         * The following are low priority actions initiated by, but isolated
+         * from the main audio thread.
+         */
+        if (lowPriAct < 0xffff)
+        {
+            unsigned int point = lowPriAct;
+            lowPriAct = 0xfffffff;
+            setpadparams(point);
+        }
+        else if (lowPriAct == 0xf0000000)
+        {
+            lowPriAct = 0xfffffff;
+            doMasterReset();
+        }
     }
     return NULL;
 }
@@ -1969,7 +1988,7 @@ void InterChange::mediate()
             #warning gui writes changed to reads
             // temp fixes!
             bool partflag = (getData.data.kit == 0xff) | (getData.data.kit >= 0x20 && getData.data.kit < 0x30);
-            if (getData.data.part >= 0x40 || partflag == false)
+            if (getData.data.part != 0xf0 && (getData.data.part >= 0x40 || partflag == false))
                 getData.data.type = getData.data.type & 0xbf;
             else if ((getData.data.type & 3) == 0)
                 getData.data.type |= 1;
@@ -2033,9 +2052,16 @@ void InterChange::setpadparams(int point)
 {
     int npart = point & 0xff;
     int kititem = point >> 8;
-    synth->partonoffLock(npart, 0);
     synth->part[npart]->kit[kititem].padpars->applyparameters(false);
-    synth->partonoffLock(npart, 1);
+    synth->partonoffWrite(npart, 1);
+}
+
+
+void InterChange::doMasterReset()
+{
+    synth->resetAll(); // we have to update the gui after this
+    usleep(10000); // we shouldn't need this :(
+    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
 }
 
 
@@ -2448,7 +2474,10 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 96:
             if (write)
-                synth->resetAll();
+            {
+                synth->Mute(); // safe here - acting just before it's read
+                lowPriAct = 0xf0000000; // reset
+            }
             break;
         case 128:
             if (write)
@@ -3949,7 +3978,10 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case 104:
             if (write)
-                synth->getRuntime().padApply = npart | (kititem << 8);
+            {
+                synth->partonoffWrite(npart, 0); // safe to mute directly here
+                lowPriAct = npart | (kititem << 8);
+            }
             break;
 
         case 112:

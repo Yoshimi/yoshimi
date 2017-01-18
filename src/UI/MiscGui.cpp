@@ -137,6 +137,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (npart >= 0xf0) // main / sys / ins
     {
+
         synth->getGuiMaster()->returns_update(getData);
         return;
     }

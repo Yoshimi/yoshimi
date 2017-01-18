@@ -23,6 +23,7 @@
 #define INTERCH_H
 
 #include <jack/ringbuffer.h>
+#include <atomic>
 
 using namespace std;
 
@@ -53,11 +54,13 @@ class InterChange : private MiscFuncs
         void mediate();
         void returns(CommandBlock *getData);
         void setpadparams(int point);
+        void doMasterReset();
         void commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);
 
     private:
+        std::atomic_uint lowPriAct;
         void *CLIresolvethread(void);
         static void *_CLIresolvethread(void *arg);
         pthread_t  CLIresolvethreadHandle;

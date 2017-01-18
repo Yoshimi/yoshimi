@@ -77,12 +77,10 @@ bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan,
         lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
         if (lastpos == -3)
             return false;
-        float value = _value;
+        float value = _value; // needs to be refetched each loop
         if (category & 2)
         {
             value = value / 128.0; // convert from 14 bit
-            if (CC == 128)
-                value += 64; // adjust for pitch bend
         }
         int status = foundEntry.status;
         if ((status & 4) == 4)

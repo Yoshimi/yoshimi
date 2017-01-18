@@ -185,6 +185,7 @@ class MasterUI {selected : {private MiscFuncs}
       {
           filename += ("-" + asString(instance));
       }
+      partmax = synth->getRuntime().NumAvailableParts;
       filename += ".windows";
       microtonalui = new MicrotonalUI(&synth->microtonal);
       bankui = new BankUI(&npart, synth);;
@@ -561,10 +562,10 @@ paramsui->Show(4);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-              synth->microtonal.Pglobalfinedetune = o->value();
-              synth->setAllPartMaps();
-              globalfinedetune->changed();
-              send_data(32, o->value(), 0xc8);}
+             // synth->microtonal.Pglobalfinedetune = o->value();
+              //synth->setAllPartMaps();
+             // globalfinedetune->changed();
+    send_data(32, o->value(), 0xc8);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
@@ -574,14 +575,17 @@ paramsui->Show(4);}
         Fl_Button {} {
           label Reset
           callback {//
-    do_new_master();
-    send_data(96, o->value(), 0xc0);}
+    if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
+    {
+        //do_new_master();
+        send_data(96, o->value(), 0xc0);
+    }}
           tooltip {Clear all dynamic settings} xywh {15 60 75 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
           callback {//
-              virkeyboard->relaseallkeys();
+              /*virkeyboard->relaseallkeys();
               vumeter->init(-1, synth);
               for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
               {
@@ -593,13 +597,13 @@ paramsui->Show(4);}
 	              	}
               	}
               }
-              synth->allStop();
+              synth->allStop();*/
               send_data(128, o->value(), 0xc0);}
           tooltip {Cease all sound immediately!} xywh {15 32 75 20} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
-          callback {synth->setPvolume(o->value());
+          callback {//synth->setPvolume(o->value());
 send_data(0, o->value(), 0x48);}
           tooltip {Master Volume} xywh {331 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
@@ -882,8 +886,8 @@ send_data(0, o->value(), 0x48);}
       }
       Fl_Spinner masterkeyshift {
         label {Key Shift}
-        callback {synth->setPkeyshift(o->value() + 64);
-synth->setAllPartMaps();
+        callback {//synth->setPkeyshift(o->value() + 64);
+//synth->setAllPartMaps();
 send_data(35, o->value(), 0xc0);}
         tooltip {Shift pitch +/- N semitones} xywh {332 87 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
@@ -892,42 +896,43 @@ send_data(35, o->value(), 0xc0);}
       Fl_Spinner npartcounter {
         label Part
         callback {//
-          int nval = o->value() - 1;
-          synth->getRuntime().currentPart = nval;
-          partuigroup->remove(partui);
-          delete partui;
-          partui = new PartUI(0, 0, 765, 525);
-          partuigroup->add(partui);
-          partui->init(synth->part[nval], nval, bankui);
-          partui->redraw();
-          o->redraw();
-          npart = nval;
-          updatepanel();
-          maxparts->value(synth->getRuntime().NumAvailableParts);
-          send_data(14, o->value()-1, 0xc0);}
+    int nval = o->value() - 1;
+    synth->getRuntime().currentPart = nval;
+    partuigroup->remove(partui);
+    delete partui;
+    partui = new PartUI(0, 0, 765, 525);
+    partuigroup->add(partui);
+    partui->init(synth->part[nval], nval, bankui);
+    partui->redraw();
+    o->redraw();
+    npart = nval;
+    updatepanel();
+    send_data(14, o->value()-1, 0xc0);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
-        code0 {o->type(FL_INT_INPUT); o->range(1.0, synth->getRuntime().NumAvailableParts);}
+        code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
       }
       Fl_Spinner maxparts {
         label of
-        callback {int tmp = o->value();
-if (tmp == 48)
-{
-    if (synth->getRuntime().NumAvailableParts == 32)
-        tmp = 64;
-    else
-        tmp = 32;
-    o->value(tmp);
-}
-synth->getRuntime().NumAvailableParts = tmp;
-updatepart();
-updatepanel();
-setinspartlist();
-send_data(15, o->value(), 0xc0);}
+        callback {//
+    int tmp = o->value();
+    if (tmp == 48)
+    {
+        if (partmax == 32)
+            tmp = 64;
+        else
+            tmp = 32;
+        o->value(tmp);
+    }
+    partmax = tmp;
+    npartcounter->range(1.0, partmax);
+    updatepart();
+    updatepanel();
+    setinspartlist();
+    send_data(15, tmp, 0xc0);}
         xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
-        code0 {o->value(synth->getRuntime().NumAvailableParts);}
+        code0 {o->value(partmax);}
       }
     }
     Fl_Window aboutwindow {
@@ -1193,7 +1198,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     int nval = (int) value;
-
     if (npart == 0xf1)
     {
         if (insert == 16)
@@ -1250,6 +1254,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             break;
 
         case 15:
+            partmax = lrint(value);
+            //checkmaxparts();
             updatepart();
             updatepanel();
             setinspartlist();
@@ -1269,11 +1275,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             break;
 
 	case 96:
-	    delete microtonalui;
-            setMasterLabel("");
-            npartcounter->value(1);
-            refresh_master_ui();
-            updatepanel();
+	    return;
+	    // this is done elsewhere
             break;
 
         case 128:
@@ -1304,7 +1307,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {updatepanel()} {} {
     code {//
-        int partmax = synth->getRuntime().NumAvailableParts;
+        //int partmax = synth->getRuntime().NumAvailableParts;
         for (int npart = 0; npart < partmax; ++npart)
         {
             if (npart < NUM_MIDI_CHANNELS)
@@ -1372,6 +1375,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     code {//
     if (checkmaxparts())
     {
+        npart = 0;
         npartcounter->value(npart + 1);
         npartcounter->do_callback();
         return;
@@ -1400,7 +1404,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     if (!synth->part[npart]->Ppolymode && synth->part[npart]->Plegatomode)
         partui->keymode->value(2);
 
-    maxparts->value(synth->getRuntime().NumAvailableParts);
+    maxparts->value(partmax);
     maxparts->redraw();
     npartcounter->value(npart + 1);
     npartcounter->redraw();
@@ -1503,18 +1507,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     else
         synth->addHistory(fname, 3);} {}
   }
-  Function {do_new_master()} {} {
-    code {//
-    if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
-    {
-        delete microtonalui;
-        synth->resetAll();
-        setMasterLabel("");
-        npartcounter->value(1);
-        refresh_master_ui();
-        updatepanel();
-        }} {}
-  }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//
         const char *fname;
@@ -1587,8 +1579,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {refresh_master_ui()} {} {
     code {//
+    if (microtonalui) // not taking chances!
+        delete microtonalui;
+    partmax = synth->getRuntime().NumAvailableParts;
+    maxparts->value(partmax);
+    checkmaxparts();
     npartcounter->value((synth->getRuntime().currentPart) + 1);
-    npartcounter->do_callback();
+    npartcounter->do_callback(); 
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
     syseffnocounter->do_callback();
@@ -1602,7 +1599,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
     microtonalui = new MicrotonalUI(&synth->microtonal);
     setMasterLabel("");
-    checkmaxparts();
     updatesendwindow();
     updatepanel();
     vectorui->updateAll();
@@ -1616,8 +1612,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   } {
     code {//
     bool changed = false;
-    int max = synth->getRuntime().NumAvailableParts;
-    if(panelgroup >= max)
+    if(panelgroup >= partmax)
     {
         panelgroup = 0;
         npart = 0;
@@ -1625,9 +1620,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         Panelsmallgroups->value(0);
         changed = true;
     }
-    npartcounter->range(1, max);
-    if ( npartcounter->value() >= (max + 1))
+    npartcounter->range(1, partmax);
+    if (npartcounter->value() >= (partmax + 1))
+    {
         npartcounter->value(1);
+        changed = true;
+    }
     return changed;} {}
   }
   Function {strategicRetreat(void)} {} {
@@ -2073,6 +2071,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   decl {int npart;} {public local
   }
   decl {int nsyseff;} {private local
+  }
+  decl {int partmax;} {private local
   }
   decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
   }
