@@ -2060,8 +2060,7 @@ void InterChange::setpadparams(int point)
 void InterChange::doMasterReset()
 {
     synth->resetAll(); // we have to update the gui after this
-    usleep(10000); // we shouldn't need this :(
-    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 1);
 }
 
 

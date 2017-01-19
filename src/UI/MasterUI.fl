@@ -529,7 +529,7 @@ paramsui->Show(3);}
     	setMasterLabel(laststatefile.substr(name_start + 1, name_end - name_start - 1));
 
     }
-    refresh_master_ui();}
+    refresh_master_ui(0);}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
@@ -1521,7 +1521,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         int result = synth->loadParameters(fname);
         setinspartlist();
         npartcounter->value(1);
-        refresh_master_ui();
+        refresh_master_ui(0);
         if (result >= 0)
         {
             string name = (string)fname;
@@ -1577,7 +1577,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         }
         updatepanel();} {}
   }
-  Function {refresh_master_ui()} {} {
+  Function {refresh_master_ui(int type)} {} {
     code {//
     if (microtonalui) // not taking chances!
         delete microtonalui;
@@ -1585,7 +1585,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     maxparts->value(partmax);
     checkmaxparts();
     npartcounter->value((synth->getRuntime().currentPart) + 1);
-    npartcounter->do_callback(); 
+    npartcounter->do_callback();
     nsyseff = 0;
     syseffnocounter->value(nsyseff + 1);
     syseffnocounter->do_callback();
@@ -1606,7 +1606,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     if (synth->getRuntime().toConsole == false)
         Reports->deactivate();
     else
-        Reports->activate();} {}
+        Reports->activate();
+    if (type == 1)
+    	configui->update_config(4);} {}
   }
   Function {checkmaxparts()} {return_type bool
   } {

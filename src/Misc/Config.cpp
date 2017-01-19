@@ -1223,7 +1223,7 @@ void GuiThreadMsg::processGuiMessages()
             {
 
                 case GuiThreadMsg::UpdateMaster:
-                    guiMaster->refresh_master_ui();
+                    guiMaster->refresh_master_ui(msg->index);
                     break;
 
                 case GuiThreadMsg::UpdateConfig:

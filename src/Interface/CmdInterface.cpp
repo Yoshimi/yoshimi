@@ -1775,7 +1775,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
         {
             defaults();
             synth->resetAll();
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 1);
         }
         return false;
     }
