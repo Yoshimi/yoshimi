@@ -46,7 +46,7 @@ using namespace std;
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
-    lowPriAct = 0xffffffff;
+    flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
         fromCLI = NULL;
@@ -121,17 +121,13 @@ void *InterChange::CLIresolvethread(void)
          * The following are low priority actions initiated by, but isolated
          * from the main audio thread.
          */
-        if (lowPriAct < 0xffff)
-        {
-            unsigned int point = lowPriAct;
-            lowPriAct = 0xfffffff;
+        unsigned int point = flagsReadClear();
+        //if (point < 0xffffffff)
+            //cout << " point " << hex << point << endl;
+        if (point < 0xffff)
             setpadparams(point);
-        }
-        else if (lowPriAct == 0xf0000000)
-        {
-            lowPriAct = 0xfffffff;
+        else if (point == 0xf0000000)
             doMasterReset();
-        }
     }
     return NULL;
 }
@@ -2475,7 +2471,7 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write)
             {
                 synth->Mute(); // safe here - acting just before it's read
-                lowPriAct = 0xf0000000; // reset
+                flagsWrite(0xf0000000); // reset
             }
             break;
         case 128:
@@ -3979,7 +3975,7 @@ void InterChange::commandPad(CommandBlock *getData)
             if (write)
             {
                 synth->partonoffWrite(npart, 0); // safe to mute directly here
-                lowPriAct = npart | (kititem << 8);
+                flagsWrite(npart | (kititem << 8));
             }
             break;
 

@@ -1772,11 +1772,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     if (matchnMove(3, point, "reset"))
     {
         if (query("Restore to basic settings", false))
-        {
-            defaults();
-            synth->resetAll();
-            GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 1);
-        }
+            sendDirect(0, 64, 96, 240);
         return false;
     }
 
@@ -1800,7 +1796,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
     if (helpList())
         return false;
     if (matchnMove(2, point, "stop"))
-        synth->allStop();
+        sendDirect(0, 64, 128, 240);
     else if (matchnMove(1, point, "list"))
     {
         if (matchnMove(1, point, "instruments") || matchnMove(2, point, "programs"))
@@ -2214,9 +2210,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 replyString = setExtension((string) point, "xiz");
-                synth->actionLock(lockmute);
                 tmp = synth->part[npart]->saveXML(replyString);
-                synth->actionLock(unlock);
                 if (tmp)
                     Runtime.Log("Saved part " + asString(npart) + "  instrument " + (string) synth->part[npart]->Pname + "  as " +replyString);
                 else

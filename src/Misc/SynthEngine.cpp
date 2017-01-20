@@ -1932,10 +1932,9 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(void)
 {
-    actionLock(lockmute);
     defaults();
     ClearNRPNs();
-    actionLock(unlock);
+    Unmute();
     Runtime.Log("All dynamic values set to defaults.");
 }
 

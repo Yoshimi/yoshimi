@@ -291,8 +291,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
     }
     if (ctrl == C_reset)
     {
-        synth->resetAll();
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 1);
+        synth->interchange.flagsWrite(0xf0000000);
         return;
     }
     if (ctrl == synth->getRuntime().midi_bank_root)
