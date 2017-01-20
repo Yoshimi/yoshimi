@@ -179,9 +179,12 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade;
     int found = 0;
-    if (!interchange.fromCLI)
+    /*if (!interchange.fromCLI)
         goto bail_out;
     if (!interchange.fromGUI)
+        goto bail_out;*/
+
+    if (!interchange.Init(this))
         goto bail_out;
 
     if (!pthread_mutex_init(&processMutex, NULL))

@@ -46,42 +46,48 @@ using namespace std;
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
+    ;
+}
+
+
+bool InterChange::Init(SynthEngine *_synth)
+{
     flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
-        fromCLI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromCLI' ringbuffer");
+        goto bail_out;
     }
     else
          jack_ringbuffer_reset(fromCLI);
 
     if (!(toCLI = jack_ringbuffer_create(sizeof(commandSize) * 512)))
     {
-        toCLI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'toCLI' ringbuffer");
+        goto bail_out;
     }
     else
         jack_ringbuffer_reset(toCLI);
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
-        fromGUI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromGUI' ringbuffer");
+        goto bail_out;
     }
     else
         jack_ringbuffer_reset(fromGUI);
     if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
-        toGUI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'toGUI' ringbuffer");
+        goto bail_out;
     }
     else
         jack_ringbuffer_reset(toGUI);
 
     if (!(fromMIDI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
-        fromMIDI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromMIDI' ringbuffer");
+        goto bail_out;
     }
     else
          jack_ringbuffer_reset(fromMIDI);
@@ -89,7 +95,38 @@ InterChange::InterChange(SynthEngine *_synth) :
     if (!synth->getRuntime().startThread(&CLIresolvethreadHandle, _CLIresolvethread, this, false, 0, false, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
+        goto bail_out;
     }
+    return true;
+
+
+bail_out:
+    if (fromCLI)
+    {
+        jack_ringbuffer_free(fromCLI);
+        fromCLI = NULL;
+    }
+    if (toCLI)
+    {
+        jack_ringbuffer_free(toCLI);
+        toCLI = NULL;
+    }
+    if (fromGUI)
+    {
+        jack_ringbuffer_free(fromGUI);
+        fromGUI = NULL;
+    }
+    if (toGUI)
+    {
+        jack_ringbuffer_free(toGUI);
+        toGUI = NULL;
+    }
+    if (fromMIDI)
+    {
+        jack_ringbuffer_free(fromMIDI);
+        fromGUI = NULL;
+    }
+    return false;
 }
 
 
@@ -104,8 +141,14 @@ void *InterChange::CLIresolvethread(void)
     CommandBlock getData;
     int toread;
     char *point;
+
     while(synth->getRuntime().runSynth)
     {
+        /*unsigned int tick;
+        ++ tick;
+        if ((tick & 2047) == 0)
+            cout << "resolve tick" << endl;*/
+
         while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
         {
             toread = commandSize;
@@ -122,12 +165,12 @@ void *InterChange::CLIresolvethread(void)
          * from the main audio thread.
          */
         unsigned int point = flagsReadClear();
-        //if (point < 0xffffffff)
-            //cout << " point " << hex << point << endl;
         if (point < 0xffff)
             setpadparams(point);
         else if (point == 0xf0000000)
             doMasterReset();
+        //if (point < 0xffffffff)
+            //cout << " point " << hex << point << endl;
     }
     return NULL;
 }

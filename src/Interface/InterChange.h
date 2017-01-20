@@ -40,6 +40,7 @@ class InterChange : private MiscFuncs
     public:
         InterChange(SynthEngine *_synth);
         ~InterChange();
+        bool Init(SynthEngine *_synth);
 
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
