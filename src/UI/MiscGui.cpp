@@ -150,14 +150,14 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (kititem == 0xff || (kititem & 0x20)) // part
     {
-        if (control != 58 && kititem < 255 && part->Pkitmode == 0)
-            return; // invalid access
+        //if (control != 58 && kititem < 255 && part->Pkitmode == 0)
+            //return; // invalid access
         synth->getGuiMaster()->partui->returns_update(getData);
         return;
     }
 
-    if (kititem < 255 && part->Pkitmode == 0)
-        return; // invalid access
+    //if (kititem < 255 && part->Pkitmode == 0)
+        //return; // invalid access
     if (engine == 2) // padsynth
     {
         if(synth->getGuiMaster()->partui->padnoteui)

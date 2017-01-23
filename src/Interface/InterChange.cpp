@@ -228,7 +228,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insertPar2 = getData->data.par2;
 
     bool isMidi = type & 8;
-
+//cout << "\nPart " << (int) npart << "\nKit " << (int) kititem << "\nEngine " << (int)engine << endl;
 #ifdef ENABLE_REPORTS
     if (isGui)
         synth->getRuntime().Log("From GUI");
@@ -283,12 +283,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     else if (kititem == 0xff || (kititem & 0x20))
     {
-        if (control != 58 && kititem < 255 && part->Pkitmode == 0)
+        if (false)//control != 58 && kititem < 255 && part->Pkitmode == 0)
             commandName = "Part " + to_string(int(npart)) + " Kitmode not enabled";
-        commandName = resolvePart(getData);
+        else
+            commandName = resolvePart(getData);
     }
 
-    if (kititem < 255 && part->Pkitmode == 0)
+    else if (false)//kititem < 255 && part->Pkitmode == 0)
         commandName = "Part " + to_string(int(npart)) + " Kitmode not enabled";
     else if (engine == 2)
     {
@@ -2161,14 +2162,14 @@ void InterChange::commandSend(CommandBlock *getData)
 
     if (kititem == 0xff || (kititem & 0x20))
     {
-        if (control != 58 && kititem < 255 && part->Pkitmode == 0)
-            return;
+        //if (control != 58 && kititem < 255 && part->Pkitmode == 0)
+            //return;
         commandPart(getData);
         return;
     }
 
-    if (kititem < 255 && part->Pkitmode == 0)
-        return;
+    //if (kititem < 255 && part->Pkitmode == 0)
+        //return;
 
     if (engine == 2)
     {
