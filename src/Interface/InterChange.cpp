@@ -283,9 +283,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
 
     else if (kititem == 0xff || (kititem & 0x20))
     {
+        if (control != 58 && kititem < 255 && part->Pkitmode == 0)
+            commandName = "Part " + to_string(int(npart)) + " Kitmode not enabled";
         commandName = resolvePart(getData);
     }
 
+    if (kititem < 255 && part->Pkitmode == 0)
+        commandName = "Part " + to_string(int(npart)) + " Kitmode not enabled";
     else if (engine == 2)
     {
         switch(insert)
@@ -2157,9 +2161,14 @@ void InterChange::commandSend(CommandBlock *getData)
 
     if (kititem == 0xff || (kititem & 0x20))
     {
+        if (control != 58 && kititem < 255 && part->Pkitmode == 0)
+            return;
         commandPart(getData);
         return;
     }
+
+    if (kititem < 255 && part->Pkitmode == 0)
+        return;
 
     if (engine == 2)
     {

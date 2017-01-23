@@ -1659,8 +1659,10 @@ int SynthEngine::SetSystemValue(int type, int value)
                     if (value >= NUM_MIDI_CHANNELS)
                         return 1; // out of range
                 }
-                else
+                else if (value > 0)
                     value = (Runtime.channelSwitchValue + 1) % NUM_MIDI_CHANNELS; // loop
+                else
+                    return 0; // do nothing if it's a switch off
 
                 Runtime.channelSwitchValue = value;
                 for (int ch = 0; ch < NUM_MIDI_CHANNELS; ++ch)
