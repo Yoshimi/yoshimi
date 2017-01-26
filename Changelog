@@ -3,6 +3,9 @@ yoshimi 1.5.0 M
 2017-1-26 Will
 * Modified splash screen creation utility and files and
   made them formally available in a new 'Util' directory.
+* Another attempt at error checks for attempt to access
+  kit when not in kit mode. Think it's right now :)
+* Commented out some redundant code.
 
 2017-1-23 Will
 * Channel switcher/Solo now ignores zero in loop mode.

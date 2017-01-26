@@ -128,11 +128,11 @@ static void *mainGuiThread(void *arg)
     //Fl_Pixmap pix(yoshimi_logo);
 
     box.image(pix);
-    Fl_Box boxLb(textBorder, splashHeight - textHeight * 2, splashWidth - textBorder * 2, textHeight);
-    boxLb.box(FL_NO_BOX);
-    boxLb.align(FL_ALIGN_CENTER);
-    boxLb.labelsize(textHeight);
-    boxLb.labeltype(FL_NORMAL_LABEL);
+    //Fl_Box boxLb(textBorder, splashHeight - textHeight * 2, splashWidth - textBorder * 2, textHeight);
+    //boxLb.box(FL_NO_BOX);
+    //boxLb.align(FL_ALIGN_CENTER);
+    //boxLb.labelsize(textHeight);
+    //boxLb.labeltype(FL_NORMAL_LABEL);
     //boxLb.labelcolor(FL_WHITE);
     //boxLb.labelfont(FL_HELVETICA | FL_BOLD);
     /*boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
@@ -141,7 +141,7 @@ static void *mainGuiThread(void *arg)
     boxLb.label(startup.c_str());*/
 
     winSplash.set_modal();
-    winSplash.clear_border();
+    //winSplash.clear_border();
     winSplash.border(false);
 
     if (bShowGui && firstRuntime->showSplash)
@@ -446,8 +446,8 @@ int main(int argc, char *argv[])
     bExitSuccess = true;
 
 bail_out:
-    //if (bShowGui && !bExitSuccess) // this could be done better!
-        //sleep(2);
+    if (bShowGui && !bExitSuccess) // this could be done better!
+        sleep(2);
     for (it = synthInstances.begin(); it != synthInstances.end(); ++it)
     {
         SynthEngine *_synth = it->first;
