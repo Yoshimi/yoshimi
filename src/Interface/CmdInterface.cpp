@@ -115,6 +115,9 @@ string toplist [] = {
     "AVailable <n>",              "available parts (16, 32, 64)",
     "Volume <n>",                 "master volume",
     "SHift <n>",                  "master key shift semitones (0 no shift)",
+    "DEtune <n>",                 "master fine detune",
+    "SOlo <n>",                   "channel 'solo' switcher (off, row, col, loop)",
+    "SCC <n>",                     "Incoming 'solo' channel number",
     "TIMes [s]",                  "time display on instrument load message (ENable / other",
     "PREferred Midi <s>",         "* MIDI connection type (Jack, Alsa)",
     "PREferred Audio <s>",        "* audio connection type (Jack, Alsa)",
@@ -608,82 +611,52 @@ int CmdInterface::effects()
 }
 
 
-int CmdInterface::volPanShift()
+int CmdInterface::keyShift(int part)
 {
-    Config &Runtime = synth->getRuntime();
+    int cmdType = 0;
+    if (!isRead)
+        cmdType = 64;
+    if (!matchnMove(2, point, "shift"))
+        return todo_msg;
+    if (!isRead && point[0] == 0)
+            return value_msg;
+    int value = string2int(point);
+    if (value < MIN_KEY_SHIFT)
+        value = MIN_KEY_SHIFT;
+    else if(value > MAX_KEY_SHIFT)
+        value = MAX_KEY_SHIFT;
+    sendDirect(value, cmdType, 35, part);
+    return done_msg;
+}
+
+
+int CmdInterface::volPanVel()
+{
     int reply = todo_msg;
-    int value;
-    bool panelFlag = false;
-    bool partFlag = false;
+    int cmdType = 0;
+    if (!isRead)
+        cmdType = 64;
+    int cmd = -1;
 
     if (matchnMove(1, point, "volume"))
-    {
-        if (point[0] == 0)
-            return value_msg;
-        value = string2int127(point);
-        if(bitTest(level, part_lev))
-        {
-                synth->part[npart]->SetController(7, value);
-                Runtime.Log("Volume set to " + asString(value));
-                panelFlag = true;
-        }
-        else
-                synth->SetSystemValue(7, value);
-        reply = done_msg;
-    }
-    else if(bitTest(level, part_lev) && matchnMove(1, point, "pan"))
-    {
-        if (point[0] == 0)
-            return value_msg;
-        value = string2int127(point);
-        synth->part[npart]->SetController(10, value);
-        reply = done_msg;
-        Runtime.Log("Panning set to " + asString(value));
-        panelFlag = true;
-    }
-    else if (matchnMove(2, point, "shift"))
-    {
-        if (point[0] == 0)
-            return value_msg;
-        value = string2int(point);
-        if (value < MIN_KEY_SHIFT)
-            value = MIN_KEY_SHIFT;
-        else if(value > MAX_KEY_SHIFT)
-            value = MAX_KEY_SHIFT;
-        if(bitTest(level, part_lev))
-            synth->SetPartShift(npart, value + 64);
-        else
-                synth->SetSystemValue(2, value + 64);
-        reply = done_msg;
-    }
+        cmd = 0;
+    else if(matchnMove(1, point, "pan"))
+        cmd = 2;
     else if (matchnMove(2, point, "velocity"))
+        cmd = 1;
+    else if (matchnMove(2, point, "offset"))
+        cmd = 4;
+    switch (cmd)
     {
-        if (point[0] == 0)
-            return value_msg;
-        value = string2int127(point);
-        if (bitTest(level, part_lev))
-        {
-            synth->part[npart]->Pvelsns = value;
-            Runtime.Log("Velocity sense set to " + asString(value));
-            partFlag = true;
-        }
-        reply = done_msg;
+        case 0:
+        case 1:
+        case 2:
+        case 4:
+            if (!isRead && point[0] == 0)
+                return value_msg;
+            sendDirect(string2int127(point), cmdType, cmd, npart);
+            reply = done_msg;
     }
-    else if (bitTest(level, part_lev) && matchnMove(2, point, "offset"))
-    {
-        if (point[0] == 0)
-            return value_msg;
-        value = string2int127(point);
-        synth->part[npart]->Pveloffs = value;
-        Runtime.Log("Velocity offset set to " + asString(value));
-        partFlag = true;
-        reply = done_msg;
-    }
-
-    if (panelFlag) // currently only volume and pan
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePanelItem, npart);
-    if (partFlag)
-        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdatePart, 0);
     return reply;
 }
 
@@ -895,7 +868,10 @@ int CmdInterface::commandPart(bool justSet)
         bitSet(level, part_lev);
         return effects();
     }
-    tmp = volPanShift();
+    tmp = keyShift(npart);
+    if (tmp != todo_msg)
+        return tmp;
+    tmp = volPanVel();
     if(tmp != todo_msg)
         return tmp;
     if (matchnMove(2, point, "enable"))
@@ -1378,9 +1354,60 @@ int CmdInterface::commandReadnSet()
     if (bitTest(level, all_fx))
         return effects();
 
-    tmp = volPanShift();
-    if(tmp > todo_msg)
+
+
+    int cmdType = 0;
+    if (!isRead)
+        cmdType = 64;
+
+
+    if (matchnMove(1, point, "volume"))
+    {
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        sendDirect(string2int127(point), cmdType, 0, 240);
+        return done_msg;
+    }
+    if (matchnMove(2, point, "detune"))
+    {
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        sendDirect(string2int127(point), cmdType, 32, 240);
+        return done_msg;
+    }
+
+    tmp = keyShift(240);
+    if (tmp != todo_msg)
         return tmp;
+
+    if (matchnMove(2, point, "solo"))
+    {
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        int value = string2int127(point);
+        if (value > 3)
+            return range_msg;
+        sendDirect(value, cmdType, 48, 240);
+        return done_msg;
+    }
+    if (matchnMove(3, point, "scc"))
+    {
+        int value = 0;
+        if (!isRead)
+        {
+            if (point[0] == 0)
+                return value_msg;
+            value = string2int127(point);
+            string reply = Runtime.masterCCtest(value);
+            if (reply > "")
+            {
+                Runtime.Log("In use for " + reply);
+                return done_msg;
+            }
+        }
+        sendDirect(value, cmdType, 49, 240);
+        return done_msg;
+    }
 
     if (matchnMove(2, point, "program") || matchnMove(4, point, "instrument"))
     {
@@ -1401,7 +1428,7 @@ int CmdInterface::commandReadnSet()
         Runtime.configChanged = true;
         return done_msg;
     }
-    else if (matchnMove(2, point, "activate"))
+    if (matchnMove(2, point, "activate"))
     {
         if (isRead)
         {
@@ -1427,32 +1454,27 @@ int CmdInterface::commandReadnSet()
             Runtime.Log("Root CC is " + asString(Runtime.midi_bank_root));
             return done_msg;
         }
-        if (point[0] != 0)
-        {
-            synth->SetSystemValue(113, string2int(point));
-            reply = done_msg;
-            Runtime.configChanged = true;
-        }
-        else
-            reply = value_msg;
+        if (point[0] == 0)
+            return value_msg;
+        synth->SetSystemValue(113, string2int(point));
+        Runtime.configChanged = true;
+        return done_msg;
     }
-    else if (matchnMove(3, point, "ccbank"))
+    if (matchnMove(3, point, "ccbank"))
     {
         if (isRead)
         {
             Runtime.Log("Bank CC is " + asString(Runtime.midi_bank_C));
             return done_msg;
         }
-        if (point[0] != 0)
-        {
-            synth->SetSystemValue(114, string2int(point));
-            reply = done_msg;
-            Runtime.configChanged = true;
-        }
-        else
-            reply = value_msg;
+        if (point[0] == 0)
+            return value_msg;
+        synth->SetSystemValue(114, string2int(point));
+        reply = done_msg;
+        Runtime.configChanged = true;
+        return done_msg;
     }
-    else if (matchnMove(1, point, "extend"))
+    if (matchnMove(1, point, "extend"))
     {
          if (isRead)
         {
@@ -1465,32 +1487,27 @@ int CmdInterface::commandReadnSet()
             Runtime.Log(name, 1);
             return done_msg;
         }
-       if (point[0] != 0)
-        {
-            synth->SetSystemValue(117, string2int(point));
-            reply = done_msg;
-            Runtime.configChanged = true;
-        }
-        else
-            reply = value_msg;
+        if (point[0] == 0)
+            return value_msg;
+        synth->SetSystemValue(117, string2int(point));
+        reply = done_msg;
+        Runtime.configChanged = true;
+        return done_msg;
+
     }
     else if (matchnMove(2, point, "available")) // 16, 32, 64
     {
-        if (isRead)
-        {
-            Runtime.Log(asString(Runtime.NumAvailableParts) + " available parts", 1);
-            return done_msg;
-        }
-        if (point[0] != 0)
-        {
-            synth->SetSystemValue(118, string2int(point));
-            reply = done_msg;
-            Runtime.configChanged = true;
-        }
-        else
-            reply = value_msg;
+        if (!isRead && point[0] == 0)
+            return value_msg;
+        int value = string2int(point);
+        if (value != 16 && value != 32 && value != 64)
+            return range_msg;
+        sendDirect(value, cmdType, 15, 240);
+        return done_msg;
     }
-    else if (matchnMove(3, point, "preferred"))
+
+
+    if (matchnMove(3, point, "preferred"))
     {
         name = " set to ";
         if (matchnMove(1, point, "midi"))

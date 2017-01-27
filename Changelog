@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-1-27 Will
+* Transferred most CLI main and part level controls to
+  new method and added in 'solo' and 'detune'.
+* Changed resolve thread's timer to 60uS.
+* Corrected GUI max parts display anomaly.
+
 2017-1-26 Will
 * Modified splash screen creation utility and files and
   made them formally available in a new 'Util' directory.

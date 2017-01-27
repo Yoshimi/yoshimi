@@ -159,7 +159,7 @@ void *InterChange::CLIresolvethread(void)
             else
                 resolveReplies(&getData);
         }
-        usleep(500);
+        usleep(60);
         /*
          * The following are low priority actions initiated by, but isolated
          * from the main audio thread.
@@ -278,7 +278,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
         commandName = resolveEffects(getData);
     }
 
-    else if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+    else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
         commandName = "Part " + to_string(int(npart)) + " Kit item " + to_string(int(kititem)) + " not enabled";
 
     else if (kititem == 0xff || (kititem & 0x20))
@@ -505,10 +505,10 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Chan Switch Type";
+            contstr = "Chan 'solo' Switch Type";
             break;
         case 49:
-            contstr = "Chan Switch CC";
+            contstr = "Chan 'solo' Switch CC";
             break;
 
         case 96:
@@ -2156,7 +2156,7 @@ void InterChange::commandSend(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+    if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
         return; // attempt to access non existant kititem
 
     if (kititem == 0xff || (kititem & 0x20))

@@ -120,8 +120,8 @@ static void *mainGuiThread(void *arg)
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
 #endif
 
-    const int textHeight = 20;
-    const int textBorder = 15;
+    //const int textHeight = 20;
+    //const int textBorder = 15;
 
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
     Fl_Box box(0, 0, splashWidth,splashHeight);
@@ -320,7 +320,7 @@ bool mainCreateNewInstance(unsigned int forceId)
     //register jack ports for enabled parts
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if(synth->part [npart]->Penabled)
+        if(synth->part[npart]->Penabled)
         {
             mainRegisterAudioPort(synth, npart);
         }

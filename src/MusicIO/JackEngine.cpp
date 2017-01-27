@@ -227,8 +227,7 @@ void JackEngine::registerAudioPort(int partnum)
     {
         if(audio.ports [portnum] != NULL)
         {
-            //port already registered
-            //synth->getRuntime().Log("Jack port " + asString(partnum) + " already registered!");
+            synth->getRuntime().Log("Jack port " + asString(partnum) + " already registered!", 2);
             return;
         }
         /* This has a hack to stop all enabled parts from resistering
@@ -237,12 +236,13 @@ void JackEngine::registerAudioPort(int partnum)
          * Also, at startup there seems to be no way to enable main L/R
          * without also enabling part 0 direct :(
          */
+        string portName;
         if(synth->part [partnum] && synth->partonoffRead(partnum) && (synth->part [partnum]->Paudiodest > 1 || partnum == 0))
         {
-            string portName = "track_" + asString(partnum + 1) + "_r";
-            audio.ports[portnum + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
             portName = "track_" + asString(partnum + 1) + "_l";
             audio.ports[portnum] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+            portName = "track_" + asString(partnum + 1) + "_r";
+            audio.ports[portnum + 1] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
             if(audio.ports [portnum])
             {

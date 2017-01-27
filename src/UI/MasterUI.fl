@@ -1255,7 +1255,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
 
         case 15:
             partmax = lrint(value);
-            //checkmaxparts();
             updatepart();
             updatepanel();
             setinspartlist();
@@ -1378,6 +1377,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         npart = 0;
         npartcounter->value(npart + 1);
         npartcounter->do_callback();
+        maxparts->value(partmax);
+        maxparts->redraw();
         return;
     }
 
@@ -1617,13 +1618,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     if(panelgroup >= partmax)
     {
         panelgroup = 0;
-        npart = 0;
         Panelgroups->value(0);
         Panelsmallgroups->value(0);
         changed = true;
     }
     npartcounter->range(1, partmax);
-    if (npartcounter->value() >= (partmax + 1))
+    if (npart >= partmax)
     {
         npartcounter->value(1);
         changed = true;

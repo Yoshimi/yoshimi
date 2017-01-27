@@ -48,7 +48,8 @@ class CmdInterface : private MiscFuncs
         void historyList(int listnum);
         int effectsList();
         int effects();
-        int volPanShift();
+        int volPanVel();
+        int keyShift(int part);
         int commandVector();
         int commandPart(bool justSet);
         int commandReadnSet();
