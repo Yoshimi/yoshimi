@@ -5,6 +5,7 @@ yoshimi 1.5.0 M
   new method and added in 'solo' and 'detune'.
 * Changed resolve thread's timer to 60uS.
 * Corrected GUI max parts display anomaly.
+* Added missing 'c8' in GUI voice list :(
 
 2017-1-26 Will
 * Modified splash screen creation utility and files and

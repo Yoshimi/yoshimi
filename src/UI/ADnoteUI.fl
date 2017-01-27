@@ -166,7 +166,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         synth->getGuiMaster()->partui->adnoteui->advoice->Detune->value(detune);
         synth->getGuiMaster()->partui->adnoteui->advoice->detunevalueoutput->do_callback();
     }
-    collect_data(synth, detune, (Fl::event_button() | 0xc0), 32, npart, kititem, 0x80 + nvoice);}
+    collect_data(synth, detune, (Fl::event_button() | 0xc8), 32, npart, kititem, 0x80 + nvoice);}
           tooltip {Fine Detune (cents)} xywh {310 5 185 20} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
           code0 {o->value(pars->VoicePar[nvoice].PDetune - 8192);}
           class mwheel_slider_rev
