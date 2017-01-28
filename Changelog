@@ -4,6 +4,12 @@ yoshimi 1.5.0 M
 * Merged in Jesper's edit button in AddSynth voice list.
 * Adjusted positions/sizes to match general style.
 * Made other style adjustments to AddSynth GUI.
+* Set right click closures in bank GUI - long overdue.
+* Changed highly confusing code window names in bank GUI
+  so they match up with everything else!
+  bank -> instrument
+  root -> bank
+  path -> root
 
 2017-1-27 Will
 * Transferred most CLI main and part level controls to

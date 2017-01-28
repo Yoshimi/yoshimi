@@ -218,11 +218,11 @@ class MasterUI {selected : {private MiscFuncs}
       if (instrumentsO)
           bankui->Show();
       if (banksO)
-          bankui->rootuiwindow->show();
+          bankui->bankuiwindow->show();
       if (presetsO)
           configui->presets->show();
       if (rootsO)
-          bankui->pathwindow->show();
+          bankui->rootuiwindow->show();
       if (scalesO)
           microtonalui->microtonaluiwindow->show();
       if (virkbdO)
@@ -388,7 +388,7 @@ mainCreateNewInstance(forceId);}
         } {
           MenuItem {} {
             label {&Show Patch Banks...}
-            callback {bankui->rootuiwindow->show();}
+            callback {bankui->bankuiwindow->show();}
             xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -426,7 +426,7 @@ paramsui->Show(2);}
         } {
           MenuItem {} {
             label {&Bank Root Dirs...}
-            callback {bankui->pathwindow->show();}
+            callback {bankui->rootuiwindow->show();}
             xywh {30 30 100 20} labelsize 12
           }
           MenuItem {} {
@@ -1893,9 +1893,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
 
     masterwindow->position(masterX, masterY);
     panelwindow->position(panelX, panelY);
-    bankui->bankuiwindow->position(instrumentsX, instrumentsY);
-    bankui->rootuiwindow->position(banksX, banksY);
-    bankui->pathwindow->position(rootsX, rootsY);
+    bankui->instrumentuiwindow->position(instrumentsX, instrumentsY);
+    bankui->bankuiwindow->position(banksX, banksY);
+    bankui->rootuiwindow->position(rootsX, rootsY);
     configui->presets->position(presetsX, presetsY);
     microtonalui->microtonaluiwindow->position(scalesX, scalesY);
     virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
@@ -1921,17 +1921,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
              panelwindow->y(),
              panelwindow->visible());
     putData("instruments",
+             bankui->instrumentuiwindow->x(),
+             bankui->instrumentuiwindow->y(),
+             bankui->instrumentuiwindow->visible());
+    putData("banks",
              bankui->bankuiwindow->x(),
              bankui->bankuiwindow->y(),
              bankui->bankuiwindow->visible());
-    putData("banks",
+    putData("roots",
              bankui->rootuiwindow->x(),
              bankui->rootuiwindow->y(),
              bankui->rootuiwindow->visible());
-    putData("roots",
-             bankui->pathwindow->x(),
-             bankui->pathwindow->y(),
-             bankui->pathwindow->visible());
     putData("presets",
              configui->presets->x(),
              configui->presets->y(),
