@@ -415,14 +415,14 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
-    Fl_Window partgroup {selected
+    Fl_Window partgroup {
       xywh {964 44 375 165} type Double hide
       class Fl_Group
     } {
-      Fl_Group partgroupui {open
+      Fl_Group partgroupui {
         xywh {0 0 377 166}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
@@ -1222,7 +1222,7 @@ send_data(57, o->value(), 0xc0);}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {725 144 395 360} type Double hide
+      xywh {362 85 395 360} type Double hide
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
@@ -1470,7 +1470,7 @@ send_data(48, o->value(), 0xc8);}
       Fl_Button {} {
         label Close
         callback {instrumenteditwindow->hide();}
-        xywh {295 333 95 25} box THIN_UP_BOX
+        xywh {311 335 80 21} box THIN_UP_BOX labelfont 1 labelsize 13
       }
     }
   }

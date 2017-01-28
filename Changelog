@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-1-28 Will
+* Merged in Jesper's edit button in AddSynth voice list.
+* Adjusted positions/sizes to match general style.
+* Made other style adjustments to AddSynth GUI.
+
 2017-1-27 Will
 * Transferred most CLI main and part level controls to
   new method and added in 'solo' and 'detune'.
