@@ -358,6 +358,20 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 void SUBnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
+    int insert = getData->data.insert;
+
+    // defaults
+    getData->limits.min = 0;
+    getData->limits.max = 127;
+    getData->limits.def = 0;
+
+    if (insert >= 6 && insert <= 7)
+    { // do harmonics stuff
+        if (insert == 7)
+            getData->limits.def = 6400;
+        return;
+    }
+
     switch (control)
     {
         case 32:

@@ -5192,17 +5192,10 @@ void InterChange::returnLimits(CommandBlock *getData)
     int parameter = getData->data.parameter;
     int par2 = getData->data.par2;
 
-    //default values
-    getData->limits.min = 0;
-    getData->limits.max = 127;
-    getData->limits.def = 0;
-
     if (npart < 0x40)
     {
         Part *part;
         part = synth->part[npart];
-
-
 
         if (kititem < 0x10)
         {
@@ -5227,10 +5220,20 @@ void InterChange::returnLimits(CommandBlock *getData)
                     padpars->getLimits(getData);
                 }
             }
-            else if (engine != 1 && insert >= 5 && insert <= 7)
+            else if (insert >= 5 && insert <= 7)
             {
+                if (engine == 1)
+                {
+                    SUBnoteParameters *subpars;
+                    subpars = part->kit[kititem].subpars;
+                    subpars->getLimits(getData);
+                }
+                else
+                {
                     part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
-                    // we use this for limits as oscillator values identical
+                    // we also use this for pad limits
+                    // as oscillator values identical
+                }
             }
             else if (engine != 1 && insert == 8) // resonance
             {
@@ -5238,12 +5241,14 @@ void InterChange::returnLimits(CommandBlock *getData)
                 {
                     getData->limits.min = 1;
                     getData->limits.max = 90;
+                    getData->limits.def = 5000; // default values are *100
                 }
             }
             else if (insert == 0 && parameter <= 2) // LFO
             {
                 if (control == 0) // another cheat!
                 {
+                    getData->limits.min = 0;
                     getData->limits.max = 1;
                     getData->limits.def = 50; // default values are *100
                 }
@@ -5256,5 +5261,10 @@ void InterChange::returnLimits(CommandBlock *getData)
         }
     }
     else
+    {
+        getData->limits.min = 0;
+        getData->limits.max = 127;
+        getData->limits.def = 0;
         cout << "Using defaults" << endl;
+    }
 }

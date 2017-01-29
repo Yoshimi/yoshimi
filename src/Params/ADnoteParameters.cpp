@@ -815,6 +815,11 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
     //int engine = getData->data.engine;
+
+    // defaults
+    getData->limits.min = 0;
+    getData->limits.max = 127;
+    getData->limits.def = 0;
     switch (control)
     {
         case 32:

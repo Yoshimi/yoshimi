@@ -938,6 +938,12 @@ void PADnoteParameters::getfromXML(XMLwrapper *xml)
 void PADnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
+
+    // defaults
+    getData->limits.min = 0;
+    getData->limits.max = 127;
+    getData->limits.def = 0;
+
     switch (control)
     {
         case 16:
