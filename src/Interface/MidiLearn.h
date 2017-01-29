@@ -59,7 +59,7 @@ class MidiLearn : private MiscFuncs
         } data;
 
         struct LearnBlock{
-            unsigned char CC;
+            unsigned int CC;
             unsigned char chan;
             unsigned char min_in;
             unsigned char max_in;

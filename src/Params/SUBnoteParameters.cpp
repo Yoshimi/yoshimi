@@ -374,6 +374,10 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
     switch (control)
     {
+        case 17:
+            getData->limits.min = -64;
+            getData->limits.max = 63;
+            break;
         case 32:
             getData->limits.min = -8192;
             getData->limits.max = 8191;

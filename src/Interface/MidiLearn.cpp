@@ -489,7 +489,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         entry.max_out = it->max_out;
         entry.name = it->name;
         entry.data = it->data;
-        int CC = entry.CC;
+        unsigned int CC = entry.CC;
         int chan = entry.chan;
 
         midi_list.erase(it);

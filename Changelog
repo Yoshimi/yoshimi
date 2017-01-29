@@ -3,6 +3,7 @@ yoshimi 1.5.0 M
 2017-1-29 Will
 Bugfix: Some limits wrongly set for midi-learn.
         Revised defaults settings.
+Bugfix: More wrong limits :(
 
 2017-1-28 Will
 * Merged in Jesper's edit button in AddSynth voice list.

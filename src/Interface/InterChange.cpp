@@ -5178,6 +5178,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         getData->data.value = value;
 }
 
+
+// a lot of work needed here :(
 void InterChange::returnLimits(CommandBlock *getData)
 {
     // value is preserved so we know it's a limits test
@@ -5196,7 +5198,13 @@ void InterChange::returnLimits(CommandBlock *getData)
     {
         Part *part;
         part = synth->part[npart];
-
+        if (engine == 1 && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
+        {
+            SUBnoteParameters *subpars;
+            subpars = part->kit[kititem].subpars;
+            subpars->getLimits(getData);
+            return;
+        }
         if (kititem < 0x10)
         {
             if (insert == 0xff && parameter == 0xff && par2 == 0xff)
@@ -5206,65 +5214,85 @@ void InterChange::returnLimits(CommandBlock *getData)
                     ADnoteParameters *adpars;
                     adpars = part->kit[kititem].adpars;
                     adpars->getLimits(getData);
+                    return;
                 }
-                else if (engine == 1)
-                {
-                    SUBnoteParameters *subpars;
-                    subpars = part->kit[kititem].subpars;
-                    subpars->getLimits(getData);
-                }
-                else if (engine == 2)
+                if (engine == 2)
                 {
                     PADnoteParameters *padpars;
                     padpars = part->kit[kititem].padpars;
                     padpars->getLimits(getData);
+                    return;
                 }
+                // there may be other stuff
+                getData->limits.min = 0;
+                getData->limits.max = 127;
+                getData->limits.def = 0;
+                cout << "Using defaults" << endl;
+                return;
             }
-            else if (insert >= 5 && insert <= 7)
+            if (insert >= 5 && insert <= 7)
             {
-                if (engine == 1)
-                {
-                    SUBnoteParameters *subpars;
-                    subpars = part->kit[kititem].subpars;
-                    subpars->getLimits(getData);
-                }
-                else
-                {
-                    part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
-                    // we also use this for pad limits
-                    // as oscillator values identical
-                }
+                part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
+                // we also use this for pad limits
+                // as oscillator values identical
+                return;
             }
-            else if (engine != 1 && insert == 8) // resonance
+            if (insert == 8) // resonance
             {
                 if (control == 0) // a cheat!
                 {
                     getData->limits.min = 1;
                     getData->limits.max = 90;
                     getData->limits.def = 5000; // default values are *100
+                    return;
                 }
+                // there may be other stuff
+                getData->limits.min = 0;
+                getData->limits.max = 127;
+                getData->limits.def = 0;
+                cout << "Using defaults" << endl;
+                return;
             }
-            else if (insert == 0 && parameter <= 2) // LFO
+            if (insert == 0 && parameter <= 2) // LFO
             {
                 if (control == 0) // another cheat!
                 {
                     getData->limits.min = 0;
                     getData->limits.max = 1;
                     getData->limits.def = 50; // default values are *100
+                    return;
                 }
+                getData->limits.min = 0;
+                getData->limits.max = 127;
+                getData->limits.def = 0;
+                cout << "Using defaults" << endl;
+                return;
             }
+            // there may be other stuff
+            getData->limits.min = 0;
+            getData->limits.max = 127;
+            getData->limits.def = 0;
+            cout << "Using defaults" << endl;
+            return;
         }
-        else if (kititem == 0xff)
+        if (kititem == 0xff)
         {
+            getData->limits.min = 0;
+            getData->limits.def = 0;
             if (control == 48) // wot, again!
                 getData->limits.max = 50;
+            else
+                getData->limits.max = 127;
+            return;
         }
-    }
-    else
-    {
         getData->limits.min = 0;
         getData->limits.max = 127;
         getData->limits.def = 0;
         cout << "Using defaults" << endl;
+        return;
     }
+    getData->limits.min = 0;
+    getData->limits.max = 127;
+    getData->limits.def = 0;
+    cout << "Using defaults" << endl;
 }
