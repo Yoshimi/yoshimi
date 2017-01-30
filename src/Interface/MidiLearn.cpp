@@ -61,10 +61,12 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
 }
 
 
-bool MidiLearn::runMidiLearn(float _value, unsigned char CC, unsigned char chan, unsigned char category)
+bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, unsigned char category)
 {
     if (learning)
     {
+        //if (CC == 94) NRPN stuff :)
+            //CC |= 0x10000; // a test!
         insert(CC, chan);
         return true; // block while learning
     }
@@ -521,7 +523,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
 }
 
 
-void MidiLearn::insert(unsigned char CC, unsigned char chan)
+void MidiLearn::insert(unsigned int CC, unsigned char chan)
 {
     /*
      * This will eventually be part of a paging system of
@@ -645,15 +647,22 @@ void MidiLearn::updateGui(int opp)
     it = midi_list.begin();
     while (it != midi_list.end())
     {
+        unsigned int newCC = it->CC;
         putData.data.value = lineNo;
         putData.data.type = it->status;
         putData.data.control = 16;
-        putData.data.kit = it->CC;
+        putData.data.kit = (newCC & 0xff);
         putData.data.engine = it->chan;
         putData.data.insert = it->min_in;
         putData.data.parameter = it->max_in;
         putData.data.par2 = miscMsgPush(it->name);
         writeToGui(&putData);
+        if (newCC > 0xff)
+        {
+            putData.data.control = 9; // it's an NRPN
+            putData.data.engine = ((newCC >> 8) & 0x7f);
+            writeToGui(&putData);
+        }
         ++it;
         ++lineNo;
     }
@@ -771,7 +780,7 @@ bool MidiLearn::loadList(string name)
 
             if (xml->getparbool("Mute",0))
                 status |= 4;
-            entry.CC = xml->getpar127("Midi_Controller", 0);
+            entry.CC = xml->getpar("Midi_Controller", 0, 0, 0xfffff);
             entry.chan = xml->getpar127("Midi_Channel", 0);
             entry.min_in = xml->getpar127("Midi_Min", 0);
             entry.max_in = xml->getpar127("Midi_Max", 127);

@@ -54,6 +54,8 @@ These redraw a line in place.
 2   mute switch
 5   set min_in
 6   set max-in
+7   returned message to GUI
+9   set NRPN - overwrites a normal CC and makes it unchangeable
 
 These move a line, so a complete redraw is inititalsed.
  8  delete line

@@ -73,7 +73,7 @@ class MidiLearn : private MiscFuncs
 
         void setTransferBlock(CommandBlock *getData, string name);
 
-        bool runMidiLearn(float value, unsigned char CC, unsigned char chan, unsigned char category);
+        bool runMidiLearn(float value, unsigned int CC, unsigned char chan, unsigned char category);
         bool writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place);
         int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show);
         void listLine(int lineNo);
@@ -89,7 +89,7 @@ class MidiLearn : private MiscFuncs
         string learnedName;
         CommandBlock learnTransferBlock;
 
-        void insert(unsigned char CC, unsigned char chan);
+        void insert(unsigned int CC, unsigned char chan);
         SynthEngine *synth;
         void writeToGui(CommandBlock *putData);
         void updateGui(int opp = 0);

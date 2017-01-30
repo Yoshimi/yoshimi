@@ -557,7 +557,8 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
     }
     if (nHigh != 64 && nLow < 0x7f)
     {
-        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + "-" + asHexString(nLow) +" We don't know you!");
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + asHexString(nLow) +" We don't know you!");
+        //done this way to ensure we see both bytes even if nHigh is zero
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;
     }

@@ -109,7 +109,10 @@ string MiscFuncs::asHexString(int x)
 {
    ostringstream oss;
    oss << hex << x;
-   return string(oss.str());
+   string res = string(oss.str());
+   if (res.length() & 1)
+       return "0"+res;
+   return res;
 }
 
 
@@ -117,7 +120,10 @@ string MiscFuncs::asHexString(unsigned int x)
 {
    ostringstream oss;
    oss << hex << x;
-   return string(oss.str());
+   string res = string(oss.str());
+   if (res.length() & 1)
+       return "0"+res;
+   return res;
 }
 
 

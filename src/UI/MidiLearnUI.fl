@@ -73,6 +73,10 @@ class MidiLearnKitItem {: {public Fl_Group}
           callback {// does nothing - hides spinner arrows}
           xywh {109 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
+        Fl_Button nrpn {
+          label {8888 h}
+          xywh {69 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
+        }
         Fl_Choice channelchoice {
           callback {send_data(16);}
           tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX labelsize 12 textsize 12
@@ -378,7 +382,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
     unsigned char insert = getData->data.insert;
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
-
+    string hex;
     switch(control)
     {
         case 0:
@@ -398,6 +402,12 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
                 midilearnkititem[value]->minval->value(insert);
             if (parameter < 255)
                 midilearnkititem[value]->maxval->value(parameter);
+            break;
+        case 9: // set NRPN fixed value in place
+            hex = (asHexString(int(kititem))) + " " + (asHexString(int(engine))) + " h";
+            midilearnkititem[value]->nrpn->copy_label(hex.c_str());
+            midilearnkititem[value]->CCcounter->hide();
+            midilearnkititem[value]->nrpn->show();
             break;
         case 16:
             addLine(getData);
