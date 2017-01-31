@@ -1126,7 +1126,6 @@ updatepanel();}
     }
     else
     {
-        synth->getRuntime().channelSwitchCC = candidate;
         CS_CC = candidate;
         o->hide();
     }
@@ -1136,11 +1135,9 @@ updatepanel();}
       Fl_Choice channelswitch {
         label Solo
         callback {//
-    synth->getRuntime().channelSwitchType = o->value();
     if (o->value() == 0)
     {
         CS_CC = 128;
-        synth->getRuntime().channelSwitchCC = CS_CC;
         CSspinner->value(115);
         CSspinner->hide();
         CSpend->hide();

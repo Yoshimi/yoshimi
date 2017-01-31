@@ -546,7 +546,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
 {
     int nHigh = synth->getRuntime().nrpnH;
     int nLow = synth->getRuntime().nrpnL;
-    if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
+/*    if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
     {
         if (type == C_dataL)
             synth->getRuntime().dataL = par;
@@ -554,14 +554,8 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
              synth->getRuntime().dataH = par;
         synth->SetZynControls();
         return;
-    }
-    if (nHigh != 64 && nLow < 0x7f)
-    {
-        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + asHexString(nLow) +" We don't know you!");
-        //done this way to ensure we see both bytes even if nHigh is zero
-        synth->getRuntime().nrpnActive = false; // we were sent a turkey!
-        return;
-    }
+    }*/
+
     bool noHigh = (synth->getRuntime().dataH > 0x7f);
     if (type == C_dataL)
     {
@@ -595,6 +589,28 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
                           + "   type"  + asString((int)type)
                           + "   par " + asString((int)par));
     */
+
+    // midi learn must come before everything else
+    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, 2))
+        return;
+
+    if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
+    {
+        if (type == C_dataL)
+            synth->getRuntime().dataL = par;
+        else
+             synth->getRuntime().dataH = par;
+        synth->SetZynControls();
+        return;
+    }
+
+    if (nHigh != 64 && nLow < 0x7f)
+    {
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + asHexString(nLow) +" We don't know you!");
+        //done this way to ensure we see both bytes even if nHigh is zero
+        synth->getRuntime().nrpnActive = false; // we were sent a turkey!
+        return;
+    }
 
     if (nLow == 0) // direct part change
         nrpnDirectPart(dHigh, par);

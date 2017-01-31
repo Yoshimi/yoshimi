@@ -1680,7 +1680,13 @@ int CmdInterface::commandReadnSet()
         {
             if (!isdigit(point[0]))
                 return value_msg;
-            sendDirect(value, 0xff, 0x10, 0xd8, string2int(point));
+            tmp = string2int(point);
+            if (tmp > 129)
+            {
+                Runtime.Log("Max CC value is 129");
+                return done_msg;
+            }
+            sendDirect(value, 0xff, 0x10, 0xd8, tmp);
             Runtime.Log("Lines may be re-ordered");
             reply = done_msg;
         }

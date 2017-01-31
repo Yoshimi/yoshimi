@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-1-31 Will
+* Small clean-up in GUI panel controls.
+* Removed unnecessary callback in GUI part kitlist.
+* Midi-learn NRPN's done, but some non-harmful GUI
+  activty light errors.
+
 2017 - 1 30 Will
 * Initial prep for midi-learn NRPNs :)
 

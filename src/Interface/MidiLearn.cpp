@@ -70,7 +70,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
         insert(CC, chan);
         return true; // block while learning
     }
-
+    //cout << "here CC " << asHexString(CC) << "  val " << int(_value) << endl;
     int lastpos = -1;
     LearnBlock foundEntry;
     bool firstLine = true;
@@ -199,7 +199,7 @@ bool MidiLearn::writeMidi(CommandBlock *putData, unsigned int writesize, bool in
  * This will only be called by incoming midi. It is the only function that
  * needs to be really quick
  */
-int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show)
+int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show)
 {
     int newpos = 0; // 'last' comes in at -1 for the first call
     list<LearnBlock>::iterator it = midi_list.begin();
@@ -296,10 +296,17 @@ void MidiLearn::listAll(list<string>& msg_buf)
         msg_buf.push_back("No learned lines");
         return;
     }
+    string CCtype;
+    int CC;
     msg_buf.push_back("Midi learned:");
     while (it != midi_list.end())
     {
-        msg_buf.push_back("Line " + to_string(lineNo) + "  CC " + to_string((int)it->CC) + "  Chan " + to_string((int)it->chan) + "  " + it->name);
+        CC = it->CC;
+        if (CC < 0xff)
+            CCtype = to_string(CC);
+        else
+            CCtype = asHexString((CC >> 8) & 0x7f) + asHexString(CC & 0x7f) + " h";
+        msg_buf.push_back("Line " + to_string(lineNo) + "  CC " + CCtype + "  Chan " + to_string((int)it->chan) + "  " + it->name);
         ++ it;
         ++ lineNo;
     }
@@ -324,8 +331,9 @@ bool MidiLearn::remove(int itemNumber)
 }
 
 
-void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
+void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char _kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    unsigned int kit = _kit; // may need to set as an NRPN
     if (control == 96)
     {
         midi_list.clear();
@@ -401,7 +409,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (type == 0xff)
         type = it->status;
 
-    if (kit == 255)
+    if (kit == 255 || it->CC > 0xff) // might be an NRPN
         kit = it->CC;
 
     if (engine == 255)
@@ -558,7 +566,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     entry.CC = CC;
     entry.min_in = 0;
     entry.max_in = 127;
-    entry.status = 0;// default status
+    entry.status = 0 | (CC > 0xff);// default status - block of NRPN
     entry.min_out = learnTransferBlock.limits.min;
     entry.max_out = learnTransferBlock.limits.max;
     entry.name = learnedName;
@@ -585,7 +593,13 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         midi_list.insert(it, entry);
 
     synth->getRuntime().Log("Learned ");
-    synth->getRuntime().Log("CC " + to_string((int)entry.CC) + "  Chan " + to_string((int)entry.chan) + "  " + entry.name);
+    unsigned int CCh = entry.CC;
+    string CCtype;
+    if (CCh < 0xff)
+        CCtype = to_string(CCh);
+    else
+        CCtype = asHexString((CCh >> 8) & 0x7f) + asHexString(CCh & 0x7f) + " h";
+    synth->getRuntime().Log("CC " + CCtype + "  Chan " + to_string((int)entry.chan) + "  " + entry.name);
     updateGui();
     learning = false;
 }

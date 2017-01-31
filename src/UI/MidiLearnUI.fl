@@ -404,7 +404,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
                 midilearnkititem[value]->maxval->value(parameter);
             break;
         case 9: // set NRPN fixed value in place
-            hex = (asHexString(int(kititem))) + " " + (asHexString(int(engine))) + " h";
+            hex = (asHexString(int(engine))) + " " + (asHexString(int(kititem))) + " h";
             midilearnkititem[value]->nrpn->copy_label(hex.c_str());
             midilearnkititem[value]->CCcounter->hide();
             midilearnkititem[value]->nrpn->show();

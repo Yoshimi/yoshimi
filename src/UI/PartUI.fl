@@ -1117,9 +1117,8 @@ send_data(67, o->value(), 0xc0, 0xff, ninseff);}
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
-      xywh {223 89 670 370} type Double hide
+      xywh {132 88 670 370} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
-      code1 {kitMode->do_callback();}
     } {
       Fl_Button {} {
         label Close
