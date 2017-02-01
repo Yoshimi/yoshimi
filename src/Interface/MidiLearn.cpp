@@ -139,10 +139,12 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
             // we only want to send an activity once
             // and it's not relevant to jack freewheeling
             {
+                if (CC > 0xff)
+                    putData.data.type |= 0x10; // mark as NRPN
                 firstLine = false;
                 putData.data.control = 24;
                 putData.data.part = 0xd8;
-                putData.data.kit = CC;
+                putData.data.kit = (CC & 0xff);
                 putData.data.engine = chan;
                 writeMidi(&putData, putSize, category & 1);
             }
@@ -546,7 +548,9 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     }
     list<LearnBlock>::iterator it;
     LearnBlock entry;
-
+    unsigned char stat = 0;
+    if (CC > 0xff)
+        stat |= 1; // mark as NRPN
      /*
       * this has to be first as the transfer block will be corrupted
       * when we call for the limits of this control. Should be a better
@@ -566,7 +570,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     entry.CC = CC;
     entry.min_in = 0;
     entry.max_in = 127;
-    entry.status = 0 | (CC > 0xff);// default status - block of NRPN
+    entry.status = stat;
     entry.min_out = learnTransferBlock.limits.min;
     entry.max_out = learnTransferBlock.limits.max;
     entry.name = learnedName;

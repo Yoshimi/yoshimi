@@ -1,5 +1,12 @@
 yoshimi 1.5.0 M
 
+2017-2-1 Will
+* Corrected NRPN warning messgage.
+  nHigh had always been reported wrongly :(
+* Corrected GUI activity light error.
+* Midi-learn can now operate in place for LV2.
+* Updated docs.
+
 2017-1-31 Will
 * Small clean-up in GUI panel controls.
 * Removed unnecessary callback in GUI part kitlist.

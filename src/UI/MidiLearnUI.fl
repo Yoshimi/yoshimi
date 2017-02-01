@@ -8,7 +8,7 @@ comment {MidiLearnUI.h} {not_in_source in_header
 comment {MidiLearnUI.cc} {in_source not_in_header
 } 
 
-comment {Copyright (C) 2016, Will Godfrey
+comment {Copyright (C) 2016-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -217,7 +217,7 @@ if (control == 8)
     if (fl_choice("Remove line. %d %s?", "Yes", "No", NULL, n + 1, commandName->label()))
         return;
 }
-int type = 0;
+int type = stat & 0x10;
 if (blockcheck->value() != 0)
     type = 1;
 
@@ -249,6 +249,8 @@ end();} {}
   decl {char label[50];} {private local
   }
   decl {SynthEngine *synth;} {private local
+  }
+  decl {unsigned char stat;} {public local
   }
 } 
 
@@ -383,6 +385,8 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
     unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
     string hex;
+    unsigned int IDold;
+    unsigned int IDnew;
     switch(control)
     {
         case 0:
@@ -405,6 +409,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             break;
         case 9: // set NRPN fixed value in place
             hex = (asHexString(int(engine))) + " " + (asHexString(int(kititem))) + " h";
+            midilearnkititem[value]->stat |= 0x10;
             midilearnkititem[value]->nrpn->copy_label(hex.c_str());
             midilearnkititem[value]->CCcounter->hide();
             midilearnkititem[value]->nrpn->show();
@@ -419,13 +424,19 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             cancel->show();
             message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             message->show();
-        case 24:
+        case 24: // flash LED
+            IDold = kititem | (engine << 8);
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
             {
-                if (midilearnkititem[i] != NULL)
+                if (midilearnkititem[i] != NULL && midilearnkititem[i]->mutecheck->value() == 0)
                 {
-                    if (midilearnkititem[i]->mutecheck->value() == 0 && midilearnkititem[i]->CCcounter->value() == kititem && midilearnkititem[i]->channelchoice->value() == engine)
+                    IDnew = (unsigned int)midilearnkititem[i]->CCcounter->value() | (unsigned int)(midilearnkititem[i]->channelchoice->value() << 8);
+                    if (IDold == IDnew && (type & 0x10) == (midilearnkititem[i]->stat & 0x10))
+                    {
                         midilearnkititem[i]->activity->do_callback();
+                        if (midilearnkititem[i]->blockcheck->value() != 0)
+                            IDold = 0xffffff; // block following lines
+                    }
                 }
             }
             break;
@@ -441,28 +452,29 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
   }
   Function {addLine(CommandBlock *getData)} {} {
     code {//
-int lineNo = ((int)getData->data.value);
-int status = getData->data.type;
-string name = miscMsgPop(getData->data.par2);
-none->hide();
-clear->activate();
-save->activate();
-midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,818,20,"");
-midilearnkititem[lineNo]->init(synth, lineNo);
-kitlist->add(midilearnkititem[lineNo]);
+    int lineNo = ((int)getData->data.value);
+    int status = getData->data.type;
+    string name = miscMsgPop(getData->data.par2);
+    none->hide();
+    clear->activate();
+    save->activate();
+    midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,818,20,"");
+    midilearnkititem[lineNo]->init(synth, lineNo);
+    kitlist->add(midilearnkititem[lineNo]);
 
-midilearnkititem[lineNo]->position(2, 21 + lineNo*20);
-midilearnkititem[lineNo]->mutecheck->value(status & 4);
-midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
-midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
-midilearnkititem[lineNo]->minval->value(getData->data.insert);
-midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
-midilearnkititem[lineNo]->compresscheck->value(status & 2);
-midilearnkititem[lineNo]->blockcheck->value(status & 1);
-midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
-if (status & 4)
-    midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();
-midilearnwindow->redraw();} {}
+    midilearnkititem[lineNo]->position(2, 21 + lineNo*20);
+    midilearnkititem[lineNo]->stat = (status & 0x10);
+    midilearnkititem[lineNo]->mutecheck->value(status & 4);
+    midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
+    midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
+    midilearnkititem[lineNo]->minval->value(getData->data.insert);
+    midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
+    midilearnkititem[lineNo]->compresscheck->value(status & 2);
+    midilearnkititem[lineNo]->blockcheck->value(status & 1);
+    midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
+    if (status & 4)
+        midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();
+    midilearnwindow->redraw();} {}
   }
   Function {MidiLearnUI(SynthEngine *_synth)} {} {
     code {//

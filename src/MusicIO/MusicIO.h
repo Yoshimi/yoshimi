@@ -50,7 +50,7 @@ class MusicIO : virtual protected MiscFuncs
         void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
         bool nrpnRunVector(unsigned char ch, int ctrl, int param);
-        void nrpnProcessData(unsigned char chan, int type, int par);
+        void nrpnProcessData(unsigned char chan, int type, int par, bool in_place);
         void nrpnDirectPart(int dHigh, int par);
         void nrpnSetVector(int dHigh, unsigned char chan,  int par);
 

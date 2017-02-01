@@ -407,7 +407,7 @@ void MusicIO::setMidiController(unsigned char ch, int ctrl, int param, bool in_p
 
         if (ctrl == C_dataL || ctrl == C_dataH)
         {
-            nrpnProcessData(ch, ctrl, param);
+            nrpnProcessData(ch, ctrl, param, in_place);
             return;
         }
     }
@@ -542,7 +542,7 @@ bool MusicIO::nrpnRunVector(unsigned char ch, int ctrl, int param)
 }
 
 
-void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
+void MusicIO::nrpnProcessData(unsigned char chan, int type, int par, bool in_place)
 {
     int nHigh = synth->getRuntime().nrpnH;
     int nLow = synth->getRuntime().nrpnL;
@@ -591,7 +591,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
     */
 
     // midi learn must come before everything else
-    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, 2))
+    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, in_place |2))
         return;
 
     if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))
@@ -606,7 +606,7 @@ void MusicIO::nrpnProcessData(unsigned char chan, int type, int par)
 
     if (nHigh != 64 && nLow < 0x7f)
     {
-        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh) + asHexString(nLow) +" We don't know you!");
+        synth->getRuntime().Log("Go away NRPN 0x" + asHexString(nHigh >> 1) + asHexString(nLow) +" We don't know you!");
         //done this way to ensure we see both bytes even if nHigh is zero
         synth->getRuntime().nrpnActive = false; // we were sent a turkey!
         return;

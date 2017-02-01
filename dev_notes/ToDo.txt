@@ -1,7 +1,5 @@
 
-Send global and part keyshifts through ring buffer (like global fine detune).
-
-Add NRPN capability to midi learn, and possibly re-learn.
+Make NRPN midi learn able to be re-learned.
 
 Sort out direct access dynfilter->filter (and two enclosed controls). All work but don't update gui.
 
