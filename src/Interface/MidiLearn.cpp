@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
+    Modified February 2017
 */
 
 #include <iostream>
@@ -65,12 +65,10 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
 {
     if (learning)
     {
-        //if (CC == 94) NRPN stuff :)
-            //CC |= 0x10000; // a test!
         insert(CC, chan);
         return true; // block while learning
     }
-    //cout << "here CC " << asHexString(CC) << "  val " << int(_value) << endl;
+
     int lastpos = -1;
     LearnBlock foundEntry;
     bool firstLine = true;
@@ -737,6 +735,7 @@ bool MidiLearn::saveList(string name)
                     xml->addpar("Insert", it->data.insert);
                     xml->addpar("Parameter", it->data.parameter);
                     xml->addpar("Secondary_Parameter", it->data.par2);
+                    xml->addparstr("Command_Name", it->name.c_str());
                     xml->endbranch();
             xml->endbranch();
             ++it;

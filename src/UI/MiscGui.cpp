@@ -137,13 +137,18 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (npart >= 0xf0) // main / sys / ins
     {
-
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
     if (npart >= 0x40)
         return; // invalid part number
+
+    if ((kititem & engine & insert) == 0xff && control == 96) // special case for part clear
+    {
+        synth->getGuiMaster()->returns_update(getData);
+        return;
+    }
 
     if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
         return; // attempt to access non existant kititem

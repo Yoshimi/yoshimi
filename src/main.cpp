@@ -320,10 +320,8 @@ bool mainCreateNewInstance(unsigned int forceId)
     //register jack ports for enabled parts
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if(synth->part[npart]->Penabled)
-        {
+        if (synth->partonoffRead(npart))
             mainRegisterAudioPort(synth, npart);
-        }
     }
     return true;
 

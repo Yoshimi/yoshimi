@@ -8,9 +8,9 @@ After that, if you were learning, the first physical controller you move, or CC 
 
 If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
 
-If the controller you learned was an NRPN this will show as a hexadecimal number in the CC filed, and this will not be editable.
+If the controller you learned was an NRPN this will show as a hexadecimal number in the CC field, and this will not be editable.
 
-There is also an 'activity' LED that flickers when the associated CC/channel is recieved, provided the line is not muted, or blocked by an earlier one.
+There is also an 'activity' LED that flickers when the associated CC/channel is received, provided the line is not muted, or blocked by an earlier one.
 
 There is currently a limit of 128 lines.
 

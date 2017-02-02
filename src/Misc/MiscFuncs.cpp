@@ -2,7 +2,7 @@
     MiscFuncs.cpp
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2016, Will Godfrey
+    Copyright 2014-2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,7 +15,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
+
+    Modifed February 2017
 */
 
 #include <sys/stat.h>

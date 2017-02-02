@@ -59,6 +59,8 @@ Y : 0 to 8 : 65 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect t
 Y : 0 to 2 : 66 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
 Y : 0/1 : 67 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Bypass effect
 
+Y : any : 96 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Set part to default instrument (Simple Sound)
+
 Y : 1, 2, 3 : 120 : 0 to 63 : 255 : 255 : 255 : 255 :  : Audio destination
 
 Controllers
@@ -85,10 +87,10 @@ Y : 0/1 : 164 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable proportional port
 Y : 0 to 127 : 165 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento rate
 Y : 0 to 127 : 166 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento depth
 Y : 0/1 : 168 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable portamento control
-Y : 0 to 127 : 192 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Modulation (CC 1)
-Y : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
-Y : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
-Y : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
+YL : 0 to 127 : 192 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Modulation (CC 1)
+YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
+YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
+YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window

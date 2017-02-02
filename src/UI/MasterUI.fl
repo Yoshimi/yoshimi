@@ -27,7 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified January 2017
+This file is a derivative of the ZynAddSubFX original.
+Modified February 2017
 
 
 } {in_source in_header
@@ -370,12 +371,15 @@ mainCreateNewInstance(forceId);}
             callback {//
     if (!fl_choice("Clear instrument's parameters ?", "Yes", "No", NULL))
     {
-        synth->actionLock(lockmute);
+        
+        /*synth->actionLock(lockmute);
         synth->part[npart]->defaultsinstrument();
+         synth->part[npart]->cleanup();
         synth->actionLock(unlock);
-        npartcounter->do_callback();
+        npartcounter->do_callback();*/
+        send_data(96, 0, 0xc0, npart);
     }
-    updatepanel();}
+    //updatepanel();}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -898,7 +902,7 @@ send_data(35, o->value(), 0xc0);}
         callback {//
     int nval = o->value() - 1;
     synth->getRuntime().currentPart = nval;
-    partuigroup->remove(partui);
+/*    partuigroup->remove(partui);
     delete partui;
     partui = new PartUI(0, 0, 765, 525);
     partuigroup->add(partui);
@@ -906,8 +910,9 @@ send_data(35, o->value(), 0xc0);}
     partui->redraw();
     o->redraw();
     npart = nval;
-    updatepanel();
-    send_data(14, o->value()-1, 0xc0);}
+    updatepanel();*/
+    partNew(nval);
+    send_data(14, nval, 0xc0);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
@@ -1271,8 +1276,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             break;
 
 	case 96:
-	    return;
-	    // this is done elsewhere
+	    if (npart == 0xff)
+	        return; // this is done elsewhere
+	    partNew(npart);
             break;
 
         case 128:
@@ -1366,6 +1372,21 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             CSpend->hide();
         }
         panelwindow->changed();} {}
+  }
+  Function {partNew(int _npart)} {} {
+    code {//
+    int nval = _npart;
+    //synth->getRuntime().currentPart = nval;
+    partuigroup->remove(partui);
+    delete partui;
+    partui = new PartUI(0, 0, 765, 525);
+    partuigroup->add(partui);
+    partui->init(synth->part[nval], nval, bankui);
+    partui->redraw();
+    npartcounter->value(nval + 1);
+    npartcounter->redraw();
+    npart = nval;
+    updatepanel();} {}
   }
   Function {updatepart()} {} {
     code {//

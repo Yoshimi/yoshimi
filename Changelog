@@ -1,7 +1,16 @@
 yoshimi 1.5.0 M
 
+2017-2-2 Will
+* Midi learn files now include the text of the
+  command name for each line.
+* Removed remaining forced 'part enable' except in part.
+* Improved and extended partonoff options.
+* 'Set part to default' now uses new method.
+  Direct CLI access and the GUI now do this silently.
+* Updated docs.
+
 2017-2-1 Will
-* Corrected NRPN warning messgage.
+* Corrected NRPN warning message.
   nHigh had always been reported wrongly :(
 * Corrected GUI activity light error.
 * Midi-learn can now operate in place for LV2.

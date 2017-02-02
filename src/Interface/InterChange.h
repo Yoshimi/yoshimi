@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
+    Modified February 2017
 */
 
 #ifndef INTERCH_H
@@ -54,6 +54,7 @@ class InterChange : private MiscFuncs
         void mediate();
         void returns(CommandBlock *getData);
         void setpadparams(int point);
+        void doClearPart(int npart);
         void doMasterReset();
         void commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);

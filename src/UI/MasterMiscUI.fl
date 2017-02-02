@@ -27,7 +27,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified January 2017
+This file is a derivative of the ZynAddSubFX original, modified February 2017
 } {in_source in_header
 } 
 
@@ -420,7 +420,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
     } {
       Fl_Group panellistitemgroup {
         xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
-        code0 {if (synth->part[npart + *plgroup]->Penabled != 1) o->deactivate();}
+        code0 {if (!synth->partonoffRead(npart + *plgroup)) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
@@ -561,7 +561,7 @@ send_data(120, o->value() + 1, 0xc0);}
 
     send_data(8, o->value(), 0xc0);}
         xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
-        code0 {o->value(synth->part[npart + *plgroup]->Penabled == 1);}
+        code0 {o->value(synth->partonoffRead(npart + *plgroup));}
       }
     }
   }
@@ -588,7 +588,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart + *plgrou
 
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
 
-    partenabled->value(synth->part [setpart]->Penabled == 1);
+    partenabled->value(synth->partonoffRead(setpart));
 
     setPartLabel(findengines(setpart));
 
@@ -615,7 +615,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart + *plgrou
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());
 
-    if (synth->part[setpart]->Penabled == 1)
+    if (synth->partonoffRead(setpart))
         panellistitemgroup->activate();
     else
         panellistitemgroup->deactivate();} {}

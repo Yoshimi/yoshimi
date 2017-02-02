@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
+    Modified February 2017
 */
 
 #include <iostream>
@@ -165,8 +165,10 @@ void *InterChange::CLIresolvethread(void)
          * from the main audio thread.
          */
         unsigned int point = flagsReadClear();
-        if (point < 0xffff)
+        if (point < 0x1fff)
             setpadparams(point);
+        else if (point < 0x2100)
+            doClearPart(point & 0xff);
         else if (point == 0xf0000000)
             doMasterReset();
         //if (point < 0xffffffff)
@@ -511,7 +513,7 @@ string InterChange::resolveMain(CommandBlock *getData)
             contstr = "Chan 'solo' Switch CC";
             break;
 
-        case 96:
+        case 96: // doMasterReset(
             contstr = "Reset All";
             break;
         case 128:
@@ -678,6 +680,10 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
         case 67:
             contstr = "Bypass Effect "+ to_string(effNum);
+            break;
+
+        case 96: // doClearPart
+            contstr = "Set Default Instrument";
             break;
 
         case 120:
@@ -1312,7 +1318,7 @@ string InterChange::resolvePad(CommandBlock *getData)
         case 83:
             break;
 
-        case 104:
+        case 104:// setpadparams(
             contstr = "Apply Changes";
             break;
 
@@ -2036,7 +2042,6 @@ void InterChange::mediate()
             else if ((getData.data.type & 3) == 0)
                 getData.data.type |= 1;
             // end of fixes
-
             if(getData.data.part != 0xd8) // special midi-learn message
                 commandSend(&getData);
             returns(&getData);
@@ -2070,14 +2075,24 @@ void InterChange::returns(CommandBlock *getData)
     if (value == FLT_MAX)
         return; // need to sort this out later
     unsigned char type = getData->data.type | 4; // back from synth
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
 
     bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
+
+    bool isOK = false;
+    if (isGui && control == 96 && npart < 0x40 && (kititem & engine & insert) == 0xff)
+        isOK = true; // needs more work. Some GUI controls need updates
+
     if (synth->guiMaster)
     {
-        if (!isGui && (isMidi || (isCli && write)))
+        if (isOK || (!isGui && (isMidi || (isCli && write))))
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
@@ -2097,6 +2112,15 @@ void InterChange::setpadparams(int point)
     int kititem = point >> 8;
     synth->part[npart]->kit[kititem].padpars->applyparameters(false);
     synth->partonoffWrite(npart, 1);
+}
+
+
+void InterChange::doClearPart(int npart)
+{
+    synth->part[npart]->defaultsinstrument();
+    synth->part[npart]->cleanup();
+    synth->getRuntime().currentPart = npart;
+    synth->partonoffWrite(npart, 2);
 }
 
 
@@ -2519,7 +2543,7 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().channelSwitchCC;
             break;
 
-        case 96:
+        case 96: // doMasterReset(
             if (write)
             {
                 synth->Mute(); // safe here - acting just before it's read
@@ -2855,6 +2879,11 @@ void InterChange::commandPart(CommandBlock *getData)
                 part->Pefxbypass[effNum] = (value != 0);
             else
                 value = part->Pefxbypass[effNum];
+            break;
+
+        case 96: // doClearPart
+            synth->partonoffWrite(npart, -1);
+            flagsWrite(npart | 0x2000); // default
             break;
 
         case 120:
@@ -4023,7 +4052,7 @@ void InterChange::commandPad(CommandBlock *getData)
                 value = pars->Pquality.samplesize;
             break;
 
-        case 104:
+        case 104: // setpadparams(
             if (write)
             {
                 synth->partonoffWrite(npart, 0); // safe to mute directly here

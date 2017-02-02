@@ -27,7 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified January 2017
+This file is derivative of ZynAddSubFX original code
+modified January 2017
 } {in_source in_header
 } 
 
@@ -63,10 +64,10 @@ class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
     } {
       Fl_Dial sysend {
         label 01
-        callback {//synth->setPsysefxvol(npart,neff, o->value());
-if (Fl::event_button() == 3)
-    o->value(0);
-send_data(neff, o->value(), 0xc8);}
+        callback {//
+    if (Fl::event_button() == 3)
+        o->value(0);
+    send_data(neff, o->value(), 0xc8);}
         xywh {0 0 25 25} box ROUND_UP_BOX labelsize 10 align 130 maximum 127 step 1
         code0 {o->size(25,25);}
         code1 {o->value(synth->Psysefxvol[neff][npart]);}
@@ -419,7 +420,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {964 44 375 165} type Double hide
+      xywh {962 118 375 165} type Double hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -528,9 +529,8 @@ send_data(0, o->value(), 0xc8);}
       }
       Fl_Check_Button partGroupEnable {
         label Enabled
-        callback {//
-       // synth->partonoffLock(npart, o->value());
-    if (o->value() != 1)//part->Penabled == 1)
+        callback {//;
+    if (o->value() != 1)
     {
         partgroupui->deactivate();
         toSysEfx->deactivate();
@@ -538,8 +538,9 @@ send_data(0, o->value(), 0xc8);}
     else
     {
         partgroupui->activate();
-        toSysEfx->activate();     }
-       // synth->getGuiMaster()->updatepanel();
+        toSysEfx->activate();
+    }
+
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
     {
         synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->partenabled->value(o->value());
@@ -1486,9 +1487,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char newpart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
-    
+
     int tmp = (int(value) & 15) + 1;
-    
+
     // these are specific to the mixer panel
     if (newpart >= *plgroup && newpart < (*plgroup + NUM_MIDI_CHANNELS))
     {
@@ -1793,6 +1794,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                 bypasseff->value(value != 0);
             break;
 
+        case 96: // now done in master
+            // synth->getGuiMaster()->npartcounter->do_callback();
+            break;
+
 // controllers
         case 128:
             volrng->value((int) value);
@@ -1966,16 +1971,16 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {init(Part *part_,int npart_,BankUI *bankui_)} {} {
     code {//
-	synth = part_->getSynthEngine();
-        bankui = bankui_;
-        part = part_;
-        npart = npart_;
-        plgroup = &synth->getGuiMaster()->panelgroup;
-        ninseff = 0;
-        make_window();
-        partgroup->position(this->parent()->x() + 2, this->parent()->y() + 2);
-        partgroup->show();
-        end();} {}
+    synth = part_->getSynthEngine();
+    bankui = bankui_;
+    part = part_;
+    npart = npart_;
+    plgroup = &synth->getGuiMaster()->panelgroup;
+    ninseff = 0;
+    make_window();
+    partgroup->position(this->parent()->x() + 2, this->parent()->y() + 2);
+    partgroup->show();
+    end();} {}
   }
   Function {checkEngines()} {} {
     code {//
@@ -2035,7 +2040,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         padbox->color(BASE_COLOUR);
         instrumentpadbox->color(BASE_COLOUR);
     }
-    
+
     ADD->damage(1);
     instrumentaddbox->damage(1);
     SUB->damage(1);
@@ -2043,7 +2048,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     PAD->damage(1);
     instrumentpadbox->damage(1);
     instrumentlabel->copy_label(instrumentName.c_str());
-    
+
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
     {
         int num = npart % NUM_MIDI_CHANNELS;
@@ -2059,7 +2064,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             synth->getGuiMaster()->panellistitem[num]->partpad->color(PAD_COLOUR);
         else
             synth->getGuiMaster()->panellistitem[num]->partpad->color(BASE_COLOUR);
-             
+
         synth->getGuiMaster()->panellistitem[num]->partadd->damage(1);
         synth->getGuiMaster()->panellistitem[num]->partsub->damage(1);
         synth->getGuiMaster()->panellistitem[num]->partpad->damage(1);

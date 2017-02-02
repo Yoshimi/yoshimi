@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009, James Morris
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2016, Will Godfrey
+    Copyright 2014-2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified December 2016
+    This file is derivative of ZynAddSubFX original code, modified February 2017
 */
 
 #include <cstring>
@@ -1253,9 +1253,7 @@ void Part::add2XMLinstrument(XMLwrapper *xml)
 void Part::add2XML(XMLwrapper *xml)
 {
     // parameters
-    xml->addparbool("enabled", Penabled);
-    //if (!Penabled && xml->minimal)
-        //return;
+    xml->addparbool("enabled", (Penabled == 1));
 
     xml->addpar("volume", Pvolume);
     xml->addpar("panning", Ppanning);
@@ -1435,7 +1433,7 @@ void Part::getfromXMLinstrument(XMLwrapper *xml)
 
 void Part::getfromXML(XMLwrapper *xml)
 {
-    Penabled = xml->getparbool("enabled", Penabled);
+    Penabled = (xml->getparbool("enabled", Penabled) == 1);
 
     setVolume(xml->getpar127("volume", Pvolume));
     setPan(xml->getpar127("panning", Ppanning));

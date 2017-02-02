@@ -104,7 +104,7 @@ class Part : private MiscFuncs, SynthHelper
 
         SynthEngine *getSynthEngine() {return synth;}
 
-        unsigned char Penabled;
+        char Penabled; // this *must* be signed
         unsigned char Pvolume;
         unsigned char Pminkey;
         unsigned char Pmaxkey;

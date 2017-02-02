@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2016, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, last modified November 2016
+    This file is derivative of original ZynAddSubFX code.
+    Modified February 2017
 */
 
 #include<stdio.h>
@@ -878,7 +879,7 @@ void SynthEngine::SetProgram(unsigned char chan, unsigned short pgm)
 bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
 {
     bool loadOK = false;
-    int enablestate;
+    unsigned char enablestate;
     string loaded;
 
     struct timeval tv1, tv2;
@@ -887,10 +888,10 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     sem_wait (&partlock);
 
     if (Runtime.enable_part_on_voice_load)
-        enablestate = 1;
+        enablestate = 1; // always on
     else
-        enablestate = partonoffRead(npart);
-    partonoffWrite(npart, 0);
+        enablestate = 2; // on of it was before
+    partonoffWrite(npart, -1); // more off than before :)
     if (part[npart]->loadXMLinstrument(fname))
     {
         partonoffWrite(npart, enablestate); // must be here to update gui
@@ -1436,7 +1437,7 @@ int SynthEngine::SetSystemValue(int type, int value)
         case 78:
         case 79:
             for (int npart = 0; npart < Runtime.NumAvailableParts; ++ npart)
-                if (part[npart]->Penabled && part[npart]->Prcvchn == (type - 64))
+                if (partonoffRead(npart) && part[npart]->Prcvchn == (type - 64))
                     SetPartShift(npart, value);
             break;
 
@@ -1957,26 +1958,38 @@ void SynthEngine::partonoffWrite(int npart, int what)
 {
     if (npart >= Runtime.NumAvailableParts)
         return;
-
-    unsigned char tmp = part[npart]->Penabled;
-    if (what == 3)
-        what = (tmp!= 0); // recover inhibited state
-
-    if (what == 1) // always enable
+    unsigned char original = part[npart]->Penabled;
+    unsigned char tmp = original;
+    switch (what)
     {
-        VUpeak.values.parts[npart] = 1e-9f;
-        part[npart]->Penabled = 1;
+        case 0: // always off
+            tmp = 0;
+            break;
+        case 1: // always on
+            tmp = 1;
+            break;
+        case -1: // further from on
+            tmp -= 1;
+            break;
+        case 2:
+            if (tmp != 1) // nearer to on
+                tmp += 1;
+            break;
+        default:
+            return;
     }
-    else if ((what & 1) == 0)
+
+    part[npart]->Penabled = tmp;
+    if (tmp == 1 && original != 1) // enable if it wasn't already on
+        VUpeak.values.parts[npart] = 1e-9f;
+    else if (tmp != 1 && original == 1) // disable if it wasn't already off
     {
-        if (what == 0) // always disable
-            part[npart]->Penabled = 0;
-        else if (tmp & 1)
-            part[npart]->Penabled = 2; // just inhibit
         part[npart]->cleanup();
         for (int nefx = 0; nefx < NUM_INS_EFX; ++nefx)
+        {
             if (Pinsparts[nefx] == npart)
                 insefx[nefx]->cleanup();
+        }
         VUpeak.values.parts[npart] = -0.2;
     }
 }
@@ -2043,7 +2056,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             if (Pinsparts[nefx] >= 0)
             {
                 int efxpart = Pinsparts[nefx];
-                if (part[efxpart]->Penabled)
+                if (partonoffRead(efxpart))
                     insefx[nefx]->out(part[efxpart]->partoutl, part[efxpart]->partoutr);
             }
         }
@@ -3011,7 +3024,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 2);
     Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
 
-    part[0]->Penabled = 0;
+    partonoffWrite(0, 0); // why?;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
         if (!xml->enterbranch("PART", npart))
