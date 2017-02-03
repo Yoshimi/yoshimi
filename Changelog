@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-2-3 Will
+* Applied AddSynth Voice tooltip patch from Rob.
+* Main volume now interpolated. No zipper noise :)
+
 2017-2-2 Will
 * Midi learn files now include the text of the
   command name for each line.

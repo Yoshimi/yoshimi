@@ -11,7 +11,7 @@ comment {Envelope.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016 Will Godfrey
+Copyright 2016-2017 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,7 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified November 2016
+This file is a derivative of the ZynAddSubFX original.
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -502,7 +503,7 @@ send_data(group, 24, o->value(), 0xc0);}
           label L
           callback {env->Plinearenvelope=(int)o->value();
 send_data(group, 17, o->value(), 0xc0);}
-          tooltip {The evelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
+          tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
         Fl_Button {} {

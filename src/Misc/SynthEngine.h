@@ -165,15 +165,16 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int p_bufferbytes; //used for variable length runs
         float p_buffersize_f; //used for variable length runs
         float p_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
-
-        unsigned char Pvolume;
+        float         TransVolume;
+        float         Pvolume;
+        float         VolumeInc;
         int           Paudiodest;
         int           Pkeyshift;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
 
         // parameters control
-        void setPvolume(char value);
+        void setPvolume(float value);
         void setPkeyshift(int Pkeyshift_);
         void setPsysefxvol(int Ppart, int Pefx, char Pvol);
         void setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol);

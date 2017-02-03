@@ -27,7 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified January 2017
+This file is derivative of ZynAddSubFX original code.
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -310,7 +311,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                         voiceFMfreqenvgroup->activate();
                     o->redraw();
                     send_data(104, o->value(), 0xc0);}
-                tooltip {Forced Release} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                tooltip {Enable Frequency Envelope} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
               }
               Fl_Counter ModCoarseDetune {
@@ -426,7 +427,7 @@ send_data(81, o->value(), 0xc8);}
                         voiceFMampenvgroup->activate();
                     o->redraw();
                     send_data(88, o->value(), 0xc0);}
-                tooltip {Forced Release} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                tooltip {Enable Amplitude Envelope} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
               }
               Fl_Value_Slider ModFdamp {
@@ -587,7 +588,7 @@ send_data(82, o->value(), 0xc8);}
                       voicefreqenvgroup->activate();
                   o->redraw();
                   send_data(40, o->value(), 0xc0);}
-              tooltip {Forced Release} xywh {15 300 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+              tooltip {Enable Frequency Envelope} xywh {15 300 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqEnvelopeEnabled);}
             }
             Fl_Group voicefreqlfogroup {
@@ -615,7 +616,7 @@ send_data(82, o->value(), 0xc8);}
     o->redraw();
 
     send_data(41, o->value(), 0xc0);}
-              tooltip {Forced Release} xywh {220 300 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+              tooltip {Enable Frequency LFO} xywh {220 300 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqLfoEnabled);}
             }
             Fl_Counter Octave {
@@ -1000,7 +1001,7 @@ send_data(1, o->value(), 0xc8);}
                     voiceampenvgroup->activate();
                 o->redraw();
                 send_data(8, o->value(), 0xc0);}
-            tooltip {Forced Release} xywh {15 110 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Enable Amplitude Envelope} xywh {15 110 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpEnvelopeEnabled);}
           }
           Fl_Group voiceamplfogroup {
@@ -1020,7 +1021,7 @@ send_data(1, o->value(), 0xc8);}
                     voiceamplfogroup->activate();
                 o->redraw();
                 send_data(9, o->value(), 0xc0);}
-            tooltip {Forced Release} xywh {15 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Enable Amplitude LFO} xywh {15 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
           }
           Fl_Check_Button VolumeMinus {
@@ -1059,7 +1060,7 @@ send_data(4, o->value(), 0xc0);}
                     voicefilterenvgroup->activate();
                 o->redraw();
                 send_data(72, o->value(), 0xc0);}
-            tooltip {Forced Release} xywh {255 110 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Enable Filter Envelope} xywh {255 110 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PFilterEnvelopeEnabled);}
           }
           Fl_Group voicefilterlfogroup {
@@ -1079,7 +1080,7 @@ send_data(4, o->value(), 0xc0);}
                     voicefilterlfogroup->activate();
                 o->redraw();
                 send_data(73, o->value(), 0xc0);}
-            tooltip {Forced Release} xywh {255 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Enable Filter LFO} xywh {255 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PFilterLfoEnabled);}
           }
         }
@@ -1595,12 +1596,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
-      label {ADsynth Global Parameters of the Instrument}
+      label {ADsynth Global Parameters of the Instrument} selected
       xywh {81 82 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}

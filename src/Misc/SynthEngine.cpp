@@ -178,12 +178,9 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     bufferbytes = buffersize * sizeof(float);
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
-    fadeStep = 10.0f / samplerate; // 100mS fade;
+    fadeStep = 10.0f / samplerate; // 100mS fade
+    VolumeInc = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
     int found = 0;
-    /*if (!interchange.fromCLI)
-        goto bail_out;
-    if (!interchange.fromGUI)
-        goto bail_out;*/
 
     if (!interchange.Init(this))
         goto bail_out;
@@ -462,6 +459,7 @@ void *SynthEngine::RBPthread(void)
 void SynthEngine::defaults(void)
 {
     setPvolume(90);
+    TransVolume = Pvolume - 1; // ensure it is always set
     setPkeyshift(64);
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
@@ -2175,6 +2173,16 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Master volume, and all output fade
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
+            if (Pvolume - TransVolume > VolumeInc)
+            {
+                TransVolume += VolumeInc;
+                volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
+            }
+            else if (TransVolume - Pvolume > VolumeInc)
+            {
+                TransVolume -= VolumeInc;
+                volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
+            }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
             if (shutup) // fade-out - fadeLevel must also have been set
@@ -2263,10 +2271,10 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 }
 
 // Parameter control
-void SynthEngine::setPvolume(char control_value)
+void SynthEngine::setPvolume(float control_value)
 {
     Pvolume = control_value;
-    volume  = dB2rap((Pvolume - 96.0f) / 96.0f * 40.0f);
+    //volume  = dB2rap((float(Pvolume) / 128.0 - 96.0f) / 96.0f * 40.0f);
 }
 
 
