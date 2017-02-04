@@ -5,14 +5,14 @@ code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
 } 
 
-comment {BankUI.cc} {in_source not_in_header
+comment {BankUI.cc} {selected in_source not_in_header
 } 
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2016, Will Godfrey & others
+Copyright 2014-2017, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of original ZynAddSubFX code, modified January 2017
+This file is derivative of original ZynAddSubFX code.
+
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -270,7 +272,7 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window instrumentuiwindow {
-      label Bank selected
+      label Bank
       xywh {210 403 780 575} type Double hide
     } {
       Fl_Choice banklist {
@@ -832,7 +834,7 @@ instFrom = 0;} {}
             }
             else if (!bank->emptyslot(slot))
             {
-                if (fl_choice("Overwrite the slot no. %d ?", "Yes", "No", NULL, slot + 1))
+                if (fl_choice("Overwrite the slot no. %d ?", NULL, "No", "Yes", slot + 1) < 2)
                 {
                     setread();
                     doit = false;
@@ -851,7 +853,7 @@ instFrom = 0;} {}
 
         if (mode == 3 && !bank->emptyslot(slot))
         {   // Clears the slot (choices reversed for 'No' priority)
-            if (!fl_choice("Clear the slot no. %d ?", "Yes", "No", NULL, slot + 1))
+            if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
             {
                 if (!bank->clearslot(slot))
                     fl_alert("Could not clear this location");
@@ -974,14 +976,14 @@ instFrom = 0;} {}
 
         if (mode == 3 && !thisname.empty())
         {   // Remove bank and file contents (choices reversed for 'No' priority)
-            if (!fl_choice("Completely remove %s?", "Yes", "No", NULL, thisname.c_str()))
+            if (fl_choice("Completely remove %s?", NULL, "No", "Yes", thisname.c_str()) > 1)
             {
                 int clearit = true;
                 int count = bank->getBankSize(slot);
 //                synth->getRuntime().Log("Bank size " + asString(count));
                 if (count > 1)
-                    clearit = !fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
-                                         "Continue", "STOP !", NULL, count);
+                    clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
+                                         NULL, "STOP !", "Continue", count) > 1;
                 if (clearit)
                 {
 //                    synth->getRuntime().Log("We're going");

@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {Copyright 2016, Will Godfrey
+comment {Copyright 2016-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified October 2016
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -754,7 +754,7 @@ return col;} {}
                 return;
             filename = fl_filename_setext(filename, ".xvy");
             if (isRegFile(string(filename)))
-                if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") > 1)
                     return;
             synth->actionLock(lockmute);
             bool result = synth->saveVector(BaseChan, string(filename), true);

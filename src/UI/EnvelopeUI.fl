@@ -28,6 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
+
 Modified February 2017
 } {in_source in_header
 } 
@@ -275,7 +276,7 @@ return(1);} {}
   }
 } 
 
-class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -423,7 +424,8 @@ send_data(group, 35, o->value(), 0xc0);}
       }
     }
   }
-  Function {make_ADSR_window()} {} {
+  Function {make_ADSR_window()} {selected
+  } {
     Fl_Window envADSR {
       xywh {1185 87 205 70} type Double color 50 labelfont 1 hide
       class Fl_Group
@@ -1041,12 +1043,12 @@ refresh();} {}
   Function {reinit()} {} {
     code {if (env->Pfreemode != 0)
 {
-    int answer=fl_choice("Disable the free mode of the Envelope?", "No", "Yes", NULL);
+    bool answer = fl_choice("Disable the free mode of the Envelope?", NULL, "No", "Yes") > 1;
     if (env->Pfreemode != 0)
         freemodebutton->value(1);
     else
         freemodebutton->value(0);
-    if (answer == 0)
+    if (!answer)
         return;
 }
 

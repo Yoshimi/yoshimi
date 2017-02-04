@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-} {in_source in_header
+Modified January 2017} {in_source in_header
 } 
 
 decl {\#include <FL/fl_ask.H>
@@ -210,24 +210,27 @@ send_data(2);}
   }
   Function {send_data(int control)} {} {
     code {//
-if (control == 8)
-{
-    if(Fl::event_state(FL_CTRL) == 0)
-        return;
-    if (fl_choice("Remove line. %d %s?", "Yes", "No", NULL, n + 1, commandName->label()))
-        return;
-}
-int type = stat & 0x10;
-if (blockcheck->value() != 0)
-    type = 1;
+    bool doit = true;
+    if (control == 8)
+    {
+        doit = (Fl::event_state(FL_CTRL) != 0);
+        if (doit)
+            doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
+    }
+    if (doit)
+    {
+        int type = stat & 0x10;
+        if (blockcheck->value() != 0)
+            type = 1;
 
-if (compresscheck->value() != 0)
-    type |= 2;
+        if (compresscheck->value() != 0)
+            type |= 2;
 
-if (mutecheck->value() != 0)
-    type |= 4;
+        if (mutecheck->value() != 0)
+            type |= 4;
 
-collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
+        collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);
+    }} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -332,7 +335,7 @@ setWindowTitle(findleafname(filename));}
       Fl_Button clear {
         label Clear
         callback {//
-if (fl_choice("Remove all entries", "Yes", "No", NULL))
+if (fl_choice("Remove all entries", NULL, "No", "Yes") < 2)
     return;
 
 send_data(96,0,0);

@@ -5,7 +5,7 @@ code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2016, Will Godfrey
+Copyright 2014 -2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -21,7 +21,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
+This file is derivative of ZynAddSubFX original code.
+
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -61,7 +63,7 @@ class ConfigUI {selected : {private MiscFuncs}
       } {
         Fl_Group {} {
           label {Main settings}
-          xywh {5 25 382 277} labelsize 12
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Choice {} {
             label {* AddSynth Oscillator Size}
@@ -240,7 +242,7 @@ else
         }
         Fl_Group {} {
           label Switches
-          xywh {5 25 382 277} hide
+          xywh {5 25 382 277}
         } {
           Fl_Check_Button autoState {
             label {* Start With Default State}
@@ -295,25 +297,27 @@ else
           }
           Fl_Check_Button {} {
             label {Enable GUI}
-            callback {int tmp = o->value();
-if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
-{
-    fl_alert("You can't disable both interfaces!");
-    o->value(1);
-    return;
-}
+            callback {//
+    bool doit = true;
+    int tmp = o->value();
+    if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
+    {
+        fl_alert("You can't disable both interfaces!");
+        doit = false;
+    }
+    if (doit == true && tmp == 0)
+        doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
 
-if (tmp == 0 && fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", "Yes", "No", NULL))
-{
-    o->value(1);
-    return;
-}
-
-if (synth->getRuntime().showGui != tmp)
-{
-    synth->getRuntime().showGui = tmp;
-    synth->getRuntime().configChanged = true;
-}}
+    if (doit)
+    {
+        if (synth->getRuntime().showGui != tmp)
+        {
+            synth->getRuntime().showGui = tmp;
+            synth->getRuntime().configChanged = true;
+        }
+    }
+    else
+        o->value(1);}
             tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -525,7 +529,7 @@ synth->getRuntime().configChanged = true;}
         EPCspinner->value(EPCvalue);
         EPCspinner->activate();
     }
-    
+
     BankRootvalue = synth->getRuntime().midi_bank_root;
     if (BankRootvalue >= 128)
     {

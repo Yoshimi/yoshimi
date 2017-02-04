@@ -5,6 +5,10 @@ yoshimi 1.5.0 M
   so no more zipper noise.
 * Removed unused and commented out code.
 * Corrected code copyright and 'Modified' dates.
+* Bugfix: FLTK choice windows gave "yes" on Escape.
+* Bugfix: Regression when loading vectors from CLI
+  would crash if no channel given :(
+*Bugfix: GUI not updated onloading vector file.
 
 2017-2-3 Will
 * Applied AddSynth Voice tooltip patch from Rob.

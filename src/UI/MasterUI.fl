@@ -28,6 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
+
 Modified February 2017
 
 
@@ -356,7 +357,7 @@ mainCreateNewInstance(forceId);}
         return;
     filename = fl_filename_setext(filename, ".xiz");
     if (isRegFile(string(filename)))
-        if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
+        if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
             return;
     synth->actionLock(lockmute);
     bool result = synth->part[npart]->saveXML(string(filename));
@@ -369,17 +370,8 @@ mainCreateNewInstance(forceId);}
           MenuItem {} {
             label {&Clear}
             callback {//
-    if (!fl_choice("Clear instrument's parameters ?", "Yes", "No", NULL))
-    {
-        
-        /*synth->actionLock(lockmute);
-        synth->part[npart]->defaultsinstrument();
-         synth->part[npart]->cleanup();
-        synth->actionLock(unlock);
-        npartcounter->do_callback();*/
-        send_data(96, 0, 0xc0, npart);
-    }
-    //updatepanel();}
+    if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", npart + 1) > 1)
+        send_data(96, 0, 0xc0, npart);}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -472,7 +464,7 @@ paramsui->Show(2);}
                     return;
                 filename = fl_filename_setext(filename, ".xsz");
                 if (isRegFile(string(filename)))
-                    if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                    if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") < 2)
                         return;
                 synth->actionLock(lockmute);
                 bool result = synth->microtonal.saveXML(string(filename));
@@ -496,7 +488,7 @@ paramsui->Show(3);}
           MenuItem {} {
             label {&Clear}
             callback {\#
-    if (!fl_choice("Set scales to the defaults?", "Yes", "No", NULL))
+    if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
     {
         synth->actionLock(lockmute);
         synth->microtonal.defaults();
@@ -579,9 +571,8 @@ paramsui->Show(4);}
         Fl_Button {} {
           label Reset
           callback {//
-    if (!fl_choice("Set *ALL* dynamic values to their defaults?", "Yes", "No", NULL))
+    if (fl_choice("Set *ALL* dynamic values to their defaults?", NULL, "No", "Yes") > 1)
     {
-        //do_new_master();
         send_data(96, o->value(), 0xc0);
     }}
           tooltip {Clear all dynamic settings} xywh {15 60 75 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
@@ -1579,7 +1570,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             if (result)
             {
                 result = false;
-                if (!fl_choice("The file exists. Overwrite it?", "No", "Yes", NULL))
+                if (fl_choice("The file exists. Overwrite it?", NULL, "No", "Yes") < 2)
                     return;
             }
         }
@@ -1632,6 +1623,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   } {
     code {//
     bool changed = false;
+    partmax = synth->getRuntime().NumAvailableParts;
+    // ^^^ this is needed for vector control - need to put right!
     if(panelgroup >= partmax)
     {
         panelgroup = 0;

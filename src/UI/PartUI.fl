@@ -27,8 +27,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code
-modified January 2017
+This file is derivative of ZynAddSubFX original code.
+
+Modified January 2017
 } {in_source in_header
 } 
 
@@ -300,7 +301,7 @@ if ((Fl::event_button() == 3))
         callback {//
             int answer = 1;
             if (o->value() == 0)
-                answer = fl_choice("Delete the item?","No","Yes",NULL);
+                answer = (fl_choice("Delete the item?", NULL,"No","Yes") > 1);
             if (answer != 0)
             {
                 //synth->actionLock(lockmute);
@@ -370,7 +371,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
       callback {//
           int answer = 1;
             if (!o->value())
-                answer = fl_choice("Delete the item?", "No", "Yes", NULL);
+                answer = (fl_choice("Delete the item?", NULL, "No", "Yes") > 1);
             if (answer)
             {
                 synth->actionLock(lockmute);
