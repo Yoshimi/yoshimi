@@ -27,7 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified February 2017
+This file is a derivative of the ZynAddSubFX original.
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -470,20 +471,18 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
     }
     else
         realvalue = 127 - o->value();
-        //synth->part[npart + *plgroup]->setVolume(realvalue);
     synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
-    send_data(0, realvalue, 0xc8);}
+    send_data(0, realvalue, 0x48);}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
           code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
           class mwheel_slider
         }
         Fl_Dial partpanning {
           callback {//
-              //synth->part[npart + *plgroup]->SetController(C_panning, o->value());
     synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
     if (Fl::event_button() == 3)
         o->value(64);
-    send_data(2, o->value(), 0xc8);}
+    send_data(2, o->value(), 0x48);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
           code1 {//o->init(64);}

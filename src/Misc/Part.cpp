@@ -21,7 +21,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified February 2017
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified February 2017
 */
 
 #include <cstring>
@@ -108,7 +110,6 @@ Part::Part(Microtonal *microtonal_, FFTwrapper *fft_, SynthEngine *_synth) :
     cleanup();
     Pname.clear();
 
-    oldvolumel = oldvolumer = 0.5f;
     lastnote = -1;
     lastpos = 0; // lastpos will store previously used NoteOn(...)'s pos.
     lastlegatomodevalid = false; // To store previous legatomodevalid value.
@@ -124,9 +125,11 @@ void Part::defaults(void)
     Ppolymode = 1;
     Plegatomode = 0;
     setVolume(96);
+    TransVolume = Pvolume - 1; // ensure it gets set
     Pkeyshift = 64;
     Prcvchn = 0;
     setPan(Ppanning = 64);
+    TransPanning = Ppanning - 1;
     Pvelsns = 64;
     Pveloffs = 64;
     Pkeylimit = 20;
@@ -1105,8 +1108,14 @@ void Part::ComputePartSmps(void)
 // Parameter control
 void Part::setVolume(float value)
 {
-    Pvolume = (int)value;
-    volume  = dB2rap((value - 96.0f) / 96.0f * 40.0f) * ctl->expression.relvolume;
+    Pvolume = value;
+}
+
+
+void Part::checkVolume(float step)
+{
+    TransVolume += step;
+    volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
 }
 
 
@@ -1116,10 +1125,17 @@ void Part::setDestination(int value)
 }
 
 
-void Part::setPan(char value)
+void Part::setPan(float value)
 {
     Ppanning = value;
-    float t = ((Ppanning > 0) ? (float)(Ppanning - 1) : 0.0f) / 126.0f;
+}
+
+
+void Part::checkPanning(float step)
+{
+    float t;
+    TransPanning += step;
+    t = ((TransPanning > 0) ? (TransPanning - 1) : 0.0f) / 126.0f;
     pangainL = cosf(t * HALFPI);
     pangainR = cosf((1.0f - t) * HALFPI);
 }

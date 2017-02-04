@@ -22,6 +22,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
+
     Modified February 2017
 */
 
@@ -179,7 +180,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     oscilsize_f = oscilsize = Runtime.Oscilsize;
     halfoscilsize_f = halfoscilsize = oscilsize / 2;
     fadeStep = 10.0f / samplerate; // 100mS fade
-    VolumeInc = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
+    ControlStep = (127.0f / samplerate) * 5.0f; // 200mS for 0 to 127
     int found = 0;
 
     if (!interchange.Init(this))
@@ -2065,30 +2066,21 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             if (!partonoffRead(npart))
                 continue;
 
-            float oldvol_l = part[npart]->oldvolumel;
-            float oldvol_r = part[npart]->oldvolumer;
-            float newvol_l = part[npart]->pannedVolLeft();
-            float newvol_r = part[npart]->pannedVolRight();
-            if (aboveAmplitudeThreshold(oldvol_l, newvol_l) || aboveAmplitudeThreshold(oldvol_r, newvol_r))
-            {   // the volume or the panning has changed and needs interpolation
-                for (int i = 0; i < p_buffersize; ++i)
-                {
-                    float vol_l = interpolateAmplitude(oldvol_l, newvol_l, i, p_buffersize);
-                    float vol_r = interpolateAmplitude(oldvol_r, newvol_r, i, p_buffersize);
-                    part[npart]->partoutl[i] *= vol_l;
-                    part[npart]->partoutr[i] *= vol_r;
-                }
-                part[npart]->oldvolumel = newvol_l;
-                part[npart]->oldvolumer = newvol_r;
-            }
-            else
+            float Step = ControlStep;
+            for (int i = 0; i < p_buffersize; ++i)
             {
-                for (int i = 0; i < p_buffersize; ++i)
-                {   // the volume did not change
-                    part[npart]->partoutl[i] *= newvol_l;
-                    part[npart]->partoutr[i] *= newvol_r;
-                }
+                if (part[npart]->Ppanning - part[npart]->TransPanning > Step)
+                    part[npart]->checkPanning(Step);
+                else if (part[npart]->TransPanning - part[npart]->Ppanning > Step)
+                    part[npart]->checkPanning(-Step);
+                if (part[npart]->Pvolume - part[npart]->TransVolume > Step)
+                    part[npart]->checkVolume(Step);
+                else if (part[npart]->TransVolume - part[npart]->Pvolume > Step)
+                    part[npart]->checkVolume(-Step);
+                part[npart]->partoutl[i] *= (part[npart]->pannedVolLeft() * part[npart]->ctl->expression.relvolume);
+                part[npart]->partoutr[i] *= (part[npart]->pannedVolRight() * part[npart]->ctl->expression.relvolume);
             }
+
         }
         // System effects
         for (nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
@@ -2171,16 +2163,17 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         LFOtime++; // update the LFO's time
 
         // Master volume, and all output fade
+        float cStep = ControlStep;
         for (int idx = 0; idx < p_buffersize; ++idx)
         {
-            if (Pvolume - TransVolume > VolumeInc)
+            if (Pvolume - TransVolume > cStep)
             {
-                TransVolume += VolumeInc;
+                TransVolume += cStep;
                 volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
             }
-            else if (TransVolume - Pvolume > VolumeInc)
+            else if (TransVolume - Pvolume > cStep)
             {
-                TransVolume -= VolumeInc;
+                TransVolume -= cStep;
                 volume = dB2rap((TransVolume - 96.0f) / 96.0f * 40.0f);
             }
             mainL[idx] *= volume; // apply Master Volume

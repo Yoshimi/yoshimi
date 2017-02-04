@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-2-4 Will
+* Changed interpolation for part volume and pan
+  so no more zipper noise.
+* Removed unused and commented out code.
+* Corrected code copyright and 'Modified' dates.
+
 2017-2-3 Will
 * Applied AddSynth Voice tooltip patch from Rob.
 * Main volume now interpolated. No zipper noise :)

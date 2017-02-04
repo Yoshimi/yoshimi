@@ -2,7 +2,7 @@
     JackEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2017, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified October 2014
+    Modified February 2017
 */
 
 #include <errno.h>
@@ -136,8 +136,6 @@ bool JackEngine::Start(void)
 {
     bool jackPortsRegistered = true;
     internalbuff = synth->getRuntime().Buffersize;
-    //Andrew Deryabin: use default error callback function provided by jack
-    //jack_set_error_function(_errorCallback);
     jack_set_xrun_callback(jackClient, _xrunCallback, this);
     #if defined(JACK_SESSION)
         if (jack_set_session_callback
@@ -462,105 +460,13 @@ bool JackEngine::processMidi(jack_nframes_t nframes)
     unsigned int idx;
     jack_midi_event_t jEvent;
     jack_nframes_t eventCount = jack_midi_get_event_count(portBuf);
-    //unsigned char channel, note, velocity;
-    //int ctrltype;
-    //int par;
-    //unsigned int ev;
+
     for(idx = 0; idx < eventCount; ++idx)
     {
         if(!jack_midi_event_get(&jEvent, portBuf, idx))
         {
-            //par = 0;
-            if (jEvent.size < 1 || jEvent.size > 4)
-                continue; // no interest in zero sized or long events
-            setMidi(jEvent.buffer[0], jEvent.buffer[1], jEvent.buffer[2]);
-            /*channel = jEvent.buffer[0] & 0x0F;
-            switch ((ev = jEvent.buffer[0] & 0xF0))
-            {
-                case 0x01: // modulation wheel or lever
-                    ctrltype = C_modwheel;
-                    par = jEvent.buffer[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0x07: // channel volume (formerly main volume)
-                    ctrltype = C_volume;
-                    par = jEvent.buffer[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0x0B: // expression controller
-                    ctrltype = C_expression;
-                    par = jEvent.buffer[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0x78: // all sound off
-                    ctrltype = C_allsoundsoff;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case 0x79: // reset all controllers
-                    ctrltype = C_resetallcontrollers;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case 0x7B:  // all notes off
-                    ctrltype = C_allnotesoff;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case 0x80: // note-off
-                    note = jEvent.buffer[1];
-                    setMidiNote(channel, note);
-                    break;
-
-                case 0x90: // note-on
-                    if ((note = jEvent.buffer[1])) // skip note == 0
-                    {
-                        velocity = jEvent.buffer[2];
-                        setMidiNote(channel, note, velocity);
-                    }
-                    break;
-
-                case 0xA0: // key aftertouch
-                    ctrltype = C_keypressure;
-                    // need to work out how to use key values >> j Event.buffer[1]
-                    par = jEvent.buffer[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0xB0: // controller
-                    ctrltype = jEvent.buffer[1];//getMidiController(jEvent.buffer[1]);
-                    par = jEvent.buffer[2];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0xC0: // program change
-                    ctrltype = C_programchange;
-                    par = jEvent.buffer[1];
-                    setMidiProgram(channel, par);
-                    break;
-
-                case 0xD0: // channel aftertouch
-                    ctrltype = C_channelpressure;
-                    par = jEvent.buffer[1];
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0xE0: // pitch bend
-                    ctrltype = C_pitchwheel;
-                    par = ((jEvent.buffer[2] << 7) | jEvent.buffer[1]) - 8192;
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case 0xF0: // system exclusive
-                    break;
-
-                default: // wot, more? commented out some progs spam us :(
-                    synth->getRuntime().Log("other event: " + asString((int)ev), 1);
-                    break;
-            }*/
+            if (jEvent.size >= 1 && jEvent.size <= 4) // no interest in zero sized or long events
+                setMidi(jEvent.buffer[0], jEvent.buffer[1], jEvent.buffer[2]);
         }
     }
     return true;
@@ -571,12 +477,6 @@ int JackEngine::_xrunCallback(void *arg)
 {
     ((JackEngine *)arg)->synth->getRuntime().Log("xrun reported", 2);
     return 0;
-}
-
-
-void JackEngine::_errorCallback(const char *msg)
-{
-    //synth->getRuntime().Log("Jack reports error: " + string(msg));
 }
 
 

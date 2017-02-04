@@ -2,7 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2017, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Last modified August 2014
+
+    Modified February 2017
 */
 
 #include <endian.h>
@@ -583,10 +584,6 @@ void *AlsaEngine::_MidiThread(void *arg)
 void *AlsaEngine::MidiThread(void)
 {
     snd_seq_event_t *event;
-    //unsigned char channel;
-    //unsigned char note;
-    //unsigned char velocity;
-    //unsigned int ctrltype;
     unsigned int par;
     int chk;
     bool sendit;
@@ -669,81 +666,6 @@ void *AlsaEngine::MidiThread(void)
                     synth->getRuntime().Log("Alsa midi port disconnected");
                     sendit = false;
                     break;
-                /*case SND_SEQ_EVENT_NOTEON:
-                    if (event->data.note.note)
-                    {
-                        channel = event->data.note.channel;
-                        note = event->data.note.note;
-                        velocity = event->data.note.velocity;
-                        setMidiNote(channel, note, velocity);
-                    }
-                    break;
-
-                case SND_SEQ_EVENT_NOTEOFF:
-                    channel = event->data.note.channel;
-                    note = event->data.note.note;
-                    setMidiNote(channel, note);
-                    break;
-
-                case SND_SEQ_EVENT_KEYPRESS:
-                    channel = event->data.note.channel;
-                    ctrltype = C_keypressure;
-                    par = event->data.note.velocity;
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case SND_SEQ_EVENT_CHANPRESS:
-                    channel = event->data.control.channel;
-                    ctrltype = C_channelpressure;
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case SND_SEQ_EVENT_PGMCHANGE:
-                    channel = event->data.control.channel;
-                    ctrltype = C_programchange;
-                    par = event->data.control.value;
-                    setMidiProgram(channel, par);
-                    break;
-
-                case SND_SEQ_EVENT_PITCHBEND:
-                    channel = event->data.control.channel;
-                    ctrltype = C_pitchwheel;
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case SND_SEQ_EVENT_CONTROLLER:
-                    channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;//getMidiController(event->data.control.param);
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
-                    break;
-
-                case SND_SEQ_EVENT_NONREGPARAM:
-                    channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;
-                    par = event->data.control.value;
-                    setMidiController(channel, 99, ctrltype >> 7);
-                    setMidiController(channel, 98, ctrltype & 0x7f);
-                    setMidiController(channel, 6, par >> 7);
-                    setMidiController(channel, 38, par & 0x7f);
-                    break;
-
-                case SND_SEQ_EVENT_RESET: // reset to power-on state
-                    channel = event->data.control.channel;
-                    ctrltype = C_resetallcontrollers;
-                    setMidiController(channel, ctrltype, 0);
-                    break;
-
-                case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
-                    synth->getRuntime().Log("Alsa midi port connected");
-                    break;
-
-                case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
-                    synth->getRuntime().Log("Alsa midi port disconnected");
-                    break;
-                */
                 default:
                     sendit = false;// commented out some progs spam us :(
                     /* synth->getRuntime().Log("Other non-handled midi event, type: "

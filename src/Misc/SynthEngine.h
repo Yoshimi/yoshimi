@@ -167,7 +167,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float p_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
         float         TransVolume;
         float         Pvolume;
-        float         VolumeInc;
+        float         ControlStep;
         int           Paudiodest;
         int           Pkeyshift;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];

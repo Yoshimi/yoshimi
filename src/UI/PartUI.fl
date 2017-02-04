@@ -494,13 +494,12 @@ send_data(4, o->value(), 0xc8);}
         }
         Fl_Dial partpan {
           label Pan
-          callback {//
-                   // part->SetController(C_panning, o->value());
-if (Fl::event_button() == 3)
-    o->value(64);
-if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-    synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
-send_data(2, o->value(), 0xc8);}
+          callback {//;
+    if (Fl::event_button() == 3)
+        o->value(64);
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+        synth->getGuiMaster()->setPanelPartPanWidget(npart % NUM_MIDI_CHANNELS, o->value());
+    send_data(2, o->value(), 0x48);}
           xywh {290 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PanningStd);}
           code1 {o->value(part->Ppanning);}
@@ -509,14 +508,13 @@ send_data(2, o->value(), 0xc8);}
         }
         Fl_Dial partvol {
           label Volume
-          callback {//
-//                    part->setVolume(o->value());
-if (Fl::event_button() == 3)
-    o->value(96);
-if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-  synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
+          callback {//;
+    if (Fl::event_button() == 3)
+        o->value(96);
+    if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
+      synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
 
-send_data(0, o->value(), 0xc8);}
+    send_data(0, o->value(), 0x48);}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_PartVolume);}
           code1 {o->value(part->Pvolume);}
