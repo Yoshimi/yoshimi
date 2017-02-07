@@ -24,6 +24,7 @@
 #include "Misc/ConfBuild.cpp"
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
+#include "Interface/MidiDecode.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
@@ -594,9 +595,9 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
         isFreeWheel = true;
     if (_synth->getRuntime().midi_bank_C != 128)
     {
-        setMidiBankOrRootDir((short)bank, isFreeWheel);
+        synth->mididecode.setMidiBankOrRootDir((short)bank, isFreeWheel);
     }
-    setMidiProgram(channel, program, isFreeWheel);
+    synth->mididecode.setMidiProgram(channel, program, isFreeWheel);
 }
 
 

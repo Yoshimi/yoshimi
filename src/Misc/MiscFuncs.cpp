@@ -387,8 +387,7 @@ void MiscFuncs::miscMsgInit()
 
 int MiscFuncs::miscMsgPush(string _text)
 {
-    mutex mtx;
-    mtx.lock();
+    sem_wait(&miscmsglock);
 
     string text = _text;
     list<string>::iterator it = miscList.begin();
@@ -409,17 +408,16 @@ int MiscFuncs::miscMsgPush(string _text)
         cout << "List full :(" << endl;
         idx = -1;
     }
-
+    cout << "List size " << int(idx) << endl;
     int result = idx; // in case of a new entry before return
-    mtx.unlock();
+    sem_post(&miscmsglock);
     return result;
 }
 
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
-    mutex mtx;
-    mtx.lock();
+    sem_wait(&miscmsglock);
 
     int pos = _pos;
     list<string>::iterator it = miscList.begin();
@@ -434,8 +432,10 @@ string MiscFuncs::miscMsgPop(int _pos)
     }
     string result = "";
     if (idx == pos)
-        swap( result, *it); // in case of a new entry before return
-    mtx.unlock();
+    {
+        swap (result, *it); // in case of a new entry before return
+    }
+    sem_post(&miscmsglock);
     return result;
 }
 

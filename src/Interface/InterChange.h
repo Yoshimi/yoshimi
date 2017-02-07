@@ -33,7 +33,9 @@ using namespace std;
 #include "Synth/OscilGen.h"
 #include "Synth/Resonance.h"
 
+//#include "Interface/MidiDecode.h"
 class SynthEngine;
+//class MidiDecode;
 
 class InterChange : private MiscFuncs
 {
@@ -105,6 +107,7 @@ class InterChange : private MiscFuncs
         void commandEffects(CommandBlock *getData);
 
         SynthEngine *synth;
+        //MidiDecode *mididecode;
 };
 
 #endif

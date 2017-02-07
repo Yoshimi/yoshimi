@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
     Modified February 2017
 */
 
@@ -609,6 +610,8 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
 
 void MidiLearn::writeToGui(CommandBlock *putData)
 {
+    if (!synth->getRuntime().showGui)
+        return;
     putData->data.part = 0xd8;
     unsigned int writesize = sizeof(*putData);
     char *point = (char*)putData;
@@ -636,6 +639,8 @@ void MidiLearn::writeToGui(CommandBlock *putData)
 
 void MidiLearn::updateGui(int opp)
 {
+    if (!synth->getRuntime().showGui)
+        return;
     CommandBlock putData;
     if (opp == 21)
     {

@@ -47,20 +47,7 @@ class MusicIO : virtual protected MiscFuncs
     protected:
         bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
-        int getMidiController(unsigned char b);
         void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
-        void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
-        bool nrpnRunVector(unsigned char ch, int ctrl, int param);
-        void nrpnProcessData(unsigned char chan, int type, int par, bool in_place);
-        void nrpnDirectPart(int dHigh, int par);
-        void nrpnSetVector(int dHigh, unsigned char chan,  int par);
-
-        //if setBank is false then set RootDir number else current bank number
-        void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
-        void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
-        void setMidiNoteOff(unsigned char chan, unsigned char note);
-        void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
-
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
         int *interleaved;

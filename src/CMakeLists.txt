@@ -289,6 +289,7 @@ set (Interface_Sources
     Interface/CmdInterface.cpp
     Interface/InterChange.cpp
     Interface/MidiLearn.cpp
+    Interface/MidiDecode.cpp
     UI/MiscGui.cpp
 )
 

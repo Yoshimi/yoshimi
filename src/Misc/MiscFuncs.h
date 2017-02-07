@@ -26,6 +26,7 @@
 #include <cmath>
 #include <string>
 #include <list>
+#include <semaphore.h>
 
 using namespace std;
 
@@ -34,8 +35,8 @@ static list<string> miscList;
 class MiscFuncs
 {
     public:
-        MiscFuncs() { }
-        ~MiscFuncs() { }
+        MiscFuncs() {sem_init(&miscmsglock, 0, 1);}
+        ~MiscFuncs() {sem_destroy(&miscmsglock);}
         string asString(int n);
         string asString(long long n);
         string asString(unsigned long n);
@@ -81,6 +82,7 @@ class MiscFuncs
 
         float dB2rap(float dB);
         float rap2dB(float rap);
+        sem_t miscmsglock;
 };
 
 void invSignal(float *sig, size_t len);

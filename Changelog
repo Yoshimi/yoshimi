@@ -1,5 +1,13 @@
 yoshimi 1.5.0 M
 
+2017-2-7 Will
+* First trial of async MIDI buffer.
+* Changed miscMsg from mutext to semaphore.
+* Bugfix: miscMsg buffer not being cleared.
+  Only when no GUI. That was supposed to get them!
+* Bugfix: Return messages killed for CLI when disabled
+  for Gui.
+
 2017-2-4 Will
 * Changed interpolation for part volume and pan
   so no more zipper noise.
@@ -8,7 +16,7 @@ yoshimi 1.5.0 M
 * Bugfix: FLTK choice windows gave "yes" on Escape.
 * Bugfix: Regression when loading vectors from CLI
   would crash if no channel given :(
-*Bugfix: GUI not updated onloading vector file.
+* Bugfix: GUI not updated on loading vector file.
 
 2017-2-3 Will
 * Applied AddSynth Voice tooltip patch from Rob.

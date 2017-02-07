@@ -40,8 +40,7 @@ using namespace std;
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #include "MasterUI.h"
-
-
+//#include "Interface/MidiDecode.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
@@ -234,9 +233,10 @@ void InterChange::resolveReplies(CommandBlock *getData)
 #ifdef ENABLE_REPORTS
     if (isGui)
         synth->getRuntime().Log("From GUI");
-#endif
-
     if ((isGui && button < 2) || (isCli && button == 1))
+#else
+    if (isCli && button == 1)
+#endif
     {
         if (button == 0)
             isValue = "Request set default";
@@ -249,7 +249,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
         isValue +="\n  Type ";
         for (int i = 7; i > -1; -- i)
             isValue += to_string((type >> i) & 1);
-#ifdef ENABLE_REPORTS
         synth->getRuntime().Log(isValue
                             + "\n  Control " + to_string((int) control)
                             + "\n  Part " + to_string((int) npart)
@@ -259,7 +258,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
                             + "\n  Parameter " + to_string((int) insertParam)
                             + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
-#endif
     }
     if (npart >= 0xc0 && npart < 0xd0)
     {
@@ -411,7 +409,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if(!isMidi || synth->getRuntime().monitorCCin)
         synth->getRuntime().Log(commandName + actual);
 #else
-    else if(!isGui && button == 2)
+    else if(!isGui)// && button == 2)
         synth->getRuntime().Log(commandName + actual);
 #endif
 }
@@ -2060,9 +2058,15 @@ void InterChange::mediate()
                 commandSend(&getData);
                 returns(&getData);
             }
-            else if (getData.data.part == 0xd8 && getData.data.control == 24)
+            else if (getData.data.control == 24)
+            {
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
+            }
+            else if (getData.data.control == 0xd8)
+            {
+                synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
+            }
         }
     }
     while (more && synth->getRuntime().runSynth);

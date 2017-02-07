@@ -43,6 +43,7 @@ using namespace std;
 #include <stdlib.h>
 #include <unistd.h>
 
+#define MUTEX
 
 static unsigned int getRemoveSynthId(bool remove = false, unsigned int idx = 0)
 {
@@ -85,6 +86,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     bank(this),
     interchange(this),
     midilearn(this),
+    mididecode(this),
     Runtime(this, argc, argv),
     presetsstore(this),
     shutup(false),
@@ -2041,8 +2043,9 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
  */
     else
     {
+#ifdef MUTEX
         actionLock(lock);
-
+#endif
         // Compute part samples and store them ->partoutl,partoutr
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             if (partonoffRead(npart))
@@ -2193,9 +2196,9 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 fadeLevel -= fadeStep;
             }
         }
-
+#ifdef MUTEX
         actionLock(unlock);
-
+#endif
         // Peak calculation for mixed outputs
         VUpeak.values.vuRmsPeakL = 1e-12f;
         VUpeak.values.vuRmsPeakR = 1e-12f;

@@ -41,6 +41,7 @@ using namespace std;
 #include "Misc/SynthHelper.h"
 #include "Interface/InterChange.h"
 #include "Interface/MidiLearn.h"
+#include "Interface/MidiDecode.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
@@ -63,6 +64,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
     public:
         InterChange interchange;
         MidiLearn midilearn;
+        MidiDecode mididecode;
     private:
         Config Runtime;
         PresetsStore presetsstore;

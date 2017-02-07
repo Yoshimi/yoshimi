@@ -42,6 +42,7 @@ file (GLOB yoshimi_misc_files
     ../Misc/SynthEngine.h  ../Misc/Bank.h  ../Misc/Microtonal.h
     ../Misc/Part.h  ../Misc/XMLwrapper.h  ../Misc/MiscFuncs.h ../Misc/WavFile.h)
 file (GLOB yoshimi_interface_files
+    ../Interface/MidiDecode.cpp ../Interface/MidiDecode.h
     ../Interface/InterChange.cpp ../Interface/InterChange.h
     ../Interface/MidiLearn.cpp ../Interface/MidiLearn.h
     ../UI/MiscGui.cpp ../UI/MiscGui.h)
