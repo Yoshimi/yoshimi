@@ -57,39 +57,60 @@ bool InterChange::Init(SynthEngine *_synth)
         synth->getRuntime().Log("InterChange failed to create 'fromCLI' ringbuffer");
         goto bail_out;
     }
-    else
-         jack_ringbuffer_reset(fromCLI);
+    if (jack_ringbuffer_mlock(fromCLI))
+    {
+        synth->getRuntime().Log("Failed to lock fromCLI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(fromCLI);
 
     if (!(toCLI = jack_ringbuffer_create(sizeof(commandSize) * 512)))
     {
         synth->getRuntime().Log("InterChange failed to create 'toCLI' ringbuffer");
         goto bail_out;
     }
-    else
-        jack_ringbuffer_reset(toCLI);
+    if (jack_ringbuffer_mlock(toCLI))
+    {
+        synth->getRuntime().Log("Failed to lock toCLI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(toCLI);
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         synth->getRuntime().Log("InterChange failed to create 'fromGUI' ringbuffer");
         goto bail_out;
     }
-    else
-        jack_ringbuffer_reset(fromGUI);
+    if (jack_ringbuffer_mlock(fromGUI))
+    {
+        synth->getRuntime().Log("Failed to lock fromGUI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(fromGUI);
+
     if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         synth->getRuntime().Log("InterChange failed to create 'toGUI' ringbuffer");
         goto bail_out;
     }
-    else
-        jack_ringbuffer_reset(toGUI);
+    if (jack_ringbuffer_mlock(toGUI))
+    {
+        synth->getRuntime().Log("Failed to lock toGUI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(toGUI);
 
     if (!(fromMIDI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
         synth->getRuntime().Log("InterChange failed to create 'fromMIDI' ringbuffer");
         goto bail_out;
     }
-    else
-         jack_ringbuffer_reset(fromMIDI);
+    if (jack_ringbuffer_mlock(fromMIDI))
+    {
+        synth->getRuntime().Log("Failed to lock fromMIDI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(fromMIDI);
 
     if (!synth->getRuntime().startThread(&CLIresolvethreadHandle, _CLIresolvethread, this, false, 0, false, "CLI"))
     {

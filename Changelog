@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-2-8 Will
+* Commented out redundant code from LV2.
+* Added mlock to all ring buffers.
+* Ensured all locked pages unlocked on exit.
+
 2017-2-7 Will
 * First trial of async MIDI buffer.
 * Changed miscMsg from mutext to semaphore.

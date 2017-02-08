@@ -220,13 +220,24 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
 
     if (!(vuringbuf = jack_ringbuffer_create(sizeof(VUtransfer))))
     {
-        Runtime.Log("SynthEngine failed to create vu ringbuffer");
+        Runtime.Log("SynthEngine failed to create vuringbuf");
+        goto bail_out;
+    }
+    if (jack_ringbuffer_mlock(vuringbuf))
+    {
+        Runtime.Log("Failed to lock vuringbuf memory");
         goto bail_out;
     }
 
+
     if (!(RBPringbuf = jack_ringbuffer_create(512)))
     {
-        Runtime.Log("SynthEngine failed to create GUI ringbuffer");
+        Runtime.Log("SynthEngine failed to create RBPringbuf");
+        goto bail_out;
+    }
+    if (jack_ringbuffer_mlock(vuringbuf))
+    {
+        Runtime.Log("Failed to lock RBPringbuf memory");
         goto bail_out;
     }
 

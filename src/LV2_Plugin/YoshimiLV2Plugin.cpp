@@ -133,16 +133,16 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
-            bool bMidiProcessed = false;
+//            bool bMidiProcessed = false;
             if (_bFreeWheel != NULL)
             {
-                if (*_bFreeWheel != 0)
+                if (true)//*_bFreeWheel != 0)
                 {
                     processMidiMessage(msg);
-                    bMidiProcessed = true;
+//                    bMidiProcessed = true;
                 }
             }
-            if (!bMidiProcessed)
+            /*if (!bMidiProcessed)
             {
                 intMidiEvent.time = next_frame;
                 memset(intMidiEvent.data, 0, sizeof(intMidiEvent.data));
@@ -170,7 +170,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
                                 + asString((int)sizeof(struct midi_event)));
                 }
 
-            }
+            }*/
 
         }
     }
@@ -208,7 +208,7 @@ void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 }
 
 
-void *YoshimiLV2Plugin::midiThread()
+/*void *YoshimiLV2Plugin::midiThread()
 {
     struct midi_event midiEvent;
     while (synth->getRuntime().runSynth)
@@ -231,7 +231,7 @@ void *YoshimiLV2Plugin::midiThread()
         processMidiMessage(reinterpret_cast<const uint8_t *>(midiEvent.data));
     }
     return NULL;
-}
+}*/
 
 
 void *YoshimiLV2Plugin::idleThread()
@@ -270,8 +270,8 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _bufferPos(0),
     _offsetPos(0),
     _bFreeWheel(NULL),
-    _midiRingBuf(NULL),
-    _pMidiThread(0),
+    //_midiRingBuf(NULL),
+    //_pMidiThread(0),
     _pIdleThread(0)
 {
     flatbankprgs.clear();
@@ -329,15 +329,15 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
             getProgram(flatbankprgs.size() + 1);
         }
         _synth->getRuntime().runSynth = false;
-        sem_post(&_midiSem);
-        pthread_join(_pMidiThread, NULL);
+        //sem_post(&_midiSem);
+        //pthread_join(_pMidiThread, NULL);
         pthread_join(_pIdleThread, NULL);
-        sem_destroy(&_midiSem);
-        if (_midiRingBuf != NULL)
+        //sem_destroy(&_midiSem);
+        /*if (_midiRingBuf != NULL)
         {
             jack_ringbuffer_free(_midiRingBuf);
             _midiRingBuf = NULL;
-        }
+        }*/
         delete _synth;
         _synth = NULL;
     }
@@ -350,13 +350,13 @@ bool YoshimiLV2Plugin::init()
         return false;
     if (!prepBuffers())
         return false;
-    if (sem_init(&_midiSem, 0, 0) != 0)
+    /*if (sem_init(&_midiSem, 0, 0) != 0)
     {
         _synth->getRuntime().Log("Failed to create midi semaphore");
         return false;
-    }
+    }*/
 
-    _midiRingBuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096);
+    /*_midiRingBuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096);
     if (!_midiRingBuf)
     {
         _synth->getRuntime().Log("Failed to create midi ringbuffer");
@@ -366,7 +366,7 @@ bool YoshimiLV2Plugin::init()
     {
         _synth->getRuntime().Log("Failed to lock memory");
         return false;
-    }
+    }*/
 
     _synth->Init(_sampleRate, _bufferSize);
 
@@ -377,11 +377,11 @@ bool YoshimiLV2Plugin::init()
 
     _synth->getRuntime().runSynth = true;
 
-    if (!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false, "LV2 midi"))
+    /*if (!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false, "LV2 midi"))
     {
         synth->getRuntime().Log("Failed to start midi thread");
         return false;
-    }
+    }*/
 
     if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false, "LV2 idle"))
     {
@@ -601,10 +601,10 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
 }
 
 
-void *YoshimiLV2Plugin::static_midiThread(void *arg)
+/*void *YoshimiLV2Plugin::static_midiThread(void *arg)
 {
     return static_cast<YoshimiLV2Plugin *>(arg)->midiThread();
-}
+}*/
 
 
 void *YoshimiLV2Plugin::static_idleThread(void *arg)

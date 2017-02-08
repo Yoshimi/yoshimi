@@ -17,6 +17,7 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/mman.h>
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
@@ -471,6 +472,7 @@ bail_out:
     }
     if(bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
+    munlockall(); // just to be sure
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
