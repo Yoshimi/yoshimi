@@ -1167,8 +1167,13 @@ updatepanel();}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff, int insert = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int part = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
+if (parameter == 0)
+{
+    collect_data(synth, 0, (Fl::event_button() | type), control, part, 0xff, 0xff, 0xff, 0xff, par2);
+    return;
+}
 if (part == 0xff)
     part = 0xf0;
 int eng;
@@ -1179,7 +1184,7 @@ else if (part == 0xf2)
 else
     eng = 0xff;
 
-collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1527,33 +1532,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
             if (fname == NULL)
                 return;
         }
-        int result = synth->loadParameters(fname);
-        setinspartlist();
-        npartcounter->value(1);
-        refresh_master_ui(0);
-        if (result >= 0)
-        {
-            string name = (string)fname;
-            unsigned int name_start = name.rfind("/");
-    	    unsigned int name_end = name.rfind(".");
-    	    setMasterLabel(name.substr(name_start + 1, name_end - name_start - 1));
-
-            if (updatehistory)
-                 synth->addHistory(fname, 2);
-            RecentParams->activate();
-            microtonalui->apply();
-        }
-        else
-        {
-            string msg = "Could not load file " + string(fname);
-            if (result == -10)
-            {
-                msg += ",\\nit does not appear to be a valid patch set file.";
-                fl_alert("%s",msg.c_str());
-            }
-            else
-                fl_alert("%s",msg.c_str());
-        }} {}
+        send_data(80, 0, 0xc0, 240, 255, 255, 0, miscMsgPush(fname));} {}
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//

@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License along with
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
     Modified February 2017
 */
 
@@ -112,7 +113,7 @@ bool InterChange::Init(SynthEngine *_synth)
     }
     jack_ringbuffer_reset(fromMIDI);
 
-    if (!synth->getRuntime().startThread(&CLIresolvethreadHandle, _CLIresolvethread, this, false, 0, false, "CLI"))
+    if (!synth->getRuntime().startThread(&sortResultsThreadHandle, _sortResultsThread, this, false, 0, false, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
         goto bail_out;
@@ -150,13 +151,13 @@ bail_out:
 }
 
 
-void *InterChange::_CLIresolvethread(void *arg)
+void *InterChange::_sortResultsThread(void *arg)
 {
-    return static_cast<InterChange*>(arg)->CLIresolvethread();
+    return static_cast<InterChange*>(arg)->sortResultsThread();
 }
 
 
-void *InterChange::CLIresolvethread(void)
+void *InterChange::sortResultsThread(void)
 {
     CommandBlock getData;
     int toread;
@@ -166,8 +167,13 @@ void *InterChange::CLIresolvethread(void)
     {
         /*unsigned int tick;
         ++ tick;
-        if ((tick & 2047) == 0)
-            cout << "resolve tick" << endl;*/
+        if (!(tick & 8191))
+        {
+            if (tick & 16383)
+                cout << "Tick" << endl;
+            else
+                cout << "Tock" << endl;
+        }*/
 
         while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
         {
@@ -179,10 +185,10 @@ void *InterChange::CLIresolvethread(void)
             else
                 resolveReplies(&getData);
         }
-        usleep(60);
+        usleep(80); // actually gives around 120 uS
         /*
-         * The following are low priority actions initiated by, but isolated
-         * from the main audio thread.
+         * The following are low priority actions initiated by,
+         * but isolated from the main audio thread.
          */
         unsigned int point = flagsReadClear();
         if (point < 0x1fff)
@@ -2151,7 +2157,9 @@ void InterChange::doClearPart(int npart)
 
 void InterChange::doMasterReset()
 {
-    synth->resetAll(); // we have to update the gui after this
+    synth->resetAll();
+    synth->actionLock(unlock); // we have to update the gui after this
+    synth->getRuntime().Log("All dynamic values set to defaults.");
     GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 1);
 }
 
@@ -2508,6 +2516,7 @@ void InterChange::commandMain(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
     switch (control)
@@ -2540,10 +2549,7 @@ void InterChange::commandMain(CommandBlock *getData)
             break;
         case 35:
             if (write)
-            {
-                synth->setPkeyshift(value + 64);
-                synth->setAllPartMaps();
-            }
+                synth->writeRBP(11, int(value) + 64, 0); // global keyshift
             else
                 value = synth->Pkeyshift - 64;
             break;
@@ -2568,10 +2574,17 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().channelSwitchCC;
             break;
 
+        case 80: // load patchset
+            if (write)
+            {
+                synth->actionLock(lockmute);
+                synth->writeRBP(6, par2, 0);
+            }
+            break;
         case 96: // doMasterReset(
             if (write)
             {
-                synth->Mute(); // safe here - acting just before it's read
+                synth->actionLock(lockmute);
                 flagsWrite(0xf0000000); // reset
             }
             break;
@@ -2815,10 +2828,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 35:
             if (write)
-            {
-                part->Pkeyshift = (char) value + 64;
-                synth->setPartMap(npart);
-            }
+                synth->writeRBP(12, npart, int(value) + 64); // part keyshift
             else
                 value = part->Pkeyshift - 64;
             break;

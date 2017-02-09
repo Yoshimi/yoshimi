@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    modified February 2017
 */
 
 #include <FL/Fl.H>
@@ -137,6 +138,8 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
 
     if (npart >= 0xf0) // main / sys / ins
     {
+        if (npart == 0xf0 && (control == 80 || control == 96))
+            return; // gui in undefined state at this point
         synth->getGuiMaster()->returns_update(getData);
         return;
     }

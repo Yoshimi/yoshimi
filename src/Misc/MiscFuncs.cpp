@@ -408,7 +408,7 @@ int MiscFuncs::miscMsgPush(string _text)
         cout << "List full :(" << endl;
         idx = -1;
     }
-    cout << "List size " << int(idx) << endl;
+    //cout << "List size " << int(idx) << endl;
     int result = idx; // in case of a new entry before return
     sem_post(&miscmsglock);
     return result;

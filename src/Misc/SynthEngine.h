@@ -21,6 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code.
+
     Modified February 2017
 */
 
@@ -80,7 +81,6 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool loadXML(string filename);
         void applyparameters(void);
-        int loadParameters(string filename);
         int loadPatchSetAndUpdate(string filename);
         bool installBanks(int instance);
         bool saveBanks(int instance);

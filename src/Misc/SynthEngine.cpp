@@ -229,7 +229,6 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         goto bail_out;
     }
 
-
     if (!(RBPringbuf = jack_ringbuffer_create(512)))
     {
         Runtime.Log("SynthEngine failed to create RBPringbuf");
@@ -435,36 +434,55 @@ void *SynthEngine::RBPthread(void)
             {
                 switch ((unsigned char)block.data[0])
                 {
-                    case 1:
+                    case 1: // load root
                         SetBankRoot(block.data[1]);
                         break;
 
-                    case 2:
+                    case 2: // load bank
                         SetBank(block.data[1]);
                         break;
 
-                    case 3: // lower set
+                    case 3: // load standard instrument
                         SetProgram(block.data[1], block.data[2]);
                         break;
 
-                    case 4: // upper set
+                    case 4: // load upper set instrument
                         SetProgram(block.data[1], (block.data[2] + 128));
                         break;
 
-                    case 5: // file name from miscMsg
+                    case 5: // load file named instrument via miscMsg
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
 
-                    case 10: // global fine detune
+                    case 6: // load named patchset via miscMsg
+                        loadPatchSetAndUpdate(miscMsgPop(block.data[1]));
+                        break;
+
+                    case 7: // load named state via miscMsg
+                        ; // to do
+                        break;
+
+                    case 10: // set global fine detune
                         microtonal.Pglobalfinedetune = block.data[1];
                         setAllPartMaps();
+                        break;
+
+                    case 11: // set global key shift
+                        setPkeyshift(block.data[1]);
+                        setAllPartMaps();
+                        break;
+
+                    case 12: // set part keyshift
+                        part[(unsigned char)block.data[1]]->Pkeyshift = block.data[2];
+                        setPartMap(block.data[1]);
+                        break;
                 }
             }
             else
-                Runtime.Log("Unable to read data from Root/bank/Program");
+                Runtime.Log("Unable to read data from Root/Bank/Program");
         }
         else
-            usleep(250); // yes it's a hack but seems reliable
+            usleep(120); // yes it's a hack but seems reliable
     }
     return NULL;
 }
@@ -931,7 +949,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     sem_post (&partlock);
 
     if (!loadOK)
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Failed to load " + fname));
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     else
     {
         if (part[npart]->Pname == "Simple Sound")
@@ -1952,8 +1970,6 @@ void SynthEngine::resetAll(void)
 {
     defaults();
     ClearNRPNs();
-    Unmute();
-    Runtime.Log("All dynamic values set to defaults.");
 }
 
 
@@ -2333,10 +2349,8 @@ void SynthEngine::ShutUp(void)
 
 void SynthEngine::allStop()
 {
-    actionLock(lockmute);
     shutup = 1;
     fadeLevel = 1.0f;
-    actionLock(unlock);
 }
 
 
@@ -2379,23 +2393,26 @@ void SynthEngine::applyparameters(void)
 }
 
 
-int SynthEngine::loadParameters(string fname)
-{
-    int result = 0;
-
-    actionLock(lockmute);
-    defaults(); // clear all parameters
-    if (loadXML(fname)) // load the data
-        result = 1; // this is messy, but can't trust bool to int conversions
-    actionLock(unlock);
-    return result;
-}
-
-
 int SynthEngine::loadPatchSetAndUpdate(string fname)
 {
-    int result = loadParameters(fname);
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+    bool result = false;
+    if (loadXML(fname)) // load the data
+    {
+        result = true;
+        setAllPartMaps();
+        addHistory(fname, 2);
+    }
+    actionLock(unlock);
+    if (result)
+    {
+        Runtime.Log("Loaded " + fname);
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
+    }
+    else
+    {
+        Runtime.Log("Could not load " + fname);
+        GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
+    }
     return result;
 }
 
@@ -3006,7 +3023,7 @@ bool SynthEngine::loadXML(string filename)
     XMLwrapper *xml = new XMLwrapper(this);
     if (NULL == xml)
     {
-        Runtime.Log("Failed to init xml tree");
+        Runtime.Log("Failed to init xml tree", 2);
         return false;
     }
     if (!xml->loadXMLfile(filename))

@@ -29,8 +29,8 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified January 2017
-} {in_source in_header
+Modified February 2017
+} {selected in_source in_header
 } 
 
 decl {\#include <FL/fl_ask.H>
@@ -417,7 +417,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 } 
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -1117,7 +1117,7 @@ send_data(67, o->value(), 0xc0, 0xff, ninseff);}
     }
     Fl_Window instrumentkitlist {
       label {Instrument Kit}
-      xywh {132 88 670 370} type Double hide
+      xywh {355 84 670 370} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("kit List").c_str());}
     } {
       Fl_Button {} {
@@ -1180,6 +1180,7 @@ if ((Fl::event_button() == 3))
         tooltip {Single = only 1st item in defined note range sounds} xywh {35 348 88 19} down_box BORDER_BOX labelsize 11 textfont 1 textsize 11
         code0 {if (part->Pkitfade) {o->value(3);} else {o->value(part->Pkitmode);}}
         code1 {partKitOn = o->value() > 0;}
+        code2 {if (!partKitOn) kitlist->deactivate();}
       } {
         MenuItem {} {
           label {     Off}

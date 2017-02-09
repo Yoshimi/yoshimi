@@ -1,7 +1,7 @@
 /*
     CmdInterface.cpp
 
-    Copyright 2015-2016, Will Godfrey and others.
+    Copyright 2015-2017, Will Godfrey and others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,6 +15,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+    Modified February 2017
 */
 
 #include <iostream>
@@ -2136,9 +2138,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                int loadResult = synth->loadPatchSetAndUpdate((string) point);
-                if  (loadResult == 1)
-                    Runtime.Log((string) point + " loaded");
+                sendDirect(0, 64, 80, 240, 255, 255, 255, 255, miscMsgPush(point));
                 reply = done_msg;
             }
         }
@@ -2289,7 +2289,12 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         param = string2int(point);
                         point = skipChars(point);
                         if (point[0] != 0)
-                            par2 = string2int(point);
+                        {
+                            if (control == 80 && part == 240)
+                                par2 = miscMsgPush(point);
+                            else
+                                par2 = string2int(point);
+                        }
                     }
                 }
             }
