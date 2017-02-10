@@ -197,6 +197,8 @@ void *InterChange::sortResultsThread(void)
             doClearPart(point & 0xff);
         else if (point == 0xf0000000)
             doMasterReset();
+        else if (point == 0xf0000001)
+            synth->ShutUp();
         //if (point < 0xffffffff)
             //cout << " point " << hex << point << endl;
     }
@@ -436,7 +438,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if(!isMidi || synth->getRuntime().monitorCCin)
         synth->getRuntime().Log(commandName + actual);
 #else
-    else if(!isGui)// && button == 2)
+    else if(!isGui)
         synth->getRuntime().Log(commandName + actual);
 #endif
 }
@@ -2178,11 +2180,9 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-//    bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     char button = type & 3;
 
-    //if ((isGui && button != 2) || (isCli && button == 1))
     if (isCli && button == 1)
         return;
 
@@ -2577,20 +2577,23 @@ void InterChange::commandMain(CommandBlock *getData)
         case 80: // load patchset
             if (write)
             {
-                synth->actionLock(lockmute);
-                synth->writeRBP(6, par2, 0);
+                synth->shutup = 3 | (par2 << 8);
+                synth->fadeLevel = 1.0f;
             }
             break;
         case 96: // doMasterReset(
             if (write)
             {
-                synth->actionLock(lockmute);
-                flagsWrite(0xf0000000); // reset
+                synth->shutup = 1;
+                synth->fadeLevel = 1.0f;
             }
             break;
         case 128:
             if (write)
-                synth->allStop();
+            {
+                synth->shutup = 2;
+                synth->fadeLevel = 1.0f;
+            }
             break;
     }
 
@@ -4090,7 +4093,7 @@ void InterChange::commandPad(CommandBlock *getData)
         case 104: // setpadparams(
             if (write)
             {
-                synth->partonoffWrite(npart, 0); // safe to mute directly here
+                synth->partonoffWrite(npart, 0);
                 flagsWrite(npart | (kititem << 8));
             }
             break;

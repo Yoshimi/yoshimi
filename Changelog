@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-2-10 Will
+* Implemented silent master reset.
+* Implemented Xrun-free stop.
+* Implemented silent patchset change.
+
 2017-2-9 Will.
 * Global and part keyshifts now go through ringbuffer.
 * Code tidy-ups and improved comments.

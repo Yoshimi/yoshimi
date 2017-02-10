@@ -89,7 +89,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     mididecode(this),
     Runtime(this, argc, argv),
     presetsstore(this),
-    shutup(false),
+    shutup(0),
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
@@ -129,7 +129,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         insefx[nefx] = NULL;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx] = NULL;
-    shutup = false;
+    shutup = 0;
 }
 
 
@@ -175,7 +175,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
-     // because its now *groups* of audio buffers.
+    // because its now *groups* of audio buffers.
     p_all_buffersize_f = buffersize_f;
 
     bufferbytes = buffersize * sizeof(float);
@@ -523,7 +523,7 @@ void SynthEngine::defaults(void)
     Runtime.channelSwitchValue = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
-    ShutUp();
+    ShutUp(); // do we need this here anymore?
 }
 
 
@@ -2243,7 +2243,15 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         }
 
        if (shutup && fadeLevel <= 0.001f)
-            ShutUp();
+       {
+           actionLock(lockmute);
+           if (shutup == 1)
+               interchange.flagsWrite(0xf0000000); // reset
+           else if (shutup == 2)
+               interchange.flagsWrite(0xf0000001); // silence
+           else if ((shutup & 0xff) == 3)
+            writeRBP(6, shutup >> 8, 0); // load patchset
+       }
 
         // Peak computation for part vu meters
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
@@ -2297,7 +2305,6 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 void SynthEngine::setPvolume(float control_value)
 {
     Pvolume = control_value;
-    //volume  = dB2rap((float(Pvolume) / 128.0 - 96.0f) / 96.0f * 40.0f);
 }
 
 
@@ -2342,8 +2349,9 @@ void SynthEngine::ShutUp(void)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
-    shutup = false;
+    shutup = 0;
     fadeLevel = 0.0f;
+    actionLock(unlock);
 }
 
 
@@ -2387,7 +2395,6 @@ bool SynthEngine::actionLock(lockset request)
 
 void SynthEngine::applyparameters(void)
 {
-    ShutUp();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart]->applyparameters();
 }

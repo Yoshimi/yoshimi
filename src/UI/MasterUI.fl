@@ -580,19 +580,6 @@ paramsui->Show(4);}
         Fl_Button {} {
           label {Stop!}
           callback {//
-              /*virkeyboard->relaseallkeys();
-              vumeter->init(-1, synth);
-              for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
-              {
-              	if(panelwindow)
-              	{
-	              	if(panellistitem[i]->partVUMeter)
-	              	{
-	              		panellistitem[i]->partVUMeter->resetPart();
-	              	}
-              	}
-              }
-              synth->allStop();*/
               send_data(128, o->value(), 0xc0);}
           tooltip {Cease all sound immediately!} xywh {15 32 75 20} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
