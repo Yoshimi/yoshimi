@@ -2023,7 +2023,7 @@ void SynthEngine::partonoffWrite(int npart, int what)
 }
 
 
-bool SynthEngine::partonoffRead(int npart)
+char SynthEngine::partonoffRead(int npart)
 {
     return (part[npart]->Penabled == 1);
 }
@@ -2074,10 +2074,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         actionLock(lock);
 #endif
         // Compute part samples and store them ->partoutl,partoutr
+        char partLocal[NUM_MIDI_PARTS]; // isolates loop from possible change
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
-            if (partonoffRead(npart))
+        {
+            partLocal[npart] = partonoffRead(npart);
+            if (partLocal[npart])
                 part[npart]->ComputePartSmps();
-
+        }
         // Insertion effects
         int nefx;
         for (nefx = 0; nefx < NUM_INS_EFX; ++nefx)
@@ -2093,7 +2096,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Apply the part volumes and pannings (after insertion effects)
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
-            if (!partonoffRead(npart))
+            if (!partLocal[npart])
                 continue;
 
             float Step = ControlStep;
@@ -2125,7 +2128,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             // Mix the channels according to the part settings about System Effect
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (partonoffRead(npart)        // it's enabled
+                if (partLocal[npart]        // it's enabled
                  && Psysefxvol[nefx][npart]      // it's sending an output
                  && part[npart]->Paudiodest & 1) // it's connected to the main outs
                 {
@@ -2256,7 +2259,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         // Peak computation for part vu meters
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
         {
-            if (partonoffRead(npart))
+            if (partLocal[npart])
             {
                 for (int idx = 0; idx < p_buffersize; ++idx)
                 {
@@ -2277,7 +2280,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuOutPeakR = 1e-12f;
             for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
             {
-                if (partonoffRead(npart))
+                if (partLocal[npart])
                     VUpeak.values.parts[npart] = 1.0e-9;
                 else if (VUpeak.values.parts[npart] < -2.2) // fake peak is a negative value
                     VUpeak.values.parts[npart]+= 2;

@@ -991,7 +991,7 @@ ZynAddSubFX}
       code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
-      Fl_Pack Panelpack1 {open
+      Fl_Pack Panelpack1 {
         xywh {8 10 533 286} type HORIZONTAL
         code0 {//
           for (int i = 0; i < 8; i++)
@@ -1004,7 +1004,7 @@ ZynAddSubFX}
       Fl_Box Panelbox1 {
         xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
       }
-      Fl_Pack Panelpack2 {open
+      Fl_Pack Panelpack2 {
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
             for (int i = 8; i < 16; i++)
@@ -1291,69 +1291,68 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {updatepanel()} {} {
     code {//
-        //int partmax = synth->getRuntime().NumAvailableParts;
-        for (int npart = 0; npart < partmax; ++npart)
-        {
-            if (npart < NUM_MIDI_CHANNELS)
-            	panellistitem[npart]->refresh();
-            vectorui->setInstrumentLabel(npart);
-        }
+    for (int npart = 0; npart < partmax; ++npart)
+    {
+        if (npart < NUM_MIDI_CHANNELS)
+            panellistitem[npart]->refresh();
+        vectorui->setInstrumentLabel(npart);
+    }
 
-        if (synth->getRuntime().single_row_panel)
-        {
-        	panelwindow->size(1085,345);
-	        Panelpack2->position(544,10);
-	        Panelclose->position(1018,314);
-	        Panelgroups->position(12,323);
-	        Panelsmallgroups->position(12,323);
-	        channelswitch->position(130,323);
-	        CSspinner->position(216,323);
-	        CSpend->position(276,321);
-        }
-        else
-        {
-	        panelwindow->size(550,675);
-	        Panelpack2->position(8,325);
-	        Panelclose->position(482,645);
-	        Panelgroups->position(12,653);
-	        Panelsmallgroups->position(12,653);
-	        channelswitch->position(130,653);
-	        CSspinner->position(216,653);
-	        CSpend->position(276,651);
-        }
+    if (synth->getRuntime().single_row_panel)
+    {
+        panelwindow->size(1085,345);
+        Panelpack2->position(544,10);
+        Panelclose->position(1018,314);
+        Panelgroups->position(12,323);
+        Panelsmallgroups->position(12,323);
+        channelswitch->position(130,323);
+        CSspinner->position(216,323);
+        CSpend->position(276,321);
+    }
+    else
+    {
+        panelwindow->size(550,675);
+        Panelpack2->position(8,325);
+        Panelclose->position(482,645);
+        Panelgroups->position(12,653);
+        Panelsmallgroups->position(12,653);
+        channelswitch->position(130,653);
+        CSspinner->position(216,653);
+        CSpend->position(276,651);
+    }
 
-        if (partmax == 64)
-            Panelgroups->show();
-        else
-            Panelgroups->hide();
-        if (partmax == 32)
-            Panelsmallgroups->show();
-        else
-            Panelsmallgroups->hide();
+    if (partmax == 64)
+        Panelgroups->show();
+    else
+        Panelgroups->hide();
+    if (partmax == 32)
+        Panelsmallgroups->show();
+    else
+        Panelsmallgroups->hide();
 
-        int oldswitch = channelswitch->value();
-        channelswitch->value(synth->getRuntime().channelSwitchType);
-        if (synth->getRuntime().channelSwitchType > 0)
+    int oldswitch = channelswitch->value();
+    channelswitch->value(synth->getRuntime().channelSwitchType);
+    if (synth->getRuntime().channelSwitchType > 0)
+    {
+        if (oldswitch == 0)
         {
-            if (oldswitch == 0)
-            {
-                CSspinner->value(115);
-                CSpend->show();
-            }
-            else
-            {
-                CSspinner->value(synth->getRuntime().channelSwitchCC);
-                CSpend->hide();
-            }
-            CSspinner->show();
+            CSspinner->value(115);
+            CSpend->show();
         }
         else
         {
-            synth->getRuntime().channelSwitchCC = 128;
-            CSspinner->hide();
+            CSspinner->value(synth->getRuntime().channelSwitchCC);
             CSpend->hide();
         }
-        panelwindow->changed();} {}
+        CSspinner->show();
+    }
+    else
+    {
+        synth->getRuntime().channelSwitchCC = 128;
+        CSspinner->hide();
+        CSpend->hide();
+    }
+    panelwindow->changed();} {}
   }
   Function {partNew(int _npart)} {} {
     code {//

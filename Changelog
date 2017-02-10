@@ -4,6 +4,8 @@ yoshimi 1.5.0 M
 * Implemented silent master reset.
 * Implemented Xrun-free stop.
 * Implemented silent patchset change.
+* Gui tidy-ups.
+* Small optimisation in main audio loop partonoff read.
 
 2017-2-9 Will.
 * Global and part keyshifts now go through ringbuffer.
