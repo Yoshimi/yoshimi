@@ -197,8 +197,6 @@ void *InterChange::sortResultsThread(void)
             doClearPart(point & 0xff);
         else if (point == 0xf0000000)
             doMasterReset();
-        else if (point == 0xf0000001)
-            synth->ShutUp();
         //if (point < 0xffffffff)
             //cout << " point " << hex << point << endl;
     }
@@ -2577,23 +2575,20 @@ void InterChange::commandMain(CommandBlock *getData)
         case 80: // load patchset
             if (write)
             {
-                synth->shutup = 3 | (par2 << 8);
-                synth->fadeLevel = 1.0f;
+                synth->actionLock(lockmute);
+                synth->writeRBP(6, par2, 0);
             }
             break;
         case 96: // doMasterReset(
             if (write)
             {
-                synth->shutup = 1;
-                synth->fadeLevel = 1.0f;
+                synth->actionLock(lockmute);
+                flagsWrite(0xf0000000); // reset
             }
             break;
         case 128:
             if (write)
-            {
-                synth->shutup = 2;
-                synth->fadeLevel = 1.0f;
-            }
+                synth->allStop();
             break;
     }
 

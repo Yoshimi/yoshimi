@@ -1,13 +1,11 @@
 yoshimi 1.5.0 M
 
-2017-2-10 Will
-* Implemented silent master reset.
-* Implemented Xrun-free stop.
-* Implemented silent patchset change.
-* Gui tidy-ups.
+2017-2-11 Will
+* Reverted unsafe changes from build 952.
 * Small optimisation in main audio loop partonoff read.
+* A few Gui tidy-ups.
 
-2017-2-9 Will.
+2017-2-9 Will
 * Global and part keyshifts now go through ringbuffer.
 * Code tidy-ups and improved comments.
 * Bugfix: Part kitlist wasn't deactivated on start.

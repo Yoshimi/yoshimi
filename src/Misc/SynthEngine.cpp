@@ -89,7 +89,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     mididecode(this),
     Runtime(this, argc, argv),
     presetsstore(this),
-    shutup(0),
+    fade(0),
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
@@ -129,7 +129,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         insefx[nefx] = NULL;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx] = NULL;
-    shutup = 0;
+    fade = 0;
 }
 
 
@@ -175,7 +175,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     buffersize_f = buffersize = Runtime.Buffersize;
     if (buffersize_f > audiobufsize)
         buffersize_f = audiobufsize;
-    // because its now *groups* of audio buffers.
+     // because its now *groups* of audio buffers.
     p_all_buffersize_f = buffersize_f;
 
     bufferbytes = buffersize * sizeof(float);
@@ -523,7 +523,7 @@ void SynthEngine::defaults(void)
     Runtime.channelSwitchValue = 0;
     //CmdInterface.defaults(); // **** need to work out how to call this
     Runtime.NumAvailableParts = NUM_MIDI_CHANNELS;
-    ShutUp(); // do we need this here anymore?
+    ShutUp();
 }
 
 
@@ -555,9 +555,13 @@ void SynthEngine::NoteOn(unsigned char chan, unsigned char note, unsigned char v
             {
                if (partonoffRead(npart))
                 {
+#ifdef MUTEX
                     actionLock(lock);
+#endif
                     part[npart]->NoteOn(note, velocity, keyshift);
+#ifdef MUTEX
                     actionLock(unlock);
+#endif
                 }
                 else if (VUpeak.values.parts[npart] > (-velocity))
                     VUpeak.values.parts[npart] = -(0.2 + velocity); // ensure fake is always negative
@@ -587,9 +591,13 @@ void SynthEngine::NoteOff(unsigned char chan, unsigned char note)
         // mask values 16 - 31 to still allow a note off
         if (chan == (part[npart]->Prcvchn & 0xef) && partonoffRead(npart))
         {
+#ifdef MUTEX
             actionLock(lock);
+#endif
             part[npart]->NoteOff(note);
+#ifdef MUTEX
             actionLock(unlock);
+#endif
         }
     }
 }
@@ -2211,7 +2219,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (shutup) // fade-out - fadeLevel must also have been set
+            if (fade) // fadeLevel must also have been set
             {
                 for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
@@ -2245,16 +2253,8 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuRmsPeakR += mainR[idx] * mainR[idx];
         }
 
-       if (shutup && fadeLevel <= 0.001f)
-       {
-           actionLock(lockmute);
-           if (shutup == 1)
-               interchange.flagsWrite(0xf0000000); // reset
-           else if (shutup == 2)
-               interchange.flagsWrite(0xf0000001); // silence
-           else if ((shutup & 0xff) == 3)
-            writeRBP(6, shutup >> 8, 0); // load patchset
-       }
+       if (fade && fadeLevel <= 0.001f)
+            ShutUp();
 
         // Peak computation for part vu meters
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
@@ -2308,6 +2308,7 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 void SynthEngine::setPvolume(float control_value)
 {
     Pvolume = control_value;
+    //volume  = dB2rap((float(Pvolume) / 128.0 - 96.0f) / 96.0f * 40.0f);
 }
 
 
@@ -2352,15 +2353,14 @@ void SynthEngine::ShutUp(void)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
-    shutup = 0;
+    fade = 0;
     fadeLevel = 0.0f;
-    actionLock(unlock);
 }
 
 
 void SynthEngine::allStop()
 {
-    shutup = 1;
+    fade = 1;
     fadeLevel = 1.0f;
 }
 
@@ -2398,6 +2398,7 @@ bool SynthEngine::actionLock(lockset request)
 
 void SynthEngine::applyparameters(void)
 {
+    ShutUp();
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
         part[npart]->applyparameters();
 }

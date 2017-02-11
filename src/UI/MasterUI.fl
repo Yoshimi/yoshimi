@@ -32,7 +32,7 @@ This file is a derivative of the ZynAddSubFX original.
 Modified February 2017
 
 
-} {in_source in_header
+} {selected in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -558,9 +558,6 @@ paramsui->Show(4);}
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
-             // synth->microtonal.Pglobalfinedetune = o->value();
-              //synth->setAllPartMaps();
-             // globalfinedetune->changed();
     send_data(32, o->value(), 0xc8);}
           tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
@@ -867,9 +864,8 @@ paramsui->Show(4);}
       }
       Fl_Spinner masterkeyshift {
         label {Key Shift}
-        callback {//synth->setPkeyshift(o->value() + 64);
-//synth->setAllPartMaps();
-send_data(35, o->value(), 0xc0);}
+        callback {//
+    send_data(35, o->value(), 0xc0);}
         tooltip {Shift pitch +/- N semitones} xywh {332 87 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
@@ -879,15 +875,6 @@ send_data(35, o->value(), 0xc0);}
         callback {//
     int nval = o->value() - 1;
     synth->getRuntime().currentPart = nval;
-/*    partuigroup->remove(partui);
-    delete partui;
-    partui = new PartUI(0, 0, 765, 525);
-    partuigroup->add(partui);
-    partui->init(synth->part[nval], nval, bankui);
-    partui->redraw();
-    o->redraw();
-    npart = nval;
-    updatepanel();*/
     partNew(nval);
     send_data(14, nval, 0xc0);}
         xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
@@ -991,7 +978,7 @@ ZynAddSubFX}
       code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
-      Fl_Pack Panelpack1 {
+      Fl_Pack Panelpack1 {open
         xywh {8 10 533 286} type HORIZONTAL
         code0 {//
           for (int i = 0; i < 8; i++)
@@ -1004,7 +991,7 @@ ZynAddSubFX}
       Fl_Box Panelbox1 {
         xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
       }
-      Fl_Pack Panelpack2 {
+      Fl_Pack Panelpack2 {open
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
             for (int i = 8; i < 16; i++)
@@ -1176,7 +1163,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
-    //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char engine = getData->data.engine;
@@ -1291,73 +1277,72 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {updatepanel()} {} {
     code {//
-    for (int npart = 0; npart < partmax; ++npart)
-    {
-        if (npart < NUM_MIDI_CHANNELS)
-            panellistitem[npart]->refresh();
-        vectorui->setInstrumentLabel(npart);
-    }
-
-    if (synth->getRuntime().single_row_panel)
-    {
-        panelwindow->size(1085,345);
-        Panelpack2->position(544,10);
-        Panelclose->position(1018,314);
-        Panelgroups->position(12,323);
-        Panelsmallgroups->position(12,323);
-        channelswitch->position(130,323);
-        CSspinner->position(216,323);
-        CSpend->position(276,321);
-    }
-    else
-    {
-        panelwindow->size(550,675);
-        Panelpack2->position(8,325);
-        Panelclose->position(482,645);
-        Panelgroups->position(12,653);
-        Panelsmallgroups->position(12,653);
-        channelswitch->position(130,653);
-        CSspinner->position(216,653);
-        CSpend->position(276,651);
-    }
-
-    if (partmax == 64)
-        Panelgroups->show();
-    else
-        Panelgroups->hide();
-    if (partmax == 32)
-        Panelsmallgroups->show();
-    else
-        Panelsmallgroups->hide();
-
-    int oldswitch = channelswitch->value();
-    channelswitch->value(synth->getRuntime().channelSwitchType);
-    if (synth->getRuntime().channelSwitchType > 0)
-    {
-        if (oldswitch == 0)
+        for (int npart = 0; npart < partmax; ++npart)
         {
-            CSspinner->value(115);
-            CSpend->show();
+            if (npart < NUM_MIDI_CHANNELS)
+            	panellistitem[npart]->refresh();
+            vectorui->setInstrumentLabel(npart);
+        }
+
+        if (synth->getRuntime().single_row_panel)
+        {
+        	panelwindow->size(1085,345);
+	        Panelpack2->position(544,10);
+	        Panelclose->position(1018,314);
+	        Panelgroups->position(12,323);
+	        Panelsmallgroups->position(12,323);
+	        channelswitch->position(130,323);
+	        CSspinner->position(216,323);
+	        CSpend->position(276,321);
         }
         else
         {
-            CSspinner->value(synth->getRuntime().channelSwitchCC);
+	        panelwindow->size(550,675);
+	        Panelpack2->position(8,325);
+	        Panelclose->position(482,645);
+	        Panelgroups->position(12,653);
+	        Panelsmallgroups->position(12,653);
+	        channelswitch->position(130,653);
+	        CSspinner->position(216,653);
+	        CSpend->position(276,651);
+        }
+
+        if (partmax == 64)
+            Panelgroups->show();
+        else
+            Panelgroups->hide();
+        if (partmax == 32)
+            Panelsmallgroups->show();
+        else
+            Panelsmallgroups->hide();
+
+        int oldswitch = channelswitch->value();
+        channelswitch->value(synth->getRuntime().channelSwitchType);
+        if (synth->getRuntime().channelSwitchType > 0)
+        {
+            if (oldswitch == 0)
+            {
+                CSspinner->value(115);
+                CSpend->show();
+            }
+            else
+            {
+                CSspinner->value(synth->getRuntime().channelSwitchCC);
+                CSpend->hide();
+            }
+            CSspinner->show();
+        }
+        else
+        {
+            synth->getRuntime().channelSwitchCC = 128;
+            CSspinner->hide();
             CSpend->hide();
         }
-        CSspinner->show();
-    }
-    else
-    {
-        synth->getRuntime().channelSwitchCC = 128;
-        CSspinner->hide();
-        CSpend->hide();
-    }
-    panelwindow->changed();} {}
+        panelwindow->changed();} {}
   }
   Function {partNew(int _npart)} {} {
     code {//
     int nval = _npart;
-    //synth->getRuntime().currentPart = nval;
     partuigroup->remove(partui);
     delete partui;
     partui = new PartUI(0, 0, 765, 525);
