@@ -84,7 +84,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
             value = value / 128.0; // convert from 14 bit
         }
         int status = foundEntry.status;
-        if ((status & 4) == 4)
+        if ((status & 4) == 4) // it's muted
             continue;
 
         int minIn = foundEntry.min_in;
@@ -148,7 +148,7 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
                 writeMidi(&putData, putSize, category & 1);
             }
         }
-        if (lastpos == -1)
+        if (lastpos == -1) // blocking all of this CC/chan pair
             return true;
     }
     return false;

@@ -86,6 +86,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool saveBanks(int instance);
         void addHistory(string name, int group);
         vector<string> * getHistory(int group);
+        string lastPatchSetSeen(void);
         bool loadHistory(void);
         bool saveHistory(void);
         bool loadVector(unsigned char baseChan, string name, bool full);

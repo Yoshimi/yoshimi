@@ -32,7 +32,7 @@ This file is a derivative of the ZynAddSubFX original.
 Modified February 2017
 
 
-} {selected in_source in_header
+} {in_source in_header
 } 
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1468,14 +1468,20 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   Function {setMasterLabel(string name)} {} {
     code {//
     string prefix;
+    string panel;
     if  (name.size())
+    {
     	prefix = synth->makeUniqueName(name);
+    	panel = synth->makeUniqueName("Mixer Panel - "+name);
+    }
     else
     {
     	prefix = synth->makeUniqueName("");
     	prefix = prefix.substr(0, prefix.length() - 3);
+    	panel = prefix + "Mixer Panel";
     }
     masterwindow->copy_label(prefix.c_str());
+    panelwindow->copy_label(panel.c_str());
     masterwindow->changed();} {}
   }
   Function {do_load_scale(string fname)} {} {
@@ -1507,34 +1513,35 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {do_save_master(const char* file = NULL)} {} {
     code {//
-        const char *fname;
-        bool result = false;
-        if (file == NULL)
+    const char *fname;
+    bool result = false;
+    if (file == NULL)
+    {
+        char *tmp = fl_file_chooser("Save:", "({*.xmz})", NULL, 0);
+        if (tmp == NULL)
+            return;
+        tmp = fl_filename_setext(tmp, ".xmz");
+        fname = tmp;
+        result = isRegFile(tmp);
+        if (result)
         {
-            char *tmp = fl_file_chooser("Save:", "({*.xmz})", NULL, 0);
-            if (tmp == NULL)
+            result = false;
+            if (fl_choice("The file exists. Overwrite it?", NULL, "No", "Yes") < 2)
                 return;
-            tmp = fl_filename_setext(tmp, ".xmz");
-            fname = tmp;
-            result = isRegFile(tmp);
-            if (result)
-            {
-                result = false;
-                if (fl_choice("The file exists. Overwrite it?", NULL, "No", "Yes") < 2)
-                    return;
-            }
         }
-        else
-            fname = file;
-        result = synth->saveXML(fname);
-        if (!result)
-            fl_alert("Could not save the file.");
-        else
-        {
-            synth->addHistory(fname, 2);
-            RecentParams->activate();
-        }
-        updatepanel();} {}
+    }
+    else
+        fname = file;
+    result = synth->saveXML(fname);
+    if (!result)
+        fl_alert("Could not save the file.");
+    else
+    {
+        synth->addHistory(fname, 2);
+        RecentParams->activate();
+        setMasterLabel(findleafname(synth->lastPatchSetSeen()));
+    }
+    updatepanel();} {}
   }
   Function {refresh_master_ui(int type)} {} {
     code {//
@@ -1557,7 +1564,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     mastervolumedial->value(synth->Pvolume);
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
     microtonalui = new MicrotonalUI(&synth->microtonal);
-    setMasterLabel("");
+    setMasterLabel(findleafname(synth->lastPatchSetSeen()));
     updatesendwindow();
     updatepanel();
     vectorui->updateAll();

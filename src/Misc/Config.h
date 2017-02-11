@@ -143,6 +143,7 @@ class Config : public MiscFuncs
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
+        int           lastPatchSet;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;

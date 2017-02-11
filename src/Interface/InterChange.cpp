@@ -2582,6 +2582,7 @@ void InterChange::commandMain(CommandBlock *getData)
         case 96: // doMasterReset(
             if (write)
             {
+                synth->getRuntime().lastPatchSet = -1;
                 synth->actionLock(lockmute);
                 flagsWrite(0xf0000000); // reset
             }

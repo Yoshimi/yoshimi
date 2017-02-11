@@ -2515,31 +2515,76 @@ void SynthEngine::addHistory(string name, int group)
     unsigned int offset = 0;
     bool copy = false;
     vector<string> &listType = *getHistory(group);
+    if (!listType.size())
+    {
+        listType.push_back(name);
+        Runtime.lastPatchSet = 0;
+        return;
+    }
     if (listType.size() > MAX_HISTORY)
         offset = listType.size() - MAX_HISTORY;
      // don't test against names that will be dropped when saving
+    int lineNo = offset;
+
     for (vector<string>::iterator it = listType.begin() + offset; it != listType.end(); ++it)
     {
         if (*it == name)
+        {
             copy = true;
+            break;
+        }
+        ++ lineNo;
     }
     if (!copy)
         listType.push_back(name);
+    if (group == 2)
+        Runtime.lastPatchSet = lineNo;
     return;
 }
 
 
 vector<string> * SynthEngine::getHistory(int group)
 {
-    if (group == 6)
-        return &MidiLearnHistory;
-    else if (group == 5)
-        return &VectorHistory;
-    else if (group == 4)
-        return &StateHistory;
-    else if (group == 3)
-        return &ScaleHistory;
-    return &ParamsHistory;
+    switch(group)
+    {
+        case 2:
+            return &ParamsHistory;
+            break;
+        case 3:
+            return &ScaleHistory;
+            break;
+        case 4:
+            return &StateHistory;
+            break;
+        case 5:
+            return &VectorHistory;
+            break;
+        case 6:
+            return &MidiLearnHistory;
+            break;
+        default:
+            Runtime.Log("Unrecognised group " + to_string(group) + "\nUsing patchset history");
+            return &ParamsHistory;
+    }
+}
+
+
+string SynthEngine::lastPatchSetSeen()
+{
+    if (Runtime.lastPatchSet == -1)
+        return "";
+    int count = 0;
+    vector<string> &listType = *getHistory(2);
+    vector<string>::iterator it = listType.begin();
+    while (it != listType.end() && count < Runtime.lastPatchSet)
+    {
+        ++ it;
+        ++ count;
+    }
+    if (it == listType.end())
+        return "";
+    else
+        return *it;
 }
 
 
