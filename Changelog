@@ -5,6 +5,7 @@ yoshimi 1.5.0 M
 * Small optimisation in main audio loop partonoff read.
 * A few Gui tidy-ups.
 * Mixer as well as main window now show current patchset.
+* Cautious 2nd attempt at just soft patchset change.
 
 2017-2-9 Will
 * Global and part keyshifts now go through ringbuffer.

@@ -89,7 +89,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
     mididecode(this),
     Runtime(this, argc, argv),
     presetsstore(this),
-    fade(0),
+    fadeAll(0),
     samplerate(48000),
     samplerate_f(samplerate),
     halfsamplerate_f(samplerate / 2),
@@ -129,7 +129,7 @@ SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int 
         insefx[nefx] = NULL;
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx] = NULL;
-    fade = 0;
+    fadeAll = 0;
 }
 
 
@@ -2219,7 +2219,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             }
             mainL[idx] *= volume; // apply Master Volume
             mainR[idx] *= volume;
-            if (fade) // fadeLevel must also have been set
+            if (fadeAll) // fadeLevel must also have been set
             {
                 for (npart = 0; npart < (Runtime.NumAvailableParts); ++npart)
                 {
@@ -2253,8 +2253,16 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
             VUpeak.values.vuRmsPeakR += mainR[idx] * mainR[idx];
         }
 
-       if (fade && fadeLevel <= 0.001f)
-            ShutUp();
+        if (fadeAll && fadeLevel <= 0.001f)
+        {
+            if (fadeAll == 1)
+                ShutUp();
+            else if ((fadeAll & 0xff) == 3)
+            {
+                Mute();
+                writeRBP(6, fadeAll >> 8, 0);
+            }
+        }
 
         // Peak computation for part vu meters
         for (npart = 0; npart < Runtime.NumAvailableParts; ++npart)
@@ -2353,14 +2361,13 @@ void SynthEngine::ShutUp(void)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
-    fade = 0;
-    fadeLevel = 0.0f;
+    fadeAll = 0;
 }
 
 
-void SynthEngine::allStop()
+void SynthEngine::allStop(unsigned int stopType)
 {
-    fade = 1;
+    fadeAll = stopType;
     fadeLevel = 1.0f;
 }
 
@@ -2409,11 +2416,14 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
     bool result = false;
     if (loadXML(fname)) // load the data
     {
+        actionLock(lockmute);
         result = true;
         setAllPartMaps();
         addHistory(fname, 2);
+        actionLock(unlock);
+        fadeAll = 0;
     }
-    actionLock(unlock);
+
     if (result)
     {
         Runtime.Log("Loaded " + fname);

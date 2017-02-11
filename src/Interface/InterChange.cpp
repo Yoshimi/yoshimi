@@ -2575,8 +2575,10 @@ void InterChange::commandMain(CommandBlock *getData)
         case 80: // load patchset
             if (write)
             {
-                synth->actionLock(lockmute);
-                synth->writeRBP(6, par2, 0);
+                //synth->actionLock(lockmute);
+                //synth->writeRBP(6, par2, 0);
+                synth->allStop(3 | (par2 << 8));
+                //synth->fadeLevel = 1.0;
             }
             break;
         case 96: // doMasterReset(
@@ -2587,9 +2589,9 @@ void InterChange::commandMain(CommandBlock *getData)
                 flagsWrite(0xf0000000); // reset
             }
             break;
-        case 128:
+        case 128: // just stop
             if (write)
-                synth->allStop();
+                synth->allStop(1);
             break;
     }
 

@@ -134,7 +134,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);
-        void allStop();
+        void allStop(unsigned int stopType);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
         void partonoffLock(int npart, int what);
         void partonoffWrite(int npart, int what);
@@ -148,7 +148,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
 
         Part *part[NUM_MIDI_PARTS];
-        unsigned int fade;
+        unsigned int fadeAll;
         float fadeStep;
         float fadeLevel;
 
