@@ -4,6 +4,7 @@ yoshimi 1.5.0 M
 * Separated out temporary Gui Write -> Read per section.
   This enables us to do conversions section by section.
 * Improved Cli messaging.
+* Re-implemented silent panic stop.
 
 2017-2-11 Will
 * Reverted unsafe changes from build 952.

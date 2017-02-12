@@ -454,8 +454,15 @@ void *SynthEngine::RBPthread(void)
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
 
-                    case 6: // load named patchset via miscMsg
-                        loadPatchSetAndUpdate(miscMsgPop(block.data[1]));
+                    case 6: // cease all sound or load named patchset via miscMsg
+                        if (block.data[1] == 1)
+                        {
+                            actionLock(lockmute);
+                            ShutUp();
+                            actionLock(unlock);
+                        }
+                        else
+                            loadPatchSetAndUpdate(miscMsgPop(block.data[1]));
                         break;
 
                     case 7: // load named state via miscMsg
@@ -2255,13 +2262,18 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
         if (fadeAll && fadeLevel <= 0.001f)
         {
-            if (fadeAll == 1)
+            Mute();
+            /*if (fadeAll == 1)
                 ShutUp();
             else if ((fadeAll & 0xff) == 3)
             {
                 Mute();
                 writeRBP(6, fadeAll >> 8, 0);
-            }
+            }*/
+            if ((fadeAll & 0xff) == 3)
+                writeRBP(6, fadeAll >> 8, 0);
+            else
+                writeRBP(6, 1, 0);
         }
 
         // Peak computation for part vu meters
@@ -2349,6 +2361,8 @@ void SynthEngine::setPaudiodest(int value)
 // Panic! (Clean up all parts and effects)
 void SynthEngine::ShutUp(void)
 {
+
+
     VUpeak.values.vuOutPeakL = 1e-12f;
     VUpeak.values.vuOutPeakR = 1e-12f;
 
