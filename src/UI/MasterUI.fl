@@ -1119,8 +1119,9 @@ updatepanel();}
     }
     send_data(48, o->value(), 0xc0);}
         tooltip {Assign groups of parts to Ch 1, singly enabled by MIDI} xywh {130 653 53 18} down_box BORDER_BOX labelsize 12 align 1 textsize 12
-        code0 {o->value(synth->getRuntime().channelSwitchType);}
-        code1 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
+        code1 {o->value(synth->getRuntime().channelSwitchType);}
+        code2 {if (o->value() == 0) CSspinner->hide(); else CSspinner->show();}
+        code3 {CS_CC = o->value();}
       } {
         MenuItem switchoff {
           label Off

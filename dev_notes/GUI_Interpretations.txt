@@ -15,7 +15,8 @@ string          name - handled via simple message system.
 
 
 Type bits
-0-1 event (see below)
+0 \
+1 /  event (see below)
 2   source is return from synth
 3   source is MIDI
 4   source is CLI

@@ -256,10 +256,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insertPar2 = getData->data.par2;
 
     bool isMidi = type & 8;
-//cout << "\nPart " << (int) npart << "\nKit " << (int) kititem << "\nEngine " << (int)engine << endl;
+//cout << "Button " << int(button) << endl;
 #ifdef ENABLE_REPORTS
-    if (isGui)
-        synth->getRuntime().Log("From GUI");
     if ((isGui && button < 2) || (isCli && button == 1))
 #else
     if (isCli && button == 1)
@@ -432,11 +430,12 @@ void InterChange::resolveReplies(CommandBlock *getData)
         synth->midilearn.setTransferBlock(getData, commandName);
         return;
     }
+
 #ifdef ENABLE_REPORTS
-    else if(!isMidi || synth->getRuntime().monitorCCin)
+    else if((isGui && button == 2) || isCli)
         synth->getRuntime().Log(commandName + actual);
 #else
-    else if(!isGui)
+    else if(isCli)
         synth->getRuntime().Log(commandName + actual);
 #endif
 }
@@ -2059,14 +2058,6 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
 
-            #warning gui writes changed to reads
-            // temp fixes!
-            bool partflag = (getData.data.kit == 0xff) | (getData.data.kit >= 0x20 && getData.data.kit < 0x30);
-            if (getData.data.part != 0xf0 && (getData.data.part >= 0x40 || partflag == false))
-                getData.data.type = getData.data.type & 0xbf;
-            else if ((getData.data.type & 3) == 0)
-                getData.data.type |= 1;
-            // end of fixes
             if(getData.data.part != 0xd8) // special midi-learn message
                 commandSend(&getData);
             returns(&getData);
@@ -2337,6 +2328,10 @@ void InterChange::commandSend(CommandBlock *getData)
 
 void InterChange::commandVector(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     int value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3120,6 +3115,10 @@ void InterChange::commandPart(CommandBlock *getData)
 
 void InterChange::commandAdd(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3260,6 +3259,10 @@ void InterChange::commandAdd(CommandBlock *getData)
 
 void InterChange::commandAddVoice(CommandBlock *getData)
 {
+    #pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3617,6 +3620,10 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
 void InterChange::commandSub(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3843,11 +3850,16 @@ void InterChange::commandSub(CommandBlock *getData)
 
 void InterChange::commandPad(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
+
     bool write = (type & 0x40) > 0;
     Part *part;
     part = synth->part[npart];
@@ -4142,10 +4154,15 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     int value = (int) getData->data.value; // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
+
     bool write = (type & 0x40) > 0;
 
     if (insert == 6)
@@ -4402,10 +4419,15 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
 void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     int value = (int) getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
+
     bool write = (type & 0x40) > 0;
 
     if (insert == 9)
@@ -4480,6 +4502,10 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
 void InterChange::commandLFO(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -4607,6 +4633,10 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -4855,6 +4885,10 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -5145,6 +5179,10 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
 void InterChange::commandSysIns(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -5199,6 +5237,10 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
 void InterChange::commandEffects(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
