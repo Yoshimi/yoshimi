@@ -58,7 +58,6 @@ class InterChange : private MiscFuncs
         void returns(CommandBlock *getData);
         void setpadparams(int point);
         void doClearPart(int npart);
-        void doMasterReset();
         void commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);

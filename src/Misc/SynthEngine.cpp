@@ -461,6 +461,8 @@ void *SynthEngine::RBPthread(void)
                             ShutUp();
                             actionLock(unlock);
                         }
+                        else if(block.data[1] == 2)
+                            resetAll();
                         else
                             loadPatchSetAndUpdate(miscMsgPop(block.data[1]));
                         break;
@@ -1983,8 +1985,12 @@ void SynthEngine::ClearNRPNs(void)
 
 void SynthEngine::resetAll(void)
 {
+    actionLock(lockmute);
     defaults();
     ClearNRPNs();
+    actionLock(unlock);
+    Runtime.Log("All dynamic values set to defaults.");
+    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 1);
 }
 
 
@@ -2263,17 +2269,10 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         if (fadeAll && fadeLevel <= 0.001f)
         {
             Mute();
-            /*if (fadeAll == 1)
-                ShutUp();
+            if (fadeAll > 0 && fadeAll < 3)
+                writeRBP(6, fadeAll, 0); // stop and master reset
             else if ((fadeAll & 0xff) == 3)
-            {
-                Mute();
-                writeRBP(6, fadeAll >> 8, 0);
-            }*/
-            if ((fadeAll & 0xff) == 3)
-                writeRBP(6, fadeAll >> 8, 0);
-            else
-                writeRBP(6, 1, 0);
+                writeRBP(6, fadeAll >> 8, 0); // load patchset
         }
 
         // Peak computation for part vu meters

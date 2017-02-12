@@ -195,10 +195,6 @@ void *InterChange::sortResultsThread(void)
             setpadparams(point);
         else if (point < 0x2100)
             doClearPart(point & 0xff);
-        else if (point == 0xf0000000)
-            doMasterReset();
-        //if (point < 0xffffffff)
-            //cout << " point " << hex << point << endl;
     }
     return NULL;
 }
@@ -2146,15 +2142,6 @@ void InterChange::doClearPart(int npart)
 }
 
 
-void InterChange::doMasterReset()
-{
-    synth->resetAll();
-    synth->actionLock(unlock); // we have to update the gui after this
-    synth->getRuntime().Log("All dynamic values set to defaults.");
-    GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 1);
-}
-
-
 void InterChange::commandSend(CommandBlock *getData)
 {
     float value = getData->data.value;
@@ -2576,12 +2563,11 @@ void InterChange::commandMain(CommandBlock *getData)
                 //synth->fadeLevel = 1.0;
             }
             break;
-        case 96: // doMasterReset(
+        case 96: // MasterReset(
             if (write)
             {
                 synth->getRuntime().lastPatchSet = -1;
-                synth->actionLock(lockmute);
-                flagsWrite(0xf0000000); // reset
+                synth->allStop(2);
             }
             break;
         case 128: // just stop

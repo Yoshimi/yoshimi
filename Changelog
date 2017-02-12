@@ -5,6 +5,7 @@ yoshimi 1.5.0 M
   This enables us to do conversions section by section.
 * Improved Cli messaging.
 * Re-implemented silent panic stop.
+* Re-implimented soft master reset. Hopefully all OK now.
 
 2017-2-11 Will
 * Reverted unsafe changes from build 952.
