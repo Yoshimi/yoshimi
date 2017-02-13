@@ -2273,6 +2273,7 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
                 writeRBP(6, fadeAll, 0); // stop and master reset
             else if ((fadeAll & 0xff) == 3)
                 writeRBP(6, fadeAll >> 8, 0); // load patchset
+            fadeAll = 0;
         }
 
         // Peak computation for part vu meters
@@ -2374,7 +2375,6 @@ void SynthEngine::ShutUp(void)
         insefx[nefx]->cleanup();
     for (int nefx = 0; nefx < NUM_SYS_EFX; ++nefx)
         sysefx[nefx]->cleanup();
-    fadeAll = 0;
 }
 
 
@@ -2434,7 +2434,6 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
         setAllPartMaps();
         addHistory(fname, 2);
         actionLock(unlock);
-        fadeAll = 0;
     }
 
     if (result)

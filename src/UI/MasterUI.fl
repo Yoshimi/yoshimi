@@ -1479,7 +1479,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     {
     	prefix = synth->makeUniqueName("");
     	prefix = prefix.substr(0, prefix.length() - 3);
-    	panel = prefix + "Mixer Panel";
+    	panel = prefix + " : Mixer Panel";
     }
     masterwindow->copy_label(prefix.c_str());
     panelwindow->copy_label(panel.c_str());

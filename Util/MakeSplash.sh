@@ -40,7 +40,7 @@ if [ "$EXTEN" = "svg" ]; then
         echo
         exit 1
     fi
-    # Extract width and height values from the svg - somehwat reliant on inkscapes svg formatting
+    # Extract width and height values from the svg - somewhat reliant on inkscapes svg formatting
     WIDTH=$(sed -n -E '1,/\s*width=/ {/width/ s/.*width="(.*)"/\1/p;}' "$FILE")
     HEIGHT=$(sed -n -E '1,/\s*height=/ {/height/ s/.*height="(.*)"/\1/p;}' "$FILE")
 

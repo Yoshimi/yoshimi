@@ -103,43 +103,29 @@ static void *mainGuiThread(void *arg)
 
     map<SynthEngine *, MusicClient *>::iterator it;
     fl_register_images();
-#if (FL_MAJOR_VERSION == 1 && FL_MINOR_VERSION < 3)
-    char *fname = tmpnam(NULL);
-    if (fname)
-    {
-        FILE *f = fopen(fname, "wb");
-        if (f)
-        {
-            fwrite(splashPngData, splashPngLength, 1, f);
-            fclose(f);
-        }
-    }
-    Fl_PNG_Image pix(fname);
-    if (fname)
-    unlink(fname);
-#else
-    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
-#endif
 
-    //const int textHeight = 20;
-    //const int textBorder = 15;
+    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
+
+    const int textHeight = 15;
+    const int textY = 20;
+    const float timeout = 2.5f;
+    const int textColour = FL_DARK_BLUE;//WHITE;//CYAN;
 
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
-    Fl_Box box(0, 0, splashWidth,splashHeight);
-    //Fl_Pixmap pix(yoshimi_logo);
 
+    Fl_Box box(0, 0, splashWidth,splashHeight);
     box.image(pix);
-    //Fl_Box boxLb(textBorder, splashHeight - textHeight * 2, splashWidth - textBorder * 2, textHeight);
-    //boxLb.box(FL_NO_BOX);
-    //boxLb.align(FL_ALIGN_CENTER);
-    //boxLb.labelsize(textHeight);
-    //boxLb.labeltype(FL_NORMAL_LABEL);
-    //boxLb.labelcolor(FL_WHITE);
-    //boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-    /*boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
+
     string startup = YOSHIMI_VERSION;
-    startup = "Yoshimi " + startup + " is starting";
-    boxLb.label(startup.c_str());*/
+    startup = "V " + startup;
+
+    Fl_Box boxLb(0, splashHeight - textY - textHeight, splashWidth, textHeight, startup.c_str());
+    boxLb.box(FL_NO_BOX);
+    boxLb.align(FL_ALIGN_CENTER);
+    boxLb.labelsize(textHeight);
+    boxLb.labeltype(FL_NORMAL_LABEL);
+    boxLb.labelcolor(textColour);
+    boxLb.labelfont(FL_HELVETICA | FL_BOLD);
 
     winSplash.set_modal();
     //winSplash.clear_border();
@@ -149,21 +135,11 @@ static void *mainGuiThread(void *arg)
     {
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
         winSplash.show();
-        Fl::add_timeout(2, splashTimeout, &winSplash);
+        Fl::add_timeout(timeout, splashTimeout, &winSplash);
     }
 
     do
     {
-        /*if (bShowGui)
-        {
-            Fl::wait(0.033333);
-            while (!splashMessages.empty())
-            {
-                boxLb.copy_label(splashMessages.front().c_str());
-                splashMessages.pop_front();
-            }
-        }
-        else*/
             usleep(33333);
     }
     while (firstSynth == NULL); // just wait
@@ -230,11 +206,6 @@ static void *mainGuiThread(void *arg)
         if (bShowGui)
         {
             Fl::wait(0.033333);
-            /*while (!splashMessages.empty())
-            {
-                boxLb.copy_label(splashMessages.front().c_str());
-                splashMessages.pop_front();
-            }*/
             GuiThreadMsg::processGuiMessages();
         }
         else
@@ -272,15 +243,6 @@ bool mainCreateNewInstance(unsigned int forceId)
         synth->getRuntime().Log("Failed to instantiate MusicClient");
         goto bail_out;
     }
-
-
-    /* this is done in newMusicClient() now! ^^^^^
-    if (!(musicClient->Open()))
-    {
-        synth->getRuntime().Log("Failed to open MusicClient");
-        goto bail_out;
-    }
-    */
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
@@ -418,8 +380,6 @@ int main(int argc, char *argv[])
     firstSynth->loadHistory();
     firstSynth->installBanks(0);
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
-
-    //splashMessages.push_back("Startup complete!");
 
     //create command line processing thread
     pthread_t cmdThr;

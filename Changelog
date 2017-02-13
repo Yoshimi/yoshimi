@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-2-13 Will
+* Spash screen onptimisations.
+* Small Fadeout improvement.
+* Doc updates.
+
 2017-2-12 Will
 * Separated out temporary Gui Write -> Read per section.
   This enables us to do conversions section by section.
