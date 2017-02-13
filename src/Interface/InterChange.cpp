@@ -4558,55 +4558,55 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
     {
         case 0:
             if (write)
-                pars->Pfreq = val;
+                pars->setPfreq(val);
             else
                 val = pars->Pfreq;
             break;
         case 1:
             if (write)
-                pars->Pintensity = val;
+                pars->setPintensity(val);
             else
                 val = pars->Pintensity;
             break;
         case 2:
             if (write)
-                pars->Pdelay = val;
+                pars->setPdelay(val);
             else
                 val = pars->Pdelay;
             break;
         case 3:
             if (write)
-                pars->Pstartphase = val;
+                pars->setPstartphase(val);
             else
                 val = pars->Pstartphase;
             break;
         case 4:
             if (write)
-                pars->Prandomness = val;
+                pars->setPrandomness(val);
             else
                 val = pars->Prandomness;
             break;
         case 5:
             if (write)
-                pars->PLFOtype = (int)val;
+                pars->setPLFOtype((int)val);
             else
                 val = pars->PLFOtype;
             break;
         case 6:
             if (write)
-                pars->Pcontinous = (val != 0);
+                pars->setPcontinous((val != 0));
             else
                 val = pars->Pcontinous;
             break;
         case 7:
             if (write)
-                pars->Pfreqrand = val;
+                pars->setPfreqrand(val);
             else
                 val = pars->Pfreqrand;
             break;
         case 8:
             if (write)
-                pars->Pstretch = val;
+                pars->setPstretch(val);
             else
                 val = pars->Pstretch;
             break;

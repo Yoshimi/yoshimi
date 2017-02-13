@@ -197,6 +197,7 @@ class ADnoteParameters : public Presets
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         static int ADnote_unison_sizes[15];
+        void postrender(void);
 
     private:
         void defaults(int n); // n is the nvoice

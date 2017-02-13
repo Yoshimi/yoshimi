@@ -55,6 +55,7 @@ LFOParams::LFOParams(float Pfreq_, unsigned char Pintensity_,
             break;
     };
     defaults();
+    updated = true;
 }
 
 
@@ -97,4 +98,5 @@ void LFOParams::getfromXML(XMLwrapper *xml)
     Pdelay = xml->getpar127("delay", Pdelay);
     Pstretch = xml->getpar127("stretch", Pstretch);
     Pcontinous = xml->getparbool("continous", Pcontinous);
+    updated = true;
 }

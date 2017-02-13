@@ -389,3 +389,8 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
     }
 }
+
+void SUBnoteParameters::postrender(void)
+{
+    return;
+}

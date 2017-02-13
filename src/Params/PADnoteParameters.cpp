@@ -960,3 +960,13 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
             break;
     }
 }
+
+void PADnoteParameters::postrender(void)
+{
+    // loop over our gathered dirty flags and unset them for the next period
+      AmpLfo->updated
+    = FilterLfo->updated
+    = FreqLfo->updated
+    = false;
+
+}

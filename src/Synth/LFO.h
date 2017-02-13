@@ -32,13 +32,16 @@ class SynthEngine;
 class LFO
 {
     public:
-        LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth);
+        LFO(LFOParams *_lfopars, float basefreq, SynthEngine *_synth);
         ~LFO() { };
         float lfoout(void);
         float amplfoout(void);
     private:
+        LFOParams *lfopars;
+        void Recompute(void);
         void computenextincrnd(void);
         float x;
+        float basefreq;
         float incx, incrnd, nextincrnd;
         float amp1, amp2; // used for randomness
         float lfointensity;
