@@ -85,7 +85,6 @@ class InterChange : private MiscFuncs
         string resolveLFO(CommandBlock *getData);
         string resolveFilter(CommandBlock *getData);
         string resolveEnvelope(CommandBlock *getData);
-        string resolveSysIns(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
         bool showValue;
 

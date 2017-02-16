@@ -1916,49 +1916,6 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
 }
 
 
-string InterChange::resolveSysIns(CommandBlock *getData)
-{
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char effnum = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-
-    bool isSysEff = (npart == 0xf1);
-
-    string name;
-    if (isSysEff)
-        name = "System ";
-    else
-        name = "Insert ";
-
-    string contstr;
-    string second;
-    if (insert == 0xff)
-    {
-        second = "";
-        switch (control)
-        {
-            case 0:
-                contstr = "Number ";
-                break;
-            case 1:
-                contstr = to_string(effnum + 1) + " Type ";
-                break;
-            case 2: // insert only
-                contstr = to_string(effnum + 1) + " To ";
-        }
-        contstr = "Effect " + contstr;
-    }
-    else // system only
-    {
-        contstr = "From Effect " + to_string(effnum + 1);
-        second = " To Effect " + to_string(control + 1);
-    }
-
-    return (name  + contstr + second);
-}
-
-
 string InterChange::resolveEffects(CommandBlock *getData)
 {
     int value = lrint(getData->data.value);

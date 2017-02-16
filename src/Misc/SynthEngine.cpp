@@ -945,9 +945,9 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
         loadOK = true;
         // show file instead of program if we got here from Instruments -> Load External...
         loaded = "Loaded " +
-                    ((pgm == -1) ? fname : to_string(pgm)
+                    ((pgm == -1) ? fname : to_string(pgm + 1)
                     + " \"" + bank.getname(pgm) + "\"")
-                    + " to Part " + to_string(npart);
+                    + " to Part " + to_string(npart + 1);
         if (Runtime.showTimes)
         {
             gettimeofday(&tv2, NULL);
