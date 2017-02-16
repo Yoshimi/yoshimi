@@ -21,7 +21,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified September 2016
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified February 2017
 */
 
 #include <iostream>
@@ -750,7 +752,11 @@ void Config::Log(string msg, char tostderr)
     if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
     else
-        cerr << msg << endl;
+    {
+        cout << msg << endl;
+        cout << CLIstring;
+        cout << flush;
+    }
 }
 
 

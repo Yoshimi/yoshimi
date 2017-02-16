@@ -444,7 +444,7 @@ int CmdInterface::effects()
         }
 
         if (isRead)
-            Runtime.Log("Current FX number is " + asString(nFX));
+            Runtime.Log("Current FX number is " + asString(nFX + 1));
         return done_msg;
     }
 
@@ -476,7 +476,7 @@ int CmdInterface::effects()
         }
         if (point[0] == 0)
         {
-            Runtime.Log("FX number set to " + asString(nFX));
+            Runtime.Log("FX number set to " + asString(nFX + 1));
             return done_msg;
         }
     }
@@ -553,20 +553,20 @@ int CmdInterface::effects()
         if (bitTest(level, part_lev))
         {
             category = 2;
-            dest = "part " + asString(npart) + " fx sent to system "
+            dest = "part " + asString(npart + 1) + " fx sent to system "
                  + asString(par) + " at " + asString(value);
         }
         else if (bitTest(level, ins_fx))
         {
             category = 1;
-            dest = "insert fx " + asString(nFX) + " sent to " + dest;
+            dest = "insert fx " + asString(nFX + 1) + " sent to " + dest;
         }
         else
         {
             if (par <= nFX)
                 return range_msg;
             category = 0;
-            dest = "system fx " + asString(nFX) + " sent to "
+            dest = "system fx " + asString(nFX + 1) + " sent to "
                  + asString(par) + " at " + asString(value);
         }
 
@@ -593,7 +593,7 @@ int CmdInterface::effects()
         if (bitTest(level, part_lev))
         {
             category = 2;
-            dest = "part " + asString(npart);
+            dest = "part " + asString(npart + 1);
         }
         else if (bitTest(level, ins_fx))
         {
@@ -675,7 +675,7 @@ int CmdInterface::commandVector()
         if (synth->SingleVector(msg, chan))
             synth->cliOutput(msg, LINES);
         else
-            Runtime.Log("No vector on channel " + asString(chan));
+            Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
     if (point[0] == 0)
@@ -683,7 +683,7 @@ int CmdInterface::commandVector()
         if (Runtime.nrpndata.vectorEnabled[chan])
             bitSet(level, vect_lev);
         else
-            Runtime.Log("No vector on channel " + asString(chan));
+            Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
 
@@ -859,7 +859,7 @@ int CmdInterface::commandPart(bool justSet)
             }
             if (point[0] == 0)
             {
-                Runtime.Log("Part number set to " + asString(npart));
+                Runtime.Log("Part number set to " + asString(npart + 1));
                 return done_msg;
             }
         }
@@ -925,7 +925,7 @@ int CmdInterface::commandPart(bool justSet)
                 name = " (no MIDI)";
             else if (tmp >= NUM_MIDI_CHANNELS)
                 name = " (" + asString (tmp % NUM_MIDI_CHANNELS) + " note off only)";
-            Runtime.Log("Part " + asString(npart) + " set to channel " + asString(tmp) + name, isRead);
+            Runtime.Log("Part " + asString(npart + 1) + " set to channel " + asString(tmp + 1) + name, isRead);
             reply = done_msg;
         }
         else
@@ -2093,7 +2093,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 }
                 else
                     tmp = chan;
-                loadChan = "channel " + asString(chan);
+                loadChan = "channel " + asString(chan + 1);
             }
             else
             {
@@ -2235,7 +2235,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 replyString = setExtension((string) point, "xiz");
                 tmp = synth->part[npart]->saveXML(replyString);
                 if (tmp)
-                    Runtime.Log("Saved part " + asString(npart) + "  instrument " + (string) synth->part[npart]->Pname + "  as " +replyString);
+                    Runtime.Log("Saved part " + asString(npart + 1) + "  instrument " + (string) synth->part[npart]->Pname + "  as " +replyString);
                 else
                     Runtime.Log("Failed to save " + replyString);
                 reply = done_msg;
@@ -2351,7 +2351,6 @@ void CmdInterface::cmdIfaceCommandLoop()
     }
     cCmd = NULL;
     bool exit = false;
-
     sprintf(welcomeBuffer, "yoshimi> ");
     while(!exit)
     {
@@ -2370,7 +2369,7 @@ void CmdInterface::cmdIfaceCommandLoop()
                 prompt += (":" + asString(currentInstance));
             if (bitTest(level, part_lev))
             {
-                prompt += (" part " + asString(npart));
+                prompt += (" part " + asString(npart + 1));
                 nFXtype = synth->part[npart]->partefx[nFX]->geteffect();
                 if (synth->partonoffRead(npart))
                     prompt += " on";
@@ -2392,20 +2391,24 @@ void CmdInterface::cmdIfaceCommandLoop()
                         nFXtype = synth->sysefx[nFX]->geteffect();
                     }
                 }
-                prompt += (" FX " + asString(nFX) + " " + fx_list[nFXtype].substr(0, 5));
+                prompt += (" FX " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
                 if (nFXtype > 0)
                     prompt += ("-" + asString(nFXpreset));
             }
             if (bitTest(level, vect_lev))
             {
-                prompt += (" Vect Ch " + asString(chan) + " ");
+                prompt += (" Vect Ch " + asString(chan + 1) + " ");
                 if (axis == 0)
                     prompt += "X";
                 else
                     prompt += "Y";
             }
             prompt += "> ";
+            if (rl_end > 0)
+                cout << endl;
             sprintf(welcomeBuffer,"%s",prompt.c_str());
+            if (synth) // it won't be until Process called
+                synth->getRuntime().CLIstring = prompt;
         }
         else
             usleep(20000);

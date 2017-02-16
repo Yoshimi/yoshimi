@@ -1293,9 +1293,9 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
         if (Xfeatures & 8)
             Xtext += " 4";
     }
-    msg_buf.push_back("Channel " + asString(chan));
+    msg_buf.push_back("Channel " + asString(chan + 1));
     msg_buf.push_back("  X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[chan]) + ",  " + Xtext);
-    msg_buf.push_back("    L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
+    msg_buf.push_back("  L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
 
     if (Runtime.nrpndata.vectorYaxis[chan] > 0x7f
         || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
@@ -1318,7 +1318,7 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
                 Ytext += " 4";
         }
         msg_buf.push_back("  Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[chan]) + ",  " + Ytext);
-        msg_buf.push_back("    U = " + part[chan + 32]->Pname + ",  D = " + part[chan + 48]->Pname);
+        msg_buf.push_back("  U = " + part[chan + 32]->Pname + ",  D = " + part[chan + 48]->Pname);
     }
     return true;
 }
@@ -1499,7 +1499,7 @@ int SynthEngine::SetSystemValue(int type, int value)
             else
             {
                 Runtime.toConsole = false;
-                Runtime.Log("Sending reports to stderr");
+                Runtime.Log("Sending reports to stdout");
             }
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
@@ -1877,7 +1877,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc2[chan] = C_panning;
             Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
-            Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
+            //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
         case 1:
@@ -1891,7 +1891,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.nrpndata.vectorYcc2[chan] = C_panning;
                 Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
                 Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
-                Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
+                //Runtime.Log("Vector " + asString(int(chan) + 1) + " Y CC set to " + asString(par));
             }
             break;
 
@@ -1960,7 +1960,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorYaxis[chan] = 0xff;
             Runtime.nrpndata.vectorXfeatures[chan] = 0;
             Runtime.nrpndata.vectorYfeatures[chan] = 0;
-            Runtime.Log("Channel " + asString((int) chan) + " vector control disabled");
+            Runtime.Log("Channel " + asString(int(chan) + 1) + " vector control disabled");
             break;
     }
 }

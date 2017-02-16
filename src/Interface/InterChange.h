@@ -87,6 +87,7 @@ class InterChange : private MiscFuncs
         string resolveEnvelope(CommandBlock *getData);
         string resolveSysIns(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
+        bool showValue;
 
         void commandVector(CommandBlock *getData);
         void commandMain(CommandBlock *getData);

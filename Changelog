@@ -1,5 +1,12 @@
 yoshimi 1.5.0 M
 
+2017-2-16 Will
+* Improved readline behavour.
+  Still needs more work - sometimes multiple prompt lines!
+* Converted reported Cli numbers to match Gui ones.
+  May have missed some :(
+  Entries still zero based.
+
 2017-2-13 Will
 * Spash screen onptimisations.
 * Small Fadeout improvement.
