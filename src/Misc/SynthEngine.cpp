@@ -2429,8 +2429,8 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
     bool result = false;
     if (loadXML(fname)) // load the data
     {
-        actionLock(lockmute);
         result = true;
+        actionLock(lockmute);
         setAllPartMaps();
         addHistory(fname, 2);
         actionLock(unlock);
@@ -2443,6 +2443,7 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
     }
     else
     {
+        Unmute();
         Runtime.Log("Could not load " + fname);
         GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
@@ -3126,7 +3127,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 2);
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
     Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
 
     partonoffWrite(0, 0); // why?;

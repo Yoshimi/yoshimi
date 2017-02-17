@@ -69,6 +69,7 @@ string basics[] = {
     "  MLearn [s<n>]",              "midi learned controls ('@' n for full details on one line)",
     "  History [s]",                "recent files (Patchsets, SCales, STates, Vectors, MLearn)",
     "  Effects [s]",                "effect types ('all' include preset numbers and names)",
+    "  PREsets",                    "all the presets for the currently selected effect",
     "LOad",                         "load patch files",
     "  Instrument <s>",             "instrument to current part from named file",
     "  Patchset <s>",               "complete set of instruments from named file",
@@ -141,7 +142,6 @@ string vectlist [] = {
     "Off",                      "disable vector for CHANNEL",
     "end"
 };
-
 
 string partlist [] = {
     "ENable",                   "enables the part",
@@ -354,7 +354,32 @@ void CmdInterface::historyList(int listnum)
 }
 
 
-int CmdInterface::effectsList()
+string CmdInterface::historySelect(int listnum, int selection)
+{
+    vector<string> listType = *synth->getHistory(listnum);
+    if (listType.size()== 0)
+    {
+        synth->getRuntime().Log("No saved entries");
+        return "";
+    }
+    else
+    {
+        vector<string>::iterator it = listType.begin();
+        int itemNo = 0;
+        while (it != listType.end() && itemNo != selection)
+        {
+            ++ it;
+            ++ itemNo;
+        }
+        if (it != listType.end())
+            return *it;
+    }
+    synth->getRuntime().Log("No such entry");
+    return "";
+}
+
+
+int CmdInterface::effectsList(bool presets)
 {
     list<string>msg;
 
@@ -365,10 +390,15 @@ int CmdInterface::effectsList()
     string left;
     bool all;
 
-    if (bitTest(level, part_lev) && bitTest(level, all_fx))
+    if (bitTest(level, all_fx) && presets == true)
     {
          synth->getRuntime().Log("Type " + fx_list[nFXtype] + "\nPresets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
          return done_msg;
+    }
+    else if (presets)
+    {
+        synth->getRuntime().Log("No effect selected");
+        return done_msg;
     }
     else
         all = matchnMove(1, point, "all");
@@ -386,7 +416,7 @@ int CmdInterface::effectsList()
             while (presetsPos != string::npos)
             {
                 presetsPos = fx_presets [i].find(',', presetsLast);
-                msg.push_back("      " + asString(presetsCount) + " =" + fx_presets [i].substr(presetsLast, presetsPos - presetsLast));
+                msg.push_back("      " + asString(presetsCount + 1) + " =" + fx_presets [i].substr(presetsLast, presetsPos - presetsLast));
                 presetsLast = presetsPos + 1;
                 ++ presetsCount;
             }
@@ -444,7 +474,7 @@ int CmdInterface::effects()
         }
 
         if (isRead)
-            Runtime.Log("Current FX number is " + asString(nFX + 1));
+            Runtime.Log("Current efx number is " + asString(nFX + 1));
         return done_msg;
     }
 
@@ -476,7 +506,7 @@ int CmdInterface::effects()
         }
         if (point[0] == 0)
         {
-            Runtime.Log("FX number set to " + asString(nFX + 1));
+            Runtime.Log("efx number set to " + asString(nFX + 1));
             return done_msg;
         }
     }
@@ -485,7 +515,7 @@ int CmdInterface::effects()
     {
         if (isRead)
         {
-            Runtime.Log("Current FX type is " + fx_list[nFXtype]);
+            Runtime.Log("Current efx type is " + fx_list[nFXtype]);
             return done_msg;
         }
         flag = true;
@@ -502,7 +532,7 @@ int CmdInterface::effects()
         if (flag)
             return unrecognised_msg;
 
-        Runtime.Log("FX type set to " + fx_list[nFXtype]);
+        Runtime.Log("efx type set to " + fx_list[nFXtype]);
         //Runtime.Log("Presets -" + fx_presets[nFXtype].substr(fx_presets[nFXtype].find(',') + 1));
         if (bitTest(level, part_lev))
             category = 2;
@@ -553,20 +583,20 @@ int CmdInterface::effects()
         if (bitTest(level, part_lev))
         {
             category = 2;
-            dest = "part " + asString(npart + 1) + " fx sent to system "
+            dest = "part " + asString(npart + 1) + " efx sent to system "
                  + asString(par) + " at " + asString(value);
         }
         else if (bitTest(level, ins_fx))
         {
             category = 1;
-            dest = "insert fx " + asString(nFX + 1) + " sent to " + dest;
+            dest = "insert efx " + asString(nFX + 1) + " sent to " + dest;
         }
         else
         {
             if (par <= nFX)
                 return range_msg;
             category = 0;
-            dest = "system fx " + asString(nFX + 1) + " sent to "
+            dest = "system efx " + asString(nFX + 1) + " sent to "
                  + asString(par) + " at " + asString(value);
         }
 
@@ -607,7 +637,7 @@ int CmdInterface::effects()
         }
         nFXpreset = value;
         synth->SetEffects(category, 8, nFX, nFXtype, 0, nFXpreset);
-        Runtime.Log(dest + " fx preset set to number " + asString(nFXpreset));
+        Runtime.Log(dest + " efx preset set to number " + asString(nFXpreset + 1));
     }
     return reply;
 }
@@ -864,7 +894,7 @@ int CmdInterface::commandPart(bool justSet)
             }
         }
     }
-    if (matchnMove(2, point, "effects"))
+    if (matchnMove(2, point, "effects") || matchnMove(2, point, "efx"))
     {
         level = 1; // clear out any higher levels
         bitSet(level, part_lev);
@@ -1342,6 +1372,7 @@ int CmdInterface::commandReadnSet()
         level = 1;
         nFX = 0; // effects number limit changed
         matchnMove(2, point, "effects"); // clear it if given
+        matchnMove(2, point, "efx");
         nFXtype = synth->sysefx[nFX]->geteffect();
         return effects();
     }
@@ -1350,6 +1381,7 @@ int CmdInterface::commandReadnSet()
         level = 3;
         nFX = 0; // effects number limit changed
         matchnMove(2, point, "effects"); // clear it if given
+        matchnMove(2, point, "efx");
         nFXtype = synth->insefx[nFX]->geteffect();
         return effects();
     }
@@ -1895,8 +1927,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = what_msg;
             }
         }
-        else if (matchnMove(1, point, "effects"))
+        else if (matchnMove(1, point, "effects") || matchnMove(1, point, "efx"))
             reply = effectsList();
+        else if (matchnMove(3, point, "presets"))
+            reply = effectsList(true);
         else
         {
             replyString = "list";
@@ -2073,12 +2107,24 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 point += 1;
                 point = skipSpace(point);
                 if (isdigit(point[0]))
+                {
                     sendDirect(0, 0, 0xf2, 0xd8, 0, 0, 0, 0, string2int(point));
+                    reply = done_msg;
+                }
+                else
+                    reply = value_msg;
 
             }
             else
-                sendDirect(0, 0, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
-            reply = done_msg;
+            {
+                if ((string) point > "")
+                {
+                    sendDirect(0, 0, 0xf1, 0xd8, 0, 0, 0, 0, miscMsgPush((string) point));
+                    reply = done_msg;
+                }
+                else
+                    reply = name_msg;
+            }
         }
         else if(matchnMove(2, point, "vector"))
         {
@@ -2106,8 +2152,41 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else
             {
-                if(synth->loadVector(tmp, (string) point, true))
-                    Runtime.Log("Loaded Vector " + (string) point + " to " + loadChan);
+                bool ok = true;
+                string name;
+                if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    if (!isdigit(point[0]))
+                    {
+                        ok = false;
+                        reply = value_msg;
+                    }
+                    name = historySelect(5, string2int(point));
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = done_msg;
+                    }
+                }
+                else
+                {
+                    name = (string)point;
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = name_msg;
+                    }
+                }
+                if (ok)
+                {
+                    if(synth->loadVector(tmp, name, true))
+                    {
+                        Runtime.Log("Loaded Vector " + name + " to " + loadChan);
+                        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+                    }
+                }
                 reply = done_msg;
             }
         }
@@ -2134,12 +2213,45 @@ bool CmdInterface::cmdIfaceProcessCommand()
         }
         else if (matchnMove(1, point, "patchset"))
         {
+            bool ok = true;
             if (point[0] == 0)
+            {
+                ok = false;
                 reply = name_msg;
+            }
             else
             {
-                sendDirect(0, 64, 80, 240, 255, 255, 255, 255, miscMsgPush(point));
-                reply = done_msg;
+                string name;
+                if (point[0] == '@')
+                {
+                    point += 1;
+                    point = skipSpace(point);
+                    if (!isdigit(point[0]))
+                    {
+                        ok = false;
+                        reply = value_msg;
+                    }
+                    name = historySelect(2, string2int(point));
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = done_msg;
+                    }
+                }
+                else
+                {
+                    name = (string)point;
+                    if (name == "")
+                    {
+                        ok = false;
+                        reply = name_msg;
+                    }
+                }
+                if (ok)
+                {
+                    sendDirect(0, 64, 80, 240, 255, 255, 255, 255, miscMsgPush(name));
+                    reply = done_msg;
+                }
             }
         }
         else if (matchnMove(1, point, "instrument"))
@@ -2391,9 +2503,9 @@ void CmdInterface::cmdIfaceCommandLoop()
                         nFXtype = synth->sysefx[nFX]->geteffect();
                     }
                 }
-                prompt += (" FX " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
+                prompt += (" efx " + asString(nFX + 1) + " " + fx_list[nFXtype].substr(0, 5));
                 if (nFXtype > 0)
-                    prompt += ("-" + asString(nFXpreset));
+                    prompt += ("-" + asString(nFXpreset + 1));
             }
             if (bitTest(level, vect_lev))
             {
