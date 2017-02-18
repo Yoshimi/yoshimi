@@ -201,7 +201,38 @@ if (time<1000.0)
     snprintf((char *)&tmpstr,20,"%.1fms",time);
 else
     snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
-fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);} {}
+fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
+
+//Draw formatted point value in the top right corner when dragging points
+if(currentpoint >= 0){
+
+  string valDesc;
+  float val = (float) env->Penvval[currentpoint];
+   switch(env->Envmode){
+     case 1: //linear amplitude
+     case 2: //db amplitude
+         if(env->Plinearenvelope)
+             valDesc=convert_value(VC_EnvelopeLinAmpSusVal, val);
+         else
+             valDesc=convert_value(VC_EnvelopeAmpSusVal, val);
+         break;
+     case 3: //frequency offset
+         valDesc=convert_value(VC_EnvelopeFreqVal, val);
+         break;
+     case 4: //filter frequency offset
+         valDesc=convert_value(VC_EnvelopeFilterVal, val);
+         break;
+     case 5: //bandwidth offset (unformatted)
+         valDesc=std::to_string((int)val - 64);
+         break;
+     default:
+         valDesc = "unknown env. type";
+   }
+
+   strcpy(tmpstr, valDesc.c_str());
+   fl_color(FL_CYAN);
+   fl_draw(tmpstr,ox+lx-20,oy,20,10,FL_ALIGN_RIGHT,NULL,0);
+}} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -424,8 +455,7 @@ send_data(group, 35, o->value(), 0xc0);}
       }
     }
   }
-  Function {make_ADSR_window()} {selected
-  } {
+  Function {make_ADSR_window()} {} {
     Fl_Window envADSR {
       xywh {1185 87 205 70} type Double color 50 labelfont 1 hide
       class Fl_Group
@@ -504,7 +534,8 @@ send_data(group, 24, o->value(), 0xc0);}
         Fl_Check_Button e1linearenvelope {
           label L
           callback {env->Plinearenvelope=(int)o->value();
-send_data(group, 17, o->value(), 0xc0);}
+setAmpSusVType((int)o->value());
+send_data(group, 17, o->value(), 0xc0);} selected
           tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
@@ -1130,6 +1161,7 @@ if (env->Pfreemode==0)
 		e1adt->value(env->PA_dt);
 		e1ddt->value(env->PD_dt);
 		e1sval->value(env->PS_val);
+		setAmpSusVType(env->Plinearenvelope);
 		e1rdt->value(env->PR_dt);
 		e1envstretch->value(env->Penvstretch);
 		e1linearenvelope->value(env->Plinearenvelope);
@@ -1206,6 +1238,14 @@ else
 envwindow->resize(this->x(),this->y(),this->w(),this->h());
 
 envwindow->show();} {}
+  }
+  Function {setAmpSusVType(bool linear)} {return_type void
+  } {
+    code {//
+if(linear)
+    e1sval->setValueType(VC_EnvelopeLinAmpSusVal);
+else
+    e1sval->setValueType(VC_EnvelopeAmpSusVal);} {}
   }
   decl {EnvelopeParams *env;} {private local
   }

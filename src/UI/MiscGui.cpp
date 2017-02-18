@@ -500,6 +500,13 @@ string convert_value(ValueType type, float val)
             return(custom_value_units((1.0f - (int)val / 127.0f)
                                       * MIN_ENVELOPE_DB, "dB", 1));
 
+        case VC_EnvelopeLinAmpSusVal:
+            f = 20.0f * log10f((int)val / 127.0f);
+            if(f > -10)
+               return(custom_value_units(f, "dB", 2));
+            else
+               return(custom_value_units(f, "dB", 1));
+
         case VC_FilterFreq0: // AnalogFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
             if (f < 100.0f)
