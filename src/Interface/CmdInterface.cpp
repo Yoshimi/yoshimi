@@ -2180,13 +2180,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     }
                 }
                 if (ok)
-                {
-                    if(synth->loadVector(tmp, name, true))
-                    {
-                        Runtime.Log("Loaded Vector " + name + " to " + loadChan);
-                        GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
-                    }
-                }
+                    sendDirect(0, 64, 84, 240, tmp, 0, 0, 0, miscMsgPush(name));
                 reply = done_msg;
             }
         }
@@ -2402,7 +2396,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         point = skipChars(point);
                         if (point[0] != 0)
                         {
-                            if (control == 80 && part == 240)
+                            if ((control == 80 || control == 84) && part == 240)
                                 par2 = miscMsgPush(point);
                             else
                                 par2 = string2int(point);

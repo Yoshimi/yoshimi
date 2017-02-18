@@ -414,6 +414,8 @@ void *SynthEngine::RBPthread(void)
     unsigned int read;
     unsigned int found;
     unsigned int tries;
+    unsigned char tmp;
+    string name;
     while (Runtime.runSynth)
     {
         if (jack_ringbuffer_read_space(RBPringbuf) >= readsize)
@@ -454,17 +456,22 @@ void *SynthEngine::RBPthread(void)
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
 
-                    case 6: // cease all sound or load named patchset via miscMsg
-                        if (block.data[1] == 1)
+                    case 6: // cease all sound or load named file via miscMsg
+                        tmp = block.data[1] & 0xff;
+                        if (tmp == 1)
                         {
                             actionLock(lockmute);
                             ShutUp();
                             actionLock(unlock);
                         }
-                        else if(block.data[1] == 2)
+                        else if(tmp == 2)
                             resetAll();
-                        else
-                            loadPatchSetAndUpdate(miscMsgPop(block.data[1]));
+
+                        else if(tmp == 3) // patchset
+                            loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
+
+                        else if (tmp == 4) // vector
+                            loadVectorAndUpdate(block.data[3], block.data[2]);
                         break;
 
                     case 7: // load named state via miscMsg
@@ -1760,13 +1767,14 @@ int SynthEngine::SetSystemValue(int type, int value)
 }
 
 
-void SynthEngine::writeRBP(char type, char data0, char data1)
+void SynthEngine::writeRBP(char type, char data0, char data1, char data2)
 {
     struct RBP_data block;
     unsigned int writesize = sizeof(RBP_data);
     block.data[0] = type;
     block.data[1] = data0;
     block.data[2] = data1;
+    block.data[3] = data2;
     char *point = (char*)&block;
     unsigned int towrite = writesize;
     unsigned int wrote = 0;
@@ -2269,10 +2277,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         if (fadeAll && fadeLevel <= 0.001f)
         {
             Mute();
+            unsigned char fadeType = fadeAll & 0xff;
             if (fadeAll > 0 && fadeAll < 3)
-                writeRBP(6, fadeAll, 0); // stop and master reset
-            else if ((fadeAll & 0xff) == 3)
-                writeRBP(6, fadeAll >> 8, 0); // load patchset
+                writeRBP(6, fadeAll); // stop and master reset
+            else if (fadeType == 3)
+                writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+            else if (fadeType == 4)
+                writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
             fadeAll = 0;
         }
 
@@ -2427,6 +2438,7 @@ void SynthEngine::applyparameters(void)
 int SynthEngine::loadPatchSetAndUpdate(string fname)
 {
     bool result = false;
+    fname = setExtension(fname, "xmz");
     if (loadXML(fname)) // load the data
     {
         result = true;
@@ -2445,7 +2457,8 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
     {
         Unmute();
         Runtime.Log("Could not load " + fname);
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
+        if (Runtime.showGui)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
     return result;
 }
@@ -2754,25 +2767,45 @@ bool SynthEngine::saveHistory()
 }
 
 
-bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
+void SynthEngine::loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID)
+{
+    actionLock(lockmute);
+    ShutUp();
+    string name = miscMsgPop(nameID);
+    baseChan = loadVector(baseChan, name, true);
+    actionLock(unlock);
+    if (baseChan > 0)
+    {
+        baseChan &= 0xf;
+        Runtime.Log("Loaded Vector " + name + " to " + to_string(int(baseChan) + 1));
+        if (Runtime.showGui)
+        {
+            int tmp = 2 | (miscMsgPush(findleafname(name)) << 8) | baseChan << 16;
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, tmp);
+        }
+    }
+}
+
+
+unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
     if (name.empty())
     {
         Runtime.Log("No filename");
-        return false;
+        return 0;
     }
     string file = setExtension(name, "xvy");
     legit_pathname(file);
     if (!isRegFile(file))
     {
         Runtime.Log("Can't find " + file);
-        return false;
+        return 0;
     }
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml)
     {
-        Runtime.Log("Load Vector failed XMLwrapper allocation");
-        return false;
+        Runtime.Log("Load Vector failed XMLwrapper allocation", 2);
+        return 0;
     }
     xml->loadXMLfile(file);
 
@@ -2793,11 +2826,11 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
     xml->endbranch(); // VECTOR
     addHistory(file, 5);
     delete xml;
-    return true;
+    return baseChan | 0x20; // ensures we can get 'true' from channel 0
 }
 
 
-bool SynthEngine::extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml)
+unsigned char SynthEngine::extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml)
 {
     if (!xml->enterbranch("VECTOR"))
     {
@@ -2919,17 +2952,16 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml)
     {
-        Runtime.Log("Save Vector failed xmltree allocation");
+        Runtime.Log("Save Vector failed xmltree allocation", 2);
         return false;
     }
-
     insertVectorData(baseChan, true, xml);
 
     if (xml->saveXMLfile(file))
         addHistory(file, 5);
     else
     {
-        Runtime.Log("Failed to save data to " + file);
+        Runtime.Log("Failed to save data to " + file, 2);
         ok = false;
     }
     delete xml;

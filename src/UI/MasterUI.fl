@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {MasterUI.h} {not_in_source in_header
+comment {MasterUI.h} {selected not_in_source in_header
 } 
 
 comment {MasterUI.cc} {in_source not_in_header
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 } 
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1574,8 +1574,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         Reports->deactivate();
     else
         Reports->activate();
-    if (type == 1)
-    	configui->update_config(4);} {}
+    if (type & 1)
+    	configui->update_config(4);
+    if (type & 2)
+        vectorui->setLoadLabelRemote(type >> 16, miscMsgPop((type >> 8) & 0xff));} {}
   }
   Function {checkmaxparts()} {return_type bool
   } {

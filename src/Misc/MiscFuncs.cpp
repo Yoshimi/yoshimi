@@ -338,7 +338,7 @@ char *MiscFuncs::skipChars(char *buf)
     {
         ++ buf;
     }
-    if (buf[0] == 0x20)
+    if (buf[0] == 0x20) // now find the next word (if any)
         buf = skipSpace(buf);
     return buf;
 }

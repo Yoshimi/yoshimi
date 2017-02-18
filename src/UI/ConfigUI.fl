@@ -58,7 +58,7 @@ class ConfigUI {selected : {private MiscFuncs}
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {
+      Fl_Tabs {} {open
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
@@ -222,11 +222,11 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            tooltip {Some system errors always go to stderr} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
-              label stderr
+              label stdout
               xywh {0 0 34 20} labelsize 12
             }
             MenuItem {} {

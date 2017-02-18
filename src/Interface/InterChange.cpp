@@ -2521,6 +2521,7 @@ void InterChange::commandMain(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
@@ -2581,14 +2582,13 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 80: // load patchset
             if (write)
-            {
-                //synth->actionLock(lockmute);
-                //synth->writeRBP(6, par2, 0);
                 synth->allStop(3 | (par2 << 8));
-                //synth->fadeLevel = 1.0;
-            }
             break;
-        case 96: // MasterReset(
+        case 84: // load vector
+            if (write)
+                synth->allStop(4 | (par2 << 8) | (kititem << 16));
+            break;
+        case 96: // master reset
             if (write)
             {
                 synth->getRuntime().lastPatchSet = -1;

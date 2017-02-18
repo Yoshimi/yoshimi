@@ -1,5 +1,8 @@
 yoshimi 1.5.0 M
 
+2017-2-18 Will
+* Vectors now soft-load :)
+
 2017-2-17 Will
 * Cli effect presets now numbered from 1.
 * Improved Cli listing of effects/presets.

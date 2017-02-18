@@ -89,8 +89,9 @@ class SynthEngine : private SynthHelper, MiscFuncs
         string lastPatchSetSeen(void);
         bool loadHistory(void);
         bool saveHistory(void);
-        bool loadVector(unsigned char baseChan, string name, bool full);
-        bool extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml);
+        void loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID);
+        unsigned char loadVector(unsigned char baseChan, string name, bool full);
+        unsigned char extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml);
         bool saveVector(unsigned char baseChan, string name, bool full);
         bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
 
@@ -126,7 +127,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         int SetSystemValue(int type, int value);
-        void writeRBP(char type, char data0, char data1);
+        void writeRBP(char type, char data0, char data1 = 0, char data2 = 0);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
