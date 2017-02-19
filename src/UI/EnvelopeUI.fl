@@ -223,7 +223,7 @@ if(currentpoint >= 0){
          valDesc=convert_value(VC_EnvelopeFilterVal, val);
          break;
      case 5: //bandwidth offset (unformatted)
-         valDesc=std::to_string((int)val - 64);
+         valDesc=convert_value(VC_EnvelopeBandwidthVal, val);
          break;
      default:
          valDesc = "unknown env. type";
@@ -766,9 +766,10 @@ send_data(group, 24, o->value(), 0xc0);}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
 send_data(group, 0, o->value(), 0xc8);}
-          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, start} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->init(100);}
+          code2 {o->setValueType(VC_EnvelopeBandwidthVal);}
           class WidgetPDial
         }
         Fl_Dial e4adt {
@@ -787,9 +788,10 @@ send_data(group, 1, o->value(), 0xc8);}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
 send_data(group, 6, o->value(), 0xc8);}
-          tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, release} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_EnvelopeBandwidthVal);}
           class WidgetPDial
         }
         Fl_Dial e4rdt {

@@ -43,6 +43,7 @@ enum ValueType {
     VC_EnvelopeFilterVal,
     VC_EnvelopeAmpSusVal,
     VC_EnvelopeLinAmpSusVal,
+    VC_EnvelopeBandwidthVal,
     VC_FilterFreq0,
     VC_FilterFreq1,
     VC_FilterFreq2,
