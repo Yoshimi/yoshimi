@@ -1223,7 +1223,7 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
                         suffix += "S";
                     if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
                         suffix += "P";
-                    msg_buf.push_back("    ID " + asString(idx) + "    "
+                    msg_buf.push_back("    ID " + asString(idx + 1) + "    "
                                     + bank.roots [root].banks [bankNum].instruments [idx].name
                                     + "  (" + suffix + ")");
                 }
@@ -1249,7 +1249,7 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
     {
         if ((part[npart]->Pname) != "Simple Sound" || (partonoffRead(npart)))
         {
-            name = "  " + asString(npart);
+            name = "  " + asString(npart + 1);
             dest = part[npart]->Paudiodest;
             if (!partonoffRead(npart) || npart >= avail)
                 name += " -";

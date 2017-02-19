@@ -263,7 +263,7 @@ void MidiLearn::listLine(int lineNo)
     }
     if (it == midi_list.end())
     {
-        synth->getRuntime().Log("No entry for number " + to_string(lineNo));
+        synth->getRuntime().Log("No entry for number " + to_string(lineNo + 1));
         return;
     }
     else
@@ -307,7 +307,7 @@ void MidiLearn::listAll(list<string>& msg_buf)
             CCtype = to_string(CC);
         else
             CCtype = asHexString((CC >> 8) & 0x7f) + asHexString(CC & 0x7f) + " h";
-        msg_buf.push_back("Line " + to_string(lineNo) + "  CC " + CCtype + "  Chan " + to_string((int)it->chan) + "  " + it->name);
+        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + "  Chan " + to_string((int)it->chan) + "  " + it->name);
         ++ it;
         ++ lineNo;
     }
@@ -810,8 +810,8 @@ bool MidiLearn::loadList(string name)
                 status |= 2;
             if (xml->getparbool("Block",0))
                 status |= 1;
-            entry.min_out = xml->getpar("Convert_Min", 0, 0, 127);
-            entry.max_out = xml->getpar("Convert_Max", 0, 0, 127);
+            entry.min_out = xml->getpar("Convert_Min", 0, -16384, 16383);
+            entry.max_out = xml->getpar("Convert_Max", 0, -16384, 16383);
             xml->enterbranch("COMMAND");
                 entry.data.type = xml->getpar255("Type", 0); // ??
                 real.data.control = entry.data.control = xml->getpar255("Control", 0);

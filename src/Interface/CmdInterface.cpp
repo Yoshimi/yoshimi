@@ -343,7 +343,7 @@ void CmdInterface::historyList(int listnum)
             }
             int itemNo = 0;
             for (vector<string>::iterator it = listType.begin(); it != listType.end(); ++it, ++ itemNo)
-                msg.push_back(to_string(itemNo) + "  " + *it);
+                msg.push_back(to_string(itemNo + 1) + "  " + *it);
             found = true;
         }
     }
@@ -716,16 +716,16 @@ int CmdInterface::commandVector()
             Runtime.Log("No vector on channel " + asString(chan + 1));
         return done_msg;
     }
-
-    if (isdigit(point[0]))
+    unsigned char ch = string2int127(point);
+    if (ch > 0)
     {
-        tmp = string2int127(point);
-        if (tmp >= NUM_MIDI_CHANNELS)
+        ch -= 1;
+        if (ch >= NUM_MIDI_CHANNELS)
             return range_msg;
         point = skipChars(point);
-        if (chan != tmp)
+        if (chan != ch)
         {
-            chan = tmp;
+            chan = ch;
             axis = 0;
         }
 
@@ -872,9 +872,10 @@ int CmdInterface::commandPart(bool justSet)
         return effects();
     if (justSet || isdigit(point[0]))
     {
-        if (isdigit(point[0]))
+        tmp = string2int127(point);
+        if (tmp > 0)
         {
-            tmp = string2int127(point);
+            tmp -= 1;
             if (tmp >= Runtime.NumAvailableParts)
             {
                 Runtime.Log("Part number too high");
@@ -1899,8 +1900,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 {
                     point += 1;
                     point = skipSpace(point);
-                    if (isdigit(point[0]))
-                        synth->SetSystemValue(107, -string2int(point));
+                    tmp = string2int(point);
+                    if (tmp > 0)
+                        synth->SetSystemValue(107, -(tmp - 1));
+                        /*
+                         * we use negative values to detail a single line
+                         * because positive ones are used for bulk line count
+                         */
                     else
                         reply = value_msg;
                 }
@@ -2079,8 +2085,9 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 {
                     point += 1;
                     point = skipSpace(point);
-                    if (isdigit(point[0]))
-                        sendDirect(string2int(point), 0, 8, 0xd8);
+                    tmp = string2int(point);
+                    if (tmp > 0)
+                        sendDirect(tmp - 1, 0, 8, 0xd8);
                     else
                         reply = value_msg;
                 }
@@ -2105,10 +2112,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (point[0] == '@')
             {
                 point += 1;
-                point = skipSpace(point);
-                if (isdigit(point[0]))
+                tmp = string2int(point);
+                if (tmp > 0)
                 {
-                    sendDirect(0, 0, 0xf2, 0xd8, 0, 0, 0, 0, string2int(point));
+                    sendDirect(0, 0, 0xf2, 0xd8, 0, 0, 0, 0, tmp - 1);
                     reply = done_msg;
                 }
                 else
@@ -2129,24 +2136,26 @@ bool CmdInterface::cmdIfaceProcessCommand()
         else if(matchnMove(2, point, "vector"))
         {
             string loadChan;
+            unsigned char ch;
             if(matchnMove(1, point, "channel"))
             {
-                if (isdigit(point[0]))
+                ch = string2int127(point);
+                if (ch > 0)
                 {
-                    tmp = string2int127(point);
+                    ch -= 1;
                     point = skipChars(point);
-                    chan = tmp;
+                    //chan = ch;
                 }
                 else
-                    tmp = chan;
-                loadChan = "channel " + asString(chan + 1);
+                    ch = chan;
+                loadChan = "channel " + asString(ch + 1);
             }
             else
             {
-                tmp = 255;
+                ch = 255;
                 loadChan = "source channel";
             }
-            if (tmp != 255 && tmp >= NUM_MIDI_CHANNELS)
+            if (ch != 255 && tmp >= NUM_MIDI_CHANNELS)
                 reply = range_msg;
             else if (point[0] == 0)
                 reply = name_msg;
@@ -2158,12 +2167,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 {
                     point += 1;
                     point = skipSpace(point);
-                    if (!isdigit(point[0]))
+                    tmp = string2int(point);
+                    if (tmp <= 0)
                     {
                         ok = false;
                         reply = value_msg;
                     }
-                    name = historySelect(5, string2int(point));
+                    name = historySelect(5, tmp - 1);
                     if (name == "")
                     {
                         ok = false;
@@ -2180,7 +2190,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                     }
                 }
                 if (ok)
-                    sendDirect(0, 64, 84, 240, tmp, 0, 0, 0, miscMsgPush(name));
+                    sendDirect(0, 64, 84, 240, ch, 0, 0, 0, miscMsgPush(name));
                 reply = done_msg;
             }
         }
@@ -2220,12 +2230,13 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 {
                     point += 1;
                     point = skipSpace(point);
-                    if (!isdigit(point[0]))
+                    tmp = string2int(point);
+                    if (tmp <= 0)
                     {
                         ok = false;
                         reply = value_msg;
                     }
-                    name = historySelect(2, string2int(point));
+                    name = historySelect(2, tmp - 1);
                     if (name == "")
                     {
                         ok = false;
@@ -2279,10 +2290,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
             tmp = chan;
             if(matchnMove(1, point, "channel"))
             {
-                tmp = string2int127(point);
+                tmp = string2int127(point) - 1;
                 point = skipChars(point);
             }
-            if (tmp >= NUM_MIDI_CHANNELS)
+            if (tmp >= NUM_MIDI_CHANNELS || tmp < 0)
                 reply = range_msg;
             else if (point[0] == 0)
                 reply = name_msg;
@@ -2290,7 +2301,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             {
                 chan = tmp;
                 if(synth->saveVector(chan, (string) point, true))
-                    Runtime.Log("Saved channel " + asString(chan) + " Vector to " + (string) point);
+                    Runtime.Log("Saved channel " + asString(chan + 1) + " Vector to " + (string) point);
                 reply = done_msg;
             }
         }
