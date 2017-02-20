@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-2-20 Will
+* Remaining Cli inputs converted.
+  I hope!
+
 2017-2-19 Will
 * Bugfix: Midi-learn wasn't reloading the correct ranges.
 * Found more Cli numbers to adjust :(

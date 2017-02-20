@@ -478,9 +478,10 @@ int CmdInterface::effects()
         return done_msg;
     }
 
-    if (!isRead && isdigit(point[0]))
+    value = string2int(point);
+    if (value > 0)
     {
-        value = string2int(point);
+        value -= 1;
         point = skipChars(point);
         if (value >= nFXavail)
             return range_msg;
@@ -563,10 +564,10 @@ int CmdInterface::effects()
             }
             else
             {
-                par = string2int(point);
-                if (par >= Runtime.NumAvailableParts)
+                par = string2int(point) - 1;
+                if (par >= Runtime.NumAvailableParts || par < 0)
                     return range_msg;
-                dest = "part " + asString(par);
+                dest = "part " + asString(par + 1);
                 // done this way in case there is rubbish on the end
             }
             value = 0;
@@ -574,7 +575,7 @@ int CmdInterface::effects()
         else
         {
 
-            par = string2int(point);
+            par = string2int(point) - 1;
             point = skipChars(point);
             if (point[0] == 0)
                 return value_msg;
@@ -584,7 +585,7 @@ int CmdInterface::effects()
         {
             category = 2;
             dest = "part " + asString(npart + 1) + " efx sent to system "
-                 + asString(par) + " at " + asString(value);
+                 + asString(par + 1) + " at " + asString(value);
         }
         else if (bitTest(level, ins_fx))
         {
@@ -597,7 +598,7 @@ int CmdInterface::effects()
                 return range_msg;
             category = 0;
             dest = "system efx " + asString(nFX + 1) + " sent to "
-                 + asString(par) + " at " + asString(value);
+                 + asString(par + 1) + " at " + asString(value);
         }
 
         synth->SetEffects(category, 4, nFX, nFXtype, par, value);
@@ -615,10 +616,8 @@ int CmdInterface::effects()
         par = string2int(fx_presets [nFXtype].substr(0, fx_presets [nFXtype].find(',')));
         if (par == 1)
             return available_msg;
-        if (point[0] == 0)
-            return value_msg;
-        value = string2int127(point);
-        if (value >= par)
+        value = string2int127(point) - 1;
+        if (value >= par || value < 0)
             return range_msg;
         if (bitTest(level, part_lev))
         {
@@ -949,7 +948,8 @@ int CmdInterface::commandPart(bool justSet)
             else
             {
                 tmp = string2int127(point);
-                synth->SetPartChan(npart, tmp);
+                if (tmp > 0)
+                synth->SetPartChan(npart, tmp - 1);
             }
             string name = "";
             if (tmp >= NUM_MIDI_CHANNELS * 2)
