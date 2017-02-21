@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {Envelope.h} {not_in_source in_header
+comment {Envelope.h} {selected not_in_source in_header
 } 
 
 comment {Envelope.cc} {in_source not_in_header
@@ -535,7 +535,7 @@ send_data(group, 24, o->value(), 0xc0);}
           label L
           callback {env->Plinearenvelope=(int)o->value();
 setAmpSusVType((int)o->value());
-send_data(group, 17, o->value(), 0xc0);} selected
+send_data(group, 17, o->value(), 0xc0);}
           tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
@@ -647,7 +647,7 @@ send_data(group, 24, o->value(), 0xc0);}
       class Fl_Group
     } {
       Fl_Group {} {
-        label {Filter Env}
+        label {Filter Envelope}
         xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e3aval {
@@ -1060,9 +1060,9 @@ make_free_window();
 make_freemode_edit_window();
 
 envwindow=NULL;
-if (env->Envmode==3) envfreegroup->label("Frequency Envelope");
+if (env->Envmode==3) envfreegroup->label("Frequency Env");
 if (env->Envmode==4) envfreegroup->label("Filter Envelope");
-if (env->Envmode==5) envfreegroup->label("Bandwidth Envelope");
+if (env->Envmode==5) envfreegroup->label("Bandwidth Env");
 
 freemodeeditwindow->label(this->label());
 
