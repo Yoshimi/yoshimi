@@ -1,5 +1,37 @@
 yoshimi 1.5.0 M
 
+2017-2-21 Will
+* Merged  in Jörn's latest tooltip additions.
+* Minor change to freemode Envelope text to remove overlaps.
+
+2017-2-20 Will
+* Remaining Cli inputs converted.
+  I hope!
+
+2017-2-19 Will
+* Bugfix: Midi-learn wasn't reloading the correct ranges.
+* Found more Cli numbers to adjust :(
+* Started changing Cli *input* numbers to match Gui ones.
+* Got as far as 'commandPart'.
+
+2017-2-18 Will
+* Vectors now soft-load :)
+
+2017-2-17 Will
+* Cli effect presets now numbered from 1.
+* Improved Cli listing of effects/presets.
+* Bugfix: Solo wasn't seeing 'Loop' when reloading.
+* Bugfix: Mute not cleared if patchset load failed.
+* Cli can load patchsets and vectors from list numbers.
+* Cli loading vectors updates the Gui.
+
+2017-2-16 Will
+* Improved readline behavour.
+  Still needs more work - sometimes multiple prompt lines!
+* Converted reported Cli numbers to match Gui ones.
+  May have missed some :(
+  Entries still zero based.
+
 2017-2-13 Will
 * Spash screen onptimisations.
 * Small Fadeout improvement.

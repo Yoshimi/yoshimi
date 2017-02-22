@@ -240,6 +240,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
+    showValue = true;
+
     Part *part;
     part = synth->part[npart];
 
@@ -251,8 +253,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
 
-    bool isMidi = type & 8;
-//cout << "Button " << int(button) << endl;
+//    bool isMidi = type & 8;
+
 #ifdef ENABLE_REPORTS
     if ((isGui && button < 2) || (isCli && button == 1))
 #else
@@ -281,36 +283,33 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
     if (npart >= 0xc0 && npart < 0xd0)
-    {
         commandName = resolveVector(getData);
-    }
+
     else if (npart == 0xf0)
-    {
         commandName = resolveMain(getData);
-    }
-    else if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
-    {
-        commandName = resolveSysIns(getData);
-    }
+
+    else if (npart == 0xf1 || npart == 0xf2)
+        commandName = resolveEffects(getData);
+
     else if (npart >= 0x40)
         commandName = "Invalid part " + to_string(int(npart));
-    else if (kititem >= 0x80 && kititem != 0xff)
-    {
+
+    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= 64 && control <= 67 && kititem == 0xff))
         commandName = resolveEffects(getData);
-    }
 
     else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
-        commandName = "Part " + to_string(int(npart)) + " Kit item " + to_string(int(kititem)) + " not enabled";
+        commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
     else if (kititem == 0xff || (kititem & 0x20))
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
-            commandName = "Part " + to_string(int(npart)) + " Kitmode not enabled";
+            commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
         else
             commandName = resolvePart(getData);
     }
     else if (kititem > 0 && part->Pkitmode == 0)
-        commandName = "Part " + to_string(int(npart)) + " Kitmode not enabled";
+        commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+
     else if (engine == 2)
     {
         switch(insert)
@@ -415,12 +414,15 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    string actual = " Value ";
-    if (type & 0x80)
-        actual += to_string((int)round(value));
-    else
-        actual += to_string(value);
-
+    string actual = "";
+    if (showValue)
+    {
+        actual = " Value ";
+        if (type & 0x80)
+            actual += to_string((int)round(value));
+        else
+            actual += to_string(value);
+    }
     if ((isGui || isCli) && button == 3)
     {
         synth->midilearn.setTransferBlock(getData, commandName);
@@ -489,13 +491,18 @@ string InterChange::resolveVector(CommandBlock *getData)
             break;
     }
 
-    string name = "Vector Chan " + to_string(chan);
+    if (control == 0)
+    {
+        showValue = false;
+        return("Vector " + contstr + " set to " + to_string(chan + 1));
+    }
+    string name = "Vector Chan " + to_string(chan + 1) + " ";
     if (control == 127)
         name += " all ";
     else if (control >= 32)
-        name += " Y ";
+        name += "Y ";
     else if(control >= 16)
-        name += " X ";
+        name += "X ";
 
     return (name + contstr);
 }
@@ -558,7 +565,7 @@ string InterChange::resolvePart(CommandBlock *getData)
 
     string kitnum;
     if (kitType)
-        kitnum = " Kit " + to_string(kititem & 0x1f) + " ";
+        kitnum = " Kit " + to_string((kititem & 0x1f) + 1) + " ";
     else
         kitnum = " ";
 
@@ -666,16 +673,16 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
 
         case 40:
-            contstr = "Effect Send 0";
-            break;
-        case 41:
             contstr = "Effect Send 1";
             break;
-        case 42:
+        case 41:
             contstr = "Effect Send 2";
             break;
-        case 43:
+        case 42:
             contstr = "Effect Send 3";
+            break;
+        case 43:
+            contstr = "Effect Send 4";
             break;
 
         case 48:
@@ -693,13 +700,13 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Effect Number";
             break;
         case 65:
-            contstr = "Effect " + to_string(effNum) + " Type";
+            contstr = "Effect " + to_string(effNum + 1) + " Type";
             break;
         case 66:
-            contstr = "Effect " + to_string(effNum) + " Destination";
+            contstr = "Effect " + to_string(effNum + 1) + " Destination";
             break;
         case 67:
-            contstr = "Bypass Effect "+ to_string(effNum);
+            contstr = "Bypass Effect "+ to_string(effNum + 1);
             break;
 
         case 96: // doClearPart
@@ -800,7 +807,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + kitnum + name + contstr);
+    return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 
 
@@ -877,7 +884,7 @@ string InterChange::resolveAdd(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " AddSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + name + contstr);
 }
 
 
@@ -1068,7 +1075,7 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " Add Voice " + to_string(nvoice) + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
 }
 
 
@@ -1087,7 +1094,7 @@ string InterChange::resolveSub(CommandBlock *getData)
         else
             Htype = " Bandwidth";
 
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth Harmonic " + to_string(control) + Htype);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth Harmonic " + to_string(control + 1) + Htype);
     }
 
     string name = "";
@@ -1192,7 +1199,7 @@ string InterChange::resolveSub(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
 }
 
 
@@ -1367,7 +1374,7 @@ string InterChange::resolvePad(CommandBlock *getData)
 
     if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
         isPad += " - Need to Apply";
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " PadSynth " + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
 }
 
 
@@ -1391,18 +1398,18 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     }
     else
     {
-        eng_name = " Add Voice " + to_string(engine & 0x3f);
+        eng_name = " Add Voice " + to_string((engine & 0x3f) + 1);
         if (engine & 0x40)
             eng_name += " Modulator";
     }
 
     if (insert == 6)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Amplitude" + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
     else if(insert == 7)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Phase" + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
 
     string name = "";
@@ -1534,7 +1541,7 @@ string InterChange::resolveOscillator(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + name + contstr + isPad);
 }
 
 
@@ -1563,7 +1570,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
     {
         if (write == true && engine == 2)
             isPad = " - Need to Apply";
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
     }
 
     if (write == true && engine == 2 && control != 104)
@@ -1604,7 +1611,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance " + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
 }
 
 
@@ -1626,7 +1633,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
     else if (engine >= 0x80)
     {
         int nvoice = engine & 0x3f;
-        name = " Add Voice " + to_string(nvoice);
+        name = " Add Voice " + to_string(nvoice + 1);
     }
 
     switch (insertParam)
@@ -1674,7 +1681,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + lfo + " LFO " + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + lfo + " LFO " + contstr);
 }
 
 
@@ -1698,7 +1705,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (engine == 2)
         name = " PadSynth";
     else if (engine >= 0x80)
-        name = " Adsynth Voice " + to_string(engine & 0x3f);
+        name = " Adsynth Voice " + to_string((engine & 0x3f) + 1);
     string contstr;
     switch (control)
     {
@@ -1788,7 +1795,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (control == 37)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Filter " + extra + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + extra + contstr);
 }
 
 
@@ -1816,7 +1823,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     {
         name = " Add Voice ";
         int nvoice = engine & 0x3f;
-        name += to_string(nvoice);
+        name += to_string(nvoice + 1);
         if (engine >= 0xC0)
             name += " Modulator";
     }
@@ -1843,16 +1850,15 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         {
             return ("Freemode add/remove is write only. Current points " + to_string(par2));
         }
-        string action;
         if (control >= 0x40)
-            return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + " X increment " + to_string(par2) + " Y");
+            return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env Added Freemode Point " + to_string((control & 0x3f) + 1) + " X increment " + to_string(par2) + " Y");
         else
-            return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + " Remaining " + to_string(par2));
+            return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env Removed Freemode Point " +  to_string(control + 1) + " Remaining " + to_string(par2));
     }
 
     if (insert == 4)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + " X increment " + to_string(par2) + " Y");
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env Freemode Point " +  to_string(control + 1) + " X increment " + to_string(par2) + " Y");
     }
 
     string contstr;
@@ -1906,59 +1912,18 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env " + contstr);
-}
-
-
-string InterChange::resolveSysIns(CommandBlock *getData)
-{
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char effnum = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-
-    bool isSysEff = (npart == 0xf1);
-
-    string name;
-    if (isSysEff)
-        name = "System ";
-    else
-        name = "Insert ";
-
-    string contstr;
-    string second;
-    if (insert == 0xff)
-    {
-        second = "";
-        switch (control)
-        {
-            case 0:
-                contstr = "Number ";
-                break;
-            case 1:
-                contstr = to_string(effnum) + " Type ";
-                break;
-            case 2: // insert only
-                contstr = to_string(effnum) + " To ";
-        }
-        contstr = "Effect " + contstr;
-    }
-    else // system only
-    {
-        contstr = "From Effect " + to_string(effnum);
-        second = " To Effect " + to_string(control);
-    }
-
-    return (name  + contstr + second);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env " + contstr);
 }
 
 
 string InterChange::resolveEffects(CommandBlock *getData)
 {
+    int value = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit & 0x1f;
+    unsigned char kititem = getData->data.kit;
     unsigned char effnum = getData->data.engine;
+    unsigned char insert = getData->data.insert;
 
     string name;
     string actual;
@@ -1967,7 +1932,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     else if (npart == 0xf2)
         name = "Insert";
     else
-        name = "Part " + to_string(npart);
+        name = "Part " + to_string(npart + 1);
 
     if (kititem == 8 && getData->data.insert < 0xff)
     {
@@ -1975,19 +1940,81 @@ string InterChange::resolveEffects(CommandBlock *getData)
             name = "System";
         else if (npart == 0xf2)
             name = "Insert";
-        else name = "Part " + to_string(npart);
-        name += " Effect " + to_string(effnum);
+        else name = "Part " + to_string(npart + 1);
+        name += " Effect " + to_string(effnum + 1);
 
         return (name + " DynFilter ~ Filter Parameter " + to_string(control));
     }
 
-    name += " Effect " + to_string(effnum);
+    name += " Effect " + to_string(effnum + 1);
 
-    string effname;
-    switch (kititem)
+    string effname = "";
+    if (npart < 0x40 && (control == 64 || control == 66 || control == 67))
+    {
+        if (control == 64)
+            name = "Set " + name;
+        else if (control == 66)
+        {
+            effname = " sent to ";
+            if (value == 0)
+                effname += "next effect";
+            else if (value == 1)
+                effname += "part out";
+            else if (value == 1)
+                effname += "dry out";
+        }
+        else if (control == 67)
+            effname = " bypassed";
+        showValue = false;
+        return (name + effname);
+    }
+    else if (npart > 0xf0 && kititem == 0xff)
+    {
+        string contstr;
+        string second = "";
+        if (npart == 0xf1 && insert == 16)
+        {
+                name = "System ";
+                contstr = "from Effect " + to_string(effnum + 1);
+                second = " to Effect " + to_string(control + 1);
+                return (name + contstr + second);
+        }
+        if (npart == 0xf2 && control == 2)
+        {
+            contstr = " To ";
+            if (value == -2)
+                contstr += "Master out";
+            else if (value == -1)
+                contstr = " Off";
+            else
+            {
+                contstr += "Part ";
+                second = to_string(value + 1);
+            }
+            showValue = false;
+            return ("Send " + name + contstr + second);
+        }
+        if (control == 0)
+        {
+            name = "Set " + name;
+            showValue = false;
+            return (name + effname);
+        }
+    }
+    string contstr = "";
+    if ((npart < 0x40 && control == 65) || (npart > 0xf0 && kititem == 0xff && control == 1))
+    {
+        name += " set to";
+        kititem = value;
+        showValue = false;
+    }
+    else
+        contstr = " Control " + to_string(control + 1);
+
+    switch (kititem & 0x1f)
     {
         case 0:
-            effname = " NO Effect"; // shouldn't get here!
+            effname = " NO Effect";
             break;
         case 1:
             effname = " Reverb";
@@ -2014,8 +2041,6 @@ string InterChange::resolveEffects(CommandBlock *getData)
             effname = " DynFilter";
             break;
     }
-
-    string contstr = " Control " + to_string(control);
 
     return (name + effname + contstr);
 }
@@ -2496,6 +2521,7 @@ void InterChange::commandMain(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
@@ -2556,14 +2582,13 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 80: // load patchset
             if (write)
-            {
-                //synth->actionLock(lockmute);
-                //synth->writeRBP(6, par2, 0);
                 synth->allStop(3 | (par2 << 8));
-                //synth->fadeLevel = 1.0;
-            }
             break;
-        case 96: // MasterReset(
+        case 84: // load vector
+            if (write)
+                synth->allStop(4 | (par2 << 8) | (kititem << 16));
+            break;
+        case 96: // master reset
             if (write)
             {
                 synth->getRuntime().lastPatchSet = -1;

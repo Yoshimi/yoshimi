@@ -1,7 +1,7 @@
 /*
     MiscGui.cpp - common link between GUI and synth
 
-    Copyright 2016-2017 Will Godfrey
+    Copyright 2016-2017 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    modified February 2017
+    Modified February 2017
 */
 
 #include <FL/Fl.H>
@@ -499,6 +499,24 @@ string convert_value(ValueType type, float val)
         case VC_EnvelopeAmpSusVal:
             return(custom_value_units((1.0f - (int)val / 127.0f)
                                       * MIN_ENVELOPE_DB, "dB", 1));
+
+        case VC_EnvelopeLinAmpSusVal:
+            f = 20.0f * log10f((int)val / 127.0f);
+            if(f > -10)
+               return(custom_value_units(f, "dB", 2));
+            else
+               return(custom_value_units(f, "dB", 1));
+
+        case VC_EnvelopeBandwidthVal:
+	    f = powf(2.0f, 10.0f * ((int)val - 64) / 64.0f);
+            if(f > 100)
+                return(custom_value_units(f, "x", 1));
+            else if(f > 10)
+                return(custom_value_units(f, "x", 2));
+            else if(f > 0.01)
+                return(custom_value_units(f, "x", 3));
+            else
+                return(custom_value_units(f, "x", 4));
 
         case VC_FilterFreq0: // AnalogFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);

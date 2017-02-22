@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified January 2015
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified February 2015
 */
 
 #ifndef CONFIG_H
@@ -144,6 +146,7 @@ class Config : public MiscFuncs
         int           NumAvailableParts;
         int           currentPart;
         int           lastPatchSet;
+        string        CLIstring;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;

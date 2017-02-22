@@ -414,6 +414,8 @@ void *SynthEngine::RBPthread(void)
     unsigned int read;
     unsigned int found;
     unsigned int tries;
+    unsigned char tmp;
+    string name;
     while (Runtime.runSynth)
     {
         if (jack_ringbuffer_read_space(RBPringbuf) >= readsize)
@@ -454,17 +456,22 @@ void *SynthEngine::RBPthread(void)
                         SetProgramToPart(block.data[1], -1, miscMsgPop(block.data[2]));
                         break;
 
-                    case 6: // cease all sound or load named patchset via miscMsg
-                        if (block.data[1] == 1)
+                    case 6: // cease all sound or load named file via miscMsg
+                        tmp = block.data[1] & 0xff;
+                        if (tmp == 1)
                         {
                             actionLock(lockmute);
                             ShutUp();
                             actionLock(unlock);
                         }
-                        else if(block.data[1] == 2)
+                        else if(tmp == 2)
                             resetAll();
-                        else
-                            loadPatchSetAndUpdate(miscMsgPop(block.data[1]));
+
+                        else if(tmp == 3) // patchset
+                            loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
+
+                        else if (tmp == 4) // vector
+                            loadVectorAndUpdate(block.data[3], block.data[2]);
                         break;
 
                     case 7: // load named state via miscMsg
@@ -945,9 +952,9 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
         loadOK = true;
         // show file instead of program if we got here from Instruments -> Load External...
         loaded = "Loaded " +
-                    ((pgm == -1) ? fname : to_string(pgm)
+                    ((pgm == -1) ? fname : to_string(pgm + 1)
                     + " \"" + bank.getname(pgm) + "\"")
-                    + " to Part " + to_string(npart);
+                    + " to Part " + to_string(npart + 1);
         if (Runtime.showTimes)
         {
             gettimeofday(&tv2, NULL);
@@ -1216,7 +1223,7 @@ void SynthEngine::ListInstruments(int bankNum, list<string>& msg_buf)
                         suffix += "S";
                     if (bank.roots [root].banks [bankNum].instruments [idx].PADsynth_used)
                         suffix += "P";
-                    msg_buf.push_back("    ID " + asString(idx) + "    "
+                    msg_buf.push_back("    ID " + asString(idx + 1) + "    "
                                     + bank.roots [root].banks [bankNum].instruments [idx].name
                                     + "  (" + suffix + ")");
                 }
@@ -1242,7 +1249,7 @@ void SynthEngine::ListCurrentParts(list<string>& msg_buf)
     {
         if ((part[npart]->Pname) != "Simple Sound" || (partonoffRead(npart)))
         {
-            name = "  " + asString(npart);
+            name = "  " + asString(npart + 1);
             dest = part[npart]->Paudiodest;
             if (!partonoffRead(npart) || npart >= avail)
                 name += " -";
@@ -1293,9 +1300,9 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
         if (Xfeatures & 8)
             Xtext += " 4";
     }
-    msg_buf.push_back("Channel " + asString(chan));
+    msg_buf.push_back("Channel " + asString(chan + 1));
     msg_buf.push_back("  X CC = " + asString((int)  Runtime.nrpndata.vectorXaxis[chan]) + ",  " + Xtext);
-    msg_buf.push_back("    L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
+    msg_buf.push_back("  L = " + part[chan]->Pname + ",  R = " + part[chan + 16]->Pname);
 
     if (Runtime.nrpndata.vectorYaxis[chan] > 0x7f
         || Runtime.NumAvailableParts < NUM_MIDI_CHANNELS * 4)
@@ -1318,7 +1325,7 @@ bool SynthEngine::SingleVector(list<string>& msg_buf, int chan)
                 Ytext += " 4";
         }
         msg_buf.push_back("  Y CC = " + asString((int) Runtime.nrpndata.vectorYaxis[chan]) + ",  " + Ytext);
-        msg_buf.push_back("    U = " + part[chan + 32]->Pname + ",  D = " + part[chan + 48]->Pname);
+        msg_buf.push_back("  U = " + part[chan + 32]->Pname + ",  D = " + part[chan + 48]->Pname);
     }
     return true;
 }
@@ -1499,7 +1506,7 @@ int SynthEngine::SetSystemValue(int type, int value)
             else
             {
                 Runtime.toConsole = false;
-                Runtime.Log("Sending reports to stderr");
+                Runtime.Log("Sending reports to stdout");
             }
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, 0);
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateConfig, 1);
@@ -1760,13 +1767,14 @@ int SynthEngine::SetSystemValue(int type, int value)
 }
 
 
-void SynthEngine::writeRBP(char type, char data0, char data1)
+void SynthEngine::writeRBP(char type, char data0, char data1, char data2)
 {
     struct RBP_data block;
     unsigned int writesize = sizeof(RBP_data);
     block.data[0] = type;
     block.data[1] = data0;
     block.data[2] = data1;
+    block.data[3] = data2;
     char *point = (char*)&block;
     unsigned int towrite = writesize;
     unsigned int wrote = 0;
@@ -1877,7 +1885,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorXcc2[chan] = C_panning;
             Runtime.nrpndata.vectorXcc4[chan] = C_filtercutoff;
             Runtime.nrpndata.vectorXcc8[chan] = C_modwheel;
-            Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
+            //Runtime.Log("Vector " + asString((int) chan) + " X CC set to " + asString(par));
             break;
 
         case 1:
@@ -1891,7 +1899,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
                 Runtime.nrpndata.vectorYcc2[chan] = C_panning;
                 Runtime.nrpndata.vectorYcc4[chan] = C_filtercutoff;
                 Runtime.nrpndata.vectorYcc8[chan] = C_modwheel;
-                Runtime.Log("Vector " + asString((int) chan) + " Y CC set to " + asString(par));
+                //Runtime.Log("Vector " + asString(int(chan) + 1) + " Y CC set to " + asString(par));
             }
             break;
 
@@ -1960,7 +1968,7 @@ void SynthEngine::vectorSet(int dHigh, unsigned char chan, int par)
             Runtime.nrpndata.vectorYaxis[chan] = 0xff;
             Runtime.nrpndata.vectorXfeatures[chan] = 0;
             Runtime.nrpndata.vectorYfeatures[chan] = 0;
-            Runtime.Log("Channel " + asString((int) chan) + " vector control disabled");
+            Runtime.Log("Channel " + asString(int(chan) + 1) + " vector control disabled");
             break;
     }
 }
@@ -2269,10 +2277,13 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
         if (fadeAll && fadeLevel <= 0.001f)
         {
             Mute();
+            unsigned char fadeType = fadeAll & 0xff;
             if (fadeAll > 0 && fadeAll < 3)
-                writeRBP(6, fadeAll, 0); // stop and master reset
-            else if ((fadeAll & 0xff) == 3)
-                writeRBP(6, fadeAll >> 8, 0); // load patchset
+                writeRBP(6, fadeAll); // stop and master reset
+            else if (fadeType == 3)
+                writeRBP(6, fadeType, fadeAll >> 8, 0); // load patchset
+            else if (fadeType == 4)
+                writeRBP(6, fadeType, (fadeAll >> 8) & 0xff, fadeAll >> 16); // load vector
             fadeAll = 0;
         }
 
@@ -2427,10 +2438,11 @@ void SynthEngine::applyparameters(void)
 int SynthEngine::loadPatchSetAndUpdate(string fname)
 {
     bool result = false;
+    fname = setExtension(fname, "xmz");
     if (loadXML(fname)) // load the data
     {
-        actionLock(lockmute);
         result = true;
+        actionLock(lockmute);
         setAllPartMaps();
         addHistory(fname, 2);
         actionLock(unlock);
@@ -2443,8 +2455,10 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
     }
     else
     {
+        Unmute();
         Runtime.Log("Could not load " + fname);
-        GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
+        if (Runtime.showGui)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
     return result;
 }
@@ -2753,25 +2767,45 @@ bool SynthEngine::saveHistory()
 }
 
 
-bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
+void SynthEngine::loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID)
+{
+    actionLock(lockmute);
+    ShutUp();
+    string name = miscMsgPop(nameID);
+    baseChan = loadVector(baseChan, name, true);
+    actionLock(unlock);
+    if (baseChan > 0)
+    {
+        baseChan &= 0xf;
+        Runtime.Log("Loaded Vector " + name + " to " + to_string(int(baseChan) + 1));
+        if (Runtime.showGui)
+        {
+            int tmp = 2 | (miscMsgPush(findleafname(name)) << 8) | baseChan << 16;
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdateMaster, tmp);
+        }
+    }
+}
+
+
+unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
 {
     if (name.empty())
     {
         Runtime.Log("No filename");
-        return false;
+        return 0;
     }
     string file = setExtension(name, "xvy");
     legit_pathname(file);
     if (!isRegFile(file))
     {
         Runtime.Log("Can't find " + file);
-        return false;
+        return 0;
     }
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml)
     {
-        Runtime.Log("Load Vector failed XMLwrapper allocation");
-        return false;
+        Runtime.Log("Load Vector failed XMLwrapper allocation", 2);
+        return 0;
     }
     xml->loadXMLfile(file);
 
@@ -2792,11 +2826,11 @@ bool SynthEngine::loadVector(unsigned char baseChan, string name, bool full)
     xml->endbranch(); // VECTOR
     addHistory(file, 5);
     delete xml;
-    return true;
+    return baseChan | 0x20; // ensures we can get 'true' from channel 0
 }
 
 
-bool SynthEngine::extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml)
+unsigned char SynthEngine::extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml)
 {
     if (!xml->enterbranch("VECTOR"))
     {
@@ -2918,17 +2952,16 @@ bool SynthEngine::saveVector(unsigned char baseChan, string name, bool full)
     XMLwrapper *xml = new XMLwrapper(this);
     if (!xml)
     {
-        Runtime.Log("Save Vector failed xmltree allocation");
+        Runtime.Log("Save Vector failed xmltree allocation", 2);
         return false;
     }
-
     insertVectorData(baseChan, true, xml);
 
     if (xml->saveXMLfile(file))
         addHistory(file, 5);
     else
     {
-        Runtime.Log("Failed to save data to " + file);
+        Runtime.Log("Failed to save data to " + file, 2);
         ok = false;
     }
     delete xml;
@@ -3126,7 +3159,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     Runtime.NumAvailableParts = xml->getpar("current_midi_parts", NUM_MIDI_CHANNELS, NUM_MIDI_CHANNELS, NUM_MIDI_PARTS);
     setPvolume(xml->getpar127("volume", Pvolume));
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
-    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 2);
+    Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
     Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
 
     partonoffWrite(0, 0); // why?;
