@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code, modified February 2017
 */
 
 #ifndef LFO_H
@@ -39,6 +39,7 @@ class LFO
     private:
         LFOParams *lfopars;
         void Recompute(void);
+        void RecomputeFreq(void);
         void computenextincrnd(void);
         float x;
         float basefreq;
