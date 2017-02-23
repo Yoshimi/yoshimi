@@ -26,8 +26,6 @@ Add scales control to CLI.
 
 Make things like LFOs either floats or much higher resolution.
 
-Make LFOs active on sounding notes. Not easy!
-
 Consider enabling and disabling tooltips.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
