@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified December 2016
+    This file is a derivative of a ZynAddSubFX original, modified February 2017
 */
 
 #include "Params/SUBnoteParameters.h"

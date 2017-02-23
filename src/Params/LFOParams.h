@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified January 2011
+    This file is derivative of original ZynAddSubFX code, modified February 2017
 */
 
 #ifndef LFO_PARAMS_H
