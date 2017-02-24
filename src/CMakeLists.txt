@@ -73,6 +73,7 @@ endif (HasJackSession)
 
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
+option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
 option (EnableGuiReports "Enable GUI control reports" OFF)
@@ -92,6 +93,11 @@ set (BuildOptions_x86_64AMD
 set (BuildOptions_X86_64Core2
     "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
+)
+
+set (BuildOptions_NEON
+"-03 -march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
+  CACHE STRING "Cortex_a9 compiler options"
 )
 
 set (BuildOptionsBasic
@@ -257,7 +263,11 @@ else (BuildForDebug)
         if (BuildForCore2_X86_64)
             set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
         else (BuildForCore2_X86_64)
-            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+            if (BuildForNEON)
+                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
+            else (BuildForNEON)
+                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+            endif (BuildForNEON)
         endif (BuildForCore2_X86_64)
     endif (BuildForAMD_X86_64)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")

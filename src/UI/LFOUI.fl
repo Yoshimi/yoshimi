@@ -11,7 +11,7 @@ comment {LFOUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2017, Will Godfrey
+Copyright 2017, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,7 +27,8 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified January 2017
+This file is a derivative of the ZynAddSubFX original
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -85,7 +86,7 @@ hide();
       } {
         Fl_Dial freq {
           label {Freq.}
-		  callback {pars->setPfreq(o->value());
+          callback {pars->setPfreq(o->value());
 send_data(group, 0, o->value(), 0x48);}
           tooltip {LFO Frequency} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 step 1e-05
           code0 {o->setValueType(VC_LFOfreq);}
@@ -102,7 +103,6 @@ send_data(group, 0, o->value(), 0x48);}
         synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelfofreq->value(depth);
 
     send_data(group, 1, depth, 0xc8);}
-
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getLFOdepthType(group));}
           code1 {if (engine < 0x80) o->init(0); else if (group == 0) o->init(32); else if (group == 1) o->init(40); else o->init(20);}
@@ -110,7 +110,7 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial delay {
           label Delay
-		  callback {pars->setPdelay((int)o->value());
+          callback {pars->setPdelay((int)o->value());
 		  send_data(group, 2, o->value(), 0xc8);}
           tooltip {LFO delay} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOdelay);}
@@ -119,7 +119,7 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial startphase {
           label Start
-		  callback {pars->setPstartphase((int)o->value());
+          callback {pars->setPstartphase((int)o->value());
 		  send_data(group, 3, o->value(), 0xc8);}
           tooltip {LFO Startphase (leftmost is Random)} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_LFOstartphase);}
@@ -128,7 +128,7 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial randomness {
           label {A.R.}
-		  callback {pars->setPrandomness((int)o->value());
+          callback {pars->setPrandomness((int)o->value());
 		  send_data(group, 4, o->value(), 0xc8);}
           tooltip {LFO Amplitude Randomness} xywh {180 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
@@ -137,7 +137,7 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Choice LFOtype {
           label Type
-		  callback {pars->setPLFOtype((int)o->value());
+          callback {pars->setPLFOtype((int)o->value());
 		  send_data(group, 5, o->value(), 0xc0);}
           tooltip {LFO function} xywh {180 40 45 15} down_box BORDER_BOX labelsize 10 align 2 textsize 8
         } {
@@ -172,13 +172,13 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Check_Button continous {
           label {C.}
-		  callback {pars->setPcontinous((int)o->value());
+          callback {pars->setPcontinous((int)o->value());
 		  send_data(group, 6, o->value(), 0xc0);}
           tooltip {Continuous LFO} xywh {165 35 15 15} down_box DOWN_BOX labelsize 10 align 2
         }
         Fl_Dial freqrand {
           label {F.R.}
-		  callback {pars->setPfreqrand((int)o->value());
+          callback {pars->setPfreqrand((int)o->value());
 		  send_data(group, 7, o->value(), 0xc8);}
           tooltip {LFO Frequency Randomness} xywh {205 7 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(0);}
@@ -187,7 +187,7 @@ send_data(group, 0, o->value(), 0x48);}
         }
         Fl_Dial stretch {
           label {Str.}
-		  callback {pars->setPstretch((int)o->value());
+          callback {pars->setPstretch((int)o->value());
 send_data(group, 8, o->value(), 0xc8);}
           tooltip {LFO frequency stretch} xywh {144 30 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->init(64);}
@@ -308,4 +308,4 @@ lfotype->label(this->label());} {}
   }
   decl {int engine;} {private local
   }
-}
+} 
