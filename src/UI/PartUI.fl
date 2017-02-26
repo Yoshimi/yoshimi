@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {PartUI.h} {not_in_source in_header
-} 
+}
 
 comment {PartUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -30,13 +30,13 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified February 2017
-} {selected in_source in_header
-} 
+} {in_source in_header
+}
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-} 
+}
 
 decl {\#include "UI/MiscGui.h"
     \#include "EffUI.h"
@@ -47,14 +47,14 @@ decl {\#include "UI/MiscGui.h"
     \#include "WidgetMWSliderUI.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-} 
+}
 
 decl {\#include "Misc/Part.h"
     \#define MAX_INFO_TEXT_SIZE 256} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class PartSysEffSend {: {public Fl_Group, private MiscFuncs}
 } {
@@ -105,14 +105,14 @@ collect_data(synth, value, (Fl::event_button() | type), control + 0x28, npart);}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PartUI_ {} {
   Function {showparameters(int kititem,int engine)} {return_type virtual
   } {
     code {;} {}
   }
-} 
+}
 
 class PartKitItem {: {public Fl_Group}
 } {
@@ -415,9 +415,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -429,18 +429,15 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
         Fl_Box instrumentaddbox {
-          xywh {136 9 63 16} box FLAT_BOX deactivate
+          xywh {136 9 63 16} box FLAT_BOX
         }
         Fl_Box instrumentsubbox {
-          xywh {199 9 63 16} box FLAT_BOX deactivate
+          xywh {199 9 63 16} box FLAT_BOX
         }
         Fl_Box instrumentpadbox {
-          xywh {262 9 63 16} box FLAT_BOX deactivate
+          xywh {262 9 63 16} box FLAT_BOX
         }
-        Fl_Text_Display instrumentlabel {
-          xywh {134 24 192 1} box NO_BOX labelfont 1 labelsize 12 align 65 textsize 12
-        }
-        Fl_Button instrumentlab {
+        Fl_Button instrumentlabel {
           callback {//
     int event = Fl::event_button();
     const char *tmp = NULL;
@@ -1222,7 +1219,7 @@ send_data(57, o->value(), 0xc0);}
     }
     Fl_Window instrumenteditwindow {
       label {Instrument Edit}
-      xywh {362 85 395 360} type Double hide
+      xywh {950 85 395 360} type Double hide
       code0 {seteditname();}
       code1 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("Instrument Edit").c_str());}
     } {
@@ -1255,7 +1252,7 @@ send_data(57, o->value(), 0xc0);}
             code1 {o->value(part->kit[0].Padenabled);}
           }
           Fl_Box addbox {
-            xywh {10 226 89 18} box FLAT_BOX deactivate
+            xywh {10 226 89 18} box FLAT_BOX
             code1 {if (adsynenabledcheck->value() != 0 && engine != 0) o->color(ADD_COLOUR); else o->color(BASE_COLOUR);}
           }
           Fl_Button adeditbutton {
@@ -1295,7 +1292,7 @@ if ((Fl::event_button() == 3))
             code1 {o->value(part->kit[0].Psubenabled);}
           }
           Fl_Box subbox {
-            xywh {110 226 89 18} box FLAT_BOX deactivate
+            xywh {110 226 89 18} box FLAT_BOX
             code1 {if (subsynenabledcheck->value() != 0 && engine != 0) o->color(SUB_COLOUR); else o->color(BASE_COLOUR);}
           }
           Fl_Button subeditbutton {
@@ -1335,7 +1332,7 @@ if ((Fl::event_button() == 3))
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
           Fl_Box padbox {
-            xywh {210 226 89 18} box FLAT_BOX deactivate
+            xywh {210 226 89 18} box FLAT_BOX
             code1 {if (padsynenabledcheck->value() != 0 && engine != 0) o->color(PAD_COLOUR); else o->color(BASE_COLOUR);}
           }
           Fl_Button padeditbutton {
@@ -2236,4 +2233,4 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {bool partKitOn;} {public local
   }
-} 
+}
