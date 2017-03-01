@@ -30,6 +30,7 @@ using namespace std;
 #include "Interface/InterChange.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/Part.h"
 #include "Params/Controller.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -52,6 +53,7 @@ InterChange::InterChange(SynthEngine *_synth) :
 
 bool InterChange::Init(SynthEngine *_synth)
 {
+    Part *part;
     flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
@@ -5393,14 +5395,9 @@ void InterChange::returnLimits(CommandBlock *getData)
             cout << "Using defaults" << endl;
             return;
         }
-        if (kititem == 0xff)
+        if (kititem == 0xff) // part level controls go here
         {
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            if (control == 48) // wot, again!
-                getData->limits.max = 50;
-            else
-                getData->limits.max = 127;
+            part->getLimits(getData);
             return;
         }
         getData->limits.min = 0;
@@ -5409,6 +5406,7 @@ void InterChange::returnLimits(CommandBlock *getData)
         cout << "Using defaults" << endl;
         return;
     }
+    // main control limits go here
     getData->limits.min = 0;
     getData->limits.max = 127;
     getData->limits.def = 0;

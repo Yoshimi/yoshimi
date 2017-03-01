@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified February 2017
+Modified March 2017
 } {in_source in_header
 }
 
@@ -417,10 +417,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
-    Fl_Window partgroup {
+    Fl_Window partgroup {selected
       xywh {962 118 375 165} type Double hide
       class Fl_Group
     } {
@@ -437,7 +437,11 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
         Fl_Box instrumentpadbox {
           xywh {262 9 63 16} box FLAT_BOX
         }
-        Fl_Button instrumentlabel {
+        Fl_Text_Display instrumentlabel {
+          comment {We need this to stop the text ovewriting without the background redrawn}
+          xywh {134 24 192 1} box NO_BOX labelfont 1 labelsize 12 align 65 textsize 12
+        }
+        Fl_Button instrumentlab {
           callback {//
     int event = Fl::event_button();
     const char *tmp = NULL;

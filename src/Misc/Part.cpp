@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <cstring>
@@ -1502,5 +1502,52 @@ void Part::getfromXML(XMLwrapper *xml)
     {
         ctl->getfromXML(xml);
         xml->exitbranch();
+    }
+}
+
+
+void Part::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    getData->limits.min = 0;
+    getData->limits.def = 64;
+    getData->limits.max = 127;
+    cout << "control " << to_string(int(control))<< endl;
+    switch (control)
+    {
+        case 0:
+            getData->limits.def = 96;
+            break;
+
+        case 16:
+            getData->limits.def = 0;
+            break;
+
+        case 17:
+            getData->limits.def = 127;
+            break;
+
+        case 33:
+            getData->limits.def = 2000;
+            getData->limits.max = 60;
+            break;
+
+        case 35:
+            getData->limits.min = -36;
+            getData->limits.def = 0;
+            getData->limits.max = 36;
+            break;
+
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+            getData->limits.def = 0;
+            break;
+
+        case 48:
+            getData->limits.def = 0;
+            getData->limits.max = 50;
+            break;
     }
 }

@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #ifndef PART_H
@@ -79,6 +79,7 @@ class Part : private MiscFuncs, SynthHelper
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
+        void getLimits(CommandBlock *getData);
 
         Controller *ctl;
 

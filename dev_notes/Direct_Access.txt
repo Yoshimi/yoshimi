@@ -72,6 +72,8 @@ limits.min
 limits.max
 limits.def
 
+From the command line enter at least the forst three characters of "limits" in place of both value and type.
+
 Only a few of these are independently declared so far, all the reast have the values:
 min = 0
 max = 127
