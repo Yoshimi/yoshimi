@@ -1510,13 +1510,35 @@ void Part::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
     getData->limits.min = 0;
-    getData->limits.def = 64;
+    getData->limits.def = 6400;
     getData->limits.max = 127;
-    cout << "control " << to_string(int(control))<< endl;
+    //cout << "control " << to_string(int(control))<< endl;
     switch (control)
     {
         case 0:
-            getData->limits.def = 96;
+            getData->limits.def = 9600;
+            break;
+
+        case 5:
+            getData->limits.min = 1;
+            getData->limits.def = 100;
+            getData->limits.max = 16;
+            break;
+
+        case 6:
+            getData->limits.def = 0;
+            getData->limits.max = 2;
+            break;
+
+        case 7:
+        case 57:
+            getData->limits.def = 0;
+            getData->limits.max = 1;
+            break;
+
+        case 8:
+            getData->limits.def = 100;
+            getData->limits.max = 1;
             break;
 
         case 16:
@@ -1524,7 +1546,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 17:
-            getData->limits.def = 127;
+            getData->limits.def = 12700;
             break;
 
         case 33:
@@ -1548,6 +1570,11 @@ void Part::getLimits(CommandBlock *getData)
         case 48:
             getData->limits.def = 0;
             getData->limits.max = 50;
+            break;
+
+        case 58:
+            getData->limits.def = 0;
+            getData->limits.max = 3;
             break;
     }
 }

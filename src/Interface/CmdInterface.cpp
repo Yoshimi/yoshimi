@@ -2378,7 +2378,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             type |= (string2int127(point) & 3); // Allow 'pretend' and MIDI learn
             point = skipChars(point);
         }
-        type |= 0x40; // Fix as from CLI
+        type |= 0x10; // Fix as from CLI
         unsigned char control = string2int(point);
         point = skipChars(point);
         unsigned char part = string2int(point);
@@ -2448,7 +2448,12 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         short int min = putData.limits.min;
         short int def = putData.limits.def;
         short int max = putData.limits.max;
-        synth->getRuntime().Log("Min " + to_string(min)  + "   Def " + to_string(def) + "   Max " + to_string(max));
+        string deftype;
+        if (def >= 100 || def == 0)
+            deftype = to_string(lrint(def / 100));
+        else
+            deftype = to_string(float(def / 100.0f) + 0.000001).substr(0,4);
+        synth->getRuntime().Log("Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max));
         return 0;
     }
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)

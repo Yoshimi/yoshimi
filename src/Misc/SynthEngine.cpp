@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include<stdio.h>
@@ -3330,3 +3330,34 @@ void SynthEngine::setWindowTitle(string _windowTitle)
         windowTitle = _windowTitle;
 }
 
+void SynthEngine::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    getData->limits.min = 0;
+    getData->limits.def = 6400;
+    getData->limits.max = 127;
+    cout << "control " << to_string(int(control))<< endl;
+    switch (control)
+    {
+        case 0:
+            getData->limits.def = 9000;
+            break;
+
+        case 14:
+            getData->limits.min = 1;
+            getData->limits.def = 100;
+            getData->limits.max = Runtime.NumAvailableParts;;
+            break;
+
+        case 15:
+            getData->limits.min = 16;
+            getData->limits.def = 1600;
+            getData->limits.max = 64;
+            break;
+
+        case 35:
+            getData->limits.min = -36;
+            getData->limits.def = 0;
+            getData->limits.max = 36;
+    }
+}

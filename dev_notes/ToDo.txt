@@ -9,6 +9,8 @@ Find out why LV2 only stores/retrieves patch sets (not state)
 
 Make add voice & add/pad oscillator windows show kit number & name.
 
+Make vector window update when main window reduces numvber of available parts.
+
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
 

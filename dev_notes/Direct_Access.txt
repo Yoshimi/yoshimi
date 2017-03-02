@@ -72,12 +72,12 @@ limits.min
 limits.max
 limits.def
 
-From the command line enter at least the forst three characters of "limits" in place of both value and type.
+From the command line enter at least the first three characters of "limits" in place of both value and type.
 
 Only a few of these are independently declared so far, all the reast have the values:
 min = 0
 max = 127
 def = 0
 
-def will return the default * 100. This is so that fractional values can be resolved. 0.5 comes up quite often. No default values are very large, but may be negative.
+def returns the default * 100. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed command line response will be the actual value. No default values are very large, but they (and the others) may be negative.
 

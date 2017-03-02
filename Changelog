@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2016-3-2 Will.
+* Main part limits done (not controllers)
+* Master limits done.
+* Bugfix: Gui changing available parts requered two clicks.
+* Fixed new regression. Cli was never just reading values.
+
 2016-3-1 Will
 * Started identifying default and limit values for part.
   Cli direct access uses "lim" instead of value and type.

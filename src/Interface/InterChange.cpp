@@ -5406,7 +5406,12 @@ void InterChange::returnLimits(CommandBlock *getData)
         cout << "Using defaults" << endl;
         return;
     }
-    // main control limits go here
+    if (npart == 240) // main control limits
+    {
+        synth->getLimits(getData);
+        return;
+    }
+
     getData->limits.min = 0;
     getData->limits.max = 127;
     getData->limits.def = 0;

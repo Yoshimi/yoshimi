@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
-comment {MasterUI.h} {selected not_in_source in_header
-} 
+comment {MasterUI.h} {not_in_source in_header
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,76 +29,76 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified February 2017
+Modified March 2017
 
 
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {\#include <iostream>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "EffUI.h"} {public local
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public local
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "PartUI.h"} {public local
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 decl {\#include "VectorUI.h"} {public local
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public local
-} 
+}
 
 decl {\#include "MasterMiscUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "MidiLearnUI.h"} {public local
-} 
+}
 
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
-} 
+}
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -270,7 +270,7 @@ class MasterUI {: {private MiscFuncs}
     {
         synth->guiClosed(true);
     }}
-      xywh {7 120 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {7 120 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
     } {
       Fl_Box {} {
         xywh {275 27 103 85} box ENGRAVED_FRAME
@@ -845,7 +845,7 @@ paramsui->Show(4);}
       Fl_Group partuigroup {
         xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {open
+        Fl_Group partui {
           xywh {3 255 376 166} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
@@ -895,7 +895,6 @@ paramsui->Show(4);}
         o->value(tmp);
     }
     partmax = tmp;
-    npartcounter->range(1.0, partmax);
     updatepart();
     updatepanel();
     setinspartlist();
@@ -978,7 +977,7 @@ ZynAddSubFX}
       code0 {if (synth->getRuntime().single_row_panel) Panelbox1->hide();}
       code1 {o->copy_label(synth->makeUniqueName("Mixer Panel").c_str());}
     } {
-      Fl_Pack Panelpack1 {open
+      Fl_Pack Panelpack1 {
         xywh {8 10 533 286} type HORIZONTAL
         code0 {//
           for (int i = 0; i < 8; i++)
@@ -991,7 +990,7 @@ ZynAddSubFX}
       Fl_Box Panelbox1 {
         xywh {-4 316 563 7} box THIN_DOWN_BOX deactivate
       }
-      Fl_Pack Panelpack2 {open
+      Fl_Pack Panelpack2 {
         xywh {8 325 533 286} type HORIZONTAL
         code0 {//
             for (int i = 8; i < 16; i++)
@@ -1226,6 +1225,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
 
         case 15:
             partmax = lrint(value);
+            npartcounter->range(1, partmax);
             updatepart();
             updatepanel();
             setinspartlist();
@@ -1583,8 +1583,6 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   } {
     code {//
     bool changed = false;
-    partmax = synth->getRuntime().NumAvailableParts;
-    // ^^^ this is needed for vector control - need to put right!
     if(panelgroup >= partmax)
     {
         panelgroup = 0;
@@ -2044,7 +2042,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   decl {int nsyseff;} {private local
   }
-  decl {int partmax;} {private local
+  decl {int partmax;} {
+    comment {This is only public for vector control} public local
   }
   decl {SysEffSend *syseffsend[NUM_SYS_EFX][NUM_SYS_EFX];} {private local
   }
@@ -2176,4 +2175,4 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   decl {bool NewWindows;} {private local
   }
-} 
+}

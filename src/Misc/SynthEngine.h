@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -147,6 +147,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void Mute(void) { __sync_or_and_fetch(&muted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
+
+        void getLimits(CommandBlock *getData);
 
         Part *part[NUM_MIDI_PARTS];
         unsigned int fadeAll;
