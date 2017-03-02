@@ -1,10 +1,11 @@
 yoshimi 1.5.0 M
 
-2016-3-2 Will.
+2016-3-2 Will
 * Main part limits done (not controllers)
 * Master limits done.
 * Bugfix: Gui changing available parts requered two clicks.
 * Fixed new regression. Cli was never just reading values.
+* Gui LFOs now go entirely through ring buffers.
 
 2016-3-1 Will
 * Started identifying default and limit values for part.

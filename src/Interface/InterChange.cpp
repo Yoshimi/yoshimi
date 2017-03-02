@@ -4515,9 +4515,9 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
 void InterChange::commandLFO(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
+/*#pragma message "Gui writes changed to reads"
     if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+        getData->data.type = getData->data.type & 0xbf;*/
 
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
