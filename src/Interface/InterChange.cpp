@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <iostream>
@@ -3134,9 +3134,9 @@ void InterChange::commandPart(CommandBlock *getData)
 
 void InterChange::commandAdd(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
+/*#pragma message "Gui writes changed to reads"
     if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
+        getData->data.type = getData->data.type & 0xbf;*/
 
     float value = getData->data.value;
     unsigned char type = getData->data.type;

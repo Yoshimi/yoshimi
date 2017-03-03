@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
+version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
@@ -1596,13 +1596,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
-      label {ADsynth Global Parameters of the Instrument} selected
-      xywh {81 82 535 405} type Double hide
+      label {ADsynth Global Parameters of the Instrument}
+      xywh {109 74 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
     } {
@@ -1619,10 +1619,10 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter octave {
           label Octave
           callback {//
-    int k = lrint(o->value());
-    if (k < 0)
-        k += 16;
-    pars->GlobalPar.PCoarseDetune = k * 1024 + pars->GlobalPar.PCoarseDetune % 1024;
+    //int k = lrint(o->value());
+    //if (k < 0)
+       // k += 16;
+    //pars->GlobalPar.PCoarseDetune = k * 1024 + pars->GlobalPar.PCoarseDetune % 1024;
     send_data(35, o->value(), 0xc0);}
           tooltip Octave xywh {450 275 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k = pars->GlobalPar.PCoarseDetune / 1024; if (k >= 8) k -= 16;}
@@ -1631,10 +1631,10 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Counter coarsedet {
           label {Coarse det.}
           callback {//
-    int k = lrint(o->value());
-    if (k < 0)
-        k += 1024;
-    pars->GlobalPar.PCoarseDetune = k + (pars->GlobalPar.PCoarseDetune / 1024) * 1024;
+    //int k = lrint(o->value());
+    //if (k < 0)
+        //k += 1024;
+    //pars->GlobalPar.PCoarseDetune = k + (pars->GlobalPar.PCoarseDetune / 1024) * 1024;
     send_data(37, o->value(), 0xc0);}
           tooltip {Coarse Detune} xywh {455 345 60 20} labelsize 10 align 5 minimum -64 maximum 63 step 1 textfont 1 textsize 11
           code0 {int k = pars->GlobalPar.PCoarseDetune % 1024; if (k >= 512) k -= 1024;}
@@ -1651,7 +1651,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
           callback {//
     if (Fl::event_button() == 3)
         o->value(0);
-    pars->GlobalPar.PDetune = lrint(o->value()) + 8192;
+    //pars->GlobalPar.PDetune = lrint(o->value()) + 8192;
     detunevalueoutput->do_callback();
     send_data(32, o->value(), 0xc8);}
           tooltip {Fine Detune (cents)} xywh {57 275 385 15} type {Horz Knob} box THIN_DOWN_BOX minimum -8192 maximum 8191 step 1
@@ -1668,8 +1668,8 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Choice detunetype {
           label {Detune Type}
           callback {//
-    pars->GlobalPar.PDetuneType = lrint(o->value()) + 1;
-    detunevalueoutput->do_callback();
+    //pars->GlobalPar.PDetuneType = lrint(o->value()) + 1;
+    //detunevalueoutput->do_callback();
     send_data(36, o->value() + 1, 0xc0);}
           xywh {450 315 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {//
@@ -1682,12 +1682,12 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
         Fl_Dial relBwidth {
           label relBW
           callback {//
-    pars->GlobalPar.PBandwidth = lrint(o->value());
-    pars->getBandwidthDetuneMultiplier();
-    for (int i = 0; i < NUM_VOICES; ++i)
-    {
-        voicelistitem[i]->refreshlist();
-    }
+    //pars->GlobalPar.PBandwidth = lrint(o->value());
+   // pars->getBandwidthDetuneMultiplier();
+    //for (int i = 0; i < NUM_VOICES; ++i)
+    //{
+       // voicelistitem[i]->refreshlist();
+    //}
     send_data(39, o->value(), 0xc8);}
           tooltip {Bandwidth - how the relative fine detune of the voice are changed} xywh {500 270 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PBandwidth);}
@@ -1701,7 +1701,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
       } {
         Fl_Dial globalvolume {
           label Volume
-          callback {pars->GlobalPar.PVolume = lrint(o->value());
+          callback {//pars->GlobalPar.PVolume = lrint(o->value());
 send_data(0, o->value(), 0xc8);}
           tooltip Volume xywh {39 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
@@ -1711,7 +1711,7 @@ send_data(0, o->value(), 0xc8);}
         }
         Fl_Dial vsns {
           label {Vel Sens}
-          callback {pars->GlobalPar.PAmpVelocityScaleFunction = lrint(o->value());
+          callback {//pars->GlobalPar.PAmpVelocityScaleFunction = lrint(o->value());
 send_data(1, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function - rightmost/max to disable} xywh {106 22 35 35} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PAmpVelocityScaleFunction);}
@@ -1722,9 +1722,10 @@ send_data(1, o->value(), 0xc8);}
         Fl_Dial globalpan {
           label Pan
           callback {//
-    pars->setGlobalPan(lrint(o->value()));
-    globalrandompan->value(pars->randomGlobalPan());
-    amplitudegrp->changed();
+   // pars->setGlobalPan(lrint(o->value()));
+    //globalrandompan->value(pars->randomGlobalPan());
+    //amplitudegrp->changed();
+    globalrandompan->value(o->value() < 0.1f);
     send_data(2, o->value(), 0xc8);}
           tooltip {Global panning - leftmost/zero gives random panning} xywh {173 22 35 35} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
@@ -1735,18 +1736,20 @@ send_data(1, o->value(), 0xc8);}
         Fl_Light_Button globalrandompan {
           label Rand
           callback {//
-              if (pars->randomGlobalPan()) // set to full left
+              /*if (pars->randomGlobalPan()) // set to full left
               {
                   globalpan->value(1);
                   pars->setGlobalPan(1);
               }
-              o->value(pars->randomGlobalPan());}
-          xywh {194 57 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
+              o->value(pars->randomGlobalPan());*/
+    globalpan->value(0);
+    send_data(2, 0, 0xc8);}
+          xywh {196 57 7 13} box NO_BOX color 35 selection_color 88 labelsize 10
           code0 {o->value(pars->randomGlobalPan());}
         }
         Fl_Dial depop {
           label {D.Pop}
-          callback {pars->GlobalPar.Fadein_adjustment = lrint(o->value());
+          callback {//pars->GlobalPar.Fadein_adjustment = lrint(o->value());
 send_data(120, o->value(), 0xc8);}
           tooltip {Pop Suppression} xywh {85 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.Fadein_adjustment);}
@@ -1755,7 +1758,7 @@ send_data(120, o->value(), 0xc8);}
         }
         Fl_Dial pstr {
           label {P.Str.}
-          callback {pars->GlobalPar.PPunchStrength = lrint(o->value());
+          callback {//pars->GlobalPar.PPunchStrength = lrint(o->value());
 send_data(121, o->value(), 0xc8);}
           tooltip {Punch Strength} xywh {125 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStrength);}
@@ -1764,7 +1767,7 @@ send_data(121, o->value(), 0xc8);}
         }
         Fl_Dial pt {
           label {P.t.}
-          callback {pars->GlobalPar.PPunchTime = lrint(o->value());
+          callback {//pars->GlobalPar.PPunchTime = lrint(o->value());
 send_data(122, o->value(), 0xc8);}
           tooltip {Punch Time (duration)} xywh {155 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchTime);}
@@ -1773,7 +1776,7 @@ send_data(122, o->value(), 0xc8);}
         }
         Fl_Dial pstc {
           label {P.Stc.}
-          callback {pars->GlobalPar.PPunchStretch = lrint(o->value());
+          callback {//pars->GlobalPar.PPunchStretch = lrint(o->value());
 send_data(123, o->value(), 0xc8);}
           tooltip {Punch Stretch} xywh {185 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchStretch);}
@@ -1782,7 +1785,7 @@ send_data(123, o->value(), 0xc8);}
         }
         Fl_Dial pvel {
           label {P.Vel.}
-          callback {pars->GlobalPar.PPunchVelocitySensing = lrint(o->value());
+          callback {//pars->GlobalPar.PPunchVelocitySensing = lrint(o->value());
 send_data(124, o->value(), 0xc8);}
           tooltip {Punch Velocity Sensing} xywh {215 227 25 25} box ROUND_UP_BOX labelsize 10 align 1 maximum 127 step 1
           code0 {o->value(pars->GlobalPar.PPunchVelocitySensing);}
@@ -1834,7 +1837,7 @@ send_data(113, o->value(), 0xc0);}
       }
       Fl_Check_Button stereo {
         label Stereo
-        callback {pars->GlobalPar.PStereo = lrint(o->value());
+        callback {//pars->GlobalPar.PStereo = lrint(o->value());
 send_data(112, o->value(), 0xc0);}
         xywh {8 220 65 18} down_box DOWN_BOX labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
@@ -2012,7 +2015,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 2:
     	    globalpan->value(value);
-    	    globalrandompan->value(value == 0);
+    	    globalrandompan->value(value < 0.1f);
             amplitudegrp->changed();
     	    break;
 

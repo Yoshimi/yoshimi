@@ -2375,7 +2375,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             if (strchr(point, '.') == NULL)
                 type |= 0x80; // fix as integer
             point = skipChars(point);
-            type |= (string2int127(point) & 3); // Allow 'pretend' and MIDI learn
+            type |= (string2int127(point) & 0x43); // Allow 'pretend' and MIDI learn
             point = skipChars(point);
         }
         type |= 0x10; // Fix as from CLI
