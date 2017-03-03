@@ -2346,7 +2346,7 @@ void InterChange::commandVector(CommandBlock *getData)
     if (getData->data.type & 0x20)
         getData->data.type = getData->data.type & 0xbf;
 
-    int value = getData->data.value;
+    int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.part & 0xf;
@@ -2527,6 +2527,9 @@ void InterChange::commandMain(CommandBlock *getData)
     unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+
     switch (control)
     {
         case 0:
@@ -2551,13 +2554,13 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 32:
             if (write)
-                synth->writeRBP(10, (int) value, 0); // global fine detune
+                synth->writeRBP(10, value_int, 0); // global fine detune
             else
                 value = synth->microtonal.Pglobalfinedetune;
             break;
         case 35:
             if (write)
-                synth->writeRBP(11, int(value) + 64, 0); // global keyshift
+                synth->writeRBP(11, value_int + 64, 0); // global keyshift
             else
                 value = synth->Pkeyshift - 64;
             break;
@@ -2621,6 +2624,9 @@ void InterChange::commandPart(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
 
+    int value_int = lrint(value);
+    char value_0_1 = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
 
@@ -2652,19 +2658,19 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 5:
             if (write)
-                part->Prcvchn = (char) value;
+                part->Prcvchn = value_int;
             else
                 value = part->Prcvchn;
             break;
         case 6:
             if (write)
-                synth->SetPartKeyMode(npart, (char) value);
+                synth->SetPartKeyMode(npart, value_int);
             else
                 value = synth->ReadPartKeyMode(npart);
             break;
         case 7:
             if (write)
-                part->ctl->portamento.portamento = (char) value;
+                part->ctl->portamento.portamento = value_int;
             else
                 value = part->ctl->portamento.portamento;
             break;
@@ -2676,25 +2682,25 @@ void InterChange::commandPart(CommandBlock *getData)
                 {
                     case 0:
                         if (write)
-                            part->kit[kititem].Padenabled = (char) value;
+                            part->kit[kititem].Padenabled = value_int;
                         else
                             value = part->kit[kititem].Padenabled;
                         break;
                     case 1:
                         if (write)
-                            part->kit[kititem].Psubenabled = (char) value;
+                            part->kit[kititem].Psubenabled = value_int;
                         else
                             value = part->kit[kititem].Psubenabled;
                         break;
                     case 2:
                         if (write)
-                            part->kit[kititem].Ppadenabled = (char) value;
+                            part->kit[kititem].Ppadenabled = value_int;
                         else
                             value = part->kit[kititem].Ppadenabled;
                         break;
                     default:
                         if (write)
-                            part->setkititemstatus(kititem, (char) value);
+                            part->setkititemstatus(kititem, value_int);
                         else
                             value = part->kit[kititem].Penabled;
                         break;
@@ -2706,25 +2712,25 @@ void InterChange::commandPart(CommandBlock *getData)
                 {
                     case 0:
                         if (write)
-                            part->kit[0].Padenabled = (char) value;
+                            part->kit[0].Padenabled = value_int;
                         else
                             value = part->kit[0].Padenabled;
                         break;
                     case 1:
                         if (write)
-                            part->kit[0].Psubenabled = (char) value;
+                            part->kit[0].Psubenabled = value_int;
                         else
                             value = part->kit[0].Psubenabled;
                         break;
                     case 2:
                         if (write)
-                            part->kit[0].Ppadenabled = (char) value;
+                            part->kit[0].Ppadenabled = value_int;
                         else
                             value = part->kit[0].Ppadenabled;
                         break;
                     default:
                         if (write)
-                            synth->partonoffWrite(npart, (char) value);
+                            synth->partonoffWrite(npart, value_int);
                         else
                             value = synth->partonoffRead(npart);
                 }
@@ -2734,7 +2740,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pmuted = (char) value;
+                    part->kit[kititem & 0x1f].Pmuted = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Pmuted;
             }
@@ -2744,14 +2750,14 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pminkey = (char) value;
+                    part->kit[kititem & 0x1f].Pminkey = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Pminkey;
             }
             else
             {
                 if (write)
-                    part->Pminkey = (char) value;
+                    part->Pminkey = value_int;
                 else
                     value = part->Pminkey;
             }
@@ -2760,14 +2766,14 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pmaxkey = (char) value;
+                    part->kit[kititem & 0x1f].Pmaxkey = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Pmaxkey;
             }
             else
             {
                 if (write)
-                    part->Pmaxkey = (char) value;
+                    part->Pmaxkey = value_int;
                 else
                     value = part->Pmaxkey;
             }
@@ -2823,7 +2829,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Psendtoparteffect = (char) value;
+                    part->kit[kititem & 0x1f].Psendtoparteffect = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Psendtoparteffect;
             }
@@ -2831,13 +2837,13 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 33:
             if (write)
-                part->setkeylimit((char) value);
+                part->setkeylimit(value_int);
             else
                 value = part->Pkeylimit;
             break;
         case 35:
             if (write)
-                synth->writeRBP(12, npart, int(value) + 64); // part keyshift
+                synth->writeRBP(12, npart, value_int + 64); // part keyshift
             else
                 value = part->Pkeyshift - 64;
             break;
@@ -2877,7 +2883,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case 57:
             if (write)
             {
-                part->Pdrummode = (value != 0);
+                part->Pdrummode = value_0_1;
                 synth->setPartMap(npart);
             }
             else
@@ -2894,7 +2900,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 else
                 {
                     part->Pkitfade = false;
-                    part->Pkitmode = (char) value;
+                    part->Pkitmode = value_int;
                 }
             }
             else
@@ -2905,22 +2911,22 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 65:
             if (write)
-                part->partefx[effNum]->changeeffect((int)value);
+                part->partefx[effNum]->changeeffect(value_int);
             else
                 value = part->partefx[effNum]->geteffect();
             break;
         case 66:
             if (write)
             {
-                part->Pefxroute[effNum] = (int)value;
-                part->partefx[effNum]->setdryonly((int)value == 2);
+                part->Pefxroute[effNum] = value_int;
+                part->partefx[effNum]->setdryonly(value_int == 2);
             }
             else
                 value = part->Pefxroute[effNum];
             break;
         case 67:
             if (write)
-                part->Pefxbypass[effNum] = (value != 0);
+                part->Pefxbypass[effNum] = value_0_1;
             else
                 value = part->Pefxbypass[effNum];
             break;
@@ -2944,19 +2950,19 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 128:
             if (write)
-                part->ctl->setvolume((char) value); // not the *actual* volume
+                part->ctl->setvolume(value_int); // not the *actual* volume
             else
                 value = part->ctl->volume.data;
             break;
         case 129:
             if (write)
-                part->ctl->volume.receive = (char) value;
+                part->ctl->volume.receive = value_int;
             else
                 value = part->ctl->volume.receive;
             break;
         case 130:
             if (write)
-                part->ctl->setPanDepth((char) value);
+                part->ctl->setPanDepth(value_int);
             else
                 value = part->ctl->panning.depth;
             break;
@@ -2968,7 +2974,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 132:
             if (write)
-                part->ctl->modwheel.exponential = (char) value;
+                part->ctl->modwheel.exponential = value_int;
             else
                 value = part->ctl->modwheel.exponential;
             break;
@@ -2980,25 +2986,25 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 134:
             if (write)
-                part->ctl->bandwidth.exponential = (char) value;
+                part->ctl->bandwidth.exponential = value_int;
             else
                 value = part->ctl->bandwidth.exponential;
             break;
         case 135:
             if (write)
-                part->ctl->expression.receive = (char) value;
+                part->ctl->expression.receive = value_int;
             else
                 value = part->ctl->expression.receive;
             break;
         case 136:
             if (write)
-                part->ctl->fmamp.receive = (char) value;
+                part->ctl->fmamp.receive = value_int;
             else
                 value = part->ctl->fmamp.receive;
             break;
         case 137:
             if (write)
-                part->ctl->sustain.receive = (char) value;
+                part->ctl->sustain.receive = value_int;
             else
                 value = part->ctl->sustain.receive;
             break;
@@ -3054,13 +3060,13 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 163:
             if (write)
-                part->ctl->portamento.pitchthreshtype = (char) value;
+                part->ctl->portamento.pitchthreshtype = value_int;
             else
                 value = part->ctl->portamento.pitchthreshtype;
             break;
         case 164:
             if (write)
-                part->ctl->portamento.proportional = (char) value;
+                part->ctl->portamento.proportional = value_int;
             else
                 value = part->ctl->portamento.proportional;
             break;
@@ -3078,7 +3084,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 168:
             if (write)
-                part->ctl->portamento.receive = (char) value;
+                part->ctl->portamento.receive = value_int;
             else
                 value = part->ctl->portamento.receive;
             break;
@@ -3139,6 +3145,10 @@ void InterChange::commandAdd(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_0_1 = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     ADnoteParameters *pars;
@@ -3149,26 +3159,26 @@ void InterChange::commandAdd(CommandBlock *getData)
     {
         case 0:
             if (write)
-                pars->GlobalPar.PVolume = lrint(value);
+                pars->GlobalPar.PVolume = value_int;
             else
                 value = pars->GlobalPar.PVolume;
             break;
         case 1:
             if (write)
-                pars->GlobalPar.PAmpVelocityScaleFunction = lrint(value);
+                pars->GlobalPar.PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->GlobalPar.PAmpVelocityScaleFunction;
             break;
         case 2:
             if (write)
-                pars->setGlobalPan((int) value);
+                pars->setGlobalPan(value_int);
             else
                 value = pars->GlobalPar.PPanning;
             break;
 
         case 32:
             if (write)
-                pars->GlobalPar.PDetune = lrint(value) + 8192;
+                pars->GlobalPar.PDetune = value_int + 8192;
             else
                 value = pars->GlobalPar.PDetune - 8192;
             break;
@@ -3191,7 +3201,7 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                pars->GlobalPar.PDetuneType = lrint(value);
+                pars->GlobalPar.PDetuneType = value_int;
             else
                 value = pars->GlobalPar.PDetuneType;
             break;
@@ -3214,7 +3224,7 @@ void InterChange::commandAdd(CommandBlock *getData)
         case 39:
             if (write)
             {
-                pars->GlobalPar.PBandwidth = lrint(value);
+                pars->GlobalPar.PBandwidth = value_int;
                  pars->getBandwidthDetuneMultiplier();
             }
             else
@@ -3223,44 +3233,44 @@ void InterChange::commandAdd(CommandBlock *getData)
 
         case 112:
             if (write)
-                pars->GlobalPar.PStereo = (value != 0);
+                pars->GlobalPar.PStereo = value_0_1;
             else
                 value = pars->GlobalPar.PStereo;
             break;
         case 113:
             if (write)
-                pars->GlobalPar.Hrandgrouping = (value != 0);
+                pars->GlobalPar.Hrandgrouping = value_0_1;
             else
                 value = pars->GlobalPar.Hrandgrouping;
             break;
 
         case 120:
             if (write)
-                pars->GlobalPar.Fadein_adjustment = lrint(value);
+                pars->GlobalPar.Fadein_adjustment = value_int;
             else
                 value = pars->GlobalPar.Fadein_adjustment;
             break;
         case 121:
             if (write)
-                pars->GlobalPar.PPunchStrength = lrint(value);
+                pars->GlobalPar.PPunchStrength = value_int;
             else
                 value = pars->GlobalPar.PPunchStrength;
             break;
         case 122:
             if (write)
-                pars->GlobalPar.PPunchTime = lrint(value);
+                pars->GlobalPar.PPunchTime = value_int;
             else
                 value = pars->GlobalPar.PPunchTime;
             break;
         case 123:
             if (write)
-                pars->GlobalPar.PPunchStretch = lrint(value);
+                pars->GlobalPar.PPunchStretch = value_int;
             else
                 value = pars->GlobalPar.PPunchStretch;
             break;
         case 124:
             if (write)
-                pars->GlobalPar.PPunchVelocitySensing = lrint(value);
+                pars->GlobalPar.PPunchVelocitySensing = value_int;
             else
                 value = pars->GlobalPar.PPunchVelocitySensing;
             break;
@@ -3285,6 +3295,10 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     int nvoice = engine & 0x1f;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_0_1 = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     ADnoteParameters *pars;
@@ -3295,69 +3309,69 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     {
         case 0:
             if (write)
-                pars->VoicePar[nvoice].PVolume = lrint(value);
+                pars->VoicePar[nvoice].PVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PVolume;
             break;
         case 1:
             if (write)
-                pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(value);
+                pars->VoicePar[nvoice].PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PAmpVelocityScaleFunction;
             break;
         case 2:
             if (write)
-                 pars->setVoicePan(nvoice, lrint(value));
+                 pars->setVoicePan(nvoice, value_int);
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
         case 4:
             if (write)
-                pars->VoicePar[nvoice].PVolumeminus = (value != 0);
+                pars->VoicePar[nvoice].PVolumeminus = value_0_1;
             else
                 value = pars->VoicePar[nvoice].PVolumeminus;
             break;
         case 8:
             if (write)
-                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(value);
+                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PAmpEnvelopeEnabled;
             break;
         case 9:
             if (write)
-                pars->VoicePar[nvoice].PAmpLfoEnabled = (value != 0);
+                pars->VoicePar[nvoice].PAmpLfoEnabled = value_0_1;
             else
                 value = pars->VoicePar[nvoice].PAmpLfoEnabled;
             break;
 
         case 16:
             if (write)
-                pars->VoicePar[nvoice].PFMEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFMEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
         case 17:
             if (write)
-                pars->VoicePar[nvoice].PFMVoice = lrint(value);
+                pars->VoicePar[nvoice].PFMVoice = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVoice;
             break;
 
         case 32:
             if (write)
-                pars->VoicePar[nvoice].PDetune = lrint(value) + 8192;
+                pars->VoicePar[nvoice].PDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PDetune-8192;
             break;
         case 33:
             if (write)
-                pars->VoicePar[nvoice].PfixedfreqET = lrint(value);
+                pars->VoicePar[nvoice].PfixedfreqET = value_int;
             else
                 value = pars->VoicePar[nvoice].PfixedfreqET;
             break;
         case 34:
             if (write)
-                 pars->VoicePar[nvoice].Pfixedfreq = (value != 0);
+                 pars->VoicePar[nvoice].Pfixedfreq = value_0_1;
             else
                 value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
@@ -3379,7 +3393,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                pars->VoicePar[nvoice].PDetuneType = lrint(value);
+                pars->VoicePar[nvoice].PDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PDetuneType;
             break;
@@ -3401,44 +3415,44 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 40:
             if (write)
-                pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqEnvelopeEnabled;
             break;
         case 41:
             if (write)
-                pars->VoicePar[nvoice].PFreqLfoEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFreqLfoEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqLfoEnabled;
             break;
 
         case 48:
             if (write)
-                pars->VoicePar[nvoice].Unison_frequency_spread = lrint(value);
+                pars->VoicePar[nvoice].Unison_frequency_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
         case 49:
             if (write)
-                pars->VoicePar[nvoice].Unison_phase_randomness = lrint(value);
+                pars->VoicePar[nvoice].Unison_phase_randomness = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_phase_randomness;
             break;
         case 50:
             if (write)
-                pars->VoicePar[nvoice].Unison_stereo_spread = lrint(value);
+                pars->VoicePar[nvoice].Unison_stereo_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_stereo_spread;
             break;
         case 51:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto = lrint(value);
+                pars->VoicePar[nvoice].Unison_vibratto = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto;
             break;
         case 52:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(value);
+                pars->VoicePar[nvoice].Unison_vibratto_speed = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto_speed;
             break;
@@ -3447,21 +3461,21 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             {
                 if (value < 2)
                     value = 2;
-                pars->VoicePar[nvoice].Unison_size = lrint(value);
+                pars->VoicePar[nvoice].Unison_size = value_int;
             }
             else
                 value = pars->VoicePar[nvoice].Unison_size;
             break;
         case 54:
             if (write)
-                pars->VoicePar[nvoice].Unison_invert_phase = lrint(value);
+                pars->VoicePar[nvoice].Unison_invert_phase = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
         case 56:
             if (write)
             {
-                k = (value != 0) + 1;
+                k = value_0_1 + 1;
                 if (pars->VoicePar[nvoice].Unison_size < 2 || k == 1)
                     pars->VoicePar[nvoice].Unison_size = k;
             }
@@ -3471,69 +3485,69 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
         case 64:
             if (write)
-                pars->VoicePar[nvoice].Pfilterbypass = (value != 0);
+                pars->VoicePar[nvoice].Pfilterbypass = value_0_1;
             else
                 value = pars->VoicePar[nvoice].Pfilterbypass;
             break;
         case 68:
             if (write)
-                 pars->VoicePar[nvoice].PFilterEnabled =  (value != 0);
+                 pars->VoicePar[nvoice].PFilterEnabled =  value_0_1;
             else
                 value = pars->VoicePar[nvoice].PFilterEnabled;
             break;
         case 72:
             if (write)
-                pars->VoicePar[nvoice].PFilterEnvelopeEnabled= (value != 0);
+                pars->VoicePar[nvoice].PFilterEnvelopeEnabled= value_0_1;
             else
                 value = pars->VoicePar[nvoice].PFilterEnvelopeEnabled;
             break;
         case 73:
             if (write)
-                pars->VoicePar[nvoice].PFilterLfoEnabled= (value != 0);
+                pars->VoicePar[nvoice].PFilterLfoEnabled= value_0_1;
             else
                 value = pars->VoicePar[nvoice].PFilterLfoEnabled;
             break;
 
         case 80:
             if (write)
-                pars->VoicePar[nvoice].PFMVolume = lrint(value);
+                pars->VoicePar[nvoice].PFMVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolume;
             break;
         case 81:
             if (write)
-                pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(value);
+                pars->VoicePar[nvoice].PFMVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVelocityScaleFunction;
             break;
         case 82:
             if (write)
-                pars->VoicePar[nvoice].PFMVolumeDamp = lrint(value);
+                pars->VoicePar[nvoice].PFMVolumeDamp = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolumeDamp;
             break;
         case 88:
             if (write)
-                pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = (value != 0);
+                pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = value_0_1;
             else
                 value =  pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled;
             break;
 
         case 96:
             if (write)
-                pars->VoicePar[nvoice].PFMDetune = (int) value + 8192;
+                pars->VoicePar[nvoice].PFMDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
         case 98:
             if (write)
-                pars->VoicePar[nvoice].PFMFixedFreq = (value != 0);
+                pars->VoicePar[nvoice].PFMFixedFreq = value_0_1;
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
         case 99:
             if (write)
             {
-                k = lrint(value);
+                k = value_int;
                 if (k < 0)
                     k += 16;
                 pars->VoicePar[nvoice].PFMCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PFMCoarseDetune % 1024;
@@ -3548,14 +3562,14 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 100:
             if (write)
-                pars->VoicePar[nvoice].PFMDetuneType = (int) value;
+                pars->VoicePar[nvoice].PFMDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
         case 101:
             if (write)
             {
-                int k = lrint(value);
+                int k = value_int;
                 if (k < 0)
                     k += 1024;
                 pars->VoicePar[nvoice].PFMCoarseDetune = k + (pars->VoicePar[nvoice].PFMCoarseDetune / 1024) * 1024;
@@ -3570,57 +3584,57 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 104:
             if (write)
-                pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled;
             break;
 
         case 112:
             if (write)
-                pars->VoicePar[nvoice].PFMoscilphase = 64 - lrint(value);
+                pars->VoicePar[nvoice].PFMoscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].PFMoscilphase;
             break;
         case 113:
             if (write)
-                pars->VoicePar[nvoice].PextFMoscil = lrint(value);
+                pars->VoicePar[nvoice].PextFMoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].PextFMoscil;
             break;
 
         case 128:
             if (write)
-                pars->VoicePar[nvoice].PDelay = lrint(value);
+                pars->VoicePar[nvoice].PDelay = value_int;
             else
                 value = pars->VoicePar[nvoice].PDelay;
             break;
         case 129:
             if (write)
-                pars->VoicePar[nvoice].Enabled = (value != 0);
+                pars->VoicePar[nvoice].Enabled = value_0_1;
             else
                 value = pars->VoicePar[nvoice].Enabled;
             break;
         case 130:
             if (write)
-                pars->VoicePar[nvoice].Presonance = (value != 0);
+                pars->VoicePar[nvoice].Presonance = value_0_1;
             else
                 value = pars->VoicePar[nvoice].Presonance;
             break;
         case 136:
             if (write)
-                pars->VoicePar[nvoice].Poscilphase =64 - lrint(value);
+                pars->VoicePar[nvoice].Poscilphase =64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
         case 137:
             if (write)
-                pars->VoicePar[nvoice].Pextoscil = lrint(value);
+                pars->VoicePar[nvoice].Pextoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].Pextoscil;
             break;
         case 138:
             if (write)
-                pars->VoicePar[nvoice].Type = lrint(value);
+                pars->VoicePar[nvoice].Type = value_int;
             else
                 value = pars->VoicePar[nvoice].Type;
             break;
@@ -3645,6 +3659,10 @@ void InterChange::commandSub(CommandBlock *getData)
     unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_0_1 = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     SUBnoteParameters *pars;
@@ -3708,7 +3726,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case 18:
             if (write)
-                pars->PBandWidthEnvelopeEnabled = (value != 0);
+                pars->PBandWidthEnvelopeEnabled = value_0_1;
             else
                 value = pars->PBandWidthEnvelopeEnabled;
             break;
@@ -3727,7 +3745,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case 34:
             if (write)
-                pars->Pfixedfreq = (value != 0);
+                pars->Pfixedfreq = value_0_1;
             else
                 value = pars->Pfixedfreq;
             break;
@@ -3749,7 +3767,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                pars->PDetuneType = (int)value + 1;
+                pars->PDetuneType = value_int + 1;
             else
                 value = pars->PDetuneType;
             break;
@@ -3772,7 +3790,7 @@ void InterChange::commandSub(CommandBlock *getData)
 
         case 40:
             if (write)
-                pars->PFreqEnvelopeEnabled = (value != 0);
+                pars->PFreqEnvelopeEnabled = value_0_1;
             else
                 value = pars->PFreqEnvelopeEnabled;
             break;
@@ -3807,7 +3825,7 @@ void InterChange::commandSub(CommandBlock *getData)
         case 51:
             if (write)
             {
-                pars->POvertoneSpread.type =  (int)value;
+                pars->POvertoneSpread.type =  value_int;
                 pars->updateFrequencyMultipliers();
             }
             else
@@ -3816,24 +3834,24 @@ void InterChange::commandSub(CommandBlock *getData)
 
         case 64:
             if (write)
-                pars->PGlobalFilterEnabled = (value != 0);
+                pars->PGlobalFilterEnabled = value_0_1;
             else
                 value = pars->PGlobalFilterEnabled;
             break;
 
         case 80:
             if (write)
-                pars->Pnumstages = (int)value;
+                pars->Pnumstages = value_int;
             else
                 value = pars->Pnumstages;
             break;
         case 81:
             if (write)
-                pars->Phmagtype = (int)value;
+                pars->Phmagtype = value_int;
             break;
         case 82:
             if (write)
-                pars->Pstart = (int)value;
+                pars->Pstart = value_int;
             else
                 value = pars->Pstart;
             break;
@@ -3852,7 +3870,7 @@ void InterChange::commandSub(CommandBlock *getData)
 
         case 112:
             if (write)
-                pars->Pstereo = (value != 0);
+                pars->Pstereo = value_0_1;
             break;
     }
 
@@ -3874,6 +3892,10 @@ void InterChange::commandPad(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_0_1 = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     PADnoteParameters *pars;
@@ -3903,38 +3925,38 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case 16:
             if (write)
-                pars->setPbandwidth((int) value);
+                pars->setPbandwidth(value_int);
             else
                 value = pars->Pbandwidth;
             break;
         case 17:
             if (write)
-                pars->Pbwscale = (int) value;
+                pars->Pbwscale = value_int;
             else
                 value = pars->Pbwscale;
             break;
         case 19:
             if (write)
-                pars->Pmode = (int) value;
+                pars->Pmode = value_int;
             else
                 value = pars->Pmode;
             break;
 
         case 32:
             if (write)
-                pars->PDetune = (int) value + 8192;
+                pars->PDetune = value_int + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
         case 33:
             if (write)
-                pars->PfixedfreqET = (int) value;
+                pars->PfixedfreqET = value_int;
             else
                 value = pars->PfixedfreqET;
             break;
         case 34:
             if (write)
-                pars->Pfixedfreq = (value != 0);
+                pars->Pfixedfreq = value_0_1;
             else
                 value = pars->Pfixedfreq;
             break;
@@ -3956,7 +3978,7 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                 pars->PDetuneType = (int) value + 1;
+                 pars->PDetuneType = value_int + 1;
             else
                 value =  pars->PDetuneType - 1;
             break;
@@ -3979,69 +4001,69 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case 38:
             if (write)
-                pars->PBendAdjust = lrint(value);
+                pars->PBendAdjust = value_int;
             else
                 value = pars->PBendAdjust;
             break;
         case 39:
             if (write)
-                pars->POffsetHz = lrint(value);
+                pars->POffsetHz = value_int;
             else
                 value = pars->POffsetHz;
             break;
 
         case 48:
             if (write)
-                pars->Phrpos.par1 = (int) value;
+                pars->Phrpos.par1 = value_int;
             else
                 value = pars->Phrpos.par1;
             break;
         case 49:
             if (write)
-                pars->Phrpos.par2 = (int) value;
+                pars->Phrpos.par2 = value_int;
             else
                 value = pars->Phrpos.par2;
             break;
         case 50:
             if (write)
-                pars->Phrpos.par3 = (int) value;
+                pars->Phrpos.par3 = value_int;
             else
                 value = pars->Phrpos.par3;
             break;
         case 51:
             if (write)
-                pars->Phrpos.type = (int) value;
+                pars->Phrpos.type = value_int;
             else
                 value = pars->Phrpos.type;
             break;
 
         case 64:
             if (write)
-                pars->Php.base.par1 = (int) value;
+                pars->Php.base.par1 = value_int;
             else
                 value = pars->Php.base.par1;
             break;
         case 65:;
             if (write)
-                pars->Php.freqmult = (int) value;
+                pars->Php.freqmult = value_int;
             else
                 value = pars->Php.freqmult;
             break;
         case 66:
             if (write)
-                pars->Php.modulator.par1 = (int) value;
+                pars->Php.modulator.par1 = value_int;
             else
                 value = pars->Php.modulator.par1;
             break;
         case 67:
             if (write)
-                pars->Php.modulator.freq = (int) value;
+                pars->Php.modulator.freq = value_int;
             else
                 value = pars->Php.modulator.freq;
             break;
         case 68:
             if (write)
-                pars->Php.width = (int) value;
+                pars->Php.width = value_int;
             else
                 value = pars->Php.width;
             break;
@@ -4059,13 +4081,13 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case 71:
             if (write)
-                pars->Php.amp.par1 = (int) value;
+                pars->Php.amp.par1 = value_int;
             else
                 value = pars->Php.amp.par1;
             break;
         case 72:
             if (write)
-                pars->Php.amp.par2 = (int) value;
+                pars->Php.amp.par2 = value_int;
             else
                 value = pars->Php.amp.par2;
             break;
@@ -4083,32 +4105,32 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case 75:
             if (write)
-                pars->Php.autoscale = (value != 0);
+                pars->Php.autoscale = value_0_1;
             else
                 value = pars->Php.autoscale;
             break;
 
         case 80:
             if (write)
-                pars->Pquality.basenote = (int) value;
+                pars->Pquality.basenote = value_int;
             else
                 value = pars->Pquality.basenote;
             break;
         case 81:
             if (write)
-                pars->Pquality.smpoct = (int) value;
+                pars->Pquality.smpoct = value_int;
             else
                 value = pars->Pquality.smpoct;
             break;
         case 82:
             if (write)
-                pars->Pquality.oct = (int) value;
+                pars->Pquality.oct = value_int;
             else
                 value = pars->Pquality.oct;
             break;
         case 83:
             if (write)
-                pars->Pquality.samplesize = (int) value;
+                pars->Pquality.samplesize = value_int;
             else
                 value = pars->Pquality.samplesize;
             break;
@@ -4123,38 +4145,38 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case 112:
             if (write)
-                pars->PStereo = (value != 0);
+                pars->PStereo = value_0_1;
             else
                 ;
             break;
 
         case 120:
             if (write)
-                pars->Fadein_adjustment = (int) value;
+                pars->Fadein_adjustment = value_int;
             else
                 value = pars->Fadein_adjustment;
             break;
         case 121:
             if (write)
-                pars->PPunchStrength = (int) value;
+                pars->PPunchStrength = value_int;
             else
                 value = pars->PPunchStrength;
             break;
         case 122:
             if (write)
-                pars->PPunchTime = (int) value;
+                pars->PPunchTime = value_int;
             else
                 value = pars->PPunchTime;
             break;
         case 123:
             if (write)
-                pars->PPunchStretch = (int) value;
+                pars->PPunchStretch = value_int;
             else
                 value = pars->PPunchStretch;
             break;
         case 124:
             if (write)
-                pars->PPunchVelocitySensing = (int) value;
+                pars->PPunchVelocitySensing = value_int;
             else
                 value = pars->PPunchVelocitySensing;
             break;
@@ -4171,12 +4193,14 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
     if (getData->data.type & 0x20)
         getData->data.type = getData->data.type & 0xbf;
 
-    int value = (int) getData->data.value; // no floats here!
+    int value = lrint(getData->data.value); // no floats here!
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
 
     bool write = (type & 0x40) > 0;
+
+    char value_0_1 = (value > 0);
 
     if (insert == 6)
     {
@@ -4273,7 +4297,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             if (write)
             {
                 oscil->useasbase();
-                if (value != 0)
+                if (value_0_1)
                 {
                     for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
                     {
@@ -4317,7 +4341,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case 38:
             if (write)
-                oscil->Pfilterbeforews =  (value != 0);
+                oscil->Pfilterbeforews = value_0_1;
             else
                 value = oscil->Pfilterbeforews;
             break;
@@ -4378,7 +4402,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case 66:
             if (write)
-                oscil->Pharmonicshiftfirst = (value != 0);
+                oscil->Pharmonicshiftfirst = value_0_1;
             else
                 value = oscil->Pharmonicshiftfirst;
             break;
@@ -4436,12 +4460,14 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
     if (getData->data.type & 0x20)
         getData->data.type = getData->data.type & 0xbf;
 
-    int value = (int) getData->data.value; // no floats here
+    int value = lrint(getData->data.value); // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
 
     bool write = (type & 0x40) > 0;
+
+    char value_0_1 = (value > 0);
 
     if (insert == 9)
     {
@@ -4477,7 +4503,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case 8:
             if (write)
-                respar->Penabled = (value != 0);
+                respar->Penabled = value_0_1;
             else
                 value = respar->Penabled;
             break;
@@ -4489,11 +4515,11 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case 20:
             if (write)
-                respar->interpolatepeaks((value != 0));
+                respar->interpolatepeaks(value_0_1);
             break;
         case 21:
             if (write)
-                respar->Pprotectthefundamental = (value != 0);
+                respar->Pprotectthefundamental = value_0_1;
             else
                 value = respar->Pprotectthefundamental;
             break;
@@ -4615,13 +4641,13 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
             break;
         case 5:
             if (write)
-                pars->setPLFOtype((int)val);
+                pars->setPLFOtype(lrint(val));
             else
                 val = pars->PLFOtype;
             break;
         case 6:
             if (write)
-                pars->setPcontinous((val != 0));
+                pars->setPcontinous((val > 0.5f));
             else
                 val = pars->Pcontinous;
             break;
@@ -4688,6 +4714,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 {
     bool write = (getData->data.type & 0x40) > 0;
     float val = getData->data.value;
+    int value_int = lrint(val);
 
     int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter;
@@ -4717,7 +4744,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (velsnsamp != NULL)
             {
                 if (write)
-                    *velsnsamp = (unsigned char) val;
+                    *velsnsamp = value_int;
                 else
                     val = *velsnsamp;
             }
@@ -4726,7 +4753,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (velsns != NULL)
             {
                 if (write)
-                    *velsns = (unsigned char) val;
+                    *velsns = value_int;
                 else
                     val = *velsns;
             }
@@ -4739,14 +4766,14 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 6:
             if (write)
-                pars->Pstages = val;
+                pars->Pstages = value_int;
             else
                 val = pars->Pstages;
             break;
         case 7:
             if (write)
             {
-                if (pars->Pcategory != val)
+                if (pars->Pcategory != value_int)
                 {
                     pars->Pgain = 64;
                     pars->Ptype = 0;
@@ -4761,7 +4788,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 9:
             if (write)
             {
-                pars->Ptype = val;
+                pars->Ptype = value_int;
                 pars->changed=true;
             }
             else
@@ -4769,7 +4796,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 10:
             if (write)
-                pars->Pfreqtrackoffset = (val != 0);
+                pars->Pfreqtrackoffset = (value_int != 0);
             else
                 val = pars->Pfreqtrackoffset;
             break;
@@ -4850,7 +4877,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 32:
             if (write)
             {
-                pars->Pnumformants = val;
+                pars->Pnumformants = value_int;
                 pars->changed=true;
             }
             else
@@ -4863,7 +4890,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 35:
             if (write)
             {
-                pars->Psequencesize = val;
+                pars->Psequencesize = value_int;
                 pars->changed=true;
             }
             else
@@ -4874,7 +4901,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 37:
             if (write)
             {
-                pars->Psequence[nseqpos].nvowel = val;
+                pars->Psequence[nseqpos].nvowel = value_int;
                 pars->changed=true;
             }
             else
@@ -4883,7 +4910,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 38:
             if (write)
             {
-                pars->Psequencereversed = (val != 0);
+                pars->Psequencereversed = (value_int != 0);
                 pars->changed=true;
             }
             else
@@ -4996,7 +5023,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
 void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
-    int val = (int) getData->data.value; // these are all integers or bool
+    int val = lrint(getData->data.value); // these are all integers or bool
     bool write = (getData->data.type & 0x40) > 0;
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
@@ -5204,6 +5231,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+
     bool isSysEff = (npart == 0xf1);
     if (insert == 0xff)
     {
@@ -5215,9 +5245,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 if (write)
                 {
                     if (isSysEff)
-                        synth->sysefx[effnum]->changeeffect((int)value);
+                        synth->sysefx[effnum]->changeeffect(value_int);
                     else
-                        synth->insefx[effnum]->changeeffect((int)value);
+                        synth->insefx[effnum]->changeeffect(value_int);
                 }
                 else
                 {
@@ -5229,7 +5259,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 break;
             case 2: // insert only
                 if (write)
-                    synth->Pinsparts[effnum] = (int)value;
+                    synth->Pinsparts[effnum] = value_int;
                 else
                     value = synth->Pinsparts[effnum];
                 break;
@@ -5283,9 +5313,9 @@ void InterChange::commandEffects(CommandBlock *getData)
     if (write)
     {
         if (control == 16)
-            	eff->changepreset((int)value);
+            	eff->changepreset(lrint(value));
         else
-             eff->seteffectpar(control,(int)value);
+             eff->seteffectpar(control,lrint(value));
     }
     else
     {
