@@ -274,7 +274,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {851 86 770 580} type Double hide
+      xywh {629 86 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -982,13 +982,12 @@ send_data(1, o->value(), 0xc8);}
           Fl_Light_Button voicerandompan {
             label Rand
             callback {//
-    if(pars->randomVoicePan(nvoice))
-    {
-        voicepan->value(64);
-        pars->setVoicePan(nvoice, 64);
-    }
-    o->value(pars->randomVoicePan(nvoice));}
-            tooltip {Voice random panning On/Off} xywh {196 91 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
+    voicepan->value(0);
+    pars->setVoicePan(nvoice, 0);
+    o->value(1);
+    synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicepanning->value(0);
+    send_data(2, 0, 0xc0);}
+            tooltip {Voice random panning On/Off} xywh {196 91 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
             code0 {o->value(pars->randomVoicePan(nvoice));}
           }
           Fl_Check_Button AmpEnvEn {
@@ -1596,13 +1595,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
-      xywh {109 74 535 405} type Double hide
+      xywh {581 40 535 405} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Global").c_str());}
       code1 {o->position(synth->getGuiMaster()->addNoteX, synth->getGuiMaster()->addNoteY);}
     } {
@@ -1696,7 +1695,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
         }
       }
       Fl_Group amplitudegrp {
-        label AMPLITUDE
+        label AMPLITUDE selected
         xywh {5 5 240 250} box THIN_UP_FRAME labeltype EMBOSSED_LABEL labelsize 11 align 17
       } {
         Fl_Dial globalvolume {
@@ -1736,15 +1735,10 @@ send_data(1, o->value(), 0xc8);}
         Fl_Light_Button globalrandompan {
           label Rand
           callback {//
-              /*if (pars->randomGlobalPan()) // set to full left
-              {
-                  globalpan->value(1);
-                  pars->setGlobalPan(1);
-              }
-              o->value(pars->randomGlobalPan());*/
     globalpan->value(0);
-    send_data(2, 0, 0xc8);}
-          xywh {196 57 7 13} box NO_BOX color 35 selection_color 88 labelsize 10
+    o->value(1);
+    send_data(2, 0, 0xc0);}
+          xywh {196 57 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 8
           code0 {o->value(pars->randomGlobalPan());}
         }
         Fl_Dial depop {

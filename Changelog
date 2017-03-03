@@ -6,6 +6,7 @@ yoshimi 1.5.0 M
 * Improved float/int and float/bool casts in interchange.
 * Gui Addsynth base parameters now go through ring buffers.
 * Reinstated Addsynth base random pan button behaviour.
+* Reinstated random pan button behaviour to all others.
 
 2016-3-2 Will
 * Main part limits done (not controllers)

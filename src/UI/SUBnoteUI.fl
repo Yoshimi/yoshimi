@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {SubNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,39 +27,41 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
+This file is derivative of ZynAddSubFX original code
+
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "WidgetPDialUI.h"} {public local
-} 
+}
 
 decl {\#include "WidgetMWSliderUI.h"} {public local
-} 
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
-} 
+}
 
 decl {\#include "FilterUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"} {public local
-} 
+}
 
 decl {\#include "Params/SUBnoteParameters.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class SUBnoteharmonic {: {public Fl_Group}
 } {
@@ -164,13 +166,13 @@ hide();
   }
   decl {int kititem;} {private local
   }
-} 
+}
 
-class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
+class SUBnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
-      label {SUBsynth Parameters}
+      label {SUBsynth Parameters} selected
       xywh {19 114 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
@@ -225,7 +227,7 @@ send_data (1, o->value(), 0xc8);}
           label Pan
           callback {//
     pars->setPan((char)o->value());
-    randompan->value(pars->randomPan());
+    randompan->value(o->value() < 1);
     send_data (2, o->value(), 0xc8);}
           tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
@@ -236,13 +238,11 @@ send_data (1, o->value(), 0xc8);}
         Fl_Light_Button randompan {
           label Rand
           callback {//
-              if (pars->randomPan()) // set to full left
-              {
-                  pars->setPan(1);
-                  pan->value(1);
-              }
-              o->value(pars->randomPan());}
-          xywh {182 49 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
+    pars->setPan(0);
+    pan->value(0);
+    o->value(1);
+    send_data (2, o->value(), 0xc0);}
+          xywh {182 49 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 8
           code0 {o->value(pars->randomPan());}
         }
         Fl_Group ampenv {
@@ -846,4 +846,4 @@ make_window();} {}
   }
   decl {int kititem;} {private local
   }
-} 
+}

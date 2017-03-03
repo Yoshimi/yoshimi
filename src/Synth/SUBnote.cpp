@@ -22,7 +22,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of ZynAddSubFX original code
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <cmath>
@@ -78,6 +78,8 @@ SUBnote::SUBnote(SUBnoteParameters *parameters, Controller *ctl_, float freq,
         randpanL = cosf(t * HALFPI);
         randpanR = cosf((1.0f - t) * HALFPI);
     }
+    else
+        randpanL = randpanR = 0.7f;
     numstages = pars->Pnumstages;
     stereo = pars->Pstereo;
     start = pars->Pstart;
@@ -266,6 +268,8 @@ void SUBnote::SUBlegatonote(float freq, float velocity,
         randpanL = cosf(t * HALFPI);
         randpanR = cosf((1.0f - t) * HALFPI);
     }
+    else
+        randpanL = randpanR = 0.7f;
 
     int pos[MAX_SUB_HARMONICS];
 

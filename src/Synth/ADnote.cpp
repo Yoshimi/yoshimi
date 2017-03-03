@@ -21,7 +21,7 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <cmath>
@@ -84,6 +84,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         NoteGlobalPar.randpanL = cosf(t * HALFPI);
         NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
     }
+    else
+        NoteGlobalPar.randpanL = NoteGlobalPar.randpanR = 0.7f;
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq() // center freq
         + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f
@@ -529,6 +531,8 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         NoteGlobalPar.randpanL = cosf(t * HALFPI);
         NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
     }
+    else
+        NoteGlobalPar.randpanL = NoteGlobalPar.randpanR = 0.7f;
 
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq()
@@ -682,6 +686,8 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
             NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
         }
+        else
+            NoteVoicePar[nvoice].randpanL = NoteVoicePar[nvoice].randpanR = 0.7f;
 
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled
@@ -906,6 +912,8 @@ void ADnote::initParameters(void)
             NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
             NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
         }
+        else
+            NoteVoicePar[nvoice].randpanL = NoteVoicePar[nvoice].randpanR = 0.7f;
 
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled)

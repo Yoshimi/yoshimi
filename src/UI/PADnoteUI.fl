@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {PADNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {PADNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -27,9 +27,11 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
+This file is derivative of ZynAddSubFX original code
+
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -43,15 +45,15 @@ decl {\#include <FL/Fl_Box.H>
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "FilterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "ResonanceUI.h"
     \#include "OscilGenUI.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class PADnoteHarmonicProfile {: {public Fl_Box}
 } {
@@ -131,7 +133,7 @@ class PADnoteHarmonicProfile {: {public Fl_Box}
   }
   decl {PADnoteParameters *pars;} {public local
   }
-} 
+}
 
 class PADnoteOvertonePosition {: {public Fl_Box, private MiscFuncs}
 } {
@@ -233,7 +235,7 @@ this->pars=pars;} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
 } {
@@ -1000,7 +1002,7 @@ send_data(1, o->value(), 0xc8);}
               label Pan
               callback {//
     pars->setPan((char)o->value());
-    randompan->value(pars->randomPan());
+    randompan->value(o->value() < 1);
     send_data(2, o->value(), 0xc8);}
               tooltip {Panning - leftmost/zero is Random} xywh {175 42 34 34} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
               code0 {o->setValueType(VC_PanningRandom);}
@@ -1011,13 +1013,11 @@ send_data(1, o->value(), 0xc8);}
             Fl_Light_Button randompan {
               label Rand
               callback {//
-                  if (pars->randomPan())
-                  {   // set to full left
-                      pan->value(1);
-                      pars->setPan(1);
-                  }
-                  o->value(pars->randomPan());}
-              tooltip {Random panning On/Off} xywh {197 77 13 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
+    pan->value(0);
+    pars->setPan(0);
+    o->value(1);
+    send_data(2, 0, 0xc0);}
+              tooltip {Random panning On/Off} xywh {197 77 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 72
               code0 {o->value(pars->randomPan());}
             }
             Fl_Dial dpop {
@@ -1546,4 +1546,4 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {int kititem;} {private local
   }
-} 
+}
