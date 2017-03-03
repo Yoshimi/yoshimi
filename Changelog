@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2016-3-3 Will
+* Changed confusing naming referring to voice list vibratto.
+  Also improved comment.
+
 2016-3-2 Will
 * Main part limits done (not controllers)
 * Master limits done.

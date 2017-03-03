@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {ADNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {ADNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -28,9 +28,9 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified February 2017
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>
     \#include <FL/Fl_Group.H>
@@ -41,7 +41,7 @@ decl {\#include <FL/Fl_Box.H>
     \#include "WidgetMWSliderUI.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"
     \#include "Misc/MiscFuncs.h"
@@ -50,10 +50,10 @@ decl {\#include "Misc/SynthHelper.h"
     \#include "EnvelopeUI.h"
     \#include "LFOUI.h"
     \#include "OscilGenUI.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
@@ -85,12 +85,12 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     bool enab = (o->value() > 0.5);
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->advoice->ResonanceEn->value(enab);
-    
+
     collect_data(synth, enab, (Fl::event_button() | 0xc0), 130, npart, kititem, 0x80 + nvoice);}
           tooltip {Resonance On/Off} xywh {269 5 15 17} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 11 align 4
           code0 {o->value(pars->VoicePar[nvoice].Presonance);}
         }
-        Fl_Value_Slider voicelfofreq {
+        Fl_Value_Slider voicelistvibratto {
           callback {//
     if (Fl::event_button() == 3)
         o->value(40);
@@ -112,7 +112,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     pars->setVoicePan(nvoice, panning);
     if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
         synth->getGuiMaster()->partui->adnoteui->advoice->voicepan->value(panning);
-    
+
     collect_data(synth, panning, (Fl::event_button() | 0xc8), 2, npart, kititem, 0x80 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {244 3 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
@@ -201,7 +201,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         else
             synth->getGuiMaster()->partui->adnoteui->advoice->voiceparametersgroup->deactivate();
     }
-    
+
     collect_data(synth, enab, (Fl::event_button() | 0xc0), 129, npart, kititem, 0x80 + nvoice);}
         xywh {20 3 20 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {char tmp[10]; snprintf(tmp, 10, "%d", nvoice + 1); o->label(strdup(tmp));}
@@ -221,9 +221,9 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     nvoice = nvoice_;
     make_window();
     if (pars->VoicePar[nvoice].PFreqLfoEnabled > 0)
-        voicelfofreq->activate();
+        voicelistvibratto->activate();
     else
-        voicelfofreq->deactivate();
+        voicelistvibratto->deactivate();
     ADnoteVoiceListItem->show();
     end();} {}
   }
@@ -235,7 +235,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
         voicedetune->value(pars->VoicePar[nvoice].PDetune - 8192);
         voicepanning->value(pars->VoicePar[nvoice].PPanning);
         pars->setVoicePan(nvoice, voicepanning->value());
-        voicelfofreq->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
+        voicelistvibratto->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);
         if (pars->VoicePar[nvoice].Pextoscil != -1)
         {
             osc->init(pars->VoicePar[pars->VoicePar[nvoice].Pextoscil].OscilSmp, 0, pars->VoicePar[nvoice].Poscilphase, synth);
@@ -267,7 +267,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
   decl {int kititem;} {private local
   }
-} 
+}
 
 class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
@@ -606,12 +606,12 @@ send_data(82, o->value(), 0xc8);}
     if (enab)
     {
         voicefreqlfogroup->activate();
-        synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicelfofreq->activate();
+        synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicelistvibratto->activate();
     }
     else
     {
         voicefreqlfogroup->deactivate();
-        synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicelfofreq->deactivate();
+        synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicelistvibratto->deactivate();
     }
     o->redraw();
 
@@ -1594,7 +1594,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
@@ -2159,4 +2159,4 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {bool fromVoiceList;} {public local
   }
-} 
+}

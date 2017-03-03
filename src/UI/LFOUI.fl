@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original
 Modified March 2017
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <iostream>} {public local
@@ -65,7 +65,7 @@ decl {\#include "Misc/SynthEngine.h"} {public global
 decl {\#include "MasterUI.h"} {private global
 }
 
-class LFOUI {: {public Fl_Group, PresetsUI_}
+class LFOUI {selected : {public Fl_Group, PresetsUI_}
 } {
   Function {LFOUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -99,8 +99,8 @@ send_data(group, 0, o->value(), 0x48);}
           callback {//
     int depth = lrint(o->value());
     //pars->setPintensity(depth);
-    if (engine >= 0x80 && engine < 0x88 && group == 1) // special case
-        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelfofreq->value(depth);
+    if (engine >= 0x80 && engine < 0x88 && group == 1) // special case to sync voice list vibrato
+        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelistvibratto->value(depth);
 
     send_data(group, 1, depth, 0xc8);}
           tooltip {LFO Amount} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -234,7 +234,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char part = getData->data.part;
     unsigned char eng = getData->data.engine;
     unsigned char par = getData->data.parameter;
-    
+
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
@@ -246,8 +246,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 1:
     	    intensity->value(value);
-    	    if (engine >= 128 && engine < 136 && par == 1) // rather special !
-    	        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelfofreq->value(value);
+    	    if (engine >= 128 && engine < 136 && par == 1) // rather special to sync voice list vibrato
+    	        synth->getGuiMaster()->partui->adnoteui->voicelistitem[engine &0xf]->voicelistvibratto->value(value);
     	    break;
 
     	case 2:
