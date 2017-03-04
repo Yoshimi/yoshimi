@@ -70,14 +70,14 @@ file (GLOB yoshimi_plugin_ttl
     yoshimi.ttl)
 
 set (FltkUI_names
-    "WidgetPDialUI"  "PresetsUI"  "EnvelopeUI"
+    "PresetsUI"  "EnvelopeUI"
     "LFOUI"  "FilterUI"  "VirKeyboardUI"
     "ConfigUI"  "SUBnoteUI"  "ResonanceUI"
     "OscilGenUI"  "ADnoteUI"  "PADnoteUI"
     "EffUI"  "BankUI"  "PartUI"
     "MicrotonalUI"  "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "MidiLearnUI" "WidgetMWSliderUI"
+    "MidiLearnUI"
 )
 
 # workaround fltk_wrap_ui breakage
@@ -96,6 +96,12 @@ foreach(basename ${FltkUI_names})
     set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
 endforeach(basename ${FltkUI_names})
 
+set (FltkUI_sources
+    ${FltkUI_sources}
+    ../UI/DynamicTooltip.cpp
+    ../UI/WidgetPDial.cpp
+    ../UI/WidgetMWSlider.cpp
+)
 
 add_definitions (-DYOSHIMI_LV2_PLUGIN=1)
 
