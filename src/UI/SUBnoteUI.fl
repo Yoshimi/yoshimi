@@ -89,7 +89,7 @@ if (pars->Phmag[n]==0)
     o->selection_color(0);
 else
     o->selection_color(222);}
-        tooltip {harmonic's magnitude} xywh {0 15 10 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
+        tooltip {Harmonic's magnitude} xywh {0 15 10 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
         code0 {o->value(127-pars->Phmag[n]);}
         code1 {if (pars->Phmag[n]==0) o->selection_color(0);}
         class mwheel_slider
@@ -97,9 +97,9 @@ else
       Fl_Slider bw {
         callback {int x=64;
 if (Fl::event_button() != 3)
-    x=127-(int)o->value();
+    x = 127 - (int)o->value();
 else
-    o->value(x);
+    o->value(x - 1);
 pars->Phrelbw[n]=x;
 
 send_data(7, n, x, 0xc8);
@@ -108,9 +108,11 @@ if (pars->Phrelbw[n]==64)
     o->selection_color(0);
 else
     o->selection_color(222);}
-        tooltip {harmonic's bandwidth} xywh {0 156 10 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
-        code0 {o->value(127-pars->Phrelbw[n]);}
-        code1 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
+        tooltip {Harmonic's bandwidth multiplier} xywh {0 156 10 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 63
+	code0 {o->setValueType(VC_SubBandwidthRel);}
+	code1 {o->useCustomTip(true);}
+        code2 {o->value(127-pars->Phrelbw[n]);}
+        code3 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
         class mwheel_slider
       }
       Fl_Box {} {
@@ -178,7 +180,7 @@ class SUBnoteUI {: {public PresetsUI_, SynthHelper}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
       Fl_Scroll {} {
-        xywh {5 140 434 330} type HORIZONTAL box THIN_UP_BOX
+        xywh {5 140 435 330} type HORIZONTAL box THIN_UP_BOX
       } {
         Fl_Pack harmonics {
           xywh {10 145 425 325} type HORIZONTAL
@@ -489,8 +491,11 @@ send_data (112, o->value(), 0xc0);}
     o->value(40);
 pars->Pbandwidth=(int) o->value();
 send_data (16, o->value(), 0xc8);}
+	  tooltip {Base bandwidth, approximate}
           xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->value(pars->Pbandwidth);}
+          code0 {o->setValueType(VC_SubBandwidth);}
+          code1 {o->useCustomTip(true);}
+          code2 {o->value(pars->Pbandwidth);}
           class mwheel_val_slider_rev
         }
         Fl_Value_Slider bwidthscale {
@@ -499,8 +504,10 @@ send_data (16, o->value(), 0xc8);}
     o->value(0);
 pars->Pbwscale=(int) o->value() + 64;
 send_data (17, o->value() + 64, 0xc8);}
-          tooltip {How much I increase the BandWidth according to lower/higher harmonics} xywh {345 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
-          code0 {o->value(pars->Pbwscale-64);}
+          tooltip {Freq-dep. bw. scaling} xywh {345 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+          code0 {o->setValueType(VC_SubBandwidthScale);}
+          code1 {o->useCustomTip(true);}
+          code2 {o->value(pars->Pbwscale-64);}
           class mwheel_val_slider_rev
         }
       }

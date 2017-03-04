@@ -673,6 +673,32 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(f,"cents",2));
             else
                 return(custom_value_units(f,"cents",1));
+        case VC_SubBandwidth:
+            /* This is only an approximation based on observation.
+               Considering the variability of the synthesis depending
+               on number of filter stages, it seems accurate enough.
+             */
+	    f = powf(10.0f, (val - 127.0f) / 127.0f * 4.0f) * 4800;
+            if(f > 100)
+                return(custom_value_units(f, "cents", 1));
+            else if(f > 10)
+                return(custom_value_units(f, "cents", 2));
+            else
+                return(custom_value_units(f, "cents", 3));
+
+        case VC_SubBandwidthRel:
+	    f = powf(100.0f, (63 - (int)val) / 64.0f);
+            if(f >= 10)
+                return(custom_value_units(f, "x", 2));
+            else
+                return(custom_value_units(f, "x", 3));
+
+        case VC_SubBandwidthScale:
+            if((int)val == 0){
+                return "Constant (no scaling)";
+            }
+	    f = val / 64.0f * 3.0f;
+            return ("Scaling factor: (1000 / f)^" + custom_value_units(f,"",2));
 
         case VC_FilterVelocitySense: // this is also shown graphically
             if((int)val==127)
