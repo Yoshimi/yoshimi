@@ -50,10 +50,10 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MusicIO/MidiControl.h"} {public local
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public local
+decl {\#include "UI/WidgetPDial.h"} {public local
 } 
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
+decl {\#include "UI/WidgetMWSlider.h"} {public local
 } 
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local

@@ -38,7 +38,7 @@ decl {\#include <iostream>} {public local
 decl {\#include "UI/MiscGui.h"} {public local
 }
 
-decl {\#include "WidgetPDialUI.h"} {public local
+decl {\#include "UI/WidgetPDial.h"} {public local
 }
 
 decl {\#include <FL/Fl_Group.H>} {public local

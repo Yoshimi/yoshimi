@@ -34,10 +34,10 @@ This file is derivative of ZynAddSubFX original code, modified December 2016
 decl {\#include "UI/MiscGui.h"} {public local
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public local
+decl {\#include "UI/WidgetPDial.h"} {public local
 } 
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
+decl {\#include "UI/WidgetMWSlider.h"} {public local
 } 
 
 decl {\#include <FL/Fl_Group.H>} {public local
@@ -363,6 +363,7 @@ send_data(4, o->value(), 0xc8);}
           tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(127); else o->init(64);}
           code1 {o->setValueType(VC_FilterVelocitySense);}
+          code2 {o->setGraphicsType(VC_FilterVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial gaindial {

@@ -50,7 +50,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
-    \#include "WidgetMWSliderUI.h"
+    \#include "UI/WidgetMWSlider.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
 } 

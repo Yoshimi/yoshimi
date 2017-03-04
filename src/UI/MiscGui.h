@@ -1,7 +1,7 @@
 /*
     MiscGui.h - common link between GUI and synth
 
-    Copyright 2016 Will Godfrey & others
+    Copyright 2016-2017 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -101,7 +101,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData);
 string convert_value(ValueType type, float val);
 
 string custom_value_units(float v, string u, int prec=0);
-int  custom_graph_size(ValueType vt);
+void  custom_graph_dimensions(ValueType vt, int& w, int& h);
 void custom_graphics(ValueType vt, float val,int W,int H);
 ValueType getLFOdepthType(int group);
 ValueType getFilterFreqType(int type);

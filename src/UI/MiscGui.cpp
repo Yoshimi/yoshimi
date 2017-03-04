@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <FL/Fl.H>
@@ -526,6 +526,7 @@ string convert_value(ValueType type, float val)
                 return(custom_value_units(f,"Hz"));
             else
                 return(custom_value_units(f/1000.0f,"kHz",2));
+
         case VC_FilterFreq2: // SVFilter
             f=powf(2.0f, (val / 64.0f - 1.0f) * 5.0f + 9.96578428f);
             // We have to adjust the freq because of this line
@@ -902,8 +903,14 @@ string convert_value(ValueType type, float val)
             return(custom_value_units(f,"dB",1));
 
         case VC_plainValue:
-            return(custom_value_units(val,""));
-
+        {
+            /* Avoid trailing space */
+            ostringstream oss;
+            oss.setf(std::ios_base::fixed);
+            oss.precision(0);
+            oss << val;
+            return string(oss.str());
+        }
         case VC_FXDistVol:
             f = -40.0f * (1.0f - ((int)val / 127.0f)) + 15.05f;
             return(custom_value_units(f,"dB",1));
@@ -930,61 +937,78 @@ string convert_value(ValueType type, float val)
     return(custom_value_units(val,""));
 }
 
-int custom_graph_size(ValueType vt)
+void custom_graph_dimensions(ValueType vt, int& w, int& h)
 {
     switch(vt)
     {
         case VC_FilterVelocitySense:
-            return(48);
+            w = 128;
+            h = 64;
+            break;
         default:
-            return(0);
+            w = 0;
+            h = 0;
     }
 }
 
 void custom_graphics(ValueType vt, float val,int W,int H)
 {
-    int size,x0,y0,i;
+    int x0,y0,i;
+    int _w, _h;
     float x,y,p;
 
     switch(vt)
     {
-        case VC_FilterVelocitySense:
-            size=42;
-            x0 = W-(size+2);
-            y0 = H-(size+2);
+    case VC_FilterVelocitySense:
+    {
+        custom_graph_dimensions(vt, _w, _h);
+        x0 = W / 2 - (_w / 2);
+        y0 = H;
 
-            fl_color(215);
-            fl_rectf(x0,y0,size,size);
-            fl_color(FL_BLUE);
+        p = powf(8.0f,(64.0f-(int)val)/64.0f);
 
-            p = powf(8.0f,(64.0f-(int)val)/64.0f);
-            y0 = H-3;
+        /* Grid */
+        fl_color(FL_GRAY);
 
+        int j = 1;
+        float gDist = _h / 4;
+        for(; j < 4; j++) { /* Vertical */
             fl_begin_line();
-
-            size--;
-            if ((int)val == 127)
-            {   // in this case velF will always return 1.0
-                y = 1.0f * size;
-                for(i=0;i<=size;i++)
-                {
-                    x = (float)i / (float)size;
-                    fl_vertex((float)x0+i,(float)y0-y);
-                }
-            }
-            else
-            {
-                for(i=0;i<=size;i++) {
-                    x = (float)i / (float)size;
-                    y = powf(x,p) * size;
-                    fl_vertex((float)x0+i,(float)y0-y);
-                }
-            }
+            fl_vertex((float)x0, y0 - gDist * j);
+            fl_vertex((float)x0 + _w, y0 - gDist * j);
             fl_end_line();
-            break;
+        }
 
-        default:
-            break;
+        gDist = _w / 4;
+        for(j = 1; j < 4; j++) { /* Horizontal */
+            fl_begin_line();
+            fl_vertex((float)x0 + gDist * j, y0);
+            fl_vertex((float)x0 + gDist * j, y0 - _h);
+            fl_end_line();
+        }
+
+        /*Function curve*/
+        fl_color(FL_BLUE);
+        fl_begin_line();
+        if ((int)val == 127)
+        {   // in this case velF will always return 1.0
+            y = y0 - _h;
+            fl_vertex((float)x0, y);
+            fl_vertex((float)x0 + _w, y);
+        }
+        else
+        {
+            for(i = 0; i < _w; i++) {
+                x = (float)i / (float)_w;
+                y = powf(x,p) * _h;
+                fl_vertex((float)x0 + i,(float)y0 - y);
+            }
+        }
+        fl_end_line();
+        break;
+    }
+    default:
+        break;
     }
 }
 

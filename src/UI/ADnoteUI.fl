@@ -37,8 +37,8 @@ decl {\#include <FL/Fl_Box.H>
     \#include "Params/ADnoteParameters.h"
     \#include "Misc/SynthEngine.h"
     \#include "UI/MiscGui.h"
-    \#include "WidgetPDialUI.h"
-    \#include "WidgetMWSliderUI.h"
+    \#include "UI/WidgetPDial.h"
+    \#include "UI/WidgetMWSlider.h"
     \#include "FilterUI.h"
     \#include "PresetsUI.h"} {private global
 }
