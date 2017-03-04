@@ -1,6 +1,12 @@
 yoshimi 1.5.0 M
 
-2016-3-3 Will
+2017-3-4 Will
+* Merged in Jesper's latest tooltip improvements.
+* Voice list panning now syncs random LED in main window.
+* Updated direct access doc.
+* Corrected last few dates in this file :(
+
+2017-3-3 Will
 * Changed confusing naming referring to voice list vibratto.
   Also improved comment.
 * Improved float/int and float/bool casts in interchange.
@@ -8,19 +14,19 @@ yoshimi 1.5.0 M
 * Reinstated Addsynth base random pan button behaviour.
 * Reinstated random pan button behaviour to all others.
 
-2016-3-2 Will
+2017-3-2 Will
 * Main part limits done (not controllers)
 * Master limits done.
 * Bugfix: Gui changing available parts requered two clicks.
 * Fixed new regression. Cli was never just reading values.
 * Gui LFOs now go entirely through ring buffers.
 
-2016-3-1 Will
+2017-3-1 Will
 * Started identifying default and limit values for part.
   Cli direct access uses "lim" instead of value and type.
 * Small adjustment to part label display.
 
-2016-2-26 Will
+2017-2-26 Will
 * Fixed instrument background colours.
 
 2017-2-24 Will

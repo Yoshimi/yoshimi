@@ -111,7 +111,10 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     int panning = lrint(o->value());
     pars->setVoicePan(nvoice, panning);
     if (synth->getGuiMaster()->partui->adnoteui->advoice->nvoice == nvoice)
+    {
         synth->getGuiMaster()->partui->adnoteui->advoice->voicepan->value(panning);
+        synth->getGuiMaster()->partui->adnoteui->advoice->voicerandompan->value(panning < 1);
+    }
 
     collect_data(synth, panning, (Fl::event_button() | 0xc8), 2, npart, kititem, 0x80 + nvoice);}
           tooltip {Voice panning - zero/leftmost is Random} xywh {244 3 20 20} box ROUND_UP_BOX labelsize 10 align 4 maximum 127 step 1
