@@ -3359,15 +3359,25 @@ void SynthEngine::getLimits(CommandBlock *getData)
 
         case 32:
             getData->data.type |= 0x40;
+            break;
 
         case 35:
             getData->limits.min = -36;
             getData->limits.def = 0;
             getData->limits.max = 36;
+            break;
+
+        case 96:
+        case 128:
+            getData->limits.min = 0;
+            getData->limits.def = 0;
+            getData->limits.max = 0;
+            break;
 
         default:
             getData->limits.min = -1;
             getData->limits.def = -100;
             getData->limits.max = -1;
+            break;
     }
 }

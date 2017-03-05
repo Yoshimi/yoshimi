@@ -32,7 +32,7 @@ This file is a derivative of the ZynAddSubFX original.
 Modified March 2017
 
 
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -270,7 +270,7 @@ class MasterUI {selected : {private MiscFuncs}
     {
         synth->guiClosed(true);
     }}
-      xywh {7 120 385 465} type Double labelfont 13 labelsize 12 xclass Yoshimi visible
+      xywh {7 120 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {275 27 103 85} box ENGRAVED_FRAME
@@ -919,7 +919,7 @@ ZynAddSubFX}
         code0 {o->copy_label(string("Copyright (c) 2002-2009 Nasca O. PAUL and others"
                                "\\nCopyright 2009-2011, Alan Calvert"
                                "\\nCopyright 2012-2013, Jeremy Jongepier and others"
-                               "\\nCopyright 2014-2016, Will Godfrey and others"
+                               "\\nCopyright 2014-2017, Will Godfrey and others"
                                "\\nLV2 plugin Copyright 2014, Andrew Deryabin"
                                "\\nSplash Image Copyright 2015, James Fraser").c_str());}
       }

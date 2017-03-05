@@ -5,6 +5,8 @@ yoshimi 1.5.0 M
 * Complete limit definitions for main & part include type.
   i.e. integer/float & whether midi learnable.
 * Doc updates.
+* Bugfix: missed a couple of 'break' statements in a switch.
+* Added a special case for enable default on part 1.
 
 2017-3-4 Will
 * Merged in Jesper's latest tooltip improvements.

@@ -1510,6 +1510,7 @@ void Part::getLimits(CommandBlock *getData)
 {
     unsigned int type = getData->data.type;
     int control = getData->data.control;
+    int npart = getData->data.part;
     getData->limits.min = 0;
     getData->limits.def = 6400;
     getData->limits.max = 127;
@@ -1556,7 +1557,10 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 8:
-            getData->limits.def = 100;
+            if (npart == 0)
+                getData->limits.def = 100;
+            else
+                getData->limits.def = 0;
             getData->limits.max = 1;
             break;
 
