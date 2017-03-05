@@ -5333,8 +5333,9 @@ void InterChange::commandEffects(CommandBlock *getData)
 void InterChange::returnLimits(CommandBlock *getData)
 {
     // value is preserved so we know it's a limits test
-    // type is preseved so we know the source
-    // control is use as a midi learn enable and other bits
+    // lower bits of type are preseved so we know the source
+    // bit 6 set is used to denote midi learnable
+    // bit 7 set denotes the value is used as an integer
 
     int control = getData->data.control;
     int npart = getData->data.part;
@@ -5343,6 +5344,9 @@ void InterChange::returnLimits(CommandBlock *getData)
     int insert = getData->data.insert;
     int parameter = getData->data.parameter;
     int par2 = getData->data.par2;
+    getData->data.type &= 0x3f; //  clear top bits
+    getData->data.type |= 0x80; // default is integer
+
 
     if (npart < 0x40)
     {

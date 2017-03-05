@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,10 +20,13 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code
+
+    Modified March 2017
 */
 
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -394,4 +398,109 @@ void Controller::getfromXML(XMLwrapper *xml)
 
     resonancecenter.depth=xml->getpar127("resonance_center_depth",resonancecenter.depth);
     resonancebandwidth.depth=xml->getpar127("resonance_bandwidth_depth",resonancebandwidth.depth);
+}
+
+
+void Controller::getLimits(CommandBlock *getData)
+{
+    //unsigned int type = getData->data.type; // will be used for setting MIDI learn
+    int control = getData->data.control;
+    //cout << "ctl control " << to_string(control) << endl;
+    switch (control)
+    {
+        case 128:
+            getData->limits.min = 64;
+            getData->limits.def = 9600;
+            break;
+        case 129:
+            getData->limits.min = 0;
+            getData->limits.def = 100;
+            getData->limits.max = 1;
+            break;
+        case 130:
+            getData->limits.def = 6400;
+            getData->limits.max = 64;
+            break;
+        case 131:
+            getData->limits.def = 8000;
+            break;
+        case 132:
+            getData->limits.min = 0;
+            getData->limits.def = 0;
+            getData->limits.max = 1;
+            break;
+        case 133:
+            break;
+        case 134:
+            getData->limits.min = 0;
+            getData->limits.def = 0;
+            getData->limits.max = 1;
+            break;
+        case 135:
+            getData->limits.min = 0;
+            getData->limits.def = 100;
+            getData->limits.max = 1;
+            break;
+        case 136:
+            getData->limits.min = 0;
+            getData->limits.def = 100;
+            getData->limits.max = 1;
+            break;
+        case 137:
+            getData->limits.min = 0;
+            getData->limits.def = 100;
+            getData->limits.max = 1;
+            break;
+        case 138:
+            getData->limits.min = -8192;
+            getData->limits.def = 0;
+            getData->limits.max = 8191;
+            break;
+        case 139:
+            break;
+        case 140:
+            break;
+        case 144:
+            break;
+        case 145:
+            break;
+        case 160:
+            break;
+        case 161:
+            break;
+        case 162:
+            getData->limits.def = 300;
+            break;
+        case 163:
+            getData->limits.min = 0;
+            getData->limits.max = 1;
+            break;
+        case 164:
+            getData->limits.min = 0;
+            getData->limits.def = 0;
+            getData->limits.max = 1;
+            break;
+        case 165:
+            getData->limits.def = 8000;
+            break;
+        case 166:
+            getData->limits.def = 9000;
+            break;
+        case 168:
+            getData->limits.min = 0;
+            getData->limits.def = 100;
+            getData->limits.max = 1;
+            break;
+        case 224:
+            getData->limits.min = 0;
+            getData->limits.def = 0;
+            getData->limits.max = 0;
+            break;
+
+        default:
+            getData->limits.min = -1;
+            getData->limits.def = -100;
+            getData->limits.max = -1;
+    }
+    //getData->data.type = type; // will be used for setting MIDI learn
 }

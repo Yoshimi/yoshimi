@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-3-5 Will
+* Controller & Midi control limits done.
+* Complete limit definitions for main & part include type.
+  i.e. integer/float & whether midi learnable.
+* Doc updates.
+
 2017-3-4 Will
 * Merged in Jesper's latest tooltip improvements.
 * Voice list panning now syncs random LED in main window.

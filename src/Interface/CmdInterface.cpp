@@ -2445,15 +2445,25 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     if (putData.data.value == FLT_MAX)
     {
         synth->interchange.returnLimits(&putData);
+        unsigned char returntype = putData.data.type;
         short int min = putData.limits.min;
         short int def = putData.limits.def;
         short int max = putData.limits.max;
+        string valuetype = "   Type ";
+        if (returntype & 0x80)
+            valuetype += " integer";
+        else
+            valuetype += " float";
+        if (returntype & 0x40)
+            valuetype += " learnable";
+
         string deftype;
-        if (def >= 100 || def == 0)
+        if (def >= 100 || def <= 0)
             deftype = to_string(lrint(def / 100));
         else
             deftype = to_string(float(def / 100.0f) + 0.000001).substr(0,4);
-        synth->getRuntime().Log("Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max));
+
+        synth->getRuntime().Log("Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
         return 0;
     }
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)

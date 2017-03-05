@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified March 2017
-} {in_source in_header
+} {selected in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -420,7 +420,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
-    Fl_Window partgroup {selected
+    Fl_Window partgroup {
       xywh {962 118 375 165} type Double hide
       class Fl_Group
     } {
@@ -707,7 +707,7 @@ else
     } {
       Fl_Dial volrng {
         label {Vol Rng}
-        callback {part->ctl->setvolume((char)o->value());
+        callback {//part->ctl->setvolume((char)o->value());
 send_data(128, o->value(), 0xc0);}
         tooltip {Volume Range} xywh {132 55 30 30} labelsize 10 minimum 64 maximum 127 step 1
         code0 {o->value(part->ctl->volume.data);}
@@ -723,7 +723,7 @@ send_data(129, o->value(), 0xc0);}
       }
       Fl_Dial panwidth {
         label PanWdth
-        callback {part->ctl->setPanDepth((char)o->value());
+        callback {//part->ctl->setPanDepth((char)o->value());
 send_data(130, o->value(), 0xc0);}
         tooltip {Panning Width} xywh {10 55 30 30} labelsize 10 maximum 64 step 1
         code0 {o->value(part->ctl->panning.depth);}
@@ -732,7 +732,7 @@ send_data(130, o->value(), 0xc0);}
       }
       Fl_Dial modwh {
         label ModWh
-        callback {part->ctl->modwheel.depth = o->value();
+        callback {//part->ctl->modwheel.depth = o->value();
 send_data(131, o->value(), 0xc0);}
         tooltip {Modulation Wheel depth} xywh {50 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->modwheel.depth);}
@@ -748,7 +748,7 @@ send_data(132, o->value(), 0xc0);}
       }
       Fl_Dial bwdpth {
         label BwDpth
-        callback {part->ctl->bandwidth.depth = o->value();
+        callback {//part->ctl->bandwidth.depth = o->value();
 send_data(133, o->value(), 0xc0);}
         tooltip {BandWidth depth} xywh {125 10 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->bandwidth.depth);}
@@ -799,7 +799,7 @@ send_data(138, o->value(), 0xc0);}
       }
       Fl_Dial filtq {
         label FltQ
-        callback {part->ctl->filterq.depth = o->value();
+        callback {//part->ctl->filterq.depth = o->value();
 send_data(139, o->value(), 0xc0);}
         tooltip {Filter Q depth} xywh {50 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filterq.depth);}
@@ -808,7 +808,7 @@ send_data(139, o->value(), 0xc0);}
       }
       Fl_Dial fltcut {
         label FltCut
-        callback {part->ctl->filtercutoff.depth = o->value();
+        callback {//part->ctl->filtercutoff.depth = o->value();
 send_data(140, o->value(), 0xc0);}
         tooltip {Filter Cutoff depth} xywh {90 55 30 30} labelsize 10 maximum 127 step 1
         code0 {o->value(part->ctl->filtercutoff.depth);}

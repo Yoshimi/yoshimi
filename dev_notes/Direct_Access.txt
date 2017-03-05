@@ -81,5 +81,5 @@ def = 0
 
 def returns the default * 100. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed command line response will be the actual value. No default values are very large, but they (and the others) may be negative.
 
-Eventually 'data.type' will be returned with the read/write bit (0x40) used to tell whether this control is MIDI-learnable, and the float/integer bit (0x80) is correctly identified. All the other bits are retuned as sent.
+'data.type' is returned with the read/write bit (0x40) used to tell whether this control is MIDI-learnable, and the float/integer bit (0x80) is correctly identified. All the other bits are returned as sent.
 

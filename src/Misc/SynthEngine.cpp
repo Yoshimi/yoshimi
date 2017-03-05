@@ -3336,11 +3336,13 @@ void SynthEngine::getLimits(CommandBlock *getData)
     getData->limits.min = 0;
     getData->limits.def = 6400;
     getData->limits.max = 127;
-    cout << "control " << to_string(int(control))<< endl;
+    //cout << "master control " << to_string(control) << endl;
     switch (control)
     {
         case 0:
             getData->limits.def = 9000;
+            getData->data.type &= 0x3f;
+            getData->data.type |= 0x40;
             break;
 
         case 14:
@@ -3355,9 +3357,17 @@ void SynthEngine::getLimits(CommandBlock *getData)
             getData->limits.max = 64;
             break;
 
+        case 32:
+            getData->data.type |= 0x40;
+
         case 35:
             getData->limits.min = -36;
             getData->limits.def = 0;
             getData->limits.max = 36;
+
+        default:
+            getData->limits.min = -1;
+            getData->limits.def = -100;
+            getData->limits.max = -1;
     }
 }
