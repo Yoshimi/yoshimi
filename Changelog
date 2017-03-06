@@ -1,5 +1,11 @@
 yoshimi 1.5.0 M
 
+2017-3-6 Will
+* Cli limits now report the full name as well as the values.
+* Bugfix: Cli Add/Sub text not identifying bend & offset.
+* AddSynth limits done.
+* Doc additions and corrections.
+
 2017-3-5 Will
 * Controller & Midi control limits done.
 * Complete limit definitions for main & part include type.

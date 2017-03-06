@@ -431,6 +431,12 @@ void InterChange::resolveReplies(CommandBlock *getData)
         return;
     }
 
+    if (value == FLT_MAX)
+    { // This corrupts par2 but it shouldn't matter if used as intended
+        getData->data.par2 = miscMsgPush(commandName);
+        return;
+    }
+
 #ifdef ENABLE_REPORTS
     else if((isGui && button == 2) || isCli)
         synth->getRuntime().Log(commandName + actual);
@@ -975,6 +981,12 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
         case 37:
             contstr = "Coarse Det";
             break;
+        case 38:
+            contstr = "Bend Adj";
+            break;
+        case 39:
+            contstr = "Offset Hz";
+            break;
         case 40:
             contstr = "Enable Env";
             break;
@@ -1160,7 +1172,12 @@ string InterChange::resolveSub(CommandBlock *getData)
         case 37:
             contstr = "Coarse Det";
             break;
-
+        case 38:
+            contstr = "Bend Adj";
+            break;
+        case 39:
+            contstr = "Offset Hz";
+            break;
         case 40:
             contstr = "Env Enab";
             break;
@@ -5345,7 +5362,7 @@ void InterChange::returnLimits(CommandBlock *getData)
     int parameter = getData->data.parameter;
     int par2 = getData->data.par2;
     getData->data.type &= 0x3f; //  clear top bits
-    getData->data.type |= 0x80; // default is integer
+    getData->data.type |= 0x80; // default is integer & not learnable
 
 
     if (npart < 0x40)

@@ -2444,11 +2444,19 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
     putData.data.par2 = par2;
     if (putData.data.value == FLT_MAX)
     {
+        synth->interchange.resolveReplies(&putData);
+        string name = miscMsgPop(putData.data.par2) + "\n~ ";
+        putData.data.par2 = par2; // restore this
         synth->interchange.returnLimits(&putData);
         unsigned char returntype = putData.data.type;
         short int min = putData.limits.min;
         short int def = putData.limits.def;
         short int max = putData.limits.max;
+        if (min == -1 && def == -100 && max == -1)
+        {
+            synth->getRuntime().Log("Unrecognised Control");
+            return 0;
+        }
         string valuetype = "   Type ";
         if (returntype & 0x80)
             valuetype += " integer";
@@ -2463,7 +2471,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         else
             deftype = to_string(float(def / 100.0f) + 0.000001).substr(0,4);
 
-        synth->getRuntime().Log("Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
+        synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
         return 0;
     }
     if (jack_ringbuffer_write_space(synth->interchange.fromCLI) >= commandSize)
