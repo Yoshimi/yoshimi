@@ -373,7 +373,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  * the same 'live' ID, but if they do, the second one will get an
  * empty string.
  *
- * Both will block, but should be very quick;
+ * Both calls will block, but should be very quick;
  *
  * Normally a message will clear before the next one arrives so the
  * message numbers should remain very low even over multiple instances.

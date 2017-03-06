@@ -360,34 +360,137 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
     int control = getData->data.control;
     int insert = getData->data.insert;
 
-    // defaults
-    getData->limits.min = 0;
-    getData->limits.max = 127;
-    getData->limits.def = 0;
-
     if (insert >= 6 && insert <= 7)
     { // do harmonics stuff
         if (insert == 7)
             getData->limits.def = 6400;
+        else if (control == 0)
+            getData->limits.def = 12700;
+        else
+            getData->limits.def = 0;
+        getData->data.type |= 0x40; // all learnable
+        getData->limits.min = 0;
+        getData->limits.max = 127;
         return;
     }
 
+    // defaults
+    int type = 0;
+    int min = 0;
+    int def = 0;
+    int max = 127;
+
     switch (control)
     {
+        case 0:
+            type = 0x40;
+            def = 9600;
+            break;
+
+        case 1:
+            type = 0x40;
+            def = 9000;
+            break;
+
+        case 2:
+            type = 0x40;
+            def = 6400;
+            break;
+
+        case 16:
+            type = 0x40;
+            def = 4000;
+            break;
+
         case 17:
-            getData->limits.min = -64;
-            getData->limits.max = 63;
+            type = 0x40;
+            min = -64;
+            max = 63;
             break;
+
+            case 18:
+                max = 1;
+                break;
+
         case 32:
-            getData->limits.min = -8192;
-            getData->limits.max = 8191;
+            type = 0x40;
+            min = -8192;
+            max = 8191;
             break;
+
+        case 33:
+            type = 0x40;
+            break;
+
+        case 34:
+            max = 1;
+            break;
+
+        case 35:
+            min = -8;
+            max = 7;
+            break;
+
+        case 36:
+            max = 3;
+            break;
+
+        case 37:
+            min = -64;
+            max = 63;
+            break;
+
+        case 40:
+            max = 1;
+            break;
+
         case 48:
         case 49:
         case 50:
-            getData->limits.max = 255;
+            type = 0x40;
+            max = 255;
             break;
+
+        case 64:
+            max = 1;
+            break;
+
+        case 80:
+            min = 1;
+            def = 10000;
+            max = 5;
+            break;
+
+        case 81:
+            max = 4;
+            break;
+
+        case 82:
+            def = 10000;
+            max = 2;
+            break;
+
+        case 96:
+            max = 0;
+            break;
+
+        case 112:
+            def = 100;
+            max = 1;
+            break;
+
+
+        default:
+            min = -1;
+            def = -100;
+            max = -1;
+            break;
+
     }
+    getData->data.type |= type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }
 
 void SUBnoteParameters::postrender(void)

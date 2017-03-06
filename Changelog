@@ -5,6 +5,8 @@ yoshimi 1.5.0 M
 * Bugfix: Cli Add/Sub text not identifying bend & offset.
 * AddSynth limits done.
 * Doc additions and corrections.
+* SubSynth limits done.
+* Corrected wrong AddSynth coarse detune type.
 
 2017-3-5 Will
 * Controller & Midi control limits done.
