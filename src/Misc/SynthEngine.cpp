@@ -3333,51 +3333,67 @@ void SynthEngine::setWindowTitle(string _windowTitle)
 void SynthEngine::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
-    getData->limits.min = 0;
-    getData->limits.def = 6400;
-    getData->limits.max = 127;
+    // defaults
+    int type = (getData->data.type & 0x3f) | 0x80; // set as integer
+    int min = 0;
+    int def = 6400;
+    int max = 127;
     //cout << "master control " << to_string(control) << endl;
     switch (control)
     {
         case 0:
-            getData->limits.def = 9000;
-            getData->data.type &= 0x3f;
-            getData->data.type |= 0x40;
+            def = 9000;
+            type = (type &0x3f) | 0x40; // float, learnable
             break;
 
         case 14:
-            getData->limits.min = 1;
-            getData->limits.def = 100;
-            getData->limits.max = Runtime.NumAvailableParts;;
+            min = 1;
+            def = 100;
+            max = Runtime.NumAvailableParts;;
             break;
 
         case 15:
-            getData->limits.min = 16;
-            getData->limits.def = 1600;
-            getData->limits.max = 64;
+            min = 16;
+            def = 1600;
+            max = 64;
             break;
 
         case 32:
-            getData->data.type |= 0x40;
+            type |= 0x40;
             break;
 
         case 35:
-            getData->limits.min = -36;
-            getData->limits.def = 0;
-            getData->limits.max = 36;
+            min = -36;
+            def = 0;
+            max = 36;
+            break;
+
+        case 48:
+            def = 0;
+            max = 3;
+            break;
+
+        case 49:
+            min = 14;
+            def = 11500;
+            max = 119;
             break;
 
         case 96:
         case 128:
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            getData->limits.max = 0;
+            min = 0;
+            def = 0;
+            max = 0;
             break;
 
         default:
-            getData->limits.min = -1;
-            getData->limits.def = -100;
-            getData->limits.max = -1;
+            min = -1;
+            def = -100;
+            max = -1;
             break;
     }
+    getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }

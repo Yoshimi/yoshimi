@@ -7,6 +7,8 @@ yoshimi 1.5.0 M
 * Doc additions and corrections.
 * SubSynth limits done.
 * Corrected wrong AddSynth coarse detune type.
+* Added 'solo' to limits.
+* Optiomsed limits code in SynthEngine.
 
 2017-3-5 Will
 * Controller & Midi control limits done.
