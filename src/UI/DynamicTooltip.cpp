@@ -207,8 +207,8 @@ void DynTooltip::draw() {
     /* Draw tooltip text */
     if(!onlyValue){
         fl_draw(tipText.c_str(), x, y, _w, tipTextH,
-                Fl_Align((tipTextW < valTextW ? FL_ALIGN_CENTER : FL_ALIGN_LEFT)
-                         | FL_ALIGN_WRAP));
+                Fl_Align((tipTextW < valTextW || tipTextW < graphW ?
+                          FL_ALIGN_CENTER : FL_ALIGN_LEFT)| FL_ALIGN_WRAP));
         y += tipTextH;
     }
 

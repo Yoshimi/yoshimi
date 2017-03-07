@@ -103,6 +103,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData);
 
 string convert_value(ValueType type, float val);
 
+string variable_prec_units(float v, string u, int maxPrec, bool roundup = false);
 string custom_value_units(float v, string u, int prec=0);
 void  custom_graph_dimensions(ValueType vt, int& w, int& h);
 void custom_graphics(ValueType vt, float val,int W,int H);

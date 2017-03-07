@@ -505,7 +505,7 @@ send_data (16, o->value(), 0xc8);}
 pars->Pbwscale=(int) o->value() + 64;
 send_data (17, o->value() + 64, 0xc8);}
           tooltip {Freq-dep. bw. scaling} xywh {345 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
-          code0 {o->setValueType(VC_SubBandwidthScale);}
+          code0 {o->setValueType(VC_SubBandwidthScale); o->setGraphicsType(VC_SubBandwidthScale);}
           code1 {o->useCustomTip(true);}
           code2 {o->value(pars->Pbwscale-64);}
           class mwheel_val_slider_rev
