@@ -36,7 +36,8 @@
 
 #define MAX_TEXT_WIDTH 280
 
-DynTooltip::DynTooltip():Fl_Menu_Window(1,1) {
+DynTooltip::DynTooltip():Fl_Menu_Window(1,1)
+{
 
     tipText.clear();
     valueText.clear();
@@ -61,12 +62,14 @@ DynTooltip::DynTooltip():Fl_Menu_Window(1,1) {
    Overrides standard hide/show from Fl_Widget
    to update flags and set tooltip position
 */
-void DynTooltip::hide(){
+void DynTooltip::hide()
+{
     positioned = false;
     Fl_Menu_Window::hide();
 }
 
-void DynTooltip::show(){
+void DynTooltip::show()
+{
     reposition();
     update();
     Fl_Menu_Window::show();
@@ -75,8 +78,10 @@ void DynTooltip::show(){
 /*
   Sets the value to be formatted and shown in the tooltip
 */
-void DynTooltip::setValue(float val){
-    if (val != currentValue){
+void DynTooltip::setValue(float val)
+{
+    if (val != currentValue)
+    {
         currentValue = val;
         if(positioned)
             update();
@@ -87,8 +92,10 @@ void DynTooltip::setValue(float val){
   Calling with true causes only the formatted value
   and the associated graphics to be shown in the tooltip.
 */
-void DynTooltip::setOnlyValue(bool onlyval) {
-    if (onlyValue != onlyval){
+void DynTooltip::setOnlyValue(bool onlyval)
+{
+    if (onlyValue != onlyval)
+    {
         onlyValue = !onlyValue;
         if(positioned)
             update();
@@ -100,7 +107,8 @@ void DynTooltip::setOnlyValue(bool onlyval) {
   Calling setOnlyValue(false) will prevent this from being
   displayed.
 */
-void DynTooltip::setTooltipText(string tt_text) {
+void DynTooltip::setTooltipText(string tt_text)
+{
     tipText = tt_text;
     tipTextW = MAX_TEXT_WIDTH;
     tipTextH = 0;
@@ -116,7 +124,8 @@ void DynTooltip::setTooltipText(string tt_text) {
 /*
   Set the type of the formatted value
 */
-void DynTooltip::setValueType(ValueType vt) {
+void DynTooltip::setValueType(ValueType vt)
+{
     valueType = vt;
     if(positioned)
         update();
@@ -127,7 +136,8 @@ void DynTooltip::setValueType(ValueType vt) {
   Note: The graphicstype should probably always be the same as
   the valuetype, and this field may be removed in the future.
 */
-void DynTooltip::setGraphicsType(ValueType gvt) {
+void DynTooltip::setGraphicsType(ValueType gvt)
+{
     graphicsType = gvt;
     custom_graph_dimensions(graphicsType, graphW, graphH);
     if(positioned)
@@ -138,7 +148,8 @@ void DynTooltip::setGraphicsType(ValueType gvt) {
   Set the position of the tooltip relative to the position
   of the mouse when the tooltip is shown.
 */
-void DynTooltip::setOffset(int x, int y){
+void DynTooltip::setOffset(int x, int y)
+{
     xoffs = x;
     yoffs = y;
 }
@@ -146,22 +157,26 @@ void DynTooltip::setOffset(int x, int y){
 /*
   Change the position of the tooltip unless it is already visible.
 */
-inline void DynTooltip::reposition(){
-    if(!positioned) {
+inline void DynTooltip::reposition()
+{
+    if(!positioned)
+    {
         position(Fl::event_x_root() + xoffs, Fl::event_y_root() + yoffs);
         positioned = true;
     }
 }
 
 /* For readability - trust the optimizer */
-inline int max(int a, int b){
+inline int max(int a, int b)
+{
     return a >= b ? a : b;
 }
 
 /*
   Update the size parameters and message strings.
 */
-void DynTooltip::update() {
+void DynTooltip::update()
+{
 
     /* Update formatted value */
     valueText = convert_value(valueType, currentValue);
@@ -176,7 +191,8 @@ void DynTooltip::update() {
     int _w = max(valTextW, graphW);
     int _h = valTextH + graphH;
 
-    if(!onlyValue){
+    if(!onlyValue)
+    {
         _w = max(_w, tipTextW);
         _h += tipTextH;
     }
@@ -192,7 +208,8 @@ void DynTooltip::update() {
 /*
   Use static style parameters for regular tooltips to draw the custom ones
 */
-void DynTooltip::draw() {
+void DynTooltip::draw()
+{
 
     const int mw = Fl_Tooltip::margin_width();
     const int mh = Fl_Tooltip::margin_height();
@@ -205,7 +222,8 @@ void DynTooltip::draw() {
     fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
 
     /* Draw tooltip text */
-    if(!onlyValue){
+    if(!onlyValue)
+    {
         fl_draw(tipText.c_str(), x, y, _w, tipTextH,
                 Fl_Align((tipTextW < valTextW || tipTextW < graphW ?
                           FL_ALIGN_CENTER : FL_ALIGN_LEFT)| FL_ALIGN_WRAP));
@@ -224,7 +242,8 @@ void DynTooltip::draw() {
 /*
   Handle tooltip behaviour and functionality for default values.
 */
-void stdDynTipHandle(DynTipped *ct, int event){
+void stdDynTipHandle(DynTipped *ct, int event)
+{
 
     switch(event)
     {

@@ -38,57 +38,68 @@ mwheel_val_slider::mwheel_val_slider(int x, int y, int w, int h, const char *l)
     reverse = 1;
 }
 
-mwheel_val_slider::~mwheel_val_slider(){
+mwheel_val_slider::~mwheel_val_slider()
+{
     delete dyntip;
 }
 
 /* Support for the dynamic tooltip interface */
 
-void mwheel_val_slider::tipShow(bool show){
+void mwheel_val_slider::tipShow(bool show)
+{
     if(show)
         dyntip->show();
     else
         dyntip->hide();
 }
 
-void mwheel_val_slider::tipOnlyValue(bool ov){
+void mwheel_val_slider::tipOnlyValue(bool ov)
+{
     dyntip->setOnlyValue(ov);
 }
 
-void mwheel_val_slider::setValueType(ValueType vt) {
+void mwheel_val_slider::setValueType(ValueType vt)
+{
     dyntip->setValueType(vt);
 }
 
-void mwheel_val_slider::setGraphicsType(ValueType vt) {
+void mwheel_val_slider::setGraphicsType(ValueType vt)
+{
     dyntip->setGraphicsType(vt);
 }
 
-void mwheel_val_slider::useCustomTip(bool enabled){
-    if(!enabled){
+void mwheel_val_slider::useCustomTip(bool enabled)
+{
+    if(!enabled)
+    {
         dyntip->hide();
     }
     customTip = enabled;
     tooltip(tipText);
 }
 
-void mwheel_val_slider::value(double val){
+void mwheel_val_slider::value(double val)
+{
     Fl_Valuator::value(val);
     dyntip->setValue(val);
     dyntip->setOnlyValue(true);
 }
 
-double mwheel_val_slider::value(){
+double mwheel_val_slider::value()
+{
     return Fl_Valuator::value();
 }
 
-void mwheel_val_slider::tooltip(const char* tip){
+void mwheel_val_slider::tooltip(const char* tip)
+{
     tipText = tip;
     if(tip)
         dyntip->setTooltipText(tip);
 
     /* Call base class with empty string to prevent
        potential parent group tooltip from showing */
-    if(customTip){
+    if(customTip)
+    {
         Fl_Widget::tooltip("");
     } else {
         Fl_Widget::tooltip(tip);
@@ -98,18 +109,22 @@ void mwheel_val_slider::tooltip(const char* tip){
 /*
   Helper function for quick reimplementations under different super class calls
 */
-int mwheel_val_slider::_handle(int res, int event){
+int mwheel_val_slider::_handle(int res, int event)
+{
 
-    switch(event) {
+    switch(event)
+    {
 
     case FL_MOUSEWHEEL: {
-        if(!Fl::event_inside(this)){
+        if(!Fl::event_inside(this))
+        {
             return 1;
         }
         double range = maximum() - minimum();
         int step_size = (reverse * Fl::event_dy() > 0) ? 1 : -1;
 
-        if(Fl::event_state(FL_CTRL) != 0) {
+        if(Fl::event_state(FL_CTRL) != 0)
+        {
             step_size *= step();
             if (range > 256) // Scale stepping for large ranges
                 step_size *= 50;
@@ -127,7 +142,8 @@ int mwheel_val_slider::_handle(int res, int event){
         break;
     }
 
-    if(customTip){
+    if(customTip)
+    {
         dyntip->setValue(value());
         stdDynTipHandle(this, event);
     }
@@ -135,7 +151,8 @@ int mwheel_val_slider::_handle(int res, int event){
     return res;
 }
 
-int mwheel_val_slider::handle(int event) {
+int mwheel_val_slider::handle(int event)
+{
     return _handle(Fl_Value_Slider::handle(event), event);
 }
 
@@ -154,11 +171,13 @@ mwheel_slider::mwheel_slider(int x, int y, int w, int h, const char *l)
     reverse = 1;
 }
 
-void mwheel_slider::draw(){
+void mwheel_slider::draw()
+{
     Fl_Slider::draw();
 }
 
-int mwheel_slider::handle(int event){
+int mwheel_slider::handle(int event)
+{
     return _handle(Fl_Slider::handle(event), event);
 }
 
