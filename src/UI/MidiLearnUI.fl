@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {MidiLearnUI.h} {not_in_source in_header
-} 
+}
 
 comment {MidiLearnUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Copyright (C) 2016-2017, Will Godfrey
 
@@ -24,25 +24,25 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified January 2017} {in_source in_header
-} 
+Modified March 2017} {in_source in_header
+}
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {private local
-} 
+}
 
 decl {\# include "Misc/MiscFuncs.h"} {private local
-} 
+}
 
 decl {\#include "UI/MiscGui.h"
     \#include "EffUI.h"
@@ -53,7 +53,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "UI/WidgetMWSlider.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-} 
+}
 
 class MidiLearnKitItem {: {public Fl_Group}
 } {
@@ -255,7 +255,7 @@ end();} {}
   }
   decl {unsigned char stat;} {public local
   }
-} 
+}
 
 class MidiLearnUI {selected : {private MiscFuncs}
 } {
@@ -427,6 +427,10 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             cancel->show();
             message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             message->show();
+            break;
+        case 22:
+        midilearnwindow->show();
+            break;
         case 24: // flash LED
             IDold = kititem | (engine << 8);
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
@@ -450,6 +454,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             cancel->hide();
             words->copy_label("Learn cancelled");
             message->show();
+            break;
     }
     Fl::check();} {}
   }
@@ -535,4 +540,4 @@ midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());
   }
   decl {int num;} {private local
   }
-} 
+}

@@ -875,7 +875,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case 120:
-                def = FADEIN_ADJUSTMENT_SCALE;
+                def = FADEIN_ADJUSTMENT_SCALE * 100;
 
             case 121: // just ensures it doesn't get caught by default
                 break;

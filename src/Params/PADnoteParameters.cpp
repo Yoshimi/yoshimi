@@ -940,25 +940,223 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
     int control = getData->data.control;
 
     // defaults
-    getData->limits.min = 0;
-    getData->limits.max = 127;
-    getData->limits.def = 0;
+    int type = 0;
+    int min = 0;
+    int def = 64;
+    int max = 127;
 
     switch (control)
     {
+        case 0:
+            type |= 0x40;
+            def = 90;
+            break;
+
+        case 1:
+            type |= 0x40;
+            def = 72;
+            break;
+
+        case 2:
+            type |= 0x40;
+            break;
+
         case 16:
-            getData->limits.max = 1000;
+            def = 50000;
+            max = 1000;
             break;
+
+        case 17:
+            def = 0;
+            max = 7;
+            break;
+
+        case 19:
+            def = 0;
+            max = 2;
+            break;
+
         case 32:
-            getData->limits.min = -8192;
-            getData->limits.max = 8191;
+            type |= 0x40;
+            min = -8192;
+            def = 0;
+            max = 8191;
             break;
+
+        case 33:
+            type |= 0x40;
+            def = 0;
+            break;
+
+        case 34:
+            def = 0;
+            max = 1;
+            break;
+
+        case 35:
+            min = -8;
+            def = 0;
+            max = 7;
+            break;
+
+        case 36:
+            def = 0;
+            max = 3;
+            break;
+
+        case 37:
+            min = -64;
+            def = 0;
+            max = 63;
+            break;
+
+        case 38:
+            type |= 0x40;
+            def = 8800;
+            break;
+
+        case 39:
+            type |= 0x40;
+            break;
+
+
         case 48:
         case 49:
+            type |= 0x40;
+            max = 255;
+            break;
+
         case 50:
-            getData->limits.max = 255;
+            type |= 0x40;
+            def = 0;
+            max = 255;
+            break;
+
+        case 51:
+            def = 0;
+            max = 6;
+            break;
+
+        case 64:
+            type |= 0x40;
+            def = 80;
+            break;
+
+        case 65:
+            type |= 0x40;
+            def = 0;
+            break;
+
+        case 66:
+            type |= 0x40;
+            def = 0;
+            break;
+
+        case 67:
+            type |= 0x40;
+            def = 3000;
+            break;
+
+        case 68:
+            type |= 0x40;
+            def = 12700;
+            break;
+
+        case 69:
+            def = 0;
+            max = 2;
+            break;
+
+        case 70:
+            def = 0;
+            max = 2;
+            break;
+
+        case 71:
+            type |= 0x40;
+            def = 80;
+            break;
+
+        case 72:
+            type |= 0x40;
+            break;
+
+        case 73:
+        case 74:
+            def = 0;
+            max = 3;
+            break;
+
+        case 75:
+            def = 100;
+            max = 1;
+            break;
+
+        case 80:
+            def = 400;
+            max = 8;
+            break;
+
+        case 81:
+            def = 200;
+            max = 6;
+            break;
+
+        case 82:
+            def = 300;
+            max = 7;
+            break;
+
+        case 83:
+            def = 300;
+            max = 6;
+            break;
+
+        case 104:
+            min = 0;
+            def = 0;
+            max = 0;
+            break;
+
+        case 112:
+            def = 100;
+            max = 1;
+            break;
+
+        case 120:
+            type |= 0x40;
+            def = FADEIN_ADJUSTMENT_SCALE * 100;
+            break;
+
+        case 121:
+            type |= 0x40;
+            def = 0;
+            break;
+
+        case 122:
+            type |= 0x40;
+            def = 60;
+            break;
+
+        case 123:
+            type |= 0x40;
+            break;
+
+        case 124:
+            type |= 0x40;
+            def = 72;
+            break;
+
+        default:
+            min = -1;
+            def = -100;
+            max = -1;
             break;
     }
+    getData->data.type |= type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }
 
 void PADnoteParameters::postrender(void)

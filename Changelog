@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-3-9 Will
+* Improvements to Cli part limits.
+* Successful Midi-learn now opens editing window.
+* PadSynth limits done.
+
 2017-3-6 Will
 * Cli limits now report the full name as well as the values.
 * Bugfix: Cli Add/Sub text not identifying bend & offset.
@@ -8,7 +13,7 @@ yoshimi 1.5.0 M
 * SubSynth limits done.
 * Corrected wrong AddSynth coarse detune type.
 * Added 'solo' to limits.
-* Optiomsed limits code in SynthEngine.
+* Optimised limits code in SynthEngine.
 
 2017-3-5 Will
 * Controller & Midi control limits done.

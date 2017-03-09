@@ -5364,6 +5364,11 @@ void InterChange::returnLimits(CommandBlock *getData)
     getData->data.type &= 0x3f; //  clear top bits
     getData->data.type |= 0x80; // default is integer & not learnable
 
+    if (npart == 240) // main control limits
+    {
+        synth->getLimits(getData);
+        return;
+    }
 
     if (npart < 0x40)
     {
@@ -5376,67 +5381,25 @@ void InterChange::returnLimits(CommandBlock *getData)
             subpars->getLimits(getData);
             return;
         }
-        if (kititem < 0x10)
+        if (kititem == 0xff || (kititem & 0x20)) // part level controls
         {
-            if (insert == 0xff && parameter == 0xff && par2 == 0xff)
+            part->getLimits(getData);
+            return;
+        }
+        if (insert == 0xff && parameter == 0xff && par2 == 0xff)
+        {
+            if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
             {
-                if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
-                {
-                    ADnoteParameters *adpars;
-                    adpars = part->kit[kititem].adpars;
-                    adpars->getLimits(getData);
-                    return;
-                }
-                if (engine == 2)
-                {
-                    PADnoteParameters *padpars;
-                    padpars = part->kit[kititem].padpars;
-                    padpars->getLimits(getData);
-                    return;
-                }
-                // there may be other stuff
-                getData->limits.min = 0;
-                getData->limits.max = 127;
-                getData->limits.def = 0;
-                cout << "Using defaults" << endl;
+                ADnoteParameters *adpars;
+                adpars = part->kit[kititem].adpars;
+                adpars->getLimits(getData);
                 return;
             }
-            if (insert >= 5 && insert <= 7)
+            if (engine == 2)
             {
-                part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
-                // we also use this for pad limits
-                // as oscillator values identical
-                return;
-            }
-            if (insert == 8) // resonance
-            {
-                if (control == 0) // a cheat!
-                {
-                    getData->limits.min = 1;
-                    getData->limits.max = 90;
-                    getData->limits.def = 5000; // default values are *100
-                    return;
-                }
-                // there may be other stuff
-                getData->limits.min = 0;
-                getData->limits.max = 127;
-                getData->limits.def = 0;
-                cout << "Using defaults" << endl;
-                return;
-            }
-            if (insert == 0 && parameter <= 2) // LFO
-            {
-                if (control == 0) // another cheat!
-                {
-                    getData->limits.min = 0;
-                    getData->limits.max = 1;
-                    getData->limits.def = 50; // default values are *100
-                    return;
-                }
-                getData->limits.min = 0;
-                getData->limits.max = 127;
-                getData->limits.def = 0;
-                cout << "Using defaults" << endl;
+                PADnoteParameters *padpars;
+                padpars = part->kit[kititem].padpars;
+                padpars->getLimits(getData);
                 return;
             }
             // there may be other stuff
@@ -5446,23 +5409,51 @@ void InterChange::returnLimits(CommandBlock *getData)
             cout << "Using defaults" << endl;
             return;
         }
-        if (kititem == 0xff) // part level controls go here
+        if (insert >= 5 && insert <= 7)
         {
-            part->getLimits(getData);
+            part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
+            // we also use this for pad limits
+            // as oscillator values identical
             return;
         }
+        if (insert == 8) // resonance
+        {
+            if (control == 0) // a cheat!
+            {
+                getData->limits.min = 1;
+                getData->limits.max = 90;
+                getData->limits.def = 5000; // default values are *100
+                return;
+            }
+            // there may be other stuff
+            getData->limits.min = 0;
+            getData->limits.max = 127;
+            getData->limits.def = 0;
+            cout << "Using defaults" << endl;
+            return;
+        }
+        if (insert == 0 && parameter <= 2) // LFO
+        {
+            if (control == 0) // another cheat!
+            {
+                getData->limits.min = 0;
+                getData->limits.max = 1;
+                getData->limits.def = 50; // default values are *100
+                return;
+            }
+            getData->limits.min = 0;
+            getData->limits.max = 127;
+            getData->limits.def = 0;
+            cout << "Using defaults" << endl;
+            return;
+        }
+        // there may be other stuff
         getData->limits.min = 0;
         getData->limits.max = 127;
         getData->limits.def = 0;
         cout << "Using defaults" << endl;
         return;
     }
-    if (npart == 240) // main control limits
-    {
-        synth->getLimits(getData);
-        return;
-    }
-
     getData->limits.min = 0;
     getData->limits.max = 127;
     getData->limits.def = 0;

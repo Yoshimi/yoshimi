@@ -1511,10 +1511,12 @@ void Part::getLimits(CommandBlock *getData)
     unsigned int type = getData->data.type;
     int control = getData->data.control;
     int npart = getData->data.part;
-    getData->limits.min = 0;
-    getData->limits.def = 6400;
-    getData->limits.max = 127;
-    cout << "part control " << to_string(control) << endl;
+
+    // defaults
+    int min = 0;
+    int def = 6400;
+    int max = 127;
+    //cout << "part control " << to_string(control) << endl;
     if ((control >= 128 && control <= 168) || control == 224)
     {
         ctl->getLimits(getData);
@@ -1526,7 +1528,7 @@ void Part::getLimits(CommandBlock *getData)
         case 0:
             type &= 0x3f;
             type |= 0x40;
-            getData->limits.def = 9600;
+            def = 9600;
             break;
 
         case 1:
@@ -1540,56 +1542,61 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 5:
-            getData->limits.min = 1;
-            getData->limits.def = 100;
-            getData->limits.max = 16;
+            min = 1;
+            def = 100;
+            max = 16;
             break;
 
         case 6:
-            getData->limits.def = 0;
-            getData->limits.max = 2;
+            def = 0;
+            max = 2;
             break;
 
         case 7:
         case 57:
-            getData->limits.def = 0;
-            getData->limits.max = 1;
+            def = 0;
+            max = 1;
             break;
 
         case 8:
             if (npart == 0)
-                getData->limits.def = 100;
+                def = 100;
             else
-                getData->limits.def = 0;
-            getData->limits.max = 1;
+                def = 0;
+            max = 1;
+            break;
+
+        case 9:
+            def = 0;
+            max = 1;
             break;
 
         case 16:
-            getData->limits.def = 0;
+            def = 0;
             break;
 
         case 17:
-            getData->limits.def = 12700;
+            def = 12700;
             break;
 
         case 18:
         case 19:
         case 20:
         case 96:
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            getData->limits.max = 0;
+            min = 0;
+            def = 0;
+            max = 0;
             break;
 
         case 33:
-            getData->limits.def = 2000;
-            getData->limits.max = 60;
+            def = 2000;
+            max = 60;
             break;
 
         case 35:
-            getData->limits.min = -36;
-            getData->limits.def = 0;
-            getData->limits.max = 36;
+            min = -36;
+            def = 0;
+            max = 36;
             break;
 
         case 40:
@@ -1597,22 +1604,22 @@ void Part::getLimits(CommandBlock *getData)
         case 42:
         case 43:
             type |= 0x40;
-            getData->limits.def = 0;
+            def = 0;
             break;
 
         case 48:
-            getData->limits.def = 0;
-            getData->limits.max = 50;
+            def = 0;
+            max = 50;
             break;
 
         case 58:
-            getData->limits.def = 0;
-            getData->limits.max = 3;
+            def = 0;
+            max = 3;
             break;
         case 120:
-            getData->limits.min = 1;
-            getData->limits.def = 100;
-            getData->limits.max = 3;
+            min = 1;
+            def = 100;
+            max = 3;
             break;
 
         // the following are learnable MIDI controllers
@@ -1624,7 +1631,7 @@ void Part::getLimits(CommandBlock *getData)
 
         case 194:
             type |= 0x40;
-            getData->limits.def = 12700;
+            def = 12700;
             break;
 
         // these haven't been done
@@ -1636,10 +1643,13 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         default:
-            getData->limits.min = -1;
-            getData->limits.def = -100;
-            getData->limits.max = -1;
+            min = -1;
+            def = -100;
+            max = -1;
             break;
     }
     getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }

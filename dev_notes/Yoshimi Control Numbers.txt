@@ -231,7 +231,7 @@ YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Velocity sensitivi
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Panning
 
 YL : 0 to 1000 : 16 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth
-Y : 0 to 6 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
+Y : 0 to 7 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
 
 Y : 0 to 2 : 19 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Spectrum mode – Bandwidth, Discrete, Continuous
 

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified February 2017
+    Modified march 2017
 */
 
 #include <iostream>
@@ -603,7 +603,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     else
         CCtype = asHexString((CCh >> 8) & 0x7f) + asHexString(CCh & 0x7f) + " h";
     synth->getRuntime().Log("CC " + CCtype + "  Chan " + to_string((int)entry.chan) + "  " + entry.name);
-    updateGui();
+    updateGui(1);
     learning = false;
 }
 
@@ -660,7 +660,7 @@ void MidiLearn::updateGui(int opp)
     putData.data.value = 0;
     writeToGui(&putData);
 
-    if (opp >= 1) // sending back message gui
+    if (opp > 1) // sending back message gui
         return;
 
     int lineNo = 0;
@@ -686,6 +686,11 @@ void MidiLearn::updateGui(int opp)
         }
         ++it;
         ++lineNo;
+    }
+    if (opp == 1) // open the gui editing window
+    {
+        putData.data.control = 22;
+        writeToGui(&putData);
     }
 }
 
