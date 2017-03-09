@@ -403,58 +403,64 @@ void Controller::getfromXML(XMLwrapper *xml)
 
 void Controller::getLimits(CommandBlock *getData)
 {
-    //unsigned int type = getData->data.type; // will be used for setting MIDI learn
     int control = getData->data.control;
     //cout << "ctl control " << to_string(control) << endl;
+
+    // defaults
+    int type = 0x80;
+    int min = 0;
+    int def = 0;
+    int max = 127;
+
     switch (control)
     {
         case 128:
-            getData->limits.min = 64;
-            getData->limits.def = 9600;
+            min = 64;
+            def = 960;
             break;
         case 129:
-            getData->limits.min = 0;
-            getData->limits.def = 100;
-            getData->limits.max = 1;
+            min = 0;
+            def = 10;
+            max = 1;
             break;
         case 130:
-            getData->limits.def = 6400;
-            getData->limits.max = 64;
+            def = 640;
+            max = 64;
             break;
         case 131:
-            getData->limits.def = 8000;
+            def = 800;
             break;
         case 132:
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            getData->limits.max = 1;
+            min = 0;
+            def = 0;
+            max = 1;
             break;
         case 133:
             break;
         case 134:
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            getData->limits.max = 1;
+            min = 0;
+            def = 0;
+            max = 1;
             break;
         case 135:
-            getData->limits.min = 0;
-            getData->limits.def = 100;
-            getData->limits.max = 1;
+            min = 0;
+            def = 10;
+            max = 1;
             break;
         case 136:
-            getData->limits.min = 0;
-            getData->limits.def = 100;
-            getData->limits.max = 1;
+            min = 0;
+            def = 10;
+            max = 1;
             break;
         case 137:
-            getData->limits.min = 0;
-            getData->limits.def = 100;
-            getData->limits.max = 1;
+            min = 0;
+            def = 10;
+            max = 1;
             break;
         case 138:
-            getData->limits.min = -8192;
-            getData->limits.def = 0;
-            getData->limits.max = 8191;
+            min = -8192;
+            def = 0;
+            max = 8191;
             break;
         case 139:
             break;
@@ -469,38 +475,42 @@ void Controller::getLimits(CommandBlock *getData)
         case 161:
             break;
         case 162:
-            getData->limits.def = 300;
+            def = 30;
             break;
         case 163:
-            getData->limits.min = 0;
-            getData->limits.max = 1;
+            min = 0;
+            max = 1;
             break;
         case 164:
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            getData->limits.max = 1;
+            min = 0;
+            def = 0;
+            max = 1;
             break;
         case 165:
-            getData->limits.def = 8000;
+            def = 800;
             break;
         case 166:
-            getData->limits.def = 9000;
+            def = 900;
             break;
         case 168:
-            getData->limits.min = 0;
-            getData->limits.def = 100;
-            getData->limits.max = 1;
+            min = 0;
+            def = 10;
+            max = 1;
             break;
         case 224:
-            getData->limits.min = 0;
-            getData->limits.def = 0;
-            getData->limits.max = 0;
+            min = 0;
+            def = 0;
+            max = 0;
             break;
 
         default:
-            getData->limits.min = -1;
-            getData->limits.def = -100;
-            getData->limits.max = -1;
+            min = -1;
+            def = -10;
+            max = -1;
+            break;
     }
-    //getData->data.type = type; // will be used for setting MIDI learn
+    getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }

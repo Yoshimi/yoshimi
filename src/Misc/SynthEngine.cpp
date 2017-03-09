@@ -3336,25 +3336,25 @@ void SynthEngine::getLimits(CommandBlock *getData)
     // defaults
     int type = (getData->data.type & 0x3f) | 0x80; // set as integer
     int min = 0;
-    int def = 6400;
+    int def = 640;
     int max = 127;
     //cout << "master control " << to_string(control) << endl;
     switch (control)
     {
         case 0:
-            def = 9000;
+            def = 900;
             type = (type &0x3f) | 0x40; // float, learnable
             break;
 
         case 14:
             min = 1;
-            def = 100;
+            def = 10;
             max = Runtime.NumAvailableParts;;
             break;
 
         case 15:
             min = 16;
-            def = 1600;
+            def = 160;
             max = 64;
             break;
 
@@ -3375,7 +3375,7 @@ void SynthEngine::getLimits(CommandBlock *getData)
 
         case 49:
             min = 14;
-            def = 11500;
+            def = 1150;
             max = 119;
             break;
 
@@ -3388,7 +3388,7 @@ void SynthEngine::getLimits(CommandBlock *getData)
 
         default:
             min = -1;
-            def = -100;
+            def = -10;
             max = -1;
             break;
     }

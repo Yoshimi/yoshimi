@@ -5422,7 +5422,7 @@ void InterChange::returnLimits(CommandBlock *getData)
             {
                 getData->limits.min = 1;
                 getData->limits.max = 90;
-                getData->limits.def = 5000; // default values are *100
+                getData->limits.def = 500; // default values are *10
                 return;
             }
             // there may be other stuff
@@ -5436,9 +5436,10 @@ void InterChange::returnLimits(CommandBlock *getData)
         {
             if (control == 0) // another cheat!
             {
+                getData->limits.type = 0x40;
                 getData->limits.min = 0;
                 getData->limits.max = 1;
-                getData->limits.def = 50; // default values are *100
+                getData->limits.def = 5; // default values are *10
                 return;
             }
             getData->limits.min = 0;

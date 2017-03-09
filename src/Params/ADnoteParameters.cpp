@@ -827,17 +827,17 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
         {
             case 0:
                 type |= 0x40;
-                def = 9000;
+                def = 900;
                 break;
 
             case 1:
                 type |= 0x40;
-                def = 6400;
+                def = 640;
                 break;
 
             case 2:
                 type |= 0x40;
-                def = 6400;
+                def = 640;
                 break;
 
             case 32:
@@ -862,7 +862,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
             case 39:
                 type |= 0x40;
-                def = 6400;
+                def = 640;
                 break;
 
             case 112:
@@ -875,26 +875,26 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case 120:
-                def = FADEIN_ADJUSTMENT_SCALE * 100;
+                def = FADEIN_ADJUSTMENT_SCALE * 10;
 
             case 121: // just ensures it doesn't get caught by default
                 break;
 
             case 122:
-                def = 6000;
+                def = 600;
                 break;
 
             case 123:
-                def = 6400;
+                def = 640;
                 break;
 
             case 124:
-                def = 7200;
+                def = 720;
                 break;
 
             default:
                 min = -1;
-                def = -100;
+                def = -10;
                 max = -1;
                 break;
         }
@@ -909,17 +909,17 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
     {
         case 0:
             type |= 0x40;
-            def = 10000;
+            def = 1000;
             break;
 
         case 1:
             type |= 0x40;
-            def = 12700;
+            def = 1270;
             break;
 
         case 2:
             type |= 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 4:
@@ -935,7 +935,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 17:
             min = -1;
-            def = -100;
+            def = -10;
             max = 6;
             break;
 
@@ -974,12 +974,12 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 38:
             type |= 0x40;
-            def = 8800;
+            def = 880;
             break;
 
         case 39:
             type |= 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 40:
@@ -990,32 +990,32 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 48:
             type |= 0x40;
-            def = 6000;
+            def = 600;
             break;
 
         case 49:
             type |= 0x40;
-            def = 12700;
+            def = 1270;
             break;
 
         case 50:
             type |= 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 51:
             type |= 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 52:
             type |= 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 53:
             min = 2;
-            def = 200;
+            def = 20;
             max = 50;
             break;
 
@@ -1045,12 +1045,12 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 80:
             type |= 0x40;
-            def = 9000;
+            def = 900;
             break;
 
         case 81:
             type |= 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 82:
@@ -1063,7 +1063,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 113:
             min = -1;
-            def = -100;
+            def = -10;
             max = 6;
             break;
 
@@ -1073,13 +1073,13 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 129:
         case 130:
-            def = 100;
+            def = 10;
             max = 1;
             break;
 
         case 137:
             min = -1;
-            def = -100;
+            def = -10;
             max = 6;
             break;
 
@@ -1089,7 +1089,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         default:
             min = -1;
-            def = -100;
+            def = -10;
             max = -1;
             break;
     }

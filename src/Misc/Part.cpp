@@ -1514,7 +1514,7 @@ void Part::getLimits(CommandBlock *getData)
 
     // defaults
     int min = 0;
-    int def = 6400;
+    int def = 640;
     int max = 127;
     //cout << "part control " << to_string(control) << endl;
     if ((control >= 128 && control <= 168) || control == 224)
@@ -1528,7 +1528,7 @@ void Part::getLimits(CommandBlock *getData)
         case 0:
             type &= 0x3f;
             type |= 0x40;
-            def = 9600;
+            def = 960;
             break;
 
         case 1:
@@ -1543,7 +1543,7 @@ void Part::getLimits(CommandBlock *getData)
 
         case 5:
             min = 1;
-            def = 100;
+            def = 10;
             max = 16;
             break;
 
@@ -1560,7 +1560,7 @@ void Part::getLimits(CommandBlock *getData)
 
         case 8:
             if (npart == 0)
-                def = 100;
+                def = 10;
             else
                 def = 0;
             max = 1;
@@ -1576,7 +1576,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 17:
-            def = 12700;
+            def = 1270;
             break;
 
         case 18:
@@ -1589,7 +1589,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 33:
-            def = 2000;
+            def = 200;
             max = 60;
             break;
 
@@ -1618,7 +1618,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
         case 120:
             min = 1;
-            def = 100;
+            def = 10;
             max = 3;
             break;
 
@@ -1631,7 +1631,7 @@ void Part::getLimits(CommandBlock *getData)
 
         case 194:
             type |= 0x40;
-            def = 12700;
+            def = 1270;
             break;
 
         // these haven't been done
@@ -1644,7 +1644,7 @@ void Part::getLimits(CommandBlock *getData)
 
         default:
             min = -1;
-            def = -100;
+            def = -10;
             max = -1;
             break;
     }

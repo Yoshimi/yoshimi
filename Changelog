@@ -4,6 +4,10 @@ yoshimi 1.5.0 M
 * Improvements to Cli part limits.
 * Successful Midi-learn now opens editing window.
 * PadSynth limits done.
+* Reduced internal multiplier for all limits.
+  Just one went over short int size :(
+* Small optimisation in Controllers limits.
+* Updated docs.
 
 2017-3-6 Will
 * Cli limits now report the full name as well as the values.

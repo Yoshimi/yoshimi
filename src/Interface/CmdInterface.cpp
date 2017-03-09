@@ -2452,7 +2452,7 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
         short int min = putData.limits.min;
         short int def = putData.limits.def;
         short int max = putData.limits.max;
-        if (min == -1 && def == -100 && max == -1)
+        if (min == -1 && def == -10 && max == -1)
         {
             synth->getRuntime().Log("Unrecognised Control");
             return 0;
@@ -2466,10 +2466,10 @@ int CmdInterface::sendDirect(float value, unsigned char type, unsigned char cont
             valuetype += " learnable";
 
         string deftype;
-        if (def >= 100 || def <= 0)
-            deftype = to_string(lrint(def / 100));
+        if (def >= 10 || def <= 0)
+            deftype = to_string(lrint(def / 10));
         else
-            deftype = to_string(float(def / 100.0f) + 0.000001).substr(0,4);
+            deftype = to_string(float(def / 10.0f) + 0.000001).substr(0,4);
 
         synth->getRuntime().Log(name + "Min " + to_string(min)  + "   Def " + deftype + "   Max " + to_string(max) + valuetype);
         return 0;

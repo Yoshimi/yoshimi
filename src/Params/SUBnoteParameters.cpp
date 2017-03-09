@@ -363,9 +363,9 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
     if (insert >= 6 && insert <= 7)
     { // do harmonics stuff
         if (insert == 7)
-            getData->limits.def = 6400;
+            getData->limits.def = 640;
         else if (control == 0)
-            getData->limits.def = 12700;
+            getData->limits.def = 1270;
         else
             getData->limits.def = 0;
         getData->data.type |= 0x40; // all learnable
@@ -384,22 +384,22 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
     {
         case 0:
             type = 0x40;
-            def = 9600;
+            def = 960;
             break;
 
         case 1:
             type = 0x40;
-            def = 9000;
+            def = 900;
             break;
 
         case 2:
             type = 0x40;
-            def = 6400;
+            def = 640;
             break;
 
         case 16:
             type = 0x40;
-            def = 4000;
+            def = 400;
             break;
 
         case 17:
@@ -457,7 +457,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
 
         case 80:
             min = 1;
-            def = 10000;
+            def = 1000;
             max = 5;
             break;
 
@@ -466,7 +466,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 82:
-            def = 10000;
+            def = 1000;
             max = 2;
             break;
 
@@ -475,14 +475,14 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 112:
-            def = 100;
+            def = 10;
             max = 1;
             break;
 
 
         default:
             min = -1;
-            def = -100;
+            def = -10;
             max = -1;
             break;
 
