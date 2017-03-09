@@ -467,26 +467,28 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
     if (Fl::event_button() == 3)
     {
         realvalue = 96;
-        o->value(127-realvalue);
+        o->value(realvalue);
         o->redraw();
     }
     else
-        realvalue = 127 - o->value();
+        realvalue = o->value();
     synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
     send_data(0, realvalue, 0x48);}
-          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
-          code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
-          class mwheel_slider
+          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
+          code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
+          code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
+          class mwheel_slider_rev
         }
         Fl_Dial partpanning {
           callback {//
-    synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
     if (Fl::event_button() == 3)
         o->value(64);
+    synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
     send_data(2, o->value(), 0x48);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
-          code1 {//o->init(64);}
+          code1 {o->setValueType(VC_PanningStd);}
+          code2 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -582,7 +584,7 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
 
     setPartLabel(findengines(setpart));
 
-    partvolume->value(127 - synth->part[setpart]->Pvolume);
+    partvolume->value(synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
     int tmpch = synth->part[setpart]->Prcvchn;
     if (tmpch < NUM_MIDI_CHANNELS)

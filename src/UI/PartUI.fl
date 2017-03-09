@@ -514,7 +514,7 @@ send_data(4, o->value(), 0xc8);}
     if (Fl::event_button() == 3)
         o->value(96);
     if (npart >= *plgroup && npart < (*plgroup + NUM_MIDI_CHANNELS))
-      synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, (127 - o->value()));
+      synth->getGuiMaster()->setPanelPartVolWidget(npart % NUM_MIDI_CHANNELS, o->value());
 
     send_data(0, o->value(), 0x48);}
           xywh {336 42 31 31} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
@@ -1496,7 +1496,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     {
         int displaypart = newpart % NUM_MIDI_CHANNELS;
         if (control == 0)
-            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(127 - value);
+            synth->getGuiMaster()->panellistitem[displaypart]->partvolume->value(value);
         else if (control == 2)
             synth->getGuiMaster()->panellistitem[displaypart]->partpanning->value(value);
         else if (control == 5)
