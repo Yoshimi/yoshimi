@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-3-10 Will
+* Monitoring incoming CCs switch now saved in config.
+* Implimented 'Open learned editor window' switch.
+  Also saved in config.
+
 2017-3-9 Will
 * Improvements to Cli part limits.
 * Successful Midi-learn now opens editing window.

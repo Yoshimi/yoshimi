@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2015, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2015
+    Modified March 2017
 */
 
 #ifndef CONFIG_H
@@ -142,6 +142,7 @@ class Config : public MiscFuncs
         int           enable_part_on_voice_load;
         bool          ignoreResetCCs;
         bool          monitorCCin;
+        bool          showLearnedCC;
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;

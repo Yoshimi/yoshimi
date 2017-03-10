@@ -5,7 +5,7 @@
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
     Copyright 2013, Nikita Zlobin
-    Copyright 2014-2016, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified February 2017
+    Modified March 2017
 */
 
 #include <iostream>
@@ -130,6 +130,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     enable_part_on_voice_load(1),
     ignoreResetCCs(false),
     monitorCCin(false),
+    showLearnedCC(true),
     single_row_panel(1),
     NumAvailableParts(NUM_MIDI_CHANNELS),
     currentPart(0),
@@ -605,6 +606,8 @@ bool Config::extractConfigData(XMLwrapper *xml)
     EnableProgChange = 1 - xml->getpar("ignore_program_change", EnableProgChange, 0, 1); // inverted for Zyn compatibility
     enable_part_on_voice_load = xml->getpar("enable_part_on_voice_load", enable_part_on_voice_load, 0, 1);
     ignoreResetCCs = xml->getpar("ignore_reset_all_CCs",ignoreResetCCs,0, 1);
+    monitorCCin = xml->getparbool("monitor-incoming_CCs", monitorCCin);
+    showLearnedCC = xml->getparbool("open_editor_on_learned_CC", showLearnedCC);
 
     //misc
     checksynthengines = xml->getpar("check_pad_synth", checksynthengines, 0, 1);
@@ -675,6 +678,8 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("ignore_program_change", (1 - EnableProgChange));
     xmltree->addpar("enable_part_on_voice_load", enable_part_on_voice_load);
     xmltree->addpar("ignore_reset_all_CCs",ignoreResetCCs);
+    xmltree->addparbool("monitor-incoming_CCs", monitorCCin);
+    xmltree->addparbool("open_editor_on_learned_CC",showLearnedCC);
     xmltree->addpar("check_pad_synth", checksynthengines);
     xmltree->addpar(string("root_current_ID"), synth->ReadBankRoot());
     xmltree->addpar(string("bank_current_ID"), synth->ReadBank());

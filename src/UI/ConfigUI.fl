@@ -1,6 +1,6 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -23,32 +23,32 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified February 2017
-} {in_source in_header
-} 
+Modified March 2017
+} {selected in_source in_header
+}
 
 decl {\#include <cmath>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {private local
-} 
+}
 
 decl {\#include "Misc/Bank.h"} {private local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private local
-} 
+}
 
-class ConfigUI {selected : {private MiscFuncs}
+class ConfigUI {: {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -58,7 +58,7 @@ class ConfigUI {selected : {private MiscFuncs}
       code0 {o->copy_label(synth->makeUniqueName("Settings").c_str());}
       code1 {if (synth->getIsLV2Plugin()){jackTab->deactivate();alsaTab->deactivate();}}
     } {
-      Fl_Tabs {} {open
+      Fl_Tabs {} {
         xywh {5 5 385 298}
       } {
         Fl_Group {} {
@@ -736,14 +736,22 @@ synth->getRuntime().configChanged = true;}
     synth->getRuntime().ignoreResetCCs = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {234 240 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
-            label {Log incoming CCs}
+            label {Log Incoming CCs}
             callback {synth->getRuntime().monitorCCin = o->value();}
-            xywh {234 260 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().monitorCCin);}
+            xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().monitorCCin);
+            synth->getRuntime().configChanged = true;}
+          }
+          Fl_Check_Button midiLearned {
+            label {Show Learn Editor}
+            callback {synth->getRuntime().showLearnedCC = o->value();}
+            tooltip {Open the MIDI learn window for editing when a new CC has been learned} xywh {234 270 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showLearnedCC);
+            synth->getRuntime().configChanged = true;}
           }
         }
       }
@@ -990,4 +998,4 @@ presets->hide();}
   }
   decl {int oldrootID;} {private local
   }
-} 
+}
