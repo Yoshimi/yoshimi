@@ -54,12 +54,15 @@ enum ValueType {
     VC_FilterVelocitySense,
     VC_InstrumentVolume,
     VC_ADDVoiceVolume,
+    VC_ADDVoiceDelay,
+    VC_PitchBend,
     VC_PartVolume,
     VC_PanningRandom,
     VC_PanningStd,
     VC_EnvStretch,
     VC_LFOStretch,
     VC_FreqOffsetHz,
+    VC_FixedFreqET,
     VC_FilterGain,
     VC_AmpVelocitySense,
     VC_FilterQAnalogUnused,
@@ -103,6 +106,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData);
 
 string convert_value(ValueType type, float val);
 
+string variable_prec_units(float v, string u, int maxPrec, bool roundup = false);
 string custom_value_units(float v, string u, int prec=0);
 void  custom_graph_dimensions(ValueType vt, int& w, int& h);
 void custom_graphics(ValueType vt, float val,int W,int H);

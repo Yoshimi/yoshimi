@@ -33,7 +33,8 @@
 #include <cairo.h>
 #include <cairo-xlib.h>
 
-WidgetPDial::WidgetPDial(int x,int y, int w, int h, const char *label) : Fl_Dial(x,y,w,h,label) {
+WidgetPDial::WidgetPDial(int x,int y, int w, int h, const char *label) : Fl_Dial(x,y,w,h,label)
+{
     Fl_Group *save = Fl_Group::current();
     dyntip = new DynTooltip();
     Fl_Group::current(save);
@@ -41,34 +42,41 @@ WidgetPDial::WidgetPDial(int x,int y, int w, int h, const char *label) : Fl_Dial
     oldvalue = 0.0;
 }
 
-WidgetPDial::~WidgetPDial() {
+WidgetPDial::~WidgetPDial()
+{
     delete dyntip;
 }
 
-void WidgetPDial::init(float home_ ) {
+void WidgetPDial::init(float home_ )
+{
     home = home_;
 }
 
-void WidgetPDial::tipShow(bool show){
+void WidgetPDial::tipShow(bool show)
+{
     if(show)
         dyntip->show();
     else
         dyntip->hide();
 }
 
-void WidgetPDial::tipOnlyValue(bool ov){
+void WidgetPDial::tipOnlyValue(bool ov)
+{
     dyntip->setOnlyValue(ov);
 }
 
-void WidgetPDial::setValueType(ValueType type_) {
+void WidgetPDial::setValueType(ValueType type_)
+{
     dyntip->setValueType(type_);
 }
 
-void WidgetPDial::setGraphicsType(ValueType type_) {
+void WidgetPDial::setGraphicsType(ValueType type_)
+{
     dyntip->setGraphicsType(type_);
 }
 
-void WidgetPDial::tooltip(const char * tip) {
+void WidgetPDial::tooltip(const char * tip)
+{
     if(tip)
         dyntip->setTooltipText(tip);
 }
@@ -77,17 +85,20 @@ void WidgetPDial::tooltip(const char * tip) {
   Override these Fl_Valuator methods to update
   the tooltip value when the widget value is changed.
 */
-void WidgetPDial::value(double val){
+void WidgetPDial::value(double val)
+{
     Fl_Valuator::value(val);
     dyntip->setValue(val);
     dyntip->setOnlyValue(true);
 }
 
-double WidgetPDial::value(){
+double WidgetPDial::value()
+{
     return Fl_Valuator::value();
 }
 
-int WidgetPDial::handle(int event) {
+int WidgetPDial::handle(int event)
+{
 
     double dragsize, v, min = minimum(), max = maximum();
     int my, mx;
@@ -132,7 +143,8 @@ int WidgetPDial::handle(int event) {
         res = 1;
         break;
     case FL_MOUSEWHEEL:
-        if (!Fl::event_inside(this)) {
+        if (!Fl::event_inside(this))
+        {
             return 1;
         }
         my = - Fl::event_dy();
@@ -166,7 +178,8 @@ int WidgetPDial::handle(int event) {
     return res;
 }
 
-void WidgetPDial::drawgradient(int cx,int cy,int sx,double m1,double m2) {
+void WidgetPDial::drawgradient(int cx,int cy,int sx,double m1,double m2)
+{
     for (int i = (int)(m1 * sx); i < (int)(m2 * sx); ++i)
     {
         double tmp = 1.0 - powf( i * 1.0 / sx, 2.0);
@@ -175,7 +188,8 @@ void WidgetPDial::drawgradient(int cx,int cy,int sx,double m1,double m2) {
     }
 }
 
-void WidgetPDial::draw() {
+void WidgetPDial::draw()
+{
     int cx = x(), cy = y(), sx = w(), sy = h();
     double d = (sx>sy)?sy:sx; // d = the smallest side -2
     double dh = d/2;
@@ -194,7 +208,8 @@ void WidgetPDial::draw() {
     double rHand = 8.0/35;
     double rGear = 15.0/35;
     //drawing base dark circle
-    if (active_r()) {
+    if (active_r())
+    {
         cairo_pattern_create_rgb(51.0/255,51.0/255,51.0/255);
     } else {
         cairo_set_source_rgb(cr,0.4,0.4,0.4);
@@ -217,7 +232,8 @@ void WidgetPDial::draw() {
     cairo_arc(cr,0,0,d*rCint,0,2*M_PI);
     cairo_fill(cr);
     //drawing the "light" circle:
-    if (active_r()) {
+    if (active_r())
+    {
         cairo_set_source_rgb(cr,0,197.0/255,245.0/255); //light blue
     } else {
         cairo_set_source_rgb(cr,0.6,0.7,0.8);
@@ -227,7 +243,8 @@ void WidgetPDial::draw() {
     cairo_arc(cr,0,0,d*rGear,0.75*M_PI,+val*1.5*M_PI+0.75*M_PI);
     cairo_stroke(cr);
     //drawing the hand:
-    if (active_r()) {
+    if (active_r())
+    {
         cairo_set_source_rgb(cr,61.0/255,61.0/255,61.0/255);
     } else {
         cairo_set_source_rgb(cr,111.0/255,111.0/255,111.0/255);
@@ -243,7 +260,8 @@ void WidgetPDial::draw() {
     cairo_surface_destroy(Xsurface);  cairo_destroy(cr);
 }
 
-inline void WidgetPDial::pdialcolor(int r,int g,int b) {
+inline void WidgetPDial::pdialcolor(int r,int g,int b)
+{
     if (active_r())
         fl_color(r, g, b);
     else

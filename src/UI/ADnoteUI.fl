@@ -78,6 +78,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     collect_data(synth, vol, (Fl::event_button() | 0xc8), 0, npart, kititem, 0x80 + nvoice);}
           tooltip Volume xywh {125 3 113 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1
           code0 {o->value(pars->VoicePar[nvoice].PVolume);}
+          code1 {o->setValueType(VC_ADDVoiceVolume);o->useCustomTip(true);}
           class mwheel_val_slider_rev
         }
         Fl_Check_Button voiceresonanceenabled {
@@ -102,6 +103,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     collect_data(synth, lfodepth, (Fl::event_button() | 0xc8), 1, npart, kititem, 0x80 + nvoice, 0, 1);}
           tooltip {Frequency LFO amount} xywh {505 3 115 20} type {Horz Knob} box THIN_DOWN_BOX labelsize 8 align 5 maximum 127 step 1 deactivate
           code0 {o->value(pars->VoicePar[nvoice].FreqLfo->Pintensity);}
+          code1 {o->setValueType(VC_LFOdepthFreq);o->useCustomTip(true);}
           class mwheel_val_slider_rev
         }
         Fl_Dial voicepanning {
@@ -691,6 +693,7 @@ send_data(33, o->value(), 0xc8);}
               code0 {o->value(pars->VoicePar[nvoice].PfixedfreqET);}
               code1 {if (pars->VoicePar[nvoice].Pfixedfreq==0) o->deactivate();}
               code2 {o->init(0);}
+              code3 {o->setValueType(VC_FixedFreqET);}
               class WidgetPDial
             }
             Fl_Choice FreqDetunetype {
@@ -705,9 +708,10 @@ send_data(36, o->value(), 0xc0);}
               label Bend
               callback {pars->VoicePar[nvoice].PBendAdjust = lrint(o->value());
 send_data(38, o->value(), 0xc8);}
-              tooltip {How the frequency varies according to the pitch wheel} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+              tooltip {Pitch bend scaling for this voice} xywh {70 254 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->VoicePar[nvoice].PBendAdjust);}
               code1 {o->init(88);}
+              code2 {o->setValueType(VC_PitchBend);}
               class WidgetPDial
             }
             Fl_Dial offset {
@@ -1130,8 +1134,9 @@ send_data(4, o->value(), 0xc0);}
 pars->VoicePar[nvoice].PDelay = lrint(o->value());
 
 send_data(128, o->value(), 0xc8);}
-            tooltip Volume xywh {111 21 84 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
+            tooltip {Time before the voice activates} xywh {111 21 84 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
+            code1 {o->setValueType(VC_ADDVoiceDelay);o->useCustomTip(true);}
             class mwheel_val_slider_rev
           }
         }
