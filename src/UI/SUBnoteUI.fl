@@ -402,6 +402,7 @@ send_data (33, o->value(), 0xc8);}
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
           code2 {o->init(0);}
+          code3 {o->setValueType(VC_FixedFreqET);}
           class WidgetPDial
         }
         Fl_Choice detunetype {
@@ -418,9 +419,10 @@ send_data (33, o->value(), 0xc8);}
           label Bend
           callback {pars->PBendAdjust = lrint(o->value());
 send_data(38, o->value(), 0xc8);}
-          tooltip {How the frequency varies according to the pitch wheel} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+          tooltip {Pitch bend range scaling} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
           code1 {o->init(88);}
+          code2 {o->setValueType(VC_PitchBend);}
           class WidgetPDial
         }
         Fl_Dial offset {

@@ -550,6 +550,24 @@ string convert_value(ValueType type, float val)
         case VC_ADDVoiceVolume:
             return(custom_value_units(-60.0f*(1.0f-lrint(val)/127.0f),"dB",1));
 
+        case VC_ADDVoiceDelay:
+            if((int) val == 0)
+                return "No delay";
+            f = (expf((val/127.0f) * logf(50.0f)) - 1) / 10;
+            if(f >= 1)
+                return variable_prec_units(f, "s", 2, true);
+            else
+                return variable_prec_units(f * 1000, "ms", 1);
+
+        case VC_PitchBend:
+            if ((int) val == 64)
+                return "Off - no pitch bend";
+            f = (val - 64) / 24;
+            s = string(f > 0 ? "" : "\n(reversed)");
+            f = fabsf(f);
+                return custom_value_units(f, "x bend range " + s, 2) +
+                    "\n(default: +/- " + custom_value_units(200 * f, "cents )");
+
         case VC_PartVolume:
             return(custom_value_units((val-96.0f)/96.0f*40.0f,"dB",1));
 
@@ -602,6 +620,15 @@ string convert_value(ValueType type, float val)
             f = ((int)val-64.0f)/64.0f;
             f = 15.0f*(f * sqrtf(fabsf(f)));
             return(custom_value_units(f+((f<0) ? (-0.005f) : (0.005f)),"Hz",2));
+
+        case VC_FixedFreqET:
+            f = powf(2.0f, (lrint(val) - 1) / 63.0f) - 1.0f;
+            if(lrint(val) <= 1) /* 0 and 1 are both fixed */
+                return "Fixed";
+            else if(lrint(val) <= 64)
+                return custom_value_units(powf(2.0f,f),"x /octave up",2);
+            else
+                return custom_value_units(powf(3.0f,f),"x /octave up",2);
 
         case VC_FilterGain:
             f = ((int)val / 64.0f -1.0f) * 30.0f; // -30..30dB

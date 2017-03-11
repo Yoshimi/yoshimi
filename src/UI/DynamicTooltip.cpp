@@ -96,7 +96,7 @@ void DynTooltip::setOnlyValue(bool onlyval)
 {
     if (onlyValue != onlyval)
     {
-        onlyValue = !onlyValue;
+        onlyValue = onlyval;
         if(positioned)
             update();
     }
