@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-3-11 Will
+* Splash timeout is longer and doesn't block user.
+* Fixed regression - exit was always claiming config changed.
+
 2017-3-10 Will
 * Monitoring incoming CCs switch now saved in config.
 * Implimented 'Open learned editor window' switch.

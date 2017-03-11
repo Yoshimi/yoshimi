@@ -108,7 +108,7 @@ static void *mainGuiThread(void *arg)
 
     const int textHeight = 15;
     const int textY = 20;
-    const float timeout = 2.5f;
+    const float timeout = 3.5f;
     const int textColour = FL_DARK_BLUE;//WHITE;//CYAN;
 
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
@@ -126,8 +126,9 @@ static void *mainGuiThread(void *arg)
     boxLb.labeltype(FL_NORMAL_LABEL);
     boxLb.labelcolor(textColour);
     boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-
-    winSplash.set_modal();
+    bool splashSet = false;
+    // see later!
+    //winSplash.set_modal();
     //winSplash.clear_border();
     winSplash.border(false);
 
@@ -195,6 +196,16 @@ static void *mainGuiThread(void *arg)
                     MasterUI *guiMaster = _synth->getGuiMaster(false);
                     if (guiMaster)
                     {
+/*
+ * this hack is necessary because 'set_non_modal' doesn't work
+ * on all WMs, and 'set_modal' stops the user doing anything
+ * while the splash is visible
+ */
+                        if (!splashSet)
+                        {
+                            winSplash.show();
+                            splashSet = true;
+                        }
                         guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
                     }

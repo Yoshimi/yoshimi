@@ -24,7 +24,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified March 2017
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <cmath>} {public local
@@ -48,7 +48,7 @@ decl {\#include "Misc/Bank.h"} {private local
 decl {\#include "MasterUI.h"} {private local
 }
 
-class ConfigUI {: {private MiscFuncs}
+class ConfigUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window configwindow {
@@ -741,17 +741,17 @@ synth->getRuntime().configChanged = true;}
           }
           Fl_Check_Button midiMon {
             label {Log Incoming CCs}
-            callback {synth->getRuntime().monitorCCin = o->value();}
+            callback {synth->getRuntime().monitorCCin = o->value();
+synth->getRuntime().configChanged = true;}
             xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().monitorCCin);
-            synth->getRuntime().configChanged = true;}
+            code0 {o->value(synth->getRuntime().monitorCCin);}
           }
           Fl_Check_Button midiLearned {
             label {Show Learn Editor}
-            callback {synth->getRuntime().showLearnedCC = o->value();}
+            callback {synth->getRuntime().showLearnedCC = o->value();
+synth->getRuntime().configChanged = true;}
             tooltip {Open the MIDI learn window for editing when a new CC has been learned} xywh {234 270 18 18} down_box DOWN_BOX labelsize 12 align 4
-            code0 {o->value(synth->getRuntime().showLearnedCC);
-            synth->getRuntime().configChanged = true;}
+            code0 {o->value(synth->getRuntime().showLearnedCC);}
           }
         }
       }
