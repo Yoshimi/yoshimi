@@ -1867,17 +1867,17 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     {
         if (!write)
         {
-            return ("Freemode add/remove is write only. Current points " + to_string(par2));
+            return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
         }
         if (control >= 0x40)
-            return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env Added Freemode Point " + to_string((control & 0x3f) + 1) + " X increment " + to_string(par2) + " Y");
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int((control & 0x3f) + 1)) + " X increment " + to_string(int(par2)) + " Y");
         else
-            return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env Removed Freemode Point " +  to_string(control + 1) + " Remaining " + to_string(par2));
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + " Remaining " + to_string(int(par2)));
     }
 
     if (insert == 4)
     {
-        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env Freemode Point " +  to_string(control + 1) + " X increment " + to_string(par2) + " Y");
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control + 1)) + " X increment " + to_string(int(par2)) + " Y");
     }
 
     string contstr;
@@ -1931,7 +1931,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name  + env + " Env " + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
 }
 
 

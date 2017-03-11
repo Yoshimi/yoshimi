@@ -1,12 +1,12 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
-comment {Envelope.h} {selected not_in_source in_header
-} 
+comment {Envelope.h} {not_in_source in_header
+}
 
 comment {Envelope.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
@@ -29,39 +29,39 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified February 2017
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "UI/WidgetPDial.h"} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include "Params/EnvelopeParams.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class EnvelopeFreeEdit {: {public Fl_Box}
 } {
@@ -125,7 +125,7 @@ for (int i=0;i<env->Penvpoints;i++)
 };
 return(nearestpoint);} {}
   }
-  Function {draw()} {open private
+  Function {draw()} {private
   } {
     code {int ox=x(),oy=y(),lx=w(),ly=h();
 if (env->Pfreemode==0)
@@ -305,9 +305,9 @@ return(1);} {}
   }
   decl {int group;} {private local
   }
-} 
+}
 
-class EnvelopeUI {: {public Fl_Group,PresetsUI_}
+class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -896,7 +896,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
-    if (insert ==3 && insert == 4)
+    if (insert ==3 || insert == 4)
     {
         Fl::check();
         return;
@@ -1263,4 +1263,4 @@ else
   }
   decl {int group;} {private local
   }
-} 
+}

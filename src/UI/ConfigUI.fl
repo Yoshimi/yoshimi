@@ -208,7 +208,7 @@ class ConfigUI {selected : {private MiscFuncs}
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
 		if(synth->getRuntime().GzipCompression != tmp)
 			synth->getRuntime().configChanged = true;}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -242,7 +242,7 @@ else
         }
         Fl_Group {} {
           label Switches
-          xywh {5 25 382 277} hide
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Check_Button autoState {
             label {* Start With Default State}
