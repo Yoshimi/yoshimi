@@ -5,6 +5,8 @@ yoshimi 1.5.0 M
 * Fixed regression - exit was always claiming config changed.
 * Fixed regression - wrong font sizes in 'settings'.
 * BugFiX: Cli wasn't seeing value for freemode X offset.
+* Bugfix: Midi-learn led didn't work if channel set to all.
+* Version colour in Splash window now defined as RGB.
 
 2017-3-10 Will
 * Monitoring incoming CCs switch now saved in config.

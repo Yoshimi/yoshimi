@@ -437,7 +437,10 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             {
                 if (midilearnkititem[i] != NULL && midilearnkititem[i]->mutecheck->value() == 0)
                 {
-                    IDnew = (unsigned int)midilearnkititem[i]->CCcounter->value() | (unsigned int)(midilearnkititem[i]->channelchoice->value() << 8);
+                    unsigned char newchan = midilearnkititem[i]->channelchoice->value();
+                    if (newchan == 16) // all of them
+                        newchan = engine; // force it to match
+                    IDnew = (unsigned int)midilearnkititem[i]->CCcounter->value() | (newchan << 8);
                     if (IDold == IDnew && (type & 0x10) == (midilearnkititem[i]->stat & 0x10))
                     {
                         midilearnkititem[i]->activity->do_callback();

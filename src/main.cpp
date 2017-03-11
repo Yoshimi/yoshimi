@@ -104,27 +104,25 @@ static void *mainGuiThread(void *arg)
     map<SynthEngine *, MusicClient *>::iterator it;
     fl_register_images();
 
-    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
-
     const int textHeight = 15;
     const int textY = 20;
+    const unsigned char lred = 0x00;
+    const unsigned char lgreen = 0x00;
+    const unsigned char lblue = 0x6f;
     const float timeout = 3.5f;
-    const int textColour = FL_DARK_BLUE;//WHITE;//CYAN;
 
+    Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
-
     Fl_Box box(0, 0, splashWidth,splashHeight);
     box.image(pix);
-
     string startup = YOSHIMI_VERSION;
     startup = "V " + startup;
-
     Fl_Box boxLb(0, splashHeight - textY - textHeight, splashWidth, textHeight, startup.c_str());
     boxLb.box(FL_NO_BOX);
     boxLb.align(FL_ALIGN_CENTER);
     boxLb.labelsize(textHeight);
     boxLb.labeltype(FL_NORMAL_LABEL);
-    boxLb.labelcolor(textColour);
+    boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
     boxLb.labelfont(FL_HELVETICA | FL_BOLD);
     bool splashSet = false;
     // see later!
