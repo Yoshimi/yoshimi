@@ -35,6 +35,7 @@ mwheel_val_slider::mwheel_val_slider(int x, int y, int w, int h, const char *l)
     Fl_Group::current(save);
 
     customTip = false;
+    tipText.clear();
     reverse = 1;
 }
 
@@ -75,7 +76,8 @@ void mwheel_val_slider::useCustomTip(bool enabled)
         dyntip->hide();
     }
     customTip = enabled;
-    tooltip(tipText);
+    if(!tipText.empty())
+        tooltip(tipText.c_str());
 }
 
 void mwheel_val_slider::value(double val)
@@ -92,10 +94,11 @@ double mwheel_val_slider::value()
 
 void mwheel_val_slider::tooltip(const char* tip)
 {
-    tipText = tip;
-    if(tip)
-        dyntip->setTooltipText(tip);
-
+     if(tip)
+     {
+         tipText = string(tip);
+         dyntip->setTooltipText(tip);
+     }
     /* Call base class with empty string to prevent
        potential parent group tooltip from showing */
     if(customTip)

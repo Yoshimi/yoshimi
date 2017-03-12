@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-3-12 Jesper
+* Bugfix: Segfault from tooltip text handling in slider
+  when creating new instances of yoshimi.
+* Bugfix: All dials on the EQ effects can now be midi-learned.
+
 2017-3-12 Will
 * Added more reliable way of detecting Midi-learn NRPNs.
 * Bugfix: Splash was ignoring switch settings :(

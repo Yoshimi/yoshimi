@@ -2055,6 +2055,8 @@ string InterChange::resolveEffects(CommandBlock *getData)
             break;
         case 7:
             effname = " EQ";
+            contstr = " (Band " + to_string((control - 10)/5) +
+                ") Control " + to_string((control - 10) % 5);
             break;
         case 8:
             effname = " DynFilter";
@@ -5329,14 +5331,16 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (write)
     {
-        if (control == 16)
+        // EQ (7) does not have presets and 16 collides with
+        // control value for the band 1 frequency parameter
+        if (control == 16 && kititem != 7)
             	eff->changepreset(lrint(value));
         else
              eff->seteffectpar(control,lrint(value));
     }
     else
     {
-        if (control == 16)
+        if (control == 16 && kititem != 7)
             value = eff->getpreset();
         else
             value = eff->geteffectpar(control);
@@ -5367,6 +5371,13 @@ void InterChange::returnLimits(CommandBlock *getData)
     if (npart == 240) // main control limits
     {
         synth->getLimits(getData);
+        return;
+    }
+
+    if(kititem == 0x87) //EQ in part effects
+    {
+        getData->limits.min = 0;
+        getData->limits.max = 127;
         return;
     }
 
