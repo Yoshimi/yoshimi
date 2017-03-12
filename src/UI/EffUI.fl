@@ -1755,7 +1755,7 @@ send_data(1, o->value(), 7, 0xc0);}
           callback {int np=eqband*5+11;
 eff->seteffectpar(np,(int) o->value());
 eqgraph->redraw();
-send_data(2, o->value(), 7, 0xc8);}
+send_data(np, o->value(), 7, 0xc8);}
           xywh {250 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQfreq);}
@@ -1766,7 +1766,7 @@ send_data(2, o->value(), 7, 0xc8);}
           callback {int np=eqband*5+12;
 eff->seteffectpar(np,(int) o->value());
 eqgraph->redraw();
-send_data(3, o->value(), 7, 0xc8);}
+send_data(np, o->value(), 7, 0xc8);}
           xywh {280 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127 step 1
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQfilterGain);}
@@ -1777,7 +1777,7 @@ send_data(3, o->value(), 7, 0xc8);}
           callback {int np=eqband*5+13;
 eff->seteffectpar(np,(int) o->value());
 eqgraph->redraw();
-send_data(4, o->value(), 7, 0xc8);}
+send_data(np, o->value(), 7, 0xc8);}
           tooltip {Resonance/Bandwidth} xywh {310 50 25 25} box ROUND_UP_BOX labelsize 10 when 3 maximum 127
           code0 {o->init(64);}
           code1 {o->setValueType(VC_FXEQq);}
@@ -1788,7 +1788,7 @@ send_data(4, o->value(), 7, 0xc8);}
           callback {int np=eqband*5+14;
 eff->seteffectpar(np,(int) o->value());
 eqgraph->redraw();
-send_data(5, o->value(), 7, 0xc0);}
+send_data(np, o->value(), 7, 0xc0);}
           tooltip {Additional filter stages} xywh {340 60 30 15} type Simple labelsize 10 minimum 1 maximum 127 step 1 textfont 1 textsize 11
           code0 {o->bounds(0,MAX_FILTER_STAGES-1);}
         }
@@ -1799,7 +1799,7 @@ send_data(5, o->value(), 7, 0xc0);}
 eff->seteffectpar(np,(int) o->value());
 bandcounter->do_callback();
 eqgraph->redraw();
-send_data(6, o->value(), 7, 0xc0);}
+send_data(np, o->value(), 7, 0xc0);}
         tooltip Type xywh {323 20 40 15} down_box BORDER_BOX labelsize 11 align 1 when 6 textsize 11
       } {
         MenuItem {} {
@@ -2289,21 +2289,26 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 
     	    break;
 
     	case 7:
-    	    switch (control)
-    	    {
-    	        case 0:
-    	            eqp0->value(value);
-    	            break;
-    	        case 2:
-    	            freqdial->value(value);
-    	            break;
+            if(control == 0)
+            {
+                eqp0->value(value);
+            }
+            else if(eqband == (control - 10) / 5)
+            {
+                switch ((control - 10) % 5)
+                {
+                case 1:
+                    freqdial->value(value);
+                    break;
+                case 2:
+                    gaindial->value(value);
+                    break;
     	        case 3:
-    	            gaindial->value(value);
-    	            break;
-    	        case 4:
     	            qdial->value(value);
     	            break;
-    	    };
+                };
+            }
+            this->redraw();
     	    break;
 
     	case 8:

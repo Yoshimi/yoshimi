@@ -55,7 +55,7 @@ class mwheel_val_slider : public Fl_Value_Slider, public DynTipped {
   bool customTip;
   DynTooltip *dyntip;
  private:
-  const char* tipText;
+  string tipText;
 };
 
 class mwheel_val_slider_rev : public mwheel_val_slider {
