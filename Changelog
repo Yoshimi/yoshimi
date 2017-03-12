@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-3-12 Will
+* Added more reliable way of detecting Midi-learn NRPNs.
+* Bugfix: Splash was ignoring switch settings :(
+
 2017-3-11 Will
 * Splash timeout is longer and doesn't block user.
 * Fixed regression - exit was always claiming config changed.

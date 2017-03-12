@@ -549,7 +549,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     LearnBlock entry;
     unsigned char stat = 0;
     if (CC > 0xff)
-        stat |= 1; // mark as NRPN
+        stat |= 9; // mark as NRPN and set 'block'
      /*
       * this has to be first as the transfer block will be corrupted
       * when we call for the limits of this control. Should be a better
@@ -678,8 +678,8 @@ void MidiLearn::updateGui(int opp)
         putData.data.parameter = it->max_in;
         putData.data.par2 = miscMsgPush(it->name);
         writeToGui(&putData);
-        if (newCC > 0xff)
-        {
+        if (newCC > 0xff || (it->status & 8) > 0)
+        { // status now used in case NRPN is < 0x100
             putData.data.control = 9; // it's an NRPN
             putData.data.engine = ((newCC >> 8) & 0x7f);
             writeToGui(&putData);
@@ -728,25 +728,26 @@ bool MidiLearn::saveList(string name)
         {
             xml->beginbranch("LINE", ID);
             xml->addparbool("Mute", (it->status & 4) > 0);
-                xml->addpar("Midi_Controller", it->CC);
-                xml->addpar("Midi_Channel", it->chan);
-                xml->addpar("Midi_Min", it->min_in);
-                xml->addpar("Midi_Max", it->max_in);
-                xml->addparbool("Limit", (it->status & 2) > 0);
-                xml->addparbool("Block", (it->status & 1) > 0);
-                xml->addpar("Convert_Min", it->min_out);
-                xml->addpar("Convert_Max", it->max_out);
-                xml->beginbranch("COMMAND");
-                    xml->addpar("Type", it->data.type);
-                    xml->addpar("Control", it->data.control);
-                    xml->addpar("Part", it->data.part);
-                    xml->addpar("Kit_Item", it->data.kit);
-                    xml->addpar("Engine", it->data.engine);
-                    xml->addpar("Insert", it->data.insert);
-                    xml->addpar("Parameter", it->data.parameter);
-                    xml->addpar("Secondary_Parameter", it->data.par2);
-                    xml->addparstr("Command_Name", it->name.c_str());
-                    xml->endbranch();
+            xml->addparbool("NRPN", (it->status & 8) > 0);
+            xml->addpar("Midi_Controller", it->CC);
+            xml->addpar("Midi_Channel", it->chan);
+            xml->addpar("Midi_Min", it->min_in);
+            xml->addpar("Midi_Max", it->max_in);
+            xml->addparbool("Limit", (it->status & 2) > 0);
+            xml->addparbool("Block", (it->status & 1) > 0);
+            xml->addpar("Convert_Min", it->min_out);
+            xml->addpar("Convert_Max", it->max_out);
+            xml->beginbranch("COMMAND");
+                xml->addpar("Type", it->data.type);
+                xml->addpar("Control", it->data.control);
+                xml->addpar("Part", it->data.part);
+                xml->addpar("Kit_Item", it->data.kit);
+                xml->addpar("Engine", it->data.engine);
+                xml->addpar("Insert", it->data.insert);
+                xml->addpar("Parameter", it->data.parameter);
+                xml->addpar("Secondary_Parameter", it->data.par2);
+                xml->addparstr("Command_Name", it->name.c_str());
+                xml->endbranch();
             xml->endbranch();
             ++it;
             ++ID;
@@ -807,7 +808,11 @@ bool MidiLearn::loadList(string name)
 
             if (xml->getparbool("Mute",0))
                 status |= 4;
+            if (xml->getparbool("NRPN",0))
+                status |= 8;
             entry.CC = xml->getpar("Midi_Controller", 0, 0, 0xfffff);
+            if (entry.CC > 0xff)
+                status |= 8; // belt & braces!
             entry.chan = xml->getpar127("Midi_Channel", 0);
             entry.min_in = xml->getpar127("Midi_Min", 0);
             entry.max_in = xml->getpar127("Midi_Max", 127);

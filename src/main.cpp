@@ -124,14 +124,14 @@ static void *mainGuiThread(void *arg)
     boxLb.labeltype(FL_NORMAL_LABEL);
     boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
     boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-    bool splashSet = false;
     // see later!
     //winSplash.set_modal();
     //winSplash.clear_border();
     winSplash.border(false);
-
+    bool splashSet = false;
     if (bShowGui && firstRuntime->showSplash)
     {
+        splashSet = true;
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
         winSplash.show();
         Fl::add_timeout(timeout, splashTimeout, &winSplash);
@@ -199,10 +199,10 @@ static void *mainGuiThread(void *arg)
  * on all WMs, and 'set_modal' stops the user doing anything
  * while the splash is visible
  */
-                        if (!splashSet)
+                        if (i == 0 && splashSet == true)
                         {
                             winSplash.show();
-                            splashSet = true;
+                            splashSet = false;
                         }
                         guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
