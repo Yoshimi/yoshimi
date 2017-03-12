@@ -1,11 +1,11 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303
+version 1.0304
 header_name {.h}
 code_name {.cc}
 comment {EffUI.h} {not_in_source in_header
 }
 
-comment {EffUI.cc} {in_source not_in_header
+comment {EffUI.cc} {selected in_source not_in_header
 }
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -228,7 +228,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
         }} {}
   }
   Function {make_null_window()} {} {
-    Fl_Window effnullwindow {selected
+    Fl_Window effnullwindow {
       xywh {915 700 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
@@ -1744,7 +1744,7 @@ qdial->value(q);
 
 int dbl=eff->geteffectpar(npb+4);
 stagescounter->value(dbl);
-send_data(1, o->value(), 7, 0xc0);}
+send_data(1, eqband, 7, 0xc0);}
         tooltip {Band no.} xywh {263 20 45 15} type Simple labelsize 11 align 1 minimum 0 maximum 1 step 1 textsize 11
         code0 {o->bounds(0,MAX_EQ_BANDS-1);}
       }

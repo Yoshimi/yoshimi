@@ -2055,8 +2055,9 @@ string InterChange::resolveEffects(CommandBlock *getData)
             break;
         case 7:
             effname = " EQ";
-            contstr = " (Band " + to_string((control - 10)/5) +
-                ") Control " + to_string((control - 10) % 5);
+            if (control > 1)
+                contstr = " (Band " + to_string((control - 10)/5) +
+                ") Control " + to_string(10 + (control % 5));
             break;
         case 8:
             effname = " DynFilter";
@@ -5335,16 +5336,17 @@ void InterChange::commandEffects(CommandBlock *getData)
         // control value for the band 1 frequency parameter
         if (control == 16 && kititem != 7)
             	eff->changepreset(lrint(value));
-        else
+        else if (control != 1 || kititem != 7) // EQ selector is not a parameter
              eff->seteffectpar(control,lrint(value));
     }
     else
     {
         if (control == 16 && kititem != 7)
             value = eff->getpreset();
-        else
+        else if (control != 1 || kititem != 7) // EQ selector is not a parameter
             value = eff->geteffectpar(control);
     }
+
     if (!write)
         getData->data.value = value;
 }

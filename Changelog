@@ -3,6 +3,10 @@ yoshimi 1.5.0 M
 2017-3-12 Will.
 * Updated /dev_notes/Effect_Inserts.txt
 * Removed boost dependency based on ideas from Rob.
+* Made EQ reporting more human-readable :)
+* Corrected EQ band selector reporting/adjustment.
+  It's not a parameter.
+* Reverted boost change pending further investigation.
 
 2017-3-12 Jesper
 * Bugfix: Segfault from tooltip text handling in slider
