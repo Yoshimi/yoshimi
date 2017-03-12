@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-3-12 Will.
+* Updated /dev_notes/Effect_Inserts.txt
+* Removed boost dependency based on ideas from Rob.
+
 2017-3-12 Jesper
 * Bugfix: Segfault from tooltip text handling in slider
   when creating new instances of yoshimi.

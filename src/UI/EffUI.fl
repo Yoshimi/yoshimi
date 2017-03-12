@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0303
+header_name {.h}
 code_name {.cc}
 comment {EffUI.h} {not_in_source in_header
-} 
+}
 
 comment {EffUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016, Will Godfrey
+Copyright 2016-2017, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,36 +27,38 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified November 2016
+This file is a derivative of the ZynAddSubFX original
+
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {\#include <iostream>} {public local
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "UI/WidgetPDial.h"} {public local
-} 
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
-} 
+}
 
 decl {\#include "FilterUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Effects/EffectMgr.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 class EQGraph {: {public Fl_Box}
 } {
@@ -199,7 +201,7 @@ eff = eff_;
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class EffUI {open : {public Fl_Group,public PresetsUI_}
 } {
@@ -2085,7 +2087,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 
     unsigned char control = getData->data.control;
     unsigned char efftype = getData->data.kit & 0x7f;
     //unsigned char effnum = getData->data.engine;
-    
+
     //cout << "cont " << (int)control << "  type " << (int)efftype << "  num " << (int)effnum << endl;
     switch(efftype)
     {
@@ -2128,7 +2130,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, group | 
     	        case 12:
     	            revp12->value(value);
     	            break;
-    	        
+
     	    }
     	    break;
 
@@ -2562,4 +2564,4 @@ refresh(eff, npart, neff);} {}
   }
   decl {int neff;} {private local
   }
-} 
+}

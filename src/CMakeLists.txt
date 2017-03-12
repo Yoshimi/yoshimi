@@ -166,12 +166,12 @@ else (JACK_FOUND)
 endif (JACK_FOUND)
 
 # Boost
-find_package (Boost)
-if (Boost_FOUND)
-    message(STATUS "Found boost headers version " ${Boost_VERSION})
-else (Boost_FOUND)
-    message (FATAL_ERROR "boost headers required, but not found")
-endif (Boost_FOUND)
+#find_package (Boost)
+#if (Boost_FOUND)
+#    message(STATUS "Found boost headers version " ${Boost_VERSION})
+#else (Boost_FOUND)
+#    message (FATAL_ERROR "boost headers required, but not found")
+#endif (Boost_FOUND)
 
 # fontconfig
 pkg_check_modules (FONTCONFIG REQUIRED fontconfig>=0.22)

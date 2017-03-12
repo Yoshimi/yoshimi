@@ -22,6 +22,8 @@
 
 //#include <cmath>
 
+using namespace std;
+
 class Float2Int {
     public:
         Float2Int() { }

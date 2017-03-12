@@ -1,5 +1,5 @@
 
-Direct access to envelope not updating Gui graph and freemde not correctly registering with Gui, but seems to work correctly otherwise.
+Direct access to envelope not updating Gui graph, and freemode not correctly registering with Gui, but seems to work otherwise.
 
 Make NRPN midi learn able to be re-learned.
 

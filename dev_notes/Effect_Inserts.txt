@@ -103,15 +103,15 @@ Distortion
 
 EQ
 0   Gain
-1   Band number (0-6)
-2   Band frequency
-3   Band gain
-4   Band Q
-5   Band additional stages (0-4)
-6   Type (0-9)
+1   Band number (0-7) {BN}
+10 + BN * 5   Filter type (0-9)
+11 + BN * 5   Band frequency
+12 + BN * 5   Band gain
+13 + BN * 5   Band Q
+14 + BN * 5   Band additional stages (0-4)
 
 
-DynFilter
+DynFilter   This is not yet complete. GUI not updataing.
 0   Volume
 1   Panning
 2   LFO frequency
