@@ -436,4 +436,4 @@ Effect Inserts
  :  :  :  : See note -> :  :  :  :  : Kit numbers are 128 + (0 to 8) for actual effect types.
  :  :  :  :  :  :  :  :  : 0 is no effect
 YL :  : 0 to 15 : 0 to 63, 241, 242 : 128 : effect number : 255 : 255 : 255 : Depends on actual effect
- :  :  :  :  :  :  :  :  : See ‘Effect_Inserts.txt’ for all control ranges. Dynefilter yet to complete.
+ :  :  :  :  :  :  :  :  : See ‘Effect_Inserts.txt’ for all control ranges. Dynefilter not complete.

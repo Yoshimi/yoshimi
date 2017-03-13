@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
-} 
+}
 
 comment {FilterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016 Will Godfrey
+Copyright 2016-2017 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,45 +27,46 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
-} {in_source in_header
-} 
+This file is derivative of ZynAddSubFX original code
+
+Modified March 2017} {in_source in_header
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "UI/WidgetPDial.h"} {public local
-} 
+}
 
 decl {\#include "UI/WidgetMWSlider.h"} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Params/FilterParams.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 } {
@@ -193,7 +194,7 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   }
   decl {float *graphpoints;} {private local
   }
-} 
+}
 
 class FilterUI {selected : {public Fl_Group,PresetsUI_}
 } {
@@ -219,7 +220,7 @@ pars=NULL;
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        label {               Filter Params} open
+        label {               Filter Params}
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -706,19 +707,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char par = getData->data.parameter;
     //unsigned char par2 = getData->data.par2;
 
-
     if (part != npart || ((eng >= 128 && eng != 136) && eng != engine))
         return;
-    if (eng == 0x88)
-    {
-    	if (control == 7)
-    	;
-    	else if (control == 9)
-    	;
-    	//cout << "cont " << (int)control << endl;
-       return;
-    }
-
+    
     switch(control)
     {
     	case 0:
@@ -930,4 +921,4 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {int engine;} {private local
   }
-} 
+}

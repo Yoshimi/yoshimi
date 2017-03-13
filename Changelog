@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-3-13 Will
+* Enabled Gui updates for dynfilter controls 7,8,9.
+* Doc updates.
+
 2017-3-12 Will.
 * Updated /dev_notes/Effect_Inserts.txt
 * Removed boost dependency based on ideas from Rob.
