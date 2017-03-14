@@ -1,5 +1,9 @@
 yoshimi 1.5.0 M
 
+2017-3-14 Will
+* Updated auto window position control.
+* Removed some auto window opens due to conflicts.
+
 2017-3-13 Will
 * Enabled Gui updates for dynfilter controls 7,8,9.
 * Doc updates.

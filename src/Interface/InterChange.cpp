@@ -53,7 +53,7 @@ InterChange::InterChange(SynthEngine *_synth) :
 
 bool InterChange::Init(SynthEngine *_synth)
 {
-    Part *part;
+    //Part *part;
     flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {

@@ -3,7 +3,7 @@ Direct access to envelope not updating Gui graph, and freemode not correctly reg
 
 Make NRPN midi learn able to be re-learned.
 
-Sort out direct access dynfilter->filter (and two enclosed controls). All work but don't update gui.
+Sort out direct access dynfilter->filter controls work but don't update gui.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 

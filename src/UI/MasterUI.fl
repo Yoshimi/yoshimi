@@ -32,7 +32,7 @@ This file is a derivative of the ZynAddSubFX original.
 Modified March 2017
 
 
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <string>} {public local
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {open : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -233,16 +233,21 @@ class MasterUI {: {private MiscFuncs}
           configui->Show();
       if (yoshiLogO)
           yoshiLog->Show();
+      if (vectorO)
+          vectorui->Show();
       if (mlearnO)
           midilearnui->Show();
       if (controllersO)
           partui->ctlwindow->show();
+      if (midictlO)
+          partui->ctlmidi->show();
       if (inseditO)
           partui->instrumenteditwindow->show();
-      if (kitlistO)
-          partui->instrumentkitlist->show();
-      if (partfxO)
-          partui->partfx->show();} {}
+      //if (kitlistO)
+          //partui->instrumentkitlist->show();
+      //if (partfxO)
+          //partui->partfx->show();} {selected
+    }
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -1815,6 +1820,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                  yoshiLogY,
                  yoshiLogO);
     ok = getData(ok,
+                "vectors",
+                 vectorX,
+                 vectorY,
+                 vectorO);
+    ok = getData(ok,
                 "MIDIlearn",
                  mlearnX,
                  mlearnY,
@@ -1824,6 +1834,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                  controllersX,
                  controllersY,
                  controllersO);
+    ok = getData(ok,
+                "midicontrols",
+                 midictlX,
+                 midictlY,
+                 midictlO);
     ok = getData(ok,
                 "instrumentedit",
                  inseditX,
@@ -1869,9 +1884,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     virkeyboard->virkeyboardwindow->position(virkbdX, virkbdY);
     configui->configwindow->position(settingsX, settingsY);
     yoshiLog->logConsole->position(yoshiLogX, yoshiLogY);
+    vectorui->vectorwindow->position(vectorX, vectorY);
     midilearnui->midilearnwindow->position(mlearnX, mlearnY);
     partui->ctlwindow->position(controllersX, controllersY);
-    partui->ctlmidi->position(controllersX, controllersY);
+    partui->ctlmidi->position(midictlX, midictlY);
     partui->instrumenteditwindow->position(inseditX, inseditY);
     partui->instrumentkitlist->position(kitlistX, kitlistY);
     partui->partfx->position(partfxX, partfxY);} {}
@@ -1920,6 +1936,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
              yoshiLog->logConsole->x(),
              yoshiLog->logConsole->y(),
              yoshiLog->logConsole->visible());
+    putData("vectors",
+             vectorui->vectorwindow->x(),
+             vectorui->vectorwindow->y(),
+             vectorui->vectorwindow->visible());
     putData("MIDIlearn",
              midilearnui->midilearnwindow->x(),
              midilearnui->midilearnwindow->y(),
@@ -1935,6 +1955,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
                  controllersX,
                  controllersY,
                  controllersO);
+
+    if (partui->ctlwindow->x())
+    	putData("midcontrols",
+                 partui->ctlmidi->x(),
+                 partui->ctlmidi->y(),
+                 partui->ctlmidi->visible());
+    else // no window so store previous values
+        putData("controllers",
+                 midictlX,
+                 midictlY,
+                 midictlO);
 
     if (partui->instrumenteditwindow->x())
         putData("instrumentedit",
@@ -2125,6 +2156,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   decl {int yoshiLogO;} {private local
   }
+  decl {int vectorX;} {public local
+  }
+  decl {int vectorY;} {public local
+  }
+  decl {int vectorO;} {public local
+  }
   decl {int mlearnX;} {public local
   }
   decl {int mlearnY;} {public local
@@ -2135,7 +2172,13 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   decl {int controllersY;} {public local
   }
-  decl {int controllersO;} {private local
+  decl {int controllersO;} {public local
+  }
+  decl {int midictlX;} {public local
+  }
+  decl {int midictlY;} {public local
+  }
+  decl {int midictlO;} {public local
   }
   decl {int inseditX;} {private local
   }
