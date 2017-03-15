@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-3-15 Will
+* Added correction from Jesper to tooltips code.
+* Direct access now enables envelope freemode in Gui
+  but still doesn't do redraws.
+
 2017-3-14 Will
 * Updated auto window position control.
 * Removed some auto window opens due to conflicts.

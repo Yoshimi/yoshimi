@@ -97,7 +97,7 @@ void mwheel_val_slider::tooltip(const char* tip)
      if(tip)
      {
          tipText = string(tip);
-         dyntip->setTooltipText(tip);
+         dyntip->setTooltipText(tipText);
      }
     /* Call base class with empty string to prevent
        potential parent group tooltip from showing */

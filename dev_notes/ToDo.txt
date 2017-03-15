@@ -1,9 +1,9 @@
 
-Direct access to envelope not updating Gui graph, and freemode not correctly registering with Gui, but seems to work otherwise.
-
-Make NRPN midi learn able to be re-learned.
+Direct access to envelope not updating Gui graph, but seems to work otherwise.
 
 Sort out direct access dynfilter->filter controls work but don't update gui.
+
+Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
 
@@ -11,7 +11,7 @@ Find out why LV2 only stores/retrieves patch sets (not state)
 
 Make add voice & add/pad oscillator windows show kit number & name.
 
-Make vector window update when main window reduces numvber of available parts.
+Make vector window update when main window reduces number of available parts.
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
@@ -23,8 +23,6 @@ Make loading effect presets update the 'top' line.
 Startup state load doesn't set buffersize correctly - partially resolved. Size is ignored if loaded when already running (which is reasonable).
 
 Allow headless compilation.
-
-Add ARM specific options to CmakeLists.txt
 
 Add scales control to CLI.
 

@@ -1034,11 +1034,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 32:
-    	    freemodebutton->value(value != 0); // not working :(
-    	    reinit();
-            freeedit->lastpoint=-1;
-            freeedit->redraw();
-            freemodebutton->value(value != 0);
+    	    reinitcore(value != 0);
     	    break;
     }
     Fl::check();} {}
@@ -1124,6 +1120,47 @@ else
     deletepoint->hide();
     forcedreleasecheck->hide();
 };} {}
+  }
+  Function {reinitcore(bool freemode)} {} {
+    code {if (freemode)
+   freemodebutton->value(1);
+else
+    freemodebutton->value(0);
+
+hide();
+int winx = freemodeeditwindow->x();
+int winy = freemodeeditwindow->y();
+
+freemodeeditwindow->hide();
+
+envwindow->hide();
+Fl_Group *par = envwindow->parent();
+par->hide();
+
+
+refresh();
+envwindow->show();
+par->redraw();
+
+par->show();
+show();
+freemodeeditwindow->position(winx, winy);
+freemodeeditwindow->show();
+
+if (freemode)
+{
+    freemodebutton->value(1);
+    addpoint->show();
+    deletepoint->show();
+    forcedreleasecheck->show();
+}
+else
+{
+    freemodebutton->value(0);
+    addpoint->hide();
+    deletepoint->hide();
+    forcedreleasecheck->hide();
+}} {}
   }
   Function {refresh()} {} {
     code {freemodebutton->value(env->Pfreemode);
