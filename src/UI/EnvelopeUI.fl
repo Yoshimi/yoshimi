@@ -1073,53 +1073,18 @@ refresh();} {}
     code {if (env->Pfreemode != 0)
 {
     bool answer = fl_choice("Disable the free mode of the Envelope?", NULL, "No", "Yes") > 1;
-    if (env->Pfreemode != 0)
-        freemodebutton->value(1);
-    else
-        freemodebutton->value(0);
     if (!answer)
+    {
+        freemodebutton->value(1); // back as it was
         return;
+    }
 }
 
 if (env->Pfreemode == 0)
     env->Pfreemode = 1;
 else
     env->Pfreemode = 0;
-
-hide();
-int winx = freemodeeditwindow->x();
-int winy = freemodeeditwindow->y();
-
-freemodeeditwindow->hide();
-
-envwindow->hide();
-Fl_Group *par = envwindow->parent();
-par->hide();
-
-
-refresh();
-envwindow->show();
-par->redraw();
-
-par->show();
-show();
-freemodeeditwindow->position(winx, winy);
-freemodeeditwindow->show();
-
-if (env->Pfreemode != 0)
-{
-    freemodebutton->value(1);
-    addpoint->show();
-    deletepoint->show();
-    forcedreleasecheck->show();
-}
-else
-{
-    freemodebutton->value(0);
-    addpoint->hide();
-    deletepoint->hide();
-    forcedreleasecheck->hide();
-};} {}
+reinitcore(env->Pfreemode);} {}
   }
   Function {reinitcore(bool freemode)} {} {
     code {if (freemode)

@@ -125,11 +125,11 @@ void Part::defaults(void)
     Ppolymode = 1;
     Plegatomode = 0;
     setVolume(96);
-    TransVolume = Pvolume - 1; // ensure it gets set
+    TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
     Prcvchn = 0;
     setPan(Ppanning = 64);
-    TransPanning = Ppanning - 1;
+    TransPanning = 128; // ensure it always gets set
     Pvelsns = 64;
     Pveloffs = 64;
     Pkeylimit = 20;
