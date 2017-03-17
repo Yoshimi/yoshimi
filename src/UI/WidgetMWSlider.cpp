@@ -123,7 +123,7 @@ int mwheel_val_slider::_handle(int res, int event)
         {
             return 1;
         }
-        double range = maximum() - minimum();
+        double range = abs(maximum() - minimum());
         int step_size = (reverse * Fl::event_dy() > 0) ? 1 : -1;
 
         if(Fl::event_state(FL_CTRL) != 0)

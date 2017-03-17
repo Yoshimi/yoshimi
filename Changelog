@@ -1,5 +1,12 @@
 yoshimi 1.5.0 M
 
+2017-3-17 Jesper
+* AddSynth gui - sync voice list when changing detune type
+* AddSynth section labels now consistent with the other synths.
+* Minor graphical corrections - overlapping margins etc.
+* Bugfix: Sliders behaved incorrectly when min>max
+  specifically when using control-mousewheel to change value
+
 2017-3-17 Will
 * Part naming now goes through ring buffers.
 * BugFix: Recent state loading failed

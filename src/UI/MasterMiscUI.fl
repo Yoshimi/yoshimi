@@ -477,7 +477,7 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
           xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
           code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
-          class mwheel_slider_rev
+          class mwheel_slider
         }
         Fl_Dial partpanning {
           callback {//
