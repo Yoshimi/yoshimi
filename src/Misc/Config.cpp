@@ -736,6 +736,11 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         ok = extractConfigData(xml); // this still needs improving
         if (ok)
         {
+            for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+            {
+                synth->part[npart]->defaults();
+                synth->part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
+            }
             ok = synth->getfromXML(xml);
             if (ok)
                 synth->getRuntime().stateChanged = true;
