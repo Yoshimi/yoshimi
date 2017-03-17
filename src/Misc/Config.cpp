@@ -247,7 +247,7 @@ bool Config::Setup(int argc, char **argv)
             no_state0: Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
         }
-        Log(StateFile);
+        Log(StateFile);;
         restoreSessionData(StateFile, true);
         /* There is a single state file that contains both startup config
          * data that must be set early, and runtime data that must be set
@@ -724,7 +724,6 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
         Log("Failed to init xmltree for restoreState", 1);
         goto end_game;
     }
-
     if (!xml->loadXMLfile(sessionfile))
     {
         Log("Failed to load xml file " + sessionfile);
@@ -1309,6 +1308,7 @@ void GuiThreadMsg::processGuiMessages()
                 case GuiThreadMsg::GuiAlert:
                     if (msg->data)
                         guiMaster->ShowAlert(msg->index);
+                    break;
 
                 default:
                     break;

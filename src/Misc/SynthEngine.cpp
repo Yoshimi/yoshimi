@@ -2919,7 +2919,7 @@ unsigned char SynthEngine::extractVectorData(unsigned char *baseChan, bool full,
         if (part[npart + *baseChan]->Paudiodest & 2)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + *baseChan);
     }
-    GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
+    //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
 
     return true;
 }

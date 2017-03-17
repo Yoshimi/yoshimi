@@ -4,6 +4,7 @@ yoshimi 1.5.0 M
 * Part naming now goes through ring buffers.
 * BugFix: Recent state loading failed
   due to missing lines in ParametersUI.fl
+* Small adjustments to messageing.
 
 2017-3-16 Will
 * Bugfix: part volume was not being activated on load
