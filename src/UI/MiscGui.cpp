@@ -76,6 +76,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     }
     type |= (typetop & 0x80);
+
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;

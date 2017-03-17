@@ -713,7 +713,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     XMLwrapper *xml = NULL;
     bool ok = false;
     if (sessionfile.size() && !isRegFile(sessionfile))
-        sessionfile += ".state";
+        sessionfile = setExtension(sessionfile, "state");
     if (!sessionfile.size() || !isRegFile(sessionfile))
     {
         Log("Session file " + sessionfile + " not available", 1);

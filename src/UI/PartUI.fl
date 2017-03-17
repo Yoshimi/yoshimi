@@ -30,7 +30,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 This file is derivative of ZynAddSubFX original code.
 
 Modified March 2017
-} {selected in_source in_header
+} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -417,7 +417,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -456,8 +456,8 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
                 fl_alert("Can't use name of default sound");
             else
             {
-                part->Pname = string(tmp);
-                checkEngines();
+                unsigned char id = miscMsgPush(string(tmp));
+                send_data(222, 0, 0xc0, 0xff, 0xff, 0xff, 0xff, id);
             }
         }
     }}
@@ -1475,9 +1475,9 @@ send_data(48, o->value(), 0xc8);}
       }
     }
   }
-  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff)} {} {
+  Function {send_data(int control, float value, int type, int kititem = 0xff, int engine = 0xff, int insert = 0xff, int parameter = 0xff, int par2 = 0xff)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine);} {}
+collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, engine, insert, parameter, par2);} {}
   }
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
@@ -1915,6 +1915,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             filtercutoff->value(value);
             break;
 
+        case 222:
+            setinstrumentlabel();
+            checkEngines();
+            break;
         case 224:
             updatecontrollers();
             break;

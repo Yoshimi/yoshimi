@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {open : {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -246,8 +246,7 @@ class MasterUI {open : {private MiscFuncs}
       //if (kitlistO)
           //partui->instrumentkitlist->show();
       //if (partfxO)
-          //partui->partfx->show();} {selected
-    }
+          //partui->partfx->show();} {}
   }
   Function {make_window()} {} {
     Fl_Window masterwindow {
@@ -517,8 +516,7 @@ paramsui->Show(3);}
           MenuItem loadState {
             label {Load...}
             callback {// for Alessandro
-    char *fle = fl_file_chooser("Load:", "({*.state})",
-                                laststatefile.c_str(), 0);
+    char *fle = fl_file_chooser("Load:", "({*.state})", laststatefile.c_str(), 0);
     if (fle)
     {
         laststatefile = string(fle);

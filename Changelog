@@ -1,9 +1,14 @@
 yoshimi 1.5.0 M
 
+2017-3-17 Will
+* Part naming now goes through ring buffers.
+* BugFix: Recent state loading failed
+  due to missing lines in ParametersUI.fl
+
 2017-3-16 Will
-*Bugfix: part volume was not being activated on load
- but only if the saved value was 95! There was a similar
- less important issue with panning.
+* Bugfix: part volume was not being activated on load
+  but only if the saved value was 95! There was a similar
+  less important issue with panning.
 * Small optimisation in Gui freemode enable switch.
 
 2017-3-15 Will

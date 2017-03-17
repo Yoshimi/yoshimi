@@ -567,6 +567,7 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
@@ -586,7 +587,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             if (control >= 0xa0)
                 name += "Portamento ";
         }
-        else if (control < 0xe0)
+        else if (control < 0xdc)
             name = "MIDI ";
     }
     else if (kititem < 0xff)
@@ -810,6 +811,10 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Filter Cutoff";
             break;
 
+        case 222:
+            showValue = false;
+            contstr = "Name is: " + miscMsgPop(par2);
+            break;
         case 224:
             contstr = "Clear controllers";
             break;
@@ -2152,7 +2157,7 @@ void InterChange::returns(CommandBlock *getData)
     bool write = (type & 0x40) > 0;
 
     bool isOK = false;
-    if (isGui && control == 96 && npart < 0x40 && (kititem & engine & insert) == 0xff)
+    if (isGui && (control == 96 || control == 222) && npart < 0x40 && (kititem & engine & insert) == 0xff)
         isOK = true; // needs more work. Some GUI controls need updates
 
     if (synth->guiMaster)
@@ -2639,6 +2644,7 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool write = (type & 0x40) > 0;
@@ -3136,6 +3142,14 @@ void InterChange::commandPart(CommandBlock *getData)
                 value = part->ctl->filtercutoff.data;
             break;
 
+        case 222:
+            if (write)
+            {
+                string name = miscMsgPop(par2);
+                synth->part[npart]->Pname = name;
+                getData->data.par2 = miscMsgPush(name);
+                break;
+            }
         case 224:
             if (write)
             {

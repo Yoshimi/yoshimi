@@ -1141,9 +1141,8 @@ int CmdInterface::commandPart(bool justSet)
                 name = "Cant use name of default sound";
             else
             {
-                synth->part[npart]->Pname = name;
-                name = "Set part name to " + name;
-                partFlag = true;
+                sendDirect(0, 64, 222, npart, 255, 255, 255, 255, miscMsgPush(name));
+                return done_msg;
             }
         }
         Runtime.Log(name);
