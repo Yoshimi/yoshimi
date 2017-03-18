@@ -1299,7 +1299,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 33:
     	    fixedfreqetdial->value(value);
-    	    if (value == 0) fixedfreqetdial->deactivate();
+    	    //if (value == 0) fixedfreqetdial->deactivate();
     	    break;
 
     	case 34:
@@ -1604,7 +1604,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {

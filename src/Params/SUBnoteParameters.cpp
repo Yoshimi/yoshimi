@@ -440,6 +440,16 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             max = 63;
             break;
 
+        case 38:
+            type = 0x40;
+            def = 880;
+            break;
+
+        case 39:
+            type = 0x40;
+            def = 640;
+            break;
+
         case 40:
             max = 1;
             break;

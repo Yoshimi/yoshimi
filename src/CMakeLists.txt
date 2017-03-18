@@ -363,6 +363,8 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
+# many of these are here for convenience and consistency
+# changing them is likely to have unpredicable consequences
 add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
 add_definitions (-DMAX_HISTORY=25)

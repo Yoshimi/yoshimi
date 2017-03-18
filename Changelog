@@ -1,5 +1,10 @@
 yoshimi 1.5.0 M
 
+2017-3-18 Will
+* BugFix: Direct access Eq.T. dial deactivated in error.
+* Implemented forgotten direct access subsynth bend and offset.
+* Updated docs.
+
 2017-3-17 Jesper
 * AddSynth gui - sync voice list when changing detune type
 * AddSynth section labels now consistent with the other synths.

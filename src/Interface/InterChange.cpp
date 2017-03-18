@@ -3822,6 +3822,20 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
 
+        case 38:
+            if (write)
+                pars->PBendAdjust = value;
+            else
+                value = pars->PBendAdjust;
+            break;
+
+        case 39:
+            if (write)
+                pars->POffsetHz = value;
+            else
+                value = pars->POffsetHz;
+            break;
+
         case 40:
             if (write)
                 pars->PFreqEnvelopeEnabled = value_0_1;
