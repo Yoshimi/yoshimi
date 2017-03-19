@@ -118,7 +118,7 @@ int WidgetPDial::handle(int event)
             res = 1;
             break;
         }
-        if (this->when() != 0) // only effects knobs need this
+        if (this->when() != 0 && Fl::event_button() == 3) // only effects knobs need this
             do_callback();
         oldvalue = value();
     case FL_DRAG:

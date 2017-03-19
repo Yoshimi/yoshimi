@@ -924,7 +924,7 @@ ZynAddSubFX}
                                "\\nCopyright 2012-2013, Jeremy Jongepier and others"
                                "\\nCopyright 2014-2017, Will Godfrey and others"
                                "\\nLV2 plugin Copyright 2014, Andrew Deryabin"
-                               "\\nSplash Image Copyright 2015, James Fraser").c_str());}
+                               "\\nSplash Image Copyright 2017, Jesper Lloyd").c_str());}
       }
       Fl_Box {} {
         label {copy terms}

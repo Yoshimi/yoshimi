@@ -1,4 +1,9 @@
-yoshimi 1.5.0 M
+yoshimi 1.5.1 rc1
+
+2017-3-19 Will
+* Bugfix: Rotary controls were making pairs of calls.
+* Installed new splash screen and updated notices.
+* Set master as 1.5.1 rc1
 
 2017-3-18 Will
 * BugFix: Direct access Eq.T. dial deactivated in error.

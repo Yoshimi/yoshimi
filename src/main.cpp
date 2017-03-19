@@ -105,10 +105,10 @@ static void *mainGuiThread(void *arg)
     fl_register_images();
 
     const int textHeight = 15;
-    const int textY = 20;
-    const unsigned char lred = 0x00;
-    const unsigned char lgreen = 0x00;
-    const unsigned char lblue = 0x6f;
+    const int textY = 10;
+    const unsigned char lred = 0xd7;
+    const unsigned char lgreen = 0xf7;
+    const unsigned char lblue = 0xff;
     const float timeout = 3.5f;
 
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
