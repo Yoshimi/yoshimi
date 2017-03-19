@@ -229,7 +229,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
   }
   Function {make_null_window()} {} {
     Fl_Window effnullwindow {
-      xywh {915 700 380 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
+      xywh {915 700 379 95} type Double box PLASTIC_THIN_UP_BOX color 221 hide
       class Fl_Group
     } {
       Fl_Text_Display {} {
@@ -240,7 +240,7 @@ class EffUI {open : {public Fl_Group,public PresetsUI_}
   }
   Function {make_reverb_window()} {} {
     Fl_Window effreverbwindow {
-      xywh {1005 24 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
+      xywh {1005 24 379 95} type Double box PLASTIC_UP_BOX color 221 labelsize 12 align 33 hide
       class Fl_Group
     } {
       Fl_Text_Display {} {
@@ -530,7 +530,7 @@ send_data(butt, o->value(), 1, 0xc0);}
   }
   Function {make_echo_window()} {} {
     Fl_Window effechowindow {
-      xywh {1006 149 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
+      xywh {1006 149 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Choice echop {
@@ -710,7 +710,7 @@ send_data(butt, o->value(), 2, 0xc8);}
   }
   Function {make_chorus_window()} {} {
     Fl_Window effchoruswindow {
-      xywh {1007 275 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1007 275 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice chorusp {
@@ -958,7 +958,7 @@ send_data(4, o->value(), 3, 0xc0);}
   }
   Function {make_phaser_window()} {} {
     Fl_Window effphaserwindow {
-      xywh {991 245 380 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
+      xywh {991 245 379 95} type Double box PLASTIC_UP_BOX color 221 labelsize 11 hide
       class Fl_Group
     } {
       Fl_Choice phaserp {
@@ -1244,7 +1244,7 @@ send_data(14, o->value(), 4, 0xc0);}
   }
   Function {make_alienwah_window()} {} {
     Fl_Window effalienwahwindow {
-      xywh {1013 520 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1013 520 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice awp {
@@ -1453,7 +1453,7 @@ send_data(8, o->value(), 5, 0xc0);}
   }
   Function {make_distorsion_window()} {} {
     Fl_Window effdistorsionwindow {
-      xywh {1013 641 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1013 641 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice distp {
@@ -1702,7 +1702,7 @@ send_data(10, o->value(), 6, 0xc0);}
   }
   Function {make_eq_window()} {} {
     Fl_Window effeqwindow {
-      xywh {1010 762 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1010 762 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Text_Display {} {
@@ -1854,7 +1854,7 @@ send_data(np, o->value(), 7, 0xc0);}
   }
   Function {make_dynamicfilter_window()} {} {
     Fl_Window effdynamicfilterwindow {
-      xywh {1009 883 380 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
+      xywh {1009 883 379 95} type Double box PLASTIC_UP_BOX color 221 labelfont 1 hide
       class Fl_Group
     } {
       Fl_Choice dfp {

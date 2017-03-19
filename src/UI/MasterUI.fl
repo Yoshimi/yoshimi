@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -274,13 +274,13 @@ class MasterUI {selected : {private MiscFuncs}
     {
         synth->guiClosed(true);
     }}
-      xywh {7 120 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {155 412 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
-        xywh {275 27 103 85} box ENGRAVED_FRAME
+        xywh {279 28 103 85} box ENGRAVED_FRAME
       }
       Fl_Menu_Bar mastermenu {
-        xywh {-7 0 400 25} labelsize 13
+        xywh {0 0 385 25} labelsize 13
       } {
         Submenu {} {
           label {&Yoshimi}
@@ -381,7 +381,7 @@ mainCreateNewInstance(forceId);}
         }
         Submenu Parameters {
           label {&Patch Sets}
-          xywh {0 0 70 21} labelsize 12
+          xywh {0 0 70 20} labelsize 12
           code0 {o = o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(2);}
           code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
@@ -437,7 +437,7 @@ paramsui->Show(2);}
         }
         Submenu Scales {
           label {&Scales}
-          tooltip {Clear all parameters to default settings} xywh {0 0 65 21} labelsize 12
+          tooltip {Clear all parameters to default settings} xywh {0 0 65 20} labelsize 12
           code0 {o = o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(3);}
           code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
@@ -508,7 +508,7 @@ paramsui->Show(3);}
         }
         Submenu {} {
           label {S&tate}
-          xywh {0 0 65 21} labelsize 12
+          xywh {0 0 65 20} labelsize 12
           code0 {o = o; // suppress warning}
           code1 {vector <string> listType = *synth->getHistory(4);}
           code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
@@ -556,13 +556,13 @@ paramsui->Show(4);}
       }
       Fl_Group MasterControls {
         label {Master  }
-        xywh {3 24 380 91} box PLASTIC_DOWN_FRAME labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
+        xywh {3 24 380 91} labeltype NO_LABEL labelsize 11 labelcolor 96 align 22
       } {
         Fl_Dial globalfinedetune {
           label Detune
           callback {//
     send_data(32, o->value(), 0xc8);}
-          tooltip {global fine detune} xywh {281 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
+          tooltip {Global Fine Detune} xywh {286 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1 value 64
           code0 {o->setValueType(VC_GlobalFineDetune);}
           code1 {o->value(synth->microtonal.Pglobalfinedetune);}
           code2 {o->init(64);}
@@ -575,46 +575,46 @@ paramsui->Show(4);}
     {
         send_data(96, o->value(), 0xc0);
     }}
-          tooltip {Clear all dynamic settings} xywh {15 60 75 20} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Clear all dynamic settings} xywh {7 59 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
           callback {//
               send_data(128, o->value(), 0xc0);}
-          tooltip {Cease all sound immediately!} xywh {15 32 75 20} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {7 29 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
           callback {send_data(0, o->value(), 0x48);}
-          tooltip {Master Volume} xywh {331 31 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
+          tooltip {Master Volume} xywh {335 32 40 40} box ROUND_UP_BOX color 29 labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_MasterVolume);}
           code1 {o->value(synth->Pvolume);}
           code2 {o->init(90);}
           class WidgetPDial
         }
         Fl_Button {} {
-          label {Virtual Keybd}
+          label {Virtual Keyboard}
           callback {virkeyboard->Show();}
-          tooltip {Virtual Keyboard} xywh {100 60 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {85 59 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button mixerpanel {
           label {Mixer Panel}
           callback {//
                 updatepanel();
                 panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {100 32 80 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {85 29 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button Reports {
           label Reports
           callback {yoshiLog->Show();}
-          xywh {192 60 75 20} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Message Log} xywh {203 59 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
           code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
         }
         Fl_Button vectors {
           label Vectors
           callback {//
 	vectorui->Show();}
-          tooltip {Vector Setup Window} xywh {192 32 75 20} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Vector Setup Window} xywh {203 29 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
       Fl_Tabs sysinsgroup {
@@ -624,11 +624,11 @@ paramsui->Show(4);}
                 showSysEfxUI();
            else if (o->value() == InsertionEffectsGrp)
                showInsEfxUI();}
-        xywh {3 88 382 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
+        xywh {3 88 379 68} box PLASTIC_UP_BOX color 44 selection_color 221 labeltype NO_LABEL labelsize 12 align 5
       } {
         Fl_Group SystemEffectsGrp {
-          label {System Effects}
-          xywh {4 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
+          label {  System Effects  }
+          xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4 hide
         } {
           Fl_Spinner syseffnocounter {
             label Effect
@@ -637,7 +637,7 @@ paramsui->Show(4);}
               sysefftype->value(synth->sysefx[nsyseff]->geteffect());
               syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
               send_data(0, o->value() - 1, 0xc0, 0xf1);}
-            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
+            xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 0 maximum 4 textfont 1 textsize 11
             code0 {o->range(1, NUM_SYS_EFX);}
             code1 {o->value(nsyseff + 1);}
           }
@@ -650,7 +650,7 @@ paramsui->Show(4);}
               syseffectui->refresh(synth->sysefx[nsyseff], 0xf1, nsyseff);
               showSysEfxUI();
               send_data(1, o->value(), 0xc0, 0xf1);}
-            xywh {120 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
+            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 10 align 16
             code0 {o->value(synth->sysefx[nsyseff]->geteffect());}
           } {
             MenuItem {} {
@@ -693,7 +693,7 @@ paramsui->Show(4);}
           Fl_Button {} {
             label {Send to}
             callback {syseffsendwindow->show();}
-            xywh {256 127 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
+            xywh {256 126 62 20} box THIN_UP_BOX labelfont 1 labelsize 11 labelcolor 97
           }
           Fl_Button {} {
             label C
@@ -710,8 +710,8 @@ paramsui->Show(4);}
           }
         }
         Fl_Group InsertionEffectsGrp {
-          label {Insertion Effects}
-          xywh {4 116 380 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
+          label {  Insertion Effects  }
+          xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4
         } {
           Fl_Spinner inseffnocounter {
             label Effect
@@ -733,7 +733,7 @@ paramsui->Show(4);}
                 inseffectuigroup->deactivate();
               }
               send_data(0, o->value() - 1, 0xc0, 0xf2);}
-            xywh {40 127 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
+            xywh {40 126 36 20} labeltype NO_LABEL labelsize 11 align 20 maximum 8 textfont 1 textsize 11
             code0 {o->range(1, NUM_INS_EFX);}
             code1 {o->value(ninseff + 1);}
           }
@@ -746,7 +746,7 @@ paramsui->Show(4);}
               inseffectui->refresh(synth->insefx[ninseff], 0xf2, ninseff);
               showInsEfxUI();
               send_data(1, o->value(), 0xc0, 0xf2);}
-            xywh {120 127 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
+            xywh {120 126 96 20} down_box BORDER_BOX labeltype NO_LABEL labelsize 11 align 0 textsize 12
             code0 {o->value(synth->insefx[ninseff]->geteffect());}
             code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           } {
@@ -805,7 +805,7 @@ paramsui->Show(4);}
               }
               synth->insefx[ninseff]->cleanup();
               send_data(2, o->value() - 2, 0xc0, 0xf2);}
-            xywh {242 127 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
+            xywh {242 126 96 20} down_box BORDER_BOX labelfont 1 labelsize 10 textfont 1 textsize 11
             code0 {setinspartlist();}
             code3 {o->value(synth->Pinsparts[ninseff]+2);}
           } {}
@@ -839,28 +839,28 @@ paramsui->Show(4);}
         code0 {o->hide();}
       } {
         Fl_Group inseffectui {open
-          xywh {3 158 380 95} color 52
+          xywh {3 158 379 95} color 52
           code0 {o->init(synth->insefx[ninseff], 0xf2, ninseff);o->hide();}
           code1 {if (synth->Pinsparts[ninseff]== -1) o->deactivate();}
           class EffUI
         } {}
       }
       Fl_Group partuigroup {
-        xywh {3 255 380 170} box ENGRAVED_FRAME
+        xywh {3 255 379 170} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {
-          xywh {3 255 376 166} color 47
+        Fl_Group partui {open
+          xywh {3 255 379 170} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}
           class PartUI
         } {}
       }
       Fl_Group {} {
-        xywh {3 427 380 36} box DOWN_BOX color 43 labelsize 12
+        xywh {3 427 379 36} box DOWN_BOX color 43 labelsize 12
       } {
         Fl_Box vumeter {
           label {VU-Meter}
-          xywh {5 429 377 34} color 48 selection_color 75
+          xywh {3 429 379 34} color 48 selection_color 75
           code0 {o->init(-1, synth);}
           class VUMeter
         }
@@ -869,7 +869,7 @@ paramsui->Show(4);}
         label {Key Shift}
         callback {//
     send_data(35, o->value(), 0xc0);}
-        tooltip {Shift pitch +/- N semitones} xywh {332 87 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
+        tooltip {Shift pitch +/- N semitones} xywh {336 88 38 20} labelsize 10 minimum -36 maximum 36 textsize 10
         code0 {o->range(MIN_KEY_SHIFT, MAX_KEY_SHIFT);o->step(1.0);}
         code1 {o->value(synth->Pkeyshift - 64);}
       }
@@ -880,7 +880,7 @@ paramsui->Show(4);}
     synth->getRuntime().currentPart = nval;
     partNew(nval);
     send_data(14, nval, 0xc0);}
-        xywh {38 265 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
+        xywh {36 264 40 20} labelsize 11 when 6 minimum 0 maximum 127 textsize 11
         code0 {o->range(1.0, partmax);}
         code1 {o->value(synth->getRuntime().currentPart + 1);}
         code2 {bankui->init(o);}
@@ -902,7 +902,7 @@ paramsui->Show(4);}
     updatepanel();
     setinspartlist();
     send_data(15, tmp, 0xc0);}
-        xywh {95 265 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
+        tooltip {Set the number of available parts} xywh {93 264 40 20} labelsize 11 minimum 16 maximum 64 step 16 value 16 textsize 11
         code0 {o->value(partmax);}
       }
     }
@@ -2025,17 +2025,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     if (!ok)
         return false;
 
-    ok = (fgets(word, 30, windows) != NULL);
+    ok = (fgets(word, 20, windows) != NULL);
     if (ok)
     	ok = strstr(word, name.c_str());
     if (true)
     {
         ok = false;
-        if (fgets(word, 30, windows) != NULL)
+        if (fgets(word, 20, windows) != NULL)
     	    X = atoi(word);
-        if (fgets(word, 30, windows) != NULL)
+        if (fgets(word, 20, windows) != NULL)
     	    Y = atoi(word);
-    	if (fgets(word, 30, windows) != NULL)
+    	if (fgets(word, 20, windows) != NULL)
     	{
     	    O = atoi(word);
     	    ok = true;
