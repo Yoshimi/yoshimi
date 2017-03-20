@@ -59,7 +59,7 @@ static char prog_doc[] =
     "Copyright 2002-2009 Nasca Octavian Paul and others, "
     "Copyright 2009-2011 Alan Calvert, "
     "Copyright 20012-2013 Jeremy Jongepier and others, "
-    "Copyright 20014-2016 Will Godfrey and others";
+    "Copyright 20014-2017 Will Godfrey and others";
 string argline = "Yoshimi " + (string) YOSHIMI_VERSION + "\nBuild Number " + to_string(BUILD_NUMBER);
 const char* argp_program_version = argline.c_str();
 
@@ -247,7 +247,7 @@ bool Config::Setup(int argc, char **argv)
             no_state0: Log("Invalid state file specified for restore " + StateFile, 2);
             return true;
         }
-        Log(StateFile);;
+        Log(StateFile);
         restoreSessionData(StateFile, true);
         /* There is a single state file that contains both startup config
          * data that must be set early, and runtime data that must be set
@@ -712,6 +712,7 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
 {
     XMLwrapper *xml = NULL;
     bool ok = false;
+
     if (sessionfile.size() && !isRegFile(sessionfile))
         sessionfile = setExtension(sessionfile, "state");
     if (!sessionfile.size() || !isRegFile(sessionfile))
@@ -743,7 +744,10 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
             }
             ok = synth->getfromXML(xml);
             if (ok)
+            {
+                synth->setAllPartMaps();
                 synth->getRuntime().stateChanged = true;
+            }
         }
     }
 

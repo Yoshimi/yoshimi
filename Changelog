@@ -1,5 +1,9 @@
 yoshimi 1.5.1 rc1
 
+2017-3-20 Will
+*Bugfix: setExtension got one case wrong.
+*Bugfix: State load wasn't setting partmaps.
+
 2017-3-19 Will
 * Bugfix: Rotary controls were making pairs of calls.
 * Installed new splash screen and updated notices.
