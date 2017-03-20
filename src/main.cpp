@@ -97,8 +97,6 @@ void splashTimeout(void *splashWin)
 
 static void *mainGuiThread(void *arg)
 {
-    Fl::lock();
-
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
@@ -334,6 +332,9 @@ int main(int argc, char *argv[])
     pthread_t thr;
     pthread_attr_t attr;
     sem_t semGui;
+
+    // moved from mainGuiThread() to prevent leaking from early GuiThreadMessage
+    Fl::lock();
 
     if (!mainCreateNewInstance(0))
     {
