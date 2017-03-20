@@ -1,5 +1,9 @@
 yoshimi 1.5.1 rc2
 
+2017-3-21 Jesper
+* SubSynth ui: persistent margins for the harm. sliders + non-clipped labels
+  Adjusted some misaligned/off-center widgets and added forceH tooltip
+
 2017-3-20 Will
 * Bugfix: setExtension got one case wrong.
 * Bugfix: State load wasn't setting partmaps.
