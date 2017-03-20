@@ -274,7 +274,7 @@ class MasterUI {: {private MiscFuncs}
     {
         synth->guiClosed(true);
     }}
-      xywh {155 412 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
+      xywh {1343 539 385 465} type Double labelfont 13 labelsize 12 hide xclass Yoshimi
     } {
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
@@ -575,13 +575,13 @@ paramsui->Show(4);}
     {
         send_data(96, o->value(), 0xc0);
     }}
-          tooltip {Clear all dynamic settings} xywh {7 59 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
+          tooltip {Clear all dynamic settings} xywh {7 60 70 24} box PLASTIC_UP_BOX color 228 selection_color 32 labelfont 1 labelsize 11 align 16
         }
         Fl_Button {} {
           label {Stop!}
           callback {//
               send_data(128, o->value(), 0xc0);}
-          tooltip {Cease all sound immediately!} xywh {7 29 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
+          tooltip {Cease all sound immediately!} xywh {7 30 70 24} box PLASTIC_UP_BOX color 88 selection_color 0 labelfont 1 labelsize 11 align 16
         }
         Fl_Dial mastervolumedial {
           label Volume
@@ -595,26 +595,26 @@ paramsui->Show(4);}
         Fl_Button {} {
           label {Virtual Keyboard}
           callback {virkeyboard->Show();}
-          tooltip {Virtual Keyboard} xywh {85 59 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Virtual Keyboard} xywh {85 60 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button mixerpanel {
           label {Mixer Panel}
           callback {//
                 updatepanel();
                 panelwindow->show();}
-          tooltip {Mixer Panel Window} xywh {85 29 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Mixer Panel Window} xywh {85 30 110 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
         Fl_Button Reports {
           label Reports
           callback {yoshiLog->Show();}
-          tooltip {Message Log} xywh {203 59 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
+          tooltip {Message Log} xywh {203 60 70 24} box PLASTIC_UP_BOX color 228 labelsize 11
           code0 {if (synth->getRuntime().toConsole == false)Reports->deactivate();}
         }
         Fl_Button vectors {
           label Vectors
           callback {//
 	vectorui->Show();}
-          tooltip {Vector Setup Window} xywh {203 29 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
+          tooltip {Vector Setup Window} xywh {203 30 70 24} box PLASTIC_UP_BOX color 228 labelsize 11 labelcolor 32
         }
       }
       Fl_Tabs sysinsgroup {
@@ -628,7 +628,7 @@ paramsui->Show(4);}
       } {
         Fl_Group SystemEffectsGrp {
           label {  System Effects  }
-          xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4 hide
+          xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 align 4
         } {
           Fl_Spinner syseffnocounter {
             label Effect
@@ -711,7 +711,7 @@ paramsui->Show(4);}
         }
         Fl_Group InsertionEffectsGrp {
           label {  Insertion Effects  }
-          xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4
+          xywh {3 116 379 40} color 221 selection_color 31 labelfont 1 labelsize 12 labelcolor 33 align 4 hide
         } {
           Fl_Spinner inseffnocounter {
             label Effect

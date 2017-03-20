@@ -1,5 +1,10 @@
 yoshimi 1.5.1 rc1
 
+2017-3-20
+* Reverted min/max button style and relative positions
+* Reverted mistakes: wrong tab selected, perceptual spinner size
+  and moved button grid one pixel down to huge effect.
+
 2017-3-19 Jesper
 * Bugfix: stored window positions were read with wrong buffer size
 * Visual: menu bar positioned left of window + overlap by frame beneath
