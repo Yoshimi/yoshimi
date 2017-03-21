@@ -41,7 +41,7 @@ class DynTooltip : private Fl_Menu_Window {
 
  public:
   DynTooltip();
-
+  ~DynTooltip();
   void setValue(float);
   void setValueType(ValueType vt);
   void setGraphicsType(ValueType gv_);
@@ -49,10 +49,12 @@ class DynTooltip : private Fl_Menu_Window {
   void setOnlyValue(bool onlyval);
 
   void hide();
-  void show();
+  void show(float timeout=0);
 
   void setOffset(int x, int y);
   void draw();
+
+  void tipHandle(int event);
 
  private:
   void reposition();
@@ -74,32 +76,8 @@ class DynTooltip : private Fl_Menu_Window {
 
   /* relative tooltip position */
   int xoffs, yoffs;
+
+  //  static bool _recent;
 };
-
-/*
-  Interface to allow for shared behaviour when handling
-  events of dynamic tooltips.
-*/
-class DynTipped {
- public:
-
-  /* Set whether tooltip is visible or not */
-  virtual void tipShow(bool) = 0;
-
-  /* Set whether or not to show only value, or description + value */
-  virtual void tipOnlyValue(bool) = 0;
-
-  /* Set ValueType used to format the value */
-  virtual void setValueType(ValueType vt) = 0;
-
-  /* Set the type for supplementary graphics, when applicable */
-  virtual void setGraphicsType(ValueType vt) = 0;
-};
-
-
-/*
-  Standard behaviour for showing/hiding/switching dynamic tooltips
-*/
-void stdDynTipHandle(DynTipped*,int event);
 
 #endif
