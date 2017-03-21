@@ -1,4 +1,24 @@
-yoshimi 1.5.1 rc1
+yoshimi 1.5.1 rc2
+
+2017-3-20 Will
+* Bugfix: setExtension got one case wrong.
+* Bugfix: State load wasn't setting partmaps.
+* Small adjstment to Insertion Effects tab.
+* Set master as 1.5.1 rc2
+
+2017-3-20 Jesper
+* Reverted min/max button style and relative positions
+* Reverted mistakes: wrong tab selected, perceptual spinner size
+  and moved button grid one pixel down to huge effect.
+
+2017-3-19 Jesper
+* Bugfix: stored window positions were read with wrong buffer size
+* Visual: menu bar positioned left of window + overlap by frame beneath
+* Even alignment and distribution of widgets in MasterUI & PartUI
+  Exact centering required resizing effects windows by 1 pixel
+* Tooltip fixes in MasterUI and PartUI
+  one inconsistent description and some inconsistent capitalisation.
+* Renamed m-R-M to Set-R-Set and placed the buttons next to their spinners
 
 2017-3-19 Will
 * Bugfix: Rotary controls were making pairs of calls.

@@ -303,26 +303,28 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
     {
         if (Runtime.paramsLoad.size())
         {
-            if (loadXML(Runtime.paramsLoad))
+            string file = setExtension(Runtime.paramsLoad, "xmz");
+            if (loadXML(file))
             {
                 applyparameters();
-                addHistory(Runtime.paramsLoad, 2);
-                Runtime.Log("Loaded " + Runtime.paramsLoad + " parameters");
+                addHistory(file, 2);
+                Runtime.Log("Loaded " + file + " parameters");
             }
             else
             {
-                Runtime.Log("Failed to load parameters " + Runtime.paramsLoad);
+                Runtime.Log("Failed to load parameters " + file);
                 Runtime.paramsLoad = "";
             }
         }
         else if (Runtime.instrumentLoad.size())
         {
+            string feli = setExtension(Runtime.instrumentLoad, "xiz");
             int loadtopart = 0;
-            if (part[loadtopart]->loadXMLinstrument(Runtime.instrumentLoad))
-                Runtime.Log("Instrument file " + Runtime.instrumentLoad + " loaded");
+            if (part[loadtopart]->loadXMLinstrument(feli))
+                Runtime.Log("Instrument file " + feli + " loaded");
             else
             {
-                Runtime.Log("Failed to load instrument file " + Runtime.instrumentLoad);
+                Runtime.Log("Failed to load instrument file " + feli);
                 Runtime.instrumentLoad = "";
             }
         }

@@ -266,7 +266,7 @@ string MiscFuncs::setExtension(string fname, string ext)
 
     string tmp;                         // return value
     size_t ext_pos = fname.rfind('.');  // period, if any
-    size_t slash_pos = fname.find('/'); // UNIX path-separator
+    size_t slash_pos = fname.rfind('/'); // UNIX path-separator
     if (slash_pos == string::npos)
     {
         // There are no slashes in the string, therefore the last period, if

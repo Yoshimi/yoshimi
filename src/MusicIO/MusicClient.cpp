@@ -21,6 +21,7 @@
 #include "Misc/SynthEngine.h"
 #include "MusicIO/AlsaEngine.h"
 #include "MusicIO/JackEngine.h"
+#include <iostream>
 #include <stdlib.h>
 #include <set>
 
