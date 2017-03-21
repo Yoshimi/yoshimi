@@ -307,7 +307,7 @@ return(1);} {}
   }
 }
 
-class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -754,7 +754,7 @@ send_data(group, 24, o->value(), 0xc0);}
   }
   Function {make_ASRbw_window()} {} {
     Fl_Window envASRbw {
-      xywh {1186 399 210 70} type Double hide
+      xywh {1209 649 210 70} type Double hide
       class Fl_Group
     } {
       Fl_Group {} {
@@ -766,7 +766,7 @@ send_data(group, 24, o->value(), 0xc0);}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
 send_data(group, 0, o->value(), 0xc8);}
-          tooltip {Bandwidth multiplier, start} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, start} xywh {8 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->init(100);}
           code2 {o->setValueType(VC_EnvelopeBandwidthVal);}
@@ -777,7 +777,7 @@ send_data(group, 0, o->value(), 0xc8);}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
 send_data(group, 1, o->value(), 0xc8);}
-          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Attack time} xywh {43 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           code2 {o->init(70);}
@@ -788,7 +788,7 @@ send_data(group, 1, o->value(), 0xc8);}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
 send_data(group, 6, o->value(), 0xc8);}
-          tooltip {Bandwidth multiplier, release} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, release} xywh {113 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->init(64);}
           code2 {o->setValueType(VC_EnvelopeBandwidthVal);}
@@ -799,7 +799,7 @@ send_data(group, 6, o->value(), 0xc8);}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
 send_data(group, 5, o->value(), 0xc8);}
-          tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release time} xywh {78 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           code2 {o->init(60);}
@@ -809,7 +809,7 @@ send_data(group, 5, o->value(), 0xc8);}
           label Stretch
           callback {env->Penvstretch=(int)o->value();
 send_data(group, 7, o->value(), 0xc8);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {148 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
           code2 {o->setValueType(VC_EnvStretch);}
@@ -819,7 +819,7 @@ send_data(group, 7, o->value(), 0xc8);}
           label frcR
           callback {env->Pforcedrelease=(int)o->value();
 send_data(group, 16, o->value(), 0xc0);}
-          tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Button {} {
