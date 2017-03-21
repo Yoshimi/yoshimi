@@ -46,19 +46,6 @@ mwheel_val_slider::~mwheel_val_slider()
 
 /* Support for the dynamic tooltip interface */
 
-void mwheel_val_slider::tipShow(bool show)
-{
-    if(show)
-        dyntip->show();
-    else
-        dyntip->hide();
-}
-
-void mwheel_val_slider::tipOnlyValue(bool ov)
-{
-    dyntip->setOnlyValue(ov);
-}
-
 void mwheel_val_slider::setValueType(ValueType vt)
 {
     dyntip->setValueType(vt);
@@ -148,7 +135,7 @@ int mwheel_val_slider::_handle(int res, int event)
     if(customTip)
     {
         dyntip->setValue(value());
-        stdDynTipHandle(this, event);
+        dyntip->tipHandle(event);
     }
 
     return res;

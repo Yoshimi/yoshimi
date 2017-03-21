@@ -38,15 +38,13 @@
   Dial widget with custom drawing and input handling.
   Supports dynamic tooltips and adjustable default values.
 */
-class WidgetPDial : public Fl_Dial, public DynTipped {
+class WidgetPDial : public Fl_Dial {
  public:
   WidgetPDial(int x,int y, int w, int h, const char *label=0);
   ~WidgetPDial();
 
   void init(float home_ = -1); /*Set optional default value */
 
-  void tipShow(bool);
-  void tipOnlyValue(bool);
   void setValueType(ValueType type_);
   void setGraphicsType(ValueType type_);
 

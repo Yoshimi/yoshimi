@@ -52,19 +52,6 @@ void WidgetPDial::init(float home_ )
     home = home_;
 }
 
-void WidgetPDial::tipShow(bool show)
-{
-    if(show)
-        dyntip->show();
-    else
-        dyntip->hide();
-}
-
-void WidgetPDial::tipOnlyValue(bool ov)
-{
-    dyntip->setOnlyValue(ov);
-}
-
 void WidgetPDial::setValueType(ValueType type_)
 {
     dyntip->setValueType(type_);
@@ -174,7 +161,7 @@ int WidgetPDial::handle(int event)
     }
 
     dyntip->setValue(value());
-    stdDynTipHandle(this, event);
+    dyntip->tipHandle(event);
     return res;
 }
 

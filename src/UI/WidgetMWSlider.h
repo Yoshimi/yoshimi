@@ -28,7 +28,7 @@
 #include <FL/Fl_Value_Slider.H>
 #include "UI/DynamicTooltip.h"
 
-class mwheel_val_slider : public Fl_Value_Slider, public DynTipped {
+class mwheel_val_slider : public Fl_Value_Slider {
  public:
   mwheel_val_slider(int x, int y, int w, int h, const char *l=0) ;
   ~mwheel_val_slider();
@@ -36,8 +36,6 @@ class mwheel_val_slider : public Fl_Value_Slider, public DynTipped {
   void useCustomTip(bool);
 
   /* DynTipped methods */
-  void tipShow(bool);
-  void tipOnlyValue(bool);
   void setValueType(ValueType vt);
   void setGraphicsType(ValueType vt);
 
