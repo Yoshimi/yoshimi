@@ -36,6 +36,21 @@
 
 #define MAX_TEXT_WIDTH 280
 
+
+// Whether or not a dynamic tooltip was shown recently
+static bool _recent;
+
+/* Delayed display of tooltip - callbackk*/
+static void delayedShow(void* dyntip){
+    if(DynTooltip* tip = (DynTooltip*) dyntip)
+       tip->show(0);
+}
+
+static void resetRecent(void*){
+    _recent = false;
+}
+
+
 DynTooltip::DynTooltip():Fl_Menu_Window(1,1)
 {
 
@@ -58,6 +73,11 @@ DynTooltip::DynTooltip():Fl_Menu_Window(1,1)
     hide();
 }
 
+DynTooltip::~DynTooltip(){
+    Fl::remove_timeout(delayedShow);
+    Fl::remove_timeout(resetRecent);
+}
+
 /*
    Overrides standard hide/show from Fl_Widget
    to update flags and set tooltip position
@@ -68,11 +88,17 @@ void DynTooltip::hide()
     Fl_Menu_Window::hide();
 }
 
-void DynTooltip::show()
+void DynTooltip::show(float timeout)
 {
-    reposition();
-    update();
-    Fl_Menu_Window::show();
+    if(timeout <= 0){
+        Fl::remove_timeout(delayedShow, this);
+        _recent = true;
+        reposition();
+        update();
+        Fl_Menu_Window::show();
+    } else {
+        Fl::add_timeout(timeout, delayedShow, this);
+    }
 }
 
 /*
@@ -205,6 +231,7 @@ void DynTooltip::update()
     redraw();
 }
 
+
 /*
   Use static style parameters for regular tooltips to draw the custom ones
 */
@@ -240,27 +267,31 @@ void DynTooltip::draw()
 }
 
 /*
-  Handle tooltip behaviour and functionality for default values.
+  Standard tooltip behaviour
 */
-void stdDynTipHandle(DynTipped *ct, int event)
+void DynTooltip::tipHandle(int event)
 {
-
     switch(event)
     {
     case FL_ENTER:
-        ct->tipOnlyValue(false);
-        ct->tipShow(true);
+        Fl::remove_timeout(resetRecent);
+        setOnlyValue(false);
+        show(_recent ? Fl_Tooltip::hoverdelay() : Fl_Tooltip::delay());
         break;
     case FL_PUSH:
     case FL_DRAG:
     case FL_MOUSEWHEEL:
-        ct->tipOnlyValue(true);
-        ct->tipShow(true);
+        Fl::remove_timeout(delayedShow);
+        Fl::remove_timeout(resetRecent);
+        setOnlyValue(true);
+        show(0);
         break;
     case FL_LEAVE:
     case FL_RELEASE:
     case FL_HIDE:
-        ct->tipShow(false);
+        Fl::remove_timeout(delayedShow);
+        Fl::add_timeout(Fl_Tooltip::hoverdelay(),resetRecent);
+        hide();
         break;
     }
 }
