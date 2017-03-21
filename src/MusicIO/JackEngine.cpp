@@ -231,11 +231,9 @@ void JackEngine::registerAudioPort(int partnum)
         /* This has a hack to stop all enabled parts from resistering
          * individual ports (at startup) if part is not configured for
          * direct O/P.
-         * Also, at startup there seems to be no way to enable main L/R
-         * without also enabling part 0 direct :(
          */
         string portName;
-        if(synth->part [partnum] && synth->partonoffRead(partnum) && (synth->part [partnum]->Paudiodest > 1 || partnum == 0))
+        if(synth->part [partnum] && synth->partonoffRead(partnum) && (synth->part [partnum]->Paudiodest > 1))
         {
             portName = "track_" + asString(partnum + 1) + "_l";
             audio.ports[portnum] = jack_port_register(jackClient, portName.c_str(), JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
@@ -360,8 +358,10 @@ int JackEngine::processCallback(jack_nframes_t nframes)
     bool okmidi = true;
 
     if (midi.port)
+        // input exists, using jack midi
         okmidi = processMidi(nframes);
-    if (audio.ports[0] && audio.ports[1])
+    if (audio.ports[NUM_MIDI_PARTS * 2] && audio.ports[NUM_MIDI_PARTS * 2 + 1])
+        // (at least) main outputs exist, using jack audio
         okaudio = processAudio(nframes);
     return (okaudio && okmidi) ? 0 : -1;
 }
