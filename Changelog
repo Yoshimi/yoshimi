@@ -1,4 +1,10 @@
-yoshimi 1.5.1 rc2
+yoshimi 1.5.1 rc3
+
+2017-3-21 Will
+* Added correction for startup part connection status from Rob.
+* Set master as 1.5.1 rc3
+* Readjusted main menubar.
+* Removed '03' from Neon ccmake options.
 
 2017-3-21 Jesper
 * SubSynth ui: persistent margins for the harm. sliders + non-clipped labels
