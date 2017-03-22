@@ -542,15 +542,15 @@ void JackEngine::latencyCallback(jack_latency_callback_mode_t mode)
 {
     if (mode == JackCaptureLatency)
     {
-        if (audio.ports[2 * NUM_MIDI_PARTS] && audio.ports[2 * NUM_MIDI_PARTS + 1])
+        for (int i = 0; i < 2 * NUM_MIDI_PARTS + 2; ++i)
         {
-            jack_latency_range_t range[2];
-            for (int i = 0; i < 2; ++i)
+            jack_latency_range_t range;
+            if (audio.ports[i])
             {
-                jack_port_get_latency_range(audio.ports[2 * NUM_MIDI_PARTS + i], mode, &range[i]);
-                range[i].min++;
-                range[i].max += audio.jackNframes;
-                jack_port_set_latency_range(audio.ports[2 * NUM_MIDI_PARTS + i], JackPlaybackLatency, &range[i]);
+                jack_port_get_latency_range(audio.ports[i], mode, &range);
+                range.min++;
+                range.max += audio.jackNframes;
+                jack_port_set_latency_range(audio.ports[i], JackPlaybackLatency, &range);
             }
         }
     }
