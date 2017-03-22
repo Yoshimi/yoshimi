@@ -74,6 +74,7 @@ endif (HasJackSession)
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
+option (BuildForThisCPU "Build for presently running system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
 option (EnableGuiReports "Enable GUI control reports" OFF)
@@ -98,6 +99,11 @@ set (BuildOptions_X86_64Core2
 set (BuildOptions_NEON
 "-march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
   CACHE STRING "Cortex_a9 compiler options"
+)
+
+set (BuildOptionsThisCPU
+    "-O3 -march=native -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+  CACHE STRING "Current CPU compiler options"
 )
 
 set (BuildOptionsBasic
@@ -267,6 +273,11 @@ else (BuildForDebug)
                 set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
             else (BuildForNEON)
                 set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+                if (BuildForThisCPU)
+                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_ThisCPU})
+                else (BuildForThicCPU)
+                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+                endif (BuildForThisCPU)
             endif (BuildForNEON)
         endif (BuildForCore2_X86_64)
     endif (BuildForAMD_X86_64)
