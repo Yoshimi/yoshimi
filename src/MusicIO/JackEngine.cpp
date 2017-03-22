@@ -493,13 +493,13 @@ bool JackEngine::latencyPrep(void)
 
 #else // < 0.120.1 API
 
-    if (jack_port_set_latency && audio.ports[2 * NUM_MIDI_PARTS] && audio.ports[2 * NUM_MIDI_PARTS + 1])
+    for (int i = 0; i < 2 * NUM_MIDI_PARTS + 2; ++i)
     {
-        jack_port_set_latency(audio.ports[2 * NUM_MIDI_PARTS], jack_get_buffer_size(jackClient));
-        jack_port_set_latency(audio.ports[2 * NUM_MIDI_PARTS + 1], jack_get_buffer_size(jackClient));
-        if (jack_recompute_total_latencies)
-            jack_recompute_total_latencies(jackClient);
+        if (jack_port_set_latency && audio.ports[i])
+            jack_port_set_latency(audio.ports[i], jack_get_buffer_size(jackClient));
     }
+    if (jack_recompute_total_latencies)
+        jack_recompute_total_latencies(jackClient);
     return true;
 
 #endif
