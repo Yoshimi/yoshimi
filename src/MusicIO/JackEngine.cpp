@@ -493,13 +493,13 @@ bool JackEngine::latencyPrep(void)
 
 #else // < 0.120.1 API
 
-    if (jack_port_set_latency && audio.ports[0] && audio.ports[1])
+    for (int i = 0; i < 2 * NUM_MIDI_PARTS + 2; ++i)
     {
-        jack_port_set_latency(audio.ports[0], jack_get_buffer_size(jackClient));
-        jack_port_set_latency(audio.ports[1], jack_get_buffer_size(jackClient));
-        if (jack_recompute_total_latencies)
-            jack_recompute_total_latencies(jackClient);
+        if (jack_port_set_latency && audio.ports[i])
+            jack_port_set_latency(audio.ports[i], jack_get_buffer_size(jackClient));
     }
+    if (jack_recompute_total_latencies)
+        jack_recompute_total_latencies(jackClient);
     return true;
 
 #endif
@@ -542,15 +542,15 @@ void JackEngine::latencyCallback(jack_latency_callback_mode_t mode)
 {
     if (mode == JackCaptureLatency)
     {
-        if (audio.ports[0] && audio.ports[1])
+        for (int i = 0; i < 2 * NUM_MIDI_PARTS + 2; ++i)
         {
-            jack_latency_range_t range[2];
-            for (int i = 0; i < 2; ++i)
+            jack_latency_range_t range;
+            if (audio.ports[i])
             {
-                jack_port_get_latency_range(audio.ports[i], mode, &range[i]);
-                range[i].min++;
-                range[i].max += audio.jackNframes;
-                jack_port_set_latency_range(audio.ports[i], JackPlaybackLatency, &range[i]);
+                jack_port_get_latency_range(audio.ports[i], mode, &range);
+                range.min++;
+                range.max += audio.jackNframes;
+                jack_port_set_latency_range(audio.ports[i], JackPlaybackLatency, &range);
             }
         }
     }
