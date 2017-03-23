@@ -41,8 +41,6 @@ RPNs (channel based)
 100,1 Fine detune
 100,2 Coarse detune
 
-Maybe a NRPN variation of this for global fine tuning.
-
 Improve Copy & Paste functionality.
 
 Documentation!

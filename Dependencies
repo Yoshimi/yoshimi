@@ -21,7 +21,7 @@ Some of these will pull in other ones.
     libxml2-dev
     pkg-config
     xutils-dev
-    zlib1g.dev
+    zlib1g-dev
 
 LV2 plugin adds one more dependency:
     lv2-dev with minimum version >= 1.0.0.

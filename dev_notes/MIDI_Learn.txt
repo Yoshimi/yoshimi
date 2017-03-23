@@ -66,7 +66,7 @@ These move a line, so a complete redraw is inititalsed.
 
 20  send list size
 21  send ID of learn type message
-22  open MIDI-learn wediting window
+22  open MIDI-learn editing window
 
 24 incoming activity
 

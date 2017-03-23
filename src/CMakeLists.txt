@@ -32,7 +32,7 @@ add_definitions(-Werror=format-security)
 
 # ^^^ comment these two out on release pushes ^^^
 
-set (YOSHIMI_VERSION "1.5.1 rc3")
+set (YOSHIMI_VERSION "1.5.1 rc4")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -96,7 +96,7 @@ set (BuildOptions_X86_64Core2
 )
 
 set (BuildOptions_NEON
-"-march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
+"-03 -march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
   CACHE STRING "Cortex_a9 compiler options"
 )
 
