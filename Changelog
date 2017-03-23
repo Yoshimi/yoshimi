@@ -8,6 +8,8 @@ yoshimi 1.5.1 rc4
 * Re-instated '03' Neon ccmake option.
 * Doc updates - again!
 * Set master as 1.5.1 rc4
+* It's ohh three not zero three !!!
+  Now done right.
 
 2017-3-22 Jesper
 * Master window: Added subclassed Fl_Menu_Bar which only draws the bottom border.
