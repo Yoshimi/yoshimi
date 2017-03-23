@@ -11,7 +11,7 @@ comment {MasterUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2017, Will Godfrey
+Copyright 2014-2017, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -280,10 +280,11 @@ class MasterUI {selected : {private MiscFuncs}
         xywh {279 28 103 85} box ENGRAVED_FRAME
       }
       Fl_Menu_Bar mastermenu {
-        xywh {-11 0 405 25} labelsize 12 textsize 12
+        xywh {-7 0 395 25} labelsize 12 textsize 12
+        class ClearMenuBar
       } {
         Submenu {} {
-          label { &Yoshimi}
+          label {&Yoshimi}
           xywh {0 0 96 20} labelsize 12
         } {
           MenuItem {} {
@@ -297,7 +298,7 @@ class MasterUI {selected : {private MiscFuncs}
             xywh {0 0 100 20} labelsize 12
           }
           MenuItem newinstanceid {
-            label {New instance with id...}
+            label {New instance with &id...}
             callback {if(synth->getIsLV2Plugin())
 {
 	return;
@@ -334,7 +335,7 @@ mainCreateNewInstance(forceId);}
           xywh {0 0 100 20} labelsize 12
         } {
           MenuItem {} {
-            label {&Show Stored...}
+            label {S&how Stored...}
             callback {bankui->Show();}
             xywh {20 20 100 20} labelsize 12
           }
@@ -387,7 +388,7 @@ mainCreateNewInstance(forceId);}
           code2 {if (listType.size() == 0) RecentParams->deactivate(); else RecentParams->activate();}
         } {
           MenuItem {} {
-            label {&Show Patch Banks...}
+            label {S&how Patch Banks...}
             callback {bankui->bankuiwindow->show();}
             xywh {30 30 100 20} labelsize 12
           }
@@ -443,7 +444,7 @@ paramsui->Show(2);}
           code2 {if (listType.size() == 0) RecentScale->deactivate(); else RecentScale->activate();}
         } {
           MenuItem {} {
-            label {&Show Settings...}
+            label {S&how Settings...}
             callback {microtonalui->Show();}
             xywh {20 20 100 20} labelsize 12
           }
@@ -514,7 +515,7 @@ paramsui->Show(3);}
           code2 {if (listType.size() == 0) RecentState->deactivate(); else RecentState->activate();}
         } {
           MenuItem loadState {
-            label {Load...}
+            label {&Load...}
             callback {// for Alessandro
     char *fle = fl_file_chooser("Load:", "({*.state})", laststatefile.c_str(), 0);
     if (fle)
@@ -532,7 +533,7 @@ paramsui->Show(3);}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
-            label {Save...}
+            label {&Save...}
             callback {// for Alessandro
 
                 char *fle = fl_file_chooser("Save:", "({*.state})",

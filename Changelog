@@ -5,6 +5,12 @@ yoshimi 1.5.1 rc3
 * Added two new instruments to Will_Godfrey_Companion
 * New splash image included in Utils.
 
+2017-3-22 Jesper
+* Master window: Added subclassed Fl_Menu_Bar which only draws the bottom border.
+  Now it is not necessary to use negative coordinates to hide the edges.
+* VUMeter no longer swallows all shortcut/keyboard events.
+* Added missing hotkeys/mnemonics and fixed conflicting ones.
+
 2017-3-21 Will
 * Added correction for startup part connection status from Rob.
 * Set master as 1.5.1 rc3

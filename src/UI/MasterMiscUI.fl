@@ -89,6 +89,12 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "Misc/MiscFuncs.h"} {public local
 }
 
+decl {\#include <FL/Fl_Menu_Bar.H>} {public global
+}
+
+decl {\#include <FL/fl_draw.H>} {private global
+}
+
 decl {\#define MIN_DB -48.0} {public local
 }
 
@@ -317,10 +323,10 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
     {
         case FL_SHOW:
             tick(this);
-            break;
+            return 1;
         case FL_HIDE:
             Fl::remove_timeout(tick, this);
-            break;
+            return 1;
         case FL_PUSH:
             if (npart < 0)
             {
@@ -331,9 +337,9 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
                	if(masterUI)
                     masterUI->resetPartsClip();
             }
-            break;
+            return 1;
     }
-    return 1;} {}
+    return 0;} {}
   }
   decl {int npart;} {private local
   }
@@ -659,5 +665,27 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
   decl {SynthEngine *synth;} {private local
   }
   decl {int *plgroup;} {public local
+  }
+}
+
+class ClearMenuBar {: {public Fl_Menu_Bar}
+} {
+  Function {ClearMenuBar(int x, int y, int w, int h) : Fl_Menu_Bar(x,y,w,h)} {
+    comment {Menu bar drawing only the bottom border}
+  } {
+    code {} {}
+  }
+  Function {draw()} {return_type void
+  } {
+    code {//
+    int m = 10; //margin larger than border in any style
+    fl_push_clip(x(),y(),w(),h());
+    fl_draw_box(box(), x() - m, y() - m, w() + 2 * m, h() + m, color());
+    fl_pop_clip();
+    Fl_Boxtype _box = box();
+    //Draw menu like normal, but without a box
+    box(FL_NO_BOX);
+    Fl_Menu_Bar::draw();
+    box(_box);} {}
   }
 }
