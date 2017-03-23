@@ -1,5 +1,10 @@
 yoshimi 1.5.1 rc3
 
+2017-3-22 Will
+* Doc updates and moves ready for release.
+* Added two new instruments to Will_Godfrey_Companion
+* New splash image included in Utils.
+
 2017-3-21 Will
 * Added correction for startup part connection status from Rob.
 * Set master as 1.5.1 rc3
