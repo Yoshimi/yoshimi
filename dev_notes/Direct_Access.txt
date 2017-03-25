@@ -16,7 +16,7 @@ Top level controls
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes
 Controllers Window
-MIDI CCs window - used for all except incoming real MIDI
+MIDI learn editor window - used for all except incoming real MIDI
 Kit edit window
 AddSynth Editor
 AddSynth Voice Editor
@@ -35,7 +35,7 @@ This matches the results from using the middle mouse button in the GUI (assuming
 
 An alternative way to find out the correct command sequence is to click on a control with any button *except* the middle one. Trailing '255's can be ommitted if there are no following parameters set.
 
-In some situations par2 is used as a miscMSG ID for passing text values between threads but synchronised via the RT thread.
+In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread.
 
 
 The format is:
@@ -67,10 +67,10 @@ parameter = subtype associated with some inserts.
 par2 = an offset for some parameters.
 
 
-A variation of the above is when you set flt_max as the value. This will be interpeted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them as short integers in the form:
+A variation of the above is when you set flt_max as the value. This will be interpreted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them as short integers in the form:
 limits.min
 limits.max
-limits.def
+limits.def (x10)
 
 From the command line enter at least the first three characters of "limits" in place of both value and type.
 
@@ -79,7 +79,7 @@ min = 0
 max = 127
 def = 0
 
-def returns the default * 10. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed command line response will be the actual value. Default values (and the others) may be negative.
+def returns the actual default * 10. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed command line response will be the actual value. Default values (and the others) may be negative.
 
 'data.type' is returned with the read/write bit (0x40) used to tell whether this control is MIDI-learnable, and the float/integer bit (0x80) is correctly identified. All the other bits are returned as sent.
 

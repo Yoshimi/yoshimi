@@ -1,4 +1,21 @@
-yoshimi 1.5.1 rc3
+yoshimi 1.5.1 rc4
+
+2017-3-22 Will
+* Doc updates and moves ready for release.
+* Added two new instruments to Will_Godfrey_Companion
+* New splash image included in Utils.
+* Merged in jack latency fixes from Rob.
+* Re-instated '03' Neon ccmake option.
+* Doc updates - again!
+* Set master as 1.5.1 rc4
+* It's ohh three not zero three !!!
+  Now done right.
+
+2017-3-22 Jesper
+* Master window: Added subclassed Fl_Menu_Bar which only draws the bottom border.
+  Now it is not necessary to use negative coordinates to hide the edges.
+* VUMeter no longer swallows all shortcut/keyboard events.
+* Added missing hotkeys/mnemonics and fixed conflicting ones.
 
 2017-3-21 Will
 * Added correction for startup part connection status from Rob.
