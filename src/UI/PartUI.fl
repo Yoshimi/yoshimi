@@ -417,11 +417,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {1343 539 380 170} type Double box NO_BOX hide
+      xywh {1019 539 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
@@ -583,7 +583,7 @@ send_data(5, tmp, 0xc0);}
       Fl_Check_Button enportamento {
         label Portamento
         callback {//part->ctl->portamento.portamento = o->value();
-send_data(7, o->value(), 0xc0);}
+send_data(7, o->value(), 0xc8);}
         tooltip {Enable/Disable the portamento} xywh {76 59 15 20} down_box DOWN_BOX labelsize 11 align 8
         code0 {o->value(part->ctl->portamento.portamento);}
       }
@@ -863,7 +863,7 @@ send_data(145, o->value(), 0xc0);}
         Fl_Dial prtime {
           label time
           callback {part->ctl->portamento.time = o->value();
-send_data(160, o->value(), 0xc0);}
+send_data(160, o->value(), 0xc8);}
           tooltip {Portamento time} xywh {345 60 25 25} labelsize 10 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.time);}
           code1 {o->init(64);}
@@ -1563,7 +1563,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 7:
-    	    enportamento->value((int) value);
+    	    enportamento->value(value > 0.5f);
     	    break;
 
         case 8:

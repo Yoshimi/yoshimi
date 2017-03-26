@@ -3,6 +3,10 @@ Direct access to envelope not updating Gui graph, but seems to work otherwise.
 
 Sort out direct access dynfilter->filter controls work but don't update gui.
 
+Expand midi-learn to include switches, and the controllers window
+
+Make new instance with ID autoselect the next available, then dispense with the other form.
+
 Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
