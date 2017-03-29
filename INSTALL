@@ -13,7 +13,7 @@ which builds an executable called yoshimi, installed by default in
 
 ---- Sample instructions to compile/build using ccmake on Linux , outside-source-tree -----
 
-This uses "yoshimi-1.4.1" as an example, should work fine with other versions.
+This uses "yoshimi-1.5.1" as an example, should work fine with other versions.
 
 Here is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 
@@ -21,21 +21,21 @@ Extract source code archive:
 
     mkdir /path/to/workDir
     cd    /path/to/workDir
-    tar -jxvf /path/to/yoshimi-1.4.1.tar.bz2
+    tar -jxvf /path/to/yoshimi-1.5.1.tar.bz2
 
 Now there should be a directory:
 
-   /path/to/workDir/yoshimi-1.4.1
+   /path/to/workDir/yoshimi-1.5.1
 
 If this has a build directory inside, move into this directory:
 
-    cd yoshimi-1.4.1/build
+    cd yoshimi-1.5.1/build
 
 Otherwise create it first with:
 
-    mkdir yoshimi-1.4.1/build
+    mkdir yoshimi-1.5.1/build
 
-"/path/to/workDir/yoshimi-1.4.1/" is the source code directory.
+"/path/to/workDir/yoshimi-1.5.1/" is the source code directory.
 "/path/to/workDir/yoshimi/build" is now the current working directory, and will have make-related files (when ccmake is done with configuring and generates the files).
 
 Run ccmake:
@@ -60,6 +60,7 @@ When compilation is completed successfully, install it (as root) with:
 
 Yoshimi will in fact run anywhere in userspace, which can be convenient as an alternative to installing it - especially when comparing different built versions.  In this case banks and presets will remain in the yoshimi directory.
 
+For more fine tuned building see INSTALL_CUSTOM
 
 ---- Build and command line options ----
 

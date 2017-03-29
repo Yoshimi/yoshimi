@@ -87,8 +87,6 @@ MusicClient::MusicClient(SynthEngine *_synth, audio_drivers _audioDrv, midi_driv
     :synth(_synth), timerThreadId(0), timerWorking(false),
     audioDrv(_audioDrv), midiDrv(_midiDrv), audioIO(0), midiIO(0)
 {
-    //synth->getRuntime().Samplerate = NMC_SRATE;
-
     for(int i = 0; i < NUM_MIDI_PARTS + 1; i++)
     {
         buffersL [i] = new float [synth->getRuntime().Buffersize];

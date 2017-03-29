@@ -53,7 +53,6 @@ InterChange::InterChange(SynthEngine *_synth) :
 
 bool InterChange::Init(SynthEngine *_synth)
 {
-    //Part *part;
     flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
@@ -3168,10 +3167,6 @@ void InterChange::commandPart(CommandBlock *getData)
 
 void InterChange::commandAdd(CommandBlock *getData)
 {
-/*#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;*/
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3316,7 +3311,7 @@ void InterChange::commandAdd(CommandBlock *getData)
 
 void InterChange::commandAddVoice(CommandBlock *getData)
 {
-    #pragma message "Gui writes changed to reads"
+#pragma message "Gui writes changed to reads"
     if (getData->data.type & 0x20)
         getData->data.type = getData->data.type & 0xbf;
 
@@ -4587,10 +4582,6 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
 void InterChange::commandLFO(CommandBlock *getData)
 {
-/*#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;*/
-
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;

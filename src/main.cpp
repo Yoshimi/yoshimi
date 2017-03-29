@@ -48,8 +48,6 @@ using namespace std;
 #include <readline/history.h>
 #include <Interface/CmdInterface.h>
 
-//extern void cmdIfaceCommandLoop();
-
 CmdInterface commandInt;
 
 void mainRegisterAudioPort(SynthEngine *s, int portnum);

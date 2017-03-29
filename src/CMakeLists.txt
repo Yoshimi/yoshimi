@@ -68,23 +68,18 @@ else (HasJackSession)
     set (JackSessionSupport OFF)
 endif (HasJackSession)
 
-#set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
-#set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
-
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
 option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
 option (BuildForThisCPU "Build for presently running system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
-option (EnableGuiReports "Enable GUI control reports" OFF)
-
-option (ReportNoteOnTimes "Report Note-On Times" OFF)
-
 #option to build lv2 plugin
-option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
+option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
-set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
+# developer info
+option (ShowGuiReports "Enable GUI control reports" OFF)
+option (ShowNoteOnTimes "Report Note-On Times" OFF)
 
 set (BuildOptions_x86_64AMD
     "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
@@ -433,32 +428,17 @@ add_definitions (-DFF_MAX_SEQUENCE=8)
 add_definitions (-DMAX_PHASER_STAGES=12)
 add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
-if (EnableGuiReports)
+if (ShowGuiReports)
     add_definitions (-DENABLE_REPORTS)
-endif (EnableGuiReports)
+endif (ShowGuiReports)
 
-if (ReportNoteOnTimes)
+if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
-endif (ReportNoteOnTimes)
-#if (${DefaultAudio} STREQUAL "jack")
-#    message(STATUS "Default audio driver is Jack")
-    add_definitions(-DDEFAULT_AUDIO=jack_audio)
-#elseif (${DefaultAudio} STREQUAL "alsa")
-#    message(STATUS "Default audio driver is Alsa")
-#    add_definitions(-DDEFAULT_AUDIO=alsa_audio)
-#else (${DefaultAudio} STREQUAL "alsa")
-#    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
-#endif (${DefaultAudio} STREQUAL "jack")
+endif (ShowNoteOnTimes)
 
-#if (${DefaultMidi} STREQUAL "jack")
-#    message(STATUS "Default midi driver is Jack")
-    add_definitions(-DDEFAULT_MIDI=jack_midi)
-#elseif (${DefaultMidi} STREQUAL "alsa")
-#    message(STATUS "Default midi driver is Alsa")
-#    add_definitions(-DDEFAULT_MIDI=alsa_midi)
-#else (${DefaultMidi} STREQUAL "alsa")
-#    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
-#endif (${DefaultMidi} STREQUAL "jack")
+add_definitions(-DDEFAULT_AUDIO=jack_audio)
+
+add_definitions(-DDEFAULT_MIDI=jack_midi)
 
 if (JackSessionSupport)
     message(STATUS "With jack session support")
@@ -609,7 +589,7 @@ add_custom_target (distclean
 )
 
 
-if (BuildLV2Plugin)
+if (LV2Plugin)
     if (EXISTS $ENV{LV2_PATH})
         set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH
         "Specifies where the LV2 libraries should be installed")
@@ -625,4 +605,4 @@ if (BuildLV2Plugin)
         message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
     endif (LV2_FOUND)
     add_subdirectory(LV2_Plugin)
-endif (BuildLV2Plugin)
+endif (LV2Plugin)

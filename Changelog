@@ -1,5 +1,11 @@
 yoshimi 1.5.1 rc5
 
+2017-3-29 Will
+* Edited ccmake option names for more logical sequence.
+* Created INSTALL_CUSTOM info file.
+* Removed unused, and commented-out code.
+  No fuctional changes.
+
 2017-3-26 Will
 * Corrected anomaly with some float to bool conversions.
   Changed varable in 'interchange' to make this clearer.

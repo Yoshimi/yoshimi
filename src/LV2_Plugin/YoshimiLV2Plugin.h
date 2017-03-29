@@ -65,7 +65,6 @@ private:
    float *_bFreeWheel;
 
    jack_ringbuffer_t *_midiRingBuf;
-   pthread_t _pMidiThread;
    pthread_t _pIdleThread;
 
    float *lv2Left [NUM_MIDI_PARTS + 1];
@@ -73,7 +72,6 @@ private:
 
    void process(uint32_t sample_count);
    void processMidiMessage(const uint8_t *msg);
-   void *midiThread(void);
    void *idleThread(void);
    std::vector <LV2_Program_Descriptor> flatbankprgs;
 public:
@@ -112,7 +110,6 @@ public:
    const LV2_Program_Descriptor * getProgram(uint32_t index);
    void selectProgramNew(unsigned char channel, uint32_t bank, uint32_t program);
 
-   static void *static_midiThread(void *arg);
    static void *static_idleThread(void *arg);
 
    static LV2_State_Status static_StateSave(LV2_Handle instance, LV2_State_Store_Function store, LV2_State_Handle handle, uint32_t flags, const LV2_Feature *const * features);

@@ -2143,7 +2143,6 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 {
                     ch -= 1;
                     point = skipChars(point);
-                    //chan = ch;
                 }
                 else
                     ch = chan;

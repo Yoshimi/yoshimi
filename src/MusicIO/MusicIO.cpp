@@ -27,7 +27,6 @@ using namespace std;
 
 #include "Misc/Config.h"
 #include "Misc/SynthEngine.h"
-//#include "MusicIO/MidiControl.h"
 #include "MusicIO/MusicIO.h"
 
 #include <unistd.h>
