@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified December 2016
+    This file is derivative of ZynAddSubFX original code, modified February 2017
 */
 
 #include <iostream>
@@ -814,19 +814,305 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 void ADnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
-    //int engine = getData->data.engine;
+
+    // defaults
+    int type = 0;
+    int min = 0;
+    int def = 0;
+    int max = 127;
+
+    if (getData->data.engine < 0x80)
+    {
+        switch (control)
+        {
+            case 0:
+                type |= 0x40;
+                def = 900;
+                break;
+
+            case 1:
+                type |= 0x40;
+                def = 640;
+                break;
+
+            case 2:
+                type |= 0x40;
+                def = 640;
+                break;
+
+            case 32:
+                type |= 0x40;
+                min = -8192;
+                max = 8191;
+                break;
+
+            case 35:
+                min = -8;
+                max = 7;
+                break;
+
+            case 36:
+                max = 3;
+                break;
+
+            case 37:
+                min = -64;
+                max = 63;
+                break;
+
+            case 39:
+                type |= 0x40;
+                def = 640;
+                break;
+
+            case 112:
+                def = 100;
+                max = 1;
+                break;
+
+            case 113:
+                max = 1;
+                break;
+
+            case 120:
+                def = FADEIN_ADJUSTMENT_SCALE * 10;
+
+            case 121: // just ensures it doesn't get caught by default
+                break;
+
+            case 122:
+                def = 600;
+                break;
+
+            case 123:
+                def = 640;
+                break;
+
+            case 124:
+                def = 720;
+                break;
+
+            default:
+                min = -1;
+                def = -10;
+                max = -1;
+                break;
+        }
+        getData->data.type |= type;
+        getData->limits.min = min;
+        getData->limits.def = def;
+        getData->limits.max = max;
+        return;
+    }
+
     switch (control)
     {
-        case 32:
-        case 96: // only for advoice modulator
-            getData->limits.min = -8192;
-            getData->limits.max = 8191;
+        case 0:
+            type |= 0x40;
+            def = 1000;
             break;
+
+        case 1:
+            type |= 0x40;
+            def = 1270;
+            break;
+
+        case 2:
+            type |= 0x40;
+            def = 640;
+            break;
+
+        case 4:
+        case 8:
+        case 9:
+        case 88:
+            max = 1;
+            break;
+
+        case 16:
+            max = 4;
+            break;
+
+        case 17:
+            min = -1;
+            def = -10;
+            max = 6;
+            break;
+
+        case 32:
+        case 96:
+            type |= 0x40;
+            min = -8192;
+            max = 8191;
+            break;
+
+        case 33:
+            type |= 0x40;
+            break;
+
+        case 34:
+        case 98:
+            max = 1;
+            break;
+
+        case 35:
+        case 99:
+            min = -8;
+            max = 7;
+            break;
+
+        case 36:
+        case 100:
+            max = 4;
+            break;
+
+        case 37:
+        case 101:
+            min = -64;
+            max = 63;
+            break;
+
+        case 38:
+            type |= 0x40;
+            def = 880;
+            break;
+
+        case 39:
+            type |= 0x40;
+            def = 640;
+            break;
+
+        case 40:
+        case 41:
+        case 104:
+            max = 1;
+            break;
+
+        case 48:
+            type |= 0x40;
+            def = 600;
+            break;
+
+        case 49:
+            type |= 0x40;
+            def = 1270;
+            break;
+
+        case 50:
+            type |= 0x40;
+            def = 640;
+            break;
+
+        case 51:
+            type |= 0x40;
+            def = 640;
+            break;
+
+        case 52:
+            type |= 0x40;
+            def = 640;
+            break;
+
+        case 53:
+            min = 2;
+            def = 20;
+            max = 50;
+            break;
+
+        case 54:
+            max = 5;
+            break;
+
+        case 56:
+            max = 1;
+            break;
+
+        case 64:
+            max = 1;
+            break;
+
+        case 68:
+            max = 1;
+            break;
+
+        case 72:
+            max = 1;
+            break;
+
+        case 73:
+            max = 1;
+            break;
+
+        case 80:
+            type |= 0x40;
+            def = 900;
+            break;
+
+        case 81:
+            type |= 0x40;
+            def = 640;
+            break;
+
         case 82:
         case 112:
         case 136:
-            getData->limits.min = -64;
-            getData->limits.max = 63;
+            type |= 0x40;
+            min = -64;
+            max = 63;
             break;
+
+        case 113:
+            min = -1;
+            def = -10;
+            max = 6;
+            break;
+
+        case 128:
+            type |= 0x40;
+            break;
+
+        case 129:
+        case 130:
+            def = 10;
+            max = 1;
+            break;
+
+        case 137:
+            min = -1;
+            def = -10;
+            max = 6;
+            break;
+
+        case 138:
+            max = 2;
+            break;
+
+        default:
+            min = -1;
+            def = -10;
+            max = -1;
+            break;
+    }
+    getData->data.type |= type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
+}
+
+void ADnoteParameters::postrender(void)
+{
+    // loop over our gathered dirty flags and unset them for the next period
+      GlobalPar.AmpLfo->updated
+    = GlobalPar.FilterLfo->updated
+    = GlobalPar.FreqLfo->updated
+    = false;
+    for (int i = 0; i < NUM_VOICES; ++i)
+    {
+        if (VoicePar[i].Enabled)
+              VoicePar[i].AmpLfo->updated
+            = VoicePar[i].FilterLfo->updated
+            = VoicePar[i].FreqLfo->updated
+            = false;
+
     }
 }

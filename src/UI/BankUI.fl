@@ -5,14 +5,14 @@ code_name {.cc}
 comment {BankUI.h} {not_in_source in_header
 } 
 
-comment {BankUI.cc} {in_source not_in_header
+comment {BankUI.cc} {selected in_source not_in_header
 } 
 
 comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014-2016, Will Godfrey & others
+Copyright 2014-2017, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of original ZynAddSubFX code, modified August 2016
+This file is derivative of original ZynAddSubFX code.
+
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -53,8 +55,7 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MasterUI.h"} {private local
 } 
 
-class BankProcess_ {selected
-} {
+class BankProcess_ {} {
   Function {process(void)} {return_type {virtual void}
   } {
     code {;} {}
@@ -270,7 +271,7 @@ class RootSlot {: {public Fl_Button, RootProcess_}
 class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
 } {
   Function {make_window()} {} {
-    Fl_Window bankuiwindow {
+    Fl_Window instrumentuiwindow {
       label Bank
       xywh {210 403 780 575} type Double hide
     } {
@@ -292,16 +293,25 @@ class BankUI {: {public BankProcess_, RootProcess_, MiscFuncs}
       Fl_Button {} {
         label Roots
         callback {//
-    pathwindow->show();
+    rootuiwindow->show();
     if ((Fl::event_button() == 3))
-        bankuiwindow->hide();}
+    {
+        rootFrom = 3;
+        instrumentuiwindow->hide();
+    }}
         tooltip {Show root paths} xywh {350 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
         label Banks
-        callback {rootuiwindow->show();
-if ((Fl::event_button() == 3))
-    bankuiwindow->hide();}
+        callback {//
+    bankuiwindow->show();
+    if ((Fl::event_button() == 3))
+    {
+        bankFrom = 3;
+        instrumentuiwindow->hide();
+    }
+    else
+        instFrom = 0;}
         tooltip {Show banks in current root} xywh {496 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Text_Display {} {
@@ -408,7 +418,17 @@ removeselection();}
       }
       Fl_Button {} {
         label Close
-        callback {bankuiwindow->hide();}
+        callback {//
+    instrumentuiwindow->hide();
+    if (Fl::event_button() == 3)
+    {
+        if (instFrom == 2)
+            bankuiwindow->show();
+        else if (instFrom == 4)
+            ; // todo open mixer panel
+    }
+    else
+        instFrom = 0; // to avoid later confusion!}
         xywh {665 539 70 24} box THIN_UP_BOX labelsize 12
       }
       Fl_Group engines {
@@ -419,8 +439,7 @@ removeselection();}
           callback {//
     synth->getRuntime().checksynthengines = (int) o->value();
     rescan_for_banks(true);
-    synth->getGuiMaster()->partui->resetlabels();
-    synth->getGuiMaster()->updatepanel();
+    synth->getGuiMaster()->partui->checkEngines();
     synth->getRuntime().configChanged = true;}
           xywh {477 531 136 15} down_box DOWN_BOX labelsize 11
           code0 {o->value(synth->getRuntime().checksynthengines);}
@@ -445,7 +464,7 @@ removeselection();}
         }
       }
     }
-    Fl_Window rootuiwindow {
+    Fl_Window bankuiwindow {
       label Root
       xywh {55 474 775 575} type Double labelsize 12 hide
       code0 {o->copy_label(bank->getRootFileTitle().c_str());}
@@ -453,9 +472,14 @@ removeselection();}
       Fl_Button {} {
         label Roots
         callback {//
-    pathwindow->show();
+    rootuiwindow->show();
     if ((Fl::event_button() == 3))
-       rootuiwindow->hide();}
+    {
+        rootFrom = 2;
+        bankuiwindow->hide();
+    }
+    else
+        rootFrom = 0;}
         tooltip {Show root paths} xywh {248 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Button {} {
@@ -464,9 +488,13 @@ removeselection();}
       }
       Fl_Button {} {
         label Instruments
-        callback {bankuiwindow->show();
-if ((Fl::event_button() == 3))
-    rootuiwindow->hide();}
+        callback {//
+    instrumentuiwindow->show();
+    if (Fl::event_button() == 3)
+    {
+        instFrom = 2;
+        bankuiwindow->hide();
+    }}
         tooltip {Show instruments in current bank} xywh {627 5 93 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11 align 128
       }
       Fl_Group {} {
@@ -563,11 +591,27 @@ removeselection();}
       }
       Fl_Button {} {
         label Close
-        callback {rootuiwindow->hide();}
+        callback {//
+    bankuiwindow->hide();
+    if (Fl::event_button() == 3)
+    {
+        if (bankFrom == 1)
+        {
+            rootFrom = 2;
+            rootuiwindow->show();
+        }
+        else if (bankFrom == 3)
+        {
+            instFrom = 2;
+            instrumentuiwindow->show();
+        }
+    }
+    else
+        bankFrom = 0;}
         xywh {647 538 70 24} box THIN_UP_BOX labelsize 12
       }
     }
-    Fl_Window pathwindow {
+    Fl_Window rootuiwindow {
       label {Bank Root Paths}
       callback {o->hide();}
       xywh {30 70 465 295} type Double hide
@@ -634,9 +678,14 @@ Pend->hide();}
       Fl_Button showdefaultrootdirbutton {
         label {Open current}
         callback {//
-    rootuiwindow->show();
+    bankuiwindow->show();
     if (Fl::event_button() == 3)
-        pathwindow->hide();}
+    {
+        bankFrom = 1;
+        rootuiwindow->hide();
+    }
+    else
+        rootFrom = 0;}
         xywh {265 225 75 35} box THIN_UP_BOX labelsize 12 align 128
       }
       Fl_Button Pend {
@@ -670,7 +719,15 @@ Pend->hide();}
       }
       Fl_Button {} {
         label Close
-        callback {pathwindow->do_callback();}
+        callback {//
+    if (Fl::event_button() == 3)
+    {
+        if (rootFrom == 2)
+            bankuiwindow->show();
+    }
+    else
+        rootFrom = 0;
+    rootuiwindow->do_callback();}
         xywh {402 268 51 20} box THIN_UP_BOX labelsize 12
       }
     }
@@ -678,30 +735,33 @@ Pend->hide();}
   Function {BankUI(int *npart_, SynthEngine *_synth)} {} {
     code {synth = _synth;
 fnc = &BankProcess_::process;
-        npart = npart_;
-        bank = synth->getBankPtr();
-        what = 0;
-        nselected = -1;
-        make_window();
-        mode = 1;
+    npart = npart_;
+    bank = synth->getBankPtr();
+    what = 0;
+    nselected = -1;
+    make_window();
+    mode = 1;
 fnr = &RootProcess_::rootprocess;
-	root = synth->getBankPtr();} {}
+    root = synth->getBankPtr();
+rootFrom = 0;
+bankFrom = 0;
+instFrom = 0;} {}
   }
   Function {~BankUI()} {return_type virtual
   } {
     code {//
+        instrumentuiwindow->hide();
+        delete instrumentuiwindow;
         bankuiwindow->hide();
         delete bankuiwindow;
         rootuiwindow->hide();
-        delete rootuiwindow;
-        pathwindow->hide();
-        delete pathwindow;} {}
+        delete rootuiwindow;} {}
   }
   Function {Show()} {} {
     code {// called from part UI
     rescan_for_banks(false);
     set_bank_slot();
-    bankuiwindow->show();
+    instrumentuiwindow->show();
     readbutton->value(1);
     mode = 1;
     removeselection();
@@ -710,7 +770,7 @@ fnr = &RootProcess_::rootprocess;
   }
   Function {Hide()} {} {
     code {// called from master UI
-    bankuiwindow->hide();} {}
+    instrumentuiwindow->hide();} {}
   }
   Function {init(Fl_Spinner *cbwig_)} {} {
     code {//
@@ -729,7 +789,7 @@ fnr = &RootProcess_::rootprocess;
 	    else
                 synth->writeRBP(4, (*npart) | 0x80, slot - 128);
             if (what == 3)
-                bankuiwindow->hide();
+                instrumentuiwindow->hide();
             cbwig->do_callback();
             refreshmainwindow();
             return;
@@ -774,7 +834,7 @@ fnr = &RootProcess_::rootprocess;
             }
             else if (!bank->emptyslot(slot))
             {
-                if (fl_choice("Overwrite the slot no. %d ?", "Yes", "No", NULL, slot + 1))
+                if (fl_choice("Overwrite the slot no. %d ?", NULL, "No", "Yes", slot + 1) < 2)
                 {
                     setread();
                     doit = false;
@@ -793,7 +853,7 @@ fnr = &RootProcess_::rootprocess;
 
         if (mode == 3 && !bank->emptyslot(slot))
         {   // Clears the slot (choices reversed for 'No' priority)
-            if (!fl_choice("Clear the slot no. %d ?", "Yes", "No", NULL, slot + 1))
+            if (fl_choice("Clear the slot no. %d ?", NULL, "No", "Yes", slot + 1) > 1)
             {
                 if (!bank->clearslot(slot))
                     fl_alert("Could not clear this location");
@@ -853,9 +913,9 @@ fnr = &RootProcess_::rootprocess;
                  return;
              }
             if (what == 3)
-                rootuiwindow->hide();
+                bankuiwindow->hide();
             cbwig->do_callback();
-            bankuiwindow->show();
+            instrumentuiwindow->show();
             set_bank_slot(); // needed by 'old' menu selector
             refreshmainwindow();
             return;
@@ -916,14 +976,14 @@ fnr = &RootProcess_::rootprocess;
 
         if (mode == 3 && !thisname.empty())
         {   // Remove bank and file contents (choices reversed for 'No' priority)
-            if (!fl_choice("Completely remove %s?", "Yes", "No", NULL, thisname.c_str()))
+            if (fl_choice("Completely remove %s?", NULL, "No", "Yes", thisname.c_str()) > 1)
             {
                 int clearit = true;
                 int count = bank->getBankSize(slot);
 //                synth->getRuntime().Log("Bank size " + asString(count));
                 if (count > 1)
-                    clearit = !fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
-                                         "Continue", "STOP !", NULL, count);
+                    clearit = fl_choice("There are %d instruments in this bank\\nThey will be permanently deleted",
+                                         NULL, "STOP !", "Continue", count) > 1;
                 if (clearit)
                 {
 //                    synth->getRuntime().Log("We're going");
@@ -992,8 +1052,8 @@ fnr = &RootProcess_::rootprocess;
   }
   Function {refreshmainwindow()} {} {
     code {//
-    bankuiwindow->copy_label(bank->getBankFileTitle().c_str());
-    rootuiwindow->copy_label(bank->getRootFileTitle().c_str());
+    instrumentuiwindow->copy_label(bank->getBankFileTitle().c_str());
+    bankuiwindow->copy_label(bank->getRootFileTitle().c_str());
     for (int i = 0; i < BANK_SIZE; ++i)
         bs[i]->refresh();
     for (int i = 0; i < ROOT_SIZE; ++i)
@@ -1123,6 +1183,12 @@ fnr = &RootProcess_::rootprocess;
   }
   decl {int oldrootID;} {private local
   }
-  decl {string pathwindowlabel;} {private local
+  decl {string rootuiwindowlabel;} {private local
+  }
+  decl {int rootFrom;} {private local
+  }
+  decl {int bankFrom;} {private local
+  }
+  decl {int instFrom;} {private local
   }
 } 

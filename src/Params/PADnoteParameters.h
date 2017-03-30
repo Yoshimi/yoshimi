@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified April 2011
+    This file is a derivative of a ZynAddSubFX original, modified February 2017
 */
 
 #ifndef PAD_NOTE_PARAMETERS_H
@@ -53,6 +53,7 @@ class PADnoteParameters : public Presets
         void add2XML(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getLimits(CommandBlock *getData);
+        void postrender(void);
 
         //returns a value between 0.0-1.0 that represents the estimation
         // perceived bandwidth

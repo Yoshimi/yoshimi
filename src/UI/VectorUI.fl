@@ -1,8 +1,8 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
-comment {Copyright 2016, Will Godfrey
+comment {Copyright 2016-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can
 redistribute it and/or modify it under the terms of the GNU General
@@ -17,30 +17,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified October 2016
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {private global
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 class VectorUI {selected : {private MiscFuncs}
 } {
@@ -68,7 +68,7 @@ send_data(0, o->value() - 1, 0xc0);}
         MenuItem {} {
           label Load
           callback {loadVector("");
-send_data(1, 0, 0xc0);}
+//send_data(1, 0, 0xc0);}
           xywh {0 0 34 20} labelsize 12
         }
         MenuItem {} {
@@ -117,7 +117,7 @@ if (ok)
           label Recent
           callback {paramsui->Recent->position(vectorwindow->x() + vectorwindow->w() - paramsui->Recent->w(),vectorwindow->y()+20);
 paramsui->Show(5);
-send_data(1, 2, 0xc0);}
+//send_data(1, 2, 0xc0);}
           xywh {20 20 34 20} labelsize 12 deactivate
         }
         MenuItem {} {
@@ -294,16 +294,19 @@ if (tmp < 14)
     synth->getRuntime().nrpndata.vectorEnabled[BaseChan] = false;
     Xgroup->deactivate();
     Ygroup->deactivate();
-    Ycontrol->deactivate();
+    Ycontrol->deactivate();;
 }
 else
 {
     if (!synth->vectorInit(0, BaseChan, tmp))
         synth->vectorSet(0, BaseChan, tmp);
     Xgroup->activate();
+    if (synth->getGuiMaster()->partmax < 32)
+    	synth->getGuiMaster()->partmax = 32;
     if (Ycc >= 14)
     {
       Ygroup->activate();
+      synth->getGuiMaster()->partmax = 64;
     }
     Ycontrol->activate();
     Ycontrol->redraw();
@@ -483,6 +486,7 @@ else
     if (!synth->vectorInit(1, BaseChan, tmp))
         synth->vectorSet(1, BaseChan, tmp);
     Ygroup->activate();
+    synth->getGuiMaster()->partmax = 64;
 }
 Ycc =  tmp;
 o->value(tmp);
@@ -497,9 +501,12 @@ send_data(32, o->value(), 0xc0);}
       }
     }
   }
-  Function {send_data(int control, float value, int type)} {} {
+  Function {send_data(int control, float value, int type, int part = 255, int kit = 255, int engine = 255, int insert = 255, int parameter = 255, int par2 = 255)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, 0xc0 | BaseChan);} {}
+    if (control == 84)
+        collect_data(synth, value, (Fl::event_button() | type), control, part, kit, engine, insert, parameter, par2);
+    else
+        collect_data(synth, value, (Fl::event_button() | type), control, 0xc0 | BaseChan);} {}
   }
   Function {VectorUI(SynthEngine *_synth, BankUI *_bankui, ParametersUI *_paramsui)} {} {
     code {//
@@ -683,6 +690,14 @@ else if (npart == BaseChan + NUM_MIDI_CHANNELS * 3)
 
 Loaded->copy_label(loadlabel[BaseChan].c_str());} {}
   }
+  Function {setLoadLabelRemote(int chan, string name)} {} {
+    code {//
+    loadlabel[chan] = name;
+    BaseChan = chan;
+    setbasechan->value(BaseChan + 1);
+    updateAll(false);
+    //Loaded->copy_label(name.c_str());} {}
+  }
   Function {findengines(int npart)} {return_type {unsigned int}
   } {
     code {//
@@ -731,20 +746,7 @@ return col;} {}
         	return;
     	fname = string(filename);
     }
-    synth->actionLock(lockmute);
-    bool result = synth->loadVector(BaseChan, fname, true);
-    synth->actionLock(unlock);
-    recenthistory->activate();
-    if (!result)
-        fl_alert("Failed to load vector");
-    else
-    {
-        loadlabel[BaseChan] = findleafname(fname);
-        Loaded->copy_label(loadlabel[BaseChan].c_str());
-        Ycontrol->activate();
-        Ycontrol->damage();
-    }
-    setbuttons();} {}
+    send_data(84, 0, 0xc0, 240, BaseChan, 255, 255, 255, miscMsgPush(fname));} {}
   }
   Function {saveVector()} {} {
     code {//
@@ -754,7 +756,7 @@ return col;} {}
                 return;
             filename = fl_filename_setext(filename, ".xvy");
             if (isRegFile(string(filename)))
-                if (!fl_choice("The file exists. \\nOverwrite it?", "No", "Yes", NULL))
+                if (fl_choice("The file exists. \\nOverwrite it?", NULL, "No", "Yes") > 1)
                     return;
             synth->actionLock(lockmute);
             bool result = synth->saveVector(BaseChan, string(filename), true);
@@ -802,4 +804,4 @@ Ycontrol->damage();} {}
   }
   decl {string loadlabel [NUM_MIDI_CHANNELS];} {private local
   }
-} 
+}

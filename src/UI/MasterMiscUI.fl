@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
-} 
+}
 
 comment {MasterUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014-2016, Will Godfrey
+Copyright 2014-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,72 +27,79 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified December 2016
+This file is a derivative of the ZynAddSubFX original.
+Modified February 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <string>} {public local
-} 
+}
 
 decl {\#include <iostream>} {public local
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
 decl {\#include "ADnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "SUBnoteUI.h"} {public local
-} 
+}
 
 decl {\#include "EffUI.h"} {public local
-} 
+}
 
 decl {\#include "VirKeyboardUI.h"} {public local
-} 
+}
 
 decl {\#include "ConfigUI.h"} {public local
-} 
+}
 
 decl {\#include "BankUI.h"} {public local
-} 
+}
 
 decl {\#include "PartUI.h"} {public local
-} 
+}
 
 decl {\#include "MicrotonalUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "ParametersUI.h"} {public local
-} 
+}
 
 decl {\#include "ConsoleUI.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
-decl {\#include "WidgetMWSliderUI.h"} {private global
-} 
+decl {\#include "UI/WidgetMWSlider.h"} {private global
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
+
+decl {\#include <FL/Fl_Menu_Bar.H>} {public global
+}
+
+decl {\#include <FL/fl_draw.H>} {private global
+}
 
 decl {\#define MIN_DB -48.0} {public local
-} 
+}
 
 decl {\#define NO_DB -68.0} {public local
-} 
+}
 
 class VUMeter {: {public Fl_Box, private MiscFuncs}
 } {
@@ -101,7 +108,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
   }
   Function {init(int part_, SynthEngine *_synth)} {} {
     code {// the "part_" parameters sets the part (if it is >=0), else it sets the master
-synth = _synth;
+    synth = _synth;
     label(NULL);
     npart = part_;
     oldpeakl = 0;
@@ -304,19 +311,22 @@ synth = _synth;
   }
   Function {tick(void *v)} {return_type {static void}
   } {
-    code {tickdraw((VUMeter *) v);
+    code {//
+    tickdraw((VUMeter *) v);
     ((VUMeter *)v)->synth->fetchMeterData(&((VUMeter *) v)->synth->VUdata);
     Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
   }
   Function {handle(int event)} {return_type int
   } {
-    code {switch(event){
+    code {//
+    switch(event)
+    {
         case FL_SHOW:
             tick(this);
-            break;
+            return 1;
         case FL_HIDE:
             Fl::remove_timeout(tick, this);
-            break;
+            return 1;
         case FL_PUSH:
             if (npart < 0)
             {
@@ -325,13 +335,11 @@ synth = _synth;
                 clipped = 0;
                	MasterUI *masterUI = synth->getGuiMaster(false);
                	if(masterUI)
-               	{
-               		masterUI->resetPartsClip();
-               	}
+                    masterUI->resetPartsClip();
             }
-            break;
-        }
-        return 1;} {}
+            return 1;
+    }
+    return 0;} {}
   }
   decl {int npart;} {private local
   }
@@ -359,17 +367,18 @@ synth = _synth;
   } panelpart;} {private local
   }
   Function {resetPart(bool clipOnly = false)} {} {
-    code {for (int i = 0; i < NUM_MIDI_PARTS; i++)
-      {
-          panelpart.clip[i] = false;
-      	  if(!clipOnly)
-      	  {
-	          panelpart.oldpeak[i] = 0;
-	          synth->VUdata.values.parts[i] = 0.0;
-	  }
-      }} {}
+    code {//
+    for (int i = 0; i < NUM_MIDI_PARTS; i++)
+    {
+        panelpart.clip[i] = false;
+        if(!clipOnly)
+        {
+            panelpart.oldpeak[i] = 0;
+            synth->VUdata.values.parts[i] = 0.0;
+        }
+    }} {}
   }
-} 
+}
 
 class SysEffSend {: {public WidgetPDial, private MiscFuncs}
 } {
@@ -396,12 +405,12 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   Function {handle(int event)} {return_type int
   } {
     code {//
-	if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
-        {
-            synth->setPsysefxsend(neff1,neff2,value());
-            collect_data(synth, value(), (Fl::event_button() | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
-        }
-        return WidgetPDial::handle(event);} {}
+    if (event == FL_PUSH || event == FL_DRAG || event == FL_MOUSEWHEEL)
+    {
+        synth->setPsysefxsend(neff1,neff2,value());
+        collect_data(synth, value(), (Fl::event_button() | (1 << 7)), neff2, 0xf1, 0xff, neff1, 16);
+    }
+    return WidgetPDial::handle(event);} {}
   }
   decl {int neff1;} {private local
   }
@@ -409,19 +418,18 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+}
 
 class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
 } {
-  Function {make_window()} {private
-  } {
+  Function {make_window()} {} {
     Fl_Window panellistitem {
-      private xywh {1195 44 60 275} type Double hide
+      xywh {1195 44 60 275} type Double hide
       class Fl_Group
     } {
       Fl_Group panellistitemgroup {
-        private xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
-        code0 {if (synth->part[npart + *plgroup]->Penabled != 1) o->deactivate();}
+        xywh {0 20 64 252} box PLASTIC_THIN_UP_BOX
+        code0 {if (!synth->partonoffRead(npart + *plgroup)) o->deactivate();}
         code1 {if (synth->getRuntime().audioEngine != jack_audio) audiosend->deactivate();}
       } {
         Fl_Group {} {
@@ -435,13 +443,13 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
           }
         }
         Fl_Box partadd {
-          xywh {5 25 17 30} box FLAT_BOX deactivate
+          xywh {5 25 17 30} box FLAT_BOX
         }
         Fl_Box partsub {
-          xywh {22 25 18 30} box FLAT_BOX deactivate
+          xywh {22 25 18 30} box FLAT_BOX
         }
         Fl_Box partpad {
-          xywh {40 25 17 30} box FLAT_BOX deactivate
+          xywh {40 25 17 30} box FLAT_BOX
         }
         Fl_Text_Display partname {
           label test
@@ -456,38 +464,37 @@ class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
         bankui->cbwig->value(npart + 1 + *plgroup);
         bankui->cbwig->do_callback();
     }
-    bankui->Show();
-    //setPartLabel(findengines(npart | *plgroup));}
+    bankui->Show();}
           xywh {4 24 55 33} box THIN_DOWN_FRAME labelfont 1 labelsize 10 align 208
         }
         Fl_Slider partvolume {
           callback {//
-        int realvalue;
-	if (Fl::event_button() == 3)
-	{
-	    realvalue = 96;
-	    o->value(127-realvalue);
-	    o->redraw();
-	}
-	else
-	    realvalue = 127 - o->value();
-        synth->part[npart + *plgroup]->setVolume(realvalue);
-        synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
-
-        send_data(0, realvalue, 0xc0);}
-          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX maximum 127 step 1
-          code0 {o->value(127 - synth->part[npart + *plgroup]->Pvolume);}
+    int realvalue;
+    if (Fl::event_button() == 3)
+    {
+        realvalue = 96;
+        o->value(realvalue);
+        o->redraw();
+    }
+    else
+        realvalue = o->value();
+    synth->getGuiMaster()->setPartVolWidget(npart + *plgroup, realvalue);
+    send_data(0, realvalue, 0x48);}
+          xywh {8 65 30 110} type {Vert Knob} box THIN_DOWN_BOX minimum 127 maximum 0 step 1
+          code0 {o->value(synth->part[npart + *plgroup]->Pvolume);}
+          code1 {o->setValueType(VC_PartVolume); o->useCustomTip(true);}
           class mwheel_slider
         }
         Fl_Dial partpanning {
           callback {//
-              synth->part[npart + *plgroup]->SetController(C_panning, o->value());
-              synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
-
-              send_data(2, o->value(), 0xc0);}
+    if (Fl::event_button() == 3)
+        o->value(64);
+    synth->getGuiMaster()->setPartPanWidget(npart + *plgroup, o->value());
+    send_data(2, o->value(), 0x48);}
           xywh {17 180 30 30} maximum 127 step 1
           code0 {o->value(synth->part[npart + *plgroup]->Ppanning);}
-          code1 {o->init(64);}
+          code1 {o->setValueType(VC_PanningStd);}
+          code2 {//o->init(64);}
           class WidgetPDial
         }
         Fl_Button {} {
@@ -505,12 +512,11 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
         }
         Fl_Choice partrcv {
           callback {//
-	      int tmp = o->value() & 0xf;
-              synth->part[npart + *plgroup]->Prcvchn = tmp;
-              synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
-              o->textcolor(FL_BLACK);
+      int tmp = o->value() & 0xf;
+      synth->getGuiMaster()->setPartMidiWidget(npart + *plgroup, tmp + 1);
+      o->textcolor(FL_BLACK);
 
-              send_data(5, tmp, 0xc0);}
+      send_data(5, tmp, 0xc0);}
           tooltip {receive from MIDI channel} xywh {8 210 50 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
           code0 {for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
@@ -522,9 +528,8 @@ Right mouse button: Instrument edit} xywh {12 247 40 20} box PLASTIC_UP_BOX labe
           code1 {o->value(synth->part[npart + *plgroup]->Prcvchn);}
         } {}
         Fl_Choice audiosend {
-          callback {synth->SetPartDestination(npart + *plgroup, o->value() + 1);
-
-send_data(120, o->value(), 0xc0);}
+          callback {//
+    send_data(120, o->value() + 1, 0xc0);}
           tooltip {Set Audio Destination} xywh {8 229 50 15} box BORDER_BOX down_box BORDER_BOX labelsize 9 textsize 9
           code0 {if (synth->part[npart + *plgroup]->Paudiodest == 2) o->value(1); else if (synth->part[npart + *plgroup]->Paudiodest == 3) o->value(2); else o->value(0);}
         } {
@@ -544,34 +549,27 @@ send_data(120, o->value(), 0xc0);}
       }
       Fl_Check_Button partenabled {
         label 01
-        callback {synth->actionLock(lockmute);
-            synth->partonoffWrite(npart + *plgroup, o->value());
-            synth->actionLock(unlock);
-            if (o->value() != 1)
-                panellistitemgroup->deactivate();
-            else
-            {
-                panellistitemgroup->activate();
-                if ((int)bankui->cbwig->value() != (npart + 1 + *plgroup))
-                    bankui->cbwig->value(npart + 1 + *plgroup);
-            }
-            if ((int)bankui->cbwig->value() == (npart + 1 + *plgroup))
-                bankui->cbwig->do_callback();
-            o->redraw();
+        callback {//
+    synth->getGuiMaster()->setPartActive(npart + *plgroup, o->value());
+    if (o->value() != 1)
+        panellistitemgroup->deactivate();
+    else
+        panellistitemgroup->activate();
 
-            send_data(8, o->value(), 0xc0);}
-        private xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
-        code0 {o->value(synth->part[npart + *plgroup]->Penabled == 1);}
+    send_data(8, o->value(), 0xc0);}
+        xywh {5 0 45 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelsize 15 align 24
+        code0 {o->value(synth->partonoffRead(npart + *plgroup));}
       }
     }
   }
   Function {send_data(int control, float value, int type)} {} {
     code {//
-collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0xff);} {}
+    collect_data(synth, value, (Fl::event_button() | type), control, npart + *plgroup, 0xff, 0xff);} {}
   }
   Function {Panellistitem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
-    code {npart = 0;
-        bankui = NULL;} {}
+    code {//
+    npart = 0;
+    bankui = NULL;} {}
   }
   Function {init(int npart_, BankUI *bankui_, SynthEngine *_synth)} {} {
     code {//
@@ -588,11 +586,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0x
 
     int setpart = npart | *plgroup; // assumes *plgroup always power of 2
 
-    partenabled->value(synth->part [setpart]->Penabled == 1);
+    partenabled->value(synth->partonoffRead(setpart));
 
     setPartLabel(findengines(setpart));
 
-    partvolume->value(127 - synth->part[setpart]->Pvolume);
+    partvolume->value(synth->part[setpart]->Pvolume);
     partpanning->value(synth->part[setpart]->Ppanning);
     int tmpch = synth->part[setpart]->Prcvchn;
     if (tmpch < NUM_MIDI_CHANNELS)
@@ -615,7 +613,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0x
     string num = asString(setpart + 1);
     partenabled->copy_label(num.c_str());
 
-    if (synth->part[setpart]->Penabled == 1)
+    if (synth->partonoffRead(setpart))
         panellistitemgroup->activate();
     else
         panellistitemgroup->deactivate();} {}
@@ -668,4 +666,26 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, 0xff, 0x
   }
   decl {int *plgroup;} {public local
   }
-} 
+}
+
+class ClearMenuBar {: {public Fl_Menu_Bar}
+} {
+  Function {ClearMenuBar(int x, int y, int w, int h) : Fl_Menu_Bar(x,y,w,h)} {
+    comment {Menu bar drawing only the bottom border}
+  } {
+    code {} {}
+  }
+  Function {draw()} {return_type void
+  } {
+    code {//
+    int m = 10; //margin larger than border in any style
+    fl_push_clip(x(),y(),w(),h());
+    fl_draw_box(box(), x() - m, y() - m, w() + 2 * m, h() + m, color());
+    fl_pop_clip();
+    Fl_Boxtype _box = box();
+    //Draw menu like normal, but without a box
+    box(FL_NO_BOX);
+    Fl_Menu_Bar::draw();
+    box(_box);} {}
+  }
+}

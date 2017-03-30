@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,10 +20,13 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code
+
+    Modified March 2017
 */
 
 #include <cmath>
+#include <iostream>
 
 using namespace std;
 
@@ -394,4 +398,119 @@ void Controller::getfromXML(XMLwrapper *xml)
 
     resonancecenter.depth=xml->getpar127("resonance_center_depth",resonancecenter.depth);
     resonancebandwidth.depth=xml->getpar127("resonance_bandwidth_depth",resonancebandwidth.depth);
+}
+
+
+void Controller::getLimits(CommandBlock *getData)
+{
+    int control = getData->data.control;
+    //cout << "ctl control " << to_string(control) << endl;
+
+    // defaults
+    int type = 0x80;
+    int min = 0;
+    int def = 0;
+    int max = 127;
+
+    switch (control)
+    {
+        case 128:
+            min = 64;
+            def = 960;
+            break;
+        case 129:
+            min = 0;
+            def = 10;
+            max = 1;
+            break;
+        case 130:
+            def = 640;
+            max = 64;
+            break;
+        case 131:
+            def = 800;
+            break;
+        case 132:
+            min = 0;
+            def = 0;
+            max = 1;
+            break;
+        case 133:
+            break;
+        case 134:
+            min = 0;
+            def = 0;
+            max = 1;
+            break;
+        case 135:
+            min = 0;
+            def = 10;
+            max = 1;
+            break;
+        case 136:
+            min = 0;
+            def = 10;
+            max = 1;
+            break;
+        case 137:
+            min = 0;
+            def = 10;
+            max = 1;
+            break;
+        case 138:
+            min = -8192;
+            def = 0;
+            max = 8191;
+            break;
+        case 139:
+            break;
+        case 140:
+            break;
+        case 144:
+            break;
+        case 145:
+            break;
+        case 160:
+            break;
+        case 161:
+            break;
+        case 162:
+            def = 30;
+            break;
+        case 163:
+            min = 0;
+            max = 1;
+            break;
+        case 164:
+            min = 0;
+            def = 0;
+            max = 1;
+            break;
+        case 165:
+            def = 800;
+            break;
+        case 166:
+            def = 900;
+            break;
+        case 168:
+            min = 0;
+            def = 10;
+            max = 1;
+            break;
+        case 224:
+            min = 0;
+            def = 0;
+            max = 0;
+            break;
+
+        default:
+            min = -1;
+            def = -10;
+            max = -1;
+            break;
+    }
+    getData->data.type = type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
 }

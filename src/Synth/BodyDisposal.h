@@ -20,6 +20,9 @@
 #ifndef BODYDISPOSAL_H
 #define BODYDISPOSAL_H
 
+//#include <list> // non boost
+//#include <cstddef> // non boost
+
 #include <boost/ptr_container/ptr_list.hpp>
 
 using namespace std;
@@ -36,6 +39,7 @@ class BodyDisposal
 
     private:
         boost::ptr_list<Carcass> corpses;
+        //list<Carcass*> corpses; // non boost
 };
 
 #endif

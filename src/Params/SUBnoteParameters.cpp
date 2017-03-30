@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified December 2016
+    This file is a derivative of a ZynAddSubFX original, modified February 2017
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -358,16 +358,152 @@ void SUBnoteParameters::getfromXML(XMLwrapper *xml)
 void SUBnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
+    int insert = getData->data.insert;
+
+    if (insert >= 6 && insert <= 7)
+    { // do harmonics stuff
+        if (insert == 7)
+            getData->limits.def = 640;
+        else if (control == 0)
+            getData->limits.def = 1270;
+        else
+            getData->limits.def = 0;
+        getData->data.type |= 0x40; // all learnable
+        getData->limits.min = 0;
+        getData->limits.max = 127;
+        return;
+    }
+
+    // defaults
+    int type = 0;
+    int min = 0;
+    int def = 0;
+    int max = 127;
+
     switch (control)
     {
-        case 32:
-            getData->limits.min = -8192;
-            getData->limits.max = 8191;
+        case 0:
+            type = 0x40;
+            def = 960;
             break;
+
+        case 1:
+            type = 0x40;
+            def = 900;
+            break;
+
+        case 2:
+            type = 0x40;
+            def = 640;
+            break;
+
+        case 16:
+            type = 0x40;
+            def = 400;
+            break;
+
+        case 17:
+            type = 0x40;
+            min = -64;
+            max = 63;
+            break;
+
+            case 18:
+                max = 1;
+                break;
+
+        case 32:
+            type = 0x40;
+            min = -8192;
+            max = 8191;
+            break;
+
+        case 33:
+            type = 0x40;
+            break;
+
+        case 34:
+            max = 1;
+            break;
+
+        case 35:
+            min = -8;
+            max = 7;
+            break;
+
+        case 36:
+            max = 3;
+            break;
+
+        case 37:
+            min = -64;
+            max = 63;
+            break;
+
+        case 38:
+            type = 0x40;
+            def = 880;
+            break;
+
+        case 39:
+            type = 0x40;
+            def = 640;
+            break;
+
+        case 40:
+            max = 1;
+            break;
+
         case 48:
         case 49:
         case 50:
-            getData->limits.max = 255;
+            type = 0x40;
+            max = 255;
             break;
+
+        case 64:
+            max = 1;
+            break;
+
+        case 80:
+            min = 1;
+            def = 1000;
+            max = 5;
+            break;
+
+        case 81:
+            max = 4;
+            break;
+
+        case 82:
+            def = 1000;
+            max = 2;
+            break;
+
+        case 96:
+            max = 0;
+            break;
+
+        case 112:
+            def = 10;
+            max = 1;
+            break;
+
+
+        default:
+            min = -1;
+            def = -10;
+            max = -1;
+            break;
+
     }
+    getData->data.type |= type;
+    getData->limits.min = min;
+    getData->limits.def = def;
+    getData->limits.max = max;
+}
+
+void SUBnoteParameters::postrender(void)
+{
+    return;
 }

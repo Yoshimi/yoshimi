@@ -2,7 +2,7 @@
     AlsaEngine.cpp
 
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2017, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -16,7 +16,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
-    Last modified August 2014
+
+    Modified February 2017
 */
 
 #include <endian.h>
@@ -81,7 +82,7 @@ bool AlsaEngine::openAudio(void)
     return true;
 bail_out:
     Close();
-    splashMessages.push_back("Can't connect to alsa audio :(");
+//    splashMessages.push_back("Can't connect to alsa audio :(");
     return false;
 }
 
@@ -575,104 +576,104 @@ void *AlsaEngine::_MidiThread(void *arg)
 }
 
 
+/*
+ * This next function needs a lot of work we shouldn't need
+ * to decode then re-encode the data in a different form
+ */
+
 void *AlsaEngine::MidiThread(void)
 {
     snd_seq_event_t *event;
-    unsigned char channel;
-    unsigned char note;
-    unsigned char velocity;
-    unsigned int ctrltype;
     unsigned int par;
     int chk;
+    bool sendit;
+    unsigned char par0, par1 = 0, par2 = 0;
     while (synth->getRuntime().runSynth)
     {
         while ((chk = snd_seq_event_input(midi.handle, &event)) > 0)
         {
             if (!event)
                 continue;
-
+            sendit = true;
+            par0 = event->data.control.channel;
+            par = 0;
             switch (event->type)
             {
                 case SND_SEQ_EVENT_NOTEON:
-                    if (event->data.note.note)
-                    {
-                        channel = event->data.note.channel;
-                        note = event->data.note.note;
-                        velocity = event->data.note.velocity;
-                        setMidiNote(channel, note, velocity);
-                    }
+                    par0 = event->data.note.channel;
+                    par0 |= 0x90;
+                    par1 = event->data.note.note;
+                    par2 = event->data.note.velocity;
                     break;
 
                 case SND_SEQ_EVENT_NOTEOFF:
-                    channel = event->data.note.channel;
-                    note = event->data.note.note;
-                    setMidiNote(channel, note);
+                    par0 = event->data.note.channel;
+                    par0 |= 0x80;
+                    par1 = event->data.note.note;
                     break;
 
                 case SND_SEQ_EVENT_KEYPRESS:
-                    channel = event->data.note.channel;
-                    ctrltype = C_keypressure;
-                    par = event->data.note.velocity;
-                    setMidiController(channel, ctrltype, par);
+                    par0 = event->data.note.channel;
+                    par0 |= 0xa0;
+                    par1 = event->data.note.note;
+                    par2 = event->data.note.velocity;
                     break;
 
                 case SND_SEQ_EVENT_CHANPRESS:
-                    channel = event->data.control.channel;
-                    ctrltype = C_channelpressure;
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
+                    par0 |= 0xd0;
+                    par1 = event->data.control.value;
                     break;
 
                 case SND_SEQ_EVENT_PGMCHANGE:
-                    channel = event->data.control.channel;
-                    ctrltype = C_programchange;
-                    par = event->data.control.value;
-                    setMidiProgram(channel, par);
+                    par0 |= 0xc0;
+                    par1 = event->data.control.value;
                     break;
 
                 case SND_SEQ_EVENT_PITCHBEND:
-                    channel = event->data.control.channel;
-                    ctrltype = C_pitchwheel;
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
+                    par0 |= 0xe0;
+                    par = event->data.control.value + 8192;
+                    par1 = par & 0x7f;
+                    par2 = par >> 7;
                     break;
 
                 case SND_SEQ_EVENT_CONTROLLER:
-                    channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;//getMidiController(event->data.control.param);
-                    par = event->data.control.value;
-                    setMidiController(channel, ctrltype, par);
+                    par0 |= 0xb0;
+                    par1 = event->data.control.param;
+                    par2 = event->data.control.value;
                     break;
 
                 case SND_SEQ_EVENT_NONREGPARAM:
-                    channel = event->data.control.channel;
-                    ctrltype = event->data.control.param;
+                    par0 |= 0xb0; // splitting into separate CCs
+                    par = event->data.control.param;
+                    setMidi(par0, 99, par >> 7);
+                    setMidi(par0, 99, par & 0x7f);
                     par = event->data.control.value;
-                    setMidiController(channel, 99, ctrltype >> 7);
-                    setMidiController(channel, 98, ctrltype & 0x7f);
-                    setMidiController(channel, 6, par >> 7);
-                    setMidiController(channel, 38, par & 0x7f);
+                    setMidi(par0, 6, par >> 7);
+                    par1 = 38;
+                    par2 = par & 0x7f; // let last one through
                     break;
 
                 case SND_SEQ_EVENT_RESET: // reset to power-on state
-                    channel = event->data.control.channel;
-                    ctrltype = C_resetallcontrollers;
-                    setMidiController(channel, ctrltype, 0);
+                    par0 = 0xff;
                     break;
 
                 case SND_SEQ_EVENT_PORT_SUBSCRIBED: // ports connected
                     synth->getRuntime().Log("Alsa midi port connected");
+                    sendit = false;
                     break;
 
                 case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: // ports disconnected
                     synth->getRuntime().Log("Alsa midi port disconnected");
+                    sendit = false;
                     break;
-
-                default:// commented out some progs spam us :(
+                default:
+                    sendit = false;// commented out some progs spam us :(
                     /* synth->getRuntime().Log("Other non-handled midi event, type: "
                                 + asString((int)event->type));*/
                     break;
             }
+            if (sendit)
+                setMidi(par0, par1, par2);
             snd_seq_free_event(event);
         }
 ;

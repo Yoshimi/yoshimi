@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014-2015, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified January 2015
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified March 2017
 */
 
 #ifndef CONFIG_H
@@ -34,7 +36,6 @@
 using namespace std;
 
 #include "MusicIO/MusicClient.h"
-#include "Misc/HistoryListItem.h"
 #include "Misc/MiscFuncs.h"
 #include "FL/Fl.H"
 
@@ -141,10 +142,12 @@ class Config : public MiscFuncs
         int           enable_part_on_voice_load;
         bool          ignoreResetCCs;
         bool          monitorCCin;
+        bool          showLearnedCC;
         int           single_row_panel;
         int           NumAvailableParts;
         int           currentPart;
-        unsigned int  padApply;
+        int           lastPatchSet;
+        string        CLIstring;
         unsigned char channelSwitchType;
         unsigned char channelSwitchCC;
         unsigned char channelSwitchValue;
@@ -223,6 +226,7 @@ public:
         UpdatePartProgram,
         UpdateEffects,
         UpdateBankRootDirs,
+        UpdateControllers,
         RescanForBanks,
         RefreshCurBank,
         GuiAlert,

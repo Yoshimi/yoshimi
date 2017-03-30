@@ -35,3 +35,17 @@ Please try to avoid creating trailing whitespace.
 
 
 We now implement a build number. This is only bumped up when I push new commits to master (both github and sourceforge) so may represent several actual commits.
+
+
+
+There seems to be no easy way to copy commit messages to the changelog, and people downloading releases won't see them, so please update this using the following as an example.
+
+2017-3-5 Will
+* Controller & Midi control limits done.
+* Complete limit definitions for main & part include type.
+  i.e. integer/float & whether midi learnable.
+* Doc updates.
+* Bugfix: missed a couple of 'break' statements in a switch.
+* Added a special case for enable default on part 1.
+
+Lines without '*' are continuations/extra info keeping the line length short, and I don't usually include them in commit messages.

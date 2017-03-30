@@ -1,3 +1,29 @@
+V 1.5.1 - Jenny Wren
+
+MIDI-learn has been extended so that you can now learn aftertouch, the pitch wheel (to full 14 bit resolution) and most recently NRPNs. A number of hardware devices send these for greater control depth and to provide more than the usual number of controls. Also, there is a 'Settings' option to always open the editing window on a sucessful 'learn'.
+
+Main volume now has interpolation so there is no zipper noise, and part volume and pan have better interpolation for the same reason.
+
+LFO frequency and depth are now fully dynamic.
+
+Four common MIDI controls now have a window (right click on 'Controllers'). This is so that they can be be MIDI-learned. The reason you might want to, is for linking them to aftertouch - a particular benefit to users of wind controllers.
+
+A number of actions are now 'soft' in that a fast fade is performed, then the synth is disabled, the action takes place, and the synth is re-enabled.
+These are 'Stop' and 'Reset' as well as loading Vectors and Patchsets.
+
+The 'Solo' feature now ignores a value of zero if it is in 'Loop' mode. This means you can use a simple on/off switch control to step through the parts only when it gets the 'on' value.
+
+Visually there have been a lot of improvements. Main window key shortcuts work correctly! General layouts have been further harmonised. The AddSynth voice list window is now fully in sync with the voice windows themselves.
+
+More tooltips give real values on hovering. Some also give small graphic representations.
+
+We have a new splash screen, which also doesn't block anymore. There is now also a 'Util' directory which has the tools, instructions and examples to enable you to create a personalised splash.
+
+There is more information for making custom builds.
+
+Both CLI and GUI have been further isolated from the audio thread, and there is now intelligent buffering of incoming MIDI where needed.
+
+
 V 1.5.0 - The Robin
 
 Vector control now has its own dedicated button on the main window.

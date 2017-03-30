@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified January 2011
+    This file is derivative of ZynAddSubFX original code
+    Modified February 2017
 */
 
 #ifndef LFO_H
@@ -32,13 +34,17 @@ class SynthEngine;
 class LFO
 {
     public:
-        LFO(LFOParams *lfopars, float basefreq, SynthEngine *_synth);
+        LFO(LFOParams *_lfopars, float basefreq, SynthEngine *_synth);
         ~LFO() { };
         float lfoout(void);
         float amplfoout(void);
     private:
+        LFOParams *lfopars;
+        void Recompute(void);
+        void RecomputeFreq(void);
         void computenextincrnd(void);
         float x;
+        float basefreq;
         float incx, incrnd, nextincrnd;
         float amp1, amp2; // used for randomness
         float lfointensity;

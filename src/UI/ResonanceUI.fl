@@ -49,10 +49,10 @@ decl {\#include <iostream>} {private local
 decl {\#include "UI/MiscGui.h"} {public local
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public local
+decl {\#include "UI/WidgetPDial.h"} {public local
 } 
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
+decl {\#include "UI/WidgetMWSlider.h"} {public local
 } 
 
 decl {\#include "PresetsUI.h"} {public local

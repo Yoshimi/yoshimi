@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified January 2011
+    This file is derivative of original ZynAddSubFX code, modified February 2017
 */
 
 #ifndef LFO_PARAMS_H
@@ -42,6 +42,16 @@ class LFOParams : public Presets
         void defaults(void);
         void getfromXML(XMLwrapper *xml);
 
+        void setPfreq(float n) { Pfreq = n; updated = true; }
+        void setPintensity(unsigned char n) { Pintensity = n; updated = true; }
+        void setPstartphase(unsigned char n) { Pstartphase = n; }
+        void setPLFOtype(unsigned char n) { PLFOtype = n; updated = true; }
+        void setPrandomness(unsigned char n) { Prandomness = n; updated = true; }
+        void setPfreqrand(unsigned char n) { Pfreqrand = n; updated = true; }
+        void setPdelay(unsigned char n) { Pdelay = n; }
+        void setPcontinous(unsigned char n) { Pcontinous = n; updated = true; }
+        void setPstretch(unsigned char n) { Pstretch = n; updated = true; }
+
         // MIDI Parameters
         float Pfreq;
         unsigned char Pintensity;
@@ -55,6 +65,7 @@ class LFOParams : public Presets
 
         int fel;         // kind of LFO - 0 frequency, 1 amplitude, 2 filter
        // static int time; // used by Pcontinous - moved to SynthEngine to make it per-instance
+        bool updated;
 
     private:
         // Default parameters

@@ -1,4 +1,4 @@
-This is an experimental test feature only accessible from the command line.
+This is a test feature only accessible from the command line.
 
                             *** WARNING ***
 
@@ -8,14 +8,15 @@ It mostly updates the GUI too.
 
 Refer to "Yoshimi Control Numbers.ods" for control numbers and actions and "GUI_Interpretations.txt" for further explanations.
 
-Also, see "Effect_Inserts" for the actual effect controllers and Envelope_Inserts for the enveople controller ranges.
+Also, see "Effect_Inserts" for the actual effect controllers and "Envelope_Inserts" for the envelope controller ranges.
 
 Sections currently in place and tested:
 
 Top level controls
-Midi-learn
-Main part controls
-Controllers
+Midi-learn - used for all operations
+Main part controls - now used by GUI for writes
+Controllers Window
+MIDI learn editor window - used for all except incoming real MIDI
 Kit edit window
 AddSynth Editor
 AddSynth Voice Editor
@@ -34,6 +35,8 @@ This matches the results from using the middle mouse button in the GUI (assuming
 
 An alternative way to find out the correct command sequence is to click on a control with any button *except* the middle one. Trailing '255's can be ommitted if there are no following parameters set.
 
+In some situations par2 is used as a miscMsg ID for passing text values between threads but synchronised via the RT thread.
+
 
 The format is:
 
@@ -41,7 +44,7 @@ direct {value} {type} {control} {part} {kit} {engine} {insert} {parameter} {par2
 
 direct = the actual command name, must be typed in full.
 
-value = the value that will be set, may be negative and floating point (looks for the devimal point).
+value = the value that will be set, may be negative and floating point (looks for the decimal point).
 
 type = a subset of the command type: 0 for read and 64 for write. Sending 1 will just echo the bytes you sent.
 Sending 3 will turn it into a midi-learn command.
@@ -53,7 +56,7 @@ part = the number of the part being changed.
 All the above are mandatory. The following must also be entered in sequence when needed.
 
 kit = a part's kit number (if enabled otherwise zero).
-      also used for effects.
+      also used differently for effects.
 
 engine = the synth engine being adjusted.
 
@@ -64,15 +67,19 @@ parameter = subtype associated with some inserts.
 par2 = an offset for some parameters.
 
 
-A variation of the above is when you set flt_max as the value. This will be interpeted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them as short integers in the form:
+A variation of the above is when you set flt_max as the value. This will be interpreted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them as short integers in the form:
 limits.min
 limits.max
-limits.def
+limits.def (x10)
 
-Only a few of these are independently declared so far, all the reast have the values:
+From the command line enter at least the first three characters of "limits" in place of both value and type.
+
+Most of these up to 'engine' level are independently declared, all the rest have the values:
 min = 0
 max = 127
 def = 0
 
-def will return the default * 100. This is so that fractional values can be resolved. 0.5 comes up quite often. No default values are very large, but may be negative.
+def returns the actual default * 10. This is so that fractional values can be resolved. 0.5 comes up quite often. However the printed command line response will be the actual value. Default values (and the others) may be negative.
+
+'data.type' is returned with the read/write bit (0x40) used to tell whether this control is MIDI-learnable, and the float/integer bit (0x80) is correctly identified. All the other bits are returned as sent.
 

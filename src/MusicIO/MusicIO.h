@@ -3,7 +3,7 @@
 
     Copyright 2009-2011, Alan Calvert
     Copyright 2009, James Morris
-    Copyright 2014-2015, Will Godfrey & others
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -17,6 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    Modified February 2017
 */
 
 #ifndef MUSIC_IO_H
@@ -46,19 +47,7 @@ class MusicIO : virtual protected MiscFuncs
     protected:
         bool prepBuffers(void);
         void getAudio(void) { if (synth) synth->MasterAudio(zynLeft, zynRight); }
-        int getMidiController(unsigned char b);
-        void setMidiController(unsigned char ch, int ctrl, int param, bool in_place = false);
-        bool nrpnRunVector(unsigned char ch, int ctrl, int param);
-        void nrpnProcessData(unsigned char chan, int type, int par);
-        void nrpnDirectPart(int dHigh, int par);
-        void nrpnSetVector(int dHigh, unsigned char chan,  int par);
-
-        //if setBank is false then set RootDir number else current bank number
-        void setMidiBankOrRootDir(unsigned int bank_or_root_num, bool in_place = false, bool setRootDir = false);
-        void setMidiProgram(unsigned char ch, int prg, bool in_place = false);
-        void setMidiNote(unsigned char chan, unsigned char note);
-        void setMidiNote(unsigned char chan, unsigned char note, unsigned char velocity);
-
+        void setMidi(unsigned char par0, unsigned char par1, unsigned char par2, bool in_place = false);
         float *zynLeft [NUM_MIDI_PARTS + 1];
         float *zynRight [NUM_MIDI_PARTS + 1];
         int *interleaved;

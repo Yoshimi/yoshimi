@@ -22,11 +22,12 @@
 #define MIDI_CONTROL_H
 
 typedef enum {
-    C_NULL =               1002,
+    C_NULL =               1000,
     C_programchange =      1001,
-    C_pitchwheel =         1000,
-    C_channelpressure =     901,
-    C_keypressure =         900,
+    C_reset =              2000,
+    C_pitchwheel =          640, // so this can be used in midi learn
+    C_channelpressure =     641,
+    C_keypressure =         642,
     C_bankselectmsb =         0,
     C_breath =                2,
     C_expression =           11,

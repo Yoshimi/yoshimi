@@ -2,6 +2,7 @@
     JackEngine.h
 
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014-2017, Will Godfrey and others
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,6 +16,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+    Modified January 2017
 */
 
 #ifndef JACK_ENGINE_H
@@ -33,8 +36,6 @@
 using namespace std;
 
 #include "MusicIO/MusicIO.h"
-
-extern list<string> splashMessages;
 
 class SynthEngine;
 
@@ -68,7 +69,6 @@ class JackEngine : public MusicIO
         bool latencyPrep(void);
         int processCallback(jack_nframes_t nframes);
         static int _processCallback(jack_nframes_t nframes, void *arg);
-        static void _errorCallback(const char *msg);
         static int _xrunCallback(void *arg);
 
 

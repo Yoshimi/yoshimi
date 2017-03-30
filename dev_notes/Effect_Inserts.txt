@@ -1,6 +1,6 @@
 This is a simple list of all the effect inserts (as seen by direct access), their control numbers and actions. These apply regardless of whether the effect is in System effects, Insertion effects, or individual part effects.
 
-Control ranges are all 0 to 127 unless otherwise marked.
+Control ranges are all 0 to 127 unless otherwise marked, and most are MIDI-learnable
 
 Reverb
 0   Volume
@@ -103,15 +103,15 @@ Distortion
 
 EQ
 0   Gain
-1   Band number (0-6)
-2   Band frequency
-3   Band gain
-4   Band Q
-5   Band additional stages (0-4)
-6   Type (0-9)
+1   Band number (0-7) {BN}
+10 + BN * 5   Filter type (0-9)
+11 + BN * 5   Band frequency
+12 + BN * 5   Band gain
+13 + BN * 5   Band Q
+14 + BN * 5   Band additional stages (0-4)
 
 
-DynFilter
+DynFilter   This is not complete. filter UI not updating.
 0   Volume
 1   Panning
 2   LFO frequency

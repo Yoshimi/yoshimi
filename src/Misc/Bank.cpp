@@ -185,19 +185,23 @@ bool Bank::savetoslot(unsigned int ninstrument, Part *part)
     string filepath = getBankPath(currentRootID, currentBankID);
     if (filepath.at(filepath.size() - 1) != '/')
         filepath += "/";
-    filepath += filename;
-    if (isRegFile(filepath))
+    string fullpath = filepath + filename;
+    if (isRegFile(fullpath))
     {
-        int chk = remove(filepath.c_str());
+        int chk = remove(fullpath.c_str());
         if (chk < 0)
         {
-            synth->getRuntime().Log("saveToSlot failed to unlink " + filepath
+            synth->getRuntime().Log("saveToSlot failed to unlink " + fullpath
                         + ", " + string(strerror(errno)));
             return false;
         }
     }
-    if (!part->saveXML(filepath))
+    if (!part->saveXML(fullpath))
         return false;
+    filepath += force_bank_dir_file;
+    FILE *tmpfile = fopen(filepath.c_str(), "w+");
+    fputs (YOSHIMI_VERSION, tmpfile);
+    fclose(tmpfile);
     addtobank(currentRootID, currentBankID, ninstrument, filename, part->Pname);
     return true;
 }
@@ -362,6 +366,7 @@ bool Bank::newbankfile(string newbankdir)
         forcefile += "/";
     forcefile += force_bank_dir_file;
     FILE *tmpfile = fopen(forcefile.c_str(), "w+");
+    fputs (YOSHIMI_VERSION, tmpfile);
     fclose(tmpfile);
     return true;
 }

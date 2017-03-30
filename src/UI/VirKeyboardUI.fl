@@ -12,7 +12,7 @@ comment {
 Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2014 -2016, Will Godfrey
+Copyright 2014 -2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -28,7 +28,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of origional ZynAddSubFX code, modified December 2016
+This file is a derivative of origional ZynAddSubFX code, modified January 2017
 } {in_source in_header
 } 
 
@@ -50,10 +50,10 @@ decl {\#include "Misc/SynthEngine.h"} {public local
 decl {\#include "MusicIO/MidiControl.h"} {public local
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public local
+decl {\#include "UI/WidgetPDial.h"} {public local
 } 
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
+decl {\#include "UI/WidgetMWSlider.h"} {public local
 } 
 
 decl {const int keyspos[12]={0,-1,1,-2,2,3,-4,4,-5,5,-6,6};} {private local
@@ -495,7 +495,7 @@ virkeyboardwindow->hide();}
         }
 	synth->SetController(virkeys->midich, C_pitchwheel, - old);
         virkeys->take_focus();}
-        xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8192 step 1
+        xywh {6 12 18 110} labelsize 8 align 1 minimum -8192 maximum 8191 step 1
         class mwheel_slider
       }
     }

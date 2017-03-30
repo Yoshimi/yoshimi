@@ -1,10 +1,10 @@
 #include "Misc/Splash.h"
 
-const int splashWidth = 411;
-const int splashHeight = 311;
+const int splashWidth = 480;
+const int splashHeight = 320;
 
 const unsigned char splashPngData[] = {
-#include "Splash/SplashPngHex"
+#include "Misc/SplashPngHex"
 };
 
-const unsigned int splashPngLength = 85670;
+const unsigned int splashPngLength = 85082;

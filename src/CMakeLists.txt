@@ -2,7 +2,7 @@
 #   CMakeLists.txt
 #
 #   Copyright 2009-2011, Alan Calvert
-#   Copyright 2014-2016, Will Godfrey, and others
+#   Copyright 2014-2017, Will Godfrey, and others
 #
 #   This file is part of yoshimi, which is free software: you can
 #   redistribute it and/or modify it under the terms of the GNU General
@@ -27,12 +27,12 @@ endif (POLICY CMP0046)
 set (CMAKE_CXX_STANDARD 11) # we seem to need both for
 add_definitions(-std=gnu++11) # various versions of cmake
 
-add_definitions(-Wall)
-add_definitions(-Werror=format-security)
+#add_definitions(-Wall)
+#add_definitions(-Werror=format-security)
 
 # ^^^ comment these two out on release pushes ^^^
 
-set (YOSHIMI_VERSION "1.5.0")
+set (YOSHIMI_VERSION "1.5.1")
 
 file (WRITE version.txt "${YOSHIMI_VERSION}")
 
@@ -68,21 +68,18 @@ else (HasJackSession)
     set (JackSessionSupport OFF)
 endif (HasJackSession)
 
-#set (DefaultAudio jack CACHE STRING "Default audio driver - alsa or jack")
-#set (DefaultMidi jack CACHE STRING "Default midi driver - alsa or jack")
-
 option (BuildForAMD_X86_64 "Build for AMD x86_64 system" OFF)
 option (BuildForCore2_X86_64 "Build for Intel Core2 x86_64 system" OFF)
+option (BuildForNEON "Build for ARM Cortex A9 system" OFF)
+option (BuildForThisCPU "Build for presently running system" OFF)
 option (BuildForDebug "Include gdb debugging support" OFF)
 
-option (EnableGuiReports "Enable GUI control reports" OFF)
-
-option (ReportNoteOnTimes "Report Note-On Times" OFF)
-
 #option to build lv2 plugin
-option (BuildLV2Plugin "Build yoshimi lv2 plugin interface" ON)
+option (LV2Plugin "Build yoshimi lv2 plugin interface" ON)
 
-set (FifoDirectory /dev/shm CACHE STRING "Directory for fifos")
+# developer info
+option (ShowGuiReports "Enable GUI control reports" OFF)
+option (ShowNoteOnTimes "Report Note-On Times" OFF)
 
 set (BuildOptions_x86_64AMD
     "-O3 -march=athlon64 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
@@ -92,6 +89,16 @@ set (BuildOptions_x86_64AMD
 set (BuildOptions_X86_64Core2
     "-O3 -march=core2 -m64 -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
   CACHE STRING "X86_64 compiler options"
+)
+
+set (BuildOptions_NEON
+"-O3 -march=armv7-a -mfloat-abi=hard -mfpu=neon -mcpu=cortex-a9 -mtune=cortex-a9 -pipe -mvectorize-with-neon-quad -funsafe-loop-optimizations"
+  CACHE STRING "Cortex_a9 compiler options"
+)
+
+set (BuildOptionsThisCPU
+    "-O3 -march=native -Wall -ffast-math -fno-finite-math-only -fomit-frame-pointer"
+  CACHE STRING "Current CPU compiler options"
 )
 
 set (BuildOptionsBasic
@@ -257,7 +264,16 @@ else (BuildForDebug)
         if (BuildForCore2_X86_64)
             set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_X86_64Core2})
         else (BuildForCore2_X86_64)
-            set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+            if (BuildForNEON)
+                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptions_NEON})
+            else (BuildForNEON)
+                set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+                if (BuildForThisCPU)
+                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsThisCPU})
+                else (BuildForThicCPU)
+                    set (CMAKE_CXX_FLAGS_RELEASE ${BuildOptionsBasic})
+                endif (BuildForThisCPU)
+            endif (BuildForNEON)
         endif (BuildForCore2_X86_64)
     endif (BuildForAMD_X86_64)
     message (STATUS "Building for ${CMAKE_BUILD_TYPE}, flags: ${CMAKE_CXX_FLAGS_RELEASE}")
@@ -289,6 +305,7 @@ set (Interface_Sources
     Interface/CmdInterface.cpp
     Interface/InterChange.cpp
     Interface/MidiLearn.cpp
+    Interface/MidiDecode.cpp
     UI/MiscGui.cpp
 )
 
@@ -311,14 +328,14 @@ set (MusicIO_sources
 )
 
 set (FltkUI_names
-    "WidgetPDialUI" "PresetsUI" "EnvelopeUI"
+    "PresetsUI" "EnvelopeUI"
     "LFOUI" "FilterUI" "VirKeyboardUI"
     "ConfigUI" "SUBnoteUI" "ResonanceUI"
     "OscilGenUI" "ADnoteUI" "PADnoteUI"
     "EffUI" "BankUI" "PartUI"
     "MicrotonalUI" "MasterUI" "MasterMiscUI"
     "ParametersUI" "ConsoleUI" "VectorUI"
-    "MidiLearnUI" "WidgetMWSliderUI"
+    "MidiLearnUI"
 )
 
 # workaround fltk_wrap_ui breakage
@@ -337,6 +354,13 @@ foreach(basename ${FltkUI_names})
     set (FltkUI_headers ${FltkUI_headers} "${headerfile}")
 endforeach(basename ${FltkUI_names})
 
+set (FltkUI_sources
+    ${FltkUI_sources}
+    UI/DynamicTooltip.cpp
+    UI/WidgetPDial.cpp
+    UI/WidgetMWSlider.cpp
+)
+
 add_definitions (
     -D'YOSHIMI_VERSION="${YOSHIMI_VERSION}"'
     -D'BASE_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}"'
@@ -345,6 +369,8 @@ add_definitions (
     -DYOSHI_FIFO_DIR="${FifoDirectory}"
 )
 
+# many of these are here for convenience and consistency
+# changing them is likely to have unpredicable consequences
 add_definitions (-DYOSHIMI="yoshimi")
 add_definitions (-DCOMMAND_SIZE=80)
 add_definitions (-DMAX_HISTORY=25)
@@ -402,32 +428,17 @@ add_definitions (-DFF_MAX_SEQUENCE=8)
 add_definitions (-DMAX_PHASER_STAGES=12)
 add_definitions (-DMAX_ALIENWAH_DELAY=100)
 
-if (EnableGuiReports)
+if (ShowGuiReports)
     add_definitions (-DENABLE_REPORTS)
-endif (EnableGuiReports)
+endif (ShowGuiReports)
 
-if (ReportNoteOnTimes)
+if (ShowNoteOnTimes)
     add_definitions (-DREPORT_NOTEON)
-endif (ReportNoteOnTimes)
-#if (${DefaultAudio} STREQUAL "jack")
-#    message(STATUS "Default audio driver is Jack")
-    add_definitions(-DDEFAULT_AUDIO=jack_audio)
-#elseif (${DefaultAudio} STREQUAL "alsa")
-#    message(STATUS "Default audio driver is Alsa")
-#    add_definitions(-DDEFAULT_AUDIO=alsa_audio)
-#else (${DefaultAudio} STREQUAL "alsa")
-#    message(FATAL_ERROR "Invalid DefaultAudio selection: " ${DefaultAudio})
-#endif (${DefaultAudio} STREQUAL "jack")
+endif (ShowNoteOnTimes)
 
-#if (${DefaultMidi} STREQUAL "jack")
-#    message(STATUS "Default midi driver is Jack")
-    add_definitions(-DDEFAULT_MIDI=jack_midi)
-#elseif (${DefaultMidi} STREQUAL "alsa")
-#    message(STATUS "Default midi driver is Alsa")
-#    add_definitions(-DDEFAULT_MIDI=alsa_midi)
-#else (${DefaultMidi} STREQUAL "alsa")
-#    message(FATAL_ERROR "Invalid DefaultMidi selection: " ${DefaultMidi})
-#endif (${DefaultMidi} STREQUAL "jack")
+add_definitions(-DDEFAULT_AUDIO=jack_audio)
+
+add_definitions(-DDEFAULT_MIDI=jack_midi)
 
 if (JackSessionSupport)
     message(STATUS "With jack session support")
@@ -578,7 +589,7 @@ add_custom_target (distclean
 )
 
 
-if (BuildLV2Plugin)
+if (LV2Plugin)
     if (EXISTS $ENV{LV2_PATH})
         set(LV2_INSTALL_DIR $ENV{LV2_PATH} CACHE PATH
         "Specifies where the LV2 libraries should be installed")
@@ -594,4 +605,4 @@ if (BuildLV2Plugin)
         message (FATAL_ERROR "lv2 package required but not found (version 1.0.0 needed)")
     endif (LV2_FOUND)
     add_subdirectory(LV2_Plugin)
-endif (BuildLV2Plugin)
+endif (LV2Plugin)

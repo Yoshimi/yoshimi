@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2009 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,8 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified August 2014
+    This file is derivative of original ZynAddSubFX code
+    Modified March 2017
 */
 
 #include <cmath>
@@ -83,6 +84,8 @@ ADnote::ADnote(ADnoteParameters *adpars_, Controller *ctl_, float freq_,
         NoteGlobalPar.randpanL = cosf(t * HALFPI);
         NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
     }
+    else
+        NoteGlobalPar.randpanL = NoteGlobalPar.randpanR = 0.7f;
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq() // center freq
         + adpars->GlobalPar.PFilterVelocityScale / 127.0f * 6.0f
@@ -528,6 +531,8 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
         NoteGlobalPar.randpanL = cosf(t * HALFPI);
         NoteGlobalPar.randpanR = cosf((1.0f - t) * HALFPI);
     }
+    else
+        NoteGlobalPar.randpanL = NoteGlobalPar.randpanR = 0.7f;
 
     NoteGlobalPar.FilterCenterPitch =
         adpars->GlobalPar.GlobalFilter->getfreq()
@@ -681,6 +686,8 @@ void ADnote::ADlegatonote(float freq_, float velocity_, int portamento_,
             NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
             NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
         }
+        else
+            NoteVoicePar[nvoice].randpanL = NoteVoicePar[nvoice].randpanR = 0.7f;
 
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled
@@ -905,6 +912,8 @@ void ADnote::initParameters(void)
             NoteVoicePar[nvoice].randpanL = cosf(t * HALFPI);
             NoteVoicePar[nvoice].randpanR = cosf((1.0f - t) * HALFPI);
         }
+        else
+            NoteVoicePar[nvoice].randpanL = NoteVoicePar[nvoice].randpanR = 0.7f;
 
         newamplitude[nvoice] = 1.0f;
         if (adpars->VoicePar[nvoice].PAmpEnvelopeEnabled)
@@ -1317,6 +1326,49 @@ inline void ADnote::computeVoiceOscillatorLinearInterpolation(int nvoice)
 // end of port
 
 
+/*
+ * Computes the Oscillator (Without Modulation) - CubicInterpolation
+
+ * The differences from the Linear are to little to deserve to be used.
+ * This is because I am using a large zynMaster->getOscilsize(), >512
+ *
+inline void ADnote::computeVoiceOscillatorCubicInterpolation(int nvoice)
+{
+    int i, poshi;
+    float poslo;
+    for (int k = 0; k < unison_size[nvoice]; ++k)
+    {
+        poshi = oscposhi[nvoice][k];
+        poslo = oscposlo[nvoice][k];
+        float *smps = NoteVoicePar[nvoice].OscilSmp;
+        float xm1,x0,x1,x2,a,b,c;
+        for (i = 0; i < synth->p_buffersize; ++i)
+        {
+        x   m1 = smps[poshi];
+            x0 = smps[poshi + 1];
+            x1 = smps[poshi + 2];
+            x2 = smps[poshi + 3];
+            a = (3.0 * (x0 - x1) - xm1 + x2) / 2.0;
+            b = 2.0 * x1 + xm1 - (5.0 * x0 + x2) / 2.0;
+            c = (x1 - xm1) / 2.0;
+            tmpwave_unison[i][k] = (((a * poslo) + b) * poslo + c) * poslo + x0;
+            printf("a\n");
+            //tmpwave_unison[i][k] = smps[poshi] * (1.0 - poslo) + smps[poshi + 1] * poslo;
+            poslo += oscfreqlo[nvoice][k];
+            if (poslo >= 1.0)
+            {
+                    poslo -= 1.0;
+            ++poshi;
+            }
+            poshi += oscfreqhi[nvoice][k];
+            poshi &= synth->oscilsize - 1;
+        }
+        oscposhi[nvoice][k] = poshi;
+        oscposlo[nvoice][k] = poslo;
+    }
+}
+*/
+
 // Computes the Oscillator (Morphing)
 void ADnote::computeVoiceOscillatorMorph(int nvoice)
 {
@@ -1665,7 +1717,10 @@ int ADnote::noteout(float *outl, float *outr)
                         break;
                     default:
                         computeVoiceOscillatorLinearInterpolation(nvoice);
-                        //if (config.cfg.Interpolation) computeVoiceOscillatorCubicInterpolation(nvoice);
+                        // don't know how this sounds
+                        // Yoshi segfaults on it :(
+                        //if (synth->getRuntime().Interpolation)
+                            //computeVoiceOscillatorCubicInterpolation(nvoice);
                         break;
                 }
                 break;

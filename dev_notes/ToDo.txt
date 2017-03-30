@@ -1,15 +1,21 @@
 
-Send global and part keyshifts through ring buffer (like global fine detune).
+Direct access to envelope not updating Gui graph, but seems to work otherwise.
 
-Sort out direct access dynfilter->filter (and two enclosed controls). All work but don't update gui.
+Sort out direct access dynfilter->filter controls work but don't update gui.
+
+Expand midi-learn to include switches, and the controllers window
+
+Make 'New Instance With ID' autoselect the next one available, then dispense with the other form.
+
+Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
-
-CLI doesn't manage global detune, but direct access does.
 
 Find out why LV2 only stores/retrieves patch sets (not state)
 
 Make add voice & add/pad oscillator windows show kit number & name.
+
+Make vector window update when main window reduces number of available parts.
 
 Consider, Pitchwheel split range in Controllers, but that one seems
 a bit pointless to me!
@@ -18,8 +24,7 @@ Change root/bank/instrument lists to single file for all instances.
 
 Make loading effect presets update the 'top' line.
 
-Startup state load doesn't set buffersize correctly - partially resolved.
-    size is ignored if loaded when already running (which is reasonable).
+Startup state load doesn't set buffersize correctly - partially resolved. Size is ignored if loaded when already running (which is reasonable).
 
 Allow headless compilation.
 
@@ -27,12 +32,9 @@ Add scales control to CLI.
 
 Make things like LFOs either floats or much higher resolution.
 
-Make LFOs active on sounding notes. Not easy!
-
 Consider enabling and disabling tooltips.
 
-Make attempt to start second independent instance open a new one in running
-yoshimi instead - saves memory and more consistent.
+Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
 
 
 RPNs (channel based)
@@ -42,8 +44,6 @@ RPNs (channel based)
 100,0 Pitch bend range
 100,1 Fine detune
 100,2 Coarse detune
-
-Maybe a NRPN variation of this for global fine tuning.
 
 Improve Copy & Paste functionality.
 

@@ -29,5 +29,8 @@ void BodyDisposal::addBody(Carcass *body)
 void BodyDisposal::disposeBodies(void)
 {
     for (int x = corpses.size(); x > 0; --x)
+    {
+        //delete corpses.front(); // non boost
         corpses.pop_front();
+    }
 }

@@ -1,7 +1,7 @@
 /*
     MidiLearn.h
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified February 2017
 */
 
 #ifndef MIDILEARN_H
@@ -59,7 +60,7 @@ class MidiLearn : private MiscFuncs
         } data;
 
         struct LearnBlock{
-            unsigned char CC;
+            unsigned int CC;
             unsigned char chan;
             unsigned char min_in;
             unsigned char max_in;
@@ -67,15 +68,15 @@ class MidiLearn : private MiscFuncs
             int min_out; // defined programaticly
             int max_out; // defined programaticly
             Control data; // controller to learn
-            string name; // optional derived from controller text?
+            string name; // derived from controller text
         };
         bool learning;
 
         void setTransferBlock(CommandBlock *getData, string name);
 
-        bool runMidiLearn(float value, unsigned char CC, unsigned char chan, bool in_place);
+        bool runMidiLearn(float value, unsigned int CC, unsigned char chan, unsigned char category);
         bool writeMidi(CommandBlock *putData, unsigned int writesize, bool in_place);
-        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned char CC, unsigned char chan, LearnBlock *block, bool show);
+        int findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int CC, unsigned char chan, LearnBlock *block, bool show);
         void listLine(int lineNo);
         void listAll(list<string>& msg_buf);
         bool remove(int itemNumber);
@@ -89,8 +90,9 @@ class MidiLearn : private MiscFuncs
         string learnedName;
         CommandBlock learnTransferBlock;
 
-        void insert(unsigned char CC, unsigned char chan);
+        void insert(unsigned int CC, unsigned char chan);
         SynthEngine *synth;
+        void writeToGui(CommandBlock *putData);
         void updateGui(int opp = 0);
 };
 

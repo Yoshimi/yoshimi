@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code, modified February 2017
 */
 
 #ifndef AD_NOTE_PARAMETERS_H
@@ -197,6 +197,7 @@ class ADnoteParameters : public Presets
         ADnoteGlobalParam GlobalPar;
         ADnoteVoiceParam VoicePar[NUM_VOICES];
         static int ADnote_unison_sizes[15];
+        void postrender(void);
 
     private:
         void defaults(int n); // n is the nvoice

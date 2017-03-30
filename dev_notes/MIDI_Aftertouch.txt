@@ -1,9 +1,11 @@
 voice aftertouch
 A0-AF
-becomes CC 900
-but don't yet know how to interpret (or claim extra parameter)
+should become CC 642
+but don't yet know how to interpret (or claim extra parameter) so it is tempoarily set as chanel aftertouch.
+
 
 channel aftertouch
 D0 = DF
-becomes CC 901
-but not implemented yet
+becomes CC 641
+
+This is now implemented for MIDI learn, and is translated as CC 129.

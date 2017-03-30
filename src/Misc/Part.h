@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011 Alan Calvert
-    Copyright 2014, Will Godfrey
+    Copyright 2014-2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified July 2014
+    This file is derivative of original ZynAddSubFX code.
+
+    Modified March 2017
 */
 
 #ifndef PART_H
@@ -77,6 +79,7 @@ class Part : private MiscFuncs, SynthHelper
         void add2XMLinstrument(XMLwrapper *xml);
         void getfromXML(XMLwrapper *xml);
         void getfromXMLinstrument(XMLwrapper *xml);
+        void getLimits(CommandBlock *getData);
 
         Controller *ctl;
 
@@ -100,18 +103,22 @@ class Part : private MiscFuncs, SynthHelper
         void setkeylimit(unsigned char Pkeylimit_);
         void setkititemstatus(int kititem, int Penabled_);
         void setVolume(float value);
+        void checkVolume(float step);
         void setDestination(int value);
+        void checkPanning(float step);
 
         SynthEngine *getSynthEngine() {return synth;}
 
-        unsigned char Penabled;
-        unsigned char Pvolume;
+        char Penabled; // this *must* be signed
+        float         Pvolume;
+        float         TransVolume;
         unsigned char Pminkey;
         unsigned char Pmaxkey;
         unsigned char Pkeyshift;
         float PnoteMap[128];
         unsigned char Prcvchn;
-        char          Ppanning;
+        float         Ppanning;
+        float         TransPanning;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages
@@ -145,9 +152,8 @@ class Part : private MiscFuncs, SynthHelper
         EffectMgr *partefx[NUM_PART_EFX];      // insertion part effects - part of the instrument
 
         float volume;      // applied by MasterAudio
-        float oldvolumel;
-        float oldvolumer;
-        float randompan;
+        float pangainL;
+        float pangainR;
         int lastnote;
 
 
@@ -155,7 +161,7 @@ class Part : private MiscFuncs, SynthHelper
         void KillNotePos(int pos);
         void RelaseNotePos(int pos);
         void MonoMemRenote(void); // MonoMem stuff.
-        void setPan(char panning);
+        void setPan(float value);
         void Mute(void) { __sync_or_and_fetch(&partMuted, 0xFF); }
         void Unmute(void) { __sync_and_and_fetch(&partMuted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&partMuted, 0) != 0); }
@@ -182,8 +188,6 @@ class Part : private MiscFuncs, SynthHelper
         int lastposb;             // ^^
         bool lastlegatomodevalid; // previous legatomodevalid.
 
-        float pangainL;
-        float pangainR;
         float *tmpoutl;
         float *tmpoutr;
         float oldfreq; // for portamento

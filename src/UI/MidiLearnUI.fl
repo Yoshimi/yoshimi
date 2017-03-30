@@ -1,14 +1,14 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {MidiLearnUI.h} {not_in_source in_header
-} 
+}
 
 comment {MidiLearnUI.cc} {in_source not_in_header
-} 
+}
 
-comment {Copyright (C) 2016, Will Godfrey
+comment {Copyright (C) 2016-2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -24,25 +24,25 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-} {in_source in_header
-} 
+Modified March 2017} {in_source in_header
+}
 
 decl {\#include <FL/fl_ask.H>
     \#include "Misc/Config.h"
     \#include "Misc/SynthEngine.h"} {private global
-} 
+}
 
 decl {using namespace std;} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {private local
-} 
+}
 
 decl {\# include "Misc/MiscFuncs.h"} {private local
-} 
+}
 
 decl {\#include "UI/MiscGui.h"
     \#include "EffUI.h"
@@ -50,10 +50,10 @@ decl {\#include "UI/MiscGui.h"
     \#include "ADnoteUI.h"
     \#include "SUBnoteUI.h"
     \#include "PADnoteUI.h"
-    \#include "WidgetMWSliderUI.h"
+    \#include "UI/WidgetMWSlider.h"
     \#include "Params/Controller.h"
     \#include "Misc/MiscFuncs.h"} {public global
-} 
+}
 
 class MidiLearnKitItem {: {public Fl_Group}
 } {
@@ -67,11 +67,15 @@ class MidiLearnKitItem {: {public Fl_Group}
       } {
         Fl_Spinner CCcounter {
           callback {send_data(16);}
-          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 119 value 14 textsize 12
+          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
           xywh {109 0 15 16} box FLAT_BOX down_box FLAT_BOX
+        }
+        Fl_Button nrpn {
+          label {8888 h}
+          xywh {69 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
         }
         Fl_Choice channelchoice {
           callback {send_data(16);}
@@ -199,31 +203,34 @@ if (o->value())
 else
     midilearnkititemgroup->activate();
 send_data(2);}
-        tooltip {Completely ignore this line} xywh {39 0 19 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+        tooltip {Completely ignore this line} xywh {39 0 16 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
   }
   Function {send_data(int control)} {} {
     code {//
-if (control == 8)
-{
-    if(Fl::event_state(FL_CTRL) == 0)
-        return;
-    if (fl_choice("Remove line. %d %s?", "Yes", "No", NULL, n + 1, commandName->label()))
-        return;
-}
-int type = 0;
-if (blockcheck->value() != 0)
-    type = 1;
+    bool doit = true;
+    if (control == 8)
+    {
+        doit = (Fl::event_state(FL_CTRL) != 0);
+        if (doit)
+            doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
+    }
+    if (doit)
+    {
+        int type = stat & 0x10;
+        if (blockcheck->value() != 0)
+            type = 1;
 
-if (compresscheck->value() != 0)
-    type |= 2;
+        if (compresscheck->value() != 0)
+            type |= 2;
 
-if (mutecheck->value() != 0)
-    type |= 4;
+        if (mutecheck->value() != 0)
+            type |= 4;
 
-collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);} {}
+        collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);
+    }} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -246,7 +253,9 @@ end();} {}
   }
   decl {SynthEngine *synth;} {private local
   }
-} 
+  decl {unsigned char stat;} {public local
+  }
+}
 
 class MidiLearnUI {selected : {private MiscFuncs}
 } {
@@ -298,6 +307,11 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         label Max
         xywh {265 0 40 15} labelfont 1 labelsize 11 align 18
       }
+      Fl_Button {} {
+        label Close
+        callback {midilearnwindow->hide();}
+        xywh {730 262 63 20} box THIN_UP_BOX
+      }
       Fl_Button load {
         label Load
         callback {char *filename;
@@ -321,7 +335,7 @@ setWindowTitle(findleafname(filename));}
       Fl_Button clear {
         label Clear
         callback {//
-if (fl_choice("Remove all entries", "Yes", "No", NULL))
+if (fl_choice("Remove all entries", NULL, "No", "Yes") < 2)
     return;
 
 send_data(96,0,0);
@@ -337,16 +351,10 @@ synth->getGuiMaster()->paramsui->Show(6);}
         code0 {vector<string> &listType = *synth->getHistory(6);}
         code1 {if (listType.size() == 0) o->deactivate(); else o->activate();}
       }
-      Fl_Button {} {
-        label Close
-        callback {midilearnwindow->hide();}
-        xywh {730 262 63 20} box THIN_UP_BOX
-      }
     }
     Fl_Window message {
       xywh {4 20 290 85} type Double labelsize 12 hide
-      code0 {o->position(0, 0);}
-      code1 {o->copy_label(synth->makeUniqueName("").c_str());}
+      code0 {o->copy_label(synth->makeUniqueName("").c_str());}
     } {
       Fl_Box words {
         label {?}
@@ -372,14 +380,42 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
   Function {returns_update(CommandBlock *getData)} {} {
     code {//
     int value = lrint(getData->data.value);
+    unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+    unsigned char parameter = getData->data.parameter;
     unsigned char par2 = getData->data.par2;
-
+    string hex;
+    unsigned int IDold;
+    unsigned int IDnew;
     switch(control)
     {
         case 0:
+            break;
+        case 7:
+            if(type < 255) // edit line in place
+            {
+                midilearnkititem[value]->blockcheck->value((type & 1) != 0);
+                midilearnkititem[value]->compresscheck->value((type & 2) != 0);
+                midilearnkititem[value]->mutecheck->value((type & 4) != 0);
+            }
+            if (kititem < 255)
+                midilearnkititem[value]->CCcounter->value(kititem);
+            if (engine < 255)
+                midilearnkititem[value]->channelchoice->value(engine);
+            if (insert < 255)
+                midilearnkititem[value]->minval->value(insert);
+            if (parameter < 255)
+                midilearnkititem[value]->maxval->value(parameter);
+            break;
+        case 9: // set NRPN fixed value in place
+            hex = (asHexString(int(engine))) + " " + (asHexString(int(kititem))) + " h";
+            midilearnkititem[value]->stat |= 0x10;
+            midilearnkititem[value]->nrpn->copy_label(hex.c_str());
+            midilearnkititem[value]->CCcounter->hide();
+            midilearnkititem[value]->nrpn->show();
             break;
         case 16:
             addLine(getData);
@@ -389,14 +425,28 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
         case 21:
             words->copy_label(miscMsgPop(par2).c_str());
             cancel->show();
+            message->position(Fl::event_x_root() + 16, Fl::event_y_root());
             message->show();
-        case 24:
+            break;
+        case 22:
+        midilearnwindow->show();
+            break;
+        case 24: // flash LED
+            IDold = kititem | (engine << 8);
             for(int i = 0; i < MIDI_LEARN_BLOCK; ++ i)
             {
-                if (midilearnkititem[i] != NULL)
+                if (midilearnkititem[i] != NULL && midilearnkititem[i]->mutecheck->value() == 0)
                 {
-                    if (midilearnkititem[i]->CCcounter->value() == kititem && midilearnkititem[i]->channelchoice->value() == engine)
+                    unsigned char newchan = midilearnkititem[i]->channelchoice->value();
+                    if (newchan == 16) // all of them
+                        newchan = engine; // force it to match
+                    IDnew = (unsigned int)midilearnkititem[i]->CCcounter->value() | (newchan << 8);
+                    if (IDold == IDnew && (type & 0x10) == (midilearnkititem[i]->stat & 0x10))
+                    {
                         midilearnkititem[i]->activity->do_callback();
+                        if (midilearnkititem[i]->blockcheck->value() != 0)
+                            IDold = 0xffffff; // block following lines
+                    }
                 }
             }
             break;
@@ -407,33 +457,35 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             cancel->hide();
             words->copy_label("Learn cancelled");
             message->show();
+            break;
     }
     Fl::check();} {}
   }
   Function {addLine(CommandBlock *getData)} {} {
     code {//
-int lineNo = ((int)getData->data.value);
-int status = getData->data.type;
-string name = miscMsgPop(getData->data.par2);
-none->hide();
-clear->activate();
-save->activate();
-midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,818,20,"");
-midilearnkititem[lineNo]->init(synth, lineNo);
-kitlist->add(midilearnkititem[lineNo]);
+    int lineNo = ((int)getData->data.value);
+    int status = getData->data.type;
+    string name = miscMsgPop(getData->data.par2);
+    none->hide();
+    clear->activate();
+    save->activate();
+    midilearnkititem[lineNo] = new MidiLearnKitItem(0, 0,818,20,"");
+    midilearnkititem[lineNo]->init(synth, lineNo);
+    kitlist->add(midilearnkititem[lineNo]);
 
-midilearnkititem[lineNo]->position(2, 21 + lineNo*20);
-midilearnkititem[lineNo]->mutecheck->value(status & 4);
-midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
-midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
-midilearnkititem[lineNo]->minval->value(getData->data.insert);
-midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
-midilearnkititem[lineNo]->compresscheck->value(status & 2);
-midilearnkititem[lineNo]->blockcheck->value(status & 1);
-midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
-if (status & 4)
-    midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();
-midilearnwindow->redraw();} {}
+    midilearnkititem[lineNo]->position(2, 21 + lineNo*20);
+    midilearnkititem[lineNo]->stat = (status & 0x10);
+    midilearnkititem[lineNo]->mutecheck->value(status & 4);
+    midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
+    midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
+    midilearnkititem[lineNo]->minval->value(getData->data.insert);
+    midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
+    midilearnkititem[lineNo]->compresscheck->value(status & 2);
+    midilearnkititem[lineNo]->blockcheck->value(status & 1);
+    midilearnkititem[lineNo]->commandName->copy_label(name.c_str());
+    if (status & 4)
+        midilearnkititem[lineNo]->midilearnkititemgroup->deactivate();
+    midilearnwindow->redraw();} {}
   }
   Function {MidiLearnUI(SynthEngine *_synth)} {} {
     code {//
@@ -491,4 +543,4 @@ midilearnwindow->copy_label(synth->makeUniqueName("MIDI Learn" + name).c_str());
   }
   decl {int num;} {private local
   }
-} 
+}

@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {SubNoteUI.h} {not_in_source in_header
-} 
+}
 
 comment {SubNoteUI.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2015-2016, Will Godfrey
+Copyright 2015-2017, Will Godfrey & others
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,46 +27,48 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
+This file is derivative of ZynAddSubFX original code
+
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
-decl {\#include "WidgetPDialUI.h"} {public local
-} 
+decl {\#include "UI/WidgetPDial.h"} {public local
+}
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
-} 
+decl {\#include "UI/WidgetMWSlider.h"} {public local
+}
 
 decl {\#include "EnvelopeUI.h"} {public local
-} 
+}
 
 decl {\#include "FilterUI.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthHelper.h"} {public local
-} 
+}
 
 decl {\#include "Params/SUBnoteParameters.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class SUBnoteharmonic {: {public Fl_Group}
 } {
   Function {make_window()} {private
   } {
     Fl_Window harmonic {
-      xywh {558 534 90 310} type Double hide
+      xywh {791 751 90 310} type Double hide
       class Fl_Group
     } {
       Fl_Slider mag {
@@ -87,7 +89,7 @@ if (pars->Phmag[n]==0)
     o->selection_color(0);
 else
     o->selection_color(222);}
-        tooltip {harmonic's magnitude} xywh {0 15 10 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
+        tooltip {Harmonic's magnitude} xywh {0 15 12 131} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 127
         code0 {o->value(127-pars->Phmag[n]);}
         code1 {if (pars->Phmag[n]==0) o->selection_color(0);}
         class mwheel_slider
@@ -95,9 +97,9 @@ else
       Fl_Slider bw {
         callback {int x=64;
 if (Fl::event_button() != 3)
-    x=127-(int)o->value();
+    x = 127 - (int)o->value();
 else
-    o->value(x);
+    o->value(x - 1);
 pars->Phrelbw[n]=x;
 
 send_data(7, n, x, 0xc8);
@@ -106,23 +108,25 @@ if (pars->Phrelbw[n]==64)
     o->selection_color(0);
 else
     o->selection_color(222);}
-        tooltip {harmonic's bandwidth} xywh {0 156 10 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 64
-        code0 {o->value(127-pars->Phrelbw[n]);}
-        code1 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
+        tooltip {Harmonic's bandwidth multiplier} xywh {0 156 12 126} type {Vert Knob} box FLAT_BOX selection_color 222 maximum 127 step 1 value 63
+        code0 {o->setValueType(VC_SubBandwidthRel);}
+        code1 {o->useCustomTip(true);}
+        code2 {o->value(127-pars->Phrelbw[n]);}
+        code3 {if (pars->Phrelbw[n]==64) o->selection_color(0);}
         class mwheel_slider
       }
       Fl_Box {} {
-        xywh {10 216 5 5} box FLAT_BOX color 39
+        xywh {12 217 5 3} box FLAT_BOX color 39
         code0 {if (n+1==MAX_SUB_HARMONICS) o->hide();}
       }
       Fl_Box {} {
         label 01
-        xywh {0 285 10 15} labelfont 1 labelsize 9 align 20
+        xywh {0 285 12 15} labelfont 1 labelsize 9 align 16
         code0 {char tmp[10];snprintf(tmp,10,"%d",n+1);o->label(strdup(tmp));}
       }
       Fl_Box {} {
         label 01
-        xywh {0 0 10 15} labelfont 1 labelsize 9 align 20
+        xywh {0 0 12 15} labelfont 1 labelsize 9 align 16
         code0 {char tmp[10];snprintf(tmp,10,"%d",n+1);o->label(strdup(tmp));}
       }
     }
@@ -164,23 +168,25 @@ hide();
   }
   decl {int kititem;} {private local
   }
-} 
+}
 
-class SUBnoteUI {selected : {public PresetsUI_, SynthHelper}
+class SUBnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {} {
     Fl_Window SUBparameters {
       label {SUBsynth Parameters}
-      xywh {19 114 735 475} type Double hide
+      xywh {1 21 735 475} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("SubSynth").c_str());}
       code1 {o->position(synth->getGuiMaster()->subNoteX, synth->getGuiMaster()->subNoteY);}
     } {
       Fl_Scroll {} {
-        xywh {5 140 434 330} type HORIZONTAL box THIN_UP_BOX
+        xywh {5 140 435 330} type HORIZONTAL box THIN_UP_BOX when 1
       } {
         Fl_Pack harmonics {
-          xywh {10 145 425 325} type HORIZONTAL
-          code0 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,15,o->h(),"");h[i]->init(pars, i, npart, kititem);}}
+          xywh {5 148 435 300} type HORIZONTAL
+          code0 {new Fl_Box(0,0,9,o->h());}
+          code1 {for (int i=0;i<MAX_SUB_HARMONICS;i++){h[i]=new SUBnoteharmonic(0,0,17,o->h(),"");h[i]->init(pars, i, npart, kititem);}}
+          code2 {new Fl_Box(0,0,3,o->h());}
         } {}
       }
       Fl_Button {} {
@@ -205,7 +211,7 @@ if ((Fl::event_button() == 3))
           label Volume
           callback {pars->PVolume = (int)o->value();
 send_data (0, o->value(), 0xc8);}
-          tooltip Volume xywh {40 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip Volume xywh {37 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_InstrumentVolume);}
           code1 {o->value(pars->PVolume);}
           code2 {o->init(96);}
@@ -215,7 +221,7 @@ send_data (0, o->value(), 0xc8);}
           label {Veloc Sens}
           callback {pars->PAmpVelocityScaleFunction = (int) o->value();
 send_data (1, o->value(), 0xc8);}
-          tooltip {Velocity sensing} xywh {101 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity sensing} xywh {98 20 29 29} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->PAmpVelocityScaleFunction);}
           code1 {o->init(90);}
           code2 {o->setValueType(VC_AmpVelocitySense);}
@@ -225,9 +231,9 @@ send_data (1, o->value(), 0xc8);}
           label Pan
           callback {//
     pars->setPan((char)o->value());
-    randompan->value(pars->randomPan());
+    randompan->value(o->value() < 1);
     send_data (2, o->value(), 0xc8);}
-          tooltip {Panning - zero/leftmost is Random} xywh {160 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
+          tooltip {Panning - zero/leftmost is Random} xywh {157 20 29 29} box ROUND_UP_BOX labelsize 10 align 6 maximum 127 step 1
           code0 {o->setValueType(VC_PanningRandom);}
           code1 {o->value(pars->PPanning);}
           code2 {o->init(64);}
@@ -236,13 +242,11 @@ send_data (1, o->value(), 0xc8);}
         Fl_Light_Button randompan {
           label Rand
           callback {//
-              if (pars->randomPan()) // set to full left
-              {
-                  pars->setPan(1);
-                  pan->value(1);
-              }
-              o->value(pars->randomPan());}
-          xywh {182 49 13 13} box NO_BOX color 35 selection_color 88 labelsize 10
+    pars->setPan(0);
+    pan->value(0);
+    o->value(1);
+    send_data (2, o->value(), 0xc0);}
+          xywh {179 49 7 13} box NO_BOX color 35 selection_color 88 labelsize 10 align 8
           code0 {o->value(pars->randomPan());}
         }
         Fl_Group ampenv {
@@ -253,20 +257,20 @@ send_data (1, o->value(), 0xc8);}
         } {}
       }
       Fl_Group {} {
-        xywh {495 406 235 35} box THIN_UP_FRAME
+        xywh {500 406 230 35} box THIN_UP_FRAME
       } {
         Fl_Counter filterstages {
           label {Filter Stages}
           callback {pars->Pnumstages = (int) o->value();
 send_data (80, o->value(), 0xc0);}
-          tooltip {How many times the noise is filtered} xywh {515 421 45 15} type Simple labelfont 1 labelsize 10 align 1 minimum 1 maximum 5 step 1 textsize 10
+          tooltip {How many times the noise is filtered} xywh {520 421 45 15} type Simple labelfont 1 labelsize 10 align 1 minimum 1 maximum 5 step 1 value 1 textsize 10
           code0 {o->value(pars->Pnumstages);}
         }
         Fl_Choice magtype {
           label {Mag.Type}
           callback {pars->Phmagtype = (int) o->value();
 send_data (81, o->value(), 0xc0);}
-          xywh {585 421 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
+          xywh {590 421 65 15} down_box BORDER_BOX labelfont 1 labelsize 10 align 1 textsize 11
           code0 {o->value(pars->Phmagtype);}
         } {
           MenuItem {} {
@@ -333,7 +337,7 @@ send_data (82, o->value(), 0xc0);}
     o->show();
     freqsettingsui->redraw();
     send_data (40, o->value(), 0xc0);}
-          xywh {445 68 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
+          xywh {445 67 55 15} down_box DOWN_BOX labelfont 1 labelsize 10
           code0 {o->value(pars->PFreqEnvelopeEnabled);}
         }
         Fl_Counter octave {
@@ -344,7 +348,7 @@ send_data (82, o->value(), 0xc0);}
         k += 16;
     pars->PCoarseDetune = k * 1024 + pars->PCoarseDetune % 1024;
     send_data (35, o->value(), 0xc0);}
-          tooltip Octave xywh {445 18 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+          tooltip Octave xywh {446 18 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
         }
@@ -375,7 +379,7 @@ send_data (82, o->value(), 0xc0);}
         Fl_Value_Output detunevalueoutput {
           label Detune
           callback {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
-          xywh {444 47 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
+          xywh {445 47 45 15} labelsize 10 align 5 minimum -5000 maximum 5000 textfont 1 textsize 10
           code0 {o->step(0.01, 1);}
           code1 {o->value(getDetune(pars->PDetuneType,0,pars->PDetune));}
         }
@@ -400,6 +404,7 @@ send_data (33, o->value(), 0xc8);}
           code0 {o->value(pars->PfixedfreqET);}
           code1 {if (pars->Pfixedfreq==0) o->deactivate();}
           code2 {o->init(0);}
+          code3 {o->setValueType(VC_FixedFreqET);}
           class WidgetPDial
         }
         Fl_Choice detunetype {
@@ -416,9 +421,10 @@ send_data (33, o->value(), 0xc8);}
           label Bend
           callback {pars->PBendAdjust = lrint(o->value());
 send_data(38, o->value(), 0xc8);}
-          tooltip {How the frequency varies according to the pitch wheel} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
+          tooltip {Pitch bend range scaling} xywh {500 21 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
           code0 {o->value(pars->PBendAdjust);}
           code1 {o->init(88);}
+          code2 {o->setValueType(VC_PitchBend);}
           class WidgetPDial
         }
         Fl_Dial offset {
@@ -436,7 +442,7 @@ send_data(39, o->value(), 0xc8);}
         label Stereo
         callback {pars->Pstereo=(int) o->value();
 send_data (112, o->value(), 0xc0);}
-        xywh {440 406 55 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 10
+        xywh {440 406 60 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
       }
       Fl_Button {} {
@@ -464,7 +470,7 @@ send_data (112, o->value(), 0xc0);}
       } {
         Fl_Group bandwidthenvelopegroup {
           label {SUBsynth - BandWidth Envelope}
-          xywh {225 65 205 70} box FLAT_BOX color 51 align 144
+          xywh {225 65 210 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->BandWidthEnvelope, npart, kititem, 1, 3);}
           code1 {if (pars->PBandWidthEnvelopeEnabled==0) o->deactivate();}
           class EnvelopeUI
@@ -489,8 +495,10 @@ send_data (112, o->value(), 0xc0);}
     o->value(40);
 pars->Pbandwidth=(int) o->value();
 send_data (16, o->value(), 0xc8);}
-          xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
-          code0 {o->value(pars->Pbandwidth);}
+          tooltip {Base bandwidth, approximate} xywh {225 40 115 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 maximum 127 step 1
+          code0 {o->setValueType(VC_SubBandwidth);}
+          code1 {o->useCustomTip(true);}
+          code2 {o->value(pars->Pbandwidth);}
           class mwheel_val_slider_rev
         }
         Fl_Value_Slider bwidthscale {
@@ -499,8 +507,10 @@ send_data (16, o->value(), 0xc8);}
     o->value(0);
 pars->Pbwscale=(int) o->value() + 64;
 send_data (17, o->value() + 64, 0xc8);}
-          tooltip {How much I increase the BandWidth according to lower/higher harmonics} xywh {345 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
-          code0 {o->value(pars->Pbwscale-64);}
+          tooltip {Freq-dep. bw. scaling} xywh {344 40 90 15} type {Horz Knob} box THIN_DOWN_BOX labelsize 10 align 1 minimum -64 maximum 63 step 1
+          code0 {o->setValueType(VC_SubBandwidthScale); o->setGraphicsType(VC_SubBandwidthScale);}
+          code1 {o->useCustomTip(true);}
+          code2 {o->value(pars->Pbwscale-64);}
           class mwheel_val_slider_rev
         }
       }
@@ -511,13 +521,13 @@ send_data (17, o->value() + 64, 0xc8);}
       } {
         Fl_Group filterenv {
           label {SUBsynth - Filter Envelope}
-          xywh {445 331 275 70} box FLAT_BOX color 51 align 144
+          xywh {447 328 275 70} box FLAT_BOX color 51 align 144
           code0 {o->init(pars->GlobalFilterEnvelope, npart, kititem, 1, 2);}
           class EnvelopeUI
         } {}
         Fl_Group filterui {
-          label {SUBsynthl - Filter}
-          xywh {445 246 275 75} box FLAT_BOX color 50 align 144
+          label {SUBsynth - Filter}
+          xywh {447 246 275 75} box FLAT_BOX color 50 align 144
           code0 {o->init(pars->GlobalFilter,&pars->PGlobalFilterVelocityScale,&pars->PGlobalFilterVelocityScaleFunction, npart, kititem, 1);}
           class FilterUI
         } {}
@@ -533,7 +543,7 @@ send_data (17, o->value() + 64, 0xc8);}
     o->show();
     globalfiltergroup->redraw();
     send_data (64, o->value(), 0xc0);}
-        xywh {445 226 85 20} down_box DOWN_BOX labelfont 1 labelsize 11
+        xywh {446 225 85 20} down_box DOWN_BOX labelfont 1 labelsize 11
         code0 {o->value(pars->PGlobalFilterEnabled);}
       }
       Fl_Button {} {
@@ -551,7 +561,7 @@ send_data (17, o->value() + 64, 0xc8);}
         xywh {440 140 290 81} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
       } {
         Fl_Choice spreadtype {
-          label {Overtones  Position}
+          label {Overtone Positions}
           callback {pars->POvertoneSpread.type = (int)o->value();
 pars->updateFrequencyMultipliers();
 send_data (51, o->value(), 0xc0);}
@@ -596,7 +606,7 @@ send_data (51, o->value(), 0xc0);}
           callback {pars->POvertoneSpread.par1 = o->value();
 pars->updateFrequencyMultipliers();
 send_data (48, o->value(), 0xc8);}
-          xywh {572 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
+          xywh {570 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par1);}
           code1 {o->init(0);}
           class WidgetPDial
@@ -606,7 +616,7 @@ send_data (48, o->value(), 0xc8);}
           callback {pars->POvertoneSpread.par2 = o->value();
 pars->updateFrequencyMultipliers();
 send_data (49, o->value(), 0xc8);}
-          xywh {626 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
+          xywh {625 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par2);}
           code1 {o->init(0);}
           class WidgetPDial
@@ -616,7 +626,7 @@ send_data (49, o->value(), 0xc8);}
           callback {pars->POvertoneSpread.par3 = o->value();
 pars->updateFrequencyMultipliers();
 send_data (50, o->value(), 0xc8);}
-          xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
+          tooltip {Move towards closest harmonic} xywh {680 166 30 30} box ROUND_UP_BOX labelsize 10 maximum 255 step 1
           code0 {o->value(pars->POvertoneSpread.par3);}
           code1 {o->init(0);}
           code2 {o->setValueType(VC_percent255);}
@@ -768,6 +778,14 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	case 37:
     	    coarsedet->value(value);
     	    break;
+    	    
+    	case 38:
+    	    bend->value(value);
+    	    break;
+
+    	case 39:
+    	    offset->value(value);
+    	    break;
 
     	case 40:
     	    freqee->value(value);
@@ -846,4 +864,4 @@ make_window();} {}
   }
   decl {int kititem;} {private local
   }
-} 
+}

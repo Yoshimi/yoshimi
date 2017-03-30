@@ -45,10 +45,12 @@ class CmdInterface : private MiscFuncs
         bool query(string text, bool priority);
         void helpLoop(list<string>& msg, string *commands, int indent);
         bool helpList();
+        string historySelect(int listnum, int selection);
         void historyList(int listnum);
-        int effectsList();
+        int effectsList(bool presets = false);
         int effects();
-        int volPanShift();
+        int volPanVel();
+        int keyShift(int part);
         int commandVector();
         int commandPart(bool justSet);
         int commandReadnSet();

@@ -15,6 +15,8 @@
 
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+
+    Modified March 2017
 */
 
 #include "YoshimiLV2Plugin.h"
@@ -22,6 +24,7 @@
 #include "Misc/ConfBuild.cpp"
 #include "Misc/SynthEngine.h"
 #include "Interface/InterChange.h"
+#include "Interface/MidiDecode.h"
 #include "MusicIO/MusicClient.h"
 #include "MasterUI.h"
 #include "Synth/BodyDisposal.h"
@@ -130,54 +133,13 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
             }
             //process this midi event
             const uint8_t *msg = (const uint8_t*)(event + 1);
-            bool bMidiProcessed = false;
             if (_bFreeWheel != NULL)
-            {
-                if (*_bFreeWheel != 0)
-                {
-                    processMidiMessage(msg);
-                    bMidiProcessed = true;
-                }
-            }
-            if (!bMidiProcessed)
-            {
-                intMidiEvent.time = next_frame;
-                memset(intMidiEvent.data, 0, sizeof(intMidiEvent.data));
-                memcpy(intMidiEvent.data, msg, event->body.size);
-                unsigned int wrote = 0;
-                int tries = 0;
-                char *_data = (char *)&intMidiEvent;
-                while (wrote < sizeof(intMidiEvent) && tries < 3)
-                {
-                    int act_write = jack_ringbuffer_write(_midiRingBuf, reinterpret_cast<const char *>(_data), sizeof(intMidiEvent) - wrote);
-                    wrote += act_write;
-                    _data += act_write;
-                    ++tries;
-                }
-                if (wrote == sizeof(struct midi_event))
-                {
-                    if (sem_post(&_midiSem) < 0)
-                        _synth->getRuntime().Log("processMidi semaphore post error, "
-                                    + string(strerror(errno)));
-                }
-                else
-                {
-                    _synth->getRuntime().Log("Bad write to midi ringbuffer: "
-                                + asString(wrote) + " / "
-                                + asString((int)sizeof(struct midi_event)));
-                }
-
-            }
-
+                processMidiMessage(msg);
         }
     }
 
     if (processed < real_sample_count)
     {
-        /*if (processed != 0)
-        {
-            fprintf(stderr, "Processed = %u\n", processed);
-        }*/
         uint32_t to_process = real_sample_count - processed;
         int mastered = 0;
         offs = next_frame;
@@ -194,132 +156,13 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += to_process;
 
     }
-
 }
 
 
 void YoshimiLV2Plugin::processMidiMessage(const uint8_t * msg)
 {
-    unsigned char channel, note, velocity;
-    int ctrltype;
-    int par = 0;
-    unsigned int ev;
-    channel = msg[0] & 0x0F;
     bool in_place = _bFreeWheel ? ((*_bFreeWheel == 0) ? false : true) : false;
-    switch ((ev = msg[0] & 0xF0))
-    {
-        case 0x01: // modulation wheel or lever
-            ctrltype = C_modwheel;
-            par = msg[2];
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-        case 0x07: // channel volume (formerly main volume)
-            ctrltype = C_volume;
-            par = msg[2];
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-        case 0x0B: // expression controller
-            ctrltype = C_expression;
-            par = msg[2];
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-        case 0x78: // all sound off
-            ctrltype = C_allsoundsoff;
-            setMidiController(channel, ctrltype, 0, in_place);
-            break;
-
-        case 0x79: // reset all controllers
-            ctrltype = C_resetallcontrollers;
-            setMidiController(channel, ctrltype, 0, in_place);
-            break;
-
-        case 0x7B:  // all notes off
-            ctrltype = C_allnotesoff;
-            setMidiController(channel, ctrltype, 0, in_place);
-            break;
-
-        case 0x80: // note-off
-            note = msg[1];
-            setMidiNote(channel, note);
-            break;
-
-        case 0x90: // note-on
-            if ((note = msg[1])) // skip note == 0
-            {
-                velocity = msg[2];
-                setMidiNote(channel, note, velocity);
-            }
-            break;
-
-        case 0xA0: // key aftertouch
-            ctrltype = C_keypressure;
-            // need to work out how to use key values >> j Event.buffer[1]
-            par = msg[2];
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-        case 0xB0: // controller
-            ctrltype = getMidiController(msg[1]);
-            par = msg[2];
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-        case 0xC0: // program change
-            ctrltype = C_programchange;
-            par = msg[1];
-            setMidiProgram(channel, par, in_place);
-            break;
-
-        case 0xD0: // channel aftertouch
-            ctrltype = C_channelpressure;
-            par = msg[2];
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-
-        case 0xE0: // pitch bend
-            ctrltype = C_pitchwheel;
-            par = ((msg[2] << 7) | msg[1]) - 8192;
-            setMidiController(channel, ctrltype, par, in_place);
-            break;
-
-        case 0xF0: // system exclusive
-            break;
-
-        default: // wot, more?
-            //synth->getRuntime().Log("other event: " + asString((int)ev));
-            break;
-    }
-
-}
-
-
-void *YoshimiLV2Plugin::midiThread()
-{
-    struct midi_event midiEvent;
-    while (synth->getRuntime().runSynth)
-    {
-        if (sem_wait(&_midiSem) < 0)
-        {
-            _synth->getRuntime().Log("midiThread semaphore wait error, "
-                        + string(strerror(errno)));
-            continue;
-        }
-        if (!_synth->getRuntime().runSynth)
-            break;
-        size_t fetch = jack_ringbuffer_read(_midiRingBuf, (char*)&midiEvent, sizeof(struct midi_event));
-        if (fetch != sizeof(struct midi_event))
-        {
-            _synth->getRuntime().Log("Short ringbuffer read, " + asString((float)fetch) + " / "
-                        + asString((int)sizeof(struct midi_event)));
-            continue;
-        }
-        processMidiMessage(reinterpret_cast<const uint8_t *>(midiEvent.data));
-    }
-    return NULL;
+    setMidi(msg[0], msg[1], msg[2], in_place);
 }
 
 
@@ -359,8 +202,6 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
     _bufferPos(0),
     _offsetPos(0),
     _bFreeWheel(NULL),
-    _midiRingBuf(NULL),
-    _pMidiThread(0),
     _pIdleThread(0)
 {
     flatbankprgs.clear();
@@ -418,15 +259,7 @@ YoshimiLV2Plugin::~YoshimiLV2Plugin()
             getProgram(flatbankprgs.size() + 1);
         }
         _synth->getRuntime().runSynth = false;
-        sem_post(&_midiSem);
-        pthread_join(_pMidiThread, NULL);
         pthread_join(_pIdleThread, NULL);
-        sem_destroy(&_midiSem);
-        if (_midiRingBuf != NULL)
-        {
-            jack_ringbuffer_free(_midiRingBuf);
-            _midiRingBuf = NULL;
-        }
         delete _synth;
         _synth = NULL;
     }
@@ -439,23 +272,6 @@ bool YoshimiLV2Plugin::init()
         return false;
     if (!prepBuffers())
         return false;
-    if (sem_init(&_midiSem, 0, 0) != 0)
-    {
-        _synth->getRuntime().Log("Failed to create midi semaphore");
-        return false;
-    }
-
-    _midiRingBuf = jack_ringbuffer_create(sizeof(struct midi_event) * 4096);
-    if (!_midiRingBuf)
-    {
-        _synth->getRuntime().Log("Failed to create midi ringbuffer");
-        return false;
-    }
-    if (jack_ringbuffer_mlock(_midiRingBuf))
-    {
-        _synth->getRuntime().Log("Failed to lock memory");
-        return false;
-    }
 
     _synth->Init(_sampleRate, _bufferSize);
 
@@ -465,12 +281,6 @@ bool YoshimiLV2Plugin::init()
     memset(lv2Right, 0, sizeof(float *) * (NUM_MIDI_PARTS + 1));
 
     _synth->getRuntime().runSynth = true;
-
-    if (!_synth->getRuntime().startThread(&_pMidiThread, YoshimiLV2Plugin::static_midiThread, this, true, 1, false, "LV2 midi"))
-    {
-        synth->getRuntime().Log("Failed to start midi thread");
-        return false;
-    }
 
     if (!_synth->getRuntime().startThread(&_pIdleThread, YoshimiLV2Plugin::static_idleThread, this, false, 0, false, "LV2 idle"))
     {
@@ -528,7 +338,6 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
          inst->lv2Left[portIndex] = static_cast<float *>(data_location);
      else
          inst->lv2Right[portIndex] = static_cast<float *>(data_location);
-
 }
 
 
@@ -536,7 +345,6 @@ void YoshimiLV2Plugin::activate(LV2_Handle instance)
 {
     YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
     inst->Start();
-
 }
 
 
@@ -544,7 +352,6 @@ void YoshimiLV2Plugin::deactivate(LV2_Handle instance)
 {
     YoshimiLV2Plugin *inst = static_cast<YoshimiLV2Plugin *>(instance);
     inst->Close();
-
 }
 
 
@@ -684,15 +491,9 @@ void YoshimiLV2Plugin::selectProgramNew(unsigned char channel, uint32_t bank, ui
         isFreeWheel = true;
     if (_synth->getRuntime().midi_bank_C != 128)
     {
-        setMidiBankOrRootDir((short)bank, isFreeWheel);
+        synth->mididecode.setMidiBankOrRootDir((short)bank, isFreeWheel);
     }
-    setMidiProgram(channel, program, isFreeWheel);
-}
-
-
-void *YoshimiLV2Plugin::static_midiThread(void *arg)
-{
-    return static_cast<YoshimiLV2Plugin *>(arg)->midiThread();
+    synth->mididecode.setMidiProgram(channel, program, isFreeWheel);
 }
 
 

@@ -2,7 +2,7 @@
 version 1.0303 
 header_name {.h} 
 code_name {.cc}
-comment {OscilgenUI.h} {not_in_source in_header
+comment {OscilgenUI.h} {selected not_in_source in_header
 } 
 
 comment {OscilgenUI.cc} {in_source not_in_header
@@ -11,7 +11,7 @@ comment {OscilgenUI.cc} {in_source not_in_header
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2010, Alan Calvert
-Copyright 2016 Will Godfrey
+Copyright 2016-2017 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,7 +27,9 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified December 2016
+This file is a derivative of the ZynAddSubFX original.
+
+Modified February 2017
 } {in_source in_header
 } 
 
@@ -49,10 +51,10 @@ decl {\#include <cmath>} {private local
 decl {\#include "UI/MiscGui.h"} {public local
 } 
 
-decl {\#include "WidgetPDialUI.h"} {public local
+decl {\#include "UI/WidgetPDial.h"} {public local
 } 
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
+decl {\#include "UI/WidgetMWSlider.h"} {public local
 } 
 
 decl {\#include "EnvelopeUI.h"} {public local
@@ -474,7 +476,7 @@ else
   }
 } 
 
-class OscilEditor {selected : {public PresetsUI_}
+class OscilEditor {: {public PresetsUI_}
 } {
   Function {make_window()} {} {
     Fl_Window osceditUI {
@@ -816,7 +818,7 @@ if ((Fl::event_button() == 3))
       }
       Fl_Button clearHarm {
         label Clear
-        callback {if (!fl_choice("Clear the harmonics settings?","No","Yes",NULL)) return;
+        callback {if (fl_choice("Clear the harmonics settings?", NULL,"No","Yes") < 2) return;
 
 for (int i=0;i<MAX_AD_HARMONICS;i++){
     h[i]->mag->value(64);
@@ -1224,7 +1226,7 @@ send_data (42, o->value(), 0xc8);}
       }
       Fl_Button {} {
         label Sine
-        callback {if (!fl_choice("Convert to SINE?","No","Yes",NULL)) return;
+        callback {if (fl_choice("Convert to SINE?",NULL, "No","Yes") < 2) return;
 
 synth->actionLock(lock);
  oscil->convert2sine(0);
@@ -1272,7 +1274,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char npart = getData->data.part;
     unsigned char eng = getData->data.engine;
     unsigned char insert = getData->data.insert;
-    
+
     if (eng != engine)
         return;
 
@@ -1287,7 +1289,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         else
             h[control]->mag->selection_color(222);
     }
-    
+
     else if (insert == 7)
     {
     	h[control]->phase->value(127 - value);
@@ -1296,7 +1298,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
         else
             h[control]->phase->selection_color(222);
     }
-    
+
     else
     {
         switch (control)
@@ -1371,7 +1373,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                         h[i]->mag->selection_color(0);
                     else
                         h[i]->mag->selection_color(222);
-                    
+
                     if (h[i]->phase->value() == 64)
                         h[i]->phase->selection_color(0);
                     else
@@ -1458,9 +1460,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                 break;
 
             case 96:
-                
-                
-                
+
+
+
                 for (int i = 0; i < MAX_AD_HARMONICS; ++i)
                 {
                     h[i]->mag->value(64);
@@ -1482,7 +1484,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                 set = false;
         }
     }
-    
+
     if (set)
     {
         oscildisplaygroup->redraw();

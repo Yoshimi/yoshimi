@@ -21,6 +21,7 @@ Status bits:
 1   limit (otherwise compress)
 2   mute
 
+4   mark as an NRPN
 
 When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
@@ -54,6 +55,8 @@ These redraw a line in place.
 2   mute switch
 5   set min_in
 6   set max-in
+7   returned message to GUI
+9   set NRPN - overwrites a normal CC and makes it unchangeable
 
 These move a line, so a complete redraw is inititalsed.
  8  delete line
@@ -63,6 +66,7 @@ These move a line, so a complete redraw is inititalsed.
 
 20  send list size
 21  send ID of learn type message
+22  open MIDI-learn editing window
 
 24 incoming activity
 

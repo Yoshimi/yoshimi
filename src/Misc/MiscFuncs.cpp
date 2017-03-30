@@ -2,7 +2,7 @@
     MiscFuncs.cpp
 
     Copyright 2010, Alan Calvert
-    Copyright 2014-2016, Will Godfrey
+    Copyright 2014-2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
@@ -15,7 +15,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
+    along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
+
+    Modifed February 2017
 */
 
 #include <sys/stat.h>
@@ -109,7 +111,10 @@ string MiscFuncs::asHexString(int x)
 {
    ostringstream oss;
    oss << hex << x;
-   return string(oss.str());
+   string res = string(oss.str());
+   if (res.length() & 1)
+       return "0"+res;
+   return res;
 }
 
 
@@ -117,7 +122,10 @@ string MiscFuncs::asHexString(unsigned int x)
 {
    ostringstream oss;
    oss << hex << x;
-   return string(oss.str());
+   string res = string(oss.str());
+   if (res.length() & 1)
+       return "0"+res;
+   return res;
 }
 
 
@@ -258,7 +266,7 @@ string MiscFuncs::setExtension(string fname, string ext)
 
     string tmp;                         // return value
     size_t ext_pos = fname.rfind('.');  // period, if any
-    size_t slash_pos = fname.find('/'); // UNIX path-separator
+    size_t slash_pos = fname.rfind('/'); // UNIX path-separator
     if (slash_pos == string::npos)
     {
         // There are no slashes in the string, therefore the last period, if
@@ -330,7 +338,7 @@ char *MiscFuncs::skipChars(char *buf)
     {
         ++ buf;
     }
-    if (buf[0] == 0x20)
+    if (buf[0] == 0x20) // now find the next word (if any)
         buf = skipSpace(buf);
     return buf;
 }
@@ -365,7 +373,7 @@ bool MiscFuncs::matchnMove(int num , char *&pnt, const char *word)
  * the same 'live' ID, but if they do, the second one will get an
  * empty string.
  *
- * Both will block, but should be very quick;
+ * Both calls will block, but should be very quick;
  *
  * Normally a message will clear before the next one arrives so the
  * message numbers should remain very low even over multiple instances.
@@ -379,8 +387,7 @@ void MiscFuncs::miscMsgInit()
 
 int MiscFuncs::miscMsgPush(string _text)
 {
-    mutex mtx;
-    mtx.lock();
+    sem_wait(&miscmsglock);
 
     string text = _text;
     list<string>::iterator it = miscList.begin();
@@ -401,17 +408,16 @@ int MiscFuncs::miscMsgPush(string _text)
         cout << "List full :(" << endl;
         idx = -1;
     }
-
+    //cout << "List size " << int(idx) << endl;
     int result = idx; // in case of a new entry before return
-    mtx.unlock();
+    sem_post(&miscmsglock);
     return result;
 }
 
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
-    mutex mtx;
-    mtx.lock();
+    sem_wait(&miscmsglock);
 
     int pos = _pos;
     list<string>::iterator it = miscList.begin();
@@ -426,8 +432,10 @@ string MiscFuncs::miscMsgPop(int _pos)
     }
     string result = "";
     if (idx == pos)
-        swap( result, *it); // in case of a new entry before return
-    mtx.unlock();
+    {
+        swap (result, *it); // in case of a new entry before return
+    }
+    sem_post(&miscmsglock);
     return result;
 }
 

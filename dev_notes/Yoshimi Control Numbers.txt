@@ -59,6 +59,8 @@ Y : 0 to 8 : 65 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect t
 Y : 0 to 2 : 66 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Set effect destination (Next Effect, Part Out, Dry Out)
 Y : 0/1 : 67 : 0 to 63 : 255 : effect number : 255 : 255 : 255 : Bypass effect
 
+Y : any : 96 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Set part to default instrument (Simple Sound)
+
 Y : 1, 2, 3 : 120 : 0 to 63 : 255 : 255 : 255 : 255 :  : Audio destination
 
 Controllers
@@ -72,7 +74,7 @@ Y : 0/1 : 134 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Exponential bandwidth
 Y : 0/1 : 135 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression enable
 Y : 0/1 : 136 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : FM amplitude enable
 Y : 0/1 : 137 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Sustain pedal enable
-Y : -64k to 64k : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
+Y : -8192 to 8191 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
 Y : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
 Y : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
 Y : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
@@ -85,6 +87,10 @@ Y : 0/1 : 164 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable proportional port
 Y : 0 to 127 : 165 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento rate
 Y : 0 to 127 : 166 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Proportional portamento depth
 Y : 0/1 : 168 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Enable portamento control
+YL : 0 to 127 : 192 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Modulation (CC 1)
+YL : 0 to 127 : 194 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression (CC 11)
+YL : 0 to 127 : 197 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q (CC 71)
+YL : 0 to 127 : 198 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Cutoff (CC 74)
 Y : any : 224 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Reset all controllers (for this part)
 
 Instrument edit window
@@ -94,6 +100,7 @@ Y : 0/1 : 8 : 0 to 63 : 255 : 2 : 255 : 255 : 255 : Enable PadSynth
 Y : 0 to 50 : 48 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Humanise
 
 Kit edit window
+Y : 0/1 : 8 : 0 to 63 : 32 + 1 to 15 : 0 to 2 : 255 : 255 : 255 : Kit item engine enable - Addsynth, Subsynth, Padsynth
 Y : 0/1 : 8 : 0 to 63 : 32 + 1 to 15 : 255 : 255 : 255 : 255 : Kit item enable (can't disable kit item 0)
 Y : 0/1 : 9 : 0 to 63 : 32 + 0 to 15 : 255 : 255 : 255 : 255 : Kit item mute
 Y : 0 to 126 : 16 : 0 to 63 : 32 + 0 to 15 : 255 : 255 : 255 : 255 : Kit item minimum note
@@ -142,7 +149,7 @@ YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 :
 YL : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Equal temper variation
 Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Set voice base frequency to 440Hz
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Octave
-Y : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
+Y : 0 to 4 : 36 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Detune type – Default, L35 cents, L10 cents, E100 cents, E1200 cents
 Y : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Coarse detune
 YL : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Pitch bend adjust
 YL : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Bend offset Hz
@@ -159,6 +166,7 @@ Y : 2 to 50 : 53 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison
 Y : 0 to 5 : 54 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison phase invert – None, Random, 50%, 33%, 25%, 20%
 Y : 0/1 : 56 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison enable
 
+Y : 0/1 : 64 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Bypass global filter
 Y : 0/1 : 68 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter
 Y : 0/1 : 72 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter envelope
 Y : 0/1 : 73 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter LFO
@@ -198,6 +206,8 @@ Y : 0/1 : 34 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Set voice base frequenc
 Y : -8 to 7 : 35 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Octave
 Y : 0 to 3 : 36 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune type – L35 cents, L10 cents, E100 cents, E1200 cents
 Y : 0 to 127 : 37 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Coarse detune
+YL : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Pitch bend adjust
+YL : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bend offset Hz
 
 Y : 0/1 : 40 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable frequency envelope
 
@@ -223,7 +233,7 @@ YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Velocity sensitivi
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Panning
 
 YL : 0 to 1000 : 16 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth
-Y : 0 to 6 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
+Y : 0 to 7 : 17 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Bandwidth scale – Normal, Equal Hz, ¼ , ½ , ¾ , 1½ , Double, Inverse ½
 
 Y : 0 to 2 : 19 : 0 to 63 : 0 to 15 : 2 : 255 : 255 : 255 : Spectrum mode – Bandwidth, Discrete, Continuous
 
@@ -427,5 +437,5 @@ Effect Inserts
  :  :  :  :  :  :  :  :  : Normal part effects are numbers 0 to 63
  :  :  :  : See note -> :  :  :  :  : Kit numbers are 128 + (0 to 8) for actual effect types.
  :  :  :  :  :  :  :  :  : 0 is no effect
-Y :  : 0 to 15 : 0 to 63, 241, 242 : 128 : effect number : 255 : 255 : 255 : Depends on actual effect
- :  :  :  :  :  :  :  :  : See ‘Effect_Inserts.txt’ for all control ranges.
+YL :  : 0 to 15 : 0 to 63, 241, 242 : 128 : effect number : 255 : 255 : 255 : Depends on actual effect
+ :  :  :  :  :  :  :  :  : See ‘Effect_Inserts.txt’ for all control ranges. Dynefilter not complete.

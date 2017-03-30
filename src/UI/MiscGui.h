@@ -1,7 +1,7 @@
 /*
     MiscGui.h - common link between GUI and synth
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -42,6 +42,8 @@ enum ValueType {
     VC_EnvelopeFreqVal,
     VC_EnvelopeFilterVal,
     VC_EnvelopeAmpSusVal,
+    VC_EnvelopeLinAmpSusVal,
+    VC_EnvelopeBandwidthVal,
     VC_FilterFreq0,
     VC_FilterFreq1,
     VC_FilterFreq2,
@@ -52,16 +54,22 @@ enum ValueType {
     VC_FilterVelocitySense,
     VC_InstrumentVolume,
     VC_ADDVoiceVolume,
+    VC_ADDVoiceDelay,
+    VC_PitchBend,
     VC_PartVolume,
     VC_PanningRandom,
     VC_PanningStd,
     VC_EnvStretch,
     VC_LFOStretch,
     VC_FreqOffsetHz,
+    VC_FixedFreqET,
     VC_FilterGain,
     VC_AmpVelocitySense,
     VC_FilterQAnalogUnused,
     VC_BandWidth,
+    VC_SubBandwidth,
+    VC_SubBandwidthScale,
+    VC_SubBandwidthRel,
     VC_FXSysSend,
     VC_FXEchoVol,
     VC_FXEchoDelay,
@@ -98,8 +106,9 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData);
 
 string convert_value(ValueType type, float val);
 
+string variable_prec_units(float v, string u, int maxPrec, bool roundup = false);
 string custom_value_units(float v, string u, int prec=0);
-int  custom_graph_size(ValueType vt);
+void  custom_graph_dimensions(ValueType vt, int& w, int& h);
 void custom_graphics(ValueType vt, float val,int W,int H);
 ValueType getLFOdepthType(int group);
 ValueType getFilterFreqType(int type);

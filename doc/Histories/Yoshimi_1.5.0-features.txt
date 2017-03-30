@@ -3,7 +3,7 @@ Still learning new songs and singing sweetly in the middle of winter.
 
 Vector control now has its own dedicated button on the main window. A little bit of shuffling meant that space could be created for it while actually making the window look neater, and the master controls more obvious!
 
-As a further protection against rogue sequencers making assupmtions, any attempt to set an invalid bank root will be ignored. The same was already true for banks themselves. Also, on first time startup, discovered roots will be given ID numbers starting from 5 and in steps of 5. This makes it a little easier to re-arrange them to your preference. We recommend that you don't have zero for either, as this is the usual assumed number.
+As a further protection against rogue sequencers making assumptions, any attempt to set an invalid bank root will be ignored. The same was already true for banks themselves. Also, on first time startup, discovered roots will be given ID numbers starting from 5 and in steps of 5. This makes it a little easier to re-arrange them to your preference. We recommend that you don't have zero for either, as this is the usual assumed number.
 
 If working from the command line, listing roots and banks will identify the current ones with a '*'. Also, we forgot to mention at the last release that listing instruments, as well as showing the current bank and root you are listing from, will suffix each entry with A,S,P depending on the combination of AddSynth, SubSynth, Padsynth.
 

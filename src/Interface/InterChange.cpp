@@ -1,7 +1,7 @@
 /*
     InterChange.cpp - General communications
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017, Will Godfrey & others
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified March 2017
 */
 
 #include <iostream>
@@ -29,6 +30,7 @@ using namespace std;
 #include "Interface/InterChange.h"
 #include "Misc/MiscFuncs.h"
 #include "Misc/SynthEngine.h"
+#include "Misc/Part.h"
 #include "Params/Controller.h"
 #include "Params/ADnoteParameters.h"
 #include "Params/SUBnoteParameters.h"
@@ -39,69 +41,141 @@ using namespace std;
 #include "Effects/EffectMgr.h"
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
+#include "MasterUI.h"
+//#include "Interface/MidiDecode.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
 {
+    ;
+}
+
+
+bool InterChange::Init(SynthEngine *_synth)
+{
+    flagsValue = 0xffffffff;
     if (!(fromCLI = jack_ringbuffer_create(sizeof(commandSize) * 256)))
     {
-        fromCLI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromCLI' ringbuffer");
+        goto bail_out;
     }
-    else
-         jack_ringbuffer_reset(fromCLI);
+    if (jack_ringbuffer_mlock(fromCLI))
+    {
+        synth->getRuntime().Log("Failed to lock fromCLI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(fromCLI);
 
     if (!(toCLI = jack_ringbuffer_create(sizeof(commandSize) * 512)))
     {
-        toCLI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'toCLI' ringbuffer");
+        goto bail_out;
     }
-    else
-        jack_ringbuffer_reset(toCLI);
+    if (jack_ringbuffer_mlock(toCLI))
+    {
+        synth->getRuntime().Log("Failed to lock toCLI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(toCLI);
 
     if (!(fromGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
-        fromGUI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromGUI' ringbuffer");
+        goto bail_out;
     }
-    else
-        jack_ringbuffer_reset(fromGUI);
+    if (jack_ringbuffer_mlock(fromGUI))
+    {
+        synth->getRuntime().Log("Failed to lock fromGUI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(fromGUI);
+
     if (!(toGUI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
-        toGUI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'toGUI' ringbuffer");
+        goto bail_out;
     }
-    else
-        jack_ringbuffer_reset(toGUI);
+    if (jack_ringbuffer_mlock(toGUI))
+    {
+        synth->getRuntime().Log("Failed to lock toGUI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(toGUI);
 
     if (!(fromMIDI = jack_ringbuffer_create(sizeof(commandSize) * 1024)))
     {
-        fromMIDI = NULL;
         synth->getRuntime().Log("InterChange failed to create 'fromMIDI' ringbuffer");
+        goto bail_out;
     }
-    else
-         jack_ringbuffer_reset(fromMIDI);
+    if (jack_ringbuffer_mlock(fromMIDI))
+    {
+        synth->getRuntime().Log("Failed to lock fromMIDI memory");
+        goto bail_out;
+    }
+    jack_ringbuffer_reset(fromMIDI);
 
-    if (!synth->getRuntime().startThread(&CLIresolvethreadHandle, _CLIresolvethread, this, false, 0, false, "CLI"))
+    if (!synth->getRuntime().startThread(&sortResultsThreadHandle, _sortResultsThread, this, false, 0, false, "CLI"))
     {
         synth->getRuntime().Log("Failed to start CLI resolve thread");
+        goto bail_out;
     }
+    return true;
+
+
+bail_out:
+    if (fromCLI)
+    {
+        jack_ringbuffer_free(fromCLI);
+        fromCLI = NULL;
+    }
+    if (toCLI)
+    {
+        jack_ringbuffer_free(toCLI);
+        toCLI = NULL;
+    }
+    if (fromGUI)
+    {
+        jack_ringbuffer_free(fromGUI);
+        fromGUI = NULL;
+    }
+    if (toGUI)
+    {
+        jack_ringbuffer_free(toGUI);
+        toGUI = NULL;
+    }
+    if (fromMIDI)
+    {
+        jack_ringbuffer_free(fromMIDI);
+        fromGUI = NULL;
+    }
+    return false;
 }
 
 
-void *InterChange::_CLIresolvethread(void *arg)
+void *InterChange::_sortResultsThread(void *arg)
 {
-    return static_cast<InterChange*>(arg)->CLIresolvethread();
+    return static_cast<InterChange*>(arg)->sortResultsThread();
 }
 
 
-void *InterChange::CLIresolvethread(void)
+void *InterChange::sortResultsThread(void)
 {
     CommandBlock getData;
     int toread;
     char *point;
+
     while(synth->getRuntime().runSynth)
     {
+        /*unsigned int tick;
+        ++ tick;
+        if (!(tick & 8191))
+        {
+            if (tick & 16383)
+                cout << "Tick" << endl;
+            else
+                cout << "Tock" << endl;
+        }*/
+
         while (jack_ringbuffer_read_space(synth->interchange.toCLI)  >= synth->interchange.commandSize)
         {
             toread = commandSize;
@@ -112,7 +186,16 @@ void *InterChange::CLIresolvethread(void)
             else
                 resolveReplies(&getData);
         }
-        usleep(500);
+        usleep(80); // actually gives around 120 uS
+        /*
+         * The following are low priority actions initiated by,
+         * but isolated from the main audio thread.
+         */
+        unsigned int point = flagsReadClear();
+        if (point < 0x1fff)
+            setpadparams(point);
+        else if (point < 0x2100)
+            doClearPart(point & 0xff);
     }
     return NULL;
 }
@@ -158,6 +241,8 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
+    showValue = true;
+
     Part *part;
     part = synth->part[npart];
 
@@ -169,13 +254,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
 
-    bool isMidi = type & 8;
+//    bool isMidi = type & 8;
 
 #ifdef ENABLE_REPORTS
-    if (isGui)
-        synth->getRuntime().Log("From GUI");
-#endif
     if ((isGui && button < 2) || (isCli && button == 1))
+#else
+    if (isCli && button == 1)
+#endif
     {
         if (button == 0)
             isValue = "Request set default";
@@ -188,7 +273,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
         isValue +="\n  Type ";
         for (int i = 7; i > -1; -- i)
             isValue += to_string((type >> i) & 1);
-#ifdef ENABLE_REPORTS
         synth->getRuntime().Log(isValue
                             + "\n  Control " + to_string((int) control)
                             + "\n  Part " + to_string((int) npart)
@@ -198,32 +282,34 @@ void InterChange::resolveReplies(CommandBlock *getData)
                             + "\n  Parameter " + to_string((int) insertParam)
                             + "\n  2nd Parameter " + to_string((int) insertPar2));
         return;
-#endif
     }
     if (npart >= 0xc0 && npart < 0xd0)
-    {
         commandName = resolveVector(getData);
-    }
-    else if (npart == 0xf0)
-    {
-        commandName = resolveMain(getData);
-    }
-    else if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
-    {
-        commandName = resolveSysIns(getData);
-    }
-    else if (kititem >= 0x80 && kititem != 0xff)
-    {
-        commandName = resolveEffects(getData);
-    }
 
-    else if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
-        commandName = "Kit item " + to_string(kititem) + " not enabled";
+    else if (npart == 0xf0)
+        commandName = resolveMain(getData);
+
+    else if (npart == 0xf1 || npart == 0xf2)
+        commandName = resolveEffects(getData);
+
+    else if (npart >= 0x40)
+        commandName = "Invalid part " + to_string(int(npart));
+
+    else if ((kititem >= 0x80 && kititem != 0xff) || (control >= 64 && control <= 67 && kititem == 0xff))
+        commandName = resolveEffects(getData);
+
+    else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+        commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
     else if (kititem == 0xff || (kititem & 0x20))
     {
-        commandName = resolvePart(getData);
+        if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
+            commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
+        else
+            commandName = resolvePart(getData);
     }
+    else if (kititem > 0 && part->Pkitmode == 0)
+        commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
 
     else if (engine == 2)
     {
@@ -329,22 +415,32 @@ void InterChange::resolveReplies(CommandBlock *getData)
         }
     }
 
-    string actual = " Value ";
-    if (type & 0x80)
-        actual += to_string((int)round(value));
-    else
-        actual += to_string(value);
-
+    string actual = "";
+    if (showValue)
+    {
+        actual = " Value ";
+        if (type & 0x80)
+            actual += to_string((int)round(value));
+        else
+            actual += to_string(value);
+    }
     if ((isGui || isCli) && button == 3)
     {
         synth->midilearn.setTransferBlock(getData, commandName);
         return;
     }
+
+    if (value == FLT_MAX)
+    { // This corrupts par2 but it shouldn't matter if used as intended
+        getData->data.par2 = miscMsgPush(commandName);
+        return;
+    }
+
 #ifdef ENABLE_REPORTS
-    else if(!isMidi || synth->getRuntime().monitorCCin)
+    else if((isGui && button == 2) || isCli)
         synth->getRuntime().Log(commandName + actual);
 #else
-    else if(!isGui && button == 2)
+    else if(isCli)
         synth->getRuntime().Log(commandName + actual);
 #endif
 }
@@ -402,13 +498,18 @@ string InterChange::resolveVector(CommandBlock *getData)
             break;
     }
 
-    string name = "Vector Chan " + to_string(chan);
+    if (control == 0)
+    {
+        showValue = false;
+        return("Vector " + contstr + " set to " + to_string(chan + 1));
+    }
+    string name = "Vector Chan " + to_string(chan + 1) + " ";
     if (control == 127)
         name += " all ";
     else if (control >= 32)
-        name += " Y ";
+        name += "Y ";
     else if(control >= 16)
-        name += " X ";
+        name += "X ";
 
     return (name + contstr);
 }
@@ -440,13 +541,13 @@ string InterChange::resolveMain(CommandBlock *getData)
             break;
 
         case 48:
-            contstr = "Chan Switch Type";
+            contstr = "Chan 'solo' Switch Type";
             break;
         case 49:
-            contstr = "Chan Switch CC";
+            contstr = "Chan 'solo' Switch CC";
             break;
 
-        case 96:
+        case 96: // doMasterReset(
             contstr = "Reset All";
             break;
         case 128:
@@ -465,25 +566,28 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
 
     string kitnum;
     if (kitType)
-        kitnum = " Kit " + to_string(kititem & 0x1f) + " ";
+        kitnum = " Kit " + to_string((kititem & 0x1f) + 1) + " ";
     else
         kitnum = " ";
 
     string name = "";
     if (control >= 0x80)
     {
-        if (control < 0xe0)
+        if (control < 0xc0)
         {
             name = "Controller ";
             if (control >= 0xa0)
                 name += "Portamento ";
         }
+        else if (control < 0xdc)
+            name = "MIDI ";
     }
     else if (kititem < 0xff)
     {
@@ -577,16 +681,16 @@ string InterChange::resolvePart(CommandBlock *getData)
             break;
 
         case 40:
-            contstr = "Effect Send 0";
-            break;
-        case 41:
             contstr = "Effect Send 1";
             break;
-        case 42:
+        case 41:
             contstr = "Effect Send 2";
             break;
-        case 43:
+        case 42:
             contstr = "Effect Send 3";
+            break;
+        case 43:
+            contstr = "Effect Send 4";
             break;
 
         case 48:
@@ -604,13 +708,17 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Effect Number";
             break;
         case 65:
-            contstr = "Effect " + to_string(effNum) + " Type";
+            contstr = "Effect " + to_string(effNum + 1) + " Type";
             break;
         case 66:
-            contstr = "Effect " + to_string(effNum) + " Destination";
+            contstr = "Effect " + to_string(effNum + 1) + " Destination";
             break;
         case 67:
-            contstr = "Bypass Effect "+ to_string(effNum);
+            contstr = "Bypass Effect "+ to_string(effNum + 1);
+            break;
+
+        case 96: // doClearPart
+            contstr = "Set Default Instrument";
             break;
 
         case 120:
@@ -689,12 +797,29 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Enable";
             break;
 
+        case 192:
+            contstr = "Modulation";
+            break;
+        case 194:
+            contstr = "Expression";
+            break;
+        case 197:
+            contstr = "Filter Q";
+            break;
+        case 198:
+            contstr = "Filter Cutoff";
+            break;
+
+        case 222:
+            showValue = false;
+            contstr = "Name is: " + miscMsgPop(par2);
+            break;
         case 224:
             contstr = "Clear controllers";
             break;
     }
 
-    return ("Part " + to_string(npart) + kitnum + name + contstr);
+    return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
 }
 
 
@@ -771,7 +896,7 @@ string InterChange::resolveAdd(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " AddSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + name + contstr);
 }
 
 
@@ -859,6 +984,12 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             break;
         case 37:
             contstr = "Coarse Det";
+            break;
+        case 38:
+            contstr = "Bend Adj";
+            break;
+        case 39:
+            contstr = "Offset Hz";
             break;
         case 40:
             contstr = "Enable Env";
@@ -962,7 +1093,7 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " Add Voice " + to_string(nvoice) + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
 }
 
 
@@ -981,7 +1112,7 @@ string InterChange::resolveSub(CommandBlock *getData)
         else
             Htype = " Bandwidth";
 
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth Harmonic " + to_string(control) + Htype);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth Harmonic " + to_string(control + 1) + Htype);
     }
 
     string name = "";
@@ -1045,7 +1176,12 @@ string InterChange::resolveSub(CommandBlock *getData)
         case 37:
             contstr = "Coarse Det";
             break;
-
+        case 38:
+            contstr = "Bend Adj";
+            break;
+        case 39:
+            contstr = "Offset Hz";
+            break;
         case 40:
             contstr = "Env Enab";
             break;
@@ -1086,7 +1222,7 @@ string InterChange::resolveSub(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " SubSynth " + name + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
 }
 
 
@@ -1232,7 +1368,7 @@ string InterChange::resolvePad(CommandBlock *getData)
         case 83:
             break;
 
-        case 104:
+        case 104:// setpadparams(
             contstr = "Apply Changes";
             break;
 
@@ -1261,7 +1397,7 @@ string InterChange::resolvePad(CommandBlock *getData)
 
     if (write && ((control >= 16 && control <= 19) || (control >= 48 && control <= 83)))
         isPad += " - Need to Apply";
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + " PadSynth " + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " PadSynth " + name + contstr + isPad);
 }
 
 
@@ -1285,18 +1421,18 @@ string InterChange::resolveOscillator(CommandBlock *getData)
     }
     else
     {
-        eng_name = " Add Voice " + to_string(engine & 0x3f);
+        eng_name = " Add Voice " + to_string((engine & 0x3f) + 1);
         if (engine & 0x40)
             eng_name += " Modulator";
     }
 
     if (insert == 6)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Amplitude" + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Amplitude" + isPad);
     }
     else if(insert == 7)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + " Harmonic " + to_string((int)control) + " Phase" + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + " Harmonic " + to_string((int)control + 1) + " Phase" + isPad);
     }
 
     string name = "";
@@ -1428,7 +1564,7 @@ string InterChange::resolveOscillator(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + eng_name + name + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + name + contstr + isPad);
 }
 
 
@@ -1457,7 +1593,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
     {
         if (write == true && engine == 2)
             isPad = " - Need to Apply";
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance Point " + to_string(control) + isPad);
+        return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance Point " + to_string(control + 1) + isPad);
     }
 
     if (write == true && engine == 2 && control != 104)
@@ -1498,7 +1634,7 @@ string InterChange::resolveResonance(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Resonance " + contstr + isPad);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
 }
 
 
@@ -1520,7 +1656,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
     else if (engine >= 0x80)
     {
         int nvoice = engine & 0x3f;
-        name = " Add Voice " + to_string(nvoice);
+        name = " Add Voice " + to_string(nvoice + 1);
     }
 
     switch (insertParam)
@@ -1568,7 +1704,7 @@ string InterChange::resolveLFO(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + lfo + " LFO " + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + lfo + " LFO " + contstr);
 }
 
 
@@ -1592,7 +1728,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (engine == 2)
         name = " PadSynth";
     else if (engine >= 0x80)
-        name = " Adsynth Voice " + to_string(engine & 0x3f);
+        name = " Adsynth Voice " + to_string((engine & 0x3f) + 1);
     string contstr;
     switch (control)
     {
@@ -1682,7 +1818,7 @@ string InterChange::resolveFilter(CommandBlock *getData)
     else if (control == 37)
         extra = "Seq Pos " + to_string(nseqpos) + " ";
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name + " Filter " + extra + contstr);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Filter " + extra + contstr);
 }
 
 
@@ -1710,7 +1846,7 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     {
         name = " Add Voice ";
         int nvoice = engine & 0x3f;
-        name += to_string(nvoice);
+        name += to_string(nvoice + 1);
         if (engine >= 0xC0)
             name += " Modulator";
     }
@@ -1735,18 +1871,17 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
     {
         if (!write)
         {
-            return ("Freemode add/remove is write only. Current points " + to_string(par2));
+            return ("Freemode add/remove is write only. Current points " + to_string(int(par2)));
         }
-        string action;
         if (control >= 0x40)
-            return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Added Freemode Point " + to_string(control &0x3f) + " X increment " + to_string(par2) + " Y");
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Added Freemode Point " + to_string(int((control & 0x3f) + 1)) + " X increment " + to_string(int(par2)) + " Y");
         else
-            return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Removed Freemode Point " + action + to_string(control) + " Remaining " + to_string(par2));
+            return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Removed Freemode Point " +  to_string(int(control + 1)) + " Remaining " + to_string(int(par2)));
     }
 
     if (insert == 4)
     {
-        return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env Freemode Point " +  to_string(control) + " X increment " + to_string(par2) + " Y");
+        return ("Part " + to_string(int(npart + 1)) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env Freemode Point " +  to_string(int(control + 1)) + " X increment " + to_string(int(par2)) + " Y");
     }
 
     string contstr;
@@ -1800,59 +1935,18 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
             break;
     }
 
-    return ("Part " + to_string(npart) + " Kit " + to_string(kititem) + name  + env + " Env " + contstr);
-}
-
-
-string InterChange::resolveSysIns(CommandBlock *getData)
-{
-    unsigned char control = getData->data.control;
-    unsigned char npart = getData->data.part;
-    unsigned char effnum = getData->data.engine;
-    unsigned char insert = getData->data.insert;
-
-    bool isSysEff = (npart == 0xf1);
-
-    string name;
-    if (isSysEff)
-        name = "System ";
-    else
-        name = "Insert ";
-
-    string contstr;
-    string second;
-    if (insert == 0xff)
-    {
-        second = "";
-        switch (control)
-        {
-            case 0:
-                contstr = "Number ";
-                break;
-            case 1:
-                contstr = to_string(effnum) + " Type ";
-                break;
-            case 2: // insert only
-                contstr = to_string(effnum) + " To ";
-        }
-        contstr = "Effect " + contstr;
-    }
-    else // system only
-    {
-        contstr = "From Effect " + to_string(effnum);
-        second = " To Effect " + to_string(control);
-    }
-
-    return (name  + contstr + second);
+    return ("Part " + to_string(npart + 1) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
 }
 
 
 string InterChange::resolveEffects(CommandBlock *getData)
 {
+    int value = lrint(getData->data.value);
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit & 0x1f;
+    unsigned char kititem = getData->data.kit;
     unsigned char effnum = getData->data.engine;
+    unsigned char insert = getData->data.insert;
 
     string name;
     string actual;
@@ -1861,7 +1955,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     else if (npart == 0xf2)
         name = "Insert";
     else
-        name = "Part " + to_string(npart);
+        name = "Part " + to_string(npart + 1);
 
     if (kititem == 8 && getData->data.insert < 0xff)
     {
@@ -1869,19 +1963,81 @@ string InterChange::resolveEffects(CommandBlock *getData)
             name = "System";
         else if (npart == 0xf2)
             name = "Insert";
-        else name = "Part " + to_string(npart);
-        name += " Effect " + to_string(effnum);
+        else name = "Part " + to_string(npart + 1);
+        name += " Effect " + to_string(effnum + 1);
 
         return (name + " DynFilter ~ Filter Parameter " + to_string(control));
     }
 
-    name += " Effect " + to_string(effnum);
+    name += " Effect " + to_string(effnum + 1);
 
-    string effname;
-    switch (kititem)
+    string effname = "";
+    if (npart < 0x40 && (control == 64 || control == 66 || control == 67))
+    {
+        if (control == 64)
+            name = "Set " + name;
+        else if (control == 66)
+        {
+            effname = " sent to ";
+            if (value == 0)
+                effname += "next effect";
+            else if (value == 1)
+                effname += "part out";
+            else if (value == 1)
+                effname += "dry out";
+        }
+        else if (control == 67)
+            effname = " bypassed";
+        showValue = false;
+        return (name + effname);
+    }
+    else if (npart > 0xf0 && kititem == 0xff)
+    {
+        string contstr;
+        string second = "";
+        if (npart == 0xf1 && insert == 16)
+        {
+                name = "System ";
+                contstr = "from Effect " + to_string(effnum + 1);
+                second = " to Effect " + to_string(control + 1);
+                return (name + contstr + second);
+        }
+        if (npart == 0xf2 && control == 2)
+        {
+            contstr = " To ";
+            if (value == -2)
+                contstr += "Master out";
+            else if (value == -1)
+                contstr = " Off";
+            else
+            {
+                contstr += "Part ";
+                second = to_string(value + 1);
+            }
+            showValue = false;
+            return ("Send " + name + contstr + second);
+        }
+        if (control == 0)
+        {
+            name = "Set " + name;
+            showValue = false;
+            return (name + effname);
+        }
+    }
+    string contstr = "";
+    if ((npart < 0x40 && control == 65) || (npart > 0xf0 && kititem == 0xff && control == 1))
+    {
+        name += " set to";
+        kititem = value;
+        showValue = false;
+    }
+    else
+        contstr = " Control " + to_string(control + 1);
+
+    switch (kititem & 0x1f)
     {
         case 0:
-            effname = " NO Effect"; // shouldn't get here!
+            effname = " NO Effect";
             break;
         case 1:
             effname = " Reverb";
@@ -1903,13 +2059,14 @@ string InterChange::resolveEffects(CommandBlock *getData)
             break;
         case 7:
             effname = " EQ";
+            if (control > 1)
+                contstr = " (Band " + to_string((control - 10)/5) +
+                ") Control " + to_string(10 + (control % 5));
             break;
         case 8:
             effname = " DynFilter";
             break;
     }
-
-    string contstr = " Control " + to_string(control);
 
     return (name + effname + contstr);
 }
@@ -1947,8 +2104,6 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
-            #warning gui writes changed to reads
-            getData.data.type = getData.data.type & 0xbf;
 
             if(getData.data.part != 0xd8) // special midi-learn message
                 commandSend(&getData);
@@ -1968,9 +2123,15 @@ void InterChange::mediate()
                 commandSend(&getData);
                 returns(&getData);
             }
-            else if (getData.data.part == 0xd8 && getData.data.control == 24)
+            else if (getData.data.control == 24)
+            {
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
+            }
+            else if (getData.data.control == 0xd8)
+            {
+                synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
+            }
         }
     }
     while (more && synth->getRuntime().runSynth);
@@ -1983,14 +2144,24 @@ void InterChange::returns(CommandBlock *getData)
     if (value == FLT_MAX)
         return; // need to sort this out later
     unsigned char type = getData->data.type | 4; // back from synth
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
 
     bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
+
+    bool isOK = false;
+    if (isGui && (control == 96 || control == 222) && npart < 0x40 && (kititem & engine & insert) == 0xff)
+        isOK = true; // needs more work. Some GUI controls need updates
+
     if (synth->guiMaster)
     {
-        if (!isGui && (isMidi || (isCli && write)))
+        if (isOK || (!isGui && (isMidi || (isCli && write))))
         {
             if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
@@ -2008,9 +2179,17 @@ void InterChange::setpadparams(int point)
 {
     int npart = point & 0xff;
     int kititem = point >> 8;
-    synth->partonoffLock(npart, 0);
     synth->part[npart]->kit[kititem].padpars->applyparameters(false);
-    synth->partonoffLock(npart, 1);
+    synth->partonoffWrite(npart, 1);
+}
+
+
+void InterChange::doClearPart(int npart)
+{
+    synth->part[npart]->defaultsinstrument();
+    synth->part[npart]->cleanup();
+    synth->getRuntime().currentPart = npart;
+    synth->partonoffWrite(npart, 2);
 }
 
 
@@ -2028,12 +2207,10 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-
-    bool isGui = type & 0x20;
     bool isCli = type & 0x10;
     char button = type & 3;
 
-    if ((isGui && button != 2) || (isCli && button == 1))
+    if (isCli && button == 1)
         return;
 
     if (npart >= 0xc0 && npart < 0xd0)
@@ -2057,17 +2234,25 @@ void InterChange::commandSend(CommandBlock *getData)
         return;
     }
 
+    if (npart >= 0x40)
+        return; // invalid part number
+
     Part *part;
     part = synth->part[npart];
 
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+    if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
         return; // attempt to access non existant kititem
 
     if (kititem == 0xff || (kititem & 0x20))
     {
+        if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
+            return;
         commandPart(getData);
         return;
     }
+
+    if (kititem > 0 && kititem < 0xff && part->Pkitmode == 0)
+        return;
 
     if (engine == 2)
     {
@@ -2181,7 +2366,11 @@ void InterChange::commandSend(CommandBlock *getData)
 
 void InterChange::commandVector(CommandBlock *getData)
 {
-    int value = getData->data.value;
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
+    int value = getData->data.value; // no floats here
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned int chan = getData->data.part & 0xf;
@@ -2358,8 +2547,13 @@ void InterChange::commandMain(CommandBlock *getData)
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
+    unsigned char kititem = getData->data.kit;
+    unsigned char par2 = getData->data.par2;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+
     switch (control)
     {
         case 0:
@@ -2384,16 +2578,13 @@ void InterChange::commandMain(CommandBlock *getData)
 
         case 32:
             if (write)
-                synth->writeRBP(10, (int) value, 0); // global fine detune
+                synth->writeRBP(10, value_int, 0); // global fine detune
             else
                 value = synth->microtonal.Pglobalfinedetune;
             break;
         case 35:
             if (write)
-            {
-                synth->setPkeyshift(value + 64);
-                synth->setAllPartMaps();
-            }
+                synth->writeRBP(11, value_int + 64, 0); // global keyshift
             else
                 value = synth->Pkeyshift - 64;
             break;
@@ -2418,13 +2609,24 @@ void InterChange::commandMain(CommandBlock *getData)
                 value = synth->getRuntime().channelSwitchCC;
             break;
 
-        case 96:
+        case 80: // load patchset
             if (write)
-                synth->resetAll();
+                synth->allStop(3 | (par2 << 8));
             break;
-        case 128:
+        case 84: // load vector
             if (write)
-                synth->allStop();
+                synth->allStop(4 | (par2 << 8) | (kititem << 16));
+            break;
+        case 96: // master reset
+            if (write)
+            {
+                synth->getRuntime().lastPatchSet = -1;
+                synth->allStop(2);
+            }
+            break;
+        case 128: // just stop
+            if (write)
+                synth->allStop(1);
             break;
     }
 
@@ -2441,10 +2643,14 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool write = (type & 0x40) > 0;
     bool kitType = (kititem >= 0x20 && kititem < 0x40);
+
+    int value_int = lrint(value);
+    char value_bool = (value > 0.5f);
 
     Part *part;
     part = synth->part[npart];
@@ -2477,50 +2683,51 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 5:
             if (write)
-                part->Prcvchn = (char) value;
+                part->Prcvchn = value_int;
             else
                 value = part->Prcvchn;
             break;
         case 6:
             if (write)
-                synth->SetPartKeyMode(npart, (char) value);
+                synth->SetPartKeyMode(npart, value_int);
             else
                 value = synth->ReadPartKeyMode(npart);
             break;
         case 7:
             if (write)
-                part->ctl->portamento.portamento = (char) value;
+                part->ctl->portamento.portamento = value_bool;
             else
                 value = part->ctl->portamento.portamento;
             break;
         case 8:
             if (kitType)
             {
+                kititem &= 0x1f;
                 switch(engine)
                 {
                     case 0:
                         if (write)
-                            part->kit[kititem & 0x1f].Padenabled = (char) value;
+                            part->kit[kititem].Padenabled = value_bool;
                         else
-                            value = part->kit[kititem & 0x1f].Padenabled;
+                            value = part->kit[kititem].Padenabled;
                         break;
                     case 1:
                         if (write)
-                            part->kit[kititem & 0x1f].Psubenabled = (char) value;
+                            part->kit[kititem].Psubenabled = value_bool;
                         else
-                            value = part->kit[kititem & 0x1f].Psubenabled;
+                            value = part->kit[kititem].Psubenabled;
                         break;
                     case 2:
                         if (write)
-                            part->kit[kititem & 0x1f].Ppadenabled = (char) value;
+                            part->kit[kititem].Ppadenabled = value_bool;
                         else
-                            value = part->kit[kititem & 0x1f].Ppadenabled;
+                            value = part->kit[kititem].Ppadenabled;
                         break;
                     default:
                         if (write)
-                            part->setkititemstatus(kititem & 0x1f, (char) value);
+                            part->setkititemstatus(kititem, value_bool);
                         else
-                            value = part->kit[kititem & 0x1f].Penabled;
+                            value = part->kit[kititem].Penabled;
                         break;
                 }
             }
@@ -2530,25 +2737,25 @@ void InterChange::commandPart(CommandBlock *getData)
                 {
                     case 0:
                         if (write)
-                            part->kit[0].Padenabled = (char) value;
+                            part->kit[0].Padenabled = value_bool;
                         else
                             value = part->kit[0].Padenabled;
                         break;
                     case 1:
                         if (write)
-                            part->kit[0].Psubenabled = (char) value;
+                            part->kit[0].Psubenabled = value_bool;
                         else
                             value = part->kit[0].Psubenabled;
                         break;
                     case 2:
                         if (write)
-                            part->kit[0].Ppadenabled = (char) value;
+                            part->kit[0].Ppadenabled = value_bool;
                         else
                             value = part->kit[0].Ppadenabled;
                         break;
                     default:
                         if (write)
-                            synth->partonoffWrite(npart, (char) value);
+                            synth->partonoffWrite(npart, value_bool);
                         else
                             value = synth->partonoffRead(npart);
                 }
@@ -2558,7 +2765,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pmuted = (char) value;
+                    part->kit[kititem & 0x1f].Pmuted = value_bool;
                 else
                     value = part->kit[kititem & 0x1f].Pmuted;
             }
@@ -2568,14 +2775,14 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pminkey = (char) value;
+                    part->kit[kititem & 0x1f].Pminkey = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Pminkey;
             }
             else
             {
                 if (write)
-                    part->Pminkey = (char) value;
+                    part->Pminkey = value_int;
                 else
                     value = part->Pminkey;
             }
@@ -2584,14 +2791,14 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Pmaxkey = (char) value;
+                    part->kit[kititem & 0x1f].Pmaxkey = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Pmaxkey;
             }
             else
             {
                 if (write)
-                    part->Pmaxkey = (char) value;
+                    part->Pmaxkey = value_int;
                 else
                     value = part->Pmaxkey;
             }
@@ -2647,7 +2854,7 @@ void InterChange::commandPart(CommandBlock *getData)
             if (kitType)
             {
                 if (write)
-                    part->kit[kititem & 0x1f].Psendtoparteffect = (char) value;
+                    part->kit[kititem & 0x1f].Psendtoparteffect = value_int;
                 else
                     value = part->kit[kititem & 0x1f].Psendtoparteffect;
             }
@@ -2655,16 +2862,13 @@ void InterChange::commandPart(CommandBlock *getData)
 
         case 33:
             if (write)
-                part->setkeylimit((char) value);
+                part->setkeylimit(value_int);
             else
                 value = part->Pkeylimit;
             break;
         case 35:
             if (write)
-            {
-                part->Pkeyshift = (char) value + 64;
-                synth->setPartMap(npart);
-            }
+                synth->writeRBP(12, npart, value_int + 64); // part keyshift
             else
                 value = part->Pkeyshift - 64;
             break;
@@ -2704,7 +2908,7 @@ void InterChange::commandPart(CommandBlock *getData)
         case 57:
             if (write)
             {
-                part->Pdrummode = (value != 0);
+                part->Pdrummode = value_bool;
                 synth->setPartMap(npart);
             }
             else
@@ -2721,7 +2925,7 @@ void InterChange::commandPart(CommandBlock *getData)
                 else
                 {
                     part->Pkitfade = false;
-                    part->Pkitmode = (char) value;
+                    part->Pkitmode = value_int;
                 }
             }
             else
@@ -2732,48 +2936,58 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 65:
             if (write)
-                part->partefx[effNum]->changeeffect((int)value);
+                part->partefx[effNum]->changeeffect(value_int);
             else
                 value = part->partefx[effNum]->geteffect();
             break;
         case 66:
             if (write)
             {
-                part->Pefxroute[effNum] = (int)value;
-                part->partefx[effNum]->setdryonly((int)value == 2);
+                part->Pefxroute[effNum] = value_int;
+                part->partefx[effNum]->setdryonly(value_int == 2);
             }
             else
                 value = part->Pefxroute[effNum];
             break;
         case 67:
             if (write)
-                part->Pefxbypass[effNum] = (value != 0);
+                part->Pefxbypass[effNum] = value_bool;
             else
                 value = part->Pefxbypass[effNum];
             break;
 
+        case 96: // doClearPart
+            synth->partonoffWrite(npart, -1);
+            flagsWrite(npart | 0x2000); // default
+            break;
+
         case 120:
-            if (write)
-                part->Paudiodest = (char) value;
+            if (synth->partonoffRead(npart) != 1)
+            {
+                getData->data.value = part->Paudiodest; // specific for this control
+                return;
+            }
+            else if (write)
+                synth->SetPartDestination(npart, int(value));
             else
                 value = part->Paudiodest;
             break;
 
         case 128:
             if (write)
-                part->ctl->setvolume((char) value); // not the *actual* volume
+                part->ctl->setvolume(value_int); // not the *actual* volume
             else
                 value = part->ctl->volume.data;
             break;
         case 129:
             if (write)
-                part->ctl->volume.receive = (char) value;
+                part->ctl->volume.receive = value_bool;
             else
                 value = part->ctl->volume.receive;
             break;
         case 130:
             if (write)
-                part->ctl->setPanDepth((char) value);
+                part->ctl->setPanDepth(value_int);
             else
                 value = part->ctl->panning.depth;
             break;
@@ -2785,7 +2999,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 132:
             if (write)
-                part->ctl->modwheel.exponential = (char) value;
+                part->ctl->modwheel.exponential = value_bool;
             else
                 value = part->ctl->modwheel.exponential;
             break;
@@ -2797,25 +3011,25 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 134:
             if (write)
-                part->ctl->bandwidth.exponential = (char) value;
+                part->ctl->bandwidth.exponential = value_bool;
             else
                 value = part->ctl->bandwidth.exponential;
             break;
         case 135:
             if (write)
-                part->ctl->expression.receive = (char) value;
+                part->ctl->expression.receive = value_bool;
             else
                 value = part->ctl->expression.receive;
             break;
         case 136:
             if (write)
-                part->ctl->fmamp.receive = (char) value;
+                part->ctl->fmamp.receive = value_bool;
             else
                 value = part->ctl->fmamp.receive;
             break;
         case 137:
             if (write)
-                part->ctl->sustain.receive = (char) value;
+                part->ctl->sustain.receive = value_bool;
             else
                 value = part->ctl->sustain.receive;
             break;
@@ -2871,13 +3085,13 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 163:
             if (write)
-                part->ctl->portamento.pitchthreshtype = (char) value;
+                part->ctl->portamento.pitchthreshtype = value_int;
             else
                 value = part->ctl->portamento.pitchthreshtype;
             break;
         case 164:
             if (write)
-                part->ctl->portamento.proportional = (char) value;
+                part->ctl->portamento.proportional = value_int;
             else
                 value = part->ctl->portamento.proportional;
             break;
@@ -2895,14 +3109,54 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 168:
             if (write)
-                part->ctl->portamento.receive = (char) value;
+                part->ctl->portamento.receive = value_bool;
             else
                 value = part->ctl->portamento.receive;
             break;
 
+        case 192:
+            if (write)
+                part->ctl->setmodwheel(value);
+            else
+                value = part->ctl->modwheel.data;
+            break;
+        case 194:
+            if (write)
+            {
+                part->SetController(C_expression, value);
+            }
+            else
+                value = part->ctl->expression.data;
+            break;
+        case 197:
+            if (write)
+                part->ctl->setfilterq(value);
+            else
+                value = part->ctl->filterq.data;
+            break;
+        case 198:
+            if (write)
+                part->ctl->setfiltercutoff(value);
+            else
+                value = part->ctl->filtercutoff.data;
+            break;
+
+        case 222:
+            if (write)
+            {
+                string name = miscMsgPop(par2);
+                synth->part[npart]->Pname = name;
+                getData->data.par2 = miscMsgPush(name);
+                break;
+            }
         case 224:
             if (write)
+            {
                 part->SetController(0x79,0); // C_resetallcontrollers
+                if (type & 0x20)
+                    getData->data.type = ((type & 0xcf) | 0x10);
+                    // fudge so that gui updates *after* changes
+            }
             break;
     }
 
@@ -2920,6 +3174,10 @@ void InterChange::commandAdd(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_bool = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     ADnoteParameters *pars;
@@ -2930,26 +3188,26 @@ void InterChange::commandAdd(CommandBlock *getData)
     {
         case 0:
             if (write)
-                pars->GlobalPar.PVolume = lrint(value);
+                pars->GlobalPar.PVolume = value_int;
             else
                 value = pars->GlobalPar.PVolume;
             break;
         case 1:
             if (write)
-                pars->GlobalPar.PAmpVelocityScaleFunction = lrint(value);
+                pars->GlobalPar.PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->GlobalPar.PAmpVelocityScaleFunction;
             break;
         case 2:
             if (write)
-                pars->setGlobalPan((int) value);
+                pars->setGlobalPan(value_int);
             else
                 value = pars->GlobalPar.PPanning;
             break;
 
         case 32:
             if (write)
-                pars->GlobalPar.PDetune = lrint(value) + 8192;
+                pars->GlobalPar.PDetune = value_int + 8192;
             else
                 value = pars->GlobalPar.PDetune - 8192;
             break;
@@ -2972,7 +3230,7 @@ void InterChange::commandAdd(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                pars->GlobalPar.PDetuneType = lrint(value);
+                pars->GlobalPar.PDetuneType = value_int;
             else
                 value = pars->GlobalPar.PDetuneType;
             break;
@@ -2995,7 +3253,7 @@ void InterChange::commandAdd(CommandBlock *getData)
         case 39:
             if (write)
             {
-                pars->GlobalPar.PBandwidth = lrint(value);
+                pars->GlobalPar.PBandwidth = value_int;
                  pars->getBandwidthDetuneMultiplier();
             }
             else
@@ -3004,44 +3262,44 @@ void InterChange::commandAdd(CommandBlock *getData)
 
         case 112:
             if (write)
-                pars->GlobalPar.PStereo = (value != 0);
+                pars->GlobalPar.PStereo = value_bool;
             else
                 value = pars->GlobalPar.PStereo;
             break;
         case 113:
             if (write)
-                pars->GlobalPar.Hrandgrouping = (value != 0);
+                pars->GlobalPar.Hrandgrouping = value_bool;
             else
                 value = pars->GlobalPar.Hrandgrouping;
             break;
 
         case 120:
             if (write)
-                pars->GlobalPar.Fadein_adjustment = lrint(value);
+                pars->GlobalPar.Fadein_adjustment = value_int;
             else
                 value = pars->GlobalPar.Fadein_adjustment;
             break;
         case 121:
             if (write)
-                pars->GlobalPar.PPunchStrength = lrint(value);
+                pars->GlobalPar.PPunchStrength = value_int;
             else
                 value = pars->GlobalPar.PPunchStrength;
             break;
         case 122:
             if (write)
-                pars->GlobalPar.PPunchTime = lrint(value);
+                pars->GlobalPar.PPunchTime = value_int;
             else
                 value = pars->GlobalPar.PPunchTime;
             break;
         case 123:
             if (write)
-                pars->GlobalPar.PPunchStretch = lrint(value);
+                pars->GlobalPar.PPunchStretch = value_int;
             else
                 value = pars->GlobalPar.PPunchStretch;
             break;
         case 124:
             if (write)
-                pars->GlobalPar.PPunchVelocitySensing = lrint(value);
+                pars->GlobalPar.PPunchVelocitySensing = value_int;
             else
                 value = pars->GlobalPar.PPunchVelocitySensing;
             break;
@@ -3053,6 +3311,10 @@ void InterChange::commandAdd(CommandBlock *getData)
 
 void InterChange::commandAddVoice(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3062,6 +3324,10 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     int nvoice = engine & 0x1f;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_bool = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     ADnoteParameters *pars;
@@ -3072,69 +3338,69 @@ void InterChange::commandAddVoice(CommandBlock *getData)
     {
         case 0:
             if (write)
-                pars->VoicePar[nvoice].PVolume = lrint(value);
+                pars->VoicePar[nvoice].PVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PVolume;
             break;
         case 1:
             if (write)
-                pars->VoicePar[nvoice].PAmpVelocityScaleFunction = lrint(value);
+                pars->VoicePar[nvoice].PAmpVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PAmpVelocityScaleFunction;
             break;
         case 2:
             if (write)
-                 pars->setVoicePan(nvoice, lrint(value));
+                 pars->setVoicePan(nvoice, value_int);
             else
                 value = pars->VoicePar[nvoice].PPanning;
             break;
         case 4:
             if (write)
-                pars->VoicePar[nvoice].PVolumeminus = (value != 0);
+                pars->VoicePar[nvoice].PVolumeminus = value_bool;
             else
                 value = pars->VoicePar[nvoice].PVolumeminus;
             break;
         case 8:
             if (write)
-                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(value);
+                pars->VoicePar[nvoice].PAmpEnvelopeEnabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].PAmpEnvelopeEnabled;
             break;
         case 9:
             if (write)
-                pars->VoicePar[nvoice].PAmpLfoEnabled = (value != 0);
+                pars->VoicePar[nvoice].PAmpLfoEnabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].PAmpLfoEnabled;
             break;
 
         case 16:
             if (write)
-                pars->VoicePar[nvoice].PFMEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFMEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMEnabled;
             break;
         case 17:
             if (write)
-                pars->VoicePar[nvoice].PFMVoice = lrint(value);
+                pars->VoicePar[nvoice].PFMVoice = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVoice;
             break;
 
         case 32:
             if (write)
-                pars->VoicePar[nvoice].PDetune = lrint(value) + 8192;
+                pars->VoicePar[nvoice].PDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PDetune-8192;
             break;
         case 33:
             if (write)
-                pars->VoicePar[nvoice].PfixedfreqET = lrint(value);
+                pars->VoicePar[nvoice].PfixedfreqET = value_int;
             else
                 value = pars->VoicePar[nvoice].PfixedfreqET;
             break;
         case 34:
             if (write)
-                 pars->VoicePar[nvoice].Pfixedfreq = (value != 0);
+                 pars->VoicePar[nvoice].Pfixedfreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].Pfixedfreq;
             break;
@@ -3156,7 +3422,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                pars->VoicePar[nvoice].PDetuneType = lrint(value);
+                pars->VoicePar[nvoice].PDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PDetuneType;
             break;
@@ -3178,44 +3444,44 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 40:
             if (write)
-                pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqEnvelopeEnabled;
             break;
         case 41:
             if (write)
-                pars->VoicePar[nvoice].PFreqLfoEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFreqLfoEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFreqLfoEnabled;
             break;
 
         case 48:
             if (write)
-                pars->VoicePar[nvoice].Unison_frequency_spread = lrint(value);
+                pars->VoicePar[nvoice].Unison_frequency_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_frequency_spread;
             break;
         case 49:
             if (write)
-                pars->VoicePar[nvoice].Unison_phase_randomness = lrint(value);
+                pars->VoicePar[nvoice].Unison_phase_randomness = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_phase_randomness;
             break;
         case 50:
             if (write)
-                pars->VoicePar[nvoice].Unison_stereo_spread = lrint(value);
+                pars->VoicePar[nvoice].Unison_stereo_spread = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_stereo_spread;
             break;
         case 51:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto = lrint(value);
+                pars->VoicePar[nvoice].Unison_vibratto = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto;
             break;
         case 52:
             if (write)
-                pars->VoicePar[nvoice].Unison_vibratto_speed = lrint(value);
+                pars->VoicePar[nvoice].Unison_vibratto_speed = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_vibratto_speed;
             break;
@@ -3224,21 +3490,21 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             {
                 if (value < 2)
                     value = 2;
-                pars->VoicePar[nvoice].Unison_size = lrint(value);
+                pars->VoicePar[nvoice].Unison_size = value_int;
             }
             else
                 value = pars->VoicePar[nvoice].Unison_size;
             break;
         case 54:
             if (write)
-                pars->VoicePar[nvoice].Unison_invert_phase = lrint(value);
+                pars->VoicePar[nvoice].Unison_invert_phase = value_int;
             else
                 value = pars->VoicePar[nvoice].Unison_invert_phase;
             break;
         case 56:
             if (write)
             {
-                k = (value != 0) + 1;
+                k = value_bool + 1;
                 if (pars->VoicePar[nvoice].Unison_size < 2 || k == 1)
                     pars->VoicePar[nvoice].Unison_size = k;
             }
@@ -3248,69 +3514,69 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
         case 64:
             if (write)
-                pars->VoicePar[nvoice].Pfilterbypass = (value != 0);
+                pars->VoicePar[nvoice].Pfilterbypass = value_bool;
             else
                 value = pars->VoicePar[nvoice].Pfilterbypass;
             break;
         case 68:
             if (write)
-                 pars->VoicePar[nvoice].PFilterEnabled =  (value != 0);
+                 pars->VoicePar[nvoice].PFilterEnabled =  value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterEnabled;
             break;
         case 72:
             if (write)
-                pars->VoicePar[nvoice].PFilterEnvelopeEnabled= (value != 0);
+                pars->VoicePar[nvoice].PFilterEnvelopeEnabled= value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterEnvelopeEnabled;
             break;
         case 73:
             if (write)
-                pars->VoicePar[nvoice].PFilterLfoEnabled= (value != 0);
+                pars->VoicePar[nvoice].PFilterLfoEnabled= value_bool;
             else
                 value = pars->VoicePar[nvoice].PFilterLfoEnabled;
             break;
 
         case 80:
             if (write)
-                pars->VoicePar[nvoice].PFMVolume = lrint(value);
+                pars->VoicePar[nvoice].PFMVolume = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolume;
             break;
         case 81:
             if (write)
-                pars->VoicePar[nvoice].PFMVelocityScaleFunction = lrint(value);
+                pars->VoicePar[nvoice].PFMVelocityScaleFunction = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVelocityScaleFunction;
             break;
         case 82:
             if (write)
-                pars->VoicePar[nvoice].PFMVolumeDamp = lrint(value);
+                pars->VoicePar[nvoice].PFMVolumeDamp = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMVolumeDamp;
             break;
         case 88:
             if (write)
-                pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = (value != 0);
+                pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = value_bool;
             else
                 value =  pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled;
             break;
 
         case 96:
             if (write)
-                pars->VoicePar[nvoice].PFMDetune = (int) value + 8192;
+                pars->VoicePar[nvoice].PFMDetune = value_int + 8192;
             else
                 value = pars->VoicePar[nvoice].PFMDetune - 8192;
             break;
         case 98:
             if (write)
-                pars->VoicePar[nvoice].PFMFixedFreq = (value != 0);
+                pars->VoicePar[nvoice].PFMFixedFreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
         case 99:
             if (write)
             {
-                k = lrint(value);
+                k = value_int;
                 if (k < 0)
                     k += 16;
                 pars->VoicePar[nvoice].PFMCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PFMCoarseDetune % 1024;
@@ -3325,14 +3591,14 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 100:
             if (write)
-                pars->VoicePar[nvoice].PFMDetuneType = (int) value;
+                pars->VoicePar[nvoice].PFMDetuneType = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMDetuneType;
             break;
         case 101:
             if (write)
             {
-                int k = lrint(value);
+                int k = value_int;
                 if (k < 0)
                     k += 1024;
                 pars->VoicePar[nvoice].PFMCoarseDetune = k + (pars->VoicePar[nvoice].PFMCoarseDetune / 1024) * 1024;
@@ -3347,57 +3613,57 @@ void InterChange::commandAddVoice(CommandBlock *getData)
             break;
         case 104:
             if (write)
-                pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(value);
+                pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = value_int;
             else
                 value = pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled;
             break;
 
         case 112:
             if (write)
-                pars->VoicePar[nvoice].PFMoscilphase = 64 - lrint(value);
+                pars->VoicePar[nvoice].PFMoscilphase = 64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].PFMoscilphase;
             break;
         case 113:
             if (write)
-                pars->VoicePar[nvoice].PextFMoscil = lrint(value);
+                pars->VoicePar[nvoice].PextFMoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].PextFMoscil;
             break;
 
         case 128:
             if (write)
-                pars->VoicePar[nvoice].PDelay = lrint(value);
+                pars->VoicePar[nvoice].PDelay = value_int;
             else
                 value = pars->VoicePar[nvoice].PDelay;
             break;
         case 129:
             if (write)
-                pars->VoicePar[nvoice].Enabled = (value != 0);
+                pars->VoicePar[nvoice].Enabled = value_bool;
             else
                 value = pars->VoicePar[nvoice].Enabled;
             break;
         case 130:
             if (write)
-                pars->VoicePar[nvoice].Presonance = (value != 0);
+                pars->VoicePar[nvoice].Presonance = value_bool;
             else
                 value = pars->VoicePar[nvoice].Presonance;
             break;
         case 136:
             if (write)
-                pars->VoicePar[nvoice].Poscilphase =64 - lrint(value);
+                pars->VoicePar[nvoice].Poscilphase =64 - value_int;
             else
                 value = 64 - pars->VoicePar[nvoice].Poscilphase;
             break;
         case 137:
             if (write)
-                pars->VoicePar[nvoice].Pextoscil = lrint(value);
+                pars->VoicePar[nvoice].Pextoscil = value_int;
             else
                 value = pars->VoicePar[nvoice].Pextoscil;
             break;
         case 138:
             if (write)
-                pars->VoicePar[nvoice].Type = lrint(value);
+                pars->VoicePar[nvoice].Type = value_int;
             else
                 value = pars->VoicePar[nvoice].Type;
             break;
@@ -3410,6 +3676,10 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
 void InterChange::commandSub(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3418,6 +3688,10 @@ void InterChange::commandSub(CommandBlock *getData)
     unsigned char insert = getData->data.insert & 0x1f; // ensure no stray filter
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_bool = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     SUBnoteParameters *pars;
@@ -3481,7 +3755,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case 18:
             if (write)
-                pars->PBandWidthEnvelopeEnabled = (value != 0);
+                pars->PBandWidthEnvelopeEnabled = value_bool;
             else
                 value = pars->PBandWidthEnvelopeEnabled;
             break;
@@ -3500,7 +3774,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case 34:
             if (write)
-                pars->Pfixedfreq = (value != 0);
+                pars->Pfixedfreq = value_bool;
             else
                 value = pars->Pfixedfreq;
             break;
@@ -3522,7 +3796,7 @@ void InterChange::commandSub(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                pars->PDetuneType = (int)value + 1;
+                pars->PDetuneType = value_int + 1;
             else
                 value = pars->PDetuneType;
             break;
@@ -3543,9 +3817,23 @@ void InterChange::commandSub(CommandBlock *getData)
             }
             break;
 
+        case 38:
+            if (write)
+                pars->PBendAdjust = value;
+            else
+                value = pars->PBendAdjust;
+            break;
+
+        case 39:
+            if (write)
+                pars->POffsetHz = value;
+            else
+                value = pars->POffsetHz;
+            break;
+
         case 40:
             if (write)
-                pars->PFreqEnvelopeEnabled = (value != 0);
+                pars->PFreqEnvelopeEnabled = value_bool;
             else
                 value = pars->PFreqEnvelopeEnabled;
             break;
@@ -3580,7 +3868,7 @@ void InterChange::commandSub(CommandBlock *getData)
         case 51:
             if (write)
             {
-                pars->POvertoneSpread.type =  (int)value;
+                pars->POvertoneSpread.type =  value_int;
                 pars->updateFrequencyMultipliers();
             }
             else
@@ -3589,24 +3877,24 @@ void InterChange::commandSub(CommandBlock *getData)
 
         case 64:
             if (write)
-                pars->PGlobalFilterEnabled = (value != 0);
+                pars->PGlobalFilterEnabled = value_bool;
             else
                 value = pars->PGlobalFilterEnabled;
             break;
 
         case 80:
             if (write)
-                pars->Pnumstages = (int)value;
+                pars->Pnumstages = value_int;
             else
                 value = pars->Pnumstages;
             break;
         case 81:
             if (write)
-                pars->Phmagtype = (int)value;
+                pars->Phmagtype = value_int;
             break;
         case 82:
             if (write)
-                pars->Pstart = (int)value;
+                pars->Pstart = value_int;
             else
                 value = pars->Pstart;
             break;
@@ -3625,7 +3913,7 @@ void InterChange::commandSub(CommandBlock *getData)
 
         case 112:
             if (write)
-                pars->Pstereo = (value != 0);
+                pars->Pstereo = value_bool;
             break;
     }
 
@@ -3636,12 +3924,21 @@ void InterChange::commandSub(CommandBlock *getData)
 
 void InterChange::commandPad(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
+
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_bool = (value > 0.5f);
+
     Part *part;
     part = synth->part[npart];
     PADnoteParameters *pars;
@@ -3671,38 +3968,38 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case 16:
             if (write)
-                pars->setPbandwidth((int) value);
+                pars->setPbandwidth(value_int);
             else
                 value = pars->Pbandwidth;
             break;
         case 17:
             if (write)
-                pars->Pbwscale = (int) value;
+                pars->Pbwscale = value_int;
             else
                 value = pars->Pbwscale;
             break;
         case 19:
             if (write)
-                pars->Pmode = (int) value;
+                pars->Pmode = value_int;
             else
                 value = pars->Pmode;
             break;
 
         case 32:
             if (write)
-                pars->PDetune = (int) value + 8192;
+                pars->PDetune = value_int + 8192;
             else
                 value = pars->PDetune - 8192;
             break;
         case 33:
             if (write)
-                pars->PfixedfreqET = (int) value;
+                pars->PfixedfreqET = value_int;
             else
                 value = pars->PfixedfreqET;
             break;
         case 34:
             if (write)
-                pars->Pfixedfreq = (value != 0);
+                pars->Pfixedfreq = value_bool;
             else
                 value = pars->Pfixedfreq;
             break;
@@ -3724,7 +4021,7 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case 36:
             if (write)
-                 pars->PDetuneType = (int) value + 1;
+                 pars->PDetuneType = value_int + 1;
             else
                 value =  pars->PDetuneType - 1;
             break;
@@ -3747,69 +4044,69 @@ void InterChange::commandPad(CommandBlock *getData)
 
         case 38:
             if (write)
-                pars->PBendAdjust = lrint(value);
+                pars->PBendAdjust = value_int;
             else
                 value = pars->PBendAdjust;
             break;
         case 39:
             if (write)
-                pars->POffsetHz = lrint(value);
+                pars->POffsetHz = value_int;
             else
                 value = pars->POffsetHz;
             break;
 
         case 48:
             if (write)
-                pars->Phrpos.par1 = (int) value;
+                pars->Phrpos.par1 = value_int;
             else
                 value = pars->Phrpos.par1;
             break;
         case 49:
             if (write)
-                pars->Phrpos.par2 = (int) value;
+                pars->Phrpos.par2 = value_int;
             else
                 value = pars->Phrpos.par2;
             break;
         case 50:
             if (write)
-                pars->Phrpos.par3 = (int) value;
+                pars->Phrpos.par3 = value_int;
             else
                 value = pars->Phrpos.par3;
             break;
         case 51:
             if (write)
-                pars->Phrpos.type = (int) value;
+                pars->Phrpos.type = value_int;
             else
                 value = pars->Phrpos.type;
             break;
 
         case 64:
             if (write)
-                pars->Php.base.par1 = (int) value;
+                pars->Php.base.par1 = value_int;
             else
                 value = pars->Php.base.par1;
             break;
         case 65:;
             if (write)
-                pars->Php.freqmult = (int) value;
+                pars->Php.freqmult = value_int;
             else
                 value = pars->Php.freqmult;
             break;
         case 66:
             if (write)
-                pars->Php.modulator.par1 = (int) value;
+                pars->Php.modulator.par1 = value_int;
             else
                 value = pars->Php.modulator.par1;
             break;
         case 67:
             if (write)
-                pars->Php.modulator.freq = (int) value;
+                pars->Php.modulator.freq = value_int;
             else
                 value = pars->Php.modulator.freq;
             break;
         case 68:
             if (write)
-                pars->Php.width = (int) value;
+                pars->Php.width = value_int;
             else
                 value = pars->Php.width;
             break;
@@ -3827,13 +4124,13 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case 71:
             if (write)
-                pars->Php.amp.par1 = (int) value;
+                pars->Php.amp.par1 = value_int;
             else
                 value = pars->Php.amp.par1;
             break;
         case 72:
             if (write)
-                pars->Php.amp.par2 = (int) value;
+                pars->Php.amp.par2 = value_int;
             else
                 value = pars->Php.amp.par2;
             break;
@@ -3851,75 +4148,78 @@ void InterChange::commandPad(CommandBlock *getData)
             break;
         case 75:
             if (write)
-                pars->Php.autoscale = (value != 0);
+                pars->Php.autoscale = value_bool;
             else
                 value = pars->Php.autoscale;
             break;
 
         case 80:
             if (write)
-                pars->Pquality.basenote = (int) value;
+                pars->Pquality.basenote = value_int;
             else
                 value = pars->Pquality.basenote;
             break;
         case 81:
             if (write)
-                pars->Pquality.smpoct = (int) value;
+                pars->Pquality.smpoct = value_int;
             else
                 value = pars->Pquality.smpoct;
             break;
         case 82:
             if (write)
-                pars->Pquality.oct = (int) value;
+                pars->Pquality.oct = value_int;
             else
                 value = pars->Pquality.oct;
             break;
         case 83:
             if (write)
-                pars->Pquality.samplesize = (int) value;
+                pars->Pquality.samplesize = value_int;
             else
                 value = pars->Pquality.samplesize;
             break;
 
-        case 104:
+        case 104: // setpadparams(
             if (write)
-                synth->getRuntime().padApply = npart | (kititem << 8);
+            {
+                synth->partonoffWrite(npart, 0);
+                flagsWrite(npart | (kititem << 8));
+            }
             break;
 
         case 112:
             if (write)
-                pars->PStereo = (value != 0);
+                pars->PStereo = value_bool;
             else
                 ;
             break;
 
         case 120:
             if (write)
-                pars->Fadein_adjustment = (int) value;
+                pars->Fadein_adjustment = value_int;
             else
                 value = pars->Fadein_adjustment;
             break;
         case 121:
             if (write)
-                pars->PPunchStrength = (int) value;
+                pars->PPunchStrength = value_int;
             else
                 value = pars->PPunchStrength;
             break;
         case 122:
             if (write)
-                pars->PPunchTime = (int) value;
+                pars->PPunchTime = value_int;
             else
                 value = pars->PPunchTime;
             break;
         case 123:
             if (write)
-                pars->PPunchStretch = (int) value;
+                pars->PPunchStretch = value_int;
             else
                 value = pars->PPunchStretch;
             break;
         case 124:
             if (write)
-                pars->PPunchVelocitySensing = (int) value;
+                pars->PPunchVelocitySensing = value_int;
             else
                 value = pars->PPunchVelocitySensing;
             break;
@@ -3932,10 +4232,16 @@ void InterChange::commandPad(CommandBlock *getData)
 
 void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 {
-    int value = (int) getData->data.value; // no floats here!
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
+    int value = lrint(getData->data.value); // no floats here!
+    char value_bool = (getData->data.value > 0.5f);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
+
     bool write = (type & 0x40) > 0;
 
     if (insert == 6)
@@ -4033,7 +4339,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             if (write)
             {
                 oscil->useasbase();
-                if (value != 0)
+                if (value_bool)
                 {
                     for (int i = 0; i < MAX_AD_HARMONICS; ++ i)
                     {
@@ -4077,7 +4383,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case 38:
             if (write)
-                oscil->Pfilterbeforews =  (value != 0);
+                oscil->Pfilterbeforews = value_bool;
             else
                 value = oscil->Pfilterbeforews;
             break;
@@ -4138,7 +4444,7 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
             break;
         case 66:
             if (write)
-                oscil->Pharmonicshiftfirst = (value != 0);
+                oscil->Pharmonicshiftfirst = value_bool;
             else
                 value = oscil->Pharmonicshiftfirst;
             break;
@@ -4192,10 +4498,16 @@ void InterChange::commandOscillator(CommandBlock *getData, OscilGen *oscil)
 
 void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 {
-    int value = (int) getData->data.value; // no floats here
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
+    int value = lrint(getData->data.value); // no floats here
+    char value_bool = (getData->data.value > 0.5);
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char insert = getData->data.insert;
+
     bool write = (type & 0x40) > 0;
 
     if (insert == 9)
@@ -4232,7 +4544,7 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case 8:
             if (write)
-                respar->Penabled = (value != 0);
+                respar->Penabled = value_bool;
             else
                 value = respar->Penabled;
             break;
@@ -4244,11 +4556,11 @@ void InterChange::commandResonance(CommandBlock *getData, Resonance *respar)
 
         case 20:
             if (write)
-                respar->interpolatepeaks((value != 0));
+                respar->interpolatepeaks(value_bool);
             break;
         case 21:
             if (write)
-                respar->Pprotectthefundamental = (value != 0);
+                respar->Pprotectthefundamental = value_bool;
             else
                 value = respar->Pprotectthefundamental;
             break;
@@ -4336,55 +4648,55 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
     {
         case 0:
             if (write)
-                pars->Pfreq = val;
+                pars->setPfreq(val);
             else
                 val = pars->Pfreq;
             break;
         case 1:
             if (write)
-                pars->Pintensity = val;
+                pars->setPintensity(val);
             else
                 val = pars->Pintensity;
             break;
         case 2:
             if (write)
-                pars->Pdelay = val;
+                pars->setPdelay(val);
             else
                 val = pars->Pdelay;
             break;
         case 3:
             if (write)
-                pars->Pstartphase = val;
+                pars->setPstartphase(val);
             else
                 val = pars->Pstartphase;
             break;
         case 4:
             if (write)
-                pars->Prandomness = val;
+                pars->setPrandomness(val);
             else
                 val = pars->Prandomness;
             break;
         case 5:
             if (write)
-                pars->PLFOtype = (int)val;
+                pars->setPLFOtype(lrint(val));
             else
                 val = pars->PLFOtype;
             break;
         case 6:
             if (write)
-                pars->Pcontinous = (val != 0);
+                pars->setPcontinous((val > 0.5f));
             else
                 val = pars->Pcontinous;
             break;
         case 7:
             if (write)
-                pars->Pfreqrand = val;
+                pars->setPfreqrand(val);
             else
                 val = pars->Pfreqrand;
             break;
         case 8:
             if (write)
-                pars->Pstretch = val;
+                pars->setPstretch(val);
             else
                 val = pars->Pstretch;
             break;
@@ -4397,6 +4709,10 @@ void InterChange::lfoReadWrite(CommandBlock *getData, LFOParams *pars)
 
 void InterChange::commandFilter(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -4435,6 +4751,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 {
     bool write = (getData->data.type & 0x40) > 0;
     float val = getData->data.value;
+    int value_int = lrint(val);
 
     int nseqpos = getData->data.parameter;
     int nformant = getData->data.parameter;
@@ -4464,7 +4781,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (velsnsamp != NULL)
             {
                 if (write)
-                    *velsnsamp = (unsigned char) val;
+                    *velsnsamp = value_int;
                 else
                     val = *velsnsamp;
             }
@@ -4473,7 +4790,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             if (velsns != NULL)
             {
                 if (write)
-                    *velsns = (unsigned char) val;
+                    *velsns = value_int;
                 else
                     val = *velsns;
             }
@@ -4486,14 +4803,14 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 6:
             if (write)
-                pars->Pstages = val;
+                pars->Pstages = value_int;
             else
                 val = pars->Pstages;
             break;
         case 7:
             if (write)
             {
-                if (pars->Pcategory != val)
+                if (pars->Pcategory != value_int)
                 {
                     pars->Pgain = 64;
                     pars->Ptype = 0;
@@ -4508,7 +4825,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 9:
             if (write)
             {
-                pars->Ptype = val;
+                pars->Ptype = value_int;
                 pars->changed=true;
             }
             else
@@ -4516,7 +4833,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
             break;
         case 10:
             if (write)
-                pars->Pfreqtrackoffset = (val != 0);
+                pars->Pfreqtrackoffset = (value_int != 0);
             else
                 val = pars->Pfreqtrackoffset;
             break;
@@ -4597,7 +4914,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 32:
             if (write)
             {
-                pars->Pnumformants = val;
+                pars->Pnumformants = value_int;
                 pars->changed=true;
             }
             else
@@ -4610,7 +4927,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 35:
             if (write)
             {
-                pars->Psequencesize = val;
+                pars->Psequencesize = value_int;
                 pars->changed=true;
             }
             else
@@ -4621,7 +4938,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 37:
             if (write)
             {
-                pars->Psequence[nseqpos].nvowel = val;
+                pars->Psequence[nseqpos].nvowel = value_int;
                 pars->changed=true;
             }
             else
@@ -4630,7 +4947,7 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
         case 38:
             if (write)
             {
-                pars->Psequencereversed = (val != 0);
+                pars->Psequencereversed = (value_int != 0);
                 pars->changed=true;
             }
             else
@@ -4645,6 +4962,10 @@ void InterChange::filterReadWrite(CommandBlock *getData, FilterParams *pars, uns
 
 void InterChange::commandEnvelope(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
@@ -4739,7 +5060,7 @@ void InterChange::commandEnvelope(CommandBlock *getData)
 
 void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 {
-    int val = (int) getData->data.value; // these are all integers or bool
+    int val = lrint(getData->data.value); // these are all integers or bool
     bool write = (getData->data.type & 0x40) > 0;
     unsigned char point = getData->data.control;
     unsigned char insert = getData->data.insert;
@@ -4935,6 +5256,10 @@ void InterChange::envelopeReadWrite(CommandBlock *getData, EnvelopeParams *pars)
 
 void InterChange::commandSysIns(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -4943,6 +5268,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
     unsigned char insert = getData->data.insert;
 
     bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+
     bool isSysEff = (npart == 0xf1);
     if (insert == 0xff)
     {
@@ -4954,9 +5282,9 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 if (write)
                 {
                     if (isSysEff)
-                        synth->sysefx[effnum]->changeeffect((int)value);
+                        synth->sysefx[effnum]->changeeffect(value_int);
                     else
-                        synth->insefx[effnum]->changeeffect((int)value);
+                        synth->insefx[effnum]->changeeffect(value_int);
                 }
                 else
                 {
@@ -4968,7 +5296,7 @@ void InterChange::commandSysIns(CommandBlock *getData)
                 break;
             case 2: // insert only
                 if (write)
-                    synth->Pinsparts[effnum] = (int)value;
+                    synth->Pinsparts[effnum] = value_int;
                 else
                     value = synth->Pinsparts[effnum];
                 break;
@@ -4989,6 +5317,10 @@ void InterChange::commandSysIns(CommandBlock *getData)
 
 void InterChange::commandEffects(CommandBlock *getData)
 {
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -5004,8 +5336,10 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     else if (npart == 0xf2)
         eff = synth->insefx[effnum];
-    else
+    else if (npart < 0x40)
         eff = synth->part[npart]->partefx[effnum];
+    else
+        return; //invalid part number
 
     if (kititem == 8 && getData->data.insert < 0xff)
     {
@@ -5015,27 +5349,33 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     if (write)
     {
-        if (control == 16)
-            	eff->changepreset((int)value);
-        else
-             eff->seteffectpar(control,(int)value);
+        // EQ (7) does not have presets and 16 collides with
+        // control value for the band 1 frequency parameter
+        if (control == 16 && kititem != 7)
+            	eff->changepreset(lrint(value));
+        else if (control != 1 || kititem != 7) // EQ selector is not a parameter
+             eff->seteffectpar(control,lrint(value));
     }
     else
     {
-        if (control == 16)
+        if (control == 16 && kititem != 7)
             value = eff->getpreset();
-        else
+        else if (control != 1 || kititem != 7) // EQ selector is not a parameter
             value = eff->geteffectpar(control);
     }
+
     if (!write)
         getData->data.value = value;
 }
 
+
+// a lot of work needed here :(
 void InterChange::returnLimits(CommandBlock *getData)
 {
     // value is preserved so we know it's a limits test
-    // type is preseved so we know the source
-    // control is use as a midi learn enable and other bits
+    // lower bits of type are preseved so we know the source
+    // bit 6 set is used to denote midi learnable
+    // bit 7 set denotes the value is used as an integer
 
     int control = getData->data.control;
     int npart = getData->data.part;
@@ -5044,70 +5384,109 @@ void InterChange::returnLimits(CommandBlock *getData)
     int insert = getData->data.insert;
     int parameter = getData->data.parameter;
     int par2 = getData->data.par2;
+    getData->data.type &= 0x3f; //  clear top bits
+    getData->data.type |= 0x80; // default is integer & not learnable
 
-    //default values
-    getData->limits.min = 0;
-    getData->limits.max = 127;
-    getData->limits.def = 0;
+    if (npart == 240) // main control limits
+    {
+        synth->getLimits(getData);
+        return;
+    }
+
+    if(kititem == 0x87) //EQ in part effects
+    {
+        getData->limits.min = 0;
+        getData->limits.max = 127;
+        return;
+    }
 
     if (npart < 0x40)
     {
         Part *part;
         part = synth->part[npart];
-
-
-
-        if (kititem < 0x10)
+        if (engine == 1 && (insert == 0xff || (insert >= 5 && insert <= 7)) && parameter == 0xff)
         {
-            if (insert == 0xff && parameter == 0xff && par2 == 0xff)
-            {
-                if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
-                {
-                    ADnoteParameters *adpars;
-                    adpars = part->kit[kititem].adpars;
-                    adpars->getLimits(getData);
-                }
-                else if (engine == 1)
-                {
-                    SUBnoteParameters *subpars;
-                    subpars = part->kit[kititem].subpars;
-                    subpars->getLimits(getData);
-                }
-                else if (engine == 2)
-                {
-                    PADnoteParameters *padpars;
-                    padpars = part->kit[kititem].padpars;
-                    padpars->getLimits(getData);
-                }
-            }
-            else if (engine != 1 && insert >= 5 && insert <= 7)
-            {
-                    part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
-                    // we use this for limits as oscillator values identical
-            }
-            else if (engine != 1 && insert == 8) // resonance
-            {
-                if (control == 0) // a cheat!
-                {
-                    getData->limits.min = 1;
-                    getData->limits.max = 90;
-                }
-            }
-            else if (insert == 0 && parameter <= 2) // LFO
-            {
-                if (control == 0) // another cheat!
-                {
-                    getData->limits.max = 1;
-                    getData->limits.def = 50; // default values are *100
-                }
-            }
+            SUBnoteParameters *subpars;
+            subpars = part->kit[kititem].subpars;
+            subpars->getLimits(getData);
+            return;
         }
-        else if (kititem == 0xff)
+        if (kititem == 0xff || (kititem & 0x20)) // part level controls
         {
-            if (control == 48) // wot, again!
-                getData->limits.max = 50;
+            part->getLimits(getData);
+            return;
         }
-    }
-    else
+        if (insert == 0xff && parameter == 0xff && par2 == 0xff)
+        {
+            if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
+            {
+                ADnoteParameters *adpars;
+                adpars = part->kit[kititem].adpars;
+                adpars->getLimits(getData);
+                return;
+            }
+            if (engine == 2)
+            {
+                PADnoteParameters *padpars;
+                padpars = part->kit[kititem].padpars;
+                padpars->getLimits(getData);
+                return;
+            }
+            // there may be other stuff
+            getData->limits.min = 0;
+            getData->limits.max = 127;
+            getData->limits.def = 0;
+            cout << "Using defaults" << endl;
+            return;
+        }
+        if (insert >= 5 && insert <= 7)
+        {
+            part->kit[0].adpars->VoicePar[0].OscilSmp->getLimits(getData);
+            // we also use this for pad limits
+            // as oscillator values identical
+            return;
+        }
+        if (insert == 8) // resonance
+        {
+            if (control == 0) // a cheat!
+            {
+                getData->limits.min = 1;
+                getData->limits.max = 90;
+                getData->limits.def = 500; // default values are *10
+                return;
+            }
+            // there may be other stuff
+            getData->limits.min = 0;
+            getData->limits.max = 127;
+            getData->limits.def = 0;
+            cout << "Using defaults" << endl;
+            return;
+        }
+        if (insert == 0 && parameter <= 2) // LFO
+        {
+            if (control == 0) // another cheat!
+            {
+                getData->limits.type = 0x40;
+                getData->limits.min = 0;
+                getData->limits.max = 1;
+                getData->limits.def = 5; // default values are *10
+                return;
+            }
+            getData->limits.min = 0;
+            getData->limits.max = 127;
+            getData->limits.def = 0;
+            cout << "Using defaults" << endl;
+            return;
+        }
+        // there may be other stuff
+        getData->limits.min = 0;
+        getData->limits.max = 127;
+        getData->limits.def = 0;
         cout << "Using defaults" << endl;
+        return;
+    }
+    getData->limits.min = 0;
+    getData->limits.max = 127;
+    getData->limits.def = 0;
+    cout << "Using defaults" << endl;
 }

@@ -1,4 +1,4 @@
-This is not intended to be used within the realtime threads as both push and pop use mutex. However, they are very fast so you'd probably get away with it :)
+This is not intended to be used within the realtime threads as both push and pop use a common semaphore. However, they are very fast so you'd probably get away with it :)
 
 There are just two calls:
 
@@ -10,4 +10,6 @@ These calls are accessible to all parts of Yoshimi and provide a simple asynchon
 
 Pushing a message will return the first available ID and Popping a message makes its ID available again.
 
-There is a maximum of 255 possible entries at any one time, but it's unlikely that limit will ever be reached.
+There is a maximum of 254 possible entries at any one time, but it's unlikely that limit will ever be reached.
+
+The ID 255 is a 'do nothing' reserved for calls that might want to send a message... but then again might not :)

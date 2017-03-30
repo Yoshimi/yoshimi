@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {FilterUI.h} {not_in_source in_header
-} 
+}
 
-comment {FilterUI.cc} {selected in_source not_in_header
-} 
+comment {FilterUI.cc} {in_source not_in_header
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2016 Will Godfrey
+Copyright 2016-2017 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,45 +27,46 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified November 2016
-} {in_source in_header
-} 
+This file is derivative of ZynAddSubFX original code
+
+Modified March 2017} {in_source in_header
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
-decl {\#include "WidgetPDialUI.h"} {public local
-} 
+decl {\#include "UI/WidgetPDial.h"} {public local
+}
 
-decl {\#include "WidgetMWSliderUI.h"} {public local
-} 
+decl {\#include "UI/WidgetMWSlider.h"} {public local
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Params/FilterParams.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
 } {
@@ -193,9 +194,9 @@ class FormantFilterGraph {: {public Fl_Box, MiscFuncs}
   }
   decl {float *graphpoints;} {private local
   }
-} 
+}
 
-class FilterUI {: {public Fl_Group,PresetsUI_}
+class FilterUI {selected : {public Fl_Group,PresetsUI_}
 } {
   Function {FilterUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -215,11 +216,11 @@ pars=NULL;
   }
   Function {make_window()} {} {
     Fl_Window filterui {
-      xywh {840 20 275 75} type Double color 247 labelfont 1 labelsize 12 hide
+      xywh {460 79 275 75} type Double color 247 labelfont 1 labelsize 12 hide
       class Fl_Group
     } {
       Fl_Group filterparamswindow {
-        label {Filter Params}
+        label {               Filter Params}
         xywh {0 0 275 75} box PLASTIC_UP_BOX color 231 labelfont 1 labelsize 10 align 17
       } {
         Fl_Choice analogfiltertypechoice {
@@ -229,7 +230,7 @@ pars->changed=true;
 // set type for Q
 updateVCforQ();
 send_data(8, o->value(), 0xc0);}
-          tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
+          tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
           MenuItem {} {
@@ -274,7 +275,7 @@ send_data(8, o->value(), 0xc0);}
           callback {pars->Ptype=(int)o->value();
 pars->changed=true;
 send_data(9, o->value(), 0xc0);}
-          tooltip {The Filter type} xywh {10 50 50 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
+          tooltip {The Filter type} xywh {5 43 50 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code1 {o->value(pars->Ptype);}
         } {
           MenuItem {} {
@@ -301,7 +302,7 @@ pars->changed=true;
 // set type for Q
 updateVCforQ();
 send_data(7, o->value(), 0xc0);}
-          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {10 20 60 15} down_box BORDER_BOX labelsize 10 align 5 textsize 10
+          tooltip {The Category of the Filter (Analog/Formantic/etc.)} xywh {5 10 66 15} down_box BORDER_BOX labelsize 10 align 6 textsize 10
           code0 {o->value(pars->Pcategory);}
         } {
           MenuItem {} {
@@ -321,7 +322,7 @@ send_data(7, o->value(), 0xc0);}
           label {C.Freq}
           callback {pars->Pfreq=(int)o->value();
 send_data(0, o->value(), 0xc8);}
-          tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {75 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Center Frequency of the Filter or the base position in the vowel's sequence} xywh {65 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(getFilterFreqType(filtertype->value()));}
           code1 {o->value(pars->Pfreq);}
           code2 {if (kititem == 0x88) o->init(45); else if (engine >= 0x80) o->init(50); else if (engine == 1) o->init(80); else o->init(94);}
@@ -332,7 +333,7 @@ send_data(0, o->value(), 0xc8);}
           callback {pars->Pq=(int)o->value();
 formantfiltergraph->redraw();
 send_data(1, o->value(), 0xc8);}
-          tooltip {Filter resonance or bandwidth} xywh {110 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Filter resonance or bandwidth} xywh {100 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pq);}
           code1 {if (kititem == 0x88) o->init(64); else if (engine >= 0x80) o->init(60); else o->init(40);}
           code2 {updateVCforQ();}
@@ -342,7 +343,7 @@ send_data(1, o->value(), 0xc8);}
           label {freq.tr.}
           callback {pars->Pfreqtrack=(int) o->value();
 send_data(2, o->value(), 0xc8);}
-          tooltip {Filter frequency tracking} xywh {215 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Filter frequency tracking} xywh {240 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code1 {o->value(pars->Pfreqtrack);}
           code2 {o->init(64);}
           class WidgetPDial
@@ -351,7 +352,7 @@ send_data(2, o->value(), 0xc8);}
           label {V.SnsA.}
           callback {if (velsnsamp!=NULL) *velsnsamp=(int)o->value();
 send_data(3, o->value(), 0xc8);}
-          tooltip {Velocity sensing amount of the Filter} xywh {145 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity sensing amount of the Filter} xywh {135 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(4127); else if (engine >= 0x80) o->init(0); else o->init(64);}
           code1 {o->setValueType(VC_FilterVelocityAmp);}
           class WidgetPDial
@@ -360,9 +361,10 @@ send_data(3, o->value(), 0xc8);}
           label {V.Sns.}
           callback {if (velsns!=NULL) *velsns=(int)o->value();
 send_data(4, o->value(), 0xc8);}
-          tooltip {Velocity Sensing Function of the Filter} xywh {180 25 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Velocity Sensing Function of the Filter} xywh {170 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {if (kititem == 0x88) o->init(127); else o->init(64);}
           code1 {o->setValueType(VC_FilterVelocitySense);}
+          code2 {o->setGraphicsType(VC_FilterVelocitySense);}
           class WidgetPDial
         }
         Fl_Dial gaindial {
@@ -371,7 +373,7 @@ send_data(4, o->value(), 0xc8);}
 formantfiltergraph->redraw();
 pars->changed = true;
 send_data(5, o->value(), 0xc8);}
-          tooltip {Filter output gain/damp} xywh {250 35 20 20} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Filter output gain/damp} xywh {205 28 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(pars->Pgain);}
           code1 {o->init(64);}
           code2 {o->setValueType(VC_FilterGain);}
@@ -383,7 +385,7 @@ send_data(5, o->value(), 0xc8);}
 formantfiltergraph->redraw();
 pars->changed = true;
 send_data(6, o->value(), 0xc0);}
-          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {235 5 35 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+          tooltip {Filter stages (in order to increase dB/oct. value and the order of the filter)} xywh {74 10 35 15} down_box BORDER_BOX labelsize 10 align 8 textfont 1 textsize 10
           code1 {for (int i=0;i<MAX_FILTER_STAGES;i++) {char tmp[10];snprintf(tmp,10,"%dx",i+1);o->add(tmp);};}
           code2 {o->value(pars->Pstages);}
         } {}
@@ -391,24 +393,24 @@ send_data(6, o->value(), 0xc0);}
       Fl_Button editbutton {
         label Edit
         callback {formantparswindow->show();}
-        xywh {10 39 50 25} box PLASTIC_UP_BOX labelfont 1 labelsize 11
+        xywh {5 40 52 26} box PLASTIC_UP_BOX labelfont 1 labelsize 11
       }
       Fl_Button {} {
         label C
         callback {synth->getGuiMaster()->getPresetsUi()->copy(pars);}
-        xywh {186 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {202 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Button {} {
         label P
         callback {synth->getGuiMaster()->getPresetsUi()->paste(pars,this);}
-        xywh {203 5 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
+        xywh {220 8 15 15} box THIN_UP_BOX color 179 labelfont 1 labelsize 10 labelcolor 7
       }
       Fl_Check_Button freqtrackoffset {
-        label {0/+}
+        label {0 /+}
         callback {pars->Pfreqtrackoffset=(int)o->value();
 freqtrdial->setValueType(getFilterFreqTrackType((int)o->value()));
 send_data(10, o->value(), 0xc0);}
-        tooltip {Set frequency tracking range to 0%-200%} xywh {244 20 15 15} down_box DOWN_BOX labelsize 9
+        tooltip {Set frequency tracking range to 0%-200%} xywh {238 10 33 16} down_box DOWN_BOX labelsize 10 align 24
       }
     }
   }
@@ -705,19 +707,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char par = getData->data.parameter;
     //unsigned char par2 = getData->data.par2;
 
-
     if (part != npart || ((eng >= 128 && eng != 136) && eng != engine))
         return;
-    if (eng == 0x88)
-    {
-    	if (control == 7)
-    	;
-    	else if (control == 9)
-    	;
-    	//cout << "cont " << (int)control << endl;
-       return;
-    }
-
+    
     switch(control)
     {
     	case 0:
@@ -902,8 +894,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   Function {updateVCforQ()} {return_type void
   } {
-    code {
-       switch (filtertype->value())
+    code {switch (filtertype->value())
        {
           case 0:
              if (analogfiltertypechoice->value()<2)
@@ -930,4 +921,4 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
   decl {int engine;} {private local
   }
-} 
+}

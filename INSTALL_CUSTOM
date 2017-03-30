@@ -1,0 +1,35 @@
+---- Customising yoshimi ----
+
+There are a number of compile-time options that can be set or edited. These are presented when you run ccmake after the first time you press 'c'.
+
+Many of these are 'switches' which you toggle on and off. You do this by using the up and down cursor keys to reach the option you want to change, then hit 'Return' to actually change it.
+
+The first of these are the build choices. If these are all off, a basic all-purpose build will take place. Also, these are exclusive, in that you can only have one of them on at a time (even though more may seem to be set).
+
+However, if you know the details of your machine architecture, switch the appropriate one on. Many current desktops as well as laptops are 64 bit Intel ones, so for one of these you would select 'BuildForCore2_X86_64', whereas for the raspberry PI V3 you would chose 'BuildForNEON'.
+
+Alternatively 'BuildForThisCPU' will try to find the best fit for your particular machine. However, it should be noted that if your compiler is an older version of GCC this option will fail the latest Raspberry Pi hardware.
+
+After these, there are the actual compiler flags that will be used. These should only be changed if there is some specific feature you want enabled or disabled. You select as before by moving the cursor, but this time pressing 'Return' enters a line editor and you move sideways to reach the item you want to change, typing in the new flag, or removing the unwanted one. Pressing 'Return' again puts you back in selection mode.
+
+
+---- Locations ----
+
+After the main build information you will see the location of the Curses directory (used for command line access). This is where cmake found a valid location and you shouldn't change it unless you have a specific need to use a different library.
+
+
+---- Other Options ----
+
+There is a switch for building in jack session support.
+
+Yoshimi can be used as an LV2 plugin if switched on here, otherwise the code will not be generated. Once again there is an editable location. The majority of installs want this located at 'lib/lv2' but if you need something different you can change it here.
+
+The next option 'ShowGuiReports' is intended as a tool for developers, and will show the command structure used when any GUI control is moved. If you scroll or hit any button other than 2 (middle), these will be the ones you need if you want to duplicate the action from the command line. However, if you hit 2 then you will get the message that MIDI-learn reports.
+
+Finally, there is 'ShowNoteOnTimes'. This is an option to display the time it takes for a note to be generated and is again for the benefit of developers.
+
+
+---- Help ----
+
+If you get stuck, ask for help on:
+  <http://www.freelists.org/list/yoshimi>.

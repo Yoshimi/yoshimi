@@ -25,16 +25,16 @@ Yoshimi responds to the following messages.
 121: Reset All Controllers
 123: All Notes OFF
 
+* different to the official GM spec.
+
 Program Change (voices 1 - 128) also user selectable CC for voices 128 - 160
 There is also an option for making Program Change enable a part if it's currently disabled.
 
-Key pressure (aftertouch) is internally translated as CC 900 but not currently implemented.
+Key pressure (aftertouch) is internally translated as CC 642 but not currently implemented.
 
-Channel Pressure in internally translated as CC 901 but not currently implemented.
+Channel aftertouch is internally translated as CC 641 and is accessed by MIDI learn further translated as CC 129.
 
-Pitch Bend is internally translated as CC 1000
-
-* different to the official GM spec.
+Pitch Bend is internally translated as CC 640 and is accessed by MIDI learn further translated as CC 128.
 
 
 The modulation wheel only affects AddSynth and PadSynth, and then only the frequency LFO depth. Just to make it more confusing, it changes the level from 0 up to it's current (gui) setting only. Therefore if the LFO depth is set to zero the Mod Wheel will have no effect.

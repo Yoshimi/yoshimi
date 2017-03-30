@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, last modified March 2016
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified March 2017
 */
 
 #ifndef SYNTHENGINE_H
@@ -40,6 +42,7 @@ using namespace std;
 #include "Misc/SynthHelper.h"
 #include "Interface/InterChange.h"
 #include "Interface/MidiLearn.h"
+#include "Interface/MidiDecode.h"
 #include "Misc/Config.h"
 #include "Params/PresetsStore.h"
 
@@ -62,6 +65,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
     public:
         InterChange interchange;
         MidiLearn midilearn;
+        MidiDecode mididecode;
     private:
         Config Runtime;
         PresetsStore presetsstore;
@@ -77,16 +81,17 @@ class SynthEngine : private SynthHelper, MiscFuncs
 
         bool loadXML(string filename);
         void applyparameters(void);
-        int loadParameters(string filename);
         int loadPatchSetAndUpdate(string filename);
         bool installBanks(int instance);
         bool saveBanks(int instance);
         void addHistory(string name, int group);
         vector<string> * getHistory(int group);
+        string lastPatchSetSeen(void);
         bool loadHistory(void);
         bool saveHistory(void);
-        bool loadVector(unsigned char baseChan, string name, bool full);
-        bool extractVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
+        void loadVectorAndUpdate(unsigned char baseChan, unsigned char nameID);
+        unsigned char loadVector(unsigned char baseChan, string name, bool full);
+        unsigned char extractVectorData(unsigned char *baseChan, bool full, XMLwrapper *xml);
         bool saveVector(unsigned char baseChan, string name, bool full);
         bool insertVectorData(unsigned char baseChan, bool full, XMLwrapper *xml);
 
@@ -122,7 +127,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool SingleVector(list<string>& msg_buf, int chan);
         void ListSettings(list<string>& msg_buf);
         int SetSystemValue(int type, int value);
-        void writeRBP(char type, char data0, char data1);
+        void writeRBP(char type, char data0, char data1 = 0, char data2 = 0);
         bool vectorInit(int dHigh, unsigned char chan, int par);
         void vectorSet(int dHigh, unsigned char chan, int par);
         void ClearNRPNs(void);
@@ -130,11 +135,11 @@ class SynthEngine : private SynthHelper, MiscFuncs
         float numRandom(void);
         unsigned int random(void);
         void ShutUp(void);
-        void allStop();
+        void allStop(unsigned int stopType);
         int MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_MIDI_PARTS + 1], int to_process = 0);
         void partonoffLock(int npart, int what);
         void partonoffWrite(int npart, int what);
-        bool partonoffRead(int npart);
+        char partonoffRead(int npart);
         sem_t partlock;
         void setPartMap(int npart);
         void setAllPartMaps(void);
@@ -143,8 +148,10 @@ class SynthEngine : private SynthHelper, MiscFuncs
         void Unmute(void) { __sync_and_and_fetch(&muted, 0); }
         bool isMuted(void) { return (__sync_add_and_fetch(&muted, 0) != 0); }
 
+        void getLimits(CommandBlock *getData);
+
         Part *part[NUM_MIDI_PARTS];
-        bool shutup;
+        unsigned int fadeAll;
         float fadeStep;
         float fadeLevel;
 
@@ -164,15 +171,16 @@ class SynthEngine : private SynthHelper, MiscFuncs
         int p_bufferbytes; //used for variable length runs
         float p_buffersize_f; //used for variable length runs
         float p_all_buffersize_f; //used for variable length runs (mainly for lv2 - calculate envelopes and lfo)
-
-        unsigned char Pvolume;
+        float         TransVolume;
+        float         Pvolume;
+        float         ControlStep;
         int           Paudiodest;
         int           Pkeyshift;
         unsigned char Psysefxvol[NUM_SYS_EFX][NUM_MIDI_PARTS];
         unsigned char Psysefxsend[NUM_SYS_EFX][NUM_SYS_EFX];
 
         // parameters control
-        void setPvolume(char value);
+        void setPvolume(float value);
         void setPkeyshift(int Pkeyshift_);
         void setPsysefxvol(int Ppart, int Pefx, char Pvol);
         void setPsysefxsend(int Pefxfrom, int Pefxto, char Pvol);

@@ -1,11 +1,11 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cpp}
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009-2011, Alan Calvert
-Copyright 2014 -2016, Will Godfrey
+Copyright 2014 -2017, Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -21,30 +21,32 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is derivative of ZynAddSubFX original code, modified December 2016
+This file is derivative of ZynAddSubFX original code.
+
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include <cmath>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_File_Chooser.H>} {public local
-} 
+}
 
 decl {\#include "Misc/Config.h"} {public local
-} 
+}
 
 decl {\#include "Misc/MiscFuncs.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {private local
-} 
+}
 
 decl {\#include "Misc/Bank.h"} {private local
-} 
+}
 
 decl {\#include "MasterUI.h"} {private local
-} 
+}
 
 class ConfigUI {selected : {private MiscFuncs}
 } {
@@ -206,7 +208,7 @@ class ConfigUI {selected : {private MiscFuncs}
 		synth->getRuntime().GzipCompression = (unsigned int) o->value();
 		if(synth->getRuntime().GzipCompression != tmp)
 			synth->getRuntime().configChanged = true;}
-            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple align 4 minimum 0 maximum 9 step 1 textsize 12
+            tooltip {gzip compression level (0 - uncompressed)} xywh {284 165 65 20} type Simple labelsize 12 align 4 minimum 0 maximum 9 step 1 textsize 12
             code0 {o->value(synth->getRuntime().GzipCompression);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -220,11 +222,11 @@ else
     synth->getGuiMaster()->Reports->deactivate();
     synth->getGuiMaster()->yoshiLog->Hide();
 }}
-            tooltip {Some system errors always go to stderr} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
+            tooltip {Some system errors always go to stdout} xywh {200 195 150 20} down_box BORDER_BOX labelsize 12 textsize 13
             code0 {o->value(synth->getRuntime().toConsole);}
           } {
             MenuItem {} {
-              label stderr
+              label stdout
               xywh {0 0 34 20} labelsize 12
             }
             MenuItem {} {
@@ -240,7 +242,7 @@ else
         }
         Fl_Group {} {
           label Switches
-          xywh {5 25 382 277} hide
+          xywh {5 25 382 277} labelsize 12 hide
         } {
           Fl_Check_Button autoState {
             label {* Start With Default State}
@@ -295,25 +297,27 @@ else
           }
           Fl_Check_Button {} {
             label {Enable GUI}
-            callback {int tmp = o->value();
-if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
-{
-    fl_alert("You can't disable both interfaces!");
-    o->value(1);
-    return;
-}
+            callback {//
+    bool doit = true;
+    int tmp = o->value();
+    if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
+    {
+        fl_alert("You can't disable both interfaces!");
+        doit = false;
+    }
+    if (doit == true && tmp == 0)
+        doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
 
-if (tmp == 0 && fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", "Yes", "No", NULL))
-{
-    o->value(1);
-    return;
-}
-
-if (synth->getRuntime().showGui != tmp)
-{
-    synth->getRuntime().showGui = tmp;
-    synth->getRuntime().configChanged = true;
-}}
+    if (doit)
+    {
+        if (synth->getRuntime().showGui != tmp)
+        {
+            synth->getRuntime().showGui = tmp;
+            synth->getRuntime().configChanged = true;
+        }
+    }
+    else
+        o->value(1);}
             tooltip {Enable starting with this graphical  interface} xywh {270 200 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showGui);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
@@ -525,7 +529,7 @@ synth->getRuntime().configChanged = true;}
         EPCspinner->value(EPCvalue);
         EPCspinner->activate();
     }
-    
+
     BankRootvalue = synth->getRuntime().midi_bank_root;
     if (BankRootvalue >= 128)
     {
@@ -732,14 +736,22 @@ synth->getRuntime().configChanged = true;}
     synth->getRuntime().ignoreResetCCs = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {234 240 18 18} down_box DOWN_BOX labelsize 12 align 4
+            xywh {234 230 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().ignoreResetCCs);}
           }
           Fl_Check_Button midiMon {
-            label {Log incoming CCs}
-            callback {synth->getRuntime().monitorCCin = o->value();}
-            xywh {234 260 18 18} down_box DOWN_BOX labelsize 12 align 4
+            label {Log Incoming CCs}
+            callback {synth->getRuntime().monitorCCin = o->value();
+synth->getRuntime().configChanged = true;}
+            xywh {234 250 18 18} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().monitorCCin);}
+          }
+          Fl_Check_Button midiLearned {
+            label {Show Learn Editor}
+            callback {synth->getRuntime().showLearnedCC = o->value();
+synth->getRuntime().configChanged = true;}
+            tooltip {Open the MIDI learn window for editing when a new CC has been learned} xywh {234 270 18 18} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().showLearnedCC);}
           }
         }
       }
@@ -986,4 +998,4 @@ presets->hide();}
   }
   decl {int oldrootID;} {private local
   }
-} 
+}

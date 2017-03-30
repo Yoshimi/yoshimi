@@ -1,17 +1,17 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
-header_name {.h} 
+version 1.0304
+header_name {.h}
 code_name {.cc}
 comment {Envelope.h} {not_in_source in_header
-} 
+}
 
 comment {Envelope.cc} {in_source not_in_header
-} 
+}
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
 Copyright (C) 2002-2005 Nasca Octavian Paul
 Copyright 2009, Alan Calvert
-Copyright 2016 Will Godfrey
+Copyright 2016-2017 Will Godfrey
 
 This file is part of yoshimi, which is free software: you can redistribute
 it and/or modify it under the terms of the GNU Library General Public
@@ -27,39 +27,41 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-This file is a derivative of the ZynAddSubFX original, modified November 2016
+This file is a derivative of the ZynAddSubFX original.
+
+Modified March 2017
 } {in_source in_header
-} 
+}
 
 decl {\#include "UI/MiscGui.h"} {public local
-} 
+}
 
-decl {\#include "WidgetPDialUI.h"} {public local
-} 
+decl {\#include "UI/WidgetPDial.h"} {public local
+}
 
 decl {\#include <FL/Fl_Group.H>} {public local
-} 
+}
 
 decl {\#include <FL/Fl_Box.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_draw.H>} {public local
-} 
+}
 
 decl {\#include <FL/fl_ask.H>} {public local
-} 
+}
 
 decl {\#include "Params/EnvelopeParams.h"} {public local
-} 
+}
 
 decl {\#include "PresetsUI.h"} {public local
-} 
+}
 
 decl {\#include "Misc/SynthEngine.h"} {public global
-} 
+}
 
 decl {\#include "MasterUI.h"} {private global
-} 
+}
 
 class EnvelopeFreeEdit {: {public Fl_Box}
 } {
@@ -123,7 +125,7 @@ for (int i=0;i<env->Penvpoints;i++)
 };
 return(nearestpoint);} {}
   }
-  Function {draw()} {open private
+  Function {draw()} {private
   } {
     code {int ox=x(),oy=y(),lx=w(),ly=h();
 if (env->Pfreemode==0)
@@ -199,7 +201,38 @@ if (time<1000.0)
     snprintf((char *)&tmpstr,20,"%.1fms",time);
 else
     snprintf((char *)&tmpstr,20,"%.2fs",time/1000.0);
-fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);} {}
+fl_draw(tmpstr,ox+lx-20,oy+ly-10,20,10,FL_ALIGN_RIGHT,NULL,0);
+
+//Draw formatted point value in the top right corner when dragging points
+if(currentpoint >= 0){
+
+  string valDesc;
+  float val = (float) env->Penvval[currentpoint];
+   switch(env->Envmode){
+     case 1: //linear amplitude
+     case 2: //db amplitude
+         if(env->Plinearenvelope)
+             valDesc=convert_value(VC_EnvelopeLinAmpSusVal, val);
+         else
+             valDesc=convert_value(VC_EnvelopeAmpSusVal, val);
+         break;
+     case 3: //frequency offset
+         valDesc=convert_value(VC_EnvelopeFreqVal, val);
+         break;
+     case 4: //filter frequency offset
+         valDesc=convert_value(VC_EnvelopeFilterVal, val);
+         break;
+     case 5: //bandwidth offset (unformatted)
+         valDesc=convert_value(VC_EnvelopeBandwidthVal, val);
+         break;
+     default:
+         valDesc = "unknown env. type";
+   }
+
+   strcpy(tmpstr, valDesc.c_str());
+   fl_color(FL_CYAN);
+   fl_draw(tmpstr,ox+lx-20,oy,20,10,FL_ALIGN_RIGHT,NULL,0);
+}} {}
   }
   Function {handle(int event)} {return_type int
   } {
@@ -272,9 +305,9 @@ return(1);} {}
   }
   decl {int group;} {private local
   }
-} 
+}
 
-class EnvelopeUI {selected : {public Fl_Group,PresetsUI_}
+class EnvelopeUI {: {public Fl_Group,PresetsUI_}
 } {
   Function {EnvelopeUI(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {synth = NULL;
@@ -501,8 +534,9 @@ send_data(group, 24, o->value(), 0xc0);}
         Fl_Check_Button e1linearenvelope {
           label L
           callback {env->Plinearenvelope=(int)o->value();
+setAmpSusVType((int)o->value());
 send_data(group, 17, o->value(), 0xc0);}
-          tooltip {The evelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
+          tooltip {The envelope is linear} xywh {180 20 15 15} down_box DOWN_BOX labelsize 10 align 4
           code0 {o->value(env->Plinearenvelope);}
         }
         Fl_Button {} {
@@ -613,7 +647,7 @@ send_data(group, 24, o->value(), 0xc0);}
       class Fl_Group
     } {
       Fl_Group {} {
-        label {Filter Env}
+        label {Filter Envelope}
         xywh {0 0 275 70} box PLASTIC_UP_BOX color 223 labelfont 1 labelsize 10 align 17
       } {
         Fl_Dial e3aval {
@@ -720,7 +754,7 @@ send_data(group, 24, o->value(), 0xc0);}
   }
   Function {make_ASRbw_window()} {} {
     Fl_Window envASRbw {
-      xywh {1186 399 210 70} type Double hide
+      xywh {1209 649 210 70} type Double hide
       class Fl_Group
     } {
       Fl_Group {} {
@@ -732,9 +766,10 @@ send_data(group, 24, o->value(), 0xc0);}
           callback {env->PA_val=(int)o->value();
 freeedit->redraw();
 send_data(group, 0, o->value(), 0xc8);}
-          tooltip {Starting value} xywh {5 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, start} xywh {8 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PA_val);}
           code1 {o->init(100);}
+          code2 {o->setValueType(VC_EnvelopeBandwidthVal);}
           class WidgetPDial
         }
         Fl_Dial e4adt {
@@ -742,7 +777,7 @@ send_data(group, 0, o->value(), 0xc8);}
           callback {env->PA_dt=(int)o->value();
 freeedit->redraw();
 send_data(group, 1, o->value(), 0xc8);}
-          tooltip {Attack time} xywh {40 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Attack time} xywh {43 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PA_dt);}
           code2 {o->init(70);}
@@ -753,9 +788,10 @@ send_data(group, 1, o->value(), 0xc8);}
           callback {env->PR_val=(int)o->value();
 freeedit->redraw();
 send_data(group, 6, o->value(), 0xc8);}
-          tooltip {Release value} xywh {110 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Bandwidth multiplier, release} xywh {113 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->PR_val);}
           code1 {o->init(64);}
+          code2 {o->setValueType(VC_EnvelopeBandwidthVal);}
           class WidgetPDial
         }
         Fl_Dial e4rdt {
@@ -763,7 +799,7 @@ send_data(group, 6, o->value(), 0xc8);}
           callback {env->PR_dt=(int)o->value();
 freeedit->redraw();
 send_data(group, 5, o->value(), 0xc8);}
-          tooltip {Release time} xywh {75 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Release time} xywh {78 20 30 30} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->setValueType(VC_EnvelopeDT);}
           code1 {o->value(env->PR_dt);}
           code2 {o->init(60);}
@@ -773,7 +809,7 @@ send_data(group, 5, o->value(), 0xc8);}
           label Stretch
           callback {env->Penvstretch=(int)o->value();
 send_data(group, 7, o->value(), 0xc8);}
-          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {145 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
+          tooltip {Envelope stretch (on lower notes makes the envelope longer)} xywh {148 25 25 25} box ROUND_UP_BOX labelsize 10 maximum 127 step 1
           code0 {o->value(env->Penvstretch);}
           code1 {o->init(64);}
           code2 {o->setValueType(VC_EnvStretch);}
@@ -783,7 +819,7 @@ send_data(group, 7, o->value(), 0xc8);}
           label frcR
           callback {env->Pforcedrelease=(int)o->value();
 send_data(group, 16, o->value(), 0xc0);}
-          tooltip {Forced release} xywh {180 25 15 25} down_box DOWN_BOX labelsize 10 align 6
+          tooltip {Forced release} xywh {185 25 15 25} down_box DOWN_BOX labelsize 10 align 6
           code0 {o->value(env->Pforcedrelease);}
         }
         Fl_Button {} {
@@ -860,7 +896,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     if (part != npart || (eng >= 128 && eng != engine))
         return;
 
-    if (insert ==3 && insert == 4)
+    if (insert ==3 || insert == 4)
     {
         Fl::check();
         return;
@@ -998,11 +1034,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 32:
-    	    freemodebutton->value(value != 0); // not working :(
-    	    reinit();
-            freeedit->lastpoint=-1;
-            freeedit->redraw();
-            freemodebutton->value(value != 0);
+    	    reinitcore(value != 0);
     	    break;
     }
     Fl::check();} {}
@@ -1024,9 +1056,9 @@ make_free_window();
 make_freemode_edit_window();
 
 envwindow=NULL;
-if (env->Envmode==3) envfreegroup->label("Frequency Envelope");
+if (env->Envmode==3) envfreegroup->label("Frequency Env");
 if (env->Envmode==4) envfreegroup->label("Filter Envelope");
-if (env->Envmode==5) envfreegroup->label("Bandwidth Envelope");
+if (env->Envmode==5) envfreegroup->label("Bandwidth Env");
 
 freemodeeditwindow->label(this->label());
 
@@ -1040,19 +1072,25 @@ refresh();} {}
   Function {reinit()} {} {
     code {if (env->Pfreemode != 0)
 {
-    int answer=fl_choice("Disable the free mode of the Envelope?", "No", "Yes", NULL);
-    if (env->Pfreemode != 0)
-        freemodebutton->value(1);
-    else
-        freemodebutton->value(0);
-    if (answer == 0)
+    bool answer = fl_choice("Disable the free mode of the Envelope?", NULL, "No", "Yes") > 1;
+    if (!answer)
+    {
+        freemodebutton->value(1); // back as it was
         return;
+    }
 }
 
 if (env->Pfreemode == 0)
     env->Pfreemode = 1;
 else
     env->Pfreemode = 0;
+reinitcore(env->Pfreemode);} {}
+  }
+  Function {reinitcore(bool freemode)} {} {
+    code {if (freemode)
+   freemodebutton->value(1);
+else
+    freemodebutton->value(0);
 
 hide();
 int winx = freemodeeditwindow->x();
@@ -1074,7 +1112,7 @@ show();
 freemodeeditwindow->position(winx, winy);
 freemodeeditwindow->show();
 
-if (env->Pfreemode != 0)
+if (freemode)
 {
     freemodebutton->value(1);
     addpoint->show();
@@ -1087,7 +1125,7 @@ else
     addpoint->hide();
     deletepoint->hide();
     forcedreleasecheck->hide();
-};} {}
+}} {}
   }
   Function {refresh()} {} {
     code {freemodebutton->value(env->Pfreemode);
@@ -1127,6 +1165,7 @@ if (env->Pfreemode==0)
 		e1adt->value(env->PA_dt);
 		e1ddt->value(env->PD_dt);
 		e1sval->value(env->PS_val);
+		setAmpSusVType(env->Plinearenvelope);
 		e1rdt->value(env->PR_dt);
 		e1envstretch->value(env->Penvstretch);
 		e1linearenvelope->value(env->Plinearenvelope);
@@ -1204,6 +1243,14 @@ envwindow->resize(this->x(),this->y(),this->w(),this->h());
 
 envwindow->show();} {}
   }
+  Function {setAmpSusVType(bool linear)} {return_type void
+  } {
+    code {//
+if(linear)
+    e1sval->setValueType(VC_EnvelopeLinAmpSusVal);
+else
+    e1sval->setValueType(VC_EnvelopeAmpSusVal);} {}
+  }
   decl {EnvelopeParams *env;} {private local
   }
   decl {Fl_Group *envwindow;} {private local
@@ -1218,4 +1265,4 @@ envwindow->show();} {}
   }
   decl {int group;} {private local
   }
-} 
+}

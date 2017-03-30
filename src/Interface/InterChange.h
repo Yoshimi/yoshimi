@@ -1,7 +1,7 @@
 /*
     InterChange.h - General communications
 
-    Copyright 2016 Will Godfrey
+    Copyright 2016-2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -17,6 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+    Modified February 2017
 */
 
 #ifndef INTERCH_H
@@ -33,13 +34,16 @@ using namespace std;
 #include "Synth/OscilGen.h"
 #include "Synth/Resonance.h"
 
+//#include "Interface/MidiDecode.h"
 class SynthEngine;
+//class MidiDecode;
 
 class InterChange : private MiscFuncs
 {
     public:
         InterChange(SynthEngine *_synth);
         ~InterChange();
+        bool Init(SynthEngine *_synth);
 
         CommandBlock commandData;
         size_t commandSize = sizeof(commandData);
@@ -53,14 +57,21 @@ class InterChange : private MiscFuncs
         void mediate();
         void returns(CommandBlock *getData);
         void setpadparams(int point);
+        void doClearPart(int npart);
         void commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);
 
+        void flagsWrite(unsigned int val){__sync_and_and_fetch(&flagsValue, val);}
+
     private:
-        void *CLIresolvethread(void);
-        static void *_CLIresolvethread(void *arg);
-        pthread_t  CLIresolvethreadHandle;
+        unsigned int flagsValue;
+        unsigned int flagsRead(){return __sync_add_and_fetch(&flagsValue, 0);}
+        unsigned int flagsReadClear(){ return __sync_fetch_and_or(&flagsValue, 0xffffffff);}
+
+        void *sortResultsThread(void);
+        static void *_sortResultsThread(void *arg);
+        pthread_t  sortResultsThreadHandle;
 
         string resolveVector(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
@@ -74,8 +85,8 @@ class InterChange : private MiscFuncs
         string resolveLFO(CommandBlock *getData);
         string resolveFilter(CommandBlock *getData);
         string resolveEnvelope(CommandBlock *getData);
-        string resolveSysIns(CommandBlock *getData);
         string resolveEffects(CommandBlock *getData);
+        bool showValue;
 
         void commandVector(CommandBlock *getData);
         void commandMain(CommandBlock *getData);
@@ -96,6 +107,7 @@ class InterChange : private MiscFuncs
         void commandEffects(CommandBlock *getData);
 
         SynthEngine *synth;
+        //MidiDecode *mididecode;
 };
 
 #endif

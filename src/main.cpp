@@ -17,6 +17,7 @@
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/mman.h>
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
@@ -46,8 +47,6 @@ using namespace std;
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <Interface/CmdInterface.h>
-
-//extern void cmdIfaceCommandLoop();
 
 CmdInterface commandInt;
 
@@ -96,73 +95,46 @@ void splashTimeout(void *splashWin)
 
 static void *mainGuiThread(void *arg)
 {
-    Fl::lock();
-
     sem_post((sem_t *)arg);
 
     map<SynthEngine *, MusicClient *>::iterator it;
     fl_register_images();
-#if (FL_MAJOR_VERSION == 1 && FL_MINOR_VERSION < 3)
-    char *fname = tmpnam(NULL);
-    if (fname)
-    {
-        FILE *f = fopen(fname, "wb");
-        if (f)
-        {
-            fwrite(splashPngData, splashPngLength, 1, f);
-            fclose(f);
-        }
-    }
-    Fl_PNG_Image pix(fname);
-    if (fname)
-    unlink(fname);
-#else
+
+    const int textHeight = 15;
+    const int textY = 10;
+    const unsigned char lred = 0xd7;
+    const unsigned char lgreen = 0xf7;
+    const unsigned char lblue = 0xff;
+    const float timeout = 3.5f;
+
     Fl_PNG_Image pix("splash_screen_png", splashPngData, splashPngLength);
-#endif
-
-    const int textHeight = 20;
-    const int textBorder = 15;
-
     Fl_Window winSplash(splashWidth, splashHeight, "yoshimi splash screen");
     Fl_Box box(0, 0, splashWidth,splashHeight);
-    //Fl_Pixmap pix(yoshimi_logo);
-
     box.image(pix);
-    Fl_Box boxLb(textBorder, splashHeight - textHeight * 2, splashWidth - textBorder * 2, textHeight);
+    string startup = YOSHIMI_VERSION;
+    startup = "V " + startup;
+    Fl_Box boxLb(0, splashHeight - textY - textHeight, splashWidth, textHeight, startup.c_str());
     boxLb.box(FL_NO_BOX);
     boxLb.align(FL_ALIGN_CENTER);
     boxLb.labelsize(textHeight);
     boxLb.labeltype(FL_NORMAL_LABEL);
-    //boxLb.labelcolor(FL_WHITE);
-    //boxLb.labelfont(FL_HELVETICA | FL_BOLD);
-    boxLb.labelfont(FL_HELVETICA | FL_ITALIC);
-    string startup = YOSHIMI_VERSION;
-    startup = "Yoshimi " + startup + " is starting";
-    boxLb.label(startup.c_str());
-
-    winSplash.set_modal();
-    winSplash.clear_border();
+    boxLb.labelcolor(fl_rgb_color(lred, lgreen, lblue));
+    boxLb.labelfont(FL_HELVETICA | FL_BOLD);
+    // see later!
+    //winSplash.set_modal();
+    //winSplash.clear_border();
     winSplash.border(false);
-
+    bool splashSet = false;
     if (bShowGui && firstRuntime->showSplash)
     {
+        splashSet = true;
         winSplash.position((Fl::w() - winSplash.w()) / 2, (Fl::h() - winSplash.h()) / 2);
         winSplash.show();
-        Fl::add_timeout(2, splashTimeout, &winSplash);
+        Fl::add_timeout(timeout, splashTimeout, &winSplash);
     }
 
     do
     {
-        if (bShowGui)
-        {
-            Fl::wait(0.033333);
-            while (!splashMessages.empty())
-            {
-                boxLb.copy_label(splashMessages.front().c_str());
-                splashMessages.pop_front();
-            }
-        }
-        else
             usleep(33333);
     }
     while (firstSynth == NULL); // just wait
@@ -181,21 +153,6 @@ static void *mainGuiThread(void *arg)
             SynthEngine *_synth = it->first;
             MusicClient *_client = it->second;
             _synth->getRuntime().deadObjects->disposeBodies();
-
-            /*
-             * Setting pad parameters can take very many seconds.
-             * This dodge is to force it to diable the part then
-             * make the change take place in a low priority thread.
-             * It needs to be improved!
-             */
-            unsigned int padApply = _synth->getRuntime().padApply;
-            if (padApply < 0xffff)
-            {
-                _synth->interchange.setpadparams(padApply);
-                _synth->getRuntime().padApply = 0xffff;
-            }
-            // end of pad dodge
-
             if (!_synth->getRuntime().runSynth && _synth->getUniqueId() > 0)
             {
                 if (_synth->getRuntime().configChanged)
@@ -233,6 +190,16 @@ static void *mainGuiThread(void *arg)
                     MasterUI *guiMaster = _synth->getGuiMaster(false);
                     if (guiMaster)
                     {
+/*
+ * this hack is necessary because 'set_non_modal' doesn't work
+ * on all WMs, and 'set_modal' stops the user doing anything
+ * while the splash is visible
+ */
+                        if (i == 0 && splashSet == true)
+                        {
+                            winSplash.show();
+                            splashSet = false;
+                        }
                         guiMaster->Log(_synth->getRuntime().LogList.front());
                         _synth->getRuntime().LogList.pop_front();
                     }
@@ -244,11 +211,6 @@ static void *mainGuiThread(void *arg)
         if (bShowGui)
         {
             Fl::wait(0.033333);
-            while (!splashMessages.empty())
-            {
-                boxLb.copy_label(splashMessages.front().c_str());
-                splashMessages.pop_front();
-            }
             GuiThreadMsg::processGuiMessages();
         }
         else
@@ -286,15 +248,6 @@ bool mainCreateNewInstance(unsigned int forceId)
         synth->getRuntime().Log("Failed to instantiate MusicClient");
         goto bail_out;
     }
-
-
-    /* this is done in newMusicClient() now! ^^^^^
-    if (!(musicClient->Open()))
-    {
-        synth->getRuntime().Log("Failed to open MusicClient");
-        goto bail_out;
-    }
-    */
 
     if (!synth->Init(musicClient->getSamplerate(), musicClient->getBuffersize()))
     {
@@ -335,10 +288,8 @@ bool mainCreateNewInstance(unsigned int forceId)
     //register jack ports for enabled parts
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)
     {
-        if(synth->part [npart]->Penabled)
-        {
+        if (synth->partonoffRead(npart))
             mainRegisterAudioPort(synth, npart);
-        }
     }
     return true;
 
@@ -379,6 +330,9 @@ int main(int argc, char *argv[])
     pthread_t thr;
     pthread_attr_t attr;
     sem_t semGui;
+
+    // moved from mainGuiThread() to prevent leaking from early GuiThreadMessage
+    Fl::lock();
 
     if (!mainCreateNewInstance(0))
     {
@@ -435,8 +389,6 @@ int main(int argc, char *argv[])
     firstSynth->installBanks(0);
     GuiThreadMsg::sendMessage(firstSynth, GuiThreadMsg::RefreshCurBank, 1);
 
-    //splashMessages.push_back("Startup complete!");
-
     //create command line processing thread
     pthread_t cmdThr;
     if(bShowCmdLine)
@@ -488,6 +440,7 @@ bail_out:
     }
     if(bShowCmdLine)
         tcsetattr(0, TCSANOW, &oldTerm);
+    munlockall(); // just to be sure
     if (bExitSuccess)
         exit(EXIT_SUCCESS);
     else
