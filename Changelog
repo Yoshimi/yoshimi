@@ -1,4 +1,8 @@
-yoshimi 1.5.1 rc5
+yoshimi 1.5.1
+
+2017-3-30 Will
+* Finalised all code and docs for release.
+* Set version 1.5.1
 
 2017-3-29 Will
 * Edited ccmake option names for more logical sequence.
