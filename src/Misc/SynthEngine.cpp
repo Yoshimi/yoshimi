@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include<stdio.h>
@@ -234,7 +234,7 @@ bool SynthEngine::Init(unsigned int audiosrate, int audiobufsize)
         Runtime.Log("SynthEngine failed to create RBPringbuf");
         goto bail_out;
     }
-    if (jack_ringbuffer_mlock(vuringbuf))
+    if (jack_ringbuffer_mlock(RBPringbuf))
     {
         Runtime.Log("Failed to lock RBPringbuf memory");
         goto bail_out;

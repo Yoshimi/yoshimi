@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified February 2017
+    Modified April 2017
 */
 
 #include <errno.h>
@@ -397,17 +397,19 @@ bool JackEngine::processAudio(jack_nframes_t nframes)
         return false;
     }
 
-    int framesize = sizeof(float) * nframes;
+    int framesize;
     if (nframes < internalbuff)
     {
+        framesize = sizeof(float) * nframes;
         synth->MasterAudio(zynLeft, zynRight, nframes);
         sendAudio(framesize, 0);
     }
     else
     {
+        framesize = sizeof(float) * internalbuff;
         for (unsigned int pos = 0; pos < nframes; pos += internalbuff)
         {
-        synth->MasterAudio(zynLeft, zynRight, 0);
+        synth->MasterAudio(zynLeft, zynRight, internalbuff);
         sendAudio(framesize, pos);
         }
     }
