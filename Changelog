@@ -1,4 +1,9 @@
-yoshimi 1.5.1
+yoshimi 1.5.1.1
+
+2017-4-9 Will
+* Bugfix: Wrong size buffer used for jack audio
+  causing overwrites if internal < nframes.
+* Set version 1.5.1.1
 
 2017-3-30 Will
 * Finalised all code and docs for release.
