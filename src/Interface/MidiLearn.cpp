@@ -430,7 +430,12 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (engine == 255)
         engine = it->chan;
     else
-        synth->getRuntime().Log("Chan = " + to_string(int(engine) + 1));
+    {
+        if (engine == 16)
+            synth->getRuntime().Log("Chan = All");
+        else
+            synth->getRuntime().Log("Chan = " + to_string(int(engine) + 1));
+    }
 
     if (control == 16)
     {
@@ -775,7 +780,8 @@ bool MidiLearn::saveList(string name)
         {
             xml->beginbranch("LINE", ID);
             xml->addparbool("Mute", (it->status & 4) > 0);
-            xml->addparbool("NRPN", (it->status & 8) > 0);xml->addparbool("7_bit", (it->status & 16) > 0);
+            xml->addparbool("NRPN", (it->status & 8) > 0);
+            xml->addparbool("7_bit", (it->status & 16) > 0);
             xml->addpar("Midi_Controller", it->CC);
             xml->addpar("Midi_Channel", it->chan);
             xml->addpar("Midi_Min", it->min_in);

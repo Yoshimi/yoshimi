@@ -1388,12 +1388,9 @@ int CmdInterface::commandReadnSet()
     if (bitTest(level, all_fx))
         return effects();
 
-
-
     int cmdType = 0;
     if (!isRead)
         cmdType = 64;
-
 
     if (matchnMove(1, point, "volume"))
     {
@@ -1726,9 +1723,10 @@ int CmdInterface::commandReadnSet()
         }
         else if (matchnMove(2, point, "channel"))
         {
-            if (!isdigit(point[0]))
-                return value_msg;
-            sendDirect(value, 0xff, 0x10, 0xd8, 0xff, string2int(point));
+            tmp = string2int(point) - 1;
+            if (tmp < 0 || tmp > 16)
+                tmp = 16;
+            sendDirect(value, 0xff, 0x10, 0xd8, 0xff, tmp);
             Runtime.Log("Lines may be re-ordered");
             reply = done_msg;
         }

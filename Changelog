@@ -5,6 +5,7 @@ yoshimi 1.5.1.1
 * Implemented 7bit NRPNs (not Gui changeable).
 * Updated docs.
 * Bugfix: Loading Midi-learn files was setting learn mode.
+* Bugfix: CLI error when changing Midi-learned channels.
 
 2017-4-9 Will
 * Bugfix: Wrong size buffer used for jack audio
