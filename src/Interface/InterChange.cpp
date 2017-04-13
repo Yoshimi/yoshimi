@@ -42,7 +42,6 @@ using namespace std;
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #include "MasterUI.h"
-//#include "Interface/MidiDecode.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
@@ -253,8 +252,6 @@ void InterChange::resolveReplies(CommandBlock *getData)
     string commandName;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-
-//    bool isMidi = type & 8;
 
 #ifdef ENABLE_REPORTS
     if ((isGui && button < 2) || (isCli && button == 1))

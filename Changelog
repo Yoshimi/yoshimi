@@ -1,9 +1,10 @@
 yoshimi 1.5.1.1
 
-2017-4-17 Will
+2017-4-13 Will
 * Revised Cli access to Midi-learn.
 * Implemented 7bit NRPNs (not Gui changeable).
 * Updated docs.
+* Bugfix: Loading Midi-learn files was setting learn mode.
 
 2017-4-9 Will
 * Bugfix: Wrong size buffer used for jack audio

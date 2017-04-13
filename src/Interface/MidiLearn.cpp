@@ -21,6 +21,7 @@
 */
 
 #include <iostream>
+#include <cfloat>
 #include <bitset>
 #include <unistd.h>
 #include <list>
@@ -882,14 +883,14 @@ bool MidiLearn::loadList(string name)
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;
-            real.data.value = 0;
-            real.data.type = 0x1b;
+            real.data.value = FLT_MAX;
+            real.data.type = 0;
             /*
-             * Need to modify resolveReplies so that we can
-             * get just the name without this loopback.
+             * Need to improve resolveReplies so that we can
+             * get just the name without corrupting data
              */
             synth->interchange.resolveReplies(&real);
-            entry.name = learnedName;
+            entry.name = miscMsgPop(real.data.par2);
             midi_list.push_back(entry);
             ++ ID;
         }
