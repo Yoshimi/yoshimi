@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -42,7 +42,6 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
 
     if (part != 0xd8)
     {
-
         if ((type & 3) == 3)
         { // value type is now irrelevant
             if(Fl::event_state(FL_CTRL) != 0)
@@ -64,16 +63,12 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 }
             }
             else
-            {
-                //type = 0;
                 type = 0x40;
                 // identifying this for button 3 as set default
-            }
         }
         else if((type & 7) > 2)
             type = 1 | typetop;
             // change scroll wheel to button 1
-
     }
     type |= (typetop & 0x80);
 

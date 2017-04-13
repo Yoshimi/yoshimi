@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include <iostream>
@@ -2123,12 +2123,12 @@ void InterChange::mediate()
                 commandSend(&getData);
                 returns(&getData);
             }
-            else if (getData.data.control == 24)
+            else if (getData.data.control == 24) // activity LED
             {
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
             }
-            else if (getData.data.control == 0xd8)
+            else if (getData.data.control == 0xd8) // not part!
             {
                 synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
             }

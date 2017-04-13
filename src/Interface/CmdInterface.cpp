@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include <iostream>
@@ -1705,9 +1705,9 @@ int CmdInterface::commandReadnSet()
         if (point[0] == '@')
             point +=1;
         point = skipSpace(point);
-        if (!isdigit(point[0]))
+        float value = string2int(point) - 1;
+        if (value < 0)
             return value_msg;
-        float value = string2int(point);
         point = skipChars(point);
         tmp = 0;
         if (matchnMove(2, point, "cc"))
@@ -1736,14 +1736,14 @@ int CmdInterface::commandReadnSet()
         {
             if (!isdigit(point[0]))
                 return value_msg;
-            sendDirect(value, 0xff, 0, 0xd8, 0xff, 0xff, string2int(point));
+            sendDirect(value, 0xff, 5, 0xd8, 0xff, 0xff, string2int(point));
             reply = done_msg;
         }
         else if (matchnMove(2, point, "maximum"))
         {
             if (!isdigit(point[0]))
                 return value_msg;
-            sendDirect(value, 0xff, 0, 0xd8, 0xff, 0xff, 0xff, string2int(point));
+            sendDirect(value, 0xff, 6, 0xd8, 0xff, 0xff, 0xff, string2int(point));
         }
         else if (matchnMove(2, point, "mute"))
         {
@@ -1762,6 +1762,12 @@ int CmdInterface::commandReadnSet()
             if (matchnMove(1, point, "enable"))
                 tmp = 1;
             sendDirect(value, tmp, 0, 0xd8);
+        }
+        else if (matchnMove(2, point, "7bit"))
+        {
+            if (matchnMove(1, point, "enable"))
+                tmp = 16;
+            sendDirect(value, tmp, 4, 0xd8);
         }
         else
             reply = opp_msg;
@@ -2429,10 +2435,17 @@ bool CmdInterface::cmdIfaceProcessCommand()
 
 int CmdInterface::sendDirect(float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
+    if (part != 0xd8) // MIDI learn
+        type |= 0x10; // from command line
+    /*
+     * MIDI learn is synced by the audio thread but
+     * not passed on to any of the normal controls.
+     * The type field is used for a different purpose.
+     */
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;
-    putData.data.type = type | 0x10; // from command line
+    putData.data.type = type;
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kit;

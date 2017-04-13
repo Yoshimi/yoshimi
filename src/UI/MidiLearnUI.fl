@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified March 2017} {in_source in_header
+Modified April 2017} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -78,7 +78,7 @@ class MidiLearnKitItem {: {public Fl_Group}
           xywh {69 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
         }
         Fl_Choice channelchoice {
-          callback {send_data(16);}
+          callback {send_data(48);}
           tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX labelsize 12 textsize 12
         } {
           MenuItem {} {
@@ -203,7 +203,7 @@ if (o->value())
 else
     midilearnkititemgroup->activate();
 send_data(2);}
-        tooltip {Completely ignore this line} xywh {39 0 16 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+        tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
@@ -211,7 +211,7 @@ send_data(2);}
   Function {send_data(int control)} {} {
     code {//
     bool doit = true;
-    if (control == 8)
+    /*if (control == 8)
     {
         doit = (Fl::event_state(FL_CTRL) != 0);
         if (doit)
@@ -221,7 +221,7 @@ send_data(2);}
     {
         int type = stat & 0x10;
         if (blockcheck->value() != 0)
-            type = 1;
+            type |= 1;
 
         if (compresscheck->value() != 0)
             type |= 2;
@@ -230,7 +230,49 @@ send_data(2);}
             type |= 4;
 
         collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);
-    }} {}
+    }*/
+    int type = 0;
+    int CC = 0xff;
+    int chan = 0xff;
+    int min = 0xff;
+    int max = 0xff;
+    switch (control)
+    {
+        case 0:
+            if (blockcheck->value() != 0)
+                type = 1;
+            break;
+        case 1:
+            if (compresscheck->value() != 0)
+                type = 2;
+            break;
+        case 2:
+            if (mutecheck->value() != 0)
+                type = 4;
+            break;
+        case 4:
+            // type = 16;
+            break;
+        case 5:
+            min = lrint(minval->value());
+            break;
+        case 6:
+            max = lrint(maxval->value());
+            break;
+        case 8:
+            doit = (Fl::event_state(FL_CTRL) != 0);
+            if (doit)
+                doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
+            break;
+        case 16:
+            CC = lrint(CCcounter->value());
+            break;
+        case 48: // gets changed to 16
+            chan = lrint(channelchoice->value());
+            break;
+    }
+    if (doit)
+        collect_data(synth, n, type, control & 0x1f, 216, CC, chan, min, max, 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -400,6 +442,10 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
                 midilearnkititem[value]->blockcheck->value((type & 1) != 0);
                 midilearnkititem[value]->compresscheck->value((type & 2) != 0);
                 midilearnkititem[value]->mutecheck->value((type & 4) != 0);
+                if (type & 4) // it's muted
+                    midilearnkititem[value]->midilearnkititemgroup->deactivate();
+                else
+                    midilearnkititem[value]->midilearnkititemgroup->activate();
             }
             if (kititem < 255)
                 midilearnkititem[value]->CCcounter->value(kititem);

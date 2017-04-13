@@ -1,5 +1,10 @@
 yoshimi 1.5.1.1
 
+2017-4-17 Will
+* Revised Cli access to Midi-learn.
+* Implemented 7bit NRPNs (not Gui changeable).
+* Updated docs.
+
 2017-4-9 Will
 * Bugfix: Wrong size buffer used for jack audio
   causing overwrites if internal < nframes.
@@ -18,7 +23,7 @@ yoshimi 1.5.1.1
 2017-3-26 Will
 * Corrected anomaly with some float to bool conversions.
   Changed varable in 'interchange' to make this clearer.
-* Activated Midi_learn for portamento enable & rate.
+* Activated Midi-learn for portamento enable & rate.
 * Set master as 1.5.1 rc5
 
 2017-3-22 Will
