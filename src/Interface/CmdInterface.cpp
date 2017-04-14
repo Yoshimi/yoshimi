@@ -1732,16 +1732,18 @@ int CmdInterface::commandReadnSet()
         }
         else if (matchnMove(2, point, "minimum"))
         {
-            if (!isdigit(point[0]))
+            float percent = string2float(point);
+            if (percent < 0 || percent > 100)
                 return value_msg;
-            sendDirect(value, 0xff, 5, 0xd8, 0xff, 0xff, string2int(point));
+            sendDirect(value, 0xff, 5, 0xd8, 0xff, 0xff, round(percent * 2.0f));
             reply = done_msg;
         }
         else if (matchnMove(2, point, "maximum"))
         {
-            if (!isdigit(point[0]))
+            float percent = string2float(point);
+            if (percent < 0 || percent > 100)
                 return value_msg;
-            sendDirect(value, 0xff, 6, 0xd8, 0xff, 0xff, 0xff, string2int(point));
+            sendDirect(value, 0xff, 6, 0xd8, 0xff, 0xff, 0xff, round(percent * 2.0f));
         }
         else if (matchnMove(2, point, "mute"))
         {

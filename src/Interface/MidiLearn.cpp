@@ -90,8 +90,8 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         }
         else
             value = float(_value);
-        int minIn = foundEntry.min_in;
-        int maxIn = foundEntry.max_in;
+        float minIn = foundEntry.min_in / 1.575f;
+        float maxIn = foundEntry.max_in / 1.575f;
         if (minIn > maxIn)
         {
             value = 127 - value;
@@ -291,8 +291,8 @@ void MidiLearn::listLine(int lineNo)
         synth->getRuntime().Log("Line " + to_string(lineNo + 1) + mute
                 + "  CC " + to_string((int)it->CC)
                 + "  Chan " + to_string((int)it->chan + 1)
-                + "  Min " + to_string((int)it->min_in)
-                + "  Max " + to_string((int)it->max_in)
+                + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
+                + "  Max " + asString(float(it->max_in / 2.0f)) + "%"
                 + limit + block + nrpn + "  " + it->name);
     }
 }
@@ -414,13 +414,12 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     if (insert == 0xff) // don't change
         insert = it->min_in;
     else
-        synth->getRuntime().Log("Min = " + to_string(int(insert)));
+        synth->getRuntime().Log("Min = " + asString(float(insert / 2.0f)) + "%");
 
     if (parameter == 0xff)
         parameter = it->max_in;
     else
-        synth->getRuntime().Log("Max = " + to_string(int(parameter)));
-
+        synth->getRuntime().Log("Max = " + asString(float(parameter / 2.0f)) + "%");
 
     if (kit == 255 || it->CC > 0xff) // might be an NRPN
         kit = it->CC; // remember NRPN has a high bit set
@@ -620,7 +619,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     entry.chan = chan;
     entry.CC = CC;
     entry.min_in = 0;
-    entry.max_in = 127;
+    entry.max_in = 200;
     entry.status = stat;
     entry.min_out = learnTransferBlock.limits.min;
     entry.max_out = learnTransferBlock.limits.max;
@@ -784,8 +783,8 @@ bool MidiLearn::saveList(string name)
             xml->addparbool("7_bit", (it->status & 16) > 0);
             xml->addpar("Midi_Controller", it->CC);
             xml->addpar("Midi_Channel", it->chan);
-            xml->addpar("Midi_Min", it->min_in);
-            xml->addpar("Midi_Max", it->max_in);
+            xml->addparreal("Midi_Min", it->min_in / 1.575f);
+            xml->addparreal("Midi_Max", it->max_in / 1.575f);
             xml->addparbool("Limit", (it->status & 2) > 0);
             xml->addparbool("Block", (it->status & 1) > 0);
             xml->addpar("Convert_Min", it->min_out);
@@ -869,8 +868,17 @@ bool MidiLearn::loadList(string name)
             if (entry.CC > 0xff)
                 status |= 8; // belt & braces!
             entry.chan = xml->getpar127("Midi_Channel", 0);
-            entry.min_in = xml->getpar127("Midi_Min", 0);
-            entry.max_in = xml->getpar127("Midi_Max", 127);
+
+            int min = round(xml->getparreal("Midi_Min", 200.0f) * 1.575f);
+            if (min >= 200)
+                min = int(xml->getpar127("Midi_Min", 0) * 1.575f);
+            entry.min_in = min;
+
+            int max = round(xml->getparreal("Midi_Max", 200.0f) * 1.575f);
+            if (max >= 200)
+                max = int(xml->getpar127("Midi_Max", 127) * 1.575f);
+            entry.max_in = max;
+
             if (xml->getparbool("Limit",0))
                 status |= 2;
             if (xml->getparbool("Block",0))
