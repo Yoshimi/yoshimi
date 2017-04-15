@@ -279,7 +279,7 @@ class MasterUI {selected : {private MiscFuncs}
       Fl_Box {} {
         xywh {279 28 103 85} box ENGRAVED_FRAME
       }
-      Fl_Menu_Bar mastermenu {open
+      Fl_Menu_Bar mastermenu {
         xywh {-7 0 395 25} labelsize 12 textsize 12
         class ClearMenuBar
       } {
@@ -298,6 +298,8 @@ class MasterUI {selected : {private MiscFuncs}
     return;
 
 const char *sId = fl_input("Accept next, or enter desired instance id...", "next");
+if (sId == NULL)
+    return;
 unsigned int forceId = 0;
 if (sId)
     forceId = string2uint(sId);

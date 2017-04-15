@@ -288,9 +288,14 @@ void MidiLearn::listLine(int lineNo)
             if (status & 16)
                 nrpn += " 7bit";
         }
+        string chan = "  Chan ";
+        if ((it->chan) > 15)
+            chan += "All";
+        else
+            chan += to_string(int(it->chan + 1));
         synth->getRuntime().Log("Line " + to_string(lineNo + 1) + mute
-                + "  CC " + to_string((int)it->CC)
-                + "  Chan " + to_string((int)it->chan + 1)
+                + "  CC " + to_string(int(it->CC))
+                + chan
                 + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
                 + "  Max " + asString(float(it->max_in / 2.0f)) + "%"
                 + limit + block + nrpn + "  " + it->name);
@@ -317,7 +322,13 @@ void MidiLearn::listAll(list<string>& msg_buf)
             CCtype = to_string(CC);
         else
             CCtype = asHexString((CC >> 8) & 0x7f) + asHexString(CC & 0x7f) + " h";
-        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + "  Chan " + to_string((int)it->chan) + "  " + it->name);
+        string chan = "  Chan ";
+        if ((it->chan) > 15)
+            chan += "All";
+        else
+            chan += to_string(int(it->chan + 1));
+
+        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + chan + "  " + it->name);
         ++ it;
         ++ lineNo;
     }
@@ -405,36 +416,38 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         ++lineNo;
     }
 
+    string lineName;
     if (it == midi_list.end())
     {
-        synth->getRuntime().Log("Line " + to_string(int(value)) + " not found");
+        synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " not found");
         return;
     }
 
     if (insert == 0xff) // don't change
         insert = it->min_in;
     else
-        synth->getRuntime().Log("Min = " + asString(float(insert / 2.0f)) + "%");
+        lineName = "Min = " + asString(float(insert / 2.0f)) + "%";
 
     if (parameter == 0xff)
         parameter = it->max_in;
     else
-        synth->getRuntime().Log("Max = " + asString(float(parameter / 2.0f)) + "%");
+        lineName = "Max = " + asString(float(parameter / 2.0f)) + "%";
 
     if (kit == 255 || it->CC > 0xff) // might be an NRPN
         kit = it->CC; // remember NRPN has a high bit set
     else
-        synth->getRuntime().Log("CC = " + to_string(int(kit)));
+        lineName = "CC = " + to_string(int(kit));
 
     if (engine == 255)
         engine = it->chan;
     else
     {
         if (engine == 16)
-            synth->getRuntime().Log("Chan = All");
+            lineName = "Chan = All";
         else
-            synth->getRuntime().Log("Chan = " + to_string(int(engine) + 1));
+            lineName = "Chan = " + to_string(int(engine) + 1);
     }
+
 
     if (control == 16)
     {
@@ -484,14 +497,17 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     {
         remove(value);
         updateGui();
-        synth->getRuntime().Log("Removed line " + to_string(int(value)));
+        synth->getRuntime().Log("Removed line " + to_string(int(value + 1)));
         return;
     }
 
     if (control < 8)
     {
         if (control > 4)
+        {
             type = it->status;
+            synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + lineName);
+        }
         else{
             unsigned char tempType = it->status;
             bool isOn = (type & 0x1f) > 0;
@@ -519,7 +535,7 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
                 name += " enabled";
             else
                 name += " disabled";
-            synth->getRuntime().Log(name);
+            synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + name);
         }
         CommandBlock putData;
         memset(&putData.bytes, 255, sizeof(putData));
@@ -576,6 +592,8 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
             midi_list.push_back(entry);
         else
             midi_list.insert(it, entry);
+
+        synth->getRuntime().Log("Moved line to " + to_string(lineNo + 1) + " " + lineName);
         updateGui();
         return;
     }

@@ -1,5 +1,10 @@
 yoshimi 1.5.1.1
 
+2017-4-15 Will
+* Implemented Gui access to 7 bit NRPNs.
+* Revised Midi-learn window.
+* Corrected some Cli numbering.
+
 2017-4-14 Will
 * Revised Gui new instance selection.
   Only 1 menu entry needed now.
