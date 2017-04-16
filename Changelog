@@ -1,5 +1,11 @@
 yoshimi 1.5.1.1
 
+2017-4-16 Will
+* Part 'kit' is no longer ORed with 32 for some controls
+  instead 'insert' is set to 32 for these.
+* Added more error checks and warnings.
+* Updated docs.
+
 2017-4-15 Will
 * Implemented Gui access to 7 bit NRPNs.
 * Revised Midi-learn window.

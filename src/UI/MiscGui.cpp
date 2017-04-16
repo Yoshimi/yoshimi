@@ -133,7 +133,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             synth->getGuiMaster()->syseffectui->returns_update(getData);
         else if (npart == 0xf2)
             synth->getGuiMaster()->inseffectui->returns_update(getData);
-        else if (npart < 0x40)
+        else if (npart < NUM_MIDI_PARTS)
             synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
         return;
     }
@@ -146,19 +146,22 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (npart >= 0x40)
+    if (npart >= NUM_MIDI_PARTS)
         return; // invalid part number
 
-    if ((kititem & engine & insert) == 0xff && control == 96) // special case for part clear
+    if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+        return; // invalid kit number
+
+    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == 96) // special case for part clear
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
-    if (kititem == 0xff || (kititem & 0x20)) // part
+    if (kititem == 0xff || insert == 0x20) // part
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
             return; // invalid access

@@ -289,7 +289,7 @@ void MidiLearn::listLine(int lineNo)
                 nrpn += " 7bit";
         }
         string chan = "  Chan ";
-        if ((it->chan) > 15)
+        if ((it->chan) >= NUM_MIDI_CHANNELS)
             chan += "All";
         else
             chan += to_string(int(it->chan + 1));
@@ -323,7 +323,7 @@ void MidiLearn::listAll(list<string>& msg_buf)
         else
             CCtype = asHexString((CC >> 8) & 0x7f) + asHexString(CC & 0x7f) + " h";
         string chan = "  Chan ";
-        if ((it->chan) > 15)
+        if ((it->chan) >= NUM_MIDI_CHANNELS)
             chan += "All";
         else
             chan += to_string(int(it->chan + 1));

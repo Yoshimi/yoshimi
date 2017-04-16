@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include <cmath>
@@ -409,7 +409,7 @@ void Controller::getLimits(CommandBlock *getData)
     // defaults
     int type = 0x80;
     int min = 0;
-    int def = 0;
+    int def = 640;
     int max = 127;
 
     switch (control)
@@ -419,41 +419,34 @@ void Controller::getLimits(CommandBlock *getData)
             def = 960;
             break;
         case 129:
-            min = 0;
             def = 10;
             max = 1;
             break;
         case 130:
-            def = 640;
             max = 64;
             break;
         case 131:
             def = 800;
             break;
         case 132:
-            min = 0;
             def = 0;
             max = 1;
             break;
         case 133:
             break;
         case 134:
-            min = 0;
             def = 0;
             max = 1;
             break;
         case 135:
-            min = 0;
             def = 10;
             max = 1;
             break;
         case 136:
-            min = 0;
             def = 10;
             max = 1;
             break;
         case 137:
-            min = 0;
             def = 10;
             max = 1;
             break;
@@ -471,6 +464,8 @@ void Controller::getLimits(CommandBlock *getData)
         case 145:
             break;
         case 160:
+            type |= 8;
+            min = 0;
             break;
         case 161:
             break;
@@ -480,9 +475,9 @@ void Controller::getLimits(CommandBlock *getData)
         case 163:
             min = 0;
             max = 1;
+            def = 10;
             break;
         case 164:
-            min = 0;
             def = 0;
             max = 1;
             break;
@@ -493,12 +488,10 @@ void Controller::getLimits(CommandBlock *getData)
             def = 900;
             break;
         case 168:
-            min = 0;
             def = 10;
             max = 1;
             break;
         case 224:
-            min = 0;
             def = 0;
             max = 0;
             break;

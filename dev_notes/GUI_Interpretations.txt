@@ -45,7 +45,7 @@ If 'part' is 0xf0 (main) and 'kit' is 0xff you're there and it is main volume, k
 
 If part is < 0x40 and kit is 0xff it's the general part level controls.
 
-If part is < 0x40 and kit >= 0x20 but less than 0x80 it's the engine enable controls. (kit number ORed with 0x20)
+If part is < 0x40 and insert = 0x20 it's the kit engine enable controls.
 
 Midi Learn
 This uses part number 0xd8

@@ -5,8 +5,6 @@ Sort out direct access dynfilter->filter controls work but don't update gui.
 
 Expand midi-learn to include switches, and the controllers window
 
-Make 'New Instance With ID' autoselect the next one available, then dispense with the other form.
-
 Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
