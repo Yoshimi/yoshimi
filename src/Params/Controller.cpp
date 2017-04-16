@@ -464,7 +464,7 @@ void Controller::getLimits(CommandBlock *getData)
         case 145:
             break;
         case 160:
-            type |= 8;
+            type |= 0x40;
             min = 0;
             break;
         case 161:

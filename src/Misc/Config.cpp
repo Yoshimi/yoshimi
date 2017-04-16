@@ -223,7 +223,7 @@ bool Config::Setup(int argc, char **argv)
         midiDevice = "";
     loadCmdArgs(argc, argv);
     Oscilsize = nearestPowerOf2(Oscilsize, MAX_AD_HARMONICS * 2, 16384);
-    Buffersize = nearestPowerOf2(Buffersize, 16, 1024);
+    Buffersize = nearestPowerOf2(Buffersize, 16, 4096);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
     if (loadDefaultState && !restoreState)
@@ -526,7 +526,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
         return false;
     }
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 4096);
     Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     showGui = xml->getparbool("enable_gui", showGui);

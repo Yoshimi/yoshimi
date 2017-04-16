@@ -1553,6 +1553,7 @@ void Part::getLimits(CommandBlock *getData)
             break;
 
         case 7:
+            type |= 0x40;
         case 57:
             def = 0;
             max = 1;
@@ -1640,6 +1641,12 @@ void Part::getLimits(CommandBlock *getData)
         case 195:
             break;
         case 196:
+            break;
+
+        case 255: // number of parts!
+            min = 16;
+            def = 160;
+            max = 64;
             break;
 
         default:

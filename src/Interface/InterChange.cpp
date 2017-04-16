@@ -572,6 +572,9 @@ string InterChange::resolvePart(CommandBlock *getData)
 
     bool kitType = (insert == 0x20);
 
+    if (control == 255)
+        return "Number of parts";
+
     string kitnum;
     if (kitType)
         kitnum = " Kit " + to_string(kititem + 1) + " ";
@@ -628,7 +631,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Mode";
             break;
         case 7:
-            contstr = "Portamento";
+            contstr = "Portamento Enable";
             break;
         case 8:
             contstr = "Enable";
@@ -1987,9 +1990,10 @@ string InterChange::resolveEffects(CommandBlock *getData)
             else if (value == 1)
                 effname += "dry out";
         }
-        else if (control == 67)
+        if (control == 67)
             effname = " bypassed";
-        showValue = false;
+        else
+            showValue = false;
         return (name + effname);
     }
     else if (npart > 0xf0 && kititem == 0xff)
@@ -2038,7 +2042,8 @@ string InterChange::resolveEffects(CommandBlock *getData)
     switch (kititem & 0x1f)
     {
         case 0:
-            effname = " NO Effect";
+            effname = " None";
+            contstr = " ";
             break;
         case 1:
             effname = " Reverb";
@@ -2244,7 +2249,7 @@ void InterChange::commandSend(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
+    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         return; // attempt to access not enabled kititem
 
     if (kititem == 0xff || insert == 0x20)
@@ -2659,7 +2664,6 @@ void InterChange::commandPart(CommandBlock *getData)
 
     Part *part;
     part = synth->part[npart];
-
     switch (control)
     {
         case 0:

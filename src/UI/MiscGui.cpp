@@ -158,7 +158,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem].Penabled == false)
+    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
     if (kititem == 0xff || insert == 0x20) // part

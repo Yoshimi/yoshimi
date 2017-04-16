@@ -5,6 +5,8 @@ yoshimi 1.5.1.1
   instead 'insert' is set to 32 for these.
 * Added more error checks and warnings.
 * Updated docs.
+* Increased max buffersize to 4096 frames.
+* Fixed regression - Cli had lost part effect control :(
 
 2017-4-15 Will
 * Implemented Gui access to 7 bit NRPNs.

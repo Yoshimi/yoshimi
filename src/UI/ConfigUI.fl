@@ -150,6 +150,14 @@ class ConfigUI {selected : {private MiscFuncs}
               label 1024
               xywh {65 65 100 20} labelfont 1
             }
+            MenuItem {} {
+              label 2048
+              xywh {65 65 100 20} labelfont 1
+            }
+            MenuItem {} {
+              label 4096
+              xywh {65 65 100 20} labelfont 1
+            }
           }
           Fl_Choice {} {
             label {PADsynth Interpolation}
