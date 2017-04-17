@@ -36,8 +36,8 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    int typetop = type & 0xc0;
-    if ( part == 0xf1 && insert == 16)
+    int typetop = type & 0xd0;
+    if ( part == 0xf1 && insert == 0x10)
         type |= 8; // this is a hack :(
 
     if (part != 0xd8)
@@ -67,15 +67,15 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 // identifying this for button 3 as set default
         }
         else if((type & 7) > 2)
-            type = 1 | typetop;
+            type = 1;
             // change scroll wheel to button 1
     }
-    type |= (typetop & 0x80);
+    type |= (typetop & 0x90); // allow for redraws *after* command
 
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;
-    putData.data.type = type | 0x20; // 0x20 = from GUI
+    putData.data.type = type | 0x20; // = from GUI
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;

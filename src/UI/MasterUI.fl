@@ -368,7 +368,7 @@ mainCreateNewInstance(forceId);}
             label {&Clear}
             callback {//
     if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", npart + 1) > 1)
-        send_data(96, 0, 0xc0, npart);}
+        send_data(96, 0, 0xd0, npart);}
             xywh {35 35 100 20} labelsize 12
           }
         }

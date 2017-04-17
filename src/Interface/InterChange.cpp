@@ -245,7 +245,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    bool isCli = type & 0x10;
+    bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
     bool isGui = type & 0x20;
     char button = type & 3;
     string isValue;
@@ -2097,7 +2097,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromCLI, point, toread);
-            if(getData.data.part != 0xd8) // special midi-learn message
+            if(getData.data.part != 0xd8) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -2111,7 +2111,7 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
 
-            if(getData.data.part != 0xd8) // special midi-learn message
+            if(getData.data.part != 0xd8) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -2124,7 +2124,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            if(getData.data.part != 0xd8) // special midi-learn message
+            if(getData.data.part != 0xd8) // Not special midi-learn message
             {
                 commandSend(&getData);
                 returns(&getData);
@@ -2156,28 +2156,20 @@ void InterChange::returns(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
-    bool isGui = type & 0x20;
-    bool isCli = type & 0x10;
+    bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
 
-    bool isOK = false;
-    if (isGui && (control == 96 || control == 222) && npart < NUM_MIDI_PARTS && (kititem & engine & insert) == 0xff)
-        isOK = true; // needs more work. Some GUI controls need updates
+    bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
-    if (synth->guiMaster)
+    if (synth->guiMaster && isOKtoRedraw)
     {
-        if (isOK || (!isGui && (isMidi || (isCli && write))))
-        {
-            if (jack_ringbuffer_write_space(toGUI) >= commandSize)
-                jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
-        }
+        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
     }
 
     if (jack_ringbuffer_write_space(toCLI) >= commandSize)
-    {
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
-    }
 }
 
 
@@ -2214,9 +2206,10 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool isCli = type & 0x10;
+    bool isGui = type & 0x20;
     char button = type & 3;
 
-    if (isCli && button == 1)
+    if (!isGui && button == 1)
         return;
 
     if (npart >= 0xc0 && npart < 0xd0)
@@ -3319,10 +3312,6 @@ void InterChange::commandAdd(CommandBlock *getData)
 
 void InterChange::commandAddVoice(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3581,6 +3570,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 pars->VoicePar[nvoice].PFMFixedFreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
+            break;
         case 99:
             if (write)
             {

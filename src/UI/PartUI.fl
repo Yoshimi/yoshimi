@@ -114,7 +114,7 @@ class PartUI_ {} {
   }
 }
 
-class PartKitItem {selected : {public Fl_Group}
+class PartKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window partkititem {
@@ -417,7 +417,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -457,7 +457,7 @@ class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
             else
             {
                 unsigned char id = miscMsgPush(string(tmp));
-                send_data(222, 0, 0xc0, 0xff, 0xff, 0xff, 0xff, id);
+                send_data(222, 0, 0xd0, 0xff, 0xff, 0xff, 0xff, id);
             }
         }
     }}
