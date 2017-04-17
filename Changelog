@@ -4,6 +4,7 @@ yoshimi 1.5.1.1
 * Implemented Gui changes redrawing *after* command set.
 * Transferred AddSynthVoice to new control method.
 * Updated docs.
+* Transferred SubSynth to new control method.
 
 2017-4-16 Will
 * Part 'kit' is no longer ORed with 32 for some controls
