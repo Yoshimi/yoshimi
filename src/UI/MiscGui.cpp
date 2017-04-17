@@ -70,7 +70,7 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
             type = 1;
             // change scroll wheel to button 1
     }
-    type |= (typetop & 0x90); // allow for redraws *after* command
+    type |= (typetop & 0xd0); // allow for redraws *after* command
 
     CommandBlock putData;
     size_t commandSize = sizeof(putData);

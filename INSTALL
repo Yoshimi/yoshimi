@@ -8,12 +8,12 @@ It's a CMake build.  Simply cd to the src directory, then
     make
     sudo make install
 which builds an executable called yoshimi, installed by default in
-/usr/local/bin.
+    /usr/local/bin.
 
 
 ---- Sample instructions to compile/build using ccmake on Linux , outside-source-tree -----
 
-This uses "yoshimi-1.5.1" as an example, should work fine with other versions.
+This uses "yoshimi-1.5.1" as an example, and should work fine with other versions.
 
 Here is an easy way to build/compile using ccmake, in a separate build directory.  This way, changes to source code can be readily compared without combing through the build-related files.
 

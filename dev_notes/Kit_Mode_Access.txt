@@ -4,7 +4,7 @@ direct 1 64 58 0
 
 Kit item 0 is always enabled, although you can mute it and enable/disable the individual engines.
 
-To be clear though, we'll enable kit item 4 and work with that. For kit controls we set 'insert' to 32. This means we also need to set the intemediate 'engine' value to 255 for some controls.
+To be clear though, we'll enable kit item 4 and work with that. For kit controls we set 'insert' to 32. This means we also need to set the intermediate 'engine' value to 255 for some controls.
 
 direct 1 64 8 0 4 255 32
 

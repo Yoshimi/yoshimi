@@ -28,7 +28,7 @@ Allow headless compilation.
 
 Add scales control to CLI.
 
-Make things like LFOs either floats or much higher resolution.
+Make things like Echo delay either floats or much higher resolution.
 
 Consider enabling and disabling tooltips.
 

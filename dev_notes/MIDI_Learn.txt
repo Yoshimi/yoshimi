@@ -26,7 +26,7 @@ Status bits:
 
 When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
-This will be used for updating the list and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
+This is used for updating the list and filling in/altering line entries. The gui never does these directly, but requests them using the same part number.
 
 Name strings are passed across using the simple message system. These are not editable in the GUI.
 
@@ -73,7 +73,7 @@ These move a line, so a complete redraw is inititalsed.
 
 96  clear all
 
-The gui now always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a list re-order first.
+The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a list re-order first.
 
 
 0xf1 load list
