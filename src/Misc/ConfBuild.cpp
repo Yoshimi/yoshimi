@@ -3,4 +3,4 @@
 
 */
 
-#define BUILD_NUMBER 1011
+#define BUILD_NUMBER 1012
