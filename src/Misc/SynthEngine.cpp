@@ -2818,11 +2818,12 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
             lastPart = NUM_MIDI_CHANNELS * 2;
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
-            if (!xml->enterbranch("PART", npart))
-                continue;
-            part[npart + baseChan]->getfromXML(xml);
-            part[npart + baseChan]->Prcvchn = baseChan;
-            xml->exitbranch();
+            if (xml->enterbranch("PART", npart))
+            {
+                part[npart + baseChan]->getfromXML(xml);
+                part[npart + baseChan]->Prcvchn = baseChan;
+                xml->exitbranch();
+            }
         }
     }
     xml->endbranch(); // VECTOR
@@ -2921,8 +2922,8 @@ unsigned char SynthEngine::extractVectorData(unsigned char *baseChan, bool full,
         if (part[npart + *baseChan]->Paudiodest & 2)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + *baseChan);
     }
-    //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
-
+    if (!full) // this needs improving!
+        xml->endbranch(); // VECTOR
     return true;
 }
 

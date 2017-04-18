@@ -3,6 +3,7 @@ yoshimi 1.5.1.1
 2017-4-18 Will
 * Corrected AddSynth sound/noise display.
 * Included AddSynthVoiceList in new controls method.
+* Midi-learn data added to saved state file.
 
 2017-4-17 Will
 * Implemented Gui change can redraw *after* command set.

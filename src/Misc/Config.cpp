@@ -701,6 +701,7 @@ void Config::saveSessionData(string savefile)
     }
     addConfigXML(xmltree);
     synth->add2XML(xmltree);
+    synth->midilearn.insertMidiListData(false, xmltree);
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
     else
@@ -748,6 +749,9 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
                 synth->setAllPartMaps();
                 synth->getRuntime().stateChanged = true;
             }
+            bool oklearn = synth->midilearn.extractMidiListData(true, xml);
+            if (oklearn)
+                synth->midilearn.updateGui();
         }
     }
 

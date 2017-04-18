@@ -82,7 +82,10 @@ class MidiLearn : private MiscFuncs
         bool remove(int itemNumber);
         void generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2);
         bool saveList(string name);
+        bool insertMidiListData(bool full,  XMLwrapper *xml);
         bool loadList(string name);
+        bool extractMidiListData(bool full,  XMLwrapper *xml);
+        void updateGui(int opp = 0);
 
 
     private:
@@ -93,7 +96,6 @@ class MidiLearn : private MiscFuncs
         void insert(unsigned int CC, unsigned char chan);
         SynthEngine *synth;
         void writeToGui(CommandBlock *putData);
-        void updateGui(int opp = 0);
 };
 
 #endif

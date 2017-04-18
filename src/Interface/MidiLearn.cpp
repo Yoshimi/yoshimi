@@ -788,7 +788,21 @@ bool MidiLearn::saveList(string name)
         synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
         return false;
     }
-    bool ok = true;
+    bool ok = insertMidiListData(true,  xml);
+    if (xml->saveXMLfile(file))
+        synth->addHistory(file, 6);
+    else
+    {
+        synth->getRuntime().Log("Failed to save data to " + file);
+        ok = false;
+    }
+    delete xml;
+    return ok;
+}
+
+
+bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
+{
     int ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
@@ -822,17 +836,8 @@ bool MidiLearn::saveList(string name)
             ++it;
             ++ID;
         }
-        xml->endbranch();
-
-    if (xml->saveXMLfile(file))
-        synth->addHistory(file, 6);
-    else
-    {
-        synth->getRuntime().Log("Failed to save data to " + file);
-        ok = false;
-    }
-    delete xml;
-    return ok;
+    xml->endbranch(); // MIDILEARN
+    return true;
 }
 
 
@@ -857,10 +862,21 @@ bool MidiLearn::loadList(string name)
         return false;
     }
     xml->loadXMLfile(file);
+    bool ok = extractMidiListData(true,  xml);
+    delete xml;
+    if (!ok)
+        return false;
+    synth->addHistory(file, 6);
+    return true;
+}
 
+
+bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
+{
     if (!xml->enterbranch("MIDILEARN"))
     {
-        synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
+        if (full)
+            synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
         return false;
     }
     LearnBlock entry;
@@ -927,9 +943,7 @@ bool MidiLearn::loadList(string name)
             ++ ID;
         }
     }
-
-    xml->endbranch(); // MIDILEARN
-    synth->addHistory(file, 6);
-    delete xml;
+    xml->exitbranch(); // MIDILEARN
     return true;
 }
+

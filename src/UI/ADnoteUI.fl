@@ -55,15 +55,14 @@ decl {\#include "Misc/SynthHelper.h"
 decl {\#include "MasterUI.h"} {private global
 }
 
-class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
+class ADvoicelistitem {: {public Fl_Group, SynthHelper}
 } {
-  Function {make_window()} {open
-  } {
-    Fl_Window ADnoteVoiceListItem {open
+  Function {make_window()} {} {
+    Fl_Window ADnoteVoiceListItem {
       xywh {117 302 625 30} type Double box ENGRAVED_BOX hide
       class Fl_Group
     } {
-      Fl_Group voicelistitemgroup {open
+      Fl_Group voicelistitemgroup {
         xywh {38 1 584 25} box FLAT_BOX
         code0 {if (pars->VoicePar[nvoice].Enabled == 0) o->deactivate();}
       } {
@@ -233,8 +232,7 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
     ADnoteVoiceListItem->show();
     end();} {}
   }
-  Function {refreshlist()} {open
-  } {
+  Function {refreshlist()} {} {
     code {//
         voiceenabled->value(pars->VoicePar[nvoice].Enabled);
         voiceresonanceenabled->value(pars->VoicePar[nvoice].Presonance);
@@ -257,25 +255,6 @@ class ADvoicelistitem {open : {public Fl_Group, SynthHelper}
         noiselabel->do_callback();
         ADnoteVoiceListItem->redraw();} {}
   }
-  Function {setnoiselabel(int type)} {open
-  } {
-    code {//
-switch (type)
-{
-    case 1:
-        noiselabel->labelcolor(7);
-    case 2:
-        noiselabel->labelcolor(5);
-    default:
-        voiceoscil->activate();
-        noiselabel->hide();
-        ADnoteVoiceListItem->redraw();
-        return;
-}
-voiceoscil->deactivate();
-noiselabel->show();
-ADnoteVoiceListItem->redraw();} {}
-  }
   Function {~ADvoicelistitem()} {} {
     code {//
         ADnoteVoiceListItem->hide();
@@ -295,17 +274,16 @@ ADnoteVoiceListItem->redraw();} {}
   }
 }
 
-class ADvoiceUI {open : {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
-  Function {make_window()} {open
-  } {
+  Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice open
+      label Voice
       xywh {629 21 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {open
+      Fl_Group voiceparametersgroup {
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
@@ -1238,8 +1216,7 @@ o->show();}
     code {//
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, nvoice | 0x80);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
@@ -1577,18 +1554,16 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 138:
-    	    tmp = (int) value;
+    	    tmp = lrint(value);
     	    SoundType->value(tmp);
-    	    if (tmp == 0)
-                voicemodegroup->activate();
-            else
+    	    if (tmp)
                 voicemodegroup->deactivate();
+            else
+                voicemodegroup->activate();
             noiselabel->do_callback();
-            synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->setnoiselabel(tmp);
     	    break;
     }
-    Fl::check();} {selected
-    }
+    Fl::check();} {}
   }
   Function {init(ADnoteParameters *parameters,int npart_, int kititem_, int nvoice_)} {} {
     code {//
@@ -1629,7 +1604,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
