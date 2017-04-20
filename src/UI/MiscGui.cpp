@@ -94,7 +94,7 @@ void read_updates(SynthEngine *synth)
     CommandBlock getData;
     size_t commandSize = sizeof(getData);
 
-    while(jack_ringbuffer_read_space(synth->interchange.toGUI) >= commandSize)
+    if (jack_ringbuffer_read_space(synth->interchange.toGUI) >= commandSize)
     {
         int toread = commandSize;
         char *point = (char*) &getData.bytes;

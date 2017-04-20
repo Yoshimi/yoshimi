@@ -1,5 +1,10 @@
 yoshimi 1.5.1.1
 
+2017-4-20 Will
+* Improved handling of Vectors in state load
+* Loading large Midi-learn lists was overloading Gui
+  so reduced Gui update rate.
+
 2017-4-18 Will
 * Corrected AddSynth sound/noise display.
 * Included AddSynthVoiceList in new controls method.

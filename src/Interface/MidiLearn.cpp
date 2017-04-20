@@ -803,6 +803,8 @@ bool MidiLearn::saveList(string name)
 
 bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
 {
+    if (midi_list.size() == 0)
+        return false;
     int ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();

@@ -2825,9 +2825,9 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
                 xml->exitbranch();
             }
         }
+        xml->endbranch(); // VECTOR
+        addHistory(file, 5);
     }
-    xml->endbranch(); // VECTOR
-    addHistory(file, 5);
     delete xml;
     return baseChan | 0x20; // ensures we can get 'true' from channel 0
 }
@@ -2922,8 +2922,6 @@ unsigned char SynthEngine::extractVectorData(unsigned char *baseChan, bool full,
         if (part[npart + *baseChan]->Paudiodest & 2)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + *baseChan);
     }
-    if (!full) // this needs improving!
-        xml->endbranch(); // VECTOR
     return true;
 }
 
