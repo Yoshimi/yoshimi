@@ -737,18 +737,18 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     {
         ok = extractConfigData(xml); // this still needs improving
         if (ok)
-        {
+        { // mark as soon as anything changes
+            synth->getRuntime().stateChanged = true;
             for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
             {
-                //synth->part[npart]->defaults();
+                synth->part[npart]->defaults();
                 synth->part[npart]->Prcvchn = npart % NUM_MIDI_CHANNELS;
             }
             ok = synth->getfromXML(xml);
             if (ok)
             {
-                xml->endbranch();
+                xml->endbranch(); // we shouldn't need this here
                 synth->setAllPartMaps();
-                synth->getRuntime().stateChanged = true;
             }
             bool oklearn = synth->midilearn.extractMidiListData(true, xml);
             if (oklearn)
