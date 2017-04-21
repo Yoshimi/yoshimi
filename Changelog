@@ -1,5 +1,8 @@
 yoshimi 1.5.1.1
 
+2017-4-21 Will.
+* Reverted Midi-learn Gui change - caused other problems.
+
 2017-4-20 Will
 * Improved handling of Vectors in state load
 * Loading large Midi-learn lists was overloading Gui
