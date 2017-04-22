@@ -725,11 +725,13 @@ void MidiLearn::updateGui(int opp)
     {
         putData.data.control = 96;
         putData.data.par2 = 0xff;
+        if (opp == 2)
+            putData.data.kit = 2; // close editing window
     }
     putData.data.value = 0;
     writeToGui(&putData);
 
-    if (opp > 1) // sending back message gui
+    if (opp > 2) // sending back message gui
         return;
 
     int lineNo = 0;
