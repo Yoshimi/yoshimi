@@ -1,5 +1,9 @@
 yoshimi 1.5.1.1
 
+2017-4-23 Will
+* Reverted Midi-learn Gui change again
+  It was just moving the problem to any window that was open :(
+
 2017-4-22 Will
 * If State file has Midi-learn data it closes the window.
   This evades the issue rather than solving it :(

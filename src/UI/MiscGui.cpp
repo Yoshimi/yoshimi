@@ -120,10 +120,9 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     }
     if (npart == 0xd8 && synth->getGuiMaster()->midilearnui != NULL)
     {
-        if (control == 96 && kititem == 2)
-            synth->getGuiMaster()->midilearnui->midilearnwindow->hide();
-        else
-            synth->getGuiMaster()->midilearnui->returns_update(getData);
+        //if (control == 96 && kititem == 2)
+            //synth->getGuiMaster()->midilearnui->midilearnwindow->hide();
+        synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
     }
 
