@@ -224,8 +224,8 @@ void DynTooltip::update()
     }
 
     /* Add standard tooltip margins and set size*/
-    _w += Fl_Tooltip::margin_width() * 2;
-    _h += Fl_Tooltip::margin_height() * 2;
+    _w += 6;//Fl_Tooltip::margin_width() * 2;
+    _h += 6;//Fl_Tooltip::margin_height() * 2;
 
     size(_w, _h);
     redraw();
@@ -238,8 +238,8 @@ void DynTooltip::update()
 void DynTooltip::draw()
 {
 
-    const int mw = Fl_Tooltip::margin_width();
-    const int mh = Fl_Tooltip::margin_height();
+    const int mw = 3;//Fl_Tooltip::margin_width();
+    const int mh = 3;//Fl_Tooltip::margin_height();
 
     int x = mw, y = mh;
     int _w = w() - mw * 2;

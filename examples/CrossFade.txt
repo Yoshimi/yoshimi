@@ -1,7 +1,7 @@
 
-CrossFade.xiz is an instrument incorporating the new crossfade feature in kits.
+CrossFade.xiz is an instrument incorporating the new crossfade feature in kits. First released in Yoshimi V 1.5.0
 
-As well as appearing to blend three different sounds, the middle and upper ones have independent effects, and the lower and upper ones are panned slightly left and right.
+As well as appearing to blend three different sounds, they have independent effects, and the lower and upper ones are panned slightly left and right.
 
 If you open the virtual keyboard and use the mouse to run up and down the keys you get a very good idea of how the sound morphs.
 
