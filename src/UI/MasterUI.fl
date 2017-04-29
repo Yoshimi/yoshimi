@@ -1673,9 +1673,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     {
         partui->partGroupEnable->value(active);
         if (active)
+        {
             partui->partgroupui->activate();
+            partui->toSysEfx->activate();
+        }
         else
+        {
             partui->partgroupui->deactivate();
+            partui->toSysEfx->deactivate();
+        }
     }} {}
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {

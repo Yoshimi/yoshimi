@@ -1,5 +1,21 @@
 yoshimi 1.5.1.1
 
+2017-4-29 Will
+* Corrected some Gui engine enable/colour anomalies.
+  Needs more work to rationalise duplications.
+* Enabled engine switches for Midi-learn.
+* Enabled some controllers for Midi_learn.
+  pan width
+  bandwidth depth
+  pitchwheel range
+  portamento time
+  portamento time stretch
+  portamento threshold
+  proportional rate
+  proportional depth
+* Updated limits
+* Small adjustment to controllers window.
+
 2017-4-28 Will
 * Fixed dynamic tooltip margins at 3 for all FLTK 1.3.x.
   May reinstate the margin setting at a later date.

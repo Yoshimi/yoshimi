@@ -423,6 +423,7 @@ void Controller::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 130:
+            type |= 0x40;
             max = 64;
             break;
         case 131:
@@ -433,6 +434,7 @@ void Controller::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 133:
+            type |= 0x40;
             break;
         case 134:
             def = 0;
@@ -451,9 +453,10 @@ void Controller::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 138:
-            min = -8192;
+            type |= 0x40;
+            min = -6400;
             def = 0;
-            max = 8191;
+            max = 6400;
             break;
         case 139:
             break;
@@ -468,8 +471,10 @@ void Controller::getLimits(CommandBlock *getData)
             min = 0;
             break;
         case 161:
+            type |= 0x40;
             break;
         case 162:
+            type |= 0x40;
             def = 30;
             break;
         case 163:
@@ -482,9 +487,11 @@ void Controller::getLimits(CommandBlock *getData)
             max = 1;
             break;
         case 165:
+            type |= 0x40;
             def = 800;
             break;
         case 166:
+            type |= 0x40;
             def = 900;
             break;
         case 168:

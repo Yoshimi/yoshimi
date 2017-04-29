@@ -74,7 +74,7 @@ Y : 0/1 : 134 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Exponential bandwidth
 Y : 0/1 : 135 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Expression enable
 Y : 0/1 : 136 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : FM amplitude enable
 Y : 0/1 : 137 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Sustain pedal enable
-Y : -8192 to 8191 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
+Y : -6400 to 6400 : 138 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Pitch wheel range
 Y : 0 to 127 : 139 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter Q depth
 Y : 0 to 127 : 140 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Filter cutoff depth
 Y : 0 to 127 : 144 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Resonance centre frequency controller depth
@@ -100,7 +100,7 @@ Y : 0/1 : 8 : 0 to 63 : 255 : 2 : 255 : 255 : 255 : Enable PadSynth
 Y : 0 to 50 : 48 : 0 to 63 : 255 : 255 : 255 : 255 : 255 : Humanise
 
 Kit edit window
-Y : 0/1 : 8 : 0 to 63 : 1 to 15 : 0 to 2 : 32 : 255 : 255 : Kit item engine enable - Addsynth, Subsynth, Padsynth
+Y : 0/1 : 8 : 0 to 63 : 0 to 15 : 0 to 2 : 32 : 255 : 255 : Kit item engine enable - Addsynth, Subsynth, Padsynth
 Y : 0/1 : 8 : 0 to 63 : 1 to 15 : 255 : 32 : 255 : 255 : Kit item enable (can't disable kit item 0)
 Y : 0/1 : 9 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item mute
 Y : 0 to 126 : 16 : 0 to 63 : 0 to 15 : 255 : 32 : 255 : 255 : Kit item minimum note
