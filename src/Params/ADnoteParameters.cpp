@@ -840,6 +840,12 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 def = 640;
                 break;
 
+            case 8:
+                type |= 0x40;
+                def = 10;
+                max = 1;
+                break;
+
             case 32:
                 type |= 0x40;
                 min = -8192;

@@ -410,9 +410,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
 {
     char *data = NULL;
     int sz = _synth->getalldata(&data);
-    //FILE *f = fopen("/tmp/y1.state", "w+");
-    //fwrite(data, 1, sz, f);
-    //fclose(f);
+
     store(handle, _yosmihi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
     free(data);
     return LV2_STATE_SUCCESS;
@@ -427,13 +425,8 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
 
     const char *data = (const char *)retrieve(handle, _yosmihi_state_id, &sz, &type, &new_flags);
 
-    //FILE *f = fopen("/tmp/y2.state", "w+");
-    //fwrite(data, 1, sz, f);
-    //fclose(f);
-
     if (sz > 0)
     {
-
         _synth->putalldata(data, sz);
     }
     return LV2_STATE_SUCCESS;

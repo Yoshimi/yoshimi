@@ -549,7 +549,7 @@ send_data(4, o->value(), 0xc8);}
         else
             synth->getGuiMaster()->panellistitem[npart % NUM_MIDI_CHANNELS]->panellistitemgroup->activate();
     }
-    send_data(8, o->value(), 0xc8);}
+    send_data(8, o->value(), 0xc0);}
         xywh {58 59 20 20} down_box DOWN_BOX labelsize 11 align 4
         code0 {o->value(part->Penabled == 1);}
       }
@@ -1600,7 +1600,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                     switch(engine)
                     {
                         case 0:
-                            part->kit[npart].Padenabled = valBool;
+                            partkititem[kititem]->adcheck->value(valBool);
                             adsynenabledcheck->value(valBool);
                             if (valBool)
                             {
@@ -1616,7 +1616,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                             }
                             break;
                         case 1:
-                            part->kit[npart].Psubenabled = valBool;
+                            partkititem[kititem]->subcheck->value(valBool);
                             subsynenabledcheck->value(valBool);
                             if (valBool)
                             {
@@ -1632,7 +1632,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                             }
                             break;
                         case 2:
-                            part->kit[npart].Ppadenabled = valBool;
+                            partkititem[kititem]->padcheck->value(valBool);
                             padsynenabledcheck->value(valBool);
                             if (valBool)
                             {
@@ -1655,7 +1655,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                 switch(engine)
                 {
                     case 0:
-                        part->kit[npart].Padenabled = valBool;
+                        partkititem[0]->adcheck->value(valBool);
                         adsynenabledcheck->value(valBool);
                         if (valBool)
                         {
@@ -1671,7 +1671,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                         }
                         break;
                     case 1:
-                        part->kit[npart].Psubenabled = valBool;
+                        partkititem[0]->subcheck->value(valBool);
                         subsynenabledcheck->value(valBool);
                         if (valBool)
                         {
@@ -1687,7 +1687,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                         }
                         break;
                     case 2:
-                        part->kit[npart].Ppadenabled = valBool;
+                        partkititem[0]->padcheck->value(valBool);
                         padsynenabledcheck->value(valBool);
                         if (valBool)
                         {

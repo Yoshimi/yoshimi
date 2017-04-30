@@ -907,14 +907,14 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
                 status |= 8; // belt & braces!
             entry.chan = xml->getpar127("Midi_Channel", 0);
 
-            int min = round(xml->getparreal("Midi_Min", 200.0f) * 1.575f);
+            int min = int((xml->getparreal("Midi_Min", 200.0f) * 1.575f) + 0.5f);
             if (min >= 200)
-                min = int(xml->getpar127("Midi_Min", 0) * 1.575f);
+                min = int((xml->getpar127("Midi_Min", 0) * 1.575f) + 0.5f);
             entry.min_in = min;
 
-            int max = round(xml->getparreal("Midi_Max", 200.0f) * 1.575f);
+            int max = int((xml->getparreal("Midi_Max", 200.0f) * 1.575f) + 0.5f);
             if (max >= 200)
-                max = int(xml->getpar127("Midi_Max", 127) * 1.575f);
+                max = int((xml->getpar127("Midi_Max", 127) * 1.575f)+ 0.5f);
             entry.max_in = max;
 
             if (xml->getparbool("Limit",0))

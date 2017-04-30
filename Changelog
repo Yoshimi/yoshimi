@@ -1,5 +1,9 @@
 yoshimi 1.5.1.1
 
+2017-4-30 Will
+* Improved float -> int conversions.
+* BugFix: some of the new controls had the wrong limits.
+
 2017-4-29 Will
 * Corrected some Gui engine enable/colour anomalies.
   Needs more work to rationalise duplications.

@@ -420,7 +420,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         actual = " Value ";
         if (type & 0x80)
-            actual += to_string((int)round(value));
+            actual += to_string(int(value + 0.5f));
         else
             actual += to_string(value);
     }
@@ -5405,18 +5405,25 @@ void InterChange::returnLimits(CommandBlock *getData)
             subpars->getLimits(getData);
             return;
         }
-        if (kititem == 0xff || insert == 0x20) // part level controls
+        if (engine == 0xff && (kititem == 0xff || insert == 0x20)) // part level controls
         {
             part->getLimits(getData);
             return;
         }
-        if (insert == 0xff && parameter == 0xff && par2 == 0xff)
+        if ((insert == 0x20 || insert == 0xff) && parameter == 0xff && par2 == 0xff)
         {
             if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;
                 adpars->getLimits(getData);
+                return;
+            }
+            if (engine == 1)
+            {
+                SUBnoteParameters *subpars;
+                subpars = part->kit[kititem].subpars;
+                subpars->getLimits(getData);
                 return;
             }
             if (engine == 2)
