@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-Modified March 2017
+Modified May 2017
 } {in_source in_header
 }
 
@@ -37,13 +37,12 @@ decl {\#include "MasterUI.h"} {private global
 decl {\#include "Misc/SynthEngine.h"} {public global
 }
 
-class ParametersUI {open
+class ParametersUI {selected
 } {
-  Function {make_window(void)} {open
-  } {
+  Function {make_window(void)} {} {
     Fl_Window Recent {
       label {Recent Parameters}
-      callback {o->hide()} open
+      callback {o->hide()}
       xywh {900 700 250 180} type Double labelfont 13 labelsize 12 align 0 hide
     } {
       Fl_Browser BrowseRecent {
@@ -67,17 +66,15 @@ class ParametersUI {open
             synth->getGuiMaster()->vectorui->loadVector(fle);
             break;
         case 4:
-            synth->getRuntime().loadState(fle);            
+            synth->getGuiMaster()->setState(fle);            
             CloseRecent->hide();
             Loading->show();
-            synth->getGuiMaster()->refresh_master_ui(0);
-            //synth->addHistory(fle, 4);
             break;
         case 2:
             synth->getGuiMaster()->do_load_master(false, fle.c_str());
             break;
     }
-    Recent->hide();} selected
+    Recent->hide();}
         xywh {0 0 250 157} type Select color 55 labeltype NO_LABEL labelfont 13 labelsize 12 align 0 textsize 12
         code0 {const int colwidths[] = { 150, 330, 0 };
           o->column_widths(colwidths);

@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified April 2017
+    Modified May 2017
 */
 
 #include <iostream>
@@ -2203,8 +2203,10 @@ bool CmdInterface::cmdIfaceProcessCommand()
                 reply = name_msg;
             else if (Runtime.loadState(point))
             {
-                Runtime.Log("Loaded " + (string) point + ".state");
-                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, 0);
+                string name = (string) point;
+                //name += ".state";
+                Runtime.Log("Loaded " + name);
+                GuiThreadMsg::sendMessage(synth, GuiThreadMsg::UpdateMaster, (0x80 | (miscMsgPush(findleafname(name)) << 8)));
                 reply = done_msg;
             }
         }
