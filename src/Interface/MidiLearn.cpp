@@ -94,7 +94,7 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         }
         else
             value = float(_value);
-cout << "value " << value << endl;
+
         float minIn = foundEntry.min_in / 1.5748f;
         float maxIn = foundEntry.max_in / 1.5748f;
         if (minIn > maxIn)
