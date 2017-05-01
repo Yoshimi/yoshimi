@@ -3036,7 +3036,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 138:
             if (write)
-                part->ctl->pitchwheel.bendrange = value;
+                part->ctl->pitchwheel.bendrange = value_int;
             else
                 value = part->ctl->pitchwheel.bendrange;
             break;

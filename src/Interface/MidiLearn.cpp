@@ -79,19 +79,24 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
         int status = foundEntry.status;
         if (status & 4) // it's muted
             continue;
-
+/*
+ * Some of the following conversions seem strange but are
+ * needed to ensure a control range that is an exact
+ * equivalent of 0 to 127 under all conditions
+ */
         float value; // needs to be refetched each loop
         if (category & 2)
         {
             if (status & 16) // 7 bit NRPN
                 value = float(_value & 0x7f);
             else
-                value = float(_value) / 128.0; // convert from 14 bit
+                value = _value / 128.999f; // convert from 14 bit
         }
         else
             value = float(_value);
-        float minIn = foundEntry.min_in / 1.575f;
-        float maxIn = foundEntry.max_in / 1.575f;
+cout << "value " << value << endl;
+        float minIn = foundEntry.min_in / 1.5748f;
+        float maxIn = foundEntry.max_in / 1.5748f;
         if (minIn > maxIn)
         {
             value = 127 - value;
@@ -106,22 +111,14 @@ bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, un
                 value = maxIn;
         }
         else // compress
-        {
-            int range = maxIn - minIn;
-            value = (value * range / 127) + minIn;
-        }
+            value = ((maxIn - minIn) * value / 127.0f) + minIn;
 
         int minOut = foundEntry.min_out;
         int maxOut = foundEntry.max_out;
         if (maxOut - minOut != 127) // its a range change
-        {
-            value = value / 127;
-            value = minOut +((maxOut - minOut) * value);
-        }
+            value = minOut +((maxOut - minOut) * value / 127.0f);
         else if (minOut != 0) // it's just a shift
-        {
             value += minOut;
-        }
 
         CommandBlock putData;
         putData.data.value = value;

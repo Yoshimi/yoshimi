@@ -1494,7 +1494,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char insert = getData->data.insert;
 
     bool valBool = (value > 0.5f);
-    int valInt = int(value + 0.5f); // done like this as we can't rely on rounding direction
+    int valInt = lrint(value);
     int tmp = (valInt & 15) + 1;
 
     // these are specific to the mixer panel

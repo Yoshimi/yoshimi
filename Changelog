@@ -2,6 +2,8 @@ yoshimi 1.5.1.1
 
 2017-5-1 Will
 * State load now correctly updates main window title.
+* More float -> int range adustments
+  especially Midi-learn limits and conversions.
 
 2017-4-30 Will
 * Improved float -> int conversions.
