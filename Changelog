@@ -1,5 +1,11 @@
 yoshimi 1.5.1.1
 
+2017-5-2 Will
+* Fixed Gui anomally when loading states with Midi-learn.
+  The way we fetch Gui updates needs improving greatly.
+  Currently we use the VU timer and call across from synth.
+* LV2 state now includes Midi-learn data.
+
 2017-5-1 Will
 * State load now correctly updates main window title.
 * More float -> int range adustments

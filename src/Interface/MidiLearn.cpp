@@ -353,6 +353,13 @@ bool MidiLearn::remove(int itemNumber)
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char _kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     unsigned int kit = _kit; // may need to set as an NRPN
+    if (control == 22)
+    {
+        updateGui();
+        synth->getRuntime().Log("GUI refreshed");
+        return;
+    }
+
     if (control == 96)
     {
         midi_list.clear();

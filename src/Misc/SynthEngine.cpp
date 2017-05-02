@@ -2326,22 +2326,28 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 {
+    bool isOK = false;
     if (jack_ringbuffer_read_space(vuringbuf) >= sizeof(VUtransfer))
     {
 
         jack_ringbuffer_read(vuringbuf, ( char*)VUdata->bytes, sizeof(VUtransfer));
         VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / VUdata->values.p_buffersize);
         VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / VUdata->values.p_buffersize);
-        return true;
+        isOK = true;
     }
-    return false;
+    read_updates(this);
+    /* The line above needs improving *a* *lot*. We are calling
+     * directly across to GUI code and at the same time piggy-
+     * backing the VU update timer. Wrong in so many ways :(
+     */
+    return isOK;
 }
+
 
 // Parameter control
 void SynthEngine::setPvolume(float control_value)
 {
     Pvolume = control_value;
-    //volume  = dB2rap((float(Pvolume) / 128.0 - 96.0f) / 96.0f * 40.0f);
 }
 
 
@@ -3090,6 +3096,7 @@ int SynthEngine::getalldata(char **data)
 {
     XMLwrapper *xml = new XMLwrapper(this);
     add2XML(xml);
+    midilearn.insertMidiListData(false, xml);
     *data = xml->getXMLdata();
     delete xml;
     return strlen(*data) + 1;
@@ -3112,6 +3119,8 @@ void SynthEngine::putalldata(const char *data, int size)
         getfromXML(xml);
         actionLock(unlock);
         xml->exitbranch();
+        midilearn.extractMidiListData(false, xml);
+        //midilearn.updateGui();
     //}
     //else
         //Runtime.Log("Master putAllData failed to enter MASTER branch");

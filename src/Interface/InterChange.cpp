@@ -2196,7 +2196,7 @@ void InterChange::commandSend(CommandBlock *getData)
     float value = getData->data.value;
     if (value == FLT_MAX)
     {
-        returnLimits(getData);
+        returnLimits(getData); // this can be accessed directly
         return;
     }
     unsigned char type = getData->data.type;
