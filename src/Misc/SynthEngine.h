@@ -61,6 +61,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
     private:
         unsigned int uniqueId;
         bool isLV2Plugin;
+        bool needsSaving;
         Bank bank;
     public:
         InterChange interchange;
@@ -233,6 +234,8 @@ class SynthEngine : private SynthHelper, MiscFuncs
         Bank *getBankPtr() {return &bank;}
         string getWindowTitle() {return windowTitle;}
         void setWindowTitle(string _windowTitle = "");
+        void setNeedsSaving(bool ns) { needsSaving = ns; }
+        bool getNeedsSaving() { return needsSaving; }
     private:
         int muted;
         float volume;

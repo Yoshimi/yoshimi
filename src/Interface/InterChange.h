@@ -58,7 +58,7 @@ class InterChange : private MiscFuncs
         void returns(CommandBlock *getData);
         void setpadparams(int point);
         void doClearPart(int npart);
-        void commandSend(CommandBlock *getData);
+        bool commandSend(CommandBlock *getData);
         void resolveReplies(CommandBlock *getData);
         void returnLimits(CommandBlock *getData);
 
@@ -106,6 +106,8 @@ class InterChange : private MiscFuncs
         void commandSysIns(CommandBlock *getData);
         void commandEffects(CommandBlock *getData);
 
+        bool commandSendReal(CommandBlock *getData);
+        
         SynthEngine *synth;
         //MidiDecode *mididecode;
 };

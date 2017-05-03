@@ -49,6 +49,8 @@
 #define YOSHIMI_LV2_OPTIONS__Option          YOSHIMI_LV2_OPTIONS_PREFIX "Option"
 #define YOSHIMI_LV2_OPTIONS__options         YOSHIMI_LV2_OPTIONS_PREFIX "options"
 
+#define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
+
 typedef enum {
     LV2_OPTIONS_INSTANCE,
     LV2_OPTIONS_RESOURCE,
@@ -68,6 +70,33 @@ typedef struct _Yoshimi_LV2_Options_Option {
 
 
 using namespace std;
+
+
+
+LV2_Descriptor yoshimi_lv2_desc =
+{
+    "http://yoshimi.sourceforge.net/lv2_plugin",
+    YoshimiLV2Plugin::instantiate,
+    YoshimiLV2Plugin::connect_port,
+    YoshimiLV2Plugin::activate,
+    YoshimiLV2Plugin::run,
+    YoshimiLV2Plugin::deactivate,
+    YoshimiLV2Plugin::cleanup,
+    YoshimiLV2Plugin::extension_data
+};
+
+
+LV2_Descriptor yoshimi_lv2_multi_desc =
+{
+    "http://yoshimi.sourceforge.net/lv2_plugin_multi",
+    YoshimiLV2Plugin::instantiate,
+    YoshimiLV2Plugin::connect_port,
+    YoshimiLV2Plugin::activate,
+    YoshimiLV2Plugin::run,
+    YoshimiLV2Plugin::deactivate,
+    YoshimiLV2Plugin::cleanup,
+    YoshimiLV2Plugin::extension_data
+};
 
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
@@ -156,6 +185,26 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += to_process;
 
     }
+    LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
+    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= sizeof(LV2_Atom_Event)) //notify host about plugin's changes
+    {
+        synth->setNeedsSaving(false);        
+        aSeq->atom.type = _atom_type_chunk;
+        aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
+        aSeq->body.unit = 0;
+        aSeq->body.pad = 0;
+        size_t paddedSize = (sizeof(LV2_Atom_Event) + 7U) & (~7U);
+        LV2_Atom_Event *ev = reinterpret_cast<LV2_Atom_Event *>(aSeq + 1);
+        ev->time.frames = 0;
+        ev->body.size = 0;
+        ev->body.type = _atom_state_changed;        
+        aSeq->atom.size += paddedSize;        
+    }
+    else if(aSeq)
+    {
+        aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
+        
+    }
 }
 
 
@@ -191,18 +240,20 @@ void *YoshimiLV2Plugin::idleThread()
 }
 
 
-YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features):
+YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc):
     MusicIO(synth),
     _synth(synth),
     _sampleRate(static_cast<uint32_t>(sampleRate)),
     _bufferSize(0),
     _bundlePath(bundlePath),
     _midiDataPort(NULL),
+    _notifyDataPortOut(NULL),
     _midi_event_id(0),
     _bufferPos(0),
     _offsetPos(0),
     _bFreeWheel(NULL),
-    _pIdleThread(0)
+    _pIdleThread(0),
+    _lv2_desc(desc)
 {
     flatbankprgs.clear();
     _uridMap.handle = NULL;
@@ -230,6 +281,8 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
+        _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
+        _atom_state_changed = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_STATE__StateChanged);
         while (options->size > 0 && options->value != NULL)
         {
             if (options->context == LV2_OPTIONS_INSTANCE)
@@ -294,12 +347,12 @@ bool YoshimiLV2Plugin::init()
 }
 
 
-LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
+LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
     if (synth == NULL)
         return NULL;
-    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features);
+    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, desc);
     if (inst->init())
         return static_cast<LV2_Handle>(inst);
     else
@@ -321,6 +374,16 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
      else if (port == 1) //freewheel control port
      {
          inst->_bFreeWheel = static_cast<float *>(data_location);
+         return;
+     }
+     else if (port == 36 && std::string(inst->_lv2_desc->URI) == std::string(yoshimi_lv2_multi_desc.URI)) //notify out port
+     {
+         inst->_notifyDataPortOut = static_cast<LV2_Atom_Sequence *>(data_location);
+         return;
+     }
+     else if (port == 4 && std::string(inst->_lv2_desc->URI) == std::string(yoshimi_lv2_desc.URI)) //notify out port
+     {
+         inst->_notifyDataPortOut = static_cast<LV2_Atom_Sequence *>(data_location);
          return;
      }
 
@@ -693,31 +756,6 @@ void YoshimiLV2PluginUI::static_Hide(_LV2_External_UI_Widget *_this_)
 
 }
 
-
-LV2_Descriptor yoshimi_lv2_desc =
-{
-    "http://yoshimi.sourceforge.net/lv2_plugin",
-    YoshimiLV2Plugin::instantiate,
-    YoshimiLV2Plugin::connect_port,
-    YoshimiLV2Plugin::activate,
-    YoshimiLV2Plugin::run,
-    YoshimiLV2Plugin::deactivate,
-    YoshimiLV2Plugin::cleanup,
-    YoshimiLV2Plugin::extension_data
-};
-
-
-LV2_Descriptor yoshimi_lv2_multi_desc =
-{
-    "http://yoshimi.sourceforge.net/lv2_plugin_multi",
-    YoshimiLV2Plugin::instantiate,
-    YoshimiLV2Plugin::connect_port,
-    YoshimiLV2Plugin::activate,
-    YoshimiLV2Plugin::run,
-    YoshimiLV2Plugin::deactivate,
-    YoshimiLV2Plugin::cleanup,
-    YoshimiLV2Plugin::extension_data
-};
 
 
 extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)

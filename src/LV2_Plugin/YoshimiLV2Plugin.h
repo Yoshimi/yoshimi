@@ -50,9 +50,12 @@ private:
    std::string _bundlePath;
    LV2_URID_Map _uridMap;
    LV2_Atom_Sequence *_midiDataPort;
+   LV2_Atom_Sequence *_notifyDataPortOut;
    LV2_URID _midi_event_id;
    LV2_URID _yosmihi_state_id;
    LV2_URID _atom_string_id;
+   LV2_URID _atom_type_chunk;
+   LV2_URID _atom_state_changed;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
    sem_t _midiSem;
@@ -74,8 +77,9 @@ private:
    void processMidiMessage(const uint8_t *msg);
    void *idleThread(void);
    std::vector <LV2_Program_Descriptor> flatbankprgs;
+   const LV2_Descriptor *_lv2_desc;
 public:
-   YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features);
+   YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc);
    virtual ~YoshimiLV2Plugin();
    bool init();
 

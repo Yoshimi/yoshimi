@@ -83,6 +83,7 @@ static vector<string> MidiLearnHistory;
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
     isLV2Plugin(_isLV2Plugin),
+    needsSaving(false),
     bank(this),
     interchange(this),
     midilearn(this),
