@@ -185,19 +185,25 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += to_process;
 
     }
+    
     LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
-    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= sizeof(LV2_Atom_Event)) //notify host about plugin's changes
+    size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
+    size_t paddedSize = (neededAtomSize + 7U) & (~7U);
+    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
     {
         synth->setNeedsSaving(false);        
-        aSeq->atom.type = _atom_type_chunk;
+        aSeq->atom.type = _atom_type_sequence;
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
         aSeq->body.unit = 0;
-        aSeq->body.pad = 0;
-        size_t paddedSize = (sizeof(LV2_Atom_Event) + 7U) & (~7U);
+        aSeq->body.pad = 0;        
         LV2_Atom_Event *ev = reinterpret_cast<LV2_Atom_Event *>(aSeq + 1);
         ev->time.frames = 0;
-        ev->body.size = 0;
-        ev->body.type = _atom_state_changed;        
+        LV2_Atom_Object *aObj = reinterpret_cast<LV2_Atom_Object *>(&ev->body);
+        aObj->atom.type = _atom_object;
+        aObj->atom.size = sizeof(LV2_Atom_Object_Body);
+        aObj->body.id = 0;
+        aObj->body.otype =_atom_state_changed;
+        
         aSeq->atom.size += paddedSize;        
     }
     else if(aSeq)
@@ -205,6 +211,7 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
         
     }
+   
 }
 
 
@@ -235,6 +242,7 @@ void *YoshimiLV2Plugin::idleThread()
 //            Fl::wait(0.033333);
 //        else
             usleep(33333);
+            
     }
     return NULL;
 }
@@ -282,7 +290,10 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
         _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
+        _atom_type_sequence = _uridMap.map(_uridMap.handle, LV2_ATOM__Sequence);
         _atom_state_changed = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_STATE__StateChanged);
+        _atom_object = _uridMap.map(_uridMap.handle, LV2_ATOM__Object);
+        _atom_event_transfer = _uridMap.map(_uridMap.handle, LV2_ATOM__eventTransfer);
         while (options->size > 0 && options->value != NULL)
         {
             if (options->context == LV2_OPTIONS_INSTANCE)
@@ -604,10 +615,11 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 */
 
 
-YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
+YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
     :_plugin(NULL),
      _masterUI(NULL),
-     _controller(controller)
+     _controller(controller),
+     _write_function(write_function)
 {
     uiHost.plugin_human_id = NULL;
     uiHost.ui_closed = NULL;
@@ -699,6 +711,7 @@ void YoshimiLV2PluginUI::run()
         Fl::check();
 
         GuiThreadMsg::processGuiMessages();
+        
     }
     else
     {

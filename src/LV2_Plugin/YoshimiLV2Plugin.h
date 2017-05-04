@@ -55,7 +55,10 @@ private:
    LV2_URID _yosmihi_state_id;
    LV2_URID _atom_string_id;
    LV2_URID _atom_type_chunk;
+   LV2_URID _atom_type_sequence;
    LV2_URID _atom_state_changed;
+   LV2_URID _atom_object;
+   LV2_URID _atom_event_transfer;
    uint32_t _bufferPos;
    uint32_t _offsetPos;
    sem_t _midiSem;
@@ -148,6 +151,7 @@ private:
         YoshimiLV2PluginUI *uiInst;
     };
     _externalUI externalUI;
+    LV2UI_Write_Function _write_function;
 public:
     YoshimiLV2PluginUI(const char *, LV2UI_Write_Function, LV2UI_Controller, LV2UI_Widget *widget, const LV2_Feature *const *features);
     ~YoshimiLV2PluginUI();
