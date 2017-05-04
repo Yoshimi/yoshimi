@@ -3,7 +3,11 @@ Direct access to envelope not updating Gui graph, but seems to work otherwise.
 
 Sort out direct access dynfilter->filter controls work but don't update gui.
 
-Expand midi-learn to include switches, and the controllers window
+Expand midi-learn to include:
+    more switches
+    learn groups
+    view by group but running search only by CC & chan
+    move lines between groups
 
 Make NRPN midi learn able to be re-learned.
 
