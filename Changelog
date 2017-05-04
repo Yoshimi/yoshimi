@@ -1,5 +1,9 @@
 yoshimi 1.5.1.1
 
+2017-5-5 Will
+* Small alteration to Andrew's State Changed patch.
+  This catches controls that still write direct.
+
 2017-5-2 Will
 * Fixed Gui anomally when loading states with Midi-learn.
   The way we fetch Gui updates needs improving greatly.

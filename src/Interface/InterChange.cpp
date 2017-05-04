@@ -2192,8 +2192,14 @@ void InterChange::doClearPart(int npart)
 
 bool InterChange::commandSend(CommandBlock *getData)
 {
+    bool isWrite = (getData->data.type & 0x40) > 0;
+    /*
+     * temporararily moved this up as some commands
+     * still write directly, so are converted to reads
+     * in the appropriate sections to stop conflicts.
+     */
     bool isChanged = commandSendReal(getData);
-    if((getData->data.type & 0x40) && isChanged) //write command
+    if (isWrite && isChanged) //write command
     {
         synth->setNeedsSaving(true);
     }
@@ -2244,10 +2250,10 @@ bool InterChange::commandSendReal(CommandBlock *getData)
     }
 
     if (npart >= NUM_MIDI_PARTS)
-        return true; // invalid part number
+        return false; // invalid part number
 
     if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
-        return true; // invalid kit number
+        return false; // invalid kit number
 
     Part *part;
     part = synth->part[npart];
