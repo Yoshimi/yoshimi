@@ -1,6 +1,13 @@
-yoshimi 1.5.1.1
+yoshimi 1.5.2 rc1
 
 2017-5-5 Will
+* More 'switches' Midi-learnable:
+  AddVoice enable and modulator selection.
+  All engine stereo and octave.
+* Set master as 1.5.2 rc1
+* Updated docs
+
+2017-5-4 Will
 * Small alteration to Andrew's State Changed patch.
   This catches controls that still write direct.
 

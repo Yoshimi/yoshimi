@@ -432,6 +432,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 35:
+            type = 0x40;
             min = -8;
             max = 7;
             break;
@@ -490,6 +491,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 112:
+            type = 0x40;
             def = 10;
             max = 1;
             break;

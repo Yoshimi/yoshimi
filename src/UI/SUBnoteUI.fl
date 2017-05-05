@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified April 2017
+Modified May 2017
 } {in_source in_header
 }
 
@@ -347,7 +347,7 @@ send_data (82, o->value(), 0xc0);}
     if (k < 0)
         k += 16;
     pars->PCoarseDetune = k * 1024 + pars->PCoarseDetune % 1024;*/
-    send_data (35, o->value(), 0xc0);}
+    send_data (35, o->value(), 0xc8);}
           tooltip Octave xywh {446 18 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
@@ -441,7 +441,7 @@ send_data(39, o->value(), 0xc8);}
       Fl_Check_Button stereo {
         label Stereo
         callback {//pars->Pstereo=(int) o->value();
-send_data (112, o->value(), 0xc0);}
+send_data (112, o->value(), 0xc8);}
         xywh {440 406 60 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
       }
@@ -747,7 +747,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 18:
-    	    bwee->value(value != 0);
+    	    bwee->value(value > 0.5f);
     	    break;
 
     	case 32:
@@ -760,7 +760,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 34:
-    	    hz440->value(value != 0);
+    	    hz440->value(value > 0.5f);
     	    if (value == 0)
                 fixedfreqetdial->deactivate();
             else
@@ -768,7 +768,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 35:
-    	    octave->value(value);
+    	    octave->value(lrint(value));
     	    break;
 
     	case 36:
@@ -778,7 +778,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	case 37:
     	    coarsedet->value(value);
     	    break;
-    	    
+
     	case 38:
     	    bend->value(value);
     	    break;
@@ -808,7 +808,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 64:
-    	    filtere->value(value != 0);
+    	    filtere->value(value > 0.5f);
     	    break;
 
     	case 80:
@@ -836,7 +836,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 112:
-    	    stereo->value(value != 0);
+    	    stereo->value(value > 0.5f);
     	    break;
     }
     Fl::check();} {}

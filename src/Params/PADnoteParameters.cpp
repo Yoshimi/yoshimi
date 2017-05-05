@@ -1000,6 +1000,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 35:
+            type |= 0x40;
             min = -8;
             def = 0;
             max = 7;
@@ -1125,6 +1126,7 @@ void PADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 112:
+            type |= 0x40;
             def = 10;
             max = 1;
             break;

@@ -814,6 +814,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 void ADnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
+    int engine = getData->data.engine;
 
     // defaults
     int type = 0;
@@ -821,7 +822,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
     int def = 0;
     int max = 127;
 
-    if (getData->data.engine < 0x80)
+    if (engine < 0x80)
     {
         switch (control)
         {
@@ -853,6 +854,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case 35:
+                type |= 0x40;
                 min = -8;
                 max = 7;
                 break;
@@ -872,7 +874,8 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case 112:
-                def = 100;
+                type |= 0x40;
+                def = 10;
                 max = 1;
                 break;
 
@@ -936,6 +939,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 16:
+            type |= 0x40;
             max = 4;
             break;
 
@@ -963,6 +967,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 35:
         case 99:
+            type |= 0x40;
             min = -8;
             max = 7;
             break;
@@ -1078,6 +1083,12 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 129:
+            type |= 0x40;
+            if (engine == 0x80)
+                def = 10;
+            max = 1;
+            break;
+
         case 130:
             def = 10;
             max = 1;

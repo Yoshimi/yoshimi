@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
-Modified April 2017
+Modified May 2017
 } {in_source in_header
 }
 
@@ -274,7 +274,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
 }
 
-class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {selected : {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
@@ -340,7 +340,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                     if (k < 0)
                         k += 16;
                     pars->VoicePar[nvoice].PFMCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PFMCoarseDetune % 1024;*/
-                    send_data(99, o->value(), 0xc0);}
+                    send_data(99, o->value(), 0xc8);}
                 tooltip Octave xywh {625 270 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
                 code0 {int k = pars->VoicePar[nvoice].PFMCoarseDetune / 1024;}
                 code1 {if (k >= 8) k -= 16;}
@@ -370,7 +370,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                     //pars->VoicePar[nvoice].PFMDetuneType = lrint(o->value());
                     //fmdetunevalueoutput->do_callback();
                     send_data(100, o->value(), 0xd0);}
-                xywh {540 270 75 15} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+                xywh {540 270 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
                 code0 {//
                     o->add("Default");
                     o->add("L35cents");
@@ -505,7 +505,7 @@ send_data(82, o->value(), 0xc8);}
                     }
                     voiceFMparametersgroup->redraw();*/
                     send_data(113, o->value() - 1, 0xd0);}
-                xywh {560 395 75 15} down_box BORDER_BOX labelsize 10 textfont 1 textsize 10
+                xywh {560 395 75 15} down_box BORDER_BOX selection_color 49 labelsize 10 textfont 1 textsize 10
                 code0 {o->add("Internal");}
                 code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtM.%2d", i + 1); o->add(tmp);};}
                 code3 {o->value(pars->VoicePar[nvoice].PextFMoscil + 1);}
@@ -527,7 +527,7 @@ send_data(82, o->value(), 0xc8);}
                   }
                   voiceFMparametersgroup->redraw();*/
                   send_data(17, o->value() - 1, 0xd0);}
-              xywh {670 32 85 20} down_box BORDER_BOX labelsize 10 align 5 textfont 1 textsize 10
+              xywh {670 32 85 20} down_box BORDER_BOX selection_color 49 labelsize 10 align 5 textfont 1 textsize 10
               code0 {o->add("OFF");}
               code1 {char tmp[50]; for (int i = 0; i < nvoice; ++i) {sprintf(tmp, "ExtMod.%2d", i + 1); o->add(tmp);};}
               code2 {o->value(pars->VoicePar[nvoice].PFMVoice + 1);}
@@ -543,8 +543,8 @@ send_data(82, o->value(), 0xc8);}
                 else
                     voiceFMparametersgroup->activate();
                 o->redraw();
-                send_data(16, o->value(), 0xc0);}
-            xywh {535 32 90 20} down_box BORDER_BOX labelsize 11 align 5 textsize 11
+                send_data(16, o->value(), 0xc8);}
+            xywh {535 32 90 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
             MenuItem {} {
@@ -573,7 +573,7 @@ send_data(82, o->value(), 0xc8);}
             }
           }
           Fl_Group {} {
-            label FREQUENCY
+            label FREQUENCY open
             xywh {5 250 525 120} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -631,7 +631,7 @@ send_data(82, o->value(), 0xc8);}
                   if (k < 0)
                       k += 16;
                   pars->VoicePar[nvoice].PCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PCoarseDetune % 1024;*/
-                  send_data(35, o->value(), 0xc0);}
+                  send_data(35, o->value(), 0xc8);}
               tooltip Octave xywh {464 276 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11
               code0 {int k = pars->VoicePar[nvoice].PCoarseDetune / 1024;}
               code1 {if (k >= 8) k -= 16;}
@@ -1200,7 +1200,7 @@ o->show();}
         synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voicelistitemgroup->deactivate();
     }
     o->redraw();
-    send_data(129, o->value(), 0xc0);}
+    send_data(129, o->value(), 0xc8);}
         xywh {60 5 45 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 13
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
@@ -1245,11 +1245,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 4:
-    	    VolumeMinus->value(value != 0);
+    	    VolumeMinus->value(value > 0.5f);
     	    break;
 
     	case 8:
-    	    AmpEnvEn->value(value != 0);
+    	    AmpEnvEn->value(value > 0.5f);
     	    if (value == 0)
                     voiceampenvgroup->deactivate();
                 else
@@ -1257,7 +1257,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 9:
-    	    AmpLfoEn->value(value != 0);
+    	    AmpLfoEn->value(value > 0.5f);
     	    if (value == 0)
                     voiceamplfogroup->deactivate();
                 else
@@ -1301,7 +1301,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 34:
-    	    Freq440->value(value != 0);
+    	    Freq440->value(value > 0.5f);
     	    if (value == 0 && Mod440->value() == 0)
                 fixedfreqetdial->deactivate();
             else
@@ -1330,7 +1330,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 40:
-    	    FreqEn->value(value != 0);
+    	    FreqEn->value(value > 0.5f);
     	    if (value == 0)
                 voicefreqenvgroup->deactivate();
             else
@@ -1338,7 +1338,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 41:
-    	    FreqLfoEn->value(value != 0);
+    	    FreqLfoEn->value(value > 0.5f);
     	     if (value == 0)
                  voicefreqlfogroup->deactivate();
              else
@@ -1421,15 +1421,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 68:
-    	    FilterEn->value(value != 0);
+    	    FilterEn->value(value > 0.5f);
     	    break;
 
     	case 72:
-    	    FilterEnvEn->value(value != 0);
+    	    FilterEnvEn->value(value > 0.5f);
     	    break;
 
     	case 73:
-    	    FilterLfoEn->value(value != 0);
+    	    FilterLfoEn->value(value > 0.5f);
     	    break;
 
     	case 80:
@@ -1445,7 +1445,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 88:
-    	    ModAmpEn->value(value != 0);
+    	    ModAmpEn->value(value > 0.5f);
     	    if (value == 0)
                 voiceFMampenvgroup->deactivate();
             else
@@ -1458,7 +1458,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
         case 98:
-            tmp = (value != 0);
+            tmp = (value > 0.5f);
             Mod440->value(tmp);
             if (tmp == 0 && lrint(Freq440->value() == 0))
                 fixedfreqetdial->deactivate();
@@ -1479,7 +1479,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 104:
-    	    ModFreqEn->value(value != 0);
+    	    ModFreqEn->value(value > 0.5f);
     	    if (value == 0)
                 voiceFMfreqenvgroup->deactivate();
             else
@@ -1511,7 +1511,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 129:
-    	    tmp = (value != 0);
+    	    tmp = (value > 0.5f);
     	    voiceonbutton->value(tmp);
     	    synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voiceenabled->value(tmp);
     	    if (tmp)
@@ -1527,7 +1527,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 130:
-    	    tmp = (value != 0);
+    	    tmp = (value > 0.5f);
     	    ResonanceEn->value(tmp);
     	    synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voiceresonanceenabled->value(tmp);
     	    break;
@@ -1604,7 +1604,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
+class ADnoteUI {: {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
@@ -1631,7 +1631,7 @@ class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
     //if (k < 0)
        // k += 16;
     //pars->GlobalPar.PCoarseDetune = k * 1024 + pars->GlobalPar.PCoarseDetune % 1024;
-    send_data(35, o->value(), 0xc0);}
+    send_data(35, o->value(), 0xc8);}
           tooltip Octave xywh {450 275 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k = pars->GlobalPar.PCoarseDetune / 1024; if (k >= 8) k -= 16;}
           code2 {o->value(k);}
@@ -1841,7 +1841,7 @@ send_data(113, o->value(), 0xc0);}
       Fl_Check_Button stereo {
         label Stereo
         callback {//pars->GlobalPar.PStereo = lrint(o->value());
-send_data(112, o->value(), 0xc0);}
+send_data(112, o->value(), 0xc8);}
         xywh {8 220 65 18} down_box DOWN_BOX labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
@@ -2044,11 +2044,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             break;
 
         case 112:
-            stereo->value(value != 0);
+            stereo->value(value > 0.5f);
             break;
 
         case 113:
-            rndgrp->value(value != 0);
+            rndgrp->value(value > 0.5f);
             break;
 
         case 120:
