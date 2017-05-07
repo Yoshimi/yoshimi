@@ -2336,11 +2336,6 @@ bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
         VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / VUdata->values.p_buffersize);
         isOK = true;
     }
-    read_updates(this);
-    /* The line above needs improving *a* *lot*. We are calling
-     * directly across to GUI code and at the same time piggy-
-     * backing the VU update timer. Wrong in so many ways :(
-     */
     return isOK;
 }
 

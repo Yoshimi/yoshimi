@@ -1,4 +1,6 @@
 
+Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
+
 Direct access to envelope not updating Gui graph, but seems to work otherwise.
 
 Sort out direct access dynfilter->filter controls work but don't update gui.
@@ -12,8 +14,6 @@ Expand midi-learn to include:
 Make NRPN midi learn able to be re-learned.
 
 LV2: internal sound banks do not appear to be exposed as LV2 presets
-
-Find out why LV2 only stores/retrieves patch sets (not state)
 
 Make add voice & add/pad oscillator windows show kit number & name.
 

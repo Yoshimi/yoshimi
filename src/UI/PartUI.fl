@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified April 2017
+Modified May 2017
 } {in_source in_header
 }
 
@@ -129,7 +129,7 @@ class PartKitItem {: {public Fl_Group}
           callback {part->kit[n].Pmuted=(int)o->value();
 synth->getGuiMaster()->partui->checkEngines();
 send_data(9, o->value(), 0xc8, n, 0xff, 32)}
-          xywh {60 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {60 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Pmuted);}
         }
         Fl_Button labelbutton {
@@ -225,7 +225,7 @@ if ((Fl::event_button() == 3))
     }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc8, n, 0, 32);}
-          xywh {400 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {400 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
         Fl_Button subeditbutton {
@@ -253,7 +253,7 @@ if ((Fl::event_button() == 3))
     }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc8, n, 1, 32);}
-          xywh {470 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {470 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
         Fl_Button padeditbutton {
@@ -281,7 +281,7 @@ if ((Fl::event_button() == 3))
     }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc8, n, 2, 32);}
-          xywh {540 0 20 15} down_box DOWN_BOX labelfont 1 labelsize 11 align 4
+          xywh {540 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
         Fl_Choice sendtoeffect {
@@ -425,7 +425,7 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
       class Fl_Group
     } {
       Fl_Group partgroupui {
-        xywh {0 0 379 170}
+        xywh {0 0 379 170} box FLAT_BOX
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
         Fl_Box instrumentaddbox {
@@ -576,7 +576,7 @@ send_data(5, tmp, 0xc0);}
         callback {//
     //synth->SetPartKeyMode(npart, o->value());
     send_data(6, o->value(), 0xc0);}
-        tooltip {Poly, Mono or Legato mode} xywh {78 36 68 19} down_box BORDER_BOX labelsize 11 align 8 textfont 1 textsize 11
+        tooltip {Poly, Mono or Legato mode} xywh {78 36 68 19} down_box BORDER_BOX selection_color 49 labelsize 11 align 8 textfont 1 textsize 11
         code0 {o->add("Poly"); o->add("Mono"); o->add("Legato");}
         code1 {o->value(synth->ReadPartKeyMode(npart));}
       } {}
@@ -584,7 +584,7 @@ send_data(5, tmp, 0xc0);}
         label Portamento
         callback {//part->ctl->portamento.portamento = o->value();
 send_data(7, o->value(), 0xc8);}
-        tooltip {Enable/Disable the portamento} xywh {76 59 15 20} down_box DOWN_BOX labelsize 11 align 8
+        tooltip {Enable/Disable the portamento} xywh {76 61 15 15} box FLAT_BOX down_box DOWN_BOX value 1 color 237 labelsize 11 align 8
         code0 {o->value(part->ctl->portamento.portamento);}
       }
       Fl_Spinner partkeyshift {
@@ -638,7 +638,7 @@ send_data(33, o->value(), 0xc0);}
     ctlwindow->show();
 else
     ctlmidi->show();}
-        tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {3 81 167 25} box PLASTIC_UP_BOX color 228 labelsize 12
+        tooltip {Left mouse button: Controller range settings, Right mouse button: MIDI CCs} xywh {3 81 167 25} box PLASTIC_UP_BOX color 222 labelsize 12
       }
       Fl_Spinner minkcounter {
         label {Min Note}
@@ -796,7 +796,7 @@ send_data(136, o->value(), 0xc0);}
         label {PWheel Rng (cents)}
         callback {//part->ctl->pitchwheel.bendrange = o->value();
 send_data(138, o->value(), 0xc8);}
-        tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} labelsize 10 align 1 minimum -6400 maximum 6400 step 1
+        tooltip {Pitch Wheel Bend Range (cents)} xywh {174 15 110 20} color 237 selection_color 0 labelsize 10 align 1 minimum -6400 maximum 6400 step 1
         code0 {o->value(part->ctl->pitchwheel.bendrange);}
         code1 {o->lstep(100);}
       }
@@ -884,7 +884,7 @@ send_data(160, o->value(), 0xc8);}
           label Thresh
           callback {//part->ctl->portamento.pitchthresh = o->value();
 send_data(162, o->value(), 0xc8);}
-          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple labelsize 10 minimum 0 maximum 127 step 1
+          tooltip {Minimum or max. difference of the notes in order to do the portamento (x 100 cents)} xywh {400 20 50 20} type Simple color 237 selection_color 0 labelsize 10 minimum 0 maximum 127 step 1
           code0 {o->value(part->ctl->portamento.pitchthresh);}
         }
         Fl_Check_Button thtype {
@@ -1255,7 +1255,7 @@ send_data(57, o->value(), 0xc0);}
     }
     checkEngines();
     send_data(8, o->value(), 0xc8, 0xff, 0);}
-            tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
+            tooltip {enable/disable ADsynth} xywh {15 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Padenabled);}
           }
           Fl_Box addbox {
@@ -1295,7 +1295,7 @@ if ((Fl::event_button() == 3))
     }
     checkEngines();
     send_data(8, o->value(), 0xc8, 0xff, 1);}
-            tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
+            tooltip {enable/disable SUBsynth} xywh {115 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Psubenabled);}
           }
           Fl_Box subbox {
@@ -1335,7 +1335,7 @@ if ((Fl::event_button() == 3))
     }
     checkEngines();
     send_data(8, o->value(), 0xc8, 0xff, 2);}
-            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 222 selection_color 218 labelfont 1 labelsize 11
+            tooltip {enable/disable PADsynth} xywh {215 255 80 20} box PLASTIC_UP_BOX down_box DOWN_BOX color 228 labelfont 1 labelsize 11
             code1 {o->value(part->kit[0].Ppadenabled);}
           }
           Fl_Box padbox {
@@ -1569,23 +1569,41 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
                     case 0:
                         partkititem[kititem]->adcheck->value(valBool);
                         if (valBool)
+                        {
                             partkititem[kititem]->adeditbutton->activate();
+                            instrumentaddbox->color(ADD_COLOUR);
+                        }
                         else
+                        {
                             partkititem[kititem]->adeditbutton->deactivate();
+                            instrumentaddbox->color(BASE_COLOUR);
+                        }
                         break;
                     case 1:
                         partkititem[kititem]->subcheck->value(valBool);
                         if (valBool)
+                        {
                             partkititem[kititem]->subeditbutton->activate();
+                            instrumentsubbox->color(SUB_COLOUR);
+                        }
                         else
+                        {
                             partkititem[kititem]->subeditbutton->deactivate();
+                            instrumentsubbox->color(BASE_COLOUR);
+                        }
                         break;
                     case 2:
                         partkititem[kititem]->padcheck->value(valBool);
                         if (valBool)
+                        {
                             partkititem[kititem]->padeditbutton->activate();
+                            instrumentpadbox->color(PAD_COLOUR);
+                        }
                         else
+                        {
                             partkititem[kititem]->padeditbutton->deactivate();
+                            instrumentpadbox->color(BASE_COLOUR);
+                        }
                         break;
                     default:
                         partkititem[kititem]->enabledcheck->value(valBool);

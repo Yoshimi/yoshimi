@@ -207,8 +207,8 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
             synth->getGuiMaster()->partui->adnoteui->advoice->voiceparametersgroup->deactivate();
     }
 
-    collect_data(synth, enab, (Fl::event_button() | 0xc0), 129, npart, kititem, 0x80 + nvoice);}
-        xywh {20 3 20 20} down_box DOWN_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
+    collect_data(synth, enab, (Fl::event_button() | 0xc8), 129, npart, kititem, 0x80 + nvoice);}
+        xywh {20 3 18 20} box FLAT_BOX down_box DOWN_BOX color 237 labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {char tmp[10]; snprintf(tmp, 10, "%d", nvoice + 1); o->label(strdup(tmp));}
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
@@ -274,7 +274,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
   }
 }
 
-class ADvoiceUI {selected : {public Fl_Group, SynthHelper, MiscFuncs}
+class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
@@ -341,7 +341,7 @@ class ADvoiceUI {selected : {public Fl_Group, SynthHelper, MiscFuncs}
                         k += 16;
                     pars->VoicePar[nvoice].PFMCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PFMCoarseDetune % 1024;*/
                     send_data(99, o->value(), 0xc8);}
-                tooltip Octave xywh {625 270 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+                tooltip Octave xywh {625 270 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
                 code0 {int k = pars->VoicePar[nvoice].PFMCoarseDetune / 1024;}
                 code1 {if (k >= 8) k -= 16;}
                 code2 {o->value(k);}
@@ -544,7 +544,7 @@ send_data(82, o->value(), 0xc8);}
                     voiceFMparametersgroup->activate();
                 o->redraw();
                 send_data(16, o->value(), 0xc8);}
-            xywh {535 32 90 20} down_box BORDER_BOX selection_color 49 labelsize 11 align 5 textsize 11
+            xywh {535 32 90 20} down_box BORDER_BOX color 237 selection_color 49 labelsize 11 align 5 textsize 11
             code0 {o->value(pars->VoicePar[nvoice].PFMEnabled);}
           } {
             MenuItem {} {
@@ -573,7 +573,7 @@ send_data(82, o->value(), 0xc8);}
             }
           }
           Fl_Group {} {
-            label FREQUENCY open
+            label FREQUENCY
             xywh {5 250 525 120} box THIN_UP_BOX labelfont 1 labelsize 12 align 17
           } {
             Fl_Group voicefreqenvgroup {
@@ -632,7 +632,7 @@ send_data(82, o->value(), 0xc8);}
                       k += 16;
                   pars->VoicePar[nvoice].PCoarseDetune = k * 1024 + pars->VoicePar[nvoice].PCoarseDetune % 1024;*/
                   send_data(35, o->value(), 0xc8);}
-              tooltip Octave xywh {464 276 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11
+              tooltip Octave xywh {464 276 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 value 4 textfont 1 textsize 11
               code0 {int k = pars->VoicePar[nvoice].PCoarseDetune / 1024;}
               code1 {if (k >= 8) k -= 16;}
               code2 {o->value(k);}
@@ -770,7 +770,7 @@ send_data(39, o->value(), 0xc8);}
             class mwheel_slider_rev
           }
           Fl_Box {} {
-            xywh {200 5 45 35} box THIN_UP_BOX
+            xywh {189 5 54 35} box THIN_UP_BOX
           }
           Fl_Check_Button ResonanceEn {
             label Reson
@@ -779,7 +779,7 @@ send_data(39, o->value(), 0xc8);}
     pars->VoicePar[nvoice].Presonance = enab;
     synth->getGuiMaster()->partui->adnoteui->voicelistitem[nvoice]->voiceresonanceenabled->value(enab);
     send_data(130, enab, 0xc0);}
-            tooltip {Resonance On/Off} xywh {215 20 17 19} down_box DOWN_BOX labelfont 1 labelsize 11 align 1
+            tooltip {Resonance On/Off} xywh {209 20 17 19} down_box DOWN_BOX labelfont 1 labelsize 11 align 1
             code0 {o->value(pars->VoicePar[nvoice].Presonance);}
           }
           Fl_Choice UseOsc {
@@ -1091,9 +1091,12 @@ send_data(4, o->value(), 0xc0);}
             code0 {o->value(pars->VoicePar[nvoice].PFilterLfoEnabled);}
           }
         }
+        Fl_Box {} {
+          xywh {5 5 89 35} box THIN_UP_FRAME
+        }
         Fl_Group {} {
           label 1
-          xywh {5 5 55 35} box THIN_UP_BOX labeltype EMBOSSED_LABEL labelfont 1 labelsize 22 align 16
+          xywh {10 10 36 26} labeltype EMBOSSED_LABEL labelfont 1 labelsize 22 align 16
           code0 {//
               char tmp[2]; tmp[0] = nvoice + 49; tmp[1] = 0; o->copy_label(tmp);}
         } {}
@@ -1124,7 +1127,7 @@ send_data(4, o->value(), 0xc0);}
           }
         }
         Fl_Group {} {
-          xywh {105 5 95 35} box THIN_UP_BOX
+          xywh {94 5 95 35} box THIN_UP_BOX
         } {
           Fl_Value_Slider Delay {
             label Delay
@@ -1133,7 +1136,7 @@ send_data(4, o->value(), 0xc0);}
 pars->VoicePar[nvoice].PDelay = lrint(o->value());
 
 send_data(128, o->value(), 0xc8);}
-            tooltip {Time before the voice activates} xywh {111 21 84 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
+            tooltip {Time before the voice activates} xywh {99 21 84 12} type {Horz Knob} box THIN_DOWN_BOX labelsize 11 align 1 maximum 127 step 1
             code0 {o->value(pars->VoicePar[nvoice].PDelay);}
             code1 {o->setValueType(VC_ADDVoiceDelay);o->useCustomTip(true);}
             class mwheel_val_slider_rev
@@ -1184,7 +1187,7 @@ o->show();}
         }
       }
       Fl_Check_Button voiceonbutton {
-        label On
+        label { On}
         callback {//
     bool enab = (o->value() > 0.5);
     pars->VoicePar[nvoice].Enabled = enab;
@@ -1201,7 +1204,7 @@ o->show();}
     }
     o->redraw();
     send_data(129, o->value(), 0xc8);}
-        xywh {60 5 45 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 13
+        xywh {44 14 18 18} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
     }
@@ -1604,7 +1607,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class ADnoteUI {: {public PresetsUI_, SynthHelper}
+class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
   Function {make_window()} {private
   } {
@@ -1632,7 +1635,7 @@ class ADnoteUI {: {public PresetsUI_, SynthHelper}
        // k += 16;
     //pars->GlobalPar.PCoarseDetune = k * 1024 + pars->GlobalPar.PCoarseDetune % 1024;
     send_data(35, o->value(), 0xc8);}
-          tooltip Octave xywh {450 275 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+          tooltip Octave xywh {450 275 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k = pars->GlobalPar.PCoarseDetune / 1024; if (k >= 8) k -= 16;}
           code2 {o->value(k);}
         }
@@ -1811,7 +1814,7 @@ send_data(124, o->value(), 0xc8);}
           label {Rnd Grp}
           callback {pars->GlobalPar.Hrandgrouping = lrint(o->value());
 send_data(113, o->value(), 0xc0);}
-          tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {8 231 63 18} down_box DOWN_BOX labelsize 11
+          tooltip {How the Harmonic Amplitude is applied to voices that use the same oscillator} xywh {8 234 63 18} down_box DOWN_BOX labelsize 11
           code0 {o->value(pars->GlobalPar.Hrandgrouping);}
         }
       }
@@ -1842,7 +1845,7 @@ send_data(113, o->value(), 0xc0);}
         label Stereo
         callback {//pars->GlobalPar.PStereo = lrint(o->value());
 send_data(112, o->value(), 0xc8);}
-        xywh {8 220 65 18} down_box DOWN_BOX labelsize 11
+        xywh {8 220 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
       Fl_Button {} {

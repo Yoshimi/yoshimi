@@ -1,4 +1,11 @@
-yoshimi 1.5.2 rc1
+yoshimi 1.5.2 rc2
+
+2017-5-7 Will
+* Improved Midi-learn loading behaviour.
+* Gui Updates no longer called from synth.
+* Midi-learnable switches now have colour IDs.
+* Set master as 1.5.2 rc2
+* Updated docs.
 
 2017-5-5 Will
 * More 'switches' Midi-learnable:

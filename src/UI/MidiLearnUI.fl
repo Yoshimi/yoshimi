@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified May 2017} {selected in_source in_header
+Modified May 2017} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -276,7 +276,7 @@ end();} {}
   }
 }
 
-class MidiLearnUI {: {private MiscFuncs}
+class MidiLearnUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnwindow {
@@ -484,8 +484,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             words->copy_label("Learn cancelled");
             message->show();
             break;
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {addLine(CommandBlock *getData)} {} {
     code {//

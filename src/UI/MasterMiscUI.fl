@@ -302,7 +302,8 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
     if (npart>=0)
         draw_part();
     else
-        draw_master();} {}
+        draw_master();
+    read_updates(synth);} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
@@ -419,10 +420,10 @@ class SysEffSend {: {public WidgetPDial, private MiscFuncs}
   }
 }
 
-class Panellistitem {: {public Fl_Group, private MiscFuncs}
+class Panellistitem {selected : {public Fl_Group, private MiscFuncs}
 } {
   Function {make_window()} {} {
-    Fl_Window panellistitem {selected
+    Fl_Window panellistitem {
       xywh {1195 44 60 275} type Double hide
       class Fl_Group
     } {

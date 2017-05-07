@@ -257,7 +257,7 @@ send_data (1, o->value(), 0xc8);}
         } {}
       }
       Fl_Group {} {
-        xywh {500 406 230 35} box THIN_UP_FRAME
+        xywh {504 406 226 35} box THIN_UP_FRAME
       } {
         Fl_Counter filterstages {
           label {Filter Stages}
@@ -348,7 +348,7 @@ send_data (82, o->value(), 0xc0);}
         k += 16;
     pars->PCoarseDetune = k * 1024 + pars->PCoarseDetune % 1024;*/
     send_data (35, o->value(), 0xc8);}
-          tooltip Octave xywh {446 18 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+          tooltip Octave xywh {446 18 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
           code0 {int k=pars->PCoarseDetune/1024;if (k>=8) k-=16;}
           code2 {o->value(k);}
         }
@@ -438,11 +438,14 @@ send_data(39, o->value(), 0xc8);}
           class WidgetPDial
         }
       }
+      Fl_Box {} {
+        xywh {440 406 64 35} box THIN_UP_FRAME
+      }
       Fl_Check_Button stereo {
-        label Stereo
+        label { Stereo}
         callback {//pars->Pstereo=(int) o->value();
 send_data (112, o->value(), 0xc8);}
-        xywh {440 406 60 35} box THIN_UP_BOX down_box DOWN_BOX labelfont 1 labelsize 10
+        xywh {444 415 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
       }
       Fl_Button {} {
