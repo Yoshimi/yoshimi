@@ -1083,7 +1083,7 @@ send_data(124, o->value(), 0xc8);}
               label { Stereo}
               callback {pars->PStereo =(o->value()) ? true : false; hprofile->redraw();
 send_data(112, o->value(), 0xc8);}
-              xywh {15 249 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelsize 11
+              xywh {15 249 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
               code0 {o->value(pars->PStereo);}
             }
           }

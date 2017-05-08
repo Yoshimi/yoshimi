@@ -445,7 +445,7 @@ send_data(39, o->value(), 0xc8);}
         label { Stereo}
         callback {//pars->Pstereo=(int) o->value();
 send_data (112, o->value(), 0xc8);}
-        xywh {444 415 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+        xywh {444 415 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
         code0 {o->value(pars->Pstereo);}
       }
       Fl_Button {} {
@@ -518,7 +518,7 @@ send_data (17, o->value(), 0xc8);}
         }
       }
       Fl_Group globalfiltergroup {
-        label FILTER
+        label { FILTER }
         xywh {440 221 290 185} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
         code0 {if (pars->PGlobalFilterEnabled==0) o->deactivate();}
       } {
@@ -536,7 +536,7 @@ send_data (17, o->value(), 0xc8);}
         } {}
       }
       Fl_Check_Button filtere {
-        label Enabled
+        label { On}
         callback {//
     //pars->PGlobalFilterEnabled = o->value();
     if (o->value() == 0)
@@ -545,8 +545,8 @@ send_data (17, o->value(), 0xc8);}
         globalfiltergroup->activate();
     o->show();
     globalfiltergroup->redraw();
-    send_data (64, o->value(), 0xc0);}
-        xywh {446 225 85 20} down_box DOWN_BOX labelfont 1 labelsize 11
+    send_data (64, o->value(), 0xc8);}
+        xywh {446 227 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11
         code0 {o->value(pars->PGlobalFilterEnabled);}
       }
       Fl_Button {} {
@@ -712,17 +712,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
     unsigned char insert = getData->data.insert;
-
+    bool val_bool = (value > 0.5f);
     if (insert == 6)
     {
         h[control]->mag->value(127 - (int) value);
-        Fl::check();
         return;
     }
     if (insert == 7)
     {
         h[control]->bw->value(127 - (int) value);
-        Fl::check();
         return;
     }
 
@@ -750,7 +748,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 18:
-    	    bwee->value(value > 0.5f);
+    	    bwee->value(val_bool);
     	    break;
 
     	case 32:
@@ -811,13 +809,17 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 64:
-    	    filtere->value(value > 0.5f);
+    	    filtere->value(val_bool);
+    	    if (val_bool)
+                globalfiltergroup->activate();
+            else
+                globalfiltergroup->deactivate();
+            globalfiltergroup->redraw();
     	    break;
 
     	case 80:
     	    filterstages->value((int) value);
     	    break;
-
     	case 81:
     	    magtype->value((int) value);
     	    break;
@@ -839,10 +841,9 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 112:
-    	    stereo->value(value > 0.5f);
+    	    stereo->value(val_bool);
     	    break;
     }
-    Fl::check();} {}
   }
   Function {SUBnoteUI(SUBnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {pars = parameters;

@@ -208,7 +208,7 @@ class ADvoicelistitem {: {public Fl_Group, SynthHelper}
     }
 
     collect_data(synth, enab, (Fl::event_button() | 0xc8), 129, npart, kititem, 0x80 + nvoice);}
-        xywh {20 3 18 20} box FLAT_BOX down_box DOWN_BOX color 237 labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
+        xywh {20 3 20 20} box THIN_UP_BOX down_box DOWN_BOX color 237 labeltype EMBOSSED_LABEL labelfont 1 labelsize 13 align 4
         code0 {char tmp[10]; snprintf(tmp, 10, "%d", nvoice + 1); o->label(strdup(tmp));}
         code1 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
@@ -279,7 +279,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
       label Voice
-      xywh {629 21 770 580} type Double hide
+      xywh {593 253 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
@@ -1008,7 +1008,7 @@ send_data(1, o->value(), 0xc8);}
                     voiceampenvgroup->activate();
                 o->redraw();
                 send_data(8, o->value(), 0xc0);}
-            tooltip {Enable Amplitude Envelope} xywh {15 110 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+            tooltip {Enable Amplitude Envelope} xywh {15 109 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpEnvelopeEnabled);}
           }
           Fl_Group voiceamplfogroup {
@@ -1040,7 +1040,7 @@ send_data(4, o->value(), 0xc0);}
           }
         }
         Fl_Group voicefiltergroup {
-          label FILTER
+          label {FILTER      }
           xywh {245 5 285 245} box THIN_UP_FRAME labelfont 1 labelsize 12 align 17
           code0 {if (pars->VoicePar[nvoice].PFilterEnabled==0) o->deactivate();}
         } {
@@ -1146,11 +1146,11 @@ send_data(128, o->value(), 0xc8);}
           label {Bypass Global F.}
           callback {//pars->VoicePar[nvoice].Pfilterbypass = lrint(o->value());
 send_data(64, o->value(), 0xc0);}
-          xywh {416 16 14 14} down_box DOWN_BOX labelfont 1 labelsize 10 align 8
+          xywh {415 11 14 14} down_box DOWN_BOX labelfont 1 labelsize 10 align 8
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
         Fl_Check_Button FilterEn {
-          label Enable
+          label { On}
           callback {//
               //pars->VoicePar[nvoice].PFilterEnabled = lrint(o->value());
               if (o->value() == 0)
@@ -1159,8 +1159,8 @@ send_data(64, o->value(), 0xc0);}
                   voicefiltergroup->activate();
               o->redraw();
               bypassfiltercheckbutton->redraw();
-              send_data(68, o->value(), 0xd0);}
-          tooltip {Enable Filter} xywh {250 15 60 15} down_box DOWN_BOX labelfont 1 labelsize 10
+              send_data(68, o->value(), 0xd8);}
+          tooltip {Enable Filter} xywh {250 11 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
           code0 {o->value(pars->VoicePar[nvoice].PFilterEnabled);}
         }
         Fl_Box noiselabel {
@@ -1204,7 +1204,7 @@ o->show();}
     }
     o->redraw();
     send_data(129, o->value(), 0xc8);}
-        xywh {44 14 18 18} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13
+        xywh {44 14 20 18} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
     }
@@ -1219,7 +1219,8 @@ o->show();}
     code {//
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, nvoice | 0x80);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {} {
+  Function {returns_update(CommandBlock *getData)} {open
+  } {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
@@ -1227,6 +1228,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char npart = getData->data.part;
     unsigned char voice = getData->data.engine & 0x1f;
     int tmp;
+    bool val_bool = (value > 0.5f);
 
     if (voice != nvoice)
         return;
@@ -1248,11 +1250,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 4:
-    	    VolumeMinus->value(value > 0.5f);
+    	    VolumeMinus->value(val_bool);
     	    break;
 
     	case 8:
-    	    AmpEnvEn->value(value > 0.5f);
+    	    AmpEnvEn->value(val_bool);
     	    if (value == 0)
                     voiceampenvgroup->deactivate();
                 else
@@ -1260,7 +1262,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 9:
-    	    AmpLfoEn->value(value > 0.5f);
+    	    AmpLfoEn->value(val_bool);
     	    if (value == 0)
                     voiceamplfogroup->deactivate();
                 else
@@ -1304,7 +1306,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 34:
-    	    Freq440->value(value > 0.5f);
+    	    Freq440->value(val_bool);
     	    if (value == 0 && Mod440->value() == 0)
                 fixedfreqetdial->deactivate();
             else
@@ -1333,7 +1335,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 40:
-    	    FreqEn->value(value > 0.5f);
+    	    FreqEn->value(val_bool);
     	    if (value == 0)
                 voicefreqenvgroup->deactivate();
             else
@@ -1341,7 +1343,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 41:
-    	    FreqLfoEn->value(value > 0.5f);
+    	    FreqLfoEn->value(val_bool);
     	     if (value == 0)
                  voicefreqlfogroup->deactivate();
              else
@@ -1424,15 +1426,20 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 68:
-    	    FilterEn->value(value > 0.5f);
+    	    FilterEn->value(val_bool);
+    	    if (val_bool)
+                  voicefiltergroup->activate();
+              else
+                  voicefiltergroup->deactivate();
+              bypassfiltercheckbutton->redraw();
     	    break;
 
     	case 72:
-    	    FilterEnvEn->value(value > 0.5f);
+    	    FilterEnvEn->value(val_bool);
     	    break;
 
     	case 73:
-    	    FilterLfoEn->value(value > 0.5f);
+    	    FilterLfoEn->value(val_bool);
     	    break;
 
     	case 80:
@@ -1448,7 +1455,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 88:
-    	    ModAmpEn->value(value > 0.5f);
+    	    ModAmpEn->value(val_bool);
     	    if (value == 0)
                 voiceFMampenvgroup->deactivate();
             else
@@ -1461,7 +1468,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
         case 98:
-            tmp = (value > 0.5f);
+            tmp = (val_bool);
             Mod440->value(tmp);
             if (tmp == 0 && lrint(Freq440->value() == 0))
                 fixedfreqetdial->deactivate();
@@ -1482,7 +1489,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 104:
-    	    ModFreqEn->value(value > 0.5f);
+    	    ModFreqEn->value(val_bool);
     	    if (value == 0)
                 voiceFMfreqenvgroup->deactivate();
             else
@@ -1514,7 +1521,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 129:
-    	    tmp = (value > 0.5f);
+    	    tmp = (val_bool);
     	    voiceonbutton->value(tmp);
     	    synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voiceenabled->value(tmp);
     	    if (tmp)
@@ -1530,7 +1537,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 130:
-    	    tmp = (value > 0.5f);
+    	    tmp = (val_bool);
     	    ResonanceEn->value(tmp);
     	    synth->getGuiMaster()->partui->adnoteui->voicelistitem[voice]->voiceresonanceenabled->value(tmp);
     	    break;
@@ -1609,7 +1616,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
 class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {private
+  Function {make_window()} {open private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
@@ -1842,10 +1849,10 @@ send_data(113, o->value(), 0xc0);}
         } {}
       }
       Fl_Check_Button stereo {
-        label Stereo
+        label { Stereo}
         callback {//pars->GlobalPar.PStereo = lrint(o->value());
 send_data(112, o->value(), 0xc8);}
-        xywh {8 220 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelsize 11
+        xywh {8 220 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
         code0 {o->value(pars->GlobalPar.PStereo);}
       }
       Fl_Button {} {
@@ -2008,7 +2015,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     //unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     //unsigned char npart = getData->data.part;
-
+    bool val_bool = (value > 0.5f);
     switch(control)
     {
     	case 0:
@@ -2047,11 +2054,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             break;
 
         case 112:
-            stereo->value(value > 0.5f);
+            stereo->value(val_bool);
             break;
 
         case 113:
-            rndgrp->value(value > 0.5f);
+            rndgrp->value(val_bool);
             break;
 
         case 120:
@@ -2074,8 +2081,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             pvel->value(value);
             break;
 
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {ADnoteUI(ADnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {//

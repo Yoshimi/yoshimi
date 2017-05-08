@@ -129,7 +129,7 @@ class PartKitItem {: {public Fl_Group}
           callback {part->kit[n].Pmuted=(int)o->value();
 synth->getGuiMaster()->partui->checkEngines();
 send_data(9, o->value(), 0xc8, n, 0xff, 32)}
-          xywh {60 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {60 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Pmuted);}
         }
         Fl_Button labelbutton {
@@ -225,7 +225,7 @@ if ((Fl::event_button() == 3))
     }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc8, n, 0, 32);}
-          xywh {400 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {400 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Padenabled);}
         }
         Fl_Button subeditbutton {
@@ -253,7 +253,7 @@ if ((Fl::event_button() == 3))
     }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc8, n, 1, 32);}
-          xywh {470 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {470 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Psubenabled);}
         }
         Fl_Button padeditbutton {
@@ -281,7 +281,7 @@ if ((Fl::event_button() == 3))
     }
     synth->getGuiMaster()->partui->checkEngines();
     send_data(8, o->value(), 0xc8, n, 2, 32);}
-          xywh {540 0 15 15} box FLAT_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
+          xywh {540 0 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 11 align 4
           code0 {o->value(part->kit[n].Ppadenabled);}
         }
         Fl_Choice sendtoeffect {
@@ -417,7 +417,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -584,7 +584,7 @@ send_data(5, tmp, 0xc0);}
         label Portamento
         callback {//part->ctl->portamento.portamento = o->value();
 send_data(7, o->value(), 0xc8);}
-        tooltip {Enable/Disable the portamento} xywh {76 61 15 15} box FLAT_BOX down_box DOWN_BOX value 1 color 237 labelsize 11 align 8
+        tooltip {Enable/Disable the portamento} xywh {76 61 17 15} box THIN_UP_BOX down_box DOWN_BOX value 1 color 237 labelsize 11 align 8
         code0 {o->value(part->ctl->portamento.portamento);}
       }
       Fl_Spinner partkeyshift {

@@ -1043,6 +1043,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 68:
+            type |= 0x40;
             max = 1;
             break;
 

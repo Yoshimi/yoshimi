@@ -1,5 +1,10 @@
 yoshimi 1.5.2 rc2
 
+2017-5-8 Will
+* Made Add Voice & Sub filter enables learnable.
+  Now labelled as 'On'.
+* Removed unnecessary Gui checks from Add & Sub.
+
 2017-5-7 Will
 * Improved Midi-learn loading behaviour.
 * Gui Updates no longer called from synth.
