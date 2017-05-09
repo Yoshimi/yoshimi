@@ -1,5 +1,8 @@
 yoshimi 1.5.2 rc2
 
+2017-5-9 Will
+* BugFix: Modulator amplitude envelope wasn't enabling.
+
 2017-5-8 Will
 * Made Add Voice & Sub filter enables learnable.
   Now labelled as 'On'.

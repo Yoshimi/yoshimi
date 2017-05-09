@@ -425,11 +425,11 @@ send_data(81, o->value(), 0xc8);}
               Fl_Check_Button ModAmpEn {
                 label Enable
                 callback {//
-                    /*pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrint(o->value());
+                    //pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrint(o->value());
                     if (o->value() == 0)
                         voiceFMampenvgroup->deactivate();
                     else
-                        voiceFMampenvgroup->activate();*/
+                        voiceFMampenvgroup->activate();
                     o->redraw();
                     send_data(88, o->value(), 0xc0);}
                 tooltip {Enable Amplitude Envelope} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
@@ -1219,8 +1219,7 @@ o->show();}
     code {//
 collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem, nvoice | 0x80);} {}
   }
-  Function {returns_update(CommandBlock *getData)} {open
-  } {
+  Function {returns_update(CommandBlock *getData)} {} {
     code {//
     float value = getData->data.value;
     //unsigned char type = getData->data.type;
@@ -1456,10 +1455,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
     	case 88:
     	    ModAmpEn->value(val_bool);
-    	    if (value == 0)
-                voiceFMampenvgroup->deactivate();
-            else
+    	    if (val_bool)
                 voiceFMampenvgroup->activate();
+            else
+                voiceFMampenvgroup->deactivate();
     	    break;
 
     	case 96:
@@ -1616,7 +1615,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
 
 class ADnoteUI {selected : {public PresetsUI_, SynthHelper}
 } {
-  Function {make_window()} {open private
+  Function {make_window()} {private
   } {
     Fl_Window ADnoteGlobalParameters {
       label {ADsynth Global Parameters of the Instrument}
