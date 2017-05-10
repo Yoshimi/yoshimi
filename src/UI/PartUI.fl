@@ -417,7 +417,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
   }
 }
 
-class PartUI {: {public Fl_Group, PartUI_, private MiscFuncs}
+class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
@@ -584,7 +584,7 @@ send_data(5, tmp, 0xc0);}
         label Portamento
         callback {//part->ctl->portamento.portamento = o->value();
 send_data(7, o->value(), 0xc8);}
-        tooltip {Enable/Disable the portamento} xywh {76 61 17 15} box THIN_UP_BOX down_box DOWN_BOX value 1 color 237 labelsize 11 align 8
+        tooltip {Enable/Disable the portamento} xywh {76 61 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11 align 8
         code0 {o->value(part->ctl->portamento.portamento);}
       }
       Fl_Spinner partkeyshift {
@@ -1971,7 +1971,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     code {//
     //part->SetController(C_resetallcontrollers,0);
 
-
+    enportamento->value(0);
     expmwh->value(part->ctl->modwheel.exponential);
     modwh->value(part->ctl->modwheel.depth);
     expbw->value(part->ctl->bandwidth.exponential);

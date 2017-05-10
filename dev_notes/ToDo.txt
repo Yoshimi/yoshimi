@@ -1,11 +1,9 @@
 
 Fl::check() used too liberally. See where it can be removed - controls updating multiple windows seem the be the main problem.
 
-Reaset all controllers doesn't clear portamento checkbox.
-
 Direct access to envelope not updating Gui graph, but seems to work otherwise.
 
-Sort out direct access dynfilter->filter controls work but don't update gui.
+Sort out direct access dynfilter->filter - controls work but don't update gui.
 
 Expand midi-learn to include:
     more switches

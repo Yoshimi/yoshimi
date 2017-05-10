@@ -8,7 +8,7 @@ After that, if you were learning, the first physical controller you move, or CC 
 
 If you now use the 'Yoshimi' drop-down menu and click on 'MIDI Learn' you will see a new window displaying your recently learned controller. Along with a number of settings, you'll see text with precise details of this complete action.
 
-If the controller you learned was an NRPN this will show as a hexadecimal number in the CC field, and this field will not be editable. As of V 1.5.2 there will also be a checkbox so that you can set this as a LSB only type (some hardware synths send these).
+If the controller you learned was an NRPN this will show as a hexadecimal number in the CC field, and this field will not be editable. As of V 1.5.2 there is a checkbox so that you can set this as a LSB only type (some hardware synths send these).
 
 There is also an 'activity' LED that flickers when the associated CC/channel is received, provided the line is not muted, or blocked by an earlier one.
 
