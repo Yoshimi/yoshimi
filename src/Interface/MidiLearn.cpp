@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2017
+    Modified May 2017
 */
 
 #include <iostream>
@@ -821,7 +821,7 @@ bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
             xml->addparbool("Mute", (it->status & 4) > 0);
             xml->addparbool("NRPN", (it->status & 8) > 0);
             xml->addparbool("7_bit", (it->status & 16) > 0);
-            xml->addpar("Midi_Controller", it->CC);
+            xml->addpar("Midi_Controller", it->CC & 0x7fff); // clear out top bit
             xml->addpar("Midi_Channel", it->chan);
             xml->addparreal("Midi_Min", it->min_in / 1.575f);
             xml->addparreal("Midi_Max", it->max_in / 1.575f);
@@ -892,23 +892,33 @@ bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
     midi_list.clear();
     int ID = 0;
     int status;
+    unsigned int ent;
     while (true)
     {
         status = 0;
+        ent = 0;
         if (!xml->enterbranch("LINE", ID))
             break;
         else
         {
-
-            if (xml->getparbool("Mute",0))
+            if (xml->getparbool("Mute", 0))
                 status |= 4;
-            if (xml->getparbool("NRPN",0))
+            if (xml->getparbool("NRPN", 0))
+            {
+                ent = 0x10000; // set top bit for NRPN comparison
                 status |= 8;
+            }
             if (xml->getparbool("7_bit",0))
                 status |= 16;
-            entry.CC = xml->getpar("Midi_Controller", 0, 0, 0xfffff);
-            if (entry.CC > 0xff)
-                status |= 8; // belt & braces!
+
+            ent |= xml->getpar("Midi_Controller", 0, 0, 0xfffff);
+            if (ent > 0xff) // belt & braces!
+            {
+                ent |= 0x10000;
+                status |= 8;
+            }
+            entry.CC = ent;
+
             entry.chan = xml->getpar127("Midi_Channel", 0);
 
             int min = int((xml->getparreal("Midi_Min", 200.0f) * 1.575f) + 0.5f);

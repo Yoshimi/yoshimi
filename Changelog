@@ -3,6 +3,11 @@ yoshimi 1.5.2 rc2
 2017-5-11 Will
 * Reset all controllers now clears the portamento switch.
 * Added SubnoteUI correction from Rob.
+* Minor change to saved Midi-learned files.
+  Supresses artificial top bit when saving, making file more
+  understandable, but loading restores it for learn comparisons.
+* More AddSynth Voice & SubSyth switches learnable.
+* Updated docs.
 
 2017-5-9 Will
 * BugFix: Modulator amplitude envelope wasn't enabling.

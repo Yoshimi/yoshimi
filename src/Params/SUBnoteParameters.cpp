@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is a derivative of a ZynAddSubFX original, modified February 2017
+    This file is a derivative of a ZynAddSubFX original, modified May 2017
 */
 
 #include "Params/SUBnoteParameters.h"
@@ -413,9 +413,10 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             max = 63;
             break;
 
-            case 18:
-                max = 1;
-                break;
+        case 18:
+            type = 0x40;
+            max = 1;
+            break;
 
         case 32:
             type = 0x40;
@@ -457,6 +458,7 @@ void SUBnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 40:
+            type = 0x40;
             max = 1;
             break;
 

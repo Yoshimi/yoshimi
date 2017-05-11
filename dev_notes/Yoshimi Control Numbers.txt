@@ -139,10 +139,10 @@ YL : 0 to 127 : 0 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Volum
 YL : 0 to 127 : 1 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Velocity sensitivity
 YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Panning
 Y : 0/1 : 4 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Minus – invert volume control action
-Y : 0/1 : 8 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable amplitude envelope
-Y : 0/1 : 9 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable amplitude LFO
+YL : 0/1 : 8 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable amplitude envelope
+YL : 0/1 : 9 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable amplitude LFO
 
-Y : 0 to 4 : 16 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator type – Off, Morph, Ring, PM, FM
+YL : 0 to 5 : 16 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator type – Off, Morph, Ring, PM, FM, PWM
 Y : -1 to 6 : 17 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator (from lower numbered voice modulators) - off = -1
 
 YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Detune frequency
@@ -154,8 +154,8 @@ Y : -64 to 63 : 37 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Coar
 YL : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Pitch bend adjust
 YL : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Bend offset Hz
 
-Y : 0/1 : 40 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable frequency envelope
-Y : 0/1 : 41 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable frequency LFO
+YL : 0/1 : 40 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable frequency envelope
+YL : 0/1 : 41 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable frequency LFO
 
 YL : 0 to 127 : 48 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison frequency spread
 YL : 0 to 127 : 49 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison phase randomise
@@ -167,20 +167,20 @@ Y : 0 to 5 : 54 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison 
 Y : 0/1 : 56 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Unison enable
 
 Y : 0/1 : 64 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Bypass global filter
-Y : 0/1 : 68 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter
-Y : 0/1 : 72 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter envelope
-Y : 0/1 : 73 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter LFO
+YL : 0/1 : 68 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter
+YL : 0/1 : 72 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter envelope
+YL : 0/1 : 73 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable filter LFO
 
 YL : 0 to 127 : 80 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator amplitude
 YL : 0 to 127 : 81 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator velocity sensitivity
 YL : -64 to 63 : 82 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator HF damping
-Y : 0/1 : 88 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator amplitude envelope
+YL : 0/1 : 88 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator amplitude envelope
 YL : -8192 to 8191 : 96 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune frequency
 Y : 0/1 : 98 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Set modulator frequency to 440Hz
 YL : -8 to 7 : 99 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator octave
 Y : 0 to 4 : 100 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator detune type – Default, L35 cents, L10 cents, E100 cents, E1200 cents
 Y : -64 to 63 : 101 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator coarse detune
-Y : 0/1 : 104 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator frequency envelope
+YL : 0/1 : 104 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Enable modulator frequency envelope
 YL : -64 to 63 : 112 : 0 to 63 : 0 to 15 : 128 + (0 to 7) : 255 : 255 : 255 : Modulator oscillator phase
 Y : -1 to 6 : 113 : 0 to 63 : 0 to 15 : 128 + (1 to 7) : 255 : 255 : 255 : External modulator oscillator (from lower numbered voices) - off = -1
 
@@ -198,7 +198,7 @@ YL : 0 to 127 : 2 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Panning
 
 YL : 0 to 127 : 16 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bandwidth
 YL : 0 to 127 : 17 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bandwidth scale
-Y : 0/1 : 18 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable bandwidth envelope
+YL : 0/1 : 18 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable bandwidth envelope
 
 YL : -8192 to 8191 : 32 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Detune frequency
 YL : 0 to 127 : 33 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Equal temper variation
@@ -209,7 +209,7 @@ Y : 0 to 127 : 37 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Coarse detune
 YL : 0 to 127 : 38 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Pitch bend adjust
 YL : 0 to 127 : 39 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Bend offset Hz
 
-Y : 0/1 : 40 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable frequency envelope
+YL : 0/1 : 40 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Enable frequency envelope
 
 YL : 0 to 255 : 48 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 1
 YL : 0 to 255 : 49 : 0 to 63 : 0 to 15 : 1 : 255 : 255 : 255 : Overtone parameter 2

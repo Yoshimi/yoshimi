@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified February 2017
+    This file is derivative of ZynAddSubFX original code, modified May 2017
 */
 
 #include <iostream>
@@ -932,15 +932,19 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 4:
+            max = 1;
+            break;
+
         case 8:
         case 9:
         case 88:
+            type |= 0x40;
             max = 1;
             break;
 
         case 16:
             type |= 0x40;
-            max = 4;
+            max = 5;
             break;
 
         case 17:
@@ -996,6 +1000,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
         case 40:
         case 41:
         case 104:
+            type |= 0x40;
             max = 1;
             break;
 
@@ -1043,15 +1048,9 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 68:
-            type |= 0x40;
-            max = 1;
-            break;
-
         case 72:
-            max = 1;
-            break;
-
         case 73:
+            type |= 0x40;
             max = 1;
             break;
 

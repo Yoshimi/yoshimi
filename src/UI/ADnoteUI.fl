@@ -278,12 +278,12 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window ADnoteVoiceParameters {
-      label Voice
-      xywh {593 253 770 580} type Double hide
+      label Voice open
+      xywh {585 366 770 580} type Double hide
       code0 {o->copy_label(synth->getGuiMaster()->setPartWindowTitle("AddSynth Voice Oscillator").c_str());}
       class Fl_Group
     } {
-      Fl_Group voiceparametersgroup {
+      Fl_Group voiceparametersgroup {open
         xywh {0 0 765 580} box THIN_UP_BOX color 48
         code0 {if (pars->VoicePar[nvoice].Enabled==0) o->deactivate();}
       } {
@@ -307,7 +307,7 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                 class EnvelopeUI
               } {}
               Fl_Check_Button ModFreqEn {
-                label Enable
+                label On
                 callback {//
                     //pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled = lrint(o->value());
                     if (o->value() == 0)
@@ -315,8 +315,8 @@ class ADvoiceUI {: {public Fl_Group, SynthHelper, MiscFuncs}
                     else
                         voiceFMfreqenvgroup->activate();
                     o->redraw();
-                    send_data(104, o->value(), 0xc0);}
-                tooltip {Enable Frequency Envelope} xywh {545 295 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                    send_data(104, o->value(), 0xc8);}
+                tooltip {Enable Frequency Envelope} xywh {545 295 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMFreqEnvelopeEnabled);}
               }
               Fl_Counter ModCoarseDetune {
@@ -423,7 +423,7 @@ send_data(81, o->value(), 0xc8);}
                 class EnvelopeUI
               } {}
               Fl_Check_Button ModAmpEn {
-                label Enable
+                label On
                 callback {//
                     //pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled = lrint(o->value());
                     if (o->value() == 0)
@@ -431,8 +431,8 @@ send_data(81, o->value(), 0xc8);}
                     else
                         voiceFMampenvgroup->activate();
                     o->redraw();
-                    send_data(88, o->value(), 0xc0);}
-                tooltip {Enable Amplitude Envelope} xywh {546 134 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                    send_data(88, o->value(), 0xc8);}
+                tooltip {Enable Amplitude Envelope} xywh {546 134 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
                 code0 {o->value(pars->VoicePar[nvoice].PFMAmpEnvelopeEnabled);}
               }
               Fl_Value_Slider ModFdamp {
@@ -584,7 +584,7 @@ send_data(82, o->value(), 0xc8);}
               class EnvelopeUI
             } {}
             Fl_Check_Button FreqEn {
-              label Enable
+              label On
               callback {//
                   //pars->VoicePar[nvoice].PFreqEnvelopeEnabled = lrint(o->value());
                   if (o->value() == 0)
@@ -592,8 +592,8 @@ send_data(82, o->value(), 0xc8);}
                   else
                       voicefreqenvgroup->activate();
                   o->redraw();
-                  send_data(40, o->value(), 0xc0);}
-              tooltip {Enable Frequency Envelope} xywh {15 300 50 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                  send_data(40, o->value(), 0xc8);}
+              tooltip {Enable Frequency Envelope} xywh {15 300 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqEnvelopeEnabled);}
             }
             Fl_Group voicefreqlfogroup {
@@ -604,7 +604,7 @@ send_data(82, o->value(), 0xc8);}
               class LFOUI
             } {}
             Fl_Check_Button FreqLfoEn {
-              label Enable
+              label On
               callback {//
     bool enab = (o->value() > 0.5);
     //pars->VoicePar[nvoice].PFreqLfoEnabled = enab;
@@ -620,8 +620,8 @@ send_data(82, o->value(), 0xc8);}
     }
     o->redraw();
 
-    send_data(41, o->value(), 0xc0);}
-              tooltip {Enable Frequency LFO} xywh {220 300 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+    send_data(41, o->value(), 0xc8);}
+              tooltip {Enable Frequency LFO} xywh {220 300 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
               code0 {o->value(pars->VoicePar[nvoice].PFreqLfoEnabled);}
             }
             Fl_Counter Octave {
@@ -999,7 +999,7 @@ send_data(1, o->value(), 0xc8);}
             code0 {o->value(pars->randomVoicePan(nvoice));}
           }
           Fl_Check_Button AmpEnvEn {
-            label Enable
+            label On
             callback {//
                 pars->VoicePar[nvoice].PAmpEnvelopeEnabled = lrint(o->value());
                 if (o->value() == 0)
@@ -1007,8 +1007,8 @@ send_data(1, o->value(), 0xc8);}
                 else
                     voiceampenvgroup->activate();
                 o->redraw();
-                send_data(8, o->value(), 0xc0);}
-            tooltip {Enable Amplitude Envelope} xywh {15 109 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                send_data(8, o->value(), 0xc8);}
+            tooltip {Enable Amplitude Envelope} xywh {15 109 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpEnvelopeEnabled);}
           }
           Fl_Group voiceamplfogroup {
@@ -1019,7 +1019,7 @@ send_data(1, o->value(), 0xc8);}
             class LFOUI
           } {}
           Fl_Check_Button AmpLfoEn {
-            label Enable
+            label On
             callback {//
                 pars->VoicePar[nvoice].PAmpLfoEnabled = lrint(o->value());
                 if (o->value() == 0)
@@ -1027,8 +1027,8 @@ send_data(1, o->value(), 0xc8);}
                 else
                     voiceamplfogroup->activate();
                 o->redraw();
-                send_data(9, o->value(), 0xc0);}
-            tooltip {Enable Amplitude LFO} xywh {15 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                send_data(9, o->value(), 0xc8);}
+            tooltip {Enable Amplitude LFO} xywh {15 180 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PAmpLfoEnabled);}
           }
           Fl_Check_Button VolumeMinus {
@@ -1058,7 +1058,7 @@ send_data(4, o->value(), 0xc0);}
             class EnvelopeUI
           } {}
           Fl_Check_Button FilterEnvEn {
-            label Enable
+            label On
             callback {//
                 //pars->VoicePar[nvoice].PFilterEnvelopeEnabled = lrint(o->value());
                 if (o->value() == 0)
@@ -1066,8 +1066,8 @@ send_data(4, o->value(), 0xc0);}
                 else
                     voicefilterenvgroup->activate();
                 o->redraw();
-                send_data(72, o->value(), 0xc0);}
-            tooltip {Enable Filter Envelope} xywh {255 110 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                send_data(72, o->value(), 0xc8);}
+            tooltip {Enable Filter Envelope} xywh {255 110 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PFilterEnvelopeEnabled);}
           }
           Fl_Group voicefilterlfogroup {
@@ -1078,7 +1078,7 @@ send_data(4, o->value(), 0xc0);}
             class LFOUI
           } {}
           Fl_Check_Button FilterLfoEn {
-            label Enable
+            label On
             callback {//
                // pars->VoicePar[nvoice].PFilterLfoEnabled = lrint(o->value());
                 if (o->value() == 0)
@@ -1086,8 +1086,8 @@ send_data(4, o->value(), 0xc0);}
                 else
                     voicefilterlfogroup->activate();
                 o->redraw();
-                send_data(73, o->value(), 0xc0);}
-            tooltip {Enable Filter LFO} xywh {255 180 55 10} down_box DOWN_BOX labelfont 1 labelsize 10
+                send_data(73, o->value(), 0xc8);}
+            tooltip {Enable Filter LFO} xywh {255 180 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
             code0 {o->value(pars->VoicePar[nvoice].PFilterLfoEnabled);}
           }
         }
@@ -1096,7 +1096,7 @@ send_data(4, o->value(), 0xc0);}
         }
         Fl_Group {} {
           label 1
-          xywh {10 10 36 26} labeltype EMBOSSED_LABEL labelfont 1 labelsize 22 align 16
+          xywh {10 10 31 26} labeltype EMBOSSED_LABEL labelfont 1 labelsize 22 align 16
           code0 {//
               char tmp[2]; tmp[0] = nvoice + 49; tmp[1] = 0; o->copy_label(tmp);}
         } {}
@@ -1150,7 +1150,7 @@ send_data(64, o->value(), 0xc0);}
           code0 {o->value(pars->VoicePar[nvoice].Pfilterbypass);}
         }
         Fl_Check_Button FilterEn {
-          label { On}
+          label On
           callback {//
               //pars->VoicePar[nvoice].PFilterEnabled = lrint(o->value());
               if (o->value() == 0)
@@ -1160,7 +1160,7 @@ send_data(64, o->value(), 0xc0);}
               o->redraw();
               bypassfiltercheckbutton->redraw();
               send_data(68, o->value(), 0xd8);}
-          tooltip {Enable Filter} xywh {250 11 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
+          tooltip {Enable Filter} xywh {250 11 34 12} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 10
           code0 {o->value(pars->VoicePar[nvoice].PFilterEnabled);}
         }
         Fl_Box noiselabel {
@@ -1187,7 +1187,7 @@ o->show();}
         }
       }
       Fl_Check_Button voiceonbutton {
-        label { On}
+        label On
         callback {//
     bool enab = (o->value() > 0.5);
     pars->VoicePar[nvoice].Enabled = enab;
@@ -1204,7 +1204,7 @@ o->show();}
     }
     o->redraw();
     send_data(129, o->value(), 0xc8);}
-        xywh {44 14 20 18} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13
+        xywh {44 15 41 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelfont 1 labelsize 13
         code0 {o->value(pars->VoicePar[nvoice].Enabled);}
       }
     }
