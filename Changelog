@@ -2,6 +2,7 @@ yoshimi 1.5.2 rc2
 
 2017-5-11 Will
 * Reset all controllers now clears the portamento switch.
+* Added SubnoteUI correction from Rob.
 
 2017-5-9 Will
 * BugFix: Modulator amplitude envelope wasn't enabling.

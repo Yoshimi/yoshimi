@@ -843,7 +843,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	case 112:
     	    stereo->value(val_bool);
     	    break;
-    }
+    }}{}
   }
   Function {SUBnoteUI(SUBnoteParameters *parameters, int npart_, int kititem_)} {} {
     code {pars = parameters;
