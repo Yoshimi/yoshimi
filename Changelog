@@ -1,4 +1,9 @@
-yoshimi 1.5.2 rc2
+yoshimi 1.5.2
+
+2017-5-12 Will
+* Merged in Robs SubSynth Overtones/Legato fix.
+* Finalised all code and docs for release.
+* Set version 1.5.2
 
 2017-5-11 Will
 * Reset all controllers now clears the portamento switch.
