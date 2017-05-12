@@ -60,10 +60,12 @@ class SUBnote : public Carcass, private SynthHelper
         void computecurrentparameters(void);
         void initparameters(float freq);
         void KillNote(void);
+        void initfilterbank(void);
 
         SUBnoteParameters *pars;
 
         bool stereo;
+        int pos[MAX_SUB_HARMONICS]; // chart of non-zero harmonic locations
         int numstages; // number of stages of filters
         int numharmonics; // number of harmonics (after the too higher hamonics are removed)
         int firstnumharmonics; // To keep track of the first note's numharmonics value, useful in legato mode.
