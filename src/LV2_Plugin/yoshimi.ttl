@@ -18,6 +18,7 @@
     lv2:requiredFeature <http://lv2plug.in/ns/ext/buf-size#boundedBlockLength>;
 
     lv2:extensionData <http://lv2plug.in/ns/ext/state#interface>,
+		      <http://lv2plug.in/ns/ext/state#StateChanged>,
                       <http://kxstudio.sf.net/ns/lv2ext/programs#Interface> ;
 
     ui:ui <http://yoshimi.sourceforge.net/lv2_plugin#ExternalUI> ;
@@ -250,6 +251,14 @@
         lv2:index 35 ;
         lv2:symbol "track_16_r" ;
         lv2:name "Track 16 right" ;
+    ];
+    
+    lv2:port [
+	a lv2:OutputPort,  atom:AtomPort ;
+	atom:bufferType atom:Sequence ;
+	lv2:index 36 ;
+	lv2:symbol "notify" ;
+	lv2:name "Notify";
     ].
 
 <http://yoshimi.sourceforge.net/lv2_plugin>
@@ -303,4 +312,12 @@
         lv2:index 3 ;
         lv2:symbol "outr" ;
         lv2:name "Main right" ;
+    ];
+    
+    lv2:port [
+	a lv2:OutputPort,  atom:AtomPort ;
+	atom:bufferType atom:Sequence ;
+	lv2:index 4 ;
+	lv2:symbol "notify" ;
+	lv2:name "Notify";
     ].

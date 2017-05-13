@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include <iostream>
@@ -223,7 +223,7 @@ bool Config::Setup(int argc, char **argv)
         midiDevice = "";
     loadCmdArgs(argc, argv);
     Oscilsize = nearestPowerOf2(Oscilsize, MAX_AD_HARMONICS * 2, 16384);
-    Buffersize = nearestPowerOf2(Buffersize, 16, 1024);
+    Buffersize = nearestPowerOf2(Buffersize, 16, 4096);
     //Log(asString(Oscilsize));
     //Log(asString(Buffersize));
     if (loadDefaultState && !restoreState)
@@ -526,7 +526,7 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
         return false;
     }
     Samplerate = xml->getpar("sample_rate", Samplerate, 44100, 192000);
-    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 1024);
+    Buffersize = xml->getpar("sound_buffer_size", Buffersize, 16, 4096);
     Oscilsize = xml->getpar("oscil_size", Oscilsize, MAX_AD_HARMONICS * 2, 16384);
     GzipCompression = xml->getpar("gzip_compression", GzipCompression, 0, 9);
     showGui = xml->getparbool("enable_gui", showGui);
@@ -701,6 +701,7 @@ void Config::saveSessionData(string savefile)
     }
     addConfigXML(xmltree);
     synth->add2XML(xmltree);
+    synth->midilearn.insertMidiListData(false, xmltree);
     if (xmltree->saveXMLfile(savefile))
         Log("Session data saved to " + savefile);
     else
@@ -736,7 +737,8 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
     {
         ok = extractConfigData(xml); // this still needs improving
         if (ok)
-        {
+        { // mark as soon as anything changes
+            synth->getRuntime().stateChanged = true;
             for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
             {
                 synth->part[npart]->defaults();
@@ -745,9 +747,13 @@ bool Config::restoreSessionData(string sessionfile, bool startup)
             ok = synth->getfromXML(xml);
             if (ok)
             {
+                xml->endbranch(); // we shouldn't need this here
                 synth->setAllPartMaps();
-                synth->getRuntime().stateChanged = true;
             }
+            bool oklearn = synth->midilearn.extractMidiListData(true, xml);
+            if (oklearn)
+                synth->midilearn.updateGui(2);
+                // handles possibly undefined window
         }
     }
 

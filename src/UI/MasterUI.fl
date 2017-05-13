@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified March 2017
+Modified May 2017
 
 
 } {in_source in_header
@@ -292,25 +292,17 @@ class MasterUI {selected : {private MiscFuncs}
             callback {aboutwindow->show();}
             tooltip {Copyright and version info} xywh {15 15 100 20} labelsize 12
           }
-          MenuItem newinstance {
-            label {&New instance}
-            callback {mainCreateNewInstance(0)}
-            xywh {0 0 100 20} labelsize 12
-          }
           MenuItem newinstanceid {
-            label {New instance with &id...}
+            label {&New instance...}
             callback {if(synth->getIsLV2Plugin())
-{
-	return;
-}
-const char *sId = fl_input("Enter desired instance id...", "0");
-unsigned int forceId = 0;
-if(sId == NULL)
-{
-	return;
-}
-forceId = string2uint(sId);
+    return;
 
+const char *sId = fl_input("Accept next, or enter desired instance id...", "next");
+if (sId == NULL)
+    return;
+unsigned int forceId = 0;
+if (sId)
+    forceId = string2uint(sId);
 mainCreateNewInstance(forceId);}
             xywh {0 0 31 21} labelsize 12
           }
@@ -376,7 +368,7 @@ mainCreateNewInstance(forceId);}
             label {&Clear}
             callback {//
     if(fl_choice("Clear parameters of instrument %d ?", NULL, "No", "Yes", npart + 1) > 1)
-        send_data(96, 0, 0xc0, npart);}
+        send_data(96, 0, 0xd0, npart);}
             xywh {35 35 100 20} labelsize 12
           }
         }
@@ -520,16 +512,12 @@ paramsui->Show(3);}
     char *fle = fl_file_chooser("Load:", "({*.state})", laststatefile.c_str(), 0);
     if (fle)
     {
-        laststatefile = string(fle);
-        synth->getRuntime().loadState(laststatefile);
-        synth->addHistory(laststatefile, 4);
+        setState(fle);
+        synth->addHistory(fle, 4);
         RecentState->activate();
-        unsigned int name_start = laststatefile.rfind("/");
-    	unsigned int name_end = laststatefile.rfind(".");
-    	setMasterLabel(laststatefile.substr(name_start + 1, name_end - name_start - 1));
-
     }
-    refresh_master_ui(0);}
+    else
+        refresh_master_ui(0x80 | (miscMsgPush(" ") << 8));}
             tooltip {Load session state} xywh {0 0 34 21} labelsize 12
           }
           MenuItem saveState {
@@ -1569,7 +1557,10 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     mastervolumedial->value(synth->Pvolume);
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
     microtonalui = new MicrotonalUI(&synth->microtonal);
-    setMasterLabel(findleafname(synth->lastPatchSetSeen()));
+    if (type & 0x80)
+        setMasterLabel(miscMsgPop((type >> 8) & 0xff));
+    else
+    	setMasterLabel(findleafname(synth->lastPatchSetSeen()));
     updatesendwindow();
     updatepanel();
     vectorui->updateAll();
@@ -1681,9 +1672,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     {
         partui->partGroupEnable->value(active);
         if (active)
+        {
             partui->partgroupui->activate();
+            partui->toSysEfx->activate();
+        }
         else
+        {
             partui->partgroupui->deactivate();
+            partui->toSysEfx->deactivate();
+        }
     }} {}
   }
   Function {setPartVolWidget(int _npart, float _value)} {} {
@@ -1724,6 +1721,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     code {//
         if (_npart == npart)
             partui->instrumenteditwindow->show();} {}
+  }
+  Function {setState(string filename)} {} {
+    code {//
+    laststatefile = string(filename);
+    synth->getRuntime().loadState(filename);
+    synth->getGuiMaster()->refresh_master_ui(0x80 | (miscMsgPush(findleafname(filename)) << 8));} {}
   }
   Function {updateBankRootDirs()} {} {
     code {bankui->readbankcfg();} {}

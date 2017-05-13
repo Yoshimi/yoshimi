@@ -21,11 +21,12 @@ Status bits:
 1   limit (otherwise compress)
 2   mute
 
-4   mark as an NRPN
+3   mark as an NRPN
+4   mark as 7 bit
 
 When sending internal control messages to the GUI (instead of passing on MIDI actions) the part number will be 216 - a value that is never used in the rest of the system, but is in the same region as Vectors (and yet to come Scales) and other 'accessory' parts.
 
-This will be used for updating the list and filling in/altering line entries. The gui will never do these directly, but will request them using the same part number.
+This is used for updating the list and filling in/altering line entries. The gui never does these directly, but requests them using the same part number.
 
 Name strings are passed across using the simple message system. These are not editable in the GUI.
 
@@ -44,6 +45,8 @@ engine      channel
 insert      min_in
 parameter   max_in
 par2        text message number
+
+For NRPNs, CC has bit 16 set. This is so that even one with a value less than 127 won't be mistaken for a normal CC when being matched.
 
 The gui will be restricted to 'viewing groups' of 128 lines, it solves a *lot* of problems!
 
@@ -72,7 +75,7 @@ These move a line, so a complete redraw is inititalsed.
 
 96  clear all
 
-The gui now always does a redraw (except 20 & 21), but 0 to 6, 24 and 96 don't do a list re-order first.
+The gui always does a redraw (except 20 & 21), but 0 to 7, 24 and 96 don't do a list re-order first.
 
 
 0xf1 load list

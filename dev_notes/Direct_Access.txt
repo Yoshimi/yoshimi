@@ -15,12 +15,12 @@ Sections currently in place and tested:
 Top level controls
 Midi-learn - used for all operations
 Main part controls - now used by GUI for writes
-Controllers Window
+Controllers Window - now used by GUI for writes
 MIDI learn editor window - used for all except incoming real MIDI
-Kit edit window
-AddSynth Editor
+Kit edit window - now used by GUI for writes
+AddSynth Editor - now used by GUI for writes
 AddSynth Voice Editor
-Subsynth Editor
+Subsynth Editor - now used by GUI for writes
 Padsynth Editor
 Oscillator
 Resonance
@@ -67,7 +67,7 @@ parameter = subtype associated with some inserts.
 par2 = an offset for some parameters.
 
 
-A variation of the above is when you set flt_max as the value. This will be interpreted as requesting the min, max, and default values for the command and using the same 'CommandBlock' struct will return them as short integers in the form:
+A variation of the above is when you set flt_max as the value. This will be interpreted as requesting the min, max, and default values for the command, and using the same 'CommandBlock' struct will return them as short integers in the form:
 limits.min
 limits.max
 limits.def (x10)

@@ -83,6 +83,7 @@ static vector<string> MidiLearnHistory;
 SynthEngine::SynthEngine(int argc, char **argv, bool _isLV2Plugin, unsigned int forceId) :
     uniqueId(getRemoveSynthId(false, forceId)),
     isLV2Plugin(_isLV2Plugin),
+    needsSaving(false),
     bank(this),
     interchange(this),
     midilearn(this),
@@ -2326,22 +2327,23 @@ int SynthEngine::MasterAudio(float *outl [NUM_MIDI_PARTS + 1], float *outr [NUM_
 
 bool SynthEngine::fetchMeterData(VUtransfer *VUdata)
 {
+    bool isOK = false;
     if (jack_ringbuffer_read_space(vuringbuf) >= sizeof(VUtransfer))
     {
 
         jack_ringbuffer_read(vuringbuf, ( char*)VUdata->bytes, sizeof(VUtransfer));
         VUdata->values.vuRmsPeakL = sqrt(VUdata->values.vuRmsPeakL / VUdata->values.p_buffersize);
         VUdata->values.vuRmsPeakR = sqrt(VUdata->values.vuRmsPeakR / VUdata->values.p_buffersize);
-        return true;
+        isOK = true;
     }
-    return false;
+    return isOK;
 }
+
 
 // Parameter control
 void SynthEngine::setPvolume(float control_value)
 {
     Pvolume = control_value;
-    //volume  = dB2rap((float(Pvolume) / 128.0 - 96.0f) / 96.0f * 40.0f);
 }
 
 
@@ -2818,15 +2820,16 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
             lastPart = NUM_MIDI_CHANNELS * 2;
         for (int npart = 0; npart < lastPart; npart += NUM_MIDI_CHANNELS)
         {
-            if (!xml->enterbranch("PART", npart))
-                continue;
-            part[npart + baseChan]->getfromXML(xml);
-            part[npart + baseChan]->Prcvchn = baseChan;
-            xml->exitbranch();
+            if (xml->enterbranch("PART", npart))
+            {
+                part[npart + baseChan]->getfromXML(xml);
+                part[npart + baseChan]->Prcvchn = baseChan;
+                xml->exitbranch();
+            }
         }
+        xml->endbranch(); // VECTOR
+        addHistory(file, 5);
     }
-    xml->endbranch(); // VECTOR
-    addHistory(file, 5);
     delete xml;
     return baseChan | 0x20; // ensures we can get 'true' from channel 0
 }
@@ -2921,8 +2924,6 @@ unsigned char SynthEngine::extractVectorData(unsigned char *baseChan, bool full,
         if (part[npart + *baseChan]->Paudiodest & 2)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::RegisterAudioPort, npart + *baseChan);
     }
-    //GuiThreadMsg::sendMessage(this, GuiThreadMsg::UpdatePart,0);
-
     return true;
 }
 
@@ -3091,6 +3092,7 @@ int SynthEngine::getalldata(char **data)
 {
     XMLwrapper *xml = new XMLwrapper(this);
     add2XML(xml);
+    midilearn.insertMidiListData(false, xml);
     *data = xml->getXMLdata();
     delete xml;
     return strlen(*data) + 1;
@@ -3113,6 +3115,8 @@ void SynthEngine::putalldata(const char *data, int size)
         getfromXML(xml);
         actionLock(unlock);
         xml->exitbranch();
+        midilearn.extractMidiListData(false, xml);
+        //midilearn.updateGui();
     //}
     //else
         //Runtime.Log("Master putAllData failed to enter MASTER branch");

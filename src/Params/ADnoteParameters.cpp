@@ -19,7 +19,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified February 2017
+    This file is derivative of ZynAddSubFX original code, modified May 2017
 */
 
 #include <iostream>
@@ -814,6 +814,7 @@ void ADnoteParameters::getfromXMLsection(XMLwrapper *xml, int n)
 void ADnoteParameters::getLimits(CommandBlock *getData)
 {
     int control = getData->data.control;
+    int engine = getData->data.engine;
 
     // defaults
     int type = 0;
@@ -821,7 +822,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
     int def = 0;
     int max = 127;
 
-    if (getData->data.engine < 0x80)
+    if (engine < 0x80)
     {
         switch (control)
         {
@@ -840,6 +841,12 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 def = 640;
                 break;
 
+            case 8:
+                type |= 0x40;
+                def = 10;
+                max = 1;
+                break;
+
             case 32:
                 type |= 0x40;
                 min = -8192;
@@ -847,6 +854,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case 35:
+                type |= 0x40;
                 min = -8;
                 max = 7;
                 break;
@@ -866,7 +874,8 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
                 break;
 
             case 112:
-                def = 100;
+                type |= 0x40;
+                def = 10;
                 max = 1;
                 break;
 
@@ -923,14 +932,19 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 4:
+            max = 1;
+            break;
+
         case 8:
         case 9:
         case 88:
+            type |= 0x40;
             max = 1;
             break;
 
         case 16:
-            max = 4;
+            type |= 0x40;
+            max = 5;
             break;
 
         case 17:
@@ -957,6 +971,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
 
         case 35:
         case 99:
+            type |= 0x40;
             min = -8;
             max = 7;
             break;
@@ -985,6 +1000,7 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
         case 40:
         case 41:
         case 104:
+            type |= 0x40;
             max = 1;
             break;
 
@@ -1032,14 +1048,9 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 68:
-            max = 1;
-            break;
-
         case 72:
-            max = 1;
-            break;
-
         case 73:
+            type |= 0x40;
             max = 1;
             break;
 
@@ -1072,6 +1083,12 @@ void ADnoteParameters::getLimits(CommandBlock *getData)
             break;
 
         case 129:
+            type |= 0x40;
+            if (engine == 0x80)
+                def = 10;
+            max = 1;
+            break;
+
         case 130:
             def = 10;
             max = 1;

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include <iostream>
@@ -42,7 +42,6 @@ using namespace std;
 #include "Synth/Resonance.h"
 #include "Synth/OscilGen.h"
 #include "MasterUI.h"
-//#include "Interface/MidiDecode.h"
 
 InterChange::InterChange(SynthEngine *_synth) :
     synth(_synth)
@@ -246,15 +245,13 @@ void InterChange::resolveReplies(CommandBlock *getData)
     Part *part;
     part = synth->part[npart];
 
-    bool isCli = type & 0x10;
+    bool isCli = ((type & 0x30) == 0x10); // elminate Gui redraw
     bool isGui = type & 0x20;
     char button = type & 3;
     string isValue;
     string commandName;
     unsigned char insertParam = getData->data.parameter;
     unsigned char insertPar2 = getData->data.par2;
-
-//    bool isMidi = type & 8;
 
 #ifdef ENABLE_REPORTS
     if ((isGui && button < 2) || (isCli && button == 1))
@@ -292,16 +289,19 @@ void InterChange::resolveReplies(CommandBlock *getData)
     else if (npart == 0xf1 || npart == 0xf2)
         commandName = resolveEffects(getData);
 
-    else if (npart >= 0x40)
-        commandName = "Invalid part " + to_string(int(npart));
-
     else if ((kititem >= 0x80 && kititem != 0xff) || (control >= 64 && control <= 67 && kititem == 0xff))
         commandName = resolveEffects(getData);
 
-    else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+    else if (npart >= NUM_MIDI_PARTS)
+        commandName = "Invalid part " + to_string(int(npart) + 1);
+
+    else if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+        commandName = "Invalid kit " + to_string(int(kititem) + 1);
+
+    else if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         commandName = "Part " + to_string(int(npart) + 1) + " Kit item " + to_string(int(kititem) + 1) + " not enabled";
 
-    else if (kititem == 0xff || (kititem & 0x20))
+    else if (kititem == 0xff || insert == 0x20)
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
             commandName = "Part " + to_string(int(npart) + 1) + " Kitmode not enabled";
@@ -420,7 +420,7 @@ void InterChange::resolveReplies(CommandBlock *getData)
     {
         actual = " Value ";
         if (type & 0x80)
-            actual += to_string((int)round(value));
+            actual += to_string(int(value + 0.5f));
         else
             actual += to_string(value);
     }
@@ -566,14 +566,18 @@ string InterChange::resolvePart(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
-    bool kitType = (kititem >= 0x20 && kititem < 0x40);
+    bool kitType = (insert == 0x20);
+
+    if (control == 255)
+        return "Number of parts";
 
     string kitnum;
     if (kitType)
-        kitnum = " Kit " + to_string((kititem & 0x1f) + 1) + " ";
+        kitnum = " Kit " + to_string(kititem + 1) + " ";
     else
         kitnum = " ";
 
@@ -627,7 +631,7 @@ string InterChange::resolvePart(CommandBlock *getData)
             contstr = "Mode";
             break;
         case 7:
-            contstr = "Portamento";
+            contstr = "Portamento Enable";
             break;
         case 8:
             contstr = "Enable";
@@ -1972,7 +1976,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     name += " Effect " + to_string(effnum + 1);
 
     string effname = "";
-    if (npart < 0x40 && (control == 64 || control == 66 || control == 67))
+    if (npart < NUM_MIDI_PARTS && (control == 64 || control == 66 || control == 67))
     {
         if (control == 64)
             name = "Set " + name;
@@ -1986,9 +1990,10 @@ string InterChange::resolveEffects(CommandBlock *getData)
             else if (value == 1)
                 effname += "dry out";
         }
-        else if (control == 67)
+        if (control == 67)
             effname = " bypassed";
-        showValue = false;
+        else
+            showValue = false;
         return (name + effname);
     }
     else if (npart > 0xf0 && kititem == 0xff)
@@ -2025,7 +2030,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
         }
     }
     string contstr = "";
-    if ((npart < 0x40 && control == 65) || (npart > 0xf0 && kititem == 0xff && control == 1))
+    if ((npart < NUM_MIDI_PARTS && control == 65) || (npart > 0xf0 && kititem == 0xff && control == 1))
     {
         name += " set to";
         kititem = value;
@@ -2037,7 +2042,8 @@ string InterChange::resolveEffects(CommandBlock *getData)
     switch (kititem & 0x1f)
     {
         case 0:
-            effname = " NO Effect";
+            effname = " None";
+            contstr = " ";
             break;
         case 1:
             effname = " Reverb";
@@ -2091,7 +2097,7 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromCLI, point, toread);
-            if(getData.data.part != 0xd8) // special midi-learn message
+            if(getData.data.part != 0xd8) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -2105,7 +2111,7 @@ void InterChange::mediate()
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromGUI, point, toread);
 
-            if(getData.data.part != 0xd8) // special midi-learn message
+            if(getData.data.part != 0xd8) // Not special midi-learn message
                 commandSend(&getData);
             returns(&getData);
         }
@@ -2118,17 +2124,17 @@ void InterChange::mediate()
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(fromMIDI, point, toread);
-            if(getData.data.part != 0xd8) // special midi-learn message
+            if(getData.data.part != 0xd8) // Not special midi-learn message
             {
                 commandSend(&getData);
                 returns(&getData);
             }
-            else if (getData.data.control == 24)
+            else if (getData.data.control == 24) // activity LED
             {
                 if (jack_ringbuffer_write_space(toGUI) >= commandSize)
                 jack_ringbuffer_write(toGUI, (char*) getData.bytes, commandSize);
             }
-            else if (getData.data.control == 0xd8)
+            else if (getData.data.control == 0xd8) // not part!
             {
                 synth->mididecode.midiProcess(getData.data.kit, getData.data.engine, getData.data.insert, false);
             }
@@ -2150,28 +2156,20 @@ void InterChange::returns(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
 
-    bool isGui = type & 0x20;
-    bool isCli = type & 0x10;
+    bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
 
-    bool isOK = false;
-    if (isGui && (control == 96 || control == 222) && npart < 0x40 && (kititem & engine & insert) == 0xff)
-        isOK = true; // needs more work. Some GUI controls need updates
+    bool isOKtoRedraw = (isCliOrGuiRedraw && write) || isMidi;
 
-    if (synth->guiMaster)
+    if (synth->guiMaster && isOKtoRedraw)
     {
-        if (isOK || (!isGui && (isMidi || (isCli && write))))
-        {
-            if (jack_ringbuffer_write_space(toGUI) >= commandSize)
-                jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
-        }
+        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
     }
 
     if (jack_ringbuffer_write_space(toCLI) >= commandSize)
-    {
         jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize);
-    }
 }
 
 
@@ -2192,14 +2190,30 @@ void InterChange::doClearPart(int npart)
     synth->partonoffWrite(npart, 2);
 }
 
+bool InterChange::commandSend(CommandBlock *getData)
+{
+    bool isWrite = (getData->data.type & 0x40) > 0;
+    /*
+     * temporararily moved this up as some commands
+     * still write directly, so are converted to reads
+     * in the appropriate sections to stop conflicts.
+     */
+    bool isChanged = commandSendReal(getData);
+    if (isWrite && isChanged) //write command
+    {
+        synth->setNeedsSaving(true);
+    }
+    return isChanged;
+}
 
-void InterChange::commandSend(CommandBlock *getData)
+
+bool InterChange::commandSendReal(CommandBlock *getData)
 {
     float value = getData->data.value;
     if (value == FLT_MAX)
     {
-        returnLimits(getData);
-        return;
+        returnLimits(getData); // this can be accessed directly
+        return false;
     }
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -2208,51 +2222,55 @@ void InterChange::commandSend(CommandBlock *getData)
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
     bool isCli = type & 0x10;
+    bool isGui = type & 0x20;
     char button = type & 3;
 
-    if (isCli && button == 1)
-        return;
+    if (!isGui && button == 1)
+        return false;
 
     if (npart >= 0xc0 && npart < 0xd0)
     {
         commandVector(getData);
-        return;
+        return true;
     }
     if (npart == 0xf0)
     {
         commandMain(getData);
-        return;
+        return true;
     }
     if ((npart == 0xf1 || npart == 0xf2) && kititem == 0xff)
     {
         commandSysIns(getData);
-        return;
+        return true;
     }
     if (kititem >= 0x80 && kititem != 0xff)
     {
         commandEffects(getData);
-        return;
+        return true;
     }
 
-    if (npart >= 0x40)
-        return; // invalid part number
+    if (npart >= NUM_MIDI_PARTS)
+        return false; // invalid part number
+
+    if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+        return false; // invalid kit number
 
     Part *part;
     part = synth->part[npart];
 
-    if (kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
-        return; // attempt to access non existant kititem
+    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
+        return false; // attempt to access not enabled kititem
 
-    if (kititem == 0xff || (kititem & 0x20))
+    if (kititem == 0xff || insert == 0x20)
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
-            return;
+            return false;
         commandPart(getData);
-        return;
+        return true;
     }
 
     if (kititem > 0 && kititem < 0xff && part->Pkitmode == 0)
-        return;
+        return false;
 
     if (engine == 2)
     {
@@ -2282,7 +2300,7 @@ void InterChange::commandSend(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].padpars->resonance);
                 break;
         }
-        return;
+        return true;
     }
 
     if (engine == 1)
@@ -2303,7 +2321,7 @@ void InterChange::commandSend(CommandBlock *getData)
                 commandEnvelope(getData);
                 break;
         }
-        return;
+        return true;
     }
 
     if (engine >= 0x80)
@@ -2327,13 +2345,13 @@ void InterChange::commandSend(CommandBlock *getData)
             case 5:
             case 6:
             case 7:
-                if (engine >= 0xC0)
+                if (engine >= 0xc0)
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].FMSmp);
                 else
                     commandOscillator(getData,  part->kit[kititem].adpars->VoicePar[engine & 0x1f].OscilSmp);
                 break;
         }
-        return;
+        return true;
     }
 
     if (engine == 0)
@@ -2359,8 +2377,10 @@ void InterChange::commandSend(CommandBlock *getData)
                 commandResonance(getData, part->kit[kititem].adpars->GlobalPar.Reson);
                 break;
         }
+        return true;
     }
     // just do nothing if not recognised
+    return false;
 }
 
 
@@ -2643,18 +2663,18 @@ void InterChange::commandPart(CommandBlock *getData)
     unsigned char npart = getData->data.part;
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
     unsigned char par2 = getData->data.par2;
     unsigned char effNum = engine;
 
     bool write = (type & 0x40) > 0;
-    bool kitType = (kititem >= 0x20 && kititem < 0x40);
+    bool kitType = (insert == 0x20);
 
     int value_int = lrint(value);
     char value_bool = (value > 0.5f);
 
     Part *part;
     part = synth->part[npart];
-
     switch (control)
     {
         case 0:
@@ -2702,7 +2722,6 @@ void InterChange::commandPart(CommandBlock *getData)
         case 8:
             if (kitType)
             {
-                kititem &= 0x1f;
                 switch(engine)
                 {
                     case 0:
@@ -3035,7 +3054,7 @@ void InterChange::commandPart(CommandBlock *getData)
             break;
         case 138:
             if (write)
-                part->ctl->pitchwheel.bendrange = value;
+                part->ctl->pitchwheel.bendrange = value_int;
             else
                 value = part->ctl->pitchwheel.bendrange;
             break;
@@ -3311,10 +3330,6 @@ void InterChange::commandAdd(CommandBlock *getData)
 
 void InterChange::commandAddVoice(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -3573,6 +3588,7 @@ void InterChange::commandAddVoice(CommandBlock *getData)
                 pars->VoicePar[nvoice].PFMFixedFreq = value_bool;
             else
                 value = pars->VoicePar[nvoice].PFMFixedFreq;
+            break;
         case 99:
             if (write)
             {
@@ -3676,10 +3692,6 @@ void InterChange::commandAddVoice(CommandBlock *getData)
 
 void InterChange::commandSub(CommandBlock *getData)
 {
-#pragma message "Gui writes changed to reads"
-    if (getData->data.type & 0x20)
-        getData->data.type = getData->data.type & 0xbf;
-
     float value = getData->data.value;
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
@@ -5336,7 +5348,7 @@ void InterChange::commandEffects(CommandBlock *getData)
 
     else if (npart == 0xf2)
         eff = synth->insefx[effnum];
-    else if (npart < 0x40)
+    else if (npart < NUM_MIDI_PARTS)
         eff = synth->part[npart]->partefx[effnum];
     else
         return; //invalid part number
@@ -5400,7 +5412,7 @@ void InterChange::returnLimits(CommandBlock *getData)
         return;
     }
 
-    if (npart < 0x40)
+    if (npart < NUM_MIDI_PARTS)
     {
         Part *part;
         part = synth->part[npart];
@@ -5411,18 +5423,25 @@ void InterChange::returnLimits(CommandBlock *getData)
             subpars->getLimits(getData);
             return;
         }
-        if (kititem == 0xff || (kititem & 0x20)) // part level controls
+        if (engine == 0xff && (kititem == 0xff || insert == 0x20)) // part level controls
         {
             part->getLimits(getData);
             return;
         }
-        if (insert == 0xff && parameter == 0xff && par2 == 0xff)
+        if ((insert == 0x20 || insert == 0xff) && parameter == 0xff && par2 == 0xff)
         {
             if (engine == 0 || (engine >= 0x80 && engine <= 0x8f))
             {
                 ADnoteParameters *adpars;
                 adpars = part->kit[kititem].adpars;
                 adpars->getLimits(getData);
+                return;
+            }
+            if (engine == 1)
+            {
+                SUBnoteParameters *subpars;
+                subpars = part->kit[kititem].subpars;
+                subpars->getLimits(getData);
                 return;
             }
             if (engine == 2)

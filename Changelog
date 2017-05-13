@@ -1,4 +1,137 @@
-yoshimi 1.5.1.1
+yoshimi 1.5.2
+
+2017-5-12 Will
+* Merged in Robs SubSynth Overtones/Legato fix.
+* Finalised all code and docs for release.
+* Set version 1.5.2
+
+2017-5-11 Will
+* Reset all controllers now clears the portamento switch.
+* Added SubnoteUI correction from Rob.
+* Minor change to saved Midi-learned files.
+  Supresses artificial top bit when saving, making file more
+  understandable, but loading restores it for learn comparisons.
+* More AddSynth Voice & SubSyth switches learnable.
+* Updated docs.
+
+2017-5-9 Will
+* BugFix: Modulator amplitude envelope wasn't enabling.
+
+2017-5-8 Will
+* Made Add Voice & Sub filter enables learnable.
+  Now labelled as 'On'.
+* Removed unnecessary Gui checks from Add & Sub.
+
+2017-5-7 Will
+* Improved Midi-learn loading behaviour.
+* Gui Updates no longer called from synth.
+* Midi-learnable switches now have colour IDs.
+* Set master as 1.5.2 rc2
+* Updated docs.
+
+2017-5-5 Will
+* More 'switches' Midi-learnable:
+  AddVoice enable and modulator selection.
+  All engine stereo and octave.
+* Set master as 1.5.2 rc1
+* Updated docs
+
+2017-5-4 Will
+* Small alteration to Andrew's State Changed patch.
+  This catches controls that still write direct.
+
+2017-5-2 Will
+* Fixed Gui anomally when loading states with Midi-learn.
+  The way we fetch Gui updates needs improving greatly.
+  Currently we use the VU timer and call across from synth.
+* LV2 state now includes Midi-learn data.
+
+2017-5-1 Will
+* State load now correctly updates main window title.
+* More float -> int range adustments
+  especially Midi-learn limits and conversions.
+
+2017-4-30 Will
+* Improved float -> int conversions.
+* BugFix: some of the new controls had the wrong limits.
+
+2017-4-29 Will
+* Corrected some Gui engine enable/colour anomalies.
+  Needs more work to rationalise duplications.
+* Enabled engine switches for Midi-learn.
+* Enabled some controllers for Midi_learn.
+  pan width
+  bandwidth depth
+  pitchwheel range
+  portamento time
+  portamento time stretch
+  portamento threshold
+  proportional rate
+  proportional depth
+* Updated limits
+* Small adjustment to controllers window.
+
+2017-4-28 Will
+* Fixed dynamic tooltip margins at 3 for all FLTK 1.3.x.
+  May reinstate the margin setting at a later date.
+* Small change to crossfade example.
+
+2017-4-23 Will
+* Reverted Midi-learn Gui change again
+  It was just moving the problem to any window that was open :(
+
+2017-4-22 Will
+* If State file has Midi-learn data it closes the window.
+  This evades the issue rather than solving it :(
+  However no other load source shows the problem.
+
+2017-4-21 Will
+* Reverted Midi-learn Gui change - caused other problems.
+
+2017-4-20 Will
+* Improved handling of Vectors in state load
+* Loading large Midi-learn lists was overloading Gui
+  so reduced Gui update rate.
+* Misc image updates.
+
+2017-4-18 Will
+* Corrected AddSynth sound/noise display.
+* Included AddSynthVoiceList in new controls method.
+* Midi-learn data added to saved state file.
+
+2017-4-17 Will
+* Implemented Gui change can redraw *after* command set.
+* Transferred AddSynthVoice to new control method.
+* Updated docs.
+* Transferred SubSynth to new control method.
+* Fixed regression - scroll wheel had stopped responding.
+* More doc updates.
+
+2017-4-16 Will
+* Part 'kit' is no longer ORed with 32 for some controls
+  instead 'insert' is set to 32 for these.
+* Added more error checks and warnings.
+* Updated docs.
+* Increased max buffersize to 4096 frames.
+* Fixed regression - Cli had lost part effect control :(
+
+2017-4-15 Will
+* Implemented Gui access to 7 bit NRPNs.
+* Revised Midi-learn window.
+* Corrected some Cli numbering.
+
+2017-4-14 Will
+* Revised Gui new instance selection.
+  Only 1 menu entry needed now.
+* Revised Midi-learn min/max - now percentages.
+  Resolution is now 0.5% :)
+
+2017-4-13 Will
+* Revised Cli access to Midi-learn.
+* Implemented 7bit NRPNs (not Gui changeable).
+* Updated docs.
+* Bugfix: Loading Midi-learn files was setting learn mode.
+* Bugfix: CLI error when changing Midi-learned channels.
 
 2017-4-9 Will
 * Bugfix: Wrong size buffer used for jack audio
@@ -18,7 +151,7 @@ yoshimi 1.5.1.1
 2017-3-26 Will
 * Corrected anomaly with some float to bool conversions.
   Changed varable in 'interchange' to make this clearer.
-* Activated Midi_learn for portamento enable & rate.
+* Activated Midi-learn for portamento enable & rate.
 * Set master as 1.5.1 rc5
 
 2017-3-22 Will

@@ -24,7 +24,7 @@ You should have received a copy of the GNU General Public License along with
 yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Modified March 2017} {in_source in_header
+Modified May 2017} {in_source in_header
 }
 
 decl {\#include <FL/fl_ask.H>
@@ -59,27 +59,31 @@ class MidiLearnKitItem {: {public Fl_Group}
 } {
   Function {make_window()} {} {
     Fl_Window midilearnkititem {
-      xywh {66 719 825 20} type Double hide
+      xywh {8 649 825 20} type Double hide
       class Fl_Group
     } {
       Fl_Group midilearnkititemgroup {
-        xywh {49 -4 776 23} box FLAT_BOX
+        xywh {56 -4 745 23} box FLAT_BOX
       } {
         Fl_Spinner CCcounter {
           callback {send_data(16);}
-          tooltip {Continuous Controller to recognise} xywh {75 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
+          tooltip {Continuous Controller to recognise} xywh {80 0 43 15} labelsize 12 minimum 0 maximum 129 value 14 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
-          xywh {109 0 15 16} box FLAT_BOX down_box FLAT_BOX
+          xywh {114 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Button nrpn {
           label {8888 h}
-          xywh {69 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
+          tooltip {NRPN value} xywh {76 0 49 15} box THIN_DOWN_BOX down_box THIN_DOWN_BOX color 247 selection_color 7 labelsize 12 hide
+        }
+        Fl_Light_Button sevenbit {
+          callback {send_data(4);}
+          tooltip {Set for 7bit NRPN} xywh {59 0 13 15} box NO_BOX color 28 selection_color 1 hide
         }
         Fl_Choice channelchoice {
-          callback {send_data(16);}
-          tooltip {Incoming channel} xywh {134 0 39 15} down_box BORDER_BOX labelsize 12 textsize 12
+          callback {send_data(48);}
+          tooltip {Incoming channel} xywh {137 0 39 15} down_box BORDER_BOX selection_color 49 labelsize 12 textsize 12
         } {
           MenuItem {} {
             label 1
@@ -150,44 +154,36 @@ class MidiLearnKitItem {: {public Fl_Group}
             xywh {160 160 26 15} labelsize 11
           }
         }
-        Fl_Button activity {
-          callback {if (o->value() != 0)
-{
-    o->value(0);
-    o->show();
-}
-else
-{
-    o->value(1);
-    o->hide();
-}}
-          xywh {185 0 8 15} color 63
-          code0 {o->value(1);}
-          code1 {o->hide();}
-        }
         Fl_Check_Button compresscheck {
           callback {send_data(1);}
-          tooltip {Limit or compress incoming value} xywh {320 0 15 15} down_box DOWN_BOX labelfont 1 align 4
+          tooltip {Limit or compress incoming value} xywh {324 0 15 15} down_box DOWN_BOX labelfont 1 align 4
         }
         Fl_Check_Button blockcheck {
           callback {send_data(0);}
-          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {357 0 20 15} down_box DOWN_BOX labelfont 1 align 4
+          tooltip {Stop any later lines (or system controls) responding to this CC/Channel pair} xywh {360 0 20 15} down_box DOWN_BOX labelfont 1 align 4
+        }
+        Fl_Light_Button activity {
+          callback {if (o->value() != 0)
+    o->value(0);
+else
+    o->value(1);}
+          xywh {180 0 13 15} box NO_BOX color 15 selection_color 2
         }
         Fl_Spinner minval {
           callback {send_data(5);}
-          tooltip {Minimum value to pass on} xywh {205 0 43 15} labelsize 12 minimum 0 maximum 127 value 0 textsize 12
+          tooltip {Minimum % to pass on} xywh {197 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 0 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
-          xywh {239 0 15 16} box FLAT_BOX down_box FLAT_BOX
+          xywh {240 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Spinner maxval {
           callback {send_data(6);}
-          tooltip {Maximim value to pass on} xywh {264 0 43 15} labelsize 12 minimum 0 maximum 127 value 127 textsize 12
+          tooltip {Maximim % to pass on} xywh {261 0 52 15} type Float labelsize 12 minimum 0 step 0.5 value 100 textsize 12
         }
         Fl_Button {} {
           callback {// does nothing - hides spinner arrows}
-          xywh {298 0 15 16} box FLAT_BOX down_box FLAT_BOX
+          xywh {303 0 15 16} box FLAT_BOX down_box FLAT_BOX
         }
         Fl_Button commandName {
           label text
@@ -196,14 +192,14 @@ else
         }
       }
       Fl_Check_Button mutecheck {
-        label 01
+        label 999
         callback {//
 if (o->value())
     midilearnkititemgroup->deactivate();
 else
     midilearnkititemgroup->activate();
 send_data(2);}
-        tooltip {Completely ignore this line} xywh {39 0 16 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
+        tooltip {Completely ignore this line} xywh {39 0 21 15} down_box DOWN_BOX labelfont 1 labelsize 13 align 4
         code0 {o->copy_label(to_string(n + 1).c_str());}
       }
     }
@@ -211,26 +207,49 @@ send_data(2);}
   Function {send_data(int control)} {} {
     code {//
     bool doit = true;
-    if (control == 8)
+    int type = 0;
+    int CC = 0xff;
+    int chan = 0xff;
+    int min = 0xff;
+    int max = 0xff;
+    switch (control)
     {
-        doit = (Fl::event_state(FL_CTRL) != 0);
-        if (doit)
-            doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
+        case 0:
+            if (blockcheck->value() != 0)
+                type = 1;
+            break;
+        case 1:
+            if (compresscheck->value() != 0)
+                type = 2;
+            break;
+        case 2:
+            if (mutecheck->value() != 0)
+                type = 4;
+            break;
+        case 4:
+            if (sevenbit->value() != 0)
+               type = 16;
+            break;
+        case 5:
+            min = lrint(minval->value() * 2.0f);
+            break;
+        case 6:
+            max = lrint(maxval->value() * 2.0f);
+            break;
+        case 8:
+            doit = (Fl::event_state(FL_CTRL) != 0);
+            if (doit)
+                doit = (fl_choice("Remove line. %d %s?", NULL, "No", "Yes", n + 1, commandName->label()) > 1);
+            break;
+        case 16:
+            CC = lrint(CCcounter->value());
+            break;
+        case 48: // gets changed to 16
+            chan = lrint(channelchoice->value());
+            break;
     }
     if (doit)
-    {
-        int type = stat & 0x10;
-        if (blockcheck->value() != 0)
-            type = 1;
-
-        if (compresscheck->value() != 0)
-            type |= 2;
-
-        if (mutecheck->value() != 0)
-            type |= 4;
-
-        collect_data(synth, n, type, control, 216, CCcounter->value(), channelchoice->value(), minval->value(), maxval->value(), 0);
-    }} {}
+        collect_data(synth, n, type, control & 0x1f, 216, CC, chan, min, max, 0);} {}
   }
   Function {MidiLearnKitItem(int x,int y, int w, int h, const char *label=0):Fl_Group(x,y,w,h,label)} {} {
     code {n=0;} {}
@@ -264,7 +283,8 @@ class MidiLearnUI {selected : {private MiscFuncs}
       label {Midi Learn}
       tooltip {Editor for all learned controllers.
 CTRL-right click on any knob/slider to learn.
-Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {5 626 820 285} type Double hide
+Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh {7 694 820 285} type Double hide
+      code0 {send_data(22, 0, 3);}
     } {
       Fl_Scroll kitlist {
         tooltip {Editor for all learned controllers.
@@ -281,11 +301,11 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
       }
       Fl_Box {} {
         label CC
-        xywh {75 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {80 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label Chan
-        xywh {135 0 40 15} labelfont 1 labelsize 11 align 18
+        xywh {139 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
         label Block
@@ -300,12 +320,12 @@ Note: Adding/deleting entries or changing CC/Chan will renumber the lines.} xywh
         xywh {530 0 130 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
-        label Min
-        xywh {210 0 40 15} labelfont 1 labelsize 11 align 18
+        label {Min %}
+        xywh {200 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Box {} {
-        label Max
-        xywh {265 0 40 15} labelfont 1 labelsize 11 align 18
+        label {Max %}
+        xywh {263 0 40 15} labelfont 1 labelsize 11 align 18
       }
       Fl_Button {} {
         label Close
@@ -400,15 +420,20 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
                 midilearnkititem[value]->blockcheck->value((type & 1) != 0);
                 midilearnkititem[value]->compresscheck->value((type & 2) != 0);
                 midilearnkititem[value]->mutecheck->value((type & 4) != 0);
+                midilearnkititem[value]->sevenbit->value((type & 16) != 0);
+                if (type & 4) // it's muted
+                    midilearnkititem[value]->midilearnkititemgroup->deactivate();
+                else
+                    midilearnkititem[value]->midilearnkititemgroup->activate();
             }
             if (kititem < 255)
                 midilearnkititem[value]->CCcounter->value(kititem);
             if (engine < 255)
                 midilearnkititem[value]->channelchoice->value(engine);
             if (insert < 255)
-                midilearnkititem[value]->minval->value(insert);
+                midilearnkititem[value]->minval->value(insert / 2.0f);
             if (parameter < 255)
-                midilearnkititem[value]->maxval->value(parameter);
+                midilearnkititem[value]->maxval->value(parameter / 2.0f);
             break;
         case 9: // set NRPN fixed value in place
             hex = (asHexString(int(engine))) + " " + (asHexString(int(kititem))) + " h";
@@ -416,6 +441,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             midilearnkititem[value]->nrpn->copy_label(hex.c_str());
             midilearnkititem[value]->CCcounter->hide();
             midilearnkititem[value]->nrpn->show();
+            midilearnkititem[value]->sevenbit->show();
             break;
         case 16:
             addLine(getData);
@@ -458,8 +484,7 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
             words->copy_label("Learn cancelled");
             message->show();
             break;
-    }
-    Fl::check();} {}
+    }} {}
   }
   Function {addLine(CommandBlock *getData)} {} {
     code {//
@@ -478,8 +503,8 @@ collect_data(synth, value, type, control, 216, kititem, engine, insert, paramete
     midilearnkititem[lineNo]->mutecheck->value(status & 4);
     midilearnkititem[lineNo]->CCcounter->value(getData->data.kit);
     midilearnkititem[lineNo]->channelchoice->value(getData->data.engine);
-    midilearnkititem[lineNo]->minval->value(getData->data.insert);
-    midilearnkititem[lineNo]->maxval->value(getData->data.parameter);
+    midilearnkititem[lineNo]->minval->value(getData->data.insert / 2.0f);
+    midilearnkititem[lineNo]->maxval->value(getData->data.parameter / 2.0f);
     midilearnkititem[lineNo]->compresscheck->value(status & 2);
     midilearnkititem[lineNo]->blockcheck->value(status & 1);
     midilearnkititem[lineNo]->commandName->copy_label(name.c_str());

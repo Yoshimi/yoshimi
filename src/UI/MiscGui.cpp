@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified March 2017
+    Modified April 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -36,13 +36,12 @@ SynthEngine *synth;
 
 void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned char control, unsigned char part, unsigned char kititem, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
-    int typetop = type & 0xc0;
-    if ( part == 0xf1 && insert == 16)
+    int typetop = type & 0xd0;
+    if ( part == 0xf1 && insert == 0x10)
         type |= 8; // this is a hack :(
 
     if (part != 0xd8)
     {
-
         if ((type & 3) == 3)
         { // value type is now irrelevant
             if(Fl::event_state(FL_CTRL) != 0)
@@ -64,23 +63,19 @@ void collect_data(SynthEngine *synth, float value, unsigned char type, unsigned 
                 }
             }
             else
-            {
-                //type = 0;
                 type = 0x40;
                 // identifying this for button 3 as set default
-            }
         }
         else if((type & 7) > 2)
-            type = 1 | typetop;
+            type = 1;
             // change scroll wheel to button 1
-
     }
-    type |= (typetop & 0x80);
+    type |= (typetop & 0xd0); // allow for redraws *after* command
 
     CommandBlock putData;
     size_t commandSize = sizeof(putData);
     putData.data.value = value;
-    putData.data.type = type | 0x20; // 0x20 = from GUI
+    putData.data.type = type | 0x20; // = from GUI
     putData.data.control = control;
     putData.data.part = part;
     putData.data.kit = kititem;
@@ -99,7 +94,7 @@ void read_updates(SynthEngine *synth)
     CommandBlock getData;
     size_t commandSize = sizeof(getData);
 
-    while(jack_ringbuffer_read_space(synth->interchange.toGUI) >= commandSize)
+    while (jack_ringbuffer_read_space(synth->interchange.toGUI) >= commandSize)
     {
         int toread = commandSize;
         char *point = (char*) &getData.bytes;
@@ -123,7 +118,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     {
         return; // todo
     }
-    if (npart == 0xd8)
+    if (npart == 0xd8 && synth->getGuiMaster()->midilearnui != NULL)
     {
         synth->getGuiMaster()->midilearnui->returns_update(getData);
         return;
@@ -138,7 +133,7 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
             synth->getGuiMaster()->syseffectui->returns_update(getData);
         else if (npart == 0xf2)
             synth->getGuiMaster()->inseffectui->returns_update(getData);
-        else if (npart < 0x40)
+        else if (npart < NUM_MIDI_PARTS)
             synth->getGuiMaster()->partui->inseffectui->returns_update(getData);
         return;
     }
@@ -151,19 +146,22 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
         return;
     }
 
-    if (npart >= 0x40)
+    if (npart >= NUM_MIDI_PARTS)
         return; // invalid part number
 
-    if ((kititem & engine & insert) == 0xff && control == 96) // special case for part clear
+    if (kititem >= NUM_KIT_ITEMS && kititem < 0xff)
+        return; // invalid kit number
+
+    if (kititem == 0xff && engine == 0xff && insert == 0xff && control == 96) // special case for part clear
     {
         synth->getGuiMaster()->returns_update(getData);
         return;
     }
 
-    if (kititem != 0 && engine != 255 && control != 8 && part->kit[kititem & 0x1f].Penabled == false)
+    if (kititem != 0xff && kititem != 0 && engine != 0xff && control != 8 && part->kit[kititem].Penabled == false)
         return; // attempt to access non existant kititem
 
-    if (kititem == 0xff || (kititem & 0x20)) // part
+    if (kititem == 0xff || insert == 0x20) // part
     {
         if (control != 58 && kititem < 0xff && part->Pkitmode == 0)
             return; // invalid access

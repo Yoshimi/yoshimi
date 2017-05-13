@@ -28,7 +28,7 @@ yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
 Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
-Modified February 2017
+Modified May 2017
 } {in_source in_header
 }
 
@@ -132,7 +132,6 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
   }
   Function {draw_master()} {} {
     code {//
-    read_updates(synth);
             int ox = x();
             int oy = y();
             int lx = w();
@@ -251,7 +250,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
                 snprintf(tmpstr, 7, "%+3.f%s", maxdbr + 0.5f, dbtag);
                 fl_draw(tmpstr, ox + VULENX + 1, oy + ly / 2 + 1,
                     lx - VULENX - 4, VULENY, FL_ALIGN_RIGHT, NULL, 0);
-        }} {}
+            }} {}
   }
   Function {draw_part()} {} {
     code {int ox = x()+2;
@@ -303,7 +302,8 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
     if (npart>=0)
         draw_part();
     else
-        draw_master();} {}
+        draw_master();
+    read_updates(synth);} {}
   }
   Function {tickdraw(VUMeter *o)} {return_type {static void}
   } {
@@ -314,7 +314,7 @@ class VUMeter {: {public Fl_Box, private MiscFuncs}
     code {//
     tickdraw((VUMeter *) v);
     ((VUMeter *)v)->synth->fetchMeterData(&((VUMeter *) v)->synth->VUdata);
-    Fl::add_timeout(0.05, tick, v); // 1.0 / 30.0 => 30 fps} {}
+    Fl::add_timeout(0.033333333, tick, v); // 1.0 / 30.0 => 30 fps} {}
   }
   Function {handle(int event)} {return_type int
   } {

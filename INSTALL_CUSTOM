@@ -1,6 +1,6 @@
 ---- Customising yoshimi ----
 
-There are a number of compile-time options that can be set or edited. These are presented when you run ccmake after the first time you press 'c'.
+There are a number of compile-time options that can be set or edited. These are presented when you run ccmake - after the first time you press 'c'.
 
 Many of these are 'switches' which you toggle on and off. You do this by using the up and down cursor keys to reach the option you want to change, then hit 'Return' to actually change it.
 
@@ -22,7 +22,7 @@ After the main build information you will see the location of the Curses directo
 
 There is a switch for building in jack session support.
 
-Yoshimi can be used as an LV2 plugin if switched on here, otherwise the code will not be generated. Once again there is an editable location. The majority of installs want this located at 'lib/lv2' but if you need something different you can change it here.
+Yoshimi can be used as an LV2 plugin if switched on here, otherwise the code will not be generated. Once again, there is also an editable location. The majority of installs want this located at 'lib/lv2' but if you need something different you can change it here.
 
 The next option 'ShowGuiReports' is intended as a tool for developers, and will show the command structure used when any GUI control is moved. If you scroll or hit any button other than 2 (middle), these will be the ones you need if you want to duplicate the action from the command line. However, if you hit 2 then you will get the message that MIDI-learn reports.
 

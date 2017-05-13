@@ -49,6 +49,8 @@
 #define YOSHIMI_LV2_OPTIONS__Option          YOSHIMI_LV2_OPTIONS_PREFIX "Option"
 #define YOSHIMI_LV2_OPTIONS__options         YOSHIMI_LV2_OPTIONS_PREFIX "options"
 
+#define YOSHIMI_LV2_STATE__StateChanged      "http://lv2plug.in/ns/ext/state#StateChanged"
+
 typedef enum {
     LV2_OPTIONS_INSTANCE,
     LV2_OPTIONS_RESOURCE,
@@ -68,6 +70,33 @@ typedef struct _Yoshimi_LV2_Options_Option {
 
 
 using namespace std;
+
+
+
+LV2_Descriptor yoshimi_lv2_desc =
+{
+    "http://yoshimi.sourceforge.net/lv2_plugin",
+    YoshimiLV2Plugin::instantiate,
+    YoshimiLV2Plugin::connect_port,
+    YoshimiLV2Plugin::activate,
+    YoshimiLV2Plugin::run,
+    YoshimiLV2Plugin::deactivate,
+    YoshimiLV2Plugin::cleanup,
+    YoshimiLV2Plugin::extension_data
+};
+
+
+LV2_Descriptor yoshimi_lv2_multi_desc =
+{
+    "http://yoshimi.sourceforge.net/lv2_plugin_multi",
+    YoshimiLV2Plugin::instantiate,
+    YoshimiLV2Plugin::connect_port,
+    YoshimiLV2Plugin::activate,
+    YoshimiLV2Plugin::run,
+    YoshimiLV2Plugin::deactivate,
+    YoshimiLV2Plugin::cleanup,
+    YoshimiLV2Plugin::extension_data
+};
 
 
 void YoshimiLV2Plugin::process(uint32_t sample_count)
@@ -156,6 +185,33 @@ void YoshimiLV2Plugin::process(uint32_t sample_count)
         processed += to_process;
 
     }
+    
+    LV2_Atom_Sequence *aSeq = static_cast<LV2_Atom_Sequence *>(_notifyDataPortOut);
+    size_t neededAtomSize = sizeof(LV2_Atom_Event) + sizeof(LV2_Atom_Object_Body);
+    size_t paddedSize = (neededAtomSize + 7U) & (~7U);
+    if(synth->getNeedsSaving() && _notifyDataPortOut && aSeq->atom.size >= paddedSize) //notify host about plugin's changes
+    {
+        synth->setNeedsSaving(false);        
+        aSeq->atom.type = _atom_type_sequence;
+        aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
+        aSeq->body.unit = 0;
+        aSeq->body.pad = 0;        
+        LV2_Atom_Event *ev = reinterpret_cast<LV2_Atom_Event *>(aSeq + 1);
+        ev->time.frames = 0;
+        LV2_Atom_Object *aObj = reinterpret_cast<LV2_Atom_Object *>(&ev->body);
+        aObj->atom.type = _atom_object;
+        aObj->atom.size = sizeof(LV2_Atom_Object_Body);
+        aObj->body.id = 0;
+        aObj->body.otype =_atom_state_changed;
+        
+        aSeq->atom.size += paddedSize;        
+    }
+    else if(aSeq)
+    {
+        aSeq->atom.size = sizeof(LV2_Atom_Sequence_Body);
+        
+    }
+   
 }
 
 
@@ -186,23 +242,26 @@ void *YoshimiLV2Plugin::idleThread()
 //            Fl::wait(0.033333);
 //        else
             usleep(33333);
+            
     }
     return NULL;
 }
 
 
-YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features):
+YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const char *bundlePath, const LV2_Feature *const *features, const LV2_Descriptor *desc):
     MusicIO(synth),
     _synth(synth),
     _sampleRate(static_cast<uint32_t>(sampleRate)),
     _bufferSize(0),
     _bundlePath(bundlePath),
     _midiDataPort(NULL),
+    _notifyDataPortOut(NULL),
     _midi_event_id(0),
     _bufferPos(0),
     _offsetPos(0),
     _bFreeWheel(NULL),
-    _pIdleThread(0)
+    _pIdleThread(0),
+    _lv2_desc(desc)
 {
     flatbankprgs.clear();
     _uridMap.handle = NULL;
@@ -230,6 +289,11 @@ YoshimiLV2Plugin::YoshimiLV2Plugin(SynthEngine *synth, double sampleRate, const 
         LV2_URID maxBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__maxBlockLength);
         LV2_URID minBufSz = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_BUF_SIZE__minBlockLength);
         LV2_URID atomInt = _uridMap.map(_uridMap.handle, LV2_ATOM__Int);
+        _atom_type_chunk = _uridMap.map(_uridMap.handle, LV2_ATOM__Chunk);
+        _atom_type_sequence = _uridMap.map(_uridMap.handle, LV2_ATOM__Sequence);
+        _atom_state_changed = _uridMap.map(_uridMap.handle, YOSHIMI_LV2_STATE__StateChanged);
+        _atom_object = _uridMap.map(_uridMap.handle, LV2_ATOM__Object);
+        _atom_event_transfer = _uridMap.map(_uridMap.handle, LV2_ATOM__eventTransfer);
         while (options->size > 0 && options->value != NULL)
         {
             if (options->context == LV2_OPTIONS_INSTANCE)
@@ -294,12 +358,12 @@ bool YoshimiLV2Plugin::init()
 }
 
 
-LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
+LV2_Handle	YoshimiLV2Plugin::instantiate (const struct _LV2_Descriptor *desc, double sample_rate, const char *bundle_path, const LV2_Feature *const *features)
 {
     SynthEngine *synth = new SynthEngine(0, NULL, true);
     if (synth == NULL)
         return NULL;
-    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features);
+    YoshimiLV2Plugin *inst = new YoshimiLV2Plugin(synth, sample_rate, bundle_path, features, desc);
     if (inst->init())
         return static_cast<LV2_Handle>(inst);
     else
@@ -321,6 +385,16 @@ void YoshimiLV2Plugin::connect_port(LV2_Handle instance, uint32_t port, void *da
      else if (port == 1) //freewheel control port
      {
          inst->_bFreeWheel = static_cast<float *>(data_location);
+         return;
+     }
+     else if (port == 36 && std::string(inst->_lv2_desc->URI) == std::string(yoshimi_lv2_multi_desc.URI)) //notify out port
+     {
+         inst->_notifyDataPortOut = static_cast<LV2_Atom_Sequence *>(data_location);
+         return;
+     }
+     else if (port == 4 && std::string(inst->_lv2_desc->URI) == std::string(yoshimi_lv2_desc.URI)) //notify out port
+     {
+         inst->_notifyDataPortOut = static_cast<LV2_Atom_Sequence *>(data_location);
          return;
      }
 
@@ -410,9 +484,7 @@ LV2_State_Status YoshimiLV2Plugin::stateSave(LV2_State_Store_Function store, LV2
 {
     char *data = NULL;
     int sz = _synth->getalldata(&data);
-    //FILE *f = fopen("/tmp/y1.state", "w+");
-    //fwrite(data, 1, sz, f);
-    //fclose(f);
+
     store(handle, _yosmihi_state_id, data, sz, _atom_string_id, LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE);
     free(data);
     return LV2_STATE_SUCCESS;
@@ -427,13 +499,8 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
 
     const char *data = (const char *)retrieve(handle, _yosmihi_state_id, &sz, &type, &new_flags);
 
-    //FILE *f = fopen("/tmp/y2.state", "w+");
-    //fwrite(data, 1, sz, f);
-    //fclose(f);
-
     if (sz > 0)
     {
-
         _synth->putalldata(data, sz);
     }
     return LV2_STATE_SUCCESS;
@@ -548,10 +615,11 @@ LV2_Worker_Status YoshimiLV2Plugin::lv2_wrk_end_run(LV2_Handle instance)
 */
 
 
-YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function , LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
+YoshimiLV2PluginUI::YoshimiLV2PluginUI(const char *, LV2UI_Write_Function write_function, LV2UI_Controller controller, LV2UI_Widget *widget, const LV2_Feature * const *features)
     :_plugin(NULL),
      _masterUI(NULL),
-     _controller(controller)
+     _controller(controller),
+     _write_function(write_function)
 {
     uiHost.plugin_human_id = NULL;
     uiHost.ui_closed = NULL;
@@ -643,6 +711,7 @@ void YoshimiLV2PluginUI::run()
         Fl::check();
 
         GuiThreadMsg::processGuiMessages();
+        
     }
     else
     {
@@ -700,31 +769,6 @@ void YoshimiLV2PluginUI::static_Hide(_LV2_External_UI_Widget *_this_)
 
 }
 
-
-LV2_Descriptor yoshimi_lv2_desc =
-{
-    "http://yoshimi.sourceforge.net/lv2_plugin",
-    YoshimiLV2Plugin::instantiate,
-    YoshimiLV2Plugin::connect_port,
-    YoshimiLV2Plugin::activate,
-    YoshimiLV2Plugin::run,
-    YoshimiLV2Plugin::deactivate,
-    YoshimiLV2Plugin::cleanup,
-    YoshimiLV2Plugin::extension_data
-};
-
-
-LV2_Descriptor yoshimi_lv2_multi_desc =
-{
-    "http://yoshimi.sourceforge.net/lv2_plugin_multi",
-    YoshimiLV2Plugin::instantiate,
-    YoshimiLV2Plugin::connect_port,
-    YoshimiLV2Plugin::activate,
-    YoshimiLV2Plugin::run,
-    YoshimiLV2Plugin::deactivate,
-    YoshimiLV2Plugin::cleanup,
-    YoshimiLV2Plugin::extension_data
-};
 
 
 extern "C" const LV2_Descriptor *lv2_descriptor(uint32_t index)

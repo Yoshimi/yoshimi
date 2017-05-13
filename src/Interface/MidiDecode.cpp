@@ -468,7 +468,7 @@ void MidiDecode::nrpnProcessData(unsigned char chan, int type, int par, bool in_
     */
 
     // midi learn must come before everything else
-    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, in_place |2))
+    if (synth->midilearn.runMidiLearn(dHigh << 7 | par, 0x10000 | (nHigh << 7) | nLow , chan, in_place | 2))
         return;
 
     if (nLow < nHigh && (nHigh == 4 || nHigh == 8 ))

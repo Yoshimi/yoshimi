@@ -17,10 +17,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified march 2017
+    Modified May 2017
 */
 
 #include <iostream>
+#include <cfloat>
 #include <bitset>
 #include <unistd.h>
 #include <list>
@@ -40,7 +41,6 @@ MidiLearn::MidiLearn(SynthEngine *_synth) :
     synth(_synth)
 {
  //init
-
 }
 
 
@@ -54,15 +54,13 @@ void MidiLearn::setTransferBlock(CommandBlock *getData, string name)
 {
     learnTransferBlock = *getData;
     learnedName = name;
-    if (getData->data.type & 8)
-        return; // don't spam ourselves!
     learning = true;
     synth->getRuntime().Log("Learning");
     updateGui(21);
 }
 
 
-bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, unsigned char category)
+bool MidiLearn::runMidiLearn(int _value, unsigned int CC, unsigned char chan, unsigned char category)
 {
     if (learning)
     {
@@ -78,17 +76,27 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
         lastpos = findEntry(midi_list, lastpos, CC, chan, &foundEntry, false);
         if (lastpos == -3)
             return false;
-        float value = _value; // needs to be refetched each loop
+        int status = foundEntry.status;
+        if (status & 4) // it's muted
+            continue;
+/*
+ * Some of the following conversions seem strange but are
+ * needed to ensure a control range that is an exact
+ * equivalent of 0 to 127 under all conditions
+ */
+        float value; // needs to be refetched each loop
         if (category & 2)
         {
-            value = value / 128.0; // convert from 14 bit
+            if (status & 16) // 7 bit NRPN
+                value = float(_value & 0x7f);
+            else
+                value = _value / 128.999f; // convert from 14 bit
         }
-        int status = foundEntry.status;
-        if ((status & 4) == 4) // it's muted
-            continue;
+        else
+            value = float(_value);
 
-        int minIn = foundEntry.min_in;
-        int maxIn = foundEntry.max_in;
+        float minIn = foundEntry.min_in / 1.5748f;
+        float maxIn = foundEntry.max_in / 1.5748f;
         if (minIn > maxIn)
         {
             value = 127 - value;
@@ -103,22 +111,14 @@ bool MidiLearn::runMidiLearn(float _value, unsigned int CC, unsigned char chan, 
                 value = maxIn;
         }
         else // compress
-        {
-            int range = maxIn - minIn;
-            value = (value * range / 127) + minIn;
-        }
+            value = ((maxIn - minIn) * value / 127.0f) + minIn;
 
         int minOut = foundEntry.min_out;
         int maxOut = foundEntry.max_out;
         if (maxOut - minOut != 127) // its a range change
-        {
-            value = value / 127;
-            value = minOut +((maxOut - minOut) * value);
-        }
+            value = minOut +((maxOut - minOut) * value / 127.0f);
         else if (minOut != 0) // it's just a shift
-        {
             value += minOut;
-        }
 
         CommandBlock putData;
         putData.data.value = value;
@@ -235,7 +235,7 @@ int MidiLearn::findEntry(list<LearnBlock> &midi_list, int lastpos, unsigned int 
             block->min_out = it->min_out;
             block->max_out = it->max_out;
             block->data = it->data;
-            if ((it->status & 5) == 1)
+            if ((it->status & 5) == 1) // blocked, not muted
                 return -1; // don't allow any more of this CC and channel;
             return newpos;
         }
@@ -278,12 +278,24 @@ void MidiLearn::listLine(int lineNo)
         string block = "";
         if (status & 1)
             block = "  blocking";
-        synth->getRuntime().Log("Line " + to_string(lineNo) + mute
-                + "  CC " + to_string((int)it->CC)
-                + "  Chan " + to_string((int)it->chan)
-                + "  Min " + to_string((int)it->min_in)
-                + "  Max " + to_string((int)it->max_in)
-                + limit + block + "  " + it->name);
+        string nrpn = "";
+        if (status & 8)
+        {
+            nrpn = "  NRPN";
+            if (status & 16)
+                nrpn += " 7bit";
+        }
+        string chan = "  Chan ";
+        if ((it->chan) >= NUM_MIDI_CHANNELS)
+            chan += "All";
+        else
+            chan += to_string(int(it->chan + 1));
+        synth->getRuntime().Log("Line " + to_string(lineNo + 1) + mute
+                + "  CC " + to_string(int(it->CC))
+                + chan
+                + "  Min " + asString(float(it->min_in / 2.0f)) + "%"
+                + "  Max " + asString(float(it->max_in / 2.0f)) + "%"
+                + limit + block + nrpn + "  " + it->name);
     }
 }
 
@@ -307,7 +319,13 @@ void MidiLearn::listAll(list<string>& msg_buf)
             CCtype = to_string(CC);
         else
             CCtype = asHexString((CC >> 8) & 0x7f) + asHexString(CC & 0x7f) + " h";
-        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + "  Chan " + to_string((int)it->chan) + "  " + it->name);
+        string chan = "  Chan ";
+        if ((it->chan) >= NUM_MIDI_CHANNELS)
+            chan += "All";
+        else
+            chan += to_string(int(it->chan + 1));
+
+        msg_buf.push_back("Line " + to_string(lineNo + 1) + "  CC " + CCtype + chan + "  " + it->name);
         ++ it;
         ++ lineNo;
     }
@@ -335,6 +353,13 @@ bool MidiLearn::remove(int itemNumber)
 void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control, unsigned char part, unsigned char _kit, unsigned char engine, unsigned char insert, unsigned char parameter, unsigned char par2)
 {
     unsigned int kit = _kit; // may need to set as an NRPN
+    if (control == 22)
+    {
+        updateGui();
+        synth->getRuntime().Log("GUI refreshed");
+        return;
+    }
+
     if (control == 96)
     {
         midi_list.clear();
@@ -395,26 +420,38 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
         ++lineNo;
     }
 
+    string lineName;
     if (it == midi_list.end())
     {
-        synth->getRuntime().Log("Line " + to_string(int(value)) + " not found");
+        synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " not found");
         return;
     }
 
     if (insert == 0xff) // don't change
         insert = it->min_in;
+    else
+        lineName = "Min = " + asString(float(insert / 2.0f)) + "%";
 
     if (parameter == 0xff)
         parameter = it->max_in;
-
-    if (type == 0xff)
-        type = it->status;
+    else
+        lineName = "Max = " + asString(float(parameter / 2.0f)) + "%";
 
     if (kit == 255 || it->CC > 0xff) // might be an NRPN
-        kit = it->CC;
+        kit = it->CC; // remember NRPN has a high bit set
+    else
+        lineName = "CC = " + to_string(int(kit));
 
     if (engine == 255)
         engine = it->chan;
+    else
+    {
+        if (engine == 16)
+            lineName = "Chan = All";
+        else
+            lineName = "Chan = " + to_string(int(engine) + 1);
+    }
+
 
     if (control == 16)
     {
@@ -464,15 +501,49 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
     {
         remove(value);
         updateGui();
-        synth->getRuntime().Log("Removed line " + to_string(int(value)));
+        synth->getRuntime().Log("Removed line " + to_string(int(value + 1)));
         return;
     }
 
     if (control < 8)
     {
+        if (control > 4)
+        {
+            type = it->status;
+            synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + lineName);
+        }
+        else{
+            unsigned char tempType = it->status;
+            bool isOn = (type & 0x1f) > 0;
+            string name;
+            switch (control)
+            {
+                case 0:
+                    type = (tempType & 0xfe) | (type & 1);
+                    name = "Block";
+                    break;
+                case 1:
+                    type = (tempType & 0xfd) | (type & 2);
+                    name = "Limit";
+                    break;
+                case 2:
+                    type = (tempType & 0xfb) | (type & 4);
+                    name = "Mute";
+                    break;
+                case 4:
+                    type = (tempType & 0xef) | (type & 16);
+                    name = "7bit";
+                    break;
+            }
+            if (isOn)
+                name += " enabled";
+            else
+                name += " disabled";
+            synth->getRuntime().Log("Line " + to_string(lineNo + 1) + " " + name);
+        }
         CommandBlock putData;
         memset(&putData.bytes, 255, sizeof(putData));
-        // need to work on this lot
+        // need to work on this more
         putData.data.value = value;
         putData.data.type = type;
         putData.data.control = 7;
@@ -525,6 +596,8 @@ void MidiLearn::generalOpps(int value, unsigned char type, unsigned char control
             midi_list.push_back(entry);
         else
             midi_list.insert(it, entry);
+
+        synth->getRuntime().Log("Moved line to " + to_string(lineNo + 1) + " " + lineName);
         updateGui();
         return;
     }
@@ -568,7 +641,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
     entry.chan = chan;
     entry.CC = CC;
     entry.min_in = 0;
-    entry.max_in = 127;
+    entry.max_in = 200;
     entry.status = stat;
     entry.min_out = learnTransferBlock.limits.min;
     entry.max_out = learnTransferBlock.limits.max;
@@ -602,7 +675,7 @@ void MidiLearn::insert(unsigned int CC, unsigned char chan)
         CCtype = to_string(CCh);
     else
         CCtype = asHexString((CCh >> 8) & 0x7f) + asHexString(CCh & 0x7f) + " h";
-    synth->getRuntime().Log("CC " + CCtype + "  Chan " + to_string((int)entry.chan) + "  " + entry.name);
+    synth->getRuntime().Log("CC " + CCtype + "  Chan " + to_string((int)entry.chan + 1) + "  " + entry.name);
     updateGui(1);
     learning = false;
 }
@@ -656,11 +729,13 @@ void MidiLearn::updateGui(int opp)
     {
         putData.data.control = 96;
         putData.data.par2 = 0xff;
+        if (opp == 2)
+            putData.data.kit = 2; // close editing window
     }
     putData.data.value = 0;
     writeToGui(&putData);
 
-    if (opp > 1) // sending back message gui
+    if (opp > 2) // sending back message gui
         return;
 
     int lineNo = 0;
@@ -719,7 +794,23 @@ bool MidiLearn::saveList(string name)
         synth->getRuntime().Log("Save Midi Learn failed xmltree allocation");
         return false;
     }
-    bool ok = true;
+    bool ok = insertMidiListData(true,  xml);
+    if (xml->saveXMLfile(file))
+        synth->addHistory(file, 6);
+    else
+    {
+        synth->getRuntime().Log("Failed to save data to " + file);
+        ok = false;
+    }
+    delete xml;
+    return ok;
+}
+
+
+bool MidiLearn::insertMidiListData(bool full,  XMLwrapper *xml)
+{
+    if (midi_list.size() == 0)
+        return false;
     int ID = 0;
     list<LearnBlock>::iterator it;
     it = midi_list.begin();
@@ -729,10 +820,11 @@ bool MidiLearn::saveList(string name)
             xml->beginbranch("LINE", ID);
             xml->addparbool("Mute", (it->status & 4) > 0);
             xml->addparbool("NRPN", (it->status & 8) > 0);
-            xml->addpar("Midi_Controller", it->CC);
+            xml->addparbool("7_bit", (it->status & 16) > 0);
+            xml->addpar("Midi_Controller", it->CC & 0x7fff); // clear out top bit
             xml->addpar("Midi_Channel", it->chan);
-            xml->addpar("Midi_Min", it->min_in);
-            xml->addpar("Midi_Max", it->max_in);
+            xml->addparreal("Midi_Min", it->min_in / 1.575f);
+            xml->addparreal("Midi_Max", it->max_in / 1.575f);
             xml->addparbool("Limit", (it->status & 2) > 0);
             xml->addparbool("Block", (it->status & 1) > 0);
             xml->addpar("Convert_Min", it->min_out);
@@ -752,17 +844,8 @@ bool MidiLearn::saveList(string name)
             ++it;
             ++ID;
         }
-        xml->endbranch();
-
-    if (xml->saveXMLfile(file))
-        synth->addHistory(file, 6);
-    else
-    {
-        synth->getRuntime().Log("Failed to save data to " + file);
-        ok = false;
-    }
-    delete xml;
-    return ok;
+    xml->endbranch(); // MIDILEARN
+    return true;
 }
 
 
@@ -787,10 +870,21 @@ bool MidiLearn::loadList(string name)
         return false;
     }
     xml->loadXMLfile(file);
+    bool ok = extractMidiListData(true,  xml);
+    delete xml;
+    if (!ok)
+        return false;
+    synth->addHistory(file, 6);
+    return true;
+}
 
+
+bool MidiLearn::extractMidiListData(bool full,  XMLwrapper *xml)
+{
     if (!xml->enterbranch("MIDILEARN"))
     {
-        synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
+        if (full)
+            synth->getRuntime().Log("Extract Data, no MIDILEARN branch");
         return false;
     }
     LearnBlock entry;
@@ -798,24 +892,45 @@ bool MidiLearn::loadList(string name)
     midi_list.clear();
     int ID = 0;
     int status;
+    unsigned int ent;
     while (true)
     {
         status = 0;
+        ent = 0;
         if (!xml->enterbranch("LINE", ID))
             break;
         else
         {
-
-            if (xml->getparbool("Mute",0))
+            if (xml->getparbool("Mute", 0))
                 status |= 4;
-            if (xml->getparbool("NRPN",0))
+            if (xml->getparbool("NRPN", 0))
+            {
+                ent = 0x10000; // set top bit for NRPN comparison
                 status |= 8;
-            entry.CC = xml->getpar("Midi_Controller", 0, 0, 0xfffff);
-            if (entry.CC > 0xff)
-                status |= 8; // belt & braces!
+            }
+            if (xml->getparbool("7_bit",0))
+                status |= 16;
+
+            ent |= xml->getpar("Midi_Controller", 0, 0, 0xfffff);
+            if (ent > 0xff) // belt & braces!
+            {
+                ent |= 0x10000;
+                status |= 8;
+            }
+            entry.CC = ent;
+
             entry.chan = xml->getpar127("Midi_Channel", 0);
-            entry.min_in = xml->getpar127("Midi_Min", 0);
-            entry.max_in = xml->getpar127("Midi_Max", 127);
+
+            int min = int((xml->getparreal("Midi_Min", 200.0f) * 1.575f) + 0.5f);
+            if (min >= 200)
+                min = int((xml->getpar127("Midi_Min", 0) * 1.575f) + 0.5f);
+            entry.min_in = min;
+
+            int max = int((xml->getparreal("Midi_Max", 200.0f) * 1.575f) + 0.5f);
+            if (max >= 200)
+                max = int((xml->getpar127("Midi_Max", 127) * 1.575f)+ 0.5f);
+            entry.max_in = max;
+
             if (xml->getparbool("Limit",0))
                 status |= 2;
             if (xml->getparbool("Block",0))
@@ -834,21 +949,19 @@ bool MidiLearn::loadList(string name)
                 xml->exitbranch();
             xml->exitbranch();
             entry.status = status;
-            real.data.value = 0;
-            real.data.type = 0x1b;
+            real.data.value = FLT_MAX;
+            real.data.type = 0;
             /*
-             * Need to modify resolveReplies so that we can
-             * get just the name without this loopback.
+             * Need to improve resolveReplies so that we can
+             * get just the name without corrupting data
              */
             synth->interchange.resolveReplies(&real);
-            entry.name = learnedName;
+            entry.name = miscMsgPop(real.data.par2);
             midi_list.push_back(entry);
             ++ ID;
         }
     }
-
-    xml->endbranch(); // MIDILEARN
-    synth->addHistory(file, 6);
-    delete xml;
+    xml->exitbranch(); // MIDILEARN
     return true;
 }
+

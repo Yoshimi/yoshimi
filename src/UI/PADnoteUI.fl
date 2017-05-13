@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code
 
-Modified March 2017
+Modified April 2017
 } {in_source in_header
 }
 
@@ -877,8 +877,8 @@ class PADnoteUI {selected : {public PresetsUI_, private SynthHelper}
         k+=16;
     pars->PCoarseDetune = k*1024+
     pars->PCoarseDetune%1024;
-    send_data(35, o->value(), 0xc0);}
-              tooltip Octave xywh {465 305 45 15} type Simple labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
+    send_data(35, o->value(), 0xc8);}
+              tooltip Octave xywh {465 305 45 15} type Simple color 237 selection_color 0 labelsize 10 align 1 minimum -8 maximum 7 step 1 textfont 1 textsize 11
               code0 {int k=pars->PCoarseDetune/1024;}
               code1 {if (k>=8) k-=16;}
               code2 {o->value(k);}
@@ -962,7 +962,7 @@ send_data(38, o->value(), 0xc8);}
               tooltip {Pitch bend range scaling} xywh {80 280 20 20} box ROUND_UP_BOX labelsize 10 align 8 maximum 127 step 1
               code0 {o->value(pars->PBendAdjust);}
               code1 {o->init(88);}
-	      code2 {o->setValueType(VC_PitchBend);}
+              code2 {o->setValueType(VC_PitchBend);}
               class WidgetPDial
             }
             Fl_Dial offset {
@@ -1080,10 +1080,10 @@ send_data(124, o->value(), 0xc8);}
               class LFOUI
             } {}
             Fl_Check_Button stereo {
-              label Stereo
+              label { Stereo}
               callback {pars->PStereo =(o->value()) ? true : false; hprofile->redraw();
-send_data(112, o->value(), 0xc0);}
-              xywh {15 245 65 25} down_box DOWN_BOX labelsize 11
+send_data(112, o->value(), 0xc8);}
+              xywh {15 249 17 15} box THIN_UP_BOX down_box DOWN_BOX color 237 labelsize 11
               code0 {o->value(pars->PStereo);}
             }
           }
@@ -1206,12 +1206,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 17:
-    	    bwscale->value((int) value);
+    	    bwscale->value(lrint(value));
     	    cbwidget->do_callback();
     	    break;
 
     	case 19:
-    	    spectrummode->value((int) value);
+    	    spectrummode->value(lrint(value));
     	    if (pars->Pmode == 0)
             {
                 bwprofilegroup->activate();
@@ -1234,97 +1234,97 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 32:
-    	    detune->value((int) value);
+    	    detune->value(lrint(value));
     	    detunevalueoutput->do_callback();
     	    break;
 
     	case 33:
-    	    fixedfreqetdial->value((int) value);
+    	    fixedfreqetdial->value(lrint(value));
     	    break;
 
     	case 34:
-    	    hz440->value(value != 0);
-    	    if (value == 0)
+    	    hz440->value(value > 0.5f);
+    	    if (value <= 0.5f)
                 fixedfreqetdial->deactivate();
             else
                 fixedfreqetdial->activate();
     	    break;
 
     	case 35:
-    	    octave->value((int) value);
+    	    octave->value(lrint(value));
     	    break;
 
     	case 36:
-    	    detunetype->value((int) value);
+    	    detunetype->value(lrint(value));
     	    break;
 
     	case 37:
-    	    coarsedet->value((int) value);
+    	    coarsedet->value(lrint(value));
     	    break;
 
     	case 38:
-    	    bend->value((int) value);
+    	    bend->value(lrint(value));
     	    break;
 
     	case 39:
-    	    offset->value((int) value);
+    	    offset->value(lrint(value));
     	    break;
 
     	case 48:
-    	    hrpospar1->value((int) value);
+    	    hrpospar1->value(lrint(value));
     	    break;
 
     	case 49:
-    	    hrpospar2->value((int) value);
+    	    hrpospar2->value(lrint(value));
     	    break;
 
     	case 50:
-    	    hrpospar3->value((int) value);
+    	    hrpospar3->value(lrint(value));
     	    break;
 
     	case 51:
-    	    hrpostype->value((int) value);
+    	    hrpostype->value(lrint(value));
     	    break;
 
     	case 64:
-    	    hpbasepar1->value((int) value);
+    	    hpbasepar1->value(lrint(value));
     	    hprofile->redraw();
             cbwidget->do_callback();
 
     	    break;
 
     	case 65:
-    	    hpfreqmult->value((int) value);
+    	    hpfreqmult->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 66:
-    	    hpmpar1->value((int) value);
+    	    hpmpar1->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 67:
-    	    hpmfreq->value((int) value);
+    	    hpmfreq->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 68:
-    	    hpwidth->value((int) value);
+    	    hpwidth->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 69:
-    	    hpbasetype->value((int) value);
+    	    hpbasetype->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 70:
-    	    hponehalf->value((int) value);
+    	    hponehalf->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
@@ -1342,40 +1342,40 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
     	    break;
 
     	case 73:
-    	    hpamptype->value((int) value);
+    	    hpamptype->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 74:
-    	    hpampmode->value((int) value);
+    	    hpampmode->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 75:
-    	    hpautoscale->value((int) value);
+    	    hpautoscale->value(lrint(value));
     	    hprofile->redraw();
     	    cbwidget->do_callback();
     	    break;
 
     	case 80:
-    	    qbasenote->value((int) value);
+    	    qbasenote->value(lrint(value));
     	    cbwidget->do_callback();
     	    break;
 
     	case 81:
-    	    qsmpoct->value((int) value);
+    	    qsmpoct->value(lrint(value));
     	    cbwidget->do_callback();
     	    break;
 
     	case 82:
-    	    qoct->value((int) value);
+    	    qoct->value(lrint(value));
     	    cbwidget->do_callback();
     	    break;
 
     	case 83:
-    	    qsamplesize->value((int) value);
+    	    qsamplesize->value(lrint(value));
     	    cbwidget->do_callback();
     	    break;
 
@@ -1395,7 +1395,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, npart, kititem,
             break;
 
     	case 112:
-    	    stereo->value(value != 0);
+    	    stereo->value(value > 0.5f);
     	    break;
 
     	case 120:
