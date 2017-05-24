@@ -1,4 +1,9 @@
-yoshimi 1.5.2
+yoshimi 1.5.2 M
+
+20107-5-24 Will
+BugFix: LV2 state restore was not setting partmaps.
+Yoshi can now work with both CLI and GUI disabled.
+Doc updates.
 
 2017-5-12 Will
 * Merged in Robs SubSynth Overtones/Legato fix.

@@ -16,7 +16,7 @@ Whenever in doubt my reference is to check sounds against Zyn 2.2.1. This is get
 
 All-in-all, my experience is that provided you set up *exactly* the same configuration in all respects an instrument created with old Zyn will sound virtually the same on both new Zyn and the current version of Yoshi.
 
-There is an extra twist to this though. I'm the sort of of person that doesn't throw things away until I can no longer shut the cupboard doors. I have quite a few computers of varying vintage and have noticed that there are small, but noticeable differences between these with both Yosh and Zyn. At first I thought it was due to different distros, but by degrees I've brought them to pretty much the same standard. Therefore my conclusion is that it is down to architecture variations.
+There is an extra twist to this though. I'm the sort of person that doesn't throw things away until I can no longer shut the cupboard doors. I have quite a few computers of varying vintage and have noticed that there are small, but noticeable differences between these with both Yosh and Zyn. At first I thought it was due to different distros, but by degrees I've brought them to pretty much the same standard. Therefore my conclusion is that it is down to architecture variations.
 
 
 Finally, wearing my musician's hat, to me it is more important to get consistently the same sounds on my setup than for mine to sound the same as anyone else.

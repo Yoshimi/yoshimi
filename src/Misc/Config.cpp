@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified April 2017
+    Modified May 2017
 */
 
 #include <iostream>
@@ -532,11 +532,11 @@ bool Config::extractBaseParameters(XMLwrapper *xml)
     showGui = xml->getparbool("enable_gui", showGui);
     showSplash = xml->getparbool("enable_splash", showSplash);
     showCLI = xml->getparbool("enable_CLI", showCLI);
-    if (!showGui && !showCLI)
+    /*if (!showGui && !showCLI)
     {
         showGui = true;
         showCLI = true; // sanity check!
-    }
+    }*/
     xml->exitbranch(); // BaseParameters
     return true;
 }

@@ -23,7 +23,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is derivative of ZynAddSubFX original code.
 
-Modified March 2017
+Modified May 2017
 } {in_source in_header
 }
 
@@ -308,11 +308,11 @@ else
             callback {//
     bool doit = true;
     int tmp = o->value();
-    if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
+    /*if (tmp == 0 &&  synth->getRuntime().showCLI == 0)
     {
         fl_alert("You can't disable both interfaces!");
         doit = false;
-    }
+    }*/
     if (doit == true && tmp == 0)
         doit = fl_choice("Are you sure you want to disable?\\nThis can only be restored via the command line.", NULL, "No", "Yes") > 1;
 
@@ -332,13 +332,12 @@ else
           }
           Fl_Check_Button {} {
             label {Enable CLI}
-            callback {if (o->value() == 0 &&  synth->getRuntime().showGui == 0)
+            callback {/*if (o->value() == 0 &&  synth->getRuntime().showGui == 0)
 {
     fl_alert("You can't disable both interfaces!");
     o->value(1);
     return;
-}
-
+}*/
 if (synth->getRuntime().showCLI != o->value())
 {
     synth->getRuntime().showCLI = o->value();
