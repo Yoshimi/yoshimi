@@ -1,7 +1,7 @@
 /*
     CmdInterface.cpp
 
-    Copyright 2015-2017, Will Godfrey and others.
+    Copyright 2015-2017, Will Godfrey & others.
 
     This file is part of yoshimi, which is free software: you can
     redistribute it and/or modify it under the terms of the GNU General
