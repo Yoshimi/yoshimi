@@ -4,7 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
-    Copyright 2016 Will Godfrey
+    Copyright 2017 Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of original ZynAddSubFX code, modified October 2016
+    This file is derivative of original ZynAddSubFX code.
+
+    Modified May 2017
 */
 
 #include <cmath>
@@ -355,6 +357,8 @@ int Microtonal::loadline(FILE *file, char *line)
 int Microtonal::loadscl(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
+    if (!file)
+        return 2;
     char tmp[500];
 
     fseek(file, 0, SEEK_SET);
@@ -399,6 +403,8 @@ int Microtonal::loadscl(string filename)
 int Microtonal::loadkbm(string filename)
 {
     FILE *file = fopen(filename.c_str(), "r");
+    if (!file)
+        return 2;
     int x;
     char tmp[500];
 

@@ -189,8 +189,8 @@ class MasterUI {selected : {private MiscFuncs}
       }
       partmax = synth->getRuntime().NumAvailableParts;
       filename += ".windows";
-      microtonalui = new MicrotonalUI(&synth->microtonal);
-      bankui = new BankUI(&npart, synth);;
+      microtonalui = new MicrotonalUI(&synth->microtonal, synth);
+      bankui = new BankUI(&npart, synth);
       virkeyboard = new VirKeyboard(synth);
       configui = new ConfigUI(synth);
       presetsui = new PresetsUI(synth);
@@ -493,7 +493,7 @@ paramsui->Show(3);}
         synth->actionLock(unlock);
         if (NULL != microtonalui)
             delete microtonalui;
-        microtonalui = new MicrotonalUI(&synth->microtonal);
+        microtonalui = new MicrotonalUI(&synth->microtonal, synth);
 
     }}
             xywh {0 0 34 20} labelsize 12
@@ -1485,7 +1485,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     synth->actionLock(unlock);
     if (NULL != microtonalui)
         delete microtonalui;
-    microtonalui = new MicrotonalUI(&synth->microtonal);
+    microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (!result)
         fl_alert("Failed to load scale settings file");
     else
@@ -1556,7 +1556,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
     masterkeyshift->value(synth->Pkeyshift - 64);
     mastervolumedial->value(synth->Pvolume);
     globalfinedetune->value(synth->microtonal.Pglobalfinedetune);
-    microtonalui = new MicrotonalUI(&synth->microtonal);
+    microtonalui = new MicrotonalUI(&synth->microtonal, synth);
     if (type & 0x80)
         setMasterLabel(miscMsgPop((type >> 8) & 0xff));
     else

@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2017
+    Modified May 2017
 */
 
 #include <iostream>
@@ -283,6 +283,9 @@ void InterChange::resolveReplies(CommandBlock *getData)
     if (npart >= 0xc0 && npart < 0xd0)
         commandName = resolveVector(getData);
 
+    else if (npart == 0xe8)
+        commandName = resolveMicrotonal(getData);
+
     else if (npart == 0xf0)
         commandName = resolveMain(getData);
 
@@ -512,6 +515,12 @@ string InterChange::resolveVector(CommandBlock *getData)
         name += "X ";
 
     return (name + contstr);
+}
+
+
+string InterChange::resolveMicrotonal(CommandBlock *getData)
+{
+    return ("Not Implemented");
 }
 
 
@@ -2233,6 +2242,11 @@ bool InterChange::commandSendReal(CommandBlock *getData)
         commandVector(getData);
         return true;
     }
+    if (npart == 0xe8)
+    {
+        commandMicrotonal(getData);
+        return true;
+    }
     if (npart == 0xf0)
     {
         commandMain(getData);
@@ -2559,6 +2573,15 @@ void InterChange::commandVector(CommandBlock *getData)
         else if (control >= 35 && control <= 38)
             synth->getRuntime().nrpndata.vectorYfeatures[chan] = features;
     }
+}
+
+
+void InterChange::commandMicrotonal(CommandBlock *getData)
+{
+#pragma message "Gui writes changed to reads"
+    if (getData->data.type & 0x20)
+        getData->data.type = getData->data.type & 0xbf;
+    // not done yet
 }
 
 

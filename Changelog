@@ -1,6 +1,10 @@
 yoshimi 1.5.2 M
 
-20107-5-24 Will
+2017-5-26 Will
+Started implementation of CLI scales access.
+BugFix: neither .scl or .kbm were checked for no file :(
+
+2017-5-24 Will
 BugFix: LV2 state restore was not setting partmaps.
 Yoshi can now work with both CLI and GUI disabled.
 Doc updates.
