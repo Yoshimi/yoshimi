@@ -122,6 +122,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     hideErrors(0),
     showTimes(0),
     logXMLheaders(0),
+    xmlmax(1),
     configChanged(false),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'
@@ -560,6 +561,7 @@ bool Config::extractConfigData(XMLwrapper *xml)
     showTimes = xml->getpar("report_load_times", showTimes, 0, 1);
     logXMLheaders = xml->getpar("report_XMLheaders", logXMLheaders, 0, 1);
     VirKeybLayout = xml->getpar("virtual_keyboard_layout", VirKeybLayout, 0, 10);
+    xmlmax = xml->getpar("full_parameters", xmlmax, 0, 1);
 
     // get preset dirs
     int count = 0;
@@ -649,6 +651,7 @@ void Config::addConfigXML(XMLwrapper *xmltree)
     xmltree->addpar("report_load_times", showTimes);
     xmltree->addpar("report_XMLheaders", logXMLheaders);
     xmltree->addpar("virtual_keyboard_layout", VirKeybLayout);
+    xmltree->addpar("full_parameters", xmlmax);
 
     for (int i = 0; i < MAX_PRESET_DIRS; ++i)
     {

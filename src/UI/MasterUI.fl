@@ -835,9 +835,9 @@ paramsui->Show(4);}
         } {}
       }
       Fl_Group partuigroup {
-        xywh {3 255 379 170} box ENGRAVED_FRAME
+        xywh {3 255 380 170} box ENGRAVED_FRAME
       } {
-        Fl_Group partui {open
+        Fl_Group partui {
           xywh {3 255 379 170} color 47
           code0 {o->init(synth->part[0],0,bankui);}
           code1 {o->show();}

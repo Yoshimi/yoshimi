@@ -520,7 +520,75 @@ string InterChange::resolveVector(CommandBlock *getData)
 
 string InterChange::resolveMicrotonal(CommandBlock *getData)
 {
-    return ("Not Implemented");
+    unsigned char control = getData->data.control;
+
+    string contstr = "";
+    switch (control)
+    {
+        case 0:
+            contstr = "'A' Frequency";
+            break;
+        case 1:
+            contstr = "'A' Note";
+            break;
+        case 2:
+            contstr = "Invert Keys";
+            break;
+        case 3:
+            contstr = "Key Centre";
+            break;
+        case 4:
+            contstr = "Scale Shift";
+            break;
+        case 8:
+            contstr = "Enable Microtonal";
+            break;
+
+        case 16:
+            contstr = "Enable Keyboard Mapping";
+            break;
+        case 17:
+            contstr = "Keyboard First Note";
+            break;
+        case 18:
+            contstr = "Keyboard Middle Note";
+            break;
+        case 19:
+            contstr = "Keyboard Last Note";
+            break;
+
+        case 32:
+            contstr = "Tuning";
+            showValue = false;
+            break;
+        case 33:
+            contstr = "Keyboard Map";
+            showValue = false;
+            break;
+        case 34:
+            contstr = "Retune";
+            showValue = false;
+            break;
+
+        case 48:
+            contstr = "Import .scl File";
+            showValue = false;
+            break;
+        case 49:
+            contstr = "Import .kbm File";
+            showValue = false;
+            break;
+
+        case 64:
+            contstr = "Name";
+            showValue = false;
+            break;
+        case 65:
+            contstr = "Comments";
+            showValue = false;
+            break;
+    }
+    return ("Scales " + contstr);
 }
 
 

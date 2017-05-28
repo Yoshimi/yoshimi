@@ -4,6 +4,7 @@
     Original ZynAddSubFX author Nasca Octavian Paul
     Copyright (C) 2002-2005 Nasca Octavian Paul
     Copyright 2009-2011, Alan Calvert
+    Copyright 2014-2017, Will Godfrey
 
     This file is part of yoshimi, which is free software: you can redistribute
     it and/or modify it under the terms of the GNU Library General Public
@@ -19,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified April 2011
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified May 2017
 */
 
 #ifndef XML_WRAPPER_H
@@ -109,7 +112,7 @@ class XMLwrapper : private MiscFuncs
         float getparreal(const string& name, float defaultpar,
                          float min, float max);
 
-        bool minimal; // false if all parameters will be stored (used only for clipboard)
+        bool minimal; // false if all parameters will be stored
 
         struct {
             unsigned char ADDsynth_used;

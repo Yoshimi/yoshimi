@@ -554,8 +554,23 @@ void SynthEngine::setPartMap(int npart)
 
 void SynthEngine::setAllPartMaps(void)
 {
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
+
+    if (Runtime.showTimes)
+    {
+        gettimeofday(&tv2, NULL);
+        if (tv1.tv_usec > tv2.tv_usec)
+        {
+            tv2.tv_sec--;
+            tv2.tv_usec += 1000000;
+        }
+        int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
+        Runtime.Log("Key Map Time " + to_string(actual) + "uS");
+    }
 }
 
 // Note On Messages (velocity == 0 => NoteOff)

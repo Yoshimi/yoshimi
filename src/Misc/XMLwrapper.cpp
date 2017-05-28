@@ -21,7 +21,8 @@
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
     This file is derivative of original ZynAddSubFX code.
-    Modified February 2017
+
+    Modified May 2017
 */
 
 #include <zlib.h>
@@ -50,10 +51,10 @@ const char *XMLwrapper_whitespace_callback(mxml_node_t *node, int where)
 
 
 XMLwrapper::XMLwrapper(SynthEngine *_synth) :
-    minimal(true),
     stackpos(0),
     synth(_synth)
 {
+    minimal = 1 - synth->getRuntime().xmlmax;
     information.PADsynth_used = 0;
     information.ADDsynth_used = 0;
     information.SUBsynth_used = 0;
@@ -65,8 +66,8 @@ XMLwrapper::XMLwrapper(SynthEngine *_synth) :
     {
         mxmlElementSetAttr(doctype, "ZynAddSubFX-data", NULL);
         node = root = mxmlNewElement(tree, "ZynAddSubFX-data");
-        mxmlElementSetAttr(root, "version-major", "2");
-        mxmlElementSetAttr(root, "version-minor", "5");
+        mxmlElementSetAttr(root, "version-major", "3");
+        mxmlElementSetAttr(root, "version-minor", "0");
         mxmlElementSetAttr(root, "ZynAddSubFX-author", "Nasca Octavian Paul");
     }
     else

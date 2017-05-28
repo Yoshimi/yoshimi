@@ -421,11 +421,11 @@ class PartUI {selected : {public Fl_Group, PartUI_, private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window partgroup {
-      xywh {1019 539 380 170} type Double box NO_BOX hide
+      xywh {272 534 380 170} type Double box NO_BOX hide
       class Fl_Group
     } {
       Fl_Group partgroupui {
-        xywh {0 0 379 170} box FLAT_BOX
+        xywh {0 0 378 168}
         code0 {if (part->Penabled != 1) o->deactivate();}
       } {
         Fl_Box instrumentaddbox {
@@ -524,7 +524,7 @@ send_data(4, o->value(), 0xc8);}
           class WidgetPDial
         }
         Fl_Box {} {
-          xywh {240 96 132 68} box ENGRAVED_FRAME
+          xywh {240 96 134 69} box ENGRAVED_FRAME
         }
       }
       Fl_Check_Button partGroupEnable {
@@ -606,7 +606,7 @@ send_data(33, o->value(), 0xc0);}
       }
       Fl_Box {} {
         label Mask
-        xywh {242 98 130 68} box FLAT_BOX labeltype NO_LABEL
+        xywh {242 98 128 63} box FLAT_BOX labeltype NO_LABEL
       }
       Fl_Scroll toSysEfx {
         label {System Effect Sends}

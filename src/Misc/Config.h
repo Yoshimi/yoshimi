@@ -132,6 +132,7 @@ class Config : public MiscFuncs
         bool          hideErrors;
         bool          showTimes;
         bool          logXMLheaders;
+        bool          xmlmax;
         bool          configChanged;
         int           rtprio;
         int           tempRoot;

@@ -259,7 +259,7 @@ else
     synth->getRuntime().loadDefaultState = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 60 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().loadDefaultState);}
           }
           Fl_Check_Button nonFatal {
@@ -269,7 +269,7 @@ else
     synth->getRuntime().hideErrors = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 80 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().hideErrors);}
           }
           Fl_Check_Button {} {
@@ -279,7 +279,7 @@ else
     synth->getRuntime().showSplash = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 100 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showSplash);}
             code1 {if (synth->getUniqueId() != 0) o->hide();}
           }
@@ -290,7 +290,7 @@ else
     synth->getRuntime().showTimes = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 120 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().showTimes);}
           }
           Fl_Check_Button {} {
@@ -300,8 +300,18 @@ else
     synth->getRuntime().logXMLheaders = o->value();
     synth->getRuntime().configChanged = true;
 }}
-            xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
+            xywh {270 140 27 25} down_box DOWN_BOX labelsize 12 align 4
             code0 {o->value(synth->getRuntime().logXMLheaders);}
+          }
+          Fl_Check_Button {} {
+            label {Include disabled data in XML files}
+            callback {if (synth->getRuntime().xmlmax != o->value())
+{
+    synth->getRuntime().xmlmax = o->value();
+    synth->getRuntime().configChanged = true;
+}}
+            xywh {270 160 27 25} down_box DOWN_BOX labelsize 12 align 4
+            code0 {o->value(synth->getRuntime().xmlmax);}
           }
           Fl_Check_Button {} {
             label {Enable GUI}
