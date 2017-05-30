@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-5-30 Will
+* Improved error traps and reporting.
+* Set default full XML saving to 'off'.
+  Done for previous consistency.
+
 2017-5-28 Will
 * Revised Scales GUI layout.
 * Added sane limits to key maps.

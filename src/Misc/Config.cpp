@@ -122,7 +122,7 @@ Config::Config(SynthEngine *_synth, int argc, char **argv) :
     hideErrors(0),
     showTimes(0),
     logXMLheaders(0),
-    xmlmax(1),
+    xmlmax(0),
     configChanged(false),
     rtprio(40),
     midi_bank_root(0), // 128 is used as 'disabled'

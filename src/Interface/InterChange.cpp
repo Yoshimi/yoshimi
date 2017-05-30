@@ -499,6 +499,13 @@ string InterChange::resolveVector(CommandBlock *getData)
         case 34:
             contstr = "Down Instrument";
             break;
+
+        case 127:
+            break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     if (control == 0)
@@ -587,6 +594,11 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             contstr = "Comments";
             showValue = false;
             break;
+
+            default:
+            showValue = false;
+            contstr = "Unrecognised";
+
     }
     return ("Scales " + contstr);
 }
@@ -630,8 +642,11 @@ string InterChange::resolveMain(CommandBlock *getData)
         case 128:
             contstr = "Stop";
             break;
-    }
 
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
+    }
 
     return ("Main " + contstr);
 }
@@ -898,6 +913,11 @@ string InterChange::resolvePart(CommandBlock *getData)
         case 224:
             contstr = "Clear controllers";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
+
     }
 
     return ("Part " + to_string(npart + 1) + kitnum + name + contstr);
@@ -975,6 +995,10 @@ string InterChange::resolveAdd(CommandBlock *getData)
         case 124:
             contstr = "Punch Vel";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " AddSynth " + name + contstr);
@@ -1172,6 +1196,10 @@ string InterChange::resolveAddVoice(CommandBlock *getData)
         case 138:
             contstr = " Sound type";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " Add Voice " + to_string(nvoice + 1) + name + contstr);
@@ -1301,6 +1329,10 @@ string InterChange::resolveSub(CommandBlock *getData)
         case 112:
             contstr = "Stereo";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + " SubSynth " + name + contstr);
@@ -1472,6 +1504,10 @@ string InterChange::resolvePad(CommandBlock *getData)
         case 124:
             contstr = "Punch Vel";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     string isPad = "";
@@ -1643,6 +1679,10 @@ string InterChange::resolveOscillator(CommandBlock *getData)
         case 97:
             contstr = " Conv To Sine";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + eng_name + name + contstr + isPad);
@@ -1713,6 +1753,10 @@ string InterChange::resolveResonance(CommandBlock *getData)
         case 97:
             contstr = "Smooth";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + " Resonance " + contstr + isPad);
@@ -1783,6 +1827,10 @@ string InterChange::resolveLFO(CommandBlock *getData)
         case 8:
             contstr = "Stretch";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(kititem + 1) + name + lfo + " LFO " + contstr);
@@ -1892,6 +1940,10 @@ string InterChange::resolveFilter(CommandBlock *getData)
         case 38:
             contstr = "Neg Input";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
     string extra = "";
     if (control >= 18 && control <= 20)
@@ -2014,6 +2066,10 @@ string InterChange::resolveEnvelope(CommandBlock *getData)
         case 35:
             contstr = "Sust";
             break;
+
+        default:
+            showValue = false;
+            contstr = "Unrecognised";
     }
 
     return ("Part " + to_string(npart + 1) + " Kit " + to_string(int(kititem + 1)) + name  + env + " Env " + contstr);
@@ -2116,7 +2172,7 @@ string InterChange::resolveEffects(CommandBlock *getData)
     else
         contstr = " Control " + to_string(control + 1);
 
-    switch (kititem & 0x1f)
+    switch (kititem & 0x7f)
     {
         case 0:
             effname = " None";
@@ -2149,6 +2205,10 @@ string InterChange::resolveEffects(CommandBlock *getData)
         case 8:
             effname = " DynFilter";
             break;
+
+        default:
+            showValue = false;
+            contstr = " Unrecognised";
     }
 
     return (name + effname + contstr);
@@ -2649,7 +2709,67 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
 #pragma message "Gui writes changed to reads"
     if (getData->data.type & 0x20)
         getData->data.type = getData->data.type & 0xbf;
-    // not done yet
+
+    float value = getData->data.value;
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+
+    bool write = (type & 0x40) > 0;
+
+    int value_int = lrint(value);
+    char value_bool = (value > 0.5f);
+
+    switch (control)
+    {
+        case 0: // 'A' Frequency
+            break;
+        case 1: // 'A' Note
+            break;
+        case 2: // Invert Keys
+            break;
+        case 3: // Key Centre
+            break;
+        case 4: // Scale Shift
+            break;
+        case 8: // Enable Microtonal
+            break;
+
+        case 16: // Enable Keyboard Mapping
+            break;
+        case 17: // Keyboard First Note
+            break;
+        case 18: // Keyboard Middle Note
+            break;
+        case 19: // Keyboard Last Note
+            break;
+
+        case 32: // Tuning
+            showValue = false;
+            break;
+        case 33: // Keyboard Map
+            showValue = false;
+            break;
+        case 34: // Retune
+            showValue = false;
+            break;
+
+        case 48: // Import .scl File
+            showValue = false;
+            break;
+        case 49: // Import .kbm File
+            showValue = false;
+            break;
+
+        case 64: // Name
+            showValue = false;
+            break;
+        case 65: // Comments
+            showValue = false;
+            break;
+    }
+
+    if (!write)
+        getData->data.value = value;
 }
 
 
@@ -5428,7 +5548,7 @@ void InterChange::commandEffects(CommandBlock *getData)
     unsigned char type = getData->data.type;
     unsigned char control = getData->data.control;
     unsigned char npart = getData->data.part;
-    unsigned char kititem = getData->data.kit & 0x1f;
+    unsigned char kititem = getData->data.kit & 0x7f ;
     unsigned char effnum = getData->data.engine;
 
     bool write = (type & 0x40) > 0;
@@ -5443,7 +5563,8 @@ void InterChange::commandEffects(CommandBlock *getData)
         eff = synth->part[npart]->partefx[effnum];
     else
         return; //invalid part number
-
+    if (kititem > 8)
+        return;
     if (kititem == 8 && getData->data.insert < 0xff)
     {
         filterReadWrite(getData, eff->filterpars,NULL,NULL);
