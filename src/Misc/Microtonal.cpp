@@ -27,7 +27,7 @@
 
 #include <cmath>
 #include <iostream>
-
+#include <limits.h>
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
 #include "Misc/Microtonal.h"
@@ -514,7 +514,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
     xml->addparstr("comment", Pcomment.c_str());
 
     xml->addparbool("invert_up_down", Pinvertupdown);
-    xml->addparbool("invert_up_down_center", Pinvertupdowncenter);
+    xml->addpar("invert_up_down_center", Pinvertupdowncenter);
 
     xml->addparbool("enabled", Penabled);
     xml->addpar("global_fine_detune", lrint(Pglobalfinedetune));
@@ -569,7 +569,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
     Pcomment = xml->getparstr("comment");
 
     Pinvertupdown=xml->getparbool("invert_up_down", Pinvertupdown);
-    Pinvertupdowncenter=xml->getparbool("invert_up_down_center", Pinvertupdowncenter);
+    Pinvertupdowncenter=xml->getpar127("invert_up_down_center", Pinvertupdowncenter);
 
     Penabled=xml->getparbool("enabled", Penabled);
     Pglobalfinedetune = xml->getpar127("global_fine_detune", Pglobalfinedetune);
@@ -593,8 +593,8 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                     continue;
                 octave[i].x2 = 0;
                 octave[i].tuning = xml->getparreal("cents", octave[i].tuning);
-                octave[i].x1 = xml->getpar127("numerator", octave[i].x1);
-                octave[i].x2 = xml->getpar127("denominator", octave[i].x2);
+                octave[i].x1 = xml->getpar("numerator", octave[i].x1, 0, INT_MAX);
+                octave[i].x2 = xml->getpar("denominator", octave[i].x2, 0, INT_MAX);
 
                 if (octave[i].x2)
                 {
