@@ -2217,6 +2217,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
             else
             {
                 synth->microtonal.loadXML((string) point);
+                synth->setAllPartMaps();
                 reply = done_msg;
             }
         }

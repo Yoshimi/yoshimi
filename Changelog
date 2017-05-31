@@ -1,5 +1,8 @@
 yoshimi 1.5.2 M
 
+2017-5-31 Will
+* Reorganised part map setting to remove multiple calls.
+
 2017-5-30 Will
 * Improved error traps and reporting.
 * Set default full XML saving to 'off'.

@@ -501,10 +501,7 @@ LV2_State_Status YoshimiLV2Plugin::stateRestore(LV2_State_Retrieve_Function retr
     const char *data = (const char *)retrieve(handle, _yosmihi_state_id, &sz, &type, &new_flags);
 
     if (sz > 0)
-    {
         _synth->putalldata(data, sz);
-        _synth->setAllPartMaps();
-    }
     return LV2_STATE_SUCCESS;
 }
 

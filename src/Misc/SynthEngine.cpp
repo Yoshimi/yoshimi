@@ -727,7 +727,6 @@ void SynthEngine::SetZynControls()
             else if (efftype == 0x20) // select output level
             {
                 // setPsysefxvol(effnum, parnum, value); // this isn't correct!
-
             }
             else
                 sysefx[effnum]->seteffectpar(parnum, value);
@@ -962,7 +961,7 @@ bool SynthEngine::SetProgramToPart(int npart, int pgm, string fname)
     if (Runtime.enable_part_on_voice_load)
         enablestate = 1; // always on
     else
-        enablestate = 2; // on of it was before
+        enablestate = 2; // on if it was before
     partonoffWrite(npart, -1); // more off than before :)
     if (part[npart]->loadXMLinstrument(fname))
     {
@@ -2840,6 +2839,7 @@ unsigned char SynthEngine::loadVector(unsigned char baseChan, string name, bool 
                 part[npart + baseChan]->getfromXML(xml);
                 part[npart + baseChan]->Prcvchn = baseChan;
                 xml->exitbranch();
+                setPartMap(npart + baseChan);
             }
         }
         xml->endbranch(); // VECTOR
@@ -3132,6 +3132,7 @@ void SynthEngine::putalldata(const char *data, int size)
         xml->exitbranch();
         midilearn.extractMidiListData(false, xml);
         //midilearn.updateGui();
+        setAllPartMaps();
     //}
     //else
         //Runtime.Log("Master putAllData failed to enter MASTER branch");
@@ -3166,6 +3167,7 @@ bool SynthEngine::loadXML(string filename)
     defaults();
     bool isok = getfromXML(xml);
     delete xml;
+    setAllPartMaps();
     return isok;
 }
 

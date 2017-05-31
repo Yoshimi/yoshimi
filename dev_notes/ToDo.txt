@@ -11,8 +11,7 @@ Sort out direct access dynfilter->filter - controls work but don't update gui.
 Expand midi-learn to include:
     more switches
     learn groups
-    view by group but running search only by CC & chan
-    move lines between groups
+    GUI view by group but CLI and running search only by CC & chan
 
 Make NRPN midi learn able to be re-learned.
 
