@@ -23,7 +23,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified March 2017
+    Modified June 2017
 */
 
 #include <cstring>
@@ -127,6 +127,7 @@ void Part::defaults(void)
     setVolume(96);
     TransVolume = 128; // ensure it always gets set
     Pkeyshift = 64;
+    PmapOffset = 0;
     Prcvchn = 0;
     setPan(Ppanning = 64);
     TransPanning = 128; // ensure it always gets set
@@ -144,9 +145,9 @@ void Part::setNoteMap(int keyshift)
 {
     for (int i = 0; i < 128; ++i)
         if (Pdrummode)
-            PnoteMap[i] = microtonal->getFixedNoteFreq(i);
+            PnoteMap[128 - PmapOffset + i] = microtonal->getFixedNoteFreq(i);
         else
-            PnoteMap[i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
+            PnoteMap[128 - PmapOffset + i] = microtonal->getNoteFreq(i, keyshift + synth->Pkeyshift - 64);
 }
 
 
@@ -369,7 +370,7 @@ void Part::NoteOn(int note, int velocity, int masterkeyshift)
 
         // initialise note frequency
         float notebasefreq;
-        if ((notebasefreq = PnoteMap[note]) < 0.0f)
+        if ((notebasefreq = PnoteMap[PmapOffset + note]) < 0.0f)
             return; // the key is not mapped
 
         // Humanise

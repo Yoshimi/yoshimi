@@ -23,7 +23,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified April 2017
+    Modified June 2017
 */
 
 #include<stdio.h>
@@ -549,28 +549,18 @@ void SynthEngine::defaults(void)
 void SynthEngine::setPartMap(int npart)
 {
     part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
+    part[npart]->PmapOffset = 128 - part[npart]->PmapOffset;
 }
 
 
 void SynthEngine::setAllPartMaps(void)
 {
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
-
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
         part[npart]->setNoteMap(part[npart]->Pkeyshift - 64);
 
-    if (Runtime.showTimes)
-    {
-        gettimeofday(&tv2, NULL);
-        if (tv1.tv_usec > tv2.tv_usec)
-        {
-            tv2.tv_sec--;
-            tv2.tv_usec += 1000000;
-        }
-        int actual = (tv2.tv_sec - tv1.tv_sec) *1000000 + (tv2.tv_usec - tv1.tv_usec);
-        Runtime.Log("Key Map Time " + to_string(actual) + "uS");
-    }
+    // we swap all maps together after they've been changed
+    for (int npart = 0; npart < NUM_MIDI_PARTS; ++ npart)
+        part[npart]->PmapOffset = 128 - part[npart]->PmapOffset;
 }
 
 // Note On Messages (velocity == 0 => NoteOff)

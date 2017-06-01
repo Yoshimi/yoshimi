@@ -20,7 +20,9 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    This file is derivative of ZynAddSubFX original code, modified October 2016
+    This file is derivative of ZynAddSubFX original code.
+
+    Modified june 2017
 */
 
 #ifndef MICROTONAL_H
@@ -44,7 +46,6 @@ class Microtonal : private MiscFuncs
         Microtonal(SynthEngine *_synth): synth(_synth) { defaults(); }
         ~Microtonal() { }
         void defaults(void);
-        void setPartMaps(void);
         float getNoteFreq(int note, int keyshift);
         float getFixedNoteFreq(int note);
 

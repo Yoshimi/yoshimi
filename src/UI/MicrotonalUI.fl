@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified May 2017
+Modified June 2017
 } {in_source in_header
 }
 
@@ -67,7 +67,7 @@ class MicrotonalUI {selected
           label {Invert keys}
           callback {//
               microtonal->Pinvertupdown = (int) o->value();
-              microtonal->setPartMaps();
+              synth->setAllPartMaps();
               if (microtonal->Pinvertupdown == 0)
                   centerinvertcounter->deactivate();
               else
@@ -79,7 +79,7 @@ class MicrotonalUI {selected
         Fl_Spinner centerinvertcounter {
           label Center
           callback {microtonal->Pinvertupdowncenter=(int) o->value();
-microtonal->setPartMaps();
+synth->setAllPartMaps();
 send_data(3, o->value(), 0xc0);}
           xywh {333 19 52 20} labelfont 1 labelsize 11 align 129 minimum 0 maximum 127 value 0 textfont 1
           code0 {o->value(microtonal->Pinvertupdowncenter);}
@@ -109,7 +109,7 @@ send_data(65, 0, 0xc0);}
         Fl_Spinner {} {
           label Shift
           callback {microtonal->Pscaleshift=(int) o->value()+64;
-microtonal->setPartMaps();
+synth->setAllPartMaps();
 send_data(4, o->value(), 0xc0);}
           xywh {320 68 52 20} labelsize 11 align 1 minimum -63 maximum 64 value 0 textfont 1
           code0 {o->value(microtonal->Pscaleshift-64);}
@@ -173,7 +173,7 @@ if (tmp >= middlenotecounter->value())
 }
 
 microtonal->Pfirstkey = tmp;
-microtonal->setPartMaps();
+synth->setAllPartMaps();
 send_data(17, tmp, 0xc0);}
             tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 10 align 129 minimum 0 maximum 125 textfont 1 textsize 11
             code0 {o->value(microtonal->Pfirstkey);}
@@ -193,7 +193,7 @@ else if (tmp >= lastnotecounter->value())
 }
 
 microtonal->Pmiddlenote = tmp;
-microtonal->setPartMaps();
+synth->setAllPartMaps();
 send_data(18, o->value(), 0xc0);}
             tooltip {Midle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 10 align 129 maximum 126 value 60 textfont 1 textsize 11
             code0 {o->value(microtonal->Pmiddlenote);}
@@ -208,7 +208,7 @@ if (tmp <= middlenotecounter->value())
 }
 
 microtonal->Plastkey = tmp;
-microtonal->setPartMaps();
+synth->setAllPartMaps();
 send_data(19, tmp, 0xc0);}
             tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 10 align 129 minimum 2 maximum 127 value 127 textfont 1 textsize 11
             code0 {o->value(microtonal->Plastkey);}
@@ -254,7 +254,7 @@ send_data(19, tmp, 0xc0);}
           callback {//
               int x = (int) o->value();
               microtonal->Pmappingenabled = x;
-              microtonal->setPartMaps();
+              synth->setAllPartMaps();
               if (x == 0)
                   keymappinggroup->deactivate();
               else
@@ -281,7 +281,7 @@ send_data(34, o->value(), 0xc0);}
           label {"A" Note}
           callback {//
     microtonal->PAnote=(int) o->value();
-    microtonal->setPartMaps();
+    synth->setAllPartMaps();
     if (microtonal->getNoteFreq(microtonal->PAnote, 0) < 0.0)
         o->textcolor(FL_RED);
     else
@@ -297,7 +297,7 @@ send_data(34, o->value(), 0xc0);}
 afreqset->show();
 AsetBack->show();
 //microtonal->PAfreq=o->value();
-//microtonal->setPartMaps();
+//synth->setAllPartMaps();
 //send_data(0, o->value(), 0xc0);}
           tooltip {The freq. of "A" note (default=440.0)} xywh {118 17 45 20} labelfont 1 labelsize 10 align 1 minimum 1 maximum 20000 value 440 textfont 1 textsize 10
           code0 {o->step(0.001, 1);}
@@ -319,7 +319,7 @@ else if (Afreq < 1)
     afreqinput->value(Afreq);
 }
 microtonal->PAfreq = Afreq;
-microtonal->setPartMaps();
+synth->setAllPartMaps();
 send_data(0, Afreq, 0x40);
 AsetBack->hide();
 o->hide();}
@@ -330,7 +330,7 @@ o->hide();}
         label {Enable Microtonal}
         callback {//
             microtonal->Penabled = (int) o->value();
-            microtonal->setPartMaps();
+            synth->setAllPartMaps();
             if (microtonal->Penabled == 0)
                 microtonalgroup->deactivate();
             else
@@ -405,7 +405,7 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xf
     octavesizeoutput->do_callback();
 
     microtonal->texttomapping(mappinginput->value());
-    microtonal->setPartMaps();
+    synth->setAllPartMaps();
     mapsizeoutput->do_callback();
     anotecounter->do_callback();} {}
   }

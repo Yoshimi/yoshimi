@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-6-1 Will
+* More part map optimisations.
+* Part maps now double buffered.
+
 2017-5-31 Will
 * Reorganised part map setting to remove multiple calls.
 * BugFix: Reverse scale centre was being set as type bool.

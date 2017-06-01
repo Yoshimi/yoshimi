@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified March 2017
+    Modified June 2017
 */
 
 #ifndef PART_H
@@ -109,16 +109,17 @@ class Part : private MiscFuncs, SynthHelper
 
         SynthEngine *getSynthEngine() {return synth;}
 
-        char Penabled; // this *must* be signed
+        int PmapOffset;
+        float PnoteMap[256];
         float         Pvolume;
         float         TransVolume;
+        float         Ppanning;
+        float         TransPanning;
+        char Penabled; // this *must* be signed
         unsigned char Pminkey;
         unsigned char Pmaxkey;
         unsigned char Pkeyshift;
-        float PnoteMap[128];
         unsigned char Prcvchn;
-        float         Ppanning;
-        float         TransPanning;
         unsigned char Pvelsns;     // velocity sensing (amplitude velocity scale)
         unsigned char Pveloffs;    // velocity offset
         unsigned char Pnoteon;     // if the part receives NoteOn messages

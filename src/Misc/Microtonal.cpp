@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified May 2017
+    Modified June 2017
 */
 
 #include <cmath>
@@ -69,10 +69,6 @@ void Microtonal::defaults(void)
     Pglobalfinedetune = 64.0;
 }
 
-void Microtonal::setPartMaps(void)
-{
-    synth->setAllPartMaps();
-}
 
 // Get the frequency according to the note number
 float Microtonal::getNoteFreq(int note, int keyshift)
@@ -394,7 +390,7 @@ int Microtonal::loadscl(string filename)
         octave[i].x1 = tmpoctave[i].x1;
         octave[i].x2 = tmpoctave[i].x2;
     }
-    setPartMaps();
+    synth->setAllPartMaps();
     return 0;
 }
 
@@ -503,7 +499,7 @@ int Microtonal::loadkbm(string filename)
         Pmapsize = 1;
     }
     fclose(file);
-
+    synth->setAllPartMaps();
     return 0;
 }
 
@@ -665,7 +661,7 @@ bool Microtonal::loadXML(string filename)
         return false;
     }
     getfromXML(xml);
-    setPartMaps();
+    synth->setAllPartMaps();
     xml->exitbranch();
     delete xml;
     return true;
