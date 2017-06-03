@@ -58,20 +58,21 @@ class MicrotonalUI {selected
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
       label Scales
-      xywh {398 20 410 485} type Double hide
+      xywh {230 20 410 485} type Double hide
     } {
       Fl_Group {} {
         tooltip {Center where the note's freqs. are turned upside-down} xywh {249 2 155 45} box ENGRAVED_FRAME
       } {
-        Fl_Check_Button {} {
+        Fl_Check_Button invertKeys {
           label {Invert keys}
           callback {//
               microtonal->Pinvertupdown = (int) o->value();
               synth->setAllPartMaps();
-              if (microtonal->Pinvertupdown == 0)
-                  centerinvertcounter->deactivate();
-              else
-                  centerinvertcounter->activate();
+              checkInvert();
+              //if (microtonal->Pinvertupdown == 0)
+                  //centerinvertcounter->deactivate();
+              //else
+                  //centerinvertcounter->activate();
               send_data(2, o->value(), 0xc0);}
           tooltip {Turn upside-down the note frequencies} xywh {254 13 55 30} down_box DOWN_BOX labelfont 1 labelsize 11 align 148
           code0 {o->value(microtonal->Pinvertupdown);}
@@ -165,53 +166,75 @@ send_data(4, o->value(), 0xc0);}
           }
           Fl_Spinner firstnotecounter {
             label {First note}
-            callback {int tmp = int (o->value());
-if (tmp >= middlenotecounter->value())
-{
-    tmp = middlenotecounter->value() - 1;
-    o->value(tmp);
-}
-
-microtonal->Pfirstkey = tmp;
-synth->setAllPartMaps();
-send_data(17, tmp, 0xc0);}
+            callback {//
+            int tmp = int (o->value());
+            int max = middlenotecounter->value() - 1;
+            if (tmp > max)
+            {
+                if (oldFirst == max)
+                    tmp = 0;
+                else
+                    tmp = max;
+                o->value(tmp);
+            }
+            oldFirst = tmp;
+            microtonal->Pfirstkey = tmp;
+            synth->setAllPartMaps();
+            send_data(17, tmp, 0xc0);}
             tooltip {First MIDI note number} xywh {203 228 42 18} labelsize 10 align 129 minimum 0 maximum 125 textfont 1 textsize 11
-            code0 {o->value(microtonal->Pfirstkey);}
+            code0 {oldFirst = microtonal->Pfirstkey;}
+            code1 {o->value(oldFirst);}
           }
           Fl_Spinner middlenotecounter {
             label {Middle note}
-            callback {int tmp = int(o->value());
-if (tmp <= firstnotecounter->value())
-{
-    tmp = firstnotecounter->value() + 1;
-    o->value(tmp);
-}
-else if (tmp >= lastnotecounter->value())
-{
-    tmp = lastnotecounter->value() - 1;
-    o->value(tmp);
-}
-
-microtonal->Pmiddlenote = tmp;
-synth->setAllPartMaps();
-send_data(18, o->value(), 0xc0);}
+            callback {//
+            int tmp = int(o->value());
+            int min = firstnotecounter->value() + 1;
+            int max = lastnotecounter->value() - 1;
+            if (tmp < min)
+            {
+                if(oldMid == min)
+                    tmp = max;
+                else
+                    tmp = min;
+                o->value(tmp);
+            }
+            else if (tmp > max)
+            {
+                if(oldMid == max)
+                    tmp = min;
+                else
+                    tmp = max;
+                o->value(tmp);
+            }
+            oldMid = tmp;
+            microtonal->Pmiddlenote = tmp;
+            synth->setAllPartMaps();
+            send_data(18, o->value(), 0xc0);}
             tooltip {Midle note (where scale degree 0 is mapped to)} xywh {203 293 42 18} labelsize 10 align 129 maximum 126 value 60 textfont 1 textsize 11
-            code0 {o->value(microtonal->Pmiddlenote);}
+            code0 {oldMid = microtonal->Pmiddlenote;}
+            code1 {o->value(oldMid);}
           }
           Fl_Spinner lastnotecounter {
             label {Last note}
-            callback {int tmp = int(o->value());
-if (tmp <= middlenotecounter->value())
-{
-    tmp = middlenotecounter->value() + 1;
-    o->value(tmp);
-}
-
-microtonal->Plastkey = tmp;
-synth->setAllPartMaps();
-send_data(19, tmp, 0xc0);}
+            callback {
+            int tmp = int(o->value());
+            int min = middlenotecounter->value() + 1;
+            if (tmp < min)
+            {
+                if (oldLast == min)
+                    tmp = 127;
+                else
+                    tmp = min;
+                o->value(tmp);
+            }
+            oldLast = tmp;
+            microtonal->Plastkey = tmp;
+            synth->setAllPartMaps();
+            send_data(19, tmp, 0xc0);}
             tooltip {Last MIDI note number} xywh {203 357 42 18} labelsize 10 align 129 minimum 2 maximum 127 value 127 textfont 1 textsize 11
-            code0 {o->value(microtonal->Plastkey);}
+            code0 {oldLast = microtonal->Plastkey;}
+            code1 {o->value(oldLast);}
           }
           Fl_Value_Output mapsizeoutput {
             label {Map Size}
@@ -255,6 +278,7 @@ send_data(19, tmp, 0xc0);}
               int x = (int) o->value();
               microtonal->Pmappingenabled = x;
               synth->setAllPartMaps();
+              checkInvert();
               if (x == 0)
                   keymappinggroup->deactivate();
               else
@@ -326,11 +350,12 @@ o->hide();}
           xywh {163 17 12 18} box NO_BOX hide
         }
       }
-      Fl_Check_Button {} {
+      Fl_Check_Button enableMicrotonal {
         label {Enable Microtonal}
         callback {//
             microtonal->Penabled = (int) o->value();
             synth->setAllPartMaps();
+            checkInvert();
             if (microtonal->Penabled == 0)
                 microtonalgroup->deactivate();
             else
@@ -409,6 +434,12 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xf
     mapsizeoutput->do_callback();
     anotecounter->do_callback();} {}
   }
+  Function {checkInvert()} {} {
+    code {if((enableMicrotonal->value() && mappingenabledbutton->value()) || !invertKeys->value())
+    centerinvertcounter->deactivate();
+else
+    centerinvertcounter->activate();} {}
+  }
   decl {Microtonal *microtonal;} {private local
   }
   decl {string winlabel;} {private local
@@ -416,5 +447,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xf
   decl {SynthEngine *synth;} {private local
   }
   decl {float Afreq;} {private local
+  }
+  decl {int oldFirst;} {private local
+  }
+  decl {int oldMid;} {private local
+  }
+  decl {int oldLast;} {private local
   }
 }

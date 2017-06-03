@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This file is a derivative of the ZynAddSubFX original.
 
-Modified May 2017
+Modified June 2017
 
 
 } {in_source in_header
@@ -449,7 +449,8 @@ paramsui->Show(2);}
         return;
     string fname = string(filename);
     do_load_scale(fname);
-    RecentScale->activate();}
+    RecentScale->activate();
+    send_data(88, 0, 0xd0, 0xf0);}
             xywh {35 35 100 20} labelsize 12
           }
           MenuItem {} {
@@ -494,7 +495,7 @@ paramsui->Show(3);}
         if (NULL != microtonalui)
             delete microtonalui;
         microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-
+        send_data(96, 0, 0xd0, 0xe8);
     }}
             xywh {0 0 34 20} labelsize 12
           }

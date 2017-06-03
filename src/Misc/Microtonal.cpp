@@ -212,11 +212,15 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
 
     // convert to float if the number are too big
-    if ((type==2) && ((x1 > (128 * 128 * 128 - 1)) || (x2 > (128 * 128* 128 - 1))))
+
+    //this seems to be unecessary!
+
+   /* if ((type==2) && ((x1 > (128 * 128 * 128 - 1)) || (x2 > (128 * 128* 128 - 1))))
     {
         type = 1;
         x = ((float)x1) / x2;
-    }
+    }*/
+
     switch (type)
     {
         case 1:

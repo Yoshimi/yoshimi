@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-6-3 Will
+* Made Invert center key status clearer.
+* Identified more scales controls ready for direct access.
+* More doc updates.
+
 2017-6-1 Will
 * More part map optimisations.
 * Part maps now double buffered.

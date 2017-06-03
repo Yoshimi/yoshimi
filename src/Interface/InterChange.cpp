@@ -594,8 +594,12 @@ string InterChange::resolveMicrotonal(CommandBlock *getData)
             contstr = "Comments";
             showValue = false;
             break;
+        case 96:
+            contstr = "Clear all settings";
+            showValue = false;
+            break;
 
-            default:
+        default:
             showValue = false;
             contstr = "Unrecognised";
 

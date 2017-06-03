@@ -66,6 +66,7 @@ void MidiDecode::midiProcess(unsigned char par0, unsigned char par1, unsigned ch
             break;
 
         case 0x90: // note-on
+            // cout << "note " << int(par1) << endl;
             note = par1;
             if (note)
             {

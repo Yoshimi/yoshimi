@@ -38,6 +38,7 @@ Consider enabling and disabling tooltips.
 
 Make attempt to start second independent instance open a new one in running yoshimi instead - saves memory and more consistent.
 
+Possible single state file (for standalone) including all currently open instances,
 
 RPNs (channel based)
 
