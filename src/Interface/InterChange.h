@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2017
+    Modified June 2017
 */
 
 #ifndef INTERCH_H
@@ -72,7 +72,7 @@ class InterChange : private MiscFuncs
         void *sortResultsThread(void);
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
-
+        void transfertext(CommandBlock *getData);
         string resolveVector(CommandBlock *getData);
         string resolveMicrotonal(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);
@@ -111,7 +111,6 @@ class InterChange : private MiscFuncs
         bool commandSendReal(CommandBlock *getData);
 
         SynthEngine *synth;
-        //MidiDecode *mididecode;
 };
 
 #endif

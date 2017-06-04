@@ -1,4 +1,5 @@
 Add scales control to CLI.
+Correct errors in tunings :(
 
 NRPN channels?
 

@@ -1,5 +1,11 @@
 yoshimi 1.5.2 M
 
+2017-6-4 Will
+* Tunings and Keyboard map implemented.
+* Most Scales controls now available to direct access.
+* Added new Scales.txt doc to 'dev_notes'
+* Updated Yoshimi Control Numbers.ods file.
+
 2017-6-3 Will
 * Made Invert center key status clearer.
 * Identified more scales controls ready for direct access.

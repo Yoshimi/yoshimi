@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>.
 
-    Modified May 2017
+    Modified June 2017
 */
 
 #include <iostream>
@@ -2412,7 +2412,7 @@ bool CmdInterface::cmdIfaceProcessCommand()
                         point = skipChars(point);
                         if (point[0] != 0)
                         {
-                            if ((control == 80 || control == 84) && part == 240)
+                            if (((control == 80 || control == 84) && part == 240) || (part == 232 && param == 240))
                                 par2 = miscMsgPush(point);
                             else
                                 par2 = string2int(point);

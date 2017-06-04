@@ -17,7 +17,7 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified April 2017
+    Modified June 2017
 */
 
 #include "Misc/SynthEngine.h"
@@ -114,6 +114,11 @@ void decode_updates(SynthEngine *synth, CommandBlock *getData)
     unsigned char insertParam = getData->data.parameter;
     //unsigned char insertPar2 = getData->data.par2;
 
+    if (npart == 0xe8)
+    {
+        synth->getGuiMaster()->microtonalui->returns_update(getData);
+        return;
+    }
     if (npart >= 0xc0 && npart < 0xd0) // vector
     {
         return; // todo

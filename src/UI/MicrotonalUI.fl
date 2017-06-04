@@ -53,7 +53,7 @@ decl {\#include "UI/MiscGui.h"
     \#include "Misc/MiscFuncs.h"} {public global
 }
 
-class MicrotonalUI {selected
+class MicrotonalUI {selected : {private MiscFuncs}
 } {
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
@@ -107,7 +107,7 @@ send_data(65, 0, 0xc0);}
           xywh {10 104 391 25} labelfont 1 labelsize 11 align 5
           code0 {o->insert(microtonal->Pcomment.c_str());}
         }
-        Fl_Spinner {} {
+        Fl_Spinner scaleShift {
           label Shift
           callback {microtonal->Pscaleshift=(int) o->value()+64;
 synth->setAllPartMaps();
@@ -217,8 +217,7 @@ send_data(4, o->value(), 0xc0);}
           }
           Fl_Spinner lastnotecounter {
             label {Last note}
-            callback {
-            int tmp = int(o->value());
+            callback {int tmp = int(o->value());
             int min = middlenotecounter->value() + 1;
             if (tmp < min)
             {
@@ -374,6 +373,71 @@ o->hide();}
   Function {send_data(int control, float value, int type, int par2 = 0xff)} {} {
     code {//
 collect_data(synth, value, (Fl::event_button() | type), control, 0xe8, 0xff, 0xff, 0xff, 0xff, par2);} {}
+  }
+  Function {returns_update(CommandBlock *getData)} {} {
+    code {//
+float value = getData->data.value;
+unsigned char control = getData->data.control;
+unsigned char insert = getData->data.insert;
+unsigned char par2 = getData->data.par2;
+int value_int = lrint(value);
+bool value_bool = (value > 0.5f);
+
+switch (control)
+{
+    case 0:
+        afreqinput->value(value);
+        break;
+    case 1:
+        anotecounter->value(value_int);
+        break;
+    case 2:
+        invertKeys->value(value_bool);
+        checkInvert();
+        break;
+    case 3:
+        centerinvertcounter->value(value_int);
+        break;
+    case 4:
+        scaleShift->value(value_int);
+        break;
+
+    case 8:
+        enableMicrotonal->value(value_bool);
+        checkInvert();
+        if (value_bool)
+            microtonalgroup->activate();
+        else
+            microtonalgroup->deactivate();
+        break;
+        
+    case 16:
+        mappingenabledbutton->value(value_bool);
+        checkInvert();
+        if (value_bool)
+            keymappinggroup->activate();
+        else
+            keymappinggroup->deactivate();
+        break;
+    case 17:
+        firstnotecounter->value(value_int);
+        break;
+    case 18:
+        middlenotecounter->value(value_int);
+        break;
+    case 19:
+        lastnotecounter->value(value_int);
+        break;
+
+    case 32:
+        tuningsinput->value(miscMsgPop(par2).c_str());
+        octavesizeoutput->value(insert);
+        break;
+    case 33:
+        mappinginput->value(miscMsgPop(par2).c_str());
+        mapsizeoutput->value(insert);
+        break;
+}} {}
   }
   Function {updateTuningsInput()} {} {
     code {//

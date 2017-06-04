@@ -1,0 +1,15 @@
+Tunings and keyboard maps are both handled as strings of numbers. Currently, there must be exactly one space between all values.
+
+For scales, where ratios are used there must be no spaces either side of the divisor sign.
+
+In keyboard maps, non-sounding notes should be marked with an 'x' instead of the number.
+
+The scale/keymap sizes are generated internally by counting the number of entries in the strings.
+
+e.g.
+
+Scale:
+76.04900 193.15686 310.26471 5/4 503.42157 579.47057 696.57843 25/16 889.73529 1006.84314 1082.89214 2/1
+
+Keyboard Map:
+0 1 2 3 x 5 6 7 x 9 10 11

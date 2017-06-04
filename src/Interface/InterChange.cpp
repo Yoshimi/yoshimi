@@ -17,10 +17,11 @@
     yoshimi; if not, write to the Free Software Foundation, Inc., 51 Franklin
     Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-    Modified May 2017
+    Modified June 2017
 */
 
 #include <iostream>
+#include <string>
 #include <cfloat>
 #include <bitset>
 #include <unistd.h>
@@ -29,6 +30,7 @@ using namespace std;
 
 #include "Interface/InterChange.h"
 #include "Misc/MiscFuncs.h"
+#include "Misc/Microtonal.h"
 #include "Misc/SynthEngine.h"
 #include "Misc/Part.h"
 #include "Params/Controller.h"
@@ -180,7 +182,9 @@ void *InterChange::sortResultsThread(void)
             toread = commandSize;
             point = (char*) &getData.bytes;
             jack_ringbuffer_read(toCLI, point, toread);
-            if(getData.data.part == 0xd8) // special midi-learn)
+            if (getData.data.parameter == 0xf0)
+                transfertext(&getData);
+            else if(getData.data.part == 0xd8) // special midi-learn)
                 synth->midilearn.generalOpps(getData.data.value, getData.data.type, getData.data.control, getData.data.part, getData.data.kit, getData.data.engine, getData.data.insert, getData.data.parameter, getData.data.par2);
             else
                 resolveReplies(&getData);
@@ -227,6 +231,51 @@ InterChange::~InterChange()
         jack_ringbuffer_free(fromMIDI);
         fromGUI = NULL;
     }
+}
+
+
+void InterChange::transfertext(CommandBlock *getData)
+{
+    unsigned char type = getData->data.type;
+    unsigned char control = getData->data.control;
+    unsigned char npart = getData->data.part;
+    unsigned char kititem = getData->data.kit;
+    unsigned char engine = getData->data.engine;
+    unsigned char insert = getData->data.insert;
+
+    string text = miscMsgPop(getData->data.par2);
+    //cout << text << endl;
+    if (npart == 232)
+    {
+        if (control == 32 || control == 33)
+        {
+            for ( std::string::iterator it=text.begin(); it!=text.end(); ++it)
+                {
+                    if (*it == ' ')
+                        *it = 10;
+                }
+        }
+        switch(control)
+        {
+            case 32:
+                synth->microtonal.texttotunings(text.c_str());
+                synth->setAllPartMaps();
+                getData->data.insert = synth->microtonal.getoctavesize();
+                break;
+            case 33:
+                synth->microtonal.texttomapping(text.c_str());
+                synth->setAllPartMaps();
+                getData->data.insert = synth->microtonal.Pmapsize;
+                break;
+        }
+    }
+
+    if (synth->guiMaster && !(getData->data.type & 0x20))
+        if (jack_ringbuffer_write_space(toGUI) >= commandSize)
+        {
+            getData->data.par2 = miscMsgPush(text); // pass it on
+            jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
+        }
 }
 
 
@@ -527,6 +576,9 @@ string InterChange::resolveVector(CommandBlock *getData)
 
 string InterChange::resolveMicrotonal(CommandBlock *getData)
 {
+    // this is unique and placed here to avoid Xruns
+    synth->setAllPartMaps();
+
     unsigned char control = getData->data.control;
 
     string contstr = "";
@@ -2296,7 +2348,12 @@ void InterChange::returns(CommandBlock *getData)
     unsigned char kititem = getData->data.kit;
     unsigned char engine = getData->data.engine;
     unsigned char insert = getData->data.insert;
-
+    if (getData->data.parameter == 0xf0)
+    {
+        if (jack_ringbuffer_write_space(toCLI) >= commandSize)
+        jack_ringbuffer_write(toCLI, (char*) getData->bytes, commandSize); // this will redirect where needed.
+        return;
+    }
     bool isCliOrGuiRedraw = type & 0x10; // separated out for clarity
     bool isMidi = type & 8;
     bool write = (type & 0x40) > 0;
@@ -2351,6 +2408,8 @@ bool InterChange::commandSend(CommandBlock *getData)
 bool InterChange::commandSendReal(CommandBlock *getData)
 {
     float value = getData->data.value;
+    if (getData->data.parameter == 0xf0)
+        return true; // text message transfer
     if (value == FLT_MAX)
     {
         returnLimits(getData); // this can be accessed directly
@@ -2726,35 +2785,83 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
     switch (control)
     {
         case 0: // 'A' Frequency
+            if (write)
+            {
+                if (value > 2000)
+                    value = 2000;
+                else if (value < 1)
+                    value = 1;
+                synth->microtonal.PAfreq = value;
+            }
+            else
+                value = synth->microtonal.PAfreq;
             break;
+
         case 1: // 'A' Note
+            if (write)
+                synth->microtonal.PAnote = value_int;
+            else
+                value = synth->microtonal.PAnote;
             break;
         case 2: // Invert Keys
+            if (write)
+                synth->microtonal.Pinvertupdown = value_bool;
+            else
+                value = synth->microtonal.Pinvertupdown;
             break;
         case 3: // Key Centre
+            if (write)
+                synth->microtonal.Pinvertupdowncenter = value_int;
+            else
+                value = synth->microtonal.Pinvertupdowncenter;
             break;
         case 4: // Scale Shift
+            if (write)
+                synth->microtonal.Pscaleshift = value_int;
+            else
+                value = synth->microtonal.Pscaleshift;
             break;
+
         case 8: // Enable Microtonal
+            if (write)
+                synth->microtonal.Penabled = value_bool;
+            else
+                value = synth->microtonal.Penabled;
             break;
 
         case 16: // Enable Keyboard Mapping
+            if (write)
+                synth->microtonal.Pmappingenabled = value_bool;
+            else
+               value = synth->microtonal.Pmappingenabled;
             break;
         case 17: // Keyboard First Note
+            if (write)
+                synth->microtonal.Pfirstkey = value_int;
+            else
+                value = synth->microtonal.Pfirstkey;
             break;
         case 18: // Keyboard Middle Note
+            if (write)
+                synth->microtonal.Pmiddlenote = value_int;
+            else
+                value = synth->microtonal.Pmiddlenote;
             break;
         case 19: // Keyboard Last Note
+            if (write)
+                synth->microtonal.Plastkey = value_int;
+            else
+                value = synth->microtonal.Plastkey;
             break;
 
         case 32: // Tuning
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
         case 33: // Keyboard Map
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
         case 34: // Retune
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
 
         case 48: // Import .scl File
@@ -2765,10 +2872,10 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             break;
 
         case 64: // Name
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
         case 65: // Comments
-            showValue = false;
+            showValue = false; // done eslewhere
             break;
     }
 
