@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-6-5 Will
+* Improved accuracy of scale number<=>text conversions.
+* Added "Musical Scale.odf" to 'doc'.
+
 2017-6-4 Will
 * Tunings and Keyboard map implemented.
 * Most Scales controls now available to direct access.

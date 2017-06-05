@@ -130,7 +130,7 @@ send_data(4, o->value(), 0xc0);}
             code0 {o->value(microtonal->getoctavesize());}
           }
           Fl_Button {} {
-            label {Import .SCL file}
+            label {Import .scl file}
             callback {//
               const char *filename;
               filename = fl_file_chooser("Open:", "(*.scl)", NULL, 0);
@@ -410,7 +410,7 @@ switch (control)
         else
             microtonalgroup->deactivate();
         break;
-        
+
     case 16:
         mappingenabledbutton->value(value_bool);
         checkInvert();

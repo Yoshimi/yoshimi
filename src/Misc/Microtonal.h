@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified june 2017
+    Modified June 2017
 */
 
 #ifndef MICROTONAL_H
@@ -95,7 +95,7 @@ class Microtonal : private MiscFuncs
 
         struct {
             unsigned char type; // 1 for cents or 2 for division
-            float tuning;       // the real tuning (eg. +1.05946 for one halftone)
+            double tuning;       // the real tuning (eg. +1.05946 for one halftone)
                                 // or 2.0 for one octave
             unsigned int x1; // the real tunning is x1 / x2
             unsigned int x2;

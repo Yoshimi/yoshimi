@@ -22,7 +22,7 @@
 
     This file is derivative of ZynAddSubFX original code.
 
-    Modified May 2017
+    Modified June 2017
 */
 
 #ifndef XML_WRAPPER_H
@@ -56,6 +56,8 @@ class XMLwrapper : private MiscFuncs
 
         void addpar(const string& name, int val); // add simple parameter: name, value
         void addparreal(const string& name, float val);
+
+        void addpardouble(const string& name, double val);
 
         void addparbool(const string& name, int val); // 1 => "yes", else "no"
 
@@ -111,6 +113,10 @@ class XMLwrapper : private MiscFuncs
         float getparreal(const string& name, float defaultpar);
         float getparreal(const string& name, float defaultpar,
                          float min, float max);
+
+        double getpardouble(const string& name, double defaultpar);
+        double getpardouble(const string& name, double defaultpar,
+                         double min, double max);
 
         bool minimal; // false if all parameters will be stored
 

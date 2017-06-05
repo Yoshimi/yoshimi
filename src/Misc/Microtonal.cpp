@@ -56,7 +56,7 @@ void Microtonal::defaults(void)
 
     for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
-        octave[i].tuning = tmpoctave[i].tuning = powf(2.0f, (i % octavesize + 1) / 12.0f);
+        octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
         octave[i].type = tmpoctave[i].type = 1;
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
         octave[i].x2 = tmpoctave[i].x2 = 0;
@@ -180,7 +180,7 @@ float Microtonal::getNoteFreq(int note, int keyshift)
 int Microtonal::linetotunings(unsigned int nline, const char *line)
 {
     int x1 = -1, x2 = -1, type = -1;
-    float x = -1.0f, tmp, tuning = 1.0f;
+    double x = -1.0, tmp, tuning = 1.0;
 
     if (strstr(line, "/") == NULL)
     {
@@ -191,11 +191,12 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             type = 2; // division
         }
         else
-        {   // float number case
-            sscanf(line, "%f", &x);
-            if (x < 0.000001f)
+        {   // double number case
+            //sscanf(line, "%lf", &x);
+            x = stod(string(line));
+            if (x < 0.000001)
                 return 1;
-            type = 1; // float type(cents)
+            type = 1; // double type(cents)
         }
     }
     else
@@ -224,13 +225,13 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     switch (type)
     {
         case 1:
-            x1 = (int) floorf(x);
-            tmp = fmodf(x, 1.0f);
-            x2 = (int)truncf(floorf(tmp * 1e6f));
-            tuning = powf(2.0f, x / 1200.0f);
+            x1 = (int) floor(x);
+            tmp = fmod(x, 1.0);
+            x2 = (int)truncf(floor(tmp * 1e6));
+            tuning = pow(2.0, x / 1200.0);
             break;
         case 2:
-            x = ((float)x1) / x2;
+            x = ((double)x1) / x2;
             tuning = x;
             break;
     }
@@ -538,7 +539,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
             xml->beginbranch("DEGREE", i);
             if (octave[i].type == 1)
             {
-                xml->addparreal("cents", octave[i].tuning);
+                xml->addpardouble("cents", octave[i].tuning);
             }
             if (octave[i].type == 2)
             {
@@ -592,21 +593,21 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                 if (!xml->enterbranch("DEGREE", i))
                     continue;
                 octave[i].x2 = 0;
-                octave[i].tuning = xml->getparreal("cents", octave[i].tuning);
+                octave[i].tuning = xml->getpardouble("cents", octave[i].tuning);
                 octave[i].x1 = xml->getpar("numerator", octave[i].x1, 0, INT_MAX);
                 octave[i].x2 = xml->getpar("denominator", octave[i].x2, 0, INT_MAX);
 
                 if (octave[i].x2)
                 {
                     octave[i].type = 2;
-                    octave[i].tuning = ((float)octave[i].x1) / octave[i].x2;
+                    octave[i].tuning = ((double)octave[i].x1) / octave[i].x2;
                 }
                 else {
                     octave[i].type = 1;
                     //populate fields for display
-                    float x = logf(octave[i].tuning) / LOG_2 * 1200.0f;
+                    double x = log(octave[i].tuning) / LOG_2 * 1200.0;
                     octave[i].x1 = (int) floor(x);
-                    octave[i].x2 = (int) (floor(fmodf(x, 1.0f) * 1e6));
+                    octave[i].x2 = (int) (floor(fmod(x, 1.0) * 1e6));
                 }
                 xml->exitbranch();
             }

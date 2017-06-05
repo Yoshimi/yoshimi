@@ -22,7 +22,7 @@
 
     This file is derivative of original ZynAddSubFX code.
 
-    Modified May 2017
+    Modified June 2017
 */
 
 #include <zlib.h>
@@ -385,6 +385,12 @@ void XMLwrapper::addparreal(const string& name, float val)
 }
 
 
+void XMLwrapper::addpardouble(const string& name, double val)
+{
+    addparams2("par_real","name", name.c_str(), "value", asLongString(val));
+}
+
+
 void XMLwrapper::addparbool(const string& name, int val)
 {
     if (val != 0)
@@ -661,6 +667,30 @@ float XMLwrapper::getparreal(const string& name, float defaultpar)
 float XMLwrapper::getparreal(const string& name, float defaultpar, float min, float max)
 {
     float result = getparreal(name, defaultpar);
+    if (result < min)
+        result = min;
+    else if (result > max)
+        result = max;
+    return result;
+}
+
+
+double XMLwrapper::getpardouble(const string& name, double defaultpar)
+{
+    node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
+                           MXML_DESCEND_FIRST);
+    if (!node)
+        return defaultpar;
+    const char *strval = mxmlElementGetAttr(node, "value");
+    if (!strval)
+        return defaultpar;
+    return string2double(string(strval));
+}
+
+
+double XMLwrapper::getpardouble(const string& name, double defaultpar, double min, double max)
+{
+    double result = getpardouble(name, defaultpar);
     if (result < min)
         result = min;
     else if (result > max)

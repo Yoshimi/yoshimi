@@ -102,6 +102,8 @@ string MiscFuncs::asString(float n)
 string MiscFuncs::asLongString(float n)
 {
    ostringstream oss;
+   oss.precision(9);
+   oss.width(9);
    oss << n;
    return oss.str();
 }
@@ -135,6 +137,15 @@ float MiscFuncs::string2float(string str)
     float fval;
     machine >> fval;
     return fval;
+}
+
+
+double MiscFuncs::string2double(string str)
+{
+    istringstream machine(str);
+    double dval;
+    machine >> dval;
+    return dval;
 }
 
 
