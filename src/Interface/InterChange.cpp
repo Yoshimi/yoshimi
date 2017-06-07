@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <cfloat>
 #include <bitset>
 #include <unistd.h>
@@ -247,14 +248,40 @@ void InterChange::transfertext(CommandBlock *getData)
     //cout << text << endl;
     if (npart == 232)
     {
-        if (control == 32 || control == 33)
+        text.erase(remove(text.begin(), text.end(), ' '), text.end());
+        string delimiters = ",";
+        size_t current;
+        size_t next = -1;
+        size_t found;
+        string word;
+        string newtext = "";
+        do
         {
-            for ( std::string::iterator it=text.begin(); it!=text.end(); ++it)
+            current = next + 1;
+            next = text.find_first_of( delimiters, current );
+            word = text.substr( current, next - current );
+
+            found = word.find('.');
+            if (found != string::npos)
+            {
+                if (found < 4)
                 {
-                    if (*it == ' ')
-                        *it = 10;
+                    string tmp (4 - found, '0'); // leading zeros
+                    word = tmp + word;
                 }
+                found = word.size();
+                if ( found < 11)
+                {
+                    string tmp  (11 - found, '0'); // trailing zeros
+                    word += tmp;
+                }
+            }
+            newtext += word;
+            if (next != string::npos)
+                newtext += "\n";
         }
+        while (next != string::npos);
+        text = newtext;
         switch(control)
         {
             case 32:

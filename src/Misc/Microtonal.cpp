@@ -248,9 +248,8 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             tuning = x;
             break;
     }
-    //string text = string(line);
 
-    tmpoctave[nline].text = reformatline(string(line));//text;
+    tmpoctave[nline].text = reformatline(string(line));
     tmpoctave[nline].tuning = tuning;
     tmpoctave[nline].type = type;
     tmpoctave[nline].x1 = x1;

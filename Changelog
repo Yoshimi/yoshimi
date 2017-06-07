@@ -3,6 +3,8 @@ yoshimi 1.5.2 M
 2017-6-7 Will
 * Scales no longer suffer from cumulative errors :)
 * Removed some (now unnecessary) mutex locks.
+* Direct access tunings and keymaps now CSV,
+  and reformatted to standard scales.
 
 2017-6-5 Will
 * Improved accuracy of scale number<=>text conversions.
