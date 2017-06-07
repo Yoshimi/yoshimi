@@ -88,6 +88,7 @@ class Microtonal : private MiscFuncs
         bool loadXML(string filename);
 
     private:
+        string reformatline(string text);
         int linetotunings(unsigned int nline, const char *line);
         int loadline(FILE *file, char *line); // loads a line from the text file,
                                               // ignoring the lines beggining with "!"
@@ -99,6 +100,7 @@ class Microtonal : private MiscFuncs
                                 // or 2.0 for one octave
             unsigned int x1; // the real tunning is x1 / x2
             unsigned int x2;
+            string text;
         } octave[MAX_OCTAVE_SIZE],
           tmpoctave[MAX_OCTAVE_SIZE];
 

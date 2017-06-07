@@ -27,6 +27,7 @@
 
 #include <cmath>
 #include <iostream>
+# include <algorithm>
 #include <limits.h>
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -56,6 +57,7 @@ void Microtonal::defaults(void)
 
     for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
+        octave[i].text = "";
         octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
         octave[i].type = tmpoctave[i].type = 1;
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
@@ -170,11 +172,33 @@ float Microtonal::getNoteFreq(int note, int keyshift)
             freq /= oct;
         if (scaleshift != 0)
             freq /= octave[scaleshift - 1].tuning;
-//	fprintf(stderr,"note=%d freq=%.3f cents=%d\n",note,freq,(int)floor(log(freq/PAfreq)/log(2.0)*1200.0+0.5));
         freq *= globalfinedetunerap;
         return freq * rap_keyshift;
     }
 }
+
+
+string Microtonal::reformatline(string text)
+{
+    text.erase(remove_if( text.begin(), text.end(),
+     [](char c){ return (c =='\r' || c =='\t' || c == ' ' || c == '\n');}), text.end() );
+
+    size_t found;
+    found = text.find('.');
+    if (found < 4)
+    {
+        string tmp (4 - found, '0'); // leading zeros
+        text = tmp + text;
+    }
+    found = text.size();
+    if ( found < 11)
+    {
+        string tmp  (11 - found, '0'); // trailing zeros
+        text += tmp;
+    }
+    return text;
+}
+
 
 // Convert a line to tunings; returns -1 if it ok
 int Microtonal::linetotunings(unsigned int nline, const char *line)
@@ -192,7 +216,6 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
         }
         else
         {   // double number case
-            //sscanf(line, "%lf", &x);
             x = stod(string(line));
             if (x < 0.000001)
                 return 1;
@@ -212,16 +235,6 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
     if (x1 <= 0)
         x1 = 1; // not allow zero frequency sounds (consider 0 as 1)
 
-    // convert to float if the number are too big
-
-    //this seems to be unecessary!
-
-   /* if ((type==2) && ((x1 > (128 * 128 * 128 - 1)) || (x2 > (128 * 128* 128 - 1))))
-    {
-        type = 1;
-        x = ((float)x1) / x2;
-    }*/
-
     switch (type)
     {
         case 1:
@@ -235,7 +248,9 @@ int Microtonal::linetotunings(unsigned int nline, const char *line)
             tuning = x;
             break;
     }
+    //string text = string(line);
 
+    tmpoctave[nline].text = reformatline(string(line));//text;
     tmpoctave[nline].tuning = tuning;
     tmpoctave[nline].type = type;
     tmpoctave[nline].x1 = x1;
@@ -280,6 +295,7 @@ int Microtonal::texttotunings(const char *text)
     octavesize = nl;
     for (i = 0; i < octavesize; ++i)
     {
+        octave[i].text = tmpoctave[i].text;
         octave[i].tuning = tmpoctave[i].tuning;
         octave[i].type = tmpoctave[i].type;
         octave[i].x1 = tmpoctave[i].x1;
@@ -338,7 +354,13 @@ void Microtonal::tuningtoline(int n, char *line, int maxn)
         return;
     }
     if (octave[n].type == 1)
-        snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
+    {
+        string text = octave[n].text;
+        if (text > " ")
+            snprintf(line, maxn, "%s", text.c_str());
+        else
+            snprintf(line, maxn, "%04d.%06d", octave[n].x1,octave[n].x2);
+    }
     if (octave[n].type == 2)
         snprintf(line, maxn, "%d/%d", octave[n].x1, octave[n].x2);
 }
@@ -390,6 +412,7 @@ int Microtonal::loadscl(string filename)
     octavesize = nnotes;
     for (int i = 0; i < octavesize; ++i)
     {
+        octave[i].text = tmpoctave[i].text;
         octave[i].tuning = tmpoctave[i].tuning;
         octave[i].type = tmpoctave[i].type;
         octave[i].x1 = tmpoctave[i].x1;
@@ -480,7 +503,8 @@ int Microtonal::loadkbm(string filename)
 
     PAfreq = tmpPAfreq;
 
-    // the scale degree(which is the octave) is not loaded, it is obtained by the tunnings with getoctavesize() method
+    // the scale degree(which is the octave) is not loaded
+    // it is obtained by the tunnings with getoctavesize() method
     if (loadline(file, &tmp[0]))
         return 2;
 
@@ -539,6 +563,7 @@ void Microtonal::add2XML(XMLwrapper *xml)
             xml->beginbranch("DEGREE", i);
             if (octave[i].type == 1)
             {
+                xml->addparstr("cents_text",octave[i].text);
                 xml->addpardouble("cents", octave[i].tuning);
             }
             if (octave[i].type == 2)
@@ -592,8 +617,15 @@ void Microtonal::getfromXML(XMLwrapper *xml)
             {
                 if (!xml->enterbranch("DEGREE", i))
                     continue;
+                string text = xml->getparstr("cents_text");
                 octave[i].x2 = 0;
-                octave[i].tuning = xml->getpardouble("cents", octave[i].tuning);
+                    if (text > " ")
+                {
+                    octave[i].text = reformatline(text);
+                    octave[i].tuning = pow(2.0, stod(text) / 1200.0);
+                }
+                else
+                    octave[i].tuning = xml->getpardouble("cents", octave[i].tuning);
                 octave[i].x1 = xml->getpar("numerator", octave[i].x1, 0, INT_MAX);
                 octave[i].x2 = xml->getpar("denominator", octave[i].x2, 0, INT_MAX);
 

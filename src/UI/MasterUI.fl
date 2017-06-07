@@ -488,10 +488,8 @@ paramsui->Show(3);}
             callback {\#
     if (fl_choice("Set scales to the defaults?", NULL, "No", "Yes") > 1)
     {
-        synth->actionLock(lockmute);
         synth->microtonal.defaults();
         synth->setAllPartMaps();
-        synth->actionLock(unlock);
         if (NULL != microtonalui)
             delete microtonalui;
         microtonalui = new MicrotonalUI(&synth->microtonal, synth);
@@ -1480,10 +1478,8 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   }
   Function {do_load_scale(string fname)} {} {
     code {//
-    synth->actionLock(lockmute);
     synth->microtonal.defaults(); // clear all parameters
     bool result = synth->microtonal.loadXML(fname);
-    synth->actionLock(unlock);
     if (NULL != microtonalui)
         delete microtonalui;
     microtonalui = new MicrotonalUI(&synth->microtonal, synth);
