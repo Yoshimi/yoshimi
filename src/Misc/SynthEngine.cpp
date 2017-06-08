@@ -481,6 +481,14 @@ void *SynthEngine::RBPthread(void)
                         ; // to do
                         break;
 
+                    /*case 8: // load named scale via miscMsg
+                        microtonal.defaults();
+                        name = miscMsgPop(block.data[2]);
+                        if (microtonal.loadXML(name))
+                            addHistory(name, 3);
+                        setAllPartMaps();
+                        break;*/
+
                     case 10: // set global fine detune
                         microtonal.Pglobalfinedetune = block.data[1];
                         setAllPartMaps();

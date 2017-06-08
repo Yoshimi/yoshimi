@@ -58,7 +58,7 @@ class MicrotonalUI {selected : {private MiscFuncs}
   Function {make_window()} {} {
     Fl_Window microtonaluiwindow {
       label Scales
-      xywh {230 20 410 485} type Double hide
+      xywh {963 511 410 485} type Double hide
     } {
       Fl_Group {} {
         tooltip {Center where the note's freqs. are turned upside-down} xywh {249 2 155 45} box ENGRAVED_FRAME
@@ -97,7 +97,7 @@ send_data(3, o->value(), 0xc0);}
 send_data(64, 0, 0xc0);}
           comment {o->value() will generate miscMsg}
           xywh {10 64 285 25} labelfont 1 labelsize 11 align 5
-          code0 {o->insert(microtonal->Pname.c_str());}
+          code0 {o->value(microtonal->Pname.c_str());}
         }
         Fl_Input commentinput {
           label {Comment:}
@@ -105,7 +105,7 @@ send_data(64, 0, 0xc0);}
 send_data(65, 0, 0xc0);}
           comment {o->value() will generate miscMsg}
           xywh {10 104 391 25} labelfont 1 labelsize 11 align 5
-          code0 {o->insert(microtonal->Pcomment.c_str());}
+          code0 {o->value(microtonal->Pcomment.c_str());}
         }
         Fl_Spinner scaleShift {
           label Shift
@@ -437,6 +437,18 @@ switch (control)
         mappinginput->value(miscMsgPop(par2).c_str());
         mapsizeoutput->value(insert);
         break;
+        
+    case 64:
+        nameinput->value(miscMsgPop(par2).c_str());
+        break;
+    case 65:
+        commentinput->value(miscMsgPop(par2).c_str());
+        break;
+        
+   case 96:
+       Hide();
+       make_window();
+       break;
 }} {}
   }
   Function {updateTuningsInput()} {} {

@@ -73,6 +73,7 @@ class InterChange : private MiscFuncs
         static void *_sortResultsThread(void *arg);
         pthread_t  sortResultsThreadHandle;
         void transfertext(CommandBlock *getData);
+        string formatScales(string text);
         string resolveVector(CommandBlock *getData);
         string resolveMicrotonal(CommandBlock *getData);
         string resolveMain(CommandBlock *getData);

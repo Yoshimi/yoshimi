@@ -248,51 +248,26 @@ void InterChange::transfertext(CommandBlock *getData)
     //cout << text << endl;
     if (npart == 232)
     {
-        text.erase(remove(text.begin(), text.end(), ' '), text.end());
-        string delimiters = ",";
-        size_t current;
-        size_t next = -1;
-        size_t found;
-        string word;
-        string newtext = "";
-        do
-        {
-            current = next + 1;
-            next = text.find_first_of( delimiters, current );
-            word = text.substr( current, next - current );
-
-            found = word.find('.');
-            if (found != string::npos)
-            {
-                if (found < 4)
-                {
-                    string tmp (4 - found, '0'); // leading zeros
-                    word = tmp + word;
-                }
-                found = word.size();
-                if ( found < 11)
-                {
-                    string tmp  (11 - found, '0'); // trailing zeros
-                    word += tmp;
-                }
-            }
-            newtext += word;
-            if (next != string::npos)
-                newtext += "\n";
-        }
-        while (next != string::npos);
-        text = newtext;
         switch(control)
         {
             case 32:
+                text = formatScales(text);
                 synth->microtonal.texttotunings(text.c_str());
                 synth->setAllPartMaps();
                 getData->data.insert = synth->microtonal.getoctavesize();
                 break;
             case 33:
+                text = formatScales(text);
                 synth->microtonal.texttomapping(text.c_str());
                 synth->setAllPartMaps();
                 getData->data.insert = synth->microtonal.Pmapsize;
+                break;
+
+            case 64:
+                synth->microtonal.Pname = text;
+                break;
+            case 65:
+                synth->microtonal.Pcomment = text;
                 break;
         }
     }
@@ -303,6 +278,45 @@ void InterChange::transfertext(CommandBlock *getData)
             getData->data.par2 = miscMsgPush(text); // pass it on
             jack_ringbuffer_write(toGUI, (char*) getData->bytes, commandSize);
         }
+}
+
+
+string InterChange::formatScales(string text)
+{
+    text.erase(remove(text.begin(), text.end(), ' '), text.end());
+    string delimiters = ",";
+    size_t current;
+    size_t next = -1;
+    size_t found;
+    string word;
+    string newtext = "";
+    do
+    {
+        current = next + 1;
+        next = text.find_first_of( delimiters, current );
+        word = text.substr( current, next - current );
+
+        found = word.find('.');
+        if (found != string::npos)
+        {
+            if (found < 4)
+            {
+                string tmp (4 - found, '0'); // leading zeros
+                word = tmp + word;
+            }
+            found = word.size();
+            if ( found < 11)
+            {
+                string tmp  (11 - found, '0'); // trailing zeros
+                word += tmp;
+            }
+        }
+        newtext += word;
+        if (next != string::npos)
+            newtext += "\n";
+    }
+    while (next != string::npos);
+    return newtext;
 }
 
 
@@ -2903,6 +2917,10 @@ void InterChange::commandMicrotonal(CommandBlock *getData)
             break;
         case 65: // Comments
             showValue = false; // done eslewhere
+            break;
+
+        case 96:
+            synth->microtonal.defaults();
             break;
     }
 
