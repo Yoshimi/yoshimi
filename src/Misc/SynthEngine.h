@@ -83,6 +83,7 @@ class SynthEngine : private SynthHelper, MiscFuncs
         bool loadXML(string filename);
         void applyparameters(void);
         int loadPatchSetAndUpdate(string filename);
+        void loadMicrotonal(unsigned char msg, unsigned char type);
         bool installBanks(int instance);
         bool saveBanks(int instance);
         void addHistory(string name, int group);

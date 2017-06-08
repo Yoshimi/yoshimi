@@ -3004,6 +3004,9 @@ void InterChange::commandMain(CommandBlock *getData)
             if (write)
                 synth->allStop(4 | (par2 << 8) | (kititem << 16));
             break;
+        case 88: // load scale
+            synth->writeRBP(6, 6, par2);
+            break;
         case 96: // master reset
             if (write)
             {

@@ -417,7 +417,6 @@ void *SynthEngine::RBPthread(void)
     unsigned int read;
     unsigned int found;
     unsigned int tries;
-    unsigned char tmp;
     string name;
     while (Runtime.runSynth)
     {
@@ -460,34 +459,34 @@ void *SynthEngine::RBPthread(void)
                         break;
 
                     case 6: // cease all sound or load named file via miscMsg
-                        tmp = block.data[1] & 0xff;
-                        if (tmp == 1)
+                        switch(block.data[1] & 0xff)
                         {
-                            actionLock(lockmute);
-                            ShutUp();
-                            actionLock(unlock);
+                            case 1:
+                                actionLock(lockmute);
+                                ShutUp();
+                                actionLock(unlock);
+                                break;
+
+                            case 2:
+                                resetAll();
+                                break;
+
+                            case 3: // load patchset
+                                loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
+                                break;
+
+                            case 4: // load vector
+                                loadVectorAndUpdate(block.data[3], block.data[2]);
+                                break;
+                            case 5: // load state
+                                ; //to do
+                                break;
+
+                            case 6: // load scale
+                                loadMicrotonal(block.data[2], 0);
+                                break;
                         }
-                        else if(tmp == 2)
-                            resetAll();
-
-                        else if(tmp == 3) // patchset
-                            loadPatchSetAndUpdate(miscMsgPop(block.data[2]));
-
-                        else if (tmp == 4) // vector
-                            loadVectorAndUpdate(block.data[3], block.data[2]);
                         break;
-
-                    case 7: // load named state via miscMsg
-                        ; // to do
-                        break;
-
-                    /*case 8: // load named scale via miscMsg
-                        microtonal.defaults();
-                        name = miscMsgPop(block.data[2]);
-                        if (microtonal.loadXML(name))
-                            addHistory(name, 3);
-                        setAllPartMaps();
-                        break;*/
 
                     case 10: // set global fine detune
                         microtonal.Pglobalfinedetune = block.data[1];
@@ -2477,6 +2476,38 @@ int SynthEngine::loadPatchSetAndUpdate(string fname)
             GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
     }
     return result;
+}
+
+
+void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type)
+{
+    string fname = miscMsgPop(msg);
+    bool ok = true;
+    switch (type)
+    {
+        case 0: // scale
+            microtonal.defaults();
+            if (!microtonal.loadXML(fname))
+                ok = false;
+            setAllPartMaps();
+            break;
+        case 1: // .scl
+            microtonal.defaults();
+            if (!microtonal.loadscl(fname))
+                ok = false;
+            break;
+        case 2: // .kbm
+            microtonal.defaults();
+            if (!microtonal.loadkbm(fname))
+                ok = false;
+            break;
+    }
+    if (!ok)
+    {
+        Runtime.Log("Could not load " + fname);
+        if (Runtime.showGui)
+            GuiThreadMsg::sendMessage(this, GuiThreadMsg::GuiAlert,miscMsgPush("Could not load " + fname));
+    }
 }
 
 

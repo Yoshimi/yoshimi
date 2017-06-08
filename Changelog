@@ -3,6 +3,7 @@ yoshimi 1.5.2 M
 2017-6-8 Will
 * BugFix Loading scales wasn't updating name/comment.
 * Direct access - more scales controls available.
+* Direct access scale loading in place.
 
 2017-6-7 Will
 * Scales no longer suffer from cumulative errors :)

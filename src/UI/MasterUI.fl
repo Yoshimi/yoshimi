@@ -5,7 +5,7 @@ code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
 }
 
-comment {MasterUI.cc} {in_source not_in_header
+comment {MasterUI.cc} {selected in_source not_in_header
 }
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {selected : {private MiscFuncs}
+class MasterUI {: {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1233,6 +1233,11 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
         case 48:
         case 49:
             updatepanel();
+            break;
+            
+        case 88:
+            microtonalui->Hide();
+            microtonalui->make_window();
             break;
 
 	case 96:
