@@ -1,5 +1,9 @@
 yoshimi 1.5.2 M
 
+2017-6-9 Will
+* BugFix: miscMsgPop wasn't checking index range.
+* Loading patch sets always zeros 'Solo' channel number.
+
 2017-6-8 Will
 * BugFix Loading scales wasn't updating name/comment.
 * Direct access - more scales controls available.

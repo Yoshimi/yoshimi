@@ -773,11 +773,17 @@ void Config::Log(string msg, char tostderr)
         return;
     if (showGui && !(tostderr & 1) && toConsole)
         LogList.push_back(msg);
-    else
+    else if (!tostderr & 1)
     {
         cout << msg << endl;
         cout << CLIstring;
         cout << flush;
+    }
+    else
+    {
+        cerr << msg << endl;
+        cerr << CLIstring;
+        cerr << flush;
     }
 }
 

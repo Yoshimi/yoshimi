@@ -5,7 +5,7 @@ code_name {.cc}
 comment {MasterUI.h} {not_in_source in_header
 }
 
-comment {MasterUI.cc} {selected in_source not_in_header
+comment {MasterUI.cc} {in_source not_in_header
 }
 
 comment {Original ZynAddSubFX author Nasca Octavian Paul
@@ -98,7 +98,7 @@ decl {\#include "MidiLearnUI.h"} {public local
 decl {extern bool mainCreateNewInstance(unsigned int forceId);} {private global
 }
 
-class MasterUI {: {private MiscFuncs}
+class MasterUI {selected : {private MiscFuncs}
 } {
   Function {MasterUI(SynthEngine *_synth)} {} {
     code {//
@@ -1484,14 +1484,15 @@ collect_data(synth, value, (Fl::event_button() | type), control, part, 0xff, eng
   Function {do_load_scale(string fname)} {} {
     code {//
     synth->microtonal.defaults(); // clear all parameters
-    bool result = synth->microtonal.loadXML(fname);
+    if (!synth->microtonal.loadXML(fname))
+    {
+        fl_alert("Failed to load scale settings file");
+        return;
+    }
     if (NULL != microtonalui)
         delete microtonalui;
     microtonalui = new MicrotonalUI(&synth->microtonal, synth);
-    if (!result)
-        fl_alert("Failed to load scale settings file");
-    else
-        synth->addHistory(fname, 3);} {}
+    synth->addHistory(fname, 3);} {}
   }
   Function {do_load_master(bool updatehistory, const char* file)} {} {
     code {//

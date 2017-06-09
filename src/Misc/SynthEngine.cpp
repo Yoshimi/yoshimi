@@ -2493,12 +2493,12 @@ void SynthEngine::loadMicrotonal(unsigned char msg, unsigned char type)
             break;
         case 1: // .scl
             microtonal.defaults();
-            if (!microtonal.loadscl(fname))
+            if (microtonal.loadscl(fname) != 0)
                 ok = false;
             break;
         case 2: // .kbm
             microtonal.defaults();
-            if (!microtonal.loadkbm(fname))
+            if (!microtonal.loadkbm(fname) != 0)
                 ok = false;
             break;
     }
@@ -3213,6 +3213,7 @@ bool SynthEngine::getfromXML(XMLwrapper *xml)
     setPkeyshift(xml->getpar("key_shift", Pkeyshift, MIN_KEY_SHIFT + 64, MAX_KEY_SHIFT + 64));
     Runtime.channelSwitchType = xml->getpar("channel_switch_type", Runtime.channelSwitchType, 0, 3);
     Runtime.channelSwitchCC = xml->getpar127("channel_switch_CC", Runtime.channelSwitchCC);
+    Runtime.channelSwitchValue = 0;
 
     partonoffWrite(0, 0); // why?;
     for (int npart = 0; npart < NUM_MIDI_PARTS; ++npart)

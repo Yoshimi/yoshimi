@@ -17,7 +17,7 @@
     You should have received a copy of the GNU General Public License
     along with yoshimi.  If not, see <http://www.gnu.org/licenses/>
 
-    Modifed February 2017
+    Modifed June 2017
 */
 
 #include <sys/stat.h>
@@ -416,7 +416,7 @@ int MiscFuncs::miscMsgPush(string _text)
     }
     if (it == miscList.end())
     {
-        cout << "List full :(" << endl;
+        cerr << "List full :(" << endl;
         idx = -1;
     }
     //cout << "List size " << int(idx) << endl;
@@ -428,6 +428,8 @@ int MiscFuncs::miscMsgPush(string _text)
 
 string MiscFuncs::miscMsgPop(int _pos)
 {
+    if (_pos >= 255)
+        return "";
     sem_wait(&miscmsglock);
 
     int pos = _pos;
