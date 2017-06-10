@@ -1,5 +1,5 @@
 This is intended for direct transfers of text between non-RT threads. Although sychronised and using miscMsg, these do not enter the Command functions at all.
 
-To identify such tranfers Parameter is set to 0xf0 (240). Nowhere else does this value appear. Once recognised it is passed to a separate function that does all the decoding.
+To identify such transfers Parameter is set to 0xf0 (240). Nowhere else does this value appear. Once recognised it is passed to a separate function that does all the decoding.
 
 It is used mostly for setting names, but also for scales and keyboard mappings, which are string representations of number lists.
