@@ -57,7 +57,7 @@ void Microtonal::defaults(void)
 
     for (int i = 0; i < MAX_OCTAVE_SIZE; ++i)
     {
-        octave[i].text = "";
+        octave[i].text = reformatline(to_string((i % octavesize + 1) * 100)+ ".0");
         octave[i].tuning = tmpoctave[i].tuning = pow(2.0, (i % octavesize + 1) / 12.0);
         octave[i].type = tmpoctave[i].type = 1;
         octave[i].x1 = tmpoctave[i].x1 = (i % octavesize + 1) * 100;
@@ -563,7 +563,11 @@ void Microtonal::add2XML(XMLwrapper *xml)
             if (octave[i].type == 1)
             {
                 xml->addparstr("cents_text",octave[i].text);
-                xml->addpardouble("cents", octave[i].tuning);
+                xml->addparreal("cents", octave[i].tuning);
+                /*
+                 * This is downgraded to preserve compatibility
+                 * with both Zyn and older Yoshi versions
+                 */
             }
             if (octave[i].type == 2)
             {
@@ -618,13 +622,16 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                     continue;
                 string text = xml->getparstr("cents_text");
                 octave[i].x2 = 0;
-                    if (text > " ")
+                if (text > " ")
                 {
                     octave[i].text = reformatline(text);
                     octave[i].tuning = pow(2.0, stod(text) / 1200.0);
                 }
                 else
+                {
+                    octave[i].text = "";
                     octave[i].tuning = xml->getpardouble("cents", octave[i].tuning);
+                }
                 octave[i].x1 = xml->getpar("numerator", octave[i].x1, 0, INT_MAX);
                 octave[i].x2 = xml->getpar("denominator", octave[i].x2, 0, INT_MAX);
 
