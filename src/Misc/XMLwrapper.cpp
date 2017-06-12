@@ -27,6 +27,7 @@
 
 #include <zlib.h>
 #include <sstream>
+#include <iostream>
 
 #include "Misc/Config.h"
 #include "Misc/XMLwrapper.h"
@@ -381,7 +382,11 @@ void XMLwrapper::addpar(const string& name, int val)
 
 void XMLwrapper::addparreal(const string& name, float val)
 {
-    addparams2("par_real","name", name.c_str(), "value", asLongString(val));
+    union { float in; uint32_t out; } convert;
+    char buf[11];
+    convert.in = val;
+    sprintf(buf, "0x%8X", convert.out);
+    addparams3("par_real", "name", name.c_str(), "value", asLongString(val), "exact_value", buf);
 }
 
 
@@ -657,7 +662,15 @@ float XMLwrapper::getparreal(const string& name, float defaultpar)
                            MXML_DESCEND_FIRST);
     if (!node)
         return defaultpar;
-    const char *strval = mxmlElementGetAttr(node, "value");
+
+    const char *strval = mxmlElementGetAttr(node, "exact_value");
+    if (strval != NULL) {
+        union { float out; uint32_t in; } convert;
+        sscanf(strval+2, "%x", &convert.in);
+        return convert.out;
+    }
+
+    strval = mxmlElementGetAttr(node, "value");
     if (!strval)
         return defaultpar;
     return string2float(string(strval));
@@ -667,30 +680,6 @@ float XMLwrapper::getparreal(const string& name, float defaultpar)
 float XMLwrapper::getparreal(const string& name, float defaultpar, float min, float max)
 {
     float result = getparreal(name, defaultpar);
-    if (result < min)
-        result = min;
-    else if (result > max)
-        result = max;
-    return result;
-}
-
-
-double XMLwrapper::getpardouble(const string& name, double defaultpar)
-{
-    node = mxmlFindElement(peek(), peek(), "par_real", "name", name.c_str(),
-                           MXML_DESCEND_FIRST);
-    if (!node)
-        return defaultpar;
-    const char *strval = mxmlElementGetAttr(node, "value");
-    if (!strval)
-        return defaultpar;
-    return string2double(string(strval));
-}
-
-
-double XMLwrapper::getpardouble(const string& name, double defaultpar, double min, double max)
-{
-    double result = getpardouble(name, defaultpar);
     if (result < min)
         result = min;
     else if (result > max)
@@ -722,6 +711,18 @@ mxml_node_t *XMLwrapper::addparams2(const string& name, const string& par1, cons
     mxml_node_t *element = mxmlNewElement(node, name.c_str());
     mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
     mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
+    return element;
+}
+
+
+mxml_node_t *XMLwrapper::addparams3(const string& name, const string& par1, const string& val1,
+                                    const string& par2, const string& val2,
+                                    const string& par3, const string& val3)
+{
+    mxml_node_t *element = mxmlNewElement(node, name.c_str());
+    mxmlElementSetAttr(element, par1.c_str(), val1.c_str());
+    mxmlElementSetAttr(element, par2.c_str(), val2.c_str());
+    mxmlElementSetAttr(element, par3.c_str(), val3.c_str());
     return element;
 }
 

@@ -114,10 +114,6 @@ class XMLwrapper : private MiscFuncs
         float getparreal(const string& name, float defaultpar,
                          float min, float max);
 
-        double getpardouble(const string& name, double defaultpar);
-        double getpardouble(const string& name, double defaultpar,
-                         double min, double max);
-
         bool minimal; // false if all parameters will be stored
 
         struct {
@@ -151,6 +147,10 @@ class XMLwrapper : private MiscFuncs
         // adds params like this: <name par1="val1" par2="val2">, returns the node
         mxml_node_t *addparams2(const string& name, const string& par1, const string& val1,
                                 const string& par2, const string& val2);
+
+        mxml_node_t *addparams3(const string& name, const string& par1, const string& val1,
+                                const string& par2, const string& val2,
+                                const string& par3, const string& val3);
 
         // this is used to store the parents
         mxml_node_t *parentstack[STACKSIZE];

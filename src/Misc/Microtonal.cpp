@@ -630,7 +630,7 @@ void Microtonal::getfromXML(XMLwrapper *xml)
                 else
                 {
                     octave[i].text = "";
-                    octave[i].tuning = xml->getpardouble("cents", octave[i].tuning);
+                    octave[i].tuning = xml->getparreal("cents", octave[i].tuning);
                 }
                 octave[i].x1 = xml->getpar("numerator", octave[i].x1, 0, INT_MAX);
                 octave[i].x2 = xml->getpar("denominator", octave[i].x2, 0, INT_MAX);

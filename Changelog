@@ -1,5 +1,10 @@
 yoshimi 1.5.2 M
 
+2017-6-12 Will
+* Further refinements to scales accuracy
+  (no longer needing doubles)
+* Full XML float compatibility with ZynAddSubFX.
+
 2017-6-11 Will
 * Improved scales compatibility with old files/ versions.
 
